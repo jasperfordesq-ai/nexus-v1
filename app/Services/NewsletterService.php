@@ -427,12 +427,12 @@ class NewsletterService
         // Build unsubscribe URL
         if ($unsubscribeToken) {
             $unsubscribeUrl = $apiUrl . '/newsletter/unsubscribe?token=' . $unsubscribeToken;
-            $unsubscribeLinks = '<a href="' . $unsubscribeUrl . '" style="color: #6b7280; text-decoration: underline;">Unsubscribe</a>'
+            $unsubscribeLinks = '<a href="' . $unsubscribeUrl . '" style="color: #6b7280; text-decoration: underline;">' . __('emails.newsletter.unsubscribe') . '</a>'
                 . ' <span style="color: #d1d5db; margin: 0 8px;">|</span> '
-                . '<a href="' . $frontendUrl . '/settings" style="color: #6b7280; text-decoration: underline;">Manage Preferences</a>';
+                . '<a href="' . $frontendUrl . '/settings" style="color: #6b7280; text-decoration: underline;">' . __('emails.newsletter.manage_preferences') . '</a>';
         } else {
             $unsubscribeUrl = $frontendUrl . '/settings';
-            $unsubscribeLinks = '<a href="' . $unsubscribeUrl . '" style="color: #6b7280; text-decoration: underline;">Manage Email Preferences</a>';
+            $unsubscribeLinks = '<a href="' . $unsubscribeUrl . '" style="color: #6b7280; text-decoration: underline;">' . __('emails.newsletter.manage_email_preferences') . '</a>';
         }
 
         // Tracking pixel (1×1 transparent GIF) — uses unique tracking_token per queue entry

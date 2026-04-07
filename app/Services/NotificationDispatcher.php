@@ -438,8 +438,8 @@ class NotificationDispatcher
             $basePath = TenantContext::getSlugPrefix();
             $profileUrl = $baseUrl . $basePath . '/profile/' . $receiverUserId;
 
-            $displayName = $isAnonymous ? 'Someone' : htmlspecialchars($reviewerName);
-            $subject = "{$displayName} left you a {$rating}-star review on {$tenantName}";
+            $displayName = $isAnonymous ? __('emails.notification.someone') : htmlspecialchars($reviewerName);
+            $subject = __('emails.notification.review_subject', ['reviewer' => $displayName, 'rating' => $rating, 'community' => $tenantName]);
 
             $emailBody = self::buildReviewReceivedEmail(
                 htmlspecialchars($recipientName),
@@ -666,7 +666,8 @@ HTML;
                 $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? 'there');
                 $tenantName = htmlspecialchars(TenantContext::getSetting('site_name', 'Project NEXUS'));
 
-                $subject = "{$senderName} sent you {$amount} hour" . ($amount != 1 ? 's' : '') . " on {$tenantName}";
+                $amountDisplay = $amount . ' hour' . ($amount != 1 ? 's' : '');
+                $subject = __('emails.notification.credit_received_subject', ['sender' => $senderName, 'amount' => $amountDisplay, 'community' => $tenantName]);
                 $emailBody = self::buildCreditReceivedEmail($recipientName, $senderName, $amount, $description, $fullUrl, $tenantName);
                 $mailer->send($user->email, $subject, $emailBody);
             } else {
@@ -1001,6 +1002,10 @@ HTML;
     {
         $amountDisplay = $amount . ' hour' . ($amount != 1 ? 's' : '');
         $descriptionHtml = $description ? "<p style=\"margin:12px 0 0;padding:12px;background:#f0f0f0;border-radius:8px;font-style:italic;color:#555;\">\"{$description}\"</p>" : '';
+        $creditTitle = __('emails.notification.credit_received_title');
+        $creditGreeting = __('emails.common.greeting', ['name' => $recipientName]);
+        $creditBody = __('emails.notification.credit_sent_body', ['sender' => $senderName, 'amount' => $amountDisplay, 'community' => $tenantName]);
+        $viewWalletText = __('emails.notification.view_wallet');
 
         return <<<HTML
 <!DOCTYPE html>
@@ -1010,16 +1015,16 @@ HTML;
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
   <tr><td style="background:linear-gradient(135deg,#10b981,#059669);padding:32px;text-align:center;">
-    <h1 style="margin:0;color:#fff;font-size:24px;">You received time credits!</h1>
+    <h1 style="margin:0;color:#fff;font-size:24px;">{$creditTitle}</h1>
   </td></tr>
   <tr><td style="padding:32px;">
-    <p style="margin:0 0 16px;font-size:16px;color:#374151;">Hi {$recipientName},</p>
+    <p style="margin:0 0 16px;font-size:16px;color:#374151;">{$creditGreeting}</p>
     <p style="margin:0 0 16px;font-size:16px;color:#374151;">
-      <strong>{$senderName}</strong> has sent you <strong>{$amountDisplay}</strong> on {$tenantName}.
+      {$creditBody}
     </p>
     {$descriptionHtml}
     <div style="text-align:center;margin:28px 0;">
-      <a href="{$walletUrl}" style="display:inline-block;padding:14px 32px;background:#10b981;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:16px;">View Your Wallet</a>
+      <a href="{$walletUrl}" style="display:inline-block;padding:14px 32px;background:#10b981;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:16px;">{$viewWalletText}</a>
     </div>
   </td></tr>
   <tr><td style="padding:16px 32px;background:#f9fafb;border-top:1px solid #e5e7eb;text-align:center;">
@@ -1064,11 +1069,13 @@ COMMENT;
         $sentByText = __('emails.notification.sent_by', ['community' => $tenantName]);
         $allRightsReserved = __('emails.footer.all_rights_reserved');
         $viewProfileText = __('emails.notification.view_profile');
+        $reviewGreeting = __('emails.common.greeting', ['name' => $recipientName]);
+        $reviewTitle = __('emails.notification.review_title');
 
         return <<<HTML
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>New Review Received</title></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>{$reviewTitle}</title></head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f3f4f6; padding: 40px 20px;">
         <tr>
@@ -1076,13 +1083,13 @@ COMMENT;
                 <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
                     <tr>
                         <td style="background: {$gradient}; padding: 32px 24px; text-align: center;">
-                            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 700;">New Review Received!</h1>
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 700;">{$reviewTitle}</h1>
                             <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$tenantName}</p>
                         </td>
                     </tr>
                     <tr>
                         <td style="padding: 32px 24px 16px;">
-                            <p style="margin: 0; font-size: 18px; color: #111827;">Hi {$recipientName},</p>
+                            <p style="margin: 0; font-size: 18px; color: #111827;">{$reviewGreeting}</p>
                         </td>
                     </tr>
                     <tr>

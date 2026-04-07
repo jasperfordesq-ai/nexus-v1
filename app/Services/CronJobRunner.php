@@ -342,7 +342,7 @@ class CronJobRunner
             $items = array_map(fn($r) => (array) $r, DB::select($itemsSql, [$userId, $frequency]));
 
             // Generate Email Body
-            $subject = "Your $frequency Digest from Project NEXUS";
+            $subject = __('emails.digest.subject', ['frequency' => $frequency]);
             $body = $this->generateEmailHtml($user, $items, $frequency);
 
             // Create mailer with tenant context for correct SMTP credentials

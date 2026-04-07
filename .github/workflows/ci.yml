@@ -396,6 +396,9 @@ jobs:
       - name: "BLOCKING: Check for translation key mismatches"
         run: node scripts/check-i18n-drift.mjs
 
+      - name: "BLOCKING: Check for hardcoded strings in email templates"
+        run: bash scripts/check-i18n.sh
+
 
   # ─────────────────────────────────────────────────────────────────
   # Stage 6b: SPDX/AGPL License Compliance Check

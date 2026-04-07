@@ -147,14 +147,25 @@
     "review_request": "Review Request"
   },
   "newsletter": {
-    "subscriber_notice": "You received this email because you're subscribed to the {{community}} newsletter."
+    "subscriber_notice": "You received this email because you're subscribed to the {{community}} newsletter.",
+    "unsubscribe": "Unsubscribe",
+    "manage_preferences": "Manage Preferences",
+    "manage_email_preferences": "Manage Email Preferences"
   },
   "notification": {
     "sent_by": "This email was sent by {{community}}",
-    "view_profile": "View Your Profile"
+    "view_profile": "View Your Profile",
+    "view_wallet": "View Your Wallet",
+    "review_subject": "{{reviewer}} left you a {{rating}}-star review on {{community}}",
+    "review_title": "New Review Received!",
+    "credit_received_subject": "{{sender}} sent you {{amount}} on {{community}}",
+    "credit_received_title": "You received time credits!",
+    "credit_sent_body": "<strong>{{sender}}</strong> has sent you <strong>{{amount}}</strong> on {{community}}.",
+    "someone": "Someone"
   },
   "digest": {
     "title": "Your {{frequency}} Digest",
+    "subject": "Your {{frequency}} Digest from Project NEXUS",
     "greeting": "Hello {{name}},",
     "intro": "Here is a summary of what you missed on Project NEXUS:",
     "opted_in_notice": "You received this email because you opted for a {{frequency}} summary.",

@@ -59,6 +59,8 @@ CLAUDE.md
 !/scripts/maintenance.sh
 !/scripts/safe-deploy.sh
 !/scripts/refresh-schema-dump.sh
+!/scripts/check-i18n.sh
+!/scripts/check-i18n-drift.mjs
 
 # ─── Deploy & Production Config ───────────────────────────────────────────────
 compose.prod.yml
