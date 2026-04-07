@@ -67,4 +67,68 @@ class JobFeedController extends BaseApiController
             'Cache-Control' => 'public, max-age=900',
         ]);
     }
+
+    /**
+     * GET /api/v2/jobs/feed/indeed.xml — Indeed XML feed format.
+     *
+     * Returns XML in Indeed's expected feed format for job syndication.
+     * Cached for 15 minutes per tenant.
+     */
+    public function indeedXml(): Response
+    {
+        $tenantId = TenantContext::getId();
+
+        if (!TenantContext::hasFeature('job_vacancies')) {
+            return response('<?xml version="1.0" encoding="UTF-8"?><source></source>', 403)
+                ->header('Content-Type', 'application/xml; charset=UTF-8');
+        }
+
+        $jobs = \App\Models\JobVacancy::where('job_vacancies.tenant_id', $tenantId)
+            ->where('job_vacancies.status', 'open')
+            ->leftJoin('organizations as o', 'job_vacancies.organization_id', '=', 'o.id')
+            ->select('job_vacancies.*', 'o.name as organization_name')
+            ->orderByDesc('job_vacancies.created_at')
+            ->limit(100)
+            ->get();
+
+        $baseUrl = config('app.url', 'https://app.project-nexus.ie');
+
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<source>' . "\n";
+        $xml .= '  <publisher>Project NEXUS</publisher>' . "\n";
+        $xml .= '  <publisherurl>' . htmlspecialchars($baseUrl) . '</publisherurl>' . "\n";
+        $xml .= '  <lastBuildDate>' . now()->toRfc2822String() . '</lastBuildDate>' . "\n";
+
+        foreach ($jobs as $job) {
+            $xml .= '  <job>' . "\n";
+            $xml .= '    <title><![CDATA[' . ($job->title ?? '') . ']]></title>' . "\n";
+            $xml .= '    <date><![CDATA[' . ($job->created_at ? $job->created_at->format('D, d M Y H:i:s O') : '') . ']]></date>' . "\n";
+            $xml .= '    <referencenumber>' . $job->id . '</referencenumber>' . "\n";
+            $xml .= '    <url><![CDATA[' . $baseUrl . '/jobs/' . $job->id . ']]></url>' . "\n";
+            $xml .= '    <company><![CDATA[' . ($job->organization_name ?? 'Project NEXUS') . ']]></company>' . "\n";
+            $xml .= '    <city><![CDATA[' . ($job->location ?? '') . ']]></city>' . "\n";
+            $xml .= '    <description><![CDATA[' . substr($job->description ?? '', 0, 5000) . ']]></description>' . "\n";
+
+            if ($job->salary_min) {
+                $xml .= '    <salary><![CDATA[' . number_format($job->salary_min, 0) . ' - ' . number_format($job->salary_max ?? $job->salary_min, 0) . ']]></salary>' . "\n";
+            }
+
+            $typeMap = ['full_time' => 'fulltime', 'part_time' => 'parttime', 'one_off' => 'contract', 'flexible' => 'parttime'];
+            $xml .= '    <jobtype><![CDATA[' . ($typeMap[$job->commitment] ?? 'other') . ']]></jobtype>' . "\n";
+            $xml .= '    <category><![CDATA[' . ($job->category ?? 'General') . ']]></category>' . "\n";
+
+            if ($job->deadline) {
+                $xml .= '    <expirationdate><![CDATA[' . $job->deadline->format('D, d M Y') . ']]></expirationdate>' . "\n";
+            }
+
+            $xml .= '  </job>' . "\n";
+        }
+
+        $xml .= '</source>';
+
+        return response($xml, 200, [
+            'Content-Type' => 'application/xml; charset=utf-8',
+            'Cache-Control' => 'public, max-age=900',
+        ]);
+    }
 }

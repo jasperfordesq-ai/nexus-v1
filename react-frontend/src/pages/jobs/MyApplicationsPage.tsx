@@ -70,6 +70,7 @@ interface ApplicationInterview {
   interview_type: 'video' | 'phone' | 'in_person';
   status: 'proposed' | 'accepted' | 'declined';
   location_notes?: string | null;
+  meeting_link?: string | null;
   duration_mins?: number;
 }
 
@@ -360,8 +361,23 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
               </div>
             )}
             <div className='flex flex-wrap items-center gap-2 mt-2'>
-              {/* Meeting link / location */}
-              {application.interview.interview_type === 'video' && application.interview.location_notes && (
+              {/* Join Video Call — meeting_link (Jitsi auto-generated or custom) */}
+              {application.interview.meeting_link && (
+                <Button
+                  as='a'
+                  href={application.interview.meeting_link}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  size='sm'
+                  color='success'
+                  variant='flat'
+                  startContent={<Video size={14} aria-hidden="true" />}
+                >
+                  {t('interview.join_call', 'Join Video Call')}
+                </Button>
+              )}
+              {/* Fallback: Meeting link via location_notes for video interviews */}
+              {!application.interview.meeting_link && application.interview.interview_type === 'video' && application.interview.location_notes && (
                 <Button
                   as='a'
                   href={application.interview.location_notes}

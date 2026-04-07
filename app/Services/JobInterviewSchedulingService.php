@@ -63,14 +63,22 @@ class JobInterviewSchedulingService
                 continue;
             }
 
+            // Auto-generate Jitsi meeting link for video interviews if not provided
+            $meetingLink = $slot['meeting_link'] ?? null;
+            $interviewType = $slot['type'] ?? 'video';
+            if ($interviewType === 'video' && empty($meetingLink)) {
+                $roomName = 'nexus-interview-' . $tenantId . '-' . $jobId . '-' . time() . '-' . bin2hex(random_bytes(4));
+                $meetingLink = 'https://meet.jit.si/' . $roomName;
+            }
+
             $record = JobInterviewSlot::create([
                 'tenant_id' => $tenantId,
                 'job_id' => $jobId,
                 'employer_user_id' => $employerId,
                 'slot_start' => $slot['start'],
                 'slot_end' => $slot['end'],
-                'interview_type' => $slot['type'] ?? 'video',
-                'meeting_link' => $slot['meeting_link'] ?? null,
+                'interview_type' => $interviewType,
+                'meeting_link' => $meetingLink,
                 'location' => $slot['location'] ?? null,
                 'notes' => $slot['notes'] ?? null,
             ]);

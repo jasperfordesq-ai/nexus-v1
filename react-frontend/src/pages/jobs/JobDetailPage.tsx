@@ -91,6 +91,7 @@ import {
   Globe,
   Copy,
   Send,
+  Video,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -216,6 +217,7 @@ interface InlineInterview {
   interview_type: 'video' | 'phone' | 'in_person';
   status: 'proposed' | 'accepted' | 'declined';
   location_notes?: string | null;
+  meeting_link?: string | null;
   duration_mins?: number;
 }
 
@@ -297,6 +299,19 @@ function buildJobPostingSchema(vacancy: JobVacancy, tenantPath: (p: string) => s
 
   if (vacancy.skills_required) {
     schema['skills'] = vacancy.skills_required;
+  }
+
+  if (vacancy.organization?.name) {
+    schema['hiringOrganization'] = {
+      '@type': 'Organization',
+      'name': vacancy.organization.name,
+      ...(vacancy.organization.logo_url ? { 'logo': vacancy.organization.logo_url } : {}),
+    };
+  } else if (vacancy.creator?.name) {
+    schema['hiringOrganization'] = {
+      '@type': 'Organization',
+      'name': vacancy.creator.name,
+    };
   }
 
   return JSON.stringify(schema);
@@ -1079,6 +1094,21 @@ export function JobDetailPage() {
                 >
                   {t('share.email')}
                 </DropdownItem>
+                {typeof navigator !== 'undefined' && 'share' in navigator && (
+                  <DropdownItem
+                    key="native-share"
+                    startContent={<Send className="w-4 h-4" aria-hidden="true" />}
+                    onPress={() => {
+                      navigator.share({
+                        title: vacancy.title,
+                        text: `Check out this ${vacancy.type} opportunity: ${vacancy.title}`,
+                        url: window.location.origin + tenantPath(`/jobs/${vacancy.id}`),
+                      }).catch(() => {});
+                    }}
+                  >
+                    {t('share.native', 'Share...')}
+                  </DropdownItem>
+                )}
               </DropdownMenu>
             </Dropdown>
 
@@ -1314,9 +1344,26 @@ export function JobDetailPage() {
                     </span>
                   )}
                 </div>
+                {/* Join Video Call button — meeting_link (Jitsi auto-generated or custom) */}
+                {pendingInterview.meeting_link && (
+                  <div className="mt-2">
+                    <Button
+                      as="a"
+                      href={pendingInterview.meeting_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="sm"
+                      color="success"
+                      variant="flat"
+                      startContent={<Video className="w-3.5 h-3.5" aria-hidden="true" />}
+                    >
+                      {t('interview.join_call', 'Join Video Call')}
+                    </Button>
+                  </div>
+                )}
                 {pendingInterview.location_notes && (
                   <p className="text-sm text-theme-muted mt-1">
-                    {pendingInterview.interview_type === 'video' ? (
+                    {pendingInterview.interview_type === 'video' && !pendingInterview.meeting_link ? (
                       <a
                         href={pendingInterview.location_notes}
                         target="_blank"
@@ -1325,12 +1372,12 @@ export function JobDetailPage() {
                       >
                         {pendingInterview.location_notes}
                       </a>
-                    ) : (
+                    ) : pendingInterview.interview_type !== 'video' ? (
                       <span className="flex items-center gap-1">
                         <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
                         {pendingInterview.location_notes}
                       </span>
-                    )}
+                    ) : null}
                   </p>
                 )}
               </div>

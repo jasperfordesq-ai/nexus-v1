@@ -54,6 +54,7 @@ Route::get('/v2/config/algorithms', [\App\Http\Controllers\Api\AdminConfigContro
 // ============================================
 Route::get('/v2/jobs/feed.xml', [\App\Http\Controllers\Api\JobFeedController::class, 'rssFeed']);
 Route::get('/v2/jobs/feed.json', [\App\Http\Controllers\Api\JobFeedController::class, 'jsonFeed']);
+Route::get('/v2/jobs/feed/indeed.xml', [\App\Http\Controllers\Api\JobFeedController::class, 'indeedXml']);
 
 // ============================================
 // PUBLIC ROUTES — SEO metadata (no auth required)

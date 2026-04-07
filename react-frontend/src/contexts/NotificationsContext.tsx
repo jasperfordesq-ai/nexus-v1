@@ -458,6 +458,7 @@ function getToastConfig(type: string): { title: string } {
     job_offer_withdrawn: { title: t('job_offer_withdrawn', 'Offer Withdrawn') },
     job_alert_match: { title: t('job_alert_match', 'New Job Match') },
     job_interview_reminder: { title: t('job_interview_reminder', 'Interview Reminder') },
+    job_completion_credits: { title: t('job_completion_credits', 'Time Credits Earned!') },
   };
 
   return configs[type] || { title: t('default', 'Notification') };

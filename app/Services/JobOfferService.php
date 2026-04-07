@@ -12,6 +12,7 @@ use App\Models\JobOffer;
 use App\Models\Notification;
 use App\Services\RealtimeService;
 use App\Services\WebhookDispatchService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -148,6 +149,49 @@ class JobOfferService
             // Update vacancy status to filled
             if ($offer->application->vacancy) {
                 $offer->application->vacancy->update(['status' => 'filled']);
+            }
+
+            // Auto-credit time credits for timebank jobs
+            try {
+                $vacancy = $offer->application->vacancy;
+                if ($vacancy && $vacancy->type === 'timebank' && $vacancy->time_credits > 0) {
+                    $candidateId = (int) $offer->application->user_id;
+                    $creditAmount = (float) $vacancy->time_credits;
+                    $jobTitle = $vacancy->title ?? 'a timebank job';
+
+                    // Create transaction record
+                    \App\Models\Transaction::create([
+                        'sender_id'        => (int) $vacancy->user_id,
+                        'receiver_id'      => $candidateId,
+                        'amount'           => $creditAmount,
+                        'transaction_type' => 'job_completion',
+                        'description'      => "Time credits earned: {$jobTitle}",
+                        'status'           => 'completed',
+                    ]);
+
+                    // Update balances
+                    DB::table('users')
+                        ->where('id', $candidateId)
+                        ->where('tenant_id', $tenantId)
+                        ->increment('balance', $creditAmount);
+
+                    // Notify the candidate about their earned credits
+                    Notification::createNotification(
+                        $candidateId,
+                        "You earned {$creditAmount} time credits for completing {$jobTitle}!",
+                        '/wallet',
+                        'transaction'
+                    );
+                    RealtimeService::broadcastAndPush($candidateId, 'Time Credits Earned!', [
+                        'type'      => 'job_completion_credits',
+                        'amount'    => $creditAmount,
+                        'job_title' => $jobTitle,
+                        'message'   => "You earned {$creditAmount} time credits for completing {$jobTitle}!",
+                        'url'       => '/wallet',
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                Log::warning('JobOfferService::accept auto-credit failed', ['error' => $e->getMessage()]);
             }
 
             // Notify the job poster
