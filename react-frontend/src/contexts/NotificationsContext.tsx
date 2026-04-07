@@ -446,6 +446,18 @@ function getToastConfig(type: string): { title: string } {
     vol_hours_approved: { title: t('vol_hours_approved', 'Hours Approved') },
     vol_hours_declined: { title: t('vol_hours_declined', 'Hours Declined') },
     vol_opportunity_closed: { title: t('vol_opportunity_closed', 'Opportunity Closed') },
+    job_application_status: { title: t('job_application_status', 'Application Update') },
+    job_application: { title: t('job_application', 'Job Application') },
+    job_interview_proposed: { title: t('job_interview_proposed', 'Interview Requested') },
+    job_interview_accepted: { title: t('job_interview_accepted', 'Interview Accepted') },
+    job_interview_declined: { title: t('job_interview_declined', 'Interview Declined') },
+    job_interview_cancelled: { title: t('job_interview_cancelled', 'Interview Cancelled') },
+    job_offer_received: { title: t('job_offer_received', 'Job Offer Received!') },
+    job_offer_accepted: { title: t('job_offer_accepted', 'Offer Accepted') },
+    job_offer_rejected: { title: t('job_offer_rejected', 'Offer Rejected') },
+    job_offer_withdrawn: { title: t('job_offer_withdrawn', 'Offer Withdrawn') },
+    job_alert_match: { title: t('job_alert_match', 'New Job Match') },
+    job_interview_reminder: { title: t('job_interview_reminder', 'Interview Reminder') },
   };
 
   return configs[type] || { title: t('default', 'Notification') };

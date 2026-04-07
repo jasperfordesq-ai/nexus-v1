@@ -10,6 +10,8 @@ use App\Core\TenantContext;
 use App\Models\JobApplication;
 use App\Models\JobInterview;
 use App\Models\Notification;
+use App\Models\Tenant;
+use App\Services\RealtimeService;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -67,12 +69,20 @@ class JobInterviewService
             // Notify the candidate
             try {
                 $jobTitle = $application->vacancy->title ?? 'a job';
+                $candidateId = (int) $application->user_id;
                 Notification::createNotification(
-                    (int) $application->user_id,
+                    $candidateId,
                     "Interview requested for {$jobTitle}",
                     "/jobs/{$application->vacancy_id}",
                     'job_application'
                 );
+                RealtimeService::broadcastAndPush($candidateId, "Interview requested for {$jobTitle}", [
+                    'type'      => 'job_interview_proposed',
+                    'job_id'    => (int) $application->vacancy_id,
+                    'job_title' => $jobTitle,
+                    'message'   => "Interview requested for {$jobTitle}",
+                    'url'       => "/jobs/{$application->vacancy_id}",
+                ]);
             } catch (\Throwable $e) {
                 Log::warning('JobInterviewService::propose notification failed: ' . $e->getMessage());
             }
@@ -128,6 +138,13 @@ class JobInterviewService
                         "/jobs/{$interview->vacancy_id}/applications",
                         'job_application_status'
                     );
+                    RealtimeService::broadcastAndPush((int) $posterId, "Interview accepted for {$jobTitle}", [
+                        'type'      => 'job_interview_accepted',
+                        'job_id'    => (int) $interview->vacancy_id,
+                        'job_title' => $jobTitle,
+                        'message'   => "Interview accepted for {$jobTitle}",
+                        'url'       => "/jobs/{$interview->vacancy_id}/applications",
+                    ]);
                 }
             } catch (\Throwable $e) {
                 Log::warning('JobInterviewService::accept notification failed: ' . $e->getMessage());
@@ -184,6 +201,13 @@ class JobInterviewService
                         "/jobs/{$interview->vacancy_id}/applications",
                         'job_application_status'
                     );
+                    RealtimeService::broadcastAndPush((int) $posterId, "Interview declined for {$jobTitle}", [
+                        'type'      => 'job_interview_declined',
+                        'job_id'    => (int) $interview->vacancy_id,
+                        'job_title' => $jobTitle,
+                        'message'   => "Interview declined for {$jobTitle}",
+                        'url'       => "/jobs/{$interview->vacancy_id}/applications",
+                    ]);
                 }
             } catch (\Throwable $e) {
                 Log::warning('JobInterviewService::decline notification failed: ' . $e->getMessage());
@@ -284,6 +308,13 @@ class JobInterviewService
                         "/jobs/{$interview->vacancy_id}",
                         'job_application_status'
                     );
+                    RealtimeService::broadcastAndPush((int) $candidateId, "Interview cancelled for {$jobTitle}", [
+                        'type'      => 'job_interview_cancelled',
+                        'job_id'    => (int) $interview->vacancy_id,
+                        'job_title' => $jobTitle,
+                        'message'   => "Interview cancelled for {$jobTitle}",
+                        'url'       => "/jobs/{$interview->vacancy_id}",
+                    ]);
                 }
             } catch (\Throwable $e) {
                 Log::warning('JobInterviewService::cancel notification failed: ' . $e->getMessage());
@@ -294,5 +325,95 @@ class JobInterviewService
             Log::error('JobInterviewService::cancel failed', ['error' => $e->getMessage()]);
             return false;
         }
+    }
+
+    /**
+     * Send interview reminders for upcoming interviews across all tenants.
+     *
+     * Sends reminders at two windows: 24 hours before and 1 hour before.
+     * Uses a `reminder_sent_at` check to avoid duplicate reminders.
+     * Called from the Laravel scheduler (bootstrap/app.php).
+     *
+     * @return array{reminders_sent: int, errors: int}
+     */
+    public static function sendReminders(): array
+    {
+        $sent = 0;
+        $errors = 0;
+
+        try {
+            $now = now();
+
+            // Find interviews scheduled in the next 24h that haven't been reminded
+            $upcoming = JobInterview::with(['application.applicant:id,first_name,last_name', 'vacancy:id,title,user_id'])
+                ->whereIn('status', ['proposed', 'accepted'])
+                ->where('scheduled_at', '>', $now)
+                ->where('scheduled_at', '<=', $now->copy()->addHours(24))
+                ->whereNull('reminder_sent_at')
+                ->get();
+
+            foreach ($upcoming as $interview) {
+                try {
+                    // Set tenant context for this interview
+                    TenantContext::setById((int) $interview->tenant_id);
+
+                    $jobTitle = $interview->vacancy->title ?? 'a job';
+                    $scheduledAt = $interview->scheduled_at->format('M j, g:i A');
+                    $hoursUntil = (int) $now->diffInHours($interview->scheduled_at);
+
+                    $timeLabel = $hoursUntil <= 1 ? 'in 1 hour' : "in {$hoursUntil} hours";
+                    $message = "Interview reminder: {$jobTitle} — {$timeLabel} ({$scheduledAt})";
+
+                    // Notify the candidate
+                    $candidateId = $interview->application->user_id ?? null;
+                    if ($candidateId) {
+                        Notification::createNotification(
+                            (int) $candidateId,
+                            $message,
+                            "/jobs/{$interview->vacancy_id}",
+                            'job_interview_proposed'
+                        );
+                        RealtimeService::broadcastAndPush((int) $candidateId, 'Interview Reminder', [
+                            'type'      => 'job_interview_reminder',
+                            'job_id'    => (int) $interview->vacancy_id,
+                            'job_title' => $jobTitle,
+                            'message'   => $message,
+                            'url'       => "/jobs/{$interview->vacancy_id}",
+                        ]);
+                    }
+
+                    // Notify the employer/interviewer
+                    $posterId = $interview->vacancy->user_id ?? null;
+                    if ($posterId) {
+                        Notification::createNotification(
+                            (int) $posterId,
+                            $message,
+                            "/jobs/{$interview->vacancy_id}/applications",
+                            'job_interview_proposed'
+                        );
+                        RealtimeService::broadcastAndPush((int) $posterId, 'Interview Reminder', [
+                            'type'      => 'job_interview_reminder',
+                            'job_id'    => (int) $interview->vacancy_id,
+                            'job_title' => $jobTitle,
+                            'message'   => $message,
+                            'url'       => "/jobs/{$interview->vacancy_id}/applications",
+                        ]);
+                    }
+
+                    // Mark as reminded to prevent duplicate sends
+                    $interview->update(['reminder_sent_at' => $now]);
+                    $sent++;
+                } catch (\Throwable $e) {
+                    $errors++;
+                    Log::warning('JobInterviewService::sendReminders failed for interview ' . $interview->id, [
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error('JobInterviewService::sendReminders failed', ['error' => $e->getMessage()]);
+        }
+
+        return ['reminders_sent' => $sent, 'errors' => $errors];
     }
 }

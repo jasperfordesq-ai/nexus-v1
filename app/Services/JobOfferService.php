@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use App\Models\JobApplication;
 use App\Models\JobOffer;
 use App\Models\Notification;
+use App\Services\RealtimeService;
 use App\Services\WebhookDispatchService;
 use Illuminate\Support\Facades\Log;
 
@@ -70,12 +71,20 @@ class JobOfferService
             // Notify the candidate
             try {
                 $jobTitle = $application->vacancy->title ?? 'a job';
+                $candidateId = (int) $application->user_id;
                 Notification::createNotification(
-                    (int) $application->user_id,
+                    $candidateId,
                     "You have received a job offer for {$jobTitle}",
                     "/jobs/{$application->vacancy_id}",
                     'job_application_status'
                 );
+                RealtimeService::broadcastAndPush($candidateId, "Job Offer Received!", [
+                    'type'      => 'job_offer_received',
+                    'job_id'    => (int) $application->vacancy_id,
+                    'job_title' => $jobTitle,
+                    'message'   => "You have received a job offer for {$jobTitle}",
+                    'url'       => "/jobs/{$application->vacancy_id}",
+                ]);
             } catch (\Throwable $e) {
                 Log::warning('JobOfferService::create notification failed: ' . $e->getMessage());
             }
@@ -152,6 +161,13 @@ class JobOfferService
                         "/jobs/{$offer->vacancy_id}/applications",
                         'job_application_status'
                     );
+                    RealtimeService::broadcastAndPush((int) $posterId, "Offer accepted for {$jobTitle}", [
+                        'type'      => 'job_offer_accepted',
+                        'job_id'    => (int) $offer->vacancy_id,
+                        'job_title' => $jobTitle,
+                        'message'   => "Offer accepted for {$jobTitle}",
+                        'url'       => "/jobs/{$offer->vacancy_id}/applications",
+                    ]);
                 }
             } catch (\Throwable $e) {
                 Log::warning('JobOfferService::accept notification failed: ' . $e->getMessage());
@@ -220,6 +236,13 @@ class JobOfferService
                         "/jobs/{$offer->vacancy_id}/applications",
                         'job_application_status'
                     );
+                    RealtimeService::broadcastAndPush((int) $posterId, "Offer rejected for {$jobTitle}", [
+                        'type'      => 'job_offer_rejected',
+                        'job_id'    => (int) $offer->vacancy_id,
+                        'job_title' => $jobTitle,
+                        'message'   => "Offer rejected for {$jobTitle}",
+                        'url'       => "/jobs/{$offer->vacancy_id}/applications",
+                    ]);
                 }
             } catch (\Throwable $e) {
                 Log::warning('JobOfferService::reject notification failed: ' . $e->getMessage());
@@ -273,6 +296,13 @@ class JobOfferService
                         "/jobs/{$offer->vacancy_id}",
                         'job_application_status'
                     );
+                    RealtimeService::broadcastAndPush((int) $candidateId, "Job offer withdrawn for {$jobTitle}", [
+                        'type'      => 'job_offer_withdrawn',
+                        'job_id'    => (int) $offer->vacancy_id,
+                        'job_title' => $jobTitle,
+                        'message'   => "Job offer withdrawn for {$jobTitle}",
+                        'url'       => "/jobs/{$offer->vacancy_id}",
+                    ]);
                 }
             } catch (\Throwable $e) {
                 Log::warning('JobOfferService::withdraw notification failed: ' . $e->getMessage());

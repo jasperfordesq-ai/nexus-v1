@@ -78,6 +78,14 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->name('marketplace:expire-stale-offers')
             ->withoutOverlapping(5);
 
+        // Jobs: send interview reminders (24h and 1h before)
+        $schedule->call(function () {
+            \App\Services\JobInterviewService::sendReminders();
+        })
+            ->everyFifteenMinutes()
+            ->name('jobs:interview-reminders')
+            ->withoutOverlapping(10);
+
         // Marketplace: deactivate expired promotions
         $schedule->call(function () {
             \App\Services\MarketplacePromotionService::deactivateExpired();

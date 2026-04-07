@@ -458,6 +458,14 @@ export function JobDetailPage() {
     loadVacancy();
   }, [loadVacancy]);
 
+  // Eagerly fetch saved profile for Quick Apply button
+  useEffect(() => {
+    if (!isAuthenticated || isOwner || !vacancy || vacancy.has_applied) return;
+    api.get<{cv_filename?: string; cover_text?: string}>('/v2/jobs/saved-profile')
+      .then((res) => { if (res.success && res.data) setSavedProfile(res.data as {cv_filename?: string; cover_text?: string}); })
+      .catch(() => {});
+  }, [isAuthenticated, isOwner, vacancy]);
+
   // J2: Load match percentage when user is authenticated
   useEffect(() => {
     if (!id || !isAuthenticated || !vacancy || isOwner) return;
@@ -2314,14 +2322,47 @@ export function JobDetailPage() {
             </Button>
           </div>
         ) : (
-          <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white w-full"
-            size="lg"
-            onPress={applyModal.onOpen}
-            aria-label={t('apply.button_label', 'Apply for {{title}}', { title: vacancy?.title ?? 'this job' })}
-          >
-            {t('apply.button')}
-          </Button>
+          <div className="flex flex-col gap-2">
+            <Button
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white w-full"
+              size="lg"
+              onPress={applyModal.onOpen}
+              aria-label={t('apply.button_label', 'Apply for {{title}}', { title: vacancy?.title ?? 'this job' })}
+            >
+              {t('apply.button')}
+            </Button>
+            {savedProfile?.cover_text && (
+              <Button
+                variant="flat"
+                color="primary"
+                size="sm"
+                className="w-full"
+                isLoading={isSubmitting}
+                onPress={async () => {
+                  if (!id || isSubmitting) return;
+                  setIsSubmitting(true);
+                  try {
+                    const response = await api.post(`/v2/jobs/${id}/apply`, {
+                      message: savedProfile.cover_text ?? '',
+                    });
+                    if (response.success) {
+                      toastRef.current.success(tRef.current('apply.success'));
+                      setSavedProfile(null);
+                      loadVacancy();
+                    } else {
+                      toastRef.current.error((response as { error?: string }).error || tRef.current('apply.error'));
+                    }
+                  } catch {
+                    toastRef.current.error(tRef.current('apply.error'));
+                  } finally {
+                    setIsSubmitting(false);
+                  }
+                }}
+              >
+                {t('apply.quick_apply', 'Quick Apply with Saved Profile')}
+              </Button>
+            )}
+          </div>
         )}
       </GlassCard>
     );

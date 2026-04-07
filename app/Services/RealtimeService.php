@@ -94,6 +94,34 @@ class RealtimeService
     }
 
     /**
+     * Broadcast a notification via Pusher AND send FCM push to mobile devices.
+     *
+     * Combines both delivery channels in a single call. Gracefully no-ops
+     * if FCM is unconfigured. The $data array should include 'message' and
+     * 'type'. An optional 'url' key is used for tap-to-navigate on mobile.
+     */
+    public static function broadcastAndPush(int $userId, string $title, array $data): bool
+    {
+        // Pusher real-time broadcast
+        $pusherResult = self::broadcastNotification($userId, $data);
+
+        // FCM push notification (no-ops if unconfigured)
+        try {
+            $body = $data['message'] ?? $title;
+            $url = $data['url'] ?? null;
+            $pushData = ['type' => $data['type'] ?? 'notification'];
+            if ($url) {
+                $pushData['url'] = $url;
+            }
+            FCMPushService::sendToUser($userId, $title, $body, $pushData);
+        } catch (\Throwable $e) {
+            Log::warning('RealtimeService::broadcastAndPush FCM failed', ['error' => $e->getMessage()]);
+        }
+
+        return $pusherResult;
+    }
+
+    /**
      * Broadcast a message event to a channel.
      */
     public static function broadcastMessage(string $channel, array $data): bool

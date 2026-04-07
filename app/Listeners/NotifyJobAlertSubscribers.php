@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use App\Events\JobVacancyCreated;
 use App\Models\JobAlert;
 use App\Models\Notification;
+use App\Services\RealtimeService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
@@ -48,12 +49,20 @@ class NotifyJobAlertSubscribers implements ShouldQueue
                 }
 
                 try {
+                    $alertUserId = (int) $alert->user_id;
                     Notification::createNotification(
-                        (int) $alert->user_id,
+                        $alertUserId,
                         "New job matching your alert: {$vacancy->title}",
                         "/jobs/{$vacancy->id}",
                         'job_application'
                     );
+                    RealtimeService::broadcastAndPush($alertUserId, 'New Job Match', [
+                        'type'      => 'job_alert_match',
+                        'job_id'    => (int) $vacancy->id,
+                        'job_title' => $vacancy->title,
+                        'message'   => "New job matching your alert: {$vacancy->title}",
+                        'url'       => "/jobs/{$vacancy->id}",
+                    ]);
 
                     // Send email alert
                     try {

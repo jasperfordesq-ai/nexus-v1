@@ -29,15 +29,17 @@ class JobInterview extends Model
         'status',
         'candidate_notes',
         'interviewer_notes',
+        'reminder_sent_at',
     ];
 
     protected $casts = [
-        'tenant_id'      => 'integer',
-        'vacancy_id'     => 'integer',
-        'application_id' => 'integer',
-        'proposed_by'    => 'integer',
-        'duration_mins'  => 'integer',
-        'scheduled_at'   => 'datetime',
+        'tenant_id'       => 'integer',
+        'vacancy_id'      => 'integer',
+        'application_id'  => 'integer',
+        'proposed_by'     => 'integer',
+        'duration_mins'   => 'integer',
+        'scheduled_at'    => 'datetime',
+        'reminder_sent_at' => 'datetime',
     ];
 
     public function vacancy(): BelongsTo

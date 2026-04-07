@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Models\Notification;
 use App\Services\JobModerationService;
 use App\Services\JobSpamDetectionService;
+use App\Services\RealtimeService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -822,6 +823,17 @@ class JobVacancyService
                     "/jobs/{$application->vacancy_id}",
                     'job_application'
                 );
+
+                // Real-time broadcast to candidate
+                RealtimeService::broadcastAndPush($applicantId, $message, [
+                    'type'        => 'job_application_status',
+                    'job_id'      => (int) $application->vacancy_id,
+                    'job_title'   => $jobTitle,
+                    'application_id' => $applicationId,
+                    'from_status' => $previousStatus,
+                    'to_status'   => $status,
+                    'message'     => $message,
+                ]);
             } catch (\Throwable $e) {
                 Log::warning('JobVacancyService::updateApplicationStatus notification failed', [
                     'application_id' => $applicationId,
