@@ -1094,21 +1094,20 @@ export function JobDetailPage() {
                 >
                   {t('share.email')}
                 </DropdownItem>
-                {typeof navigator !== 'undefined' && 'share' in navigator && (
-                  <DropdownItem
-                    key="native-share"
-                    startContent={<Send className="w-4 h-4" aria-hidden="true" />}
-                    onPress={() => {
-                      navigator.share({
-                        title: vacancy.title,
-                        text: `Check out this ${vacancy.type} opportunity: ${vacancy.title}`,
-                        url: window.location.origin + tenantPath(`/jobs/${vacancy.id}`),
-                      }).catch(() => {});
-                    }}
-                  >
-                    {t('share.native', 'Share...')}
-                  </DropdownItem>
-                )}
+                <DropdownItem
+                  key="native-share"
+                  className={typeof navigator !== 'undefined' && 'share' in navigator ? '' : 'hidden'}
+                  startContent={<Send className="w-4 h-4" aria-hidden="true" />}
+                  onPress={() => {
+                    navigator.share?.({
+                      title: vacancy.title,
+                      text: `Check out this ${vacancy.type} opportunity: ${vacancy.title}`,
+                      url: window.location.origin + tenantPath(`/jobs/${vacancy.id}`),
+                    }).catch(() => {});
+                  }}
+                >
+                  {t('share.native', 'Share...')}
+                </DropdownItem>
               </DropdownMenu>
             </Dropdown>
 
