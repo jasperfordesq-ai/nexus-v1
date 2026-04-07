@@ -82,7 +82,19 @@ if (!function_exists('__')) {
      */
     function __(string $key, array $params = []): string
     {
-        return \App\I18n\Translator::get($key, $params);
+        // Try custom JSON translator first (used by PHP admin views)
+        $result = \App\I18n\Translator::get($key, $params);
+
+        // If custom translator returned the raw key, fall back to Laravel's
+        // native translator which loads .php translation files (lang/en/*.php)
+        if ($result === $key && function_exists('app') && app()->bound('translator')) {
+            $laravelResult = app('translator')->get($key, $params);
+            if ($laravelResult !== $key) {
+                return $laravelResult;
+            }
+        }
+
+        return $result;
     }
 }
 
