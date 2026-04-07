@@ -28,6 +28,11 @@ use App\Services\SalaryBenchmarkService;
 use App\Services\CandidateSearchService;
 use App\Services\JobInterviewSchedulingService;
 use App\Core\TenantContext;
+use App\Models\JobVacancy;
+use App\Models\Review;
+use App\Models\Transaction;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * JobVacanciesController — Community job vacancy listings.
@@ -1781,5 +1786,259 @@ class JobVacanciesController extends BaseApiController
         }
 
         return $this->noContent();
+    }
+
+    /** POST /api/v2/jobs/{id}/ai-rank — AI-powered candidate ranking with community trust signals. */
+    public function aiRankCandidates(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        $vacancy = JobVacancy::where('tenant_id', $tenantId)->find($id);
+        if (!$vacancy) return $this->respondWithError('NOT_FOUND', 'Job not found', null, 404);
+
+        // Must be vacancy owner or admin
+        if ((int) $vacancy->user_id !== $userId) {
+            $user = \App\Models\User::find($userId);
+            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+                return $this->respondWithError('FORBIDDEN', 'Only the job poster can rank candidates', null, 403);
+            }
+        }
+
+        if (!\App\Services\AI\AIServiceFactory::isEnabled()) {
+            return $this->respondWithError('AI_DISABLED', 'AI is not configured', null, 503);
+        }
+
+        // Get applications with applicant data + community trust signals
+        $applications = JobApplication::with(['applicant:id,first_name,last_name,bio,skills,xp,level'])
+            ->where('vacancy_id', $id)
+            ->whereNotIn('status', ['withdrawn', 'rejected'])
+            ->get();
+
+        if ($applications->isEmpty()) {
+            return $this->respondWithData(['rankings' => [], 'message' => 'No active applications to rank']);
+        }
+
+        // Enrich each applicant with community trust signals
+        $candidateProfiles = [];
+        foreach ($applications as $app) {
+            $applicant = $app->applicant;
+            if (!$applicant) continue;
+
+            $appUserId = (int) $applicant->id;
+
+            // Transaction count
+            $txCount = Transaction::where('tenant_id', $tenantId)
+                ->where(function ($q) use ($appUserId) {
+                    $q->where('sender_id', $appUserId)->orWhere('receiver_id', $appUserId);
+                })
+                ->where('status', 'completed')
+                ->count();
+
+            // Average review rating
+            $avgRating = Review::where('tenant_id', $tenantId)
+                ->where('receiver_id', $appUserId)
+                ->where('status', 'approved')
+                ->avg('rating');
+
+            // Badge count
+            $badgeCount = DB::table('user_badges')
+                ->where('user_id', $appUserId)
+                ->count();
+
+            $candidateProfiles[] = [
+                'application_id' => $app->id,
+                'name' => trim(($applicant->first_name ?? '') . ' ' . ($applicant->last_name ?? '')),
+                'bio' => $applicant->bio ?? '',
+                'skills' => $applicant->skills ?? '',
+                'xp' => (int) ($applicant->xp ?? 0),
+                'level' => (int) ($applicant->level ?? 1),
+                'completed_exchanges' => $txCount,
+                'avg_review_rating' => $avgRating ? round((float) $avgRating, 1) : null,
+                'badges_earned' => $badgeCount,
+                'cover_message' => $app->message ?? '',
+                'match_percentage' => $app->match_percentage ?? null,
+            ];
+        }
+
+        // Build AI prompt
+        $jobDescription = "Title: {$vacancy->title}\n"
+            . "Type: {$vacancy->type}\n"
+            . "Commitment: {$vacancy->commitment}\n"
+            . "Skills Required: " . ($vacancy->skills_required ?? 'Not specified') . "\n"
+            . "Description: " . substr($vacancy->description ?? '', 0, 500);
+
+        $candidateList = '';
+        foreach ($candidateProfiles as $i => $c) {
+            $candidateList .= "\n---\nCandidate " . ($i + 1) . " (Application ID: {$c['application_id']}):\n"
+                . "Name: {$c['name']}\n"
+                . "Skills: {$c['skills']}\n"
+                . "XP: {$c['xp']} | Level: {$c['level']} | Completed Exchanges: {$c['completed_exchanges']}\n"
+                . "Avg Review Rating: " . ($c['avg_review_rating'] ?? 'No reviews') . " | Badges: {$c['badges_earned']}\n"
+                . "Skills Match: " . ($c['match_percentage'] !== null ? "{$c['match_percentage']}%" : 'N/A') . "\n"
+                . "Cover Message: " . substr($c['cover_message'], 0, 200) . "\n"
+                . "Bio: " . substr($c['bio'], 0, 200);
+        }
+
+        $systemPrompt = "You are a hiring assistant for a community timebanking platform. "
+            . "Rank candidates for a job vacancy based on skills match, experience, and community trust signals. "
+            . "Community trust signals (XP, completed exchanges, review ratings, badges) are IMPORTANT — "
+            . "they indicate how active and trusted a member is in the community. "
+            . "A candidate with high community engagement and good reviews is more reliable.\n\n"
+            . "Return a JSON array (and NOTHING else) with objects containing:\n"
+            . "- application_id (int)\n"
+            . "- rank (int, 1 = best)\n"
+            . "- score (int, 0-100)\n"
+            . "- reason (string, 1-2 sentences explaining the ranking)\n\n"
+            . "Sort by rank ascending (best first).";
+
+        $userPrompt = "JOB:\n{$jobDescription}\n\nCANDIDATES:{$candidateList}";
+
+        try {
+            $response = \App\Services\AI\AIServiceFactory::chatWithFallback(
+                [
+                    ['role' => 'system', 'content' => $systemPrompt],
+                    ['role' => 'user', 'content' => $userPrompt],
+                ],
+                ['temperature' => 0.3, 'max_tokens' => 2000]
+            );
+
+            $content = $response['content'] ?? $response['message'] ?? '';
+
+            // Extract JSON from response (handle markdown code blocks)
+            if (preg_match('/\[[\s\S]*\]/', $content, $matches)) {
+                $rankings = json_decode($matches[0], true);
+            } else {
+                $rankings = json_decode($content, true);
+            }
+
+            if (!is_array($rankings)) {
+                return $this->respondWithError('AI_PARSE_ERROR', 'Failed to parse AI ranking response', null, 500);
+            }
+
+            // Merge community data back into rankings for frontend display
+            $profileMap = [];
+            foreach ($candidateProfiles as $p) {
+                $profileMap[$p['application_id']] = $p;
+            }
+            foreach ($rankings as &$r) {
+                $appId = $r['application_id'] ?? 0;
+                if (isset($profileMap[$appId])) {
+                    $r['community_xp'] = $profileMap[$appId]['xp'];
+                    $r['community_level'] = $profileMap[$appId]['level'];
+                    $r['community_exchanges'] = $profileMap[$appId]['completed_exchanges'];
+                    $r['community_rating'] = $profileMap[$appId]['avg_review_rating'];
+                    $r['community_badges'] = $profileMap[$appId]['badges_earned'];
+                }
+            }
+            unset($r);
+
+            return $this->respondWithData([
+                'rankings' => $rankings,
+                'provider' => $response['provider'] ?? 'unknown',
+                'candidates_evaluated' => count($candidateProfiles),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('aiRankCandidates failed', ['error' => $e->getMessage()]);
+            return $this->respondWithError('AI_ERROR', 'AI ranking failed: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    /** GET /api/v2/jobs/offer-templates — List user's offer letter templates. */
+    public function offerTemplates(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        $templates = \App\Models\JobTemplate::where('tenant_id', $tenantId)
+            ->where('template_type', 'offer_letter')
+            ->where(function ($q) use ($userId) {
+                $q->where('user_id', $userId)->orWhere('is_public', true);
+            })
+            ->orderByDesc('use_count')
+            ->orderByDesc('updated_at')
+            ->get()
+            ->toArray();
+
+        return $this->respondWithData($templates);
+    }
+
+    /** POST /api/v2/jobs/offer-templates — Create an offer letter template. */
+    public function createOfferTemplate(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+        $data = $this->getJsonInput();
+
+        if (empty($data['name'])) {
+            return $this->respondWithError('VALIDATION_REQUIRED', 'Template name is required', 'name', 422);
+        }
+
+        $template = \App\Models\JobTemplate::create([
+            'tenant_id'     => $tenantId,
+            'user_id'       => $userId,
+            'template_type' => 'offer_letter',
+            'name'          => trim($data['name']),
+            'description'   => $data['body'] ?? $data['description'] ?? null,
+            'is_public'     => (bool) ($data['is_public'] ?? false),
+        ]);
+
+        return $this->respondWithData($template->toArray());
+    }
+
+    /** DELETE /api/v2/jobs/offer-templates/{id} — Delete an offer letter template. */
+    public function deleteOfferTemplate(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        $deleted = \App\Models\JobTemplate::where('tenant_id', $tenantId)
+            ->where('id', $id)
+            ->where('template_type', 'offer_letter')
+            ->where('user_id', $userId)
+            ->delete();
+
+        if ($deleted) {
+            return $this->respondWithData(['deleted' => true, 'id' => $id]);
+        }
+        return $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
+    }
+
+    /** POST /api/v2/jobs/offer-templates/{id}/render — Render a template with placeholders. */
+    public function renderOfferTemplate(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+        $data = $this->getJsonInput();
+
+        $template = \App\Models\JobTemplate::where('tenant_id', $tenantId)
+            ->where('id', $id)
+            ->where('template_type', 'offer_letter')
+            ->where(function ($q) use ($userId) {
+                $q->where('user_id', $userId)->orWhere('is_public', true);
+            })
+            ->first();
+
+        if (!$template) {
+            return $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
+        }
+
+        // Increment use count
+        $template->increment('use_count');
+
+        // Replace placeholders
+        $body = $template->description ?? '';
+        $placeholders = [
+            '{{candidate_name}}' => $data['candidate_name'] ?? '',
+            '{{position}}'       => $data['position'] ?? '',
+            '{{salary}}'         => $data['salary'] ?? '',
+            '{{start_date}}'     => $data['start_date'] ?? '',
+            '{{time_credits}}'   => $data['time_credits'] ?? '',
+            '{{organization}}'   => $data['organization'] ?? '',
+            '{{date}}'           => date('F j, Y'),
+        ];
+        $rendered = str_replace(array_keys($placeholders), array_values($placeholders), $body);
+
+        return $this->respondWithData(['rendered' => $rendered, 'template_name' => $template->name]);
     }
 }

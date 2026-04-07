@@ -29,6 +29,7 @@ import {
   SelectItem,
   Input,
   Textarea,
+  Tooltip,
 } from '@heroui/react';
 import {
   ArrowLeft,
@@ -38,6 +39,7 @@ import {
   Calendar,
   Percent,
   DollarSign,
+  Sparkles,
   Star,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -118,9 +120,10 @@ interface AppCardProps {
   onScoreApplicant?: (app: KanbanApplication) => void;
   onSelect?: (id: number, checked: boolean) => void;
   isSelected?: boolean;
+  aiRanking?: { rank: number; score: number; reason: string };
 }
 
-function AppKanbanCard({ application, onDragStart, onDownloadCv, onScheduleInterview, onSendOffer, onScoreApplicant, onSelect, isSelected }: AppCardProps) {
+function AppKanbanCard({ application, onDragStart, onDownloadCv, onScheduleInterview, onSendOffer, onScoreApplicant, onSelect, isSelected, aiRanking }: AppCardProps) {
   const { t } = useTranslation('jobs');
   const appliedDate = new Date(application.created_at);
   const stage = application.stage ?? application.status;
@@ -166,6 +169,16 @@ function AppKanbanCard({ application, onDragStart, onDownloadCv, onScheduleInter
             <p className="text-sm font-medium text-theme-primary truncate">
               {application.applicant.name}
             </p>
+            {aiRanking && (
+              <div className="flex items-center gap-1.5 mt-1">
+                <Chip size="sm" variant="flat" color={aiRanking.score >= 70 ? 'success' : aiRanking.score >= 40 ? 'warning' : 'default'}>
+                  AI: {aiRanking.score}/100
+                </Chip>
+                <Tooltip content={aiRanking.reason}>
+                  <span className="text-[10px] text-default-400 cursor-help">#{aiRanking.rank}</span>
+                </Tooltip>
+              </div>
+            )}
           </div>
         </div>
 
@@ -263,9 +276,10 @@ interface ColumnProps {
   onScoreApplicant?: (app: KanbanApplication) => void;
   onSelect?: (id: number, checked: boolean) => void;
   selectedAppIds?: Set<number>;
+  aiRankings?: Record<number, { rank: number; score: number; reason: string }>;
 }
 
-function KanbanColumn({ column, applications, onDragStart, onDrop, onDownloadCv, onScheduleInterview, onSendOffer, onScoreApplicant, onSelect, selectedAppIds }: ColumnProps) {
+function KanbanColumn({ column, applications, onDragStart, onDrop, onDownloadCv, onScheduleInterview, onSendOffer, onScoreApplicant, onSelect, selectedAppIds, aiRankings }: ColumnProps) {
   const { t } = useTranslation('jobs');
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -326,6 +340,7 @@ function KanbanColumn({ column, applications, onDragStart, onDrop, onDownloadCv,
               onScoreApplicant={onScoreApplicant}
               onSelect={onSelect}
               isSelected={selectedAppIds?.has(app.id)}
+              aiRanking={aiRankings?.[app.id]}
             />
           ))
         )}
@@ -388,6 +403,10 @@ export function JobKanbanPage() {
   ]);
   const [scorecardNotes, setScorecardNotes] = useState('');
   const [isSubmittingScorecard, setIsSubmittingScorecard] = useState(false);
+
+  // AI Ranking
+  const [aiRankings, setAiRankings] = useState<Record<number, { rank: number; score: number; reason: string; community_xp?: number; community_level?: number; community_exchanges?: number; community_rating?: number | null; community_badges?: number }>>({});
+  const [isRanking, setIsRanking] = useState(false);
 
   usePageTitle(vacancy ? `${t('kanban.pipeline_title', 'Kanban Pipeline')} — ${vacancy.title}` : t('kanban.pipeline_title', 'Kanban Pipeline'));
 
@@ -620,12 +639,40 @@ export function JobKanbanPage() {
     }
   };
 
+  // AI Rank handler
+  const handleAiRank = useCallback(async () => {
+    if (!id || isRanking) return;
+    setIsRanking(true);
+    try {
+      const res = await api.post(`/v2/jobs/${id}/ai-rank`);
+      if (res.success && res.data) {
+        const data = res.data as { rankings: Array<{ application_id: number; rank: number; score: number; reason: string; community_xp?: number; community_level?: number; community_exchanges?: number; community_rating?: number | null; community_badges?: number }> };
+        const map: typeof aiRankings = {};
+        for (const r of data.rankings) {
+          map[r.application_id] = r;
+        }
+        setAiRankings(map);
+        toast.success(t('kanban.ai_ranked', { defaultValue: 'Candidates ranked by AI' }));
+      } else {
+        toast.error((res as { error?: string }).error || t('kanban.ai_rank_failed', { defaultValue: 'AI ranking failed' }));
+      }
+    } catch {
+      toast.error(t('kanban.ai_rank_failed', { defaultValue: 'AI ranking failed' }));
+    } finally {
+      setIsRanking(false);
+    }
+  }, [id, isRanking, toast, t]);
+
   // Map applications to columns
   const columnApplications = (columnStatus: string) =>
     applications.filter((app) => {
       const colId = STATUS_TO_COLUMN[app.stage ?? app.status] ?? 'Applied';
       const col = COLUMNS.find((c) => c.status === columnStatus);
       return col && colId === col.id;
+    }).sort((a, b) => {
+      const aRank = aiRankings[a.id]?.rank ?? 999;
+      const bRank = aiRankings[b.id]?.rank ?? 999;
+      return aRank - bRank;
     });
 
   // ---------------------------------------------------------------------------
@@ -695,9 +742,21 @@ export function JobKanbanPage() {
           </h1>
           <p className="text-theme-muted text-sm mt-1">{vacancy.title}</p>
         </div>
-        <Chip variant="flat" color="default">
-          {applications.length} {t('applications', { count: applications.length })}
-        </Chip>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="flat"
+            color="secondary"
+            startContent={!isRanking && <Sparkles size={16} />}
+            isLoading={isRanking}
+            onPress={handleAiRank}
+            isDisabled={applications.length === 0}
+          >
+            {t('kanban.ai_rank', { defaultValue: 'AI Rank' })}
+          </Button>
+          <Chip variant="flat" color="default">
+            {applications.length} {t('applications', { count: applications.length })}
+          </Chip>
+        </div>
       </div>
 
       {/* Bulk action bar */}
@@ -750,6 +809,7 @@ export function JobKanbanPage() {
               onScoreApplicant={setScorecardModalApp}
               onSelect={handleSelectApp}
               selectedAppIds={selectedAppIds}
+              aiRankings={aiRankings}
             />
           ))}
         </div>

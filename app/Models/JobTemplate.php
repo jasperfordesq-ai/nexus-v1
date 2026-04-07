@@ -23,7 +23,7 @@ class JobTemplate extends Model
     protected $table = 'job_templates';
 
     protected $fillable = [
-        'tenant_id','user_id','name','description','type','commitment',
+        'tenant_id','user_id','template_type','name','description','type','commitment',
         'category','skills_required','is_remote','salary_type','salary_currency',
         'salary_min','salary_max','hours_per_week','time_credits','benefits',
         'tagline','is_public','use_count',

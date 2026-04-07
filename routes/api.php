@@ -209,6 +209,19 @@ Route::put('/v2/messages/{id}', [\App\Http\Controllers\Api\MessagesController::c
 Route::delete('/v2/messages/{id}', [\App\Http\Controllers\Api\MessagesController::class, 'deleteMessage']);
 Route::delete('/v2/conversations/{id}', [\App\Http\Controllers\Api\MessagesController::class, 'archive']);
 Route::post('/v2/messages/conversations/{id}/restore', [\App\Http\Controllers\Api\MessagesController::class, 'restoreConversation']);
+Route::get('/v2/messages/reactions/batch', [\App\Http\Controllers\Api\MessagesController::class, 'getReactionsBatch']);
+
+// ============================================
+// Group Conversations (Group DMs)
+// ============================================
+Route::post('/v2/conversations/groups', [\App\Http\Controllers\Api\GroupConversationController::class, 'store']);
+Route::get('/v2/conversations/groups', [\App\Http\Controllers\Api\GroupConversationController::class, 'index']);
+Route::get('/v2/conversations/{id}/participants', [\App\Http\Controllers\Api\GroupConversationController::class, 'participants']);
+Route::post('/v2/conversations/{id}/participants', [\App\Http\Controllers\Api\GroupConversationController::class, 'addParticipant']);
+Route::delete('/v2/conversations/{id}/participants/{userId}', [\App\Http\Controllers\Api\GroupConversationController::class, 'removeParticipant']);
+Route::patch('/v2/conversations/{id}/group', [\App\Http\Controllers\Api\GroupConversationController::class, 'updateGroup']);
+Route::get('/v2/conversations/{id}/messages', [\App\Http\Controllers\Api\GroupConversationController::class, 'messages']);
+Route::post('/v2/conversations/{id}/messages', [\App\Http\Controllers\Api\GroupConversationController::class, 'sendMessage']);
 
 // ============================================
 // MIGRATED ROUTES — Groups & Connections
@@ -307,6 +320,7 @@ Route::get('/v2/connections/status/{userId}', [\App\Http\Controllers\Api\Connect
 Route::post('/v2/connections/request', [\App\Http\Controllers\Api\ConnectionsController::class, 'request']);
 Route::post('/v2/connections/{id}/accept', [\App\Http\Controllers\Api\ConnectionsController::class, 'accept']);
 Route::delete('/v2/connections/{id}', [\App\Http\Controllers\Api\ConnectionsController::class, 'destroy']);
+Route::get('/v2/connections/suggestions', [\App\Http\Controllers\Api\ConnectionSuggestionController::class, 'suggestions']);
 
 // ============================================
 // MIGRATED ROUTES — Users (controller routes only)
@@ -463,9 +477,23 @@ Route::post('/v2/posts/{id}/media', [\App\Http\Controllers\Api\PostMediaControll
 Route::put('/v2/posts/{id}/media/reorder', [\App\Http\Controllers\Api\PostMediaController::class, 'reorderMedia']);
 Route::delete('/v2/posts/media/{mediaId}', [\App\Http\Controllers\Api\PostMediaController::class, 'removeMedia']);
 Route::put('/v2/posts/media/{mediaId}/alt', [\App\Http\Controllers\Api\PostMediaController::class, 'updateAltText']);
+// Post Views & Analytics
+Route::post('/v2/feed/posts/{id}/view', [\App\Http\Controllers\Api\PostAnalyticsController::class, 'recordView']);
+Route::get('/v2/feed/posts/{id}/analytics', [\App\Http\Controllers\Api\PostAnalyticsController::class, 'analytics']);
+// Bookmarks / Save Collections
+Route::post('/v2/bookmarks', [\App\Http\Controllers\Api\BookmarkController::class, 'toggle']);
+Route::get('/v2/bookmarks', [\App\Http\Controllers\Api\BookmarkController::class, 'index']);
+Route::get('/v2/bookmarks/status', [\App\Http\Controllers\Api\BookmarkController::class, 'status']);
+Route::post('/v2/bookmarks/{id}/move', [\App\Http\Controllers\Api\BookmarkController::class, 'move']);
+Route::get('/v2/bookmark-collections', [\App\Http\Controllers\Api\BookmarkController::class, 'collections']);
+Route::post('/v2/bookmark-collections', [\App\Http\Controllers\Api\BookmarkController::class, 'createCollection']);
+Route::match(['patch', 'put'], '/v2/bookmark-collections/{id}', [\App\Http\Controllers\Api\BookmarkController::class, 'updateCollection']);
+Route::delete('/v2/bookmark-collections/{id}', [\App\Http\Controllers\Api\BookmarkController::class, 'deleteCollection']);
 // Notifications
 Route::get('/v2/notifications', [\App\Http\Controllers\Api\NotificationsController::class, 'index']);
+Route::get('/v2/notifications/grouped', [\App\Http\Controllers\Api\NotificationsController::class, 'grouped']);
 Route::get('/v2/notifications/counts', [\App\Http\Controllers\Api\NotificationsController::class, 'counts']);
+Route::post('/v2/notifications/group/{groupKey}/read', [\App\Http\Controllers\Api\NotificationsController::class, 'markGroupRead']);
 Route::post('/v2/notifications/read-all', [\App\Http\Controllers\Api\NotificationsController::class, 'markAllRead']);
 Route::delete('/v2/notifications', [\App\Http\Controllers\Api\NotificationsController::class, 'destroyAll']);
 Route::get('/v2/notifications/{id}', [\App\Http\Controllers\Api\NotificationsController::class, 'show']);
@@ -533,6 +561,11 @@ Route::get('/v2/jobs/templates', [\App\Http\Controllers\Api\JobVacanciesControll
 Route::post('/v2/jobs/templates', [\App\Http\Controllers\Api\JobVacanciesController::class, 'createTemplate']);
 Route::get('/v2/jobs/templates/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'getTemplate']);
 Route::delete('/v2/jobs/templates/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'deleteTemplate']);
+// Offer letter templates (static routes before {id} wildcard)
+Route::get('/v2/jobs/offer-templates', [\App\Http\Controllers\Api\JobVacanciesController::class, 'offerTemplates']);
+Route::post('/v2/jobs/offer-templates', [\App\Http\Controllers\Api\JobVacanciesController::class, 'createOfferTemplate']);
+Route::delete('/v2/jobs/offer-templates/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'deleteOfferTemplate']);
+Route::post('/v2/jobs/offer-templates/{id}/render', [\App\Http\Controllers\Api\JobVacanciesController::class, 'renderOfferTemplate']);
 // Salary benchmark lookup
 Route::get('/v2/jobs/salary-benchmark', [\App\Http\Controllers\Api\JobVacanciesController::class, 'salaryBenchmark']);
 // GDPR — static literal routes before {id} wildcard
@@ -545,6 +578,8 @@ Route::delete('/v2/jobs/pipeline-rules/{id}', [\App\Http\Controllers\Api\JobVaca
 Route::post('/v2/jobs/{id}/pipeline-rules/run', [\App\Http\Controllers\Api\JobVacanciesController::class, 'runPipelineRules']);
 // Bulk application actions
 Route::post('/v2/jobs/{id}/applications/bulk-status', [\App\Http\Controllers\Api\JobVacanciesController::class, 'bulkUpdateApplicationStatus']);
+// AI candidate ranking
+Route::post('/v2/jobs/{id}/ai-rank', [\App\Http\Controllers\Api\JobVacanciesController::class, 'aiRankCandidates']);
 // Static literal routes MUST come before {id} wildcard to avoid mismatching
 Route::get('/v2/jobs/my-interviews', [\App\Http\Controllers\Api\JobVacanciesController::class, 'myInterviews']);
 Route::get('/v2/jobs/my-offers', [\App\Http\Controllers\Api\JobVacanciesController::class, 'myOffers']);
