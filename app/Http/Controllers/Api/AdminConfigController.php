@@ -2255,7 +2255,7 @@ class AdminConfigController extends BaseApiController
     /** PUT /api/v2/admin/config/identity/bulk */
     public function updateIdentityConfigBulk(): JsonResponse
     {
-        $this->requireSuperAdmin();
+        $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
         $settings = $this->input('settings');
