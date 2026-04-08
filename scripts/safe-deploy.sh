@@ -1000,6 +1000,33 @@ show_status() {
 
     echo "" | tee -a "$LOG_FILE"
 
+    # Maintenance mode check
+    local MAINT_FILE=0
+    local MAINT_DB="unknown"
+    if docker ps --filter "name=$PHP_CONTAINER" --format "{{.Names}}" | grep -q "$PHP_CONTAINER"; then
+        docker exec "$PHP_CONTAINER" test -f "$MAINTENANCE_FILE" 2>/dev/null && MAINT_FILE=1
+    fi
+    local DB_USER DB_PASS DB_NAME
+    DB_USER=$(grep "^DB_USER=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
+    DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"')
+    DB_NAME=$(grep "^DB_NAME=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
+    if [ -z "$DB_PASS" ]; then
+        DB_PASS=$(grep "^DB_PASSWORD=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "")
+    fi
+    if [ -n "$DB_PASS" ] && docker ps --filter "name=nexus-php-db" --format "{{.Names}}" | grep -q "nexus-php-db"; then
+        MAINT_DB=$(docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" \
+            -N -e "SELECT setting_value FROM tenant_settings WHERE setting_key='general.maintenance_mode' LIMIT 1;" 2>/dev/null || echo "unknown")
+    fi
+
+    if [ "$MAINT_FILE" = "1" ] || [ "$MAINT_DB" = "true" ]; then
+        log_err "MAINTENANCE MODE IS ON (file: $([ "$MAINT_FILE" = "1" ] && echo "YES" || echo "no"), db: $MAINT_DB)"
+        log_warn "Run: sudo bash scripts/maintenance.sh off"
+    else
+        log_ok "Maintenance mode: OFF (site is live)"
+    fi
+
+    echo "" | tee -a "$LOG_FILE"
+
     # Recent logs (last 5 lines)
     log_info "Recent API logs:"
     docker compose logs --tail=5 app 2>/dev/null | tee -a "$LOG_FILE" || log_warn "Could not fetch logs"
@@ -1244,15 +1271,19 @@ if run_smoke_tests; then
 VEOF
     log_ok "Build version file written (httpdocs/.build-version)"
 
-    # Purge Cloudflare cache (all 8 domains)
+    # Disable maintenance mode FIRST — deploy succeeded, go live
+    # IMPORTANT: Must happen BEFORE Cloudflare purge, otherwise CF caches
+    # the 503 maintenance response right after purge, then keeps serving it
+    # even after maintenance is disabled.
+    DEPLOY_SUCCESS=1
+    disable_maintenance_mode
+
+    # Purge Cloudflare cache AFTER maintenance is off
+    # so CF re-caches the live 200 responses, not stale 503s
     purge_cloudflare_cache
 
     # Remove dangling Docker images (prevents disk bloat over time)
     prune_docker_images
-
-    # Disable maintenance mode — deploy succeeded, go live
-    DEPLOY_SUCCESS=1
-    disable_maintenance_mode
 
     echo "" | tee -a "$LOG_FILE"
     echo "============================================" | tee -a "$LOG_FILE"
