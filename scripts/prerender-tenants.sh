@@ -180,12 +180,15 @@ main() {
     # Run the Playwright worker in a Docker container
     # --network host: so it can reach the live site via public URLs
     # -v: mount the worker script and output directory
+    # -w /work: writable dir for npm install (mounted script is read-only)
+    # npm install playwright: the Docker image has browsers but not the npm package
     echo "$MANIFEST" | docker run --rm -i \
         --network host \
-        -v "$WORKER_SCRIPT:/app/worker.mjs:ro" \
+        -v "$WORKER_SCRIPT:/worker.mjs:ro" \
         -v "$OUTPUT_DIR:/output" \
+        -w /work \
         "$PLAYWRIGHT_IMAGE" \
-        node /app/worker.mjs 2>&1
+        bash -c "npm init -y >/dev/null 2>&1 && npm install --no-save playwright >/dev/null 2>&1 && node /worker.mjs" 2>&1
 
     local EXIT_CODE=$?
 
