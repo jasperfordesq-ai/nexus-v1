@@ -182,13 +182,21 @@ main() {
     # -v: mount the worker script and output directory
     # -w /work: writable dir for npm install (mounted script is read-only)
     # npm install playwright: the Docker image has browsers but not the npm package
+    # Create a temp working dir with the worker script so npm install + node
+    # resolve from the same location (NODE_PATH doesn't work with ES modules)
+    local WORK_DIR
+    WORK_DIR=$(mktemp -d)
+    cp "$WORKER_SCRIPT" "$WORK_DIR/worker.mjs"
+
     echo "$MANIFEST" | docker run --rm -i \
         --network host \
-        -v "$WORKER_SCRIPT:/worker.mjs:ro" \
+        -v "$WORK_DIR:/work" \
         -v "$OUTPUT_DIR:/output" \
         -w /work \
         "$PLAYWRIGHT_IMAGE" \
-        bash -c "npm init -y >/dev/null 2>&1 && npm install --no-save playwright >/dev/null 2>&1 && NODE_PATH=/work/node_modules node /worker.mjs" 2>&1
+        bash -c "npm init -y >/dev/null 2>&1 && npm install --no-save playwright >/dev/null 2>&1 && node worker.mjs" 2>&1
+
+    rm -rf "$WORK_DIR" 2>/dev/null || true
 
     local EXIT_CODE=$?
 
