@@ -53,15 +53,10 @@ class SitemapController
             return $this->xmlResponse($xml);
         }
 
-        // 3. Any other domain — master tenant's content, this domain's URLs
-        $masterTenant = DB::selectOne(
-            "SELECT id FROM tenants WHERE is_active = 1 ORDER BY id LIMIT 1"
-        );
-        if ($masterTenant) {
-            $xml = $service->generateForTenant((int) $masterTenant->id, $baseUrl);
-        } else {
-            $xml = $this->emptyUrlset();
-        }
+        // 3. Any other domain (e.g., api.project-nexus.ie accessed directly)
+        //    Reuse the app domain sitemap — it already uses FRONTEND_URL for
+        //    base URLs. Never generate content URLs pointing to the API domain.
+        $xml = $service->generateForAppDomain();
 
         return $this->xmlResponse($xml);
     }

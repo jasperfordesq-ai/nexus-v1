@@ -421,10 +421,10 @@ class SitemapService
     private function getGroupUrls(int $tenantId, string $baseUrl): array
     {
         $rows = DB::select(
-            "SELECT id, created_at AS lastmod
+            "SELECT id, COALESCE(updated_at, created_at) AS lastmod
              FROM `groups`
              WHERE tenant_id = ? AND visibility = 'public' AND is_active = 1
-             ORDER BY created_at DESC",
+             ORDER BY COALESCE(updated_at, created_at) DESC",
             [$tenantId]
         );
 

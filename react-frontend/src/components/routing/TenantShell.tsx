@@ -236,14 +236,20 @@ function SlugUrlGuard({ slug }: { slug: string }) {
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
+import { Helmet } from 'react-helmet-async';
 import { Home, Search, Globe } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 
 function CommunityNotFound({ slug }: { slug: string }) {
   usePageTitle('Community Not Found');
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
+      <PageMeta title="Community Not Found" noIndex />
+      <Helmet>
+        <meta name="prerender-status-code" content="404" />
+      </Helmet>
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}

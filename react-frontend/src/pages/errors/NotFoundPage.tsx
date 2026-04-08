@@ -10,6 +10,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
+import { Helmet } from 'react-helmet-async';
 import { Home, ArrowLeft, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -24,6 +25,12 @@ export function NotFoundPage() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <PageMeta title={t('not_found.page_title')} noIndex />
+      {/* Tell prerender services this is a real 404, not a 200.
+          Without this, Prerender.io returns HTTP 200 for every "Page Not Found"
+          page, which Google treats as a soft 404 (penalized worse than a real 404). */}
+      <Helmet>
+        <meta name="prerender-status-code" content="404" />
+      </Helmet>
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}

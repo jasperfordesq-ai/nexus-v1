@@ -589,6 +589,29 @@ prune_docker_images() {
     log_ok "Dangling images removed -- $RECLAIMED"
 }
 
+# --- Prerender.io cache recache ---
+# CRITICAL: Must run AFTER maintenance mode is off so Prerender.io caches the
+# live site, not the maintenance page (which has noindex/nofollow and would
+# cause Google to de-index all public pages).
+recache_prerender() {
+    log_step "=== Prerender.io Cache Recache ==="
+
+    if [ ! -f "$DEPLOY_DIR/scripts/recache-prerender.sh" ]; then
+        log_warn "recache-prerender.sh not found — Prerender.io cache NOT refreshed"
+        log_warn "Bots may see stale content. Run manually: bash scripts/recache-prerender.sh"
+        return 1
+    fi
+
+    if bash "$DEPLOY_DIR/scripts/recache-prerender.sh" 2>&1 | tee -a "$LOG_FILE"; then
+        log_ok "Prerender.io recache queued for all public pages"
+        return 0
+    fi
+
+    log_warn "Prerender.io recache failed — bots may see stale content"
+    log_warn "Run manually: bash scripts/recache-prerender.sh"
+    return 1  # Non-blocking
+}
+
 # --- Cloudflare cache purge ---
 purge_cloudflare_cache() {
     log_step "=== Cloudflare Cache Purge (All Domains) ==="
@@ -1284,6 +1307,10 @@ VEOF
     # Purge Cloudflare cache AFTER maintenance is off
     # so CF re-caches the live 200 responses, not stale 503s
     purge_cloudflare_cache
+
+    # Recache Prerender.io AFTER maintenance is off AND Cloudflare is purged
+    # so prerender bots fetch the live site, not stale maintenance pages
+    recache_prerender
 
     # Remove dangling Docker images (prevents disk bloat over time)
     prune_docker_images
