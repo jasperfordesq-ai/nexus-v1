@@ -9,8 +9,6 @@
     "copy-locales": "node -e \"const fs=require('fs');if(fs.existsSync('../lang')){fs.cpSync('../lang','public/locales',{recursive:true,force:true});console.log('[i18n] lang/ copied to public/locales/')}else{console.log('[i18n] ../lang not found, using committed locales')}\"",
     "prebuild": "npm run copy-locales",
     "build": "tsc -b && vite build",
-    "postbuild": "node scripts/prerender.mjs",
-    "build:no-prerender": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint src --max-warnings 320 && tsc --noEmit",
     "test": "cross-env NODE_OPTIONS=\"--max-old-space-size=20480\" vitest",

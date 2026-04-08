@@ -7,10 +7,7 @@
 # -----------------------------------------------------------------------------
 # Stage 1: Build
 # -----------------------------------------------------------------------------
-# Using Debian (not Alpine) because Playwright's Chromium requires glibc.
-# The postbuild step pre-renders public pages with Playwright for SEO.
-# Production stage stays nginx:alpine — only the build image is larger.
-FROM node:20-bookworm-slim AS builder
+FROM node:20-alpine3.21 AS builder
 
 WORKDIR /app
 
@@ -44,9 +41,6 @@ ENV BUILD_COMMIT=$BUILD_COMMIT
 # Install dependencies first (better layer caching)
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit
-
-# Install Playwright Chromium + system dependencies for pre-rendering
-RUN npx playwright install chromium --with-deps
 
 # Copy source and build (postbuild step pre-renders 19 public pages)
 COPY . .

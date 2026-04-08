@@ -589,26 +589,27 @@ prune_docker_images() {
     log_ok "Dangling images removed -- $RECLAIMED"
 }
 
-# --- Prerender.io cache recache ---
-# CRITICAL: Must run AFTER maintenance mode is off so Prerender.io caches the
-# live site, not the maintenance page (which has noindex/nofollow and would
-# cause Google to de-index all public pages).
-recache_prerender() {
-    log_step "=== Prerender.io Cache Recache ==="
+# --- Per-tenant server-side pre-rendering ---
+# CRITICAL: Must run AFTER maintenance mode is off AND containers are healthy.
+# Spins up a Playwright Docker container that visits each tenant's actual
+# domain, renders public pages with real tenant data, and injects the HTML
+# into the nginx container. All tenants get correct branding/content.
+prerender_tenants() {
+    log_step "=== Per-Tenant Pre-Rendering ==="
 
-    if [ ! -f "$DEPLOY_DIR/scripts/recache-prerender.sh" ]; then
-        log_warn "recache-prerender.sh not found — Prerender.io cache NOT refreshed"
-        log_warn "Bots may see stale content. Run manually: bash scripts/recache-prerender.sh"
+    if [ ! -f "$DEPLOY_DIR/scripts/prerender-tenants.sh" ]; then
+        log_warn "prerender-tenants.sh not found — pre-rendering skipped"
+        log_warn "Run manually: sudo bash scripts/prerender-tenants.sh"
         return 1
     fi
 
-    if bash "$DEPLOY_DIR/scripts/recache-prerender.sh" 2>&1 | tee -a "$LOG_FILE"; then
-        log_ok "Prerender.io recache queued for all public pages"
+    if bash "$DEPLOY_DIR/scripts/prerender-tenants.sh" 2>&1 | tee -a "$LOG_FILE"; then
+        log_ok "Per-tenant pre-rendering complete"
         return 0
     fi
 
-    log_warn "Prerender.io recache failed — bots may see stale content"
-    log_warn "Run manually: bash scripts/recache-prerender.sh"
+    log_warn "Per-tenant pre-rendering had errors (non-blocking)"
+    log_warn "Run manually: sudo bash scripts/prerender-tenants.sh"
     return 1  # Non-blocking
 }
 
@@ -1308,9 +1309,9 @@ VEOF
     # so CF re-caches the live 200 responses, not stale 503s
     purge_cloudflare_cache
 
-    # Recache Prerender.io AFTER maintenance is off AND Cloudflare is purged
-    # so prerender bots fetch the live site, not stale maintenance pages
-    recache_prerender
+    # Pre-render all tenant public pages with real data
+    # Must run AFTER maintenance off + Cloudflare purge
+    prerender_tenants
 
     # Remove dangling Docker images (prevents disk bloat over time)
     prune_docker_images
