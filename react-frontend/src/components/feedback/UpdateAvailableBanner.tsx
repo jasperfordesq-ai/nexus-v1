@@ -19,12 +19,14 @@
  *     SW persists, and onNeedRefresh never re-fires.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, X } from 'lucide-react';
 import { Button } from '@heroui/react';
+
+const SW_UPDATE_TRIGGERED_KEY = 'nexus_sw_update_triggered';
 
 async function hasWaitingSW(): Promise<boolean> {
   try {
@@ -41,13 +43,37 @@ export function UpdateAvailableBanner() {
   const [updating, setUpdating] = useState(false);
   const location = useLocation();
 
+  // Suppresses all show-banner paths for ~3s after the user clicked "Update Now".
+  // Prevents the "press 3 times" loop caused by reg?.waiting lingering during the
+  // race between skipWaiting() and the new SW fully taking control.
+  const suppressRef = useRef(false);
+
   const checkAndShow = useCallback(() => {
+    if (suppressRef.current) return;
     hasWaitingSW().then((waiting) => {
       if (waiting) setShowBanner(true);
     });
   }, []);
 
   useEffect(() => {
+    // If the user just clicked "Update Now" and the page reloaded, suppress all
+    // immediate show-banner paths for this mount cycle. Both checkAndShow() and the
+    // __nexus_updatePending flag can find a stale reg?.waiting during the race
+    // between skipWaiting() completing and the new SW fully taking control.
+    if (sessionStorage.getItem(SW_UPDATE_TRIGGERED_KEY)) {
+      sessionStorage.removeItem(SW_UPDATE_TRIGGERED_KEY);
+      suppressRef.current = true;
+      // Allow banner again after 3s — if the update genuinely failed the user can retry.
+      setTimeout(() => { suppressRef.current = false; }, 3000);
+      // Clear the stale pending flag too so it doesn't fire later in this effect.
+      (window as NexusWindow).__nexus_updatePending = false;
+      // Still register the event listener — a genuinely new update could arrive later,
+      // but respect the suppression window so the stale boot-time check doesn't sneak through.
+      function handleUpdateAvailable() { if (!suppressRef.current) setShowBanner(true); }
+      window.addEventListener('nexus:sw_update_available', handleUpdateAvailable);
+      return () => window.removeEventListener('nexus:sw_update_available', handleUpdateAvailable);
+    }
+
     // Cover race condition: onNeedRefresh fired before React mounted
     if ((window as NexusWindow).__nexus_updatePending) {
       (window as NexusWindow).__nexus_updatePending = false;
@@ -89,6 +115,9 @@ export function UpdateAvailableBanner() {
   }, [checkAndShow]);
 
   function handleUpdate() {
+    // Mark that we triggered the update so the next mount (after reload) skips
+    // the waiting-SW check and doesn't immediately re-show the banner.
+    sessionStorage.setItem(SW_UPDATE_TRIGGERED_KEY, '1');
     setUpdating(true);
 
     // Call the updateSW function stored by main.tsx to activate the new SW + reload.
