@@ -752,6 +752,51 @@ class FeedService
         return $freshPost;
     }
 
+    /**
+     * Update an existing feed post. Only the author may edit.
+     *
+     * @return array{success: bool, error?: string}
+     */
+    public function updatePost(int $postId, int $userId, array $data): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $post = $this->feedPost->newQuery()
+            ->where('id', $postId)
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$post) {
+            return ['success' => false, 'error' => 'Post not found or not owned by you'];
+        }
+
+        $content = isset($data['content'])
+            ? \App\Helpers\HtmlSanitizer::sanitize(trim($data['content']))
+            : $post->content;
+
+        if (empty($content) && empty($post->image_url)) {
+            return ['success' => false, 'error' => 'Post must have content or an image'];
+        }
+
+        $post->content = $content;
+        $post->updated_at = now();
+        $post->save();
+
+        // Sync feed_activity content
+        try {
+            DB::table('feed_activity')
+                ->where('source_type', 'post')
+                ->where('source_id', $postId)
+                ->where('tenant_id', $tenantId)
+                ->update(['content' => $content]);
+        } catch (\Exception $e) {
+            Log::warning("FeedService::updatePost feed_activity sync failed: " . $e->getMessage());
+        }
+
+        return ['success' => true];
+    }
+
     /** @var array Validation error messages */
     private array $errors = [];
 

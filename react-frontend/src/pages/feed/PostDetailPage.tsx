@@ -9,7 +9,7 @@
  * API: GET /api/v2/feed/posts/{id}
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -178,6 +178,16 @@ export function PostDetailPage() {
     }
   };
 
+  const handleNotInterested = useCallback(async (feedItem: FeedItem) => {
+    try {
+      await api.post(`/v2/feed/posts/${feedItem.id}/not-interested`, { type: feedItem.type });
+      toast.success(t('toast.not_interested', 'We\'ll show you less like this'));
+      navigate(tenantPath('/feed'));
+    } catch (err) {
+      logError('Failed to record not-interested', err);
+    }
+  }, [toast, t, navigate, tenantPath]);
+
   return (
     <>
       <PageMeta
@@ -218,7 +228,9 @@ export function PostDetailPage() {
             onMuteUser={handleMuteUser}
             onReportPost={openReportModal}
             onDeletePost={handleDeletePost}
+            onNotInterested={handleNotInterested}
             onVotePoll={handleVotePoll}
+            feedMode="recent"
             isAuthenticated={isAuthenticated}
             currentUserId={user?.id}
             defaultShowComments

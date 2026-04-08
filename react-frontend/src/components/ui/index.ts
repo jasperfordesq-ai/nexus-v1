@@ -14,6 +14,7 @@ export { BackToTop } from './BackToTop';
 export { AlgorithmLabel } from './AlgorithmLabel';
 export { ImagePlaceholder } from './ImagePlaceholder';
 export { DynamicIcon, ICON_MAP, ICON_NAMES } from './DynamicIcon';
+export { ConfettiCelebration } from './ConfettiCelebration';
 
 // Skeleton Components
 export {

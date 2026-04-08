@@ -74,7 +74,11 @@
   "bookmark": {
     "save": "Save",
     "remove": "Remove from saved",
-    "saved": "Saved"
+    "saved": "Saved",
+    "save_to": "Save to collection",
+    "no_collection": "General (no collection)",
+    "new_collection": "New collection",
+    "collection_name": "Collection name"
   },
   "bookmarks": {
     "page_title": "Saved",

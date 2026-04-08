@@ -267,7 +267,7 @@ export function HashtagPage() {
         <>
           {isLoading ? (
             <div className="space-y-4">
-              {[1, 2, 3].map((i) => <FeedSkeleton key={i} />)}
+              {[0, 1, 2].map((i) => <FeedSkeleton key={i} index={i} />)}
             </div>
           ) : items.length === 0 ? (
             <EmptyState
@@ -288,6 +288,7 @@ export function HashtagPage() {
                       onReportPost={openReportModal}
                       onDeletePost={() => handleDeletePost(item)}
                       onVotePoll={handleVotePoll}
+                      feedMode="recent"
                       isAuthenticated={isAuthenticated}
                       currentUserId={user?.id}
                     />

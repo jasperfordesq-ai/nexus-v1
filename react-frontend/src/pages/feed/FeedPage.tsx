@@ -35,7 +35,6 @@ import {
   AlertTriangle,
   ImagePlus,
   BarChart3,
-  Sparkles,
   TrendingUp,
   Flag,
   ArrowUp,
@@ -57,8 +56,11 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { FeedCard } from '@/components/feed/FeedCard';
 import { FeedSkeleton } from '@/components/feed/FeedSkeleton';
+import { FeedEmptyIllustration } from '@/components/illustrations';
 import type { FeedItem, FeedFilter, PollData } from '@/components/feed/types';
 import { getAuthor } from '@/components/feed/types';
 import type { ReactionType } from '@/components/social';
@@ -132,6 +134,21 @@ export function FeedPage() {
 
   // Stable ref for loadFeed — avoids including it in useEffect deps which causes reset loops
   const loadFeedRef = useRef<(append?: boolean) => Promise<void>>(null!);
+
+  // Infinite scroll: auto-load when sentinel nears viewport
+  const handleLoadMore = useCallback(() => { loadFeedRef.current?.(true); }, []);
+  const infiniteScrollRef = useInfiniteScroll({
+    hasMore,
+    isLoading: isLoadingMore,
+    onLoadMore: handleLoadMore,
+  });
+
+  // Pull-to-refresh: touch gesture on mobile
+  const handlePullRefresh = useCallback(async () => { await loadFeedRef.current?.(); }, []);
+  const { pullDistance, isRefreshing } = usePullToRefresh({
+    onRefresh: handlePullRefresh,
+    enabled: !isLoading,
+  });
 
 
   const loadFeed = useCallback(async (append = false) => {
@@ -479,6 +496,53 @@ export function FeedPage() {
     }
   }, []);
 
+  /* ───────── Edit Post ───────── */
+
+  const [editingItem, setEditingItem] = useState<FeedItem | null>(null);
+
+  const handleEditPost = useCallback((item: FeedItem) => {
+    setEditingItem(item);
+    setComposeDefaultTab('post');
+    onCreateOpen();
+  }, [onCreateOpen]);
+
+  const handleEditSuccess = useCallback((updatedItem: FeedItem) => {
+    // Merge server response into existing item to preserve engagement counts, reactions, etc.
+    setItems((prev) =>
+      prev.map((fi) =>
+        fi.id === updatedItem.id && (fi.type === updatedItem.type || updatedItem.type === undefined)
+          ? { ...fi, content: updatedItem.content, updated_at: updatedItem.updated_at ?? new Date().toISOString() }
+          : fi
+      )
+    );
+    setEditingItem(null);
+    onCreateClose();
+  }, [onCreateClose]);
+
+  const handleComposeClose = useCallback(() => {
+    setEditingItem(null);
+    onCreateClose();
+  }, [onCreateClose]);
+
+  /* ───────── Not Interested ───────── */
+
+  const handleNotInterested = useCallback(async (item: FeedItem) => {
+    // Optimistic removal — revert by re-inserting on failure
+    setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+    try {
+      await api.post(`/v2/feed/posts/${item.id}/not-interested`, { type: item.type });
+      toastRef.current.success(tRef.current('toast.not_interested', 'We\'ll show you less like this'));
+    } catch (err) {
+      logError('Failed to record not-interested', err);
+      // Revert: re-insert the item (may not be in original position, but that's acceptable)
+      setItems((prev) => {
+        if (prev.some((fi) => fi.id === item.id && fi.type === item.type)) return prev;
+        return [item, ...prev];
+      });
+      toastRef.current.error(tRef.current('toast.hide_failed'));
+    }
+  }, []);
+
   /* ───────── Poll Voting ───────── */
 
   const handleVotePoll = useCallback(async (pollId: number, optionId: number) => {
@@ -544,6 +608,24 @@ export function FeedPage() {
     <div className="max-w-5xl mx-auto flex gap-6">
       {/* Main Feed Column */}
       <div className="flex-1 min-w-0 max-w-2xl space-y-5">
+
+      {/* Pull-to-refresh indicator (mobile only) */}
+      {(pullDistance > 0 || isRefreshing) && (
+        <div
+          className="flex justify-center items-center overflow-hidden"
+          style={{ height: Math.max(pullDistance, isRefreshing ? 48 : 0), transition: pullDistance > 0 ? 'none' : 'height 0.3s ease-out' }}
+        >
+          <RefreshCw
+            className={`w-5 h-5 text-[var(--color-primary)] ${isRefreshing ? 'animate-spin' : ''}`}
+            style={{
+              transform: isRefreshing ? undefined : `rotate(${pullDistance * 4}deg)`,
+              opacity: isRefreshing ? 1 : Math.min(pullDistance / 60, 1),
+              transition: 'opacity 0.2s ease',
+            }}
+          />
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -714,14 +796,14 @@ export function FeedPage() {
         <>
           {isLoading ? (
             <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <FeedSkeleton key={i} />
+              {[0, 1, 2].map((i) => (
+                <FeedSkeleton key={i} index={i} />
               ))}
             </div>
           ) : items.length === 0 ? (
             <GlassCard className="p-12 text-center">
-              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-6">
-                <Sparkles className="w-10 h-10 text-indigo-400" aria-hidden="true" />
+              <div className="mx-auto mb-6">
+                <FeedEmptyIllustration className="w-32 h-32 mx-auto" />
               </div>
               <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">{t('empty_title')}</h2>
               <p className="text-sm text-[var(--text-muted)] mb-6 max-w-xs mx-auto">
@@ -754,7 +836,10 @@ export function FeedPage() {
                         onReportPost={openReportModal}
                         onDeletePost={handleDeletePost}
                         onAdminDeletePost={isAdmin ? handleAdminDeletePost : undefined}
+                        onEditPost={handleEditPost}
+                        onNotInterested={handleNotInterested}
                         onVotePoll={handleVotePoll}
+                        feedMode={feedMode}
                         isAuthenticated={isAuthenticated}
                         currentUserId={user?.id}
                         isAdmin={isAdmin}
@@ -770,7 +855,11 @@ export function FeedPage() {
                 ))}
               </AnimatePresence>
 
-              {hasMore && (
+              {/* Infinite scroll sentinel — triggers auto-load before user reaches bottom */}
+              {hasMore && <div ref={infiniteScrollRef} className="h-1" aria-hidden="true" />}
+
+              {/* Manual fallback: visible only while loading more */}
+              {hasMore && isLoadingMore && (
                 <div className="pt-6 pb-2 text-center">
                   <Button
                     variant="bordered"
@@ -787,8 +876,8 @@ export function FeedPage() {
               {/* Pagination loading skeletons */}
               {isLoadingMore && (
                 <div className="space-y-4 pt-2">
-                  {[1, 2].map((i) => (
-                    <FeedSkeleton key={`load-more-skeleton-${i}`} />
+                  {[0, 1].map((i) => (
+                    <FeedSkeleton key={`load-more-skeleton-${i}`} index={i} />
                   ))}
                 </div>
               )}
@@ -800,8 +889,10 @@ export function FeedPage() {
       {/* Compose Hub */}
       <ComposeHub
         isOpen={isCreateOpen}
-        onClose={onCreateClose}
+        onClose={handleComposeClose}
         defaultTab={composeDefaultTab}
+        editItem={editingItem}
+        onEditSuccess={handleEditSuccess}
         onSuccess={(type) => {
           if (type === 'poll') {
             navigate(tenantPath('/polls'));

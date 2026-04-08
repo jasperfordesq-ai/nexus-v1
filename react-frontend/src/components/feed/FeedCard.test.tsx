@@ -163,7 +163,10 @@ describe('FeedCard', () => {
 
   it('shows moderation menu for authenticated users', () => {
     render(<FeedCard {...defaultProps} />);
-    expect(screen.getByLabelText('Post options')).toBeInTheDocument();
+    // Two buttons exist (desktop dropdown + mobile bottom sheet trigger) — JSDOM renders both
+    const buttons = screen.getAllByLabelText('Post options');
+    expect(buttons.length).toBeGreaterThanOrEqual(1);
+    expect(buttons[0]).toBeInTheDocument();
   });
 
   it('does not show moderation menu for unauthenticated users', () => {
@@ -175,12 +178,14 @@ describe('FeedCard', () => {
     // Set currentUserId to match author_id — dropdown items render on open,
     // but the trigger button should always be present
     render(<FeedCard {...defaultProps} currentUserId={10} />);
-    expect(screen.getByLabelText('Post options')).toBeInTheDocument();
+    const buttons = screen.getAllByLabelText('Post options');
+    expect(buttons.length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows post options button for other users posts', () => {
     render(<FeedCard {...defaultProps} currentUserId={99} />);
-    expect(screen.getByLabelText('Post options')).toBeInTheDocument();
+    const buttons = screen.getAllByLabelText('Post options');
+    expect(buttons.length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders review with rating stars', () => {

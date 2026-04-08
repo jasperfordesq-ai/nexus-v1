@@ -33,6 +33,7 @@ export interface FeedItem {
     avatar_url?: string;
   };
   created_at: string;
+  updated_at?: string;
   type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'review' | 'job' | 'challenge' | 'volunteer' | 'blog' | 'discussion' | 'badge_earned' | 'level_up';
   likes_count: number;
   comments_count: number;
@@ -97,6 +98,8 @@ export interface FeedItem {
     content_type?: string | null;
     embed_html?: string | null;
   }>;
+  /** Server-provided ranking reasons (when available) or client-inferred */
+  ranking_reasons?: string[];
   /** Quoted post (quote repost) — embedded original post */
   quoted_post?: {
     id: number;

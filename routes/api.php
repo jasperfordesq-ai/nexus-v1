@@ -451,6 +451,8 @@ Route::post('/v2/feed/polls', [\App\Http\Controllers\Api\SocialController::class
 Route::get('/v2/feed/polls/{id}', [\App\Http\Controllers\Api\SocialController::class, 'getPollV2']);
 Route::post('/v2/feed/polls/{id}/vote', [\App\Http\Controllers\Api\SocialController::class, 'votePollV2']);
 Route::get('/v2/feed/posts/scheduled', [\App\Http\Controllers\Api\SocialController::class, 'scheduledPosts']);
+Route::put('/v2/feed/posts/{id}', [\App\Http\Controllers\Api\SocialController::class, 'updatePostV2']);
+Route::post('/v2/feed/posts/{id}/not-interested', [\App\Http\Controllers\Api\SocialController::class, 'notInterested']);
 Route::post('/v2/feed/posts/{id}/hide', [\App\Http\Controllers\Api\SocialController::class, 'hidePostV2']);
 Route::post('/v2/feed/posts/{id}/report', [\App\Http\Controllers\Api\SocialController::class, 'reportPostV2']);
 Route::delete('/v2/feed/posts/{id}', [\App\Http\Controllers\Api\SocialController::class, 'deletePostV2']);

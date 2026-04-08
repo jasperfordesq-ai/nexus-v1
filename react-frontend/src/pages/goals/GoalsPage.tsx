@@ -17,7 +17,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Button,
   Input,
@@ -58,13 +58,12 @@ import {
   Heart,
   UserPlus,
   Sparkles,
-  PartyPopper,
   ClipboardCheck,
   FileText,
   History,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, ConfettiCelebration } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -112,54 +111,6 @@ interface ProgressEntry {
 }
 
 type GoalTab = 'my' | 'buddying' | 'discover';
-
-/* ───────────────────────── Confetti Particle ───────────────────────── */
-
-function ConfettiCelebration({ show }: { show: boolean }) {
-  if (!show) return null;
-
-  const particles = Array.from({ length: 20 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 200 - 100,
-    y: -(Math.random() * 200 + 50),
-    rotation: Math.random() * 360,
-    scale: Math.random() * 0.5 + 0.5,
-    color: ['#6366f1', '#a855f7', '#22c55e', '#f59e0b', '#ec4899'][Math.floor(Math.random() * 5)],
-  }));
-
-  return (
-    <AnimatePresence>
-      {show && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
-          {particles.map((p) => (
-            <motion.div
-              key={p.id}
-              initial={{ x: '50%', y: '50%', opacity: 1, scale: p.scale, rotate: 0 }}
-              animate={{
-                x: `calc(50% + ${p.x}px)`,
-                y: `calc(50% + ${p.y}px)`,
-                opacity: 0,
-                rotate: p.rotation,
-              }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.2, ease: 'easeOut' }}
-              className="absolute w-3 h-3 rounded-sm"
-              style={{ backgroundColor: p.color }}
-            />
-          ))}
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: [0, 1.2, 1], opacity: [0, 1, 0] }}
-            transition={{ duration: 1.5, times: [0, 0.3, 1] }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <PartyPopper className="w-16 h-16 text-amber-400" />
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
-  );
-}
 
 /* ───────────────────────── Main Component ───────────────────────── */
 

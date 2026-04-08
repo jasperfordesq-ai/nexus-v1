@@ -60,6 +60,8 @@ export function ComposeHub({
   defaultTab = 'post',
   onSuccess,
   groupId,
+  editItem,
+  onEditSuccess,
 }: ComposeHubProps) {
   const { t } = useTranslation('feed');
   const { hasFeature, hasModule } = useTenant();
@@ -120,7 +122,7 @@ export function ComposeHub({
       )}
 
       {activeTab === 'listing' && <ListingTab {...tabProps} />}
-      {activeTab === 'post' && <PostTab {...tabProps} />}
+      {activeTab === 'post' && <PostTab {...tabProps} editItem={editItem} onEditSuccess={onEditSuccess} />}
       {activeTab === 'poll' && <PollTab {...tabProps} />}
       {activeTab === 'event' && <EventTab {...tabProps} />}
       {activeTab === 'goal' && <GoalTab {...tabProps} />}
@@ -135,10 +137,10 @@ export function ComposeHub({
           isOpen={isOpen}
           onClose={handleClose}
           activeTab={activeTab}
-          onTabChange={setActiveTab}
-          tabs={tabs}
-          headerTitle={t('compose.create_title', { type: t(`compose.tab_${activeTab}`) })}
-          templatePicker={<TemplatePicker tab={activeTab} onSelect={handleTemplateSelect} />}
+          onTabChange={editItem ? () => {} : setActiveTab}
+          tabs={editItem ? [] : tabs}
+          headerTitle={editItem ? t('card.edit_post', 'Edit Post') : t('compose.create_title', { type: t(`compose.tab_${activeTab}`) })}
+          templatePicker={editItem ? undefined : <TemplatePicker tab={activeTab} onSelect={handleTemplateSelect} />}
         >
           {bodyContent}
         </MobileComposeOverlay>
@@ -171,38 +173,40 @@ export function ComposeHub({
                   <ActiveIcon className="w-4 h-4 text-white" aria-hidden="true" />
                 </div>
                 <span className="font-semibold flex-1">
-                  {t('compose.create_title', { type: t(`compose.tab_${activeTab}`) })}
+                  {editItem ? t('card.edit_post', 'Edit Post') : t('compose.create_title', { type: t(`compose.tab_${activeTab}`) })}
                 </span>
-                <TemplatePicker tab={activeTab} onSelect={handleTemplateSelect} />
+                {!editItem && <TemplatePicker tab={activeTab} onSelect={handleTemplateSelect} />}
               </div>
 
-              {/* Underlined tabs */}
-              <Tabs
-                selectedKey={activeTab}
-                onSelectionChange={(key) => setActiveTab(key as ComposeTab)}
-                variant="underlined"
-                size="sm"
-                classNames={{
-                  tabList: 'gap-2 p-0 border-b border-[var(--border-default)]',
-                  tab: 'min-h-[44px] px-3 text-[var(--text-muted)] data-[selected=true]:text-[var(--text-primary)]',
-                  cursor: 'bg-gradient-to-r from-indigo-500 to-purple-600 h-[2px] rounded-full',
-                }}
-              >
-                {tabs.map((tab) => {
-                  const Icon = tab.icon;
-                  return (
-                    <Tab
-                      key={tab.key}
-                      title={
-                        <div className="flex items-center gap-1.5">
-                          <Icon className="w-3.5 h-3.5" aria-hidden="true" />
-                          <span>{t(`compose.tab_${tab.key}`)}</span>
-                        </div>
-                      }
-                    />
-                  );
-                })}
-              </Tabs>
+              {/* Underlined tabs — hidden in edit mode (locked to Post tab) */}
+              {!editItem && (
+                <Tabs
+                  selectedKey={activeTab}
+                  onSelectionChange={(key) => setActiveTab(key as ComposeTab)}
+                  variant="underlined"
+                  size="sm"
+                  classNames={{
+                    tabList: 'gap-2 p-0 border-b border-[var(--border-default)]',
+                    tab: 'min-h-[44px] px-3 text-[var(--text-muted)] data-[selected=true]:text-[var(--text-primary)]',
+                    cursor: 'bg-gradient-to-r from-indigo-500 to-purple-600 h-[2px] rounded-full',
+                  }}
+                >
+                  {tabs.map((tab) => {
+                    const Icon = tab.icon;
+                    return (
+                      <Tab
+                        key={tab.key}
+                        title={
+                          <div className="flex items-center gap-1.5">
+                            <Icon className="w-3.5 h-3.5" aria-hidden="true" />
+                            <span>{t(`compose.tab_${tab.key}`)}</span>
+                          </div>
+                        }
+                      />
+                    );
+                  })}
+                </Tabs>
+              )}
             </div>
           </ModalHeader>
 

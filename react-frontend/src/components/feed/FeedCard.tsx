@@ -53,16 +53,19 @@ import {
   Zap,
   Pencil,
   X,
+  ThumbsDown,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, BottomSheet } from '@/components/ui';
+import { GlassCard, BottomSheet, ConfettiCelebration } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime, formatDate, formatTime } from '@/lib/helpers';
 import { useFeedTracking } from '@/hooks/useFeedTracking';
+import { useLongPress } from '@/hooks/useLongPress';
 import type { FeedItem, FeedComment, PollData } from './types';
 import { getAuthor, getItemDetailPath, getItemDetailLabel } from './types';
+import { WhyShown } from './WhyShown';
 import { FeedContentRenderer } from './FeedContentRenderer';
 import { ImageCarousel } from './ImageCarousel';
 import { MediaGrid } from './MediaGrid';
@@ -95,7 +98,13 @@ export interface FeedCardProps {
   onDeletePost: (item: FeedItem) => void;
   /** Called with the feed item when an admin deletes any post. */
   onAdminDeletePost?: (item: FeedItem) => void;
+  /** Called with the feed item when the user wants to edit their own post. */
+  onEditPost?: (item: FeedItem) => void;
+  /** Called when the user marks a post as "not interested" (algorithm feedback). */
+  onNotInterested?: (item: FeedItem) => void;
   onVotePoll: (pollId: number, optionId: number) => void;
+  /** Current feed mode — used for "Why shown" explainer (only in ranking mode) */
+  feedMode?: 'ranking' | 'recent';
   isAuthenticated: boolean;
   currentUserId?: number;
   /** Whether the current user is an admin (shows admin delete on all posts). */
@@ -406,7 +415,10 @@ const FeedCard = React.memo(function FeedCard({
   onReportPost,
   onDeletePost,
   onAdminDeletePost,
+  onEditPost,
+  onNotInterested,
   onVotePoll,
+  feedMode = 'ranking',
   isAuthenticated,
   currentUserId,
   isAdmin,
@@ -429,6 +441,11 @@ const FeedCard = React.memo(function FeedCard({
 
   // Bottom sheet for mobile options menu
   const [isOptionsSheetOpen, setIsOptionsSheetOpen] = useState(false);
+
+  // Long-press to open options on mobile
+  const longPressHandlers = useLongPress({
+    onLongPress: () => { if (isAuthenticated) setIsOptionsSheetOpen(true); },
+  });
 
   const handleDoubleTapLike = useCallback(() => {
     if (!isAuthenticated) return;
@@ -454,6 +471,18 @@ const FeedCard = React.memo(function FeedCard({
   // Post analytics modal
   const [showAnalytics, setShowAnalytics] = useState(false);
 
+  // Confetti celebration for milestone feed items (badge_earned, level_up)
+  const [showConfetti, setShowConfetti] = useState(false);
+  const confettiTriggeredRef = useRef(false);
+  const confettiTimeoutRefs = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // Clean up confetti timeouts on unmount
+  useEffect(() => {
+    return () => {
+      confettiTimeoutRefs.current.forEach(clearTimeout);
+    };
+  }, []);
+
   // View tracking — fire once per session per post when entering viewport
   const viewTrackedRef = useRef(false);
   const viewTargetRef = useRef<HTMLDivElement | null>(null);
@@ -471,6 +500,16 @@ const FeedCard = React.memo(function FeedCard({
           viewTrackedRef.current = true;
           api.post(`/v2/feed/posts/${item.id}/view`).catch(() => {});
           observer.disconnect();
+
+          // Trigger confetti for milestone items on first view
+          const isMilestone = item.type === 'badge_earned' || item.type === 'level_up';
+          if (isMilestone && !confettiTriggeredRef.current) {
+            confettiTriggeredRef.current = true;
+            confettiTimeoutRefs.current.push(
+              setTimeout(() => setShowConfetti(true), 300),
+              setTimeout(() => setShowConfetti(false), 2000),
+            );
+          }
         }
       },
       { threshold: 0.5 }
@@ -478,7 +517,7 @@ const FeedCard = React.memo(function FeedCard({
     observer.observe(el);
 
     return () => observer.disconnect();
-  }, [item.id]);
+  }, [item.id, item.type]);
 
   const author = getAuthor(item);
   const isOwnPost = currentUserId === author.id;
@@ -614,7 +653,13 @@ const FeedCard = React.memo(function FeedCard({
   };
 
   return (
-    <GlassCard ref={(el: HTMLDivElement | null) => { (trackingRef as React.MutableRefObject<HTMLDivElement | null>).current = el; viewTargetRef.current = el; }} hoverable className="overflow-hidden group">
+    <GlassCard ref={(el: HTMLDivElement | null) => { (trackingRef as React.MutableRefObject<HTMLDivElement | null>).current = el; viewTargetRef.current = el; }} hoverable className="overflow-hidden group relative">
+      {/* Long-press touch target for mobile context menu */}
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+      <div onTouchStart={longPressHandlers.onTouchStart} onTouchMove={longPressHandlers.onTouchMove} onTouchEnd={longPressHandlers.onTouchEnd}>
+      {/* Confetti celebration overlay for milestones */}
+      <ConfettiCelebration show={showConfetti} />
+
       {/* Type accent bar */}
       {typeLabel && (
         <div className={`h-0.5 bg-gradient-to-r ${config.gradient}`} />
@@ -670,13 +715,33 @@ const FeedCard = React.memo(function FeedCard({
                     </Chip>
                   )
                 )}
+                {/* Scheduling indicator — visible only to the post author */}
+                {item.publish_status === 'scheduled' && isOwnPost && item.scheduled_at && (
+                  <Tooltip content={new Date(item.scheduled_at).toLocaleString()} placement="bottom" delay={300} closeDelay={0} size="sm">
+                    <Chip
+                      size="sm"
+                      variant="flat"
+                      color="warning"
+                      startContent={<Clock className="w-3 h-3" aria-hidden="true" />}
+                      className="text-[10px] h-5"
+                    >
+                      {t('card.scheduled', 'Scheduled')}
+                    </Chip>
+                  </Tooltip>
+                )}
               </div>
-              <Tooltip content={new Date(item.created_at).toLocaleString()} placement="bottom" delay={500} closeDelay={0} size="sm">
-                <p className="text-xs text-[var(--text-subtle)] flex items-center gap-1 cursor-default">
-                  <Clock className="w-3 h-3" aria-hidden="true" />
-                  {formatRelativeTime(item.created_at)}
-                </p>
-              </Tooltip>
+              <div className="flex items-center gap-1.5">
+                <Tooltip content={new Date(item.created_at).toLocaleString()} placement="bottom" delay={500} closeDelay={0} size="sm">
+                  <p className="text-xs text-[var(--text-subtle)] flex items-center gap-1 cursor-default">
+                    <Clock className="w-3 h-3" aria-hidden="true" />
+                    {formatRelativeTime(item.created_at)}
+                  </p>
+                </Tooltip>
+                {item.updated_at && item.updated_at !== item.created_at && (
+                  <span className="text-[10px] text-[var(--text-subtle)] italic">({t('card.edited')})</span>
+                )}
+                <WhyShown item={item} feedMode={feedMode} />
+              </div>
             </div>
           </div>
 
@@ -707,6 +772,15 @@ const FeedCard = React.memo(function FeedCard({
                         >
                           {t('card.view_analytics', 'View Analytics')}
                         </DropdownItem>
+                        {onEditPost && item.type === 'post' && (
+                          <DropdownItem
+                            key="edit"
+                            startContent={<Pencil className="w-4 h-4" aria-hidden="true" />}
+                            onPress={() => onEditPost(item)}
+                          >
+                            {t('card.edit_post', 'Edit Post')}
+                          </DropdownItem>
+                        )}
                         <DropdownItem
                           key="delete"
                           startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
@@ -726,6 +800,15 @@ const FeedCard = React.memo(function FeedCard({
                         >
                           {t('card.hide_post')}
                         </DropdownItem>
+                        {onNotInterested && (
+                          <DropdownItem
+                            key="not-interested"
+                            startContent={<ThumbsDown className="w-4 h-4" aria-hidden="true" />}
+                            onPress={() => onNotInterested(item)}
+                          >
+                            {t('card.not_interested', 'Not interested')}
+                          </DropdownItem>
+                        )}
                         <DropdownItem
                           key="mute"
                           startContent={<VolumeX className="w-4 h-4" aria-hidden="true" />}
@@ -789,6 +872,16 @@ const FeedCard = React.memo(function FeedCard({
                       >
                         {t('card.view_analytics', 'View Analytics')}
                       </Button>
+                      {onEditPost && item.type === 'post' && (
+                        <Button
+                          variant="light"
+                          className="justify-start text-[var(--text-primary)]"
+                          startContent={<Pencil className="w-4 h-4" aria-hidden="true" />}
+                          onPress={() => { setIsOptionsSheetOpen(false); onEditPost(item); }}
+                        >
+                          {t('card.edit_post', 'Edit Post')}
+                        </Button>
+                      )}
                       <Button
                         variant="light"
                         className="justify-start text-danger"
@@ -808,6 +901,16 @@ const FeedCard = React.memo(function FeedCard({
                       >
                         {t('card.hide_post')}
                       </Button>
+                      {onNotInterested && (
+                        <Button
+                          variant="light"
+                          className="justify-start text-[var(--text-primary)]"
+                          startContent={<ThumbsDown className="w-4 h-4" aria-hidden="true" />}
+                          onPress={() => { setIsOptionsSheetOpen(false); onNotInterested(item); }}
+                        >
+                          {t('card.not_interested', 'Not interested')}
+                        </Button>
+                      )}
                       <Button
                         variant="light"
                         className="justify-start text-[var(--text-primary)]"
@@ -1285,6 +1388,7 @@ const FeedCard = React.memo(function FeedCard({
           )}
         </AnimatePresence>
       </div>
+      </div>{/* end long-press touch target */}
     </GlassCard>
   );
 });

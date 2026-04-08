@@ -153,6 +153,7 @@ export function GroupFeedTab({
                   onReportPost={() => onReportPost(item.id)}
                   onDeletePost={() => onDeletePost(item)}
                   onVotePoll={onVotePoll}
+                  feedMode="recent"
                   isAuthenticated={isAuthenticated}
                   currentUserId={currentUser?.id}
                 />

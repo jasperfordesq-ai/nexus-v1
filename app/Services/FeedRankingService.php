@@ -682,7 +682,10 @@ class FeedRankingService
     /**
      * Rank feed items in-memory using 15-signal EdgeRank.
      */
-    public function rankFeedItems(array $items, ?int $viewerId = null, ?string $viewerTimezone = null): array
+    /**
+     * @param bool $includeReasons If true, attaches '_ranking_reasons' with top signals per item
+     */
+    public function rankFeedItems(array $items, ?int $viewerId = null, ?string $viewerTimezone = null, bool $includeReasons = false): array
     {
         if (!$this->isEnabled() || count($items) < 2) {
             return $items;
@@ -849,6 +852,91 @@ class FeedRankingService
 
         foreach ($items as &$item) {
             unset($item['_edge_rank']);
+        }
+        unset($item);
+
+        // Second pass: compute ranking reasons when requested
+        // Done after sort so we don't waste time on items that get filtered
+        if ($includeReasons) {
+            $items = $this->attachRankingReasons($items, $viewerId, $connectedSet, $socialScores, $velocityScores, $typeWeights);
+        }
+
+        return $items;
+    }
+
+    /**
+     * Attach human-readable ranking reasons to each item.
+     * Returns the top 3 contributing signals as i18n-ready keys.
+     */
+    private function attachRankingReasons(
+        array $items,
+        ?int $viewerId,
+        array $connectedSet,
+        array $socialScores,
+        array $velocityScores,
+        array $typeWeights,
+    ): array {
+        static $reasonLabels = [
+            'social_affinity' => 'why_shown.from_connection',
+            'engagement'      => 'why_shown.popular',
+            'velocity'        => 'why_shown.trending',
+            'type_boost'      => 'why_shown.community_content',
+            'quality'         => 'why_shown.quality_content',
+            'conversation'    => 'why_shown.active_discussion',
+            'fresh'           => 'why_shown.fresh',
+            'saved'           => 'why_shown.frequently_saved',
+        ];
+
+        foreach ($items as &$item) {
+            $signals = [];
+            $authorId = (int) ($item['user_id'] ?? 0);
+            $postId = (int) ($item['id'] ?? $item['post_id'] ?? 0);
+
+            // Social affinity
+            if ($viewerId && $authorId && (isset($connectedSet[$authorId]) || (isset($socialScores[$authorId]) && $socialScores[$authorId] > 0))) {
+                $signals['social_affinity'] = 2.0;
+            }
+
+            // Engagement
+            $likes = (int) ($item['likes_count'] ?? 0);
+            $comments = (int) ($item['comments_count'] ?? 0);
+            if (($likes + $comments) >= 3) {
+                $signals['engagement'] = 1.5 + min($likes + $comments, 20) * 0.05;
+            }
+
+            // Velocity
+            if (isset($velocityScores[$postId]) && $velocityScores[$postId] >= self::VELOCITY_THRESHOLD) {
+                $signals['velocity'] = 1.8;
+            }
+
+            // Type boost
+            $sourceType = $item['type'] ?? $item['source_type'] ?? 'post';
+            if (($typeWeights[$sourceType] ?? 1.0) > 1.1) {
+                $signals['type_boost'] = $typeWeights[$sourceType] ?? 1.0;
+            }
+
+            // Quality (images, video)
+            if (!empty($item['image_url']) || !empty($item['media'])) {
+                $signals['quality'] = 1.3;
+            }
+
+            // Freshness (< 4h)
+            $createdAt = $item['created_at'] ?? null;
+            if ($createdAt) {
+                $hoursAgo = max(0, (time() - strtotime($createdAt)) / 3600);
+                if ($hoursAgo < 4) {
+                    $signals['fresh'] = 1.5;
+                }
+            }
+
+            // Sort by weight descending, take top 3
+            arsort($signals);
+            $topReasons = [];
+            foreach (array_slice($signals, 0, 3, true) as $key => $weight) {
+                $topReasons[] = $reasonLabels[$key] ?? $key;
+            }
+
+            $item['ranking_reasons'] = $topReasons;
         }
         unset($item);
 

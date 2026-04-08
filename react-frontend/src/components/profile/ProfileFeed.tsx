@@ -253,6 +253,7 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
               onReportPost={() => {/* no-op on profile */}}
               onDeletePost={() => void handleDeletePost(item)}
               onVotePoll={handleVotePoll}
+              feedMode="recent"
               isAuthenticated={isAuthenticated}
               currentUserId={user?.id}
             />

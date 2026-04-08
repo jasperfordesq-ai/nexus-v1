@@ -13,7 +13,21 @@
 import { Skeleton, Divider } from '@heroui/react';
 import { GlassCard } from '@/components/ui';
 
-export function FeedSkeleton() {
+type SkeletonVariant = 'with-image' | 'text-only' | 'random';
+
+// Stable per-index seed so random variants don't shift on re-render
+const variantForIndex = (index: number): boolean => index % 3 !== 2; // ~66% show image
+
+interface FeedSkeletonProps {
+  variant?: SkeletonVariant;
+  /** Index in the skeleton list — used for deterministic "random" variant */
+  index?: number;
+}
+
+export function FeedSkeleton({ variant = 'random', index = 0 }: FeedSkeletonProps) {
+  const showImage = variant === 'with-image' || (variant === 'random' ? variantForIndex(index) : false);
+  const lineCount = variant === 'random' ? (index % 2 === 0 ? 3 : 2) : 3;
+
   return (
     <GlassCard className="overflow-hidden">
       <div className="p-5">
@@ -30,12 +44,12 @@ export function FeedSkeleton() {
         <div className="space-y-2 mb-4">
           <Skeleton className="h-4 w-full rounded-lg" />
           <Skeleton className="h-4 w-4/5 rounded-lg" />
-          <Skeleton className="h-4 w-3/5 rounded-lg" />
+          {lineCount >= 3 && <Skeleton className="h-4 w-3/5 rounded-lg" />}
         </div>
       </div>
 
-      {/* Image placeholder (16:9 aspect ratio) */}
-      <Skeleton className="w-full aspect-video rounded-none" />
+      {/* Image placeholder (16:9 aspect ratio) — conditional */}
+      {showImage && <Skeleton className="w-full aspect-video rounded-none" />}
 
       <div className="p-5 pt-4">
         {/* Divider */}

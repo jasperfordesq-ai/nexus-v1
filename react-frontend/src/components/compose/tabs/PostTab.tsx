@@ -52,7 +52,10 @@ interface PostDraft {
   plainText: string;
 }
 
-export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmitProps) {
+export function PostTab({ onSuccess, onClose, groupId, templateData, editItem, onEditSuccess }: TabSubmitProps & {
+  editItem?: import('@/components/feed/types').FeedItem | null;
+  onEditSuccess?: (item: import('@/components/feed/types').FeedItem) => void;
+}) {
   const { t } = useTranslation('feed');
   const { user } = useAuth();
   const toast = useToast();
@@ -61,9 +64,11 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
   const editorRef = useRef<ComposeEditorHandle>(null);
   const submitRef = useRef<() => void>(() => {});
 
+  const isEditing = !!editItem;
+
   const [draft, setDraft, clearDraft] = useDraftPersistence<PostDraft>(
-    'compose-draft-post',
-    { htmlContent: '', plainText: '' },
+    isEditing ? `compose-edit-${editItem?.id}` : 'compose-draft-post',
+    { htmlContent: editItem?.content ?? '', plainText: editItem?.content ?? '' },
   );
 
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
@@ -131,6 +136,23 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
         ? `${baseContent}\n${selectedGifUrl}`.trim()
         : baseContent;
 
+      // ── Edit mode: PUT existing post ──
+      if (isEditing && editItem) {
+        const res = await api.put(`/v2/feed/posts/${editItem.id}`, {
+          content: contentToSend,
+        });
+
+        if (res.success && res.data) {
+          clearDraft();
+          toast.success(t('toast.post_updated', 'Post updated'));
+          onEditSuccess?.(res.data as import('@/components/feed/types').FeedItem);
+        } else {
+          toast.error(t('toast.update_failed', 'Failed to update post'));
+        }
+        return;
+      }
+
+      // ── Create mode: POST new post ──
       let res;
 
       // Build scheduling payload
@@ -181,8 +203,8 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
         toast.error(t('compose.post_failed'));
       }
     } catch (err) {
-      logError('Failed to create post', err);
-      toast.error(t('compose.post_failed'));
+      logError(isEditing ? 'Failed to update post' : 'Failed to create post', err);
+      toast.error(isEditing ? t('toast.update_failed', 'Failed to update post') : t('compose.post_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -195,7 +217,7 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
       canSubmit,
       isSubmitting,
       onSubmit: () => submitRef.current(),
-      buttonLabel: t('compose.post_button'),
+      buttonLabel: isEditing ? t('compose.save_changes', 'Save') : t('compose.post_button'),
       gradientClass: 'from-indigo-500 to-purple-600',
     });
     return unregister;

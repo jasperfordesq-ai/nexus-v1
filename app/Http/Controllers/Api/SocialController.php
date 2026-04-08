@@ -424,6 +424,56 @@ class SocialController extends BaseApiController
     // V2 endpoints — native (no delegation)
     // ========================================================================
 
+    /** PUT /api/v2/feed/posts/{id} — Edit own post content */
+    public function updatePostV2(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('feed_edit', 30, 60);
+
+        $data = $this->getAllInput();
+
+        $result = $this->feedService->updatePost($id, $userId, $data);
+
+        if (!$result['success']) {
+            $status = str_contains($result['error'] ?? '', 'not found') ? 404 : 422;
+            return $this->respondWithError('UPDATE_FAILED', $result['error'], null, $status);
+        }
+
+        // Return the updated post with media
+        $post = $this->feedService->getItem('post', $id, $userId);
+        if ($post) {
+            $post['media'] = $this->postMediaService->getMediaForPost($id);
+        }
+
+        return $this->respondWithData($post);
+    }
+
+    /** POST /api/v2/feed/posts/{id}/not-interested — Algorithm feedback */
+    public function notInterested(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = $this->getTenantId();
+
+        $targetType = $this->input('type', 'post');
+        $validTypes = ['post', 'listing', 'event', 'poll', 'goal', 'review', 'job',
+                       'challenge', 'volunteer', 'blog', 'discussion', 'badge_earned', 'level_up'];
+        if (!in_array($targetType, $validTypes, true)) {
+            $targetType = 'post';
+        }
+
+        // Record as hidden (reuses feed_hidden table — the EdgeRank negative signal
+        // treats all hidden items equally for now)
+        DB::table('feed_hidden')->insertOrIgnore([
+            'user_id'     => $userId,
+            'tenant_id'   => $tenantId,
+            'target_type' => $targetType,
+            'target_id'   => $id,
+            'created_at'  => now(),
+        ]);
+
+        return $this->respondWithData(['success' => true, 'post_id' => $id]);
+    }
+
     /** POST /api/v2/feed/posts/{id}/hide */
     public function hidePostV2(int $id): JsonResponse
     {

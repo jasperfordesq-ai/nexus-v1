@@ -29,6 +29,10 @@ export interface ComposeHubProps {
   defaultTab?: ComposeTab;
   onSuccess?: (type: ComposeTab, id?: number) => void;
   groupId?: number;
+  /** When set, the compose modal opens in edit mode for this item */
+  editItem?: import('@/components/feed/types').FeedItem | null;
+  /** Called with the updated item after a successful edit */
+  onEditSuccess?: (item: import('@/components/feed/types').FeedItem) => void;
 }
 
 export interface TemplateData {
