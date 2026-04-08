@@ -17,7 +17,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Avatar, Tabs, Tab, Chip, Skeleton, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
+import { Button, Avatar, Chip, Skeleton, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
 import {
   User,
   MapPin,
@@ -742,81 +742,45 @@ export function ProfilePage() {
 
       {/* Tabs Content */}
       <motion.div variants={itemVariants}>
-        <Tabs
-          selectedKey={activeTab}
-          onSelectionChange={(key) => setActiveTab(key as string)}
-          aria-label={t('aria.profile_sections', 'Profile sections')}
-          classNames={{
-            tabList: 'bg-theme-elevated p-1 rounded-lg overflow-x-auto flex-nowrap',
-            cursor: 'bg-theme-hover',
-            tab: 'text-theme-muted data-[selected=true]:text-theme-primary',
-          }}
-        >
-          <Tab
-            key="about"
-            aria-label={t('aria.about_this_user', 'About this user')}
-            title={
-              <span className="flex items-center gap-2">
-                <User className="w-4 h-4" aria-hidden="true" />
-                {t('tabs.about')}
-              </span>
-            }
-          />
-          <Tab
-            key="listings"
-            aria-label={t('aria.user_listings', 'User listings')}
-            title={
-              <span className="flex items-center gap-2">
-                <ListTodo className="w-4 h-4" aria-hidden="true" />
-                {t('tabs.listings')}
-              </span>
-            }
-          />
-          <Tab
-            key="activity"
-            aria-label={t('aria.user_activity_feed', 'User activity feed')}
-            title={
-              <span className="flex items-center gap-2">
-                <Rss className="w-4 h-4" aria-hidden="true" />
-                {t('tabs.activity', 'Activity')}
-              </span>
-            }
-          />
-          <Tab
-            key="availability"
-            aria-label={t('aria.user_availability', 'User availability')}
-            title={
-              <span className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" aria-hidden="true" />
-                {t('tabs.availability')}
-              </span>
-            }
-          />
-          {hasReviews && reviewsAvailable && (
-            <Tab
-              key="reviews"
-              aria-label={t('aria.user_reviews', 'User reviews')}
-              title={
-                <span className="flex items-center gap-2">
-                  <Star className="w-4 h-4" aria-hidden="true" />
-                  {t('tabs.reviews')}
-                </span>
-              }
-            />
-          )}
-          {hasGamification && (
-            <Tab
-              key="achievements"
-              aria-label={t('aria.user_achievements', 'User achievements')}
-              title={
-                <span className="flex items-center gap-2">
-                  <Award className="w-4 h-4" aria-hidden="true" />
-                  {t('tabs.achievements')}
-                </span>
-              }
-            />
-          )}
-        </Tabs>
+        {(() => {
+          const tabs = [
+            { key: 'about', icon: User, label: t('tabs.about') },
+            { key: 'listings', icon: ListTodo, label: t('tabs.listings') },
+            { key: 'activity', icon: Rss, label: t('tabs.activity', 'Activity') },
+            { key: 'availability', icon: Calendar, label: t('tabs.availability') },
+            ...(hasReviews && reviewsAvailable ? [{ key: 'reviews', icon: Star, label: t('tabs.reviews') }] : []),
+            ...(hasGamification ? [{ key: 'achievements', icon: Award, label: t('tabs.achievements') }] : []),
+          ];
+          return (
+            <div
+              className="flex items-center gap-1 bg-theme-elevated p-1 rounded-lg overflow-x-auto scrollbar-hide"
+              role="tablist"
+              aria-label={t('aria.profile_sections', 'Profile sections')}
+            >
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.key;
+                return (
+                  <button
+                    type="button"
+                    key={tab.key}
+                    role="tab"
+                    aria-selected={isActive ? 'true' : 'false'}
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+                      isActive
+                        ? 'bg-theme-hover text-theme-primary shadow-sm'
+                        : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover/50'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })()}
 
         <div className="mt-6">
           {activeTab === 'about' && (
