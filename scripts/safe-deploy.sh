@@ -1151,14 +1151,17 @@ for arg in "$@"; do
     esac
 done
 
-# Handle logs subcommand (no lock needed)
+# Handle logs and status subcommands (read-only, no lock/cleanup needed)
+# Exit early BEFORE the trap is meaningful — these commands must NOT
+# trigger cleanup() which would delete the deploy lock or toggle maintenance.
 if [ "$MODE" = "logs" ]; then
+    trap - EXIT  # disable cleanup trap for read-only commands
     show_logs "$@"
     exit 0
 fi
 
-# Handle status mode (no lock needed)
 if [ "$MODE" = "status" ]; then
+    trap - EXIT  # disable cleanup trap for read-only commands
     LOG_FILE="/dev/null"
     show_status
     exit 0
