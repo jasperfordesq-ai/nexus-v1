@@ -509,7 +509,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                       variant="light"
                       size="sm"
                       className="text-theme-muted hover:text-theme-primary h-8 min-w-0 px-2 gap-1.5 text-xs"
-                      onPress={() => { onClose(); navigate(tenantPath('/help')); }}
+                      onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/help')), 150); }}
                     >
                       <HelpCircle className="w-3.5 h-3.5" aria-hidden="true" />
                       {t('user_menu.help_center')}
@@ -519,7 +519,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                     variant="light"
                     size="sm"
                     className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 h-8 min-w-0 px-2 gap-1.5 text-xs"
-                    onPress={() => { onClose(); navigate(tenantPath(RELEASE_STATUS.readMorePath)); }}
+                    onPress={() => { onClose(); setTimeout(() => navigate(tenantPath(RELEASE_STATUS.readMorePath)), 150); }}
                   >
                     <FlaskConical className="w-3.5 h-3.5" aria-hidden="true" />
                     {t('dev_banner.dev_notice', 'Dev Notice')}
@@ -529,7 +529,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                       variant="light"
                       size="sm"
                       className="text-theme-muted hover:text-theme-primary h-8 min-w-0 px-2 gap-1.5 text-xs"
-                      onPress={() => { onClose(); navigate(tenantPath('/contact')); }}
+                      onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/contact')), 150); }}
                     >
                       <MessageSquare className="w-3.5 h-3.5" aria-hidden="true" />
                       {t('support.contact')}
@@ -541,7 +541,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                         variant="light"
                         size="sm"
                         className="text-theme-muted hover:text-theme-primary h-8 min-w-0 px-2 gap-1.5 text-xs"
-                        onPress={() => { onClose(); navigate(tenantPath('/admin')); }}
+                        onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/admin')), 150); }}
                       >
                         <Shield className="w-3.5 h-3.5" aria-hidden="true" />
                         {t('user_menu.admin_panel')}
@@ -577,7 +577,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 <div className="flex items-center gap-2">
                   <Button
                     variant="light"
-                    onPress={() => { onClose(); navigate(tenantPath('/settings')); }}
+                    onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/settings')), 150); }}
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-[var(--border-default)] transition-all h-auto"
                   >
                     <Settings className="w-4 h-4" aria-hidden="true" />
