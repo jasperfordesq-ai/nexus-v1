@@ -27,16 +27,21 @@ if (import.meta.env.PROD) {
     onNeedRefresh?: () => void;
     onOfflineReady?: () => void;
   }) => (reloadPage?: boolean) => void }) => {
+    // Check if the user already triggered an update from this exact build.
+    // If so, don't fire events that would re-show the banner — the SW just
+    // needs time to activate and the next reload will pick up new code.
+    const UPDATE_COMMIT_KEY = 'nexus_sw_update_from_commit';
+    const updateAlreadyTriggered = () => {
+      const fromCommit = sessionStorage.getItem(UPDATE_COMMIT_KEY);
+      return !!(fromCommit && fromCommit === __BUILD_COMMIT__);
+    };
+
     const updateSW = registerSW({
       immediate: true,
       onNeedRefresh() {
-        // Store the updateSW function BEFORE dispatching the event —
-        // if a listener calls handleUpdate() synchronously, updateSW must exist.
         (window as NexusWindow).__nexus_updateSW = updateSW;
-        // Set a flag so the banner can detect updates that fired before React mounted.
+        if (updateAlreadyTriggered()) return; // Don't re-show banner
         (window as NexusWindow).__nexus_updatePending = true;
-        // Dispatch a custom event so the React app can show an update banner.
-        // The banner lets the user choose when to reload — never interrupt them.
         window.dispatchEvent(new CustomEvent('nexus:sw_update_available'));
       },
       onOfflineReady() {
@@ -50,22 +55,16 @@ if (import.meta.env.PROD) {
     (window as NexusWindow).__nexus_updateSW = updateSW;
 
     // On boot, check directly if a waiting SW already exists from a previous session.
-    // This is the primary fix for mobile: sessionStorage is wiped on app close,
-    // but registration.waiting persists. onNeedRefresh won't fire again, so we
-    // must detect the waiting worker ourselves.
-    navigator.serviceWorker.getRegistration().then((reg) => {
-      if (reg?.waiting) {
-        (window as NexusWindow).__nexus_updatePending = true;
-        window.dispatchEvent(new CustomEvent('nexus:sw_update_available'));
-      }
-    }).catch(() => { /* non-blocking */ });
-
-    // Also fire the banner if a new SW moves into waiting state while the app is open
-    // (covers the case where the new SW finishes installing mid-session).
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      // A new SW just took control — this only happens after updateSW(true) is called,
-      // so the reload is already handled by the banner. No action needed here.
-    });
+    // Skip if we already triggered an update from this build — avoids the
+    // "click 4-5 times" loop where the old code keeps re-showing the banner.
+    if (!updateAlreadyTriggered()) {
+      navigator.serviceWorker.getRegistration().then((reg) => {
+        if (reg?.waiting) {
+          (window as NexusWindow).__nexus_updatePending = true;
+          window.dispatchEvent(new CustomEvent('nexus:sw_update_available'));
+        }
+      }).catch(() => { /* non-blocking */ });
+    }
 
     // Periodically check for SW updates (every 5 min) so long-lived sessions
     // (mobile PWA kept open for hours) eventually see the update banner.

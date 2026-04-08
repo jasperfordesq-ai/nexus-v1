@@ -29,6 +29,7 @@ import { useEffect, useCallback, useRef } from 'react';
 
 const CHECK_INTERVAL_MS = 5 * 60 * 1000;
 const INITIAL_DELAY_MS = 15_000;
+const SW_UPDATE_FROM_COMMIT_KEY = 'nexus_sw_update_from_commit';
 
 export function useVersionCheck() {
   // Once we've notified in this session, don't fire again — the banner is already showing.
@@ -36,6 +37,13 @@ export function useVersionCheck() {
 
   const check = useCallback(async () => {
     if (hasNotified.current) return;
+
+    // If the user already clicked "Update" from this build, don't re-fire.
+    // The banner suppresses itself based on this same key — re-dispatching
+    // the event would be pointless and causes the "click 4-5 times" loop.
+    const fromCommit = sessionStorage.getItem(SW_UPDATE_FROM_COMMIT_KEY);
+    if (fromCommit && fromCommit === __BUILD_COMMIT__) return;
+
     try {
       const res = await fetch('/build-info.json', { cache: 'no-store' });
       if (!res.ok) return;

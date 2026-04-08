@@ -19,14 +19,17 @@
  *     SW persists, and onNeedRefresh never re-fires.
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, X } from 'lucide-react';
 import { Button } from '@heroui/react';
 
-const SW_UPDATE_TRIGGERED_KEY = 'nexus_sw_update_triggered';
+// Stores the BUILD_COMMIT that the user clicked "Update" from.
+// If on reload we're STILL running that same commit, the update hasn't taken
+// effect yet — suppress the banner entirely instead of showing it again.
+const SW_UPDATE_FROM_COMMIT_KEY = 'nexus_sw_update_from_commit';
 
 async function hasWaitingSW(): Promise<boolean> {
   try {
@@ -37,39 +40,47 @@ async function hasWaitingSW(): Promise<boolean> {
   }
 }
 
+/**
+ * Returns true if the user already triggered an update from this exact build
+ * and the page is still running old code (i.e. the reload didn't pick up new assets).
+ */
+function isUpdateAlreadyTriggered(): boolean {
+  const fromCommit = sessionStorage.getItem(SW_UPDATE_FROM_COMMIT_KEY);
+  if (!fromCommit) return false;
+  if (fromCommit === __BUILD_COMMIT__) {
+    // Still running the same build — update hasn't taken effect. Suppress.
+    return true;
+  }
+  // Different build is running — the update worked! Clean up.
+  sessionStorage.removeItem(SW_UPDATE_FROM_COMMIT_KEY);
+  return false;
+}
+
 export function UpdateAvailableBanner() {
   const { t } = useTranslation('common');
   const [showBanner, setShowBanner] = useState(false);
   const [updating, setUpdating] = useState(false);
   const location = useLocation();
 
-  // Suppresses all show-banner paths for ~3s after the user clicked "Update Now".
-  // Prevents the "press 3 times" loop caused by reg?.waiting lingering during the
-  // race between skipWaiting() and the new SW fully taking control.
-  const suppressRef = useRef(false);
-
   const checkAndShow = useCallback(() => {
-    if (suppressRef.current) return;
+    if (isUpdateAlreadyTriggered()) return;
     hasWaitingSW().then((waiting) => {
       if (waiting) setShowBanner(true);
     });
   }, []);
 
   useEffect(() => {
-    // If the user just clicked "Update Now" and the page reloaded, suppress all
-    // immediate show-banner paths for this mount cycle. Both checkAndShow() and the
-    // __nexus_updatePending flag can find a stale reg?.waiting during the race
-    // between skipWaiting() completing and the new SW fully taking control.
-    if (sessionStorage.getItem(SW_UPDATE_TRIGGERED_KEY)) {
-      sessionStorage.removeItem(SW_UPDATE_TRIGGERED_KEY);
-      suppressRef.current = true;
-      // Allow banner again after 3s — if the update genuinely failed the user can retry.
-      setTimeout(() => { suppressRef.current = false; }, 3000);
-      // Clear the stale pending flag too so it doesn't fire later in this effect.
+    // If we already triggered an update from this build, suppress everything.
+    // The banner would just make the user click again for no reason — the SW
+    // needs time to activate. We'll un-suppress on the next reload that actually
+    // picks up the new code (different __BUILD_COMMIT__).
+    if (isUpdateAlreadyTriggered()) {
       (window as NexusWindow).__nexus_updatePending = false;
-      // Still register the event listener — a genuinely new update could arrive later,
-      // but respect the suppression window so the stale boot-time check doesn't sneak through.
-      function handleUpdateAvailable() { if (!suppressRef.current) setShowBanner(true); }
+      // Still listen for events, but only show if suppression clears
+      // (e.g. a DIFFERENT update arrives while we're waiting).
+      function handleUpdateAvailable() {
+        if (!isUpdateAlreadyTriggered()) setShowBanner(true);
+      }
       window.addEventListener('nexus:sw_update_available', handleUpdateAvailable);
       return () => window.removeEventListener('nexus:sw_update_available', handleUpdateAvailable);
     }
@@ -115,40 +126,60 @@ export function UpdateAvailableBanner() {
   }, [checkAndShow]);
 
   function handleUpdate() {
-    // Mark that we triggered the update so the next mount (after reload) skips
-    // the waiting-SW check and doesn't immediately re-show the banner.
-    sessionStorage.setItem(SW_UPDATE_TRIGGERED_KEY, '1');
+    // Store which build we're updating FROM — on reload, if __BUILD_COMMIT__
+    // still matches this value, the update hasn't taken effect yet and we
+    // suppress the banner instead of showing it again in an annoying loop.
+    sessionStorage.setItem(SW_UPDATE_FROM_COMMIT_KEY, __BUILD_COMMIT__);
     setUpdating(true);
 
-    // Call the updateSW function stored by main.tsx to activate the new SW + reload.
-    // The 3s timeout is a hard safety net — if *anything* hangs (postMessage lost,
-    // controllerchange never fires, Promise stuck), we always reload.
     const updateSW = (window as NexusWindow).__nexus_updateSW;
+
+    // Strategy: tell the SW to skip waiting, then wait for `controllerchange`
+    // (meaning the NEW SW has taken control) before reloading. This ensures
+    // the reload actually fetches new assets from the new SW's precache.
+    // Hard timeout of 5s in case controllerchange never fires.
+    const doReload = () => window.location.reload();
+
     if (typeof updateSW === 'function') {
-      const reloadTimeout = setTimeout(() => window.location.reload(), 3000);
+      let reloaded = false;
+      const reload = () => {
+        if (reloaded) return;
+        reloaded = true;
+        doReload();
+      };
+
+      // Listen for the new SW to take control BEFORE calling updateSW.
+      // controllerchange fires when a new SW claims the page.
+      if (navigator.serviceWorker) {
+        navigator.serviceWorker.addEventListener('controllerchange', reload, { once: true });
+      }
+
+      // Hard safety timeout — if controllerchange never fires, reload anyway.
+      const fallbackTimeout = setTimeout(reload, 5000);
+
       try {
         const result = updateSW(true);
         if (result && typeof (result as Promise<void>).then === 'function') {
           (result as Promise<void>).then(
             () => {
-              // SW activated — but vite-plugin-pwa may not auto-reload (relies on
-              // controllerchange which can miss). Give it 500ms, then force reload.
-              clearTimeout(reloadTimeout);
-              setTimeout(() => window.location.reload(), 500);
+              // Promise resolved — SW activated. Give controllerchange 500ms to
+              // fire, then force reload if it hasn't happened yet.
+              clearTimeout(fallbackTimeout);
+              setTimeout(reload, 500);
             },
             () => {
-              clearTimeout(reloadTimeout);
-              window.location.reload();
+              clearTimeout(fallbackTimeout);
+              reload();
             }
           );
         }
-        // If updateSW returned void (not a Promise), the 3s timeout handles it.
+        // If updateSW returned void (not a Promise), controllerchange or timeout handles it.
       } catch {
-        clearTimeout(reloadTimeout);
-        window.location.reload();
+        clearTimeout(fallbackTimeout);
+        reload();
       }
     } else {
-      window.location.reload();
+      doReload();
     }
   }
 
