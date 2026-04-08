@@ -188,7 +188,7 @@ main() {
         -v "$OUTPUT_DIR:/output" \
         -w /work \
         "$PLAYWRIGHT_IMAGE" \
-        bash -c "npm init -y >/dev/null 2>&1 && npm install --no-save playwright >/dev/null 2>&1 && node /worker.mjs" 2>&1
+        bash -c "npm init -y >/dev/null 2>&1 && npm install --no-save playwright >/dev/null 2>&1 && NODE_PATH=/work/node_modules node /worker.mjs" 2>&1
 
     local EXIT_CODE=$?
 
