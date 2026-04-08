@@ -106,6 +106,7 @@ export function Layout({
             onMobileMenuOpen={handleMobileMenuOpen}
             externalSearchOpen={isSearchOpen}
             onSearchOpenChange={handleSearchOpenChange}
+            isMobileMenuOpen={isMobileMenuOpen}
           />
           <MobileDrawer
             isOpen={isMobileMenuOpen}
@@ -135,7 +136,7 @@ export function Layout({
       {showFooter && <Footer />}
 
       {/* Mobile bottom tab bar */}
-      {showNavbar && <MobileTabBar onMenuOpen={handleMobileMenuOpen} />}
+      {showNavbar && <MobileTabBar onMenuOpen={handleMobileMenuOpen} isMenuOpen={isMobileMenuOpen} />}
 
       {/* Back to top button */}
       <BackToTop />

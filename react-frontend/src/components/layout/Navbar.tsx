@@ -81,13 +81,16 @@ import { PresenceIndicator, StatusSelector } from '@/components/social';
 import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 
 interface NavbarProps {
+  /** Opens mobile drawer — only used for unauthenticated users (authenticated users use MobileTabBar) */
   onMobileMenuOpen?: () => void;
   /** External control for search overlay (from MobileDrawer) */
   externalSearchOpen?: boolean;
   onSearchOpenChange?: (open: boolean) => void;
+  /** Whether the mobile drawer is currently open — hides navbar on mobile when true */
+  isMobileMenuOpen?: boolean;
 }
 
-export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChange }: NavbarProps) {
+export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChange, isMobileMenuOpen }: NavbarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation('common');
@@ -377,7 +380,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
         {t('accessibility.skip_to_content', 'Skip to main content')}
       </a>
 
-      <header className="fixed top-0 left-0 right-0 z-300 backdrop-blur-xl border-b border-theme-default glass-surface overflow-x-clip" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+      <header className={`fixed top-0 left-0 right-0 z-300 backdrop-blur-xl border-b border-theme-default glass-surface overflow-x-clip transition-transform duration-200 ${isMobileMenuOpen ? '-translate-y-full md:translate-y-0' : ''}`} style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         {/* Development status banner — inside fixed header so it's always visible */}
         <DevelopmentStatusBanner />
 
@@ -491,17 +494,19 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
           <div className="flex items-center justify-between h-14 sm:h-16">
             {/* Left Section: Mobile Menu + Brand */}
             <div className="flex items-center gap-2 sm:gap-3">
-              {/* Mobile Menu Toggle */}
-              <Button
-                isIconOnly
-                variant="light"
-                size="sm"
-                className="lg:hidden text-theme-muted hover:text-theme-primary min-w-[44px] min-h-[44px]"
-                onPress={onMobileMenuOpen}
-                aria-label={t('accessibility.open_menu')}
-              >
-                <Menu className="w-5 h-5" aria-hidden="true" />
-              </Button>
+              {/* Mobile Menu Toggle — guests only (authenticated users use MobileTabBar) */}
+              {!isAuthenticated && (
+                <Button
+                  isIconOnly
+                  variant="light"
+                  size="sm"
+                  className="lg:hidden text-theme-muted hover:text-theme-primary min-w-[44px] min-h-[44px]"
+                  onPress={onMobileMenuOpen}
+                  aria-label={t('accessibility.open_menu')}
+                >
+                  <Menu className="w-5 h-5" aria-hidden="true" />
+                </Button>
+              )}
 
               {/* Brand — shrinks when scrolled */}
               <TenantLogo size="md" showName compact={isScrolled} />

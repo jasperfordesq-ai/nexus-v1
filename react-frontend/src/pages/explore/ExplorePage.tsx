@@ -800,7 +800,7 @@ export default function ExplorePage() {
                         </div>
                       </div>
                       <p className="text-sm text-[var(--text-secondary)] line-clamp-3">
-                        {post.excerpt}
+                        {post.excerpt?.replace(/<[^>]*>/g, '') || ''}
                       </p>
                       <div className="flex items-center gap-3 text-xs text-[var(--text-muted)]">
                         <span className="flex items-center gap-1">
@@ -854,8 +854,15 @@ export default function ExplorePage() {
                           loading="lazy"
                         />
                       ) : (
-                        <div className="w-full h-32 rounded-lg bg-[var(--surface-elevated)] flex items-center justify-center">
-                          <ListTodo className="w-8 h-8 text-[var(--text-subtle)]" />
+                        <div className="w-full h-32 rounded-lg bg-gradient-to-br from-[var(--surface-elevated)] to-[var(--glass-bg)] flex flex-col items-center justify-center gap-1.5">
+                          {listing.type === 'offer' ? (
+                            <HandHeart className="w-7 h-7 text-[var(--color-primary)] opacity-40" />
+                          ) : (
+                            <Search className="w-7 h-7 text-[var(--color-primary)] opacity-40" />
+                          )}
+                          <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--text-subtle)]">
+                            {listing.type}
+                          </span>
                         </div>
                       )}
                       <div>

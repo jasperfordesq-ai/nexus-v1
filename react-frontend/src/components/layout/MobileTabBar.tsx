@@ -27,12 +27,14 @@ import { QuickCreateMenu } from './QuickCreateMenu';
 
 interface MobileTabBarProps {
   onMenuOpen?: () => void;
+  /** Whether the mobile drawer is currently open — hides tab bar when true */
+  isMenuOpen?: boolean;
 }
 
 /** Routes where the tab bar should be hidden */
 const hiddenRoutes = ['/login', '/register', '/password/forgot', '/password/reset', '/onboarding'];
 
-export function MobileTabBar({ onMenuOpen }: MobileTabBarProps) {
+export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
   const { t } = useTranslation('common');
   const location = useLocation();
   const navigate = useNavigate();
@@ -86,7 +88,7 @@ export function MobileTabBar({ onMenuOpen }: MobileTabBarProps) {
       <div className="h-16 md:hidden" aria-hidden="true" />
 
       <nav
-        className="fixed bottom-0 left-0 right-0 z-300 md:hidden"
+        className={`fixed bottom-0 left-0 right-0 z-300 md:hidden transition-transform duration-200 ${isMenuOpen ? 'translate-y-full' : ''}`}
         aria-label={t('aria.mobile_navigation')}
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >

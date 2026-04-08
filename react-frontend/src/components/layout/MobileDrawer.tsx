@@ -11,7 +11,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Button,
   Avatar,
@@ -242,22 +242,22 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
     const Icon = item.icon;
     const resolvedHref = tenantPath(item.href);
+    const isActive = location.pathname === resolvedHref || location.pathname.startsWith(resolvedHref + '/');
 
     return (
-      <NavLink
+      <button
         key={item.href}
-        to={resolvedHref}
-        className={({ isActive }) =>
-          `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-            isActive
-              ? 'bg-theme-active text-theme-primary'
-              : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
-          }`
-        }
+        type="button"
+        onClick={() => { onClose(); setTimeout(() => navigate(resolvedHref), 150); }}
+        className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-left ${
+          isActive
+            ? 'bg-theme-active text-theme-primary'
+            : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
+        }`}
       >
         <Icon className="w-4 h-4" aria-hidden="true" />
         <span>{item.label}</span>
-      </NavLink>
+      </button>
     );
   };
 
@@ -323,9 +323,10 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
           {/* User Section */}
           {isAuthenticated && user && (
             <div className="p-4 border-b border-[var(--border-default)]">
-              <Link
-                to={tenantPath('/profile')}
-                className="flex items-center gap-3"
+              <button
+                type="button"
+                onClick={() => { onClose(); setTimeout(() => navigate(tenantPath('/profile')), 150); }}
+                className="flex items-center gap-3 w-full text-left"
               >
                 <Avatar
                   name={`${user.first_name} ${user.last_name}`}
@@ -339,7 +340,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   </p>
                   <p className="text-sm text-theme-subtle">{user.email}</p>
                 </div>
-              </Link>
+              </button>
 
               {/* Identity Verification Status */}
               <VerificationBadgeRow userId={user.id} size="sm" />
@@ -347,17 +348,19 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
               {/* Quick Stats */}
               <div className="grid grid-cols-3 gap-2 mt-3">
-                <Link
-                  to={tenantPath('/wallet')}
+                <button
+                  type="button"
+                  onClick={() => { onClose(); setTimeout(() => navigate(tenantPath('/wallet')), 150); }}
                   className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors"
                 >
                   <p className="text-lg font-bold text-theme-primary">
                     {user.balance ?? 0}
                   </p>
                   <p className="text-xs text-theme-subtle">{t('stats.credits')}</p>
-                </Link>
-                <Link
-                  to={tenantPath('/messages')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { onClose(); setTimeout(() => navigate(tenantPath('/messages')), 150); }}
                   className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative"
                 >
                   <p className="text-lg font-bold text-theme-primary">
@@ -367,9 +370,10 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   {counts.messages > 0 && (
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
                   )}
-                </Link>
-                <Link
-                  to={tenantPath('/notifications')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { onClose(); setTimeout(() => navigate(tenantPath('/notifications')), 150); }}
                   className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative"
                 >
                   <p className="text-lg font-bold text-theme-primary">
@@ -379,7 +383,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   {unreadCount > 0 && (
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
                   )}
-                </Link>
+                </button>
               </div>
             </div>
           )}
@@ -515,7 +519,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                     variant="light"
                     size="sm"
                     className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 h-8 min-w-0 px-2 gap-1.5 text-xs"
-                    onPress={() => { onClose(); navigate(RELEASE_STATUS.readMorePath); }}
+                    onPress={() => { onClose(); navigate(tenantPath(RELEASE_STATUS.readMorePath)); }}
                   >
                     <FlaskConical className="w-3.5 h-3.5" aria-hidden="true" />
                     {t('dev_banner.dev_notice', 'Dev Notice')}
@@ -571,19 +575,14 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
             {isAuthenticated && (
               <div className="px-4 py-3 border-t border-[var(--border-default)]">
                 <div className="flex items-center gap-2">
-                  <NavLink
-                    to={tenantPath('/settings')}
-                    className={({ isActive }) =>
-                      `flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
-                        isActive
-                          ? 'bg-theme-active text-theme-primary'
-                          : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-[var(--border-default)]'
-                      }`
-                    }
+                  <Button
+                    variant="light"
+                    onPress={() => { onClose(); navigate(tenantPath('/settings')); }}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-[var(--border-default)] transition-all h-auto"
                   >
                     <Settings className="w-4 h-4" aria-hidden="true" />
                     <span>{t('account.settings')}</span>
-                  </NavLink>
+                  </Button>
                   <Button
                     variant="light"
                     onPress={handleLogout}
@@ -599,19 +598,19 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
             {/* Auth buttons for guests */}
             {!isAuthenticated && (
               <div className="px-4 py-3 border-t border-[var(--border-default)] space-y-2">
-                <Link to={tenantPath('/login')}>
-                  <Button
-                    variant="flat"
-                    className="w-full bg-theme-elevated text-theme-secondary"
-                  >
-                    {t('auth.log_in')}
-                  </Button>
-                </Link>
-                <Link to={tenantPath('/register')}>
-                  <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium">
-                    {t('auth.sign_up')}
-                  </Button>
-                </Link>
+                <Button
+                  variant="flat"
+                  className="w-full bg-theme-elevated text-theme-secondary"
+                  onPress={() => { onClose(); navigate(tenantPath('/login')); }}
+                >
+                  {t('auth.log_in')}
+                </Button>
+                <Button
+                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
+                  onPress={() => { onClose(); navigate(tenantPath('/register')); }}
+                >
+                  {t('auth.sign_up')}
+                </Button>
               </div>
             )}
 
@@ -627,21 +626,21 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 Built on Project NEXUS by Jasper Ford
               </a>
               <div className="flex justify-center gap-2 mt-2">
-                <Link
-                  to={tenantPath('/platform/terms')}
+                <button
+                  type="button"
+                  onClick={() => { onClose(); setTimeout(() => navigate(tenantPath('/platform/terms')), 150); }}
                   className="text-[10px] text-theme-subtle hover:text-theme-primary transition-colors"
-                  onClick={onClose}
                 >
                   Platform Terms
-                </Link>
+                </button>
                 <span className="text-theme-subtle/30">&middot;</span>
-                <Link
-                  to={tenantPath('/platform/privacy')}
+                <button
+                  type="button"
+                  onClick={() => { onClose(); setTimeout(() => navigate(tenantPath('/platform/privacy')), 150); }}
                   className="text-[10px] text-theme-subtle hover:text-theme-primary transition-colors"
-                  onClick={onClose}
                 >
                   Privacy
-                </Link>
+                </button>
               </div>
             </div>
           </nav>
