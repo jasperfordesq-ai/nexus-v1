@@ -1,6 +1,6 @@
 # Project NEXUS — Roadmap
 
-> **Last updated:** 2026-04-05 (Marketplace module: Phases 1-5 implemented — all MKT1-MKT40 built)
+> **Last updated:** 2026-04-08 (SEO: critical audit fixes deployed + Next.js migration planned)
 > **Maintained by:** Jasper Ford
 > **Status key:** ✅ Done | ⚠️ Partial | 📋 Planned | 💡 Future
 
@@ -10,18 +10,80 @@ This is the **single, canonical roadmap** for Project NEXUS. All feature plannin
 
 ## Table of Contents
 
-1. [Technical Debt & Platform Health](#1-technical-debt--platform-health)
-2. [Federation & Internationalization](#2-federation--internationalization)
-3. [Social & Engagement Features](#3-social--engagement-features)
-4. [Media & Communication](#4-media--communication)
-5. [Admin & Reporting](#5-admin--reporting)
-6. [Infrastructure & Integrations](#6-infrastructure--integrations)
-7. [Marketplace Module (Commercial)](#7-marketplace-module-commercial)
-8. [Completed Work](#8-completed-work)
+1. [SEO & Rendering Architecture](#1-seo--rendering-architecture)
+2. [Technical Debt & Platform Health](#2-technical-debt--platform-health)
+3. [Federation & Internationalization](#3-federation--internationalization)
+4. [Social & Engagement Features](#4-social--engagement-features)
+5. [Media & Communication](#5-media--communication)
+6. [Admin & Reporting](#6-admin--reporting)
+7. [Infrastructure & Integrations](#7-infrastructure--integrations)
+8. [Marketplace Module (Commercial)](#8-marketplace-module-commercial)
+9. [Completed Work](#9-completed-work)
 
 ---
 
-## 1. Technical Debt & Platform Health
+## 1. SEO & Rendering Architecture
+
+The platform lost all organic keywords after migrating from WordPress to a Vite React SPA. The SPA sends an empty `<div id="root"></div>` to crawlers — Google cannot index content without JavaScript execution. A deep audit (2026-04-08) found 7 critical issues including Prerender.io cache poisoning, missing WordPress redirects, and broken sitemap configuration. Emergency fixes deployed same day. The long-term fix is migrating the frontend rendering architecture.
+
+### Phase A — Emergency SEO Fixes (Complete)
+
+Deployed 2026-04-08. Stops the bleeding while the architectural fix is planned.
+
+| # | Item | Status | Notes |
+|---|------|--------|-------|
+| SEO1 | Prerender.io cache poisoning fix | ✅ Done | MaintenancePage returns 503 via `prerender-status-code` meta tag. Prevents maintenance page from being cached and served to Google with `noindex`. |
+| SEO2 | Homepage prerender bypass fix | ✅ Done | nginx `try_files $uri @prerender` (removed `$uri/`). Homepage was serving empty SPA shell to all crawlers. |
+| SEO3 | WordPress legacy URL redirects | ✅ Done | 301/410 rules in nginx.conf for `/wp-*`, `/guides/*`, `/feed/`, `/author/*`, `/community-directory/`, `/southern-star/`. Preserves backlink equity. |
+| SEO4 | NotFoundPage soft 404 fix | ✅ Done | NotFoundPage + CommunityNotFound return 404 via `prerender-status-code`. Previously returned 200 (soft 404 penalty). |
+| SEO5 | robots.txt Sitemap directive fix | ✅ Done | nginx `sub_filter` rewrites `app.project-nexus.ie` → `$host` so each custom domain references its own sitemap. |
+| SEO6 | Sitemap API domain URL fix | ✅ Done | `SitemapController` case 3 uses `generateForAppDomain()` instead of generating URLs with the API domain. |
+| SEO7 | Group lastmod dates | ✅ Done | `SitemapService` uses `COALESCE(updated_at, created_at)` instead of `created_at`. 431 groups had stale Dec 2025 dates. |
+| SEO8 | Auto-recache after deploy | ✅ Done | `scripts/recache-prerender.sh` (2-phase: static + sitemap URLs). Integrated into `safe-deploy.sh`. |
+| SEO9 | Cloudflare robots.txt injection | ✅ Done | Disabled Cloudflare AI bot control robots.txt modification across all 8 zones. Was creating duplicate `User-agent: *` groups. |
+
+### Phase B — Build-Time Static Pre-Rendering (In Progress)
+
+Interim solution: pre-render public pages at build time so nginx serves real HTML to everyone (users AND bots), with React hydrating on top. No external services, no runtime rendering.
+
+| # | Item | Status | Priority | Notes |
+|---|------|--------|----------|-------|
+| SEO10 | Playwright pre-render script | 📋 Planned | Critical | `postbuild` script visits ~20 static public routes, saves rendered HTML. nginx serves these directly. |
+| SEO11 | Dynamic route pre-rendering | 📋 Planned | Critical | Blog posts, listings, groups fetched from sitemap at build time and pre-rendered. |
+| SEO12 | Structured data on listings | 📋 Planned | High | Product/Service JSON-LD schema on `ListingDetailPage`. Enables rich snippets. |
+| SEO13 | Article schema completion | 📋 Planned | High | Blog posts: add `dateModified`, `description`, `author.url` to Article JSON-LD. |
+| SEO14 | Homepage internal linking | 📋 Planned | High | Add discoverable links to blog, listings, events, groups in `LandingPageRenderer` for crawlers. |
+| SEO15 | Remove test blog posts | 📋 Planned | Medium | 4 lorem ipsum posts in sitemap (`aenean-sed-pulvinar-et-diam`, etc.) — unpublish from admin. |
+
+### Phase C — Next.js Migration (Planned)
+
+The correct long-term architecture. Migrate the React frontend from Vite SPA to Next.js App Router with server-side rendering. Public pages get SSR/SSG with Incremental Static Regeneration. Protected pages stay as `"use client"` components. Estimated **4-6 weeks** for SEO-critical public pages, **10-14 weeks** for full migration.
+
+| # | Item | Status | Priority | Effort | Notes |
+|---|------|--------|----------|--------|-------|
+| NX1 | Next.js project setup | 📋 Planned | Critical | 1 week | Tailwind 4, HeroUI, i18n (next-intl), TypeScript strict. New branch `nextjs-migration`. |
+| NX2 | Multi-tenant middleware | 📋 Planned | Critical | 1 week | Domain → tenant resolution in Next.js middleware (currently in React `TenantContext`). Server-side tenant bootstrap. |
+| NX3 | Auth system (SSR-compatible) | 📋 Planned | Critical | 1 week | Sanctum token → server-side session. Protected route middleware. API client for server components. |
+| NX4 | Public pages — SSG | 📋 Planned | Critical | 3-5 days | Homepage, About, FAQ, Contact, Help, Legal pages (x6), Timebanking Guide. Static generation at build time. |
+| NX5 | Blog pages — ISR | 📋 Planned | Critical | 3-5 days | Blog listing + `/blog/:slug`. Incremental Static Regeneration (60s revalidation). Full Article schema. |
+| NX6 | Listings pages — ISR | 📋 Planned | Critical | 3-5 days | Listings browse + `/listings/:id`. ISR with Product/Service schema. |
+| NX7 | Groups + Events pages — ISR | 📋 Planned | High | 3-5 days | `/groups/:id`, `/events/:id`. ISR (300s revalidation). |
+| NX8 | Auth pages (Login, Register, etc.) | 📋 Planned | High | 2-3 days | Client components, minimal SSR needed. |
+| NX9 | Protected pages (Dashboard, Messages, Wallet, etc.) | 📋 Planned | Medium | 3-4 weeks | 50+ routes. Most stay as `"use client"` with SSR shell (layout only). |
+| NX10 | Admin panel | 📋 Planned | Medium | 1 week | Catch-all `"use client"` route. Already fully client-side. |
+| NX11 | PWA + Service Worker | 📋 Planned | Medium | 3-5 days | `next-pwa` package. Rework SW registration and update detection. |
+| NX12 | Real-time features (Pusher, presence) | 📋 Planned | Medium | 2-3 days | Client-only, needs SSR-safe initialization. |
+| NX13 | Stripe, Maps, WebAuthn, Lexical | 📋 Planned | Low | 3-5 days | All client components. Minimal SSR impact. |
+| NX14 | Production Dockerfile + deployment | 📋 Planned | Critical | 2-3 days | Node.js runtime replaces nginx static. Docker Compose changes. CI/CD updates. |
+| NX15 | E2E testing + performance benchmarking | 📋 Planned | High | 1 week | Playwright tests, Lighthouse CI, Core Web Vitals verification. |
+
+**Migration approach:** Incremental, page by page. NX1-NX7 (public pages) ship first — this is the SEO-critical work (~4-6 weeks). NX8-NX13 (protected pages) follow as a second phase. The existing Vite SPA continues serving protected routes until each page is migrated.
+
+**Branch:** `nextjs-migration` (will be created when Phase C begins).
+
+---
+
+## 2. Technical Debt & Platform Health
 
 Items that improve code quality, test coverage, and maintainability.
 
@@ -37,7 +99,7 @@ Items that improve code quality, test coverage, and maintainability.
 
 ---
 
-## 2. Federation & Internationalization
+## 3. Federation & Internationalization
 
 Features enabling a **global network of timebanks** communicating across languages. Inspired by outreach from the international timebanking community (hOurWorld, Timebanks.org, Care and Share Time Bank).
 
@@ -65,7 +127,7 @@ Features enabling a **global network of timebanks** communicating across languag
 
 ---
 
-## 3. Social & Engagement Features
+## 4. Social & Engagement Features
 
 Features that make NEXUS feel like a modern social platform.
 
@@ -99,7 +161,7 @@ Features that make NEXUS feel like a modern social platform.
 | # | Item | Status | Priority | Effort | Notes |
 |---|------|--------|----------|--------|-------|
 | SOC16 | Live streaming | 💡 Future | Low | Very Large (4-8 wk) | No implementation. Needs media server (Mux/Agora). |
-| SOC17 | Marketplace module (commercial) | ✅ Done | — | — | Phases 1–5 fully implemented (2026-04-05). 18 tables, 14 services, 12 controllers, ~100 endpoints, 14 pages, 26 components, 3 admin pages. See [Section 7](#7-marketplace-module-commercial). |
+| SOC17 | Marketplace module (commercial) | ✅ Done | — | — | Phases 1–5 fully implemented (2026-04-05). 18 tables, 14 services, 12 controllers, ~100 endpoints, 14 pages, 26 components, 3 admin pages. See [Section 8](#8-marketplace-module-commercial). |
 | SOC18 | User activity status sharing | ✅ Done | — | — | `user_presence` table: `custom_status`, `status_emoji`. `StatusSelector` component. `PresenceController` API. |
 | SOC19 | Community challenges / competitions | 📋 Planned | Low | Medium (1-2 wk) | Ideation challenges exist (different concept). No team competitions, community-wide progress bars, or competitive leaderboards. |
 | SOC20 | Personal impact dashboard | ✅ Done | — | — | `ImpactReportingService` with SROI calculations. `ImpactReportPage` + `ImpactSummaryPage`. Community health metrics, impact timelines. |
@@ -110,7 +172,7 @@ Features that make NEXUS feel like a modern social platform.
 
 ---
 
-## 4. Media & Communication
+## 5. Media & Communication
 
 Enhancements to the messaging and media systems.
 
@@ -121,7 +183,7 @@ Enhancements to the messaging and media systems.
 
 ---
 
-## 5. Admin & Reporting
+## 6. Admin & Reporting
 
 | # | Item | Status | Priority | Effort | Notes |
 |---|------|--------|----------|--------|-------|
@@ -132,7 +194,7 @@ Enhancements to the messaging and media systems.
 
 ---
 
-## 6. Infrastructure & Integrations
+## 7. Infrastructure & Integrations
 
 | # | Item | Status | Priority | Effort | Notes |
 |---|------|--------|----------|--------|-------|
@@ -146,7 +208,7 @@ Enhancements to the messaging and media systems.
 
 ---
 
-## 7. Marketplace Module (Commercial)
+## 8. Marketplace Module (Commercial)
 
 A **completely standalone commercial marketplace module** (SOC17) for buying/selling physical goods and paid services — like Facebook Marketplace. This is **entirely separate from the Listings module** (which handles timebanking service exchanges for time credits). The marketplace has its own tables, services, controllers, pages, and Meilisearch index. Zero coupling to listings.
 
@@ -259,7 +321,7 @@ Features unique to NEXUS — no competitor has these because they require a comm
 
 ---
 
-## 8. Completed Work
+## 9. Completed Work
 
 Summary of major completed initiatives. These are kept for historical reference only.
 
