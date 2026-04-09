@@ -9,7 +9,7 @@
  * Includes health check, API call logs, and feature toggles.
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   Button,
   Chip,
