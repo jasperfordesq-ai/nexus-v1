@@ -50,7 +50,7 @@ class CommunityDashboardService
             $totalBadges = (int) UserBadge::where('tenant_id', $tenantId)->count();
 
             $totalVolunteerHours = (float) VolLog::where('tenant_id', $tenantId)
-                ->where('status', 'verified')->sum('hours');
+                ->where('status', 'approved')->sum('hours');
 
             $totalListings = (int) Listing::where('tenant_id', $tenantId)->count();
 
@@ -190,7 +190,7 @@ class CommunityDashboardService
             ->whereBetween('created_at', [$start, $end])->count();
 
         $volHours = round((float) VolLog::where('tenant_id', $tenantId)
-            ->where('status', 'verified')
+            ->where('status', 'approved')
             ->whereBetween('created_at', [$start, $end])->sum('hours'), 1);
 
         $newPosts = (int) FeedPost::where('tenant_id', $tenantId)
