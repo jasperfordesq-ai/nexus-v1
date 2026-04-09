@@ -16,6 +16,8 @@ class GoalCheckin extends Model
     use HasFactory, HasTenantScope;
     protected $table = 'goal_checkins';
 
+    public const UPDATED_AT = null;
+
     protected $fillable = [
         'goal_id', 'user_id', 'tenant_id', 'progress_percent', 'note', 'mood',
     ];

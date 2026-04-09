@@ -32,6 +32,37 @@ class GoalsController extends BaseApiController
         private readonly GoalReminderService $reminderService,
     ) {}
 
+    /**
+     * Enrich a goal array with computed fields the frontend expects.
+     *
+     * Maps nested relations to flat fields: user_name, user_avatar,
+     * buddy_id, buddy_name, buddy_avatar, progress_percentage.
+     */
+    private function enrichGoal(array $goal): array
+    {
+        // Flatten user relation
+        $user = $goal['user'] ?? null;
+        $goal['user_name'] = $user
+            ? trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''))
+            : null;
+        $goal['user_avatar'] = $user['avatar_url'] ?? null;
+
+        // Map mentor → buddy fields (frontend uses buddy_id, backend stores mentor_id)
+        $mentor = $goal['mentor'] ?? null;
+        $goal['buddy_id'] = $goal['mentor_id'] ?? null;
+        $goal['buddy_name'] = $mentor
+            ? trim(($mentor['first_name'] ?? '') . ' ' . ($mentor['last_name'] ?? ''))
+            : null;
+        $goal['buddy_avatar'] = $mentor['avatar_url'] ?? null;
+
+        // Compute progress percentage
+        $target = (float) ($goal['target_value'] ?? 0);
+        $current = (float) ($goal['current_value'] ?? 0);
+        $goal['progress_percentage'] = $target > 0 ? min(100.0, ($current / $target) * 100) : 0.0;
+
+        return $goal;
+    }
+
     // -----------------------------------------------------------------
     //  GET /api/v2/goals
     // -----------------------------------------------------------------
@@ -59,6 +90,7 @@ class GoalsController extends BaseApiController
         $result = $this->goalService->getAll($filters);
 
         $items = array_map(function (array $goal) use ($userId) {
+            $goal = $this->enrichGoal($goal);
             $goal['is_owner'] = ((int) ($goal['user_id'] ?? 0) === $userId);
             $goal['is_buddy'] = ((int) ($goal['mentor_id'] ?? 0) === $userId && ($goal['mentor_id'] ?? null) !== null);
             return $goal;
@@ -90,7 +122,7 @@ class GoalsController extends BaseApiController
             return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.goal_is_private'), null, 403);
         }
 
-        $data = $goal->toArray();
+        $data = $this->enrichGoal($goal->toArray());
         $data['is_owner'] = ((int) $goal->user_id === $userId);
         $data['is_buddy'] = ((int) ($goal->mentor_id ?? 0) === $userId && $goal->mentor_id !== null);
 
@@ -113,7 +145,7 @@ class GoalsController extends BaseApiController
         }
 
         $goal = $this->goalService->create($userId, $data);
-        $result = $goal->toArray();
+        $result = $this->enrichGoal($goal->load(['user:id,first_name,last_name,avatar_url', 'mentor:id,first_name,last_name,avatar_url'])->toArray());
         $result['is_owner'] = true;
 
         // Record feed activity (only for public goals)
@@ -152,7 +184,7 @@ class GoalsController extends BaseApiController
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.goal_not_found_or_not_owned'), null, 404);
         }
 
-        $data = $goal->toArray();
+        $data = $this->enrichGoal($goal->load(['user:id,first_name,last_name,avatar_url', 'mentor:id,first_name,last_name,avatar_url'])->toArray());
         $data['is_owner'] = true;
 
         return $this->respondWithData($data);
@@ -240,7 +272,7 @@ class GoalsController extends BaseApiController
             \Log::warning('Goal auto-completion notification failed', ['goal' => $id, 'error' => $e->getMessage()]);
         }
 
-        $data = $goal->toArray();
+        $data = $this->enrichGoal($goal->load(['user:id,first_name,last_name,avatar_url', 'mentor:id,first_name,last_name,avatar_url'])->toArray());
         $data['is_owner'] = true;
 
         return $this->respondWithData($data);
@@ -298,7 +330,7 @@ class GoalsController extends BaseApiController
             \Log::warning('Goal buddy completion notification failed', ['goal' => $id, 'error' => $e->getMessage()]);
         }
 
-        $data = $goal->toArray();
+        $data = $this->enrichGoal($goal->load(['user:id,first_name,last_name,avatar_url', 'mentor:id,first_name,last_name,avatar_url'])->toArray());
         $data['is_owner'] = true;
 
         return $this->respondWithData($data);
@@ -323,6 +355,7 @@ class GoalsController extends BaseApiController
         $result = $this->goalService->getPublicForBuddy($userId, $filters);
 
         $items = array_map(function (array $goal) use ($userId) {
+            $goal = $this->enrichGoal($goal);
             $goal['is_owner'] = ((int) ($goal['user_id'] ?? 0) === $userId);
             $goal['is_buddy'] = false;
             return $goal;
@@ -350,6 +383,7 @@ class GoalsController extends BaseApiController
         $result = $this->goalService->getGoalsAsMentor($userId, $filters);
 
         $items = array_map(function (array $goal) use ($userId) {
+            $goal = $this->enrichGoal($goal);
             $goal['is_owner'] = ((int) ($goal['user_id'] ?? 0) === $userId);
             $goal['is_buddy'] = true;
             return $goal;
@@ -392,7 +426,7 @@ class GoalsController extends BaseApiController
 
         return $this->respondWithData([
             'message' => __('api.buddy_added'),
-            'goal'    => $goal->toArray(),
+            'goal'    => $this->enrichGoal($goal->toArray()),
         ]);
     }
 

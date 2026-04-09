@@ -382,6 +382,8 @@ export function GoalsPage() {
               : g
           )
         );
+      } else {
+        toastRef.current.error(tRef.current('goals.toast.buddy_failed'));
       }
     } catch (err) {
       logError('Failed to become buddy', err);
@@ -919,6 +921,18 @@ export function GoalsPage() {
                 </div>
               </ModalBody>
               <ModalFooter>
+                {tab === 'discover' && detailGoal && !detailGoal.is_owner && detailGoal.is_public && !detailGoal.buddy_id && !detailGoal.is_buddy && user && (
+                  <Button
+                    className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white"
+                    startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
+                    onPress={() => {
+                      handleBecomeBuddy(detailGoal);
+                      onDetailClose();
+                    }}
+                  >
+                    {t('goals.become_buddy')}
+                  </Button>
+                )}
                 <Button variant="flat" onPress={onDetailClose} className="text-theme-muted">{t('goals.modal.close')}</Button>
               </ModalFooter>
             </>

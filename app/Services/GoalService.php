@@ -32,7 +32,7 @@ class GoalService
         $cursor = $filters['cursor'] ?? null;
 
         $query = $this->goal->newQuery()
-            ->with(['user:id,first_name,last_name,avatar_url', 'mentor:id,first_name,last_name']);
+            ->with(['user:id,first_name,last_name,avatar_url', 'mentor:id,first_name,last_name,avatar_url']);
 
         if (! empty($filters['user_id'])) {
             $query->where('user_id', (int) $filters['user_id']);
@@ -75,7 +75,7 @@ class GoalService
         $cursor = $filters['cursor'] ?? null;
 
         $query = $this->goal->newQuery()
-            ->with(['user:id,first_name,last_name,avatar_url'])
+            ->with(['user:id,first_name,last_name,avatar_url', 'mentor:id,first_name,last_name,avatar_url'])
             ->where('is_public', true)
             ->where('status', 'active')
             ->where('user_id', '!=', $userId)
@@ -108,7 +108,7 @@ class GoalService
         $cursor = $filters['cursor'] ?? null;
 
         $query = $this->goal->newQuery()
-            ->with(['user:id,first_name,last_name,avatar_url'])
+            ->with(['user:id,first_name,last_name,avatar_url', 'mentor:id,first_name,last_name,avatar_url'])
             ->where('mentor_id', $userId);
 
         if ($cursor !== null && ($cid = base64_decode($cursor, true)) !== false) {
@@ -135,7 +135,7 @@ class GoalService
     public function getById(int $id): ?Goal
     {
         return $this->goal->newQuery()
-            ->with(['user:id,first_name,last_name,avatar_url', 'mentor:id,first_name,last_name'])
+            ->with(['user:id,first_name,last_name,avatar_url', 'mentor:id,first_name,last_name,avatar_url'])
             ->find($id);
     }
 
