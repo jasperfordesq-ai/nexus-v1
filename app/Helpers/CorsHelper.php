@@ -46,11 +46,16 @@ class CorsHelper
     private static function getConfiguredOrigins(): array
     {
         if (self::$allowedOrigins === null) {
+            // Always start with the hardcoded defaults
+            self::$allowedOrigins = self::$defaultOrigins;
+
+            // Merge any additional origins from environment (additive, never replaces)
             $envOrigins = getenv('ALLOWED_ORIGINS') ?: ($_ENV['ALLOWED_ORIGINS'] ?? '');
             if (!empty($envOrigins)) {
-                self::$allowedOrigins = array_map('trim', explode(',', $envOrigins));
-            } else {
-                self::$allowedOrigins = self::$defaultOrigins;
+                $envList = array_filter(array_map('trim', explode(',', $envOrigins)));
+                self::$allowedOrigins = array_values(array_unique(
+                    array_merge(self::$allowedOrigins, $envList)
+                ));
             }
         }
         return self::$allowedOrigins;

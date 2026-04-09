@@ -27,10 +27,28 @@ return [
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
-    'allowed_origins' => array_filter(array_map(
-        'trim',
-        explode(',', env('CORS_ALLOWED_ORIGINS', env('ALLOWED_ORIGINS', 'https://app.project-nexus.ie,http://localhost:5173')))
-    )),
+    'allowed_origins' => array_values(array_unique(array_filter(array_merge(
+        // Static production origins (always allowed regardless of env)
+        [
+            'https://project-nexus.ie',
+            'https://www.project-nexus.ie',
+            'https://app.project-nexus.ie',
+            'https://api.project-nexus.ie',
+            'https://hour-timebank.ie',
+            'https://www.hour-timebank.ie',
+            'https://nexuscivic.ie',
+            'https://www.nexuscivic.ie',
+            'https://timebank.global',
+            'https://www.timebank.global',
+            'http://localhost:5173',
+            'http://localhost:8090',
+            'http://127.0.0.1:5173',
+        ],
+        // Additional origins from environment (additive)
+        array_map('trim', array_filter(
+            explode(',', env('CORS_ALLOWED_ORIGINS', env('ALLOWED_ORIGINS', '')))
+        ))
+    )))),
 
     'allowed_origins_patterns' => [],
 
