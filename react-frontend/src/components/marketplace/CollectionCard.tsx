@@ -39,7 +39,7 @@ export function CollectionCard({ collection, thumbnails = [], onClick }: Collect
                   {thumbnails[i] ? (
                     <img
                       src={thumbnails[i]}
-                      alt=""
+                      alt={t('marketplace.collection_image', 'Collection image {{number}}', { number: i + 1 })}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />

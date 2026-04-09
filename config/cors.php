@@ -34,7 +34,7 @@ return [
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => ['Accept', 'Content-Type', 'Authorization', 'X-Requested-With', 'X-XSRF-TOKEN', 'X-Socket-Id', 'X-Timezone', 'X-Locale', 'Cache-Control', 'Pragma'],
 
     'exposed_headers' => [],
 

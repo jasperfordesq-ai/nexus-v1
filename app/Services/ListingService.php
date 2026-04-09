@@ -101,7 +101,8 @@ class ListingService
             }
 
             if (!empty($filters['type']) && is_string($filters['type'])) {
-                $meiliFilters[] = "type = '{$filters['type']}'";
+                $safeType = str_replace("'", "\\'", $filters['type']);
+                $meiliFilters[] = "type = '{$safeType}'";
             }
 
             if (!empty($filters['user_id'])) {
@@ -395,7 +396,8 @@ class ListingService
                 }
             }
             if (!empty($filters['type']) && is_string($filters['type'])) {
-                $meiliFilters[] = "type = '{$filters['type']}'";
+                $safeType = str_replace("'", "\\'", $filters['type']);
+                $meiliFilters[] = "type = '{$safeType}'";
             }
             if (!empty($filters['user_id'])) {
                 $meiliFilters[] = 'user_id = ' . (int) $filters['user_id'];

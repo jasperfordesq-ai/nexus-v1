@@ -81,16 +81,16 @@ class ListingsController extends BaseApiController
         }
 
         if ($this->query('min_hours')) {
-            $filters['min_hours'] = (float) $this->query('min_hours');
+            $filters['min_hours'] = max(0, min(1000, (float) $this->query('min_hours')));
         }
         if ($this->query('max_hours')) {
-            $filters['max_hours'] = (float) $this->query('max_hours');
+            $filters['max_hours'] = max(0, min(2000, (float) $this->query('max_hours')));
         }
         if ($this->query('service_type')) {
             $filters['service_type'] = $this->query('service_type');
         }
         if ($this->query('posted_within')) {
-            $filters['posted_within'] = (int) $this->query('posted_within');
+            $filters['posted_within'] = max(1, min(365, (int) $this->query('posted_within')));
         }
 
         if ($this->query('cursor')) {
@@ -400,16 +400,16 @@ class ListingsController extends BaseApiController
         }
 
         if ($this->query('min_hours')) {
-            $filters['min_hours'] = (float) $this->query('min_hours');
+            $filters['min_hours'] = max(0, min(1000, (float) $this->query('min_hours')));
         }
         if ($this->query('max_hours')) {
-            $filters['max_hours'] = (float) $this->query('max_hours');
+            $filters['max_hours'] = max(0, min(2000, (float) $this->query('max_hours')));
         }
         if ($this->query('service_type')) {
             $filters['service_type'] = $this->query('service_type');
         }
         if ($this->query('posted_within')) {
-            $filters['posted_within'] = (int) $this->query('posted_within');
+            $filters['posted_within'] = max(1, min(365, (int) $this->query('posted_within')));
         }
 
         if ($this->query('cursor')) {

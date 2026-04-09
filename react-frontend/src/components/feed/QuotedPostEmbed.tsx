@@ -103,7 +103,7 @@ export function QuotedPostEmbed({ post, isPreview = false }: QuotedPostEmbedProp
           <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden">
             <img
               src={thumbnailUrl}
-              alt=""
+              alt={t('feed.quoted_post_image', 'Quoted post image')}
               className="w-full h-full object-cover"
               loading="lazy"
             />

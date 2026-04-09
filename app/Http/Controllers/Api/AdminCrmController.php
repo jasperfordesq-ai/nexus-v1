@@ -711,6 +711,10 @@ class AdminCrmController extends BaseApiController
 
         $userId = $this->queryInt('user_id');
         $type = $this->query('type');
+        $allowedTypes = ['login', 'signup', 'listing_created', 'contact_added', 'mention_received', 'note_added', 'task_created', 'group_joined', 'profile_updated'];
+        if ($type && !in_array($type, $allowedTypes, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid type parameter', null, 400);
+        }
         $days = $this->queryInt('days', 30);
         $page = max(1, $this->queryInt('page', 1));
         $limit = min(100, max(1, $this->queryInt('limit', 25)));

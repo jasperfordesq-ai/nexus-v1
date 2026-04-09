@@ -83,17 +83,26 @@ class MarketplaceOrderService
             $buyerId, $listing, $tenantId, $quantity,
             $unitPrice, $totalPrice, $shippingCost, $data
         ) {
+            // Lock listing row to prevent race condition on simultaneous purchases
+            $lockedListing = MarketplaceListing::where('id', $listing->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$lockedListing || $lockedListing->status !== 'active') {
+                throw new \InvalidArgumentException('This listing is no longer available for purchase.');
+            }
+
             $order = new MarketplaceOrder();
             $order->tenant_id = $tenantId;
             $order->order_number = self::generateOrderNumber($tenantId);
             $order->buyer_id = $buyerId;
-            $order->seller_id = $listing->user_id;
-            $order->marketplace_listing_id = $listing->id;
+            $order->seller_id = $lockedListing->user_id;
+            $order->marketplace_listing_id = $lockedListing->id;
             $order->marketplace_offer_id = null;
             $order->quantity = $quantity;
             $order->unit_price = $unitPrice;
             $order->total_price = $totalPrice;
-            $order->currency = $listing->price_currency ?? 'EUR';
+            $order->currency = $lockedListing->price_currency ?? 'EUR';
             $order->time_credits_used = $data['time_credits_used'] ?? null;
             $order->shipping_method = $data['shipping_method'] ?? null;
             $order->shipping_cost = $shippingCost;
@@ -103,8 +112,7 @@ class MarketplaceOrderService
             $order->save();
 
             // Mark listing as sold (or reduce quantity in future)
-            MarketplaceListing::where('id', $listing->id)
-                ->update(['status' => 'sold']);
+            $lockedListing->update(['status' => 'sold']);
 
             return $order;
         });
@@ -187,18 +195,22 @@ class MarketplaceOrderService
             throw new \InvalidArgumentException('Order must be delivered before it can be completed.');
         }
 
-        $order->status = 'completed';
-        $order->escrow_released_at = now();
-        $order->save();
+        return DB::transaction(function () use ($order) {
+            $order->status = 'completed';
+            $order->escrow_released_at = now();
+            $order->save();
 
-        // Update seller stats
-        $sellerProfile = \App\Models\MarketplaceSellerProfile::where('user_id', $order->seller_id)->first();
-        if ($sellerProfile) {
-            $sellerProfile->increment('total_sales');
-            $sellerProfile->increment('total_revenue', (float) $order->total_price);
-        }
+            // Lock seller profile to prevent race condition on concurrent completions
+            $sellerProfile = \App\Models\MarketplaceSellerProfile::where('user_id', $order->seller_id)
+                ->lockForUpdate()
+                ->first();
+            if ($sellerProfile) {
+                $sellerProfile->increment('total_sales');
+                $sellerProfile->increment('total_revenue', (float) $order->total_price);
+            }
 
-        return $order;
+            return $order;
+        });
     }
 
     // -----------------------------------------------------------------

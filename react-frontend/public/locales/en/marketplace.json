@@ -322,8 +322,11 @@
   "gallery": {
     "no_images": "No images available",
     "image_alt": "Listing image",
-    "select_image": "View image {{number}}"
+    "select_image": "View image {{number}}",
+    "thumbnail_alt": "Image {{number}}"
   },
+
+  "collection_image": "Collection image {{number}}",
 
   "price": {
     "free": "Free",

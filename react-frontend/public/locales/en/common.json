@@ -291,7 +291,9 @@
     "trending": "Trending",
     "no_results": "No GIFs found",
     "powered_by": "Powered by GIPHY",
-    "button_label": "Add GIF"
+    "button_label": "Add GIF",
+    "select": "Select GIF",
+    "preview_alt": "GIF preview"
   },
   "loading": "Loading...",
   "feature_error": {

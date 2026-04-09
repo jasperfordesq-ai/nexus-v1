@@ -109,13 +109,19 @@ class JobVacanciesController extends BaseApiController
             $filters['featured'] = $this->queryBool('featured');
         }
         if ($this->query('latitude') !== null) {
-            $filters['latitude'] = (float) $this->query('latitude');
+            $lat = (float) $this->query('latitude');
+            if ($lat >= -90 && $lat <= 90) {
+                $filters['latitude'] = $lat;
+            }
         }
         if ($this->query('longitude') !== null) {
-            $filters['longitude'] = (float) $this->query('longitude');
+            $lng = (float) $this->query('longitude');
+            if ($lng >= -180 && $lng <= 180) {
+                $filters['longitude'] = $lng;
+            }
         }
         if ($this->query('radius_km') !== null) {
-            $filters['radius_km'] = (float) $this->query('radius_km');
+            $filters['radius_km'] = max(0.1, min(500, (float) $this->query('radius_km')));
         }
         if ($this->query('is_remote')) {
             $filters['is_remote'] = true;

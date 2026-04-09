@@ -131,7 +131,7 @@ export function MarketplaceImageGallery({ images }: MarketplaceImageGalleryProps
             >
               <img
                 src={image.thumbnail_url || image.url}
-                alt=""
+                alt={t('gallery.thumbnail_alt', 'Image {{number}}', { number: index + 1 })}
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
