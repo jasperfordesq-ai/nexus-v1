@@ -34,8 +34,9 @@ import { PresenceProvider } from '@/contexts/PresenceContext';
 import { detectTenantFromUrl, RESERVED_PATHS } from '@/lib/tenant-routing';
 import { tokenManager } from '@/lib/api';
 import { CookieConsentBanner } from '@/components/feedback';
-import { lazy, Suspense, useLayoutEffect } from 'react';
+import { lazy, Suspense, useEffect, useLayoutEffect } from 'react';
 import { Spinner } from '@heroui/react';
+import { listenForImpersonationToken } from '@/lib/impersonate';
 
 const MaintenancePage = lazy(() => import('@/pages/public/MaintenancePage'));
 
@@ -48,6 +49,15 @@ interface TenantShellProps {
 }
 
 export function TenantShell({ appRoutes }: TenantShellProps) {
+  // Listen for impersonation token handoff from admin tab via BroadcastChannel.
+  // Token is set in tokenManager (memory → localStorage, same as normal login)
+  // and page reloads to pick up the new auth state.
+  useEffect(() => {
+    return listenForImpersonationToken(() => {
+      window.location.reload();
+    });
+  }, []);
+
   // Use detectTenantFromUrl() which correctly implements TRS-001 R1–R4:
   // - R1: Custom domain (e.g. hour-timebank.ie) → slug = null (backend resolves from Host)
   // - R2: Subdomain of project-nexus.ie → slug from subdomain

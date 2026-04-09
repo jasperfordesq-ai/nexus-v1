@@ -196,11 +196,10 @@ export function UserList() {
           const tokenData = res.data as { token?: string; impersonation_token?: string };
           const token = tokenData.token || tokenData.impersonation_token;
           if (token) {
-            // Store token in sessionStorage instead of URL query params
-            // to avoid leaking it in browser history, Referer headers, and server logs
-            sessionStorage.setItem('impersonate_token', token);
+            // Use BroadcastChannel for memory-only token handoff — never persisted
+            const { sendImpersonationToken } = await import('@/lib/impersonate');
+            sendImpersonationToken(token, `${window.location.origin}${tenantPath('/dashboard')}`);
             toast.success(t('users.impersonate_success', { name: user.name }));
-            window.open(`${window.location.origin}${tenantPath('/dashboard')}`, '_blank');
           } else {
             toast.success(t('users.impersonate_started'));
           }

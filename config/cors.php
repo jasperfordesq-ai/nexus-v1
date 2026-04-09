@@ -25,7 +25,7 @@ return [
 
     'paths' => ['v2/*', 'api/*', 'sanctum/csrf-cookie', 'broadcasting/auth', 'up'],
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
     'allowed_origins' => array_filter(array_map(
         'trim',
