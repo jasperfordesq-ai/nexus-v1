@@ -188,13 +188,13 @@ export function ExternalPartners() {
 
   // ─── Load data ───
   const loadData = useCallback(async () => {
-    if (abortControllerRef.current) abortControllerRef.current.abort();
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-
+    // NOTE: We intentionally do NOT pass an AbortController signal here.
+    // The api.get() deduplication cache keys on endpoint only (not signal),
+    // so in React StrictMode's mount→unmount→remount cycle, aborting the
+    // first request would poison the cached promise for the second caller.
     setLoading(true);
     try {
-      const res = await api.get('/v2/admin/federation/external-partners', { signal: controller.signal });
+      const res = await api.get('/v2/admin/federation/external-partners');
       if (res.success) {
         const payload = res.data;
         setPartners(Array.isArray(payload) ? payload : (payload as { data?: ExternalPartner[] })?.data ?? []);
@@ -208,7 +208,6 @@ export function ExternalPartners() {
 
   useEffect(() => {
     loadData();
-    return () => { if (abortControllerRef.current) abortControllerRef.current.abort(); };
   }, [loadData]);
 
   // ─── Open create modal ───
