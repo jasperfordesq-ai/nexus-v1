@@ -512,7 +512,7 @@ Route::get('/v2/reviews/pending', [\App\Http\Controllers\Api\ReviewsController::
 Route::get('/v2/reviews/user/{userId}', [\App\Http\Controllers\Api\ReviewsController::class, 'userReviews']);
 Route::get('/v2/users/{userId}/reviews', [\App\Http\Controllers\Api\ReviewsController::class, 'userReviews']);
 Route::get('/v2/reviews/user/{userId}/stats', [\App\Http\Controllers\Api\ReviewsController::class, 'userStats']);
-Route::get('/v2/reviews/user/{userId}/trust', [\App\Http\Controllers\Api\ReviewsController::class, 'userTrust']);
+
 Route::get('/v2/reviews/{id}', [\App\Http\Controllers\Api\ReviewsController::class, 'show']);
 Route::post('/v2/reviews', [\App\Http\Controllers\Api\ReviewsController::class, 'store']);
 Route::delete('/v2/reviews/{id}', [\App\Http\Controllers\Api\ReviewsController::class, 'destroy']);
@@ -2032,8 +2032,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/polls', [\App\Http\Controllers\Api\PollsController::class, 'index']);
 Route::post('/polls/vote', [\App\Http\Controllers\Api\PollsController::class, 'vote']);
 Route::get('/goals', [\App\Http\Controllers\Api\GoalsController::class, 'index']);
-Route::post('/goals/update', [\App\Http\Controllers\Api\GoalsController::class, 'updateProgress']);
-Route::post('/goals/offer-buddy', [\App\Http\Controllers\Api\GoalsController::class, 'offerBuddy']);
+// Legacy routes removed: /goals/update and /goals/offer-buddy — use V2 endpoints instead
 Route::get('/vol_opportunities', [\App\Http\Controllers\Api\VolunteerController::class, 'index']);
 Route::get('/events', [\App\Http\Controllers\Api\EventsController::class, 'index']);
 Route::post('/events/rsvp', [\App\Http\Controllers\Api\EventsController::class, 'rsvp']);
@@ -2054,7 +2053,7 @@ Route::post('/nexus-score/recalculate', [\App\Http\Controllers\Api\GamificationC
 Route::get('/wallet/transactions', [\App\Http\Controllers\Api\WalletController::class, 'transactions']);
 Route::get('/wallet/pending-count', [\App\Http\Controllers\Api\WalletController::class, 'pendingCount']);
 Route::post('/wallet/transfer', [\App\Http\Controllers\Api\WalletController::class, 'transfer']);
-Route::post('/wallet/delete', [\App\Http\Controllers\Api\WalletController::class, 'delete']);
+// Legacy route removed: /wallet/delete — use V2 DELETE /v2/wallet/transactions/{id} instead
 Route::post('/wallet/user-search', [\App\Http\Controllers\Api\WalletController::class, 'userSearch']);
 Route::get('/members', [\App\Http\Controllers\Api\CoreController::class, 'members']);
 Route::get('/listings', [\App\Http\Controllers\Api\CoreController::class, 'listings']);

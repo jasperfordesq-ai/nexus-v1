@@ -49,7 +49,7 @@ fi
 # ─── SSH Config ───────────────────────────────────────────────
 SSH_KEY="${PROD_SSH_KEY:-C:\\ssh-keys\\project-nexus.pem}"
 SSH_HOST="${PROD_SSH_HOST:-azureuser@20.224.171.253}"
-SSH_OPTS="-i ${SSH_KEY} -o ConnectTimeout=10 -o StrictHostKeyChecking=no"
+SSH_OPTS="-i ${SSH_KEY} -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new"
 DB_NAME="${PROD_DB_NAME:-nexus}"
 DB_CONTAINER="nexus-php-db"
 

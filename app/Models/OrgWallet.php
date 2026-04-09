@@ -9,6 +9,8 @@ namespace App\Models;
 use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class OrgWallet extends Model
 {
@@ -24,4 +26,14 @@ class OrgWallet extends Model
         'organization_id' => 'integer',
         'balance' => 'decimal:2',
     ];
+
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(VolOrganization::class, 'organization_id');
+    }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(OrgTransaction::class, 'organization_id', 'organization_id');
+    }
 }

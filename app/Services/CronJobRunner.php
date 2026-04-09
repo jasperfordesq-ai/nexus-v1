@@ -487,25 +487,16 @@ class CronJobRunner
      */
     private static function resolveEmailSubject(string $activityType, string $contentSnippet = ''): string
     {
-        return match ($activityType) {
-            'new_topic' => "New Discussion: " . substr(strip_tags($contentSnippet), 0, 50) . "...",
-            'new_reply' => "New Reply to Discussion",
-            'new_message' => "\xF0\x9F\x92\xAC New Message",
-            'hot_match' => "\xF0\x9F\x94\xA5 Hot Match Found!",
-            'mutual_match' => "\xF0\x9F\xA4\x9D Mutual Match Opportunity",
-            'match_digest' => "\xF0\x9F\x93\x8A Your Match Digest",
-            'match_approval_request' => "\xF0\x9F\x93\x8B Match Needs Approval",
-            'match_approved' => "\xE2\x9C\x85 You've Been Matched!",
-            'match_rejected' => "Match Update",
-            'exchange_request_received' => "\xF0\x9F\x93\xA5 New Exchange Request",
-            'exchange_request_declined' => "Exchange Request Declined",
-            'exchange_approved' => "\xE2\x9C\x85 Exchange Approved - Ready to Begin!",
-            'exchange_rejected' => "Exchange Not Approved",
-            'exchange_completed' => "\xF0\x9F\x8E\x89 Exchange Completed!",
-            'exchange_cancelled' => "Exchange Cancelled",
-            'exchange_disputed' => "\xE2\x9A\xA0\xEF\xB8\x8F Exchange Dispute - Broker Review Needed",
-            default => "Notification from Nexus",
-        };
+        if ($activityType === 'new_topic') {
+            $snippet = substr(strip_tags($contentSnippet), 0, 50) . '...';
+            return __('emails.notification_subject.new_topic', ['snippet' => $snippet]);
+        }
+
+        $key = "emails.notification_subject.{$activityType}";
+        $translated = __($key);
+
+        // If the key was not found, fall back to the default subject
+        return $translated !== $key ? $translated : __('emails.notification_subject.default');
     }
 
     private function generateEmailHtml($user, $items, $frequency)

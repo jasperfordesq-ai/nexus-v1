@@ -284,5 +284,24 @@
     "view_all_mutual": "view all mutual matches",
     "receiving_notice": "You're receiving this because you enabled mutual match notifications.",
     "manage_preferences": "Manage notification preferences"
+  },
+  "notification_subject": {
+    "new_topic": "New Discussion: {{snippet}}",
+    "new_reply": "New Reply to Discussion",
+    "new_message": "\uD83D\uDCAC New Message",
+    "hot_match": "\uD83D\uDD25 Hot Match Found!",
+    "mutual_match": "\uD83E\uDD1D Mutual Match Opportunity",
+    "match_digest": "\uD83D\uDCCA Your Match Digest",
+    "match_approval_request": "\uD83D\uDCCB Match Needs Approval",
+    "match_approved": "\u2705 You've Been Matched!",
+    "match_rejected": "Match Update",
+    "exchange_request_received": "\uD83D\uDCE5 New Exchange Request",
+    "exchange_request_declined": "Exchange Request Declined",
+    "exchange_approved": "\u2705 Exchange Approved - Ready to Begin!",
+    "exchange_rejected": "Exchange Not Approved",
+    "exchange_completed": "\uD83C\uDF89 Exchange Completed!",
+    "exchange_cancelled": "Exchange Cancelled",
+    "exchange_disputed": "\u26A0\uFE0F Exchange Dispute - Broker Review Needed",
+    "default": "Notification from Project NEXUS"
   }
 }

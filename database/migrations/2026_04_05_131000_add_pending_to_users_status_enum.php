@@ -13,7 +13,11 @@ return new class extends Migration
     {
         // Add 'pending' to the users.status ENUM so that RegistrationService
         // can set status='pending' for newly registered users awaiting email verification.
-        DB::statement("ALTER TABLE users MODIFY COLUMN status ENUM('active','inactive','suspended','banned','pending') DEFAULT 'active'");
+        // Guard: only alter if 'pending' is not already in the ENUM definition.
+        $column = DB::selectOne("SHOW COLUMNS FROM users WHERE Field = 'status'");
+        if ($column && !str_contains($column->Type, "'pending'")) {
+            DB::statement("ALTER TABLE users MODIFY COLUMN status ENUM('active','inactive','suspended','banned','pending') DEFAULT 'active'");
+        }
     }
 
     public function down(): void

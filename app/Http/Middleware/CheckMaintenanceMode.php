@@ -98,7 +98,7 @@ class CheckMaintenanceMode
         $token = $request->bearerToken();
         if ($token) {
             try {
-                $payload = \App\Services\TokenService::validateToken($token);
+                $payload = app(\App\Services\TokenService::class)->validateToken($token);
                 if ($payload && isset($payload['user_id'])) {
                     $rows = DB::select(
                         "SELECT role, is_super_admin, is_tenant_super_admin
