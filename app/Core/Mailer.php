@@ -282,7 +282,12 @@ class Mailer
                 $email->addCc($cc);
             }
             if ($replyTo) {
-                $email->setReplyTo($replyTo);
+                // Parse RFC 5322 format "Name <email>" into separate parts for SendGrid
+                if (preg_match('/^(.+?)\s*<([^>]+)>$/', $replyTo, $matches)) {
+                    $email->setReplyTo(trim($matches[2]), trim($matches[1]));
+                } else {
+                    $email->setReplyTo($replyTo);
+                }
             }
 
             $plainText = strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $body));
