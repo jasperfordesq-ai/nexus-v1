@@ -183,9 +183,6 @@ export function ExternalPartners() {
   const [logsLoading, setLogsLoading] = useState(false);
   const [logsPartnerName, setLogsPartnerName] = useState('');
 
-  // AbortController for cancelling in-flight requests
-  const abortControllerRef = useRef<AbortController | null>(null);
-
   // ─── Load data ───
   const loadData = useCallback(async () => {
     // NOTE: We intentionally do NOT pass an AbortController signal here.
