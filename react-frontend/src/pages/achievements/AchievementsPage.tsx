@@ -1086,6 +1086,228 @@ function XpShopTab({ userXp }: { userXp: number }) {
 // Badge Showcase Modal
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Badge Detail Modal
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface BadgeDetail {
+  key: string;
+  name: string;
+  description: string;
+  icon: string;
+  type: string;
+  threshold: number;
+  badge_tier?: string;
+  badge_class?: string;
+  rarity?: string;
+  xp_value?: number;
+  earned: boolean;
+  earned_at: string | null;
+  is_showcased: boolean;
+}
+
+interface BadgeDetailModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  badgeKey: string | null;
+}
+
+const BADGE_TYPE_LABELS: Record<string, string> = {
+  vol: 'Volunteering',
+  offer: 'Offers',
+  request: 'Requests',
+  earn: 'Earning',
+  spend: 'Spending',
+  transaction: 'Transactions',
+  diversity: 'Community Diversity',
+  connection: 'Connections',
+  message: 'Messaging',
+  review_given: 'Reviews',
+  '5star': '5-Star Reviews',
+  event_attend: 'Event Attendance',
+  event_host: 'Event Hosting',
+  group_join: 'Groups',
+  group_create: 'Group Creation',
+  post: 'Posts',
+  likes_received: 'Likes',
+  profile: 'Profile',
+  membership: 'Membership',
+  streak: 'Streaks',
+  level: 'Levels',
+  special: 'Special',
+  vol_org: 'Organisations',
+  quality: 'Quality',
+  reliability: 'Reliability',
+  mentoring: 'Mentoring',
+  reciprocity: 'Reciprocity',
+  verification: 'Verification',
+};
+
+function BadgeDetailModal({ isOpen, onClose, badgeKey }: BadgeDetailModalProps) {
+  const { t } = useTranslation('gamification');
+  const [badge, setBadge] = useState<BadgeDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen || !badgeKey) {
+      setBadge(null);
+      setError(false);
+      return;
+    }
+
+    let cancelled = false;
+    const loadBadge = async () => {
+      setIsLoading(true);
+      setError(false);
+      try {
+        const res = await api.get<BadgeDetail>(`/v2/gamification/badges/${badgeKey}`);
+        if (cancelled) return;
+        if (res.success && res.data) {
+          setBadge(res.data as BadgeDetail);
+        } else {
+          setError(true);
+        }
+      } catch {
+        if (!cancelled) setError(true);
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+    loadBadge();
+    return () => { cancelled = true; };
+  }, [isOpen, badgeKey]);
+
+  const typeLabel = badge ? (BADGE_TYPE_LABELS[badge.type] ?? badge.type) : '';
+  const rarityKey = badge?.rarity ? `achievements.badge_detail.rarity_${badge.rarity}` : '';
+  const tierKey = badge?.badge_tier ? `achievements.badge_detail.tier_${badge.badge_tier}` : '';
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="lg"
+      classNames={{
+        base: 'bg-content1 border border-white/10',
+        header: 'border-b border-white/10',
+        body: 'py-6',
+        footer: 'border-t border-white/10',
+      }}
+    >
+      <ModalContent>
+        {isLoading ? (
+          <ModalBody>
+            <div className="flex flex-col items-center gap-4 py-8">
+              <Skeleton className="rounded-full"><div className="w-20 h-20 rounded-full bg-default-300" /></Skeleton>
+              <Skeleton className="rounded-lg"><div className="h-6 w-48 rounded-lg bg-default-300" /></Skeleton>
+              <Skeleton className="rounded-lg"><div className="h-4 w-64 rounded-lg bg-default-200" /></Skeleton>
+            </div>
+          </ModalBody>
+        ) : error || !badge ? (
+          <ModalBody>
+            <div className="text-center py-8">
+              <AlertTriangle className="w-10 h-10 text-warning mx-auto mb-2" aria-hidden="true" />
+              <p className="text-theme-muted">{t('achievements.badge_detail.load_failed')}</p>
+            </div>
+          </ModalBody>
+        ) : (
+          <>
+            <ModalHeader className="flex items-center gap-3">
+              <Medal className="w-5 h-5 text-amber-400" aria-hidden="true" />
+              {t('achievements.badge_detail.title')}
+            </ModalHeader>
+            <ModalBody>
+              <div className="flex flex-col items-center text-center">
+                {/* Badge Icon */}
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                  className={`w-24 h-24 rounded-full flex items-center justify-center text-5xl mb-4 ${
+                    badge.earned
+                      ? 'bg-gradient-to-br from-amber-500/30 to-orange-500/30 shadow-lg shadow-amber-500/10'
+                      : 'bg-gradient-to-br from-gray-500/20 to-gray-600/20 grayscale'
+                  }`}
+                >
+                  {badge.icon || <Medal className="w-12 h-12 text-amber-400" aria-hidden="true" />}
+                </motion.div>
+
+                {/* Badge Name */}
+                <h2 className="text-xl font-bold text-theme-primary mb-2">{badge.name}</h2>
+
+                {/* Description */}
+                <p className="text-theme-muted text-sm max-w-md mb-5 leading-relaxed">
+                  {badge.description}
+                </p>
+
+                {/* Earned Status */}
+                {badge.earned && badge.earned_at ? (
+                  <div className="flex items-center gap-2 mb-5 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                    <CheckCircle className="w-4 h-4 text-emerald-400" aria-hidden="true" />
+                    <span className="text-sm text-emerald-400 font-medium">
+                      {t('achievements.badge_detail.earned_on', { date: new Date(badge.earned_at).toLocaleDateString() })}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 mb-5 px-4 py-2 rounded-full bg-white/5 border border-white/10">
+                    <Lock className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
+                    <span className="text-sm text-theme-subtle">{t('achievements.badge_detail.not_earned')}</span>
+                  </div>
+                )}
+
+                {/* Info Grid */}
+                <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
+                  {/* Category */}
+                  <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                    <p className="text-xs text-theme-subtle mb-1">{t('achievements.badge_detail.type')}</p>
+                    <p className="text-sm font-medium text-theme-primary">{typeLabel}</p>
+                  </div>
+
+                  {/* Rarity */}
+                  {badge.rarity && (
+                    <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                      <p className="text-xs text-theme-subtle mb-1">{t('achievements.badge_detail.rarity')}</p>
+                      <p className="text-sm font-medium text-theme-primary">{t(rarityKey, badge.rarity)}</p>
+                    </div>
+                  )}
+
+                  {/* XP Reward */}
+                  {badge.xp_value != null && badge.xp_value > 0 && (
+                    <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                      <p className="text-xs text-theme-subtle mb-1">{t('achievements.badge_detail.xp_reward')}</p>
+                      <div className="flex items-center gap-1">
+                        <Zap className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
+                        <p className="text-sm font-medium text-amber-400">{badge.xp_value} XP</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tier */}
+                  {badge.badge_tier && (
+                    <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                      <p className="text-xs text-theme-subtle mb-1">{t('achievements.badge_detail.tier')}</p>
+                      <p className="text-sm font-medium text-theme-primary">{t(tierKey, badge.badge_tier)}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <Button variant="flat" onPress={onClose} className="text-theme-muted">
+                {t('achievements.badge_detail.close')}
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Showcase Modal
+// ─────────────────────────────────────────────────────────────────────────────
+
 interface ShowcaseModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -1243,6 +1465,7 @@ export function AchievementsPage() {
   const [activeTab, setActiveTab] = useState<string>('badges');
   const [isShowcaseOpen, setIsShowcaseOpen] = useState(false);
   const [isSavingShowcase, setIsSavingShowcase] = useState(false);
+  const [selectedBadgeKey, setSelectedBadgeKey] = useState<string | null>(null);
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
@@ -1564,36 +1787,54 @@ export function AchievementsPage() {
                     >
                       {filteredBadges.map((badge) => (
                         <motion.div key={badge.badge_key} variants={itemVariants}>
-                          <GlassCard className={`p-4 text-center hover:scale-105 transition-transform ${
-                            !badge.earned_at && badge.earned === false ? 'opacity-40' : ''
-                          }`}>
+                          <GlassCard
+                            className={`p-4 text-center hover:scale-105 transition-transform cursor-pointer ${
+                              !badge.earned_at && badge.earned === false ? 'opacity-40' : ''
+                            }`}
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => setSelectedBadgeKey(badge.badge_key)}
+                            onKeyDown={(e: React.KeyboardEvent) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                setSelectedBadgeKey(badge.badge_key);
+                              }
+                            }}
+                            aria-label={badge.name}
+                          >
                             <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center text-2xl">
                               {badge.icon || <Medal className="w-7 h-7 text-amber-400" aria-hidden="true" />}
                             </div>
                             <h3 className="font-semibold text-theme-primary text-sm mb-1 truncate">{badge.name}</h3>
                             <p className="text-xs text-theme-muted line-clamp-2">{badge.description}</p>
-                            {badge.is_showcased && (
+                            {!!badge.is_showcased && (
                               <Chip size="sm" color="warning" variant="flat" className="mt-2">
                                 <Star className="w-3 h-3 inline mr-1" aria-hidden="true" />
                                 {t('achievements.showcased')}
                               </Chip>
                             )}
-                            {badge.earned_at && (
+                            {badge.earned_at ? (
                               <p className="text-xs text-theme-subtle mt-2">
                                 {t('achievements.earned_date', { date: new Date(badge.earned_at).toLocaleDateString() })}
                               </p>
-                            )}
-                            {!badge.earned_at && badge.earned === false && (
+                            ) : badge.earned === false ? (
                               <div className="flex items-center justify-center gap-1 mt-2 text-xs text-theme-subtle">
                                 <Lock className="w-3 h-3" aria-hidden="true" />
                                 {t('achievements.locked')}
                               </div>
-                            )}
+                            ) : null}
                           </GlassCard>
                         </motion.div>
                       ))}
                     </motion.div>
                   )}
+
+                  {/* Badge Detail Modal */}
+                  <BadgeDetailModal
+                    isOpen={selectedBadgeKey !== null}
+                    onClose={() => setSelectedBadgeKey(null)}
+                    badgeKey={selectedBadgeKey}
+                  />
 
                   {/* Showcase Modal */}
                   <ShowcaseModal

@@ -3,10 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { forwardRef, type ReactNode, type CSSProperties, type MouseEventHandler } from 'react';
+import { forwardRef, type ReactNode, type HTMLAttributes } from 'react';
 import { motion, type Variants } from 'framer-motion';
 
-export interface GlassCardProps {
+/** Exclude HTML event props that conflict with Framer Motion's signatures */
+type SafeHtmlProps = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onDrag' | 'onDragStart' | 'onDragEnd' | 'onAnimationStart'>;
+
+export interface GlassCardProps extends SafeHtmlProps {
   children: ReactNode;
   /** Enable hover lift effect */
   hoverable?: boolean;
@@ -14,12 +17,6 @@ export interface GlassCardProps {
   glow?: 'primary' | 'secondary' | 'accent' | 'none';
   /** Use Framer Motion for smooth animations */
   animated?: boolean;
-  /** Additional CSS classes */
-  className?: string;
-  /** Inline styles */
-  style?: CSSProperties;
-  /** Click handler */
-  onClick?: MouseEventHandler<HTMLDivElement>;
 }
 
 const cardVariants: Variants = {
@@ -40,8 +37,7 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
       glow = 'none',
       animated = false,
       className = '',
-      style,
-      onClick,
+      ...rest
     },
     ref
   ) => {
@@ -54,8 +50,7 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
         <motion.div
           ref={ref}
           className={combinedClassName}
-          style={style}
-          onClick={onClick}
+          {...rest}
           variants={cardVariants}
           initial="hidden"
           animate="visible"
@@ -68,7 +63,7 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
     }
 
     return (
-      <div ref={ref} className={combinedClassName} style={style} onClick={onClick}>
+      <div ref={ref} className={combinedClassName} {...rest}>
         {children}
       </div>
     );

@@ -89,6 +89,28 @@
       "load_failed_desc": "Could not load the XP shop."
     },
     "loading": "Loading achievements",
+    "badge_detail": {
+      "title": "Badge Details",
+      "earned_on": "Earned on {{date}}",
+      "not_earned": "Not yet earned",
+      "not_earned_desc": "Keep going — you'll unlock this badge soon!",
+      "type": "Category",
+      "threshold": "Requirement",
+      "threshold_value": "{{threshold}} {{type}}",
+      "rarity": "Rarity",
+      "xp_reward": "XP Reward",
+      "tier": "Tier",
+      "close": "Close",
+      "rarity_common": "Common",
+      "rarity_uncommon": "Uncommon",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "rarity_legendary": "Legendary",
+      "tier_core": "Core",
+      "tier_template": "Standard",
+      "tier_custom": "Custom",
+      "load_failed": "Could not load badge details."
+    },
     "showcase": {
       "manage_title": "Manage Badge Showcase",
       "select_badges": "Select up to 5 badges to showcase on your profile. ({{count}}/5 selected)",
