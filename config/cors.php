@@ -52,7 +52,7 @@ return [
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['Accept', 'Content-Type', 'Authorization', 'X-Requested-With', 'X-XSRF-TOKEN', 'X-Socket-Id', 'X-Timezone', 'X-Locale', 'Cache-Control', 'Pragma'],
+    'allowed_headers' => ['Accept', 'Content-Type', 'Authorization', 'X-Requested-With', 'X-XSRF-TOKEN', 'X-CSRF-TOKEN', 'X-Socket-Id', 'X-Timezone', 'X-Locale', 'X-Tenant-ID', 'X-Trusted-Device', 'Cache-Control', 'Pragma'],
 
     'exposed_headers' => [],
 
