@@ -18,6 +18,9 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (!Schema::hasTable('reactions')) {
+            return;
+        }
         Schema::table('reactions', function (Blueprint $table) {
             $table->string('emoji', 50)->change();
         });

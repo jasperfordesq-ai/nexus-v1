@@ -12,6 +12,9 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (!Schema::hasTable('listings') || Schema::hasColumn('listings', 'availability')) {
+            return;
+        }
         Schema::table('listings', function (Blueprint $table) {
             $table->json('availability')->nullable()->after('service_type');
         });
