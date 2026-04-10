@@ -253,8 +253,10 @@ export function FederationMembersPage() {
   }, [navigate, tenantPath, toast, t]);
 
   const handleSendMessage = useCallback((member: FederatedMember) => {
+    const memberName = member.name?.trim() || `${member.first_name || ''} ${member.last_name || ''}`.trim();
+    const nameParam = memberName ? `&name=${encodeURIComponent(memberName)}` : '';
     navigate(
-      tenantPath(`/federation/messages?compose=true&to_user=${member.id}&to_tenant=${member.timebank.id}`)
+      tenantPath(`/federation/messages?compose=true&to_user=${member.id}&to_tenant=${member.timebank.id}${nameParam}`)
     );
   }, [navigate, tenantPath]);
 
