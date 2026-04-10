@@ -66,6 +66,30 @@ class FederationV2Controller extends BaseApiController
         return $id > 0 ? ['type' => 'internal', 'id' => $id] : null;
     }
 
+    /**
+     * Resolve a relative avatar/image URL from an external partner against their base_url.
+     * Returns the URL unchanged if it's already absolute, or null if empty.
+     */
+    private static function resolveExternalUrl(?string $url, string $partnerBaseUrl): ?string
+    {
+        if (!$url || $url === '') return null;
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) return $url;
+        return $partnerBaseUrl . '/' . ltrim($url, '/');
+    }
+
+    /**
+     * Get the base_url for an external partner (cached per request).
+     */
+    private function getPartnerBaseUrl(int $externalPartnerId): string
+    {
+        static $cache = [];
+        if (!isset($cache[$externalPartnerId])) {
+            $partner = \App\Services\FederationExternalPartnerService::getById($externalPartnerId, $this->getTenantId());
+            $cache[$externalPartnerId] = rtrim($partner['base_url'] ?? '', '/');
+        }
+        return $cache[$externalPartnerId];
+    }
+
     // =====================================================================
     // STATUS & OPT-IN/OUT
     // =====================================================================
@@ -601,11 +625,7 @@ class FederationV2Controller extends BaseApiController
             return array_map(function ($l) use ($externalPartnerId, $partnerName, $partnerBaseUrl) {
                 // v1 API returns 'owner', not 'author'
                 $owner = $l['owner'] ?? $l['author'] ?? [];
-                $avatar = $owner['avatar'] ?? null;
-                // Resolve relative avatar URLs against partner base
-                if ($avatar && !str_starts_with($avatar, 'http')) {
-                    $avatar = $partnerBaseUrl . '/' . ltrim($avatar, '/');
-                }
+                $avatar = self::resolveExternalUrl($owner['avatar'] ?? null, $partnerBaseUrl);
 
                 return [
                     'id' => 'ext-' . $externalPartnerId . '-' . ($l['id'] ?? 0),
@@ -653,8 +673,10 @@ class FederationV2Controller extends BaseApiController
             return array_map(function ($l) {
                 // v1 API returns 'owner', not 'author'
                 $owner = $l['owner'] ?? $l['author'] ?? [];
+                $partnerId = $l['partner_id'] ?? 0;
+                $baseUrl = $partnerId ? $this->getPartnerBaseUrl((int) $partnerId) : '';
                 return [
-                    'id' => 'ext-' . ($l['partner_id'] ?? 0) . '-' . ($l['id'] ?? 0),
+                    'id' => 'ext-' . $partnerId . '-' . ($l['id'] ?? 0),
                     'title' => $l['title'] ?? '',
                     'description' => $l['description'] ?? '',
                     'type' => $l['type'] ?? 'offer',
@@ -665,7 +687,7 @@ class FederationV2Controller extends BaseApiController
                     'author' => [
                         'id' => (int) ($owner['id'] ?? 0),
                         'name' => $owner['name'] ?? trim(($l['first_name'] ?? '') . ' ' . ($l['last_name'] ?? '')),
-                        'avatar' => $owner['avatar'] ?? null,
+                        'avatar' => self::resolveExternalUrl($owner['avatar'] ?? null, $baseUrl),
                     ],
                     'timebank' => [
                         'id' => (int) ($l['timebank']['id'] ?? $l['tenant_id'] ?? 0),
@@ -858,14 +880,15 @@ class FederationV2Controller extends BaseApiController
                 $this->getTenantId()
             );
             $partnerName = $partner['name'] ?? 'External Partner';
+            $partnerBaseUrl = rtrim($partner['base_url'] ?? '', '/');
 
-            return array_map(function ($m) use ($externalPartnerId, $partnerName) {
+            return array_map(function ($m) use ($externalPartnerId, $partnerName, $partnerBaseUrl) {
                 return [
                     'id' => 'ext-' . $externalPartnerId . '-' . ($m['id'] ?? 0),
                     'name' => $m['name'] ?? trim(($m['first_name'] ?? '') . ' ' . ($m['last_name'] ?? '')),
                     'first_name' => $m['first_name'] ?? '',
                     'last_name' => $m['last_name'] ?? '',
-                    'avatar' => $m['avatar'] ?? null,
+                    'avatar' => self::resolveExternalUrl($m['avatar'] ?? null, $partnerBaseUrl),
                     'bio' => $m['bio'] ?? '',
                     'skills' => is_array($m['skills'] ?? null) ? $m['skills'] : (is_string($m['skills'] ?? null) ? array_map('trim', explode(',', $m['skills'])) : []),
                     'location' => $m['location'] ?? null,
@@ -901,12 +924,14 @@ class FederationV2Controller extends BaseApiController
             $result = $searchService->searchExternalMembers($tenantId, $filters);
 
             return array_map(function ($m) {
+                $partnerId = $m['partner_id'] ?? 0;
+                $baseUrl = $partnerId ? $this->getPartnerBaseUrl((int) $partnerId) : '';
                 return [
-                    'id' => 'ext-' . ($m['partner_id'] ?? 0) . '-' . ($m['id'] ?? 0),
+                    'id' => 'ext-' . $partnerId . '-' . ($m['id'] ?? 0),
                     'name' => $m['name'] ?? trim(($m['first_name'] ?? '') . ' ' . ($m['last_name'] ?? '')),
                     'first_name' => $m['first_name'] ?? '',
                     'last_name' => $m['last_name'] ?? '',
-                    'avatar' => $m['avatar'] ?? null,
+                    'avatar' => self::resolveExternalUrl($m['avatar'] ?? null, $baseUrl),
                     'bio' => $m['bio'] ?? '',
                     'skills' => is_array($m['skills'] ?? null) ? $m['skills'] : (is_string($m['skills'] ?? null) ? array_map('trim', explode(',', $m['skills'])) : []),
                     'location' => $m['location'] ?? null,
