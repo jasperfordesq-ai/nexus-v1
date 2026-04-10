@@ -30,6 +30,7 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Tooltip,
 } from '@heroui/react';
 import {
   MessageSquare,
@@ -41,6 +42,7 @@ import {
   Plus,
   Search,
   ArrowLeft,
+  Languages,
 } from 'lucide-react';
 
 import { useTranslation } from 'react-i18next';
@@ -169,11 +171,11 @@ const bubbleVariants = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function FederationMessagesPage() {
-  const { t } = useTranslation('federation');
+  const { t, i18n } = useTranslation('federation');
   usePageTitle(t('messages.page_title'));
 
   const { user } = useAuth();
-  const { hasFeature } = useTenant();
+  const { hasFeature, tenantSlug } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -202,6 +204,25 @@ export function FederationMessagesPage() {
 
   // ── Mobile state ──
   const [mobileShowThread, setMobileShowThread] = useState(false);
+
+  // ── Translation state ──
+  const translationEnabled = hasFeature('message_translation');
+  const [autoTranslateOn, setAutoTranslateOn] = useState(false);
+  const [autoTranslations, setAutoTranslations] = useState<Map<number, string>>(new Map());
+  const [manualTranslations, setManualTranslations] = useState<Map<number, string>>(new Map());
+  const [translatingIds, setTranslatingIds] = useState<Set<number>>(new Set());
+  const [showOriginalIds, setShowOriginalIds] = useState<Set<number>>(new Set());
+  const [translationErrors, setTranslationErrors] = useState<Map<number, string>>(new Map());
+  const autoTranslatingRef = useRef(false);
+  const translatedIdsRef = useRef<Set<number>>(new Set());
+
+  const LANG_NAMES: Record<string, string> = {
+    en: 'English', fr: 'French', de: 'German', es: 'Spanish',
+    it: 'Italian', pt: 'Portuguese', ga: 'Irish', nl: 'Dutch',
+    pl: 'Polish', ja: 'Japanese', ar: 'Arabic',
+  };
+  const userLangBase = (i18n.language || 'en').split('-')[0] ?? 'en';
+  const userLangName = LANG_NAMES[userLangBase] ?? userLangBase;
 
   // ── Refs ──
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -356,6 +377,24 @@ export function FederationMessagesPage() {
       setReplyText('');
       setMobileShowThread(true);
 
+      // Clear translation state for new thread
+      setAutoTranslations(new Map());
+      setManualTranslations(new Map());
+      setTranslatingIds(new Set());
+      setTranslationErrors(new Map());
+      setShowOriginalIds(new Set());
+      translatedIdsRef.current.clear();
+      autoTranslatingRef.current = false;
+
+      // Restore auto-translate preference for this thread
+      const fedTranslateKey = `nexus_fed_auto_translate_${tenantSlug || 'default'}`;
+      try {
+        const prefs = JSON.parse(localStorage.getItem(fedTranslateKey) || '{}');
+        setAutoTranslateOn(!!prefs[key]);
+      } catch {
+        setAutoTranslateOn(false);
+      }
+
       // Mark as read
       markThreadRead(thread);
 
@@ -364,7 +403,115 @@ export function FederationMessagesPage() {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     },
-    [markThreadRead]
+    [markThreadRead, tenantSlug]
+  );
+
+  // ── Translation helpers ──
+  const handleAutoTranslateToggle = useCallback(() => {
+    if (!activeThreadKey) return;
+    const fedTranslateKey = `nexus_fed_auto_translate_${tenantSlug || 'default'}`;
+    try {
+      const prefs = JSON.parse(localStorage.getItem(fedTranslateKey) || '{}');
+      if (prefs[activeThreadKey]) {
+        delete prefs[activeThreadKey];
+        localStorage.setItem(fedTranslateKey, JSON.stringify(prefs));
+        setAutoTranslateOn(false);
+        setAutoTranslations(new Map());
+        translatedIdsRef.current.clear();
+        toast.info(t('messages.auto_translate_disabled'));
+      } else {
+        prefs[activeThreadKey] = userLangBase;
+        localStorage.setItem(fedTranslateKey, JSON.stringify(prefs));
+        setAutoTranslateOn(true);
+        toast.success(t('messages.auto_translate_enabled'));
+      }
+    } catch {
+      // localStorage unavailable — just toggle in memory
+      setAutoTranslateOn((prev) => !prev);
+    }
+  }, [activeThreadKey, tenantSlug, userLangBase, toast, t]);
+
+  // Auto-translate effect: translate all inbound messages when toggle is on
+  useEffect(() => {
+    if (!autoTranslateOn || !activeThread?.messages?.length || autoTranslatingRef.current) return;
+
+    const untranslated = activeThread.messages.filter(
+      (msg) =>
+        msg.direction === 'inbound' &&
+        !autoTranslations.has(msg.id) &&
+        !translatedIdsRef.current.has(msg.id) &&
+        msg.body
+    );
+    if (untranslated.length === 0) return;
+
+    for (const msg of untranslated) {
+      translatedIdsRef.current.add(msg.id);
+    }
+    autoTranslatingRef.current = true;
+
+    (async () => {
+      const newTranslations = new Map(autoTranslations);
+      for (const msg of untranslated) {
+        try {
+          const response = await api.post<{ translated_text: string }>(
+            `/v2/federation/messages/${msg.id}/translate`,
+            { target_language: userLangBase }
+          );
+          const translated = response.data?.translated_text;
+          if (translated) {
+            newTranslations.set(msg.id, translated);
+          }
+        } catch {
+          translatedIdsRef.current.delete(msg.id);
+        }
+      }
+      setAutoTranslations(newTranslations);
+      autoTranslatingRef.current = false;
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoTranslateOn, activeThread?.messages?.length, i18n.language]);
+
+  const handleTranslateMessage = useCallback(
+    async (msgId: number) => {
+      // Toggle view if already translated
+      const existingTranslation = manualTranslations.get(msgId) || autoTranslations.get(msgId);
+      if (existingTranslation) {
+        setShowOriginalIds((prev) => {
+          const next = new Set(prev);
+          if (next.has(msgId)) next.delete(msgId);
+          else next.add(msgId);
+          return next;
+        });
+        return;
+      }
+
+      setTranslatingIds((prev) => new Set(prev).add(msgId));
+      setTranslationErrors((prev) => {
+        const m = new Map(prev);
+        m.delete(msgId);
+        return m;
+      });
+
+      try {
+        const response = await api.post<{ translated_text: string }>(
+          `/v2/federation/messages/${msgId}/translate`,
+          { target_language: userLangBase }
+        );
+        const translated = response.data?.translated_text ?? '';
+        setManualTranslations((prev) => new Map(prev).set(msgId, translated));
+      } catch {
+        setTranslationErrors((prev) =>
+          new Map(prev).set(msgId, t('messages.translation_failed'))
+        );
+      } finally {
+        setTranslatingIds((prev) => {
+          const s = new Set(prev);
+          s.delete(msgId);
+          return s;
+        });
+      }
+    },
+    [manualTranslations, autoTranslations, userLangBase, t]
   );
 
   // ── Send reply ──
@@ -752,7 +899,61 @@ export function FederationMessagesPage() {
                       {activeThread.partner.tenant_name}
                     </Chip>
                   </div>
+
+                  {/* Auto-translate toggle */}
+                  {translationEnabled && (
+                    <Tooltip
+                      content={
+                        autoTranslateOn
+                          ? t('messages.auto_translate_tooltip_on')
+                          : t('messages.auto_translate_tooltip_off')
+                      }
+                    >
+                      <Button
+                        isIconOnly
+                        variant="flat"
+                        size="sm"
+                        className={
+                          autoTranslateOn
+                            ? 'bg-indigo-500/20 text-indigo-500 ring-1 ring-indigo-500/30 ml-auto'
+                            : 'bg-theme-elevated text-theme-muted ml-auto'
+                        }
+                        aria-label={
+                          autoTranslateOn
+                            ? t('messages.auto_translate_tooltip_on')
+                            : t('messages.auto_translate_tooltip_off')
+                        }
+                        onPress={handleAutoTranslateToggle}
+                      >
+                        <Languages className="w-4 h-4" />
+                      </Button>
+                    </Tooltip>
+                  )}
                 </div>
+
+                {/* Auto-translate active banner */}
+                {translationEnabled && autoTranslateOn && (
+                  <div
+                    className="flex items-center gap-2 px-3 py-2 mx-4 mt-2 bg-indigo-500/10 rounded-lg"
+                    role="status"
+                  >
+                    <Languages
+                      className="w-4 h-4 text-indigo-500 flex-shrink-0"
+                      aria-hidden="true"
+                    />
+                    <p className="text-xs text-indigo-600 dark:text-indigo-300 flex-1">
+                      {t('messages.auto_translate_active_banner')}
+                    </p>
+                    <Button
+                      size="sm"
+                      variant="light"
+                      className="h-6 min-w-0 px-2 text-xs text-indigo-500"
+                      onPress={handleAutoTranslateToggle}
+                    >
+                      {t('messages.auto_translate_turn_off')}
+                    </Button>
+                  </div>
+                )}
 
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -801,7 +1002,74 @@ export function FederationMessagesPage() {
                                     : 'bg-theme-elevated text-theme-primary rounded-bl-md'
                                 }`}
                               >
-                                <p className="text-sm whitespace-pre-wrap">{msg.body}</p>
+                                {(() => {
+                                  const translatedText =
+                                    manualTranslations.get(msg.id) ||
+                                    autoTranslations.get(msg.id);
+                                  const isShowingOriginal = showOriginalIds.has(msg.id);
+                                  const isCurrentlyTranslating = translatingIds.has(msg.id);
+                                  const error = translationErrors.get(msg.id);
+
+                                  return (
+                                    <>
+                                      <p className="text-sm whitespace-pre-wrap">
+                                        {translatedText && !isShowingOriginal
+                                          ? translatedText
+                                          : msg.body}
+                                      </p>
+
+                                      {translationEnabled && msg.body && (
+                                        <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                                          <Button
+                                            size="sm"
+                                            variant="light"
+                                            className={`h-6 min-w-0 px-2 text-xs gap-1 ${
+                                              isOwn
+                                                ? 'text-white/60 hover:text-white/100'
+                                                : 'opacity-60 hover:opacity-100'
+                                            } ${isCurrentlyTranslating ? 'animate-pulse' : ''}`}
+                                            onPress={() => handleTranslateMessage(msg.id)}
+                                            isDisabled={isCurrentlyTranslating}
+                                            startContent={
+                                              <Languages className="w-3 h-3" aria-hidden="true" />
+                                            }
+                                            aria-label={
+                                              translatedText
+                                                ? t('messages.view_original')
+                                                : t('messages.translate_to', {
+                                                    language: userLangName,
+                                                  })
+                                            }
+                                          >
+                                            {isCurrentlyTranslating
+                                              ? t('messages.translating')
+                                              : translatedText
+                                                ? isShowingOriginal
+                                                  ? t('messages.show_translation')
+                                                  : t('messages.view_original')
+                                                : t('messages.translate_to', {
+                                                    language: userLangName,
+                                                  })}
+                                          </Button>
+                                          {translatedText && !isShowingOriginal && (
+                                            <span
+                                              className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                                                isOwn
+                                                  ? 'bg-white/15 text-white/60'
+                                                  : 'bg-theme-muted/10 text-theme-muted'
+                                              }`}
+                                            >
+                                              {t('messages.translated_label')}
+                                            </span>
+                                          )}
+                                          {error && !translatedText && (
+                                            <span className="text-xs text-red-400">{error}</span>
+                                          )}
+                                        </div>
+                                      )}
+                                    </>
+                                  );
+                                })()}
                               </div>
 
                               {/* Timestamp + read indicator */}

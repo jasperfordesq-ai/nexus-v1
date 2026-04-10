@@ -10,6 +10,8 @@ use App\Services\FederationActivityService;
 use App\Services\FederationEmailService;
 use App\Services\FederationRealtimeService;
 use App\Services\FederationUserService;
+use App\Services\TranscriptionService;
+use App\Services\TranslationConfigurationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Models\Notification;
@@ -1537,6 +1539,106 @@ class FederationV2Controller extends BaseApiController
             error_log("FederationV2Api::markMessageRead error: " . $e->getMessage());
             return $this->respondWithError('INTERNAL_ERROR', __('api.fed_mark_read_failed'), null, 500);
         }
+    }
+
+    /** POST /api/v2/federation/messages/{id}/translate */
+    public function translateMessage(int $id): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $tenantId = $this->getTenantId();
+
+        if (!\App\Core\TenantContext::hasFeature('message_translation')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.feature_disabled'), null, 403);
+        }
+
+        $this->rateLimit('federation_messages_translate', 20, 60);
+
+        $targetLanguage = trim(request()->input('target_language', ''));
+        if (empty($targetLanguage)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.message_target_language_required'), 'target_language', 400);
+        }
+        if (strlen($targetLanguage) > 10 || !preg_match('/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/', $targetLanguage)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.message_target_language_required'), 'target_language', 400);
+        }
+
+        // Fetch the message — user must be sender or receiver
+        $message = DB::selectOne("
+            SELECT id, body, sender_tenant_id, sender_user_id,
+                   receiver_tenant_id, receiver_user_id,
+                   external_partner_id, direction
+            FROM federation_messages
+            WHERE id = ?
+              AND (
+                (sender_tenant_id = ? AND sender_user_id = ?)
+                OR (receiver_tenant_id = ? AND receiver_user_id = ?)
+              )
+        ", [$id, $tenantId, $userId, $tenantId, $userId]);
+
+        if (!$message) {
+            return $this->respondWithError('NOT_FOUND', __('api.fed_message_not_found'), null, 404);
+        }
+
+        $sourceText = $message->body ?? '';
+        if (empty(trim($sourceText))) {
+            return $this->respondWithError('NO_CONTENT', __('api.message_no_translatable_content'), null, 422);
+        }
+
+        // INT7: Fetch conversation context for better disambiguation
+        $conversationContext = [];
+        $translationConfig = TranslationConfigurationService::getAll();
+        if (!empty($translationConfig['translation.context_aware'])) {
+            $contextLimit = (int) ($translationConfig['translation.context_messages'] ?? 5);
+
+            // Get the two participants of this thread
+            $sTenant = (int) $message->sender_tenant_id;
+            $sUser   = (int) $message->sender_user_id;
+            $rTenant = (int) $message->receiver_tenant_id;
+            $rUser   = (int) $message->receiver_user_id;
+
+            $contextRows = DB::select("
+                SELECT body FROM federation_messages
+                WHERE id < ?
+                  AND (
+                    (sender_tenant_id = ? AND sender_user_id = ? AND receiver_tenant_id = ? AND receiver_user_id = ?)
+                    OR (sender_tenant_id = ? AND sender_user_id = ? AND receiver_tenant_id = ? AND receiver_user_id = ?)
+                  )
+                ORDER BY id DESC LIMIT ?
+            ", [$id, $sTenant, $sUser, $rTenant, $rUser, $rTenant, $rUser, $sTenant, $sUser, $contextLimit]);
+
+            $conversationContext = array_filter(
+                array_reverse(array_map(fn ($r) => $r->body, $contextRows)),
+                fn ($b) => !empty($b)
+            );
+            $conversationContext = array_values($conversationContext);
+        }
+
+        // INT10: Load glossary terms for the target language
+        $glossary = [];
+        if (!empty($translationConfig['translation.glossary_enabled'])
+            && DB::getSchemaBuilder()->hasTable('translation_glossaries')
+        ) {
+            $glossaryRows = DB::table('translation_glossaries')
+                ->where('tenant_id', $tenantId)
+                ->where('target_language', $targetLanguage)
+                ->where('is_active', true)
+                ->limit(50)
+                ->get(['source_term', 'target_term']);
+            foreach ($glossaryRows as $row) {
+                $glossary[$row->source_term] = $row->target_term;
+            }
+        }
+
+        $translatedText = TranscriptionService::translate($sourceText, 'auto', $targetLanguage, $conversationContext, $glossary);
+
+        if ($translatedText === null) {
+            return $this->respondWithError('TRANSLATION_FAILED', __('api.message_translation_failed'), null, 500);
+        }
+
+        return $this->respondWithData([
+            'translated_text' => $translatedText,
+            'source_type'     => 'body',
+            'context_used'    => !empty($conversationContext),
+        ]);
     }
 
     // =====================================================================

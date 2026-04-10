@@ -48,6 +48,7 @@ class MessageService
                 CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END as partner_id
             ', [$userId])
             ->where('tenant_id', $tenantId)
+            ->where('is_federated', 0)
             ->where(function ($q) use ($userId) {
                 $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
             })
@@ -99,6 +100,7 @@ class MessageService
             $rows = DB::table('messages')
                 ->selectRaw('sender_id, COUNT(*) as cnt')
                 ->where('tenant_id', $tenantId)
+                ->where('is_federated', 0)
                 ->where('receiver_id', $userId)
                 ->where('is_read', false)
                 ->whereIn('sender_id', $partnerIds)
@@ -370,6 +372,7 @@ class MessageService
         return Message::query()
             ->where('receiver_id', $userId)
             ->where('is_read', false)
+            ->where('is_federated', 0)
             ->count();
     }
 
