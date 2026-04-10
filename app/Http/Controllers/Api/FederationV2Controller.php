@@ -283,7 +283,7 @@ class FederationV2Controller extends BaseApiController
 
                 return [
                     'id' => 'ext-' . $ep['id'],
-                    'name' => $ep['partner_name'] ?? $ep['name'],
+                    'name' => $ep['name'],
                     'logo' => null,
                     'tagline' => $ep['description'] ?? '',
                     'location' => '',

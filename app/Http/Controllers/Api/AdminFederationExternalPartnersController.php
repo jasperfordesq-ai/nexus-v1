@@ -127,32 +127,41 @@ class AdminFederationExternalPartnersController extends BaseApiController
         $result = FederationExternalApiClient::healthCheck($id);
         $elapsed = (int) round((microtime(true) - $startTime) * 1000);
 
-        // On successful health check, sync partner metadata (member count, name, version)
+        // On successful health check, sync partner metadata
         if ($result['success']) {
             try {
+                // Fetch the partner's timebank info — with the response envelope
+                // now unwrapped, data is the array of timebanks directly.
                 $timebankInfo = FederationExternalApiClient::get($id, '/timebanks');
+                $memberCount = 0;
+                $partnerDisplayName = null;
+
                 if (($timebankInfo['success'] ?? false) && !empty($timebankInfo['data'])) {
-                    $tbData = $timebankInfo['data']['data'][0] ?? $timebankInfo['data'][0] ?? null;
-                    if ($tbData) {
-                        DB::update(
-                            "UPDATE federation_external_partners SET
-                                partner_member_count = ?,
-                                partner_name = COALESCE(?, partner_name),
-                                last_sync_at = NOW(),
-                                error_count = 0,
-                                last_error = NULL
-                             WHERE id = ? AND tenant_id = ?",
-                            [
-                                (int) ($tbData['member_count'] ?? 0),
-                                $tbData['name'] ?? null,
-                                $id,
-                                $tenantId,
-                            ]
-                        );
+                    $timebanks = $timebankInfo['data'];
+                    // The first timebank is the partner's own tenant
+                    $firstTb = is_array($timebanks) ? ($timebanks[0] ?? null) : null;
+                    if ($firstTb) {
+                        $memberCount = (int) ($firstTb['member_count'] ?? 0);
+                        $partnerDisplayName = $firstTb['name'] ?? null;
                     }
                 }
+
+                DB::update(
+                    "UPDATE federation_external_partners SET
+                        partner_member_count = ?,
+                        partner_name = COALESCE(NULLIF(?, ''), partner_name),
+                        last_sync_at = NOW(),
+                        error_count = 0,
+                        last_error = NULL
+                     WHERE id = ? AND tenant_id = ?",
+                    [$memberCount, $partnerDisplayName, $id, $tenantId]
+                );
             } catch (\Throwable $e) {
-                // Non-critical — don't fail the health check
+                // Non-critical — still update last_sync_at
+                DB::update(
+                    "UPDATE federation_external_partners SET last_sync_at = NOW(), error_count = 0, last_error = NULL WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
+                );
                 error_log("FederationExternalPartner: metadata sync failed for #{$id}: " . $e->getMessage());
             }
         }
