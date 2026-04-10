@@ -149,6 +149,11 @@ class FederationV2Controller extends BaseApiController
             'federation_optin' => true,
             'profile_visible_federated' => true,
             'appear_in_federated_search' => true,
+            'show_skills_federated' => true,
+            'show_location_federated' => true,
+            'show_reviews_federated' => true,
+            'messaging_enabled_federated' => true,
+            'transactions_enabled_federated' => true,
         ]);
 
         $success = $this->federationUserService->updateSettings($userId, $settings);
