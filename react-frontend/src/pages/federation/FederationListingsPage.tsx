@@ -404,8 +404,11 @@ export function FederationListingsPage() {
         <ModalContent>
           {selectedListing && (() => {
             const isOffer = selectedListing.type === 'offer';
+            const isExternal = !!(selectedListing as Record<string, unknown>).is_external;
             const authorAvatar = resolveAvatarUrl(selectedListing.author?.avatar);
             const listingImage = selectedListing.image_url ? resolveAssetUrl(selectedListing.image_url) : null;
+            const authorName = selectedListing.author?.name || t('listings.anonymous_user', 'Anonymous');
+            const canNavigateToProfile = !isExternal && selectedListing.author?.id;
 
             return (
               <>
@@ -428,7 +431,7 @@ export function FederationListingsPage() {
                     <h2 className="text-lg font-bold text-theme-primary line-clamp-2">
                       {selectedListing.title}
                     </h2>
-                    <div className="flex items-center gap-2 mt-0.5">
+                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                       <Chip
                         size="sm"
                         variant="flat"
@@ -443,6 +446,13 @@ export function FederationListingsPage() {
                       {selectedListing.category_name && (
                         <Chip size="sm" variant="flat" className="bg-theme-hover text-theme-muted">
                           {selectedListing.category_name}
+                        </Chip>
+                      )}
+                      {isExternal && (
+                        <Chip size="sm" variant="flat" className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+                          startContent={<Globe className="w-3 h-3" />}
+                        >
+                          {t('listings.external_partner', 'External')}
                         </Chip>
                       )}
                     </div>
@@ -483,33 +493,41 @@ export function FederationListingsPage() {
                           {selectedListing.location}
                         </span>
                       )}
+                      {selectedListing.created_at && (
+                        <span className="flex items-center gap-1.5 text-theme-muted">
+                          <Clock className="w-4 h-4" aria-hidden="true" />
+                          {new Date(selectedListing.created_at).toLocaleDateString()}
+                        </span>
+                      )}
                     </div>
 
                     {/* Author & Community */}
                     <div className="flex items-center justify-between pt-3 border-t border-theme-default">
-                      <Button
-                        variant="light"
-                        className="flex items-center gap-3 hover:opacity-80 transition-opacity h-auto min-w-0 p-0 justify-start"
-                        onPress={() => {
-                          if (selectedListing.author?.id) {
+                      {canNavigateToProfile ? (
+                        <Button
+                          variant="light"
+                          className="flex items-center gap-3 hover:opacity-80 transition-opacity h-auto min-w-0 p-0 justify-start"
+                          onPress={() => {
                             setIsDetailOpen(false);
                             setSelectedListing(null);
-                            navigate(tenantPath(`/federation/members/${selectedListing.author.id}`));
-                          }
-                        }}
-                      >
-                        <Avatar
-                          src={authorAvatar}
-                          name={selectedListing.author?.name || 'User'}
-                          size="sm"
-                        />
-                        <div className="text-left">
-                          <p className="text-sm font-medium text-theme-primary">
-                            {selectedListing.author?.name || 'Unknown'}
-                          </p>
-                          <p className="text-xs text-theme-subtle">{t('listings.view_profile')}</p>
+                            navigate(tenantPath(`/federation/members/${selectedListing.author!.id}`));
+                          }}
+                        >
+                          <Avatar src={authorAvatar} name={authorName} size="sm" />
+                          <div className="text-left">
+                            <p className="text-sm font-medium text-theme-primary">{authorName}</p>
+                            <p className="text-xs text-theme-subtle">{t('listings.view_profile')}</p>
+                          </div>
+                        </Button>
+                      ) : (
+                        <div className="flex items-center gap-3">
+                          <Avatar src={authorAvatar} name={authorName} size="sm" />
+                          <div className="text-left">
+                            <p className="text-sm font-medium text-theme-primary">{authorName}</p>
+                            <p className="text-xs text-theme-subtle">{selectedListing.timebank.name}</p>
+                          </div>
                         </div>
-                      </Button>
+                      )}
                       <Chip
                         size="sm"
                         variant="flat"
@@ -522,7 +540,7 @@ export function FederationListingsPage() {
                   </div>
                 </ModalBody>
                 <ModalFooter className="flex gap-2">
-                  {isAuthenticated && selectedListing.author?.id && (
+                  {isAuthenticated && selectedListing.author?.id && !isExternal && (
                     <>
                       <Button
                         variant="flat"
@@ -551,18 +569,16 @@ export function FederationListingsPage() {
                       </Button>
                     </>
                   )}
-                  {!isAuthenticated && (
-                    <Button
-                      variant="flat"
-                      className="bg-theme-elevated text-theme-muted"
-                      onPress={() => {
-                        setIsDetailOpen(false);
-                        setSelectedListing(null);
-                      }}
-                    >
-                      {t('listings.close')}
-                    </Button>
-                  )}
+                  <Button
+                    variant="flat"
+                    className="bg-theme-elevated text-theme-muted"
+                    onPress={() => {
+                      setIsDetailOpen(false);
+                      setSelectedListing(null);
+                    }}
+                  >
+                    {t('listings.close', 'Close')}
+                  </Button>
                 </ModalFooter>
               </>
             );

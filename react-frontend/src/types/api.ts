@@ -1561,7 +1561,7 @@ export interface FederatedEvent {
 }
 
 export interface FederatedListing {
-  id: number;
+  id: number | string;
   title: string;
   description: string;
   type: 'offer' | 'request';
@@ -1575,10 +1575,13 @@ export interface FederatedListing {
     avatar?: string | null;
   };
   timebank: {
-    id: number;
+    id: number | string;
     name: string;
   };
   created_at?: string;
+  is_external?: boolean;
+  external_partner_id?: number;
+  partner_name?: string;
 }
 
 export interface FederatedMember {

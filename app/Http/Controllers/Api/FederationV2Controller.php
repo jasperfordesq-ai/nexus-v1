@@ -596,8 +596,17 @@ class FederationV2Controller extends BaseApiController
                 $this->getTenantId()
             );
             $partnerName = $partner['name'] ?? 'External Partner';
+            $partnerBaseUrl = rtrim($partner['base_url'] ?? '', '/');
 
-            return array_map(function ($l) use ($externalPartnerId, $partnerName) {
+            return array_map(function ($l) use ($externalPartnerId, $partnerName, $partnerBaseUrl) {
+                // v1 API returns 'owner', not 'author'
+                $owner = $l['owner'] ?? $l['author'] ?? [];
+                $avatar = $owner['avatar'] ?? null;
+                // Resolve relative avatar URLs against partner base
+                if ($avatar && !str_starts_with($avatar, 'http')) {
+                    $avatar = $partnerBaseUrl . '/' . ltrim($avatar, '/');
+                }
+
                 return [
                     'id' => 'ext-' . $externalPartnerId . '-' . ($l['id'] ?? 0),
                     'title' => $l['title'] ?? '',
@@ -605,12 +614,12 @@ class FederationV2Controller extends BaseApiController
                     'type' => $l['type'] ?? 'offer',
                     'category_name' => $l['category_name'] ?? $l['category'] ?? null,
                     'image_url' => $l['image_url'] ?? null,
-                    'estimated_hours' => isset($l['rate']) ? (float) $l['rate'] : null,
+                    'estimated_hours' => isset($l['rate']) ? (float) $l['rate'] : (isset($l['estimated_hours']) ? (float) $l['estimated_hours'] : null),
                     'location' => $l['location'] ?? null,
                     'author' => [
-                        'id' => (int) ($l['author']['id'] ?? $l['user_id'] ?? 0),
-                        'name' => $l['author']['name'] ?? trim(($l['first_name'] ?? '') . ' ' . ($l['last_name'] ?? '')),
-                        'avatar' => $l['author']['avatar'] ?? $l['avatar'] ?? null,
+                        'id' => (int) ($owner['id'] ?? 0),
+                        'name' => $owner['name'] ?? trim(($l['first_name'] ?? '') . ' ' . ($l['last_name'] ?? '')),
+                        'avatar' => $avatar,
                     ],
                     'timebank' => [
                         'id' => 'ext-' . $externalPartnerId,
@@ -618,6 +627,7 @@ class FederationV2Controller extends BaseApiController
                     ],
                     'created_at' => $l['created_at'] ?? null,
                     'is_external' => true,
+                    'external_partner_id' => $externalPartnerId,
                     'partner_name' => $partnerName,
                 ];
             }, $result['data']);
@@ -641,6 +651,8 @@ class FederationV2Controller extends BaseApiController
             $result = $searchService->searchExternalListings($tenantId, $filters);
 
             return array_map(function ($l) {
+                // v1 API returns 'owner', not 'author'
+                $owner = $l['owner'] ?? $l['author'] ?? [];
                 return [
                     'id' => 'ext-' . ($l['partner_id'] ?? 0) . '-' . ($l['id'] ?? 0),
                     'title' => $l['title'] ?? '',
@@ -648,12 +660,12 @@ class FederationV2Controller extends BaseApiController
                     'type' => $l['type'] ?? 'offer',
                     'category_name' => $l['category_name'] ?? $l['category'] ?? null,
                     'image_url' => $l['image_url'] ?? null,
-                    'estimated_hours' => isset($l['rate']) ? (float) $l['rate'] : null,
+                    'estimated_hours' => isset($l['rate']) ? (float) $l['rate'] : (isset($l['estimated_hours']) ? (float) $l['estimated_hours'] : null),
                     'location' => $l['location'] ?? null,
                     'author' => [
-                        'id' => (int) ($l['author']['id'] ?? $l['user_id'] ?? 0),
-                        'name' => $l['author']['name'] ?? trim(($l['first_name'] ?? '') . ' ' . ($l['last_name'] ?? '')),
-                        'avatar' => $l['author']['avatar'] ?? $l['avatar'] ?? null,
+                        'id' => (int) ($owner['id'] ?? 0),
+                        'name' => $owner['name'] ?? trim(($l['first_name'] ?? '') . ' ' . ($l['last_name'] ?? '')),
+                        'avatar' => $owner['avatar'] ?? null,
                     ],
                     'timebank' => [
                         'id' => (int) ($l['timebank']['id'] ?? $l['tenant_id'] ?? 0),
