@@ -25,7 +25,7 @@ class TranscriptionService
      */
     public static function transcribe(string $audioFilePath): ?array
     {
-        $apiKey = config('services.openai.key');
+        $apiKey = config('services.openai.api_key');
         if (empty($apiKey)) {
             Log::warning('TranscriptionService::transcribe — OpenAI API key not configured');
             return null;
@@ -87,7 +87,7 @@ class TranscriptionService
         array $conversationContext = [],
         array $glossary = [],
     ): ?string {
-        $apiKey = config('services.openai.key');
+        $apiKey = config('services.openai.api_key');
         if (empty($apiKey)) {
             Log::warning('TranscriptionService::translate — OpenAI API key not configured');
             return null;
