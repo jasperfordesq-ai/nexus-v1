@@ -1703,6 +1703,11 @@ class FederationV2Controller extends BaseApiController
             $receiverTenantIdInt = (int) $receiverTenantId;
             $receiverIdInt = (int) $receiverId;
 
+            // Prevent self-transactions
+            if ($receiverIdInt === $userId && $receiverTenantIdInt === $tenantId) {
+                return $this->respondWithError('SELF_TRANSACTION', 'Cannot send a transaction to yourself', null, 400);
+            }
+
             // Verify receiver exists, opted in, and accepts federated transactions
             $receiver = DB::selectOne(
                 "SELECT u.id, u.tenant_id, t.name as tenant_name, fus.transactions_enabled_federated
@@ -1764,8 +1769,8 @@ class FederationV2Controller extends BaseApiController
 
         $realReceiverId = $receiverIdStr;
         if (str_starts_with($receiverIdStr, 'ext-')) {
-            $parts = explode('-', $receiverIdStr);
-            $realReceiverId = end($parts);
+            $parts = explode('-', $receiverIdStr, 3);
+            $realReceiverId = $parts[2] ?? $receiverIdStr;
         }
         $realReceiverId = (int) $realReceiverId;
         if ($realReceiverId <= 0) {
