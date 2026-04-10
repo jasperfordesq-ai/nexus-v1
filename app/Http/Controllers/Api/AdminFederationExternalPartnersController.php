@@ -126,18 +126,15 @@ class AdminFederationExternalPartnersController extends BaseApiController
         $result = FederationExternalApiClient::healthCheck($id);
         $elapsed = (int) round((microtime(true) - $startTime) * 1000);
 
-        if ($result['success']) {
-            return $this->respondWithData([
-                'healthy' => true,
-                'response_time_ms' => $elapsed,
-                'status_code' => $result['status_code'] ?? 200,
-            ]);
-        }
-
-        return $this->respondWithError('HEALTH_CHECK_FAILED', $result['error'] ?? __('api.health_check_failed'),
-            null,
-            502
-        );
+        // Always return 200 — the health check result is in the payload.
+        // Using 502 here causes Cloudflare to replace our JSON with its own
+        // error page, stripping CORS headers and breaking the browser request.
+        return $this->respondWithData([
+            'healthy' => $result['success'],
+            'response_time_ms' => $elapsed,
+            'status_code' => $result['status_code'] ?? 0,
+            'error' => $result['success'] ? null : ($result['error'] ?? 'Health check failed'),
+        ]);
     }
 
     /**

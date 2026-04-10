@@ -319,13 +319,22 @@ export function ExternalPartners() {
     try {
       const res = await api.post(`/v2/admin/federation/external-partners/${partner.id}/health-check`, {});
       if (res.success) {
-        const data = res.data as { response_time_ms?: number };
-        toast.success(
-          t('federation.health_check_success', {
-            name: partner.name,
-            time: data?.response_time_ms ?? '?',
-          }) || `${partner.name}: Healthy (${data?.response_time_ms ?? '?'}ms)`
-        );
+        const data = res.data as { healthy?: boolean; response_time_ms?: number; error?: string };
+        if (data?.healthy) {
+          toast.success(
+            t('federation.health_check_success', {
+              name: partner.name,
+              time: data?.response_time_ms ?? '?',
+            }) || `${partner.name}: Healthy (${data?.response_time_ms ?? '?'}ms)`
+          );
+        } else {
+          toast.error(
+            t('federation.health_check_partner_error', {
+              name: partner.name,
+              error: data?.error ?? 'Partner unreachable',
+            }) || `${partner.name}: ${data?.error ?? 'Partner unreachable'}`
+          );
+        }
         loadData();
       } else {
         const errorMsg = (res as { error?: string }).error || t('federation.health_check_error');
