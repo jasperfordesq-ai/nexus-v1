@@ -48,6 +48,11 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('safeguarding-purge-message-copies');
 
+        $schedule->command('federation:sync-partners')
+            ->hourly()
+            ->withoutOverlapping()
+            ->name('federation-sync-partners');
+
         $schedule->command('federation:purge-external-logs')
             ->daily()
             ->withoutOverlapping()
