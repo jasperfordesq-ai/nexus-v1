@@ -387,9 +387,18 @@ class FederationExternalApiClient
      */
     private static function recordFailure(int $partnerId): void
     {
+        // Fix #8: Use Cache::increment() (atomic Redis INCR) instead of the
+        // non-atomic get()+put() pattern. Under concurrent failures, get+put
+        // can under-count (two requests both read 0, both write 1) causing
+        // the breaker to miss the threshold.
         $cacheKey = "federation_cb_failures:{$partnerId}";
-        $failures = (int) Cache::get($cacheKey, 0) + 1;
-        Cache::put($cacheKey, $failures, self::CIRCUIT_BREAKER_COOLDOWN_SECONDS * 2);
+        $failures = Cache::increment($cacheKey);
+
+        // On first increment the key has no TTL — set it.
+        // Subsequent increments on an existing key preserve the TTL.
+        if ($failures === 1) {
+            Cache::put($cacheKey, $failures, self::CIRCUIT_BREAKER_COOLDOWN_SECONDS * 2);
+        }
 
         if ($failures >= self::CIRCUIT_BREAKER_THRESHOLD) {
             // Trip the circuit breaker

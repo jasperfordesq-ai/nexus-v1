@@ -252,14 +252,21 @@ class FederationApiMiddleware
         $path = $_SERVER['REQUEST_URI'];
         $body = file_get_contents('php://input') ?: '';
 
-        // Check for replay via optional nonce header
+        // Replay attack prevention via nonce header.
+        // Nonce is REQUIRED for HMAC-signed requests — without it, the only
+        // protection is the 5-minute timestamp window, which is too wide.
         $nonce = $_SERVER['HTTP_X_FEDERATION_NONCE'] ?? null;
-        if ($nonce) {
-            $cacheKey = "federation_nonce:{$nonce}";
-            if (Cache::has($cacheKey)) {
-                return false; // Replay detected
-            }
-            Cache::put($cacheKey, true, self::TIMESTAMP_TOLERANCE); // TTL matches timestamp tolerance
+        if (empty($nonce)) {
+            return false; // Nonce required for HMAC auth
+        }
+
+        // Fix #5: Use Cache::add() (atomic Redis SET NX) instead of the
+        // non-atomic has() + put() pattern which has a TOCTOU race condition
+        // where two concurrent requests with the same nonce both pass the
+        // has() check before either calls put().
+        $cacheKey = "federation_nonce:{$nonce}";
+        if (!Cache::add($cacheKey, true, self::TIMESTAMP_TOLERANCE)) {
+            return false; // Nonce already seen — replay detected
         }
 
         $stringToSign = implode("\n", [$method, $path, $timestamp, $body]);
@@ -319,6 +326,19 @@ class FederationApiMiddleware
     public static function getAuthMethod(): ?string
     {
         return self::$authMethod;
+    }
+
+    /**
+     * Reset static authentication state.
+     *
+     * Call this in test setUp() to prevent state bleed between test cases,
+     * and in any async context (queue workers, event handlers) that calls
+     * authenticate() outside of a normal HTTP request lifecycle.
+     */
+    public static function reset(): void
+    {
+        self::$authenticatedPartner = null;
+        self::$authMethod = null;
     }
 
     /**
@@ -463,11 +483,14 @@ class FederationApiMiddleware
                 WHERE id = ? AND (rate_limit_hour IS NULL OR rate_limit_hour != ?)
             ", [$currentHour, $keyId, $currentHour]);
 
-            // Atomic increment-and-check: only increments if under the rate limit
+            // Atomic increment-and-check: only increments if under the rate limit.
+            // Fix #9: COALESCE rate_limit to 1000 — if rate_limit IS NULL in MariaDB,
+            // "x < NULL" evaluates to NULL (falsy), causing 0 rows updated and every
+            // request to be treated as rate-limited. COALESCE ensures a sensible default.
             $updated = DB::update("
                 UPDATE federation_api_keys
                 SET hourly_request_count = hourly_request_count + 1
-                WHERE id = ? AND hourly_request_count < rate_limit
+                WHERE id = ? AND hourly_request_count < COALESCE(rate_limit, 1000)
             ", [$keyId]);
 
             if ($updated === 0) {
