@@ -1336,11 +1336,11 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithError('INVALID_PARTNER', 'Invalid external partner ID', null, 400);
         }
 
-        // Parse real member ID from "ext-3-42" or plain "42"
+        // Parse real member ID from "ext-{partnerId}-{userId}" or plain "{userId}"
         $realReceiverId = $receiverIdStr;
         if (str_starts_with($receiverIdStr, 'ext-')) {
-            $parts = explode('-', $receiverIdStr);
-            $realReceiverId = end($parts);
+            $parts = explode('-', $receiverIdStr, 3); // ext, partnerId, userId
+            $realReceiverId = $parts[2] ?? $receiverIdStr;
         }
         $realReceiverId = (int) $realReceiverId;
         if ($realReceiverId <= 0) {
@@ -1383,17 +1383,23 @@ class FederationV2Controller extends BaseApiController
         }
 
         $externalMessageId = $result['data']['message_id'] ?? null;
-        $receiverName = $result['data']['receiver_name'] ?? ('User #' . $realReceiverId);
+        $receiverName = htmlspecialchars(
+            $result['data']['receiver_name'] ?? ('User #' . $realReceiverId),
+            ENT_QUOTES, 'UTF-8'
+        );
 
-        // Store local outbound copy so it appears in sender's thread list
+        // Store local outbound copy so it appears in sender's thread list.
+        // receiver_user_id stores the REMOTE user ID (for unique thread keys).
+        // receiver_tenant_id = 0 signals this is external (external_partner_id is authoritative).
         DB::insert("
             INSERT INTO federation_messages
             (sender_tenant_id, sender_user_id, receiver_tenant_id, receiver_user_id,
              subject, body, direction, status, reference_message_id,
              external_partner_id, external_receiver_name, external_message_id, created_at)
-            VALUES (?, ?, 0, 0, ?, ?, 'outbound', 'delivered', ?, ?, ?, ?, NOW())
+            VALUES (?, ?, 0, ?, ?, ?, 'outbound', 'delivered', ?, ?, ?, ?, NOW())
         ", [
             $tenantId, $userId,
+            $realReceiverId,
             $subject, $body,
             $referenceMessageId ? (int) $referenceMessageId : null,
             $externalPartnerId,
@@ -1666,6 +1672,9 @@ class FederationV2Controller extends BaseApiController
         if (!($senderSettings['federation_optin'] ?? false)) {
             return $this->respondWithError('SENDER_NOT_OPTED_IN', 'You must opt in to federation first', null, 403);
         }
+        if (!($senderSettings['transactions_enabled_federated'] ?? false)) {
+            return $this->respondWithError('SENDER_TRANSACTIONS_DISABLED', 'You have not enabled federated transactions', null, 403);
+        }
 
         // Validate required fields
         $errors = [];
@@ -1694,14 +1703,18 @@ class FederationV2Controller extends BaseApiController
             $receiverTenantIdInt = (int) $receiverTenantId;
             $receiverIdInt = (int) $receiverId;
 
-            // Verify receiver
+            // Verify receiver exists, opted in, and accepts federated transactions
             $receiver = DB::selectOne(
-                "SELECT u.id, u.tenant_id, t.name as tenant_name FROM users u JOIN tenants t ON t.id = u.tenant_id
+                "SELECT u.id, u.tenant_id, t.name as tenant_name, fus.transactions_enabled_federated
+                 FROM users u JOIN tenants t ON t.id = u.tenant_id
                  JOIN federation_user_settings fus ON fus.user_id = u.id
                  WHERE u.id = ? AND u.tenant_id = ? AND u.status = 'active' AND fus.federation_optin = 1",
                 [$receiverIdInt, $receiverTenantIdInt]
             );
             if (!$receiver) return $this->respondWithError('RECIPIENT_NOT_FOUND', 'Recipient not found', null, 404);
+            if (!$receiver->transactions_enabled_federated) {
+                return $this->respondWithError('RECIPIENT_TRANSACTIONS_DISABLED', 'Recipient has not enabled federated transactions', null, 403);
+            }
 
             // Partnership check
             $partnership = $this->federationPartnershipService->getPartnership($tenantId, $receiverTenantIdInt);
@@ -1769,14 +1782,14 @@ class FederationV2Controller extends BaseApiController
 
         DB::beginTransaction();
         try {
-            // Deduct sender balance first (atomic check)
-            $deducted = DB::update("UPDATE users SET balance = balance - ? WHERE id = ? AND balance >= ?", [$amount, $userId, $amount]);
-            if ($deducted === 0) {
+            // Lock sender row and check balance BEFORE calling external API
+            $senderBalance = DB::selectOne("SELECT balance FROM users WHERE id = ? FOR UPDATE", [$userId]);
+            if (!$senderBalance || $senderBalance->balance < $amount) {
                 DB::rollBack();
                 return $this->respondWithError('INSUFFICIENT_BALANCE', 'Insufficient balance', null, 400);
             }
 
-            // Send to external partner
+            // Call external API BEFORE deducting — if it fails, nothing to rollback
             $result = \App\Services\FederationExternalApiClient::createTransaction($externalPartnerId, [
                 'sender_id' => $userId,
                 'recipient_id' => $realReceiverId,
@@ -1790,9 +1803,11 @@ class FederationV2Controller extends BaseApiController
                 return $this->respondWithError('EXTERNAL_TX_FAILED', $errorMsg, null, 422);
             }
 
+            // External API succeeded — now deduct balance and record locally
+            DB::update("UPDATE users SET balance = balance - ? WHERE id = ?", [$amount, $userId]);
+
             $externalTxId = $result['data']['transaction_id'] ?? null;
 
-            // Store local record
             DB::insert(
                 "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at)
                  VALUES (?, ?, 0, ?, ?, 'completed', 1, ?, 0, NOW())",
