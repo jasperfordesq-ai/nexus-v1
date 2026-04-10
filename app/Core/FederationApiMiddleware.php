@@ -419,6 +419,7 @@ class FederationApiMiddleware
                 fak.rate_limit,
                 fak.status,
                 fak.signing_enabled,
+                fak.platform_id,
                 fak.last_used_at,
                 t.name as tenant_name,
                 t.domain as tenant_domain
