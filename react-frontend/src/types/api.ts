@@ -1534,6 +1534,7 @@ export interface FederationPartner {
   federation_level_name?: string;
   permissions?: string[];
   partnership_since?: string;
+  is_external?: boolean;
 }
 
 export interface FederatedEvent {

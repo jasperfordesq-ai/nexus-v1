@@ -72,6 +72,9 @@ export function FederationMemberProfilePage() {
 
   const toast = useToast();
 
+  // External member IDs start with 'ext-' — these can't be fetched from the API
+  const isExternalMember = id?.startsWith('ext-') ?? false;
+
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
 
@@ -107,7 +110,7 @@ export function FederationMemberProfilePage() {
 
 
   const loadMember = useCallback(async () => {
-    if (!id) return;
+    if (!id || isExternalMember) return;
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -128,7 +131,7 @@ export function FederationMemberProfilePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, isExternalMember]);
 
   useEffect(() => {
     loadMember();
@@ -167,6 +170,38 @@ export function FederationMemberProfilePage() {
   const reachKey = member?.service_reach ?? 'local_only';
   const reachMeta = SERVICE_REACH_META[reachKey] ?? SERVICE_REACH_META.local_only ?? { label: 'Local Only', icon: Home };
   const ReachIcon = reachMeta.icon;
+
+  // External members — show a friendly redirect message instead of a 404
+  if (isExternalMember) {
+    return (
+      <div className="space-y-6">
+        <PageMeta title="External Member" noIndex />
+        <Breadcrumbs
+          items={[
+            { label: t('member_profile.breadcrumb_federation'), href: '/federation' },
+            { label: t('member_profile.breadcrumb_members'), href: '/federation/members' },
+            { label: t('member_profile.breadcrumb_profile') },
+          ]}
+        />
+        <GlassCard className="p-8 text-center">
+          <Globe className="w-12 h-12 text-indigo-500 mx-auto mb-4" aria-hidden="true" />
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">
+            {t('member_profile.external_member_title', 'External Member')}
+          </h2>
+          <p className="text-theme-muted mb-6 max-w-md mx-auto">
+            {t('member_profile.external_member_description', "External member profiles are displayed on their home community's platform. You can message them or send credits from the Members page.")}
+          </p>
+          <Button
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+            onPress={() => navigate(tenantPath('/federation/members'))}
+          >
+            {t('member_profile.back_to_members')}
+          </Button>
+        </GlassCard>
+      </div>
+    );
+  }
 
   // Loading
   if (isLoading) {

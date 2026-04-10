@@ -468,6 +468,16 @@ function PartnerCard({ partner, onViewDetails }: PartnerCardProps) {
           >
             {levelMeta?.label || partner.federation_level_name || `Level ${partner.federation_level}`}
           </Chip>
+          {partner.is_external && (
+            <Chip
+              size="sm"
+              variant="flat"
+              className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+              startContent={<Globe className="w-3 h-3" />}
+            >
+              {t('federation.external', 'External')}
+            </Chip>
+          )}
           {partner.partnership_since && (
             <span className="text-xs text-theme-subtle">
               {t('partners.since_date', {

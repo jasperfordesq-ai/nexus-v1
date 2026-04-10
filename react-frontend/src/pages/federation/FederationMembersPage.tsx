@@ -240,8 +240,17 @@ export function FederationMembersPage() {
 
   // Navigation handlers
   const handleViewProfile = useCallback((member: FederatedMember) => {
+    // External members (id starts with 'ext-') don't have profile pages
+    const memberId = String(member.id);
+    if (member.is_external || memberId.startsWith('ext-')) {
+      toast.info(
+        t('members.external_profile_title', 'External Member'),
+        t('members.external_profile_message', 'This member belongs to an external partner community. You can message them or send credits from the Members page.')
+      );
+      return;
+    }
     navigate(tenantPath(`/federation/members/${member.id}`));
-  }, [navigate, tenantPath]);
+  }, [navigate, tenantPath, toast, t]);
 
   const handleSendMessage = useCallback((member: FederatedMember) => {
     navigate(
@@ -308,7 +317,9 @@ export function FederationMembersPage() {
               startContent={<Globe className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             >
               {partners.map((partner) => (
-                <SelectItem key={String(partner.id)}>{partner.name}</SelectItem>
+                <SelectItem key={String(partner.id)}>
+                  {partner.is_external ? `${partner.name} (${t('federation.external', 'External')})` : partner.name}
+                </SelectItem>
               ))}
             </Select>
           </div>
@@ -509,14 +520,26 @@ const FederatedMemberCard = memo(function FederatedMemberCard({
           <h3 className="font-semibold text-theme-primary text-lg leading-tight truncate">
             {displayName}
           </h3>
-          <Chip
-            size="sm"
-            variant="flat"
-            className="mt-1 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
-            startContent={<Globe className="w-3 h-3" aria-hidden="true" />}
-          >
-            {member.timebank.name}
-          </Chip>
+          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+            <Chip
+              size="sm"
+              variant="flat"
+              className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+              startContent={<Globe className="w-3 h-3" aria-hidden="true" />}
+            >
+              {member.timebank.name}
+            </Chip>
+            {member.is_external && (
+              <Chip
+                size="sm"
+                variant="flat"
+                className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+                startContent={<Globe className="w-3 h-3" />}
+              >
+                {t('federation.external', 'External')}
+              </Chip>
+            )}
+          </div>
         </div>
       </div>
 

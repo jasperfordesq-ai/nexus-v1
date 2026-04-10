@@ -1,4 +1,5 @@
 {
+  "federation.external": "External",
   "hub.page_title": "Federation",
   "hub.breadcrumb_dashboard": "Dashboard",
   "hub.breadcrumb_federation": "Federation",
@@ -420,24 +421,32 @@
     "aria_read": "Read",
     "aria_delivered": "Delivered",
     "aria_reply": "Reply message",
-    "aria_send_reply": "Send reply"
+    "aria_send_reply": "Send reply",
+    "external_recipient_info": "This message will be sent to an external partner server."
   },
   "onboarding": {
     "reach_label_remote_ok": "Remote OK"
   },
-  "listings": {},
+  "listings": {
+    "external_badge": "External"
+  },
   "members": {
     "reach_remote_ok": "Remote OK",
     "aria_search": "Search federated members",
     "aria_filter_community": "Filter by partner community",
-    "aria_filter_skills": "Filter by skills"
+    "aria_filter_skills": "Filter by skills",
+    "external_profile_title": "External Member",
+    "external_profile_message": "This member belongs to an external partner community. You can message them or send credits from the Members page."
   },
   "events": {},
   "partners": {},
   "partner_detail": {
     "federation_partner_badge": "Federation Partner"
   },
-  "member_profile": {},
+  "member_profile": {
+    "external_member_title": "External Member",
+    "external_member_description": "External member profiles are displayed on their home community's platform. You can message them or send credits from the Members page."
+  },
   "settings": {},
   "connections": {
     "page_title": "Connections",

@@ -904,43 +904,51 @@ export function FederationMessagesPage() {
             <div className="space-y-4">
               {/* Recipient selector */}
               {selectedRecipient ? (
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated">
-                  <Avatar
-                    src={resolveAvatarUrl(selectedRecipient.avatar)}
-                    name={selectedRecipient.name || 'Recipient'}
-                    size="sm"
-                    className="ring-2 ring-theme-default"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-theme-primary truncate">
-                      {selectedRecipient.name || `User #${selectedRecipient.id}`}
-                    </p>
-                    {selectedRecipient.tenant_name && (
-                      <Chip
-                        size="sm"
-                        variant="flat"
-                        startContent={<Globe className="w-2.5 h-2.5" aria-hidden="true" />}
-                        classNames={{
-                          base: 'h-5 bg-indigo-500/10 dark:bg-indigo-500/20',
-                          content: 'text-indigo-600 dark:text-indigo-400 text-[10px] px-1',
-                        }}
-                      >
-                        {selectedRecipient.tenant_name}
-                      </Chip>
-                    )}
+                <>
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated">
+                    <Avatar
+                      src={resolveAvatarUrl(selectedRecipient.avatar)}
+                      name={selectedRecipient.name || 'Recipient'}
+                      size="sm"
+                      className="ring-2 ring-theme-default"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-theme-primary truncate">
+                        {selectedRecipient.name || `User #${selectedRecipient.id}`}
+                      </p>
+                      {selectedRecipient.tenant_name && (
+                        <Chip
+                          size="sm"
+                          variant="flat"
+                          startContent={<Globe className="w-2.5 h-2.5" aria-hidden="true" />}
+                          classNames={{
+                            base: 'h-5 bg-indigo-500/10 dark:bg-indigo-500/20',
+                            content: 'text-indigo-600 dark:text-indigo-400 text-[10px] px-1',
+                          }}
+                        >
+                          {selectedRecipient.tenant_name}
+                        </Chip>
+                      )}
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      className="bg-theme-elevated text-theme-muted"
+                      onPress={() => {
+                        setSelectedRecipient(null);
+                        setComposeRecipientQuery('');
+                      }}
+                    >
+                      {t('messages.change')}
+                    </Button>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="flat"
-                    className="bg-theme-elevated text-theme-muted"
-                    onPress={() => {
-                      setSelectedRecipient(null);
-                      setComposeRecipientQuery('');
-                    }}
-                  >
-                    {t('messages.change')}
-                  </Button>
-                </div>
+                  {selectedRecipient.is_external && (
+                    <div className="flex items-center gap-2 p-2.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-sm">
+                      <Globe className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                      <span>{t('messages.external_recipient_info', 'This message will be sent to an external partner server.')}</span>
+                    </div>
+                  )}
+                </>
               ) : (
                 <>
                   <Input
@@ -980,9 +988,19 @@ export function FederationMessagesPage() {
                             />
                             <div className="flex-1 min-w-0 text-left">
                               <p className="font-medium text-theme-primary text-sm truncate">{member.name}</p>
-                              <div className="flex items-center gap-1 text-theme-subtle">
+                              <div className="flex items-center gap-1.5 text-theme-subtle">
                                 <Globe className="w-2.5 h-2.5" aria-hidden="true" />
                                 <span className="text-[11px]">{member.tenant_name}</span>
+                                {member.is_external && (
+                                  <Chip
+                                    size="sm"
+                                    variant="flat"
+                                    className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 h-4 text-[10px]"
+                                    startContent={<Globe className="w-2.5 h-2.5" />}
+                                  >
+                                    {t('federation.external', 'External')}
+                                  </Chip>
+                                )}
                               </div>
                             </div>
                           </div>

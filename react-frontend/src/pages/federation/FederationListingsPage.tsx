@@ -659,6 +659,16 @@ function FederatedListingCard({ listing, onViewDetails }: FederatedListingCardPr
             {listing.category_name}
           </Chip>
         )}
+        {listing.is_external && (
+          <Chip
+            size="sm"
+            variant="flat"
+            className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+            startContent={<Globe className="w-3 h-3" />}
+          >
+            {t('federation.external', 'External')}
+          </Chip>
+        )}
       </div>
 
       {/* Title & Description */}
