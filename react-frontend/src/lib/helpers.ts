@@ -32,13 +32,18 @@ export function resolveAssetUrl(url: string | null | undefined, fallback?: strin
 
   // Already absolute
   if (url.startsWith('http://') || url.startsWith('https://')) {
-    // Re-root upload paths through the API server regardless of the stored domain.
-    // Covers stale DB rows where the domain was saved as the old frontend domain
-    // (e.g. https://hour-timebank.ie/uploads/…) instead of the API server.
+    // Re-root upload paths through the API server ONLY if the URL is from a known
+    // local domain (stale DB rows). External partner URLs must be left as-is so
+    // avatars from federation partners load from the correct server.
     try {
       const parsed = new URL(url);
       if (parsed.pathname.startsWith('/uploads/')) {
-        return API_ASSET_BASE + parsed.pathname;
+        const apiHost = API_ASSET_BASE ? new URL(API_ASSET_BASE).host : '';
+        const isLocalDomain = apiHost && parsed.host !== apiHost;
+        const knownLocalDomains = [apiHost, 'hour-timebank.ie', 'app.project-nexus.ie'];
+        if (knownLocalDomains.some(d => d && parsed.host === d)) {
+          return API_ASSET_BASE + parsed.pathname;
+        }
       }
     } catch {
       // Not a valid URL — fall through and return as-is
