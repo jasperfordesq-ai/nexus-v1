@@ -275,31 +275,38 @@ export function FederationMessagesPage() {
       setIsComposeOpen(true);
 
       if (toUser && toTenant) {
-        // Pre-fill recipient from URL params
-        setSelectedRecipient({
-          id: parseInt(toUser, 10),
-          name: '', // Will be resolved when recipient search loads
-          tenant_id: parseInt(toTenant, 10),
-          tenant_name: '',
-        });
+        // External partner recipients (ext-N) can't receive messages via the V2 API yet
+        const isExternalTenant = toTenant.startsWith('ext-');
 
-        // Try to fetch the user info to fill in the name
-        api
-          .get<FederatedMemberResult & { timebank?: { id: number; name: string } }>(`/v2/federation/members/${toUser}?tenant_id=${toTenant}`)
-          .then((res) => {
-            if (res.success && res.data) {
-              // Normalize: API may return tenant info under timebank instead of tenant_id
-              const d = res.data;
-              setSelectedRecipient({
-                ...d,
-                tenant_id: d.tenant_id ?? d.timebank?.id ?? parseInt(toTenant!, 10),
-                tenant_name: d.tenant_name ?? d.timebank?.name ?? '',
-              });
-            }
-          })
-          .catch(() => {
-            // Silently fail - user can still search
+        if (isExternalTenant) {
+          // Don't pre-fill — external messaging not supported yet.
+          // The user can search for internal recipients instead.
+        } else {
+          // Pre-fill recipient from URL params (internal tenant)
+          setSelectedRecipient({
+            id: parseInt(toUser, 10),
+            name: '',
+            tenant_id: parseInt(toTenant, 10),
+            tenant_name: '',
           });
+
+          // Fetch user info to fill in the name
+          api
+            .get<FederatedMemberResult & { timebank?: { id: number; name: string } }>(`/v2/federation/members/${toUser}?tenant_id=${toTenant}`)
+            .then((res) => {
+              if (res.success && res.data) {
+                const d = res.data;
+                setSelectedRecipient({
+                  ...d,
+                  tenant_id: d.tenant_id ?? d.timebank?.id ?? parseInt(toTenant!, 10),
+                  tenant_name: d.tenant_name ?? d.timebank?.name ?? '',
+                });
+              }
+            })
+            .catch(() => {
+              // Silently fail - user can still search
+            });
+        }
       }
 
       // Clear compose params from URL
@@ -414,8 +421,10 @@ export function FederationMessagesPage() {
             tenant_id: m.tenant_id ?? m.timebank?.id ?? 0,
             tenant_name: m.tenant_name ?? m.timebank?.name ?? '',
           }));
-          // Filter out current user
-          setComposeRecipientResults(normalized.filter((m) => m.id !== user?.id));
+          // Filter out current user and external members (can't message cross-server yet)
+          setComposeRecipientResults(
+            normalized.filter((m) => m.id !== user?.id && typeof m.tenant_id === 'number' && m.tenant_id > 0)
+          );
         }
       } catch (err) {
         logError('Failed to search federated members', err);
