@@ -540,28 +540,31 @@ export function FederationListingsPage() {
                   </div>
                 </ModalBody>
                 <ModalFooter className="flex gap-2">
-                  {isAuthenticated && selectedListing.author?.id && !isExternal && (
+                  {isAuthenticated && selectedListing.author?.id && (
                     <>
-                      <Button
-                        variant="flat"
-                        className="bg-theme-elevated text-theme-primary"
-                        startContent={<User className="w-4 h-4" aria-hidden="true" />}
-                        onPress={() => {
-                          setIsDetailOpen(false);
-                          setSelectedListing(null);
-                          navigate(tenantPath(`/federation/members/${selectedListing.author!.id}`));
-                        }}
-                      >
-                        {t('listings.view_profile')}
-                      </Button>
+                      {!isExternal && (
+                        <Button
+                          variant="flat"
+                          className="bg-theme-elevated text-theme-primary"
+                          startContent={<User className="w-4 h-4" aria-hidden="true" />}
+                          onPress={() => {
+                            setIsDetailOpen(false);
+                            setSelectedListing(null);
+                            navigate(tenantPath(`/federation/members/${selectedListing.author!.id}`));
+                          }}
+                        >
+                          {t('listings.view_profile')}
+                        </Button>
+                      )}
                       <Button
                         className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                         startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
                         onPress={() => {
                           setIsDetailOpen(false);
                           setSelectedListing(null);
+                          const nameParam = authorName ? `&name=${encodeURIComponent(authorName)}` : '';
                           navigate(
-                            tenantPath(`/federation/messages?compose=true&to_user=${selectedListing.author!.id}&to_tenant=${selectedListing.timebank.id}`)
+                            tenantPath(`/federation/messages?compose=true&to_user=${selectedListing.author!.id}&to_tenant=${selectedListing.timebank.id}${nameParam}`)
                           );
                         }}
                       >

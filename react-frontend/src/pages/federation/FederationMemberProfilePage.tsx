@@ -18,6 +18,14 @@ import {
   Avatar,
   Chip,
   Spinner,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Input,
+  Textarea,
+  useDisclosure,
 } from '@heroui/react';
 import {
   Globe,
@@ -31,6 +39,7 @@ import {
   Car,
   User,
   UserPlus,
+  Coins,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -74,6 +83,12 @@ export function FederationMemberProfilePage() {
 
   const [connectionStatus, setConnectionStatus] = useState<string>('none');
   const [connectLoading, setConnectLoading] = useState(false);
+
+  // Transaction modal
+  const txModal = useDisclosure();
+  const [txAmount, setTxAmount] = useState('');
+  const [txDescription, setTxDescription] = useState('');
+  const [txSending, setTxSending] = useState(false);
 
   const loadConnectionStatus = useCallback(async () => {
     if (!id || !member) return;
@@ -300,13 +315,24 @@ export function FederationMemberProfilePage() {
                   <Button
                     className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                     startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
-                    onPress={() =>
+                    onPress={() => {
+                      const nameParam = member.name ? `&name=${encodeURIComponent(member.name)}` : '';
                       navigate(
-                        tenantPath(`/federation/messages?compose=true&to_user=${member.id}&to_tenant=${member.timebank.id}`)
-                      )
-                    }
+                        tenantPath(`/federation/messages?compose=true&to_user=${member.id}&to_tenant=${member.timebank.id}${nameParam}`)
+                      );
+                    }}
                   >
                     {t('member_profile.send_message')}
+                  </Button>
+                )}
+                {isAuthenticated && (
+                  <Button
+                    variant="flat"
+                    className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                    startContent={<Coins className="w-4 h-4" aria-hidden="true" />}
+                    onPress={() => txModal.onOpen()}
+                  >
+                    {t('member_profile.send_credits', 'Send Credits')}
                   </Button>
                 )}
                 <Button
@@ -356,6 +382,96 @@ export function FederationMemberProfilePage() {
             </div>
           </GlassCard>
         </motion.div>
+      )}
+      {/* Send Credits Modal */}
+      {member && (
+        <Modal isOpen={txModal.isOpen} onOpenChange={txModal.onOpenChange} size="md">
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex items-center gap-2">
+                  <Coins className="w-5 h-5 text-emerald-500" />
+                  {t('member_profile.send_credits_to', { name: member.name }) || `Send Credits to ${member.name}`}
+                </ModalHeader>
+                <ModalBody className="gap-4">
+                  <Input
+                    label={t('member_profile.amount_hours', 'Amount (hours)')}
+                    placeholder="1-100"
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={txAmount}
+                    onValueChange={setTxAmount}
+                    isRequired
+                  />
+                  <Textarea
+                    label={t('member_profile.description', 'Description')}
+                    placeholder={t('member_profile.tx_description_placeholder', 'What is this transfer for?')}
+                    value={txDescription}
+                    onValueChange={setTxDescription}
+                    minRows={2}
+                    isRequired
+                  />
+                  <div className="text-sm text-theme-muted bg-theme-elevated rounded-lg p-3">
+                    <p>
+                      {t('member_profile.tx_summary', {
+                        amount: txAmount || '0',
+                        name: member.name,
+                        community: member.timebank?.name || '',
+                      }) || `Transfer ${txAmount || '0'} hour(s) to ${member.name} at ${member.timebank?.name}`}
+                    </p>
+                  </div>
+                </ModalBody>
+                <ModalFooter>
+                  <Button variant="flat" onPress={onClose}>
+                    {t('member_profile.cancel', 'Cancel')}
+                  </Button>
+                  <Button
+                    className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
+                    startContent={<Coins className="w-4 h-4" />}
+                    isLoading={txSending}
+                    isDisabled={!txAmount || parseInt(txAmount) < 1 || parseInt(txAmount) > 100 || !txDescription.trim()}
+                    onPress={async () => {
+                      setTxSending(true);
+                      try {
+                        const res = await api.post('/v2/federation/transactions', {
+                          receiver_id: member.id,
+                          receiver_tenant_id: member.timebank?.id ?? member.tenant_id,
+                          amount: parseInt(txAmount),
+                          description: txDescription.trim(),
+                        });
+                        if (res.success) {
+                          toast.success(
+                            t('member_profile.tx_success', 'Credits sent!'),
+                            t('member_profile.tx_success_detail', {
+                              amount: txAmount,
+                              name: member.name,
+                            }) || `${txAmount} hour(s) sent to ${member.name}`
+                          );
+                          setTxAmount('');
+                          setTxDescription('');
+                          onClose();
+                        } else {
+                          toast.error(
+                            t('member_profile.tx_failed', 'Transfer failed'),
+                            (res as { error?: string }).error || 'Unknown error'
+                          );
+                        }
+                      } catch (err) {
+                        logError('Federation transaction failed', err);
+                        toast.error(t('member_profile.tx_failed', 'Transfer failed'));
+                      } finally {
+                        setTxSending(false);
+                      }
+                    }}
+                  >
+                    {t('member_profile.send_credits', 'Send Credits')}
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
       )}
     </div>
   );

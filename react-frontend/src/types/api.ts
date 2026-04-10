@@ -1585,7 +1585,7 @@ export interface FederatedListing {
 }
 
 export interface FederatedMember {
-  id: number;
+  id: number | string;
   name?: string;
   first_name?: string;
   last_name?: string;
@@ -1595,10 +1595,14 @@ export interface FederatedMember {
   location?: string;
   service_reach?: string;
   messaging_enabled?: boolean;
+  tenant_id?: number | string;
+  tenant_name?: string;
   timebank: {
-    id: number;
+    id: number | string;
     name: string;
   };
+  is_external?: boolean;
+  partner_name?: string;
 }
 
 export interface FederationConnection {
@@ -1626,17 +1630,19 @@ export interface FederatedMessage {
     id: number;
     name: string;
     avatar?: string | null;
-    tenant_id: number;
+    tenant_id: number | string;
     tenant_name: string;
   };
   receiver: {
     id: number;
     name: string;
     avatar?: string | null;
-    tenant_id: number;
+    tenant_id: number | string;
     tenant_name: string;
   };
   reference_message_id?: number;
+  is_external?: boolean;
+  external_partner_id?: number;
 }
 
 export interface FederationStatus {

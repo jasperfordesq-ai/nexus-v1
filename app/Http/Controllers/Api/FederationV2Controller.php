@@ -1016,17 +1016,20 @@ class FederationV2Controller extends BaseApiController
                 SELECT fm.id, fm.subject, fm.body, fm.direction, fm.status, fm.read_at,
                     fm.created_at, fm.sender_tenant_id, fm.sender_user_id,
                     fm.receiver_tenant_id, fm.receiver_user_id, fm.reference_message_id,
+                    fm.external_partner_id, fm.external_receiver_name, fm.external_message_id,
                     COALESCE(su.first_name, '') as sender_first_name,
                     COALESCE(su.last_name, '') as sender_last_name,
                     su.avatar_url as sender_avatar, st.name as sender_tenant_name,
                     COALESCE(ru.first_name, '') as receiver_first_name,
                     COALESCE(ru.last_name, '') as receiver_last_name,
-                    ru.avatar_url as receiver_avatar, rt.name as receiver_tenant_name
+                    ru.avatar_url as receiver_avatar, rt.name as receiver_tenant_name,
+                    ep.name as external_partner_name
                 FROM federation_messages fm
                 LEFT JOIN users su ON su.id = fm.sender_user_id
                 LEFT JOIN tenants st ON st.id = fm.sender_tenant_id
                 LEFT JOIN users ru ON ru.id = fm.receiver_user_id
                 LEFT JOIN tenants rt ON rt.id = fm.receiver_tenant_id
+                LEFT JOIN federation_external_partners ep ON ep.id = fm.external_partner_id
                 WHERE (
                     (fm.sender_tenant_id = ? AND fm.sender_user_id = ?)
                     OR (fm.receiver_tenant_id = ? AND fm.receiver_user_id = ?)
@@ -1036,7 +1039,21 @@ class FederationV2Controller extends BaseApiController
             $rows = array_map(fn($r) => (array)$r, $rowResults);
 
             $formatted = array_map(function ($msg) {
-                return [
+                $isExternal = !empty($msg['external_partner_id']);
+                $extPartnerId = $isExternal ? (int) $msg['external_partner_id'] : null;
+
+                // For external messages, receiver info comes from external fields
+                $receiverName = $isExternal
+                    ? ($msg['external_receiver_name'] ?? 'External User')
+                    : trim($msg['receiver_first_name'] . ' ' . $msg['receiver_last_name']);
+                $receiverTenantId = $isExternal
+                    ? ('ext-' . $extPartnerId)
+                    : (int) $msg['receiver_tenant_id'];
+                $receiverTenantName = $isExternal
+                    ? ($msg['external_partner_name'] ?? 'External Partner')
+                    : ($msg['receiver_tenant_name'] ?? '');
+
+                $formatted = [
                     'id' => (int) $msg['id'],
                     'subject' => $msg['subject'] ?? '',
                     'body' => $msg['body'],
@@ -1053,13 +1070,20 @@ class FederationV2Controller extends BaseApiController
                     ],
                     'receiver' => [
                         'id' => (int) $msg['receiver_user_id'],
-                        'name' => trim($msg['receiver_first_name'] . ' ' . $msg['receiver_last_name']),
-                        'avatar' => $msg['receiver_avatar'] ?: null,
-                        'tenant_id' => (int) $msg['receiver_tenant_id'],
-                        'tenant_name' => $msg['receiver_tenant_name'] ?? '',
+                        'name' => $receiverName,
+                        'avatar' => $isExternal ? null : ($msg['receiver_avatar'] ?: null),
+                        'tenant_id' => $receiverTenantId,
+                        'tenant_name' => $receiverTenantName,
                     ],
                     'reference_message_id' => $msg['reference_message_id'] ? (int) $msg['reference_message_id'] : null,
                 ];
+
+                if ($isExternal) {
+                    $formatted['is_external'] = true;
+                    $formatted['external_partner_id'] = $extPartnerId;
+                }
+
+                return $formatted;
             }, $rows);
 
             return $this->respondWithData($formatted);
@@ -1120,6 +1144,16 @@ class FederationV2Controller extends BaseApiController
         // Sanitize subject and body to prevent stored XSS
         $subject = htmlspecialchars($subject, ENT_QUOTES, 'UTF-8');
         $body = htmlspecialchars($body, ENT_QUOTES, 'UTF-8');
+
+        // ── External partner message routing ──
+        // If receiver_tenant_id starts with "ext-", route via FederationExternalApiClient
+        $receiverTenantStr = (string) $receiverTenantId;
+        if (str_starts_with($receiverTenantStr, 'ext-')) {
+            return $this->sendExternalMessage(
+                $userId, $tenantId, $receiverTenantStr, (string) $receiverId,
+                $subject, $body, $referenceMessageId
+            );
+        }
 
         try {
             // Verify the receiver exists and accepts federated messages
@@ -1284,6 +1318,124 @@ class FederationV2Controller extends BaseApiController
             error_log("FederationV2Api::sendMessage error: " . $e->getMessage());
             return $this->respondWithError('SEND_FAILED', __('api.fed_send_failed'), null, 500);
         }
+    }
+
+    /**
+     * Send a message to an external partner via their federation API.
+     *
+     * Called when receiver_tenant_id starts with "ext-". Routes through
+     * FederationExternalApiClient and stores a local outbound copy.
+     */
+    private function sendExternalMessage(
+        int $userId, int $tenantId, string $receiverTenantStr, string $receiverIdStr,
+        string $subject, string $body, $referenceMessageId
+    ): JsonResponse {
+        // Parse partner ID from "ext-3"
+        $externalPartnerId = (int) substr($receiverTenantStr, 4);
+        if ($externalPartnerId <= 0) {
+            return $this->respondWithError('INVALID_PARTNER', 'Invalid external partner ID', null, 400);
+        }
+
+        // Parse real member ID from "ext-3-42" or plain "42"
+        $realReceiverId = $receiverIdStr;
+        if (str_starts_with($receiverIdStr, 'ext-')) {
+            $parts = explode('-', $receiverIdStr);
+            $realReceiverId = end($parts);
+        }
+        $realReceiverId = (int) $realReceiverId;
+        if ($realReceiverId <= 0) {
+            return $this->respondWithError('INVALID_RECEIVER', 'Invalid external receiver ID', null, 400);
+        }
+
+        // Load and validate external partner
+        $partner = \App\Services\FederationExternalPartnerService::getById($externalPartnerId, $tenantId);
+        if (!$partner || $partner['status'] !== 'active') {
+            return $this->respondWithError('PARTNER_NOT_FOUND', 'External partner not found or inactive', null, 404);
+        }
+        if (!($partner['allow_messaging'] ?? false)) {
+            return $this->respondWithError('MESSAGING_NOT_ALLOWED', 'This partner does not allow messaging', null, 403);
+        }
+
+        // Get sender info for the outbound call and local record
+        $senderRow = DB::selectOne(
+            "SELECT u.first_name, u.last_name, u.avatar_url, t.name as tenant_name FROM users u JOIN tenants t ON t.id = u.tenant_id WHERE u.id = ?",
+            [$userId]
+        );
+        $sender = $senderRow ? (array) $senderRow : [];
+        $senderName = trim(($sender['first_name'] ?? '') . ' ' . ($sender['last_name'] ?? ''));
+
+        // Send via external API
+        try {
+            $result = \App\Services\FederationExternalApiClient::sendMessage($externalPartnerId, [
+                'sender_id' => $userId,
+                'recipient_id' => $realReceiverId,
+                'subject' => $subject,
+                'body' => $body,
+            ]);
+        } catch (\Throwable $e) {
+            error_log("FederationV2::sendExternalMessage API error: " . $e->getMessage());
+            return $this->respondWithError('EXTERNAL_API_FAILED', 'Failed to reach partner: ' . $e->getMessage(), null, 502);
+        }
+
+        if (!($result['success'] ?? false)) {
+            $errorMsg = $result['error'] ?? 'External partner rejected the message';
+            return $this->respondWithError('EXTERNAL_SEND_FAILED', $errorMsg, null, 422);
+        }
+
+        $externalMessageId = $result['data']['message_id'] ?? null;
+        $receiverName = $result['data']['receiver_name'] ?? ('User #' . $realReceiverId);
+
+        // Store local outbound copy so it appears in sender's thread list
+        DB::insert("
+            INSERT INTO federation_messages
+            (sender_tenant_id, sender_user_id, receiver_tenant_id, receiver_user_id,
+             subject, body, direction, status, reference_message_id,
+             external_partner_id, external_receiver_name, external_message_id, created_at)
+            VALUES (?, ?, 0, 0, ?, ?, 'outbound', 'delivered', ?, ?, ?, ?, NOW())
+        ", [
+            $tenantId, $userId,
+            $subject, $body,
+            $referenceMessageId ? (int) $referenceMessageId : null,
+            $externalPartnerId,
+            $receiverName,
+            $externalMessageId,
+        ]);
+        $outboundId = (int) DB::getPdo()->lastInsertId();
+
+        // Audit log
+        $this->federationAuditService->log(
+            'external_message_sent',
+            $tenantId, null, $userId,
+            ['message_id' => $outboundId, 'partner_id' => $externalPartnerId, 'receiver_id' => $realReceiverId],
+            FederationAuditService::LEVEL_INFO
+        );
+
+        return $this->respondWithData([
+            'id' => $outboundId,
+            'subject' => $subject,
+            'body' => $body,
+            'direction' => 'outbound',
+            'status' => 'delivered',
+            'read_at' => null,
+            'created_at' => date('Y-m-d H:i:s'),
+            'sender' => [
+                'id' => $userId,
+                'name' => $senderName,
+                'avatar' => $sender['avatar_url'] ?? null,
+                'tenant_id' => $tenantId,
+                'tenant_name' => $sender['tenant_name'] ?? '',
+            ],
+            'receiver' => [
+                'id' => $realReceiverId,
+                'name' => $receiverName,
+                'avatar' => null,
+                'tenant_id' => $receiverTenantStr,
+                'tenant_name' => $partner['name'] ?? 'External Partner',
+            ],
+            'reference_message_id' => $referenceMessageId ? (int) $referenceMessageId : null,
+            'is_external' => true,
+            'external_partner_id' => $externalPartnerId,
+        ], null, 201);
     }
 
     /** POST /api/v2/federation/messages/{id}/read */
@@ -1491,5 +1643,178 @@ class FederationV2Controller extends BaseApiController
             'failed' => 'delivered',
         ];
         return $map[$dbStatus] ?? 'delivered';
+    }
+
+    // =====================================================================
+    // FEDERATED TRANSACTIONS
+    // =====================================================================
+
+    /** POST /api/v2/federation/transactions */
+    public function sendTransaction(): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $tenantId = $this->getTenantId();
+
+        $input = request()->all();
+        $receiverId = $input['receiver_id'] ?? null;
+        $receiverTenantId = $input['receiver_tenant_id'] ?? null;
+        $amount = $input['amount'] ?? null;
+        $description = $input['description'] ?? '';
+
+        // Validate sender settings
+        $senderSettings = $this->federationUserService->getUserSettings($userId);
+        if (!($senderSettings['federation_optin'] ?? false)) {
+            return $this->respondWithError('SENDER_NOT_OPTED_IN', 'You must opt in to federation first', null, 403);
+        }
+
+        // Validate required fields
+        $errors = [];
+        if (empty($receiverId)) $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Receiver ID is required', 'field' => 'receiver_id'];
+        if (empty($receiverTenantId)) $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Receiver tenant ID is required', 'field' => 'receiver_tenant_id'];
+        if ($amount === null || $amount === '') $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Amount is required', 'field' => 'amount'];
+        if (empty($description)) $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description is required', 'field' => 'description'];
+        if (!empty($errors)) return $this->respondWithErrors($errors);
+
+        $amount = (int) $amount;
+        if ($amount < 1 || $amount > 100) {
+            return $this->respondWithError('INVALID_AMOUNT', 'Amount must be between 1 and 100 whole hours', null, 400);
+        }
+
+        $description = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
+
+        $receiverTenantStr = (string) $receiverTenantId;
+        $isExternal = str_starts_with($receiverTenantStr, 'ext-');
+
+        if ($isExternal) {
+            return $this->sendExternalTransaction($userId, $tenantId, $receiverTenantStr, (string) $receiverId, $amount, $description);
+        }
+
+        // ── Internal transaction ──
+        try {
+            $receiverTenantIdInt = (int) $receiverTenantId;
+            $receiverIdInt = (int) $receiverId;
+
+            // Verify receiver
+            $receiver = DB::selectOne(
+                "SELECT u.id, u.tenant_id, t.name as tenant_name FROM users u JOIN tenants t ON t.id = u.tenant_id
+                 JOIN federation_user_settings fus ON fus.user_id = u.id
+                 WHERE u.id = ? AND u.tenant_id = ? AND u.status = 'active' AND fus.federation_optin = 1",
+                [$receiverIdInt, $receiverTenantIdInt]
+            );
+            if (!$receiver) return $this->respondWithError('RECIPIENT_NOT_FOUND', 'Recipient not found', null, 404);
+
+            // Partnership check
+            $partnership = $this->federationPartnershipService->getPartnership($tenantId, $receiverTenantIdInt);
+            if (!$partnership || $partnership['status'] !== 'active' || !($partnership['transactions_enabled'] ?? false)) {
+                return $this->respondWithError('TRANSACTIONS_NOT_ALLOWED', 'Partnership does not allow transactions', null, 403);
+            }
+
+            DB::beginTransaction();
+            $deducted = DB::update("UPDATE users SET balance = balance - ? WHERE id = ? AND balance >= ?", [$amount, $userId, $amount]);
+            if ($deducted === 0) {
+                DB::rollBack();
+                return $this->respondWithError('INSUFFICIENT_BALANCE', 'Insufficient balance', null, 400);
+            }
+
+            DB::update("UPDATE users SET balance = balance + ? WHERE id = ?", [$amount, $receiverIdInt]);
+
+            DB::insert(
+                "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at)
+                 VALUES (?, ?, ?, ?, ?, 'completed', 1, ?, ?, NOW())",
+                [$receiverTenantIdInt, $userId, $receiverIdInt, $amount, $description, $tenantId, $receiverTenantIdInt]
+            );
+            $txId = (int) DB::getPdo()->lastInsertId();
+            DB::commit();
+
+            $this->federationAuditService->log('federation_transaction', $tenantId, $receiverTenantIdInt, $userId,
+                ['transaction_id' => $txId, 'amount' => $amount, 'receiver_id' => $receiverIdInt]);
+
+            return $this->respondWithData(['transaction_id' => $txId, 'status' => 'completed', 'amount' => $amount], null, 201);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            error_log("FederationV2::sendTransaction internal error: " . $e->getMessage());
+            return $this->respondWithError('TRANSACTION_FAILED', 'Transaction failed', null, 500);
+        }
+    }
+
+    /**
+     * Send a transaction to an external partner via their federation API.
+     */
+    private function sendExternalTransaction(
+        int $userId, int $tenantId, string $receiverTenantStr, string $receiverIdStr,
+        int $amount, string $description
+    ): JsonResponse {
+        $externalPartnerId = (int) substr($receiverTenantStr, 4);
+        if ($externalPartnerId <= 0) {
+            return $this->respondWithError('INVALID_PARTNER', 'Invalid external partner ID', null, 400);
+        }
+
+        $realReceiverId = $receiverIdStr;
+        if (str_starts_with($receiverIdStr, 'ext-')) {
+            $parts = explode('-', $receiverIdStr);
+            $realReceiverId = end($parts);
+        }
+        $realReceiverId = (int) $realReceiverId;
+        if ($realReceiverId <= 0) {
+            return $this->respondWithError('INVALID_RECEIVER', 'Invalid external receiver ID', null, 400);
+        }
+
+        $partner = \App\Services\FederationExternalPartnerService::getById($externalPartnerId, $tenantId);
+        if (!$partner || $partner['status'] !== 'active') {
+            return $this->respondWithError('PARTNER_NOT_FOUND', 'External partner not found or inactive', null, 404);
+        }
+        if (!($partner['allow_transactions'] ?? false)) {
+            return $this->respondWithError('TRANSACTIONS_NOT_ALLOWED', 'This partner does not allow transactions', null, 403);
+        }
+
+        DB::beginTransaction();
+        try {
+            // Deduct sender balance first (atomic check)
+            $deducted = DB::update("UPDATE users SET balance = balance - ? WHERE id = ? AND balance >= ?", [$amount, $userId, $amount]);
+            if ($deducted === 0) {
+                DB::rollBack();
+                return $this->respondWithError('INSUFFICIENT_BALANCE', 'Insufficient balance', null, 400);
+            }
+
+            // Send to external partner
+            $result = \App\Services\FederationExternalApiClient::createTransaction($externalPartnerId, [
+                'sender_id' => $userId,
+                'recipient_id' => $realReceiverId,
+                'amount' => $amount,
+                'description' => $description,
+            ]);
+
+            if (!($result['success'] ?? false)) {
+                DB::rollBack();
+                $errorMsg = $result['error'] ?? 'External partner rejected the transaction';
+                return $this->respondWithError('EXTERNAL_TX_FAILED', $errorMsg, null, 422);
+            }
+
+            $externalTxId = $result['data']['transaction_id'] ?? null;
+
+            // Store local record
+            DB::insert(
+                "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at)
+                 VALUES (?, ?, 0, ?, ?, 'completed', 1, ?, 0, NOW())",
+                [$tenantId, $userId, $amount, $description, $tenantId]
+            );
+            $txId = (int) DB::getPdo()->lastInsertId();
+            DB::commit();
+
+            $this->federationAuditService->log('external_transaction_sent', $tenantId, null, $userId,
+                ['transaction_id' => $txId, 'external_tx_id' => $externalTxId, 'partner_id' => $externalPartnerId, 'amount' => $amount]);
+
+            return $this->respondWithData([
+                'transaction_id' => $txId,
+                'status' => 'completed',
+                'amount' => $amount,
+                'is_external' => true,
+                'external_partner' => $partner['name'] ?? 'External Partner',
+            ], null, 201);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            error_log("FederationV2::sendExternalTransaction error: " . $e->getMessage());
+            return $this->respondWithError('TRANSACTION_FAILED', 'Transaction failed: ' . $e->getMessage(), null, 500);
+        }
     }
 }
