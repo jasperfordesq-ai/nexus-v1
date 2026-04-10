@@ -39,7 +39,6 @@ export function resolveAssetUrl(url: string | null | undefined, fallback?: strin
       const parsed = new URL(url);
       if (parsed.pathname.startsWith('/uploads/')) {
         const apiHost = API_ASSET_BASE ? new URL(API_ASSET_BASE).host : '';
-        const isLocalDomain = apiHost && parsed.host !== apiHost;
         const knownLocalDomains = [apiHost, 'hour-timebank.ie', 'app.project-nexus.ie'];
         if (knownLocalDomains.some(d => d && parsed.host === d)) {
           return API_ASSET_BASE + parsed.pathname;
