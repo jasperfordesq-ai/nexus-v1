@@ -1058,9 +1058,11 @@ class FederationV2Controller extends BaseApiController
                 WHERE (
                     (fm.sender_tenant_id = ? AND fm.sender_user_id = ?)
                     OR (fm.receiver_tenant_id = ? AND fm.receiver_user_id = ?)
+                    OR (fm.external_partner_id IS NOT NULL AND fm.direction = 'outbound' AND fm.sender_user_id = ?)
+                    OR (fm.external_partner_id IS NOT NULL AND fm.direction = 'inbound' AND fm.receiver_user_id = ?)
                 )
                 ORDER BY fm.created_at DESC LIMIT 200
-            ", [$tenantId, $userId, $tenantId, $userId]);
+            ", [$tenantId, $userId, $tenantId, $userId, $userId, $userId]);
             $rows = array_map(fn($r) => (array)$r, $rowResults);
 
             $formatted = array_map(function ($msg) {
@@ -1869,10 +1871,12 @@ class FederationV2Controller extends BaseApiController
 
             $externalTxId = $result['data']['transaction_id'] ?? null;
 
+            // Store the remote receiver's real ID (not 0) for data integrity.
+            // FK constraint dropped for federation support.
             DB::insert(
                 "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at)
-                 VALUES (?, ?, 0, ?, ?, 'completed', 1, ?, 0, NOW())",
-                [$tenantId, $userId, $amount, $description, $tenantId]
+                 VALUES (?, ?, ?, ?, ?, 'completed', 1, ?, ?, NOW())",
+                [$tenantId, $userId, $realReceiverId, $amount, $description, $tenantId, $externalPartnerId]
             );
             $txId = (int) DB::getPdo()->lastInsertId();
             DB::commit();

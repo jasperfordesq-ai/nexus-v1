@@ -635,15 +635,14 @@ class FederationController extends BaseApiController
         $senderName = htmlspecialchars($input['sender_name'] ?? 'A federation member', ENT_QUOTES, 'UTF-8');
         if ($isExternal) {
             // Find the external partner record that matches this API key's platform_id
+            // Find the external partner record for this tenant.
+            // Use the most recently synced active partner (most likely the one calling us).
             $externalPartnerId = null;
-            $platformId = $auth['platform_id'] ?? null;
-            if ($platformId) {
-                $epRow = DB::selectOne(
-                    "SELECT id, name FROM federation_external_partners WHERE tenant_id = ? AND status = 'active' LIMIT 1",
-                    [(int) $recipient['tenant_id']]
-                );
-                if ($epRow) $externalPartnerId = (int) $epRow->id;
-            }
+            $epRow = DB::selectOne(
+                "SELECT id FROM federation_external_partners WHERE tenant_id = ? AND status = 'active' ORDER BY last_sync_at DESC, id DESC LIMIT 1",
+                [(int) $recipient['tenant_id']]
+            );
+            if ($epRow) $externalPartnerId = (int) $epRow->id;
 
             try {
                 DB::insert("
