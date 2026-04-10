@@ -701,6 +701,11 @@ class FederationController extends BaseApiController
             }
         }
 
+        // Prevent self-transactions
+        if ((int) $input['sender_id'] === (int) $input['recipient_id']) {
+            return $this->fedError(400, 'Cannot send a transaction to yourself', 'SELF_TRANSACTION');
+        }
+
         $amount = (int) $input['amount'];
         if ($amount <= 0 || $amount > 100) {
             return $this->fedError(400, 'Amount must be between 1 and 100 whole hours', 'INVALID_AMOUNT');
@@ -810,6 +815,11 @@ class FederationController extends BaseApiController
             if (!isset($input[$field]) || $input[$field] === '') {
                 return $this->fedError(400, "Missing required field: {$field}", 'VALIDATION_ERROR');
             }
+        }
+
+        // Prevent self-reviews
+        if ((int) $input['reviewer_id'] === (int) $input['reviewee_id']) {
+            return $this->fedError(400, 'Cannot review yourself', 'SELF_REVIEW');
         }
 
         $rating = (int) $input['rating'];
