@@ -404,7 +404,7 @@ export function FederationListingsPage() {
         <ModalContent>
           {selectedListing && (() => {
             const isOffer = selectedListing.type === 'offer';
-            const isExternal = !!(selectedListing as Record<string, unknown>).is_external;
+            const isExternal = !!selectedListing.is_external;
             const authorAvatar = resolveAvatarUrl(selectedListing.author?.avatar);
             const listingImage = selectedListing.image_url ? resolveAssetUrl(selectedListing.image_url) : null;
             const authorName = selectedListing.author?.name || t('listings.anonymous_user', 'Anonymous');
