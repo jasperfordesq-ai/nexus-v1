@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Services\TenantFeatureConfig;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -73,35 +74,15 @@ class TenantHierarchyService
             }
 
             // Handle features — store as JSON
-            // If no features provided, use sensible defaults (conservative — most optional features off)
+            // If no features provided, use TenantFeatureConfig::FEATURE_DEFAULTS as the
+            // single source of truth. This keeps new-tenant defaults in sync automatically.
             $features = null;
             if (isset($data['features'])) {
                 $features = is_string($data['features'])
                     ? $data['features']
                     : json_encode($data['features']);
             } else {
-                // Default: core features on, advanced features off for new tenants
-                $features = json_encode([
-                    'events' => true,
-                    'groups' => true,
-                    'gamification' => false,
-                    'goals' => false,
-                    'blog' => true,
-                    'resources' => false,
-                    'volunteering' => false,
-                    'exchange_workflow' => false,
-                    'organisations' => false,
-                    'federation' => false,
-                    'connections' => true,
-                    'reviews' => true,
-                    'polls' => false,
-                    'job_vacancies' => false,
-                    'ideation_challenges' => false,
-                    'direct_messaging' => true,
-                    'group_exchanges' => false,
-                    'search' => true,
-                    'ai_chat' => false,
-                ]);
+                $features = json_encode(TenantFeatureConfig::FEATURE_DEFAULTS);
             }
 
             // Handle configuration — store as JSON

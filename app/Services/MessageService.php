@@ -361,6 +361,7 @@ class MessageService
             ->where('sender_id', $partnerId)
             ->where('receiver_id', $userId)
             ->where('is_read', false)
+            ->where('is_federated', 0)
             ->update(['is_read' => true, 'read_at' => now()]);
     }
 
@@ -418,10 +419,12 @@ class MessageService
             ->where('sender_id', $otherUserId)
             ->where('receiver_id', $userId)
             ->where('is_read', false)
+            ->where('is_federated', 0)
             ->count();
 
         $messageCount = Message::query()
             ->betweenUsers($userId, $otherUserId)
+            ->where('is_federated', 0)
             ->count();
 
         return [

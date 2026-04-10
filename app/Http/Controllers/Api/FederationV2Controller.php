@@ -1562,6 +1562,7 @@ class FederationV2Controller extends BaseApiController
         }
 
         // Fetch the message — user must be sender or receiver
+        // Handles both internal federation and external partner messages
         $message = DB::selectOne("
             SELECT id, body, sender_tenant_id, sender_user_id,
                    receiver_tenant_id, receiver_user_id,
@@ -1571,8 +1572,10 @@ class FederationV2Controller extends BaseApiController
               AND (
                 (sender_tenant_id = ? AND sender_user_id = ?)
                 OR (receiver_tenant_id = ? AND receiver_user_id = ?)
+                OR (external_partner_id IS NOT NULL AND direction = 'outbound' AND sender_user_id = ?)
+                OR (external_partner_id IS NOT NULL AND direction = 'inbound' AND receiver_user_id = ?)
               )
-        ", [$id, $tenantId, $userId, $tenantId, $userId]);
+        ", [$id, $tenantId, $userId, $tenantId, $userId, $userId, $userId]);
 
         if (!$message) {
             return $this->respondWithError('NOT_FOUND', __('api.fed_message_not_found'), null, 404);
