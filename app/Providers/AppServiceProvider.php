@@ -1018,6 +1018,11 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Load JSON translation files from lang/{locale}/ subdirectories.
+        // Laravel only loads lang/{locale}.json by default. Our email translations
+        // are in lang/en/emails.json, lang/en/emails_listings.json, etc.
+        $this->loadJsonTranslations();
+
         // Initialize Sentry SDK for error tracking (raw sentry/sentry package).
         // sentry-laravel is not installed, so we init manually with PII scrubbing.
         $this->initializeSentry();
@@ -1064,6 +1069,44 @@ class AppServiceProvider extends ServiceProvider
      * - PII scrubbing via before_send callback
      * - Send default PII disabled
      */
+    /**
+     * Load JSON translation files from lang/{locale}/ subdirectories.
+     *
+     * Laravel's __() helper only loads lang/{locale}.json (flat file).
+     * Our email translations are split into lang/en/emails.json,
+     * lang/en/emails_listings.json, etc. This method flattens them
+     * into dot-notation keys and merges them into the translator.
+     *
+     * e.g. lang/en/emails.json { "federation": { "message_title": "..." } }
+     * becomes accessible as __('emails.federation.message_title')
+     */
+    private function loadJsonTranslations(): void
+    {
+        try {
+            $locale = app()->getLocale();
+            $langPath = lang_path($locale);
+
+            if (!is_dir($langPath)) return;
+
+            $translator = app('translator');
+
+            foreach (glob($langPath . '/*.json') as $file) {
+                $namespace = pathinfo($file, PATHINFO_FILENAME); // e.g. 'emails'
+                $data = json_decode(file_get_contents($file), true);
+                if (!is_array($data)) continue;
+
+                // Flatten nested arrays into dot-notation and add to the translator
+                $flattened = \Illuminate\Support\Arr::dot($data);
+                foreach ($flattened as $key => $value) {
+                    $translator->addLines([$namespace . '.' . $key => $value], $locale);
+                }
+            }
+        } catch (\Throwable $e) {
+            // Non-fatal — emails will show raw keys but the app won't crash
+            error_log('loadJsonTranslations failed: ' . $e->getMessage());
+        }
+    }
+
     private function initializeSentry(): void
     {
         if (!class_exists(\Sentry\SentrySdk::class)) {
