@@ -229,8 +229,14 @@ class FederationExternalApiClient
         if ($lastResponse->successful()) {
             self::recordSuccess($partnerId);
             $responseData = $lastResponse->json() ?? [];
+            // Unwrap v1 API response envelope: {success: true, data: [...actual data...]}
+            // The v1 endpoints wrap everything in {success, data, pagination}. We need the
+            // inner 'data' array, not the entire envelope, so callers get actual records.
+            $innerData = (is_array($responseData) && array_key_exists('data', $responseData))
+                ? $responseData['data']
+                : $responseData;
             self::logApiCall($partnerId, $endpoint, $method, $statusCode, true, $elapsed, null, $body ?: null, $rawResponseBody);
-            return ['success' => true, 'data' => $responseData, 'status_code' => $statusCode];
+            return ['success' => true, 'data' => $innerData, 'status_code' => $statusCode];
         }
 
         // Non-success HTTP status
@@ -361,10 +367,13 @@ class FederationExternalApiClient
         Cache::forget("federation_cb_failures:{$partnerId}");
         Cache::forget("federation_cb_open:{$partnerId}");
 
-        // If partner was in 'error' status, restore to 'active'
+        // Restore partner to 'active' regardless of current status so that
+        // a recovered partner can self-heal after the circuit-breaker cooldown
+        // expires (previously the WHERE status='failed' guard meant getPartner()
+        // would refuse to load a failed partner, making recordSuccess unreachable).
         DB::table('federation_external_partners')
             ->where('id', $partnerId)
-            ->where('status', 'failed')
+            ->whereIn('status', ['failed', 'pending'])
             ->update([
                 'status' => 'active',
                 'error_count' => 0,
@@ -416,13 +425,22 @@ class FederationExternalApiClient
     // ----------------------------------------------------------------
 
     /**
-     * Load an active external partner record by ID.
+     * Load an external partner record by ID.
+     *
+     * 'failed' partners are intentionally included here so that after the
+     * circuit-breaker cache key expires (CIRCUIT_BREAKER_COOLDOWN_SECONDS)
+     * the next outbound call can attempt recovery.  isCircuitOpen() is the
+     * sole gate while the cooldown is active; once the cache key is gone,
+     * the call is attempted and recordSuccess() will restore the DB status
+     * to 'active' if the partner responds successfully.
+     *
+     * Partners that are explicitly 'disabled' or 'deleted' are still excluded.
      */
     private static function getPartner(int $partnerId): ?array
     {
         $row = DB::table('federation_external_partners')
             ->where('id', $partnerId)
-            ->whereIn('status', ['active', 'pending'])
+            ->whereIn('status', ['active', 'pending', 'failed'])
             ->first();
 
         if (!$row) {
