@@ -65,7 +65,7 @@ interface FederatedThread {
     id: number;
     name: string;
     avatar?: string | null;
-    tenant_id: number;
+    tenant_id: number | string;
     tenant_name: string;
   };
   /** All messages in the thread, chronological */
