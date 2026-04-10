@@ -591,16 +591,18 @@ const FederatedMemberCard = memo(function FederatedMemberCard({
 
       {/* Action Buttons */}
       <div className="flex gap-2 pt-2 border-t border-theme-default">
-        <Button
-          size="sm"
-          variant="flat"
-          className="flex-1 bg-theme-elevated text-theme-primary hover:bg-theme-hover"
-          startContent={<User className="w-3.5 h-3.5" aria-hidden="true" />}
-          onPress={() => onViewProfile(member)}
-        >
-          {t('members.view_profile')}
-        </Button>
-        {isAuthenticated && member.messaging_enabled && (
+        {!member.is_external && (
+          <Button
+            size="sm"
+            variant="flat"
+            className="flex-1 bg-theme-elevated text-theme-primary hover:bg-theme-hover"
+            startContent={<User className="w-3.5 h-3.5" aria-hidden="true" />}
+            onPress={() => onViewProfile(member)}
+          >
+            {t('members.view_profile')}
+          </Button>
+        )}
+        {isAuthenticated && (
           <Button
             size="sm"
             className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"

@@ -171,16 +171,21 @@ export function FederationMemberProfilePage() {
   const reachMeta = SERVICE_REACH_META[reachKey] ?? SERVICE_REACH_META.local_only ?? { label: 'Local Only', icon: Home };
   const ReachIcon = reachMeta.icon;
 
-  // External members — show a friendly redirect message instead of a 404
-  if (isExternalMember) {
+  // External members — show actions (message, send credits) instead of a dead-end 404
+  if (isExternalMember && id) {
+    // Parse ext-{partnerId}-{memberId}
+    const parts = id.split('-');
+    const extPartnerId = parts[1] ?? '';
+    const extTenantId = `ext-${extPartnerId}`;
+
     return (
       <div className="space-y-6">
-        <PageMeta title="External Member" noIndex />
+        <PageMeta title={t('member_profile.external_member_title', 'External Member')} noIndex />
         <Breadcrumbs
           items={[
             { label: t('member_profile.breadcrumb_federation'), href: '/federation' },
             { label: t('member_profile.breadcrumb_members'), href: '/federation/members' },
-            { label: t('member_profile.breadcrumb_profile') },
+            { label: t('member_profile.external_member_title', 'External Member') },
           ]}
         />
         <GlassCard className="p-8 text-center">
@@ -188,16 +193,26 @@ export function FederationMemberProfilePage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
             {t('member_profile.external_member_title', 'External Member')}
           </h2>
-          <p className="text-theme-muted mb-6 max-w-md mx-auto">
-            {t('member_profile.external_member_description', "External member profiles are displayed on their home community's platform. You can message them or send credits from the Members page.")}
+          <p className="text-theme-muted mb-4 max-w-md mx-auto">
+            {t('member_profile.external_member_description', "This member belongs to an external partner community. Their full profile is on their home platform.")}
           </p>
-          <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-            startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
-            onPress={() => navigate(tenantPath('/federation/members'))}
-          >
-            {t('member_profile.back_to_members')}
-          </Button>
+          <div className="flex flex-wrap gap-3 justify-center">
+            <Button
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
+              onPress={() => navigate(tenantPath(`/federation/messages?compose=true&to_user=${id}&to_tenant=${extTenantId}`))}
+            >
+              {t('member_profile.send_message')}
+            </Button>
+            <Button
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+              startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+              onPress={() => navigate(tenantPath('/federation/members'))}
+            >
+              {t('member_profile.back_to_members')}
+            </Button>
+          </div>
         </GlassCard>
       </div>
     );
