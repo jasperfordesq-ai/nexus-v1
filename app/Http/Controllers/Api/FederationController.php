@@ -588,15 +588,18 @@ class FederationController extends BaseApiController
             }
         }
 
-        // Validate sender belongs to partner's tenant AND has opted into federation
-        $senderCheck = DB::selectOne(
-            "SELECT u.id FROM users u
-             JOIN federation_user_settings fus ON fus.user_id = u.id
-             WHERE u.id = ? AND u.tenant_id = ? AND fus.federation_optin = 1 AND u.status = 'active'",
-            [(int) $input['sender_id'], $partnerTenantId]
-        );
-        if (!$senderCheck) {
-            return $this->fedError(403, 'Sender not found, not in your tenant, or has not opted into federation', 'SENDER_NOT_ELIGIBLE');
+        // Validate sender — for external partners, the sender is on the REMOTE server
+        // and can't be validated locally. The API key authentication already proves legitimacy.
+        if (!$isExternal) {
+            $senderCheck = DB::selectOne(
+                "SELECT u.id FROM users u
+                 JOIN federation_user_settings fus ON fus.user_id = u.id
+                 WHERE u.id = ? AND u.tenant_id = ? AND fus.federation_optin = 1 AND u.status = 'active'",
+                [(int) $input['sender_id'], $partnerTenantId]
+            );
+            if (!$senderCheck) {
+                return $this->fedError(403, 'Sender not found, not in your tenant, or has not opted into federation', 'SENDER_NOT_ELIGIBLE');
+            }
         }
 
         if ($isExternal) {
@@ -683,16 +686,18 @@ class FederationController extends BaseApiController
         if (!$recipient) return $this->fedError(404, 'Recipient not found or not accessible', 'RECIPIENT_NOT_FOUND');
         if (!$recipient['transactions_enabled_federated']) return $this->fedError(403, 'Recipient does not accept federated transactions', 'TRANSACTIONS_DISABLED');
 
-        // Validate sender belongs to partner's tenant AND has opted into federation
+        // Validate sender — skip for external partners (sender is on remote server)
         $senderId = (int) $input['sender_id'];
-        $senderCheck = DB::selectOne(
-            "SELECT u.id FROM users u
-             JOIN federation_user_settings fus ON fus.user_id = u.id
-             WHERE u.id = ? AND u.tenant_id = ? AND fus.federation_optin = 1 AND u.status = 'active'",
-            [$senderId, $partnerTenantId]
-        );
-        if (!$senderCheck) {
-            return $this->fedError(403, 'Sender not found, not in your tenant, or has not opted into federation', 'SENDER_NOT_ELIGIBLE');
+        if (!$isExternal) {
+            $senderCheck = DB::selectOne(
+                "SELECT u.id FROM users u
+                 JOIN federation_user_settings fus ON fus.user_id = u.id
+                 WHERE u.id = ? AND u.tenant_id = ? AND fus.federation_optin = 1 AND u.status = 'active'",
+                [$senderId, $partnerTenantId]
+            );
+            if (!$senderCheck) {
+                return $this->fedError(403, 'Sender not found, not in your tenant, or has not opted into federation', 'SENDER_NOT_ELIGIBLE');
+            }
         }
 
         // Fix 4: Check partnership level allows transactions
@@ -777,15 +782,17 @@ class FederationController extends BaseApiController
             return $this->fedError(400, 'Rating must be between 1 and 5', 'INVALID_RATING');
         }
 
-        // Validate reviewer belongs to partner's tenant AND has opted into federation
-        $reviewerCheck = DB::selectOne(
-            "SELECT u.id FROM users u
-             JOIN federation_user_settings fus ON fus.user_id = u.id
-             WHERE u.id = ? AND u.tenant_id = ? AND fus.federation_optin = 1 AND u.status = 'active'",
-            [(int) $input['reviewer_id'], $partnerTenantId]
-        );
-        if (!$reviewerCheck) {
-            return $this->fedError(403, 'Reviewer not found, not in your tenant, or has not opted into federation', 'REVIEWER_NOT_ELIGIBLE');
+        // Validate reviewer — skip for external partners (reviewer is on remote server)
+        if (!$isExternal) {
+            $reviewerCheck = DB::selectOne(
+                "SELECT u.id FROM users u
+                 JOIN federation_user_settings fus ON fus.user_id = u.id
+                 WHERE u.id = ? AND u.tenant_id = ? AND fus.federation_optin = 1 AND u.status = 'active'",
+                [(int) $input['reviewer_id'], $partnerTenantId]
+            );
+            if (!$reviewerCheck) {
+                return $this->fedError(403, 'Reviewer not found, not in your tenant, or has not opted into federation', 'REVIEWER_NOT_ELIGIBLE');
+            }
         }
 
         // Validate reviewee exists and has show_reviews_federated enabled

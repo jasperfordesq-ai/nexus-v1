@@ -914,7 +914,7 @@ export function FederationMessagesPage() {
                     />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-theme-primary truncate">
-                        {selectedRecipient.name || `User #${selectedRecipient.id}`}
+                        {selectedRecipient.name || (selectedRecipient.is_external ? t('members.external_member', 'External Member') : `User #${selectedRecipient.id}`)}
                       </p>
                       {selectedRecipient.tenant_name && (
                         <Chip
