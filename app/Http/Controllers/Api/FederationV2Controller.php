@@ -233,10 +233,54 @@ class FederationV2Controller extends BaseApiController
                 ];
             }, $partnerships);
 
+            // Also include active external partners
+            $externalPartners = $this->getExternalPartnersForDisplay($tenantId);
+            $formatted = array_merge($formatted, $externalPartners);
+
             return $this->respondWithData($formatted);
         } catch (\Exception $e) {
             error_log("FederationV2Api::partners error: " . $e->getMessage());
             return $this->respondWithData([]);
+        }
+    }
+
+    /**
+     * Fetch active external partners formatted for the Partner Communities page.
+     */
+    private function getExternalPartnersForDisplay(int $tenantId): array
+    {
+        try {
+            $externalPartners = \App\Services\FederationExternalPartnerService::getActivePartners($tenantId);
+
+            return array_map(function ($ep) {
+                $permissions = [];
+                if ($ep['allow_member_search'] ?? false) $permissions[] = 'profiles';
+                if ($ep['allow_messaging'] ?? false) $permissions[] = 'messaging';
+                if ($ep['allow_transactions'] ?? false) $permissions[] = 'transactions';
+                if ($ep['allow_listing_search'] ?? false) $permissions[] = 'listings';
+                if ($ep['allow_events'] ?? false) $permissions[] = 'events';
+                if ($ep['allow_groups'] ?? false) $permissions[] = 'groups';
+
+                return [
+                    'id' => 'ext-' . $ep['id'],
+                    'name' => $ep['partner_name'] ?? $ep['name'],
+                    'logo' => null,
+                    'tagline' => $ep['description'] ?? '',
+                    'location' => '',
+                    'country' => '',
+                    'member_count' => (int) ($ep['partner_member_count'] ?? 0),
+                    'federation_level' => 1,
+                    'federation_level_name' => 'External',
+                    'permissions' => $permissions,
+                    'partnership_since' => $ep['created_at'] ?? null,
+                    'is_external' => true,
+                    'base_url' => $ep['base_url'] ?? null,
+                    'status' => $ep['status'] ?? 'active',
+                ];
+            }, $externalPartners);
+        } catch (\Throwable $e) {
+            error_log("FederationV2Api::getExternalPartnersForDisplay error: " . $e->getMessage());
+            return [];
         }
     }
 
