@@ -10,6 +10,7 @@ use App\Services\FederationExternalApiClient;
 use App\Services\FederationExternalPartnerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * AdminFederationExternalPartnersController -- CRUD for external federation partners.
@@ -125,6 +126,36 @@ class AdminFederationExternalPartnersController extends BaseApiController
         $startTime = microtime(true);
         $result = FederationExternalApiClient::healthCheck($id);
         $elapsed = (int) round((microtime(true) - $startTime) * 1000);
+
+        // On successful health check, sync partner metadata (member count, name, version)
+        if ($result['success']) {
+            try {
+                $timebankInfo = FederationExternalApiClient::get($id, '/timebanks');
+                if (($timebankInfo['success'] ?? false) && !empty($timebankInfo['data'])) {
+                    $tbData = $timebankInfo['data']['data'][0] ?? $timebankInfo['data'][0] ?? null;
+                    if ($tbData) {
+                        DB::update(
+                            "UPDATE federation_external_partners SET
+                                partner_member_count = ?,
+                                partner_name = COALESCE(?, partner_name),
+                                last_sync_at = NOW(),
+                                error_count = 0,
+                                last_error = NULL
+                             WHERE id = ? AND tenant_id = ?",
+                            [
+                                (int) ($tbData['member_count'] ?? 0),
+                                $tbData['name'] ?? null,
+                                $id,
+                                $tenantId,
+                            ]
+                        );
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Non-critical — don't fail the health check
+                error_log("FederationExternalPartner: metadata sync failed for #{$id}: " . $e->getMessage());
+            }
+        }
 
         // Always return 200 — the health check result is in the payload.
         // Using 502 here causes Cloudflare to replace our JSON with its own
