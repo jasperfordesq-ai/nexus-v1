@@ -2076,6 +2076,7 @@ Route::post('/listings/delete', [\App\Http\Controllers\Api\ListingsController::c
 // for authentication — they must NOT be inside auth:sanctum.
 // ============================================
 Route::get('/v1/federation', [\App\Http\Controllers\Api\FederationController::class, 'index']);
+Route::get('/v1/federation/health', [\App\Http\Controllers\Api\FederationController::class, 'health']);
 Route::get('/v1/federation/timebanks', [\App\Http\Controllers\Api\FederationController::class, 'timebanks']);
 Route::get('/v1/federation/members', [\App\Http\Controllers\Api\FederationController::class, 'members']);
 Route::get('/v1/federation/members/{id}', [\App\Http\Controllers\Api\FederationController::class, 'member']);

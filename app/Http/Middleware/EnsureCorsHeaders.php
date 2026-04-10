@@ -24,8 +24,21 @@ class EnsureCorsHeaders
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $response = $next($request);
+        try {
+            $response = $next($request);
+        } catch (\Throwable $e) {
+            // When inner middleware throws, Laravel's exception handler renders
+            // a 500 response that bypasses this middleware's response phase.
+            // Catch the exception, render it, and add CORS headers so the browser
+            // can read the error instead of showing a misleading CORS block.
+            $response = $this->renderException($request, $e);
+        }
 
+        return $this->addCorsHeaders($request, $response);
+    }
+
+    private function addCorsHeaders(Request $request, Response $response): Response
+    {
         // Only add CORS headers to API paths (same paths as config/cors.php)
         $path = $request->path();
         if (!$this->isApiPath($path)) {
@@ -51,6 +64,17 @@ class EnsureCorsHeaders
         }
 
         return $response;
+    }
+
+    private function renderException(Request $request, \Throwable $e): Response
+    {
+        try {
+            return app(\Illuminate\Contracts\Debug\ExceptionHandler::class)
+                ->render($request, $e);
+        } catch (\Throwable) {
+            // If even the exception handler fails, return a minimal JSON 500
+            return response()->json(['message' => 'Server Error'], 500);
+        }
     }
 
     private function isApiPath(string $path): bool

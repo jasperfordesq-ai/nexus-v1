@@ -291,6 +291,7 @@ class FederationController extends BaseApiController
             'version' => '1.0',
             'documentation' => '/docs/api/federation',
             'endpoints' => [
+                'GET /api/v1/federation/health' => 'Health check',
                 'GET /api/v1/federation/timebanks' => 'List partner timebanks',
                 'GET /api/v1/federation/members' => 'Search federated members',
                 'GET /api/v1/federation/members/{id}' => 'Get member profile',
@@ -303,6 +304,16 @@ class FederationController extends BaseApiController
                 'GET /api/v1/federation/transactions/{id}' => 'Get transaction status',
                 'POST /api/v1/federation/transactions' => 'Initiate time credit transfer',
             ],
+        ]);
+    }
+
+    /** GET /api/v1/federation/health — Health check for partner connectivity */
+    public function health(): JsonResponse
+    {
+        return $this->fedSuccess([
+            'status' => 'ok',
+            'timestamp' => now()->toIso8601String(),
+            'version' => '1.0',
         ]);
     }
 
@@ -577,13 +588,15 @@ class FederationController extends BaseApiController
             }
         }
 
-        // Fix 6: Validate sender belongs to partner's tenant
+        // Validate sender belongs to partner's tenant AND has opted into federation
         $senderCheck = DB::selectOne(
-            "SELECT id FROM users WHERE id = ? AND tenant_id = ?",
+            "SELECT u.id FROM users u
+             JOIN federation_user_settings fus ON fus.user_id = u.id
+             WHERE u.id = ? AND u.tenant_id = ? AND fus.federation_optin = 1 AND u.status = 'active'",
             [(int) $input['sender_id'], $partnerTenantId]
         );
         if (!$senderCheck) {
-            return $this->fedError(403, 'Sender does not belong to your tenant', 'SENDER_TENANT_MISMATCH');
+            return $this->fedError(403, 'Sender not found, not in your tenant, or has not opted into federation', 'SENDER_NOT_ELIGIBLE');
         }
 
         if ($isExternal) {
@@ -670,14 +683,16 @@ class FederationController extends BaseApiController
         if (!$recipient) return $this->fedError(404, 'Recipient not found or not accessible', 'RECIPIENT_NOT_FOUND');
         if (!$recipient['transactions_enabled_federated']) return $this->fedError(403, 'Recipient does not accept federated transactions', 'TRANSACTIONS_DISABLED');
 
-        // Fix 3: Validate sender belongs to partner's tenant
+        // Validate sender belongs to partner's tenant AND has opted into federation
         $senderId = (int) $input['sender_id'];
         $senderCheck = DB::selectOne(
-            "SELECT id FROM users WHERE id = ? AND tenant_id = ?",
+            "SELECT u.id FROM users u
+             JOIN federation_user_settings fus ON fus.user_id = u.id
+             WHERE u.id = ? AND u.tenant_id = ? AND fus.federation_optin = 1 AND u.status = 'active'",
             [$senderId, $partnerTenantId]
         );
         if (!$senderCheck) {
-            return $this->fedError(403, 'Sender does not belong to your tenant', 'SENDER_TENANT_MISMATCH');
+            return $this->fedError(403, 'Sender not found, not in your tenant, or has not opted into federation', 'SENDER_NOT_ELIGIBLE');
         }
 
         // Fix 4: Check partnership level allows transactions
@@ -762,13 +777,15 @@ class FederationController extends BaseApiController
             return $this->fedError(400, 'Rating must be between 1 and 5', 'INVALID_RATING');
         }
 
-        // Validate reviewer belongs to partner's tenant
+        // Validate reviewer belongs to partner's tenant AND has opted into federation
         $reviewerCheck = DB::selectOne(
-            "SELECT id FROM users WHERE id = ? AND tenant_id = ?",
+            "SELECT u.id FROM users u
+             JOIN federation_user_settings fus ON fus.user_id = u.id
+             WHERE u.id = ? AND u.tenant_id = ? AND fus.federation_optin = 1 AND u.status = 'active'",
             [(int) $input['reviewer_id'], $partnerTenantId]
         );
         if (!$reviewerCheck) {
-            return $this->fedError(403, 'Reviewer does not belong to your tenant', 'REVIEWER_TENANT_MISMATCH');
+            return $this->fedError(403, 'Reviewer not found, not in your tenant, or has not opted into federation', 'REVIEWER_NOT_ELIGIBLE');
         }
 
         // Validate reviewee exists and has show_reviews_federated enabled
@@ -895,14 +912,17 @@ class FederationController extends BaseApiController
             return $this->fedError(404, 'User not found or federated reviews are disabled', 'USER_NOT_FOUND');
         }
 
+        // Scope reviews to the calling partner's tenant — a partner can only read
+        // reviews where the reviewer or receiver belongs to their tenant.
         $sql = "SELECT SQL_CALC_FOUND_ROWS r.id, r.reviewer_id, r.reviewer_tenant_id, r.receiver_id, r.receiver_tenant_id, r.rating, r.comment, r.review_type, r.status, r.transaction_id, r.created_at,
                        u.first_name as reviewer_first_name, u.last_name as reviewer_last_name, u.avatar_url as reviewer_avatar,
                        t.name as reviewer_tenant_name
                 FROM reviews r
                 JOIN users u ON u.id = r.reviewer_id
                 LEFT JOIN tenants t ON t.id = r.reviewer_tenant_id
-                WHERE r.receiver_id = ? AND r.review_type = 'federated' AND r.show_cross_tenant = 1 AND r.status = 'approved'";
-        $params = [$userId];
+                WHERE r.receiver_id = ? AND r.review_type = 'federated' AND r.show_cross_tenant = 1 AND r.status = 'approved'
+                AND (r.reviewer_tenant_id = ? OR r.receiver_tenant_id = ?)";
+        $params = [$userId, $partnerTenantId, $partnerTenantId];
 
         $sql .= " ORDER BY r.created_at DESC LIMIT ?, ?";
         $params[] = (int) (($page - 1) * $perPage);

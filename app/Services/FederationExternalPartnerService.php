@@ -27,6 +27,30 @@ class FederationExternalPartnerService
     private const VALID_STATUSES = ['pending', 'active', 'suspended', 'failed'];
 
     /**
+     * IP ranges that must never be used as partner base_urls (SSRF prevention).
+     */
+    private const BLOCKED_IP_RANGES = [
+        '127.',          // loopback
+        '10.',           // RFC 1918
+        '172.16.', '172.17.', '172.18.', '172.19.', '172.20.', '172.21.',
+        '172.22.', '172.23.', '172.24.', '172.25.', '172.26.', '172.27.',
+        '172.28.', '172.29.', '172.30.', '172.31.', // RFC 1918
+        '192.168.',      // RFC 1918
+        '169.254.',      // link-local / cloud metadata
+        '0.',            // non-routable
+        'fd',            // IPv6 ULA
+        '::1',           // IPv6 loopback
+        'fe80:',         // IPv6 link-local
+    ];
+
+    private const BLOCKED_HOSTNAMES = [
+        'localhost',
+        'metadata.google.internal',
+        'metadata.google',
+        'kubernetes.default',
+    ];
+
+    /**
      * Credential fields that must be encrypted at rest.
      */
     private const ENCRYPTED_FIELDS = ['api_key', 'signing_secret', 'oauth_client_secret'];
@@ -45,7 +69,7 @@ class FederationExternalPartnerService
             );
 
             return array_map(fn ($row) => self::formatPartner($row), $rows);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('[FederationExternalPartner] getAll failed', [
                 'tenant_id' => $tenantId,
                 'error' => $e->getMessage(),
@@ -71,7 +95,7 @@ class FederationExternalPartnerService
             }
 
             return self::formatPartner($row);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('[FederationExternalPartner] getById failed', [
                 'id' => $id,
                 'tenant_id' => $tenantId,
@@ -103,7 +127,7 @@ class FederationExternalPartnerService
             $result = DB::selectOne($query, $params);
 
             return $result && (int) $result->cnt > 0;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('[FederationExternalPartner] urlExists failed', [
                 'base_url' => $baseUrl,
                 'tenant_id' => $tenantId,
@@ -130,6 +154,12 @@ class FederationExternalPartnerService
 
         if (empty($data['base_url'])) {
             return ['success' => false, 'error' => 'Base URL is required'];
+        }
+
+        // SSRF protection: validate base_url is not an internal/private address
+        $ssrfError = self::validateBaseUrl($data['base_url']);
+        if ($ssrfError) {
+            return ['success' => false, 'error' => $ssrfError];
         }
 
         // Check URL uniqueness
@@ -192,7 +222,7 @@ class FederationExternalPartnerService
             ]);
 
             return ['success' => true, 'id' => $id];
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('[FederationExternalPartner] create failed', [
                 'tenant_id' => $tenantId,
                 'error' => $e->getMessage(),
@@ -218,8 +248,12 @@ class FederationExternalPartnerService
             return ['success' => false, 'error' => 'Partner not found'];
         }
 
-        // If base_url is being changed, check uniqueness
+        // If base_url is being changed, validate and check uniqueness
         if (!empty($data['base_url']) && $data['base_url'] !== $existing['base_url']) {
+            $ssrfError = self::validateBaseUrl($data['base_url']);
+            if ($ssrfError) {
+                return ['success' => false, 'error' => $ssrfError];
+            }
             if (self::urlExists($data['base_url'], $tenantId, $id)) {
                 return ['success' => false, 'error' => 'A partner with this URL already exists for this tenant'];
             }
@@ -281,7 +315,7 @@ class FederationExternalPartnerService
             ]);
 
             return ['success' => true, 'id' => $id];
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('[FederationExternalPartner] update failed', [
                 'id' => $id,
                 'tenant_id' => $tenantId,
@@ -336,7 +370,7 @@ class FederationExternalPartnerService
             ]);
 
             return ['success' => true];
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('[FederationExternalPartner] delete failed', [
                 'id' => $id,
                 'tenant_id' => $tenantId,
@@ -395,7 +429,7 @@ class FederationExternalPartnerService
             ]);
 
             return ['success' => true, 'id' => $id, 'status' => $status];
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('[FederationExternalPartner] updateStatus failed', [
                 'id' => $id,
                 'tenant_id' => $tenantId,
@@ -419,7 +453,7 @@ class FederationExternalPartnerService
             );
 
             return array_map(fn ($row) => self::formatPartner($row), $rows);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('[FederationExternalPartner] getActivePartners failed', [
                 'tenant_id' => $tenantId,
                 'error' => $e->getMessage(),
@@ -442,7 +476,7 @@ class FederationExternalPartnerService
             );
 
             return array_map(fn ($row) => self::formatPartner($row), $rows);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('[FederationExternalPartner] getActivePartnersForListings failed', [
                 'tenant_id' => $tenantId,
                 'error' => $e->getMessage(),
@@ -483,7 +517,7 @@ class FederationExternalPartnerService
                     'created_at' => $row->created_at,
                 ];
             }, $rows);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('[FederationExternalPartner] getLogs failed', [
                 'partner_id' => $partnerId,
                 'error' => $e->getMessage(),
@@ -540,5 +574,63 @@ class FederationExternalPartnerService
             'created_at' => $row->created_at,
             'updated_at' => $row->updated_at,
         ];
+    }
+
+    /**
+     * Validate a base_url is safe (SSRF prevention).
+     *
+     * Blocks private/internal IPs, localhost, link-local, and cloud metadata endpoints.
+     *
+     * @return string|null Error message if URL is unsafe, null if safe
+     */
+    public static function validateBaseUrl(string $url): ?string
+    {
+        $parsed = parse_url($url);
+
+        if (!$parsed || empty($parsed['scheme']) || empty($parsed['host'])) {
+            return 'Invalid URL format';
+        }
+
+        if (!in_array($parsed['scheme'], ['https', 'http'], true)) {
+            return 'URL scheme must be http or https';
+        }
+
+        $host = strtolower($parsed['host']);
+
+        // Block known dangerous hostnames
+        foreach (self::BLOCKED_HOSTNAMES as $blocked) {
+            if ($host === $blocked) {
+                return 'URL host is not allowed (internal/reserved hostname)';
+            }
+        }
+
+        // Resolve hostname to IP and check against blocked ranges
+        $ips = gethostbynamel($host);
+        if ($ips === false) {
+            // DNS resolution failed — allow it through (might resolve from the server)
+            // but still check if the host itself looks like an IP
+            $ips = [filter_var($host, FILTER_VALIDATE_IP) ? $host : null];
+            $ips = array_filter($ips);
+        }
+
+        foreach ($ips as $ip) {
+            foreach (self::BLOCKED_IP_RANGES as $range) {
+                if (str_starts_with($ip, $range)) {
+                    return 'URL resolves to a private/internal IP address';
+                }
+            }
+
+            // Also check IPv4-mapped IPv6 (::ffff:127.0.0.1)
+            if (str_starts_with($ip, '::ffff:')) {
+                $mappedIp = substr($ip, 7);
+                foreach (self::BLOCKED_IP_RANGES as $range) {
+                    if (str_starts_with($mappedIp, $range)) {
+                        return 'URL resolves to a private/internal IP address';
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

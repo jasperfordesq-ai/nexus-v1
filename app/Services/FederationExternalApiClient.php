@@ -438,6 +438,9 @@ class FederationExternalApiClient
 
     /**
      * Log an outbound API call to federation_external_partner_logs.
+     *
+     * Sensitive fields (message bodies, credentials, tokens) are redacted
+     * before storage to prevent data leakage via admin log views.
      */
     private static function logApiCall(
         int $partnerId,
@@ -455,9 +458,9 @@ class FederationExternalApiClient
                 'partner_id' => $partnerId,
                 'endpoint' => substr($endpoint, 0, 500),
                 'method' => strtoupper($method),
-                'request_body' => $requestBody ? substr($requestBody, 0, 10000) : null,
+                'request_body' => $requestBody ? substr(self::redactSensitiveFields($requestBody), 0, 10000) : null,
                 'response_code' => $statusCode ?: null,
-                'response_body' => $responseBody ? substr($responseBody, 0, 10000) : null,
+                'response_body' => $responseBody ? substr(self::redactSensitiveFields($responseBody), 0, 10000) : null,
                 'response_time_ms' => (int) round($responseTime),
                 'success' => $success ? 1 : 0,
                 'error_message' => $errorMessage ? substr($errorMessage, 0, 65535) : null,
@@ -470,5 +473,27 @@ class FederationExternalApiClient
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    /**
+     * Redact sensitive fields from JSON strings before logging.
+     */
+    private static function redactSensitiveFields(string $json): string
+    {
+        $data = json_decode($json, true);
+        if (!is_array($data)) {
+            return $json;
+        }
+
+        $sensitiveKeys = ['body', 'message_body', 'content', 'api_key', 'signing_secret',
+            'oauth_client_secret', 'token', 'access_token', 'refresh_token', 'password', 'secret'];
+
+        array_walk_recursive($data, function (&$value, $key) use ($sensitiveKeys) {
+            if (in_array(strtolower($key), $sensitiveKeys, true) && is_string($value) && strlen($value) > 0) {
+                $value = '[REDACTED]';
+            }
+        });
+
+        return json_encode($data, JSON_UNESCAPED_SLASHES) ?: $json;
     }
 }
