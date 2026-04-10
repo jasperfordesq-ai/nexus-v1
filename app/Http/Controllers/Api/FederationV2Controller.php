@@ -1066,40 +1066,70 @@ class FederationV2Controller extends BaseApiController
             $formatted = array_map(function ($msg) {
                 $isExternal = !empty($msg['external_partner_id']);
                 $extPartnerId = $isExternal ? (int) $msg['external_partner_id'] : null;
+                $direction = $msg['direction'] === 'outbound' ? 'outbound' : 'inbound';
+                $externalName = $msg['external_receiver_name'] ?? 'External User';
+                $partnerName = $msg['external_partner_name'] ?? 'External Partner';
 
-                // For external messages, receiver info comes from external fields
-                $receiverName = $isExternal
-                    ? ($msg['external_receiver_name'] ?? 'External User')
-                    : trim($msg['receiver_first_name'] . ' ' . $msg['receiver_last_name']);
-                $receiverTenantId = $isExternal
-                    ? ('ext-' . $extPartnerId)
-                    : (int) $msg['receiver_tenant_id'];
-                $receiverTenantName = $isExternal
-                    ? ($msg['external_partner_name'] ?? 'External Partner')
-                    : ($msg['receiver_tenant_name'] ?? '');
-
-                $formatted = [
-                    'id' => (int) $msg['id'],
-                    'subject' => $msg['subject'] ?? '',
-                    'body' => $msg['body'],
-                    'direction' => $msg['direction'] === 'outbound' ? 'outbound' : 'inbound',
-                    'status' => $this->mapMessageStatus($msg['status'] ?? 'delivered'),
-                    'read_at' => $msg['read_at'] ?: null,
-                    'created_at' => $msg['created_at'],
-                    'sender' => [
+                if ($isExternal && $direction === 'outbound') {
+                    // Outbound to external: sender is local, receiver is external
+                    $senderInfo = [
                         'id' => (int) $msg['sender_user_id'],
                         'name' => trim($msg['sender_first_name'] . ' ' . $msg['sender_last_name']),
                         'avatar' => $msg['sender_avatar'] ?: null,
                         'tenant_id' => (int) $msg['sender_tenant_id'],
                         'tenant_name' => $msg['sender_tenant_name'] ?? '',
-                    ],
-                    'receiver' => [
+                    ];
+                    $receiverInfo = [
                         'id' => (int) $msg['receiver_user_id'],
-                        'name' => $receiverName,
-                        'avatar' => $isExternal ? null : ($msg['receiver_avatar'] ?: null),
-                        'tenant_id' => $receiverTenantId,
-                        'tenant_name' => $receiverTenantName,
-                    ],
+                        'name' => $externalName,
+                        'avatar' => null,
+                        'tenant_id' => 'ext-' . $extPartnerId,
+                        'tenant_name' => $partnerName,
+                    ];
+                } elseif ($isExternal && $direction === 'inbound') {
+                    // Inbound from external: sender is external, receiver is local
+                    $senderInfo = [
+                        'id' => (int) $msg['sender_user_id'],
+                        'name' => $externalName,
+                        'avatar' => null,
+                        'tenant_id' => 'ext-' . $extPartnerId,
+                        'tenant_name' => $partnerName,
+                    ];
+                    $receiverInfo = [
+                        'id' => (int) $msg['receiver_user_id'],
+                        'name' => trim($msg['receiver_first_name'] . ' ' . $msg['receiver_last_name']),
+                        'avatar' => $msg['receiver_avatar'] ?: null,
+                        'tenant_id' => (int) $msg['receiver_tenant_id'],
+                        'tenant_name' => $msg['receiver_tenant_name'] ?? '',
+                    ];
+                } else {
+                    // Internal message
+                    $senderInfo = [
+                        'id' => (int) $msg['sender_user_id'],
+                        'name' => trim($msg['sender_first_name'] . ' ' . $msg['sender_last_name']),
+                        'avatar' => $msg['sender_avatar'] ?: null,
+                        'tenant_id' => (int) $msg['sender_tenant_id'],
+                        'tenant_name' => $msg['sender_tenant_name'] ?? '',
+                    ];
+                    $receiverInfo = [
+                        'id' => (int) $msg['receiver_user_id'],
+                        'name' => trim($msg['receiver_first_name'] . ' ' . $msg['receiver_last_name']),
+                        'avatar' => $msg['receiver_avatar'] ?: null,
+                        'tenant_id' => (int) $msg['receiver_tenant_id'],
+                        'tenant_name' => $msg['receiver_tenant_name'] ?? '',
+                    ];
+                }
+
+                $formatted = [
+                    'id' => (int) $msg['id'],
+                    'subject' => $msg['subject'] ?? '',
+                    'body' => $msg['body'],
+                    'direction' => $direction,
+                    'status' => $this->mapMessageStatus($msg['status'] ?? 'delivered'),
+                    'read_at' => $msg['read_at'] ?: null,
+                    'created_at' => $msg['created_at'],
+                    'sender' => $senderInfo,
+                    'receiver' => $receiverInfo,
                     'reference_message_id' => $msg['reference_message_id'] ? (int) $msg['reference_message_id'] : null,
                 ];
 
@@ -1393,6 +1423,7 @@ class FederationV2Controller extends BaseApiController
         try {
             $result = \App\Services\FederationExternalApiClient::sendMessage($externalPartnerId, [
                 'sender_id' => $userId,
+                'sender_name' => $senderName,
                 'recipient_id' => $realReceiverId,
                 'subject' => $subject,
                 'body' => $body,

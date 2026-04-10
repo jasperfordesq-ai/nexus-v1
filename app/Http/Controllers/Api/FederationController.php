@@ -630,16 +630,52 @@ class FederationController extends BaseApiController
         $stmt->execute([$recipient['tenant_id'], $input['sender_id'], $input['recipient_id'], $sanitizedSubject, $sanitizedBody]);
         $messageId = $db->lastInsertId();
 
+        // For external inbound messages, also insert into federation_messages so
+        // the V2 federation messages page can display them alongside outbound messages.
+        $senderName = htmlspecialchars($input['sender_name'] ?? 'A federation member', ENT_QUOTES, 'UTF-8');
+        if ($isExternal) {
+            // Find the external partner record that matches this API key's platform_id
+            $externalPartnerId = null;
+            $platformId = $auth['platform_id'] ?? null;
+            if ($platformId) {
+                $epRow = DB::selectOne(
+                    "SELECT id, name FROM federation_external_partners WHERE tenant_id = ? AND status = 'active' LIMIT 1",
+                    [(int) $recipient['tenant_id']]
+                );
+                if ($epRow) $externalPartnerId = (int) $epRow->id;
+            }
+
+            try {
+                DB::insert("
+                    INSERT INTO federation_messages
+                    (sender_tenant_id, sender_user_id, receiver_tenant_id, receiver_user_id,
+                     subject, body, direction, status,
+                     external_partner_id, external_receiver_name, external_message_id, created_at)
+                    VALUES (0, ?, ?, ?, ?, ?, 'inbound', 'unread', ?, ?, ?, NOW())
+                ", [
+                    (int) $input['sender_id'],
+                    (int) $recipient['tenant_id'], (int) $input['recipient_id'],
+                    $sanitizedSubject, $sanitizedBody,
+                    $externalPartnerId,
+                    $senderName,
+                    (int) $messageId,
+                ]);
+            } catch (\Throwable $e) {
+                error_log("FederationV1: federation_messages insert failed: " . $e->getMessage());
+            }
+        }
+
         $this->federationAuditService->log('api_message_sent', $partnerTenantId, $recipient['tenant_id'], null, ['message_id' => $messageId, 'recipient_id' => $input['recipient_id'], 'external_partner' => $isExternal]);
 
         // Non-blocking notifications
-        $senderName = $input['sender_name'] ?? 'A federation member';
         $senderTenantName = 'Partner Timebank';
         try {
-            $sRow = $db->prepare("SELECT u.name, u.first_name, u.last_name, t.name as tenant_name FROM users u JOIN tenants t ON u.tenant_id = t.id WHERE u.id = ?");
-            $sRow->execute([$input['sender_id']]);
-            $sr = $sRow->fetch(\PDO::FETCH_ASSOC);
-            if ($sr) { $senderName = $sr['name'] ?: trim($sr['first_name'] . ' ' . $sr['last_name']); $senderTenantName = $sr['tenant_name'] ?: 'Partner Timebank'; }
+            if (!$isExternal) {
+                $sRow = $db->prepare("SELECT u.name, u.first_name, u.last_name, t.name as tenant_name FROM users u JOIN tenants t ON u.tenant_id = t.id WHERE u.id = ?");
+                $sRow->execute([$input['sender_id']]);
+                $sr = $sRow->fetch(\PDO::FETCH_ASSOC);
+                if ($sr) { $senderName = $sr['name'] ?: trim($sr['first_name'] . ' ' . $sr['last_name']); $senderTenantName = $sr['tenant_name'] ?: 'Partner Timebank'; }
+            }
         } catch (\Exception $e) {}
 
         try { $this->federationEmailService->sendNewMessageNotification((int) $input['recipient_id'], (int) $input['sender_id'], (int) $partnerTenantId, substr($input['body'], 0, 200)); } catch (\Exception $e) { error_log("FederationV1: email failed: " . $e->getMessage()); }
