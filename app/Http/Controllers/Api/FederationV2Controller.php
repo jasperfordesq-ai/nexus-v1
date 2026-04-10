@@ -17,6 +17,7 @@ use App\Services\FederatedConnectionService;
 use App\Services\FederationAuditService;
 use App\Services\FederationFeatureService;
 use App\Services\FederationPartnershipService;
+use App\Services\FederationSearchService;
 
 /**
  * FederationV2Controller -- Federation v2: cross-tenant discovery, messaging, connections.
@@ -480,10 +481,61 @@ class FederationV2Controller extends BaseApiController
                 $nextCursor = $this->encodeCursor($lastRow['id']);
             }
 
+            // Merge external partner listings (only on first page to avoid duplicates)
+            if (!$cursorId) {
+                $external = $this->fetchExternalListings($tenantId, $q, $type);
+                if (!empty($external)) {
+                    $formatted = array_merge($formatted, $external);
+                }
+            }
+
             return $this->respondWithCollection($formatted, $nextCursor, $perPage, $hasMore);
         } catch (\Exception $e) {
             error_log("FederationV2Api::listings error: " . $e->getMessage());
             return $this->respondWithCollection([], null, $perPage, false);
+        }
+    }
+
+    /**
+     * Fetch listings from external federation partners and normalize to the same shape.
+     */
+    private function fetchExternalListings(int $tenantId, string $q, string $type): array
+    {
+        try {
+            $searchService = app(FederationSearchService::class);
+            $filters = [];
+            if (!empty($q)) $filters['q'] = $q;
+            if (!empty($type)) $filters['type'] = $type;
+
+            $result = $searchService->searchExternalListings($tenantId, $filters);
+
+            return array_map(function ($l) {
+                return [
+                    'id' => 'ext-' . ($l['partner_id'] ?? 0) . '-' . ($l['id'] ?? 0),
+                    'title' => $l['title'] ?? '',
+                    'description' => $l['description'] ?? '',
+                    'type' => $l['type'] ?? 'offer',
+                    'category_name' => $l['category_name'] ?? $l['category'] ?? null,
+                    'image_url' => $l['image_url'] ?? null,
+                    'estimated_hours' => isset($l['rate']) ? (float) $l['rate'] : null,
+                    'location' => $l['location'] ?? null,
+                    'author' => [
+                        'id' => (int) ($l['author']['id'] ?? $l['user_id'] ?? 0),
+                        'name' => $l['author']['name'] ?? trim(($l['first_name'] ?? '') . ' ' . ($l['last_name'] ?? '')),
+                        'avatar' => $l['author']['avatar'] ?? $l['avatar'] ?? null,
+                    ],
+                    'timebank' => [
+                        'id' => (int) ($l['timebank']['id'] ?? $l['tenant_id'] ?? 0),
+                        'name' => $l['timebank']['name'] ?? $l['partner_name'] ?? 'External Partner',
+                    ],
+                    'created_at' => $l['created_at'] ?? null,
+                    'is_external' => true,
+                    'partner_name' => $l['partner_name'] ?? null,
+                ];
+            }, $result['listings'] ?? []);
+        } catch (\Throwable $e) {
+            error_log("FederationV2Api::fetchExternalListings error: " . $e->getMessage());
+            return [];
         }
     }
 
@@ -618,10 +670,60 @@ class FederationV2Controller extends BaseApiController
                 $nextCursor = $this->encodeCursor($lastRow['id']);
             }
 
+            // Merge external partner members (only on first page to avoid duplicates)
+            if (!$cursorId) {
+                $external = $this->fetchExternalMembers($tenantId, $q, $skills);
+                if (!empty($external)) {
+                    $totalItems += count($external);
+                    $formatted = array_merge($formatted, $external);
+                }
+            }
+
             return $this->respondWithCollection($formatted, $nextCursor, $perPage, $hasMore, ['total_items' => $totalItems]);
         } catch (\Exception $e) {
             error_log("FederationV2Api::members error: " . $e->getMessage());
             return $this->respondWithCollection([], null, $perPage, false, ['total_items' => 0]);
+        }
+    }
+
+    /**
+     * Fetch members from external federation partners and normalize to the same shape.
+     */
+    private function fetchExternalMembers(int $tenantId, string $q, string $skills): array
+    {
+        try {
+            $searchService = app(FederationSearchService::class);
+            $filters = [];
+            if (!empty($q)) $filters['q'] = $q;
+            if (!empty($skills)) $filters['skills'] = $skills;
+
+            $result = $searchService->searchExternalMembers($tenantId, $filters);
+
+            return array_map(function ($m) {
+                return [
+                    'id' => 'ext-' . ($m['partner_id'] ?? 0) . '-' . ($m['id'] ?? 0),
+                    'name' => $m['name'] ?? trim(($m['first_name'] ?? '') . ' ' . ($m['last_name'] ?? '')),
+                    'first_name' => $m['first_name'] ?? '',
+                    'last_name' => $m['last_name'] ?? '',
+                    'avatar' => $m['avatar'] ?? null,
+                    'bio' => $m['bio'] ?? '',
+                    'skills' => is_array($m['skills'] ?? null) ? $m['skills'] : (is_string($m['skills'] ?? null) ? array_map('trim', explode(',', $m['skills'])) : []),
+                    'location' => $m['location'] ?? null,
+                    'service_reach' => $m['service_reach'] ?? 'local_only',
+                    'messaging_enabled' => (bool) ($m['accepts_messages'] ?? $m['messaging_enabled'] ?? false),
+                    'tenant_id' => (int) ($m['timebank']['id'] ?? $m['tenant_id'] ?? 0),
+                    'tenant_name' => $m['timebank']['name'] ?? $m['partner_name'] ?? 'External Partner',
+                    'timebank' => [
+                        'id' => (int) ($m['timebank']['id'] ?? $m['tenant_id'] ?? 0),
+                        'name' => $m['timebank']['name'] ?? $m['partner_name'] ?? 'External Partner',
+                    ],
+                    'is_external' => true,
+                    'partner_name' => $m['partner_name'] ?? null,
+                ];
+            }, $result['members'] ?? []);
+        } catch (\Throwable $e) {
+            error_log("FederationV2Api::fetchExternalMembers error: " . $e->getMessage());
+            return [];
         }
     }
 
