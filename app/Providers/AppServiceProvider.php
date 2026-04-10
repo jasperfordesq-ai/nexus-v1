@@ -1095,9 +1095,14 @@ class AppServiceProvider extends ServiceProvider
                 $data = json_decode(file_get_contents($file), true);
                 if (!is_array($data)) continue;
 
-                // Flatten nested arrays into dot-notation and add to the translator
+                // Flatten nested arrays into dot-notation and add to the translator.
+                // Convert {{var}} placeholders (i18next format used in JSON) to
+                // :var (Laravel format) so __() parameter substitution works.
                 $flattened = \Illuminate\Support\Arr::dot($data);
                 foreach ($flattened as $key => $value) {
+                    if (is_string($value)) {
+                        $value = preg_replace('/\{\{(\w+)\}\}/', ':$1', $value);
+                    }
                     $translator->addLines([$namespace . '.' . $key => $value], $locale);
                 }
             }
