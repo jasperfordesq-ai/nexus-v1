@@ -90,6 +90,7 @@ interface PartnerFormData {
   api_path: string;
   auth_method: string;
   description: string;
+  status: string;
   api_key: string;
   signing_secret: string;
   oauth_client_id: string;
@@ -134,12 +135,19 @@ const AUTH_METHODS = [
   { key: 'oauth2', i18nKey: 'federation.auth_method_oauth2', fallback: 'OAuth 2.0' },
 ];
 
+const PARTNER_STATUSES = [
+  { key: 'pending', i18nKey: 'federation.status_pending', fallback: 'Pending' },
+  { key: 'active', i18nKey: 'federation.status_active', fallback: 'Active' },
+  { key: 'suspended', i18nKey: 'federation.status_suspended', fallback: 'Suspended' },
+];
+
 const EMPTY_FORM: PartnerFormData = {
   name: '',
   base_url: '',
   api_path: '/api/v1/federation',
   auth_method: 'api_key',
   description: '',
+  status: 'pending',
   api_key: '',
   signing_secret: '',
   oauth_client_id: '',
@@ -223,6 +231,7 @@ export function ExternalPartners() {
       api_path: partner.api_path || '/api/v1/federation',
       auth_method: partner.auth_method || 'api_key',
       description: partner.description || '',
+      status: partner.status || 'pending',
       api_key: '',
       signing_secret: '',
       oauth_client_id: '',
@@ -253,6 +262,7 @@ export function ExternalPartners() {
         api_path: form.api_path,
         auth_method: form.auth_method,
         description: form.description || null,
+        ...(editingId ? { status: form.status } : {}),
         allow_member_search: form.allow_member_search,
         allow_listing_search: form.allow_listing_search,
         allow_messaging: form.allow_messaging,
@@ -530,6 +540,22 @@ export function ExternalPartners() {
                   onValueChange={(v) => updateForm('description', v)}
                   minRows={2}
                 />
+
+                {/* Status — only shown when editing */}
+                {editingId && (
+                  <Select
+                    label={t('federation.label_status', 'Status')}
+                    selectedKeys={[form.status]}
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0];
+                      if (selected) updateForm('status', String(selected));
+                    }}
+                  >
+                    {PARTNER_STATUSES.map((s) => (
+                      <SelectItem key={s.key}>{t(s.i18nKey, s.fallback)}</SelectItem>
+                    ))}
+                  </Select>
+                )}
 
                 {/* Auth method */}
                 <Select
