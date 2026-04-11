@@ -2103,6 +2103,37 @@ Route::post('/v1/federation/webhooks/test', [\App\Http\Controllers\Api\Federatio
 Route::post('/v2/federation/external/webhooks/receive', [\App\Http\Controllers\Api\FederationExternalWebhookController::class, 'receive'])->middleware('throttle:200,1');
 
 // ============================================
+// FEDERATION PROTOCOL ENDPOINTS — Komunitin (JSON:API) & Credit Commons
+// Authenticated via FederationApiMiddleware (API key, HMAC, JWT, or OAuth2).
+// These endpoints serve NEXUS data in protocol-native formats so that
+// external platforms can query us as a compatible federation partner.
+// ============================================
+Route::middleware(['federation.api', 'throttle:200,1'])->group(function () {
+    // --- Komunitin (JSON:API accounting protocol) ---
+    Route::get('/v2/federation/komunitin/currencies', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'currencies']);
+    Route::get('/v2/federation/komunitin/{code}/accounts', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'accounts']);
+    Route::get('/v2/federation/komunitin/{code}/accounts/{id}', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'account']);
+    Route::get('/v2/federation/komunitin/{code}/transfers', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'transfers']);
+    Route::get('/v2/federation/komunitin/{code}/transfers/{id}', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'transfer']);
+    Route::post('/v2/federation/komunitin/{code}/transfers', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'createTransfer']);
+
+    // --- Credit Commons protocol ---
+    Route::get('/v2/federation/cc/about', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'about']);
+    Route::get('/v2/federation/cc/accounts', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'accounts']);
+    Route::get('/v2/federation/cc/account', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'accountStats']);
+    Route::get('/v2/federation/cc/account/history', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'accountHistory']);
+    Route::get('/v2/federation/cc/account/history/{acc_id}', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'accountHistory']);
+    Route::get('/v2/federation/cc/account/{acc_id}', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'accountStats']);
+    Route::post('/v2/federation/cc/transaction', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'createTransaction']);
+    Route::get('/v2/federation/cc/transactions', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'transactions']);
+    Route::get('/v2/federation/cc/transaction/{uuid}', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'transaction']);
+    Route::patch('/v2/federation/cc/transaction/{uuid}/{state}', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'transitionTransaction']);
+    Route::get('/v2/federation/cc/entries', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'entries']);
+    Route::get('/v2/federation/cc/entries/{uuid}', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'transactionEntries']);
+    Route::get('/v2/federation/cc/forms', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'forms']);
+});
+
+// ============================================
 // PUBLIC LEGAL DOCUMENT ROUTES — No auth required
 // Custom tenant legal docs (Terms, Privacy, etc.) must be accessible
 // without authentication — the React useLegalDocument hook fetches

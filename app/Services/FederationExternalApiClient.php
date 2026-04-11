@@ -351,10 +351,19 @@ class FederationExternalApiClient
      */
     private static function buildAuthHeaders(array $partner, string $method, string $url, string $body = ''): array
     {
+        // Protocol-aware content negotiation: JSON:API uses application/vnd.api+json
+        $protocolType = $partner['protocol_type'] ?? 'nexus';
+        $accept = ($protocolType === 'komunitin') ? 'application/vnd.api+json' : 'application/json';
+
         $headers = [
-            'Accept' => 'application/json',
+            'Accept' => $accept,
             'User-Agent' => 'ProjectNexus-Federation/1.0',
         ];
+
+        // JSON:API requires Content-Type header on requests with body
+        if ($protocolType === 'komunitin' && in_array($method, ['POST', 'PUT', 'PATCH'])) {
+            $headers['Content-Type'] = 'application/vnd.api+json';
+        }
 
         $authMethod = $partner['auth_method'] ?? 'api_key';
 

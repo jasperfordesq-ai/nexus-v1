@@ -173,14 +173,21 @@ class FederationExternalPartnerService
             $signingSecret = !empty($data['signing_secret']) ? self::encryptApiKey($data['signing_secret']) : null;
             $oauthClientSecret = !empty($data['oauth_client_secret']) ? self::encryptApiKey($data['oauth_client_secret']) : null;
 
+            // Validate protocol_type if provided
+            $validProtocols = ['nexus', 'timeoverflow', 'komunitin', 'credit_commons'];
+            $protocolType = $data['protocol_type'] ?? 'nexus';
+            if (!in_array($protocolType, $validProtocols, true)) {
+                return ['success' => false, 'error' => 'Invalid protocol_type. Must be one of: ' . implode(', ', $validProtocols)];
+            }
+
             DB::insert(
                 "INSERT INTO federation_external_partners
                  (tenant_id, name, description, base_url, api_path, api_key, auth_method,
-                  signing_secret, oauth_client_id, oauth_client_secret, oauth_token_url,
+                  protocol_type, signing_secret, oauth_client_id, oauth_client_secret, oauth_token_url,
                   allow_member_search, allow_listing_search, allow_messaging,
                   allow_transactions, allow_events, allow_groups,
                   status, created_by, created_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, NOW())",
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, NOW())",
                 [
                     $tenantId,
                     $data['name'],
@@ -189,6 +196,7 @@ class FederationExternalPartnerService
                     $data['api_path'] ?? '/api/v1/federation',
                     $apiKey,
                     $data['auth_method'] ?? 'api_key',
+                    $protocolType,
                     $signingSecret,
                     $data['oauth_client_id'] ?? null,
                     $oauthClientSecret,
@@ -270,6 +278,12 @@ class FederationExternalPartnerService
             return ['success' => false, 'error' => 'Invalid auth_method. Must be one of: ' . implode(', ', $validAuthMethods)];
         }
 
+        // Validate protocol_type if provided
+        $validProtocols = ['nexus', 'timeoverflow', 'komunitin', 'credit_commons'];
+        if (array_key_exists('protocol_type', $data) && !in_array($data['protocol_type'], $validProtocols, true)) {
+            return ['success' => false, 'error' => 'Invalid protocol_type. Must be one of: ' . implode(', ', $validProtocols)];
+        }
+
         try {
             $sets = [];
             $params = [];
@@ -277,7 +291,7 @@ class FederationExternalPartnerService
             // Updatable fields
             $plainFields = [
                 'name', 'description', 'base_url', 'api_path', 'auth_method',
-                'oauth_client_id', 'oauth_token_url', 'status',
+                'protocol_type', 'oauth_client_id', 'oauth_token_url', 'status',
                 'allow_member_search', 'allow_listing_search', 'allow_messaging',
                 'allow_transactions', 'allow_events', 'allow_groups',
             ];

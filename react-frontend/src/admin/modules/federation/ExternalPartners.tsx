@@ -68,6 +68,7 @@ interface ExternalPartner {
   base_url: string;
   api_path: string;
   auth_method: string;
+  protocol_type: string;
   status: string;
   last_sync_at: string | null;
   created_at: string;
@@ -90,6 +91,7 @@ interface PartnerFormData {
   base_url: string;
   api_path: string;
   auth_method: string;
+  protocol_type: string;
   description: string;
   status: string;
   api_key: string;
@@ -136,6 +138,13 @@ const AUTH_METHODS = [
   { key: 'oauth2', i18nKey: 'federation.auth_method_oauth2' },
 ];
 
+const PROTOCOL_TYPES = [
+  { key: 'nexus', label: 'Project NEXUS' },
+  { key: 'timeoverflow', label: 'TimeOverflow' },
+  { key: 'komunitin', label: 'Komunitin (JSON:API)' },
+  { key: 'credit_commons', label: 'Credit Commons' },
+];
+
 const PARTNER_STATUSES = [
   { key: 'pending', i18nKey: 'federation.status_pending' },
   { key: 'active', i18nKey: 'federation.status_active' },
@@ -147,6 +156,7 @@ const EMPTY_FORM: PartnerFormData = {
   base_url: '',
   api_path: '/api/v1/federation',
   auth_method: 'api_key',
+  protocol_type: 'nexus',
   description: '',
   status: 'pending',
   api_key: '',
@@ -231,6 +241,7 @@ export function ExternalPartners() {
       base_url: partner.base_url,
       api_path: partner.api_path || '/api/v1/federation',
       auth_method: partner.auth_method || 'api_key',
+      protocol_type: partner.protocol_type || 'nexus',
       description: partner.description || '',
       status: partner.status || 'pending',
       api_key: '',
@@ -262,6 +273,7 @@ export function ExternalPartners() {
         base_url: form.base_url,
         api_path: form.api_path,
         auth_method: form.auth_method,
+        protocol_type: form.protocol_type,
         description: form.description || null,
         ...(editingId ? { status: form.status } : {}),
         allow_member_search: form.allow_member_search,
@@ -421,6 +433,7 @@ export function ExternalPartners() {
           <TableColumn>{t('federation.col_name', 'Name')}</TableColumn>
           <TableColumn>{t('federation.col_base_url', 'Base URL')}</TableColumn>
           <TableColumn>{t('federation.col_auth_method', 'Auth Method')}</TableColumn>
+          <TableColumn>{t('federation.col_protocol', 'Protocol')}</TableColumn>
           <TableColumn>{t('federation.col_status', 'Status')}</TableColumn>
           <TableColumn>{t('federation.col_last_sync', 'Last Sync')}</TableColumn>
           <TableColumn>{t('federation.col_created', 'Created')}</TableColumn>
@@ -443,6 +456,11 @@ export function ExternalPartners() {
               <TableCell>
                 <Chip size="sm" variant="flat">
                   {t(`federation.auth_method_${partner.auth_method}`, partner.auth_method)}
+                </Chip>
+              </TableCell>
+              <TableCell>
+                <Chip size="sm" variant="flat" color="secondary">
+                  {PROTOCOL_TYPES.find((p) => p.key === partner.protocol_type)?.label ?? partner.protocol_type ?? 'NEXUS'}
                 </Chip>
               </TableCell>
               <TableCell>
@@ -533,6 +551,33 @@ export function ExternalPartners() {
                   value={form.api_path}
                   onValueChange={(v) => updateForm('api_path', v)}
                 />
+                {/* Federation protocol */}
+                <Select
+                  label={t('federation.label_protocol_type', 'Federation Protocol')}
+                  description={t('federation.protocol_type_desc', 'The protocol this partner uses for data exchange')}
+                  selectedKeys={[form.protocol_type]}
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0];
+                    if (selected) {
+                      updateForm('protocol_type', String(selected));
+                      // Auto-set API path based on protocol
+                      const paths: Record<string, string> = {
+                        nexus: '/api/v2/federation',
+                        timeoverflow: '/api/v1',
+                        komunitin: '/api/v1',
+                        credit_commons: '',
+                      };
+                      if (paths[String(selected)] !== undefined) {
+                        updateForm('api_path', paths[String(selected)]);
+                      }
+                    }
+                  }}
+                >
+                  {PROTOCOL_TYPES.map((p) => (
+                    <SelectItem key={p.key}>{p.label}</SelectItem>
+                  ))}
+                </Select>
+
                 <Textarea
                   label={t('federation.label_description', 'Description')}
                   placeholder={t('federation.placeholder_description', 'Brief description of this partner')}

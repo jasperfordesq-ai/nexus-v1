@@ -137,6 +137,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             'auth' => \App\Http\Middleware\Authenticate::class,
             'admin' => \App\Http\Middleware\EnsureIsAdmin::class,
             'super-admin' => \App\Http\Middleware\EnsureIsSuperAdmin::class,
+            'federation.api' => \App\Http\Middleware\FederationApiAuth::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
