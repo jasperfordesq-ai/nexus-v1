@@ -824,7 +824,7 @@ export default function FederationHubPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <PageMeta title="Federation Hub" noIndex />
+      <PageMeta title={t('hub.page_title')} noIndex />
       <Breadcrumbs items={breadcrumbs} />
 
       {/* Page header */}

@@ -130,15 +130,15 @@ const STATUS_COLORS: Record<string, 'success' | 'default' | 'warning' | 'danger'
 };
 
 const AUTH_METHODS = [
-  { key: 'api_key', i18nKey: 'federation.auth_method_api_key', fallback: 'API Key' },
-  { key: 'hmac', i18nKey: 'federation.auth_method_hmac', fallback: 'HMAC Signature' },
-  { key: 'oauth2', i18nKey: 'federation.auth_method_oauth2', fallback: 'OAuth 2.0' },
+  { key: 'api_key', i18nKey: 'federation.auth_method_api_key' },
+  { key: 'hmac', i18nKey: 'federation.auth_method_hmac' },
+  { key: 'oauth2', i18nKey: 'federation.auth_method_oauth2' },
 ];
 
 const PARTNER_STATUSES = [
-  { key: 'pending', i18nKey: 'federation.status_pending', fallback: 'Pending' },
-  { key: 'active', i18nKey: 'federation.status_active', fallback: 'Active' },
-  { key: 'suspended', i18nKey: 'federation.status_suspended', fallback: 'Suspended' },
+  { key: 'pending', i18nKey: 'federation.status_pending' },
+  { key: 'active', i18nKey: 'federation.status_active' },
+  { key: 'suspended', i18nKey: 'federation.status_suspended' },
 ];
 
 const EMPTY_FORM: PartnerFormData = {
@@ -293,7 +293,7 @@ export function ExternalPartners() {
         formModal.onClose();
         loadData();
       } else {
-        const errorMsg = (res as { error?: string }).error || 'Failed to save partner';
+        const errorMsg = (res as { error?: string }).error || t('federation.failed_to_save_partner');
         toast.error(errorMsg);
       }
     } catch (err) {
@@ -449,9 +449,8 @@ export function ExternalPartners() {
                   size="sm"
                   variant="flat"
                   color={STATUS_COLORS[partner.status] ?? 'default'}
-                  className="capitalize"
                 >
-                  {partner.status}
+                  {t(`federation.status_${partner.status}`)}
                 </Chip>
               </TableCell>
               <TableCell>
@@ -552,7 +551,7 @@ export function ExternalPartners() {
                     }}
                   >
                     {PARTNER_STATUSES.map((s) => (
-                      <SelectItem key={s.key}>{t(s.i18nKey, s.fallback)}</SelectItem>
+                      <SelectItem key={s.key}>{t(s.i18nKey)}</SelectItem>
                     ))}
                   </Select>
                 )}
@@ -567,7 +566,7 @@ export function ExternalPartners() {
                   }}
                 >
                   {AUTH_METHODS.map((m) => (
-                    <SelectItem key={m.key}>{t(m.i18nKey, m.fallback)}</SelectItem>
+                    <SelectItem key={m.key}>{t(m.i18nKey)}</SelectItem>
                   ))}
                 </Select>
 

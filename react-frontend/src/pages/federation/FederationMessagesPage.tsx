@@ -266,7 +266,7 @@ export function FederationMessagesPage() {
     try {
       setIsLoading(true);
       setLoadError(false);
-      const response = await api.get<FederatedMessage[]>('/v2/federation/messages');
+      const response = await api.get<FederatedMessage[]>('/v2/federation/messages', { signal: controller.signal });
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setAllMessages(response.data);
@@ -643,7 +643,7 @@ export function FederationMessagesPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-4">
-      <PageMeta title="Federation Messages" noIndex />
+      <PageMeta title={t('messages.page_title')} noIndex />
       <Breadcrumbs items={breadcrumbItems} />
 
       {/* Feature disabled notice */}

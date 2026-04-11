@@ -55,19 +55,19 @@ interface FederationLevelMeta {
 
 const FEDERATION_LEVELS: Record<number, FederationLevelMeta> = {
   1: {
-    label: 'Discovery',
+    label: 'partner_detail.level_discovery',
     className: 'bg-blue-500/20 text-blue-600 dark:text-blue-400',
   },
   2: {
-    label: 'Social',
+    label: 'partner_detail.level_social',
     className: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400',
   },
   3: {
-    label: 'Economic',
+    label: 'partner_detail.level_economic',
     className: 'bg-purple-500/20 text-purple-600 dark:text-purple-400',
   },
   4: {
-    label: 'Integrated',
+    label: 'partner_detail.level_integrated',
     className: 'bg-amber-500/20 text-amber-600 dark:text-amber-400',
   },
 };
@@ -195,7 +195,7 @@ export function FederationPartnerDetailPage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title="Partner Details" noIndex />
+      <PageMeta title={t('partner_detail.page_title')} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
@@ -240,8 +240,8 @@ export function FederationPartnerDetailPage() {
                 variant="flat"
                 className={`mt-3 ${levelMeta?.className || 'bg-theme-hover text-theme-muted'}`}
               >
-                Level {partner.federation_level} &mdash;{' '}
-                {partner.federation_level_name || levelMeta?.label || 'Unknown'}
+                {t('partner_detail.level_prefix', { level: partner.federation_level })} &mdash;{' '}
+                {partner.federation_level_name || t(levelMeta?.label || 'partner_detail.level_unknown')}
               </Chip>
 
               {/* Meta row */}

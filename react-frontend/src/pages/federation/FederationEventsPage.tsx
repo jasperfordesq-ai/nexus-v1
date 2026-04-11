@@ -204,7 +204,7 @@ export function FederationEventsPage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title="Federation Events" noIndex />
+      <PageMeta title={t('events.page_title')} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[

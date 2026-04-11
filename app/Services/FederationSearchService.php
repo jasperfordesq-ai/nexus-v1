@@ -372,6 +372,11 @@ class FederationSearchService
                 continue;
             }
 
+            // Respect the allow_member_search permission flag
+            if (empty($partner['allow_member_search'])) {
+                continue;
+            }
+
             try {
                 $partnersQueried++;
                 $results = FederationExternalApiClient::fetchMembers($partnerId, $filters);

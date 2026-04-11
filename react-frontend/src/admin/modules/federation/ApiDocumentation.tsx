@@ -75,8 +75,8 @@ function AuthenticationTab() {
         <CardHeader className="flex items-center gap-2">
           <Shield size={20} className="text-primary" />
           <div>
-            <h3 className="text-lg font-semibold">API Key Authentication</h3>
-            <p className="text-sm text-default-500">Simplest method -- suitable for server-to-server calls</p>
+            <h3 className="text-lg font-semibold">{t('federation.api_doc_api_key_auth')}</h3>
+            <p className="text-sm text-default-500">{t('federation.api_doc_api_key_desc')}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
@@ -104,8 +104,8 @@ Content-Type: application/json
         <CardHeader className="flex items-center gap-2">
           <Shield size={20} className="text-warning" />
           <div>
-            <h3 className="text-lg font-semibold">HMAC-SHA256 Signature</h3>
-            <p className="text-sm text-default-500">Recommended for production -- verifies request integrity</p>
+            <h3 className="text-lg font-semibold">{t('federation.api_doc_hmac_auth')}</h3>
+            <p className="text-sm text-default-500">{t('federation.api_doc_hmac_desc')}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
@@ -156,8 +156,8 @@ BODY
         <CardHeader className="flex items-center gap-2">
           <Shield size={20} className="text-success" />
           <div>
-            <h3 className="text-lg font-semibold">JWT Bearer Token</h3>
-            <p className="text-sm text-default-500">Token-based auth for session-like integrations</p>
+            <h3 className="text-lg font-semibold">{t('federation.api_doc_jwt_auth')}</h3>
+            <p className="text-sm text-default-500">{t('federation.api_doc_jwt_desc')}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
@@ -191,8 +191,8 @@ grant_type=client_credentials&scope=members:read listings:read
         <CardHeader className="flex items-center gap-2">
           <AlertTriangle size={20} className="text-danger" />
           <div>
-            <h3 className="text-lg font-semibold">Rate Limits</h3>
-            <p className="text-sm text-default-500">Throttling headers returned on every response</p>
+            <h3 className="text-lg font-semibold">{t('federation.api_doc_rate_limits')}</h3>
+            <p className="text-sm text-default-500">{t('federation.api_doc_rate_limits_desc')}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
@@ -829,6 +829,7 @@ print(data['message_id'])  # 1234`,
 type ExampleLang = 'curl' | 'js' | 'python';
 
 function ExamplesTab() {
+  const { t } = useTranslation('admin');
   const [lang, setLang] = useState<ExampleLang>('curl');
 
   const langLabels: Record<ExampleLang, string> = {
@@ -853,7 +854,7 @@ function ExamplesTab() {
 
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">API Key Authentication + List Members</h3>
+          <h3 className="text-lg font-semibold">{t('federation.api_doc_example_api_key')}</h3>
         </CardHeader>
         <CardBody>
           <CodeBlock>{EXAMPLES.apiKey[lang]}</CodeBlock>
@@ -862,7 +863,7 @@ function ExamplesTab() {
 
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">HMAC-Signed Request</h3>
+          <h3 className="text-lg font-semibold">{t('federation.api_doc_example_hmac')}</h3>
         </CardHeader>
         <CardBody>
           <CodeBlock>{EXAMPLES.hmac[lang]}</CodeBlock>
@@ -871,7 +872,7 @@ function ExamplesTab() {
 
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">Sending a Message</h3>
+          <h3 className="text-lg font-semibold">{t('federation.api_doc_example_message')}</h3>
         </CardHeader>
         <CardBody>
           <CodeBlock>{EXAMPLES.message[lang]}</CodeBlock>
@@ -896,6 +897,7 @@ const ERROR_CODES = [
 ];
 
 function ErrorCodesTab() {
+  const { t } = useTranslation('admin');
   return (
     <div className="space-y-4">
       <p className="text-sm text-default-600">
@@ -908,7 +910,7 @@ function ErrorCodesTab() {
   "timestamp": "2026-03-28T12:00:00+00:00"
 }`}</CodeBlock>
 
-      <Table aria-label="Error codes">
+      <Table aria-label={t('federation.api_doc_error_codes_aria')}>
         <TableHeader>
           <TableColumn>Code</TableColumn>
           <TableColumn>Name</TableColumn>
@@ -958,14 +960,15 @@ const WEBHOOK_EVENTS = [
 ];
 
 function WebhooksTab() {
+  const { t } = useTranslation('admin');
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader className="flex items-center gap-2">
           <Webhook size={20} className="text-primary" />
           <div>
-            <h3 className="text-lg font-semibold">Webhook Events</h3>
-            <p className="text-sm text-default-500">Real-time notifications for federation activity</p>
+            <h3 className="text-lg font-semibold">{t('federation.api_doc_webhook_events')}</h3>
+            <p className="text-sm text-default-500">{t('federation.api_doc_webhook_events_desc')}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
@@ -974,7 +977,7 @@ function WebhooksTab() {
             to your configured HTTPS endpoint. Configure webhooks on the{' '}
             <a href="../webhooks" className="text-primary underline">Webhooks</a> page.
           </p>
-          <Table aria-label="Webhook events" removeWrapper>
+          <Table aria-label={t('federation.api_doc_webhook_events_aria')} removeWrapper>
             <TableHeader>
               <TableColumn>Event</TableColumn>
               <TableColumn>Description</TableColumn>
@@ -995,7 +998,7 @@ function WebhooksTab() {
 
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">Payload Format</h3>
+          <h3 className="text-lg font-semibold">{t('federation.api_doc_payload_format')}</h3>
         </CardHeader>
         <CardBody className="space-y-3">
           <p className="text-sm text-default-600">
@@ -1027,7 +1030,7 @@ function WebhooksTab() {
 
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">Signature Verification</h3>
+          <h3 className="text-lg font-semibold">{t('federation.api_doc_signature_verification')}</h3>
         </CardHeader>
         <CardBody className="space-y-3">
           <p className="text-sm text-default-600">

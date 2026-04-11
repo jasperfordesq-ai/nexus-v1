@@ -218,7 +218,7 @@ export function FederationListingsPage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title="Federation Listings" noIndex />
+      <PageMeta title={t('listings.page_title')} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
@@ -700,12 +700,12 @@ function FederatedListingCard({ listing, onViewDetails }: FederatedListingCardPr
         <div className="flex items-center gap-2 min-w-0">
           <Avatar
             src={avatarSrc}
-            name={listing.author?.name || 'User'}
+            name={listing.author?.name || t('listings.anonymous_user', 'User')}
             size="sm"
             className="flex-shrink-0 w-6 h-6"
           />
           <span className="text-sm text-theme-subtle truncate">
-            {listing.author?.name}
+            {listing.author?.name || t('listings.anonymous_user', 'User')}
           </span>
         </div>
         <Chip

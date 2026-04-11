@@ -110,20 +110,20 @@ const STATUS_COLORS: Record<string, 'success' | 'default' | 'warning' | 'danger'
   failing: 'danger',
 };
 
-const ALL_EVENTS = [
-  { key: 'partnership.requested', label: 'Partnership Requested' },
-  { key: 'partnership.approved', label: 'Partnership Approved' },
-  { key: 'partnership.rejected', label: 'Partnership Rejected' },
-  { key: 'partnership.terminated', label: 'Partnership Terminated' },
-  { key: 'member.opted_in', label: 'Member Opted In' },
-  { key: 'member.opted_out', label: 'Member Opted Out' },
-  { key: 'message.sent', label: 'Message Sent' },
-  { key: 'message.received', label: 'Message Received' },
-  { key: 'transaction.created', label: 'Transaction Created' },
-  { key: 'transaction.completed', label: 'Transaction Completed' },
-  { key: 'connection.requested', label: 'Connection Requested' },
-  { key: 'connection.accepted', label: 'Connection Accepted' },
-  { key: 'listing.shared', label: 'Listing Shared' },
+const ALL_EVENT_KEYS = [
+  'partnership.requested',
+  'partnership.approved',
+  'partnership.rejected',
+  'partnership.terminated',
+  'member.opted_in',
+  'member.opted_out',
+  'message.sent',
+  'message.received',
+  'transaction.created',
+  'transaction.completed',
+  'connection.requested',
+  'connection.accepted',
+  'listing.shared',
 ];
 
 const EMPTY_FORM: WebhookFormData = {
@@ -140,6 +140,11 @@ export function Webhooks() {
   const { t } = useTranslation('admin');
   usePageTitle(t('federation.webhooks_title', 'Federation Webhooks'));
   const toast = useToast();
+
+  const ALL_EVENTS = ALL_EVENT_KEYS.map((key) => ({
+    key,
+    label: t(`federation.webhook_${key.replace('.', '_')}`, key),
+  }));
 
   const formModal = useDisclosure();
   const logsModal = useDisclosure();
@@ -569,7 +574,7 @@ export function Webhooks() {
                     <Button
                       size="sm"
                       variant="flat"
-                      onPress={() => setForm((prev) => ({ ...prev, events: ALL_EVENTS.map(e => e.key) }))}
+                      onPress={() => setForm((prev) => ({ ...prev, events: ALL_EVENT_KEYS }))}
                       isDisabled={!!createdSecret}
                     >
                       {t('federation.webhooks_select_all', 'Select All')}

@@ -42,18 +42,18 @@ interface FedTopic {
   is_primary?: boolean;
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  care: 'Care & Support',
-  skills: 'Skills & Education',
-  creative: 'Creative',
-  home: 'Home & Garden',
-  health: 'Health & Fitness',
-  community: 'Community',
-  services: 'Services',
-};
-
 export function MyProfile() {
   const { t } = useTranslation('admin');
+
+  const CATEGORY_LABELS: Record<string, string> = {
+    care: t('federation.category_care', 'Care & Support'),
+    skills: t('federation.category_skills', 'Skills & Education'),
+    creative: t('federation.category_creative', 'Creative'),
+    home: t('federation.category_home', 'Home & Garden'),
+    health: t('federation.category_health', 'Health & Fitness'),
+    community: t('federation.category_community', 'Community'),
+    services: t('federation.category_services', 'Services'),
+  };
   usePageTitle(t('federation.page_title'));
   const toast = useToast();
 
@@ -445,7 +445,7 @@ export function MyProfile() {
                                   type="button"
                                   onClick={(e) => { e.stopPropagation(); togglePrimary(topic.id); }}
                                   className="flex items-center"
-                                  aria-label={isPrimary ? 'Remove primary' : 'Set as primary'}
+                                  aria-label={isPrimary ? t('federation.remove_primary', 'Remove primary') : t('federation.set_as_primary', 'Set as primary')}
                                 >
                                   <Star size={12} className={isPrimary ? 'fill-current' : 'opacity-40'} />
                                 </button>

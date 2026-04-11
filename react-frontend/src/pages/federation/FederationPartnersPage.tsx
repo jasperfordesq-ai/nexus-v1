@@ -64,22 +64,22 @@ interface FederationLevelMeta {
 
 const FEDERATION_LEVELS: Record<number, FederationLevelMeta> = {
   1: {
-    label: 'Discovery',
+    label: 'partners.level_discovery',
     color: 'primary',
     className: 'bg-blue-500/20 text-blue-600 dark:text-blue-400',
   },
   2: {
-    label: 'Social',
+    label: 'partners.level_social',
     color: 'success',
     className: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400',
   },
   3: {
-    label: 'Economic',
+    label: 'partners.level_economic',
     color: 'secondary',
     className: 'bg-purple-500/20 text-purple-600 dark:text-purple-400',
   },
   4: {
-    label: 'Integrated',
+    label: 'partners.level_integrated',
     color: 'warning',
     className: 'bg-amber-500/20 text-amber-600 dark:text-amber-400',
   },
@@ -172,7 +172,7 @@ export function FederationPartnersPage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title="Federation Partners" noIndex />
+      <PageMeta title={t('partners.page_title')} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
@@ -327,10 +327,9 @@ export function FederationPartnersPage() {
                         'bg-theme-hover text-theme-muted'
                       }
                     >
-                      Level {selectedPartner.federation_level} &mdash;{' '}
+                      {t('partners.level_prefix', { level: selectedPartner.federation_level })} &mdash;{' '}
                       {selectedPartner.federation_level_name ||
-                        FEDERATION_LEVELS[selectedPartner.federation_level]?.label ||
-                        'Unknown'}
+                        t(FEDERATION_LEVELS[selectedPartner.federation_level]?.label || 'partners.level_unknown')}
                     </Chip>
                   </div>
 
@@ -466,7 +465,7 @@ function PartnerCard({ partner, onViewDetails }: PartnerCardProps) {
             variant="flat"
             className={levelMeta?.className || 'bg-theme-hover text-theme-muted'}
           >
-            {levelMeta?.label || partner.federation_level_name || `Level ${partner.federation_level}`}
+            {t(levelMeta?.label || 'partners.level_unknown') || partner.federation_level_name || t('partners.level_prefix', { level: partner.federation_level })}
           </Chip>
           {partner.is_external && (
             <Chip

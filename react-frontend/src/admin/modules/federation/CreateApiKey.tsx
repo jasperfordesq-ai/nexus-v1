@@ -21,17 +21,17 @@ import { PageHeader } from '../../components';
 import { useTranslation } from 'react-i18next';
 
 /** Scopes must match the `fedAuth('...')` permission strings in FederationController.php */
-const AVAILABLE_SCOPES = [
-  { key: 'timebanks:read', description: 'View partner timebanks' },
-  { key: 'members:read', description: 'Search and view member profiles' },
-  { key: 'listings:read', description: 'Search and view listings' },
-  { key: 'messages:read', description: 'Read cross-community messages' },
-  { key: 'messages:write', description: 'Send cross-community messages' },
-  { key: 'transactions:read', description: 'Read transaction status' },
-  { key: 'transactions:write', description: 'Create time credit transfers' },
-  { key: 'reviews:read', description: 'Read cross-community reviews' },
-  { key: 'reviews:write', description: 'Write cross-community reviews' },
-];
+const SCOPE_KEYS = [
+  'timebanks:read',
+  'members:read',
+  'listings:read',
+  'messages:read',
+  'messages:write',
+  'transactions:read',
+  'transactions:write',
+  'reviews:read',
+  'reviews:write',
+] as const;
 
 export function CreateApiKey() {
   const { t } = useTranslation('admin');
@@ -39,6 +39,11 @@ export function CreateApiKey() {
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
+
+  const AVAILABLE_SCOPES = SCOPE_KEYS.map((key) => ({
+    key,
+    description: t(`federation.scope_${key.replace(':', '_')}`, key),
+  }));
   const [name, setName] = useState('');
   const [scopes, setScopes] = useState<string[]>([]);
   const [expiresAt, setExpiresAt] = useState<string>('');

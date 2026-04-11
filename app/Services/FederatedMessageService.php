@@ -95,87 +95,6 @@ class FederatedMessageService
     }
 
     /**
-     * Get federated inbox for a user.
-     */
-    public static function getInbox(int $userId, int $limit = 50, int $offset = 0): array
-    {
-        try {
-            return array_map(
-                fn ($row) => (array) $row,
-                DB::select(
-                    "SELECT * FROM federation_messages
-                     WHERE receiver_user_id = ? AND receiver_tenant_id = ?
-                     ORDER BY created_at DESC
-                     LIMIT ? OFFSET ?",
-                    [$userId, TenantContext::getId(), $limit, $offset]
-                )
-            );
-        } catch (\Throwable $e) {
-            return [];
-        }
-    }
-
-    /**
-     * Get message thread between two users.
-     */
-    public static function getThread(int $userId, int $otherUserId, int $otherTenantId, int $limit = 100): array
-    {
-        try {
-            return array_map(
-                fn ($row) => (array) $row,
-                DB::select(
-                    "SELECT * FROM federation_messages
-                     WHERE (sender_user_id = ? AND receiver_user_id = ? AND receiver_tenant_id = ?)
-                        OR (sender_user_id = ? AND receiver_user_id = ? AND sender_tenant_id = ?)
-                     ORDER BY created_at ASC
-                     LIMIT ?",
-                    [$userId, $otherUserId, $otherTenantId, $otherUserId, $userId, $otherTenantId, $limit]
-                )
-            );
-        } catch (\Throwable $e) {
-            return [];
-        }
-    }
-
-    /**
-     * Mark a single message as read.
-     */
-    public static function markAsRead(int $messageId, int $userId): bool
-    {
-        try {
-            $affected = DB::table('federation_messages')
-                ->where('id', $messageId)
-                ->where('receiver_user_id', $userId)
-                ->where('receiver_tenant_id', TenantContext::getId())
-                ->whereIn('status', ['pending', 'delivered', 'unread'])
-                ->update(['status' => 'read', 'read_at' => now()]);
-
-            return $affected > 0;
-        } catch (\Throwable $e) {
-            return false;
-        }
-    }
-
-    /**
-     * Mark all messages in a thread as read.
-     *
-     * @return int Number of messages marked as read
-     */
-    public static function markThreadAsRead(int $userId, int $otherUserId, int $otherTenantId): int
-    {
-        try {
-            return DB::table('federation_messages')
-                ->where('receiver_user_id', $userId)
-                ->where('sender_user_id', $otherUserId)
-                ->where('sender_tenant_id', $otherTenantId)
-                ->whereIn('status', ['pending', 'delivered', 'unread'])
-                ->update(['status' => 'read', 'read_at' => now()]);
-        } catch (\Throwable $e) {
-            return 0;
-        }
-    }
-
-    /**
      * Get unread message count for a user.
      */
     public static function getUnreadCount(int $userId): int
@@ -257,7 +176,7 @@ class FederatedMessageService
             $body = htmlspecialchars(substr($body, 0, 10000), ENT_QUOTES, 'UTF-8');
             $externalMessageId = $externalMessageId ? htmlspecialchars(substr($externalMessageId, 0, 255), ENT_QUOTES, 'UTF-8') : null;
 
-            $receiver = DB::table('users')->where('id', $receiverUserId)->where('status', 'active')->first();
+            $receiver = DB::table('users')->where('id', $receiverUserId)->where('tenant_id', TenantContext::getId())->where('status', 'active')->first();
             if (!$receiver) {
                 return ['success' => false, 'error' => 'Receiver not found'];
             }
@@ -274,7 +193,7 @@ class FederatedMessageService
 
             $messageId = DB::table('federation_messages')->insertGetId([
                 'sender_user_id'         => $externalSenderId,
-                'sender_tenant_id'       => $externalPartnerId,
+                'sender_tenant_id'       => 0, // External origin — not a real tenant ID
                 'receiver_user_id'       => $receiverUserId,
                 'receiver_tenant_id'     => $receiver->tenant_id,
                 'subject'                => $subject,

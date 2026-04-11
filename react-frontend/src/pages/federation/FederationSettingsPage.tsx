@@ -286,7 +286,7 @@ export function FederationSettingsPage() {
       animate="visible"
       className="max-w-3xl mx-auto space-y-6"
     >
-      <PageMeta title="Federation Settings" noIndex />
+      <PageMeta title={t('settings.page_title')} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('settings.breadcrumb_federation'), href: '/federation' },

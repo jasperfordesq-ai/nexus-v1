@@ -290,13 +290,8 @@ class FederationExternalApiClient
                 break;
 
             case 'oauth2':
-                // Simplified OAuth2: use pre-obtained token stored in api_key column.
-                // Full OAuth2 client-credentials flow is future work.
-                if (empty($partner['api_key'])) {
-                    throw new \RuntimeException('OAuth token not configured for partner');
-                }
-                $decryptedToken = self::decryptCredential($partner['api_key']);
-                $headers['Authorization'] = 'Bearer ' . $decryptedToken;
+                $token = self::getOAuth2Token($partner);
+                $headers['Authorization'] = 'Bearer ' . $token;
                 break;
 
             default:
@@ -304,6 +299,65 @@ class FederationExternalApiClient
         }
 
         return $headers;
+    }
+
+    /**
+     * Obtain an OAuth2 access token via the client credentials grant.
+     *
+     * Tokens are cached for their lifetime minus a 60-second buffer.
+     * Falls back to a pre-stored token in api_key if no client credentials are configured.
+     */
+    private static function getOAuth2Token(array $partner): string
+    {
+        $partnerId = (int) $partner['id'];
+        $cacheKey = "federation_oauth2_token:{$partnerId}";
+
+        // Return cached token if available
+        $cached = Cache::get($cacheKey);
+        if ($cached) {
+            return $cached;
+        }
+
+        // If client credentials are configured, use the client credentials grant
+        if (!empty($partner['oauth_client_id']) && !empty($partner['oauth_client_secret']) && !empty($partner['oauth_token_url'])) {
+            $clientId = $partner['oauth_client_id'];
+            $clientSecret = self::decryptCredential($partner['oauth_client_secret']);
+            $tokenUrl = $partner['oauth_token_url'];
+
+            $response = Http::timeout(10)->asForm()->post($tokenUrl, [
+                'grant_type' => 'client_credentials',
+                'client_id' => $clientId,
+                'client_secret' => $clientSecret,
+            ]);
+
+            if (!$response->successful()) {
+                Log::error('FederationExternalApiClient: OAuth2 token request failed', [
+                    'partner_id' => $partnerId,
+                    'status' => $response->status(),
+                    'body' => substr($response->body(), 0, 500),
+                ]);
+                throw new \RuntimeException('OAuth2 token request failed: HTTP ' . $response->status());
+            }
+
+            $data = $response->json();
+            $accessToken = $data['access_token'] ?? null;
+            if (!$accessToken) {
+                throw new \RuntimeException('OAuth2 token response missing access_token');
+            }
+
+            // Cache for token lifetime minus 60s buffer (default 1 hour)
+            $expiresIn = max(60, ($data['expires_in'] ?? 3600) - 60);
+            Cache::put($cacheKey, $accessToken, $expiresIn);
+
+            return $accessToken;
+        }
+
+        // Fallback: use pre-stored token in api_key column
+        if (!empty($partner['api_key'])) {
+            return self::decryptCredential($partner['api_key']);
+        }
+
+        throw new \RuntimeException('OAuth2 credentials not configured for partner');
     }
 
     /**
@@ -336,15 +390,7 @@ class FederationExternalApiClient
      */
     private static function decryptCredential(string $encryptedValue): string
     {
-        try {
-            return Crypt::decryptString($encryptedValue);
-        } catch (\Exception $e) {
-            // If decryption fails, the value may be stored in plaintext (legacy).
-            Log::warning('FederationExternalApiClient: credential decryption failed, using raw value', [
-                'error' => $e->getMessage(),
-            ]);
-            return $encryptedValue;
-        }
+        return Crypt::decryptString($encryptedValue);
     }
 
     // ----------------------------------------------------------------
@@ -445,12 +491,17 @@ class FederationExternalApiClient
      *
      * Partners that are explicitly 'disabled' or 'deleted' are still excluded.
      */
-    private static function getPartner(int $partnerId): ?array
+    private static function getPartner(int $partnerId, ?int $tenantId = null): ?array
     {
-        $row = DB::table('federation_external_partners')
+        $query = DB::table('federation_external_partners')
             ->where('id', $partnerId)
-            ->whereIn('status', ['active', 'pending', 'failed'])
-            ->first();
+            ->whereIn('status', ['active', 'pending', 'failed']);
+
+        if ($tenantId !== null) {
+            $query->where('tenant_id', $tenantId);
+        }
+
+        $row = $query->first();
 
         if (!$row) {
             return null;

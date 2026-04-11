@@ -138,7 +138,7 @@ export function FederationConnectionsPage() {
   };
   return (
     <div className="space-y-6">
-      <PageMeta title="Federation Connections" noIndex />
+      <PageMeta title={t('connections.page_title')} noIndex />
       <Breadcrumbs
         items={[
           { label: t('connections.breadcrumb_federation', 'Federation'), href: '/federation' },

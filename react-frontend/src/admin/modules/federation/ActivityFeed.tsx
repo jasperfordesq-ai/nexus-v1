@@ -408,15 +408,15 @@ export function ActivityFeed() {
   const exportCsv = () => {
     if (items.length === 0) return;
     const headers = [
-      'ID',
-      'Timestamp',
-      'Type',
-      'Category',
-      'Level',
-      'Direction',
-      'Description',
-      'Actor',
-      'Partner Community',
+      t('federation.csv_id'),
+      t('federation.csv_timestamp'),
+      t('federation.csv_type'),
+      t('federation.csv_category'),
+      t('federation.csv_level'),
+      t('federation.csv_direction'),
+      t('federation.csv_description'),
+      t('federation.csv_actor'),
+      t('federation.csv_partner_community'),
     ];
     const csvEscape = (val: string | number | null | undefined): string => {
       const s = String(val ?? '');

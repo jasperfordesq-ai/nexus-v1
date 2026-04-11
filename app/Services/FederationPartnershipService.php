@@ -62,6 +62,10 @@ class FederationPartnershipService
             if ($existing['status'] === 'terminated') {
                 return ['success' => false, 'error' => 'Terminated partnerships cannot be re-requested'];
             }
+            // Allow re-requesting after a previous rejection
+            if ($existing['status'] === 'rejected') {
+                DB::table('federation_partnerships')->where('id', $existing['id'])->delete();
+            }
         }
 
         try {
@@ -185,6 +189,12 @@ class FederationPartnershipService
             return ['success' => false, 'error' => 'Not authorized to counter-propose on this partnership'];
         }
 
+        // Only the receiving party (partner_tenant_id) can counter-propose.
+        // The original requester (tenant_id) should reject/approve instead.
+        if ((int) $partnership['tenant_id'] === $tenantId) {
+            return ['success' => false, 'error' => 'The original requester cannot counter-propose their own request'];
+        }
+
         if ($partnership['status'] !== 'pending') {
             return ['success' => false, 'error' => 'Partnership is not pending'];
         }
@@ -295,7 +305,7 @@ class FederationPartnershipService
 
         try {
             DB::table('federation_partnerships')->where('id', $partnershipId)->update([
-                'status' => 'terminated',
+                'status' => 'rejected',
                 'terminated_at' => now(),
                 'terminated_by' => $rejectedBy,
                 'termination_reason' => $reason ?? 'Request rejected',

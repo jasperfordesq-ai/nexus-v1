@@ -1065,19 +1065,19 @@ class FederationV2Controller extends BaseApiController
                 WHERE (
                     (fm.sender_tenant_id = ? AND fm.sender_user_id = ?)
                     OR (fm.receiver_tenant_id = ? AND fm.receiver_user_id = ?)
-                    OR (fm.external_partner_id IS NOT NULL AND fm.direction = 'outbound' AND fm.sender_user_id = ?)
-                    OR (fm.external_partner_id IS NOT NULL AND fm.direction = 'inbound' AND fm.receiver_user_id = ?)
+                    OR (fm.external_partner_id IS NOT NULL AND fm.direction = 'outbound' AND fm.sender_user_id = ? AND fm.sender_tenant_id = ?)
+                    OR (fm.external_partner_id IS NOT NULL AND fm.direction = 'inbound' AND fm.receiver_user_id = ? AND fm.receiver_tenant_id = ?)
                 )
                 ORDER BY fm.created_at DESC LIMIT 200
-            ", [$tenantId, $userId, $tenantId, $userId, $userId, $userId]);
+            ", [$tenantId, $userId, $tenantId, $userId, $userId, $tenantId, $userId, $tenantId]);
             $rows = array_map(fn($r) => (array)$r, $rowResults);
 
             $formatted = array_map(function ($msg) {
                 $isExternal = !empty($msg['external_partner_id']);
                 $extPartnerId = $isExternal ? (int) $msg['external_partner_id'] : null;
                 $direction = $msg['direction'] === 'outbound' ? 'outbound' : 'inbound';
-                $externalName = $msg['external_receiver_name'] ?? 'External User';
-                $partnerName = $msg['external_partner_name'] ?? 'External Partner';
+                $externalName = !empty($msg['external_receiver_name']) ? $msg['external_receiver_name'] : __('api.external_user_fallback');
+                $partnerName = !empty($msg['external_partner_name']) ? $msg['external_partner_name'] : __('api.external_partner_fallback');
 
                 if ($isExternal && $direction === 'outbound') {
                     // Outbound to external: sender is local, receiver is external
@@ -1336,10 +1336,15 @@ class FederationV2Controller extends BaseApiController
 
             // 3. In-app notification + push notification
             try {
-                $notifMessage = "New federated message from {$senderName} ({$senderTenantName}): " . mb_substr($subject ?: '(no subject)', 0, 50);
+                $subjectPreview = mb_substr($subject ?: __('api.federation_no_subject'), 0, 50);
                 if (mb_strlen($subject) > 50) {
-                    $notifMessage .= '...';
+                    $subjectPreview .= '...';
                 }
+                $notifMessage = __('api.federation_new_message_notif', [
+                    'sender' => $senderName,
+                    'community' => $senderTenantName,
+                    'subject' => $subjectPreview,
+                ]);
 
                 Notification::createNotification(
                     (int)$receiverId,
@@ -1397,7 +1402,7 @@ class FederationV2Controller extends BaseApiController
         // Parse partner ID from "ext-3"
         $externalPartnerId = (int) substr($receiverTenantStr, 4);
         if ($externalPartnerId <= 0) {
-            return $this->respondWithError('INVALID_PARTNER', 'Invalid external partner ID', null, 400);
+            return $this->respondWithError('INVALID_PARTNER', __('api.invalid_external_partner_id'), null, 400);
         }
 
         // Parse real member ID from "ext-{partnerId}-{userId}" or plain "{userId}"
@@ -1408,16 +1413,16 @@ class FederationV2Controller extends BaseApiController
         }
         $realReceiverId = (int) $realReceiverId;
         if ($realReceiverId <= 0) {
-            return $this->respondWithError('INVALID_RECEIVER', 'Invalid external receiver ID', null, 400);
+            return $this->respondWithError('INVALID_RECEIVER', __('api.invalid_external_receiver_id'), null, 400);
         }
 
         // Load and validate external partner
         $partner = \App\Services\FederationExternalPartnerService::getById($externalPartnerId, $tenantId);
         if (!$partner || $partner['status'] !== 'active') {
-            return $this->respondWithError('PARTNER_NOT_FOUND', 'External partner not found or inactive', null, 404);
+            return $this->respondWithError('PARTNER_NOT_FOUND', __('api.external_partner_not_found'), null, 404);
         }
         if (!($partner['allow_messaging'] ?? false)) {
-            return $this->respondWithError('MESSAGING_NOT_ALLOWED', 'This partner does not allow messaging', null, 403);
+            return $this->respondWithError('MESSAGING_NOT_ALLOWED', __('api.external_partner_messaging_disabled'), null, 403);
         }
 
         // Get sender info for the outbound call and local record
@@ -1439,7 +1444,7 @@ class FederationV2Controller extends BaseApiController
             ]);
         } catch (\Throwable $e) {
             error_log("FederationV2::sendExternalMessage API error: " . $e->getMessage());
-            return $this->respondWithError('EXTERNAL_API_FAILED', 'Failed to reach partner: ' . $e->getMessage(), null, 502);
+            return $this->respondWithError('EXTERNAL_API_FAILED', __('api.external_partner_api_failed'), null, 502);
         }
 
         if (!($result['success'] ?? false)) {
@@ -1448,8 +1453,9 @@ class FederationV2Controller extends BaseApiController
         }
 
         $externalMessageId = $result['data']['message_id'] ?? null;
+        $rawReceiverName = $result['data']['receiver_name'] ?? '';
         $receiverName = htmlspecialchars(
-            $result['data']['receiver_name'] ?? ('User #' . $realReceiverId),
+            !empty($rawReceiverName) ? $rawReceiverName : __('api.external_user_fallback') . ' #' . $realReceiverId,
             ENT_QUOTES, 'UTF-8'
         );
 
@@ -1814,7 +1820,7 @@ class FederationV2Controller extends BaseApiController
             'delivered' => 'delivered',
             'unread' => 'unread',
             'read' => 'read',
-            'failed' => 'delivered',
+            'failed' => 'failed',
         ];
         return $map[$dbStatus] ?? 'delivered';
     }
@@ -1932,7 +1938,7 @@ class FederationV2Controller extends BaseApiController
     ): JsonResponse {
         $externalPartnerId = (int) substr($receiverTenantStr, 4);
         if ($externalPartnerId <= 0) {
-            return $this->respondWithError('INVALID_PARTNER', 'Invalid external partner ID', null, 400);
+            return $this->respondWithError('INVALID_PARTNER', __('api.invalid_external_partner_id'), null, 400);
         }
 
         $realReceiverId = $receiverIdStr;
@@ -1942,12 +1948,12 @@ class FederationV2Controller extends BaseApiController
         }
         $realReceiverId = (int) $realReceiverId;
         if ($realReceiverId <= 0) {
-            return $this->respondWithError('INVALID_RECEIVER', 'Invalid external receiver ID', null, 400);
+            return $this->respondWithError('INVALID_RECEIVER', __('api.invalid_external_receiver_id'), null, 400);
         }
 
         $partner = \App\Services\FederationExternalPartnerService::getById($externalPartnerId, $tenantId);
         if (!$partner || $partner['status'] !== 'active') {
-            return $this->respondWithError('PARTNER_NOT_FOUND', 'External partner not found or inactive', null, 404);
+            return $this->respondWithError('PARTNER_NOT_FOUND', __('api.external_partner_not_found'), null, 404);
         }
         if (!($partner['allow_transactions'] ?? false)) {
             return $this->respondWithError('TRANSACTIONS_NOT_ALLOWED', 'This partner does not allow transactions', null, 403);

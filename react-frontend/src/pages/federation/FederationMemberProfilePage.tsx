@@ -272,7 +272,7 @@ export function FederationMemberProfilePage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title="Member Profile" noIndex />
+      <PageMeta title={t('member_profile.page_title')} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[

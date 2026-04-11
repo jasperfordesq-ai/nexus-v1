@@ -194,7 +194,7 @@ class AdminFederationExternalPartnersController extends BaseApiController
         }
 
         try {
-            $logs = FederationExternalPartnerService::getLogs($id, 100);
+            $logs = FederationExternalPartnerService::getLogs($id, $tenantId, 100);
             return $this->respondWithData($logs);
         } catch (\Exception $e) {
             return $this->respondWithError('FETCH_FAILED', __('api.partner_logs_fetch_failed'), null, 500);

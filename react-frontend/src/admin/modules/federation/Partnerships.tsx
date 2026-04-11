@@ -93,18 +93,18 @@ interface PartnershipStats {
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-const LEVEL_LABELS: Record<number, string> = {
-  1: 'Discovery',
-  2: 'Social',
-  3: 'Economic',
-  4: 'Integrated',
+const LEVEL_LABEL_KEYS: Record<number, string> = {
+  1: 'federation.level_discovery',
+  2: 'federation.level_social',
+  3: 'federation.level_economic',
+  4: 'federation.level_integrated',
 };
 
-const LEVEL_DESCRIPTIONS: Record<number, string> = {
-  1: 'Basic visibility — view profiles only',
-  2: 'Social features — messaging, listings, events',
-  3: 'Full trading — time credit exchange',
-  4: 'Full integration — all features including groups',
+const LEVEL_DESCRIPTION_KEYS: Record<number, string> = {
+  1: 'federation.level_desc_discovery',
+  2: 'federation.level_desc_social',
+  3: 'federation.level_desc_economic',
+  4: 'federation.level_desc_integrated',
 };
 
 const PERMISSION_KEYS = ['profiles', 'messaging', 'transactions', 'listings', 'events', 'groups'] as const;
@@ -383,7 +383,7 @@ export function Partnerships() {
       key: 'federation_level', label: t('federation.col_level'),
       render: (item) => (
         <Chip size="sm" variant="flat" color="primary">
-          {LEVEL_LABELS[item.federation_level || 1] || 'Discovery'}
+          {t(LEVEL_LABEL_KEYS[item.federation_level || 1] || 'federation.level_discovery')}
         </Chip>
       ),
     },
@@ -556,10 +556,10 @@ export function Partnerships() {
                   }}
                 >
                   {[1, 2, 3, 4].map((level) => (
-                    <SelectItem key={String(level)} textValue={LEVEL_LABELS[level]}>
+                    <SelectItem key={String(level)} textValue={t(LEVEL_LABEL_KEYS[level] || 'federation.level_discovery')}>
                       <div>
-                        <p className="font-medium">{LEVEL_LABELS[level]}</p>
-                        <p className="text-xs text-default-400">{LEVEL_DESCRIPTIONS[level]}</p>
+                        <p className="font-medium">{t(LEVEL_LABEL_KEYS[level] || 'federation.level_discovery')}</p>
+                        <p className="text-xs text-default-400">{t(LEVEL_DESCRIPTION_KEYS[level] || 'federation.level_desc_discovery')}</p>
                       </div>
                     </SelectItem>
                   ))}
@@ -573,7 +573,7 @@ export function Partnerships() {
                       <div key={key} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Icon size={16} className="text-default-400" />
-                          <span className="text-sm capitalize">{key}</span>
+                          <span className="text-sm">{t(`federation.permission_${key}`)}</span>
                         </div>
                         <Switch
                           size="sm"
@@ -675,7 +675,7 @@ export function Partnerships() {
                             <div>
                               <p className="text-default-400">{t('federation.col_level')}</p>
                               <Chip size="sm" variant="flat" color="primary">
-                                {LEVEL_LABELS[detailPartnership.federation_level || 1] || 'Discovery'}
+                                {t(LEVEL_LABEL_KEYS[detailPartnership.federation_level || 1] || 'federation.level_discovery')}
                               </Chip>
                             </div>
                             <div>
@@ -730,7 +730,7 @@ export function Partnerships() {
                                 <div className="flex items-center gap-3">
                                   <Icon size={18} className={isEnabled ? 'text-success' : 'text-default-300'} />
                                   <div>
-                                    <p className="text-sm font-medium capitalize">{key}</p>
+                                    <p className="text-sm font-medium">{t(`federation.permission_${key}`)}</p>
                                     <p className="text-xs text-default-400">
                                       {isEnabled ? t('federation.enabled') : t('federation.disabled')}
                                     </p>
@@ -800,7 +800,7 @@ export function Partnerships() {
                                       : entry.level === 'critical' ? 'danger'
                                         : 'default'
                                   }>
-                                    {entry.level}
+                                    {t(`federation.audit_level_${entry.level}`)}
                                   </Chip>
                                 </div>
                               ))}

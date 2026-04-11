@@ -233,7 +233,7 @@ export function FederationOnboardingPage() {
 
   return (
     <div className="max-w-2xl mx-auto py-6 space-y-6">
-      <PageMeta title="Federation Onboarding" noIndex />
+      <PageMeta title={t('onboarding.page_title')} noIndex />
       {/* Title */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}

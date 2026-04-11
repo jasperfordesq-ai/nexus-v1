@@ -259,6 +259,17 @@ class FederationExternalPartnerService
             }
         }
 
+        // Validate status if provided
+        if (array_key_exists('status', $data) && !in_array($data['status'], self::VALID_STATUSES, true)) {
+            return ['success' => false, 'error' => 'Invalid status value. Must be one of: ' . implode(', ', self::VALID_STATUSES)];
+        }
+
+        // Validate auth_method if provided
+        $validAuthMethods = ['api_key', 'hmac', 'oauth2'];
+        if (array_key_exists('auth_method', $data) && !in_array($data['auth_method'], $validAuthMethods, true)) {
+            return ['success' => false, 'error' => 'Invalid auth_method. Must be one of: ' . implode(', ', $validAuthMethods)];
+        }
+
         try {
             $sets = [];
             $params = [];
@@ -491,9 +502,18 @@ class FederationExternalPartnerService
      * @param int $partnerId Partner ID
      * @param int $limit     Max number of logs to return
      */
-    public static function getLogs(int $partnerId, int $limit = 50): array
+    public static function getLogs(int $partnerId, int $tenantId, int $limit = 50): array
     {
         try {
+            // Verify partner belongs to tenant before returning logs
+            $owner = DB::selectOne(
+                "SELECT id FROM federation_external_partners WHERE id = ? AND tenant_id = ?",
+                [$partnerId, $tenantId]
+            );
+            if (!$owner) {
+                return [];
+            }
+
             $rows = DB::select(
                 "SELECT * FROM federation_external_partner_logs
                  WHERE partner_id = ?
@@ -555,6 +575,8 @@ class FederationExternalPartnerService
             'base_url' => $row->base_url,
             'api_path' => $row->api_path,
             'auth_method' => $row->auth_method,
+            'oauth_client_id' => $row->oauth_client_id ?? null,
+            'oauth_token_url' => $row->oauth_token_url ?? null,
             'status' => $row->status,
             'verified_at' => $row->verified_at,
             'last_sync_at' => $row->last_sync_at,
@@ -607,10 +629,15 @@ class FederationExternalPartnerService
         // Resolve hostname to IP and check against blocked ranges
         $ips = gethostbynamel($host);
         if ($ips === false) {
-            // DNS resolution failed — allow it through (might resolve from the server)
-            // but still check if the host itself looks like an IP
-            $ips = [filter_var($host, FILTER_VALIDATE_IP) ? $host : null];
-            $ips = array_filter($ips);
+            // If the host is a literal IP address, check it directly
+            if (filter_var($host, FILTER_VALIDATE_IP)) {
+                $ips = [$host];
+            } else {
+                // DNS resolution failed for a non-IP hostname — reject to prevent
+                // DNS rebinding attacks where the hostname resolves to an internal
+                // IP at request time but not at validation time
+                return 'URL hostname could not be resolved (DNS lookup failed)';
+            }
         }
 
         foreach ($ips as $ip) {

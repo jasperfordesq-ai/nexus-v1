@@ -52,44 +52,6 @@ class FederatedMessageServiceTest extends TestCase
     }
 
     // =========================================================================
-    // getInbox()
-    // =========================================================================
-
-    public function test_getInbox_returns_array(): void
-    {
-        DB::shouldReceive('select')->andReturn([]);
-
-        $result = FederatedMessageService::getInbox(1);
-        $this->assertIsArray($result);
-    }
-
-    public function test_getInbox_returns_empty_on_exception(): void
-    {
-        DB::shouldReceive('select')->andThrow(new \Exception('error'));
-
-        $result = FederatedMessageService::getInbox(1);
-        $this->assertEquals([], $result);
-    }
-
-    // =========================================================================
-    // markAsRead()
-    // =========================================================================
-
-    public function test_markAsRead_returns_true_when_updated(): void
-    {
-        DB::shouldReceive('table->where->where->where->update')->andReturn(1);
-
-        $this->assertTrue(FederatedMessageService::markAsRead(1, 5));
-    }
-
-    public function test_markAsRead_returns_false_when_nothing_updated(): void
-    {
-        DB::shouldReceive('table->where->where->where->update')->andReturn(0);
-
-        $this->assertFalse(FederatedMessageService::markAsRead(1, 5));
-    }
-
-    // =========================================================================
     // getUnreadCount()
     // =========================================================================
 
@@ -105,17 +67,6 @@ class FederatedMessageServiceTest extends TestCase
         DB::shouldReceive('table->where->where->count')->andThrow(new \Exception('error'));
 
         $this->assertEquals(0, FederatedMessageService::getUnreadCount(1));
-    }
-
-    // =========================================================================
-    // markThreadAsRead()
-    // =========================================================================
-
-    public function test_markThreadAsRead_returns_count(): void
-    {
-        DB::shouldReceive('table->where->where->where->where->update')->andReturn(3);
-
-        $this->assertEquals(3, FederatedMessageService::markThreadAsRead(1, 2, 3));
     }
 
     // =========================================================================
