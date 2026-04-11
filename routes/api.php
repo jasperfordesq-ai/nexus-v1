@@ -1507,6 +1507,9 @@ Route::delete('/v2/admin/federation/webhooks/{id}', [\App\Http\Controllers\Api\A
 Route::post('/v2/admin/federation/webhooks/{id}/test', [\App\Http\Controllers\Api\AdminFederationWebhooksController::class, 'test']);
 Route::get('/v2/admin/federation/webhooks/{id}/logs', [\App\Http\Controllers\Api\AdminFederationWebhooksController::class, 'logs']);
 Route::post('/v2/admin/federation/webhook-logs/{id}/retry', [\App\Http\Controllers\Api\AdminFederationWebhooksController::class, 'retry']);
+// Credit Commons node configuration
+Route::get('/v2/admin/federation/cc-config', [\App\Http\Controllers\Api\AdminCcConfigController::class, 'show']);
+Route::put('/v2/admin/federation/cc-config', [\App\Http\Controllers\Api\AdminCcConfigController::class, 'update']);
 // NOTE: Federation user routes moved to auth-only group (not admin-only)
 Route::get('/v2/admin/pages', [\App\Http\Controllers\Api\AdminContentController::class, 'getPages']);
 Route::post('/v2/admin/pages', [\App\Http\Controllers\Api\AdminContentController::class, 'createPage']);
@@ -2110,12 +2113,17 @@ Route::post('/v2/federation/external/webhooks/receive', [\App\Http\Controllers\A
 // ============================================
 Route::middleware(['federation.api', 'throttle:200,1'])->group(function () {
     // --- Komunitin (JSON:API accounting protocol) ---
+    // Spec: https://github.com/community-exchange-network/komunitin
     Route::get('/v2/federation/komunitin/currencies', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'currencies']);
+    Route::get('/v2/federation/komunitin/{code}/currency', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'currency']);
+    Route::get('/v2/federation/komunitin/{code}/currency/settings', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'currencySettings']);
     Route::get('/v2/federation/komunitin/{code}/accounts', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'accounts']);
     Route::get('/v2/federation/komunitin/{code}/accounts/{id}', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'account']);
     Route::get('/v2/federation/komunitin/{code}/transfers', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'transfers']);
     Route::get('/v2/federation/komunitin/{code}/transfers/{id}', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'transfer']);
     Route::post('/v2/federation/komunitin/{code}/transfers', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'createTransfer']);
+    Route::patch('/v2/federation/komunitin/{code}/transfers/{id}', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'updateTransfer']);
+    Route::delete('/v2/federation/komunitin/{code}/transfers/{id}', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'deleteTransfer']);
 
     // --- Credit Commons protocol ---
     Route::get('/v2/federation/cc/about', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'about']);

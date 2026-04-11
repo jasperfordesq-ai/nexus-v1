@@ -8,89 +8,133 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
-use App\Core\FederationApiMiddleware;
 use App\Core\TenantContext;
 use App\Services\Protocols\KomunitinAdapter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
- * FederationKomunitinController — JSON:API-compatible endpoints for Komunitin
- * and other platforms that speak the JSON:API accounting protocol.
+ * FederationKomunitinController — JSON:API-compatible endpoints matching the
+ * Komunitin accounting API specification (OpenAPI 3.0).
  *
- * These endpoints serve our data in JSON:API format so that Komunitin instances
- * can query NEXUS as a compatible federation partner.
+ * Spec: https://raw.githubusercontent.com/komunitin/komunitin/refs/heads/master/accounting/openapi/openapi_v3.json
+ * Repo: https://github.com/community-exchange-network/komunitin
  *
- * Authentication: via FederationApiMiddleware (API key, HMAC, or JWT).
+ * These endpoints serve NEXUS data in JSON:API format (application/vnd.api+json)
+ * so that Komunitin instances can query NEXUS as a compatible federation partner.
+ *
+ * Key spec details matched:
+ *   - JSON:API resource format with type/id/attributes/relationships/links
+ *   - Cursor-based pagination via page[size] and page[after]
+ *   - Error format: {errors: [{status, code, title, detail}]}
+ *   - Transfer states: committed, pending, rejected
+ *   - Amount in minor currency units (scale-based)
+ *   - Currency rate as {n, d} (numerator/denominator)
+ *   - links.self on every resource
+ *   - PATCH for state changes, DELETE for removal
+ *
+ * Authentication: via FederationApiMiddleware (API key, HMAC, JWT, or OAuth2).
  *
  * Endpoints:
- *   GET  /api/v2/federation/komunitin/currencies         — List currencies (we have 1: hours)
- *   GET  /api/v2/federation/komunitin/{code}/accounts     — List accounts (users with balances)
- *   GET  /api/v2/federation/komunitin/{code}/accounts/{id} — Single account
- *   GET  /api/v2/federation/komunitin/{code}/transfers    — List transfers (transactions)
- *   POST /api/v2/federation/komunitin/{code}/transfers    — Create transfer
- *   GET  /api/v2/federation/komunitin/{code}/transfers/{id} — Single transfer
+ *   GET    /currencies                  — List currencies
+ *   GET    /{code}/currency             — Single currency
+ *   GET    /{code}/currency/settings    — Currency settings
+ *   GET    /{code}/accounts             — List accounts
+ *   GET    /{code}/accounts/{id}        — Single account
+ *   GET    /{code}/transfers            — List transfers
+ *   GET    /{code}/transfers/{id}       — Single transfer
+ *   POST   /{code}/transfers            — Create transfer
+ *   PATCH  /{code}/transfers/{id}       — Update transfer state
+ *   DELETE /{code}/transfers/{id}       — Delete transfer
  */
 class FederationKomunitinController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Currencies
+    // ─────────────────────────────────────────────────────────────────────────
+
     /**
      * GET /currencies — List available currencies.
-     *
-     * NEXUS timebanks use a single currency: hours.
      */
     public function currencies(Request $request): JsonResponse
     {
         $tenantId = TenantContext::getId();
-        $tenant = DB::table('tenants')->where('id', $tenantId)->first();
 
         return $this->jsonApiResponse([
-            [
-                'type' => 'currencies',
-                'id' => "hours-{$tenantId}",
-                'attributes' => [
-                    'name' => 'Hours',
-                    'name_plural' => 'Hours',
-                    'code' => 'HOURS',
-                    'symbol' => 'h',
-                    'decimals' => 2,
-                    'scale' => KomunitinAdapter::MINOR_UNITS_PER_HOUR,
-                    'value' => 0,
-                    'stats' => [
-                        'accounts' => DB::table('users')
-                            ->where('tenant_id', $tenantId)
-                            ->where('status', 'active')
-                            ->count(),
-                        'transfers' => DB::table('transactions')
-                            ->where('tenant_id', $tenantId)
-                            ->count(),
-                    ],
-                ],
-            ],
+            $this->buildCurrencyResource($tenantId),
         ]);
     }
 
     /**
-     * GET /{code}/accounts — List accounts (federated-opted-in users).
+     * GET /{code}/currency — Single currency detail.
+     */
+    public function currency(Request $request, string $code): JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+        return $this->jsonApiResponse($this->buildCurrencyResource($tenantId), null, true);
+    }
+
+    /**
+     * GET /{code}/currency/settings — Currency settings.
+     */
+    public function currencySettings(Request $request, string $code): JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+
+        return $this->jsonApiResponse([
+            'type' => 'currency-settings',
+            'id' => "hours-{$tenantId}-settings",
+            'attributes' => [
+                'defaultAllowPayments' => true,
+                'enableExternalPayments' => true,
+                'defaultAllowTagPayments' => false,
+                'defaultInitialCreditLimit' => KomunitinAdapter::hoursToMinorUnits(0),
+                'externalTraderCreditLimit' => KomunitinAdapter::hoursToMinorUnits(0),
+                'defaultAcceptPaymentsAfter' => 0,
+                'defaultAllowPaymentRequests' => true,
+                'defaultOnPaymentCreditLimit' => KomunitinAdapter::hoursToMinorUnits(0),
+                'defaultAllowExternalPayments' => true,
+                'enableExternalPaymentRequests' => true,
+                'defaultAcceptPaymentsWhitelist' => [],
+                'defaultAllowTagPaymentRequests' => false,
+                'defaultAcceptPaymentsAutomatically' => true,
+                'defaultAllowExternalPaymentRequests' => true,
+                'defaultAcceptExternalPaymentsAutomatically' => true,
+            ],
+        ], null, true);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Accounts
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * GET /{code}/accounts — List accounts with cursor pagination.
+     *
+     * Pagination: page[size] (default 25), page[after] (cursor = last ID seen)
+     * Filter: filter[code] for autocomplete search
      */
     public function accounts(Request $request, string $code): JsonResponse
     {
         $tenantId = TenantContext::getId();
-        $limit = min((int) $request->query('page_size', '25'), 100);
-        $offset = max((int) $request->query('page_offset', '0'), 0);
-        $search = $request->query('filter_code');
+        $pageSize = min((int) ($request->query('page')['size'] ?? $request->query('page_size', '25')), 100);
+        $afterCursor = $request->query('page')['after'] ?? $request->query('page_after');
+        $filterCode = $request->query('filter')['code'] ?? $request->query('filter_code');
+        $filterTag = $request->query('filter')['tag'] ?? $request->query('filter_tag');
+        $baseUrl = $request->getSchemeAndHttpHost();
 
         $query = DB::table('users')
             ->where('tenant_id', $tenantId)
             ->where('status', 'active');
 
-        // Only include users who opted into federation (if the setting exists)
+        // Federation opt-in filter
         if (DB::table('federation_user_settings')
-            ->where('tenant_id', $tenantId)
-            ->exists()) {
+            ->where('tenant_id', $tenantId)->exists()) {
             $query->whereIn('id', function ($sub) use ($tenantId) {
                 $sub->select('user_id')
                     ->from('federation_user_settings')
@@ -99,107 +143,107 @@ class FederationKomunitinController extends BaseApiController
             });
         }
 
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%")
-                    ->orWhere('username', 'LIKE', "%{$search}%");
+        if ($filterCode) {
+            $query->where(function ($q) use ($filterCode) {
+                $q->where('username', 'LIKE', "%{$filterCode}%")
+                    ->orWhere('name', 'LIKE', "%{$filterCode}%");
             });
         }
 
-        $total = $query->count();
-        $users = $query->orderBy('name')
+        // Cursor pagination: page[after] = offset index
+        $offset = $afterCursor ? (int) $afterCursor : 0;
+
+        $users = $query->orderBy('id')
             ->offset($offset)
-            ->limit($limit)
-            ->get(['id', 'name', 'username', 'balance', 'created_at']);
+            ->limit($pageSize + 1) // Fetch one extra to check for next page
+            ->get(['id', 'name', 'username', 'balance', 'created_at', 'updated_at']);
 
-        $resources = $users->map(function ($user) use ($tenantId) {
-            return [
-                'type' => 'accounts',
-                'id' => (string) $user->id,
-                'attributes' => [
-                    'code' => $user->username ?? "user-{$user->id}",
-                    'balance' => KomunitinAdapter::hoursToMinorUnits((float) $user->balance),
-                    'creditLimit' => KomunitinAdapter::hoursToMinorUnits(-100.0),
-                    'debitLimit' => KomunitinAdapter::hoursToMinorUnits(100.0),
-                    'created' => $user->created_at,
-                ],
-                'relationships' => [
-                    'currency' => [
-                        'data' => ['type' => 'currencies', 'id' => "hours-{$tenantId}"],
-                    ],
-                ],
-            ];
-        })->all();
+        $hasNext = $users->count() > $pageSize;
+        if ($hasNext) {
+            $users = $users->slice(0, $pageSize);
+        }
 
-        return $this->jsonApiResponse($resources, [
-            'total' => $total,
-            'offset' => $offset,
-            'limit' => $limit,
-        ]);
+        $resources = $users->map(function ($user) use ($tenantId, $code, $baseUrl) {
+            return $this->buildAccountResource($user, $tenantId, $code, $baseUrl);
+        })->values()->all();
+
+        $nextOffset = $offset + $pageSize;
+        $links = [
+            'first' => $this->buildPaginationUrl($request, 0, $pageSize),
+            'last' => null,
+            'prev' => $offset > 0
+                ? $this->buildPaginationUrl($request, max(0, $offset - $pageSize), $pageSize)
+                : null,
+            'next' => $hasNext
+                ? $this->buildPaginationUrl($request, $nextOffset, $pageSize)
+                : null,
+        ];
+
+        return $this->jsonApiResponse($resources, null, false, 200, $links);
     }
 
     /**
      * GET /{code}/accounts/{id} — Single account.
      */
-    public function account(Request $request, string $code, int $id): JsonResponse
+    public function account(Request $request, string $code, string $id): JsonResponse
     {
         $tenantId = TenantContext::getId();
+        $baseUrl = $request->getSchemeAndHttpHost();
 
         $user = DB::table('users')
-            ->where('id', $id)
+            ->where('id', (int) $id)
             ->where('tenant_id', $tenantId)
             ->where('status', 'active')
-            ->first(['id', 'name', 'username', 'balance', 'created_at']);
+            ->first(['id', 'name', 'username', 'balance', 'created_at', 'updated_at']);
 
         if (!$user) {
-            return $this->jsonApiError('Account not found', 404);
+            return $this->jsonApiError('NotFound', 'Not Found',
+                "Account id {$id} not found in currency {$code}", 404);
         }
 
-        return $this->jsonApiResponse([
-            'type' => 'accounts',
-            'id' => (string) $user->id,
-            'attributes' => [
-                'code' => $user->username ?? "user-{$user->id}",
-                'balance' => KomunitinAdapter::hoursToMinorUnits((float) $user->balance),
-                'creditLimit' => KomunitinAdapter::hoursToMinorUnits(-100.0),
-                'debitLimit' => KomunitinAdapter::hoursToMinorUnits(100.0),
-                'created' => $user->created_at,
-            ],
-            'relationships' => [
-                'currency' => [
-                    'data' => ['type' => 'currencies', 'id' => "hours-{$tenantId}"],
-                ],
-            ],
-        ], null, true);
+        return $this->jsonApiResponse(
+            $this->buildAccountResource($user, $tenantId, $code, $baseUrl),
+            null, true
+        );
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Transfers
+    // ─────────────────────────────────────────────────────────────────────────
+
     /**
-     * GET /{code}/transfers — List transfers (transactions).
+     * GET /{code}/transfers — List transfers with cursor pagination.
+     *
+     * Pagination: page[size], page[after]
+     * Sort: sort=-created (default descending by created)
+     * Filter: filter[account], filter[state], filter[after], filter[before]
      */
     public function transfers(Request $request, string $code): JsonResponse
     {
         $tenantId = TenantContext::getId();
-        $limit = min((int) $request->query('page_size', '25'), 100);
-        $offset = max((int) $request->query('page_offset', '0'), 0);
-
-        // Filter options (JSON:API style)
-        $account = $request->query('filter_account');
-        $state = $request->query('filter_state');
-        $since = $request->query('filter_after');
-        $until = $request->query('filter_before');
+        $pageSize = min((int) ($request->query('page')['size'] ?? $request->query('page_size', '25')), 100);
+        $afterCursor = $request->query('page')['after'] ?? $request->query('page_after');
+        $sort = $request->query('sort', '-created');
+        $baseUrl = $request->getSchemeAndHttpHost();
 
         $query = DB::table('transactions')
             ->where('tenant_id', $tenantId);
 
-        if ($account) {
-            $query->where(function ($q) use ($account) {
-                $q->where('sender_id', $account)
-                    ->orWhere('receiver_id', $account);
+        // Filters
+        $filterAccount = $request->query('filter')['account'] ?? $request->query('filter_account');
+        $filterState = $request->query('filter')['state'] ?? $request->query('filter_state');
+        $filterAfter = $request->query('filter')['after'] ?? $request->query('filter_after');
+        $filterBefore = $request->query('filter')['before'] ?? $request->query('filter_before');
+
+        if ($filterAccount) {
+            $query->where(function ($q) use ($filterAccount) {
+                $q->where('sender_id', $filterAccount)
+                    ->orWhere('receiver_id', $filterAccount);
             });
         }
 
-        if ($state) {
-            $nexusStatus = match ($state) {
+        if ($filterState) {
+            $nexusStatus = match ($filterState) {
                 'committed', 'accepted' => 'completed',
                 'pending' => 'pending',
                 'rejected', 'deleted' => 'cancelled',
@@ -210,119 +254,89 @@ class FederationKomunitinController extends BaseApiController
             }
         }
 
-        if ($since) {
-            $query->where('created_at', '>=', $since);
+        if ($filterAfter) {
+            $query->where('created_at', '>=', $filterAfter);
         }
-        if ($until) {
-            $query->where('created_at', '<=', $until);
+        if ($filterBefore) {
+            $query->where('created_at', '<=', $filterBefore);
         }
 
-        $total = $query->count();
-        $transactions = $query->orderByDesc('created_at')
+        // Sort
+        $sortDesc = str_starts_with($sort, '-');
+        $sortField = ltrim($sort, '-+');
+        $sortCol = match ($sortField) {
+            'created' => 'created_at',
+            'updated' => 'updated_at',
+            'amount' => 'amount',
+            default => 'created_at',
+        };
+
+        // Cursor pagination
+        $offset = $afterCursor ? (int) $afterCursor : 0;
+
+        $transactions = $query->orderBy($sortCol, $sortDesc ? 'desc' : 'asc')
             ->offset($offset)
-            ->limit($limit)
+            ->limit($pageSize + 1)
             ->get();
 
-        $resources = $transactions->map(function ($tx) use ($tenantId) {
-            return [
-                'type' => 'transfers',
-                'id' => (string) $tx->id,
-                'attributes' => [
-                    'amount' => KomunitinAdapter::hoursToMinorUnits((float) $tx->amount),
-                    'meta' => $tx->description ?? '',
-                    'state' => match ($tx->status ?? 'pending') {
-                        'completed' => 'committed',
-                        'pending' => 'pending',
-                        'cancelled' => 'rejected',
-                        default => 'pending',
-                    },
-                    'created' => $tx->created_at,
-                    'updated' => $tx->updated_at ?? $tx->created_at,
-                ],
-                'relationships' => [
-                    'payer' => [
-                        'data' => ['type' => 'accounts', 'id' => (string) $tx->sender_id],
-                    ],
-                    'payee' => [
-                        'data' => ['type' => 'accounts', 'id' => (string) $tx->receiver_id],
-                    ],
-                    'currency' => [
-                        'data' => ['type' => 'currencies', 'id' => "hours-{$tenantId}"],
-                    ],
-                ],
-            ];
-        })->all();
+        $hasNext = $transactions->count() > $pageSize;
+        if ($hasNext) {
+            $transactions = $transactions->slice(0, $pageSize);
+        }
 
-        return $this->jsonApiResponse($resources, [
-            'total' => $total,
-            'offset' => $offset,
-            'limit' => $limit,
-        ]);
+        $resources = $transactions->map(function ($tx) use ($tenantId, $code, $baseUrl) {
+            return $this->buildTransferResource($tx, $tenantId, $code, $baseUrl);
+        })->values()->all();
+
+        $nextOffset = $offset + $pageSize;
+        $links = [
+            'first' => $this->buildPaginationUrl($request, 0, $pageSize),
+            'last' => null,
+            'prev' => $offset > 0
+                ? $this->buildPaginationUrl($request, max(0, $offset - $pageSize), $pageSize)
+                : null,
+            'next' => $hasNext
+                ? $this->buildPaginationUrl($request, $nextOffset, $pageSize)
+                : null,
+        ];
+
+        return $this->jsonApiResponse($resources, null, false, 200, $links);
     }
 
     /**
      * GET /{code}/transfers/{id} — Single transfer.
      */
-    public function transfer(Request $request, string $code, int $id): JsonResponse
+    public function transfer(Request $request, string $code, string $id): JsonResponse
     {
         $tenantId = TenantContext::getId();
+        $baseUrl = $request->getSchemeAndHttpHost();
 
         $tx = DB::table('transactions')
-            ->where('id', $id)
+            ->where('id', (int) $id)
             ->where('tenant_id', $tenantId)
             ->first();
 
         if (!$tx) {
-            return $this->jsonApiError('Transfer not found', 404);
+            return $this->jsonApiError('NotFound', 'Not Found',
+                "Transfer id {$id} not found in currency {$code}", 404);
         }
 
-        return $this->jsonApiResponse([
-            'type' => 'transfers',
-            'id' => (string) $tx->id,
-            'attributes' => [
-                'amount' => KomunitinAdapter::hoursToMinorUnits((float) $tx->amount),
-                'meta' => $tx->description ?? '',
-                'state' => match ($tx->status ?? 'pending') {
-                    'completed' => 'committed',
-                    'pending' => 'pending',
-                    'cancelled' => 'rejected',
-                    default => 'pending',
-                },
-                'created' => $tx->created_at,
-                'updated' => $tx->updated_at ?? $tx->created_at,
-            ],
-            'relationships' => [
-                'payer' => [
-                    'data' => ['type' => 'accounts', 'id' => (string) $tx->sender_id],
-                ],
-                'payee' => [
-                    'data' => ['type' => 'accounts', 'id' => (string) $tx->receiver_id],
-                ],
-                'currency' => [
-                    'data' => ['type' => 'currencies', 'id' => "hours-{$tenantId}"],
-                ],
-            ],
-        ], null, true);
+        return $this->jsonApiResponse(
+            $this->buildTransferResource($tx, $tenantId, $code, $baseUrl),
+            null, true
+        );
     }
 
     /**
      * POST /{code}/transfers — Create a new transfer.
      *
-     * Expects JSON:API format:
-     * {
-     *   "data": {
-     *     "type": "transfers",
-     *     "attributes": { "amount": 200, "meta": "description" },
-     *     "relationships": {
-     *       "payer": { "data": { "type": "accounts", "id": "123" } },
-     *       "payee": { "data": { "type": "accounts", "id": "456" } }
-     *     }
-     *   }
-     * }
+     * Expects Komunitin JSON:API format with payer/payee relationships
+     * and amount in minor currency units.
      */
     public function createTransfer(Request $request, string $code): JsonResponse
     {
         $tenantId = TenantContext::getId();
+        $baseUrl = $request->getSchemeAndHttpHost();
         $payload = $request->json()->all();
 
         $data = $payload['data'] ?? [];
@@ -331,14 +345,16 @@ class FederationKomunitinController extends BaseApiController
 
         $amount = KomunitinAdapter::minorUnitsToHours((int) ($attrs['amount'] ?? 0));
         $description = $attrs['meta'] ?? $attrs['description'] ?? '';
+        $state = $attrs['state'] ?? 'committed';
         $payerId = $rels['payer']['data']['id'] ?? null;
         $payeeId = $rels['payee']['data']['id'] ?? null;
 
         if (!$payerId || !$payeeId || $amount <= 0) {
-            return $this->jsonApiError('Missing required fields: payer, payee, and amount > 0', 400);
+            return $this->jsonApiError('BadRequest', 'Bad Request',
+                'Missing required fields: payer, payee, and amount > 0', 400);
         }
 
-        // Validate both accounts exist in this tenant
+        // Validate accounts
         $payer = DB::table('users')
             ->where('id', (int) $payerId)
             ->where('tenant_id', $tenantId)
@@ -352,15 +368,17 @@ class FederationKomunitinController extends BaseApiController
             ->first();
 
         if (!$payer) {
-            return $this->jsonApiError("Payer account {$payerId} not found", 404);
+            return $this->jsonApiError('NotFound', 'Not Found',
+                "Account id {$payerId} not found in currency {$code}", 404);
         }
         if (!$payee) {
-            return $this->jsonApiError("Payee account {$payeeId} not found", 404);
+            return $this->jsonApiError('NotFound', 'Not Found',
+                "Account id {$payeeId} not found in currency {$code}", 404);
         }
 
-        // Check balance
         if ((float) $payer->balance < $amount) {
-            return $this->jsonApiError('Insufficient balance', 422);
+            return $this->jsonApiError('Forbidden', 'Forbidden',
+                'Insufficient balance for this transfer', 403);
         }
 
         // Execute transfer
@@ -387,25 +405,208 @@ class FederationKomunitinController extends BaseApiController
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('[FederationKomunitin] Transfer failed', ['error' => $e->getMessage()]);
-            return $this->jsonApiError('Transfer failed', 500);
+            return $this->jsonApiError('InternalError', 'Internal Server Error',
+                'Transfer processing failed', 500);
         }
 
-        return $this->jsonApiResponse([
-            'type' => 'transfers',
-            'id' => (string) $txId,
+        $tx = DB::table('transactions')
+            ->where('id', $txId)
+            ->first();
+
+        return $this->jsonApiResponse(
+            $this->buildTransferResource($tx, $tenantId, $code, $baseUrl),
+            null, true, 201
+        );
+    }
+
+    /**
+     * PATCH /{code}/transfers/{id} — Update transfer state.
+     */
+    public function updateTransfer(Request $request, string $code, string $id): JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+        $baseUrl = $request->getSchemeAndHttpHost();
+        $payload = $request->json()->all();
+
+        $tx = DB::table('transactions')
+            ->where('id', (int) $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$tx) {
+            return $this->jsonApiError('NotFound', 'Not Found',
+                "Transfer id {$id} not found in currency {$code}", 404);
+        }
+
+        $newState = $payload['data']['attributes']['state'] ?? null;
+        if (!$newState) {
+            return $this->jsonApiError('BadRequest', 'Bad Request',
+                'Missing state in request body', 400);
+        }
+
+        $newNexusStatus = match ($newState) {
+            'committed' => 'completed',
+            'pending' => 'pending',
+            'rejected' => 'cancelled',
+            default => null,
+        };
+
+        if (!$newNexusStatus) {
+            return $this->jsonApiError('BadRequest', 'Bad Request',
+                "Invalid state: {$newState}. Must be committed, pending, or rejected", 400);
+        }
+
+        DB::table('transactions')
+            ->where('id', (int) $id)
+            ->where('tenant_id', $tenantId)
+            ->update([
+                'status' => $newNexusStatus,
+                'updated_at' => now(),
+            ]);
+
+        $tx = DB::table('transactions')
+            ->where('id', (int) $id)
+            ->first();
+
+        return $this->jsonApiResponse(
+            $this->buildTransferResource($tx, $tenantId, $code, $baseUrl),
+            null, true
+        );
+    }
+
+    /**
+     * DELETE /{code}/transfers/{id} — Delete transfer.
+     */
+    public function deleteTransfer(Request $request, string $code, string $id): JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+
+        $tx = DB::table('transactions')
+            ->where('id', (int) $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$tx) {
+            return $this->jsonApiError('NotFound', 'Not Found',
+                "Transfer id {$id} not found in currency {$code}", 404);
+        }
+
+        // Only pending transfers can be deleted
+        if (($tx->status ?? '') === 'completed') {
+            return $this->jsonApiError('BadRequest', 'Bad Request',
+                'Cannot delete a committed transfer', 400);
+        }
+
+        DB::table('transactions')
+            ->where('id', (int) $id)
+            ->where('tenant_id', $tenantId)
+            ->delete();
+
+        return response()->json(null, 204, [
+            'Content-Type' => 'application/vnd.api+json',
+        ]);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Resource builders
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private function buildCurrencyResource(int $tenantId): array
+    {
+        $tenant = DB::table('tenants')->where('id', $tenantId)->first(['slug', 'name']);
+        $currencyCode = strtoupper($tenant->slug ?? 'HOURS');
+
+        return [
+            'type' => 'currencies',
+            'id' => "hours-{$tenantId}",
             'attributes' => [
-                'amount' => KomunitinAdapter::hoursToMinorUnits($amount),
-                'meta' => $description,
-                'state' => 'committed',
-                'created' => now()->toIso8601String(),
+                'code' => $currencyCode,
+                'status' => 'active',
+                'name' => 'Hours',
+                'namePlural' => 'Hours',
+                'symbol' => 'h',
+                'decimals' => 2,
+                'scale' => KomunitinAdapter::MINOR_UNITS_PER_HOUR,
+                'rate' => ['n' => 1, 'd' => 1],
+                'created' => $tenant->created_at ?? now()->toIso8601String(),
                 'updated' => now()->toIso8601String(),
             ],
-            'relationships' => [
-                'payer' => ['data' => ['type' => 'accounts', 'id' => $payerId]],
-                'payee' => ['data' => ['type' => 'accounts', 'id' => $payeeId]],
-                'currency' => ['data' => ['type' => 'currencies', 'id' => "hours-{$tenantId}"]],
+            'links' => [
+                'self' => "/api/v2/federation/komunitin/{$currencyCode}/currency",
             ],
-        ], null, true, 201);
+        ];
+    }
+
+    private function buildAccountResource(object $user, int $tenantId, string $code, string $baseUrl): array
+    {
+        $accountCode = strtoupper($code) . str_pad((string) $user->id, 4, '0', STR_PAD_LEFT);
+
+        return [
+            'type' => 'accounts',
+            'id' => (string) $user->id,
+            'attributes' => [
+                'code' => $accountCode,
+                'balance' => KomunitinAdapter::hoursToMinorUnits((float) $user->balance),
+                'creditLimit' => KomunitinAdapter::hoursToMinorUnits(-100.0),
+                'created' => $user->created_at,
+                'updated' => $user->updated_at ?? $user->created_at,
+            ],
+            'relationships' => [
+                'currency' => [
+                    'data' => ['type' => 'currencies', 'id' => "hours-{$tenantId}"],
+                ],
+                'users' => [
+                    'data' => [
+                        [
+                            'type' => 'users',
+                            'id' => (string) $user->id,
+                            'meta' => ['external' => false, 'href' => null],
+                        ],
+                    ],
+                ],
+            ],
+            'links' => [
+                'self' => "{$baseUrl}/api/v2/federation/komunitin/{$code}/accounts/{$user->id}",
+            ],
+        ];
+    }
+
+    private function buildTransferResource(object $tx, int $tenantId, string $code, string $baseUrl): array
+    {
+        // Generate a hash for the transfer (matching Komunitin spec)
+        $hash = hash('sha256', "{$tx->id}|{$tx->sender_id}|{$tx->receiver_id}|{$tx->amount}|{$tx->created_at}");
+
+        return [
+            'type' => 'transfers',
+            'id' => (string) $tx->id,
+            'attributes' => [
+                'amount' => KomunitinAdapter::hoursToMinorUnits((float) $tx->amount),
+                'meta' => $tx->description ?? '',
+                'state' => match ($tx->status ?? 'pending') {
+                    'completed' => 'committed',
+                    'pending' => 'pending',
+                    'cancelled' => 'rejected',
+                    default => 'pending',
+                },
+                'created' => $tx->created_at,
+                'updated' => $tx->updated_at ?? $tx->created_at,
+                'hash' => $hash,
+            ],
+            'relationships' => [
+                'payer' => [
+                    'data' => ['type' => 'accounts', 'id' => (string) $tx->sender_id],
+                ],
+                'payee' => [
+                    'data' => ['type' => 'accounts', 'id' => (string) $tx->receiver_id],
+                ],
+                'currency' => [
+                    'data' => ['type' => 'currencies', 'id' => "hours-{$tenantId}"],
+                ],
+            ],
+            'links' => [
+                'self' => "{$baseUrl}/api/v2/federation/komunitin/{$code}/transfers/{$tx->id}",
+            ],
+        ];
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -413,19 +614,28 @@ class FederationKomunitinController extends BaseApiController
     // ─────────────────────────────────────────────────────────────────────────
 
     /**
-     * Build a JSON:API-compliant response.
-     *
-     * @param array      $data       JSON:API resource(s) — single object or array of objects
-     * @param array|null $meta       Optional meta object
-     * @param bool       $isSingle   Whether $data is a single resource (not wrapped in array)
-     * @param int        $status     HTTP status code
+     * Build a JSON:API-compliant response matching the Komunitin spec.
      */
-    private function jsonApiResponse(array $data, ?array $meta = null, bool $isSingle = false, int $status = 200): JsonResponse
-    {
+    private function jsonApiResponse(
+        array $data,
+        ?array $meta = null,
+        bool $isSingle = false,
+        int $status = 200,
+        ?array $links = null
+    ): JsonResponse {
         $response = ['data' => $isSingle ? $data : array_values($data)];
+
+        if ($links) {
+            $response['links'] = $links;
+        }
 
         if ($meta) {
             $response['meta'] = $meta;
+        }
+
+        // JSON:API spec: include empty included array for collections
+        if (!$isSingle) {
+            $response['included'] = [];
         }
 
         return response()->json($response, $status, [
@@ -435,27 +645,42 @@ class FederationKomunitinController extends BaseApiController
     }
 
     /**
-     * Build a JSON:API-compliant error response.
+     * Build a JSON:API-compliant error response matching the Komunitin spec.
+     *
+     * Format: {errors: [{status, code, title, detail}]}
      */
-    private function jsonApiError(string $detail, int $status = 400): JsonResponse
+    private function jsonApiError(string $code, string $title, string $detail, int $status = 400): JsonResponse
     {
         return response()->json([
             'errors' => [
                 [
                     'status' => (string) $status,
-                    'title' => match ($status) {
-                        400 => 'Bad Request',
-                        401 => 'Unauthorized',
-                        404 => 'Not Found',
-                        422 => 'Unprocessable Entity',
-                        500 => 'Internal Server Error',
-                        default => 'Error',
-                    },
+                    'code' => $code,
+                    'title' => $title,
                     'detail' => $detail,
                 ],
             ],
         ], $status, [
             'Content-Type' => 'application/vnd.api+json',
         ]);
+    }
+
+    /**
+     * Build a pagination URL with page[size] and page[after] parameters.
+     */
+    private function buildPaginationUrl(Request $request, int $offset, int $pageSize): string
+    {
+        $baseUrl = $request->url();
+        $params = $request->query();
+
+        // Remove existing pagination params
+        unset($params['page']);
+        unset($params['page_size']);
+        unset($params['page_after']);
+
+        $params['page[size]'] = $pageSize;
+        $params['page[after]'] = $offset;
+
+        return $baseUrl . '?' . http_build_query($params);
     }
 }
