@@ -2098,6 +2098,10 @@ Route::middleware('throttle:20,1')->group(function () {
 Route::post('/v1/federation/oauth/token', [\App\Http\Controllers\Api\FederationController::class, 'oauthToken'])->middleware('throttle:10,1');
 Route::post('/v1/federation/webhooks/test', [\App\Http\Controllers\Api\FederationController::class, 'testWebhook']);
 
+// External federation partner webhook receiver — HMAC-authenticated, no Sanctum.
+// TimeOverflow and other external partners POST events here.
+Route::post('/v2/federation/external/webhooks/receive', [\App\Http\Controllers\Api\FederationExternalWebhookController::class, 'receive'])->middleware('throttle:200,1');
+
 // ============================================
 // PUBLIC LEGAL DOCUMENT ROUTES — No auth required
 // Custom tenant legal docs (Terms, Privacy, etc.) must be accessible

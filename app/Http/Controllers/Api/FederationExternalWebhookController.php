@@ -1,0 +1,342 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford (via Claude Code)
+// See NOTICE file for attribution and acknowledgements.
+
+namespace App\Http\Controllers\Api;
+
+use App\Core\TenantContext;
+use App\Services\FederatedMessageService;
+use App\Services\FederationExternalPartnerService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
+
+/**
+ * FederationExternalWebhookController — Receives webhook events from
+ * external federation partners (e.g., TimeOverflow).
+ *
+ * Public endpoint (no Sanctum auth). Authentication is via HMAC-SHA256
+ * signature verification using the partner's signing_secret.
+ *
+ * POST /api/v2/federation/external/webhooks/receive
+ *
+ * Expected payload:
+ *   {
+ *     "event": "message.sent",
+ *     "partner_id": 1,          // The SENDING partner's ID on their side (informational)
+ *     "timestamp": "...",
+ *     "data": { ... event-specific payload ... }
+ *   }
+ *
+ * Headers:
+ *   X-Webhook-Signature: HMAC-SHA256 hex digest of the raw body
+ *   X-Webhook-Timestamp: Unix timestamp (for replay protection)
+ *   X-Federation-Signature: Alternative header (Nexus format)
+ *   X-Federation-Timestamp: Alternative header (Nexus format)
+ */
+class FederationExternalWebhookController extends BaseApiController
+{
+    protected bool $isV2Api = true;
+
+    /** Maximum age of a webhook timestamp before rejection (seconds) */
+    private const TIMESTAMP_TOLERANCE = 300; // 5 minutes
+
+    /** Rate limit: max webhooks per minute per IP */
+    private const RATE_LIMIT_PER_MINUTE = 200;
+
+    /**
+     * POST /api/v2/federation/external/webhooks/receive
+     */
+    public function receive(Request $request): JsonResponse
+    {
+        // ---- Rate limit by IP ----
+        $ip = $request->ip();
+        $rateLimitKey = "federation_ext_webhook:{$ip}";
+        if (RateLimiter::tooManyAttempts($rateLimitKey, self::RATE_LIMIT_PER_MINUTE)) {
+            return response()->json([
+                'errors' => [['code' => 'RATE_LIMITED', 'message' => 'Too many requests']],
+            ], 429);
+        }
+        RateLimiter::hit($rateLimitKey, 60);
+
+        // ---- Parse body ----
+        $rawBody = $request->getContent();
+        if (empty($rawBody)) {
+            return $this->respondWithError('INVALID_REQUEST', 'Empty request body', null, 400);
+        }
+
+        $payload = json_decode($rawBody, true, 10);
+        if (!is_array($payload)) {
+            return $this->respondWithError('INVALID_REQUEST', 'Invalid JSON', null, 400);
+        }
+
+        $event = $payload['event'] ?? null;
+        $data = $payload['data'] ?? [];
+
+        if (empty($event)) {
+            return $this->respondWithError('INVALID_REQUEST', 'Missing event type', null, 400);
+        }
+
+        // ---- Identify the external partner ----
+        // The partner is identified by matching the signing_secret used to generate
+        // the HMAC signature. We look up partners that have a signing_secret configured.
+        $partner = $this->identifyAndVerifyPartner($request, $rawBody);
+        if (!$partner) {
+            return $this->respondWithError('INVALID_SIGNATURE', 'Invalid or missing webhook signature', null, 401);
+        }
+
+        if ($partner->status !== 'active') {
+            return $this->respondWithError('PARTNER_INACTIVE', 'Partner is not active', null, 403);
+        }
+
+        // ---- Set tenant context from partner ----
+        TenantContext::set($partner->tenant_id);
+
+        // ---- Log the webhook ----
+        $logId = $this->logWebhook($partner, $event, $payload);
+
+        // ---- Dispatch event ----
+        try {
+            $result = $this->handleEvent($event, $data, $partner);
+
+            DB::table('federation_external_partner_logs')
+                ->where('id', $logId)
+                ->update(['status_code' => 200, 'success' => true, 'updated_at' => now()]);
+
+            return $this->respondWithData([
+                'received' => true,
+                'event' => $event,
+                'result' => $result,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error("[FederationExternalWebhook] Event processing failed: {$e->getMessage()}", [
+                'event' => $event,
+                'partner_id' => $partner->id,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            DB::table('federation_external_partner_logs')
+                ->where('id', $logId)
+                ->update(['status_code' => 500, 'success' => false, 'response_body' => substr($e->getMessage(), 0, 1000), 'updated_at' => now()]);
+
+            return $this->respondWithError('PROCESSING_FAILED', 'Webhook processing failed', null, 500);
+        }
+    }
+
+    // ----------------------------------------------------------------
+    // Signature verification
+    // ----------------------------------------------------------------
+
+    /**
+     * Identify the external partner by verifying the HMAC signature against
+     * each partner's signing_secret. Returns the matched partner or null.
+     */
+    private function identifyAndVerifyPartner(Request $request, string $rawBody): ?object
+    {
+        $signature = $request->header('X-Webhook-Signature')
+            ?? $request->header('X-Federation-Signature');
+
+        if (empty($signature)) {
+            return null;
+        }
+
+        $timestamp = $request->header('X-Webhook-Timestamp')
+            ?? $request->header('X-Federation-Timestamp');
+
+        // Timestamp freshness check (if provided)
+        if (!empty($timestamp) && abs(time() - (int) $timestamp) > self::TIMESTAMP_TOLERANCE) {
+            Log::warning('[FederationExternalWebhook] Expired timestamp', [
+                'timestamp' => $timestamp,
+                'now' => time(),
+            ]);
+            return null;
+        }
+
+        // Try all partners with signing_secret configured
+        $partners = DB::table('federation_external_partners')
+            ->whereNotNull('signing_secret')
+            ->where('signing_secret', '!=', '')
+            ->get();
+
+        foreach ($partners as $partner) {
+            $secret = $partner->signing_secret;
+
+            // Try simple body-only HMAC (TimeOverflow default)
+            $expectedSimple = hash_hmac('sha256', $rawBody, $secret);
+            if (hash_equals($expectedSimple, $signature)) {
+                return $partner;
+            }
+
+            // Try Nexus format: METHOD\nPATH\nTIMESTAMP\nBODY
+            if (!empty($timestamp)) {
+                $stringToSign = implode("\n", [
+                    $request->method(),
+                    $request->getPathInfo(),
+                    $timestamp,
+                    $rawBody,
+                ]);
+                $expectedNexus = hash_hmac('sha256', $stringToSign, $secret);
+                if (hash_equals($expectedNexus, $signature)) {
+                    return $partner;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // ----------------------------------------------------------------
+    // Event routing
+    // ----------------------------------------------------------------
+
+    private function handleEvent(string $event, array $data, object $partner): array
+    {
+        return match ($event) {
+            'message.sent', 'message.received' => $this->handleInboundMessage($data, $partner),
+            'transaction.completed' => $this->handleTransactionCompleted($data, $partner),
+            'transaction.cancelled' => $this->handleTransactionCancelled($data, $partner),
+            'transaction.requested' => $this->handleTransactionRequested($data, $partner),
+            'partnership.activated', 'partnership.approved' => $this->handlePartnershipActivated($partner),
+            'partnership.suspended' => $this->handlePartnershipSuspended($partner),
+            'partnership.terminated' => $this->handlePartnershipTerminated($partner),
+            'health_check' => ['status' => 'ok'],
+            default => ['status' => 'unhandled', 'event' => $event],
+        };
+    }
+
+    // ----------------------------------------------------------------
+    // Message handling
+    // ----------------------------------------------------------------
+
+    private function handleInboundMessage(array $data, object $partner): array
+    {
+        if (!$partner->allow_messaging) {
+            return ['status' => 'rejected', 'reason' => 'Messaging not enabled for this partner'];
+        }
+
+        // Map TimeOverflow fields to Nexus fields
+        $recipientId = $data['recipient_id'] ?? $data['local_member_id'] ?? null;
+        $senderId = $data['sender_id'] ?? $data['remote_user_identifier'] ?? 0;
+        $senderName = $data['sender_name'] ?? $data['remote_user_identifier'] ?? 'External User';
+        $subject = $data['subject'] ?? '';
+        $body = $data['body'] ?? $data['message'] ?? '';
+        $externalMessageId = $data['external_message_id'] ?? $data['message_id'] ?? null;
+
+        if (empty($body)) {
+            return ['status' => 'rejected', 'reason' => 'Message body is required'];
+        }
+
+        if (empty($recipientId)) {
+            return ['status' => 'rejected', 'reason' => 'Recipient ID is required'];
+        }
+
+        // Resolve the Nexus user ID from external partner member mapping
+        // TimeOverflow sends the member_id; we need to find the corresponding
+        // Nexus user. For now, use the recipient_id directly since the external
+        // partner registered members with matching IDs.
+        $receiverUserId = (int) $recipientId;
+
+        $result = FederatedMessageService::storeExternalMessage(
+            receiverUserId: $receiverUserId,
+            externalPartnerId: $partner->id,
+            externalSenderId: is_numeric($senderId) ? (int) $senderId : 0,
+            senderName: (string) $senderName,
+            partnerName: $partner->name ?? 'External Partner',
+            subject: (string) $subject,
+            body: (string) $body,
+            externalMessageId: $externalMessageId ? (string) $externalMessageId : null
+        );
+
+        // Update last_message_at on the partner
+        DB::table('federation_external_partners')
+            ->where('id', $partner->id)
+            ->update(['last_message_at' => now()]);
+
+        return $result;
+    }
+
+    // ----------------------------------------------------------------
+    // Transaction handling (acknowledgements)
+    // ----------------------------------------------------------------
+
+    private function handleTransactionCompleted(array $data, object $partner): array
+    {
+        Log::info('[FederationExternalWebhook] Transaction completed', [
+            'partner' => $partner->name,
+            'external_transaction_id' => $data['external_transaction_id'] ?? null,
+        ]);
+        return ['status' => 'acknowledged'];
+    }
+
+    private function handleTransactionCancelled(array $data, object $partner): array
+    {
+        Log::info('[FederationExternalWebhook] Transaction cancelled', [
+            'partner' => $partner->name,
+            'external_transaction_id' => $data['external_transaction_id'] ?? null,
+            'reason' => $data['reason'] ?? null,
+        ]);
+        return ['status' => 'acknowledged'];
+    }
+
+    private function handleTransactionRequested(array $data, object $partner): array
+    {
+        Log::info('[FederationExternalWebhook] Transaction requested', [
+            'partner' => $partner->name,
+            'external_transaction_id' => $data['external_transaction_id'] ?? null,
+            'amount' => $data['amount'] ?? null,
+        ]);
+        return ['status' => 'acknowledged'];
+    }
+
+    // ----------------------------------------------------------------
+    // Partnership events
+    // ----------------------------------------------------------------
+
+    private function handlePartnershipActivated(object $partner): array
+    {
+        DB::table('federation_external_partners')
+            ->where('id', $partner->id)
+            ->update(['status' => 'active', 'verified_at' => now(), 'error_count' => 0, 'last_error' => null]);
+        return ['status' => 'activated'];
+    }
+
+    private function handlePartnershipSuspended(object $partner): array
+    {
+        DB::table('federation_external_partners')
+            ->where('id', $partner->id)
+            ->update(['status' => 'suspended']);
+        return ['status' => 'suspended'];
+    }
+
+    private function handlePartnershipTerminated(object $partner): array
+    {
+        DB::table('federation_external_partners')
+            ->where('id', $partner->id)
+            ->update(['status' => 'failed']);
+        return ['status' => 'terminated'];
+    }
+
+    // ----------------------------------------------------------------
+    // Logging
+    // ----------------------------------------------------------------
+
+    private function logWebhook(object $partner, string $event, array $payload): int
+    {
+        return DB::table('federation_external_partner_logs')->insertGetId([
+            'partner_id' => $partner->id,
+            'tenant_id' => $partner->tenant_id,
+            'endpoint' => '/webhooks/receive',
+            'method' => 'POST',
+            'status_code' => 0, // Updated after processing
+            'success' => false,
+            'request_body' => substr(json_encode($payload), 0, 10000),
+            'response_body' => null,
+            'duration_ms' => 0,
+            'created_at' => now(),
+        ]);
+    }
+}
