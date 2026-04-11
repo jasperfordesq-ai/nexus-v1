@@ -2128,6 +2128,7 @@ Route::middleware(['federation.api', 'throttle:200,1'])->group(function () {
     Route::get('/v2/federation/cc/transactions', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'transactions']);
     Route::get('/v2/federation/cc/transaction/{uuid}', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'transaction']);
     Route::patch('/v2/federation/cc/transaction/{uuid}/{state}', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'transitionTransaction']);
+    Route::post('/v2/federation/cc/transaction/relay', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'relayTransaction']);
     Route::get('/v2/federation/cc/entries', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'entries']);
     Route::get('/v2/federation/cc/entries/{uuid}', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'transactionEntries']);
     Route::get('/v2/federation/cc/forms', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'forms']);

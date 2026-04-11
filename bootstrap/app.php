@@ -58,6 +58,11 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('federation-purge-external-logs');
 
+        $schedule->command('federation:expire-cc-validations')
+            ->everyMinute()
+            ->withoutOverlapping(2)
+            ->name('federation-expire-cc-validations');
+
         $schedule->command('sitemap:generate')
             ->dailyAt('04:00')
             ->withoutOverlapping()

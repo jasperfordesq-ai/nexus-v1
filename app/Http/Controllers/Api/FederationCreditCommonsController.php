@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Services\CreditCommonsNodeService;
 use App\Services\Protocols\CreditCommonsAdapter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -674,6 +675,140 @@ class FederationCreditCommonsController extends BaseApiController
                 ],
             ],
         ]);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // POST /transaction/relay — Relay transaction through the node tree
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * POST /transaction/relay — Receive a relayed transaction from another CC node.
+     *
+     * CC relay rules:
+     *   - If the payee is local, process the transaction locally
+     *   - If the payee is remote, forward to the next node in the tree
+     *   - Verify the Last-hash header for hashchain integrity
+     */
+    public function relayTransaction(Request $request): JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+        $payload = $request->json()->all();
+
+        // Verify hashchain
+        $remoteHash = $request->header('Last-hash');
+        if (!CreditCommonsNodeService::verifyHash($remoteHash, $tenantId)) {
+            return $this->ccError('HashMismatch',
+                'Hashchain verification failed — last hashes do not match', 500);
+        }
+
+        $payerPath = $payload['payer'] ?? null;
+        $payeePath = $payload['payee'] ?? null;
+        $quant = (float) ($payload['quant'] ?? 0);
+        $description = $payload['description'] ?? '';
+        $workflow = $payload['workflow'] ?? '0|PC-CE=';
+
+        if (!$payerPath || !$payeePath || $quant <= 0) {
+            return $this->ccError('MissingParameter', 'Required: payer, payee, quant > 0', 400);
+        }
+
+        $payeeIsLocal = CreditCommonsNodeService::isLocalAccount($payeePath, $tenantId);
+
+        if ($payeeIsLocal) {
+            // Payee is on this node — process locally
+            $payeeId = $this->resolveAccountId(
+                CreditCommonsAdapter::extractUsername($payeePath), $tenantId
+            );
+
+            if (!$payeeId) {
+                return $this->ccError('UnresolvedAccountnameViolation',
+                    "Payee '{$payeePath}' not found on this node", 400);
+            }
+
+            $uuid = (string) Str::uuid();
+
+            DB::beginTransaction();
+            try {
+                // Credit the local payee
+                DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
+                    [$quant, $payeeId, $tenantId]);
+
+                // Record the CC entry
+                DB::table('federation_cc_entries')->insert([
+                    'tenant_id' => $tenantId,
+                    'transaction_uuid' => $uuid,
+                    'payer' => $payerPath,
+                    'payee' => $payeePath,
+                    'quant' => $quant,
+                    'description' => $description,
+                    'state' => CreditCommonsAdapter::STATE_COMPLETED,
+                    'workflow' => $workflow,
+                    'author' => $payerPath,
+                    'written_at' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                // Advance hashchain
+                $newHash = CreditCommonsNodeService::advanceHashchain(
+                    $tenantId, $uuid, $quant, $payerPath, $payeePath
+                );
+
+                DB::commit();
+
+                return response()->json([
+                    'data' => [
+                        'uuid' => $uuid,
+                        'written' => now()->format('Y-m-d'),
+                        'state' => CreditCommonsAdapter::STATE_COMPLETED,
+                        'workflow' => $workflow,
+                        'entries' => [[
+                            'payer' => $payerPath,
+                            'payee' => $payeePath,
+                            'quant' => $quant,
+                            'description' => $description,
+                        ]],
+                    ],
+                    'meta' => ['transitions' => []],
+                ], 201, ['Last-hash' => $newHash]);
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                Log::error('[FederationCC] Relay local processing failed', ['error' => $e->getMessage()]);
+                return $this->ccError('Other', 'Relay processing failed', 500);
+            }
+        }
+
+        // Payee is remote — forward to the next node
+        $relayResult = CreditCommonsNodeService::relayTransaction($payload, $tenantId);
+
+        if (!$relayResult['success']) {
+            return $this->ccError('UnavailableNode',
+                $relayResult['error'] ?? 'Failed to relay transaction', 500);
+        }
+
+        // Record the relay in our entries for audit
+        $uuid = $relayResult['data']['uuid'] ?? (string) Str::uuid();
+        DB::table('federation_cc_entries')->insert([
+            'tenant_id' => $tenantId,
+            'transaction_uuid' => $uuid,
+            'payer' => $payerPath,
+            'payee' => $payeePath,
+            'quant' => $quant,
+            'description' => $description,
+            'state' => CreditCommonsAdapter::STATE_COMPLETED,
+            'workflow' => $workflow,
+            'author' => $payerPath,
+            'written_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Advance hashchain for the relay hop
+        $newHash = CreditCommonsNodeService::advanceHashchain(
+            $tenantId, $uuid, $quant, $payerPath, $payeePath
+        );
+
+        $responseData = $relayResult['data'] ?? [];
+        return response()->json($responseData, 201, ['Last-hash' => $newHash]);
     }
 
     // ─────────────────────────────────────────────────────────────────────────

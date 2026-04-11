@@ -1,0 +1,538 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+declare(strict_types=1);
+
+namespace App\Services;
+
+use App\Core\TenantContext;
+use App\Services\Protocols\CreditCommonsAdapter;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+
+/**
+ * CreditCommonsNodeService — Manages the CC node tree topology, hashchain
+ * verification, transaction relay, exchange rates, and validation timeouts.
+ *
+ * This service implements the "hard" CC features that make NEXUS a fully
+ * compliant Credit Commons node:
+ *
+ *   1. Node tree topology: parent/child relationships, path resolution
+ *   2. Transaction relay: forwarding transactions through the node tree
+ *   3. Hashchain: cryptographic chain between nodes for tamper detection
+ *   4. Exchange rates: cascading rates through the tree hierarchy
+ *   5. Validation timeouts: expiring validated (V) transactions
+ */
+class CreditCommonsNodeService
+{
+    // ─────────────────────────────────────────────────────────────────────────
+    // 1. Node Tree Topology
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Get this tenant's CC node configuration.
+     * Creates a default config if none exists.
+     */
+    public static function getNodeConfig(?int $tenantId = null): object
+    {
+        $tenantId = $tenantId ?? TenantContext::getId();
+
+        $config = DB::table('federation_cc_node_config')
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$config) {
+            $config = self::initializeNodeConfig($tenantId);
+        }
+
+        return $config;
+    }
+
+    /**
+     * Initialize a default CC node config for a tenant.
+     */
+    public static function initializeNodeConfig(int $tenantId): object
+    {
+        $tenant = DB::table('tenants')->where('id', $tenantId)->first(['slug', 'name']);
+        $slug = $tenant?->slug
+            ? Str::substr(Str::slug($tenant->slug), 0, 15)
+            : "nexus-t{$tenantId}";
+
+        DB::table('federation_cc_node_config')->insert([
+            'tenant_id' => $tenantId,
+            'node_slug' => $slug,
+            'display_name' => $tenant?->name ?? "NEXUS Tenant {$tenantId}",
+            'currency_format' => '<quantity> hours',
+            'exchange_rate' => 1.0,
+            'validated_window' => 300,
+            'parent_node_url' => null,
+            'parent_node_slug' => null,
+            'last_hash' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return DB::table('federation_cc_node_config')
+            ->where('tenant_id', $tenantId)
+            ->first();
+    }
+
+    /**
+     * Update CC node configuration.
+     */
+    public static function updateNodeConfig(int $tenantId, array $data): bool
+    {
+        $allowed = ['node_slug', 'display_name', 'currency_format', 'exchange_rate',
+            'validated_window', 'parent_node_url', 'parent_node_slug'];
+
+        $updates = array_intersect_key($data, array_flip($allowed));
+        $updates['updated_at'] = now();
+
+        return DB::table('federation_cc_node_config')
+            ->where('tenant_id', $tenantId)
+            ->update($updates) > 0;
+    }
+
+    /**
+     * Build the absolute path for this node in the CC tree.
+     *
+     * Returns an array of node slugs from root to this node.
+     * e.g., ['root-network', 'regional-hub', 'my-timebank']
+     */
+    public static function getAbsolutePath(?int $tenantId = null): array
+    {
+        $config = self::getNodeConfig($tenantId);
+        $path = [];
+
+        if ($config->parent_node_slug) {
+            // Try to resolve the parent chain
+            $parentPath = self::resolveParentPath($config);
+            $path = array_merge($parentPath, [$config->node_slug]);
+        } else {
+            $path = [$config->node_slug];
+        }
+
+        return $path;
+    }
+
+    /**
+     * Resolve parent node path by querying the parent node's /about endpoint.
+     */
+    private static function resolveParentPath(object $config): array
+    {
+        if (!$config->parent_node_url) {
+            return $config->parent_node_slug ? [$config->parent_node_slug] : [];
+        }
+
+        $cacheKey = "cc_parent_path:{$config->tenant_id}";
+        $cached = Cache::get($cacheKey);
+        if ($cached) {
+            return $cached;
+        }
+
+        try {
+            $response = Http::timeout(10)
+                ->acceptJson()
+                ->get(rtrim($config->parent_node_url, '/') . '/about');
+
+            if ($response->successful()) {
+                $aboutData = $response->json();
+                $parentPath = $aboutData['absolute_path'] ?? [$config->parent_node_slug];
+                Cache::put($cacheKey, $parentPath, 3600); // Cache for 1 hour
+                return $parentPath;
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[CreditCommonsNode] Failed to resolve parent path', [
+                'parent_url' => $config->parent_node_url,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return $config->parent_node_slug ? [$config->parent_node_slug] : [];
+    }
+
+    /**
+     * Check if a given account path belongs to this node.
+     *
+     * "my-node/alice" with node_slug "my-node" → true
+     * "other-node/alice" with node_slug "my-node" → false
+     */
+    public static function isLocalAccount(string $accountPath, ?int $tenantId = null): bool
+    {
+        $config = self::getNodeConfig($tenantId);
+        $nodeSlug = CreditCommonsAdapter::extractNodeSlug($accountPath);
+
+        return $nodeSlug === null || $nodeSlug === $config->node_slug;
+    }
+
+    /**
+     * Find which external partner handles a given remote node slug.
+     */
+    public static function findPartnerForNode(string $nodeSlug, int $tenantId): ?object
+    {
+        // Check external partners with CC protocol that might handle this node
+        $partners = DB::table('federation_external_partners')
+            ->where('tenant_id', $tenantId)
+            ->where('protocol_type', 'credit_commons')
+            ->whereIn('status', ['active', 'pending'])
+            ->get();
+
+        foreach ($partners as $partner) {
+            // Check if partner metadata contains node mapping
+            $metadata = $partner->partner_metadata ? json_decode($partner->partner_metadata, true) : [];
+            $partnerNodeSlug = $metadata['node_slug'] ?? null;
+
+            if ($partnerNodeSlug === $nodeSlug) {
+                return $partner;
+            }
+        }
+
+        // Fallback: check parent node
+        $config = self::getNodeConfig($tenantId);
+        if ($config->parent_node_slug === $nodeSlug && $config->parent_node_url) {
+            // Parent node handles all unknown routes in a tree
+            return (object) [
+                'id' => 0,
+                'base_url' => $config->parent_node_url,
+                'protocol_type' => 'credit_commons',
+                'is_parent' => true,
+            ];
+        }
+
+        return null;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 2. Transaction Relay
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Relay a transaction through the node tree.
+     *
+     * CC relay rules:
+     *   - If both payer and payee are local → process locally
+     *   - If payer is local, payee is remote → relay to payee's node
+     *   - If payee is local, payer is remote → relay to payer's node
+     *   - If both are remote → relay to parent node (trunkward routing)
+     *
+     * @param array $transaction CC NewTransaction format
+     * @param int   $tenantId   Current tenant ID
+     * @return array{success: bool, data?: array, error?: string}
+     */
+    public static function relayTransaction(array $transaction, int $tenantId): array
+    {
+        $payerPath = $transaction['payer'] ?? '';
+        $payeePath = $transaction['payee'] ?? '';
+
+        $payerIsLocal = self::isLocalAccount($payerPath, $tenantId);
+        $payeeIsLocal = self::isLocalAccount($payeePath, $tenantId);
+
+        // Both local — no relay needed, process directly
+        if ($payerIsLocal && $payeeIsLocal) {
+            return ['success' => true, 'data' => $transaction, 'routing' => 'local'];
+        }
+
+        // Determine which node to relay to
+        $remoteAccountPath = $payerIsLocal ? $payeePath : $payerPath;
+        $remoteNodeSlug = CreditCommonsAdapter::extractNodeSlug($remoteAccountPath);
+
+        if (!$remoteNodeSlug) {
+            return ['success' => false, 'error' => "Cannot determine remote node for account: {$remoteAccountPath}"];
+        }
+
+        $partner = self::findPartnerForNode($remoteNodeSlug, $tenantId);
+        if (!$partner) {
+            return ['success' => false, 'error' => "No route to node: {$remoteNodeSlug}"];
+        }
+
+        // Apply exchange rate if crossing node boundaries
+        $config = self::getNodeConfig($tenantId);
+        $exchangeRate = (float) $config->exchange_rate;
+        if ($exchangeRate !== 1.0 && $exchangeRate > 0) {
+            $transaction['quant'] = round((float) ($transaction['quant'] ?? 0) * $exchangeRate, 4);
+        }
+
+        // Forward to the remote node's /transaction/relay endpoint
+        try {
+            $relayUrl = rtrim($partner->base_url, '/') . '/transaction/relay';
+
+            $headers = ['Content-Type' => 'application/json', 'Accept' => 'application/json'];
+
+            // Add Last-hash header for hashchain verification
+            if ($config->last_hash) {
+                $headers['Last-hash'] = $config->last_hash;
+            }
+
+            $response = Http::withHeaders($headers)
+                ->timeout(30)
+                ->post($relayUrl, $transaction);
+
+            if ($response->successful()) {
+                $responseData = $response->json();
+
+                // Update hashchain if the remote node returns a hash
+                $remoteHash = $response->header('Last-hash');
+                if ($remoteHash) {
+                    self::recordHash($tenantId, $remoteHash);
+                }
+
+                return [
+                    'success' => true,
+                    'data' => $responseData,
+                    'routing' => 'relayed',
+                    'relayed_to' => $remoteNodeSlug,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'error' => "Relay failed: HTTP {$response->status()} — " . substr($response->body(), 0, 500),
+                'status_code' => $response->status(),
+            ];
+        } catch (\Throwable $e) {
+            Log::error('[CreditCommonsNode] Relay failed', [
+                'remote_node' => $remoteNodeSlug,
+                'error' => $e->getMessage(),
+            ]);
+            return ['success' => false, 'error' => 'Relay failed: ' . $e->getMessage()];
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 3. Hashchain Verification
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Compute the next hash in the chain for a transaction.
+     *
+     * The hashchain is built from every transaction that hops between two
+     * ledgers. Each node maintains its own copy and the protocol ensures
+     * hashes match for inter-ledger transactions.
+     *
+     * Hash formula: SHA256(previous_hash + transaction_uuid + amount + payer + payee)
+     */
+    public static function computeHash(string $previousHash, string $uuid, float $amount, string $payer, string $payee): string
+    {
+        $data = implode('|', [$previousHash, $uuid, (string) $amount, $payer, $payee]);
+        return hash('sha256', $data);
+    }
+
+    /**
+     * Record a new hash in the chain after a cross-node transaction.
+     */
+    public static function recordHash(int $tenantId, string $hash): void
+    {
+        DB::table('federation_cc_node_config')
+            ->where('tenant_id', $tenantId)
+            ->update([
+                'last_hash' => $hash,
+                'updated_at' => now(),
+            ]);
+    }
+
+    /**
+     * Get the current last hash for this node.
+     */
+    public static function getLastHash(?int $tenantId = null): ?string
+    {
+        $config = self::getNodeConfig($tenantId);
+        return $config->last_hash;
+    }
+
+    /**
+     * Verify an incoming Last-hash header against our stored hash.
+     *
+     * Returns true if hashes match or if the remote hasn't sent a hash yet
+     * (first interaction). Returns false on mismatch (tamper detected).
+     */
+    public static function verifyHash(?string $remoteHash, ?int $tenantId = null): bool
+    {
+        if ($remoteHash === null) {
+            return true; // No hash sent — first interaction or hash not required
+        }
+
+        $localHash = self::getLastHash($tenantId);
+
+        if ($localHash === null) {
+            // We have no hash yet — accept the remote's hash as our starting point
+            self::recordHash($tenantId ?? TenantContext::getId(), $remoteHash);
+            return true;
+        }
+
+        return hash_equals($localHash, $remoteHash);
+    }
+
+    /**
+     * Update the hashchain after a successful cross-node transaction.
+     *
+     * Called after a transaction is relayed or received from another node.
+     */
+    public static function advanceHashchain(int $tenantId, string $uuid, float $amount, string $payer, string $payee): string
+    {
+        $previousHash = self::getLastHash($tenantId) ?? str_repeat('0', 64);
+        $newHash = self::computeHash($previousHash, $uuid, $amount, $payer, $payee);
+        self::recordHash($tenantId, $newHash);
+
+        Log::info('[CreditCommonsNode] Hashchain advanced', [
+            'tenant_id' => $tenantId,
+            'uuid' => $uuid,
+            'new_hash' => substr($newHash, 0, 16) . '...',
+        ]);
+
+        return $newHash;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 4. Exchange Rate Cascading
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Get the effective exchange rate between this node and a target node.
+     *
+     * In a CC tree, rates cascade: if A→B is 1.5 and B→C is 0.8,
+     * then A→C is 1.5 * 0.8 = 1.2.
+     *
+     * For now, we support single-hop rates (this node ↔ direct partner).
+     * Multi-hop cascading requires querying intermediate nodes.
+     *
+     * @param string $targetNodeSlug The target node's slug
+     * @param int    $tenantId       Current tenant ID
+     * @return float Exchange rate (1.0 = same unit)
+     */
+    public static function getExchangeRate(string $targetNodeSlug, int $tenantId): float
+    {
+        $config = self::getNodeConfig($tenantId);
+
+        // Same node — rate is 1.0
+        if ($targetNodeSlug === $config->node_slug) {
+            return 1.0;
+        }
+
+        // Direct partner — check if we have a stored rate
+        $partner = self::findPartnerForNode($targetNodeSlug, $tenantId);
+        if ($partner) {
+            $metadata = isset($partner->partner_metadata)
+                ? json_decode($partner->partner_metadata, true) : [];
+            $directRate = $metadata['exchange_rate'] ?? null;
+            if ($directRate !== null) {
+                return (float) $directRate;
+            }
+        }
+
+        // Parent node — use our configured rate
+        if ($targetNodeSlug === $config->parent_node_slug) {
+            return (float) $config->exchange_rate;
+        }
+
+        // Unknown node — try to query via parent (multi-hop)
+        if ($config->parent_node_url) {
+            return self::queryRemoteExchangeRate($config->parent_node_url, $targetNodeSlug, $config->exchange_rate);
+        }
+
+        // Default: 1:1 (same unit assumed)
+        return 1.0;
+    }
+
+    /**
+     * Query a remote node's /about endpoint to get the exchange rate to a target.
+     */
+    private static function queryRemoteExchangeRate(string $nodeUrl, string $targetNodeSlug, float $localRate): float
+    {
+        $cacheKey = "cc_exchange_rate:{$targetNodeSlug}";
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return (float) $cached;
+        }
+
+        try {
+            $response = Http::timeout(10)
+                ->acceptJson()
+                ->get(rtrim($nodeUrl, '/') . '/about', ['node_path' => $targetNodeSlug]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $remoteRate = (float) ($data['rate'] ?? 1.0);
+                // Cascade: our rate to parent × parent's rate to target
+                $cascadedRate = $localRate * $remoteRate;
+                Cache::put($cacheKey, $cascadedRate, 3600);
+                return $cascadedRate;
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[CreditCommonsNode] Exchange rate query failed', [
+                'target' => $targetNodeSlug,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return 1.0;
+    }
+
+    /**
+     * Convert an amount from this node's currency to a target node's currency.
+     */
+    public static function convertAmount(float $amount, string $targetNodeSlug, int $tenantId): float
+    {
+        $rate = self::getExchangeRate($targetNodeSlug, $tenantId);
+        return round($amount * $rate, 4);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 5. Validation Timeouts
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Expire validated (V) transactions that have exceeded their timeout window.
+     *
+     * Called by the scheduled command `federation:expire-cc-validations`.
+     *
+     * CC spec: a validated transaction has `secs_valid_left` seconds before
+     * it automatically transitions to Erased (E). The timeout is the shortest
+     * window across all nodes involved in the transaction path.
+     *
+     * @return int Number of transactions expired
+     */
+    public static function expireValidatedTransactions(): int
+    {
+        $expired = 0;
+
+        // Get all tenants with CC node configs
+        $tenantConfigs = DB::table('federation_cc_node_config')->get();
+
+        foreach ($tenantConfigs as $config) {
+            $windowSeconds = (int) $config->validated_window;
+
+            // Find validated entries past their window
+            $staleEntries = DB::table('federation_cc_entries')
+                ->where('tenant_id', $config->tenant_id)
+                ->where('state', CreditCommonsAdapter::STATE_VALIDATED)
+                ->where('updated_at', '<', now()->subSeconds($windowSeconds))
+                ->get();
+
+            foreach ($staleEntries as $entry) {
+                DB::table('federation_cc_entries')
+                    ->where('id', $entry->id)
+                    ->update([
+                        'state' => CreditCommonsAdapter::STATE_ERASED,
+                        'updated_at' => now(),
+                    ]);
+
+                Log::info('[CreditCommonsNode] Validated transaction expired', [
+                    'tenant_id' => $config->tenant_id,
+                    'uuid' => $entry->transaction_uuid,
+                    'window' => $windowSeconds,
+                ]);
+
+                $expired++;
+            }
+        }
+
+        return $expired;
+    }
+}

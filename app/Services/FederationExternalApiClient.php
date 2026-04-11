@@ -153,21 +153,45 @@ class FederationExternalApiClient
     /**
      * Fetch members from an external partner.
      *
+     * Uses the protocol adapter to resolve the correct endpoint path.
+     *
      * @return array{success: bool, data?: array, error?: string, status_code?: int}
      */
     public static function fetchMembers(int $partnerId, array $filters = []): array
     {
-        return self::get($partnerId, '/members', $filters);
+        $adapter = self::resolveAdapter($partnerId);
+        $endpoint = $adapter->mapEndpoint('members', $filters);
+        $result = self::get($partnerId, $endpoint, $filters);
+
+        if ($result['success'] && !empty($result['data'])) {
+            $result['data'] = $adapter->transformInboundMembers(
+                is_array($result['data']) ? $result['data'] : []
+            );
+        }
+
+        return $result;
     }
 
     /**
      * Fetch listings from an external partner.
      *
+     * Uses the protocol adapter to resolve the correct endpoint path.
+     *
      * @return array{success: bool, data?: array, error?: string, status_code?: int}
      */
     public static function fetchListings(int $partnerId, array $filters = []): array
     {
-        return self::get($partnerId, '/listings', $filters);
+        $adapter = self::resolveAdapter($partnerId);
+        $endpoint = $adapter->mapEndpoint('listings', $filters);
+        $result = self::get($partnerId, $endpoint, $filters);
+
+        if ($result['success'] && !empty($result['data'])) {
+            $result['data'] = $adapter->transformInboundListings(
+                is_array($result['data']) ? $result['data'] : []
+            );
+        }
+
+        return $result;
     }
 
     /**
@@ -177,9 +201,15 @@ class FederationExternalApiClient
      */
     public static function fetchMember(int $partnerId, int $memberId): ?array
     {
-        $result = self::get($partnerId, "/members/{$memberId}");
+        $adapter = self::resolveAdapter($partnerId);
+        $endpoint = $adapter->mapEndpoint('member', ['id' => $memberId]);
+        $result = self::get($partnerId, $endpoint);
 
-        return $result['success'] ? ($result['data'] ?? null) : null;
+        if ($result['success'] && !empty($result['data'])) {
+            return $adapter->transformInboundMember($result['data']);
+        }
+
+        return null;
     }
 
     /**
@@ -189,29 +219,54 @@ class FederationExternalApiClient
      */
     public static function fetchListing(int $partnerId, int $listingId): ?array
     {
-        $result = self::get($partnerId, "/listings/{$listingId}");
+        $adapter = self::resolveAdapter($partnerId);
+        $endpoint = $adapter->mapEndpoint('listing', ['id' => $listingId]);
+        $result = self::get($partnerId, $endpoint);
 
-        return $result['success'] ? ($result['data'] ?? null) : null;
+        if ($result['success'] && !empty($result['data'])) {
+            return $adapter->transformInboundListing($result['data']);
+        }
+
+        return null;
     }
 
     /**
      * Send a cross-platform message via an external partner's API.
      *
+     * Transforms the message into the partner's expected format.
+     *
      * @return array{success: bool, data?: array, error?: string, status_code?: int}
      */
     public static function sendMessage(int $partnerId, array $messageData): array
     {
-        return self::post($partnerId, '/messages', $messageData);
+        $adapter = self::resolveAdapter($partnerId);
+        $endpoint = $adapter->mapEndpoint('messages');
+        $transformed = $adapter->transformOutboundMessage($messageData);
+
+        return self::post($partnerId, $endpoint, $transformed);
     }
 
     /**
      * Create a time-credit transaction via an external partner's API.
      *
+     * Transforms the transaction into the partner's expected format.
+     *
      * @return array{success: bool, data?: array, error?: string, status_code?: int}
      */
     public static function createTransaction(int $partnerId, array $transactionData): array
     {
-        return self::post($partnerId, '/transactions', $transactionData);
+        $adapter = self::resolveAdapter($partnerId);
+        $endpoint = $adapter->mapEndpoint('transactions');
+        $method = $adapter->mapHttpMethod('transactions', 'POST');
+        $transformed = $adapter->transformOutboundTransaction($transactionData, $partnerId);
+
+        $result = self::request($partnerId, $method, $endpoint, $transformed);
+
+        if ($result['success'] && !empty($result['data'])) {
+            $result['data'] = $adapter->transformInboundTransaction($result['data']);
+        }
+
+        return $result;
     }
 
     /**
@@ -221,7 +276,9 @@ class FederationExternalApiClient
      */
     public static function healthCheck(int $partnerId): array
     {
-        return self::get($partnerId, '/health');
+        $adapter = self::resolveAdapter($partnerId);
+        $endpoint = $adapter->mapEndpoint('health');
+        return self::get($partnerId, $endpoint);
     }
 
     // ----------------------------------------------------------------
