@@ -94,7 +94,7 @@ class FederationExternalWebhookController extends BaseApiController
         }
 
         // ---- Set tenant context from partner ----
-        TenantContext::set($partner->tenant_id);
+        TenantContext::setById($partner->tenant_id);
 
         // ---- Log the webhook ----
         $logId = $this->logWebhook($partner, $event, $payload);
