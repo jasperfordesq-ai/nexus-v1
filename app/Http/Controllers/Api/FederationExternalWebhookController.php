@@ -105,7 +105,7 @@ class FederationExternalWebhookController extends BaseApiController
 
             DB::table('federation_external_partner_logs')
                 ->where('id', $logId)
-                ->update(['status_code' => 200, 'success' => true, 'updated_at' => now()]);
+                ->update(['response_code' => 200, 'success' => true]);
 
             return $this->respondWithData([
                 'received' => true,
@@ -121,7 +121,7 @@ class FederationExternalWebhookController extends BaseApiController
 
             DB::table('federation_external_partner_logs')
                 ->where('id', $logId)
-                ->update(['status_code' => 500, 'success' => false, 'response_body' => substr($e->getMessage(), 0, 1000), 'updated_at' => now()]);
+                ->update(['response_code' => 500, 'success' => false, 'error_message' => substr($e->getMessage(), 0, 1000)]);
 
             return $this->respondWithError('PROCESSING_FAILED', 'Webhook processing failed', null, 500);
         }
@@ -526,14 +526,13 @@ class FederationExternalWebhookController extends BaseApiController
     {
         return DB::table('federation_external_partner_logs')->insertGetId([
             'partner_id' => $partner->id,
-            'tenant_id' => $partner->tenant_id,
-            'endpoint' => '/webhooks/receive',
+            'endpoint' => "/webhooks/receive [{$event}]",
             'method' => 'POST',
-            'status_code' => 0, // Updated after processing
+            'response_code' => 0,
             'success' => false,
             'request_body' => substr(json_encode($payload), 0, 10000),
             'response_body' => null,
-            'duration_ms' => 0,
+            'response_time_ms' => 0,
             'created_at' => now(),
         ]);
     }
