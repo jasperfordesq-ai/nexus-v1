@@ -520,8 +520,28 @@ class FederationExternalWebhookController extends BaseApiController
     // Partnership events
     // ----------------------------------------------------------------
 
+    /**
+     * Valid partnership status transitions.
+     * Terminated partners cannot be reactivated — matches TimeOverflow's state machine.
+     */
+    private const VALID_TRANSITIONS = [
+        'pending'   => ['active', 'suspended', 'failed'],
+        'active'    => ['suspended', 'failed'],
+        'suspended' => ['active', 'failed'],
+        'failed'    => [], // Terminal state — no transitions allowed
+    ];
+
+    private function canTransition(string $from, string $to): bool
+    {
+        return in_array($to, self::VALID_TRANSITIONS[$from] ?? [], true);
+    }
+
     private function handlePartnershipActivated(object $partner): array
     {
+        if (!$this->canTransition($partner->status, 'active')) {
+            Log::warning("[FederationExternalWebhook] Rejected activation of {$partner->status} partner #{$partner->id}");
+            return ['status' => 'rejected', 'reason' => "Cannot activate a {$partner->status} partner"];
+        }
         DB::table('federation_external_partners')
             ->where('id', $partner->id)
             ->update(['status' => 'active', 'verified_at' => now(), 'error_count' => 0, 'last_error' => null]);
@@ -530,6 +550,9 @@ class FederationExternalWebhookController extends BaseApiController
 
     private function handlePartnershipSuspended(object $partner): array
     {
+        if (!$this->canTransition($partner->status, 'suspended')) {
+            return ['status' => 'rejected', 'reason' => "Cannot suspend a {$partner->status} partner"];
+        }
         DB::table('federation_external_partners')
             ->where('id', $partner->id)
             ->update(['status' => 'suspended']);
@@ -538,6 +561,9 @@ class FederationExternalWebhookController extends BaseApiController
 
     private function handlePartnershipTerminated(object $partner): array
     {
+        if (!$this->canTransition($partner->status, 'failed')) {
+            return ['status' => 'rejected', 'reason' => "Cannot terminate a {$partner->status} partner"];
+        }
         DB::table('federation_external_partners')
             ->where('id', $partner->id)
             ->update(['status' => 'failed']);
