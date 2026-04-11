@@ -41,18 +41,18 @@ interface TenantInfo {
   domain: string;
 }
 
-const FEATURE_TOGGLES: Array<{
+const FEATURE_TOGGLE_KEYS: Array<{
   key: keyof TenantFeatureSet;
-  label: string;
-  description: string;
+  labelKey: string;
+  descKey: string;
   icon: typeof Shield;
 }> = [
-  { key: 'cross_tenant_profiles_enabled', label: 'Cross-Tenant Profiles', description: 'Allow member profiles to be visible across tenants', icon: UserCheck },
-  { key: 'cross_tenant_messaging_enabled', label: 'Cross-Tenant Messaging', description: 'Allow messaging between members of different tenants', icon: MessageSquare },
-  { key: 'cross_tenant_transactions_enabled', label: 'Cross-Tenant Transactions', description: 'Allow time credit transfers between tenants', icon: ArrowLeftRight },
-  { key: 'cross_tenant_listings_enabled', label: 'Cross-Tenant Listings', description: 'Allow listings to appear in federated search', icon: LayoutList },
-  { key: 'cross_tenant_events_enabled', label: 'Cross-Tenant Events', description: 'Allow events to be shared across tenants', icon: Calendar },
-  { key: 'cross_tenant_groups_enabled', label: 'Cross-Tenant Groups', description: 'Allow groups to accept cross-tenant members', icon: Users },
+  { key: 'cross_tenant_profiles_enabled', labelKey: 'super.cross_tenant_profiles', descKey: 'super.cross_tenant_profiles_desc', icon: UserCheck },
+  { key: 'cross_tenant_messaging_enabled', labelKey: 'super.cross_tenant_messaging', descKey: 'super.cross_tenant_messaging_desc', icon: MessageSquare },
+  { key: 'cross_tenant_transactions_enabled', labelKey: 'super.cross_tenant_transactions', descKey: 'super.cross_tenant_transactions_desc', icon: ArrowLeftRight },
+  { key: 'cross_tenant_listings_enabled', labelKey: 'super.cross_tenant_listings', descKey: 'super.cross_tenant_listings_desc', icon: LayoutList },
+  { key: 'cross_tenant_events_enabled', labelKey: 'super.cross_tenant_events', descKey: 'super.cross_tenant_events_desc', icon: Calendar },
+  { key: 'cross_tenant_groups_enabled', labelKey: 'super.cross_tenant_groups', descKey: 'super.cross_tenant_groups_desc', icon: Users },
 ];
 
 export function FederationTenantFeatures() {
@@ -69,7 +69,7 @@ export function FederationTenantFeatures() {
   const [saving, setSaving] = useState<string | null>(null);
   const [partnerAction, setPartnerAction] = useState<{ type: 'suspend' | 'terminate'; id: number } | null>(null);
 
-  usePageTitle(tenant ? `Federation Features - ${tenant.name}` : 'Federation Tenant Features');
+  usePageTitle(tenant ? t('super.federation_features_title', { name: tenant.name }) : t('super.loading_tenant_features'));
 
   const loadData = useCallback(async () => {
     if (!numericTenantId || isNaN(numericTenantId)) return;
@@ -168,8 +168,8 @@ export function FederationTenantFeatures() {
   const handlePartnerAction = async () => {
     if (!partnerAction) return;
     const res = partnerAction.type === 'suspend'
-      ? await adminSuper.suspendPartnership(partnerAction.id, 'Suspended by super admin')
-      : await adminSuper.terminatePartnership(partnerAction.id, 'Terminated by super admin');
+      ? await adminSuper.suspendPartnership(partnerAction.id, t('super.suspended_by_super_admin'))
+      : await adminSuper.terminatePartnership(partnerAction.id, t('super.terminated_by_super_admin'));
     if (res?.success) {
       toast.success(t('super.partnership_action_success', { action: partnerAction.type }));
       loadData();
@@ -182,7 +182,7 @@ export function FederationTenantFeatures() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-16">
-        <Spinner size="lg" label="Loading tenant federation features..." />
+        <Spinner size="lg" label={t('super.loading_tenant_features')} />
       </div>
     );
   }
@@ -190,7 +190,7 @@ export function FederationTenantFeatures() {
   if (!tenant) {
     return (
       <div className="p-8 text-center text-default-400">
-        Tenant not found (ID: {tenantId})
+        {t('super.tenant_not_found', { id: tenantId })}
       </div>
     );
   }
@@ -198,8 +198,8 @@ export function FederationTenantFeatures() {
   return (
     <div>
       <PageHeader
-        title={`Federation Features: ${tenant.name}`}
-        description={t('federation_tenant_features.description')}
+        title={t('super.federation_features_title', { name: tenant.name })}
+        description={t('super.federation_features_desc')}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -207,26 +207,26 @@ export function FederationTenantFeatures() {
         <Card>
           <CardHeader className="flex gap-2 items-center">
             <Network size={20} />
-            <h3 className="font-semibold">Tenant Information</h3>
+            <h3 className="font-semibold">{t('super.tenant_information')}</h3>
           </CardHeader>
           <CardBody className="flex flex-col gap-3">
             <div className="flex justify-between items-center">
-              <span className="text-default-500">Name</span>
+              <span className="text-default-500">{t('super.label_name')}</span>
               <span className="font-medium">{tenant.name}</span>
             </div>
             <Divider />
             <div className="flex justify-between items-center">
-              <span className="text-default-500">Slug</span>
+              <span className="text-default-500">{t('super.label_slug')}</span>
               <Chip size="sm" variant="flat">{tenant.slug}</Chip>
             </div>
             <Divider />
             <div className="flex justify-between items-center">
-              <span className="text-default-500">Domain</span>
+              <span className="text-default-500">{t('super.label_domain')}</span>
               <span className="text-sm">{tenant.domain || 'N/A'}</span>
             </div>
             <Divider />
             <div className="flex justify-between items-center">
-              <span className="text-default-500">Tenant ID</span>
+              <span className="text-default-500">{t('super.label_tenant_i_d')}</span>
               <Chip size="sm" variant="flat" color="primary">{tenant.id}</Chip>
             </div>
           </CardBody>
@@ -236,23 +236,23 @@ export function FederationTenantFeatures() {
         <Card>
           <CardHeader className="flex gap-2 items-center">
             <Shield size={20} />
-            <h3 className="font-semibold">Whitelist Status</h3>
+            <h3 className="font-semibold">{t('super.whitelist_status')}</h3>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <span>Federation Whitelist</span>
+              <span>{t('super.federation_whitelist_label')}</span>
               <Chip
                 color={whitelisted ? 'success' : 'default'}
                 variant="flat"
                 size="lg"
               >
-                {whitelisted ? 'Whitelisted' : 'Not Whitelisted'}
+                {whitelisted ? t('super.whitelisted') : t('super.not_whitelisted')}
               </Chip>
             </div>
             <p className="text-sm text-default-400">
               {whitelisted
-                ? 'This tenant is on the federation whitelist and can participate in cross-tenant features when whitelist mode is active.'
-                : 'This tenant is not on the federation whitelist. They will be excluded from federation when whitelist mode is active.'}
+                ? t('super.whitelisted_desc')
+                : t('super.not_whitelisted_desc')}
             </p>
             <Button
               color={whitelisted ? 'danger' : 'success'}
@@ -261,7 +261,7 @@ export function FederationTenantFeatures() {
               isLoading={saving === 'whitelist'}
               onPress={toggleWhitelist}
             >
-              {whitelisted ? 'Remove from Whitelist' : 'Add to Whitelist'}
+              {whitelisted ? t('super.remove_from_whitelist') : t('super.add_to_whitelist')}
             </Button>
           </CardBody>
         </Card>
@@ -270,11 +270,11 @@ export function FederationTenantFeatures() {
         <Card className="lg:col-span-2">
           <CardHeader className="flex gap-2 items-center">
             <Shield size={20} />
-            <h3 className="font-semibold">Federation Feature Toggles</h3>
+            <h3 className="font-semibold">{t('super.federation_feature_toggles')}</h3>
           </CardHeader>
           <CardBody>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {features && FEATURE_TOGGLES.map(({ key, label, description, icon: Icon }) => (
+              {features && FEATURE_TOGGLE_KEYS.map(({ key, labelKey, descKey, icon: Icon }) => (
                 <div
                   key={key}
                   className="flex items-center justify-between p-3 rounded-lg bg-default-50 dark:bg-default-100/50"
@@ -284,8 +284,8 @@ export function FederationTenantFeatures() {
                       <Icon size={18} />
                     </div>
                     <div className="min-w-0">
-                      <p className="font-medium text-sm">{label}</p>
-                      <p className="text-xs text-default-400 truncate">{description}</p>
+                      <p className="font-medium text-sm">{t(labelKey)}</p>
+                      <p className="text-xs text-default-400 truncate">{t(descKey)}</p>
                     </div>
                   </div>
                   <Switch
@@ -304,12 +304,12 @@ export function FederationTenantFeatures() {
         <Card className="lg:col-span-2">
           <CardHeader className="flex gap-2 items-center">
             <Network size={20} />
-            <h3 className="font-semibold">Partnerships ({partnerships.length})</h3>
+            <h3 className="font-semibold">{t('super.partnerships_heading')} ({partnerships.length})</h3>
           </CardHeader>
           <CardBody>
             {partnerships.length === 0 ? (
               <p className="text-default-400 text-sm text-center py-4">
-                No federation partnerships involving this tenant.
+                {t('super.no_partnerships_for_tenant')}
               </p>
             ) : (
               <div className="flex flex-col gap-2">
@@ -325,7 +325,7 @@ export function FederationTenantFeatures() {
                         <span className="font-medium">{partnerName}</span>
                         <StatusBadge status={p.status} />
                         <span className="text-xs text-default-400">
-                          Since {new Date(p.created_at).toLocaleDateString()}
+                          {t('super.since_date', { date: new Date(p.created_at).toLocaleDateString() })}
                         </span>
                       </div>
                       {p.status === 'active' && (
@@ -336,7 +336,7 @@ export function FederationTenantFeatures() {
                             color="warning"
                             onPress={() => setPartnerAction({ type: 'suspend', id: p.id })}
                           >
-                            Suspend
+                            {t('super.suspend_btn')}
                           </Button>
                           <Button
                             size="sm"
@@ -344,15 +344,15 @@ export function FederationTenantFeatures() {
                             color="danger"
                             onPress={() => setPartnerAction({ type: 'terminate', id: p.id })}
                           >
-                            Terminate
+                            {t('super.terminate_btn')}
                           </Button>
                         </div>
                       )}
                       {p.status === 'suspended' && (
-                        <Chip size="sm" variant="flat" color="warning">Suspended</Chip>
+                        <Chip size="sm" variant="flat" color="warning">{t('super.partnership_suspended')}</Chip>
                       )}
                       {p.status === 'terminated' && (
-                        <Chip size="sm" variant="flat" color="danger">Terminated</Chip>
+                        <Chip size="sm" variant="flat" color="danger">{t('super.partnership_terminated')}</Chip>
                       )}
                     </div>
                   );

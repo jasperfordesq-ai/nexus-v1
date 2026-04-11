@@ -8,10 +8,11 @@
  * Overview of federation activity metrics: partnerships, transactions, messages.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Card, CardBody, Button } from '@heroui/react';
 import { BarChart3, Handshake, ArrowRightLeft, MessageSquare, Clock, RefreshCw } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts/ToastContext';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 
@@ -27,13 +28,18 @@ interface FedAnalytics {
 export function FederationAnalytics() {
   const { t } = useTranslation('admin');
   usePageTitle(t('federation.page_title'));
+  const toast = useToast();
   const [data, setData] = useState<FedAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
+  const abortRef = useRef<AbortController | null>(null);
 
   const loadData = useCallback(async () => {
+    abortRef.current?.abort();
+    abortRef.current = new AbortController();
     setLoading(true);
     try {
       const res = await adminFederation.getAnalytics();
+      if (abortRef.current.signal.aborted) return;
       if (res.success && res.data) {
         const payload = res.data as unknown;
         if (payload && typeof payload === 'object' && 'data' in payload) {
@@ -41,14 +47,23 @@ export function FederationAnalytics() {
         } else {
           setData(payload as FedAnalytics);
         }
+      } else {
+        setData(null);
+        toast.error(res.error || t('federation.failed_to_load_analytics'));
       }
     } catch {
-      setData(null);
+      if (!abortRef.current?.signal.aborted) {
+        setData(null);
+        toast.error(t('federation.failed_to_load_analytics'));
+      }
     }
     setLoading(false);
-  }, []);
+  }, [t, toast]);
 
-  useEffect(() => { loadData(); }, [loadData]);
+  useEffect(() => {
+    loadData();
+    return () => { abortRef.current?.abort(); };
+  }, [loadData]);
 
   return (
     <div>

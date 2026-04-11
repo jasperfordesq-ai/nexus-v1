@@ -256,12 +256,22 @@ export function CreditAgreements() {
   // ─── Create agreement ───
   const handleCreate = useCallback(async () => {
     if (!selectedPartner) return;
+    const rate = parseFloat(exchangeRate);
+    const limit = parseInt(monthlyLimit);
+    if (!rate || rate <= 0) {
+      toast.error(t('federation.exchange_rate_must_be_positive'));
+      return;
+    }
+    if (!limit || limit <= 0) {
+      toast.error(t('federation.monthly_limit_must_be_positive'));
+      return;
+    }
     setCreating(true);
     try {
       const res = await api.post('/v2/admin/federation/credit-agreements', {
         partner_tenant_id: parseInt(selectedPartner),
-        exchange_rate: parseFloat(exchangeRate) || 1.0,
-        monthly_limit: parseInt(monthlyLimit) || 100,
+        exchange_rate: rate,
+        monthly_limit: limit,
       });
       if (res.success) {
         toast.success(t('federation.credit_agreement_created'));

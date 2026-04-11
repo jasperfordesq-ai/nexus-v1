@@ -634,15 +634,31 @@ class FederationController extends BaseApiController
         // the V2 federation messages page can display them alongside outbound messages.
         $senderName = htmlspecialchars($input['sender_name'] ?? 'A federation member', ENT_QUOTES, 'UTF-8');
         if ($isExternal) {
-            // Find the external partner record that matches this API key's platform_id
-            // Find the external partner record for this tenant.
-            // Use the most recently synced active partner (most likely the one calling us).
+            // Find the external partner record for this inbound request.
+            // Prefer matching by the authenticated API key's platform_id against
+            // the external partner's name (deterministic) rather than guessing
+            // based on last_sync_at ordering, which breaks with multiple partners.
             $externalPartnerId = null;
-            $epRow = DB::selectOne(
-                "SELECT id FROM federation_external_partners WHERE tenant_id = ? AND status = 'active' ORDER BY last_sync_at DESC, id DESC LIMIT 1",
-                [(int) $recipient['tenant_id']]
-            );
-            if ($epRow) $externalPartnerId = (int) $epRow->id;
+            $platformId = $auth['platform_id'] ?? null;
+
+            if ($platformId) {
+                $epRow = DB::selectOne(
+                    "SELECT id FROM federation_external_partners WHERE tenant_id = ? AND status = 'active' AND name = ? LIMIT 1",
+                    [(int) $recipient['tenant_id'], $platformId]
+                );
+                if ($epRow) {
+                    $externalPartnerId = (int) $epRow->id;
+                }
+            }
+
+            // Fallback: match by most recently synced active partner for this tenant
+            if (!$externalPartnerId) {
+                $epRow = DB::selectOne(
+                    "SELECT id FROM federation_external_partners WHERE tenant_id = ? AND status = 'active' ORDER BY last_sync_at DESC, id DESC LIMIT 1",
+                    [(int) $recipient['tenant_id']]
+                );
+                if ($epRow) $externalPartnerId = (int) $epRow->id;
+            }
 
             try {
                 DB::insert("

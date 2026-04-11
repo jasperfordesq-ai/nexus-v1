@@ -368,6 +368,111 @@ class FederationV2Controller extends BaseApiController
         }
     }
 
+    /** GET /api/v2/federation/partners/{id} */
+    public function partnerDetail(string $id): JsonResponse
+    {
+        $this->getUserId();
+        $tenantId = $this->getTenantId();
+
+        try {
+            // Check for external partner (ext-N format)
+            if (str_starts_with($id, 'ext-')) {
+                $extId = (int) substr($id, 4);
+                $ep = \App\Services\FederationExternalPartnerService::getById($extId, $tenantId);
+                if (!$ep || ($ep['status'] ?? '') !== 'active') {
+                    return response()->json(['success' => false, 'error' => 'Partner not found'], 404);
+                }
+                $permissions = [];
+                if ($ep['allow_member_search'] ?? false) $permissions[] = 'profiles';
+                if ($ep['allow_messaging'] ?? false) $permissions[] = 'messaging';
+                if ($ep['allow_transactions'] ?? false) $permissions[] = 'transactions';
+                if ($ep['allow_listing_search'] ?? false) $permissions[] = 'listings';
+                if ($ep['allow_events'] ?? false) $permissions[] = 'events';
+                if ($ep['allow_groups'] ?? false) $permissions[] = 'groups';
+
+                return $this->respondWithData([
+                    'id' => 'ext-' . $ep['id'],
+                    'name' => $ep['name'],
+                    'logo' => null,
+                    'tagline' => $ep['description'] ?? '',
+                    'location' => '',
+                    'country' => '',
+                    'member_count' => (int) ($ep['partner_member_count'] ?? 0),
+                    'federation_level' => 1,
+                    'federation_level_name' => 'External',
+                    'permissions' => $permissions,
+                    'partnership_since' => $ep['created_at'] ?? null,
+                    'is_external' => true,
+                    'base_url' => $ep['base_url'] ?? null,
+                    'status' => $ep['status'] ?? 'active',
+                ]);
+            }
+
+            // Internal partner — find the partnership
+            $partnerId = (int) $id;
+            $row = DB::selectOne("
+                SELECT
+                    fp.id as partnership_id, fp.federation_level,
+                    fp.created_at as partnership_since,
+                    fp.profiles_enabled, fp.messaging_enabled, fp.transactions_enabled,
+                    fp.listings_enabled, fp.events_enabled, fp.groups_enabled,
+                    CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END as partner_tenant_id,
+                    CASE WHEN fp.tenant_id = ? THEN t2.name ELSE t1.name END as partner_name,
+                    CASE WHEN fp.tenant_id = ? THEN t2.tagline ELSE t1.tagline END as partner_tagline,
+                    CASE WHEN fp.tenant_id = ? THEN t2.location_name ELSE t1.location_name END as partner_location,
+                    CASE WHEN fp.tenant_id = ? THEN t2.country_code ELSE t1.country_code END as partner_country,
+                    CASE WHEN fp.tenant_id = ? THEN dp2.logo_url ELSE dp1.logo_url END as partner_logo,
+                    (SELECT COUNT(*) FROM users u
+                     JOIN federation_user_settings fus2 ON fus2.user_id = u.id AND fus2.federation_optin = 1
+                     WHERE u.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
+                       AND u.status = 'active') as partner_member_count,
+                    (SELECT COUNT(*) FROM listings li
+                     WHERE li.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
+                       AND li.status = 'active') as partner_listing_count
+                FROM federation_partnerships fp
+                LEFT JOIN tenants t1 ON fp.tenant_id = t1.id
+                LEFT JOIN tenants t2 ON fp.partner_tenant_id = t2.id
+                LEFT JOIN federation_directory_profiles dp1 ON dp1.tenant_id = fp.tenant_id
+                LEFT JOIN federation_directory_profiles dp2 ON dp2.tenant_id = fp.partner_tenant_id
+                WHERE (fp.tenant_id = ? OR fp.partner_tenant_id = ?) AND fp.status = 'active'
+                  AND CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END = ?
+                LIMIT 1
+            ", [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $partnerId]);
+
+            if (!$row) {
+                return response()->json(['success' => false, 'error' => 'Partner not found'], 404);
+            }
+
+            $p = (array) $row;
+            $level = (int) ($p['federation_level'] ?? 1);
+            $permissions = [];
+            if ($p['profiles_enabled']) $permissions[] = 'profiles';
+            if ($p['messaging_enabled']) $permissions[] = 'messaging';
+            if ($p['transactions_enabled']) $permissions[] = 'transactions';
+            if ($p['listings_enabled']) $permissions[] = 'listings';
+            if ($p['events_enabled']) $permissions[] = 'events';
+            if ($p['groups_enabled']) $permissions[] = 'groups';
+
+            return $this->respondWithData([
+                'id' => (int) $p['partner_tenant_id'],
+                'name' => $p['partner_name'] ?? 'Unknown',
+                'logo' => $p['partner_logo'] ?: null,
+                'tagline' => $p['partner_tagline'] ?? '',
+                'location' => $p['partner_location'] ?? '',
+                'country' => $p['partner_country'] ?? '',
+                'member_count' => (int) ($p['partner_member_count'] ?? 0),
+                'listing_count' => (int) ($p['partner_listing_count'] ?? 0),
+                'federation_level' => $level,
+                'federation_level_name' => self::LEVEL_NAMES[$level] ?? 'Discovery',
+                'permissions' => $permissions,
+                'partnership_since' => $p['partnership_since'] ?? null,
+            ]);
+        } catch (\Exception $e) {
+            error_log("FederationV2Api::partnerDetail error: " . $e->getMessage());
+            return response()->json(['success' => false, 'error' => 'Failed to load partner'], 500);
+        }
+    }
+
     // =====================================================================
     // ACTIVITY
     // =====================================================================

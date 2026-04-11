@@ -413,29 +413,43 @@ class FederationExternalApiClient
 
     /**
      * Record a successful call — reset failure counter.
+     *
+     * Defense-in-depth: tenant_id is included in the WHERE clause even though
+     * getPartner() already scopes by tenant. This prevents a compromised or
+     * misrouted partner ID from modifying another tenant's partner record.
      */
     private static function recordSuccess(int $partnerId): void
     {
         Cache::forget("federation_cb_failures:{$partnerId}");
         Cache::forget("federation_cb_open:{$partnerId}");
 
+        $tenantId = \App\Core\TenantContext::getId();
+
         // Restore partner to 'active' if it was in 'failed' state so that
         // a recovered partner can self-heal after the circuit-breaker cooldown
         // expires. Do NOT auto-promote 'pending' partners — they must be
         // explicitly approved by an admin via the External Partners UI.
-        DB::table('federation_external_partners')
+        $query = DB::table('federation_external_partners')
             ->where('id', $partnerId)
-            ->where('status', 'failed')
-            ->update([
-                'status' => 'active',
-                'error_count' => 0,
-                'last_error' => null,
-                'updated_at' => now(),
-            ]);
+            ->where('status', 'failed');
+
+        if ($tenantId) {
+            $query->where('tenant_id', $tenantId);
+        }
+
+        $query->update([
+            'status' => 'active',
+            'error_count' => 0,
+            'last_error' => null,
+            'updated_at' => now(),
+        ]);
     }
 
     /**
      * Record a failed call — increment counter and potentially trip the circuit breaker.
+     *
+     * Defense-in-depth: tenant_id is included in the WHERE clause even though
+     * getPartner() already scopes by tenant.
      */
     private static function recordFailure(int $partnerId): void
     {
@@ -452,19 +466,26 @@ class FederationExternalApiClient
             Cache::put($cacheKey, $failures, self::CIRCUIT_BREAKER_COOLDOWN_SECONDS * 2);
         }
 
+        $tenantId = \App\Core\TenantContext::getId();
+
         if ($failures >= self::CIRCUIT_BREAKER_THRESHOLD) {
             // Trip the circuit breaker
             Cache::put("federation_cb_open:{$partnerId}", true, self::CIRCUIT_BREAKER_COOLDOWN_SECONDS);
 
             // Mark partner as failed in DB
-            DB::table('federation_external_partners')
-                ->where('id', $partnerId)
-                ->update([
-                    'status' => 'failed',
-                    'error_count' => $failures,
-                    'last_error' => 'Circuit breaker tripped after ' . $failures . ' consecutive failures',
-                    'updated_at' => now(),
-                ]);
+            $query = DB::table('federation_external_partners')
+                ->where('id', $partnerId);
+
+            if ($tenantId) {
+                $query->where('tenant_id', $tenantId);
+            }
+
+            $query->update([
+                'status' => 'failed',
+                'error_count' => $failures,
+                'last_error' => 'Circuit breaker tripped after ' . $failures . ' consecutive failures',
+                'updated_at' => now(),
+            ]);
 
             Log::warning('FederationExternalApiClient: circuit breaker tripped', [
                 'partner_id' => $partnerId,
@@ -472,12 +493,17 @@ class FederationExternalApiClient
             ]);
         } else {
             // Update error count in DB
-            DB::table('federation_external_partners')
-                ->where('id', $partnerId)
-                ->update([
-                    'error_count' => $failures,
-                    'updated_at' => now(),
-                ]);
+            $query = DB::table('federation_external_partners')
+                ->where('id', $partnerId);
+
+            if ($tenantId) {
+                $query->where('tenant_id', $tenantId);
+            }
+
+            $query->update([
+                'error_count' => $failures,
+                'updated_at' => now(),
+            ]);
         }
     }
 

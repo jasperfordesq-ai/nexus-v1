@@ -169,16 +169,16 @@ export default function FederationSystemControls() {
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <Lock className="w-5 h-5 text-danger" />
-            Emergency Controls
+            {t('super.emergency_controls_heading')}
           </h3>
         </CardHeader>
         <CardBody className="space-y-4">
           {controls.lockdown_active ? (
             <div className="space-y-3">
               <div className="p-4 rounded-lg bg-danger-50 dark:bg-danger-950 border border-danger">
-                <p className="font-semibold text-danger">Lockdown Active</p>
+                <p className="font-semibold text-danger">{t('super.lockdown_active_label')}</p>
                 <p className="text-sm text-danger-600 dark:text-danger-400 mt-1">
-                  {controls.lockdown_reason || 'No reason provided'}
+                  {controls.lockdown_reason || t('super.no_reason_provided')}
                 </p>
               </div>
               <Button
@@ -187,7 +187,7 @@ export default function FederationSystemControls() {
                 onPress={handleLiftLockdown}
                 fullWidth
               >
-                Lift Emergency Lockdown
+                {t('super.lift_emergency_lockdown')}
               </Button>
             </div>
           ) : (
@@ -206,7 +206,7 @@ export default function FederationSystemControls() {
                 onPress={handleTriggerLockdown}
                 fullWidth
               >
-                Trigger Emergency Lockdown
+                {t('super.trigger_emergency_lockdown')}
               </Button>
             </div>
           )}
@@ -218,16 +218,16 @@ export default function FederationSystemControls() {
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <Shield className="w-5 h-5 text-primary" />
-            Master Kill Switch
+            {t('super.master_kill_switch_heading')}
           </h3>
         </CardHeader>
         <CardBody className="space-y-6">
           {/* Federation Enabled */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">Federation Enabled</p>
+              <p className="font-medium">{t('super.federation_enabled_label')}</p>
               <p className="text-sm text-default-500">
-                Enable or disable the entire federation system
+                {t('super.federation_enabled_desc')}
               </p>
             </div>
             <Switch
@@ -239,9 +239,9 @@ export default function FederationSystemControls() {
           {/* Whitelist Mode */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">Whitelist Mode</p>
+              <p className="font-medium">{t('super.whitelist_mode_label')}</p>
               <p className="text-sm text-default-500">
-                Only allow whitelisted tenants to use federation
+                {t('super.whitelist_mode_desc')}
               </p>
             </div>
             <Switch
@@ -276,16 +276,16 @@ export default function FederationSystemControls() {
       {/* Cross-Tenant Features */}
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">Cross-Tenant Features</h3>
+          <h3 className="text-lg font-semibold">{t('super.cross_tenant_features_heading')}</h3>
         </CardHeader>
         <CardBody className="space-y-4">
           {[
-            { key: 'profiles', label: 'Profile Sharing', description: 'Allow viewing profiles across communities' },
-            { key: 'messaging', label: 'Cross-Community Messaging', description: 'Enable messaging between communities' },
-            { key: 'transactions', label: 'Cross-Community Transactions', description: 'Allow time credit transfers between communities' },
-            { key: 'listings', label: 'Listing Discovery', description: 'Show listings from partner communities' },
-            { key: 'events', label: 'Event Sharing', description: 'Share events across communities' },
-            { key: 'groups', label: 'Group Federation', description: 'Enable cross-community groups' },
+            { key: 'profiles', label: t('super.feature_profile_sharing'), description: t('super.feature_profile_sharing_desc') },
+            { key: 'messaging', label: t('super.feature_cross_messaging'), description: t('super.feature_cross_messaging_desc') },
+            { key: 'transactions', label: t('super.feature_cross_transactions'), description: t('super.feature_cross_transactions_desc') },
+            { key: 'listings', label: t('super.feature_listing_discovery'), description: t('super.feature_listing_discovery_desc') },
+            { key: 'events', label: t('super.feature_event_sharing'), description: t('super.feature_event_sharing_desc') },
+            { key: 'groups', label: t('super.feature_group_federation'), description: t('super.feature_group_federation_desc') },
           ].map(feature => (
             <div key={feature.key} className="flex items-center justify-between">
               <div>

@@ -403,6 +403,7 @@ Route::post('/v2/federation/opt-in', [\App\Http\Controllers\Api\FederationV2Cont
 Route::post('/v2/federation/setup', [\App\Http\Controllers\Api\FederationV2Controller::class, 'setup']);
 Route::post('/v2/federation/opt-out', [\App\Http\Controllers\Api\FederationV2Controller::class, 'optOut']);
 Route::get('/v2/federation/partners', [\App\Http\Controllers\Api\FederationV2Controller::class, 'partners']);
+Route::get('/v2/federation/partners/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'partnerDetail']);
 Route::get('/v2/federation/activity', [\App\Http\Controllers\Api\FederationV2Controller::class, 'activity']);
 Route::get('/v2/federation/events', [\App\Http\Controllers\Api\FederationV2Controller::class, 'events']);
 Route::get('/v2/federation/listings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'listings']);
