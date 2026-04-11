@@ -96,7 +96,10 @@ class FederationExternalWebhookController extends BaseApiController
         }
 
         // ---- Set tenant context from partner ----
-        TenantContext::setById($partner->tenant_id);
+        if (!TenantContext::setById($partner->tenant_id)) {
+            Log::error("[FederationExternalWebhook] Failed to set tenant context for partner #{$partner->id}, tenant #{$partner->tenant_id}");
+            return $this->respondWithError('TENANT_ERROR', 'Unable to resolve tenant for this partner', null, 500);
+        }
 
         // ---- Log the webhook ----
         $logId = $this->logWebhook($partner, $event, $payload);
@@ -606,7 +609,7 @@ class FederationExternalWebhookController extends BaseApiController
             'method' => 'POST',
             'response_code' => 0,
             'success' => false,
-            'request_body' => substr(json_encode($payload), 0, 10000),
+            'request_body' => substr(json_encode($payload) ?: '{"_encode_error": true}', 0, 10000),
             'response_body' => null,
             'response_time_ms' => 0,
             'created_at' => now(),
