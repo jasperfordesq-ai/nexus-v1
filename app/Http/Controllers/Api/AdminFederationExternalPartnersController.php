@@ -130,11 +130,16 @@ class AdminFederationExternalPartnersController extends BaseApiController
         // On successful health check, sync partner metadata
         if ($result['success']) {
             try {
+                // Extract version from health check response if available
+                $healthData = $result['data'] ?? [];
+                $partnerVersion = $healthData['version'] ?? $healthData['api_version'] ?? $healthData['platform_version'] ?? null;
+
                 // Fetch the partner's timebank info — with the response envelope
                 // now unwrapped, data is the array of timebanks directly.
                 $timebankInfo = FederationExternalApiClient::get($id, '/timebanks');
                 $memberCount = 0;
                 $partnerDisplayName = null;
+                $partnerMetadata = null;
 
                 if (($timebankInfo['success'] ?? false) && !empty($timebankInfo['data'])) {
                     $timebanks = $timebankInfo['data'];
@@ -143,18 +148,34 @@ class AdminFederationExternalPartnersController extends BaseApiController
                     if ($firstTb) {
                         $memberCount = (int) ($firstTb['member_count'] ?? 0);
                         $partnerDisplayName = $firstTb['name'] ?? null;
+
+                        // Collect metadata from the partner's response
+                        $metaFields = array_intersect_key(
+                            $firstTb,
+                            array_flip(['location', 'country', 'currency', 'timezone', 'language', 'features', 'description', 'tagline'])
+                        );
+                        if (!empty($metaFields)) {
+                            $partnerMetadata = json_encode($metaFields, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                        }
                     }
+                }
+
+                // Also try version from timebank data if not found in health response
+                if (!$partnerVersion && !empty($healthData['platform'])) {
+                    $partnerVersion = $healthData['platform'];
                 }
 
                 DB::update(
                     "UPDATE federation_external_partners SET
                         partner_member_count = ?,
                         partner_name = COALESCE(NULLIF(?, ''), partner_name),
+                        partner_version = COALESCE(NULLIF(?, ''), partner_version),
+                        partner_metadata = COALESCE(NULLIF(?, ''), partner_metadata),
                         last_sync_at = NOW(),
                         error_count = 0,
                         last_error = NULL
                      WHERE id = ? AND tenant_id = ?",
-                    [$memberCount, $partnerDisplayName, $id, $tenantId]
+                    [$memberCount, $partnerDisplayName, $partnerVersion, $partnerMetadata, $id, $tenantId]
                 );
             } catch (\Throwable $e) {
                 // Non-critical — still update last_sync_at

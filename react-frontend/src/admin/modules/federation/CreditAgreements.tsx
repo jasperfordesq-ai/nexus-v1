@@ -680,7 +680,7 @@ export function CreditAgreements() {
                         <p className="text-sm font-semibold">{t('federation.agreement_terms')}</p>
                       </CardHeader>
                       <CardBody>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                           <div>
                             <p className="text-default-400">{t('federation.col_partner')}</p>
                             <p className="font-medium">{getPartnerName(selectedAgreement)}</p>

@@ -10,7 +10,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Switch, Button, Input, Divider, Spinner } from '@heroui/react';
+import { Card, CardBody, CardHeader, Switch, Button, Input, Divider, Skeleton } from '@heroui/react';
 import { Network, RefreshCw, Save } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
@@ -104,8 +104,32 @@ export function FederationSettings() {
           title={t('federation.federation_settings_title')}
           description={t('federation.federation_settings_desc')}
         />
-        <div className="flex h-64 items-center justify-center">
-          <Spinner size="lg" />
+        <div className="space-y-6">
+          <Card shadow="sm">
+            <CardHeader><Skeleton className="h-5 w-40 rounded-lg" /></CardHeader>
+            <CardBody className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-32 rounded-lg" />
+                    <Skeleton className="h-3 w-48 rounded-lg" />
+                  </div>
+                  <Skeleton className="h-6 w-12 rounded-full" />
+                </div>
+              ))}
+            </CardBody>
+          </Card>
+          <Card shadow="sm">
+            <CardHeader><Skeleton className="h-5 w-48 rounded-lg" /></CardHeader>
+            <CardBody className="space-y-4">
+              {[1, 2].map((i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <Skeleton className="h-4 w-36 rounded-lg" />
+                  <Skeleton className="h-8 w-20 rounded-lg" />
+                </div>
+              ))}
+            </CardBody>
+          </Card>
         </div>
       </div>
     );

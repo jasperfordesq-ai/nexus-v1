@@ -22,6 +22,7 @@ import {
   Checkbox,
   Tooltip,
   Spinner,
+  Skeleton,
 } from '@heroui/react';
 import {
   Mail,
@@ -612,8 +613,17 @@ export function ActivityFeed() {
       {/* Timeline */}
       {loading && items.length === 0 ? (
         <Card shadow="sm">
-          <CardBody className="flex items-center justify-center py-16">
-            <Spinner size="lg" />
+          <CardBody className="space-y-4 py-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex items-start gap-3 p-3">
+                <Skeleton className="h-10 w-10 rounded-full shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-3/4 rounded-lg" />
+                  <Skeleton className="h-3 w-1/2 rounded-lg" />
+                </div>
+                <Skeleton className="h-3 w-16 rounded-lg" />
+              </div>
+            ))}
           </CardBody>
         </Card>
       ) : items.length === 0 ? (

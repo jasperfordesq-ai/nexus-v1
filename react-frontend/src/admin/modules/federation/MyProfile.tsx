@@ -10,7 +10,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Input, Textarea, Button, Spinner, Chip } from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Textarea, Button, Spinner, Chip, Skeleton } from '@heroui/react';
 import { Building, RefreshCw, Save, Star, Tag } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
@@ -239,8 +239,15 @@ export function MyProfile() {
           title={t('federation.my_profile_title')}
           description={t('federation.my_profile_desc')}
         />
-        <div className="flex h-64 items-center justify-center">
-          <Spinner size="lg" />
+        <div className="space-y-6">
+          <Card shadow="sm">
+            <CardHeader><Skeleton className="h-5 w-36 rounded-lg" /></CardHeader>
+            <CardBody className="space-y-4">
+              <Skeleton className="h-10 w-full rounded-lg" />
+              <Skeleton className="h-10 w-full rounded-lg" />
+              <Skeleton className="h-24 w-full rounded-lg" />
+            </CardBody>
+          </Card>
         </div>
       </div>
     );

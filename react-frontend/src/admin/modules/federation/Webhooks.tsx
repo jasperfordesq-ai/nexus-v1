@@ -297,7 +297,21 @@ export function Webhooks() {
   }, [deleteTarget, toast, t, loadData]);
 
   // ─── Test webhook ───
-  const handleTest = useCallback(async (webhook: WebhookItem) => {
+  const [testPreview, setTestPreview] = useState<WebhookItem | null>(null);
+
+  const SAMPLE_PAYLOAD = {
+    event: 'webhook.test',
+    timestamp: new Date().toISOString(),
+    data: {
+      webhook_id: testPreview?.id ?? 0,
+      message: 'This is a test delivery from Project NEXUS Federation',
+    },
+  };
+
+  const handleTestConfirm = useCallback(async () => {
+    if (!testPreview) return;
+    const webhook = testPreview;
+    setTestPreview(null);
     setTestingId(webhook.id);
     try {
       const res = await api.post(`/v2/admin/federation/webhooks/${webhook.id}/test`, {});
@@ -319,7 +333,7 @@ export function Webhooks() {
       toast.error(t('federation.webhooks_test_failed', 'Test delivery failed'));
     }
     setTestingId(null);
-  }, [toast, t, loadData]);
+  }, [testPreview, toast, t, loadData]);
 
   // ─── View logs ───
   const handleViewLogs = useCallback(async (webhook: WebhookItem) => {
@@ -480,7 +494,7 @@ export function Webhooks() {
                     aria-label={t('federation.webhooks_actions', 'Webhook actions')}
                     onAction={(key) => {
                       if (key === 'edit') openEdit(webhook);
-                      else if (key === 'test') handleTest(webhook);
+                      else if (key === 'test') setTestPreview(webhook);
                       else if (key === 'logs') handleViewLogs(webhook);
                       else if (key === 'delete') setDeleteTarget(webhook);
                     }}
@@ -563,7 +577,7 @@ export function Webhooks() {
                     onValueChange={(v) => setForm((prev) => ({ ...prev, events: v }))}
                     isDisabled={!!createdSecret}
                   >
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       {ALL_EVENTS.map((evt) => (
                         <Checkbox key={evt.key} value={evt.key} size="sm">
                           {evt.label}
@@ -636,63 +650,55 @@ export function Webhooks() {
                   <div className="space-y-0">
                     {logs.map((log) => (
                       <div key={log.id}>
-                        {/* Log row */}
-                        <div className="grid grid-cols-[30px_1fr_60px_60px_80px_70px_120px_50px] items-center gap-2 py-2 border-b border-default-100 text-sm">
-                          <Button
-                            isIconOnly
-                            size="sm"
-                            variant="light"
-                            onPress={() => setExpandedLogId(expandedLogId === log.id ? null : log.id)}
-                            aria-label={t('federation.webhooks_expand', 'Toggle details')}
-                          >
-                            {expandedLogId === log.id
-                              ? <ChevronDown size={14} className="text-default-400" />
-                              : <ChevronRight size={14} className="text-default-400" />
-                            }
-                          </Button>
-                          <div>
+                        {/* Log row — responsive: stacked on mobile, full grid on lg+ */}
+                        <div className="flex flex-col gap-1 py-2 border-b border-default-100 text-sm lg:grid lg:grid-cols-[30px_1fr_60px_60px_80px_70px_120px_50px] lg:items-center lg:gap-2">
+                          <div className="flex items-center gap-2 lg:contents">
+                            <Button
+                              isIconOnly
+                              size="sm"
+                              variant="light"
+                              onPress={() => setExpandedLogId(expandedLogId === log.id ? null : log.id)}
+                              aria-label={t('federation.webhooks_expand', 'Toggle details')}
+                            >
+                              {expandedLogId === log.id
+                                ? <ChevronDown size={14} className="text-default-400" />
+                                : <ChevronRight size={14} className="text-default-400" />
+                              }
+                            </Button>
                             <Chip size="sm" variant="flat">{log.event_type}</Chip>
-                          </div>
-                          <div>
-                            {log.success ? (
-                              <Check size={16} className="text-success" />
-                            ) : (
-                              <X size={16} className="text-danger" />
-                            )}
-                          </div>
-                          <div>
+                            <div>
+                              {log.success ? (
+                                <Check size={16} className="text-success" />
+                              ) : (
+                                <X size={16} className="text-danger" />
+                              )}
+                            </div>
                             <span className={`text-sm ${log.response_code && log.response_code >= 200 && log.response_code < 300 ? 'text-success' : log.response_code ? 'text-danger' : 'text-default-400'}`}>
                               {log.response_code ?? '--'}
                             </span>
-                          </div>
-                          <div>
                             <span className="text-sm text-default-500">
                               {log.response_time_ms != null ? `${log.response_time_ms}ms` : '--'}
                             </span>
-                          </div>
-                          <div>
                             <span className="text-sm text-default-500">#{log.attempt_number}</span>
-                          </div>
-                          <div>
                             <span className="text-sm text-default-400">
                               {log.created_at ? formatRelativeTime(log.created_at) : '--'}
                             </span>
-                          </div>
-                          <div>
-                            {!log.success && (
-                              <Tooltip content={t('federation.webhooks_retry', 'Retry delivery')}>
-                                <Button
-                                  isIconOnly
-                                  size="sm"
-                                  variant="light"
-                                  isLoading={retryingLogId === log.id}
-                                  onPress={() => handleRetry(log)}
-                                  aria-label={t('federation.webhooks_retry', 'Retry delivery')}
-                                >
-                                  <RotateCcw size={14} />
-                                </Button>
-                              </Tooltip>
-                            )}
+                            <div>
+                              {!log.success && (
+                                <Tooltip content={t('federation.webhooks_retry', 'Retry delivery')}>
+                                  <Button
+                                    isIconOnly
+                                    size="sm"
+                                    variant="light"
+                                    isLoading={retryingLogId === log.id}
+                                    onPress={() => handleRetry(log)}
+                                    aria-label={t('federation.webhooks_retry', 'Retry delivery')}
+                                  >
+                                    <RotateCcw size={14} />
+                                  </Button>
+                                </Tooltip>
+                              )}
+                            </div>
                           </div>
                         </div>
 
@@ -749,6 +755,53 @@ export function Webhooks() {
           isLoading={deleting}
         />
       )}
+
+      {/* Test payload preview */}
+      <Modal isOpen={!!testPreview} onOpenChange={(open) => { if (!open) setTestPreview(null); }} size="lg" scrollBehavior="inside">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex items-center gap-2">
+                <Send size={20} />
+                {t('federation.webhooks_test_preview_title', 'Test Webhook Delivery')}
+              </ModalHeader>
+              <ModalBody>
+                <p className="text-sm text-default-500 mb-3">
+                  {t('federation.webhooks_test_preview_desc', 'A test payload will be sent to this endpoint. The payload below shows the format that will be delivered.')}
+                </p>
+                {testPreview && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-default-700">{t('federation.webhooks_endpoint', 'Endpoint')}:</span>
+                      <code className="text-xs bg-default-100 px-2 py-1 rounded break-all">{testPreview.url}</code>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-default-700 mb-1">{t('federation.webhooks_sample_payload', 'Sample Payload')}</p>
+                      <pre className="text-xs bg-default-100 rounded p-3 overflow-x-auto max-h-48 border border-default-200">
+                        {JSON.stringify(SAMPLE_PAYLOAD, null, 2)}
+                      </pre>
+                    </div>
+                    <p className="text-xs text-default-400">
+                      {t('federation.webhooks_test_note', 'The payload will be signed with the webhook\'s secret using HMAC-SHA256. The X-Webhook-Signature header will be included.')}
+                    </p>
+                  </div>
+                )}
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" onPress={onClose}>{t('federation.cancel', 'Cancel')}</Button>
+                <Button
+                  color="primary"
+                  startContent={<Send size={16} />}
+                  onPress={handleTestConfirm}
+                  isLoading={testingId === testPreview?.id}
+                >
+                  {t('federation.webhooks_send_test', 'Send Test')}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

@@ -618,7 +618,7 @@ export function ExternalPartners() {
                   <p className="text-sm font-semibold text-default-700">
                     {t('federation.feature_toggles', 'Feature Toggles')}
                   </p>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <Switch
                       isSelected={form.allow_member_search}
                       onValueChange={(v) => updateForm('allow_member_search', v)}

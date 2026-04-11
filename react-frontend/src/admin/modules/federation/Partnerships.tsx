@@ -146,6 +146,9 @@ export function Partnerships() {
   const [statsLoading, setStatsLoading] = useState(false);
   const [permissionsLoading, setPermissionsLoading] = useState(false);
 
+  // Bulk selection
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+
   // Counter-proposal modal
   const counterModal = useDisclosure();
   const [counterTarget, setCounterTarget] = useState<Partnership | null>(null);
@@ -262,6 +265,44 @@ export function Partnerships() {
     } finally {
       setActionLoading(false);
     }
+  };
+
+  // ─── Bulk actions ───
+  const selectedPendingItems = useMemo(() => {
+    if (selectedKeys.size === 0) return [];
+    return filteredItems.filter(p => selectedKeys.has(String(p.id)) && p.status === 'pending');
+  }, [selectedKeys, filteredItems]);
+
+  const handleBulkApprove = async () => {
+    if (selectedPendingItems.length === 0) return;
+    setActionLoading(true);
+    let successCount = 0;
+    for (const item of selectedPendingItems) {
+      try {
+        const res = await adminFederation.approvePartnership(item.id);
+        if (res.success) successCount++;
+      } catch { /* continue */ }
+    }
+    toast.success(t('federation.bulk_approved', { count: successCount }));
+    setSelectedKeys(new Set());
+    loadData();
+    setActionLoading(false);
+  };
+
+  const handleBulkReject = async () => {
+    if (selectedPendingItems.length === 0) return;
+    setActionLoading(true);
+    let successCount = 0;
+    for (const item of selectedPendingItems) {
+      try {
+        const res = await adminFederation.rejectPartnership(item.id);
+        if (res.success) successCount++;
+      } catch { /* continue */ }
+    }
+    toast.success(t('federation.bulk_rejected', { count: successCount }));
+    setSelectedKeys(new Set());
+    loadData();
+    setActionLoading(false);
   };
 
   // ─── Counter-propose ───
@@ -521,7 +562,43 @@ export function Partnerships() {
         />
       </Tabs>
 
-      <DataTable columns={columns} data={filteredItems} isLoading={loading} onRefresh={loadData} />
+      {/* Bulk action bar */}
+      {selectedPendingItems.length > 0 && (
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800">
+          <span className="text-sm font-medium">
+            {t('federation.bulk_selected', { count: selectedPendingItems.length })}
+          </span>
+          <Button
+            size="sm"
+            color="success"
+            variant="flat"
+            startContent={<CheckCircle size={14} />}
+            onPress={handleBulkApprove}
+            isLoading={actionLoading}
+          >
+            {t('federation.bulk_approve')}
+          </Button>
+          <Button
+            size="sm"
+            color="danger"
+            variant="flat"
+            startContent={<XCircle size={14} />}
+            onPress={handleBulkReject}
+            isLoading={actionLoading}
+          >
+            {t('federation.bulk_reject')}
+          </Button>
+        </div>
+      )}
+
+      <DataTable
+        columns={columns}
+        data={filteredItems}
+        isLoading={loading}
+        onRefresh={loadData}
+        selectable
+        onSelectionChange={setSelectedKeys}
+      />
 
       {/* Approve confirmation */}
       {approveTarget && (
@@ -697,7 +774,7 @@ export function Partnerships() {
                     {detailTab === 'info' && (
                       <Card shadow="none" className="border border-default-200">
                         <CardBody className="gap-3">
-                          <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div>
                               <p className="text-default-400">{t('federation.label_partner')}</p>
                               <p className="font-medium">{detailPartnership.resolved_partner_name || detailPartnership.partner_name}</p>
@@ -856,7 +933,7 @@ export function Partnerships() {
                               <Spinner size="sm" />
                             </div>
                           ) : stats ? (
-                            <div className="grid grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                               <div className="text-center p-4 rounded-lg bg-default-50">
                                 <Mail size={24} className="mx-auto mb-2 text-primary" />
                                 <p className="text-2xl font-bold">{stats.messages_exchanged}</p>
