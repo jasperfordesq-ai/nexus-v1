@@ -123,11 +123,45 @@ class CreditCommonsNodeService
     }
 
     /**
+     * Validate a URL is not pointing to a private/internal IP address.
+     * Prevents SSRF attacks via partner node URLs.
+     */
+    private static function isUrlSafe(string $url): bool
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+        if (!$host) return false;
+
+        // Block obvious internal hostnames
+        $blockedHosts = ['localhost', '127.0.0.1', '0.0.0.0', '::1', 'metadata.google.internal'];
+        if (in_array(strtolower($host), $blockedHosts, true)) return false;
+
+        // Resolve DNS and check IP ranges
+        $ips = gethostbynamel($host);
+        if (!$ips) return true; // DNS failure — let the HTTP client handle it
+
+        foreach ($ips as $ip) {
+            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+                return false; // Private or reserved IP
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Resolve parent node path by querying the parent node's /about endpoint.
      */
     private static function resolveParentPath(object $config): array
     {
         if (!$config->parent_node_url) {
+            return $config->parent_node_slug ? [$config->parent_node_slug] : [];
+        }
+
+        // SSRF protection: validate URL before making request
+        if (!self::isUrlSafe($config->parent_node_url)) {
+            Log::warning('[CreditCommonsNode] Parent node URL blocked by SSRF filter', [
+                'url' => $config->parent_node_url,
+            ]);
             return $config->parent_node_slug ? [$config->parent_node_slug] : [];
         }
 
@@ -257,6 +291,11 @@ class CreditCommonsNodeService
         $exchangeRate = (float) $config->exchange_rate;
         if ($exchangeRate !== 1.0 && $exchangeRate > 0) {
             $transaction['quant'] = round((float) ($transaction['quant'] ?? 0) * $exchangeRate, 4);
+        }
+
+        // SSRF protection on relay target
+        if (!self::isUrlSafe($partner->base_url)) {
+            return ['success' => false, 'error' => 'Relay target URL blocked by security filter'];
         }
 
         // Forward to the remote node's /transaction/relay endpoint
@@ -451,6 +490,16 @@ class CreditCommonsNodeService
      */
     public static function resyncWithRemote(int $tenantId, string $remoteNodeUrl): array
     {
+        // SSRF protection
+        if (!self::isUrlSafe($remoteNodeUrl)) {
+            return [
+                'in_sync' => false,
+                'local_hash' => null,
+                'remote_hash' => null,
+                'action' => 'url_blocked_by_ssrf_filter',
+            ];
+        }
+
         $localHash = self::getLastHash($tenantId);
 
         try {
@@ -572,6 +621,12 @@ class CreditCommonsNodeService
      */
     private static function queryRemoteExchangeRate(string $nodeUrl, string $targetNodeSlug, float $localRate): float
     {
+        // SSRF protection
+        if (!self::isUrlSafe($nodeUrl)) {
+            Log::warning('[CreditCommonsNode] Exchange rate URL blocked by SSRF filter', ['url' => $nodeUrl]);
+            return 1.0;
+        }
+
         $cacheKey = "cc_exchange_rate:{$targetNodeSlug}";
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {

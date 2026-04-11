@@ -260,34 +260,38 @@ class FederationCreditCommonsController extends BaseApiController
             return $this->ccError('MissingParameter', 'Required: payer, payee, quant > 0', 400);
         }
 
+        // Amount bounds validation
+        if ($quant > 999999.99) {
+            return $this->ccError('MissingParameter', 'Amount exceeds maximum (999999.99)', 400);
+        }
+
         $payerId = $this->resolveAccountId($payerPath, $tenantId);
         $payeeId = $this->resolveAccountId($payeePath, $tenantId);
 
         if (!$payerId) {
-            return $this->ccError('UnresolvedAccountnameViolation', "Payer '{$payerPath}' not found", 400);
+            return $this->ccError('UnresolvedAccountnameViolation', "Payer account not found", 400);
         }
         if (!$payeeId) {
-            return $this->ccError('UnresolvedAccountnameViolation', "Payee '{$payeePath}' not found", 400);
-        }
-
-        // Check balance
-        $payer = DB::table('users')
-            ->where('id', $payerId)
-            ->where('tenant_id', $tenantId)
-            ->first(['balance']);
-
-        if ((float) ($payer->balance ?? 0) < $quant) {
-            return $this->ccError('InsufficientBalance', 'Payer has insufficient balance', 400);
+            return $this->ccError('UnresolvedAccountnameViolation', "Payee account not found", 400);
         }
 
         $uuid = (string) Str::uuid();
         $nodeSlug = $this->getNodeSlug($tenantId);
 
-        // Execute the transaction
+        // Execute the transaction with pessimistic locking to prevent race conditions
         DB::beginTransaction();
         try {
-            DB::update("UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
-                [$quant, $payerId, $tenantId]);
+            // Lock payer row and check balance atomically
+            $updated = DB::update(
+                "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
+                [$quant, $payerId, $tenantId, $quant]
+            );
+
+            if ($updated === 0) {
+                DB::rollBack();
+                return $this->ccError('InsufficientBalance', 'Payer has insufficient balance', 400);
+            }
+
             DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
                 [$quant, $payeeId, $tenantId]);
 
@@ -323,7 +327,7 @@ class FederationCreditCommonsController extends BaseApiController
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('[FederationCC] Transaction failed', ['error' => $e->getMessage()]);
-            return $this->ccError('Other', 'Transaction failed: ' . $e->getMessage(), 500);
+            return $this->ccError('Other', 'Transaction processing failed', 500);
         }
 
         $payerPath = $this->toAccountPath($payerId, $tenantId);

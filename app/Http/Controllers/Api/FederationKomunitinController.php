@@ -354,38 +354,50 @@ class FederationKomunitinController extends BaseApiController
                 'Missing required fields: payer, payee, and amount > 0', 400);
         }
 
-        // Validate accounts
-        $payer = DB::table('users')
-            ->where('id', (int) $payerId)
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'active')
-            ->first();
+        // Amount bounds validation
+        if ($amount > 999999.99) {
+            return $this->jsonApiError('BadRequest', 'Bad Request',
+                'Amount exceeds maximum allowed value', 400);
+        }
 
+        // Validate accounts exist
         $payee = DB::table('users')
             ->where('id', (int) $payeeId)
             ->where('tenant_id', $tenantId)
             ->where('status', 'active')
             ->first();
 
-        if (!$payer) {
-            return $this->jsonApiError('NotFound', 'Not Found',
-                "Account id {$payerId} not found in currency {$code}", 404);
-        }
         if (!$payee) {
             return $this->jsonApiError('NotFound', 'Not Found',
-                "Account id {$payeeId} not found in currency {$code}", 404);
+                "Payee account not found in currency {$code}", 404);
         }
 
-        if ((float) $payer->balance < $amount) {
-            return $this->jsonApiError('Forbidden', 'Forbidden',
-                'Insufficient balance for this transfer', 403);
+        $payerExists = DB::table('users')
+            ->where('id', (int) $payerId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->exists();
+
+        if (!$payerExists) {
+            return $this->jsonApiError('NotFound', 'Not Found',
+                "Payer account not found in currency {$code}", 404);
         }
 
-        // Execute transfer
+        // Execute transfer with atomic balance check to prevent race conditions
         DB::beginTransaction();
         try {
-            DB::update("UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
-                [$amount, (int) $payerId, $tenantId]);
+            // Deduct from payer atomically — WHERE balance >= amount prevents overdraw
+            $updated = DB::update(
+                "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
+                [$amount, (int) $payerId, $tenantId, $amount]
+            );
+
+            if ($updated === 0) {
+                DB::rollBack();
+                return $this->jsonApiError('Forbidden', 'Forbidden',
+                    'Insufficient balance for this transfer', 403);
+            }
+
             DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
                 [$amount, (int) $payeeId, $tenantId]);
 
