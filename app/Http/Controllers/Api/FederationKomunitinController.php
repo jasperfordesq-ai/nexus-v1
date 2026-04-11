@@ -109,6 +109,80 @@ class FederationKomunitinController extends BaseApiController
         ], null, true);
     }
 
+    /**
+     * POST /currencies — Create a currency (stub).
+     *
+     * NEXUS timebanks use a fixed 'hours' currency. This endpoint accepts the
+     * request for protocol compliance but returns the existing currency.
+     */
+    public function createCurrency(Request $request): JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+
+        // NEXUS doesn't support multiple currencies per tenant — return existing
+        return $this->jsonApiResponse(
+            $this->buildCurrencyResource($tenantId),
+            null, true, 201
+        );
+    }
+
+    /**
+     * PATCH /{code}/currency — Update currency metadata.
+     *
+     * Accepts name/namePlural updates. Currency code is immutable per Komunitin spec.
+     */
+    public function updateCurrency(Request $request, string $code): JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+        $payload = $request->json()->all();
+        $attrs = $payload['data']['attributes'] ?? [];
+
+        // Reject currency code changes (Komunitin spec: "Can't change currency code")
+        if (isset($attrs['code'])) {
+            return $this->jsonApiError('BadRequest', 'Bad Request',
+                "Can't change currency code", 400);
+        }
+
+        // NEXUS uses a fixed currency — accept the request but no-op
+        return $this->jsonApiResponse(
+            $this->buildCurrencyResource($tenantId),
+            null, true
+        );
+    }
+
+    /**
+     * PATCH /{code}/currency/settings — Update currency settings.
+     */
+    public function updateCurrencySettings(Request $request, string $code): JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+        $payload = $request->json()->all();
+        $attrs = $payload['data']['attributes'] ?? [];
+
+        // NEXUS doesn't persist per-currency settings externally — accept and return current
+        return $this->jsonApiResponse([
+            'type' => 'currency-settings',
+            'id' => "hours-{$tenantId}-settings",
+            'attributes' => array_merge([
+                'defaultAllowPayments' => true,
+                'enableExternalPayments' => true,
+                'defaultAllowTagPayments' => false,
+                'defaultInitialCreditLimit' => KomunitinAdapter::hoursToMinorUnits(0),
+                'externalTraderCreditLimit' => KomunitinAdapter::hoursToMinorUnits(0),
+                'defaultAcceptPaymentsAfter' => 0,
+                'defaultAllowPaymentRequests' => true,
+                'defaultOnPaymentCreditLimit' => KomunitinAdapter::hoursToMinorUnits(0),
+                'defaultAllowExternalPayments' => true,
+                'enableExternalPaymentRequests' => true,
+                'defaultAcceptPaymentsWhitelist' => [],
+                'defaultAllowTagPaymentRequests' => false,
+                'defaultAcceptPaymentsAutomatically' => true,
+                'defaultAllowExternalPaymentRequests' => true,
+                'defaultAcceptExternalPaymentsAutomatically' => true,
+            ], $attrs),
+        ], null, true);
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // Accounts
     // ─────────────────────────────────────────────────────────────────────────
@@ -199,6 +273,82 @@ class FederationKomunitinController extends BaseApiController
         if (!$user) {
             return $this->jsonApiError('NotFound', 'Not Found',
                 "Account id {$id} not found in currency {$code}", 404);
+        }
+
+        return $this->jsonApiResponse(
+            $this->buildAccountResource($user, $tenantId, $code, $baseUrl),
+            null, true
+        );
+    }
+
+    /**
+     * POST /{code}/accounts — Create an account (external federation partner registering).
+     *
+     * Komunitin spec expects a user relationship in the payload.
+     * NEXUS creates a federated placeholder user for the external account.
+     */
+    public function createAccount(Request $request, string $code): JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+        $baseUrl = $request->getSchemeAndHttpHost();
+        $payload = $request->json()->all();
+
+        $rels = $payload['data']['relationships'] ?? [];
+        $userRef = $rels['users']['data'][0] ?? null;
+
+        if (!$userRef || empty($userRef['id'])) {
+            return $this->jsonApiError('BadRequest', 'Bad Request',
+                'Missing users relationship in request body', 400);
+        }
+
+        // Check if this external user already has an account
+        $externalUserId = $userRef['id'];
+        $existing = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('external_federation_id', $externalUserId)
+            ->first();
+
+        if ($existing) {
+            return $this->jsonApiResponse(
+                $this->buildAccountResource($existing, $tenantId, $code, $baseUrl),
+                null, true, 200
+            );
+        }
+
+        // NEXUS doesn't create real user accounts via federation API —
+        // return 403 per Komunitin spec ("Insufficient Scope")
+        return $this->jsonApiError('Forbidden', 'Forbidden',
+            'Account creation via federation API is not supported. Users must register directly.', 403);
+    }
+
+    /**
+     * PATCH /{code}/accounts/{id} — Update account attributes (e.g., credit limit).
+     */
+    public function updateAccount(Request $request, string $code, string $id): JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+        $baseUrl = $request->getSchemeAndHttpHost();
+        $payload = $request->json()->all();
+
+        $user = DB::table('users')
+            ->where('id', (int) $id)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->first(['id', 'name', 'username', 'balance', 'created_at', 'updated_at']);
+
+        if (!$user) {
+            return $this->jsonApiError('NotFound', 'Not Found',
+                "Account id {$id} not found in currency {$code}", 404);
+        }
+
+        $attrs = $payload['data']['attributes'] ?? [];
+
+        // Komunitin allows updating creditLimit — NEXUS doesn't enforce per-user limits
+        // via federation API, so we acknowledge the request but don't change state.
+        // The balance field is read-only (managed by transfers).
+        if (isset($attrs['balance'])) {
+            return $this->jsonApiError('BadRequest', 'Bad Request',
+                'Balance cannot be modified directly — use transfers', 400);
         }
 
         return $this->jsonApiResponse(

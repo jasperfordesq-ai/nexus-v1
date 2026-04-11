@@ -2113,12 +2113,17 @@ Route::post('/v2/federation/external/webhooks/receive', [\App\Http\Controllers\A
 // ============================================
 Route::middleware(['federation.api', 'throttle:200,1'])->group(function () {
     // --- Komunitin (JSON:API accounting protocol) ---
-    // Spec: https://github.com/community-exchange-network/komunitin
+    // Full spec: https://github.com/community-exchange-network/komunitin
     Route::get('/v2/federation/komunitin/currencies', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'currencies']);
+    Route::post('/v2/federation/komunitin/currencies', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'createCurrency']);
     Route::get('/v2/federation/komunitin/{code}/currency', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'currency']);
+    Route::patch('/v2/federation/komunitin/{code}/currency', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'updateCurrency']);
     Route::get('/v2/federation/komunitin/{code}/currency/settings', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'currencySettings']);
+    Route::patch('/v2/federation/komunitin/{code}/currency/settings', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'updateCurrencySettings']);
     Route::get('/v2/federation/komunitin/{code}/accounts', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'accounts']);
+    Route::post('/v2/federation/komunitin/{code}/accounts', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'createAccount']);
     Route::get('/v2/federation/komunitin/{code}/accounts/{id}', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'account']);
+    Route::patch('/v2/federation/komunitin/{code}/accounts/{id}', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'updateAccount']);
     Route::get('/v2/federation/komunitin/{code}/transfers', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'transfers']);
     Route::get('/v2/federation/komunitin/{code}/transfers/{id}', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'transfer']);
     Route::post('/v2/federation/komunitin/{code}/transfers', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'createTransfer']);
