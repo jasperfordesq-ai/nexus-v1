@@ -106,16 +106,37 @@ class FederationExternalApiClient
      * @param int|array $partnerOrId Partner ID or partner record array
      * @return FederationProtocolAdapter
      */
+    /**
+     * Cache to avoid double DB queries when high-level methods resolve the
+     * adapter and then request() loads the same partner again.
+     * @var array<int, FederationProtocolAdapter>
+     */
+    private static array $adapterCache = [];
+
     public static function resolveAdapter(int|array $partnerOrId): FederationProtocolAdapter
     {
         if (is_int($partnerOrId)) {
+            // Cache per partner ID to avoid redundant DB queries
+            if (isset(self::$adapterCache[$partnerOrId])) {
+                return self::$adapterCache[$partnerOrId];
+            }
             $partner = self::getPartner($partnerOrId);
             $protocolType = $partner['protocol_type'] ?? 'nexus';
-        } else {
-            $protocolType = $partnerOrId['protocol_type'] ?? 'nexus';
+            $adapter = self::createAdapter($protocolType);
+            self::$adapterCache[$partnerOrId] = $adapter;
+            return $adapter;
         }
 
+        $protocolType = $partnerOrId['protocol_type'] ?? 'nexus';
         return self::createAdapter($protocolType);
+    }
+
+    /**
+     * Clear the adapter cache (used in tests and after partner updates).
+     */
+    public static function clearAdapterCache(): void
+    {
+        self::$adapterCache = [];
     }
 
     /**

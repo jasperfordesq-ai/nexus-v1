@@ -125,8 +125,11 @@ class NexusAdapter implements FederationProtocolAdapter
 
     public function unwrapResponse(array $response, string $action = ''): array
     {
-        if (isset($response['data']) && is_array($response['data'])) {
-            return $response['data'];
+        // Match the original FederationExternalApiClient unwrapping exactly:
+        // array_key_exists (not isset) so we catch data=null too
+        if (is_array($response) && array_key_exists('data', $response)) {
+            $data = $response['data'];
+            return is_array($data) ? $data : $response;
         }
 
         return $response;
