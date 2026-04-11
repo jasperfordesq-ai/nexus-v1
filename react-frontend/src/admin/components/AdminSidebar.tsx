@@ -360,6 +360,7 @@ function useAdminNav(): NavSection[] {
           { label: t('federation_api_keys'), href: '/admin/federation/api-keys', icon: Key },
           { label: t('federation_api_docs'), href: '/admin/federation/api-docs', icon: BookOpen },
           { label: t('federation_external_partners'), href: '/admin/federation/external-partners', icon: Globe },
+          { label: t('federation_cc_config'), href: '/admin/federation/cc-config', icon: Network },
           { label: t('federation_webhooks'), href: '/admin/federation/webhooks', icon: Webhook },
           { label: t('federation_activity'), href: '/admin/federation/activity', icon: Activity },
           { label: t('federation_data_management'), href: '/admin/federation/data', icon: Database },

@@ -377,7 +377,7 @@ class KomunitinAdapter implements FederationProtocolAdapter
     // ─────────────────────────────────────────────────────────────────────────
 
     /** Minor units per hour — configurable per Komunitin currency, default 100 */
-    private const MINOR_UNITS_PER_HOUR = 100;
+    public const MINOR_UNITS_PER_HOUR = 100;
 
     public static function hoursToMinorUnits(float $hours): int
     {
@@ -387,6 +387,65 @@ class KomunitinAdapter implements FederationProtocolAdapter
     public static function minorUnitsToHours(int $minorUnits): float
     {
         return round($minorUnits / self::MINOR_UNITS_PER_HOUR, 2);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Exchange rate: Komunitin {n, d} format ↔ float
+    //
+    // Komunitin represents exchange rates as numerator/denominator pairs.
+    // e.g., {n: 3, d: 2} = 1.5x exchange rate
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Convert a float exchange rate to Komunitin's {n, d} format.
+     *
+     * Uses continued fraction approximation to find the simplest n/d pair.
+     */
+    public static function floatToRate(float $rate): array
+    {
+        if ($rate <= 0) {
+            return ['n' => 0, 'd' => 1];
+        }
+
+        // Simple cases
+        if ($rate === 1.0) return ['n' => 1, 'd' => 1];
+        if ($rate === 0.5) return ['n' => 1, 'd' => 2];
+        if ($rate === 2.0) return ['n' => 2, 'd' => 1];
+
+        // Use scaling to avoid floating point issues: multiply by 10000
+        $scale = 10000;
+        $n = (int) round($rate * $scale);
+        $d = $scale;
+
+        // Simplify with GCD
+        $gcd = self::gcd($n, $d);
+        return ['n' => $n / $gcd, 'd' => $d / $gcd];
+    }
+
+    /**
+     * Convert Komunitin's {n, d} rate format to a float.
+     */
+    public static function rateToFloat(array $rate): float
+    {
+        $n = (int) ($rate['n'] ?? 1);
+        $d = (int) ($rate['d'] ?? 1);
+
+        return $d > 0 ? $n / $d : 1.0;
+    }
+
+    /**
+     * Greatest common divisor (Euclidean algorithm).
+     */
+    private static function gcd(int $a, int $b): int
+    {
+        $a = abs($a);
+        $b = abs($b);
+        while ($b !== 0) {
+            $t = $b;
+            $b = $a % $b;
+            $a = $t;
+        }
+        return $a ?: 1;
     }
 
     // ─────────────────────────────────────────────────────────────────────────

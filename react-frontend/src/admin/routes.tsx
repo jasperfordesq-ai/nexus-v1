@@ -181,6 +181,7 @@ const ExternalPartners = lazy(() => import('./modules/federation/ExternalPartner
 const Webhooks = lazy(() => import('./modules/federation/Webhooks'));
 const ApiDocumentation = lazy(() => import('./modules/federation/ApiDocumentation'));
 const FederationActivityFeed = lazy(() => import('./modules/federation/ActivityFeed'));
+const CreditCommonsConfig = lazy(() => import('./modules/federation/CreditCommonsConfig'));
 
 // Safeguarding module
 const SafeguardingDashboard = lazy(() => import('./modules/safeguarding/SafeguardingDashboard'));
@@ -465,6 +466,7 @@ export function AdminRoutes() {
       <Route path="federation/webhooks" element={<Lazy><Webhooks /></Lazy>} />
       <Route path="federation/api-docs" element={<Lazy><ApiDocumentation /></Lazy>} />
       <Route path="federation/activity" element={<Lazy><FederationActivityFeed /></Lazy>} />
+      <Route path="federation/cc-config" element={<Lazy><CreditCommonsConfig /></Lazy>} />
 
       {/* ─── SAFEGUARDING ─── */}
       <Route path="safeguarding" element={<Lazy><SafeguardingDashboard /></Lazy>} />

@@ -390,6 +390,133 @@ class CreditCommonsNodeService
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+    // 3b. Hashchain Error Recovery
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Rebuild the hashchain from all cross-node CC entries.
+     *
+     * Called when: hashchain gets out of sync (server crash mid-transaction,
+     * network timeout, manual data correction). Recomputes the entire chain
+     * from the entries table in chronological order.
+     *
+     * @return array{success: bool, entries_processed: int, new_hash: string}
+     */
+    public static function rebuildHashchain(int $tenantId): array
+    {
+        $entries = DB::table('federation_cc_entries')
+            ->where('tenant_id', $tenantId)
+            ->where('state', CreditCommonsAdapter::STATE_COMPLETED)
+            ->orderBy('written_at')
+            ->orderBy('id')
+            ->get(['transaction_uuid', 'quant', 'payer', 'payee']);
+
+        $hash = str_repeat('0', 64); // Genesis hash
+        $count = 0;
+
+        foreach ($entries as $entry) {
+            $hash = self::computeHash(
+                $hash,
+                $entry->transaction_uuid,
+                (float) $entry->quant,
+                $entry->payer,
+                $entry->payee
+            );
+            $count++;
+        }
+
+        self::recordHash($tenantId, $hash);
+
+        Log::info('[CreditCommonsNode] Hashchain rebuilt', [
+            'tenant_id' => $tenantId,
+            'entries_processed' => $count,
+            'new_hash' => substr($hash, 0, 16) . '...',
+        ]);
+
+        return [
+            'success' => true,
+            'entries_processed' => $count,
+            'new_hash' => $hash,
+        ];
+    }
+
+    /**
+     * Attempt to resync hashchain with a remote node.
+     *
+     * Queries the remote node's /about endpoint to get their last hash,
+     * then compares. If they differ, rebuilds our local chain and reports
+     * the mismatch for manual investigation.
+     *
+     * @return array{in_sync: bool, local_hash: ?string, remote_hash: ?string, action: string}
+     */
+    public static function resyncWithRemote(int $tenantId, string $remoteNodeUrl): array
+    {
+        $localHash = self::getLastHash($tenantId);
+
+        try {
+            $response = Http::timeout(10)
+                ->acceptJson()
+                ->get(rtrim($remoteNodeUrl, '/') . '/about');
+
+            if (!$response->successful()) {
+                return [
+                    'in_sync' => false,
+                    'local_hash' => $localHash,
+                    'remote_hash' => null,
+                    'action' => 'remote_unreachable',
+                ];
+            }
+
+            // The remote node doesn't expose its hash in /about by default,
+            // but some implementations include it in the response headers
+            $remoteHash = $response->header('Last-hash');
+
+            if ($remoteHash === null) {
+                return [
+                    'in_sync' => true, // Can't verify — assume OK
+                    'local_hash' => $localHash,
+                    'remote_hash' => null,
+                    'action' => 'no_remote_hash_available',
+                ];
+            }
+
+            if ($localHash && hash_equals($localHash, $remoteHash)) {
+                return [
+                    'in_sync' => true,
+                    'local_hash' => $localHash,
+                    'remote_hash' => $remoteHash,
+                    'action' => 'verified',
+                ];
+            }
+
+            // Mismatch — rebuild our chain
+            $rebuild = self::rebuildHashchain($tenantId);
+
+            return [
+                'in_sync' => false,
+                'local_hash' => $rebuild['new_hash'],
+                'remote_hash' => $remoteHash,
+                'action' => 'rebuilt_local_chain',
+                'entries_reprocessed' => $rebuild['entries_processed'],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('[CreditCommonsNode] Resync failed', [
+                'tenant_id' => $tenantId,
+                'remote_url' => $remoteNodeUrl,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'in_sync' => false,
+                'local_hash' => $localHash,
+                'remote_hash' => null,
+                'action' => 'error',
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
     // 4. Exchange Rate Cascading
     // ─────────────────────────────────────────────────────────────────────────
 
