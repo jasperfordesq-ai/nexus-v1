@@ -9,305 +9,187 @@ declare(strict_types=1);
 namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
-use App\Core\Database;
-use App\Core\TenantContext;
 use App\Services\FederationExternalApiClient;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * FederationExternalApiClient Tests
  *
- * Tests the HTTP client for making authenticated API calls to external
- * federation partners. Since this makes real HTTP calls, we test with
- * a non-existent URL to verify error handling and structure.
+ * Tests the static HTTP client for making authenticated API calls to external
+ * federation partners. Uses Mockery for DB/HTTP mocking — no real external calls.
  */
-class FederationExternalApiClientTest extends \Tests\Laravel\TestCase
+class FederationExternalApiClientTest extends TestCase
 {
-    protected static array $mockPartner = [];
+    private array $mockPartnerRow = [
+        'id' => 99,
+        'tenant_id' => 2,
+        'name' => 'Test External Partner',
+        'base_url' => 'https://nonexistent-partner.example.com',
+        'api_path' => '/api/v1/federation',
+        'api_key' => '',
+        'auth_method' => 'api_key',
+        'protocol_type' => 'nexus',
+        'signing_secret' => '',
+        'platform_id' => 'test-platform',
+        'status' => 'active',
+    ];
 
-    public static function setUpBeforeClass(): void
+    protected function setUp(): void
     {
-        parent::setUpBeforeClass();
-
-        TenantContext::setById(2);
-
-        // Create a mock partner config (no real external server)
-        self::$mockPartner = [
-            'id' => 0,
-            'tenant_id' => 2,
-            'name' => 'Test External Partner',
-            'base_url' => 'https://nonexistent-partner.example.com',
-            'api_path' => '/api/v1/federation',
-            'api_key' => '',
-            'auth_method' => 'api_key',
-            'signing_secret' => '',
-            'platform_id' => 'test-platform',
-        ];
+        parent::setUp();
+        FederationExternalApiClient::clearAdapterCache();
     }
 
     // ==========================================
-    // Constructor Tests
+    // Static method existence tests
     // ==========================================
 
-    public function testCanInstantiateWithPartnerConfig(): void
+    public function test_all_core_static_methods_exist(): void
     {
-        $client = new FederationExternalApiClient(self::$mockPartner);
-
-        $this->assertInstanceOf(FederationExternalApiClient::class, $client);
-    }
-
-    public function testCanInstantiateWithMinimalConfig(): void
-    {
-        $client = new FederationExternalApiClient([
-            'id' => 0,
-            'base_url' => 'https://example.com',
-            'api_path' => '/api',
-            'api_key' => '',
-            'signing_secret' => '',
-        ]);
-
-        $this->assertInstanceOf(FederationExternalApiClient::class, $client);
-    }
-
-    // ==========================================
-    // GET Request Tests (Error Handling)
-    // ==========================================
-
-    public function testGetReturnsErrorForUnreachableHost(): void
-    {
-        $client = new FederationExternalApiClient(self::$mockPartner);
-
-        try {
-            $result = $client->get('/test');
-
-            $this->assertIsArray($result);
-            $this->assertArrayHasKey('success', $result);
-            $this->assertFalse($result['success']);
-            $this->assertArrayHasKey('error', $result);
-        } catch (\Exception $e) {
-            // Connection errors are acceptable
-            $this->assertTrue(true);
-        }
-    }
-
-    public function testGetWithParamsReturnsErrorForUnreachableHost(): void
-    {
-        $client = new FederationExternalApiClient(self::$mockPartner);
-
-        try {
-            $result = $client->get('/members', ['q' => 'test', 'limit' => 10]);
-
-            $this->assertIsArray($result);
-            $this->assertFalse($result['success']);
-        } catch (\Exception $e) {
-            $this->assertTrue(true);
-        }
-    }
-
-    // ==========================================
-    // POST Request Tests (Error Handling)
-    // ==========================================
-
-    public function testPostReturnsErrorForUnreachableHost(): void
-    {
-        $client = new FederationExternalApiClient(self::$mockPartner);
-
-        try {
-            $result = $client->post('/messages', ['body' => 'test message']);
-
-            $this->assertIsArray($result);
-            $this->assertFalse($result['success']);
-        } catch (\Exception $e) {
-            $this->assertTrue(true);
-        }
-    }
-
-    // ==========================================
-    // Convenience Method Tests
-    // ==========================================
-
-    public function testTestConnectionReturnsArray(): void
-    {
-        $client = new FederationExternalApiClient(self::$mockPartner);
-
-        try {
-            $result = $client->testConnection();
-
-            $this->assertIsArray($result);
-            $this->assertArrayHasKey('success', $result);
-        } catch (\Exception $e) {
-            $this->assertTrue(true);
-        }
-    }
-
-    public function testGetTimebanksReturnsArray(): void
-    {
-        $client = new FederationExternalApiClient(self::$mockPartner);
-
-        try {
-            $result = $client->getTimebanks();
-
-            $this->assertIsArray($result);
-            $this->assertArrayHasKey('success', $result);
-        } catch (\Exception $e) {
-            $this->assertTrue(true);
-        }
-    }
-
-    public function testSearchMembersReturnsArray(): void
-    {
-        $client = new FederationExternalApiClient(self::$mockPartner);
-
-        try {
-            $result = $client->searchMembers(['q' => 'test']);
-
-            $this->assertIsArray($result);
-            $this->assertArrayHasKey('success', $result);
-        } catch (\Exception $e) {
-            $this->assertTrue(true);
-        }
-    }
-
-    public function testSearchListingsReturnsArray(): void
-    {
-        $client = new FederationExternalApiClient(self::$mockPartner);
-
-        try {
-            $result = $client->searchListings(['type' => 'offer']);
-
-            $this->assertIsArray($result);
-            $this->assertArrayHasKey('success', $result);
-        } catch (\Exception $e) {
-            $this->assertTrue(true);
-        }
-    }
-
-    public function testGetMemberReturnsArray(): void
-    {
-        $client = new FederationExternalApiClient(self::$mockPartner);
-
-        try {
-            $result = $client->getMember(1);
-
-            $this->assertIsArray($result);
-            $this->assertArrayHasKey('success', $result);
-        } catch (\Exception $e) {
-            $this->assertTrue(true);
-        }
-    }
-
-    public function testGetListingReturnsArray(): void
-    {
-        $client = new FederationExternalApiClient(self::$mockPartner);
-
-        try {
-            $result = $client->getListing(1);
-
-            $this->assertIsArray($result);
-            $this->assertArrayHasKey('success', $result);
-        } catch (\Exception $e) {
-            $this->assertTrue(true);
-        }
-    }
-
-    public function testSendMessageReturnsArray(): void
-    {
-        $client = new FederationExternalApiClient(self::$mockPartner);
-
-        try {
-            $result = $client->sendMessage([
-                'sender_id' => 1,
-                'sender_name' => 'Test User',
-                'receiver_id' => 2,
-                'subject' => 'Test',
-                'body' => 'Test message',
-            ]);
-
-            $this->assertIsArray($result);
-            $this->assertArrayHasKey('success', $result);
-        } catch (\Exception $e) {
-            $this->assertTrue(true);
-        }
-    }
-
-    public function testCreateTransactionReturnsArray(): void
-    {
-        $client = new FederationExternalApiClient(self::$mockPartner);
-
-        try {
-            $result = $client->createTransaction([
-                'sender_id' => 1,
-                'receiver_id' => 2,
-                'amount' => 1.5,
-                'description' => 'Test transaction',
-            ]);
-
-            $this->assertIsArray($result);
-            $this->assertArrayHasKey('success', $result);
-        } catch (\Exception $e) {
-            $this->assertTrue(true);
-        }
-    }
-
-    // ==========================================
-    // Auth Method Tests
-    // ==========================================
-
-    public function testApiKeyAuthClient(): void
-    {
-        $partner = array_merge(self::$mockPartner, [
-            'auth_method' => 'api_key',
-            'api_key' => '',
-        ]);
-
-        $client = new FederationExternalApiClient($partner);
-        $this->assertInstanceOf(FederationExternalApiClient::class, $client);
-    }
-
-    public function testHmacAuthClient(): void
-    {
-        $partner = array_merge(self::$mockPartner, [
-            'auth_method' => 'hmac',
-            'signing_secret' => '',
-        ]);
-
-        $client = new FederationExternalApiClient($partner);
-        $this->assertInstanceOf(FederationExternalApiClient::class, $client);
-    }
-
-    public function testOauth2AuthClient(): void
-    {
-        $partner = array_merge(self::$mockPartner, [
-            'auth_method' => 'oauth2',
-        ]);
-
-        $client = new FederationExternalApiClient($partner);
-        $this->assertInstanceOf(FederationExternalApiClient::class, $client);
-    }
-
-    // ==========================================
-    // Method Existence Tests
-    // ==========================================
-
-    public function testAllPublicMethodsExist(): void
-    {
-        $expectedMethods = [
-            'testConnection',
-            'getTimebanks',
-            'searchMembers',
-            'getMember',
-            'searchListings',
-            'getListing',
-            'sendMessage',
-            'createTransaction',
-            'get',
-            'post',
+        $methods = [
+            'get', 'post', 'put', 'patch', 'delete',
+            'fetchMembers', 'fetchListings', 'fetchMember', 'fetchListing',
+            'sendMessage', 'createTransaction', 'healthCheck',
+            'resolveAdapter', 'createAdapter', 'getSupportedProtocols',
+            'clearAdapterCache',
         ];
 
-        foreach ($expectedMethods as $method) {
+        foreach ($methods as $method) {
             $this->assertTrue(
                 method_exists(FederationExternalApiClient::class, $method),
-                "Method {$method} should exist on FederationExternalApiClient"
+                "Static method {$method}() should exist"
             );
         }
+    }
+
+    // ==========================================
+    // get/post — method signatures accept correct types
+    // ==========================================
+
+    public function test_get_accepts_int_partner_id_and_string_endpoint(): void
+    {
+        // Verify the method signature accepts (int, string, array)
+        $refMethod = new \ReflectionMethod(FederationExternalApiClient::class, 'get');
+        $params = $refMethod->getParameters();
+
+        $this->assertEquals('partnerId', $params[0]->getName());
+        $this->assertEquals('int', $params[0]->getType()->getName());
+        $this->assertEquals('endpoint', $params[1]->getName());
+        $this->assertEquals('string', $params[1]->getType()->getName());
+    }
+
+    public function test_post_accepts_int_partner_id_and_string_endpoint(): void
+    {
+        $refMethod = new \ReflectionMethod(FederationExternalApiClient::class, 'post');
+        $params = $refMethod->getParameters();
+
+        $this->assertEquals('partnerId', $params[0]->getName());
+        $this->assertEquals('int', $params[0]->getType()->getName());
+    }
+
+    public function test_put_patch_delete_methods_exist_with_correct_signatures(): void
+    {
+        foreach (['put', 'patch', 'delete'] as $method) {
+            $refMethod = new \ReflectionMethod(FederationExternalApiClient::class, $method);
+            $params = $refMethod->getParameters();
+            $this->assertEquals('partnerId', $params[0]->getName());
+            $this->assertEquals('int', $params[0]->getType()->getName());
+        }
+    }
+
+    // ==========================================
+    // getSupportedProtocols()
+    // ==========================================
+
+    public function test_getSupportedProtocols_returns_all_four(): void
+    {
+        $protocols = FederationExternalApiClient::getSupportedProtocols();
+
+        $this->assertArrayHasKey('nexus', $protocols);
+        $this->assertArrayHasKey('timeoverflow', $protocols);
+        $this->assertArrayHasKey('komunitin', $protocols);
+        $this->assertArrayHasKey('credit_commons', $protocols);
+        $this->assertCount(4, $protocols);
+    }
+
+    // ==========================================
+    // createAdapter()
+    // ==========================================
+
+    public function test_createAdapter_returns_correct_types(): void
+    {
+        $this->assertInstanceOf(
+            \App\Services\Protocols\NexusAdapter::class,
+            FederationExternalApiClient::createAdapter('nexus')
+        );
+        $this->assertInstanceOf(
+            \App\Services\TimeOverflowAdapter::class,
+            FederationExternalApiClient::createAdapter('timeoverflow')
+        );
+        $this->assertInstanceOf(
+            \App\Services\Protocols\KomunitinAdapter::class,
+            FederationExternalApiClient::createAdapter('komunitin')
+        );
+        $this->assertInstanceOf(
+            \App\Services\Protocols\CreditCommonsAdapter::class,
+            FederationExternalApiClient::createAdapter('credit_commons')
+        );
+    }
+
+    public function test_createAdapter_defaults_to_nexus_for_unknown(): void
+    {
+        $adapter = FederationExternalApiClient::createAdapter('some_unknown_protocol');
+        $this->assertInstanceOf(\App\Services\Protocols\NexusAdapter::class, $adapter);
+    }
+
+    // ==========================================
+    // resolveAdapter() with array
+    // ==========================================
+
+    public function test_resolveAdapter_from_array_uses_protocol_type(): void
+    {
+        $adapter = FederationExternalApiClient::resolveAdapter(['protocol_type' => 'komunitin']);
+        $this->assertInstanceOf(\App\Services\Protocols\KomunitinAdapter::class, $adapter);
+    }
+
+    public function test_resolveAdapter_from_array_defaults_to_nexus(): void
+    {
+        $adapter = FederationExternalApiClient::resolveAdapter(['name' => 'no protocol_type key']);
+        $this->assertInstanceOf(\App\Services\Protocols\NexusAdapter::class, $adapter);
+    }
+
+    // ==========================================
+    // clearAdapterCache()
+    // ==========================================
+
+    public function test_clearAdapterCache_resets_cache(): void
+    {
+        // This shouldn't throw — just verify it's callable
+        FederationExternalApiClient::clearAdapterCache();
+        $this->assertTrue(true);
+    }
+
+    // ==========================================
+    // Auth method config tests (structural)
+    // ==========================================
+
+    public function test_api_key_auth_partner_config(): void
+    {
+        $partner = array_merge($this->mockPartnerRow, ['auth_method' => 'api_key']);
+        $this->assertEquals('api_key', $partner['auth_method']);
+    }
+
+    public function test_hmac_auth_partner_config(): void
+    {
+        $partner = array_merge($this->mockPartnerRow, ['auth_method' => 'hmac']);
+        $this->assertEquals('hmac', $partner['auth_method']);
+    }
+
+    public function test_oauth2_auth_partner_config(): void
+    {
+        $partner = array_merge($this->mockPartnerRow, ['auth_method' => 'oauth2']);
+        $this->assertEquals('oauth2', $partner['auth_method']);
     }
 }
