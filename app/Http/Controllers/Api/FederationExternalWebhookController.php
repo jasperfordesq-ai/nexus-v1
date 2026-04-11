@@ -292,36 +292,202 @@ class FederationExternalWebhookController extends BaseApiController
     }
 
     // ----------------------------------------------------------------
-    // Transaction handling (acknowledgements)
+    // Transaction handling
     // ----------------------------------------------------------------
 
     private function handleTransactionCompleted(array $data, object $partner): array
     {
+        if (!$partner->allow_transactions) {
+            return ['status' => 'rejected', 'reason' => 'Transactions not enabled for this partner'];
+        }
+
+        $externalTxId = $data['external_transaction_id'] ?? null;
+
         Log::info('[FederationExternalWebhook] Transaction completed', [
             'partner' => $partner->name,
-            'external_transaction_id' => $data['external_transaction_id'] ?? null,
+            'external_transaction_id' => $externalTxId,
         ]);
+
+        // Record the completed transaction in our federation_transactions table
+        $recipientId = $data['recipient_id'] ?? $data['local_member_id'] ?? null;
+        $senderId = $data['sender_id'] ?? 0;
+        $amount = (float) ($data['amount'] ?? 0);
+        $description = $data['description'] ?? '';
+
+        if ($recipientId && $amount > 0) {
+            $receiverUserId = (int) $recipientId;
+
+            // Validate receiver exists in this tenant
+            $receiver = DB::table('users')
+                ->where('id', $receiverUserId)
+                ->where('tenant_id', TenantContext::getId())
+                ->where('status', 'active')
+                ->first();
+
+            if (!$receiver) {
+                return ['status' => 'rejected', 'reason' => "Recipient user #{$recipientId} not found in this tenant"];
+            }
+
+            // Prevent duplicate recording using external_transaction_id
+            if ($externalTxId) {
+                $exists = DB::table('federation_transactions')
+                    ->where('external_transaction_id', $externalTxId)
+                    ->where('external_partner_id', $partner->id)
+                    ->exists();
+                if ($exists) {
+                    return ['status' => 'duplicate', 'reason' => 'Transaction already recorded'];
+                }
+            }
+
+            // Credit the receiver's balance and record the transaction
+            DB::beginTransaction();
+            try {
+                DB::update("UPDATE users SET balance = balance + ? WHERE id = ?", [$amount, $receiverUserId]);
+
+                DB::table('federation_transactions')->insert([
+                    'sender_tenant_id'       => 0, // External origin
+                    'sender_user_id'         => (int) $senderId,
+                    'receiver_tenant_id'     => TenantContext::getId(),
+                    'receiver_user_id'       => $receiverUserId,
+                    'amount'                 => $amount,
+                    'description'            => $description,
+                    'status'                 => 'completed',
+                    'completed_at'           => now(),
+                    'external_partner_id'    => $partner->id,
+                    'external_receiver_name' => $data['sender_name'] ?? 'External User',
+                    'external_transaction_id' => $externalTxId,
+                    'created_at'             => now(),
+                ]);
+
+                DB::commit();
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                Log::error('[FederationExternalWebhook] Failed to record transaction', [
+                    'error' => $e->getMessage(),
+                    'partner' => $partner->name,
+                    'external_transaction_id' => $externalTxId,
+                ]);
+                return ['status' => 'error', 'reason' => 'Failed to record transaction'];
+            }
+        }
+
         return ['status' => 'acknowledged'];
     }
 
     private function handleTransactionCancelled(array $data, object $partner): array
     {
+        if (!$partner->allow_transactions) {
+            return ['status' => 'rejected', 'reason' => 'Transactions not enabled for this partner'];
+        }
+
+        $externalTxId = $data['external_transaction_id'] ?? null;
+        $reason = $data['reason'] ?? null;
+
         Log::info('[FederationExternalWebhook] Transaction cancelled', [
             'partner' => $partner->name,
-            'external_transaction_id' => $data['external_transaction_id'] ?? null,
-            'reason' => $data['reason'] ?? null,
+            'external_transaction_id' => $externalTxId,
+            'reason' => $reason,
         ]);
+
+        // If we have a record of this transaction, mark it as cancelled and reverse the credit
+        if ($externalTxId) {
+            $tx = DB::table('federation_transactions')
+                ->where('external_transaction_id', $externalTxId)
+                ->where('external_partner_id', $partner->id)
+                ->first();
+
+            if ($tx && $tx->status === 'completed') {
+                DB::beginTransaction();
+                try {
+                    // Reverse the credit
+                    DB::update("UPDATE users SET balance = balance - ? WHERE id = ? AND balance >= ?",
+                        [$tx->amount, $tx->receiver_user_id, $tx->amount]);
+
+                    DB::table('federation_transactions')
+                        ->where('id', $tx->id)
+                        ->update([
+                            'status'              => 'cancelled',
+                            'cancelled_at'        => now(),
+                            'cancellation_reason' => $reason,
+                        ]);
+
+                    DB::commit();
+                    return ['status' => 'cancelled'];
+                } catch (\Throwable $e) {
+                    DB::rollBack();
+                    Log::error('[FederationExternalWebhook] Failed to cancel transaction', [
+                        'error' => $e->getMessage(),
+                        'transaction_id' => $tx->id,
+                    ]);
+                    return ['status' => 'error', 'reason' => 'Failed to cancel transaction'];
+                }
+            }
+        }
+
         return ['status' => 'acknowledged'];
     }
 
     private function handleTransactionRequested(array $data, object $partner): array
     {
+        if (!$partner->allow_transactions) {
+            return ['status' => 'rejected', 'reason' => 'Transactions not enabled for this partner'];
+        }
+
+        $externalTxId = $data['external_transaction_id'] ?? null;
+        $amount = (float) ($data['amount'] ?? 0);
+        $recipientId = $data['recipient_id'] ?? $data['local_member_id'] ?? null;
+
         Log::info('[FederationExternalWebhook] Transaction requested', [
             'partner' => $partner->name,
-            'external_transaction_id' => $data['external_transaction_id'] ?? null,
-            'amount' => $data['amount'] ?? null,
+            'external_transaction_id' => $externalTxId,
+            'amount' => $amount,
+            'recipient_id' => $recipientId,
         ]);
-        return ['status' => 'acknowledged'];
+
+        // Validate basic fields
+        if (!$recipientId || $amount <= 0) {
+            return ['status' => 'rejected', 'reason' => 'Missing recipient_id or invalid amount'];
+        }
+
+        // Validate receiver exists
+        $receiverUserId = (int) $recipientId;
+        $receiver = DB::table('users')
+            ->where('id', $receiverUserId)
+            ->where('tenant_id', TenantContext::getId())
+            ->where('status', 'active')
+            ->exists();
+
+        if (!$receiver) {
+            return ['status' => 'rejected', 'reason' => "Recipient user #{$recipientId} not found in this tenant"];
+        }
+
+        // Prevent duplicate
+        if ($externalTxId) {
+            $exists = DB::table('federation_transactions')
+                ->where('external_transaction_id', $externalTxId)
+                ->where('external_partner_id', $partner->id)
+                ->exists();
+            if ($exists) {
+                return ['status' => 'duplicate', 'reason' => 'Transaction already recorded'];
+            }
+        }
+
+        // Record as pending — awaits a transaction.completed event to credit the balance
+        DB::table('federation_transactions')->insert([
+            'sender_tenant_id'        => 0,
+            'sender_user_id'          => (int) ($data['sender_id'] ?? 0),
+            'receiver_tenant_id'      => TenantContext::getId(),
+            'receiver_user_id'        => $receiverUserId,
+            'amount'                  => $amount,
+            'description'             => $data['description'] ?? '',
+            'status'                  => 'pending',
+            'external_partner_id'     => $partner->id,
+            'external_receiver_name'  => $data['sender_name'] ?? 'External User',
+            'external_transaction_id' => $externalTxId,
+            'created_at'              => now(),
+        ]);
+
+        return ['status' => 'accepted'];
     }
 
     // ----------------------------------------------------------------

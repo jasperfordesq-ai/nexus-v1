@@ -120,7 +120,7 @@ class AdminFederationExternalPartnersController extends BaseApiController
         // Verify partner exists and belongs to tenant
         $partner = FederationExternalPartnerService::getById($id, $tenantId);
         if (!$partner) {
-            return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.external_partner_not_found'), null, 404);
         }
 
         $startTime = microtime(true);
@@ -211,7 +211,7 @@ class AdminFederationExternalPartnersController extends BaseApiController
         // Verify partner exists and belongs to tenant
         $partner = FederationExternalPartnerService::getById($id, $tenantId);
         if (!$partner) {
-            return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.external_partner_not_found'), null, 404);
         }
 
         try {
