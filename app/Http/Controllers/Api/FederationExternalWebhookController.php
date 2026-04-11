@@ -82,11 +82,13 @@ class FederationExternalWebhookController extends BaseApiController
         }
 
         // ---- Identify the external partner ----
-        // The partner is identified by matching the signing_secret used to generate
-        // the HMAC signature. We look up partners that have a signing_secret configured.
-        $partner = $this->identifyAndVerifyPartner($request, $rawBody);
+        // Two auth methods supported:
+        //   1. API key via Authorization: Bearer {key} (simple, preferred)
+        //   2. HMAC signature via X-Webhook-Signature header (webhook-style)
+        $partner = $this->identifyPartnerByApiKey($request)
+            ?? $this->identifyAndVerifyPartner($request, $rawBody);
         if (!$partner) {
-            return $this->respondWithError('INVALID_SIGNATURE', 'Invalid or missing webhook signature', null, 401);
+            return $this->respondWithError('AUTH_FAILED', 'Invalid API key or webhook signature', null, 401);
         }
 
         if ($partner->status !== 'active') {
@@ -128,8 +130,32 @@ class FederationExternalWebhookController extends BaseApiController
     }
 
     // ----------------------------------------------------------------
-    // Signature verification
+    // Authentication: API key (simple) or HMAC signature (webhook)
     // ----------------------------------------------------------------
+
+    /**
+     * Identify partner by API key in Authorization: Bearer header.
+     * The signing_secret doubles as the API key for simple auth.
+     */
+    private function identifyPartnerByApiKey(Request $request): ?object
+    {
+        $authHeader = $request->header('Authorization');
+        if (empty($authHeader) || !str_starts_with($authHeader, 'Bearer ')) {
+            return null;
+        }
+
+        $token = substr($authHeader, 7);
+        if (empty($token)) {
+            return null;
+        }
+
+        // Match the token against signing_secret (used as shared secret)
+        return DB::table('federation_external_partners')
+            ->whereNotNull('signing_secret')
+            ->where('signing_secret', '!=', '')
+            ->where('signing_secret', $token)
+            ->first();
+    }
 
     /**
      * Identify the external partner by verifying the HMAC signature against
