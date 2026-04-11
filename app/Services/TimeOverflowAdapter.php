@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Contracts\FederationProtocolAdapter;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -23,6 +24,10 @@ use Illuminate\Support\Facades\Log;
  *   - TO "transfer" + "movements" → Nexus "transaction"
  *   - TO "account.balance" → Nexus "users.balance"
  *
+ * Implements FederationProtocolAdapter for use with the protocol-aware
+ * FederationExternalApiClient. All original static methods are preserved
+ * for backward compatibility.
+ *
  * Usage:
  *   // Fetch listings from a TimeOverflow partner
  *   $result = FederationExternalApiClient::fetchListings($partnerId, ['organization_id' => 1]);
@@ -36,7 +41,7 @@ use Illuminate\Support\Facades\Log;
  *   $payload = TimeOverflowAdapter::buildTransferPayload($nexusTransaction);
  *   FederationExternalApiClient::createTransaction($partnerId, $payload);
  */
-class TimeOverflowAdapter
+class TimeOverflowAdapter implements FederationProtocolAdapter
 {
     /**
      * Platform identifier for TimeOverflow partners.
@@ -301,5 +306,103 @@ class TimeOverflowAdapter
             'disputed' => 'disputed',
             default => 'pending',
         };
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // FederationProtocolAdapter interface implementation
+    //
+    // These methods delegate to the existing static methods above, providing
+    // the adapter interface while maintaining full backward compatibility.
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public static function getProtocolName(): string
+    {
+        return self::PLATFORM_TYPE;
+    }
+
+    public static function getDefaultApiPath(): string
+    {
+        return self::DEFAULT_API_PATH;
+    }
+
+    public function mapEndpoint(string $action, array $params = []): string
+    {
+        $id = $params['id'] ?? null;
+
+        return match ($action) {
+            'members'      => '/members',
+            'member'       => "/members/{$id}",
+            'listings'     => '/posts',           // TO calls them "posts"
+            'listing'      => "/posts/{$id}",
+            'transactions' => '/transfers',       // TO calls them "transfers"
+            'organizations' => '/organizations',
+            'health'       => '/health',
+            'messages'     => '/messages',
+            default        => "/{$action}",
+        };
+    }
+
+    public function mapHttpMethod(string $action, string $default = 'GET'): string
+    {
+        return $default;
+    }
+
+    public function transformOutboundTransaction(array $nexusTransaction, int $partnerId): array
+    {
+        return self::buildTransferPayload($nexusTransaction, $partnerId);
+    }
+
+    public function transformOutboundMessage(array $nexusMessage): array
+    {
+        return $nexusMessage;
+    }
+
+    public function transformInboundMember(array $protocolMember): array
+    {
+        return self::transformMember($protocolMember);
+    }
+
+    public function transformInboundMembers(array $protocolMembers): array
+    {
+        return self::transformMembers($protocolMembers);
+    }
+
+    public function transformInboundListing(array $protocolListing): array
+    {
+        return self::transformListing($protocolListing);
+    }
+
+    public function transformInboundListings(array $protocolListings): array
+    {
+        return self::transformListings($protocolListings);
+    }
+
+    public function transformInboundTransaction(array $protocolResponse): array
+    {
+        return self::transformTransactionResponse($protocolResponse);
+    }
+
+    public function normalizeWebhookEvent(string $protocolEvent): string
+    {
+        // TimeOverflow uses the same event names as Nexus
+        return $protocolEvent;
+    }
+
+    public function normalizeWebhookPayload(array $rawPayload): array
+    {
+        return [
+            'event' => $rawPayload['event'] ?? 'unknown',
+            'data'  => $rawPayload['data'] ?? [],
+        ];
+    }
+
+    public function unwrapResponse(array $response, string $action = ''): array
+    {
+        // TimeOverflow wraps responses in {data: [...]} like Nexus v1
+        if (isset($response['data']) && is_array($response['data'])) {
+            return $response['data'];
+        }
+
+        return $response;
     }
 }

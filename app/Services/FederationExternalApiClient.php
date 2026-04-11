@@ -6,6 +6,10 @@
 
 namespace App\Services;
 
+use App\Contracts\FederationProtocolAdapter;
+use App\Services\Protocols\CreditCommonsAdapter;
+use App\Services\Protocols\KomunitinAdapter;
+use App\Services\Protocols\NexusAdapter;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +22,10 @@ use Illuminate\Support\Facades\Log;
  *
  * Supports three authentication methods (api_key, hmac, oauth2), circuit
  * breaker logic, retry with exponential backoff, and per-call audit logging.
+ *
+ * Protocol-aware: resolves the appropriate adapter (Nexus, TimeOverflow,
+ * Komunitin, Credit Commons) based on the partner's protocol_type column,
+ * and uses it for endpoint mapping, data transformation, and response unwrapping.
  */
 class FederationExternalApiClient
 {
@@ -56,6 +64,86 @@ class FederationExternalApiClient
     public static function post(int $partnerId, string $endpoint, array $data = []): array
     {
         return self::request($partnerId, 'POST', $endpoint, $data);
+    }
+
+    /**
+     * Send a PUT request to an external federation partner.
+     *
+     * @return array{success: bool, data?: array, error?: string, status_code?: int}
+     */
+    public static function put(int $partnerId, string $endpoint, array $data = []): array
+    {
+        return self::request($partnerId, 'PUT', $endpoint, $data);
+    }
+
+    /**
+     * Send a PATCH request to an external federation partner.
+     *
+     * @return array{success: bool, data?: array, error?: string, status_code?: int}
+     */
+    public static function patch(int $partnerId, string $endpoint, array $data = []): array
+    {
+        return self::request($partnerId, 'PATCH', $endpoint, $data);
+    }
+
+    /**
+     * Send a DELETE request to an external federation partner.
+     *
+     * @return array{success: bool, data?: array, error?: string, status_code?: int}
+     */
+    public static function delete(int $partnerId, string $endpoint, array $data = []): array
+    {
+        return self::request($partnerId, 'DELETE', $endpoint, $data);
+    }
+
+    // ----------------------------------------------------------------
+    // Protocol adapter resolution
+    // ----------------------------------------------------------------
+
+    /**
+     * Resolve the protocol adapter for a partner.
+     *
+     * @param int|array $partnerOrId Partner ID or partner record array
+     * @return FederationProtocolAdapter
+     */
+    public static function resolveAdapter(int|array $partnerOrId): FederationProtocolAdapter
+    {
+        if (is_int($partnerOrId)) {
+            $partner = self::getPartner($partnerOrId);
+            $protocolType = $partner['protocol_type'] ?? 'nexus';
+        } else {
+            $protocolType = $partnerOrId['protocol_type'] ?? 'nexus';
+        }
+
+        return self::createAdapter($protocolType);
+    }
+
+    /**
+     * Create an adapter instance by protocol type name.
+     */
+    public static function createAdapter(string $protocolType): FederationProtocolAdapter
+    {
+        return match ($protocolType) {
+            'timeoverflow'   => new TimeOverflowAdapter(),
+            'komunitin'      => new KomunitinAdapter(),
+            'credit_commons' => new CreditCommonsAdapter(),
+            default          => new NexusAdapter(),
+        };
+    }
+
+    /**
+     * Get all supported protocol types.
+     *
+     * @return array<string, string> Protocol type => display name
+     */
+    public static function getSupportedProtocols(): array
+    {
+        return [
+            'nexus'          => 'Project NEXUS',
+            'timeoverflow'   => 'TimeOverflow',
+            'komunitin'      => 'Komunitin (JSON:API)',
+            'credit_commons' => 'Credit Commons',
+        ];
     }
 
     // ----------------------------------------------------------------
@@ -197,8 +285,11 @@ class FederationExternalApiClient
 
                 if ($method === 'GET') {
                     $lastResponse = $pending->get($url, $data);
+                } elseif ($method === 'DELETE' && empty($data)) {
+                    $lastResponse = $pending->delete($url);
                 } else {
-                    $lastResponse = $pending->withBody($body, 'application/json')->post($url);
+                    $lastResponse = $pending->withBody($body, 'application/json')
+                        ->send($method, $url);
                 }
 
                 // Success or client error (4xx) — don't retry
@@ -230,12 +321,12 @@ class FederationExternalApiClient
         if ($lastResponse->successful()) {
             self::recordSuccess($partnerId);
             $responseData = $lastResponse->json() ?? [];
-            // Unwrap v1 API response envelope: {success: true, data: [...actual data...]}
-            // The v1 endpoints wrap everything in {success, data, pagination}. We need the
-            // inner 'data' array, not the entire envelope, so callers get actual records.
-            $innerData = (is_array($responseData) && array_key_exists('data', $responseData))
-                ? $responseData['data']
-                : $responseData;
+
+            // Use protocol adapter for response unwrapping if available,
+            // otherwise fall back to the original Nexus v1 envelope unwrapping.
+            $adapter = self::resolveAdapter($partner);
+            $innerData = $adapter->unwrapResponse($responseData, $endpoint);
+
             self::logApiCall($partnerId, $endpoint, $method, $statusCode, true, $elapsed, null, $body ?: null, $rawResponseBody);
             return ['success' => true, 'data' => $innerData, 'status_code' => $statusCode];
         }

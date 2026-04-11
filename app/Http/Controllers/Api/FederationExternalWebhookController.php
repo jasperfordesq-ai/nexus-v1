@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
 use App\Services\FederatedMessageService;
+use App\Services\FederationExternalApiClient;
 use App\Services\FederationExternalPartnerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -94,6 +95,14 @@ class FederationExternalWebhookController extends BaseApiController
         if ($partner->status !== 'active') {
             return $this->respondWithError('PARTNER_INACTIVE', 'Partner is not active', null, 403);
         }
+
+        // ---- Normalize payload through protocol adapter ----
+        // Different protocols structure their webhooks differently. The adapter
+        // normalizes event names and data shapes into Nexus's expected format.
+        $adapter = FederationExternalApiClient::resolveAdapter((array) $partner);
+        $normalized = $adapter->normalizeWebhookPayload($payload);
+        $event = $normalized['event'];
+        $data = $normalized['data'];
 
         // ---- Set tenant context from partner ----
         if (!TenantContext::setById($partner->tenant_id)) {
