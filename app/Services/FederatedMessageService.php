@@ -4,6 +4,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Core\TenantContext;
@@ -170,11 +172,11 @@ class FederatedMessageService
     ): array {
         try {
             // Sanitize and limit external input
-            $senderName = htmlspecialchars(substr($senderName, 0, 255), ENT_QUOTES, 'UTF-8');
-            $partnerName = htmlspecialchars(substr($partnerName, 0, 255), ENT_QUOTES, 'UTF-8');
-            $subject = htmlspecialchars(substr($subject ?? '', 0, 500), ENT_QUOTES, 'UTF-8');
-            $body = htmlspecialchars(substr($body, 0, 10000), ENT_QUOTES, 'UTF-8');
-            $externalMessageId = $externalMessageId ? htmlspecialchars(substr($externalMessageId, 0, 255), ENT_QUOTES, 'UTF-8') : null;
+            $senderName = substr($senderName, 0, 255);
+            $partnerName = substr($partnerName, 0, 255);
+            $subject = substr($subject ?? '', 0, 500);
+            $body = substr($body, 0, 10000);
+            $externalMessageId = $externalMessageId ? substr($externalMessageId, 0, 255) : null;
 
             $receiver = DB::table('users')->where('id', $receiverUserId)->where('tenant_id', TenantContext::getId())->where('status', 'active')->first();
             if (!$receiver) {

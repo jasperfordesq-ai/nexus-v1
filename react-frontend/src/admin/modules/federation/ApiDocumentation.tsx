@@ -81,9 +81,7 @@ function AuthenticationTab() {
         </CardHeader>
         <CardBody className="space-y-3">
           <p className="text-sm text-default-600">
-            Include your API key in the <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">Authorization</code> header
-            as a Bearer token. Keys can be created and managed on the{' '}
-            <a href="../api-keys" className="text-primary underline">API Keys</a> page.
+            {t('federation.api_doc_api_key_instructions', 'Include your API key in the Authorization header as a Bearer token. Keys can be created and managed on the API Keys page.')}
           </p>
           <CodeBlock>{`
 GET /api/v1/federation/timebanks HTTP/1.1
@@ -92,9 +90,7 @@ Authorization: Bearer fed_live_abc123...
 Content-Type: application/json
           `}</CodeBlock>
           <p className="text-sm text-default-500">
-            Each key has scoped permissions (e.g. <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">timebanks:read</code>,{' '}
-            <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">messages:write</code>). Requests requiring a scope your key
-            does not have will return <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">403 Forbidden</code>.
+            {t('federation.api_doc_api_key_scopes', 'Each key has scoped permissions (e.g. timebanks:read, messages:write). Requests requiring a scope your key does not have will return 403 Forbidden.')}
           </p>
         </CardBody>
       </Card>
@@ -110,7 +106,7 @@ Content-Type: application/json
         </CardHeader>
         <CardBody className="space-y-3">
           <p className="text-sm text-default-600">
-            Sign every request using your API secret. The signature proves the request has not been tampered with in transit.
+            {t('federation.api_doc_hmac_instructions', 'Sign every request using your API secret. The signature proves the request has not been tampered with in transit.')}
           </p>
           <p className="text-sm font-semibold text-default-700">String to sign:</p>
           <CodeBlock>{`
@@ -123,11 +119,11 @@ BODY
             Concatenate the HTTP method, full URL path, Unix timestamp, and the raw request body
             (use empty string for GET requests with no body), each separated by a newline character.
           </p>
-          <p className="text-sm font-semibold text-default-700">Required headers:</p>
+          <p className="text-sm font-semibold text-default-700">{t('federation.api_doc_required_headers', 'Required headers:')}</p>
           <Table aria-label={t('api_docs.aria_hmac_headers')} removeWrapper>
             <TableHeader>
-              <TableColumn>Header</TableColumn>
-              <TableColumn>Description</TableColumn>
+              <TableColumn>{t('federation.api_doc_col_header', 'Header')}</TableColumn>
+              <TableColumn>{t('federation.api_doc_col_description', 'Description')}</TableColumn>
             </TableHeader>
             <TableBody>
               <TableRow key="sig">
@@ -162,8 +158,7 @@ BODY
         </CardHeader>
         <CardBody className="space-y-3">
           <p className="text-sm text-default-600">
-            Exchange your API key for a short-lived JWT via the token endpoint. Include it as a Bearer token.
-            JWTs expire after <strong>1 hour</strong>.
+            {t('federation.api_doc_jwt_instructions', 'Exchange your API key for a short-lived JWT via the token endpoint. Include it as a Bearer token. JWTs expire after 1 hour.')}
           </p>
           <CodeBlock>{`
 POST /api/v1/federation/oauth/token HTTP/1.1
@@ -197,12 +192,12 @@ grant_type=client_credentials&scope=members:read listings:read
         </CardHeader>
         <CardBody className="space-y-3">
           <p className="text-sm text-default-600">
-            All API responses include rate-limit headers. When the limit is exceeded, responses return <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">429 Too Many Requests</code>.
+            {t('federation.api_doc_rate_limit_instructions', 'All API responses include rate-limit headers. When the limit is exceeded, responses return 429 Too Many Requests.')}
           </p>
           <Table aria-label={t('api_docs.aria_rate_limit_headers')} removeWrapper>
             <TableHeader>
-              <TableColumn>Header</TableColumn>
-              <TableColumn>Description</TableColumn>
+              <TableColumn>{t('federation.api_doc_col_header', 'Header')}</TableColumn>
+              <TableColumn>{t('federation.api_doc_col_description', 'Description')}</TableColumn>
             </TableHeader>
             <TableBody>
               <TableRow key="limit">
@@ -623,13 +618,13 @@ function EndpointsTab() {
 
             {ep.params && ep.params.length > 0 && (
               <>
-                <p className="text-sm font-semibold text-default-700">Parameters</p>
+                <p className="text-sm font-semibold text-default-700">{t('federation.api_doc_parameters', 'Parameters')}</p>
                 <Table aria-label={t('api_docs.aria_parameters')} removeWrapper>
                   <TableHeader>
-                    <TableColumn>Name</TableColumn>
-                    <TableColumn>Type</TableColumn>
-                    <TableColumn>Required</TableColumn>
-                    <TableColumn>Description</TableColumn>
+                    <TableColumn>{t('federation.api_doc_col_name', 'Name')}</TableColumn>
+                    <TableColumn>{t('federation.api_doc_col_type', 'Type')}</TableColumn>
+                    <TableColumn>{t('federation.api_doc_col_required', 'Required')}</TableColumn>
+                    <TableColumn>{t('federation.api_doc_col_description', 'Description')}</TableColumn>
                   </TableHeader>
                   <TableBody>
                     {ep.params.map((p) => (
@@ -638,7 +633,7 @@ function EndpointsTab() {
                         <TableCell><span className="text-sm text-default-500">{p.type}</span></TableCell>
                         <TableCell>
                           <Chip size="sm" variant="flat" color={p.required ? 'danger' : 'default'}>
-                            {p.required ? 'Yes' : 'No'}
+                            {p.required ? t('federation.api_doc_yes', 'Yes') : t('federation.api_doc_no', 'No')}
                           </Chip>
                         </TableCell>
                         <TableCell><span className="text-sm text-default-600">{p.description}</span></TableCell>
@@ -649,7 +644,7 @@ function EndpointsTab() {
               </>
             )}
 
-            <p className="text-sm font-semibold text-default-700">Example Response</p>
+            <p className="text-sm font-semibold text-default-700">{t('federation.api_doc_example_response', 'Example Response')}</p>
             <CodeBlock>{ep.response}</CodeBlock>
           </div>
         </AccordionItem>
@@ -912,9 +907,9 @@ function ErrorCodesTab() {
 
       <Table aria-label={t('federation.api_doc_error_codes_aria')}>
         <TableHeader>
-          <TableColumn>Code</TableColumn>
-          <TableColumn>Name</TableColumn>
-          <TableColumn>Description</TableColumn>
+          <TableColumn>{t('federation.api_doc_col_code', 'Code')}</TableColumn>
+          <TableColumn>{t('federation.api_doc_col_name', 'Name')}</TableColumn>
+          <TableColumn>{t('federation.api_doc_col_description', 'Description')}</TableColumn>
         </TableHeader>
         <TableBody>
           {ERROR_CODES.map((err) => (
@@ -979,8 +974,8 @@ function WebhooksTab() {
           </p>
           <Table aria-label={t('federation.api_doc_webhook_events_aria')} removeWrapper>
             <TableHeader>
-              <TableColumn>Event</TableColumn>
-              <TableColumn>Description</TableColumn>
+              <TableColumn>{t('federation.api_doc_col_event', 'Event')}</TableColumn>
+              <TableColumn>{t('federation.api_doc_col_description', 'Description')}</TableColumn>
             </TableHeader>
             <TableBody>
               {WEBHOOK_EVENTS.map((evt) => (

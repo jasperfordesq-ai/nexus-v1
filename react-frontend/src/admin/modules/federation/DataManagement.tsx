@@ -8,15 +8,14 @@
  * Import and export federation data (users, partnerships, transactions, audit).
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { Card, CardBody, CardHeader, Button } from '@heroui/react';
+import { useState, useCallback, useEffect } from 'react';
+import { Card, CardBody, CardHeader, Button, Chip, Tooltip } from '@heroui/react';
 import { Database, Download, Upload, RefreshCw } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import api from '@/lib/api';
-
 import { useTranslation } from 'react-i18next';
 interface DataConfig {
   export_formats: string[];
@@ -33,7 +32,6 @@ export function DataManagement() {
   const [config, setConfig] = useState<DataConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [exportingType, setExportingType] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -67,42 +65,8 @@ export function DataManagement() {
     setExportingType(null);
   }, [toast, t]);
 
-  const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    if (!file.name.endsWith('.csv')) {
-      toast.error(t('federation.import_csv_only', 'Only CSV files are supported'));
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const content = reader.result as string;
-      const lines = content.split('\n').filter(Boolean);
-      toast.success(
-        t('federation.import_file_read', 'Read {{count}} rows from {{name}}', {
-          count: Math.max(0, lines.length - 1),
-          name: file.name,
-        })
-      );
-      // Reset the input so the same file can be selected again
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    };
-    reader.onerror = () => {
-      toast.error(t('federation.import_read_failed', 'Failed to read file'));
-    };
-    reader.readAsText(file);
-  }, [toast, t]);
-
   return (
     <div>
-      {/* Hidden file input for CSV upload */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".csv"
-        className="hidden"
-        onChange={handleFileUpload}
-      />
       <PageHeader
         title={t('federation.data_management_title')}
         description={t('federation.data_management_desc')}
@@ -141,24 +105,29 @@ export function DataManagement() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Upload size={20} /> {t('federation.import_data')}</h3></CardHeader>
+          <CardHeader>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Upload size={20} /> {t('federation.import_data')}
+              <Chip size="sm" color="warning" variant="flat">{t('federation.coming_soon', 'Coming Soon')}</Chip>
+            </h3>
+          </CardHeader>
           <CardBody>
             <div className="flex flex-col items-center py-8 text-default-400">
-              <Upload size={40} className="mb-3" />
+              <Upload size={40} className="mb-3 opacity-50" />
               <p className="text-sm font-medium">{t('federation.import_users')}</p>
-              <p className="text-xs text-center max-w-xs mt-1">{t('federation.import_users_desc')}</p>
-              <Button
-                size="sm"
-                variant="flat"
-                className="mt-4"
-                isDisabled={!config?.import_supported}
-                onPress={() => fileInputRef.current?.click()}
-              >
-                {t('federation.upload_csv')}
-              </Button>
-              {config?.last_import_at && (
-                <p className="text-xs text-default-400 mt-2">{t('federation.last_import')}: {new Date(config.last_import_at).toLocaleDateString()}</p>
-              )}
+              <p className="text-xs text-center max-w-xs mt-1">{t('federation.import_coming_soon')}</p>
+              <Tooltip content={t('federation.import_coming_soon')}>
+                <span>
+                  <Button
+                    size="sm"
+                    variant="flat"
+                    className="mt-4"
+                    isDisabled
+                  >
+                    {t('federation.upload_csv')}
+                  </Button>
+                </span>
+              </Tooltip>
             </div>
           </CardBody>
         </Card>

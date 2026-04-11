@@ -175,7 +175,7 @@ export function FederationMessagesPage() {
   usePageTitle(t('messages.page_title'));
 
   const { user } = useAuth();
-  const { hasFeature, tenantSlug } = useTenant();
+  const { hasFeature, tenantSlug, tenantPath } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -634,7 +634,7 @@ export function FederationMessagesPage() {
 
   // ── Breadcrumbs ──
   const breadcrumbItems = [
-    { label: t('messages.breadcrumb_federation'), href: '/federation' },
+    { label: t('messages.breadcrumb_federation'), href: tenantPath('/federation') },
     { label: t('messages.breadcrumb_messages') },
   ];
 
@@ -1108,6 +1108,7 @@ export function FederationMessagesPage() {
                       placeholder={t('messages.reply_placeholder')}
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}
+                      maxLength={10000}
                       minRows={1}
                       maxRows={4}
                       classNames={{
@@ -1290,6 +1291,7 @@ export function FederationMessagesPage() {
                 placeholder={t('messages.subject_placeholder')}
                 value={composeSubject}
                 onChange={(e) => setComposeSubject(e.target.value)}
+                maxLength={500}
                 classNames={{
                   input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                   inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
@@ -1303,6 +1305,7 @@ export function FederationMessagesPage() {
                 placeholder={t('messages.message_placeholder')}
                 value={composeBody}
                 onChange={(e) => setComposeBody(e.target.value)}
+                maxLength={10000}
                 minRows={4}
                 maxRows={8}
                 classNames={{

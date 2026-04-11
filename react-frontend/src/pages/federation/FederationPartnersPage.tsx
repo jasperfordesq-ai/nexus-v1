@@ -86,12 +86,13 @@ const FEDERATION_LEVELS: Record<number, FederationLevelMeta> = {
 };
 
 /** Map permission keys to display labels and icons */
-const PERMISSION_META: Record<string, { label: string; icon: typeof Globe }> = {
-  profiles: { label: 'View Profiles', icon: UserCheck },
-  messaging: { label: 'Cross-Community Messaging', icon: MessageSquare },
-  transactions: { label: 'Time Credit Transfers', icon: ArrowRightLeft },
-  listings: { label: 'Browse Listings', icon: ListTodo },
-  events: { label: 'Shared Events', icon: Calendar },
+const PERMISSION_META: Record<string, { icon: typeof Globe }> = {
+  profiles: { icon: UserCheck },
+  messaging: { icon: MessageSquare },
+  transactions: { icon: ArrowRightLeft },
+  listings: { icon: ListTodo },
+  events: { icon: Calendar },
+  groups: { icon: Users },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -126,7 +127,7 @@ export function FederationPartnersPage() {
       setIsLoading(true);
       setLoadError(null);
 
-      const response = await api.get<FederationPartner[]>('/v2/federation/partners');
+      const response = await api.get<FederationPartner[]>('/v2/federation/partners', { signal: controller.signal });
 
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
@@ -176,7 +177,7 @@ export function FederationPartnersPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: t('partners.breadcrumb_federation'), href: '/federation' },
+          { label: t('partners.breadcrumb_federation'), href: tenantPath('/federation') },
           { label: t('partners.breadcrumb_partners') },
         ]}
       />

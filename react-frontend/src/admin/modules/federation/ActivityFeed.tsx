@@ -367,7 +367,7 @@ export function ActivityFeed() {
         abortControllerRef.current.abort();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- reload on filter change; loadActivities excluded to avoid loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reload on filter change; loadItems excluded to avoid loop
   }, [eventTypeParam, partnerFilter, dateFrom, dateTo, debouncedSearch]);
 
   const handleLoadMore = () => {
@@ -405,6 +405,8 @@ export function ActivityFeed() {
   };
 
   // CSV export
+  // NOTE: This only exports the currently loaded items, not the full server-side dataset.
+  // To export all items, the user would need to load all pages first.
   const exportCsv = () => {
     if (items.length === 0) return;
     const headers = [
@@ -477,15 +479,20 @@ export function ActivityFeed() {
             >
               {t('federation.refresh', 'Refresh')}
             </Button>
-            <Button
-              variant="flat"
-              size="sm"
-              startContent={<Download size={16} />}
-              onPress={exportCsv}
-              isDisabled={items.length === 0}
-            >
-              {t('federation.export_csv', 'Export CSV')}
-            </Button>
+            <div className="flex flex-col items-end gap-0.5">
+              <Button
+                variant="flat"
+                size="sm"
+                startContent={<Download size={16} />}
+                onPress={exportCsv}
+                isDisabled={items.length === 0}
+              >
+                {t('federation.export_csv', 'Export CSV')}
+              </Button>
+              <span className="text-xs text-default-400">
+                {t('federation.export_loaded_only', 'Exports currently loaded items')}
+              </span>
+            </div>
           </div>
         }
       />

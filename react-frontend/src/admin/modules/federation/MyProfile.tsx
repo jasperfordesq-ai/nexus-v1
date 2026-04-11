@@ -378,13 +378,18 @@ export function MyProfile() {
               <>
                 {/* Selection count */}
                 <div className="text-sm text-default-500">
-                  {t('federation.topics_selected', '{{count}} of 10 selected').replace('{{count}}', String(selectedTopicIds.size))}
+                  {t('federation.topics_selected', { count: selectedTopicIds.size, defaultValue: '{{count}} of 10 selected' })}
                   {primaryTopicIds.size > 0 && (
                     <span className="ml-2 text-warning">
-                      ({t('federation.primary_count', '{{count}} primary').replace('{{count}}', String(primaryTopicIds.size))})
+                      ({t('federation.primary_count', { count: primaryTopicIds.size, defaultValue: '{{count}} primary' })})
                     </span>
                   )}
                 </div>
+
+                {/* Helper text for primary topic toggle */}
+                <p className="text-xs text-default-400">
+                  {t('federation.click_star_for_primary_hint', 'Click \u2605 in the summary below to set a topic as primary')}
+                </p>
 
                 {/* Topics grouped by category */}
                 {Object.entries(topicsByCategory).map(([category, topics]) => (

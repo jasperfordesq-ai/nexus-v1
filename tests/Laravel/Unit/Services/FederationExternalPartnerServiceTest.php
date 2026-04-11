@@ -314,8 +314,10 @@ class FederationExternalPartnerServiceTest extends \Tests\Laravel\TestCase
         $encryptMethod->setAccessible(true);
         $encrypted = $encryptMethod->invoke(null, $originalKey);
 
-        // Decrypt using the public method
-        $decrypted = FederationExternalPartnerService::decryptApiKey($encrypted);
+        // Decrypt using reflection (method is private)
+        $decryptMethod = $reflection->getMethod('decryptApiKey');
+        $decryptMethod->setAccessible(true);
+        $decrypted = $decryptMethod->invoke(null, $encrypted);
 
         $this->assertEquals($originalKey, $decrypted);
     }
@@ -340,8 +342,10 @@ class FederationExternalPartnerServiceTest extends \Tests\Laravel\TestCase
         $this->assertNotEquals($encrypted1, $encrypted2);
 
         // But both should decrypt to the same value
-        $decrypted1 = FederationExternalPartnerService::decryptApiKey($encrypted1);
-        $decrypted2 = FederationExternalPartnerService::decryptApiKey($encrypted2);
+        $decryptMethod = $reflection->getMethod('decryptApiKey');
+        $decryptMethod->setAccessible(true);
+        $decrypted1 = $decryptMethod->invoke(null, $encrypted1);
+        $decrypted2 = $decryptMethod->invoke(null, $encrypted2);
         $this->assertEquals($decrypted1, $decrypted2);
         $this->assertEquals($key, $decrypted1);
     }

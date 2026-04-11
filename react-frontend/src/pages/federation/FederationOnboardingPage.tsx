@@ -265,7 +265,7 @@ export function FederationOnboardingPage() {
             indicator: 'bg-gradient-to-r from-indigo-500 to-purple-600',
             track: 'bg-theme-elevated',
           }}
-          aria-label={`Step ${currentStep} of ${TOTAL_STEPS}`}
+          aria-label={t('onboarding.progress_aria', { current: currentStep, total: TOTAL_STEPS })}
         />
       </motion.div>
 

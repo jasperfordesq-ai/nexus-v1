@@ -150,9 +150,7 @@ export function PartnerDirectory() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { loadData(); }, [loadData]);
-
-  // Debounced search
+  // Debounced search — also handles initial load on mount (300ms delay)
   useEffect(() => {
     const timer = setTimeout(() => {
       loadData({

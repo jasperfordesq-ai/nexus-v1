@@ -549,7 +549,7 @@ class FederationExternalPartnerService
     /**
      * Decrypt an encrypted API key.
      */
-    public static function decryptApiKey(string $encryptedKey): string
+    private static function decryptApiKey(string $encryptedKey): string
     {
         return Crypt::decryptString($encryptedKey);
     }

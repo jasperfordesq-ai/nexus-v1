@@ -86,23 +86,14 @@ interface FederationDashboardData {
 const howItWorksCards = [
   {
     icon: Search,
-    title: 'Discover Partners',
-    description:
-      'Browse partner timebanks in the federation network and see what their communities offer.',
     gradient: 'from-indigo-500 to-blue-500',
   },
   {
     icon: Users,
-    title: 'Connect with Members',
-    description:
-      'Find members across partner communities with the skills you need, or offer yours to a wider audience.',
     gradient: 'from-purple-500 to-pink-500',
   },
   {
     icon: ArrowRightLeft,
-    title: 'Exchange Across Communities',
-    description:
-      'Send messages, request services, and complete time credit exchanges with members from any partner timebank.',
     gradient: 'from-cyan-500 to-teal-500',
   },
 ];
@@ -110,43 +101,31 @@ const howItWorksCards = [
 const quickLinks = [
   {
     icon: Globe,
-    title: 'Partner Communities',
-    description: 'Browse all partner timebanks',
     href: '/federation/partners',
     gradient: 'from-indigo-500 to-blue-500',
   },
   {
     icon: Users,
-    title: 'Federated Members',
-    description: 'Search members across communities',
     href: '/federation/members',
     gradient: 'from-purple-500 to-pink-500',
   },
   {
     icon: MessageSquare,
-    title: 'Federated Messages',
-    description: 'Cross-community conversations',
     href: '/federation/messages',
     gradient: 'from-cyan-500 to-teal-500',
   },
   {
     icon: ListTodo,
-    title: 'Federated Listings',
-    description: 'Services from partner communities',
     href: '/federation/listings',
     gradient: 'from-amber-500 to-orange-500',
   },
   {
     icon: Calendar,
-    title: 'Federated Events',
-    description: 'Events across the network',
     href: '/federation/events',
     gradient: 'from-rose-500 to-pink-500',
   },
   {
     icon: Settings,
-    title: 'Federation Settings',
-    description: 'Manage your federation preferences',
     href: '/federation/settings',
     gradient: 'from-gray-500 to-slate-500',
   },
@@ -248,7 +227,7 @@ function FederationHero({ onOptIn, isOptingIn }: { onOptIn: () => void; isOpting
           {howItWorksCards.map((card, index) => {
             const Icon = card.icon;
             return (
-              <motion.div key={card.title} variants={itemVariants}>
+              <motion.div key={index} variants={itemVariants}>
                 <GlassCard className="p-6 h-full text-center">
                   <div className="relative mx-auto mb-4">
                     <div
@@ -610,11 +589,11 @@ export default function FederationHubPage() {
   const { t } = useTranslation('federation');
   usePageTitle(t('hub.page_title'));
 
-  const { tenant } = useTenant();
+  const { tenant, tenantPath } = useTenant();
   const toast = useToast();
 
   const breadcrumbs: BreadcrumbItem[] = [
-    { label: t('hub.breadcrumb_dashboard'), href: '/dashboard' },
+    { label: t('hub.breadcrumb_dashboard'), href: tenantPath('/dashboard') },
     { label: t('hub.breadcrumb_federation') },
   ];
 

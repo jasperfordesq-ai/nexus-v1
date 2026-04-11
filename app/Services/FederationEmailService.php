@@ -4,10 +4,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -29,12 +32,12 @@ class FederationEmailService
     public static function sendNewMessageNotification(int $recipientUserId, int $senderUserId, int $senderTenantId, string $messagePreview): bool
     {
         try {
-            $recipient = self::getUserWithEmail($recipientUserId);
+            $recipient = self::getUserWithEmail($recipientUserId, TenantContext::getId());
             if (!$recipient || empty($recipient->email)) {
                 return false;
             }
 
-            $sender = self::getUserBasicInfo($senderUserId);
+            $sender = self::getUserBasicInfo($senderUserId, $senderTenantId);
             $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
 
             $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : 'A federation member';
@@ -83,12 +86,12 @@ class FederationEmailService
     public static function sendTransactionNotification(int $recipientUserId, int $senderUserId, int $senderTenantId, float $amount, string $description): bool
     {
         try {
-            $recipient = self::getUserWithEmail($recipientUserId);
+            $recipient = self::getUserWithEmail($recipientUserId, TenantContext::getId());
             if (!$recipient || empty($recipient->email)) {
                 return false;
             }
 
-            $sender = self::getUserBasicInfo($senderUserId);
+            $sender = self::getUserBasicInfo($senderUserId, $senderTenantId);
             $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
 
             $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : 'A federation member';
@@ -131,12 +134,12 @@ class FederationEmailService
     public static function sendTransactionConfirmation(int $senderUserId, int $recipientUserId, int $recipientTenantId, float $amount, string $description, float $newBalance): bool
     {
         try {
-            $sender = self::getUserWithEmail($senderUserId);
+            $sender = self::getUserWithEmail($senderUserId, TenantContext::getId());
             if (!$sender || empty($sender->email)) {
                 return false;
             }
 
-            $recipient = self::getUserBasicInfo($recipientUserId);
+            $recipient = self::getUserBasicInfo($recipientUserId, $recipientTenantId);
             $recipientTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$recipientTenantId]);
 
             $recipientName = $recipient ? trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) : 'a federation member';
@@ -180,7 +183,7 @@ class FederationEmailService
     public static function sendWeeklyDigest(int $userId, int $tenantId): bool
     {
         try {
-            $user = self::getUserWithEmail($userId);
+            $user = self::getUserWithEmail($userId, $tenantId);
             if (!$user || empty($user->email)) {
                 return false;
             }
@@ -317,22 +320,22 @@ class FederationEmailService
     /**
      * Get user with email for notifications.
      */
-    private static function getUserWithEmail(int $userId): ?object
+    private static function getUserWithEmail(int $userId, int $tenantId): ?object
     {
         return DB::selectOne(
-            "SELECT id, email, first_name, last_name FROM users WHERE id = ? AND email IS NOT NULL",
-            [$userId]
+            "SELECT id, email, first_name, last_name FROM users WHERE id = ? AND tenant_id = ? AND email IS NOT NULL",
+            [$userId, $tenantId]
         );
     }
 
     /**
      * Get basic user info for display in emails.
      */
-    private static function getUserBasicInfo(int $userId): ?object
+    private static function getUserBasicInfo(int $userId, int $tenantId): ?object
     {
         return DB::selectOne(
-            "SELECT id, first_name, last_name FROM users WHERE id = ?",
-            [$userId]
+            "SELECT id, first_name, last_name FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         );
     }
 }

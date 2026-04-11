@@ -36,14 +36,13 @@ import {
   AlertTriangle,
   RefreshCw,
   Wifi,
-  ChevronRight,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -56,6 +55,7 @@ const PER_PAGE = 20;
 export function FederationEventsPage() {
   const { t } = useTranslation('federation');
   usePageTitle(t('events.page_title'));
+  const { tenantPath } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -139,7 +139,8 @@ export function FederationEventsPage() {
         params.set('per_page', String(PER_PAGE));
 
         const response = await api.get<FederatedEvent[]>(
-          `/v2/federation/events?${params}`
+          `/v2/federation/events?${params}`,
+          { signal: controller.signal }
         );
 
         if (controller.signal.aborted) return;
@@ -208,7 +209,7 @@ export function FederationEventsPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: t('events.breadcrumb_federation'), href: '/federation' },
+          { label: t('events.breadcrumb_federation'), href: tenantPath('/federation') },
           { label: t('events.breadcrumb_events') },
         ]}
       />
@@ -272,6 +273,9 @@ export function FederationEventsPage() {
                 : 'bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover self-start'
             }
             onClick={() => setUpcomingOnly(!upcomingOnly)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setUpcomingOnly(!upcomingOnly); } }}
             aria-pressed={upcomingOnly}
           >
             {t('events.upcoming_only')}
@@ -489,10 +493,6 @@ function FederatedEventCard({ event }: FederatedEventCardProps) {
             </div>
           </div>
 
-          {/* Arrow */}
-          <div className="flex-shrink-0 self-center hidden sm:block">
-            <ChevronRight className="w-5 h-5 text-theme-subtle" aria-hidden="true" />
-          </div>
         </div>
       </GlassCard>
     </article>

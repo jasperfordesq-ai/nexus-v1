@@ -6,6 +6,7 @@
 
 namespace App\Core;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -29,8 +30,10 @@ class FederationApiMiddleware
 
     /**
      * Authenticate an incoming API request.
+     *
+     * @return bool|JsonResponse Returns true on success, or a JsonResponse on auth failure.
      */
-    public static function authenticate(): bool
+    public static function authenticate(): bool|JsonResponse
     {
         if (self::hasHmacSignature()) {
             return self::authenticateWithHmac();
@@ -54,33 +57,31 @@ class FederationApiMiddleware
 
     /**
      * Authenticate using JWT Bearer token.
+     *
+     * @return bool|JsonResponse
      */
-    private static function authenticateWithJwt(): bool
+    private static function authenticateWithJwt(): bool|JsonResponse
     {
         $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
 
         if (!preg_match('/^Bearer\s+(.+)$/i', $authHeader, $matches)) {
-            self::sendError(401, 'Invalid authorization header', 'INVALID_AUTH_HEADER');
-            return false;
+            return self::sendError(401, 'Invalid authorization header', 'INVALID_AUTH_HEADER');
         }
 
         $token = $matches[1];
         if (!class_exists(FederationJwtService::class)) {
-            self::sendError(500, 'JWT service unavailable', 'SERVICE_UNAVAILABLE');
-            return false;
+            return self::sendError(500, 'JWT service unavailable', 'SERVICE_UNAVAILABLE');
         }
         $payload = FederationJwtService::validateTokenStatic($token);
 
         if (!$payload) {
-            self::sendError(401, 'Invalid or expired token', 'INVALID_TOKEN');
-            return false;
+            return self::sendError(401, 'Invalid or expired token', 'INVALID_TOKEN');
         }
 
         $partnerId = $payload['sub'] ?? null;
 
         if (!$partnerId) {
-            self::sendError(401, 'Token missing partner information', 'INVALID_TOKEN');
-            return false;
+            return self::sendError(401, 'Token missing partner information', 'INVALID_TOKEN');
         }
 
         // Verify partner is still active in DB (may have been revoked since token issuance)
@@ -92,8 +93,7 @@ class FederationApiMiddleware
 
         if (!$dbPartner) {
             Log::warning('[FederationApiMiddleware] JWT partner no longer active in DB', ['partner_id' => $partnerId]);
-            self::sendError(401, 'Partner account has been revoked or suspended', 'PARTNER_REVOKED');
-            return false;
+            return self::sendError(401, 'Partner account has been revoked or suspended', 'PARTNER_REVOKED');
         }
 
         $partner = [
@@ -109,8 +109,7 @@ class FederationApiMiddleware
         ];
 
         if (!self::checkRateLimit($partnerId)) {
-            self::sendError(429, 'Rate limit exceeded', 'RATE_LIMIT_EXCEEDED');
-            return false;
+            return self::sendError(429, 'Rate limit exceeded', 'RATE_LIMIT_EXCEEDED');
         }
 
         self::$authenticatedPartner = $partner;
@@ -133,43 +132,39 @@ class FederationApiMiddleware
 
     /**
      * Authenticate using HMAC-SHA256 request signing.
+     *
+     * @return bool|JsonResponse
      */
-    private static function authenticateWithHmac(): bool
+    private static function authenticateWithHmac(): bool|JsonResponse
     {
         $platformId = $_SERVER['HTTP_X_FEDERATION_PLATFORM_ID'] ?? '';
         $timestamp = $_SERVER['HTTP_X_FEDERATION_TIMESTAMP'] ?? '';
         $signature = $_SERVER['HTTP_X_FEDERATION_SIGNATURE'] ?? '';
 
         if (!self::validateTimestamp($timestamp)) {
-            self::sendError(401, 'Request timestamp expired or invalid', 'TIMESTAMP_INVALID');
-            return false;
+            return self::sendError(401, 'Request timestamp expired or invalid', 'TIMESTAMP_INVALID');
         }
 
         $partner = self::getPartnerByPlatformId($platformId);
 
         if (!$partner) {
-            self::sendError(401, 'Unknown platform', 'PLATFORM_NOT_FOUND');
-            return false;
+            return self::sendError(401, 'Unknown platform', 'PLATFORM_NOT_FOUND');
         }
 
         if ($partner['status'] !== 'active') {
-            self::sendError(403, 'Partner account is not active', 'PARTNER_INACTIVE');
-            return false;
+            return self::sendError(403, 'Partner account is not active', 'PARTNER_INACTIVE');
         }
 
         if (empty($partner['signing_secret'])) {
-            self::sendError(401, 'HMAC signing not configured for this platform', 'SIGNING_NOT_CONFIGURED');
-            return false;
+            return self::sendError(401, 'HMAC signing not configured for this platform', 'SIGNING_NOT_CONFIGURED');
         }
 
         if (!self::verifyHmacSignature($signature, $partner['signing_secret'], $timestamp)) {
-            self::sendError(401, 'Invalid request signature', 'SIGNATURE_INVALID');
-            return false;
+            return self::sendError(401, 'Invalid request signature', 'SIGNATURE_INVALID');
         }
 
         if (!self::checkRateLimit($partner['id'])) {
-            self::sendError(429, 'Rate limit exceeded', 'RATE_LIMIT_EXCEEDED');
-            return false;
+            return self::sendError(429, 'Rate limit exceeded', 'RATE_LIMIT_EXCEEDED');
         }
 
         self::$authenticatedPartner = $partner;
@@ -182,36 +177,33 @@ class FederationApiMiddleware
 
     /**
      * Authenticate using simple API key.
+     *
+     * @return bool|JsonResponse
      */
-    private static function authenticateWithApiKey(): bool
+    private static function authenticateWithApiKey(): bool|JsonResponse
     {
         $apiKey = self::extractApiKey();
 
         if (empty($apiKey)) {
-            self::sendError(401, 'API key required', 'MISSING_API_KEY');
-            return false;
+            return self::sendError(401, 'API key required', 'MISSING_API_KEY');
         }
 
         $partner = self::validateApiKey($apiKey);
 
         if (!$partner) {
-            self::sendError(401, 'Invalid API key', 'INVALID_API_KEY');
-            return false;
+            return self::sendError(401, 'Invalid API key', 'INVALID_API_KEY');
         }
 
         if ($partner['status'] !== 'active') {
-            self::sendError(403, 'Partner account is not active', 'PARTNER_INACTIVE');
-            return false;
+            return self::sendError(403, 'Partner account is not active', 'PARTNER_INACTIVE');
         }
 
         if (!empty($partner['signing_enabled'])) {
-            self::sendError(401, 'HMAC signing required for this API key', 'HMAC_REQUIRED');
-            return false;
+            return self::sendError(401, 'HMAC signing required for this API key', 'HMAC_REQUIRED');
         }
 
         if (!self::checkRateLimit($partner['id'])) {
-            self::sendError(429, 'Rate limit exceeded', 'RATE_LIMIT_EXCEEDED');
-            return false;
+            return self::sendError(429, 'Rate limit exceeded', 'RATE_LIMIT_EXCEEDED');
         }
 
         self::$authenticatedPartner = $partner;
@@ -269,7 +261,7 @@ class FederationApiMiddleware
             return false; // Nonce already seen — replay detected
         }
 
-        $stringToSign = implode("\n", [$method, $path, $timestamp, $body]);
+        $stringToSign = implode("\n", [$method, $path, $timestamp, $nonce, $body]);
         $expectedSignature = hash_hmac('sha256', $stringToSign, $secret);
 
         return hash_equals($expectedSignature, $signature);
@@ -351,13 +343,17 @@ class FederationApiMiddleware
 
     /**
      * Generate a signature for a request (for testing/client libraries).
+     *
+     * The nonce MUST be included in the signed payload to prevent replay attacks
+     * where an attacker swaps the nonce within the timestamp window.
      */
-    public static function generateSignature(string $secret, string $method, string $path, string $timestamp, string $body = ''): string
+    public static function generateSignature(string $secret, string $method, string $path, string $timestamp, string $body = '', string $nonce = ''): string
     {
         $stringToSign = implode("\n", [
             strtoupper($method),
             $path,
             $timestamp,
+            $nonce,
             $body
         ]);
 
@@ -395,12 +391,13 @@ class FederationApiMiddleware
 
     /**
      * Require a specific permission, send error if not available.
+     *
+     * @return bool|JsonResponse Returns true if permitted, or a JsonResponse on denial.
      */
-    public static function requirePermission(string $feature): bool
+    public static function requirePermission(string $feature): bool|JsonResponse
     {
         if (!self::hasPermission($feature)) {
-            self::sendError(403, "Permission denied for: {$feature}", 'PERMISSION_DENIED');
-            return false;
+            return self::sendError(403, "Permission denied for: {$feature}", 'PERMISSION_DENIED');
         }
         return true;
     }
@@ -584,55 +581,35 @@ class FederationApiMiddleware
     /**
      * Send JSON error response.
      */
-    public static function sendError(int $statusCode, string $message, string $code): void
+    public static function sendError(int $statusCode, string $message, string $code): JsonResponse
     {
-        // In test environments, throw instead of exit() so PHPUnit survives.
-        // Use $_ENV (set by phpunit.xml) rather than getenv() (which reads process env from Docker).
-        if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
-            throw new \Symfony\Component\HttpKernel\Exception\HttpException(
-                $statusCode,
-                json_encode(['error' => true, 'code' => $code, 'message' => $message, 'timestamp' => date('c')])
-            );
-        }
-        http_response_code($statusCode);
-        header('Content-Type: application/json');
-        echo json_encode([
+        return response()->json([
             'error' => true,
             'code' => $code,
             'message' => $message,
-            'timestamp' => date('c')
-        ]);
-        exit;
+            'timestamp' => date('c'),
+        ], $statusCode);
     }
 
     /**
      * Send JSON success response.
      */
-    public static function sendSuccess(array $data, int $statusCode = 200): void
+    public static function sendSuccess(array $data, int $statusCode = 200): JsonResponse
     {
-        if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
-            throw new \Symfony\Component\HttpKernel\Exception\HttpException(
-                200,
-                json_encode(array_merge(['success' => true, 'timestamp' => date('c')], $data))
-            );
-        }
-        http_response_code($statusCode);
-        header('Content-Type: application/json');
-        echo json_encode(array_merge([
+        return response()->json(array_merge([
             'success' => true,
-            'timestamp' => date('c')
-        ], $data));
-        exit;
+            'timestamp' => date('c'),
+        ], $data), $statusCode);
     }
 
     /**
      * Send paginated response.
      */
-    public static function sendPaginated(array $items, int $total, int $page, int $perPage): void
+    public static function sendPaginated(array $items, int $total, int $page, int $perPage): JsonResponse
     {
         $totalPages = ceil($total / $perPage);
 
-        self::sendSuccess([
+        return self::sendSuccess([
             'data' => $items,
             'pagination' => [
                 'total' => $total,

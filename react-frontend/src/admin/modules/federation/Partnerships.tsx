@@ -206,6 +206,7 @@ export function Partnerships() {
 
   // ─── Actions ───
   const handleApprove = async (item: Partnership) => {
+    if (!window.confirm(t('federation.confirm_approve_partnership'))) return;
     setActionLoading(true);
     try {
       const res = await adminFederation.approvePartnership(item.id);
@@ -223,6 +224,7 @@ export function Partnerships() {
   };
 
   const handleReject = async (item: Partnership) => {
+    if (!window.confirm(t('federation.confirm_reject_partnership'))) return;
     setActionLoading(true);
     try {
       const res = await adminFederation.rejectPartnership(item.id);

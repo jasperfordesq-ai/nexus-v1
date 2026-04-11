@@ -52,10 +52,10 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import type { FederatedMember } from '@/types/api';
 
-const SERVICE_REACH_META: Record<string, { label: string; icon: typeof Home }> = {
-  local_only: { label: 'Local Only', icon: Home },
-  remote_ok: { label: 'Remote OK', icon: Compass },
-  travel_ok: { label: 'Will Travel', icon: Car },
+const SERVICE_REACH_META: Record<string, { icon: typeof Home }> = {
+  local_only: { icon: Home },
+  remote_ok: { icon: Compass },
+  travel_ok: { icon: Car },
 };
 
 export function FederationMemberProfilePage() {
@@ -168,7 +168,7 @@ export function FederationMemberProfilePage() {
     : 'Member';
 
   const reachKey = member?.service_reach ?? 'local_only';
-  const reachMeta = SERVICE_REACH_META[reachKey] ?? SERVICE_REACH_META.local_only ?? { label: 'Local Only', icon: Home };
+  const reachMeta = SERVICE_REACH_META[reachKey] ?? SERVICE_REACH_META.local_only ?? { icon: Home };
   const ReachIcon = reachMeta.icon;
 
   // External members — show actions (message, send credits) instead of a dead-end 404
@@ -183,8 +183,8 @@ export function FederationMemberProfilePage() {
         <PageMeta title={t('member_profile.external_member_title', 'External Member')} noIndex />
         <Breadcrumbs
           items={[
-            { label: t('member_profile.breadcrumb_federation'), href: '/federation' },
-            { label: t('member_profile.breadcrumb_members'), href: '/federation/members' },
+            { label: t('member_profile.breadcrumb_federation'), href: tenantPath('/federation') },
+            { label: t('member_profile.breadcrumb_members'), href: tenantPath('/federation/members') },
             { label: t('member_profile.external_member_title', 'External Member') },
           ]}
         />
@@ -233,8 +233,8 @@ export function FederationMemberProfilePage() {
       <div className="space-y-6">
         <Breadcrumbs
           items={[
-            { label: t('member_profile.breadcrumb_federation'), href: '/federation' },
-            { label: t('member_profile.breadcrumb_members'), href: '/federation/members' },
+            { label: t('member_profile.breadcrumb_federation'), href: tenantPath('/federation') },
+            { label: t('member_profile.breadcrumb_members'), href: tenantPath('/federation/members') },
             { label: t('member_profile.breadcrumb_profile') },
           ]}
         />
@@ -276,8 +276,8 @@ export function FederationMemberProfilePage() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: t('member_profile.breadcrumb_federation'), href: '/federation' },
-          { label: t('member_profile.breadcrumb_members'), href: '/federation/members' },
+          { label: t('member_profile.breadcrumb_federation'), href: tenantPath('/federation') },
+          { label: t('member_profile.breadcrumb_members'), href: tenantPath('/federation/members') },
           { label: displayName },
         ]}
       />

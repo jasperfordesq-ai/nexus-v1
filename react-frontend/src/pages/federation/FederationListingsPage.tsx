@@ -153,7 +153,8 @@ export function FederationListingsPage() {
         params.set('per_page', String(PER_PAGE));
 
         const response = await api.get<FederatedListing[]>(
-          `/v2/federation/listings?${params}`
+          `/v2/federation/listings?${params}`,
+          { signal: controller.signal }
         );
 
         if (controller.signal.aborted) return;
@@ -222,7 +223,7 @@ export function FederationListingsPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: t('listings.breadcrumb_federation'), href: '/federation' },
+          { label: t('listings.breadcrumb_federation'), href: tenantPath('/federation') },
           { label: t('listings.breadcrumb_listings') },
         ]}
       />
@@ -296,6 +297,9 @@ export function FederationListingsPage() {
                     : 'bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover'
                 }
                 onClick={() => setSelectedType(item.key)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedType(item.key); } }}
                 aria-pressed={isActive}
               >
                 {item.label}
@@ -609,7 +613,7 @@ function FederatedListingCard({ listing, onViewDetails }: FederatedListingCardPr
 
   return (
     <GlassCard
-      className="p-5 hover:scale-[1.02] transition-transform h-full flex flex-col cursor-pointer"
+      className="p-5 md:hover:scale-[1.02] transition-transform h-full flex flex-col cursor-pointer"
       onClick={onViewDetails}
     >
       {/* Image or Type Icon */}

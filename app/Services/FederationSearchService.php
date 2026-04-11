@@ -4,6 +4,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Services\FederationExternalApiClient;
@@ -174,6 +176,12 @@ class FederationSearchService
             $filtersApplied[] = 'search';
         }
 
+        // Build the WHERE clause portion for reuse in the count query.
+        // $sql currently contains "SELECT ... FROM ... WHERE ..." with all conditions.
+        // Extract everything after "FROM users u" to reuse the JOIN + WHERE in the count query.
+        $fromClause = substr($sql, strpos($sql, 'FROM users u'));
+        $countParams = $params; // Same params (no LIMIT/OFFSET yet)
+
         $orderBy = match ($filters['sort'] ?? 'name') {
             'recent' => " ORDER BY u.created_at DESC",
             'active' => " ORDER BY u.last_active_at DESC",
@@ -188,6 +196,10 @@ class FederationSearchService
         $params[] = $offset;
 
         try {
+            // Count query for the real total (before LIMIT/OFFSET)
+            $countSql = "SELECT COUNT(*) as cnt " . $fromClause;
+            $totalCount = (int) DB::selectOne($countSql, $countParams)->cnt;
+
             $members = array_map(
                 fn ($row) => (array) $row,
                 DB::select($sql, $params)
@@ -201,9 +213,9 @@ class FederationSearchService
 
             return [
                 'members' => $members,
-                'total' => count($members),
+                'total' => $totalCount,
                 'filters_applied' => $filtersApplied,
-                'has_more' => count($members) >= $limit,
+                'has_more' => ($offset + count($members)) < $totalCount,
             ];
         } catch (\Exception $e) {
             Log::error('FederationSearchService::searchMembers error: ' . $e->getMessage());

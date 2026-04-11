@@ -46,7 +46,7 @@ import {
   Pause,
   Play,
   ArrowRightLeft,
-  DollarSign,
+  Clock,
   TrendingUp,
   AlertTriangle,
   Eye,
@@ -628,7 +628,7 @@ export function CreditAgreements() {
                   description={t('federation.desc_maximum_credits_that_can_be_exchanged_pe')}
                   value={monthlyLimit}
                   onChange={(e) => setMonthlyLimit(e.target.value)}
-                  startContent={<DollarSign size={14} />}
+                  startContent={<Clock size={14} />}
                   min="1"
                 />
               </ModalBody>

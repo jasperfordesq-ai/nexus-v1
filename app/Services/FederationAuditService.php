@@ -4,6 +4,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Core\TenantContext;
@@ -57,6 +59,10 @@ class FederationAuditService
         }
 
         // Get actor info if available
+        // NOTE: actor_email is redacted to domain-only ('***@domain.com') to prevent
+        // cross-tenant email address leakage when admins from different tenants view
+        // the shared federation audit log. The actor_id field links to the users table
+        // where authorised viewers can look up the full email if needed.
         $actorName = null;
         $actorEmail = null;
         if ($actorUserId) {
@@ -68,7 +74,10 @@ class FederationAuditService
 
                 if ($actor) {
                     $actorName = trim(($actor->first_name ?? '') . ' ' . ($actor->last_name ?? ''));
-                    $actorEmail = $actor->email ?? null;
+                    if (!empty($actor->email)) {
+                        $parts = explode('@', $actor->email);
+                        $actorEmail = '***@' . ($parts[1] ?? 'unknown');
+                    }
                 }
             } catch (\Exception $e) {
                 // Actor lookup failed — continue without actor details

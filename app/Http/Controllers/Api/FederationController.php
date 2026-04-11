@@ -1206,26 +1206,24 @@ class FederationController extends BaseApiController
     /**
      * Authenticate federation API request. Returns partner array on success, JsonResponse on failure.
      *
-     * Note: FederationApiMiddleware::authenticate() returns true on success or calls exit() on
-     * failure (legacy pattern). The !$authenticated branch is a safety net in case the middleware
-     * is later refactored to return false instead of exiting.
+     * FederationApiMiddleware::authenticate() returns true on success or a JsonResponse on failure.
      *
      * @return array|JsonResponse
      */
     private function fedAuth(string $permission): array|JsonResponse
     {
         try {
-            $authenticated = FederationApiMiddleware::authenticate();
-        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
-            // Test-mode: sendError() throws instead of calling exit().
-            $data = json_decode($e->getMessage(), true)
-                ?? ['error' => true, 'code' => 'AUTH_FAILED', 'message' => $e->getMessage(), 'timestamp' => date('c')];
-            return response()->json($data, $e->getStatusCode());
+            $result = FederationApiMiddleware::authenticate();
         } catch (\Throwable $e) {
             return $this->fedError(500, 'Authentication error', 'AUTH_ERROR');
         }
 
-        if (!$authenticated) {
+        // authenticate() returns a JsonResponse on failure
+        if ($result instanceof \Illuminate\Http\JsonResponse) {
+            return $result;
+        }
+
+        if (!$result) {
             return $this->fedError(401, 'Authentication failed', 'AUTH_FAILED');
         }
 

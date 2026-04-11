@@ -44,7 +44,7 @@ import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { FederationSettings } from '@/types/api';
@@ -88,6 +88,7 @@ const DEFAULT_SETTINGS: SettingsFormData = {
 export function FederationSettingsPage() {
   const { t } = useTranslation('federation');
   usePageTitle(t('settings.page_title'));
+  const { tenantPath } = useTenant();
   const toast = useToast();
 
   // AbortController ref to cancel stale requests
@@ -248,8 +249,23 @@ export function FederationSettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" />
+      <div className="max-w-3xl mx-auto space-y-6">
+        <Breadcrumbs items={[
+          { label: t('settings.breadcrumb_federation'), href: tenantPath('/federation') },
+          { label: t('settings.breadcrumb_settings') },
+        ]} />
+        <div>
+          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
+            <Settings className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+            {t('settings.heading')}
+          </h1>
+          <p className="text-theme-muted mt-1">
+            {t('settings.subheading')}
+          </p>
+        </div>
+        <div className="flex items-center justify-center py-20">
+          <Spinner size="lg" />
+        </div>
       </div>
     );
   }
@@ -258,7 +274,7 @@ export function FederationSettingsPage() {
     return (
       <div className="max-w-3xl mx-auto">
         <Breadcrumbs items={[
-          { label: t('settings.breadcrumb_federation'), href: '/federation' },
+          { label: t('settings.breadcrumb_federation'), href: tenantPath('/federation') },
           { label: t('settings.breadcrumb_settings') },
         ]} />
         <GlassCard className="p-8 text-center">
@@ -289,7 +305,7 @@ export function FederationSettingsPage() {
       <PageMeta title={t('settings.page_title')} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('settings.breadcrumb_federation'), href: '/federation' },
+        { label: t('settings.breadcrumb_federation'), href: tenantPath('/federation') },
         { label: t('settings.breadcrumb_settings') },
       ]} />
 

@@ -56,11 +56,11 @@ const SEARCH_DEBOUNCE_MS = 300;
 
 type ServiceReachFilter = 'all' | 'local_only' | 'remote_ok' | 'travel_ok';
 
-const SERVICE_REACH_OPTIONS: { key: ServiceReachFilter; label: string; icon: typeof Home }[] = [
-  { key: 'all', label: 'All', icon: Users },
-  { key: 'local_only', label: 'Local Only', icon: Home },
-  { key: 'remote_ok', label: 'Remote OK', icon: Compass },
-  { key: 'travel_ok', label: 'Will Travel', icon: Car },
+const SERVICE_REACH_OPTIONS: { key: ServiceReachFilter; icon: typeof Home }[] = [
+  { key: 'all', icon: Users },
+  { key: 'local_only', icon: Home },
+  { key: 'remote_ok', icon: Compass },
+  { key: 'travel_ok', icon: Car },
 ];
 
 
@@ -180,7 +180,8 @@ export function FederationMembersPage() {
       }
 
       const response = await api.get<FederatedMember[]>(
-        `/v2/federation/members?${params}`
+        `/v2/federation/members?${params}`,
+        { signal: controller.signal }
       );
 
       if (controller.signal.aborted) return;
@@ -271,7 +272,7 @@ export function FederationMembersPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: t('members.breadcrumb_federation'), href: '/federation' },
+          { label: t('members.breadcrumb_federation'), href: tenantPath('/federation') },
           { label: t('members.breadcrumb_members') },
         ]}
       />
@@ -343,6 +344,9 @@ export function FederationMembersPage() {
                     }
                     startContent={<Icon className="w-3.5 h-3.5" aria-hidden="true" />}
                     onClick={() => setServiceReach(option.key)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setServiceReach(option.key); } }}
                     aria-pressed={isSelected}
                   >
                     {t(`members.reach_${option.key}`)}

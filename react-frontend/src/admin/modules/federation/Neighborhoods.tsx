@@ -180,6 +180,7 @@ export function Neighborhoods() {
 
   // ─── Remove tenant from neighborhood ───
   const handleRemoveTenant = useCallback(async (neighborhoodId: number, tenantId: number) => {
+    if (!window.confirm(t('federation.confirm_remove_tenant'))) return;
     try {
       await api.delete(`/v2/admin/federation/neighborhoods/${neighborhoodId}/tenants/${tenantId}`);
       toast.success(t('federation.tenant_removed_from_neighborhood'));
@@ -192,6 +193,7 @@ export function Neighborhoods() {
 
   // ─── Delete neighborhood ───
   const handleDelete = useCallback(async (neighborhoodId: number) => {
+    if (!window.confirm(t('federation.confirm_delete_neighborhood'))) return;
     try {
       await api.delete(`/v2/admin/federation/neighborhoods/${neighborhoodId}`);
       toast.success(t('federation.neighborhood_deleted'));

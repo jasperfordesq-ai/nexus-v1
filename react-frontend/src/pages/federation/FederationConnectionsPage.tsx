@@ -29,6 +29,7 @@ import {
   Trash2,
   Check,
   X,
+  AlertTriangle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -39,17 +40,7 @@ import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
-
-interface FederationConnection {
-  id: number;
-  user_id: number;
-  tenant_id: number;
-  name: string;
-  avatar_url?: string;
-  tenant_name: string;
-  message?: string;
-  created_at: string;
-}
+import type { FederationConnection } from '@/types/api';
 
 type TabKey = 'accepted' | 'pending_received' | 'pending_sent';
 
@@ -63,6 +54,7 @@ export function FederationConnectionsPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('accepted');
   const [connections, setConnections] = useState<FederationConnection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
 
   // AbortController ref to cancel stale requests
@@ -82,18 +74,22 @@ export function FederationConnectionsPage() {
     try {
       setIsLoading(true);
       const response = await api.get<FederationConnection[]>(
-        `/v2/federation/connections?status=${tab}`
+        `/v2/federation/connections?status=${tab}`,
+        { signal: controller.signal }
       );
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setConnections(response.data);
+        setLoadError(false);
       } else {
         setConnections([]);
+        setLoadError(true);
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load federation connections', err);
       setConnections([]);
+      setLoadError(true);
     } finally {
       setIsLoading(false);
     }
@@ -141,7 +137,7 @@ export function FederationConnectionsPage() {
       <PageMeta title={t('connections.page_title')} noIndex />
       <Breadcrumbs
         items={[
-          { label: t('connections.breadcrumb_federation', 'Federation'), href: '/federation' },
+          { label: t('connections.breadcrumb_federation', 'Federation'), href: tenantPath('/federation') },
           { label: t('connections.breadcrumb_connections', 'Connections') },
         ]}
       />
@@ -176,6 +172,17 @@ export function FederationConnectionsPage() {
         <div className="flex items-center justify-center py-16">
           <Spinner size="lg" label={t('connections.loading', 'Loading connections...')} />
         </div>
+      ) : loadError ? (
+        <GlassCard className="p-8 text-center">
+          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <p className="text-theme-muted mb-4">{t('connections.load_error')}</p>
+          <Button
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            onPress={() => loadConnections(activeTab)}
+          >
+            {t('connections.try_again')}
+          </Button>
+        </GlassCard>
       ) : connections.length === 0 ? (
         <GlassCard className="p-8 text-center">
           <div className="w-16 h-16 rounded-full bg-indigo-500/10 flex items-center justify-center mx-auto mb-4">

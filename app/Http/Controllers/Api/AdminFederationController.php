@@ -238,93 +238,122 @@ class AdminFederationController extends BaseApiController
 
     public function approvePartnership($id): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
-        if (!$id || !$this->tableExists('federation_partnerships')) { return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404); }
+        if (!$id || !$this->tableExists('federation_partnerships')) {
+            return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404);
+        }
 
         try {
-            $partner = DB::selectOne("SELECT * FROM federation_partnerships WHERE id = ? AND partner_tenant_id = ?", [$id, $tenantId]);
-            if (!$partner) { return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404); }
-            if ($partner->status !== 'pending') {
-                return $this->respondWithError('INVALID_STATE', __('api.only_pending_can_be_approved', ['status' => $partner->status]), null, 409);
+            $result = FederationPartnershipService::approvePartnership($id, $adminId);
+
+            if (!$result['success']) {
+                $statusCode = str_contains($result['error'] ?? '', 'not found') ? 404 : 409;
+                return $this->respondWithError('APPROVE_FAILED', $result['error'], null, $statusCode);
             }
-            DB::update("UPDATE federation_partnerships SET status = 'active', updated_at = NOW() WHERE id = ? AND partner_tenant_id = ?", [$id, $tenantId]);
 
             // Notify the initiating tenant's admins that partnership was approved
-            $initiatorTenantId = (int) $partner->tenant_id;
-            $tenantName = $this->getTenantName($tenantId);
-            $this->notifyPartnerAdmins(
-                $initiatorTenantId,
-                "{$tenantName} has approved your federation partnership request.",
-                'federation_partnership_approved'
-            );
+            $partnership = FederationPartnershipService::getPartnershipById($id);
+            if ($partnership) {
+                $initiatorTenantId = (int) $partnership['tenant_id'];
+                $tenantName = $this->getTenantName($tenantId);
+                $this->notifyPartnerAdmins(
+                    $initiatorTenantId,
+                    __('svc_notifications_2.federation.notify_partnership_approved', ['tenant_name' => $tenantName]),
+                    'federation_partnership_approved'
+                );
+            }
 
             return $this->respondWithData(['message' => __('api.partnership_approved')]);
-        } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', __('api.approve_failed', ['resource' => 'partnership'])); }
+        } catch (\Exception $e) {
+            return $this->respondWithError('UPDATE_FAILED', __('api.approve_failed', ['resource' => 'partnership']));
+        }
     }
 
     public function rejectPartnership($id): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $tenantId = TenantContext::getId();
         $id = (int) $id;
+        $input = $this->getAllInput();
+        $reason = isset($input['reason']) ? substr(trim($input['reason']), 0, 1000) : null;
 
-        if (!$id || !$this->tableExists('federation_partnerships')) { return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404); }
+        if (!$id || !$this->tableExists('federation_partnerships')) {
+            return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404);
+        }
 
         try {
-            $partner = DB::selectOne("SELECT * FROM federation_partnerships WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
-            if (!$partner) { return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404); }
-            if ($partner->status !== 'pending') {
-                return $this->respondWithError('INVALID_STATE', __('api.only_pending_can_be_rejected', ['status' => $partner->status]), null, 409);
+            // Fetch partnership before rejection so we can notify the right tenant
+            $partnership = FederationPartnershipService::getPartnershipById($id);
+
+            $result = FederationPartnershipService::rejectPartnership($id, $adminId, $reason);
+
+            if (!$result['success']) {
+                $statusCode = str_contains($result['error'] ?? '', 'not found') ? 404 : 409;
+                return $this->respondWithError('REJECT_FAILED', $result['error'], null, $statusCode);
             }
-            DB::update("UPDATE federation_partnerships SET status = 'terminated', updated_at = NOW() WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
 
             // Notify the other tenant's admins that partnership was rejected
-            $otherTenantId = ((int) $partner->tenant_id === $tenantId)
-                ? (int) $partner->partner_tenant_id
-                : (int) $partner->tenant_id;
-            $tenantName = $this->getTenantName($tenantId);
-            $this->notifyPartnerAdmins(
-                $otherTenantId,
-                "{$tenantName} has rejected the federation partnership request.",
-                'federation_partnership_rejected'
-            );
+            if ($partnership) {
+                $otherTenantId = ((int) $partnership['tenant_id'] === $tenantId)
+                    ? (int) $partnership['partner_tenant_id']
+                    : (int) $partnership['tenant_id'];
+                $tenantName = $this->getTenantName($tenantId);
+                $this->notifyPartnerAdmins(
+                    $otherTenantId,
+                    __('svc_notifications_2.federation.notify_partnership_rejected', ['tenant_name' => $tenantName]),
+                    'federation_partnership_rejected'
+                );
+            }
 
             return $this->respondWithData(['message' => __('api.partnership_rejected')]);
-        } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', __('api.reject_failed', ['resource' => 'partnership'])); }
+        } catch (\Exception $e) {
+            return $this->respondWithError('UPDATE_FAILED', __('api.reject_failed', ['resource' => 'partnership']));
+        }
     }
 
     public function terminatePartnership($id): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $tenantId = TenantContext::getId();
         $id = (int) $id;
+        $input = $this->getAllInput();
+        $reason = isset($input['reason']) ? substr(trim($input['reason']), 0, 1000) : null;
 
-        if (!$id || !$this->tableExists('federation_partnerships')) { return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404); }
+        if (!$id || !$this->tableExists('federation_partnerships')) {
+            return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404);
+        }
 
         try {
-            $partner = DB::selectOne("SELECT * FROM federation_partnerships WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
-            if (!$partner) { return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404); }
-            if (!in_array($partner->status, ['active', 'suspended'], true)) {
-                return $this->respondWithError('INVALID_STATE', __('api.only_active_can_be_terminated', ['status' => $partner->status]), null, 409);
+            // Fetch partnership before termination so we can notify the right tenant
+            $partnership = FederationPartnershipService::getPartnershipById($id);
+
+            $result = FederationPartnershipService::terminatePartnership($id, $adminId, $reason);
+
+            if (!$result['success']) {
+                $statusCode = str_contains($result['error'] ?? '', 'not found') ? 404 : 409;
+                return $this->respondWithError('TERMINATE_FAILED', $result['error'], null, $statusCode);
             }
-            DB::update("UPDATE federation_partnerships SET status = 'terminated', updated_at = NOW() WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
 
             // Notify the other tenant's admins that partnership was terminated
-            $otherTenantId = ((int) $partner->tenant_id === $tenantId)
-                ? (int) $partner->partner_tenant_id
-                : (int) $partner->tenant_id;
-            $tenantName = $this->getTenantName($tenantId);
-            $this->notifyPartnerAdmins(
-                $otherTenantId,
-                "{$tenantName} has terminated the federation partnership.",
-                'federation_partnership_terminated'
-            );
+            if ($partnership) {
+                $otherTenantId = ((int) $partnership['tenant_id'] === $tenantId)
+                    ? (int) $partnership['partner_tenant_id']
+                    : (int) $partnership['tenant_id'];
+                $tenantName = $this->getTenantName($tenantId);
+                $this->notifyPartnerAdmins(
+                    $otherTenantId,
+                    __('svc_notifications_2.federation.notify_partnership_terminated', ['tenant_name' => $tenantName]),
+                    'federation_partnership_terminated'
+                );
+            }
 
             return $this->respondWithData(['message' => __('api.partnership_terminated')]);
-        } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', __('api.update_failed', ['resource' => 'partnership'])); }
+        } catch (\Exception $e) {
+            return $this->respondWithError('UPDATE_FAILED', __('api.update_failed', ['resource' => 'partnership']));
+        }
     }
 
     public function requestPartnership(): JsonResponse

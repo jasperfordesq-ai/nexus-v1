@@ -29,9 +29,10 @@ class FederationExternalApiClient
     private const CONNECT_TIMEOUT = 5;
     private const REQUEST_TIMEOUT = 30;
 
-    /** Retry configuration */
+    /** Retry configuration — keep delays short to avoid blocking PHP workers.
+     *  Worst-case total wait: 200 + 400 + 800 = 1.4s (was 1000 + 2000 + 4000 = 7s). */
     private const MAX_RETRIES = 3;
-    private const RETRY_BASE_MS = 1000;
+    private const RETRY_BASE_MS = 200;
 
     // ----------------------------------------------------------------
     // Core HTTP methods
@@ -282,7 +283,7 @@ class FederationExternalApiClient
                 $decryptedSecret = self::decryptCredential($partner['signing_secret']);
                 $timestamp = (string) time();
                 $nonce = bin2hex(random_bytes(16));
-                $signature = self::generateHmacSignature($decryptedSecret, $method, $url, $timestamp, $body);
+                $signature = self::generateHmacSignature($decryptedSecret, $method, $url, $timestamp, $body, $nonce);
 
                 $headers['X-Federation-Signature'] = $signature;
                 $headers['X-Federation-Timestamp'] = $timestamp;
@@ -363,9 +364,13 @@ class FederationExternalApiClient
     /**
      * Generate an HMAC-SHA256 signature matching the inbound middleware's format.
      *
-     * String to sign: METHOD\nURL\nTIMESTAMP\nBODY
+     * String to sign: METHOD\nPATH\nTIMESTAMP\nNONCE\nBODY
+     *
+     * The nonce is included in the signed payload so that an attacker cannot
+     * replay a captured request with a different nonce within the 5-minute
+     * timestamp window.
      */
-    private static function generateHmacSignature(string $secret, string $method, string $url, string $timestamp, string $body): string
+    private static function generateHmacSignature(string $secret, string $method, string $url, string $timestamp, string $body, string $nonce): string
     {
         // Use path + query string (not full URL) to match the inbound middleware's
         // verifyHmacSignature() which uses $_SERVER['REQUEST_URI'] (path only).
@@ -377,6 +382,7 @@ class FederationExternalApiClient
             strtoupper($method),
             $pathWithQuery,
             $timestamp,
+            $nonce,
             $body,
         ]);
 
