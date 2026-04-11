@@ -193,11 +193,12 @@ class FederatedMessageService
                 return ['success' => false, 'error' => 'Receiver has not opted into federated messaging'];
             }
 
-            // Idempotency: if we already stored this external message, return it
+            // Idempotency: if we already stored this external message for this tenant, return it
             if ($externalMessageId) {
                 $existing = DB::table('federation_messages')
                     ->where('external_partner_id', $externalPartnerId)
                     ->where('external_message_id', $externalMessageId)
+                    ->where('receiver_tenant_id', $receiver->tenant_id)
                     ->first();
                 if ($existing) {
                     return ['success' => true, 'message_id' => $existing->id, 'duplicate' => true];

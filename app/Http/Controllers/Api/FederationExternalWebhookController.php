@@ -134,6 +134,20 @@ class FederationExternalWebhookController extends BaseApiController
     // ----------------------------------------------------------------
 
     /**
+     * Decrypt a partner's signing_secret. Handles both encrypted (from service
+     * layer) and plaintext (from direct DB insert) values gracefully.
+     */
+    private function decryptSecret(string $encrypted): ?string
+    {
+        try {
+            return \Illuminate\Support\Facades\Crypt::decryptString($encrypted);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            // Value is plaintext (not encrypted) — use as-is
+            return $encrypted;
+        }
+    }
+
+    /**
      * Identify partner by API key in Authorization: Bearer header.
      * The signing_secret doubles as the API key for simple auth.
      */
@@ -149,12 +163,20 @@ class FederationExternalWebhookController extends BaseApiController
             return null;
         }
 
-        // Match the token against signing_secret (used as shared secret)
-        return DB::table('federation_external_partners')
+        // Must iterate and decrypt each secret to compare (can't query encrypted values)
+        $partners = DB::table('federation_external_partners')
             ->whereNotNull('signing_secret')
             ->where('signing_secret', '!=', '')
-            ->where('signing_secret', $token)
-            ->first();
+            ->get();
+
+        foreach ($partners as $partner) {
+            $decrypted = $this->decryptSecret($partner->signing_secret);
+            if ($decrypted && hash_equals($decrypted, $token)) {
+                return $partner;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -189,7 +211,9 @@ class FederationExternalWebhookController extends BaseApiController
             ->get();
 
         foreach ($partners as $partner) {
-            $secret = $partner->signing_secret;
+            // Decrypt the secret (handles both encrypted and plaintext values)
+            $secret = $this->decryptSecret($partner->signing_secret);
+            if (!$secret) continue;
 
             // Try simple body-only HMAC (TimeOverflow default)
             $expectedSimple = hash_hmac('sha256', $rawBody, $secret);
