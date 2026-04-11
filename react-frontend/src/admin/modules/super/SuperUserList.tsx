@@ -101,7 +101,7 @@ export function SuperUserList() {
 
   const columns: Column<SuperAdminUser>[] = [
     {
-      key: 'name', label: 'User', sortable: true,
+      key: 'name', label: t('super.col_user'), sortable: true,
       render: (user) => (
         <div className="flex items-center gap-3">
           <Avatar name={user.name} size="sm" />
@@ -115,7 +115,7 @@ export function SuperUserList() {
       ),
     },
     {
-      key: 'tenant', label: 'Tenant', sortable: true,
+      key: 'tenant', label: t('super.col_tenant'), sortable: true,
       render: (user) => (
         <Link to={tenantPath(`/admin/super/tenants/${user.tenant_id}`)} className="hover:text-primary">
           <Chip size="sm" variant="flat">{user.tenant_name || `Tenant ${user.tenant_id}`}</Chip>
@@ -123,7 +123,7 @@ export function SuperUserList() {
       ),
     },
     {
-      key: 'role', label: 'Role', sortable: true,
+      key: 'role', label: t('super.col_role'), sortable: true,
       render: (user) => (
         <Chip size="sm" variant="flat" color={user.role === 'admin' || user.role === 'tenant_admin' ? 'primary' : 'default'}>
           {user.role}
@@ -131,20 +131,20 @@ export function SuperUserList() {
       ),
     },
     {
-      key: 'status', label: 'Status', sortable: true,
+      key: 'status', label: t('super.col_status'), sortable: true,
       render: (user) => <StatusBadge status={user.status} />,
     },
     {
-      key: 'super_admin', label: 'Super Admin', sortable: true,
+      key: 'super_admin', label: t('super.col_super_admin'), sortable: true,
       render: (user) => (
         <div className="flex items-center gap-1">
           {user.is_super_admin ? (
             <Chip size="sm" variant="flat" color="danger" startContent={<Shield size={10} />}>
-              Global SA
+              {t('super.global_sa')}
             </Chip>
           ) : user.is_tenant_super_admin ? (
             <Chip size="sm" variant="flat" color="secondary" startContent={<Shield size={10} />}>
-              Tenant SA
+              {t('super.tenant_sa')}
             </Chip>
           ) : (
             <span className="text-default-400">—</span>
@@ -153,17 +153,17 @@ export function SuperUserList() {
       ),
     },
     {
-      key: 'last_login_at', label: 'Last Login', sortable: true,
+      key: 'last_login_at', label: t('super.col_last_login'), sortable: true,
       render: (user) => (
         <span className="text-sm text-default-500">
           {user.last_login_at
             ? new Date(user.last_login_at).toLocaleDateString()
-            : 'Never'}
+            : t('super.never')}
         </span>
       ),
     },
     {
-      key: 'actions', label: 'Actions',
+      key: 'actions', label: t('super.col_actions'),
       render: (user) => (
         <Dropdown>
           <DropdownTrigger><Button isIconOnly size="sm" variant="light" aria-label={t('super.label_user_actions')}><MoreVertical size={16} /></Button></DropdownTrigger>
@@ -175,15 +175,15 @@ export function SuperUserList() {
             else if (key === 'grant-global') setConfirmAction({ type: 'grant-global', user });
             else if (key === 'revoke-global') setConfirmAction({ type: 'revoke-global', user });
           }}>
-            <DropdownItem key="view" startContent={<Eye size={14} />}>View</DropdownItem>
-            <DropdownItem key="edit" startContent={<ArrowRight size={14} />}>Edit</DropdownItem>
+            <DropdownItem key="view" startContent={<Eye size={14} />}>{t('super.action_view')}</DropdownItem>
+            <DropdownItem key="edit" startContent={<ArrowRight size={14} />}>{t('super.action_edit')}</DropdownItem>
             {!user.is_tenant_super_admin
-              ? <DropdownItem key="grant-sa" startContent={<UserCheck size={14} />} className="text-success">Grant Tenant SA</DropdownItem>
-              : <DropdownItem key="revoke-sa" startContent={<UserX size={14} />} className="text-warning">Revoke Tenant SA</DropdownItem>
+              ? <DropdownItem key="grant-sa" startContent={<UserCheck size={14} />} className="text-success">{t('super.action_grant_tenant_sa')}</DropdownItem>
+              : <DropdownItem key="revoke-sa" startContent={<UserX size={14} />} className="text-warning">{t('super.action_revoke_tenant_sa')}</DropdownItem>
             }
             {!user.is_super_admin
-              ? <DropdownItem key="grant-global" startContent={<Shield size={14} />} className="text-secondary">Grant Global SA</DropdownItem>
-              : <DropdownItem key="revoke-global" startContent={<Shield size={14} />} className="text-danger">Revoke Global SA</DropdownItem>
+              ? <DropdownItem key="grant-global" startContent={<Shield size={14} />} className="text-secondary">{t('super.action_grant_global_sa')}</DropdownItem>
+              : <DropdownItem key="revoke-global" startContent={<Shield size={14} />} className="text-danger">{t('super.action_revoke_global_sa')}</DropdownItem>
             }
           </DropdownMenu>
         </Dropdown>
@@ -192,18 +192,18 @@ export function SuperUserList() {
   ];
 
   const confirmMessages: Record<string, { title: string; message: string; label: string }> = {
-    'grant-sa': { title: 'Grant Tenant Super Admin', message: 'This user will become a tenant super admin.', label: 'Grant' },
-    'revoke-sa': { title: 'Revoke Tenant Super Admin', message: 'This user will lose tenant super admin privileges.', label: 'Revoke' },
-    'grant-global': { title: 'Grant Global Super Admin', message: 'This user will gain access to ALL tenants. GOD-level action.', label: 'Grant Global SA' },
-    'revoke-global': { title: 'Revoke Global Super Admin', message: 'This user will lose global super admin access.', label: 'Revoke Global SA' },
+    'grant-sa': { title: t('super.confirm_grant_sa_title'), message: t('super.confirm_grant_sa_message'), label: t('super.confirm_grant_sa_label') },
+    'revoke-sa': { title: t('super.confirm_revoke_sa_title'), message: t('super.confirm_revoke_sa_message'), label: t('super.confirm_revoke_sa_label') },
+    'grant-global': { title: t('super.confirm_grant_global_title'), message: t('super.confirm_grant_global_message'), label: t('super.confirm_grant_global_label') },
+    'revoke-global': { title: t('super.confirm_revoke_global_title'), message: t('super.confirm_revoke_global_message'), label: t('super.confirm_revoke_global_label') },
   };
 
   return (
     <div>
       <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-primary">Super Admin</Link>
+        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('super.page_title')}</Link>
         <span>/</span>
-        <span className="text-foreground">Users</span>
+        <span className="text-foreground">{t('super.breadcrumb_users')}</span>
       </nav>
       <PageHeader
         title={t('super.super_user_list_title')}
@@ -217,7 +217,7 @@ export function SuperUserList() {
             )}
             <Button color="primary" startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/super/users/create'))}>
-              Create User
+              {t('super.create_user')}
             </Button>
           </div>
         }
@@ -247,9 +247,9 @@ export function SuperUserList() {
             setPage(1);
           }}
         >
-          <SelectItem key="member">Member</SelectItem>
-          <SelectItem key="admin">Admin</SelectItem>
-          <SelectItem key="tenant_admin">Tenant Admin</SelectItem>
+          <SelectItem key="member">{t('super.role_member')}</SelectItem>
+          <SelectItem key="admin">{t('super.role_admin')}</SelectItem>
+          <SelectItem key="tenant_admin">{t('super.role_tenant_admin')}</SelectItem>
         </Select>
         <Switch
           size="sm"
@@ -259,13 +259,13 @@ export function SuperUserList() {
             setPage(1);
           }}
         >
-          Super Admins Only
+          {t('super.super_admins_only')}
         </Switch>
       </div>
       {users.length >= 100 && (
         <div className="mb-4 p-3 bg-warning-50 dark:bg-warning-50/10 border border-warning-200 dark:border-warning-200/20 rounded-lg">
           <p className="text-sm text-warning-700 dark:text-warning-400">
-            Showing first 100 results. Use filters to narrow down your search.
+            {t('super.showing_first_100')}
           </p>
         </div>
       )}
@@ -273,7 +273,7 @@ export function SuperUserList() {
         columns={columns}
         data={users}
         isLoading={loading}
-        searchPlaceholder="Search users across tenants..."
+        searchPlaceholder={t('super.search_users_placeholder')}
         onSearch={(q) => { setSearch(q); setPage(1); }}
         onRefresh={loadUsers}
         totalItems={users.length}

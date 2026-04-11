@@ -119,24 +119,24 @@ export function TenantList() {
 
   const confirmMessages: Record<string, { title: string; message: string; label: string }> = {
     delete: {
-      title: 'Delete Tenant',
-      message: 'This will permanently delete the tenant and all associated data. This cannot be undone.',
-      label: 'Delete',
+      title: t('super.confirm_delete_title'),
+      message: t('super.confirm_delete_message'),
+      label: t('super.confirm_delete_label'),
     },
     deactivate: {
-      title: 'Deactivate Tenant',
-      message: 'This tenant will be deactivated. Users will not be able to access it.',
-      label: 'Deactivate',
+      title: t('super.confirm_deactivate_title'),
+      message: t('super.confirm_deactivate_message'),
+      label: t('super.confirm_deactivate_label'),
     },
     reactivate: {
-      title: 'Reactivate Tenant',
-      message: 'This tenant will be reactivated and users will regain access.',
-      label: 'Reactivate',
+      title: t('super.confirm_reactivate_title'),
+      message: t('super.confirm_reactivate_message'),
+      label: t('super.confirm_reactivate_label'),
     },
     'toggle-hub': {
-      title: 'Toggle Hub Status',
-      message: 'This will toggle whether this tenant can have sub-tenants.',
-      label: 'Toggle',
+      title: t('super.confirm_toggle_hub_title'),
+      message: t('super.confirm_toggle_hub_message'),
+      label: t('super.confirm_toggle_hub_label'),
     },
   };
 
@@ -218,7 +218,7 @@ export function TenantList() {
       sortable: true,
       render: (tenant) => (
         <Chip size="sm" variant="flat" color={tenant.is_active ? 'success' : 'default'}>
-          {tenant.is_active ? 'Active' : 'Inactive'}
+          {tenant.is_active ? t('super.active_label') : t('super.inactive_label')}
         </Chip>
       ),
     },
@@ -233,7 +233,7 @@ export function TenantList() {
       label: t('tenant_list.col_hub'),
       render: (tenant) =>
         tenant.allows_subtenants ? (
-          <Chip size="sm" variant="flat" color="secondary">Hub</Chip>
+          <Chip size="sm" variant="flat" color="secondary">{t('super.hub')}</Chip>
         ) : (
           <span className="text-default-400">---</span>
         ),
@@ -267,9 +267,9 @@ export function TenantList() {
   return (
     <div>
       <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-primary">Super Admin</Link>
+        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('super.page_title')}</Link>
         <span>/</span>
-        <span className="text-foreground">Tenants</span>
+        <span className="text-foreground">{t('super.breadcrumb_tenants')}</span>
       </nav>
       <PageHeader
         title={t('super.tenant_list_title')}
@@ -319,7 +319,7 @@ export function TenantList() {
         columns={columns}
         data={tenants}
         isLoading={loading}
-        searchPlaceholder="Search tenants..."
+        searchPlaceholder={t('super.search_tenants_placeholder')}
         onSearch={(q) => setSearch(q)}
         onRefresh={loadTenants}
       />

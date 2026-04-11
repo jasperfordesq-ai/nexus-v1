@@ -21,19 +21,19 @@ import { useTranslation } from 'react-i18next';
 const PAGE_SIZE = 25;
 
 const CATEGORIES = [
-  { key: '', label: 'All Categories' },
-  { key: 'system_controls', label: 'System Controls' },
-  { key: 'partnerships', label: 'Partnerships' },
-  { key: 'whitelist', label: 'Whitelist' },
-  { key: 'features', label: 'Features' },
-  { key: 'lockdown', label: 'Lockdown' },
+  { key: '', labelKey: 'super.cat_all_categories' },
+  { key: 'system_controls', labelKey: 'super.cat_system_controls' },
+  { key: 'partnerships', labelKey: 'super.cat_partnerships' },
+  { key: 'whitelist', labelKey: 'super.cat_whitelist' },
+  { key: 'features', labelKey: 'super.cat_features' },
+  { key: 'lockdown', labelKey: 'super.cat_lockdown' },
 ];
 
 const LEVELS = [
-  { key: '', label: 'All Levels' },
-  { key: 'info', label: 'Info' },
-  { key: 'warning', label: 'Warning' },
-  { key: 'critical', label: 'Critical' },
+  { key: '', labelKey: 'super.level_all_levels' },
+  { key: 'info', labelKey: 'super.level_info' },
+  { key: 'warning', labelKey: 'super.level_warning' },
+  { key: 'critical', labelKey: 'super.level_critical' },
 ];
 
 const FEDERATION_ACTION_TYPES = [
@@ -177,7 +177,7 @@ export function FederationAuditLog() {
 
   const exportCsv = () => {
     if (logs.length === 0) return;
-    const headers = ['ID', 'Timestamp', 'Category', 'Level', 'Description', 'Actor'];
+    const headers = [t('super.col_id'), t('super.col_timestamp'), t('super.col_category'), t('super.col_level'), t('super.col_description'), t('super.col_actor')];
     const rows = logs.map((entry) => [
       entry.id,
       entry.created_at,
@@ -199,7 +199,7 @@ export function FederationAuditLog() {
   const columns: Column<SuperAuditEntry>[] = [
     {
       key: 'created_at',
-      label: 'Timestamp',
+      label: t('super.col_timestamp'),
       sortable: true,
       render: (entry) => (
         <span className="text-sm text-default-500">
@@ -209,7 +209,7 @@ export function FederationAuditLog() {
     },
     {
       key: 'category',
-      label: 'Category',
+      label: t('super.col_category'),
       render: (entry) => {
         const cat = categorizeAction(entry.action_type);
         return (
@@ -221,7 +221,7 @@ export function FederationAuditLog() {
     },
     {
       key: 'level',
-      label: 'Level',
+      label: t('super.col_level'),
       render: (entry) => {
         const lvl = inferLevel(entry.action_type);
         return (
@@ -233,14 +233,14 @@ export function FederationAuditLog() {
     },
     {
       key: 'description',
-      label: 'Description',
+      label: t('super.col_description'),
       render: (entry) => (
         <span className="text-sm">{entry.description || entry.action_type.replace(/_/g, ' ')}</span>
       ),
     },
     {
       key: 'actor',
-      label: 'Actor',
+      label: t('super.col_actor'),
       render: (entry) => (
         <span className="text-sm text-default-500">
           {entry.actor_name || `User #${entry.actor_id}`}
@@ -312,7 +312,7 @@ export function FederationAuditLog() {
           }}
         >
           {CATEGORIES.filter((c) => c.key !== '').map((c) => (
-            <SelectItem key={c.key}>{c.label}</SelectItem>
+            <SelectItem key={c.key}>{t(c.labelKey)}</SelectItem>
           ))}
         </Select>
 
@@ -327,7 +327,7 @@ export function FederationAuditLog() {
           }}
         >
           {LEVELS.filter((l) => l.key !== '').map((l) => (
-            <SelectItem key={l.key}>{l.label}</SelectItem>
+            <SelectItem key={l.key}>{t(l.labelKey)}</SelectItem>
           ))}
         </Select>
 

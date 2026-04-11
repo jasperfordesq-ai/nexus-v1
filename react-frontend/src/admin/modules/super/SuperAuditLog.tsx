@@ -89,7 +89,7 @@ export default function SuperAuditLog() {
 
   const exportCsv = () => {
     if (logs.length === 0) return;
-    const headers = ['ID', 'Action Type', 'Target Type', 'Target', 'Actor', 'Description', 'Date'];
+    const headers = ['ID', t('super.col_action'), t('super.col_target'), t('super.col_target'), t('super.col_actor'), t('super.col_description'), t('super.col_date')];
     const rows = logs.map((entry) => [
       entry.id,
       entry.action_type,
@@ -111,11 +111,11 @@ export default function SuperAuditLog() {
 
   const columns: Column<SuperAuditEntry>[] = [
     {
-      key: 'action_type', label: 'Action', sortable: true,
+      key: 'action_type', label: t('super.col_action'), sortable: true,
       render: (entry) => <StatusBadge status={entry.action_type} />,
     },
     {
-      key: 'target_label', label: 'Target', sortable: true,
+      key: 'target_label', label: t('super.col_target'), sortable: true,
       render: (entry) => {
         const targetLink = entry.target_type === 'user' && entry.target_id
           ? tenantPath(`/admin/super/users/${entry.target_id}`)
@@ -137,21 +137,21 @@ export default function SuperAuditLog() {
       },
     },
     {
-      key: 'actor_name', label: 'Actor',
+      key: 'actor_name', label: t('super.col_actor'),
       render: (entry) => entry.actor_id ? (
         <Link to={tenantPath(`/admin/super/users/${entry.actor_id}`)} className="hover:text-primary">
           {entry.actor_name || `User #${entry.actor_id}`}
         </Link>
       ) : (
-        <span>{entry.actor_name || 'System'}</span>
+        <span>{entry.actor_name || t('super.system')}</span>
       ),
     },
     {
-      key: 'description', label: 'Description',
+      key: 'description', label: t('super.col_description'),
       render: (entry) => <span className="text-sm text-default-500">{entry.description}</span>,
     },
     {
-      key: 'created_at', label: 'Date', sortable: true,
+      key: 'created_at', label: t('super.col_date'), sortable: true,
       render: (entry) => (
         <span className="text-sm text-default-500">
           {new Date(entry.created_at).toLocaleString()}
@@ -163,9 +163,9 @@ export default function SuperAuditLog() {
   return (
     <div>
       <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-primary">Super Admin</Link>
+        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('super.page_title')}</Link>
         <span>/</span>
-        <span className="text-foreground">Audit Log</span>
+        <span className="text-foreground">{t('super.audit_log')}</span>
       </nav>
       <PageHeader
         title={t('super.super_audit_log_title')}
@@ -178,7 +178,7 @@ export default function SuperAuditLog() {
             onPress={exportCsv}
             isDisabled={logs.length === 0}
           >
-            Export CSV
+            {t('super.export_csv')}
           </Button>
         }
       />
@@ -257,7 +257,7 @@ export default function SuperAuditLog() {
             startContent={<X size={14} />}
             onPress={clearFilters}
           >
-            Clear
+            {t('super.clear_filters')}
           </Button>
         )}
       </div>

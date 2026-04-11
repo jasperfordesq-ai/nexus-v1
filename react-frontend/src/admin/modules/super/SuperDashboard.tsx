@@ -71,12 +71,12 @@ export function SuperDashboard() {
   }, [loadData]);
 
   const quickActions = [
-    { label: 'Create Tenant', href: tenantPath('/admin/super/tenants/create'), icon: Plus },
-    { label: 'View Hierarchy', href: tenantPath('/admin/super/tenants/hierarchy'), icon: Network },
-    { label: 'Bulk Operations', href: tenantPath('/admin/super/bulk'), icon: ListChecks },
-    { label: 'Cross-Tenant Users', href: tenantPath('/admin/super/users'), icon: Users },
-    { label: 'Audit Log', href: tenantPath('/admin/super/audit'), icon: Activity },
-    { label: 'Federation Controls', href: tenantPath('/admin/super/federation'), icon: Globe },
+    { label: t('super.create_tenant'), href: tenantPath('/admin/super/tenants/create'), icon: Plus },
+    { label: t('super.view_hierarchy'), href: tenantPath('/admin/super/tenants/hierarchy'), icon: Network },
+    { label: t('super.bulk_operations'), href: tenantPath('/admin/super/bulk'), icon: ListChecks },
+    { label: t('super.cross_tenant_users'), href: tenantPath('/admin/super/users'), icon: Users },
+    { label: t('super.audit_log'), href: tenantPath('/admin/super/audit'), icon: Activity },
+    { label: t('super.federation_controls'), href: tenantPath('/admin/super/federation'), icon: Globe },
   ];
 
   return (
@@ -92,7 +92,7 @@ export function SuperDashboard() {
             isLoading={loading}
             size="sm"
           >
-            Refresh
+            {t('super.refresh')}
           </Button>
         }
       />
@@ -140,7 +140,7 @@ export function SuperDashboard() {
       {/* Quick Actions */}
       <Card shadow="sm" className="mb-6">
         <CardBody className="p-4">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-4">{t('super.quick_actions')}</h3>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {quickActions.map((action) => (
               <Button
@@ -160,7 +160,7 @@ export function SuperDashboard() {
       </Card>
 
       {/* Tenant Cards */}
-      <h3 className="text-lg font-semibold text-foreground mb-4">Tenants</h3>
+      <h3 className="text-lg font-semibold text-foreground mb-4">{t('super.tenants')}</h3>
       {loading ? (
         <div className="flex justify-center py-12">
           <Spinner size="lg" />
@@ -169,7 +169,7 @@ export function SuperDashboard() {
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center py-12 text-default-400">
             <Building2 size={40} className="mb-2" />
-            <p>No tenants found.</p>
+            <p>{t('super.no_tenants_found')}</p>
           </CardBody>
         </Card>
       ) : (
@@ -193,16 +193,16 @@ export function SuperDashboard() {
                     variant="flat"
                     color={tenant.is_active ? 'success' : 'default'}
                   >
-                    {tenant.is_active ? 'Active' : 'Inactive'}
+                    {tenant.is_active ? t('super.active_label') : t('super.inactive_label')}
                   </Chip>
                 </div>
                 <div className="flex items-center gap-4 text-sm text-default-500">
                   <span className="flex items-center gap-1">
                     <Users size={14} />
-                    {tenant.user_count ?? 0} users
+                    {t('super.users_count', { count: tenant.user_count ?? 0 })}
                   </span>
                   {tenant.allows_subtenants && (
-                    <Chip size="sm" variant="flat" color="secondary">Hub</Chip>
+                    <Chip size="sm" variant="flat" color="secondary">{t('super.hub')}</Chip>
                   )}
                 </div>
               </CardBody>
@@ -220,7 +220,7 @@ export function SuperDashboard() {
             variant="flat"
             endContent={<ArrowRight size={16} />}
           >
-            View All Tenants
+            {t('super.view_all_tenants')}
           </Button>
         </div>
       )}

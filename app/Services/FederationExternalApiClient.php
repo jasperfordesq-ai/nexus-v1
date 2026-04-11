@@ -163,7 +163,7 @@ class FederationExternalApiClient
 
         // ---- Build URL ----
         $baseUrl = rtrim($partner['base_url'], '/');
-        $apiPath = rtrim($partner['api_path'] ?? '/api/v1/federation', '/');
+        $apiPath = rtrim($partner['api_path'] ?? '/api/v1', '/');
         $url = $baseUrl . $apiPath . '/' . ltrim($endpoint, '/');
 
         // ---- Build body (for signing & sending) ----

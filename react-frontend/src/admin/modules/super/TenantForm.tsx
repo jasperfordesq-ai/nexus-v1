@@ -36,23 +36,23 @@ import { adminSuper } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { SuperAdminTenant, SuperAdminTenantDetail, CreateTenantPayload } from '../../api/types';
 
-const FEATURE_META: { key: string; label: string; description: string; icon: typeof Calendar }[] = [
-  { key: 'listings', label: 'Listings', description: 'Offers & requests marketplace', icon: ShoppingBag },
-  { key: 'groups', label: 'Groups', description: 'Community groups and discussions', icon: Users },
-  { key: 'wallet', label: 'Wallet', description: 'Time credit wallet & transactions', icon: Wallet },
-  { key: 'events', label: 'Events', description: 'Community events with RSVPs', icon: Calendar },
-  { key: 'volunteering', label: 'Volunteering', description: 'Volunteer opportunities and hours', icon: Heart },
-  { key: 'resources', label: 'Resources', description: 'Shared resource library', icon: Library },
-  { key: 'gamification', label: 'Gamification', description: 'Badges, achievements, XP, leaderboards', icon: Trophy },
-  { key: 'goals', label: 'Goals', description: 'Personal and community goals', icon: Target },
-  { key: 'blog', label: 'Blog', description: 'Community blog and news posts', icon: BookOpen },
-  { key: 'exchange_workflow', label: 'Exchange Workflow', description: 'Structured exchanges with broker approval', icon: ArrowRightLeft },
-  { key: 'federation', label: 'Federation', description: 'Multi-community network and partnerships', icon: Network },
-  { key: 'organisations', label: 'Organisations', description: 'Organization profiles and management', icon: Building },
-  { key: 'messages', label: 'Messages', description: 'Private messaging between members', icon: MessageCircle },
-  { key: 'dashboard', label: 'Dashboard', description: 'Member dashboard overview', icon: LayoutDashboard },
-  { key: 'feed', label: 'Feed', description: 'Community activity feed', icon: Rss },
-  { key: 'marketplace', label: 'Marketplace', description: 'Commercial buy/sell marketplace (separate from timebanking listings)', icon: ShoppingBag },
+const FEATURE_META: { key: string; labelKey: string; descKey: string; icon: typeof Calendar }[] = [
+  { key: 'listings', labelKey: 'tenant_form.feature_listings', descKey: 'tenant_form.feature_listings_desc', icon: ShoppingBag },
+  { key: 'groups', labelKey: 'tenant_form.feature_groups', descKey: 'tenant_form.feature_groups_desc', icon: Users },
+  { key: 'wallet', labelKey: 'tenant_form.feature_wallet', descKey: 'tenant_form.feature_wallet_desc', icon: Wallet },
+  { key: 'events', labelKey: 'tenant_form.feature_events', descKey: 'tenant_form.feature_events_desc', icon: Calendar },
+  { key: 'volunteering', labelKey: 'tenant_form.feature_volunteering', descKey: 'tenant_form.feature_volunteering_desc', icon: Heart },
+  { key: 'resources', labelKey: 'tenant_form.feature_resources', descKey: 'tenant_form.feature_resources_desc', icon: Library },
+  { key: 'gamification', labelKey: 'tenant_form.feature_gamification', descKey: 'tenant_form.feature_gamification_desc', icon: Trophy },
+  { key: 'goals', labelKey: 'tenant_form.feature_goals', descKey: 'tenant_form.feature_goals_desc', icon: Target },
+  { key: 'blog', labelKey: 'tenant_form.feature_blog', descKey: 'tenant_form.feature_blog_desc', icon: BookOpen },
+  { key: 'exchange_workflow', labelKey: 'tenant_form.feature_exchange_workflow', descKey: 'tenant_form.feature_exchange_workflow_desc', icon: ArrowRightLeft },
+  { key: 'federation', labelKey: 'tenant_form.feature_federation', descKey: 'tenant_form.feature_federation_desc', icon: Network },
+  { key: 'organisations', labelKey: 'tenant_form.feature_organisations', descKey: 'tenant_form.feature_organisations_desc', icon: Building },
+  { key: 'messages', labelKey: 'tenant_form.feature_messages', descKey: 'tenant_form.feature_messages_desc', icon: MessageCircle },
+  { key: 'dashboard', labelKey: 'tenant_form.feature_dashboard', descKey: 'tenant_form.feature_dashboard_desc', icon: LayoutDashboard },
+  { key: 'feed', labelKey: 'tenant_form.feature_feed', descKey: 'tenant_form.feature_feed_desc', icon: Rss },
+  { key: 'marketplace', labelKey: 'tenant_form.feature_marketplace', descKey: 'tenant_form.feature_marketplace_desc', icon: ShoppingBag },
 ];
 
 const COUNTRY_CODES = [
@@ -702,7 +702,9 @@ export function TenantForm() {
                 {t('tenant_form.features_desc')}
               </p>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {FEATURE_META.map(({ key, label, description, icon: Icon }) => {
+                {FEATURE_META.map(({ key, labelKey, descKey, icon: Icon }) => {
+                  const label = t(labelKey);
+                  const description = t(descKey);
                   const enabled = form.features[key] ?? false;
                   return (
                     <div

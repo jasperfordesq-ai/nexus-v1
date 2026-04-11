@@ -1617,8 +1617,9 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithError('EXTERNAL_SEND_FAILED', $errorMsg, null, 422);
         }
 
-        $externalMessageId = $result['data']['message_id'] ?? null;
-        $rawReceiverName = $result['data']['receiver_name'] ?? '';
+        // TimeOverflow returns { id, message_id, ... } — try both field names
+        $externalMessageId = $result['data']['message_id'] ?? $result['data']['id'] ?? null;
+        $rawReceiverName = $result['data']['receiver_name'] ?? $result['data']['remote_user_identifier'] ?? '';
         $receiverName = htmlspecialchars(
             !empty($rawReceiverName) ? $rawReceiverName : __('api.external_user_fallback') . ' #' . $realReceiverId,
             ENT_QUOTES, 'UTF-8'

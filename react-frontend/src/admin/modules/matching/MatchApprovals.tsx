@@ -163,7 +163,7 @@ export function MatchApprovals() {
   const columns: Column<MatchApproval>[] = [
     {
       key: 'match',
-      label: 'Match',
+      label: t('matching.col_match'),
       render: (item) => (
         <div className="flex items-center gap-2">
           <Avatar
@@ -194,17 +194,17 @@ export function MatchApprovals() {
     },
     {
       key: 'listing_title',
-      label: 'Listing',
+      label: t('matching.col_listing'),
       render: (item) =>
         item.listing_title ? (
           <span className="text-sm text-foreground">{item.listing_title}</span>
         ) : (
-          <span className="text-sm text-default-400 italic">No listing</span>
+          <span className="text-sm text-default-400 italic">{t('matching.no_listing')}</span>
         ),
     },
     {
       key: 'match_score',
-      label: 'Score',
+      label: t('matching.col_score'),
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-2 min-w-[100px]">
@@ -227,13 +227,13 @@ export function MatchApprovals() {
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('matching.col_status'),
       sortable: true,
       render: (item) => <StatusBadge status={item.status} />,
     },
     {
       key: 'created_at',
-      label: 'Submitted',
+      label: t('matching.col_submitted'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -243,7 +243,7 @@ export function MatchApprovals() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('matching.col_actions'),
       render: (item) => (
         <div className="flex gap-1">
           {item.status === 'pending' && (

@@ -218,13 +218,33 @@ class FederationExternalWebhookController extends BaseApiController
             return ['status' => 'rejected', 'reason' => 'Messaging not enabled for this partner'];
         }
 
-        // Map TimeOverflow fields to Nexus fields
+        // Map TimeOverflow webhook fields to Nexus fields.
+        //
+        // TimeOverflow webhook payload (data object):
+        //   sender_id:            TimeOverflow member ID (integer, external to Nexus)
+        //   sender_name:          TimeOverflow username (string)
+        //   recipient_id:         The Nexus user ID that TimeOverflow is sending to
+        //   subject:              Message subject (optional)
+        //   body:                 Message body (required)
+        //   external_message_id:  Unique ID from TimeOverflow (e.g., "to_msg_abc123")
+        //   organization_id:      TimeOverflow org ID (informational)
+        //   organization_name:    TimeOverflow org name (informational)
+        //
+        // IMPORTANT: recipient_id MUST be a valid Nexus user ID. TimeOverflow
+        // obtains this when the Nexus user's ID is shared via the federation
+        // member directory (e.g., when browsing partner members in the UI).
         $recipientId = $data['recipient_id'] ?? $data['local_member_id'] ?? null;
         $senderId = $data['sender_id'] ?? $data['remote_user_identifier'] ?? 0;
         $senderName = $data['sender_name'] ?? $data['remote_user_identifier'] ?? 'External User';
         $subject = $data['subject'] ?? '';
         $body = $data['body'] ?? $data['message'] ?? '';
         $externalMessageId = $data['external_message_id'] ?? $data['message_id'] ?? null;
+
+        // Include the source organization for context in the sender name
+        $orgName = $data['organization_name'] ?? null;
+        if ($orgName && !str_contains($senderName, $orgName)) {
+            $senderName .= " ({$orgName})";
+        }
 
         if (empty($body)) {
             return ['status' => 'rejected', 'reason' => 'Message body is required'];
@@ -234,11 +254,23 @@ class FederationExternalWebhookController extends BaseApiController
             return ['status' => 'rejected', 'reason' => 'Recipient ID is required'];
         }
 
-        // Resolve the Nexus user ID from external partner member mapping
-        // TimeOverflow sends the member_id; we need to find the corresponding
-        // Nexus user. For now, use the recipient_id directly since the external
-        // partner registered members with matching IDs.
         $receiverUserId = (int) $recipientId;
+
+        // Validate the receiver exists before calling storeExternalMessage
+        $receiver = DB::table('users')
+            ->where('id', $receiverUserId)
+            ->where('tenant_id', TenantContext::getId())
+            ->where('status', 'active')
+            ->exists();
+
+        if (!$receiver) {
+            Log::warning('[FederationExternalWebhook] Recipient not found', [
+                'recipient_id' => $recipientId,
+                'partner' => $partner->name,
+                'tenant_id' => TenantContext::getId(),
+            ]);
+            return ['status' => 'rejected', 'reason' => "Recipient user #{$recipientId} not found in this tenant"];
+        }
 
         $result = FederatedMessageService::storeExternalMessage(
             receiverUserId: $receiverUserId,
