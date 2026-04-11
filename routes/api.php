@@ -410,6 +410,7 @@ Route::get('/v2/federation/members', [\App\Http\Controllers\Api\FederationV2Cont
 Route::get('/v2/federation/members/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'member']);
 Route::get('/v2/federation/messages', [\App\Http\Controllers\Api\FederationV2Controller::class, 'messages']);
 Route::post('/v2/federation/messages', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendMessage']);
+Route::post('/v2/federation/messages/mark-read-batch', [\App\Http\Controllers\Api\FederationV2Controller::class, 'markMessagesReadBatch']);
 Route::post('/v2/federation/messages/{id}/mark-read', [\App\Http\Controllers\Api\FederationV2Controller::class, 'markMessageRead']);
 Route::post('/v2/federation/messages/{id}/translate', [\App\Http\Controllers\Api\FederationV2Controller::class, 'translateMessage']);
 Route::post('/v2/federation/transactions', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendTransaction']);

@@ -16,7 +16,7 @@ import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { logError } from '@/lib/logger';
 import { adminFederation } from '../../api/adminApi';
-import { DataTable, PageHeader, EmptyState, type Column } from '../../components';
+import { DataTable, PageHeader, EmptyState, ConfirmModal, type Column } from '../../components';
 
 import { useTranslation } from 'react-i18next';
 interface ApiKey {
@@ -39,9 +39,11 @@ export function ApiKeys() {
   const [items, setItems] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [revokingId, setRevokingId] = useState<number | null>(null);
+  const [revokeTarget, setRevokeTarget] = useState<ApiKey | null>(null);
 
-  const handleRevoke = useCallback(async (id: number) => {
-    if (!confirm(t('federation.confirm_revoke', 'Are you sure you want to revoke this API key? This cannot be undone.'))) return;
+  const confirmRevoke = useCallback(async () => {
+    if (!revokeTarget) return;
+    const id = revokeTarget.id;
     setRevokingId(id);
     try {
       const res = await adminFederation.revokeApiKey(id);
@@ -54,7 +56,8 @@ export function ApiKeys() {
       toast.error(t('federation.revoke_failed', 'Failed to revoke API key'));
     }
     setRevokingId(null);
-  }, [t, toast]);
+    setRevokeTarget(null);
+  }, [revokeTarget, t, toast]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -129,7 +132,7 @@ export function ApiKeys() {
           color="danger"
           startContent={<Ban size={14} />}
           isLoading={revokingId === item.id}
-          onPress={() => handleRevoke(item.id)}
+          onPress={() => setRevokeTarget(item)}
         >
           {t('federation.revoke', 'Revoke')}
         </Button>
@@ -163,6 +166,19 @@ export function ApiKeys() {
         }
       />
       <DataTable columns={columns} data={items} isLoading={loading} onRefresh={loadData} />
+
+      {revokeTarget && (
+        <ConfirmModal
+          isOpen={!!revokeTarget}
+          onClose={() => setRevokeTarget(null)}
+          onConfirm={confirmRevoke}
+          title={t('federation.revoke_key_title', 'Revoke API Key')}
+          message={t('federation.confirm_revoke', 'Are you sure you want to revoke this API key? This cannot be undone.')}
+          confirmLabel={t('federation.revoke', 'Revoke')}
+          confirmColor="danger"
+          isLoading={revokingId === revokeTarget.id}
+        />
+      )}
     </div>
   );
 }

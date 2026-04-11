@@ -187,6 +187,7 @@ export function Webhooks() {
         setWebhooks(Array.isArray(payload) ? payload : (payload as { data?: WebhookItem[] })?.data ?? []);
       }
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
       logError('Webhooks.load', err);
       toast.error(t('federation.webhooks_load_failed', 'Failed to load webhooks'));
     }

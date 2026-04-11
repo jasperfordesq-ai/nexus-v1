@@ -30,6 +30,7 @@ class FederationUserService
         'show_reviews_federated'         => false,
         'service_reach'                  => 'local_only',
         'travel_radius_km'              => null,
+        'email_notifications'            => true,
     ];
 
     public function __construct()
@@ -62,6 +63,7 @@ class FederationUserService
                 'show_reviews_federated'         => (bool) ($row->show_reviews_federated ?? false),
                 'service_reach'                  => $row->service_reach ?? 'local_only',
                 'travel_radius_km'              => $row->travel_radius_km ?? null,
+                'email_notifications'            => (bool) ($row->email_notifications ?? true),
             ];
         } catch (\Throwable $e) {
             return array_merge(self::DEFAULT_SETTINGS, ['user_id' => $userId]);
@@ -106,7 +108,10 @@ class FederationUserService
                     : 'local_only';
             }
             if (isset($settings['travel_radius_km'])) {
-                $data['travel_radius_km'] = (int) $settings['travel_radius_km'];
+                $data['travel_radius_km'] = max(0, (int) $settings['travel_radius_km']);
+            }
+            if (isset($settings['email_notifications'])) {
+                $data['email_notifications'] = $settings['email_notifications'] ? 1 : 0;
             }
 
             DB::table('federation_user_settings')->updateOrInsert(

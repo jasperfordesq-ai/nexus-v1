@@ -419,13 +419,13 @@ class FederationExternalApiClient
         Cache::forget("federation_cb_failures:{$partnerId}");
         Cache::forget("federation_cb_open:{$partnerId}");
 
-        // Restore partner to 'active' regardless of current status so that
+        // Restore partner to 'active' if it was in 'failed' state so that
         // a recovered partner can self-heal after the circuit-breaker cooldown
-        // expires (previously the WHERE status='failed' guard meant getPartner()
-        // would refuse to load a failed partner, making recordSuccess unreachable).
+        // expires. Do NOT auto-promote 'pending' partners — they must be
+        // explicitly approved by an admin via the External Partners UI.
         DB::table('federation_external_partners')
             ->where('id', $partnerId)
-            ->whereIn('status', ['failed', 'pending'])
+            ->where('status', 'failed')
             ->update([
                 'status' => 'active',
                 'error_count' => 0,
@@ -499,11 +499,14 @@ class FederationExternalApiClient
      */
     private static function getPartner(int $partnerId, ?int $tenantId = null): ?array
     {
+        // Always scope by tenant — use explicit ID or fall back to current context
+        $tenantId = $tenantId ?? \App\Core\TenantContext::getId();
+
         $query = DB::table('federation_external_partners')
             ->where('id', $partnerId)
             ->whereIn('status', ['active', 'pending', 'failed']);
 
-        if ($tenantId !== null) {
+        if ($tenantId) {
             $query->where('tenant_id', $tenantId);
         }
 

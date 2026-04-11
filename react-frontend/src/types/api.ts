@@ -1651,6 +1651,8 @@ export interface FederationStatus {
   tenant_federation_enabled?: boolean;
   partnerships_count?: number;
   federation_optin?: boolean;
+  messages_count?: number;
+  transactions_count?: number;
 }
 
 export interface FederationActivityItem {

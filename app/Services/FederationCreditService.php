@@ -159,8 +159,13 @@ class FederationCreditService
                 return ['success' => false, 'error' => 'Unauthorized: tenant is not party to this agreement'];
             }
 
+            // Set the correct approved_by column based on which party is approving
+            $approverColumn = ((int) $agreement->from_tenant_id === $tenantId)
+                ? 'approved_by_from'
+                : 'approved_by_to';
+
             DB::update(
-                "UPDATE federation_credit_agreements SET status = 'active', approved_by_to = ?, updated_at = NOW() WHERE id = ?",
+                "UPDATE federation_credit_agreements SET status = 'active', {$approverColumn} = ?, updated_at = NOW() WHERE id = ?",
                 [$approvedBy, $agreementId]
             );
 

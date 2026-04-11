@@ -82,6 +82,7 @@ interface ExternalPartner {
   last_error: string | null;
   partner_name: string | null;
   partner_version: string | null;
+  oauth_token_url?: string | null;
 }
 
 interface PartnerFormData {
@@ -236,7 +237,7 @@ export function ExternalPartners() {
       signing_secret: '',
       oauth_client_id: '',
       oauth_client_secret: '',
-      oauth_token_url: (partner as unknown as Record<string, string>).oauth_token_url || '',
+      oauth_token_url: partner.oauth_token_url || '',
       allow_member_search: partner.allow_member_search,
       allow_listing_search: partner.allow_listing_search,
       allow_messaging: partner.allow_messaging,

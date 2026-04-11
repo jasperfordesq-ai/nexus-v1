@@ -357,14 +357,12 @@ export function FederationMessagesPage() {
         )
       );
 
-      // Fire off mark-read calls in parallel
-      await Promise.all(
-        unreadIds.map((id) =>
-          api.post(`/v2/federation/messages/${id}/mark-read`).catch((err) => {
-            logError(`Failed to mark federated message ${id} as read`, err);
-          })
-        )
-      );
+      // Batch mark-read in a single request
+      try {
+        await api.post('/v2/federation/messages/mark-read-batch', { ids: unreadIds });
+      } catch (err) {
+        logError('Failed to batch mark federated messages as read', err);
+      }
     },
     []
   );

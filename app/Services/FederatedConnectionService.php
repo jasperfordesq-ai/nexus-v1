@@ -283,6 +283,16 @@ class FederatedConnectionService
      */
     public function getConnections(int $userId, string $statusFilter = 'accepted', int $limit = 50, int $offset = 0): array
     {
+        // Support directional pending filters from frontend tabs
+        $directionFilter = null;
+        if ($statusFilter === 'pending_received') {
+            $statusFilter = 'pending';
+            $directionFilter = 'incoming';
+        } elseif ($statusFilter === 'pending_sent') {
+            $statusFilter = 'pending';
+            $directionFilter = 'outgoing';
+        }
+
         $validStatuses = ['pending', 'accepted', 'rejected'];
         if (!in_array($statusFilter, $validStatuses, true)) {
             $statusFilter = 'accepted';
@@ -292,8 +302,7 @@ class FederatedConnectionService
         $offset = max($offset, 0);
 
         try {
-            $rows = DB::select(
-                "SELECT fc.id, fc.status, fc.message, fc.created_at, fc.updated_at,
+            $sql = "SELECT fc.id, fc.status, fc.message, fc.created_at, fc.updated_at,
                         fc.requester_user_id, fc.requester_tenant_id,
                         fc.receiver_user_id, fc.receiver_tenant_id,
                         CASE WHEN fc.requester_user_id = ? THEN ru.first_name ELSE qu.first_name END as other_first_name,
@@ -307,28 +316,43 @@ class FederatedConnectionService
                  LEFT JOIN users ru ON fc.receiver_user_id = ru.id
                  LEFT JOIN tenants qt ON fc.requester_tenant_id = qt.id
                  LEFT JOIN tenants rt ON fc.receiver_tenant_id = rt.id
-                 WHERE (fc.requester_user_id = ? OR fc.receiver_user_id = ?) AND fc.status = ?
-                 ORDER BY fc.created_at DESC
-                 LIMIT ? OFFSET ?",
-                [
-                    $userId, $userId, $userId, $userId, $userId, $userId,
-                    $userId, $userId, $statusFilter,
-                    $limit, $offset,
-                ]
-            );
+                 WHERE ";
 
+            $params = [$userId, $userId, $userId, $userId, $userId, $userId];
+
+            // Apply directional filter for pending tabs
+            if ($directionFilter === 'incoming') {
+                $sql .= "fc.receiver_user_id = ? AND fc.status = ?";
+                $params[] = $userId;
+            } elseif ($directionFilter === 'outgoing') {
+                $sql .= "fc.requester_user_id = ? AND fc.status = ?";
+                $params[] = $userId;
+            } else {
+                $sql .= "(fc.requester_user_id = ? OR fc.receiver_user_id = ?) AND fc.status = ?";
+                $params[] = $userId;
+                $params[] = $userId;
+            }
+            $params[] = $statusFilter;
+
+            $sql .= " ORDER BY fc.created_at DESC LIMIT ? OFFSET ?";
+            $params[] = $limit;
+            $params[] = $offset;
+
+            $rows = DB::select($sql, $params);
+
+            // Map field names to match frontend FederationConnection interface
             return array_map(function ($row) use ($userId) {
                 $direction = ($row->requester_user_id == $userId) ? 'outgoing' : 'incoming';
                 return [
                     'id' => (int) $row->id,
+                    'user_id' => (int) $row->other_user_id,
+                    'name' => trim(($row->other_first_name ?? '') . ' ' . ($row->other_last_name ?? '')),
+                    'avatar_url' => $row->other_avatar,
+                    'tenant_id' => (int) $row->other_tenant_id,
+                    'tenant_name' => $row->other_tenant_name,
                     'status' => $row->status,
                     'direction' => $direction,
                     'message' => $row->message,
-                    'other_user_id' => (int) $row->other_user_id,
-                    'other_tenant_id' => (int) $row->other_tenant_id,
-                    'other_name' => trim(($row->other_first_name ?? '') . ' ' . ($row->other_last_name ?? '')),
-                    'other_avatar' => $row->other_avatar,
-                    'other_tenant_name' => $row->other_tenant_name,
                     'created_at' => $row->created_at,
                     'updated_at' => $row->updated_at,
                 ];

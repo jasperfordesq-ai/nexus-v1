@@ -202,8 +202,10 @@ class FederationPartnershipService
         }
 
         try {
+            // Store the proposed level in counter_proposed_level only — do NOT
+            // update federation_level yet. The level is only applied when the
+            // original requester calls acceptCounterProposal().
             DB::table('federation_partnerships')->where('id', $partnershipId)->update([
-                'federation_level' => $newLevel,
                 'counter_proposed_at' => now(),
                 'counter_proposed_by' => $proposedBy,
                 'counter_proposal_message' => $message,
@@ -256,12 +258,15 @@ class FederationPartnershipService
         if (!empty($partnership['counter_proposed_permissions'])) {
             $proposedPermissions = json_decode($partnership['counter_proposed_permissions'], true) ?: [];
         }
-        $defaultPermissions = self::getDefaultPermissions($partnership['federation_level']);
+        // Use the counter-proposed level (not the original federation_level)
+        $acceptedLevel = $partnership['counter_proposed_level'] ?? $partnership['federation_level'];
+        $defaultPermissions = self::getDefaultPermissions($acceptedLevel);
         $permissions = array_merge($defaultPermissions, $proposedPermissions);
 
         try {
             DB::table('federation_partnerships')->where('id', $partnershipId)->update([
                 'status' => 'active',
+                'federation_level' => $acceptedLevel,
                 'approved_at' => now(),
                 'approved_by' => $acceptedBy,
                 'profiles_enabled' => $permissions['profiles'] ? 1 : 0,
@@ -276,7 +281,7 @@ class FederationPartnershipService
             FederationAuditService::log(
                 'partnership_counter_accepted',
                 $partnership['tenant_id'], $partnership['partner_tenant_id'], $acceptedBy,
-                ['accepted_level' => $partnership['federation_level']]
+                ['accepted_level' => $acceptedLevel]
             );
 
             return ['success' => true, 'message' => __('svc_notifications_2.federation.counter_proposal_accepted')];

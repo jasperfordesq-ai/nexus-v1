@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -85,26 +86,44 @@ class FederationActivityService
 
     /**
      * Get unread federation activity count for a user.
+     *
+     * Tracks read-state via a per-user cache key storing the timestamp of when
+     * the user last viewed the activity feed.
      */
     public static function getUnreadCount(int $userId): int
     {
         $tenantId = TenantContext::getId();
 
         try {
-            // Count audit log entries from the last 7 days for this tenant
-            $row = DB::selectOne(
-                "SELECT COUNT(*) as cnt FROM federation_audit_log
+            $lastReadAt = Cache::get("federation_activity_read:{$userId}");
+
+            $sql = "SELECT COUNT(*) as cnt FROM federation_audit_log
                  WHERE (source_tenant_id = ? OR target_tenant_id = ?)
                    AND level IN ('info', 'warning')
-                   AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
-                [$tenantId, $tenantId]
-            );
+                   AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+            $params = [$tenantId, $tenantId];
+
+            if ($lastReadAt) {
+                $sql .= " AND created_at > ?";
+                $params[] = $lastReadAt;
+            }
+
+            $row = DB::selectOne($sql, $params);
 
             return (int) ($row->cnt ?? 0);
         } catch (\Exception $e) {
             Log::error('[FederationActivity] getUnreadCount failed', ['error' => $e->getMessage()]);
             return 0;
         }
+    }
+
+    /**
+     * Mark all federation activity as read for a user.
+     */
+    public static function markAllRead(int $userId): void
+    {
+        // Store for 30 days (longer than the 7-day unread window)
+        Cache::put("federation_activity_read:{$userId}", now()->toDateTimeString(), 60 * 60 * 24 * 30);
     }
 
     /**

@@ -46,7 +46,7 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
-import { PageHeader } from '../../components';
+import { PageHeader, ConfirmModal } from '../../components';
 import { StatCard } from '../../components';
 
 import { useTranslation } from 'react-i18next';
@@ -101,6 +101,9 @@ export function Neighborhoods() {
   const [addToNeighborhood, setAddToNeighborhood] = useState<Neighborhood | null>(null);
   const [selectedTenantId, setSelectedTenantId] = useState('');
   const [addingTenant, setAddingTenant] = useState(false);
+  // Confirm modals
+  const [removeTenantTarget, setRemoveTenantTarget] = useState<{ neighborhoodId: number; tenantId: number } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
   // ─── Load data ───
   const loadData = useCallback(async () => {
@@ -129,7 +132,7 @@ export function Neighborhoods() {
       toast.error(t('federation.failed_to_load_neighborhoods'));
     }
     setLoading(false);
-  }, [toast]);
+  }, [t, toast]);
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -154,7 +157,7 @@ export function Neighborhoods() {
       toast.error(t('federation.failed_to_create_neighborhood'));
     }
     setCreating(false);
-  }, [newName, newDescription, toast, createModal, loadData]);
+  }, [t, newName, newDescription, toast, createModal, loadData]);
 
   // ─── Add tenant to neighborhood ───
   const handleAddTenant = useCallback(async () => {
@@ -176,33 +179,44 @@ export function Neighborhoods() {
       toast.error(t('federation.failed_to_add_tenant'));
     }
     setAddingTenant(false);
-  }, [addToNeighborhood, selectedTenantId, toast, addTenantModal, loadData]);
+  }, [t, addToNeighborhood, selectedTenantId, toast, addTenantModal, loadData]);
 
   // ─── Remove tenant from neighborhood ───
-  const handleRemoveTenant = useCallback(async (neighborhoodId: number, tenantId: number) => {
-    if (!window.confirm(t('federation.confirm_remove_tenant'))) return;
+  const confirmRemoveTenant = useCallback(async () => {
+    if (!removeTenantTarget) return;
+    const { neighborhoodId, tenantId } = removeTenantTarget;
     try {
-      await api.delete(`/v2/admin/federation/neighborhoods/${neighborhoodId}/tenants/${tenantId}`);
-      toast.success(t('federation.tenant_removed_from_neighborhood'));
-      loadData();
+      const res = await api.delete(`/v2/admin/federation/neighborhoods/${neighborhoodId}/tenants/${tenantId}`);
+      if (res.success) {
+        toast.success(t('federation.tenant_removed_from_neighborhood'));
+        loadData();
+      } else {
+        toast.error(res.error || t('federation.failed_to_remove_tenant'));
+      }
     } catch (err) {
       logError('Neighborhoods.removeTenant', err);
       toast.error(t('federation.failed_to_remove_tenant'));
     }
-  }, [toast, loadData]);
+    setRemoveTenantTarget(null);
+  }, [t, toast, loadData, removeTenantTarget]);
 
   // ─── Delete neighborhood ───
-  const handleDelete = useCallback(async (neighborhoodId: number) => {
-    if (!window.confirm(t('federation.confirm_delete_neighborhood'))) return;
+  const confirmDelete = useCallback(async () => {
+    if (deleteTarget === null) return;
     try {
-      await api.delete(`/v2/admin/federation/neighborhoods/${neighborhoodId}`);
-      toast.success(t('federation.neighborhood_deleted'));
-      loadData();
+      const res = await api.delete(`/v2/admin/federation/neighborhoods/${deleteTarget}`);
+      if (res.success) {
+        toast.success(t('federation.neighborhood_deleted'));
+        loadData();
+      } else {
+        toast.error(res.error || t('federation.failed_to_delete_neighborhood'));
+      }
     } catch (err) {
       logError('Neighborhoods.delete', err);
       toast.error(t('federation.failed_to_delete_neighborhood'));
     }
-  }, [toast, loadData]);
+    setDeleteTarget(null);
+  }, [t, toast, loadData, deleteTarget]);
 
   // ─── Stats ───
   const totalNeighborhoods = neighborhoods.length;
@@ -284,7 +298,7 @@ export function Neighborhoods() {
                   color="danger"
                   isIconOnly
                   aria-label={t('federation.label_delete_neighborhood')}
-                  onPress={() => handleDelete(neighborhood.id)}
+                  onPress={() => setDeleteTarget(neighborhood.id)}
                 >
                   <Trash2 size={14} />
                 </Button>
@@ -353,7 +367,7 @@ export function Neighborhoods() {
                             isIconOnly
                             color="danger"
                             aria-label={t('federation.remove_name', { name: tenant.name })}
-                            onPress={() => handleRemoveTenant(neighborhood.id, tenant.id)}
+                            onPress={() => setRemoveTenantTarget({ neighborhoodId: neighborhood.id, tenantId: tenant.id })}
                           >
                             <X size={14} />
                           </Button>
@@ -453,6 +467,32 @@ export function Neighborhoods() {
           )}
         </ModalContent>
       </Modal>
+
+      {/* Remove tenant confirmation */}
+      {removeTenantTarget && (
+        <ConfirmModal
+          isOpen={!!removeTenantTarget}
+          onClose={() => setRemoveTenantTarget(null)}
+          onConfirm={confirmRemoveTenant}
+          title={t('federation.remove_tenant_title', 'Remove Tenant')}
+          message={t('federation.confirm_remove_tenant', 'Are you sure you want to remove this tenant from the neighborhood?')}
+          confirmLabel={t('federation.remove', 'Remove')}
+          confirmColor="danger"
+        />
+      )}
+
+      {/* Delete neighborhood confirmation */}
+      {deleteTarget !== null && (
+        <ConfirmModal
+          isOpen={deleteTarget !== null}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={confirmDelete}
+          title={t('federation.delete_neighborhood_title', 'Delete Neighborhood')}
+          message={t('federation.confirm_delete_neighborhood', 'Are you sure you want to delete this neighborhood? This cannot be undone.')}
+          confirmLabel={t('federation.delete', 'Delete')}
+          confirmColor="danger"
+        />
+      )}
     </div>
   );
 }

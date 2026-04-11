@@ -130,6 +130,8 @@ export function Partnerships() {
   const [items, setItems] = useState<Partnership[]>([]);
   const [loading, setLoading] = useState(true);
   const [terminateTarget, setTerminateTarget] = useState<Partnership | null>(null);
+  const [approveTarget, setApproveTarget] = useState<Partnership | null>(null);
+  const [rejectTarget, setRejectTarget] = useState<Partnership | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('all');
 
@@ -205,13 +207,13 @@ export function Partnerships() {
   }, [items, activeTab, incomingRequests]);
 
   // ─── Actions ───
-  const handleApprove = async (item: Partnership) => {
-    if (!window.confirm(t('federation.confirm_approve_partnership'))) return;
+  const confirmApprove = async () => {
+    if (!approveTarget) return;
     setActionLoading(true);
     try {
-      const res = await adminFederation.approvePartnership(item.id);
+      const res = await adminFederation.approvePartnership(approveTarget.id);
       if (res.success) {
-        toast.success(t('federation.partnership_approved', { name: item.partner_name }));
+        toast.success(t('federation.partnership_approved', { name: approveTarget.partner_name }));
         loadData();
       } else {
         toast.error(t('federation.failed_to_approve_partnership'));
@@ -220,16 +222,17 @@ export function Partnerships() {
       toast.error(t('federation.failed_to_approve_partnership'));
     } finally {
       setActionLoading(false);
+      setApproveTarget(null);
     }
   };
 
-  const handleReject = async (item: Partnership) => {
-    if (!window.confirm(t('federation.confirm_reject_partnership'))) return;
+  const confirmReject = async () => {
+    if (!rejectTarget) return;
     setActionLoading(true);
     try {
-      const res = await adminFederation.rejectPartnership(item.id);
+      const res = await adminFederation.rejectPartnership(rejectTarget.id);
       if (res.success) {
-        toast.success(t('federation.partnership_rejected', { name: item.partner_name }));
+        toast.success(t('federation.partnership_rejected', { name: rejectTarget.partner_name }));
         loadData();
       } else {
         toast.error(t('federation.failed_to_reject_partnership'));
@@ -238,6 +241,7 @@ export function Partnerships() {
       toast.error(t('federation.failed_to_reject_partnership'));
     } finally {
       setActionLoading(false);
+      setRejectTarget(null);
     }
   };
 
@@ -417,8 +421,8 @@ export function Partnerships() {
             <DropdownMenu
               aria-label={t('federation.label_partnership_actions')}
               onAction={(key) => {
-                if (key === 'approve') handleApprove(item);
-                else if (key === 'reject') handleReject(item);
+                if (key === 'approve') setApproveTarget(item);
+                else if (key === 'reject') setRejectTarget(item);
                 else if (key === 'terminate') setTerminateTarget(item);
                 else if (key === 'counter') openCounterProposal(item);
               }}
@@ -518,6 +522,34 @@ export function Partnerships() {
       </Tabs>
 
       <DataTable columns={columns} data={filteredItems} isLoading={loading} onRefresh={loadData} />
+
+      {/* Approve confirmation */}
+      {approveTarget && (
+        <ConfirmModal
+          isOpen={!!approveTarget}
+          onClose={() => setApproveTarget(null)}
+          onConfirm={confirmApprove}
+          title={t('federation.approve_partnership', 'Approve Partnership')}
+          message={t('federation.confirm_approve_partnership', { name: approveTarget.partner_name })}
+          confirmLabel={t('federation.approve', 'Approve')}
+          confirmColor="primary"
+          isLoading={actionLoading}
+        />
+      )}
+
+      {/* Reject confirmation */}
+      {rejectTarget && (
+        <ConfirmModal
+          isOpen={!!rejectTarget}
+          onClose={() => setRejectTarget(null)}
+          onConfirm={confirmReject}
+          title={t('federation.reject_partnership', 'Reject Partnership')}
+          message={t('federation.confirm_reject_partnership', { name: rejectTarget.partner_name })}
+          confirmLabel={t('federation.reject', 'Reject')}
+          confirmColor="danger"
+          isLoading={actionLoading}
+        />
+      )}
 
       {/* Terminate confirmation */}
       {terminateTarget && (

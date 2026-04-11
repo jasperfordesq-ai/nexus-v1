@@ -220,6 +220,7 @@ export function CreditAgreements() {
         );
       }
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
       logError('CreditAgreements.load', err);
       toast.error(t('federation.failed_to_load_credit_agreements'));
     }

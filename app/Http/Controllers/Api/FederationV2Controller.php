@@ -120,11 +120,39 @@ class FederationV2Controller extends BaseApiController
             error_log("FederationV2Api::status partnerships count error: " . $e->getMessage());
         }
 
+        // Get real message/transaction counts for the hub stats
+        $messagesCount = 0;
+        $transactionsCount = 0;
+        if ($tenantFederationEnabled && $userOptedIn) {
+            try {
+                $msgResult = DB::selectOne(
+                    "SELECT COUNT(*) as cnt FROM federation_messages
+                     WHERE (sender_user_id = ? OR receiver_user_id = ?)",
+                    [$userId, $userId]
+                );
+                $messagesCount = (int) ($msgResult->cnt ?? 0);
+            } catch (\Exception $e) {
+                // federation_messages table may not exist yet
+            }
+            try {
+                $txResult = DB::selectOne(
+                    "SELECT COUNT(*) as cnt FROM transactions
+                     WHERE is_federated = 1 AND (sender_id = ? OR receiver_id = ?) AND tenant_id = ?",
+                    [$userId, $userId, $tenantId]
+                );
+                $transactionsCount = (int) ($txResult->cnt ?? 0);
+            } catch (\Exception $e) {
+                // ignore
+            }
+        }
+
         return $this->respondWithData([
             'enabled' => $tenantFederationEnabled && $userOptedIn,
             'tenant_federation_enabled' => $tenantFederationEnabled,
             'partnerships_count' => $partnershipsCount,
             'federation_optin' => $userOptedIn,
+            'messages_count' => $messagesCount,
+            'transactions_count' => $transactionsCount,
         ]);
     }
 
@@ -247,8 +275,12 @@ class FederationV2Controller extends BaseApiController
                     CASE WHEN fp.tenant_id = ? THEN t2.country_code ELSE t1.country_code END as partner_country,
                     CASE WHEN fp.tenant_id = ? THEN dp2.logo_url ELSE dp1.logo_url END as partner_logo,
                     (SELECT COUNT(*) FROM users u
+                     JOIN federation_user_settings fus2 ON fus2.user_id = u.id AND fus2.federation_optin = 1
                      WHERE u.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
-                       AND u.status = 'active') as partner_member_count
+                       AND u.status = 'active') as partner_member_count,
+                    (SELECT COUNT(*) FROM listings li
+                     WHERE li.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
+                       AND li.status = 'active') as partner_listing_count
                 FROM federation_partnerships fp
                 LEFT JOIN tenants t1 ON fp.tenant_id = t1.id
                 LEFT JOIN tenants t2 ON fp.partner_tenant_id = t2.id
@@ -256,7 +288,7 @@ class FederationV2Controller extends BaseApiController
                 LEFT JOIN federation_directory_profiles dp2 ON dp2.tenant_id = fp.partner_tenant_id
                 WHERE (fp.tenant_id = ? OR fp.partner_tenant_id = ?) AND fp.status = 'active'
                 ORDER BY partner_name ASC
-            ", [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId]);
+            ", [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId]);
             $partnerships = array_map(fn($r) => (array)$r, $partnershipResults);
 
             $formatted = array_map(function ($p) {
@@ -277,6 +309,7 @@ class FederationV2Controller extends BaseApiController
                     'location' => $p['partner_location'] ?? '',
                     'country' => $p['partner_country'] ?? '',
                     'member_count' => (int) ($p['partner_member_count'] ?? 0),
+                    'listing_count' => (int) ($p['partner_listing_count'] ?? 0),
                     'federation_level' => $level,
                     'federation_level_name' => self::LEVEL_NAMES[$level] ?? 'Discovery',
                     'permissions' => $permissions,
@@ -347,6 +380,9 @@ class FederationV2Controller extends BaseApiController
         try {
             $rawActivity = $this->federationActivityService->getActivityFeed($userId, 20);
 
+            // Mark activity as read now that the user has viewed the feed
+            $this->federationActivityService->markAllRead($userId);
+
             $formatted = [];
             $id = 1;
             foreach ($rawActivity as $item) {
@@ -410,7 +446,7 @@ class FederationV2Controller extends BaseApiController
                     OR (fp.partner_tenant_id = :tid2 AND fp.tenant_id = e.tenant_id)
                 )
                 WHERE fp.status = 'active' AND fp.events_enabled = 1
-                AND e.tenant_id != :tid3 AND e.status = 'published'
+                AND e.tenant_id != :tid3 AND e.status = 'active'
             ";
             $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];
 
@@ -511,13 +547,14 @@ class FederationV2Controller extends BaseApiController
 
         try {
             $sql = "
-                SELECT l.id, l.title, l.description, l.type, l.category as category_name,
+                SELECT l.id, l.title, l.description, l.type, c.name as category_name,
                     l.image_url, l.price as estimated_hours, l.location,
                     l.user_id, l.tenant_id, l.created_at,
                     u.first_name, u.last_name, u.avatar_url, t.name as tenant_name
                 FROM listings l
                 JOIN users u ON u.id = l.user_id
                 JOIN tenants t ON t.id = l.tenant_id
+                LEFT JOIN categories c ON c.id = l.category_id
                 JOIN federation_partnerships fp ON (
                     (fp.tenant_id = :tid1 AND fp.partner_tenant_id = l.tenant_id)
                     OR (fp.partner_tenant_id = :tid2 AND fp.tenant_id = l.tenant_id)
@@ -1018,6 +1055,7 @@ class FederationV2Controller extends BaseApiController
                 'location' => $m['show_location_federated'] ? ($m['location'] ?? null) : null,
                 'service_reach' => $m['service_reach'] ?? 'local_only',
                 'messaging_enabled' => (bool) ($m['messaging_enabled_federated'] ?? false),
+                'transactions_enabled' => (bool) ($m['transactions_enabled_federated'] ?? false),
                 'tenant_id' => (int) $m['tenant_id'],
                 'tenant_name' => $m['tenant_name'] ?? '',
                 'timebank' => [
@@ -1025,6 +1063,28 @@ class FederationV2Controller extends BaseApiController
                     'name' => $m['tenant_name'],
                 ],
             ];
+
+            // Add trust score / reviews if the member allows it
+            if ($m['show_reviews_federated']) {
+                $member['trust_score'] = FederationUserService::getTrustScore((int) $m['id'], (int) $m['tenant_id']);
+            }
+
+            // Add connection status with current user
+            $currentUserId = $this->getUserId();
+            $member['connection_status'] = $this->federatedConnectionService->getStatus(
+                $currentUserId, (int) $m['id'], (int) $m['tenant_id']
+            );
+
+            // Add member's active listings (if partnership allows listings)
+            $memberListings = DB::select(
+                "SELECT l.id, l.title, l.type, l.description, c.name as category_name, l.created_at
+                 FROM listings l
+                 LEFT JOIN categories c ON c.id = l.category_id
+                 WHERE l.user_id = ? AND l.tenant_id = ? AND l.status = 'active'
+                 ORDER BY l.created_at DESC LIMIT 10",
+                [(int) $m['id'], (int) $m['tenant_id']]
+            );
+            $member['listings'] = array_map(fn ($l) => (array) $l, $memberListings);
 
             return $this->respondWithData($member);
         } catch (\Exception $e) {
@@ -1427,8 +1487,8 @@ class FederationV2Controller extends BaseApiController
 
         // Get sender info for the outbound call and local record
         $senderRow = DB::selectOne(
-            "SELECT u.first_name, u.last_name, u.avatar_url, t.name as tenant_name FROM users u JOIN tenants t ON t.id = u.tenant_id WHERE u.id = ?",
-            [$userId]
+            "SELECT u.first_name, u.last_name, u.avatar_url, t.name as tenant_name FROM users u JOIN tenants t ON t.id = u.tenant_id WHERE u.id = ? AND u.tenant_id = ?",
+            [$userId, $tenantId]
         );
         $sender = $senderRow ? (array) $senderRow : [];
         $senderName = trim(($sender['first_name'] ?? '') . ' ' . ($sender['last_name'] ?? ''));
@@ -1543,6 +1603,42 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithData(['success' => true]);
         } catch (\Exception $e) {
             error_log("FederationV2Api::markMessageRead error: " . $e->getMessage());
+            return $this->respondWithError('INTERNAL_ERROR', __('api.fed_mark_read_failed'), null, 500);
+        }
+    }
+
+    /** POST /api/v2/federation/messages/mark-read-batch */
+    public function markMessagesReadBatch(): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $tenantId = $this->getTenantId();
+
+        $ids = request()->input('ids', []);
+        if (!is_array($ids) || empty($ids)) {
+            return $this->respondWithData(['updated' => 0]);
+        }
+
+        // Sanitize IDs and cap at 100 per batch
+        $ids = array_map('intval', array_slice($ids, 0, 100));
+        $ids = array_filter($ids, fn ($id) => $id > 0);
+        if (empty($ids)) {
+            return $this->respondWithData(['updated' => 0]);
+        }
+
+        try {
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $params = array_merge($ids, [$tenantId, $userId]);
+
+            $updated = DB::update(
+                "UPDATE federation_messages SET status = 'read', read_at = NOW()
+                 WHERE id IN ({$placeholders}) AND receiver_tenant_id = ? AND receiver_user_id = ?
+                 AND direction = 'inbound' AND status != 'read'",
+                $params
+            );
+
+            return $this->respondWithData(['updated' => $updated]);
+        } catch (\Exception $e) {
+            error_log("FederationV2Api::markMessagesReadBatch error: " . $e->getMessage());
             return $this->respondWithError('INTERNAL_ERROR', __('api.fed_mark_read_failed'), null, 500);
         }
     }
@@ -1723,12 +1819,8 @@ class FederationV2Controller extends BaseApiController
         $offset = max($this->queryInt('offset', 0, 0), 0);
 
         $connections = $this->federatedConnectionService->getConnections($userId, $status, $limit, $offset);
-        $pendingCount = $this->federatedConnectionService->getPendingCount($userId);
 
-        return $this->respondWithData([
-            'connections' => $connections,
-            'pending_count' => $pendingCount,
-        ]);
+        return $this->respondWithData($connections);
     }
 
     /** POST /api/v2/federation/connections */
@@ -1844,23 +1936,23 @@ class FederationV2Controller extends BaseApiController
         // Validate sender settings
         $senderSettings = $this->federationUserService->getUserSettings($userId);
         if (!($senderSettings['federation_optin'] ?? false)) {
-            return $this->respondWithError('SENDER_NOT_OPTED_IN', 'You must opt in to federation first', null, 403);
+            return $this->respondWithError('SENDER_NOT_OPTED_IN', __('api.fed_must_opt_in_first'), null, 403);
         }
         if (!($senderSettings['transactions_enabled_federated'] ?? false)) {
-            return $this->respondWithError('SENDER_TRANSACTIONS_DISABLED', 'You have not enabled federated transactions', null, 403);
+            return $this->respondWithError('SENDER_TRANSACTIONS_DISABLED', __('api.fed_transactions_not_enabled'), null, 403);
         }
 
         // Validate required fields
         $errors = [];
-        if (empty($receiverId)) $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Receiver ID is required', 'field' => 'receiver_id'];
-        if (empty($receiverTenantId)) $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Receiver tenant ID is required', 'field' => 'receiver_tenant_id'];
-        if ($amount === null || $amount === '') $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Amount is required', 'field' => 'amount'];
-        if (empty($description)) $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description is required', 'field' => 'description'];
+        if (empty($receiverId)) $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.fed_receiver_id_required'), 'field' => 'receiver_id'];
+        if (empty($receiverTenantId)) $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.fed_receiver_tenant_required'), 'field' => 'receiver_tenant_id'];
+        if ($amount === null || $amount === '') $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.fed_amount_required'), 'field' => 'amount'];
+        if (empty($description)) $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.fed_description_required'), 'field' => 'description'];
         if (!empty($errors)) return $this->respondWithErrors($errors);
 
         $amount = (int) $amount;
         if ($amount < 1 || $amount > 100) {
-            return $this->respondWithError('INVALID_AMOUNT', 'Amount must be between 1 and 100 whole hours', null, 400);
+            return $this->respondWithError('INVALID_AMOUNT', __('api.fed_amount_range'), null, 400);
         }
 
         $description = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
@@ -1879,7 +1971,7 @@ class FederationV2Controller extends BaseApiController
 
             // Prevent self-transactions
             if ($receiverIdInt === $userId && $receiverTenantIdInt === $tenantId) {
-                return $this->respondWithError('SELF_TRANSACTION', 'Cannot send a transaction to yourself', null, 400);
+                return $this->respondWithError('SELF_TRANSACTION', __('api.fed_no_self_transaction'), null, 400);
             }
 
             // Verify receiver exists, opted in, and accepts federated transactions
@@ -1890,22 +1982,22 @@ class FederationV2Controller extends BaseApiController
                  WHERE u.id = ? AND u.tenant_id = ? AND u.status = 'active' AND fus.federation_optin = 1",
                 [$receiverIdInt, $receiverTenantIdInt]
             );
-            if (!$receiver) return $this->respondWithError('RECIPIENT_NOT_FOUND', 'Recipient not found', null, 404);
+            if (!$receiver) return $this->respondWithError('RECIPIENT_NOT_FOUND', __('api.fed_recipient_not_found'), null, 404);
             if (!$receiver->transactions_enabled_federated) {
-                return $this->respondWithError('RECIPIENT_TRANSACTIONS_DISABLED', 'Recipient has not enabled federated transactions', null, 403);
+                return $this->respondWithError('RECIPIENT_TRANSACTIONS_DISABLED', __('api.fed_recipient_transactions_disabled'), null, 403);
             }
 
             // Partnership check
             $partnership = $this->federationPartnershipService->getPartnership($tenantId, $receiverTenantIdInt);
             if (!$partnership || $partnership['status'] !== 'active' || !($partnership['transactions_enabled'] ?? false)) {
-                return $this->respondWithError('TRANSACTIONS_NOT_ALLOWED', 'Partnership does not allow transactions', null, 403);
+                return $this->respondWithError('TRANSACTIONS_NOT_ALLOWED', __('api.fed_partnership_no_transactions'), null, 403);
             }
 
             DB::beginTransaction();
             $deducted = DB::update("UPDATE users SET balance = balance - ? WHERE id = ? AND balance >= ?", [$amount, $userId, $amount]);
             if ($deducted === 0) {
                 DB::rollBack();
-                return $this->respondWithError('INSUFFICIENT_BALANCE', 'Insufficient balance', null, 400);
+                return $this->respondWithError('INSUFFICIENT_BALANCE', __('api.fed_insufficient_balance'), null, 400);
             }
 
             DB::update("UPDATE users SET balance = balance + ? WHERE id = ?", [$amount, $receiverIdInt]);
@@ -1913,7 +2005,7 @@ class FederationV2Controller extends BaseApiController
             DB::insert(
                 "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at)
                  VALUES (?, ?, ?, ?, ?, 'completed', 1, ?, ?, NOW())",
-                [$receiverTenantIdInt, $userId, $receiverIdInt, $amount, $description, $tenantId, $receiverTenantIdInt]
+                [$tenantId, $userId, $receiverIdInt, $amount, $description, $tenantId, $receiverTenantIdInt]
             );
             $txId = (int) DB::getPdo()->lastInsertId();
             DB::commit();
@@ -1925,7 +2017,7 @@ class FederationV2Controller extends BaseApiController
         } catch (\Throwable $e) {
             DB::rollBack();
             error_log("FederationV2::sendTransaction internal error: " . $e->getMessage());
-            return $this->respondWithError('TRANSACTION_FAILED', 'Transaction failed', null, 500);
+            return $this->respondWithError('TRANSACTION_FAILED', __('api.fed_transaction_failed'), null, 500);
         }
     }
 
@@ -1956,7 +2048,7 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithError('PARTNER_NOT_FOUND', __('api.external_partner_not_found'), null, 404);
         }
         if (!($partner['allow_transactions'] ?? false)) {
-            return $this->respondWithError('TRANSACTIONS_NOT_ALLOWED', 'This partner does not allow transactions', null, 403);
+            return $this->respondWithError('TRANSACTIONS_NOT_ALLOWED', __('api.fed_partner_no_transactions'), null, 403);
         }
 
         DB::beginTransaction();
@@ -1965,7 +2057,7 @@ class FederationV2Controller extends BaseApiController
             $senderBalance = DB::selectOne("SELECT balance FROM users WHERE id = ? FOR UPDATE", [$userId]);
             if (!$senderBalance || $senderBalance->balance < $amount) {
                 DB::rollBack();
-                return $this->respondWithError('INSUFFICIENT_BALANCE', 'Insufficient balance', null, 400);
+                return $this->respondWithError('INSUFFICIENT_BALANCE', __('api.fed_insufficient_balance'), null, 400);
             }
 
             // Call external API BEFORE deducting — if it fails, nothing to rollback
@@ -1978,7 +2070,7 @@ class FederationV2Controller extends BaseApiController
 
             if (!($result['success'] ?? false)) {
                 DB::rollBack();
-                $errorMsg = $result['error'] ?? 'External partner rejected the transaction';
+                $errorMsg = $result['error'] ?? __('api.fed_external_partner_rejected');
                 return $this->respondWithError('EXTERNAL_TX_FAILED', $errorMsg, null, 422);
             }
 
@@ -2010,7 +2102,7 @@ class FederationV2Controller extends BaseApiController
         } catch (\Throwable $e) {
             DB::rollBack();
             error_log("FederationV2::sendExternalTransaction error: " . $e->getMessage());
-            return $this->respondWithError('TRANSACTION_FAILED', 'Transaction failed: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('TRANSACTION_FAILED', __('api.fed_transaction_failed'), null, 500);
         }
     }
 }

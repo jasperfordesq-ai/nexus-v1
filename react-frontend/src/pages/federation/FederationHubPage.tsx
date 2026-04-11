@@ -649,8 +649,8 @@ export default function FederationHubPage() {
         activity: [],
         stats: {
           partners_count: status.partnerships_count || 0,
-          messages_count: 0,
-          transactions_count: 0,
+          messages_count: status.messages_count || 0,
+          transactions_count: status.transactions_count || 0,
         },
       };
 
@@ -672,18 +672,9 @@ export default function FederationHubPage() {
         }
 
         if (activityRes.success && activityRes.data) {
-          const activityData = Array.isArray(activityRes.data)
+          newData.activity = Array.isArray(activityRes.data)
             ? activityRes.data
             : [];
-          newData.activity = activityData;
-
-          // Derive message and transaction counts from activity
-          newData.stats.messages_count = activityData.filter(
-            (a) => a.type === 'message_received' || a.type === 'message_sent'
-          ).length;
-          newData.stats.transactions_count = activityData.filter(
-            (a) => a.type === 'transaction_received' || a.type === 'transaction_sent'
-          ).length;
         }
       }
 

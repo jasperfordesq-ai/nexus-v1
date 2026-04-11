@@ -1151,6 +1151,20 @@ return [
     'fed_mark_read_failed'                 => 'Failed to mark message as read.',
     'fed_settings_update_failed'           => 'Failed to update settings. Please try again.',
     'fed_receiver_ids_required'            => 'receiver_id and receiver_tenant_id are required.',
+    'fed_must_opt_in_first'                => 'You must opt in to federation first.',
+    'fed_transactions_not_enabled'         => 'You have not enabled federated transactions.',
+    'fed_receiver_id_required'             => 'Receiver ID is required.',
+    'fed_receiver_tenant_required'         => 'Receiver tenant ID is required.',
+    'fed_amount_required'                  => 'Amount is required.',
+    'fed_description_required'             => 'Description is required.',
+    'fed_amount_range'                     => 'Amount must be between 1 and 100 whole hours.',
+    'fed_no_self_transaction'              => 'Cannot send a transaction to yourself.',
+    'fed_recipient_transactions_disabled'  => 'Recipient has not enabled federated transactions.',
+    'fed_partnership_no_transactions'      => 'Partnership does not allow transactions.',
+    'fed_insufficient_balance'             => 'Insufficient balance.',
+    'fed_transaction_failed'               => 'Transaction failed. Please try again.',
+    'fed_partner_no_transactions'          => 'This partner does not allow transactions.',
+    'fed_external_partner_rejected'        => 'External partner rejected the transaction.',
 
     // ============================================
     // USER-FACING — USERS / PROFILE (additional)
