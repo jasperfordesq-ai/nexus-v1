@@ -189,9 +189,64 @@ The Relying Party ID defaults to the registrable domain extracted from the reque
 
 ## Federation
 
+### User-facing federation endpoints (`/api/v2/federation/*`)
+
 | Endpoint | Controller |
 |----------|------------|
-| `/api/v2/federation/*` | FederationV2ApiController |
+| `/api/v2/federation/*` | `FederationV2Controller` (status, opt-in, partners, activity, members, listings, events, connections, settings) |
+
+### Inbound protocol endpoints
+
+All inbound protocol endpoints are authenticated by `FederationApiAuth`
+middleware (API key, HMAC-SHA256, or JWT — see `app/Core/FederationApiMiddleware.php`)
+and rate-limited at **200 req/min** per IP by the route group. Per-key hourly
+quotas are enforced via `federation_api_keys.rate_limit` (default 1000/hour).
+
+#### Komunitin (JSON:API) — 15 endpoints
+
+Serves NEXUS data in the Komunitin accounting protocol format
+(`application/vnd.api+json`). Spec: <https://github.com/community-exchange-network/komunitin>.
+
+Controller: `FederationKomunitinController`. All responses are JSON:API envelopes
+`{ data: { type, id, attributes, relationships, links }, included?, links?, meta? }`
+and all errors use `{ errors: [{ status, code, title, detail }] }`.
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET    | `/api/v2/federation/komunitin/currencies`                 | List tenant currencies (type=`currencies`) |
+| POST   | `/api/v2/federation/komunitin/currencies`                 | Create currency (NEXUS no-ops, returns 201) |
+| GET    | `/api/v2/federation/komunitin/{code}/currency`            | Single currency |
+| PATCH  | `/api/v2/federation/komunitin/{code}/currency`            | Update currency metadata (name, namePlural). Code is immutable |
+| GET    | `/api/v2/federation/komunitin/{code}/currency/settings`   | Currency settings (credit limits, payment defaults) |
+| PATCH  | `/api/v2/federation/komunitin/{code}/currency/settings`   | Update currency settings |
+| GET    | `/api/v2/federation/komunitin/{code}/accounts`            | Cursor-paginated account list. Filters: `filter[code]`, `filter[tag]` |
+| POST   | `/api/v2/federation/komunitin/{code}/accounts`            | Returns existing federated account or 403 (`Insufficient Scope`) |
+| GET    | `/api/v2/federation/komunitin/{code}/accounts/{id}`       | Single account (type=`accounts`) |
+| PATCH  | `/api/v2/federation/komunitin/{code}/accounts/{id}`       | Update attributes. `balance` is read-only (managed by transfers) |
+| GET    | `/api/v2/federation/komunitin/{code}/transfers`           | Cursor-paginated transfers. Filters: `filter[account]`, `filter[state]`, `filter[after]`, `filter[before]` |
+| GET    | `/api/v2/federation/komunitin/{code}/transfers/{id}`      | Single transfer (type=`transfers`) |
+| POST   | `/api/v2/federation/komunitin/{code}/transfers`           | Create transfer. Requires `data.relationships.payer`, `payee`, `data.attributes.amount` (minor units, ≤99999999). Uses atomic `UPDATE … WHERE balance >= amount` to prevent overdraw. Returns 403 `Insufficient balance` otherwise |
+| PATCH  | `/api/v2/federation/komunitin/{code}/transfers/{id}`      | Update state — `committed` / `pending` / `rejected` |
+| DELETE | `/api/v2/federation/komunitin/{code}/transfers/{id}`      | Delete (only `pending` transfers; committed returns 400) |
+
+**Pagination:** `page[size]` (max 100, default 25) and `page[after]` (cursor = offset).
+**Sort:** `sort=-created` (default), `created`, `updated`, `amount`; prefix `-` for descending.
+**Auth:** Bearer API key via `Authorization: Bearer <key>` **or** HMAC via
+`X-Federation-Platform-ID`, `X-Federation-Timestamp`, `X-Federation-Nonce`,
+`X-Federation-Signature` (SHA-256 of `METHOD\nPATH\nTIMESTAMP\nNONCE\nBODY`).
+Replay protection: nonce is cached for the 5-minute timestamp window; duplicate
+nonce within that window returns 401.
+
+#### Credit Commons — 11 endpoints
+
+Controller: `FederationCreditCommonsController`. See `routes/api.php:2133` for the
+full route map (`/v2/federation/cc/*`).
+
+### Outbound federation
+
+Outbound calls to external partners are dispatched by
+`FederationExternalApiClient` (retries, circuit breaker, audit logging).
+See [FEDERATION.md](FEDERATION.md) for full architecture.
 
 ## Admin API
 
