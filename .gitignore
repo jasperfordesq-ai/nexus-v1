@@ -25,6 +25,8 @@ composer.phar
 !/docs/API_REFERENCE.md
 !/docs/FEDERATION.md
 !/docs/OPEN_SOURCE_ANNOUNCEMENT_EMAIL.md
+!/docs/OPEN_SOURCE_ANNOUNCEMENT_EMAIL.html
+!/docs/OPEN_SOURCE_ANNOUNCEMENT_EMAIL.pdf
 
 # ─── AI Assistant Config (contains sensitive project context) ─────────────────
 CLAUDE.md
@@ -62,6 +64,7 @@ CLAUDE.md
 !/scripts/purge-cloudflare-cache.sh
 !/scripts/refresh-schema-dump.sh
 !/scripts/check-i18n.sh
+!/scripts/generate-announcement-pdf.mjs
 !/scripts/check-i18n-drift.mjs
 !/scripts/recache-prerender.sh
 !/scripts/prerender-tenants.sh
@@ -136,6 +139,7 @@ dump.sql
 *.sql.gz
 *.rar
 *.pdf
+!/docs/OPEN_SOURCE_ANNOUNCEMENT_EMAIL.pdf
 
 # ─── Temporary Files ─────────────────────────────────────────────────────────
 *.tmp
