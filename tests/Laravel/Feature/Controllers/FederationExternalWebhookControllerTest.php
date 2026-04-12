@@ -146,22 +146,25 @@ class FederationExternalWebhookControllerTest extends TestCase
             ])),
             '{not-valid-json'
         );
-        // Controller returns 400 INVALID_REQUEST for invalid JSON
-        $this->assertSame(400, $response->getStatusCode());
+        // Auth is enforced before the body is parsed — an unauthenticated caller
+        // must not learn whether their body would have parsed, so 401 is correct.
+        $this->assertSame(401, $response->getStatusCode());
     }
 
     /**
-     * Missing 'event' field in an otherwise valid JSON body -> 400 INVALID_REQUEST.
+     * Missing 'event' field -> 401 AUTH_FAILED (auth is enforced before any
+     * body inspection, so unauthenticated callers cannot probe event-shape
+     * validation errors).
      */
-    public function test_missing_event_field_yields_400(): void
+    public function test_missing_event_field_yields_401_without_auth(): void
     {
         $response = $this->apiPost(
             '/v2/federation/external/webhooks/receive',
             ['data' => ['foo' => 'bar']] // no 'event'
         );
-        $this->assertSame(400, $response->status());
+        $this->assertSame(401, $response->status());
         $body = $response->json();
-        $this->assertSame('INVALID_REQUEST', $body['errors'][0]['code'] ?? null);
+        $this->assertSame('AUTH_FAILED', $body['errors'][0]['code'] ?? null);
     }
 
     /**

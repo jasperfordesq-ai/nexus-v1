@@ -13,8 +13,6 @@ use App\Services\BlogService;
  * BlogPublicController — Eloquent-powered public blog endpoints.
  *
  * Fully migrated from legacy delegation to Eloquent via BlogService.
- * This controller mirrors BlogController for routes that may be
- * registered under a different prefix.
  */
 class BlogPublicController extends BaseApiController
 {

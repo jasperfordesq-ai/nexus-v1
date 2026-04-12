@@ -74,25 +74,17 @@ class FederationExternalWebhookController extends BaseApiController
         }
         RateLimiter::hit($rateLimitKey, 60);
 
-        // ---- Parse body ----
+        // ---- Read raw body (needed for HMAC verification) ----
         $rawBody = $request->getContent();
         if (empty($rawBody)) {
             return $this->respondWithError('INVALID_REQUEST', 'Empty request body', null, 400);
         }
 
-        $payload = json_decode($rawBody, true, 10);
-        if (!is_array($payload)) {
-            return $this->respondWithError('INVALID_REQUEST', 'Invalid JSON', null, 400);
-        }
-
-        $event = $payload['event'] ?? null;
-        $data = $payload['data'] ?? [];
-
-        if (empty($event)) {
-            return $this->respondWithError('INVALID_REQUEST', 'Missing event type', null, 400);
-        }
-
-        // ---- Identify the external partner ----
+        // ---- Authenticate BEFORE parsing or interpreting the body ----
+        // Parsing first would leak the difference between "bad JSON", "missing event",
+        // and "unknown event" to unauthenticated callers. Auth gates all payload
+        // inspection behind a valid API key or HMAC signature.
+        //
         // Two auth methods supported:
         //   1. API key via Authorization: Bearer {key} (simple, preferred)
         //   2. HMAC signature via X-Webhook-Signature header (webhook-style)
@@ -104,6 +96,19 @@ class FederationExternalWebhookController extends BaseApiController
 
         if ($partner->status !== 'active') {
             return $this->respondWithError('PARTNER_INACTIVE', 'Partner is not active', null, 403);
+        }
+
+        // ---- Parse body (post-auth) ----
+        $payload = json_decode($rawBody, true, 10);
+        if (!is_array($payload)) {
+            return $this->respondWithError('INVALID_REQUEST', 'Invalid JSON', null, 400);
+        }
+
+        $event = $payload['event'] ?? null;
+        $data = $payload['data'] ?? [];
+
+        if (empty($event)) {
+            return $this->respondWithError('INVALID_REQUEST', 'Missing event type', null, 400);
         }
 
         // ---- Normalize payload through protocol adapter ----

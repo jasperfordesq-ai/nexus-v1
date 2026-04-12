@@ -34,6 +34,16 @@ class StripeWebhookController extends BaseApiController
         $payload = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature', '');
 
+        // Missing signature header or empty body is a client error, not a server fault.
+        if ($sigHeader === '' || $payload === '') {
+            return $this->respondWithError(
+                'INVALID_SIGNATURE',
+                __('api.webhook_signature_failed'),
+                null,
+                400
+            );
+        }
+
         // Verify webhook signature
         try {
             $event = StripeService::constructWebhookEvent($payload, $sigHeader);

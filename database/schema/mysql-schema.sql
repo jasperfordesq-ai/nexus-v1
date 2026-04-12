@@ -5296,7 +5296,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -8746,10 +8746,12 @@ CREATE TABLE `stripe_webhook_events` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `event_id` varchar(255) NOT NULL,
   `event_type` varchar(100) NOT NULL,
+  `status` enum('processing','processed','failed') NOT NULL DEFAULT 'processing',
   `processed_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_event_id` (`event_id`),
-  KEY `idx_event_type` (`event_type`)
+  KEY `idx_event_type` (`event_type`),
+  KEY `stripe_webhook_events_status_index` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `super_admin_audit_log`;
@@ -11224,7 +11226,8 @@ INSERT INTO `laravel_migrations` VALUES
 (75,'2026_04_11_200001_create_federation_cc_entries_table',24),
 (76,'2026_04_12_100000_create_federated_identities_table',25),
 (77,'2026_04_12_110000_add_allow_flags_to_federation_external_partners',25),
-(78,'2026_04_12_120000_create_federation_shadow_tables',25);
+(78,'2026_04_12_120000_create_federation_shadow_tables',25),
+(79,'2026_04_12_130000_add_status_to_stripe_webhook_events',26);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
