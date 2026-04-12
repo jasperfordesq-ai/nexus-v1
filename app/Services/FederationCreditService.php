@@ -210,9 +210,15 @@ class FederationCreditService
                 return ['success' => false, 'error' => 'Unauthorized: tenant is not party to this agreement'];
             }
 
+            // Re-assert tenant membership in the UPDATE itself — the SELECT
+            // above checked ownership, but between check and update the row
+            // could be changed. Belt-and-suspenders: the UPDATE will only fire
+            // if the current tenant is still a party to the agreement.
             $updated = DB::update(
-                "UPDATE federation_credit_agreements SET status = ?, updated_at = NOW() WHERE id = ?",
-                [$status, $agreementId]
+                "UPDATE federation_credit_agreements
+                    SET status = ?, updated_at = NOW()
+                  WHERE id = ? AND (from_tenant_id = ? OR to_tenant_id = ?)",
+                [$status, $agreementId, $tenantId, $tenantId]
             );
 
             if ($updated === 0) {
