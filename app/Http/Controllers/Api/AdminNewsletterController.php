@@ -2373,7 +2373,7 @@ class AdminNewsletterController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             Log::error('Newsletter send failed', ['id' => $id, 'error' => $e->getMessage()]);
-            return $this->respondWithError('SEND_FAILED', $e->getMessage());
+            return $this->respondWithError('SEND_FAILED', __('api.newsletter_send_failed'));
         }
     }
 

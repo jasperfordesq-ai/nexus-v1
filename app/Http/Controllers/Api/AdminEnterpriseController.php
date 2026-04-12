@@ -1131,7 +1131,8 @@ class AdminEnterpriseController extends BaseApiController
                 'message' => __('api_controllers_1.admin_enterprise.data_export_generated'),
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('EXPORT_FAILED', __('api_controllers_1.admin_enterprise.data_export_failed') . ': ' . $e->getMessage(), null, 500);
+            Log::error('GDPR export failed', ['id' => $id, 'error' => $e->getMessage()]);
+            return $this->respondWithError('EXPORT_FAILED', __('api_controllers_1.admin_enterprise.data_export_failed'), null, 500);
         }
     }
 
@@ -1193,7 +1194,8 @@ class AdminEnterpriseController extends BaseApiController
             $created = DB::selectOne("SELECT * FROM consent_types WHERE id = ?", [$newId]);
             return $this->respondWithData($created ? (array) $created : ['id' => $newId], null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('CREATE_FAILED', 'Failed to create consent type: ' . $e->getMessage(), null, 500);
+            Log::error('Create consent type failed', ['error' => $e->getMessage()]);
+            return $this->respondWithError('CREATE_FAILED', 'Failed to create consent type', null, 500);
         }
     }
 

@@ -280,6 +280,7 @@ return [
     'rows_array_required'                  => 'An array of subscriber rows is required',
     'newsletter_already_sent'              => 'Newsletter has already been sent',
     'newsletter_currently_sending'         => 'Newsletter is currently being sent',
+    'newsletter_send_failed'               => 'Failed to send newsletter. Please try again or check logs.',
     'newsletter_duplicated'                => 'Newsletter duplicated successfully',
     'ab_winner_must_be_a_or_b'             => 'Winner must be "a" or "b"',
     'no_ab_testing'                        => 'Newsletter does not have A/B testing enabled',

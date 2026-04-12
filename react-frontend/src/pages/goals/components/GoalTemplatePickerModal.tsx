@@ -110,7 +110,7 @@ export function GoalTemplatePickerModal({
       }
     } catch (err) {
       logError('Failed to load goal templates', err);
-      setError('Failed to load templates. Please try again.');
+      setError(t('template_picker.load_error'));
     } finally {
       setIsLoading(false);
     }
@@ -174,13 +174,13 @@ export function GoalTemplatePickerModal({
                 startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
                 onPress={loadTemplates}
               >
-                Try Again
+                {t('template_picker.try_again')}
               </Button>
             </div>
           ) : templates.length === 0 ? (
             <div className="text-center py-8">
               <Layers className="w-12 h-12 text-theme-subtle mx-auto mb-3" aria-hidden="true" />
-              <p className="text-theme-muted">No templates available yet.</p>
+              <p className="text-theme-muted">{t('template_picker.none_available')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -288,7 +288,7 @@ export function GoalTemplatePickerModal({
               {filteredTemplates.length === 0 && (
                 <div className="text-center py-6">
                   <Sparkles className="w-8 h-8 text-theme-subtle mx-auto mb-2" aria-hidden="true" />
-                  <p className="text-sm text-theme-muted">No templates in this category.</p>
+                  <p className="text-sm text-theme-muted">{t('template_picker.none_in_category')}</p>
                 </div>
               )}
             </div>

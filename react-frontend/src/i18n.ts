@@ -50,10 +50,15 @@ i18n
 /** Languages that use right-to-left script direction. */
 const RTL_LANGUAGES = new Set(['ar']);
 
-// Keep <html lang="..."> and dir in sync with the active language for accessibility & SEO
-i18n.on('languageChanged', (lng: string) => {
+const applyLangAttributes = (lng: string) => {
   document.documentElement.lang = lng;
   document.documentElement.dir = RTL_LANGUAGES.has(lng) ? 'rtl' : 'ltr';
-});
+};
+
+// Keep <html lang="..."> and dir in sync with the active language for accessibility & SEO
+i18n.on('languageChanged', applyLangAttributes);
+
+// Apply on initial load so first paint is correct (before any languageChanged fires)
+i18n.on('initialized', () => applyLangAttributes(i18n.language || 'en'));
 
 export default i18n;

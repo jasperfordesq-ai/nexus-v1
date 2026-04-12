@@ -290,7 +290,7 @@ function ComposeToolbar({ isDisabled }: { isDisabled?: boolean }) {
           color={isLink ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={insertLink}
-          aria-label={isLink ? 'Remove Link' : 'Insert Link'}
+          aria-label={isLink ? t('compose.aria_remove_link') : t('compose.aria_insert_link')}
           aria-pressed={isLink}
           className="min-w-9 w-9 h-9"
         >

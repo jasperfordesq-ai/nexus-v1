@@ -391,7 +391,9 @@
   "hours_display_other": "{{count}} hours",
   "compose": {
     "placeholder_url": "https://example.com",
-    "placeholder_hours": "1"
+    "placeholder_hours": "1",
+    "aria_insert_link": "Insert link",
+    "aria_remove_link": "Remove link"
   },
   "toast": {
     "aria_notifications": "Notifications",

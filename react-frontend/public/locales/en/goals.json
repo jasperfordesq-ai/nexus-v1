@@ -66,5 +66,11 @@
     "retry": "Retry",
     "no_activity": "No activity recorded yet.",
     "progress_aria": "Progress: {{percent}}%"
+  },
+  "template_picker": {
+    "load_error": "Failed to load templates. Please try again.",
+    "try_again": "Try again",
+    "none_available": "No templates available yet.",
+    "none_in_category": "No templates in this category."
   }
 }

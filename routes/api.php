@@ -1684,8 +1684,13 @@ Route::middleware('throttle:30,1')->group(function () {
     Route::post('/totp/verify', [\App\Http\Controllers\Api\TotpController::class, 'verify']);
     Route::post('/webauthn/auth-challenge', [\App\Http\Controllers\Api\WebAuthnController::class, 'authChallenge']);
     Route::post('/webauthn/auth-verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'authVerify']);
+});
+// Password reset endpoints — stricter throttle to mitigate email enumeration/spam (5/min per IP)
+Route::middleware('throttle:5,1')->group(function () {
     Route::post('/auth/forgot-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'forgotPassword']);
     Route::post('/auth/reset-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'resetPassword']);
+});
+Route::middleware('throttle:30,1')->group(function () {
     Route::post('/auth/verify-email', [\App\Http\Controllers\Api\EmailVerificationController::class, 'verifyEmail']);
     Route::post('/auth/resend-verification', [\App\Http\Controllers\Api\EmailVerificationController::class, 'resendVerification']);
     Route::post('/auth/resend-verification-by-email', [\App\Http\Controllers\Api\EmailVerificationController::class, 'resendVerificationByEmail']);
@@ -2171,13 +2176,14 @@ Route::middleware(['federation.api', 'throttle:200,1'])->group(function () {
     // --- Nexus Native V2 inbound entity push (REST) ---
     // Partners using the Nexus protocol POST entities here; persistence is
     // handled downstream by dedicated listeners (see FederationNativeIngestController).
-    Route::post('/v2/federation/reviews', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'reviews']);
-    Route::post('/v2/federation/listings', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'listings']);
-    Route::post('/v2/federation/events', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'events']);
-    Route::post('/v2/federation/groups', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'groups']);
-    Route::post('/v2/federation/connections', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'connections']);
-    Route::post('/v2/federation/volunteering', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'volunteering']);
-    Route::post('/v2/federation/members/sync', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'membersSync']);
+    // Namespaced under /ingest/ to avoid colliding with user-facing FederationV2Controller routes
+    Route::post('/v2/federation/ingest/reviews', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'reviews']);
+    Route::post('/v2/federation/ingest/listings', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'listings']);
+    Route::post('/v2/federation/ingest/events', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'events']);
+    Route::post('/v2/federation/ingest/groups', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'groups']);
+    Route::post('/v2/federation/ingest/connections', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'connections']);
+    Route::post('/v2/federation/ingest/volunteering', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'volunteering']);
+    Route::post('/v2/federation/ingest/members/sync', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'membersSync']);
 });
 
 // ============================================
