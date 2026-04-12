@@ -93,14 +93,19 @@ export function usePushNotifications(userId: number | null) {
     }
   }, []);
 
-  // Handle notification tap — navigate to the linked page
+  // Handle notification tap — navigate to the linked page.
+  // The URL comes from notification.data which is attacker-influenceable if
+  // the push payload is ever tampered with or crafted via a rogue integration.
+  // Only accept same-origin, non-protocol-prefixed paths (e.g. "/dashboard"),
+  // never absolute URLs, schemes, or protocol-relative paths.
   const handleNotificationTap = useCallback(
     (notification: PushNotificationSchema) => {
-      const url = notification.data?.url;
-      if (url) {
-        // Navigate within the app using React Router
-        navigate(tenantPath(url));
-      }
+      const raw = notification.data?.url;
+      if (typeof raw !== 'string' || raw.length === 0) return;
+      // Reject anything that isn't a same-origin path. This blocks
+      // "https://evil.com", "//evil.com", "javascript:...", "mailto:...".
+      if (!raw.startsWith('/') || raw.startsWith('//')) return;
+      navigate(tenantPath(raw));
     },
     [navigate, tenantPath]
   );

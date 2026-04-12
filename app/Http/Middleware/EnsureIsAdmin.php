@@ -33,11 +33,15 @@ class EnsureIsAdmin
             ]);
         }
 
+        // NB: 'broker' (community moderator) is intentionally NOT admin-equivalent.
+        // Brokers have their own routes; allowing them here would let a moderator
+        // hit every admin endpoint (user suspend, tenant config, etc.) just by
+        // guessing the URL.
         $isAdmin = $user->is_admin
             || $user->is_super_admin
             || $user->is_tenant_super_admin
             || $user->is_god
-            || in_array($user->role ?? '', ['admin', 'tenant_admin', 'super_admin', 'broker']);
+            || in_array($user->role ?? '', ['admin', 'tenant_admin', 'super_admin'], true);
 
         if (!$isAdmin) {
             return response()->json([

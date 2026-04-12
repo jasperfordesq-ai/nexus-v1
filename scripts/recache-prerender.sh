@@ -122,8 +122,10 @@ for DOMAIN in "${DOMAINS[@]}"; do
         SITEMAP_XML=$(curl -s "https://${DOMAIN}/sitemap.xml" 2>/dev/null)
 
         if [ -n "$SITEMAP_XML" ]; then
-            # Extract URLs from sitemap XML (grep for <loc> tags)
-            SITEMAP_URLS=$(echo "$SITEMAP_XML" | grep -oP '(?<=<loc>)[^<]+' | head -200)
+            # Extract URLs from sitemap XML (grep for <loc> tags) and strip
+            # query strings + fragments so tracking params (utm_*, fbclid,
+            # etc.) don't each produce a separately-cached prerender entry.
+            SITEMAP_URLS=$(echo "$SITEMAP_XML" | grep -oP '(?<=<loc>)[^<]+' | sed 's/[?#].*$//' | sort -u | head -200)
             URL_COUNT=$(echo "$SITEMAP_URLS" | wc -l)
 
             echo -e "  ${CYAN}[INFO]${NC} Found $URL_COUNT URLs in sitemap, recaching..."

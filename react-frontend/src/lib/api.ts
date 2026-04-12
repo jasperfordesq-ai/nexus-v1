@@ -278,7 +278,12 @@ class ApiClient {
    * Generate a cache key for request deduplication
    */
   private getCacheKey(endpoint: string, options: RequestOptions): string {
-    return `${options.method || 'GET'}:${endpoint}`;
+    // Include tenant id so an in-flight GET dispatched under tenant A
+    // cannot be reused to serve a second caller under tenant B after a
+    // rapid tenant switch. Without this, identical URLs share a cache
+    // entry across tenants and leak the wrong tenant's data.
+    const tenantId = tokenManager.getTenantId() ?? '-';
+    return `${options.method || 'GET'}:${endpoint}#t=${tenantId}`;
   }
 
   /**
