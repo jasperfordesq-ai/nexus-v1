@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Project NEXUS V1.5 — Open Source Announcement</title>
+<style>
+  @page { size: A4; margin: 22mm 20mm; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: "Georgia", "Cambria", "Times New Roman", "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", serif;
+    font-size: 13pt;
+    line-height: 1.65;
+    color: #1f2937;
+    margin: 0;
+  }
+  h1, h2, h3 {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    color: #312e81;
+    line-height: 1.25;
+    page-break-after: avoid;
+  }
+  h1 {
+    font-size: 30pt;
+    margin: 0 0 8pt;
+    letter-spacing: -0.5px;
+  }
+  .subtitle {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 15pt;
+    color: #6366f1;
+    font-weight: 600;
+    margin: 0 0 18pt;
+  }
+  h2 {
+    font-size: 20pt;
+    margin: 28pt 0 10pt;
+    padding-bottom: 6pt;
+    border-bottom: 2pt solid #c7d2fe;
+  }
+  h3 {
+    font-size: 15pt;
+    margin: 18pt 0 8pt;
+    color: #4338ca;
+  }
+  p { margin: 0 0 12pt; }
+  ul { padding-left: 22pt; margin: 0 0 14pt; list-style: none; }
+  li { margin-bottom: 10pt; position: relative; }
+  li .ic {
+    display: inline-block;
+    width: 22pt;
+    margin-left: -22pt;
+    font-size: 14pt;
+    font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+  }
+  .tech-list li { padding-left: 0; }
+  .tech-list li::before {
+    content: "▸";
+    color: #6366f1;
+    display: inline-block;
+    width: 14pt;
+    margin-left: -14pt;
+    font-weight: bold;
+  }
+  strong { color: #111827; }
+  em { color: #4b5563; }
+  a { color: #4338ca; text-decoration: none; }
+  hr {
+    border: 0;
+    border-top: 1pt solid #e5e7eb;
+    margin: 22pt 0;
+  }
+  .lede {
+    font-size: 15pt;
+    line-height: 1.55;
+    color: #111827;
+    border-left: 4pt solid #6366f1;
+    padding: 4pt 0 4pt 16pt;
+    margin: 14pt 0 22pt;
+    background: #f5f3ff;
+  }
+  .meta {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 11pt;
+    color: #6b7280;
+    margin-bottom: 20pt;
+  }
+  .meta strong { color: #111827; }
+  .callout {
+    background: #eef2ff;
+    border: 1pt solid #c7d2fe;
+    border-radius: 6pt;
+    padding: 14pt 18pt;
+    margin: 18pt 0;
+  }
+  .callout p:last-child { margin-bottom: 0; }
+  .footer-signoff {
+    margin-top: 32pt;
+    padding-top: 16pt;
+    border-top: 1pt solid #e5e7eb;
+    font-size: 11pt;
+    color: #6b7280;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+  }
+  .quote {
+    font-size: 16pt;
+    font-style: italic;
+    color: #4338ca;
+    text-align: center;
+    margin: 22pt 0;
+    line-height: 1.45;
+  }
+  .tag-row { margin: 4pt 0 16pt; }
+  .tag {
+    display: inline-block;
+    background: #ede9fe;
+    color: #4c1d95;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 10.5pt;
+    font-weight: 600;
+    padding: 3pt 10pt;
+    margin: 0 4pt 4pt 0;
+    border-radius: 999pt;
+  }
+  code {
+    font-family: "SF Mono", Consolas, "Courier New", monospace;
+    font-size: 11.5pt;
+    background: #f3f4f6;
+    padding: 1pt 5pt;
+    border-radius: 3pt;
+  }
+</style>
+</head>
+<body>
+
+<h1>Project NEXUS V1.5 is Now Open Source</h1>
+<p class="subtitle">Building the Future of Community Exchange — Together</p>
+
+<div class="meta">
+  <strong>Date:</strong> 12 April 2026 &nbsp;·&nbsp;
+  <strong>Status:</strong> Ready to send &nbsp;·&nbsp;
+  <strong>License:</strong> AGPL-3.0-or-later
+</div>
+
+<div class="tag-row">
+  <span class="tag">Marketplace</span>
+  <span class="tag">Donations</span>
+  <span class="tag">Identity Verification</span>
+  <span class="tag">Federation · Nexus + Komunitin + Credit Commons + TimeOverflow</span>
+  <span class="tag">11 Languages · RTL</span>
+  <span class="tag">Build-Time SEO</span>
+  <span class="tag">Stripe Payments</span>
+  <span class="tag">Passkeys · CSP · CORS</span>
+</div>
+
+<p>Dear Community Builders, Developers, and Changemakers,</p>
+
+<p>Today marks a pivotal moment in our mission to reimagine how communities connect, exchange, and thrive.</p>
+
+<div class="lede">
+  <p><strong>We're releasing Project NEXUS V1.5 to the world — fully open source, built for everyone.</strong> This updated announcement covers the major work shipped through Spring 2026: a standalone Marketplace, Donations, Identity Verification, a four-protocol Federation layer (Nexus, Komunitin, Credit Commons, TimeOverflow), 11 languages with right-to-left support, a build-time SEO pipeline, and a hardened payments and security layer.</p>
+</div>
+
+<h2>What is Project NEXUS?</h2>
+<p>Project NEXUS is an enterprise-grade, multi-tenant community platform that puts people before profit. At its core is timebanking — a radical idea that every hour of your time is worth exactly one hour of someone else's, regardless of what you do.</p>
+<p>But NEXUS goes far beyond timebanking. It is a complete ecosystem for building connected, engaged, and empowered communities — <strong>and we're building the infrastructure to connect those communities across borders.</strong></p>
+
+<h2>What's Inside V1.5?</h2>
+<p>At a glance: <strong>a timebanking engine, real-time messaging, AI-powered matching, multi-tenant architecture, a four-protocol federation layer (Nexus, Komunitin, Credit Commons, TimeOverflow), a Stripe payments layer (subscriptions, donations, marketplace payouts, identity verification), gamification, and a complete social platform in 11 languages</strong> — all production-ready and fully Dockerized.</p>
+
+<h3>Core Platform</h3>
+<ul>
+  <li><span class="ic">⏰</span><strong>Timebanking Engine</strong> — full credit exchange system with wallet, transactions, and broker controls.</li>
+  <li><span class="ic">🏢</span><strong>Multi-Tenancy</strong> — host unlimited communities on a single platform, each with its own branding and configuration.</li>
+  <li><span class="ic">🎯</span><strong>Smart Matching</strong> — AI-powered matching with semantic embeddings, collaborative filtering, availability scheduling, and learned preferences.</li>
+  <li><span class="ic">💬</span><strong>Real-Time Messaging</strong> — private conversations with Pusher WebSocket integration and live presence.</li>
+  <li><span class="ic">📱</span><strong>Progressive Web App + Native Mobile App</strong> — install as a PWA on any device, or deploy natively via Capacitor (iOS &amp; Android).</li>
+  <li><span class="ic">🌐</span><strong>Federation</strong> — connect multiple communities into a network for cross-community exchange, shared listings, events, and messaging.</li>
+</ul>
+
+<h3>Member Experience</h3>
+<ul>
+  <li><span class="ic">📋</span><strong>Service Listings</strong> — post offers and requests, browse and smart-match listings.</li>
+  <li><span class="ic">🛒</span><strong>Marketplace</strong> — a standalone classifieds module with Stripe Connect payouts, orders, seller profiles, and AI-powered reply suggestions.</li>
+  <li><span class="ic">💳</span><strong>Donations</strong> — one-off and recurring donations via Stripe, with full dashboards and receipts for organisations.</li>
+  <li><span class="ic">🪪</span><strong>Identity Verification</strong> — optional Stripe Identity flow (document + selfie + name/DOB matching) with a verified-member badge.</li>
+  <li><span class="ic">🔄</span><strong>Exchange Workflow</strong> — structured service exchange lifecycle with broker approval.</li>
+  <li><span class="ic">👥</span><strong>Group Exchanges</strong> — bulk community service exchanges.</li>
+  <li><span class="ic">📰</span><strong>Social Feed</strong> — posts, comments, likes, polls, hashtags, voice messages, media attachments, link previews, and @mentions.</li>
+  <li><span class="ic">📸</span><strong>Stories</strong> — ephemeral 24-hour photo and video stories with reactions, polls, and highlights.</li>
+  <li><span class="ic">🎉</span><strong>Presence, Events &amp; Groups</strong> — real-time online/offline status, community gatherings, and interest-based groups.</li>
+  <li><span class="ic">🤝</span><strong>Connections &amp; Members Directory</strong> — follow, connect, browse, filter, and discover.</li>
+  <li><span class="ic">🏆</span><strong>Gamification</strong> — verification badges, journeys, XP, leaderboards, achievements, challenges, streaks, XP shop, community dashboard, and seasonal competitions.</li>
+  <li><span class="ic">💡</span><strong>Goals, Impact &amp; Ideation</strong> — personal goals with mentoring, community impact tracking, and innovation challenges with campaigns and voting.</li>
+  <li><span class="ic">🙋</span><strong>Volunteering</strong> — opportunities, shifts, hours, check-ins, expenses, certificates, wellbeing monitoring, and emergency alerts — <strong>now with a volunteer organisation time-credit wallet (member deposits, admin adjustments, and time-credit payouts to volunteers on approved hours).</strong></li>
+  <li><span class="ic">💼</span><strong>Jobs, Organisations &amp; Sub-Accounts</strong> — full recruitment with alerts and analytics, company profiles with org wallets, and household/family accounts.</li>
+  <li><span class="ic">⭐</span><strong>Reviews, Endorsements, Polls, Skills &amp; Availability</strong> — the trust, discovery, and scheduling primitives a community needs.</li>
+</ul>
+
+<h3>Content &amp; Communication</h3>
+<ul>
+  <li><span class="ic">📝</span><strong>Blog, Resources, Help Center &amp; Custom Pages</strong> — a full content layer for each tenant.</li>
+  <li><span class="ic">📰</span><strong>Newsletter System</strong> — email campaigns with A/B testing, smart segments, geo targeting, recurring sends, templates, send-time optimisation, and full open/click analytics.</li>
+  <li><span class="ic">🤖</span><strong>AI Chat</strong> — OpenAI-powered assistant for platform guidance.</li>
+  <li><span class="ic">📄</span><strong>Legal Hub</strong> — versioned legal documents with acceptance gates and an audit trail.</li>
+  <li><span class="ic">🏥</span><strong>Impact Reports &amp; Social Prescribing</strong> — SROI analysis, member outcome reports, and tooling for community health integration workflows.</li>
+</ul>
+
+<h3>Trust &amp; Reputation</h3>
+<ul>
+  <li><span class="ic">✅</span><strong>Verification Badges &amp; NexusScore</strong> — member verification indicators and proprietary reputation scoring.</li>
+  <li><span class="ic">📊</span><strong>Personal Insights Dashboard</strong> — individual engagement metrics, hours given/received, skills breakdown, and personalised recommendations.</li>
+  <li><span class="ic">🛡️</span><strong>Safeguarding &amp; CRM</strong> — flagged-content review workflow, incident reporting, safeguarding assignment tracking, and admin contact management with notes, tasks, tags, and timelines.</li>
+</ul>
+
+<h3>AI &amp; Recommendation Engine</h3>
+<ul>
+  <li><span class="ic">🔍</span><strong>Semantic Search</strong> — Meilisearch-powered full-text search with synonyms, custom ranking, and per-tenant isolation.</li>
+  <li><span class="ic">🧠</span><strong>Collaborative Filtering &amp; Semantic Embeddings</strong> — OpenAI-powered content matching for listings, members, and requests.</li>
+  <li><span class="ic">📈</span><strong>EdgeRank Feed, MatchRank &amp; CommunityRank</strong> — Bayesian quality scoring with Wilson confidence intervals.</li>
+  <li><span class="ic">🔁</span><strong>Group Recommendations &amp; Match Learning</strong> — trending, affinity-based discovery, and a feedback loop that improves recommendations over time.</li>
+  <li><span class="ic">📊</span><strong>Algorithm Health Dashboard</strong> — live admin monitoring and tuning of every ranking system.</li>
+</ul>
+
+<h3>Modern Tech Stack</h3>
+<ul class="tech-list">
+  <li>Frontend: React 18 + TypeScript + HeroUI + Tailwind CSS 4.</li>
+  <li>Backend: Laravel 12 + PHP 8.2+.</li>
+  <li>Database: MariaDB 10.11.</li>
+  <li>Search: Meilisearch v1.7.</li>
+  <li>AI: OpenAI <code>text-embedding-3-small</code>.</li>
+  <li>Real-Time: Pusher WebSockets, Firebase Cloud Messaging.</li>
+  <li>Infrastructure: Docker-ready, Redis caching, full PWA + Capacitor native app support.</li>
+  <li>API: OpenAPI 3.0 specification with Swagger UI docs.</li>
+</ul>
+
+<h3>Built for Production</h3>
+<ul>
+  <li><span class="ic">🔐</span><strong>Enterprise security</strong> — CSRF, rate limiting, TOTP 2FA, WebAuthn passkeys, CSP nonces, a CORS allowlist, Form Request validation, email verification gates, and invite-code registration.</li>
+  <li><span class="ic">💳</span><strong>Stripe payments layer</strong> — subscriptions, donations, marketplace (Connect), and identity verification, with idempotent webhook handling and deep money-flow test coverage.</li>
+  <li><span class="ic">🛡️</span><strong>GDPR compliance suite</strong> — data requests, consent management, cookie consent, breach tracking, and a full audit log.</li>
+  <li><span class="ic">🚨</span><strong>Fraud &amp; abuse detection</strong> — automated suspicious activity alerts and content moderation.</li>
+  <li><span class="ic">🏢</span><strong>Enterprise RBAC</strong> — role-based access control across 13+ modules with a full permission matrix.</li>
+  <li><span class="ic">♿</span><strong>WCAG 2.1 AA accessibility compliance.</strong></li>
+  <li><span class="ic">🌍</span><strong>11 languages</strong> — English, Irish, German, French, Italian, Portuguese, Spanish, Dutch, Polish, Japanese, and <strong>Arabic with full right-to-left layout.</strong></li>
+  <li><span class="ic">🔎</span><strong>SEO at build time</strong> — 19+ public pages pre-rendered with Playwright, structured data, sitemaps, and Prerender.io fallback for dynamic routes.</li>
+  <li><span class="ic">📊</span><strong>Admin panel</strong> — tenant configuration, algorithm controls, diagnostics, cron job monitoring, and email deliverability tracking.</li>
+  <li><span class="ic">🏗️</span><strong>Tenant hierarchy</strong> — parent-child tenant relationships with feature toggling per tenant.</li>
+  <li><span class="ic">🧪</span><strong>500+ PHPUnit tests</strong> (money flow, webhooks, federation, groups, marketplace) plus Vitest suites — run on every commit.</li>
+  <li><span class="ic">📦</span><strong>Fully Dockerized.</strong></li>
+</ul>
+
+<h2>Global Federation: Connecting Timebanks Worldwide</h2>
+
+<div class="callout">
+  <p><strong>V1.5 ships with native adapters for four federation protocols</strong> — Nexus (our own), the complete <a href="https://github.com/komunitin/komunitin-spec">Komunitin specification</a> (all 15 endpoints), the <a href="https://creditcommons.org/">Credit Commons Protocol</a> (11 endpoints, CEN-compatible mutual credit with a P→V→C→E→X transaction lifecycle), and <strong>TimeOverflow</strong>. Two-way sync across 9 entity types (members, listings, events, groups, connections, volunteering, reviews, transfers, messages), event-driven push, reputation portability, and end-to-end integration test coverage.</p>
+</div>
+
+<p>The vision is simple but ambitious: <strong>a global time bank where external federation partners can discover each other, exchange services, and trade time credits across platforms and across borders.</strong></p>
+
+<p>Imagine a member in Dublin helping someone in São Paulo with web design, while a member in Tokyo teaches Irish students origami — all through interconnected timebanking platforms, all valuing every hour equally.</p>
+
+<p>The Federation API enables:</p>
+<ul>
+  <li><span class="ic">🌍</span><strong>Cross-platform discovery</strong> — find members and services on partner timebanking platforms globally.</li>
+  <li><span class="ic">🔄</span><strong>Interoperable time credit exchange</strong> — trade time credits between different timebanking systems seamlessly.</li>
+  <li><span class="ic">🏘️</span><strong>Federation Neighborhoods</strong> — geographically grouped clusters of federated communities for regional coordination.</li>
+  <li><span class="ic">📜</span><strong>Credit Agreements</strong> — negotiated exchange rate terms between federated communities.</li>
+  <li><span class="ic">🤝</span><strong>External federation partnerships</strong> — any timebanking platform worldwide can connect to the network via standardized API endpoints.</li>
+  <li><span class="ic">🛒</span><strong>Global marketplace</strong> — a unified view of offers and requests spanning multiple platforms and communities.</li>
+  <li><span class="ic">🏅</span><strong>Trust &amp; verification</strong> — federated reputation and review systems that travel with members across platforms.</li>
+</ul>
+
+<p>This isn't just about connecting NEXUS communities to each other — it is about building the <strong>open infrastructure for a worldwide timebanking economy.</strong> We're inviting timebanking platforms, community currency projects, and mutual aid networks everywhere to join us in defining this standard together.</p>
+
+<h2>Why Open Source?</h2>
+<p>Because transformative technology should be accessible to everyone. Communities around the world deserve tools that respect their autonomy, protect their data, and adapt to their needs. By going open source under AGPL-3.0, Project NEXUS remains:</p>
+<ul>
+  <li><span class="ic">✅</span><strong>Free forever</strong> — no vendor lock-in, no surprise fees.</li>
+  <li><span class="ic">✅</span><strong>Transparent</strong> — every line of code is visible and auditable.</li>
+  <li><span class="ic">✅</span><strong>Customisable</strong> — fork it, modify it, make it yours.</li>
+  <li><span class="ic">✅</span><strong>Community-driven</strong> — shape the roadmap, contribute features, fix bugs together.</li>
+</ul>
+<p>And by building the Federation API as an open standard, we're ensuring that <strong>no single platform controls the global timebanking network.</strong> The protocol belongs to everyone.</p>
+
+<h2>Get Started Today</h2>
+<p><strong>GitHub Repository:</strong> <a href="https://github.com/jasperfordesq-ai/nexus-v1">github.com/jasperfordesq-ai/nexus-v1</a></p>
+<p>Clone it, deploy it, break it, improve it. The full platform is yours to explore, including complete source code, a Docker Compose setup for instant local development, comprehensive documentation, migration scripts, the admin panel, production deployment guides, and the OpenAPI 3.0 specification.</p>
+
+<h2>Looking Ahead: Version 2</h2>
+<p>While V1 represents years of refinement and real-world use, we're already building the next generation.</p>
+<p><strong>Project NEXUS V2</strong> is in early-stage development, exploring:</p>
+<ul>
+  <li>Modern microservices architecture (ASP.NET Core 8 + React 18).</li>
+  <li>Enhanced scalability for global networks.</li>
+  <li>Advanced AI integration for matching and insights.</li>
+  <li><strong>Extended Federation Protocol</strong> — building on V1's Federation API with deeper cross-platform credit exchange and expanded global network capabilities.</li>
+  <li>Next-generation UX patterns.</li>
+</ul>
+<p>V2 is also fully open source from day one. Follow along at <a href="https://github.com/jasperfordesq-ai/api.project-nexus.net">github.com/jasperfordesq-ai/api.project-nexus.net</a>.</p>
+
+<h2>Join the Movement</h2>
+<p>Whether you're a developer, community organiser, timebanking platform operator, designer, documentation writer, or translator — <strong>your voice matters, your contributions matter.</strong></p>
+<ul>
+  <li>V1 Issues &amp; Features: <a href="https://github.com/jasperfordesq-ai/nexus-v1/issues">GitHub Issues</a></li>
+  <li>V1 Discussions: <a href="https://github.com/jasperfordesq-ai/nexus-v1/discussions">GitHub Discussions</a></li>
+  <li>V2 Development: <a href="https://github.com/jasperfordesq-ai/api.project-nexus.net">V2 Repository</a></li>
+</ul>
+
+<h2>Early Adoption</h2>
+<p>Timebanks from around the world are now starting to pilot Project NEXUS as their community platform. From Ireland to the UK and beyond, real communities are using NEXUS to connect members, exchange services, and build social capital — and their feedback is shaping every release.</p>
+
+<h2>Acknowledgements &amp; Contributors</h2>
+<p><strong>Creator:</strong> Jasper Ford — primary author, copyright © 2024–2026.</p>
+<p><strong>Founders of hOUR Timebank CLG</strong> (the originating Irish timebank): Jasper Ford and Mary Casey.</p>
+<p><strong>Contributors:</strong> Steven J. Kelly (community insight &amp; product thinking); Sarah Bird, CEO Timebanking UK (strategic guidance).</p>
+<p><strong>Research foundation:</strong> This software builds upon a social impact study commissioned by the West Cork Development Partnership. Special thanks to Fergal Conlon, SICAP Manager.</p>
+
+<h3>Open Protocol Attribution</h3>
+<p>The federation layer implements three independent open protocols developed by the wider mutual-credit and timebanking community. Each protocol's specifications and reference implementations remain the work of their original authors; NEXUS provides adapter code only.</p>
+<ul>
+  <li><span class="ic">🔗</span><strong><a href="https://github.com/komunitin/komunitin-spec">Komunitin</a></strong> — JSON:API-based federation specification, independently authored by the Komunitin community.</li>
+  <li><span class="ic">🔗</span><strong><a href="https://creditcommons.org/">Credit Commons Protocol</a></strong> — recursive mutual-credit accounting standard used by the Credit Commons / CEN network.</li>
+  <li><span class="ic">🔗</span><strong>TimeOverflow</strong> — the open-source Spanish timebanking platform whose public API we interoperate with.</li>
+</ul>
+<p>Sincere thanks to the <strong>Komunitin</strong>, <strong>Credit Commons / CEN</strong>, and <strong>TimeOverflow</strong> communities for the open specifications that make cross-platform federation possible.</p>
+
+<p>Full attribution in <a href="https://github.com/jasperfordesq-ai/nexus-v1/blob/main/NOTICE">NOTICE</a> and <a href="https://github.com/jasperfordesq-ai/nexus-v1/blob/main/CONTRIBUTORS.md">CONTRIBUTORS.md</a>.</p>
+
+<h2>The Future is Community-Owned — and Globally Connected</h2>
+<p>For too long, community platforms have been controlled by corporations optimising for profit over people. And for too long, timebanking communities have operated in isolation, unable to connect with kindred communities across the world.</p>
+<p>Project NEXUS is different. It is built by the community, for the community, owned by everyone. With the Federation API, we're building the bridges that will connect timebanks into a <strong>truly global network</strong> — where every hour is equal, no matter where in the world it's given.</p>
+<p>Today, we're not just releasing software. We're releasing a blueprint for how communities can thrive in the digital age — <strong>together, across every border.</strong></p>
+
+<p class="quote">"Every hour is equal. Every contribution matters.<br>Every community deserves better. Everywhere."</p>
+
+<p>Welcome to Project NEXUS. Welcome home.</p>
+
+<div class="footer-signoff">
+  Project NEXUS V1.5 · Built by Jasper Ford · Licensed under AGPL-3.0-or-later<br>
+  Get started: <a href="https://github.com/jasperfordesq-ai/nexus-v1">github.com/jasperfordesq-ai/nexus-v1</a> &nbsp;·&nbsp;
+  See it live: <a href="https://app.project-nexus.ie">app.project-nexus.ie</a>
+</div>
+
+</body>
+</html>
