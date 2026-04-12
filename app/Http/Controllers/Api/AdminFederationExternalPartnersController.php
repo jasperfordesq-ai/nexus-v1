@@ -82,6 +82,11 @@ class AdminFederationExternalPartnersController extends BaseApiController
             );
         }
 
+        // Invalidate the in-request adapter cache so a protocol_type change
+        // (e.g. nexus → komunitin) is reflected immediately for any follow-up
+        // calls made in the same PHP worker cycle.
+        FederationExternalApiClient::clearAdapterCache();
+
         return $this->respondWithData(['id' => $result['id'] ?? $id]);
     }
 
@@ -103,6 +108,9 @@ class AdminFederationExternalPartnersController extends BaseApiController
                 422
             );
         }
+
+        // Drop the in-request adapter cache entry now that the partner is gone.
+        FederationExternalApiClient::clearAdapterCache();
 
         return $this->respondWithData(['deleted' => true]);
     }

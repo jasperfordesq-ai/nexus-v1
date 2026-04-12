@@ -4,6 +4,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
 use App\Services\FederationActivityService;
@@ -1333,6 +1335,12 @@ class FederationV2Controller extends BaseApiController
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
+        // Feature gate: tenant must have federation enabled at the tenant-feature
+        // level. Mirrors the idiom used by optIn()/setup().
+        if (!\App\Core\TenantContext::hasFeature('federation')) {
+            return response()->json(['error' => 'Federation feature disabled for this tenant'], 403);
+        }
+
         $input = request()->all();
         $receiverId = $input['receiver_id'] ?? null;
         $receiverTenantId = $input['receiver_tenant_id'] ?? null;
@@ -2032,6 +2040,12 @@ class FederationV2Controller extends BaseApiController
     {
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
+
+        // Feature gate: tenant must have federation enabled at the tenant-feature
+        // level. Mirrors the idiom used by optIn()/setup().
+        if (!\App\Core\TenantContext::hasFeature('federation')) {
+            return response()->json(['error' => 'Federation feature disabled for this tenant'], 403);
+        }
 
         $input = request()->all();
         $receiverId = $input['receiver_id'] ?? null;

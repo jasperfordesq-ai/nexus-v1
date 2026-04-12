@@ -111,6 +111,17 @@ class FederationExternalApiClient
     /**
      * Cache to avoid double DB queries when high-level methods resolve the
      * adapter and then request() loads the same partner again.
+     *
+     * SESSION-SCOPED BY DESIGN: PHP statics are per-request/per-worker, so a
+     * partner's protocol_type change made by an admin in one request will be
+     * picked up naturally in later requests once the worker cycles or the
+     * admin mutation calls clearAdapterCache() explicitly.
+     *
+     * Admin controllers that mutate federation_external_partners MUST invoke
+     * FederationExternalApiClient::clearAdapterCache() after a successful
+     * write so a follow-up call in the SAME request (e.g. health-check after
+     * update) resolves against the new protocol.
+     *
      * @var array<int, FederationProtocolAdapter>
      */
     private static array $adapterCache = [];

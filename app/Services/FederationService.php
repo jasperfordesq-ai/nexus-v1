@@ -4,6 +4,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
@@ -20,8 +22,18 @@ class FederationService
      */
     public function getTimebanks(int $tenantId): array
     {
+        // Use an explicit parameter binding for the CASE expression rather
+        // than interpolating the tenant ID inline. Even though $tenantId is
+        // int-typed, using bindings keeps the pattern consistent and makes
+        // the query trivially safe under static analysis.
         return DB::table('federation_partnerships as fp')
-            ->join('tenants as t', DB::raw('CASE WHEN fp.tenant_id = ' . (int) $tenantId . ' THEN fp.partner_tenant_id ELSE fp.tenant_id END'), '=', 't.id')
+            ->join('tenants as t', function ($join) use ($tenantId) {
+                $join->on(
+                    DB::raw('t.id'),
+                    '=',
+                    DB::raw('CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END')
+                )->addBinding($tenantId, 'join');
+            })
             ->where(function ($q) use ($tenantId) {
                 $q->where('fp.tenant_id', $tenantId)
                   ->orWhere('fp.partner_tenant_id', $tenantId);
