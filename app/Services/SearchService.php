@@ -1010,8 +1010,10 @@ class SearchService
         }
 
         if ($type === 'all' || $type === 'groups') {
+            // Exclude private / invite-only groups from search so non-members
+            // cannot discover their names, sizes, or descriptions.
             $hits = $client->index('groups')->search($term, [
-                'filter' => "tenant_id = {$tenantId}",
+                'filter' => "tenant_id = {$tenantId} AND privacy = 'public'",
                 'limit'  => $limit,
             ])->getHits();
 
@@ -1206,8 +1208,9 @@ class SearchService
             'attributesToRetrieve' => ['id', 'title', 'start_time'],
         ])->getHits();
 
+        // Autocomplete must also hide private groups from non-members.
         $groups = $client->index('groups')->search($term, [
-            'filter'               => "tenant_id = {$tenantId}",
+            'filter'               => "tenant_id = {$tenantId} AND privacy = 'public'",
             'limit'                => $limit,
             'attributesToRetrieve' => ['id', 'name'],
         ])->getHits();

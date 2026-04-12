@@ -57,7 +57,11 @@ class EmailTemplate
         $memberNotice = __('emails.footer.member_notice', ['community' => $tenantName]);
         $managePreferences = __('emails.footer.manage_preferences');
 
-        // Button HTML
+        // Button HTML — sanitise caller-provided URL/text. Reject any URL
+        // that isn't http(s) or mailto: so a caller cannot smuggle
+        // javascript:/data:/vbscript: and turn the CTA into an XSS sink.
+        $btnUrl  = self::sanitizeButtonUrl((string) $btnUrl);
+        $btnText = htmlspecialchars((string) $btnText, ENT_QUOTES, 'UTF-8');
         $buttonHtml = '';
         if ($btnText && $btnUrl) {
             $buttonHtml = <<<HTML
@@ -243,5 +247,28 @@ HTML;
 </body>
 </html>
 HTML;
+    }
+
+    /**
+     * Return a URL safe to interpolate into an href attribute in an email,
+     * or an empty string if the scheme is disallowed. Prevents a caller from
+     * injecting javascript:/data:/vbscript: payloads.
+     */
+    private static function sanitizeButtonUrl(string $url): string
+    {
+        $url = trim($url);
+        if ($url === '') {
+            return '';
+        }
+        // Relative URLs (starting with / or #) are fine; absolute URLs must
+        // have an allowed scheme.
+        if ($url[0] === '/' || $url[0] === '#') {
+            return htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+        }
+        $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
+        if (!in_array($scheme, ['http', 'https', 'mailto'], true)) {
+            return '';
+        }
+        return htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
     }
 }

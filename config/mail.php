@@ -31,7 +31,9 @@ return [
             'encryption' => env('SMTP_ENCRYPTION', env('MAIL_ENCRYPTION', 'tls')),
             'username' => env('SMTP_USER', env('MAIL_USERNAME')),
             'password' => env('SMTP_PASS', env('MAIL_PASSWORD')),
-            'timeout' => null,
+            // Hard cap SMTP connection/IO so a stalled relay cannot hang the
+            // scheduler's newsletter loop indefinitely (has happened before).
+            'timeout' => (int) env('SMTP_TIMEOUT', 30),
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 

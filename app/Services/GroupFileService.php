@@ -20,9 +20,13 @@ class GroupFileService
     /** Maximum file size: 25 MB */
     const MAX_FILE_SIZE = 25 * 1024 * 1024;
 
-    /** Allowed MIME types */
+    /** Allowed MIME types.
+     *  SVG is intentionally excluded: SVG can carry inline <script> and event
+     *  handlers, so allowing it + serving it inline (.htaccess does) is XSS.
+     *  Re-add only if uploads are passed through an SVG sanitizer and served
+     *  with Content-Disposition: attachment. */
     const ALLOWED_TYPES = [
-        'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+        'image/jpeg', 'image/png', 'image/gif', 'image/webp',
         'application/pdf',
         'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

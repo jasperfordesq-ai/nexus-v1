@@ -494,8 +494,23 @@ class UserService
             }
 
             $user = User::query()->findOrFail($userId);
+            $oldAvatarUrl = $user->avatar_url;
             $user->avatar_url = $avatarUrl;
             $user->save();
+
+            // Best-effort cleanup of the previous avatar so a user who
+            // changes their picture frequently doesn't leak orphaned files
+            // into storage forever. Only touch files we know we produced
+            // (under /uploads/profiles/) — never follow external URLs.
+            if ($oldAvatarUrl && $oldAvatarUrl !== $avatarUrl && is_string($oldAvatarUrl)) {
+                $path = parse_url($oldAvatarUrl, PHP_URL_PATH) ?: $oldAvatarUrl;
+                if (preg_match('#^/uploads/profiles/#', $path)) {
+                    $full = public_path(ltrim($path, '/'));
+                    if (is_file($full) && !is_link($full)) {
+                        @unlink($full);
+                    }
+                }
+            }
 
             return $avatarUrl;
         } catch (\Throwable $e) {
