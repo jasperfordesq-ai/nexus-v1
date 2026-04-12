@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Services\Protocols;
 
 use App\Contracts\FederationProtocolAdapter;
+use App\Services\CreditCommonsNodeService;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -590,6 +591,21 @@ class CreditCommonsAdapter implements FederationProtocolAdapter
      * @param array $nodeConfig Node configuration (name, exchange rate, etc.)
      * @return array CC /about response format
      */
+    /**
+     * Validate a remote hashchain value against the local chain for a tenant.
+     *
+     * Delegates to CreditCommonsNodeService which owns the hashchain state.
+     * Returns true if the remote hash matches the local last-hash (or if either
+     * side has no hash yet, which is the first-interaction bootstrap case).
+     *
+     * @param string|null $remoteHash Hash sent by the remote node via Last-hash header
+     * @param int|null    $tenantId   Tenant scope (defaults to current context)
+     */
+    public static function validateHashchain(?string $remoteHash, ?int $tenantId = null): bool
+    {
+        return CreditCommonsNodeService::verifyHash($remoteHash, $tenantId);
+    }
+
     public static function buildAboutResponse(array $nodeConfig): array
     {
         return [

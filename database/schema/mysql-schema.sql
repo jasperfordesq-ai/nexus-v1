@@ -144,7 +144,7 @@ CREATE TABLE `activity_log` (
   KEY `idx_activity_log_created_at` (`created_at`),
   KEY `idx_activity_log_user_created` (`user_id`,`created_at`),
   KEY `idx_activity_log_tenant` (`tenant_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1512 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1513 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `activity_logs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -434,6 +434,44 @@ CREATE TABLE `blog_posts` (
   KEY `idx_published` (`published_at`),
   KEY `idx_author` (`author_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=90100 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Blog posts for tenant websites';
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `bookmark_collections`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `bookmark_collections` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `is_default` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `bookmark_collections_tenant_id_user_id_name_unique` (`tenant_id`,`user_id`,`name`),
+  KEY `bookmark_collections_tenant_id_index` (`tenant_id`),
+  KEY `bookmark_collections_user_id_index` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `bookmarks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `bookmarks` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `bookmarkable_type` varchar(50) NOT NULL,
+  `bookmarkable_id` bigint(20) unsigned NOT NULL,
+  `collection_id` bigint(20) unsigned DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `bookmarks_unique` (`tenant_id`,`user_id`,`bookmarkable_type`,`bookmarkable_id`),
+  KEY `bookmarks_bookmarkable_type_bookmarkable_id_index` (`bookmarkable_type`,`bookmarkable_id`),
+  KEY `bookmarks_collection_id_foreign` (`collection_id`),
+  KEY `bookmarks_tenant_id_index` (`tenant_id`),
+  KEY `bookmarks_user_id_index` (`user_id`),
+  CONSTRAINT `bookmarks_collection_id_foreign` FOREIGN KEY (`collection_id`) REFERENCES `bookmark_collections` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `broker_control_config`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1078,6 +1116,43 @@ CREATE TABLE `content_moderation_queue` (
   KEY `idx_author` (`tenant_id`,`author_id`),
   KEY `idx_reviewer` (`reviewer_id`),
   KEY `idx_created` (`tenant_id`,`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `conversation_participants`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `conversation_participants` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `conversation_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `role` enum('admin','member') NOT NULL DEFAULT 'member',
+  `joined_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `left_at` timestamp NULL DEFAULT NULL,
+  `muted_until` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_participant` (`tenant_id`,`conversation_id`,`user_id`),
+  KEY `idx_cp_conv_user` (`conversation_id`,`user_id`),
+  KEY `idx_cp_user` (`user_id`),
+  KEY `conversation_participants_tenant_id_index` (`tenant_id`),
+  CONSTRAINT `conversation_participants_conversation_id_foreign` FOREIGN KEY (`conversation_id`) REFERENCES `conversations` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `conversations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `conversations` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `is_group` tinyint(1) NOT NULL DEFAULT 0,
+  `group_name` varchar(100) DEFAULT NULL,
+  `group_avatar_url` varchar(500) DEFAULT NULL,
+  `created_by` bigint(20) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `conversations_tenant_id_is_group_index` (`tenant_id`,`is_group`),
+  KEY `conversations_tenant_id_index` (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `cookie_consent_audit`;
@@ -2021,6 +2096,24 @@ CREATE TABLE `fcm_device_tokens` (
   KEY `idx_tenant` (`tenant_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `federated_identities`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `federated_identities` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `local_user_id` bigint(20) unsigned NOT NULL,
+  `partner_id` bigint(20) unsigned NOT NULL,
+  `external_user_id` varchar(255) NOT NULL,
+  `external_handle` varchar(255) DEFAULT NULL,
+  `attestation_signature` text DEFAULT NULL,
+  `verified_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_fed_identity_partner_ext` (`partner_id`,`external_user_id`),
+  KEY `idx_fed_identity_local_user` (`local_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `federation_api_keys`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -2102,7 +2195,55 @@ CREATE TABLE `federation_audit_log` (
   KEY `idx_actor` (`actor_user_id`),
   KEY `idx_created_at` (`created_at`),
   KEY `idx_level_created` (`level`,`created_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=418 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=419 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `federation_cc_entries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `federation_cc_entries` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `transaction_uuid` char(36) NOT NULL,
+  `federation_transaction_id` bigint(20) unsigned DEFAULT NULL COMMENT 'FK to federation_transactions.id (nullable for relay entries)',
+  `payer` varchar(100) NOT NULL COMMENT 'CC account path (e.g., node-slug/username)',
+  `payee` varchar(100) NOT NULL COMMENT 'CC account path',
+  `quant` decimal(12,4) NOT NULL COMMENT 'Amount in CC units',
+  `description` text DEFAULT NULL,
+  `state` char(1) NOT NULL DEFAULT 'P' COMMENT 'CC state: P/V/C/E/X',
+  `workflow` varchar(50) DEFAULT NULL COMMENT 'CC workflow code',
+  `author` varchar(100) DEFAULT NULL COMMENT 'CC account path of entry creator',
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'CC metadata (arbitrary key-value)' CHECK (json_valid(`metadata`)),
+  `written_at` timestamp NULL DEFAULT NULL COMMENT 'When entry was permanently written',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `federation_cc_entries_tenant_id_state_index` (`tenant_id`,`state`),
+  KEY `federation_cc_entries_payer_tenant_id_index` (`payer`,`tenant_id`),
+  KEY `federation_cc_entries_payee_tenant_id_index` (`payee`,`tenant_id`),
+  KEY `federation_cc_entries_tenant_id_index` (`tenant_id`),
+  KEY `federation_cc_entries_transaction_uuid_index` (`transaction_uuid`),
+  KEY `federation_cc_entries_federation_transaction_id_index` (`federation_transaction_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `federation_cc_node_config`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `federation_cc_node_config` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `node_slug` varchar(50) NOT NULL COMMENT 'CC node identifier (3-15 chars, lowercase)',
+  `display_name` varchar(100) DEFAULT NULL,
+  `currency_format` varchar(100) NOT NULL DEFAULT '<quantity> hours' COMMENT 'CC currency display format',
+  `exchange_rate` decimal(10,6) NOT NULL DEFAULT 1.000000 COMMENT 'Exchange rate relative to parent node (1.0 = same unit)',
+  `validated_window` int(10) unsigned NOT NULL DEFAULT 300 COMMENT 'Seconds a validated transaction remains valid before timeout',
+  `parent_node_url` varchar(500) DEFAULT NULL COMMENT 'URL of parent CC node (null = root/standalone)',
+  `parent_node_slug` varchar(50) DEFAULT NULL,
+  `last_hash` text DEFAULT NULL COMMENT 'Last hashchain hash for this node',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `federation_cc_node_config_tenant_id_unique` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `federation_connections`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2211,6 +2352,28 @@ CREATE TABLE `federation_directory_profiles` (
   KEY `idx_location` (`latitude`,`longitude`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `federation_events`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `federation_events` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `external_partner_id` bigint(20) unsigned NOT NULL,
+  `external_id` varchar(128) NOT NULL,
+  `title` varchar(500) NOT NULL,
+  `description` text DEFAULT NULL,
+  `starts_at` datetime DEFAULT NULL,
+  `ends_at` datetime DEFAULT NULL,
+  `location` varchar(500) DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_fed_events_partner_ext` (`external_partner_id`,`external_id`),
+  KEY `federation_events_tenant_id_index` (`tenant_id`),
+  KEY `federation_events_external_partner_id_index` (`external_partner_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `federation_exports`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -2258,7 +2421,7 @@ CREATE TABLE `federation_external_partner_logs` (
   KEY `idx_partner` (`partner_id`),
   KEY `idx_created` (`created_at`),
   KEY `idx_success` (`success`)
-) ENGINE=InnoDB AUTO_INCREMENT=284 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=315 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `federation_external_partners`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2272,6 +2435,7 @@ CREATE TABLE `federation_external_partners` (
   `api_path` varchar(255) DEFAULT '/api/v1/federation',
   `api_key` varchar(500) DEFAULT NULL,
   `auth_method` enum('api_key','hmac','oauth2') DEFAULT 'api_key',
+  `protocol_type` varchar(30) NOT NULL DEFAULT 'nexus' COMMENT 'Federation protocol: nexus, timeoverflow, komunitin, credit_commons',
   `signing_secret` varchar(500) DEFAULT NULL,
   `oauth_client_id` varchar(255) DEFAULT NULL,
   `oauth_client_secret` varchar(500) DEFAULT NULL,
@@ -2292,6 +2456,9 @@ CREATE TABLE `federation_external_partners` (
   `allow_transactions` tinyint(1) DEFAULT 1,
   `allow_events` tinyint(1) DEFAULT 0,
   `allow_groups` tinyint(1) DEFAULT 0,
+  `allow_connections` tinyint(1) NOT NULL DEFAULT 0,
+  `allow_volunteering` tinyint(1) NOT NULL DEFAULT 0,
+  `allow_member_sync` tinyint(1) NOT NULL DEFAULT 0,
   `created_by` int(10) unsigned DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
@@ -2301,7 +2468,94 @@ CREATE TABLE `federation_external_partners` (
   KEY `idx_status` (`status`),
   KEY `idx_base_url` (`base_url`(191)),
   KEY `idx_last_message` (`last_message_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `federation_groups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `federation_groups` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `external_partner_id` bigint(20) unsigned NOT NULL,
+  `external_id` varchar(128) NOT NULL,
+  `name` varchar(500) NOT NULL,
+  `description` text DEFAULT NULL,
+  `privacy` varchar(32) NOT NULL DEFAULT 'public',
+  `member_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_fed_groups_partner_ext` (`external_partner_id`,`external_id`),
+  KEY `federation_groups_tenant_id_index` (`tenant_id`),
+  KEY `federation_groups_external_partner_id_index` (`external_partner_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `federation_inbound_connections`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `federation_inbound_connections` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `external_partner_id` bigint(20) unsigned NOT NULL,
+  `local_user_id` bigint(20) unsigned NOT NULL,
+  `external_user_id` varchar(128) NOT NULL,
+  `status` varchar(32) NOT NULL DEFAULT 'pending',
+  `message` varchar(1000) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_fed_inbound_conn` (`external_partner_id`,`local_user_id`,`external_user_id`),
+  KEY `idx_fed_inbound_conn_local_user` (`local_user_id`),
+  KEY `federation_inbound_connections_tenant_id_index` (`tenant_id`),
+  KEY `federation_inbound_connections_external_partner_id_index` (`external_partner_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `federation_listings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `federation_listings` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `external_partner_id` bigint(20) unsigned NOT NULL,
+  `external_id` varchar(128) NOT NULL,
+  `title` varchar(500) NOT NULL,
+  `description` text DEFAULT NULL,
+  `type` varchar(32) DEFAULT NULL,
+  `category` varchar(128) DEFAULT NULL,
+  `external_user_id` varchar(128) DEFAULT NULL,
+  `external_user_name` varchar(255) DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_fed_listings_partner_ext` (`external_partner_id`,`external_id`),
+  KEY `federation_listings_tenant_id_index` (`tenant_id`),
+  KEY `federation_listings_external_partner_id_index` (`external_partner_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `federation_members`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `federation_members` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `external_partner_id` bigint(20) unsigned NOT NULL,
+  `external_id` varchar(128) NOT NULL,
+  `username` varchar(255) DEFAULT NULL,
+  `display_name` varchar(255) DEFAULT NULL,
+  `bio` text DEFAULT NULL,
+  `location` varchar(255) DEFAULT NULL,
+  `avatar_url` varchar(1000) DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`metadata`)),
+  `profile_updated_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_fed_members_partner_ext` (`external_partner_id`,`external_id`),
+  KEY `federation_members_tenant_id_index` (`tenant_id`),
+  KEY `federation_members_external_partner_id_index` (`external_partner_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `federation_messages`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2393,7 +2647,7 @@ CREATE TABLE `federation_partnerships` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `tenant_id` int(10) unsigned NOT NULL,
   `partner_tenant_id` int(10) unsigned NOT NULL,
-  `status` enum('pending','active','suspended','terminated') NOT NULL DEFAULT 'pending',
+  `status` enum('pending','active','suspended','terminated','rejected') NOT NULL DEFAULT 'pending',
   `federation_level` tinyint(3) unsigned NOT NULL DEFAULT 1,
   `profiles_enabled` tinyint(1) NOT NULL DEFAULT 0,
   `messaging_enabled` tinyint(1) NOT NULL DEFAULT 0,
@@ -2649,6 +2903,28 @@ CREATE TABLE `federation_user_settings` (
   KEY `idx_service_reach` (`service_reach`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `federation_volunteering`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `federation_volunteering` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `external_partner_id` bigint(20) unsigned NOT NULL,
+  `external_id` varchar(128) NOT NULL,
+  `title` varchar(500) NOT NULL,
+  `description` text DEFAULT NULL,
+  `hours_requested` decimal(8,2) DEFAULT NULL,
+  `location` varchar(500) DEFAULT NULL,
+  `starts_at` datetime DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_fed_vol_partner_ext` (`external_partner_id`,`external_id`),
+  KEY `federation_volunteering_tenant_id_index` (`tenant_id`),
+  KEY `federation_volunteering_external_partner_id_index` (`external_partner_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `federation_webhook_logs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -2804,7 +3080,7 @@ CREATE TABLE `feed_impressions` (
   UNIQUE KEY `uq_impression` (`post_id`,`user_id`,`tenant_id`),
   KEY `idx_post_tenant` (`post_id`,`tenant_id`),
   KEY `idx_user_tenant` (`user_id`,`tenant_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=417 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=450 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `feed_likes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2858,9 +3134,11 @@ CREATE TABLE `feed_posts` (
   `type` varchar(50) DEFAULT 'post',
   `share_count` int(11) NOT NULL DEFAULT 0,
   `original_post_id` int(11) DEFAULT NULL COMMENT 'For reposts: ID of original post',
+  `quoted_post_id` int(10) unsigned DEFAULT NULL COMMENT 'ID of the post being quoted (quote repost)',
   `is_repost` tinyint(1) NOT NULL DEFAULT 0,
   `is_hidden` tinyint(1) NOT NULL DEFAULT 0,
   `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `views_count` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `idx_tenant_user` (`tenant_id`,`user_id`),
   KEY `idx_created` (`created_at`),
@@ -2869,6 +3147,7 @@ CREATE TABLE `feed_posts` (
   KEY `idx_user_created` (`user_id`,`created_at`),
   KEY `idx_is_hidden` (`tenant_id`,`is_hidden`),
   KEY `idx_feed_posts_publish_schedule` (`publish_status`,`scheduled_at`),
+  KEY `idx_feed_posts_quoted_post_id` (`quoted_post_id`),
   CONSTRAINT `feed_posts_group_id_foreign` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE SET NULL,
   CONSTRAINT `feed_posts_tenant_id_foreign` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
   CONSTRAINT `feed_posts_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
@@ -4368,6 +4647,9 @@ CREATE TABLE `identity_verification_sessions` (
   `failure_reason` varchar(500) DEFAULT NULL COMMENT 'Human-readable failure reason',
   `reminder_sent_at` datetime DEFAULT NULL,
   `metadata` text DEFAULT NULL COMMENT 'Encrypted JSON: provider-specific extra data',
+  `stripe_payment_intent_id` varchar(255) DEFAULT NULL,
+  `verification_fee_amount` int(11) DEFAULT NULL,
+  `payment_status` enum('none','pending','completed','failed') NOT NULL DEFAULT 'none',
   `expires_at` datetime DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
@@ -4615,6 +4897,7 @@ CREATE TABLE `job_interviews` (
   `duration_mins` smallint(6) NOT NULL DEFAULT 60,
   `location_notes` text DEFAULT NULL,
   `status` varchar(30) NOT NULL DEFAULT 'proposed',
+  `reminder_sent_at` timestamp NULL DEFAULT NULL,
   `candidate_notes` text DEFAULT NULL,
   `interviewer_notes` text DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
@@ -4781,6 +5064,7 @@ CREATE TABLE `job_templates` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `tenant_id` int(10) unsigned NOT NULL,
   `user_id` int(10) unsigned NOT NULL COMMENT 'creator',
+  `template_type` varchar(20) NOT NULL DEFAULT 'job_posting',
   `name` varchar(160) NOT NULL,
   `description` text DEFAULT NULL,
   `type` enum('paid','volunteer','timebank') NOT NULL DEFAULT 'paid',
@@ -5012,7 +5296,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5050,7 +5334,7 @@ CREATE TABLE `leaderboard_seasons` (
   KEY `idx_tenant_active` (`tenant_id`,`is_active`),
   KEY `idx_dates` (`start_date`,`end_date`),
   KEY `idx_tenant_status` (`tenant_id`,`status`,`start_date`,`end_date`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `legal_document_versions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5312,7 +5596,7 @@ CREATE TABLE `listing_views` (
   KEY `idx_listing_views_date` (`viewed_at`),
   KEY `idx_listing_views_lookup` (`tenant_id`,`listing_id`,`user_id`),
   CONSTRAINT `fk_listing_views_listing_id` FOREIGN KEY (`listing_id`) REFERENCES `listings` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=151 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=152 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `listings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5391,7 +5675,516 @@ CREATE TABLE `login_attempts` (
   PRIMARY KEY (`id`),
   KEY `idx_identifier_type` (`identifier`,`type`),
   KEY `idx_attempted_at` (`attempted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=35273 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35386 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_categories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_categories` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned DEFAULT NULL,
+  `name` varchar(100) NOT NULL,
+  `slug` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `icon` varchar(50) DEFAULT NULL,
+  `parent_id` bigint(20) unsigned DEFAULT NULL,
+  `sort_order` int(11) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `mpc_tenant_slug_unique` (`tenant_id`,`slug`),
+  KEY `marketplace_categories_parent_id_foreign` (`parent_id`),
+  KEY `marketplace_categories_tenant_id_index` (`tenant_id`),
+  CONSTRAINT `marketplace_categories_parent_id_foreign` FOREIGN KEY (`parent_id`) REFERENCES `marketplace_categories` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_category_templates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_category_templates` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned DEFAULT NULL,
+  `category_id` bigint(20) unsigned DEFAULT NULL,
+  `name` varchar(100) NOT NULL,
+  `fields` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`fields`)),
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `marketplace_category_templates_category_id_foreign` (`category_id`),
+  KEY `marketplace_category_templates_tenant_id_index` (`tenant_id`),
+  CONSTRAINT `marketplace_category_templates_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `marketplace_categories` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_collection_items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_collection_items` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `collection_id` bigint(20) unsigned NOT NULL,
+  `marketplace_listing_id` bigint(20) unsigned NOT NULL,
+  `note` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `mci_collection_listing_unique` (`collection_id`,`marketplace_listing_id`),
+  KEY `marketplace_collection_items_marketplace_listing_id_foreign` (`marketplace_listing_id`),
+  KEY `marketplace_collection_items_tenant_id_index` (`tenant_id`),
+  CONSTRAINT `marketplace_collection_items_collection_id_foreign` FOREIGN KEY (`collection_id`) REFERENCES `marketplace_collections` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `marketplace_collection_items_marketplace_listing_id_foreign` FOREIGN KEY (`marketplace_listing_id`) REFERENCES `marketplace_listings` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_collections`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_collections` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `is_public` tinyint(1) NOT NULL DEFAULT 0,
+  `item_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `mc_user_id_idx` (`user_id`),
+  KEY `marketplace_collections_tenant_id_user_id_index` (`tenant_id`,`user_id`),
+  KEY `marketplace_collections_tenant_id_index` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_delivery_offers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_delivery_offers` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `order_id` bigint(20) unsigned NOT NULL,
+  `deliverer_id` int(10) unsigned NOT NULL,
+  `time_credits` decimal(8,2) NOT NULL COMMENT 'Time credits offered for delivery',
+  `estimated_minutes` smallint(5) unsigned DEFAULT NULL COMMENT 'Estimated delivery time in minutes',
+  `notes` text DEFAULT NULL COMMENT 'Deliverer notes about the delivery',
+  `status` enum('pending','accepted','declined','completed','cancelled') NOT NULL DEFAULT 'pending',
+  `accepted_at` timestamp NULL DEFAULT NULL,
+  `completed_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_mdo_order_status` (`order_id`,`status`),
+  KEY `idx_mdo_deliverer_status` (`deliverer_id`,`status`),
+  KEY `idx_mdo_tenant` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_disputes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_disputes` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `order_id` bigint(20) unsigned NOT NULL,
+  `opened_by` bigint(20) unsigned NOT NULL,
+  `reason` enum('not_received','not_as_described','damaged','wrong_item','other') NOT NULL,
+  `description` text NOT NULL,
+  `evidence_urls` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`evidence_urls`)),
+  `status` enum('open','under_review','resolved_buyer','resolved_seller','escalated','closed') NOT NULL DEFAULT 'open',
+  `resolution_notes` text DEFAULT NULL,
+  `resolved_by` bigint(20) unsigned DEFAULT NULL,
+  `resolved_at` timestamp NULL DEFAULT NULL,
+  `refund_amount` decimal(10,2) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `md_tenant_status_idx` (`tenant_id`,`status`),
+  KEY `marketplace_disputes_order_id_foreign` (`order_id`),
+  KEY `md_opened_by_idx` (`opened_by`),
+  KEY `md_resolved_by_idx` (`resolved_by`),
+  KEY `marketplace_disputes_tenant_id_index` (`tenant_id`),
+  CONSTRAINT `marketplace_disputes_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `marketplace_orders` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_escrow`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_escrow` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `order_id` bigint(20) unsigned NOT NULL,
+  `payment_id` bigint(20) unsigned NOT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `currency` varchar(3) NOT NULL DEFAULT 'EUR',
+  `status` enum('held','released','refunded','disputed') NOT NULL DEFAULT 'held',
+  `held_at` timestamp NULL DEFAULT NULL,
+  `release_after` timestamp NULL DEFAULT NULL,
+  `released_at` timestamp NULL DEFAULT NULL,
+  `release_trigger` enum('buyer_confirmed','auto_timeout','admin_override','dispute_resolved') DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `marketplace_escrow_order_id_foreign` (`order_id`),
+  KEY `marketplace_escrow_payment_id_foreign` (`payment_id`),
+  KEY `marketplace_escrow_tenant_id_status_index` (`tenant_id`,`status`),
+  KEY `marketplace_escrow_tenant_id_index` (`tenant_id`),
+  CONSTRAINT `marketplace_escrow_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `marketplace_orders` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `marketplace_escrow_payment_id_foreign` FOREIGN KEY (`payment_id`) REFERENCES `marketplace_payments` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_images`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_images` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `marketplace_listing_id` bigint(20) unsigned NOT NULL,
+  `image_url` varchar(500) NOT NULL,
+  `thumbnail_url` varchar(500) DEFAULT NULL,
+  `alt_text` varchar(255) DEFAULT NULL,
+  `sort_order` int(11) NOT NULL DEFAULT 0,
+  `is_primary` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `marketplace_images_marketplace_listing_id_foreign` (`marketplace_listing_id`),
+  KEY `marketplace_images_tenant_id_index` (`tenant_id`),
+  CONSTRAINT `marketplace_images_marketplace_listing_id_foreign` FOREIGN KEY (`marketplace_listing_id`) REFERENCES `marketplace_listings` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_listings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_listings` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `title` varchar(200) NOT NULL,
+  `description` text NOT NULL,
+  `tagline` varchar(300) DEFAULT NULL,
+  `price` decimal(10,2) DEFAULT NULL,
+  `price_currency` varchar(3) NOT NULL DEFAULT 'EUR',
+  `price_type` enum('fixed','negotiable','free','auction','contact') NOT NULL DEFAULT 'fixed',
+  `time_credit_price` decimal(8,2) DEFAULT NULL,
+  `category_id` bigint(20) unsigned DEFAULT NULL,
+  `condition` enum('new','like_new','good','fair','poor') DEFAULT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 1,
+  `location` varchar(255) DEFAULT NULL,
+  `latitude` decimal(10,8) DEFAULT NULL,
+  `longitude` decimal(11,8) DEFAULT NULL,
+  `shipping_available` tinyint(1) NOT NULL DEFAULT 0,
+  `local_pickup` tinyint(1) NOT NULL DEFAULT 1,
+  `delivery_method` enum('pickup','shipping','both','community_delivery') NOT NULL DEFAULT 'pickup',
+  `seller_type` enum('private','business') NOT NULL DEFAULT 'private',
+  `status` enum('draft','active','sold','reserved','expired','removed') NOT NULL DEFAULT 'draft',
+  `moderation_status` enum('pending','approved','rejected','flagged') NOT NULL DEFAULT 'pending',
+  `moderation_notes` text DEFAULT NULL,
+  `moderated_by` bigint(20) unsigned DEFAULT NULL,
+  `moderated_at` timestamp NULL DEFAULT NULL,
+  `views_count` int(11) NOT NULL DEFAULT 0,
+  `saves_count` int(11) NOT NULL DEFAULT 0,
+  `contacts_count` int(11) NOT NULL DEFAULT 0,
+  `promoted_until` timestamp NULL DEFAULT NULL,
+  `promotion_type` varchar(30) DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `renewed_at` timestamp NULL DEFAULT NULL,
+  `renewal_count` int(11) NOT NULL DEFAULT 0,
+  `template_data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`template_data`)),
+  `video_url` varchar(500) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `mpl_tenant_status_idx` (`tenant_id`,`status`),
+  KEY `mpl_tenant_category_idx` (`tenant_id`,`category_id`),
+  KEY `mpl_tenant_user_idx` (`tenant_id`,`user_id`),
+  KEY `mpl_tenant_geo_idx` (`tenant_id`,`latitude`,`longitude`),
+  KEY `marketplace_listings_category_id_foreign` (`category_id`),
+  FULLTEXT KEY `mpl_title_description_ft` (`title`,`description`),
+  CONSTRAINT `marketplace_listings_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `marketplace_categories` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_offers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_offers` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `marketplace_listing_id` bigint(20) unsigned NOT NULL,
+  `buyer_id` bigint(20) unsigned NOT NULL,
+  `seller_id` bigint(20) unsigned NOT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `currency` varchar(3) NOT NULL DEFAULT 'EUR',
+  `message` text DEFAULT NULL,
+  `status` enum('pending','accepted','declined','countered','expired','withdrawn') NOT NULL DEFAULT 'pending',
+  `counter_amount` decimal(10,2) DEFAULT NULL,
+  `counter_message` text DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `accepted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `mpo_tenant_listing_buyer_idx` (`tenant_id`,`marketplace_listing_id`,`buyer_id`),
+  KEY `mpo_tenant_status_idx` (`tenant_id`,`status`),
+  KEY `marketplace_offers_marketplace_listing_id_foreign` (`marketplace_listing_id`),
+  KEY `mpo_buyer_id_idx` (`buyer_id`),
+  KEY `mpo_seller_id_idx` (`seller_id`),
+  KEY `marketplace_offers_tenant_id_index` (`tenant_id`),
+  CONSTRAINT `marketplace_offers_marketplace_listing_id_foreign` FOREIGN KEY (`marketplace_listing_id`) REFERENCES `marketplace_listings` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_orders`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_orders` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `order_number` varchar(50) NOT NULL,
+  `buyer_id` bigint(20) unsigned NOT NULL,
+  `seller_id` bigint(20) unsigned NOT NULL,
+  `marketplace_listing_id` bigint(20) unsigned NOT NULL,
+  `marketplace_offer_id` bigint(20) unsigned DEFAULT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 1,
+  `unit_price` decimal(10,2) NOT NULL,
+  `total_price` decimal(10,2) NOT NULL,
+  `currency` varchar(3) NOT NULL DEFAULT 'EUR',
+  `time_credits_used` decimal(8,2) DEFAULT NULL,
+  `status` enum('pending_payment','paid','shipped','delivered','completed','disputed','refunded','cancelled') NOT NULL DEFAULT 'pending_payment',
+  `payment_intent_id` varchar(255) DEFAULT NULL,
+  `escrow_released_at` timestamp NULL DEFAULT NULL,
+  `shipping_method` varchar(100) DEFAULT NULL,
+  `shipping_cost` decimal(8,2) DEFAULT NULL,
+  `tracking_number` varchar(255) DEFAULT NULL,
+  `tracking_url` varchar(500) DEFAULT NULL,
+  `delivery_address` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`delivery_address`)),
+  `delivery_notes` text DEFAULT NULL,
+  `buyer_confirmed_at` timestamp NULL DEFAULT NULL,
+  `seller_confirmed_at` timestamp NULL DEFAULT NULL,
+  `auto_complete_at` timestamp NULL DEFAULT NULL,
+  `cancelled_at` timestamp NULL DEFAULT NULL,
+  `cancellation_reason` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `mo_tenant_order_number_unique` (`tenant_id`,`order_number`),
+  KEY `mo_tenant_buyer_idx` (`tenant_id`,`buyer_id`),
+  KEY `mo_tenant_seller_idx` (`tenant_id`,`seller_id`),
+  KEY `mo_tenant_status_idx` (`tenant_id`,`status`),
+  KEY `marketplace_orders_marketplace_listing_id_foreign` (`marketplace_listing_id`),
+  KEY `marketplace_orders_marketplace_offer_id_foreign` (`marketplace_offer_id`),
+  KEY `mo_buyer_id_idx` (`buyer_id`),
+  KEY `mo_seller_id_idx` (`seller_id`),
+  KEY `marketplace_orders_tenant_id_index` (`tenant_id`),
+  CONSTRAINT `marketplace_orders_marketplace_listing_id_foreign` FOREIGN KEY (`marketplace_listing_id`) REFERENCES `marketplace_listings` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `marketplace_orders_marketplace_offer_id_foreign` FOREIGN KEY (`marketplace_offer_id`) REFERENCES `marketplace_offers` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_payments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_payments` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `order_id` bigint(20) unsigned NOT NULL,
+  `stripe_payment_intent_id` varchar(255) DEFAULT NULL,
+  `stripe_charge_id` varchar(255) DEFAULT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `currency` varchar(3) NOT NULL DEFAULT 'EUR',
+  `platform_fee` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `seller_payout` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `payment_method` varchar(50) DEFAULT NULL,
+  `status` enum('pending','succeeded','failed','refunded','partially_refunded') NOT NULL DEFAULT 'pending',
+  `refund_amount` decimal(10,2) DEFAULT NULL,
+  `refund_reason` text DEFAULT NULL,
+  `refunded_at` timestamp NULL DEFAULT NULL,
+  `payout_status` enum('pending','scheduled','paid','failed') NOT NULL DEFAULT 'pending',
+  `payout_id` varchar(255) DEFAULT NULL,
+  `paid_out_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `marketplace_payments_order_id_foreign` (`order_id`),
+  KEY `marketplace_payments_tenant_id_order_id_index` (`tenant_id`,`order_id`),
+  KEY `marketplace_payments_tenant_id_status_index` (`tenant_id`,`status`),
+  KEY `marketplace_payments_tenant_id_index` (`tenant_id`),
+  KEY `marketplace_payments_stripe_payment_intent_id_index` (`stripe_payment_intent_id`),
+  CONSTRAINT `marketplace_payments_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `marketplace_orders` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_promotions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_promotions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `marketplace_listing_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `promotion_type` enum('bump','featured','top_of_category','homepage_carousel') NOT NULL,
+  `stripe_payment_intent_id` varchar(255) DEFAULT NULL,
+  `amount_paid` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `currency` varchar(3) NOT NULL DEFAULT 'EUR',
+  `started_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `expires_at` timestamp NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `impressions` int(10) unsigned NOT NULL DEFAULT 0,
+  `clicks` int(10) unsigned NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `marketplace_promotions_marketplace_listing_id_foreign` (`marketplace_listing_id`),
+  KEY `mpr_user_id_idx` (`user_id`),
+  KEY `mp_listing_active_idx` (`tenant_id`,`marketplace_listing_id`,`is_active`),
+  KEY `mp_user_idx` (`tenant_id`,`user_id`),
+  KEY `mp_active_expires_idx` (`is_active`,`expires_at`),
+  KEY `marketplace_promotions_tenant_id_index` (`tenant_id`),
+  CONSTRAINT `marketplace_promotions_marketplace_listing_id_foreign` FOREIGN KEY (`marketplace_listing_id`) REFERENCES `marketplace_listings` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_reports`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_reports` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `marketplace_listing_id` bigint(20) unsigned NOT NULL,
+  `reporter_id` bigint(20) unsigned NOT NULL,
+  `reason` enum('counterfeit','illegal','unsafe','misleading','discrimination','ip_violation','other') NOT NULL,
+  `description` text NOT NULL,
+  `evidence_urls` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`evidence_urls`)),
+  `status` enum('received','acknowledged','under_review','action_taken','no_action','appealed','appeal_resolved') NOT NULL DEFAULT 'received',
+  `acknowledged_at` timestamp NULL DEFAULT NULL,
+  `resolved_at` timestamp NULL DEFAULT NULL,
+  `resolution_reason` text DEFAULT NULL,
+  `action_taken` enum('none','warning','listing_removed','seller_suspended') DEFAULT NULL,
+  `appeal_text` text DEFAULT NULL,
+  `appeal_resolved_at` timestamp NULL DEFAULT NULL,
+  `handled_by` bigint(20) unsigned DEFAULT NULL,
+  `transparency_report_included` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `marketplace_reports_marketplace_listing_id_foreign` (`marketplace_listing_id`),
+  KEY `mr_reporter_id_idx` (`reporter_id`),
+  KEY `mr_handled_by_idx` (`handled_by`),
+  KEY `marketplace_reports_tenant_id_status_index` (`tenant_id`,`status`),
+  KEY `marketplace_reports_tenant_id_marketplace_listing_id_index` (`tenant_id`,`marketplace_listing_id`),
+  KEY `marketplace_reports_tenant_id_index` (`tenant_id`),
+  CONSTRAINT `marketplace_reports_marketplace_listing_id_foreign` FOREIGN KEY (`marketplace_listing_id`) REFERENCES `marketplace_listings` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_saved_listings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_saved_listings` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `marketplace_listing_id` bigint(20) unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `mps_tenant_user_listing_unique` (`tenant_id`,`user_id`,`marketplace_listing_id`),
+  KEY `marketplace_saved_listings_marketplace_listing_id_foreign` (`marketplace_listing_id`),
+  KEY `marketplace_saved_listings_tenant_id_index` (`tenant_id`),
+  CONSTRAINT `marketplace_saved_listings_marketplace_listing_id_foreign` FOREIGN KEY (`marketplace_listing_id`) REFERENCES `marketplace_listings` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_saved_searches`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_saved_searches` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `search_query` varchar(255) DEFAULT NULL,
+  `filters` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`filters`)),
+  `alert_frequency` enum('instant','daily','weekly') NOT NULL DEFAULT 'daily',
+  `alert_channel` enum('email','push','both') NOT NULL DEFAULT 'email',
+  `last_alerted_at` timestamp NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `mss_user_id_idx` (`user_id`),
+  KEY `marketplace_saved_searches_tenant_id_user_id_index` (`tenant_id`,`user_id`),
+  KEY `marketplace_saved_searches_tenant_id_index` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_seller_profiles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_seller_profiles` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `display_name` varchar(100) DEFAULT NULL,
+  `bio` text DEFAULT NULL,
+  `cover_image_url` varchar(500) DEFAULT NULL,
+  `avatar_url` varchar(500) DEFAULT NULL,
+  `seller_type` enum('private','business') NOT NULL DEFAULT 'private',
+  `business_name` varchar(200) DEFAULT NULL,
+  `business_registration` varchar(100) DEFAULT NULL,
+  `vat_number` varchar(50) DEFAULT NULL,
+  `business_address` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`business_address`)),
+  `business_verified` tinyint(1) NOT NULL DEFAULT 0,
+  `stripe_account_id` varchar(100) DEFAULT NULL,
+  `stripe_onboarding_complete` tinyint(1) NOT NULL DEFAULT 0,
+  `response_time_avg` int(11) DEFAULT NULL COMMENT 'Average response time in minutes',
+  `response_rate` decimal(5,2) DEFAULT NULL COMMENT 'Response rate percentage',
+  `total_sales` int(11) NOT NULL DEFAULT 0,
+  `total_revenue` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `avg_rating` decimal(3,2) DEFAULT NULL,
+  `total_ratings` int(11) NOT NULL DEFAULT 0,
+  `community_trust_score` decimal(5,2) DEFAULT NULL,
+  `is_community_endorsed` tinyint(1) NOT NULL DEFAULT 0,
+  `joined_marketplace_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `mpsp_tenant_user_unique` (`tenant_id`,`user_id`),
+  KEY `marketplace_seller_profiles_tenant_id_index` (`tenant_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_seller_ratings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_seller_ratings` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `order_id` bigint(20) unsigned NOT NULL,
+  `rater_id` bigint(20) unsigned NOT NULL,
+  `ratee_id` bigint(20) unsigned NOT NULL,
+  `rater_role` enum('buyer','seller') NOT NULL,
+  `rating` tinyint(4) NOT NULL,
+  `comment` text DEFAULT NULL,
+  `is_anonymous` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `msr_tenant_order_role_unique` (`tenant_id`,`order_id`,`rater_role`),
+  KEY `marketplace_seller_ratings_order_id_foreign` (`order_id`),
+  KEY `msr_rater_id_idx` (`rater_id`),
+  KEY `msr_ratee_id_idx` (`ratee_id`),
+  KEY `marketplace_seller_ratings_tenant_id_index` (`tenant_id`),
+  CONSTRAINT `marketplace_seller_ratings_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `marketplace_orders` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_shipping_options`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_shipping_options` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `seller_id` bigint(20) unsigned NOT NULL,
+  `courier_name` varchar(100) NOT NULL,
+  `courier_code` varchar(50) DEFAULT NULL,
+  `price` decimal(8,2) NOT NULL,
+  `currency` varchar(3) NOT NULL DEFAULT 'EUR',
+  `estimated_days` int(10) unsigned DEFAULT NULL,
+  `is_default` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `marketplace_shipping_options_seller_id_foreign` (`seller_id`),
+  KEY `marketplace_shipping_options_tenant_id_seller_id_index` (`tenant_id`,`seller_id`),
+  KEY `marketplace_shipping_options_tenant_id_index` (`tenant_id`),
+  CONSTRAINT `marketplace_shipping_options_seller_id_foreign` FOREIGN KEY (`seller_id`) REFERENCES `marketplace_seller_profiles` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `match_approvals`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5819,6 +6612,7 @@ DROP TABLE IF EXISTS `message_reactions`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `message_reactions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL DEFAULT 0,
   `message_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `emoji` varchar(10) NOT NULL,
@@ -5827,6 +6621,7 @@ CREATE TABLE `message_reactions` (
   UNIQUE KEY `unique_reaction` (`message_id`,`user_id`,`emoji`),
   KEY `idx_message_id` (`message_id`),
   KEY `idx_user_id` (`user_id`),
+  KEY `idx_mr_tenant_id` (`tenant_id`),
   CONSTRAINT `message_reactions_ibfk_1` FOREIGN KEY (`message_id`) REFERENCES `messages` (`id`) ON DELETE CASCADE,
   CONSTRAINT `message_reactions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -5837,6 +6632,7 @@ DROP TABLE IF EXISTS `messages`;
 CREATE TABLE `messages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tenant_id` int(11) NOT NULL,
+  `conversation_id` bigint(20) unsigned DEFAULT NULL,
   `sender_id` int(11) NOT NULL,
   `receiver_id` int(11) NOT NULL,
   `listing_id` int(11) DEFAULT NULL,
@@ -5878,9 +6674,9 @@ CREATE TABLE `messages` (
   KEY `idx_messages_is_deleted_receiver` (`tenant_id`,`receiver_id`,`is_deleted_receiver`),
   KEY `idx_msg_tenant_sender_receiver` (`tenant_id`,`sender_id`,`receiver_id`),
   KEY `idx_msg_tenant_receiver_unread` (`tenant_id`,`receiver_id`,`is_read`),
+  KEY `idx_msg_conversation` (`conversation_id`),
   CONSTRAINT `fk_messages_listing` FOREIGN KEY (`listing_id`) REFERENCES `listings` (`id`) ON DELETE SET NULL,
   CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `messages_ibfk_3` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=376 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -6419,7 +7215,7 @@ CREATE TABLE `notifications` (
   KEY `idx_notifications_user_read` (`user_id`,`is_read`),
   KEY `idx_notif_tenant_user_read_deleted` (`tenant_id`,`user_id`,`is_read`,`deleted_at`),
   CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3518 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3521 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `org_alert_settings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6459,7 +7255,7 @@ CREATE TABLE `org_audit_log` (
   KEY `idx_org_audit` (`tenant_id`,`organization_id`,`created_at`),
   KEY `idx_user_audit` (`tenant_id`,`user_id`,`created_at`),
   KEY `idx_action` (`tenant_id`,`action`,`created_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=127 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `org_balance_alerts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6825,7 +7621,7 @@ CREATE TABLE `personal_access_tokens` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
   KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=109 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=115 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `poll_options`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -7006,6 +7802,23 @@ CREATE TABLE `post_shares` (
   KEY `idx_user_tenant` (`user_id`,`tenant_id`),
   KEY `idx_created_tenant` (`tenant_id`,`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `post_views`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `post_views` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `post_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `ip_hash` varchar(64) DEFAULT NULL,
+  `viewed_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `post_views_user_unique` (`tenant_id`,`post_id`,`user_id`),
+  UNIQUE KEY `post_views_ip_unique` (`tenant_id`,`post_id`,`ip_hash`),
+  KEY `post_views_tenant_id_index` (`tenant_id`),
+  KEY `post_views_post_id_index` (`post_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `posts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -7304,6 +8117,7 @@ CREATE TABLE `reviews` (
   `rating` int(11) NOT NULL,
   `comment` text DEFAULT NULL,
   `review_type` enum('local','federated') NOT NULL DEFAULT 'local',
+  `dimensions` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`dimensions`)),
   `status` enum('pending','approved','rejected') DEFAULT 'approved',
   `is_anonymous` tinyint(1) NOT NULL DEFAULT 0,
   `show_cross_tenant` tinyint(1) NOT NULL DEFAULT 1,
@@ -7338,7 +8152,7 @@ CREATE TABLE `revoked_tokens` (
   KEY `idx_user_id` (`user_id`),
   KEY `idx_expires_at` (`expires_at`),
   CONSTRAINT `revoked_tokens_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=140 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=143 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `role_permissions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -8236,7 +9050,7 @@ CREATE TABLE `tenant_settings` (
   KEY `idx_setting_key` (`setting_key`),
   KEY `idx_setting_type` (`setting_type`),
   KEY `idx_created_at` (`created_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=566 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tenant-specific configuration settings and feature flags';
+) ENGINE=InnoDB AUTO_INCREMENT=581 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tenant-specific configuration settings and feature flags';
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tenant_wallet_limits`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -8460,10 +9274,24 @@ CREATE TABLE `transactions` (
   KEY `idx_txn_sender_status` (`sender_id`,`status`),
   KEY `idx_txn_receiver_status` (`receiver_id`,`status`),
   CONSTRAINT `fk_transactions_giver` FOREIGN KEY (`giver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `transactions_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `transactions_ibfk_3` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+  CONSTRAINT `transactions_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=126 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `translation_glossaries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `translation_glossaries` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `source_term` varchar(255) NOT NULL,
+  `target_term` varchar(255) NOT NULL,
+  `target_language` varchar(10) NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `translation_glossaries_tenant_id_index` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `user_active_unlockables`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -8531,6 +9359,7 @@ CREATE TABLE `user_blocks` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(10) unsigned NOT NULL COMMENT 'User who blocked',
   `blocked_user_id` int(10) unsigned NOT NULL COMMENT 'User who was blocked',
+  `reason` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `blocker_user_id` int(11) DEFAULT NULL,
   `match` timestamp NULL DEFAULT NULL,
@@ -9153,7 +9982,7 @@ CREATE TABLE `users` (
   `verification_status` enum('none','pending','passed','failed','expired') NOT NULL DEFAULT 'none',
   `verification_provider` varchar(50) DEFAULT NULL,
   `verification_completed_at` datetime DEFAULT NULL,
-  `status` enum('active','inactive','suspended','banned') DEFAULT 'active',
+  `status` enum('active','inactive','suspended','banned','pending') DEFAULT 'active',
   `balance` int(11) DEFAULT 0,
   `bio` text DEFAULT NULL,
   `privacy_profile` enum('public','members','connections') DEFAULT 'public',
@@ -9192,6 +10021,7 @@ CREATE TABLE `users` (
   `max_permission_level` int(10) unsigned DEFAULT 0 COMMENT 'Maximum permission level this user can grant',
   `permissions_last_updated` timestamp NULL DEFAULT NULL COMMENT 'Cache invalidation timestamp',
   `email_verified_at` timestamp NULL DEFAULT NULL COMMENT 'Timestamp when user verified their email address',
+  `verification_token` varchar(255) DEFAULT NULL,
   `is_verified` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Whether user account is verified (1) or not (0)',
   `award` varchar(255) DEFAULT NULL,
   `banned_until` varchar(255) DEFAULT NULL,
@@ -9774,6 +10604,28 @@ CREATE TABLE `vol_opportunities` (
   CONSTRAINT `fk_vol_cat` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `vol_org_transactions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `vol_org_transactions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `vol_organization_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL COMMENT 'Volunteer or admin who triggered this',
+  `vol_log_id` int(11) DEFAULT NULL COMMENT 'Links to approved hours entry',
+  `type` enum('deposit','withdrawal','volunteer_payment','admin_adjustment') NOT NULL,
+  `amount` decimal(10,2) NOT NULL COMMENT 'Positive=credit to org, Negative=debit from org',
+  `balance_after` decimal(10,2) NOT NULL COMMENT 'Org balance after this transaction',
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_vot_tenant` (`tenant_id`),
+  KEY `idx_vot_org` (`vol_organization_id`),
+  KEY `idx_vot_user` (`user_id`),
+  KEY `idx_vot_log` (`vol_log_id`),
+  KEY `idx_vot_date` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `vol_organizations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -9790,13 +10642,15 @@ CREATE TABLE `vol_organizations` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `status` varchar(20) DEFAULT 'pending',
   `auto_pay_enabled` tinyint(1) DEFAULT 0,
+  `balance` decimal(10,2) NOT NULL DEFAULT 0.00,
   `updated_at` timestamp NULL DEFAULT NULL,
   `dlp_user_id` int(10) unsigned DEFAULT NULL,
   `deputy_dlp_user_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_vol_org_tenant` (`tenant_id`),
   KEY `idx_vol_org_user` (`user_id`),
-  KEY `idx_vo_slug` (`tenant_id`,`slug`)
+  KEY `idx_vo_slug` (`tenant_id`,`slug`),
+  KEY `idx_vol_org_balance` (`tenant_id`,`balance`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `vol_reminder_settings`;
@@ -10336,7 +11190,41 @@ INSERT INTO `laravel_migrations` VALUES
 (41,'2026_04_03_200002_add_availability_to_listings',17),
 (42,'2026_04_03_300001_add_last_notified_at_to_saved_searches',17),
 (43,'2026_04_04_110000_add_missing_columns_to_events',17),
-(44,'2026_04_05_104458_add_sort_order_and_is_active_to_categories_table',18);
+(44,'2026_04_05_104458_add_sort_order_and_is_active_to_categories_table',18),
+(45,'2026_04_05_000001_create_marketplace_listings_table',19),
+(46,'2026_04_05_000002_create_marketplace_support_tables',19),
+(47,'2026_04_05_000003_create_marketplace_seller_profiles_table',19),
+(48,'2026_04_05_000004_create_marketplace_offers_table',19),
+(49,'2026_04_05_100001_create_marketplace_orders_table',19),
+(50,'2026_04_05_100002_create_marketplace_ratings_and_disputes_tables',19),
+(51,'2026_04_05_130000_add_verification_token_to_users',19),
+(52,'2026_04_05_131000_add_pending_to_users_status_enum',19),
+(53,'2026_04_05_200001_create_marketplace_payments_table',19),
+(54,'2026_04_05_200002_create_marketplace_discovery_tables',19),
+(55,'2026_04_05_300001_create_marketplace_phase4_tables',19),
+(56,'2026_04_05_400001_create_marketplace_delivery_offers_table',19),
+(57,'2026_04_05_000001_create_translation_glossaries_table',20),
+(58,'2026_04_05_500001_add_video_url_to_marketplace_listings',20),
+(59,'2026_04_06_000001_fix_marketplace_delivery_offers_tenant_id_type',20),
+(60,'2026_04_07_000001_add_identity_verification_payment',20),
+(61,'2026_04_07_000001_add_vol_org_wallet_support',20),
+(62,'2026_04_07_000001_create_bookmarks_tables',21),
+(63,'2026_04_07_000002_add_view_counts_to_feed_posts',22),
+(64,'2026_04_07_100001_add_reminder_sent_at_to_job_interviews',22),
+(65,'2026_04_07_100002_add_template_type_to_job_templates',22),
+(66,'2026_04_07_100003_add_review_type_and_dimensions_to_reviews',22),
+(67,'2026_04_07_200001_add_quoted_post_to_feed_posts',22),
+(68,'2026_04_07_300001_create_blocked_users_table',22),
+(69,'2026_04_07_300002_create_message_reactions_table',22),
+(70,'2026_04_07_300003_add_group_conversations',22),
+(71,'2026_04_10_170000_drop_messages_sender_fk_for_federation',23),
+(72,'2026_04_10_175000_drop_transactions_sender_receiver_fk_for_federation',23),
+(73,'2026_04_11_100000_add_rejected_status_to_federation_partnerships',23),
+(74,'2026_04_11_200000_add_protocol_type_to_federation_external_partners',24),
+(75,'2026_04_11_200001_create_federation_cc_entries_table',24),
+(76,'2026_04_12_100000_create_federated_identities_table',25),
+(77,'2026_04_12_110000_add_allow_flags_to_federation_external_partners',25),
+(78,'2026_04_12_120000_create_federation_shadow_tables',25);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

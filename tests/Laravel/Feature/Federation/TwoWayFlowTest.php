@@ -285,41 +285,36 @@ final class TwoWayFlowTest extends TestCase
         Event::fake(['App\\Events\\FederatedListingReceived']);
 
         $response = $this->simulateInboundWebhook($partner, 'listing.created', [
-            'id'          => 321,
+            'external_id' => 'ext-listing-' . uniqid(),
             'title'       => 'Remote listing',
             'description' => 'Offered by a partner',
             'type'        => 'offer',
             'user_id'     => 1,
         ]);
 
-        // Current main doesn't yet route listing.created inbound — tolerate either.
-        if ($response->status() !== 200) {
-            $this->markTestIncomplete(
-                'Inbound listing webhook handler not yet implemented (route via protocol adapter + handleInboundListing).'
-            );
-        }
-
         $response->assertStatus(200);
+        $this->assertNotSame('unhandled', $response->json('data.result.status'));
     }
 
     /** @dataProvider protocolProvider */
     public function test_inbound_review_webhook(string $protocol): void
     {
         $partner = $this->setupPartner($protocol);
+        $receiver = User::factory()->forTenant($this->testTenantId)->create();
+        // Reviewer must exist locally (reviews.reviewer_id has FK to users.id);
+        // partners supply a previously-synced member's local id as the reviewer.
+        $reviewer = User::factory()->forTenant($this->testTenantId)->create();
 
         $response = $this->simulateInboundWebhook($partner, 'review.created', [
-            'id'              => 500,
+            'external_id'     => 'ext-review-' . uniqid(),
             'rating'          => 5,
             'comment'         => 'Great service',
-            'reviewer_id'     => 1,
-            'reviewee_id'     => 2,
+            'reviewer_id'     => $reviewer->id,
+            'receiver_id'     => $receiver->id,
         ]);
 
-        if ($response->status() !== 200 || ($response->json('data.result.status') ?? null) === 'unhandled') {
-            $this->markTestIncomplete(
-                'TODO(federation): inbound review webhook handler not implemented in FederationExternalWebhookController.'
-            );
-        }
+        $response->assertStatus(200);
+        $this->assertNotSame('unhandled', $response->json('data.result.status'));
     }
 
     /** @dataProvider protocolProvider */
@@ -328,16 +323,13 @@ final class TwoWayFlowTest extends TestCase
         $partner = $this->setupPartner($protocol);
 
         $response = $this->simulateInboundWebhook($partner, 'event.created', [
-            'id'         => 600,
-            'title'      => 'Remote Meetup',
-            'start_time' => '2026-06-01T18:00:00Z',
+            'external_id' => 'ext-event-' . uniqid(),
+            'title'       => 'Remote Meetup',
+            'starts_at'   => '2026-06-01T18:00:00Z',
         ]);
 
-        if ($response->status() !== 200 || ($response->json('data.result.status') ?? null) === 'unhandled') {
-            $this->markTestIncomplete(
-                'TODO(federation): inbound community event webhook handler not implemented.'
-            );
-        }
+        $response->assertStatus(200);
+        $this->assertNotSame('unhandled', $response->json('data.result.status'));
     }
 
     /** @dataProvider protocolProvider */
@@ -346,29 +338,28 @@ final class TwoWayFlowTest extends TestCase
         $partner = $this->setupPartner($protocol);
 
         $response = $this->simulateInboundWebhook($partner, 'group.created', [
-            'id'   => 700,
-            'name' => 'Remote Group',
+            'external_id' => 'ext-group-' . uniqid(),
+            'name'        => 'Remote Group',
         ]);
 
-        if ($response->status() !== 200 || ($response->json('data.result.status') ?? null) === 'unhandled') {
-            $this->markTestIncomplete('TODO(federation): inbound group webhook handler not implemented.');
-        }
+        $response->assertStatus(200);
+        $this->assertNotSame('unhandled', $response->json('data.result.status'));
     }
 
     /** @dataProvider protocolProvider */
     public function test_inbound_connection_webhook(string $protocol): void
     {
         $partner = $this->setupPartner($protocol);
+        $localUser = User::factory()->forTenant($this->testTenantId)->create();
 
         $response = $this->simulateInboundWebhook($partner, 'connection.requested', [
-            'id'              => 800,
-            'requester_id'    => 1,
-            'recipient_id'    => 2,
+            'external_user_id' => 'ext-user-' . uniqid(),
+            'local_user_id'    => $localUser->id,
+            'message'          => 'Would like to connect',
         ]);
 
-        if ($response->status() !== 200 || ($response->json('data.result.status') ?? null) === 'unhandled') {
-            $this->markTestIncomplete('TODO(federation): inbound connection webhook handler not implemented.');
-        }
+        $response->assertStatus(200);
+        $this->assertNotSame('unhandled', $response->json('data.result.status'));
     }
 
     /** @dataProvider protocolProvider */
@@ -377,14 +368,13 @@ final class TwoWayFlowTest extends TestCase
         $partner = $this->setupPartner($protocol);
 
         $response = $this->simulateInboundWebhook($partner, 'volunteering.created', [
-            'id'          => 900,
+            'external_id' => 'ext-vol-' . uniqid(),
             'title'       => 'Remote vol opp',
             'description' => 'Help out',
         ]);
 
-        if ($response->status() !== 200 || ($response->json('data.result.status') ?? null) === 'unhandled') {
-            $this->markTestIncomplete('TODO(federation): inbound volunteering webhook handler not implemented.');
-        }
+        $response->assertStatus(200);
+        $this->assertNotSame('unhandled', $response->json('data.result.status'));
     }
 
     /** @dataProvider protocolProvider */
