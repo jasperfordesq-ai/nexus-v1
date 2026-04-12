@@ -1485,6 +1485,10 @@ return [
     'url_http_https_only'                  => 'Only http and https URLs are supported',
     'link_preview_failed'                  => 'Could not fetch preview for this URL',
 
+    // Bulk actions
+    'bulk_ids_required'                    => 'A non-empty list of IDs is required for bulk actions.',
+    'bulk_too_many'                        => 'Too many IDs. Maximum :max per bulk action.',
+
     // Group exchanges
     'total_hours_gt_zero'                  => 'Total hours must be greater than 0',
 ];

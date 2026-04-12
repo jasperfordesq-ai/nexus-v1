@@ -35,7 +35,8 @@ import {
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '../../components';
+import { adminMarketplace, type BulkActionResult } from '../../api/adminApi';
+import { PageHeader, DataTable, ConfirmModal, EmptyState, BulkActionToolbar, type BulkAction, type Column } from '../../components';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -103,6 +104,10 @@ export function MarketplaceModerationPage() {
   const [rejectTarget, setRejectTarget] = useState<MarketplaceListing | null>(null);
   const [rejectNotes, setRejectNotes] = useState('');
   const [rejectLoading, setRejectLoading] = useState(false);
+
+  // Bulk selection state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
 
   const loadListings = useCallback(async () => {
     setLoading(true);
@@ -392,6 +397,54 @@ export function MarketplaceModerationPage() {
         </Tabs>
       </div>
 
+      {/* Bulk action toolbar */}
+      {(() => {
+        const selectedIdList = Array.from(selectedIds).map((id) => Number(id)).filter((n) => Number.isFinite(n));
+        const bulkActions: BulkAction[] = [
+          {
+            key: 'reject',
+            label: t('bulk.marketplace.reject'),
+            icon: <XCircle size={14} />,
+            color: 'danger',
+            destructive: true,
+            needsReason: true,
+            reasonLabel: t('bulk.marketplace.reason_label'),
+            reasonPlaceholder: t('bulk.marketplace.reason_placeholder'),
+            confirmTitle: t('bulk.marketplace.reject_confirm_title'),
+            confirmMessage: t('bulk.marketplace.reject_confirm_message', { count: selectedIdList.length }),
+            onConfirm: async (reason) => {
+              if (!reason) return;
+              setBulkLoading(true);
+              try {
+                const res = await adminMarketplace.bulkReject(selectedIdList, reason);
+                if (!res.success) {
+                  toast.error(res.error || t('bulk.result_failed'));
+                  return;
+                }
+                const data = (res.data as BulkActionResult) || { success: 0, failed: 0 };
+                if (data.failed && data.failed > 0) {
+                  toast.error(t('bulk.result_partial', { success: data.success, failed: data.failed }));
+                } else {
+                  toast.success(t('bulk.result_success', { count: data.success }));
+                }
+                setSelectedIds(new Set());
+                loadListings();
+              } finally {
+                setBulkLoading(false);
+              }
+            },
+          },
+        ];
+        return (
+          <BulkActionToolbar
+            selectedCount={selectedIds.size}
+            actions={bulkActions}
+            onClearSelection={() => setSelectedIds(new Set())}
+            isLoading={bulkLoading}
+          />
+        );
+      })()}
+
       {/* Data table */}
       <DataTable
         columns={columns}
@@ -407,6 +460,8 @@ export function MarketplaceModerationPage() {
         page={page}
         pageSize={20}
         onPageChange={setPage}
+        selectable
+        onSelectionChange={setSelectedIds}
         emptyContent={
           <EmptyState
             icon={ShoppingBag}

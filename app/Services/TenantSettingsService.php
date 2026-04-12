@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\DB;
 /**
  * TenantSettingsService — reads/writes tenant_settings (key-value) table,
  * enforces login gates, and checks registration policy.
+ *
+ * This service was converted from static to instance methods as part of the TD9
+ * service layer DI refactor. Resolve via DI (constructor inject) or
+ * `app(TenantSettingsService::class)`. See docs/SERVICE_LAYER.md for the migration pattern.
  */
 class TenantSettingsService
 {
@@ -25,18 +29,18 @@ class TenantSettingsService
     /**
      * Get a single tenant setting value.
      */
-    public static function get(int $tenantId, string $key, $default = null)
+    public function get(int $tenantId, string $key, $default = null)
     {
-        $settings = static::loadAll($tenantId);
+        $settings = $this->loadAll($tenantId);
         return $settings[$key] ?? $default;
     }
 
     /**
      * Get a tenant setting as a boolean.
      */
-    public static function getBool(int $tenantId, string $key, bool $default = false): bool
+    public function getBool(int $tenantId, string $key, bool $default = false): bool
     {
-        $value = static::get($tenantId, $key);
+        $value = $this->get($tenantId, $key);
 
         if ($value === null) {
             return $default;
@@ -48,23 +52,23 @@ class TenantSettingsService
     /**
      * Check if admin approval is required for this tenant.
      */
-    public static function requiresAdminApproval(int $tenantId): bool
+    public function requiresAdminApproval(int $tenantId): bool
     {
-        return static::getBool($tenantId, 'admin_approval', false);
+        return $this->getBool($tenantId, 'admin_approval', false);
     }
 
     /**
      * Check if email verification is required for this tenant.
      */
-    public static function requiresEmailVerification(int $tenantId): bool
+    public function requiresEmailVerification(int $tenantId): bool
     {
-        return static::getBool($tenantId, 'email_verification', false);
+        return $this->getBool($tenantId, 'email_verification', false);
     }
 
     /**
      * Set a tenant setting value.
      */
-    public static function set(int $tenantId, string $key, string $value, string $type = 'string'): void
+    public function set(int $tenantId, string $key, string $value, string $type = 'string'): void
     {
         $existing = DB::selectOne(
             "SELECT id FROM tenant_settings WHERE tenant_id = ? AND setting_key = ?",
@@ -83,15 +87,15 @@ class TenantSettingsService
             );
         }
 
-        static::clearCacheForTenant($tenantId);
+        $this->clearCacheForTenant($tenantId);
     }
 
     /**
      * Get all settings for a tenant.
      */
-    public static function getAllGeneral(int $tenantId): array
+    public function getAllGeneral(int $tenantId): array
     {
-        return static::loadAll($tenantId);
+        return $this->loadAll($tenantId);
     }
 
     /**
@@ -101,7 +105,7 @@ class TenantSettingsService
      * as a literal key that never exists, so the old code was a silent no-op.
      * Instead, scan Redis for all matching keys and delete them individually.
      */
-    public static function clearCache(): void
+    public function clearCache(): void
     {
         try {
             $redis = \Illuminate\Support\Facades\Redis::connection();
@@ -122,7 +126,7 @@ class TenantSettingsService
     /**
      * Clear cached settings for a specific tenant.
      */
-    public static function clearCacheForTenant(int $tenantId): void
+    public function clearCacheForTenant(int $tenantId): void
     {
         Cache::forget(self::CACHE_PREFIX . $tenantId);
     }
@@ -132,9 +136,9 @@ class TenantSettingsService
      *
      * Reads the `registration_mode` setting. Defaults to 'open' if not set.
      */
-    public static function isRegistrationOpen(int $tenantId): bool
+    public function isRegistrationOpen(int $tenantId): bool
     {
-        $mode = static::get($tenantId, 'registration_mode', 'open');
+        $mode = $this->get($tenantId, 'registration_mode', 'open');
         return $mode === 'open';
     }
 
@@ -149,9 +153,9 @@ class TenantSettingsService
      * @param array $user User row (must include: role, is_super_admin, is_tenant_super_admin, tenant_id)
      * @return array|null Null = passes, or ['code' => ..., 'message' => ..., 'extra' => [...]]
      */
-    public static function checkLoginGates(array $user): ?array
+    public function checkLoginGates(array $user): ?array
     {
-        return static::checkLoginGatesForUser($user);
+        return $this->checkLoginGatesForUser($user);
     }
 
     /**
@@ -160,7 +164,7 @@ class TenantSettingsService
      * @param array $user User row from DB
      * @return array|null Null = passes, or error array
      */
-    public static function checkLoginGatesForUser(array $user): ?array
+    public function checkLoginGatesForUser(array $user): ?array
     {
         $role = $user['role'] ?? 'member';
         $isSuperAdmin = !empty($user['is_super_admin']);
@@ -194,7 +198,7 @@ class TenantSettingsService
         }
 
         // Check email verification requirement
-        if ($tenantId > 0 && static::getBool($tenantId, 'email_verification', false)) {
+        if ($tenantId > 0 && $this->getBool($tenantId, 'email_verification', false)) {
             if (empty($user['email_verified_at'])) {
                 return [
                     'code' => 'AUTH_EMAIL_NOT_VERIFIED',
@@ -205,7 +209,7 @@ class TenantSettingsService
         }
 
         // Check admin approval requirement
-        if ($tenantId > 0 && static::getBool($tenantId, 'admin_approval', false)) {
+        if ($tenantId > 0 && $this->getBool($tenantId, 'admin_approval', false)) {
             if (empty($user['is_approved'])) {
                 return [
                     'code' => 'AUTH_ACCOUNT_PENDING_APPROVAL',
@@ -221,7 +225,7 @@ class TenantSettingsService
     /**
      * Load all settings for a tenant (with caching).
      */
-    private static function loadAll(int $tenantId): array
+    private function loadAll(int $tenantId): array
     {
         $cacheKey = self::CACHE_PREFIX . $tenantId;
 

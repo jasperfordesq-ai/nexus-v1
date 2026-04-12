@@ -251,7 +251,21 @@ export const adminUsers = {
     const baseUrl = import.meta.env.VITE_API_BASE || '/api';
     window.open(`${baseUrl}/v2/admin/users/import/template`, '_blank');
   },
+
+  bulkApprove: (userIds: number[]) =>
+    api.post<BulkActionResult>('/v2/admin/users/bulk-approve', { user_ids: userIds }),
+
+  bulkSuspend: (userIds: number[], reason?: string) =>
+    api.post<BulkActionResult>('/v2/admin/users/bulk-suspend', { user_ids: userIds, reason }),
 };
+
+// Shared bulk-action response shape
+export interface BulkActionResult {
+  success: number;
+  failed: number;
+  skipped_ids?: number[];
+  errors?: string[];
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Config (Features & Modules) — V2 API already exists
@@ -623,6 +637,20 @@ export const adminBlog = {
 
   toggleStatus: (id: number) =>
     api.post<{ success: boolean }>(`/v2/admin/blog/${id}/toggle-status`),
+
+  bulkDelete: (postIds: number[]) =>
+    api.post<BulkActionResult>('/v2/admin/blog/bulk-delete', { post_ids: postIds }),
+
+  bulkPublish: (postIds: number[]) =>
+    api.post<BulkActionResult>('/v2/admin/blog/bulk-publish', { post_ids: postIds }),
+};
+
+export const adminMarketplace = {
+  bulkReject: (listingIds: number[], reason: string) =>
+    api.post<BulkActionResult>('/v2/admin/marketplace/bulk-reject', {
+      listing_ids: listingIds,
+      reason,
+    }),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

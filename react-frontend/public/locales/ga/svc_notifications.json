@@ -1,77 +1,81 @@
 {
   "badge_collection": {
-    "collection_complete": "Bailiúchán Críochnaithe! Chríochnaigh tú '{{name}}' agus thuill tú {{xp}} XP breise! {{icon}}"
+    "collection_complete": "Collection Complete! You finished '{{name}}' and earned {{xp}} bonus XP! {{icon}}"
   },
   "broker": {
-    "message_for_review": "Teachtaireacht nua le hathbhreithniú ó {{sender}}"
+    "message_for_review": "New message for review from {{sender}}"
+  },
+  "federation": {
+    "message_received": "Teachtaireacht chónasctha nua ó {{sender}} ({{partner}})",
+    "transaction_received": "Fuair tú {{amount}} creidiúintí ama ó {{sender}} ({{partner}})"
   },
   "challenge": {
-    "complete_claim": "Dúshlán Críochnaithe! Chríochnaigh tú '{{title}}' — éiligh do luach saothair!",
-    "complete_earned": "Dúshlán Críochnaithe! Chríochnaigh tú '{{title}}' agus thuill tú {{xp}} XP!"
+    "complete_claim": "Challenge Complete! You finished '{{title}}' — claim your reward!",
+    "complete_earned": "Challenge Complete! You finished '{{title}}' and earned {{xp}} XP!"
   },
   "gamification": {
-    "badge_earned": "Thuill tú an suaitheantas '{{name}}'! {{icon}}",
-    "level_up": "Comhghairdeas! Bhain tú Leibhéal {{level}} amach!"
+    "badge_earned": "You earned the '{{name}}' badge! {{icon}}",
+    "level_up": "Congratulations! You've reached Level {{level}}!"
   },
   "job_offer": {
-    "received_bell": "Fuair tú tairiscint poist do {{title}}",
-    "received_push_title": "Tairiscint Poist Faighte!",
-    "received_push_message": "Fuair tú tairiscint poist do {{title}}",
-    "credits_earned_bell": "Thuill tú {{amount}} creidmheas ama as {{title}} a chríochnú!",
-    "credits_earned_push_title": "Creidmheasanna Ama Tuillte!",
-    "credits_earned_push_message": "Thuill tú {{amount}} creidmheas ama as {{title}} a chríochnú!",
-    "accepted_bell": "Tairiscint glactha do {{title}}",
-    "accepted_push_title": "Tairiscint glactha do {{title}}",
-    "accepted_push_message": "Tairiscint glactha do {{title}}",
-    "rejected_bell": "Tairiscint diúltaithe do {{title}}",
-    "rejected_push_title": "Tairiscint diúltaithe do {{title}}",
-    "rejected_push_message": "Tairiscint diúltaithe do {{title}}",
-    "withdrawn_bell": "Tairiscint poist tarraingthe siar do {{title}}",
-    "withdrawn_push_title": "Tairiscint poist tarraingthe siar do {{title}}",
-    "withdrawn_push_message": "Tairiscint poist tarraingthe siar do {{title}}"
+    "received_bell": "You have received a job offer for {{title}}",
+    "received_push_title": "Job Offer Received!",
+    "received_push_message": "You have received a job offer for {{title}}",
+    "credits_earned_bell": "You earned {{amount}} time credits for completing {{title}}!",
+    "credits_earned_push_title": "Time Credits Earned!",
+    "credits_earned_push_message": "You earned {{amount}} time credits for completing {{title}}!",
+    "accepted_bell": "Offer accepted for {{title}}",
+    "accepted_push_title": "Offer accepted for {{title}}",
+    "accepted_push_message": "Offer accepted for {{title}}",
+    "rejected_bell": "Offer rejected for {{title}}",
+    "rejected_push_title": "Offer rejected for {{title}}",
+    "rejected_push_message": "Offer rejected for {{title}}",
+    "withdrawn_bell": "Job offer withdrawn for {{title}}",
+    "withdrawn_push_title": "Job offer withdrawn for {{title}}",
+    "withdrawn_push_message": "Job offer withdrawn for {{title}}"
   },
   "job_alert": {
-    "match_bell": "Post nua a mheaitseálann le d'fhógra: {{title}}",
-    "match_push_title": "Meaitseáil Nua Poist",
-    "match_push_message": "Post nua a mheaitseálann le d'fhógra: {{title}}"
+    "match_bell": "New job matching your alert: {{title}}",
+    "match_push_title": "New Job Match",
+    "match_push_message": "New job matching your alert: {{title}}"
   },
   "legal": {
-    "update_title": "Nuashonraithe: {{title}}",
-    "update_message": "Athbhreithnigh leagan {{version}} dár {{title}} le do thoil"
+    "update_title": "Updated: {{title}}",
+    "update_message": "Please review version {{version}} of our {{title}}"
   },
   "verification_badge": {
-    "granted": "Tugadh an suaitheantas deimhnithe '{{label}}' duit"
+    "granted": "You have been granted the '{{label}}' verification badge"
   },
   "mention": {
-    "mentioned_in": "Luaigh @{{name}} tú i {{entity}}",
-    "mentioned_in_with_preview": "Luaigh @{{name}} tú i {{entity}}: \"{{preview}}\""
+    "mentioned_in": "@{{name}} mentioned you in a {{entity}}",
+    "mentioned_in_with_preview": "@{{name}} mentioned you in a {{entity}}: \"{{preview}}\""
   },
   "story": {
-    "reaction": "D'fhreagair {{name}} le {{emoji}} ar do scéal"
+    "reaction": "{{name}} reacted {{emoji}} to your story"
   },
   "sub_account": {
-    "management_request": "D'iarr {{name}} do chuntas a bhainistiú mar {{type}}"
+    "management_request": "{{name}} has requested to manage your account as a {{type}}"
   },
   "totp": {
-    "rate_limited": "An iomarca iarrachtaí teipthe. Bain triail eile as i gceann {{minutes}} nóiméad."
+    "rate_limited": "Too many failed attempts. Please try again in {{minutes}} minutes."
   },
   "registration": {
-    "admin_pending_approval": "Teastaíonn ceadú ó úsáideoir nua {{name}} ({{email}})"
+    "admin_pending_approval": "New user {{name}} ({{email}}) requires approval"
   },
   "nexus_score": {
-    "strength_title": "Is é {{name}} an réimse is láidre agat!",
-    "strength_message": "Tá tú sa chiseal is airde le {{percentage}}% i {{name}}.",
-    "improvement_title": "Cuir le do scór {{name}}",
-    "tip_engagement": "Bain triail as creidmheasanna ama a sheoladh agus a fháil ó bhaill éagsúla den phobal.",
-    "tip_quality": "Díreach ar idirbhearta a chríochnú go rathúil agus athbhreithnithe dearfacha a thuilleamh.",
-    "tip_volunteer": "Logáil d'uaireanta oibre deonaí go rialta agus coinnigh comhsheasmhacht.",
-    "tip_activity": "Cruthaigh liostaí, ceangail le grúpaí, agus coinnigh sreangán laethúil logála isteach.",
-    "tip_badges": "Críochnaigh dúshláin chun tuilleadh suaitheantas agus éachtaí a thuilleamh.",
-    "tip_impact": "Roinn postálacha agus glac páirt i bhfotha an phobail.",
-    "tip_default": "Lean ort ag glacadh páirte sa phobal!",
-    "suggestion_connect_title": "Ceangail le tuilleadh ball den phobal",
-    "suggestion_connect_message": "Malartaigh creidmheasanna le daoine nua chun éagsúlacht do líonra a mhéadú.",
-    "suggestion_exchanges_title": "Críochnaigh tuilleadh malartuithe",
-    "suggestion_exchanges_message": "Tóg do cháil trí idirbhearta a chríochnú agus athbhreithnithe a thuilleamh."
+    "strength_title": "{{name}} is your strongest area!",
+    "strength_message": "You're in the top tier with {{percentage}}% in {{name}}.",
+    "improvement_title": "Grow your {{name}} score",
+    "tip_engagement": "Try sending and receiving time credits with different community members.",
+    "tip_quality": "Focus on completing transactions successfully and earning positive reviews.",
+    "tip_volunteer": "Log your volunteer hours regularly and maintain consistency.",
+    "tip_activity": "Create listings, join groups, and maintain a daily login streak.",
+    "tip_badges": "Complete challenges to earn more badges and achievements.",
+    "tip_impact": "Share posts and engage with the community feed.",
+    "tip_default": "Keep participating in the community!",
+    "suggestion_connect_title": "Connect with more community members",
+    "suggestion_connect_message": "Exchange credits with new people to increase your network diversity.",
+    "suggestion_exchanges_title": "Complete more exchanges",
+    "suggestion_exchanges_message": "Build your reputation by completing transactions and earning reviews."
   }
 }

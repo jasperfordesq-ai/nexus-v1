@@ -56,7 +56,7 @@ class GroupSSOService
     {
         $tenantId = TenantContext::getId();
 
-        $raw = TenantSettingsService::get($tenantId, self::SSO_CONFIG_KEY);
+        $raw = app(TenantSettingsService::class)->get($tenantId, self::SSO_CONFIG_KEY);
 
         if ($raw === null) {
             return self::DEFAULT_CONFIG;
@@ -92,7 +92,7 @@ class GroupSSOService
             $merged['attribute_mapping'] = self::DEFAULT_CONFIG['attribute_mapping'];
         }
 
-        TenantSettingsService::set(
+        app(TenantSettingsService::class)->set(
             $tenantId,
             self::SSO_CONFIG_KEY,
             json_encode($merged, JSON_UNESCAPED_SLASHES),

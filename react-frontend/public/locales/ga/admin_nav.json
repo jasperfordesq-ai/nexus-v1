@@ -144,11 +144,5 @@
     "admin": "Riarachán",
     "expand_sidebar": "Leathnaigh an barra taoibh",
     "collapse_sidebar": "Crap an barra taoibh"
-  },
-  "landing_page": "Landing Page",
-  "marketplace": "Marketplace",
-  "marketplace_dashboard": "Marketplace Dashboard",
-  "marketplace_moderation": "Marketplace Moderation",
-  "marketplace_sellers": "Marketplace Sellers",
-  "translation_config": "Translation Config"
+  }
 }

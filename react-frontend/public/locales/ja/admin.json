@@ -3988,5 +3988,9 @@
     "volunteer_organizations_title": "Volunteer Organizations",
     "volunteering_overview_desc": "Manage and configure volunteering overview settings",
     "volunteering_overview_title": "Volunteering Overview"
-  }
+  },
+  "cancel": "Cancel",
+  "close": "Close",
+  "import": "Import",
+  "filter": "Filter"
 }

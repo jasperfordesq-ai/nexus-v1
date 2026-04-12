@@ -49,7 +49,7 @@ class AuditLogServiceTest extends TestCase
         DB::shouldReceive('table')->with('org_audit_log')->andReturnSelf();
         DB::shouldReceive('insertGetId')->once()->andReturn(10);
 
-        $id = AuditLogService::log('test_action', 1, 2, ['detail' => 'value']);
+        $id = $this->service->log('test_action', 1, 2, ['detail' => 'value']);
         $this->assertSame(10, $id);
     }
 
@@ -59,7 +59,7 @@ class AuditLogServiceTest extends TestCase
         DB::shouldReceive('insertGetId')->andThrow(new \Exception('DB error'));
         Log::shouldReceive('warning')->once();
 
-        $id = AuditLogService::log('test_action');
+        $id = $this->service->log('test_action');
         $this->assertNull($id);
     }
 
@@ -80,7 +80,7 @@ class AuditLogServiceTest extends TestCase
         DB::shouldReceive('table')->with('org_audit_log')->andReturnSelf();
         DB::shouldReceive('insertGetId')->once()->andReturn(5);
 
-        $id = AuditLogService::logAdminAction('admin_user_created', 1, 2, ['email' => 'test@test.com']);
+        $id = $this->service->logAdminAction('admin_user_created', 1, 2, ['email' => 'test@test.com']);
         $this->assertSame(5, $id);
     }
 
@@ -89,7 +89,7 @@ class AuditLogServiceTest extends TestCase
         DB::shouldReceive('table')->with('org_audit_log')->andReturnSelf();
         DB::shouldReceive('insertGetId')->once()->andReturn(6);
 
-        $id = AuditLogService::logUserUpdated(1, 2, ['name', 'email']);
+        $id = $this->service->logUserUpdated(1, 2, ['name', 'email']);
         $this->assertSame(6, $id);
     }
 
@@ -100,7 +100,7 @@ class AuditLogServiceTest extends TestCase
         DB::shouldReceive('delete')->andReturn(50);
         DB::shouldReceive('raw')->andReturn('');
 
-        $count = AuditLogService::cleanup(365);
+        $count = $this->service->cleanup(365);
         $this->assertSame(50, $count);
     }
 
@@ -111,7 +111,7 @@ class AuditLogServiceTest extends TestCase
         DB::shouldReceive('raw')->andReturn('');
         Log::shouldReceive('warning')->once();
 
-        $count = AuditLogService::cleanup();
+        $count = $this->service->cleanup();
         $this->assertSame(0, $count);
     }
 
@@ -121,7 +121,7 @@ class AuditLogServiceTest extends TestCase
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('count')->andReturn(25);
 
-        $count = AuditLogService::getLogCount(1);
+        $count = $this->service->getLogCount(1);
         $this->assertSame(25, $count);
     }
 
@@ -132,7 +132,7 @@ class AuditLogServiceTest extends TestCase
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('count')->andThrow(new \Exception('fail'));
 
-        $count = AuditLogService::getLogCount(1);
+        $count = $this->service->getLogCount(1);
         $this->assertSame(0, $count);
     }
 
@@ -202,7 +202,7 @@ class AuditLogServiceTest extends TestCase
             })
             ->andReturn(1);
 
-        AuditLogService::log('test_action', 5, 7, ['foo' => 'bar']);
+        $this->service->log('test_action', 5, 7, ['foo' => 'bar']);
 
         $this->assertSame(42, $captured['tenant_id'], 'static log() must read tenant_id from TenantContext');
         $this->assertSame(5, $captured['organization_id']);

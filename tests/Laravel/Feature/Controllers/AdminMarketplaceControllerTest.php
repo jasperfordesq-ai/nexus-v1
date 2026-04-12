@@ -130,7 +130,7 @@ class AdminMarketplaceControllerTest extends TestCase
 
         // Seed tenant-level default_currency setting via the canonical service,
         // which knows the actual column layout (no hardcoded 'category' column).
-        \App\Services\TenantSettingsService::set(
+        app(\App\Services\TenantSettingsService::class)->set(
             $this->testTenantId,
             'general.default_currency',
             'EUR'

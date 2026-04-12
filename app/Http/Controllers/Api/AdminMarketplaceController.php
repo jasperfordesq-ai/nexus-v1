@@ -75,7 +75,7 @@ class AdminMarketplaceController extends BaseApiController
             'total_sellers' => $totalSellers,
             'total_orders' => $totalOrders,
             'revenue' => $revenue,
-            'currency' => (string) TenantSettingsService::get(
+            'currency' => (string) app(TenantSettingsService::class)->get(
                 $tenantId,
                 'general.default_currency',
                 config('app.default_currency', 'USD')
@@ -421,5 +421,81 @@ class AdminMarketplaceController extends BaseApiController
         $stats = MarketplaceReportService::getTransparencyStats();
 
         return $this->respondWithData($stats);
+    }
+
+    // -----------------------------------------------------------------
+    //  Bulk Actions (TD11)
+    // -----------------------------------------------------------------
+
+    private const BULK_MAX = 100;
+
+    /**
+     * POST /v2/admin/marketplace/bulk-reject
+     * Body: { listing_ids: int[], reason: string }
+     */
+    public function bulkReject(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $this->ensureFeature();
+        $this->rateLimit('admin_marketplace_bulk', 10, 60);
+
+        $tenantId = TenantContext::getId();
+
+        $data = request()->validate([
+            'listing_ids' => 'required|array|min:1|max:' . self::BULK_MAX,
+            'listing_ids.*' => 'integer|min:1',
+            'reason' => 'required|string|max:1000',
+        ]);
+
+        $ids = array_values(array_unique(array_map('intval', $data['listing_ids'])));
+        $reason = trim((string) $data['reason']);
+
+        // Tenant-scope eligibility — MarketplaceListing uses HasTenantScope global scope,
+        // but belt-and-braces: filter by tenant_id directly.
+        $eligible = MarketplaceListing::whereIn('id', $ids)
+            ->where('tenant_id', $tenantId)
+            ->get();
+
+        $eligibleIds = $eligible->pluck('id')->map(fn ($id) => (int) $id)->all();
+        $skippedIds = array_values(array_diff($ids, $eligibleIds));
+
+        $success = 0;
+        $failed = count($skippedIds);
+        $touchedIds = [];
+
+        foreach ($eligible as $listing) {
+            try {
+                $listing->moderation_status = 'rejected';
+                $listing->moderated_by = $adminId;
+                $listing->moderated_at = now();
+                $listing->moderation_notes = $reason;
+                $listing->status = 'removed';
+                $listing->save();
+                $touchedIds[] = (int) $listing->id;
+                $success++;
+            } catch (\Throwable $e) {
+                $failed++;
+                $skippedIds[] = (int) $listing->id;
+            }
+        }
+
+        app(\App\Services\AuditLogService::class)->log(
+            'admin_bulk_reject_marketplace_listings',
+            null,
+            $adminId,
+            [
+                'listing_ids' => $touchedIds,
+                'skipped_ids' => $skippedIds,
+                'success' => $success,
+                'failed' => $failed,
+                'reason' => $reason,
+            ]
+        );
+
+        return $this->respondWithData([
+            'success' => $success,
+            'failed' => $failed,
+            'skipped_ids' => $skippedIds,
+        ]);
     }
 }

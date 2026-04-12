@@ -144,11 +144,5 @@
     "admin": "Admin",
     "expand_sidebar": "Expandir barra lateral",
     "collapse_sidebar": "Recolher barra lateral"
-  },
-  "landing_page": "Landing Page",
-  "marketplace": "Marketplace",
-  "marketplace_dashboard": "Marketplace Dashboard",
-  "marketplace_moderation": "Marketplace Moderation",
-  "marketplace_sellers": "Marketplace Sellers",
-  "translation_config": "Translation Config"
+  }
 }

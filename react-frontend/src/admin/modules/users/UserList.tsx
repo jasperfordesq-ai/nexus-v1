@@ -53,8 +53,8 @@ import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import DOMPurify from 'dompurify';
-import { adminUsers } from '../../api/adminApi';
-import { DataTable, StatusBadge, PageHeader, ConfirmModal, type Column } from '../../components';
+import { adminUsers, type BulkActionResult } from '../../api/adminApi';
+import { DataTable, StatusBadge, PageHeader, ConfirmModal, BulkActionToolbar, type BulkAction, type Column } from '../../components';
 import type { AdminUser, UserListParams } from '../../api/types';
 
 export function UserList() {
@@ -94,6 +94,26 @@ export function UserList() {
     user: AdminUser;
   } | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+
+  // Bulk selection state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
+
+  const handleBulkResult = (res: { success: boolean; error?: string; data?: BulkActionResult | unknown }, actionLabel: string) => {
+    if (!res.success) {
+      toast.error(res.error || t('bulk.result_failed'));
+      return;
+    }
+    const data = (res.data as BulkActionResult) || { success: 0, failed: 0 };
+    if (data.failed && data.failed > 0) {
+      toast.error(t('bulk.result_partial', { success: data.success, failed: data.failed }));
+    } else {
+      toast.success(t('bulk.result_success', { count: data.success }));
+    }
+    setSelectedIds(new Set());
+    loadUsers();
+    void actionLabel;
+  };
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
@@ -424,6 +444,58 @@ export function UserList() {
         </Tabs>
       </div>
 
+      {(() => {
+        const selectedIdList = Array.from(selectedIds).map((id) => Number(id)).filter((n) => Number.isFinite(n));
+        const bulkActions: BulkAction[] = [
+          {
+            key: 'approve',
+            label: t('bulk.users.approve'),
+            icon: <UserCheck size={14} />,
+            color: 'success',
+            confirmTitle: t('bulk.users.approve_confirm_title'),
+            confirmMessage: t('bulk.users.approve_confirm_message', { count: selectedIdList.length }),
+            onConfirm: async () => {
+              setBulkLoading(true);
+              try {
+                const res = await adminUsers.bulkApprove(selectedIdList);
+                handleBulkResult(res, 'approve');
+              } finally {
+                setBulkLoading(false);
+              }
+            },
+          },
+          {
+            key: 'suspend',
+            label: t('bulk.users.suspend'),
+            icon: <UserX size={14} />,
+            color: 'warning',
+            destructive: true,
+            needsReason: true,
+            reasonLabel: t('bulk.users.reason_label'),
+            reasonPlaceholder: t('bulk.users.reason_placeholder'),
+            confirmTitle: t('bulk.users.suspend_confirm_title'),
+            confirmMessage: t('bulk.users.suspend_confirm_message', { count: selectedIdList.length }),
+            onConfirm: async (reason) => {
+              setBulkLoading(true);
+              try {
+                const res = await adminUsers.bulkSuspend(selectedIdList, reason);
+                handleBulkResult(res, 'suspend');
+              } finally {
+                setBulkLoading(false);
+              }
+            },
+          },
+        ];
+        return (
+          <BulkActionToolbar
+            selectedCount={selectedIds.size}
+            actions={bulkActions}
+            onClearSelection={() => setSelectedIds(new Set())}
+            isLoading={bulkLoading}
+          />
+        );
+      })()}
+
       <DataTable
         columns={columns}
         data={users}
@@ -435,6 +507,8 @@ export function UserList() {
         page={page}
         pageSize={20}
         onPageChange={setPage}
+        selectable
+        onSelectionChange={setSelectedIds}
       />
 
       {/* Confirm Action Modal */}

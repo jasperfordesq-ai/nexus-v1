@@ -152,9 +152,12 @@ log_errors = On\n\
 error_log = /var/log/php_errors.log\n\
 \n\
 ; Performance\n\
-; Must stay <= compose.prod.yml resources.limits.memory (512M) with overhead for Apache workers.\n\
-; PHP-FPM workers share the container allocation; 384M per request is ample for this app.\n\
-memory_limit = 384M\n\
+; memory_limit is aligned to 512M across Dockerfile and Dockerfile.prod (CLAUDE.md rule).\n\
+; The container memory limit in compose.prod.yml should be >= 768M to give Apache workers\n\
+; headroom above this per-process limit. For heavy artisan tasks use:\n\
+;   docker exec nexus-php-app php -d memory_limit=-1 artisan <command>\n\
+; See docs/DOCKER.md for details.\n\
+memory_limit = 512M\n\
 max_execution_time = 60\n\
 max_input_time = 60\n\
 max_input_vars = 3000\n\

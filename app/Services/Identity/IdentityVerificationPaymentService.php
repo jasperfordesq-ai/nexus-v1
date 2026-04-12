@@ -28,7 +28,7 @@ class IdentityVerificationPaymentService
      */
     public static function getFeeCents(int $tenantId): int
     {
-        return (int) TenantSettingsService::get($tenantId, 'identity_verification_fee_cents', '500');
+        return (int) app(TenantSettingsService::class)->get($tenantId, 'identity_verification_fee_cents', '500');
     }
 
     /**

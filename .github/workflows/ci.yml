@@ -156,6 +156,49 @@ jobs:
       - name: "BLOCKING: PHPStan static analysis (level 3)"
         run: vendor/bin/phpstan analyse --no-progress --memory-limit=512M --error-format=github
 
+      # TD15: Validate that all required env vars referenced in config/ are
+      # documented in .env.example. Catches the class of bug where a new
+      # config/foo.php references env('NEW_KEY') but the example wasn't updated,
+      # which would crash-loop `php artisan config:cache` at container start.
+      #
+      # WARNING-ONLY: Laravel's framework config files (session.php, broadcasting.php,
+      # queue.php, filesystems.php, mail.php) use env() without fallback as a
+      # documented pattern — these keys are only read when the driver is selected.
+      # Promoting to BLOCKING would require an allowlist or a smarter scanner.
+      # Tracked as a follow-up; for now this surfaces new gaps without blocking CI.
+      - name: "WARNING: Validate required env vars are documented"
+        run: |
+          cp .env.example .env.ci
+          php scripts/validate-env.php --file=.env.ci || \
+              echo "::warning::New env() calls in config/ may not be documented in .env.example — review output above"
+        continue-on-error: true
+
+      # TD15: Exercise artisan cache commands — these are fail-fast at container
+      # start in Dockerfile.prod. Any failure here would crash-loop production.
+      # We copy .env.example → .env and generate an APP_KEY so cache:build has
+      # a valid encryption key; without this, config:cache fails immediately on
+      # a fresh checkout.
+      - name: "BLOCKING: Artisan cache fail-fast test"
+        run: |
+          # Seed .env from example so env() calls resolve
+          [ -f .env ] || cp .env.example .env
+          # Ensure APP_KEY is set (required by config:cache)
+          php artisan key:generate --force --ansi
+          php artisan config:cache
+          php artisan route:cache
+          php artisan event:cache
+          # Clean up so subsequent steps don't inherit cached config
+          php artisan config:clear
+          php artisan route:clear
+          php artisan event:clear
+        env:
+          DB_HOST: 127.0.0.1
+          DB_NAME: nexus_test
+          DB_USER: nexus
+          DB_PASS: nexus_test
+          REDIS_HOST: 127.0.0.1
+          APP_ENV: testing
+
   # ─────────────────────────────────────────────────────────────────
   # Stage 2: React Frontend (TypeScript + Vitest + Build)
   # ─────────────────────────────────────────────────────────────────
@@ -377,6 +420,12 @@ jobs:
 
       - name: "BLOCKING: Check schema changes have migrations"
         run: bash scripts/check-migration-ci.sh origin/${{ github.base_ref || 'main' }}
+
+      - name: "BLOCKING: Block new legacy SQL migrations (use Laravel instead)"
+        run: bash scripts/check-no-new-legacy-sql.sh origin/${{ github.base_ref || 'main' }}
+
+      - name: "WARNING: Schema dump drift detection"
+        run: bash scripts/check-schema-drift.sh || true
 
   # ─────────────────────────────────────────────────────────────────
   # Stage 6: Translation Drift Detection

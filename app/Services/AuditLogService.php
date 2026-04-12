@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\Log;
  *
  * Tracks all significant actions with IP addresses, user agents, and detailed context.
  * All write operations are tenant-scoped.
+ *
+ * This service was converted from static to instance methods as part of the TD9
+ * service layer DI refactor. Resolve via DI (constructor inject) or
+ * `app(AuditLogService::class)`. See docs/SERVICE_LAYER.md for the migration pattern.
  */
 class AuditLogService
 {
@@ -81,7 +85,7 @@ class AuditLogService
     // ─── Instance method (DI-friendly) ──────────────────────────────
 
     /**
-     * Log an auditable action (instance method for DI usage).
+     * Log an auditable action (explicit tenant signature — legacy helper).
      */
     public function logAction(
         int $tenantId,
@@ -130,12 +134,12 @@ class AuditLogService
         })->all();
     }
 
-    // ─── Static logging helpers ──────────────────────────────────────
+    // ─── Logging helpers ─────────────────────────────────────────────
 
     /**
-     * Log an action (static convenience method).
+     * Log an action.
      */
-    public static function log($action, $organizationId = null, $userId = null, $details = [], $targetUserId = null)
+    public function log($action, $organizationId = null, $userId = null, $details = [], $targetUserId = null)
     {
         $tenantId = TenantContext::getId();
 
@@ -160,92 +164,92 @@ class AuditLogService
     /**
      * Log an admin user management action (no organization context).
      */
-    public static function logAdminAction($action, $adminUserId, $targetUserId = null, $details = [])
+    public function logAdminAction($action, $adminUserId, $targetUserId = null, $details = [])
     {
-        return self::log($action, null, $adminUserId, $details, $targetUserId);
+        return $this->log($action, null, $adminUserId, $details, $targetUserId);
     }
 
-    public static function logUserUpdated($adminUserId, $targetUserId, $changedFields = [])
+    public function logUserUpdated($adminUserId, $targetUserId, $changedFields = [])
     {
-        return self::logAdminAction(self::ACTION_ADMIN_USER_UPDATED, $adminUserId, $targetUserId, [
+        return $this->logAdminAction(self::ACTION_ADMIN_USER_UPDATED, $adminUserId, $targetUserId, [
             'changed_fields' => $changedFields,
         ]);
     }
 
-    public static function logAdminRoleChanged($adminUserId, $targetUserId, $oldRole, $newRole)
+    public function logAdminRoleChanged($adminUserId, $targetUserId, $oldRole, $newRole)
     {
-        return self::logAdminAction(self::ACTION_ADMIN_ROLE_CHANGED, $adminUserId, $targetUserId, [
+        return $this->logAdminAction(self::ACTION_ADMIN_ROLE_CHANGED, $adminUserId, $targetUserId, [
             'old_role' => $oldRole,
             'new_role' => $newRole,
         ]);
     }
 
-    public static function logUserCreated($adminUserId, $targetUserId, $targetEmail = '')
+    public function logUserCreated($adminUserId, $targetUserId, $targetEmail = '')
     {
-        return self::logAdminAction(self::ACTION_ADMIN_USER_CREATED, $adminUserId, $targetUserId, [
+        return $this->logAdminAction(self::ACTION_ADMIN_USER_CREATED, $adminUserId, $targetUserId, [
             'created_email' => $targetEmail,
         ]);
     }
 
-    public static function logUserApproved($adminUserId, $targetUserId, $targetEmail = '')
+    public function logUserApproved($adminUserId, $targetUserId, $targetEmail = '')
     {
-        return self::logAdminAction(self::ACTION_ADMIN_USER_APPROVED, $adminUserId, $targetUserId, [
+        return $this->logAdminAction(self::ACTION_ADMIN_USER_APPROVED, $adminUserId, $targetUserId, [
             'approved_email' => $targetEmail,
         ]);
     }
 
-    public static function logUserSuspended($adminUserId, $targetUserId, $reason = '')
+    public function logUserSuspended($adminUserId, $targetUserId, $reason = '')
     {
-        return self::logAdminAction(self::ACTION_ADMIN_USER_SUSPENDED, $adminUserId, $targetUserId, [
+        return $this->logAdminAction(self::ACTION_ADMIN_USER_SUSPENDED, $adminUserId, $targetUserId, [
             'reason' => $reason,
         ]);
     }
 
-    public static function logUserBanned($adminUserId, $targetUserId, $reason = '')
+    public function logUserBanned($adminUserId, $targetUserId, $reason = '')
     {
-        return self::logAdminAction(self::ACTION_ADMIN_USER_BANNED, $adminUserId, $targetUserId, [
+        return $this->logAdminAction(self::ACTION_ADMIN_USER_BANNED, $adminUserId, $targetUserId, [
             'reason' => $reason,
         ]);
     }
 
-    public static function logUserReactivated($adminUserId, $targetUserId, $previousStatus = '')
+    public function logUserReactivated($adminUserId, $targetUserId, $previousStatus = '')
     {
-        return self::logAdminAction(self::ACTION_ADMIN_USER_REACTIVATED, $adminUserId, $targetUserId, [
+        return $this->logAdminAction(self::ACTION_ADMIN_USER_REACTIVATED, $adminUserId, $targetUserId, [
             'previous_status' => $previousStatus,
         ]);
     }
 
-    public static function logUserDeleted($adminUserId, $targetUserId, $targetEmail = '')
+    public function logUserDeleted($adminUserId, $targetUserId, $targetEmail = '')
     {
-        return self::logAdminAction(self::ACTION_ADMIN_USER_DELETED, $adminUserId, $targetUserId, [
+        return $this->logAdminAction(self::ACTION_ADMIN_USER_DELETED, $adminUserId, $targetUserId, [
             'deleted_email' => $targetEmail,
         ]);
     }
 
-    public static function log2faReset($adminUserId, $targetUserId, $reason = '')
+    public function log2faReset($adminUserId, $targetUserId, $reason = '')
     {
-        return self::logAdminAction(self::ACTION_ADMIN_2FA_RESET, $adminUserId, $targetUserId, [
+        return $this->logAdminAction(self::ACTION_ADMIN_2FA_RESET, $adminUserId, $targetUserId, [
             'reason' => $reason,
         ]);
     }
 
-    public static function logUserImpersonated($adminUserId, $targetUserId, $targetEmail = '')
+    public function logUserImpersonated($adminUserId, $targetUserId, $targetEmail = '')
     {
-        return self::logAdminAction(self::ACTION_ADMIN_USER_IMPERSONATED, $adminUserId, $targetUserId, [
+        return $this->logAdminAction(self::ACTION_ADMIN_USER_IMPERSONATED, $adminUserId, $targetUserId, [
             'impersonated_email' => $targetEmail,
         ]);
     }
 
-    public static function logSuperAdminRevoked($adminUserId, $targetUserId, $targetEmail = '')
+    public function logSuperAdminRevoked($adminUserId, $targetUserId, $targetEmail = '')
     {
-        return self::logAdminAction(self::ACTION_ADMIN_SUPER_ADMIN_REVOKED, $adminUserId, $targetUserId, [
+        return $this->logAdminAction(self::ACTION_ADMIN_SUPER_ADMIN_REVOKED, $adminUserId, $targetUserId, [
             'revoked_email' => $targetEmail,
         ]);
     }
 
-    public static function logBulkImport($adminUserId, $importedCount, $skippedCount, $totalRows)
+    public function logBulkImport($adminUserId, $importedCount, $skippedCount, $totalRows)
     {
-        return self::logAdminAction(self::ACTION_ADMIN_BULK_IMPORT, $adminUserId, null, [
+        return $this->logAdminAction(self::ACTION_ADMIN_BULK_IMPORT, $adminUserId, null, [
             'imported_count' => $importedCount,
             'skipped_count' => $skippedCount,
             'total_rows' => $totalRows,
@@ -254,96 +258,96 @@ class AuditLogService
 
     // ─── Organization-level audit helpers ────────────────────────────
 
-    public static function logTransaction($organizationId, $userId, $type, $amount, $recipientId = null, $description = '')
+    public function logTransaction($organizationId, $userId, $type, $amount, $recipientId = null, $description = '')
     {
         $action = $type === 'deposit' ? self::ACTION_WALLET_DEPOSIT : self::ACTION_WALLET_WITHDRAWAL;
-        return self::log($action, $organizationId, $userId, [
+        return $this->log($action, $organizationId, $userId, [
             'amount' => $amount,
             'description' => $description,
             'recipient_id' => $recipientId,
         ], $recipientId);
     }
 
-    public static function logTransferRequest($organizationId, $requesterId, $recipientId, $amount, $description = '')
+    public function logTransferRequest($organizationId, $requesterId, $recipientId, $amount, $description = '')
     {
-        return self::log(self::ACTION_TRANSFER_REQUEST, $organizationId, $requesterId, [
+        return $this->log(self::ACTION_TRANSFER_REQUEST, $organizationId, $requesterId, [
             'amount' => $amount,
             'description' => $description,
         ], $recipientId);
     }
 
-    public static function logTransferApproval($organizationId, $approverId, $requestId, $recipientId, $amount)
+    public function logTransferApproval($organizationId, $approverId, $requestId, $recipientId, $amount)
     {
-        return self::log(self::ACTION_TRANSFER_APPROVE, $organizationId, $approverId, [
+        return $this->log(self::ACTION_TRANSFER_APPROVE, $organizationId, $approverId, [
             'request_id' => $requestId,
             'amount' => $amount,
         ], $recipientId);
     }
 
-    public static function logTransferRejection($organizationId, $approverId, $requestId, $recipientId, $reason = '')
+    public function logTransferRejection($organizationId, $approverId, $requestId, $recipientId, $reason = '')
     {
-        return self::log(self::ACTION_TRANSFER_REJECT, $organizationId, $approverId, [
+        return $this->log(self::ACTION_TRANSFER_REJECT, $organizationId, $approverId, [
             'request_id' => $requestId,
             'reason' => $reason,
         ], $recipientId);
     }
 
-    public static function logMemberAdded($organizationId, $addedBy, $memberId, $role)
+    public function logMemberAdded($organizationId, $addedBy, $memberId, $role)
     {
-        return self::log(self::ACTION_MEMBER_ADDED, $organizationId, $addedBy, [
+        return $this->log(self::ACTION_MEMBER_ADDED, $organizationId, $addedBy, [
             'role' => $role,
         ], $memberId);
     }
 
-    public static function logMemberRemoved($organizationId, $removedBy, $memberId, $reason = '')
+    public function logMemberRemoved($organizationId, $removedBy, $memberId, $reason = '')
     {
-        return self::log(self::ACTION_MEMBER_REMOVED, $organizationId, $removedBy, [
+        return $this->log(self::ACTION_MEMBER_REMOVED, $organizationId, $removedBy, [
             'reason' => $reason,
         ], $memberId);
     }
 
-    public static function logRoleChanged($organizationId, $changedBy, $memberId, $oldRole, $newRole)
+    public function logRoleChanged($organizationId, $changedBy, $memberId, $oldRole, $newRole)
     {
-        return self::log(self::ACTION_MEMBER_ROLE_CHANGED, $organizationId, $changedBy, [
+        return $this->log(self::ACTION_MEMBER_ROLE_CHANGED, $organizationId, $changedBy, [
             'old_role' => $oldRole,
             'new_role' => $newRole,
         ], $memberId);
     }
 
-    public static function logOwnershipTransfer($organizationId, $oldOwnerId, $newOwnerId)
+    public function logOwnershipTransfer($organizationId, $oldOwnerId, $newOwnerId)
     {
-        return self::log(self::ACTION_OWNERSHIP_TRANSFERRED, $organizationId, $oldOwnerId, [
+        return $this->log(self::ACTION_OWNERSHIP_TRANSFERRED, $organizationId, $oldOwnerId, [
             'previous_owner_id' => $oldOwnerId,
         ], $newOwnerId);
     }
 
-    public static function logSettingsChanged($organizationId, $userId, $changes)
+    public function logSettingsChanged($organizationId, $userId, $changes)
     {
-        return self::log(self::ACTION_SETTINGS_CHANGED, $organizationId, $userId, [
+        return $this->log(self::ACTION_SETTINGS_CHANGED, $organizationId, $userId, [
             'changes' => $changes,
         ]);
     }
 
-    public static function logLimitsChanged($organizationId, $userId, $oldLimits, $newLimits)
+    public function logLimitsChanged($organizationId, $userId, $oldLimits, $newLimits)
     {
-        return self::log(self::ACTION_LIMITS_CHANGED, $organizationId, $userId, [
+        return $this->log(self::ACTION_LIMITS_CHANGED, $organizationId, $userId, [
             'old_limits' => $oldLimits,
             'new_limits' => $newLimits,
         ]);
     }
 
-    public static function logBulkApproval($organizationId, $approverId, $requestIds, $successCount, $failCount)
+    public function logBulkApproval($organizationId, $approverId, $requestIds, $successCount, $failCount)
     {
-        return self::log(self::ACTION_BULK_APPROVE, $organizationId, $approverId, [
+        return $this->log(self::ACTION_BULK_APPROVE, $organizationId, $approverId, [
             'request_ids' => $requestIds,
             'approved_count' => $successCount,
             'failed_count' => $failCount,
         ]);
     }
 
-    public static function logBulkRejection($organizationId, $approverId, $requestIds, $successCount, $failCount, $reason = '')
+    public function logBulkRejection($organizationId, $approverId, $requestIds, $successCount, $failCount, $reason = '')
     {
-        return self::log(self::ACTION_BULK_REJECT, $organizationId, $approverId, [
+        return $this->log(self::ACTION_BULK_REJECT, $organizationId, $approverId, [
             'request_ids' => $requestIds,
             'rejected_count' => $successCount,
             'failed_count' => $failCount,
@@ -356,7 +360,7 @@ class AuditLogService
     /**
      * Get audit log for an organization.
      */
-    public static function getLog($organizationId, $filters = [], $limit = 50, $offset = 0)
+    public function getLog($organizationId, $filters = [], $limit = 50, $offset = 0)
     {
         $tenantId = TenantContext::getId();
 
@@ -414,7 +418,7 @@ class AuditLogService
     /**
      * Get audit log count for pagination.
      */
-    public static function getLogCount($organizationId, $filters = [])
+    public function getLogCount($organizationId, $filters = [])
     {
         $tenantId = TenantContext::getId();
 
@@ -443,7 +447,7 @@ class AuditLogService
     /**
      * Get action summary for dashboard.
      */
-    public static function getActionSummary($organizationId, $days = 30)
+    public function getActionSummary($organizationId, $days = 30)
     {
         $tenantId = TenantContext::getId();
 
@@ -466,7 +470,7 @@ class AuditLogService
     /**
      * Get recent activity for a user.
      */
-    public static function getUserActivity($userId, $limit = 20)
+    public function getUserActivity($userId, $limit = 20)
     {
         $tenantId = TenantContext::getId();
 
@@ -497,6 +501,8 @@ class AuditLogService
 
     /**
      * Get human-readable action label.
+     *
+     * Remains static because labels are pure data (no state, no dependencies).
      */
     public static function getActionLabel($action)
     {
@@ -506,9 +512,9 @@ class AuditLogService
     /**
      * Export audit log to CSV.
      */
-    public static function exportToCSV($organizationId, $filters = [])
+    public function exportToCSV($organizationId, $filters = [])
     {
-        $logs = self::getLog($organizationId, $filters, 10000, 0);
+        $logs = $this->getLog($organizationId, $filters, 10000, 0);
 
         if (empty($logs)) {
             return '';
@@ -558,7 +564,7 @@ class AuditLogService
      *
      * @return int Number of deleted entries
      */
-    public static function cleanup($daysToKeep = 365)
+    public function cleanup($daysToKeep = 365)
     {
         try {
             return DB::table('org_audit_log')

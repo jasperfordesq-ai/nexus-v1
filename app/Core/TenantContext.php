@@ -505,7 +505,7 @@ class TenantContext
             $tenantId = (int) (self::get()['id'] ?? 0);
             if ($tenantId > 0 && class_exists(\App\Services\TenantSettingsService::class)) {
                 foreach (['general.default_currency', 'default_currency'] as $settingKey) {
-                    $value = \App\Services\TenantSettingsService::get($tenantId, $settingKey);
+                    $value = app(\App\Services\TenantSettingsService::class)->get($tenantId, $settingKey);
                     if (is_string($value) && strlen(trim($value)) === 3) {
                         $currency = trim($value);
                         break;

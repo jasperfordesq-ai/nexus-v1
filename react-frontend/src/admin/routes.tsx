@@ -309,7 +309,6 @@ export function AdminRoutes() {
       <Route path="users/create" element={<Lazy><UserCreate /></Lazy>} />
       <Route path="users/:id/edit" element={<Lazy><UserEdit /></Lazy>} />
       <Route path="users/:id/permissions" element={<Lazy><UserPermissions /></Lazy>} />
-      <Route path="users/:id/permissions" element={<Lazy><PermissionBrowser /></Lazy>} />
 
       {/* ─── CRM ─── */}
       <Route path="crm" element={<Lazy><CrmDashboard /></Lazy>} />

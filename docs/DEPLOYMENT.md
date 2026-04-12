@@ -288,3 +288,158 @@ ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.
 ```
 
 To tune retention windows, edit the `RETENTION` array in `app/Console/Commands/PruneLogs.php` and redeploy.
+
+---
+
+## Post-Deploy Validation
+
+Two automated guardrails run around every production deploy to catch regressions that only surface once real traffic hits the new containers.
+
+### 1. Container Health Check (TD14)
+
+**Script:** `scripts/check-container-health.sh`
+
+**What it does:**
+- Runs `docker stats` on all `nexus-*` containers and flags any using >90 % of its memory limit.
+- Queries `docker events --since 1h` for `oom` and `die` events — an OOMKill in the last hour is an automatic FAIL.
+- Runs `docker inspect` on each container to read the `OOMKilled` flag, `RestartCount`, and `RestartPolicy`.
+- Exits non-zero if any container OOM'd or is above the threshold.
+
+**Automatic invocation:** `safe-deploy.sh` schedules this check to run 5 minutes after a successful deploy (in the background, so it does NOT delay the deploy finish). Results are appended to `/opt/nexus-php/logs/health-checks.log`; a detailed log is written to `/opt/nexus-php/logs/post-deploy-health-YYYYMMDD-HHMMSS.log`. A failure is additionally logged to syslog with tag `nexus-deploy`.
+
+**Why 5 minutes?** OOMKills on the PHP container typically happen after Apache workers ramp up and start handling real traffic — a just-booted container consumes ~200 MB and won't trip the limit.
+
+**Manual run — from your local workstation:**
+
+```bash
+bash scripts/check-container-health.sh
+```
+
+**Manual run — on the production server:**
+
+```bash
+ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
+    "sudo LOCAL_MODE=1 bash /opt/nexus-php/scripts/check-container-health.sh"
+```
+
+**Tunables (env vars):**
+
+| Var | Default | Purpose |
+|-----|---------|---------|
+| `MEM_THRESHOLD_PCT` | `90` | Fail threshold (% of container's memory limit) |
+| `OOM_LOOKBACK` | `1h` | docker events window for OOM/die events |
+| `CONTAINER_FILTER` | `nexus-` | Prefix to restrict checks to our containers |
+
+**Runbook — OOMKill detected:**
+
+1. **Identify the container** from the health check output (`nexus-php-app` is the usual suspect).
+2. **Inspect recent logs** for memory-hungry requests:
+   ```bash
+   sudo docker logs --tail 500 nexus-php-app | grep -iE 'memory|fatal|allowed memory size'
+   ```
+3. **Check current limits** in `compose.prod.yml`:
+   ```yaml
+   services:
+     php:
+       deploy:
+         resources:
+           limits:
+             memory: 768M   # bumped from 512M 2026-04-12
+   ```
+4. **Raise the limit** (e.g. 768M → 1024M), commit, redeploy:
+   ```bash
+   sudo bash scripts/safe-deploy.sh full --detach
+   ```
+5. **Verify** with another health check 5 min into the deploy.
+
+**Metrics baseline (PHP container, as of 2026-04-12):**
+
+| Metric | Value |
+|--------|-------|
+| Container memory limit | 768 MB (raised from 512 MB) |
+| Apache MPM workers (peak) | ~10 active, ~50 MB each → ~500 MB RSS peak |
+| OPcache | 128 MB |
+| `memory_limit` per PHP request | 512 MB |
+| Idle container RSS | ~200 MB |
+
+### 2. Artisan Cache Fail-Fast (TD15)
+
+**Why it exists:** `Dockerfile.prod` runs `artisan config:cache`, `route:cache`, and `event:cache` in its startup CMD with `|| { echo '[FATAL]'; exit 1; }`. If any of these fail — typically because a new `env('NEW_KEY')` call was added to `config/*.php` without a corresponding entry in `.env.production` — the container crash-loops and the site stays stuck in maintenance mode.
+
+The TD15 guardrails catch these failures **before deploy** rather than at container startup.
+
+**Scripts:**
+
+| Script | Purpose |
+|--------|---------|
+| `scripts/test-artisan-cache.sh` | Runs the three cache commands against the local dev container, cleans up on success/failure |
+| `scripts/validate-env.php` | Cross-references `.env.example` ↔ `config/*.php` `env()` calls to ensure all required keys are documented |
+| `scripts/pre-push-checks.sh` | Bundles the above — run before `git push` |
+
+**CI integration:** The GitHub Actions `php-checks` job runs both `validate-env.php --file=.env.ci` and the three `artisan *:cache` commands as **BLOCKING** steps. See `.github/workflows/ci.yml`.
+
+**Pre-push integration:** Husky hooks are intentionally disabled on this project (see `MEMORY.md` → `feedback_husky_hooks.md`). `scripts/pre-push-checks.sh` is provided for manual use or CI wiring — **do not re-enable Husky without an explicit user instruction.**
+
+**Manual run:**
+
+```bash
+# Validate env var coverage
+php scripts/validate-env.php
+
+# Exercise artisan cache (requires running dev container)
+bash scripts/test-artisan-cache.sh
+
+# Run both
+bash scripts/pre-push-checks.sh
+```
+
+**Recovery — artisan cache fails during deploy:**
+
+1. **Read the error** in `docker logs nexus-php-app` — it names the missing key or bad config file.
+2. **Fix the root cause:**
+   - Missing env var → add to `.env.production` on the server AND add to `.env.example` (empty placeholder) so future validations pass.
+   - Bad default in `config/foo.php` → commit the fix, redeploy.
+3. **Redeploy:** `sudo bash scripts/safe-deploy.sh full --detach`
+4. **Or, as an emergency fallback**, switch to the soft-fail entrypoint (below).
+
+**Adding a new required env var — correct sequence:**
+
+1. Add `NEW_KEY=` (empty placeholder) to `.env.example`.
+2. Add `NEW_KEY=real_value` to `.env` locally and to `.env.production` on the server (`sudo vim /opt/nexus-php/.env`).
+3. Reference in `config/foo.php` via `env('NEW_KEY')` (no second argument → required) or `env('NEW_KEY', 'sensible_default')` (optional).
+4. Run `php scripts/validate-env.php` locally to confirm.
+5. Commit + push + deploy.
+
+### 3. Runtime Cache Fallback (fail-soft mode)
+
+**File:** `docker/entrypoint-cache.sh`
+
+This alternate entrypoint runs the three `artisan *:cache` commands at **container start** but **logs** and **continues** instead of failing. It is **NOT wired into `Dockerfile.prod` by default** — it is kept as an emergency fallback if build-/startup-time fail-fast caching proves too fragile in production.
+
+**Tradeoff:**
+
+| Mode | Pros | Cons |
+|------|------|------|
+| **Fail-fast (current)** | Catches config errors immediately; forces correctness | A single missing env var crash-loops the container → site stuck in maintenance mode |
+| **Fail-soft (this script)** | Site stays up even with a broken config | Broken caches can go unnoticed; Laravel falls back to uncached env reads (slower, phantom bugs possible) |
+
+**To switch to fail-soft mode** (only in emergencies, with explicit operator approval):
+
+1. Edit `Dockerfile.prod` and replace the `CMD ["sh", "-c", "..."]` block with:
+
+   ```dockerfile
+   COPY docker/entrypoint-cache.sh /usr/local/bin/entrypoint-cache.sh
+   RUN chmod +x /usr/local/bin/entrypoint-cache.sh
+   CMD ["/usr/local/bin/entrypoint-cache.sh"]
+   ```
+
+2. Rebuild + deploy: `sudo bash scripts/safe-deploy.sh full --detach`.
+3. Monitor `sudo docker logs -f nexus-php-app | grep -E 'WARN|artisan'` for cache warnings.
+4. **Revert** to fail-fast mode once the underlying config issue is fixed.
+
+### Gotchas
+
+- **Windows docker CLI pipe issue:** `check-container-health.sh` runs via SSH (no local docker required) or with `LOCAL_MODE=1` on the server. Do NOT run it directly on Windows; the docker CLI often fails from Git Bash (see `MEMORY.md` for the `powershell.exe` workaround used by `test-artisan-cache.sh`).
+- **`docker events` permissions:** Requires `sudo` on the Linux host. The script already prefixes `sudo docker events`. On Docker Desktop for Windows the `events` stream is available without sudo but OOM events are rarely emitted — rely on the production (Linux) host for this signal.
+- **`docker stats` with a stopped container:** `--no-stream` returns blank rows for stopped containers; the script only flags containers that appear in `docker ps` output, so stopped containers are invisible to the memory check but will surface via the `OOMKilled=true` inspect check.
+- **`validate-env.php` false positives:** Any `env('KEY')` call inside a string or comment will NOT be matched (the regex requires the `env(` token to be a real function call). Dynamic keys (`env($var)`) are skipped. If the validator flags a key that is truly optional, add a default in `config/foo.php`: `env('KEY', null)`.

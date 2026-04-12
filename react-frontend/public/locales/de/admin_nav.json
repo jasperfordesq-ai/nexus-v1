@@ -144,11 +144,5 @@
     "admin": "Admin",
     "expand_sidebar": "Seitenleiste erweitern",
     "collapse_sidebar": "Seitenleiste einklappen"
-  },
-  "landing_page": "Landing Page",
-  "marketplace": "Marketplace",
-  "marketplace_dashboard": "Marketplace Dashboard",
-  "marketplace_moderation": "Marketplace Moderation",
-  "marketplace_sellers": "Marketplace Sellers",
-  "translation_config": "Translation Config"
+  }
 }

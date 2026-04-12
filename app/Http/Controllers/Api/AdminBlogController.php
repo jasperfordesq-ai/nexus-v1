@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Models\ActivityLog;
+use App\Services\AuditLogService;
 
 /**
  * AdminBlogController -- Admin blog post management.
@@ -392,6 +393,158 @@ class AdminBlogController extends BaseApiController
         return $this->respondWithData([
             'id' => (int) $id,
             'status' => $newStatus,
+        ]);
+    }
+
+    // =========================================================================
+    // Bulk Actions (TD11)
+    // =========================================================================
+
+    private const BULK_MAX = 100;
+
+    /**
+     * @return array{0: ?array<int>, 1: ?JsonResponse}
+     */
+    private function parseBulkIds(string $field): array
+    {
+        $raw = $this->input($field, []);
+        if (!is_array($raw) || empty($raw)) {
+            return [null, $this->respondWithError('VALIDATION_FAILED', __('api.bulk_ids_required'), $field, 422)];
+        }
+        $ids = [];
+        foreach ($raw as $v) {
+            $id = (int) $v;
+            if ($id > 0) $ids[$id] = true;
+        }
+        $ids = array_keys($ids);
+        if (empty($ids)) {
+            return [null, $this->respondWithError('VALIDATION_FAILED', __('api.bulk_ids_required'), $field, 422)];
+        }
+        if (count($ids) > self::BULK_MAX) {
+            return [null, $this->respondWithError('VALIDATION_FAILED', __('api.bulk_too_many', ['max' => self::BULK_MAX]), $field, 422)];
+        }
+        return [$ids, null];
+    }
+
+    /** POST /api/v2/admin/blog/bulk-delete */
+    public function bulkDelete(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $this->rateLimit('admin_blog_bulk', 10, 60);
+
+        [$ids, $err] = $this->parseBulkIds('post_ids');
+        if ($err) return $err;
+
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $eligibleRows = DB::select(
+            "SELECT id FROM posts WHERE tenant_id = ? AND id IN ({$placeholders})",
+            array_merge([$tenantId], $ids)
+        );
+        $eligibleIds = array_map(static fn ($r) => (int) $r->id, $eligibleRows);
+        $skippedIds = array_values(array_diff($ids, $eligibleIds));
+
+        $success = 0;
+        $failed = count($skippedIds);
+        $touchedIds = [];
+
+        if (!empty($eligibleIds)) {
+            try {
+                $ph = implode(',', array_fill(0, count($eligibleIds), '?'));
+                $deleted = DB::delete(
+                    "DELETE FROM posts WHERE tenant_id = ? AND id IN ({$ph})",
+                    array_merge([$tenantId], $eligibleIds)
+                );
+                $success = (int) $deleted;
+                $touchedIds = $eligibleIds;
+            } catch (\Throwable $e) {
+                $failed += count($eligibleIds);
+                $skippedIds = array_merge($skippedIds, $eligibleIds);
+            }
+        }
+
+        ActivityLog::create([
+            'user_id' => $adminId,
+            'action' => 'admin_bulk_delete_blog_posts',
+            'details' => "Bulk deleted {$success} blog posts",
+        ]);
+        app(AuditLogService::class)->log('admin_bulk_delete_blog_posts', null, $adminId, [
+            'post_ids' => $touchedIds,
+            'skipped_ids' => $skippedIds,
+            'success' => $success,
+            'failed' => $failed,
+        ]);
+
+        return $this->respondWithData([
+            'success' => $success,
+            'failed' => $failed,
+            'skipped_ids' => $skippedIds,
+        ]);
+    }
+
+    /** POST /api/v2/admin/blog/bulk-publish */
+    public function bulkPublish(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $this->rateLimit('admin_blog_bulk', 10, 60);
+
+        [$ids, $err] = $this->parseBulkIds('post_ids');
+        if ($err) return $err;
+
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $eligibleRows = DB::select(
+            "SELECT id, status FROM posts WHERE tenant_id = ? AND id IN ({$placeholders})",
+            array_merge([$tenantId], $ids)
+        );
+        $existingIds = array_map(static fn ($r) => (int) $r->id, $eligibleRows);
+        $skippedIds = array_values(array_diff($ids, $existingIds));
+
+        $toPublish = [];
+        foreach ($eligibleRows as $r) {
+            if ($r->status !== 'published') {
+                $toPublish[] = (int) $r->id;
+            } else {
+                $skippedIds[] = (int) $r->id;
+            }
+        }
+
+        $success = 0;
+        $failed = count(array_diff($ids, $existingIds));
+        $touchedIds = [];
+
+        if (!empty($toPublish)) {
+            try {
+                $ph = implode(',', array_fill(0, count($toPublish), '?'));
+                $updated = DB::update(
+                    "UPDATE posts SET status = 'published', published_at = COALESCE(published_at, NOW()), updated_at = NOW()
+                     WHERE tenant_id = ? AND id IN ({$ph})",
+                    array_merge([$tenantId], $toPublish)
+                );
+                $success = (int) $updated;
+                $touchedIds = $toPublish;
+            } catch (\Throwable $e) {
+                $failed += count($toPublish);
+                $skippedIds = array_merge($skippedIds, $toPublish);
+            }
+        }
+
+        ActivityLog::create([
+            'user_id' => $adminId,
+            'action' => 'admin_bulk_publish_blog_posts',
+            'details' => "Bulk published {$success} blog posts",
+        ]);
+        app(AuditLogService::class)->log('admin_bulk_publish_blog_posts', null, $adminId, [
+            'post_ids' => $touchedIds,
+            'skipped_ids' => $skippedIds,
+            'success' => $success,
+            'failed' => $failed,
+        ]);
+
+        return $this->respondWithData([
+            'success' => $success,
+            'failed' => $failed,
+            'skipped_ids' => $skippedIds,
         ]);
     }
 }

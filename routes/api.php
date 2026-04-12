@@ -961,6 +961,8 @@ Route::get('/v2/admin/users/import/template', [\App\Http\Controllers\Api\AdminUs
 Route::get('/v2/admin/users/{id}', [\App\Http\Controllers\Api\AdminUsersController::class, 'show']);
 Route::put('/v2/admin/users/{id}', [\App\Http\Controllers\Api\AdminUsersController::class, 'update']);
 Route::delete('/v2/admin/users/{id}', [\App\Http\Controllers\Api\AdminUsersController::class, 'destroy']);
+Route::post('/v2/admin/users/bulk-approve', [\App\Http\Controllers\Api\AdminUsersController::class, 'bulkApprove']);
+Route::post('/v2/admin/users/bulk-suspend', [\App\Http\Controllers\Api\AdminUsersController::class, 'bulkSuspend']);
 Route::post('/v2/admin/users/{id}/approve', [\App\Http\Controllers\Api\AdminUsersController::class, 'approve']);
 Route::post('/v2/admin/users/{id}/suspend', [\App\Http\Controllers\Api\AdminUsersController::class, 'suspend']);
 Route::post('/v2/admin/users/{id}/ban', [\App\Http\Controllers\Api\AdminUsersController::class, 'ban']);
@@ -1094,6 +1096,8 @@ Route::get('/v2/admin/help/faqs', [\App\Http\Controllers\Api\HelpController::cla
 Route::post('/v2/admin/help/faqs', [\App\Http\Controllers\Api\HelpController::class, 'adminCreateFaq']);
 Route::put('/v2/admin/help/faqs/{id}', [\App\Http\Controllers\Api\HelpController::class, 'adminUpdateFaq']);
 Route::delete('/v2/admin/help/faqs/{id}', [\App\Http\Controllers\Api\HelpController::class, 'adminDeleteFaq']);
+Route::post('/v2/admin/blog/bulk-delete', [\App\Http\Controllers\Api\AdminBlogController::class, 'bulkDelete']);
+Route::post('/v2/admin/blog/bulk-publish', [\App\Http\Controllers\Api\AdminBlogController::class, 'bulkPublish']);
 Route::get('/v2/admin/blog', [\App\Http\Controllers\Api\AdminBlogController::class, 'index']);
 Route::post('/v2/admin/blog', [\App\Http\Controllers\Api\AdminBlogController::class, 'store']);
 Route::get('/v2/admin/blog/{id}', [\App\Http\Controllers\Api\AdminBlogController::class, 'show']);
@@ -1438,6 +1442,7 @@ Route::post('/v2/admin/jobs/{id}/reject', [\App\Http\Controllers\Api\AdminJobsCo
 Route::post('/v2/admin/jobs/{id}/flag', [\App\Http\Controllers\Api\AdminJobsController::class, 'flag']);
 // Marketplace Admin
 Route::get('/v2/admin/marketplace/dashboard', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'dashboard']);
+Route::post('/v2/admin/marketplace/bulk-reject', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'bulkReject']);
 Route::get('/v2/admin/marketplace/listings', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'listings']);
 Route::post('/v2/admin/marketplace/listings/{id}/approve', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'approveListing']);
 Route::post('/v2/admin/marketplace/listings/{id}/reject', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'rejectListing']);

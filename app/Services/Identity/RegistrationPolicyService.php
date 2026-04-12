@@ -97,9 +97,10 @@ class RegistrationPolicyService
         }
 
         // Backwards compatibility: derive policy from legacy TenantSettingsService
-        $adminApproval = \App\Services\TenantSettingsService::requiresAdminApproval($tenantId);
-        $registrationMode = \App\Services\TenantSettingsService::get($tenantId, 'registration_mode', 'open');
-        $emailVerification = \App\Services\TenantSettingsService::requiresEmailVerification($tenantId);
+        $tss = app(\App\Services\TenantSettingsService::class);
+        $adminApproval = $tss->requiresAdminApproval($tenantId);
+        $registrationMode = $tss->get($tenantId, 'registration_mode', 'open');
+        $emailVerification = $tss->requiresEmailVerification($tenantId);
 
         $mode = 'open';
         if ($registrationMode === 'closed' || $registrationMode === 'invite') {
@@ -201,7 +202,7 @@ class RegistrationPolicyService
      */
     private static function syncToLegacySettings(int $tenantId, string $mode, bool $requireEmailVerify): void
     {
-        $tss = \App\Services\TenantSettingsService::class;
+        $tss = app(\App\Services\TenantSettingsService::class);
 
         // Map new modes to legacy settings
         $registrationMode = 'open';
@@ -227,10 +228,10 @@ class RegistrationPolicyService
                 break;
         }
 
-        $tss::set($tenantId, 'registration_mode', $registrationMode, 'string');
-        $tss::set($tenantId, 'admin_approval', $adminApproval ? 'true' : 'false', 'boolean');
-        $tss::set($tenantId, 'email_verification', $requireEmailVerify ? 'true' : 'false', 'boolean');
-        $tss::clearCache();
+        $tss->set($tenantId, 'registration_mode', $registrationMode, 'string');
+        $tss->set($tenantId, 'admin_approval', $adminApproval ? 'true' : 'false', 'boolean');
+        $tss->set($tenantId, 'email_verification', $requireEmailVerify ? 'true' : 'false', 'boolean');
+        $tss->clearCache();
     }
 
     /**

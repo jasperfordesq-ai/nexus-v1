@@ -12,11 +12,11 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, Tab, Button, Chip } from '@heroui/react';
-import { Plus, Pencil, Trash2, ToggleLeft } from 'lucide-react';
+import { Plus, Pencil, Trash2, ToggleLeft, Send } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
-import { adminBlog } from '../../api/adminApi';
-import { DataTable, PageHeader, ConfirmModal, type Column } from '../../components';
+import { adminBlog, type BulkActionResult } from '../../api/adminApi';
+import { DataTable, PageHeader, ConfirmModal, BulkActionToolbar, type BulkAction, type Column } from '../../components';
 import type { AdminBlogPost } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
@@ -40,6 +40,23 @@ export function BlogAdmin() {
   const [search, setSearch] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<AdminBlogPost | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
+
+  const handleBulkResult = (res: { success: boolean; error?: string; data?: BulkActionResult | unknown }) => {
+    if (!res.success) {
+      toast.error(res.error || t('bulk.result_failed'));
+      return;
+    }
+    const data = (res.data as BulkActionResult) || { success: 0, failed: 0 };
+    if (data.failed && data.failed > 0) {
+      toast.error(t('bulk.result_partial', { success: data.success, failed: data.failed }));
+    } else {
+      toast.success(t('bulk.result_success', { count: data.success }));
+    }
+    setSelectedIds(new Set());
+    loadItems();
+  };
 
   const loadItems = useCallback(async () => {
     setLoading(true);
@@ -232,6 +249,55 @@ export function BlogAdmin() {
         </Tabs>
       </div>
 
+      {(() => {
+        const selectedIdList = Array.from(selectedIds).map((id) => Number(id)).filter((n) => Number.isFinite(n));
+        const bulkActions: BulkAction[] = [
+          {
+            key: 'publish',
+            label: t('bulk.blog.publish'),
+            icon: <Send size={14} />,
+            color: 'success',
+            confirmTitle: t('bulk.blog.publish_confirm_title'),
+            confirmMessage: t('bulk.blog.publish_confirm_message', { count: selectedIdList.length }),
+            onConfirm: async () => {
+              setBulkLoading(true);
+              try {
+                const res = await adminBlog.bulkPublish(selectedIdList);
+                handleBulkResult(res);
+              } finally {
+                setBulkLoading(false);
+              }
+            },
+          },
+          {
+            key: 'delete',
+            label: t('bulk.blog.delete'),
+            icon: <Trash2 size={14} />,
+            color: 'danger',
+            destructive: true,
+            confirmTitle: t('bulk.blog.delete_confirm_title'),
+            confirmMessage: t('bulk.blog.delete_confirm_message', { count: selectedIdList.length }),
+            onConfirm: async () => {
+              setBulkLoading(true);
+              try {
+                const res = await adminBlog.bulkDelete(selectedIdList);
+                handleBulkResult(res);
+              } finally {
+                setBulkLoading(false);
+              }
+            },
+          },
+        ];
+        return (
+          <BulkActionToolbar
+            selectedCount={selectedIds.size}
+            actions={bulkActions}
+            onClearSelection={() => setSelectedIds(new Set())}
+            isLoading={bulkLoading}
+          />
+        );
+      })()}
+
       <DataTable
         columns={columns}
         data={items}
@@ -243,6 +309,8 @@ export function BlogAdmin() {
         page={page}
         pageSize={20}
         onPageChange={setPage}
+        selectable
+        onSelectionChange={setSelectedIds}
       />
 
       {confirmDelete && (

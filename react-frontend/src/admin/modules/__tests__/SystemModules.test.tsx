@@ -7,7 +7,7 @@
  * Batch render tests for System/cross-cutting admin modules:
  * - AdminDashboard, CommunityAnalytics, ImpactReport,
  *   CategoriesAdmin, ListingsAdmin, TenantFeatures,
- *   AdminPlaceholder, MatchingConfig, SmartMatchingOverview, MatchApprovals
+ *   MatchingConfig, SmartMatchingOverview, MatchApprovals
  *
  * Smoke tests only — verify each component renders without crashing.
  */
@@ -278,26 +278,6 @@ import { TenantFeatures } from '../config/TenantFeatures';
 describe('TenantFeatures', () => {
   it('renders without crashing', () => {
     const { container } = render(<W><TenantFeatures /></W>);
-    expect(container.querySelector('div')).toBeTruthy();
-  });
-});
-
-// ─── AdminPlaceholder ────────────────────────────────────────────────────────
-
-import { AdminPlaceholder } from '../AdminPlaceholder';
-
-describe('AdminPlaceholder', () => {
-  it('renders without crashing with required props', () => {
-    const { container } = render(<W><AdminPlaceholder title="Test Module" /></W>);
-    expect(container.querySelector('div')).toBeTruthy();
-  });
-
-  it('renders with description and legacyPath', () => {
-    const { container } = render(
-      <W>
-        <AdminPlaceholder title="Events" description="Manage community events" legacyPath="/admin-legacy/events" />
-      </W>
-    );
     expect(container.querySelector('div')).toBeTruthy();
   });
 });

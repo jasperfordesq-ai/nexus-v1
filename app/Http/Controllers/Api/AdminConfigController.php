@@ -41,6 +41,7 @@ class AdminConfigController extends BaseApiController
         private readonly FeedRankingService $feedRankingService,
         private readonly MemberRankingService $memberRankingService,
         private readonly SearchService $searchService,
+        private readonly TenantSettingsService $tenantSettingsService,
     ) {}
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -2058,7 +2059,7 @@ class AdminConfigController extends BaseApiController
 
         // Clear tenant bootstrap cache so changes take effect immediately
         $this->redisCache->delete('tenant_bootstrap', $tenantId);
-        TenantSettingsService::clearCacheForTenant($tenantId);
+        $this->tenantSettingsService->clearCacheForTenant($tenantId);
 
         return $this->respondWithData(['success' => true]);
     }
@@ -2253,7 +2254,7 @@ class AdminConfigController extends BaseApiController
 
         $config = [];
         foreach (self::IDENTITY_DEFAULTS as $key => $default) {
-            $config[$key] = (int) \App\Services\TenantSettingsService::get($tenantId, $key, (string) $default);
+            $config[$key] = (int) $this->tenantSettingsService->get($tenantId, $key, (string) $default);
         }
 
         return $this->respondWithData([
@@ -2279,12 +2280,12 @@ class AdminConfigController extends BaseApiController
                 continue;
             }
             $value = max(0, (int) $value);
-            \App\Services\TenantSettingsService::set($tenantId, $key, (string) $value, 'integer');
+            $this->tenantSettingsService->set($tenantId, $key, (string) $value, 'integer');
             $updated[$key] = $value;
         }
 
         $this->redisCache->delete('tenant_bootstrap', $tenantId);
-        \App\Services\TenantSettingsService::clearCacheForTenant($tenantId);
+        $this->tenantSettingsService->clearCacheForTenant($tenantId);
 
         return $this->respondWithData(['updated' => $updated]);
     }

@@ -12,10 +12,6 @@ use App\Services\TenantSettingsService;
 use Illuminate\Support\Facades\DB;
 use Mockery;
 
-/**
- * @runInSeparateProcess
- * @preserveGlobalState disabled
- */
 class StartingBalanceServiceTest extends TestCase
 {
     // ── getStartingBalance ──
@@ -31,11 +27,12 @@ class StartingBalanceServiceTest extends TestCase
 
     public function test_setStartingBalance_clamps_to_zero(): void
     {
-        // Mock TenantSettingsService::set to capture value
-        $mock = Mockery::mock('alias:' . TenantSettingsService::class);
+        // Mock TenantSettingsService instance to capture value via container binding
+        $mock = Mockery::mock(TenantSettingsService::class);
         $mock->shouldReceive('set')->withArgs(function ($tid, $key, $val, $type) {
             return (float) $val >= 0.0;
         })->once();
+        $this->app->instance(TenantSettingsService::class, $mock);
 
         StartingBalanceService::setStartingBalance(-10.0);
     }
@@ -44,8 +41,11 @@ class StartingBalanceServiceTest extends TestCase
 
     public function test_applyToNewUser_returns_success_when_balance_zero(): void
     {
-        // Mock getStartingBalance to return 0
-        $mock = Mockery::mock('alias:' . TenantSettingsService::class . 'Balance');
+        // Mock TenantSettingsService to return '0' for starting balance
+        $mock = Mockery::mock(TenantSettingsService::class);
+        $mock->shouldReceive('get')->andReturn('0');
+        $this->app->instance(TenantSettingsService::class, $mock);
+
         // We can test indirectly - if starting balance is 0, should return early
         $result = StartingBalanceService::applyToNewUser(1);
         $this->assertTrue($result['success']);
@@ -56,7 +56,11 @@ class StartingBalanceServiceTest extends TestCase
     {
         DB::shouldReceive('selectOne')->andReturn((object) ['id' => 1]);
 
-        // Mock TenantSettingsService to return non-zero
+        // Mock TenantSettingsService to return non-zero starting balance
+        $mock = Mockery::mock(TenantSettingsService::class);
+        $mock->shouldReceive('get')->andReturn('10');
+        $this->app->instance(TenantSettingsService::class, $mock);
+
         $result = StartingBalanceService::applyToNewUser(1);
         // If already applied or balance is 0, success is true
         $this->assertTrue($result['success']);

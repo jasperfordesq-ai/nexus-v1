@@ -131,9 +131,11 @@ log_errors = On\n\
 error_log = /var/log/php_errors.log\n\
 \n\
 ; Performance\n\
-; Dev: 1G gives headroom for artisan/composer/phpunit without hitting container limits.\n\
-; Production (Dockerfile.prod) is 512M to match compose.prod.yml resources.limits.memory.\n\
-memory_limit = 1G\n\
+; memory_limit is aligned to 512M across Dockerfile and Dockerfile.prod (CLAUDE.md rule).\n\
+; For heavy artisan tasks (PHPStan, seeders, imports) use a per-invocation override:\n\
+;   docker exec nexus-php-app php -d memory_limit=-1 artisan <command>\n\
+; See docs/DOCKER.md for details.\n\
+memory_limit = 512M\n\
 max_execution_time = 60\n\
 max_input_time = 60\n\
 max_input_vars = 3000\n\

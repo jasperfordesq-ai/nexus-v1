@@ -80,6 +80,12 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+    # Container memory limit — keep above PHP memory_limit (512M, set in Dockerfile)
+    # to leave headroom for Apache workers, opcache, and OS overhead. Matches the
+    # pattern in compose.prod.yml. For heavy artisan tasks that need more, override
+    # at invocation time: `docker exec -e PHP_MEMORY_LIMIT=-1 ...` (see docs/DOCKER.md).
+    mem_limit: 1536m
+    mem_reservation: 512m
 
   # ---------------------------------------------------------------------------
   # MariaDB 10.11 Database (MySQL-compatible, Internal only)

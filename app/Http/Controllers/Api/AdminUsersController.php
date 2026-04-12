@@ -35,6 +35,7 @@ class AdminUsersController extends BaseApiController
         private readonly GdprService $gdprService,
         private readonly TenantSettingsService $tenantSettingsService,
         private readonly TokenService $tokenService,
+        private readonly AuditLogService $auditLogService,
     ) {}
 
     // =========================================================================
@@ -331,10 +332,10 @@ class AdminUsersController extends BaseApiController
         DB::update("UPDATE users SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
 
         ActivityLog::log($adminId, 'admin_update_user', "Updated user #{$id}");
-        AuditLogService::logUserUpdated($adminId, $id, array_keys($input));
+        $this->auditLogService->logUserUpdated($adminId, $id, array_keys($input));
 
         if (isset($input['role']) && ($user['role'] ?? 'member') !== $input['role']) {
-            AuditLogService::logAdminRoleChanged($adminId, $id, $user['role'] ?? 'member', $input['role']);
+            $this->auditLogService->logAdminRoleChanged($adminId, $id, $user['role'] ?? 'member', $input['role']);
         }
 
         // Notify user when status changes to suspended/banned via the generic update path
@@ -444,7 +445,7 @@ class AdminUsersController extends BaseApiController
         }
 
         ActivityLog::log($adminId, 'admin_create_user', "Created user: {$email}");
-        AuditLogService::logUserCreated($adminId, $newUserId, $email);
+        $this->auditLogService->logUserCreated($adminId, $newUserId, $email);
 
         // Record GDPR consents (admin-created accounts)
         try {
@@ -523,7 +524,7 @@ class AdminUsersController extends BaseApiController
         ]);
 
         ActivityLog::log($adminId, 'admin_approve_user', "Approved user #{$id} ({$user['email']})");
-        AuditLogService::logUserApproved($adminId, $id, $user['email']);
+        $this->auditLogService->logUserApproved($adminId, $id, $user['email']);
 
         // Grant welcome credits + send combined welcome email + in-app notification
         $creditsAwarded = $this->grantWelcomeCredits($user, $adminId);
@@ -567,7 +568,7 @@ class AdminUsersController extends BaseApiController
         DB::update("UPDATE users SET status = 'suspended' WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         ActivityLog::log($adminId, 'admin_suspend_user', "Suspended user #{$id}: {$reason}");
-        AuditLogService::logUserSuspended($adminId, $id, $reason);
+        $this->auditLogService->logUserSuspended($adminId, $id, $reason);
 
         // Notify the suspended user (bell + email — they may not be able to log in)
         try {
@@ -634,7 +635,7 @@ class AdminUsersController extends BaseApiController
         DB::update("UPDATE users SET status = 'banned' WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         ActivityLog::log($adminId, 'admin_ban_user', "Banned user #{$id}: {$reason}");
-        AuditLogService::logUserBanned($adminId, $id, $reason);
+        $this->auditLogService->logUserBanned($adminId, $id, $reason);
 
         // Notify the banned user (email only — they can't log in at all)
         try {
@@ -679,7 +680,7 @@ class AdminUsersController extends BaseApiController
         DB::update("UPDATE users SET status = 'active', is_approved = 1 WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         ActivityLog::log($adminId, 'admin_reactivate_user', "Reactivated user #{$id} ({$user['email']})");
-        AuditLogService::logUserReactivated($adminId, $id, $user['status'] ?? 'unknown');
+        $this->auditLogService->logUserReactivated($adminId, $id, $user['status'] ?? 'unknown');
 
         // Notify the reactivated user (email + in-app)
         $emailSent = $this->sendReactivationNotificationEmail($user);
@@ -740,7 +741,7 @@ class AdminUsersController extends BaseApiController
         DB::delete("DELETE FROM users WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         ActivityLog::log($adminId, 'admin_delete_user', "Deleted user #{$id} ({$user['email']})");
-        AuditLogService::logUserDeleted($adminId, $id, $user['email']);
+        $this->auditLogService->logUserDeleted($adminId, $id, $user['email']);
 
         return $this->respondWithData(['deleted' => true, 'id' => $id]);
     }
@@ -773,7 +774,7 @@ class AdminUsersController extends BaseApiController
         }
 
         ActivityLog::log($adminId, 'admin_reset_2fa', "Reset 2FA for user #{$id}: {$reason}");
-        AuditLogService::log2faReset($adminId, $id, $reason);
+        $this->auditLogService->log2faReset($adminId, $id, $reason);
 
         // Notify the user (bell + email — security-critical action)
         try {
@@ -988,7 +989,7 @@ class AdminUsersController extends BaseApiController
         DB::update("UPDATE users SET password_hash = ? WHERE id = ? AND tenant_id = ?", [$hashed, $id, $tenantId]);
 
         ActivityLog::log($adminId, 'admin_set_password', "Admin set password for user #{$id} ({$user['email']})");
-        AuditLogService::logAdminAction('admin_set_password', $adminId, $id, ['email' => $user['email']]);
+        $this->auditLogService->logAdminAction('admin_set_password', $adminId, $id, ['email' => $user['email']]);
 
         // Notify the user (email only — they need to know their old password no longer works)
         // CRITICAL: Do NOT include the new password in the email
@@ -1056,7 +1057,7 @@ class AdminUsersController extends BaseApiController
             $token = $this->tokenService->generateImpersonationToken($id, $userTenantId, $adminId);
 
             ActivityLog::log($adminId, 'admin_impersonate', "Impersonated user #{$id} ({$user['email']})");
-            AuditLogService::logUserImpersonated($adminId, $id, $user['email']);
+            $this->auditLogService->logUserImpersonated($adminId, $id, $user['email']);
 
             $responseData = [
                 'token' => $token,
@@ -1119,7 +1120,7 @@ class AdminUsersController extends BaseApiController
 
             $action = $grant ? 'grant_tenant_super_admin' : 'revoke_tenant_super_admin';
             ActivityLog::log($adminId, $action, ($grant ? 'Granted' : 'Revoked') . " tenant super admin for user #{$id}: {$user->email} (tenant {$user->tenant_id})");
-            AuditLogService::logAdminAction($action, $adminId, $id, ['email' => $user->email]);
+            $this->auditLogService->logAdminAction($action, $adminId, $id, ['email' => $user->email]);
 
             // Notify the user of role change (bell notification)
             try {
@@ -1186,7 +1187,7 @@ class AdminUsersController extends BaseApiController
 
             $action = $grant ? 'grant_global_super_admin' : 'revoke_global_super_admin';
             ActivityLog::log($adminId, $action, ($grant ? 'Granted' : 'Revoked') . " global super admin for user #{$id}: {$user->email} (tenant {$user->tenant_id})");
-            AuditLogService::logAdminAction($action, $adminId, $id, ['email' => $user->email]);
+            $this->auditLogService->logAdminAction($action, $adminId, $id, ['email' => $user->email]);
 
             // Notify the user of role change (bell notification)
             try {
@@ -1498,7 +1499,7 @@ class AdminUsersController extends BaseApiController
         fclose($handle);
 
         ActivityLog::log($adminId, 'admin_bulk_import_users', "Bulk imported {$results['imported']} users ({$results['skipped']} skipped)");
-        AuditLogService::logBulkImport($adminId, $results['imported'], $results['skipped'], $row - 1);
+        $this->auditLogService->logBulkImport($adminId, $results['imported'], $results['skipped'], $row - 1);
 
         return $this->respondWithData([
             'imported' => $results['imported'],
@@ -1813,5 +1814,206 @@ class AdminUsersController extends BaseApiController
         } catch (\Throwable $e) {
             error_log("[AdminUsers] Failed to create reactivation notification for user #{$user['id']}: " . $e->getMessage());
         }
+    }
+
+    // =========================================================================
+    // Bulk Actions (TD11 — admin bulk-action parity)
+    // =========================================================================
+
+    private const BULK_MAX = 100;
+
+    /**
+     * Normalise and validate a bulk ID list from the request.
+     *
+     * @return array{0: ?array<int>, 1: ?JsonResponse}
+     */
+    private function parseBulkIds(string $field): array
+    {
+        $raw = $this->input($field, []);
+        if (!is_array($raw) || empty($raw)) {
+            return [null, $this->respondWithError(
+                'VALIDATION_FAILED',
+                __('api.bulk_ids_required'),
+                $field,
+                422
+            )];
+        }
+        $ids = [];
+        foreach ($raw as $v) {
+            $id = (int) $v;
+            if ($id > 0) {
+                $ids[$id] = true;
+            }
+        }
+        $ids = array_keys($ids);
+        if (empty($ids)) {
+            return [null, $this->respondWithError(
+                'VALIDATION_FAILED',
+                __('api.bulk_ids_required'),
+                $field,
+                422
+            )];
+        }
+        if (count($ids) > self::BULK_MAX) {
+            return [null, $this->respondWithError(
+                'VALIDATION_FAILED',
+                __('api.bulk_too_many', ['max' => self::BULK_MAX]),
+                $field,
+                422
+            )];
+        }
+        return [$ids, null];
+    }
+
+    /** POST /api/v2/admin/users/bulk-approve */
+    public function bulkApprove(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $this->rateLimit('admin_users_bulk', 10, 60);
+
+        [$ids, $err] = $this->parseBulkIds('user_ids');
+        if ($err) return $err;
+
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $eligible = DB::select(
+            "SELECT id, email, is_approved, is_super_admin, is_tenant_super_admin
+             FROM users WHERE tenant_id = ? AND id IN ({$placeholders})",
+            array_merge([$tenantId], $ids)
+        );
+
+        $eligibleById = [];
+        foreach ($eligible as $row) {
+            $eligibleById[(int) $row->id] = $row;
+        }
+
+        $success = 0;
+        $failed = 0;
+        $skippedIds = [];
+        $touchedIds = [];
+
+        foreach ($ids as $id) {
+            if (!isset($eligibleById[$id])) {
+                $skippedIds[] = $id;
+                $failed++;
+                continue;
+            }
+            $row = $eligibleById[$id];
+            if (!empty($row->is_approved)) {
+                $skippedIds[] = $id;
+                continue;
+            }
+            try {
+                User::updateAdminFields($id, [
+                    'role' => 'member',
+                    'is_approved' => 1,
+                    'tenant_id' => $tenantId,
+                ]);
+                $touchedIds[] = $id;
+                $success++;
+            } catch (\Throwable $e) {
+                Log::warning("[AdminUsers] bulk-approve failed for user #{$id}: " . $e->getMessage());
+                $failed++;
+                $skippedIds[] = $id;
+            }
+        }
+
+        ActivityLog::log(
+            $adminId,
+            'admin_bulk_approve_users',
+            'Bulk approved ' . count($touchedIds) . ' users'
+        );
+        $this->auditLogService->log('admin_bulk_approve_users', null, $adminId, [
+            'user_ids' => $touchedIds,
+            'skipped_ids' => $skippedIds,
+            'success' => $success,
+            'failed' => $failed,
+        ]);
+
+        return $this->respondWithData([
+            'success' => $success,
+            'failed' => $failed,
+            'skipped_ids' => $skippedIds,
+        ]);
+    }
+
+    /** POST /api/v2/admin/users/bulk-suspend */
+    public function bulkSuspend(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $this->rateLimit('admin_users_bulk', 10, 60);
+
+        [$ids, $err] = $this->parseBulkIds('user_ids');
+        if ($err) return $err;
+
+        $reason = (string) $this->input('reason', 'Suspended by admin (bulk)');
+
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $eligible = DB::select(
+            "SELECT id, is_super_admin, is_tenant_super_admin
+             FROM users WHERE tenant_id = ? AND id IN ({$placeholders})",
+            array_merge([$tenantId], $ids)
+        );
+
+        $eligibleById = [];
+        foreach ($eligible as $row) {
+            $eligibleById[(int) $row->id] = $row;
+        }
+
+        $success = 0;
+        $failed = 0;
+        $skippedIds = [];
+        $touchedIds = [];
+
+        foreach ($ids as $id) {
+            if ($id === $adminId) {
+                $skippedIds[] = $id;
+                $failed++;
+                continue;
+            }
+            if (!isset($eligibleById[$id])) {
+                $skippedIds[] = $id;
+                $failed++;
+                continue;
+            }
+            $row = $eligibleById[$id];
+            if (!empty($row->is_super_admin) || !empty($row->is_tenant_super_admin)) {
+                $skippedIds[] = $id;
+                $failed++;
+                continue;
+            }
+            try {
+                DB::update(
+                    "UPDATE users SET status = 'suspended' WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
+                );
+                $touchedIds[] = $id;
+                $success++;
+            } catch (\Throwable $e) {
+                Log::warning("[AdminUsers] bulk-suspend failed for user #{$id}: " . $e->getMessage());
+                $failed++;
+                $skippedIds[] = $id;
+            }
+        }
+
+        ActivityLog::log(
+            $adminId,
+            'admin_bulk_suspend_users',
+            'Bulk suspended ' . count($touchedIds) . " users: {$reason}"
+        );
+        $this->auditLogService->log('admin_bulk_suspend_users', null, $adminId, [
+            'user_ids' => $touchedIds,
+            'skipped_ids' => $skippedIds,
+            'success' => $success,
+            'failed' => $failed,
+            'reason' => $reason,
+        ]);
+
+        return $this->respondWithData([
+            'success' => $success,
+            'failed' => $failed,
+            'skipped_ids' => $skippedIds,
+        ]);
     }
 }

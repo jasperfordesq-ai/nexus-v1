@@ -6,7 +6,6 @@
 /**
  * Tests for admin modules batch 1:
  * - AdminDashboard
- * - AdminPlaceholder
  * - AdminNotFound
  * - UserList, UserCreate, UserEdit
  * - ListingsAdmin
@@ -191,29 +190,6 @@ describe('AdminDashboard', () => {
   it('shows Refresh button', () => {
     render(<Wrapper><AdminDashboard /></Wrapper>);
     expect(screen.getByText('Refresh')).toBeInTheDocument();
-  });
-});
-
-// ─────────────────────────────────────────────────────────────────────────────
-// AdminPlaceholder
-// ─────────────────────────────────────────────────────────────────────────────
-
-import { AdminPlaceholder } from '../modules/AdminPlaceholder';
-
-describe('AdminPlaceholder', () => {
-  it('renders title', () => {
-    render(<Wrapper><AdminPlaceholder title="Events" /></Wrapper>);
-    expect(screen.getByText('Events')).toBeInTheDocument();
-  });
-
-  it('shows migration message', () => {
-    render(<Wrapper><AdminPlaceholder title="Events" /></Wrapper>);
-    expect(screen.getByText('Migration In Progress')).toBeInTheDocument();
-  });
-
-  it('renders description', () => {
-    render(<Wrapper><AdminPlaceholder title="Events" description="Manage events" /></Wrapper>);
-    expect(screen.getByText('Manage events')).toBeInTheDocument();
   });
 });
 

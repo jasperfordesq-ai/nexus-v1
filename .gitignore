@@ -27,6 +27,11 @@ composer.phar
 !/docs/OPEN_SOURCE_ANNOUNCEMENT_EMAIL.md
 !/docs/OPEN_SOURCE_ANNOUNCEMENT_EMAIL.html
 !/docs/OPEN_SOURCE_ANNOUNCEMENT_EMAIL.pdf
+!/docs/SERVICE_LAYER.md
+!/docs/MIGRATIONS.md
+!/docs/DOCKER.md
+!/docs/database/
+!/docs/database/*.md
 
 # ─── AI Assistant Config (contains sensitive project context) ─────────────────
 CLAUDE.md
@@ -69,6 +74,14 @@ CLAUDE.md
 !/scripts/recache-prerender.sh
 !/scripts/prerender-tenants.sh
 !/scripts/prerender-worker.mjs
+!/scripts/audit-static-services.php
+!/scripts/audit-fk-cascade.php
+!/scripts/check-container-health.sh
+!/scripts/check-no-new-legacy-sql.sh
+!/scripts/check-schema-drift.sh
+!/scripts/test-artisan-cache.sh
+!/scripts/pre-push-checks.sh
+!/scripts/validate-env.php
 
 # ─── Deploy & Production Config ───────────────────────────────────────────────
 compose.prod.yml
@@ -76,6 +89,7 @@ compose.prod.yml
 
 # ─── Docker Config (local dev, contains credentials) ──────────────────────────
 /docker/
+!/docker/entrypoint-cache.sh
 
 # ─── Downloads & Binary Assets ─────────────────────────────────────────────────
 /httpdocs/downloads/

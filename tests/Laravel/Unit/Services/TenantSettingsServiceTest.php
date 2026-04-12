@@ -13,11 +13,19 @@ use Illuminate\Support\Facades\DB;
 
 class TenantSettingsServiceTest extends TestCase
 {
+    private TenantSettingsService $service;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->service = new TenantSettingsService();
+    }
+
     public function test_get_returns_default_when_key_not_found(): void
     {
         Cache::shouldReceive('remember')->andReturn([]);
 
-        $result = TenantSettingsService::get(2, 'nonexistent_key', 'default_val');
+        $result = $this->service->get(2, 'nonexistent_key', 'default_val');
 
         $this->assertEquals('default_val', $result);
     }
@@ -26,7 +34,7 @@ class TenantSettingsServiceTest extends TestCase
     {
         Cache::shouldReceive('remember')->andReturn([]);
 
-        $result = TenantSettingsService::getBool(2, 'nonexistent', true);
+        $result = $this->service->getBool(2, 'nonexistent', true);
 
         $this->assertTrue($result);
     }
@@ -35,7 +43,7 @@ class TenantSettingsServiceTest extends TestCase
     {
         Cache::shouldReceive('remember')->andReturn(['my_flag' => 'true']);
 
-        $result = TenantSettingsService::getBool(2, 'my_flag', false);
+        $result = $this->service->getBool(2, 'my_flag', false);
 
         $this->assertTrue($result);
     }
@@ -44,7 +52,7 @@ class TenantSettingsServiceTest extends TestCase
     {
         Cache::shouldReceive('remember')->andReturn(['my_flag' => 'false']);
 
-        $result = TenantSettingsService::getBool(2, 'my_flag', true);
+        $result = $this->service->getBool(2, 'my_flag', true);
 
         $this->assertFalse($result);
     }
@@ -53,42 +61,42 @@ class TenantSettingsServiceTest extends TestCase
     {
         Cache::shouldReceive('remember')->andReturn(['registration_mode' => 'open']);
 
-        $this->assertTrue(TenantSettingsService::isRegistrationOpen(2));
+        $this->assertTrue($this->service->isRegistrationOpen(2));
     }
 
     public function test_isRegistrationOpen_returns_false_for_closed(): void
     {
         Cache::shouldReceive('remember')->andReturn(['registration_mode' => 'closed']);
 
-        $this->assertFalse(TenantSettingsService::isRegistrationOpen(2));
+        $this->assertFalse($this->service->isRegistrationOpen(2));
     }
 
     public function test_checkLoginGates_returns_null_for_admin(): void
     {
         $user = ['role' => 'admin', 'tenant_id' => 2];
 
-        $this->assertNull(TenantSettingsService::checkLoginGates($user));
+        $this->assertNull($this->service->checkLoginGates($user));
     }
 
     public function test_checkLoginGates_returns_null_for_super_admin(): void
     {
         $user = ['role' => 'member', 'is_super_admin' => true, 'tenant_id' => 2];
 
-        $this->assertNull(TenantSettingsService::checkLoginGates($user));
+        $this->assertNull($this->service->checkLoginGates($user));
     }
 
     public function test_checkLoginGates_returns_null_for_tenant_super_admin(): void
     {
         $user = ['role' => 'member', 'is_tenant_super_admin' => true, 'tenant_id' => 2];
 
-        $this->assertNull(TenantSettingsService::checkLoginGates($user));
+        $this->assertNull($this->service->checkLoginGates($user));
     }
 
     public function test_checkLoginGates_blocks_pending_verification(): void
     {
         $user = ['role' => 'member', 'tenant_id' => 2, 'verification_status' => 'pending'];
 
-        $result = TenantSettingsService::checkLoginGates($user);
+        $result = $this->service->checkLoginGates($user);
 
         $this->assertNotNull($result);
         $this->assertEquals('AUTH_PENDING_VERIFICATION', $result['code']);
@@ -98,7 +106,7 @@ class TenantSettingsServiceTest extends TestCase
     {
         $user = ['role' => 'member', 'tenant_id' => 2, 'verification_status' => 'failed'];
 
-        $result = TenantSettingsService::checkLoginGates($user);
+        $result = $this->service->checkLoginGates($user);
 
         $this->assertNotNull($result);
         $this->assertEquals('AUTH_VERIFICATION_FAILED', $result['code']);
@@ -108,7 +116,7 @@ class TenantSettingsServiceTest extends TestCase
     {
         Cache::shouldReceive('forget')->once()->with('tenant_settings:2');
 
-        TenantSettingsService::clearCacheForTenant(2);
+        $this->service->clearCacheForTenant(2);
     }
 
     public function test_set_inserts_new_setting(): void
@@ -117,7 +125,7 @@ class TenantSettingsServiceTest extends TestCase
         DB::shouldReceive('insert')->once();
         Cache::shouldReceive('forget')->once();
 
-        TenantSettingsService::set(2, 'test_key', 'test_value');
+        $this->service->set(2, 'test_key', 'test_value');
     }
 
     public function test_set_updates_existing_setting(): void
@@ -126,6 +134,6 @@ class TenantSettingsServiceTest extends TestCase
         DB::shouldReceive('update')->once();
         Cache::shouldReceive('forget')->once();
 
-        TenantSettingsService::set(2, 'test_key', 'new_value');
+        $this->service->set(2, 'test_key', 'new_value');
     }
 }

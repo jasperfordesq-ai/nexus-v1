@@ -30,7 +30,7 @@ class StartingBalanceService
     public static function getStartingBalance(): float
     {
         $tenantId = TenantContext::getId();
-        $value = TenantSettingsService::get($tenantId, self::SETTING_KEY, '0');
+        $value = app(TenantSettingsService::class)->get($tenantId, self::SETTING_KEY, '0');
 
         return max(0.0, (float) $value);
     }
@@ -45,7 +45,7 @@ class StartingBalanceService
         $tenantId = TenantContext::getId();
         $amount = max(0.0, $amount);
 
-        TenantSettingsService::set($tenantId, self::SETTING_KEY, (string) $amount, 'float');
+        app(TenantSettingsService::class)->set($tenantId, self::SETTING_KEY, (string) $amount, 'float');
     }
 
     /**

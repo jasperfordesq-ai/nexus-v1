@@ -44,6 +44,7 @@ class AdminSuperController extends BaseApiController
         private readonly SuperAdminAuditService $superAdminAuditService,
         private readonly TenantHierarchyService $tenantHierarchyService,
         private readonly TenantVisibilityService $tenantVisibilityService,
+        private readonly \App\Services\TenantSettingsService $tenantSettingsService,
     ) {}
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -1491,7 +1492,7 @@ class AdminSuperController extends BaseApiController
             return $this->respondWithError('VALIDATION_INVALID_FORMAT', 'fee_cents must be 0 or greater.', 'fee_cents', 422);
         }
 
-        \App\Services\TenantSettingsService::set($tenantId, 'identity_verification_fee_cents', (string) $feeCents, 'integer');
+        $this->tenantSettingsService->set($tenantId, 'identity_verification_fee_cents', (string) $feeCents, 'integer');
 
         return $this->respondWithData([
             'tenant_id' => $tenantId,

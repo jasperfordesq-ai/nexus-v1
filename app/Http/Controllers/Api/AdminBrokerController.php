@@ -31,6 +31,7 @@ class AdminBrokerController extends BaseApiController
         private readonly BrokerMessageVisibilityService $brokerMessageVisibilityService,
         private readonly ExchangeWorkflowService $exchangeWorkflowService,
         private readonly NotificationDispatcher $notificationDispatcher,
+        private readonly AuditLogService $auditLogService,
     ) {}
 
     // ============================================
@@ -540,7 +541,7 @@ class AdminBrokerController extends BaseApiController
                     [$riskLevel, $riskCategory, $riskNotes, $memberVisibleNotes, $requiresApproval ? 1 : 0, $insuranceRequired ? 1 : 0, $dbsRequired ? 1 : 0, $adminId, $listingId, $listingTenantId]
                 );
                 $tagId = $existing->id;
-                AuditLogService::log('listing_risk_tag_updated', null, $adminId, ['listing_id' => $listingId, 'old_risk_level' => $oldRiskLevel, 'new_risk_level' => $riskLevel]);
+                $this->auditLogService->log('listing_risk_tag_updated', null, $adminId, ['listing_id' => $listingId, 'old_risk_level' => $oldRiskLevel, 'new_risk_level' => $riskLevel]);
 
                 $highLevels = [ListingRiskTagService::RISK_HIGH, ListingRiskTagService::RISK_CRITICAL];
                 if (in_array($riskLevel, $highLevels, true) && !in_array($oldRiskLevel, $highLevels, true)) {
@@ -552,7 +553,7 @@ class AdminBrokerController extends BaseApiController
                     [$listingId, $listingTenantId, $riskLevel, $riskCategory, $riskNotes, $memberVisibleNotes, $requiresApproval ? 1 : 0, $insuranceRequired ? 1 : 0, $dbsRequired ? 1 : 0, $adminId]
                 );
                 $tagId = (int) DB::getPdo()->lastInsertId();
-                AuditLogService::log('listing_risk_tag_created', null, $adminId, ['listing_id' => $listingId, 'tag_id' => $tagId, 'risk_level' => $riskLevel]);
+                $this->auditLogService->log('listing_risk_tag_created', null, $adminId, ['listing_id' => $listingId, 'tag_id' => $tagId, 'risk_level' => $riskLevel]);
 
                 if (in_array($riskLevel, [ListingRiskTagService::RISK_HIGH, ListingRiskTagService::RISK_CRITICAL], true)) {
                     $this->notifyAdminsOfRiskTagChange($listingId, $riskLevel, $adminId);
@@ -586,7 +587,7 @@ class AdminBrokerController extends BaseApiController
             $recordTenantId = (int) $existing->tenant_id;
             DB::delete("DELETE FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?", [$listingId, $recordTenantId]);
 
-            AuditLogService::log('listing_risk_tag_removed', null, $adminId, ['listing_id' => $listingId, 'previous_risk_level' => $existing->risk_level ?? null]);
+            $this->auditLogService->log('listing_risk_tag_removed', null, $adminId, ['listing_id' => $listingId, 'previous_risk_level' => $existing->risk_level ?? null]);
 
             return $this->respondWithData(['listing_id' => $listingId, 'removed' => true]);
         } catch (\Exception $e) {
@@ -983,7 +984,7 @@ class AdminBrokerController extends BaseApiController
                     );
                 }
 
-                AuditLogService::log('user_monitoring_added', null, $adminId, [
+                $this->auditLogService->log('user_monitoring_added', null, $adminId, [
                     'user_id' => $userId, 'user_name' => $userName, 'reason' => $reason,
                     'messaging_disabled' => $messagingDisabled,
                     'expires_days' => $expiresDays ? (int) $expiresDays : null, 'expires_at' => $expiresAt,
@@ -1026,7 +1027,7 @@ class AdminBrokerController extends BaseApiController
                     }
                 }
 
-                AuditLogService::log('user_monitoring_removed', null, $adminId, ['user_id' => $userId, 'user_name' => $userName]);
+                $this->auditLogService->log('user_monitoring_removed', null, $adminId, ['user_id' => $userId, 'user_name' => $userName]);
 
                 try {
                     Notification::createNotification($userId, 'Your messaging restrictions have been lifted.', '/messages', 'system', true);
