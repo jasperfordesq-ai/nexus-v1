@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+// INTENTIONAL: No tenant scope — underlying table `notification_settings` has no tenant_id column.
+// Rows are user-scoped (user_id + context_type + context_id); tenant isolation comes from the
+// parent group/discussion referenced by context_id.
 class GroupDiscussionSubscriber extends Model
 {
     use HasFactory;

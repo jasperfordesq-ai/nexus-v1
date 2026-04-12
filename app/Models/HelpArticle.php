@@ -6,6 +6,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,11 +14,12 @@ use Illuminate\Database\Eloquent\Model;
 class HelpArticle extends Model
 {
     use HasFactory;
+    use HasTenantScope;
 
     protected $table = 'help_articles';
 
     protected $fillable = [
-        'title', 'slug', 'content', 'module_tag', 'is_public',
+        'tenant_id', 'title', 'slug', 'content', 'module_tag', 'is_public',
         'view_count',
     ];
 

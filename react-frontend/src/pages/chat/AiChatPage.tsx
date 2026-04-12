@@ -42,8 +42,11 @@ interface ChatMessage {
   isError?: boolean;
 }
 
+// The /ai/chat endpoint returns a non-standard envelope where `message` and
+// `conversation_id` live at the top level of the response body. `api.post<T>`
+// unwraps a nested `data` field if present, so when the backend returns a
+// plain object (no `data` key), `res.data` === the raw body typed as T below.
 interface AiChatResponse {
-  success: boolean;
   conversation_id: number;
   message: {
     id: number;
@@ -318,11 +321,9 @@ export default function AiChatPage() {
 
       const res = await api.post<AiChatResponse>('/ai/chat', body);
 
-      // The API client unwraps `data` from the envelope, so res.data is the payload.
-      // However the AI chat endpoint returns a non-standard envelope where `message`
-      // and `conversation_id` live at the top level alongside `success`.
-      // api.post unwraps `response.data.data` if present, otherwise the full body.
-      const data = res.data as unknown as AiChatResponse | undefined;
+      // api.post unwraps `response.data.data` if present, otherwise returns the full body.
+      // See AiChatResponse type comment above for shape details.
+      const data = res.data;
 
       if (res.success && data?.message) {
         const assistantMsg: ChatMessage = {

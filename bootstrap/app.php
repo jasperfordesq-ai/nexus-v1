@@ -129,6 +129,14 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->runInBackground()
             ->name('identity-poll-stuck');
+
+        // H6: Prune unbounded logging tables (cron_logs 90d, error_404_log 30d,
+        // activity_log 180d, api_logs 30d, federation_api_logs 30d) daily at 03:00.
+        $schedule->command('nexus:prune-logs')
+            ->dailyAt('03:00')
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->name('nexus-prune-logs');
     })
     ->withRouting(
         // Routes loaded by RouteServiceProvider (no /api prefix).

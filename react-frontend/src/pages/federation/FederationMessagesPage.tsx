@@ -389,7 +389,8 @@ export function FederationMessagesPage() {
       try {
         const prefs = JSON.parse(localStorage.getItem(fedTranslateKey) || '{}');
         setAutoTranslateOn(!!prefs[key]);
-      } catch {
+      } catch (err) {
+        console.warn('[FederationMessages] Failed to parse auto-translate prefs', err);
         setAutoTranslateOn(false);
       }
 
@@ -423,9 +424,11 @@ export function FederationMessagesPage() {
         setAutoTranslateOn(true);
         toast.success(t('messages.auto_translate_enabled'));
       }
-    } catch {
-      // localStorage unavailable — just toggle in memory
-      setAutoTranslateOn((prev) => !prev);
+    } catch (err) {
+      // localStorage unavailable or parse error — fall back to safe default (off)
+      // Consistent with selectThread's catch behavior
+      console.warn('[FederationMessages] Failed to toggle auto-translate prefs', err);
+      setAutoTranslateOn(false);
     }
   }, [activeThreadKey, tenantSlug, userLangBase, toast, t]);
 

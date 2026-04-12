@@ -13,10 +13,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * ChallengeIdea — an idea submitted to an ideation challenge.
- *
- * Note: challenge_ideas has no tenant_id column; tenant scoping is done
- * via the parent ideation_challenges.tenant_id join when needed.
  */
+// INTENTIONAL: No tenant scope — challenge_ideas has no tenant_id column.
+// Scoped indirectly via parent IdeationChallenge (challenge_id -> ideation_challenges.tenant_id).
 class ChallengeIdea extends Model
 {
     use HasFactory;

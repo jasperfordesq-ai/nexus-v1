@@ -28,6 +28,7 @@ const TenantFeatures = lazy(() => import('./modules/config/TenantFeatures'));
 const ModuleConfiguration = lazy(() => import('./modules/config/ModuleConfiguration'));
 const UserCreate = lazy(() => import('./modules/users/UserCreate'));
 const UserEdit = lazy(() => import('./modules/users/UserEdit'));
+const UserPermissions = lazy(() => import('./modules/users/UserPermissions'));
 const ListingsAdmin = lazy(() => import('./modules/listings/ListingsAdmin'));
 const ActivityLog = lazy(() => import('./modules/system/ActivityLog'));
 const CategoriesAdmin = lazy(() => import('./modules/categories/CategoriesAdmin'));
@@ -226,6 +227,7 @@ const SmartMatchMonitoring = lazy(() => import('./modules/community/SmartMatchMo
 const DeliverabilityDashboard = lazy(() => import('./modules/deliverability/DeliverabilityDashboard'));
 const DeliverablesList = lazy(() => import('./modules/deliverability/DeliverablesList'));
 const CreateDeliverable = lazy(() => import('./modules/deliverability/CreateDeliverable'));
+const EditDeliverable = lazy(() => import('./modules/deliverability/EditDeliverable'));
 const DeliverabilityAnalytics = lazy(() => import('./modules/deliverability/DeliverabilityAnalytics'));
 
 // Diagnostics module
@@ -306,6 +308,7 @@ export function AdminRoutes() {
       <Route path="users" element={<Lazy><UserList /></Lazy>} />
       <Route path="users/create" element={<Lazy><UserCreate /></Lazy>} />
       <Route path="users/:id/edit" element={<Lazy><UserEdit /></Lazy>} />
+      <Route path="users/:id/permissions" element={<Lazy><UserPermissions /></Lazy>} />
       <Route path="users/:id/permissions" element={<Lazy><PermissionBrowser /></Lazy>} />
 
       {/* ─── CRM ─── */}
@@ -552,6 +555,7 @@ export function AdminRoutes() {
       <Route path="deliverability" element={<Lazy><DeliverabilityDashboard /></Lazy>} />
       <Route path="deliverability/list" element={<Lazy><DeliverablesList /></Lazy>} />
       <Route path="deliverability/create" element={<Lazy><CreateDeliverable /></Lazy>} />
+      <Route path="deliverability/edit/:id" element={<Lazy><EditDeliverable /></Lazy>} />
       <Route path="deliverability/analytics" element={<Lazy><DeliverabilityAnalytics /></Lazy>} />
 
       {/* ─── MATCHING DIAGNOSTIC ─── */}

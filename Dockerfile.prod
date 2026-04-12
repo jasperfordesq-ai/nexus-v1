@@ -126,6 +126,17 @@ RUN echo 'ServerTokens Prod' >> /etc/apache2/conf-available/security.conf \
     && echo 'ServerSignature Off' >> /etc/apache2/conf-available/security.conf \
     && a2enconf security
 
+# Security headers (HSTS, clickjacking, MIME-sniff, referrer).
+# CSP intentionally omitted — requires per-app tuning (Pusher, Stripe, Google Maps, etc.)
+# and must be tested before rollout. Add in a follow-up PR.
+RUN a2enmod headers \
+    && printf 'Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"\n\
+Header always set X-Frame-Options "SAMEORIGIN"\n\
+Header always set X-Content-Type-Options "nosniff"\n\
+Header always set Referrer-Policy "strict-origin-when-cross-origin"\n' \
+    > /etc/apache2/conf-available/security-headers.conf \
+    && a2enconf security-headers
+
 # =============================================================================
 # PHP Configuration (Production)
 # =============================================================================
@@ -141,7 +152,9 @@ log_errors = On\n\
 error_log = /var/log/php_errors.log\n\
 \n\
 ; Performance\n\
-memory_limit = 8G\n\
+; Must stay <= compose.prod.yml resources.limits.memory (512M) with overhead for Apache workers.\n\
+; PHP-FPM workers share the container allocation; 384M per request is ample for this app.\n\
+memory_limit = 384M\n\
 max_execution_time = 60\n\
 max_input_time = 60\n\
 max_input_vars = 3000\n\
@@ -236,9 +249,9 @@ CMD ["sh", "-c", "\
     chown -R www-data:www-data /var/www/html/httpdocs/uploads /var/www/html/public/uploads 2>/dev/null; \
     chmod -R 775 /var/www/html/httpdocs/uploads /var/www/html/public/uploads 2>/dev/null; \
     if [ -f /var/www/html/artisan ]; then \
-        php /var/www/html/artisan config:cache 2>/dev/null || true; \
-        php /var/www/html/artisan route:cache 2>/dev/null || true; \
-        php /var/www/html/artisan event:cache 2>/dev/null || true; \
+        php /var/www/html/artisan config:cache || { echo '[FATAL] artisan config:cache failed'; exit 1; }; \
+        php /var/www/html/artisan route:cache  || { echo '[FATAL] artisan route:cache failed'; exit 1; }; \
+        php /var/www/html/artisan event:cache  || { echo '[FATAL] artisan event:cache failed'; exit 1; }; \
         ln -sf /var/www/html/storage/app/public /var/www/html/httpdocs/storage 2>/dev/null || true; \
     fi; \
     apache2-foreground"]

@@ -27,6 +27,8 @@ import {
   SelectItem,
   Tabs,
   Tab,
+  Card,
+  CardBody,
 } from '@heroui/react';
 import {
   Plus,
@@ -35,6 +37,7 @@ import {
   Trash2,
   FolderOpen,
   Tag,
+  AlertTriangle,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
@@ -47,13 +50,7 @@ import { useTranslation } from 'react-i18next';
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const CATEGORY_TYPES = [
-  { key: 'listing', label: 'Listing' },
-  { key: 'event', label: 'Event' },
-  { key: 'blog', label: 'Blog' },
-  { key: 'resource', label: 'Resource / KB' },
-  { key: 'vol_opportunity', label: 'Volunteering' },
-] as const;
+const CATEGORY_TYPE_KEYS = ['listing', 'event', 'blog', 'resource', 'vol_opportunity'] as const;
 
 const TYPE_COLORS: Record<string, 'primary' | 'success' | 'warning' | 'secondary'> = {
   listing: 'primary',
@@ -61,14 +58,6 @@ const TYPE_COLORS: Record<string, 'primary' | 'success' | 'warning' | 'secondary
   blog: 'warning',
   resource: 'primary',
   vol_opportunity: 'secondary',
-};
-
-const TYPE_LABELS: Record<string, string> = {
-  listing: 'Listing',
-  event: 'Event',
-  blog: 'Blog',
-  resource: 'Resource / KB',
-  vol_opportunity: 'Volunteering',
 };
 
 const COLOR_OPTIONS = [
@@ -85,9 +74,20 @@ export function CategoriesAdmin() {
   usePageTitle(t('categories.page_title'));
   const toast = useToast();
 
+  // Translated category type labels (derived from i18n)
+  const TYPE_LABELS: Record<string, string> = {
+    listing: t('categories.type_listing'),
+    event: t('categories.type_event'),
+    blog: t('categories.type_blog'),
+    resource: t('categories.type_resource'),
+    vol_opportunity: t('categories.type_vol_opportunity'),
+  };
+  const CATEGORY_TYPES = CATEGORY_TYPE_KEYS.map((key) => ({ key, label: TYPE_LABELS[key] }));
+
   // Data state
   const [categories, setCategories] = useState<AdminCategory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState('all');
 
   // Modal state
@@ -104,21 +104,29 @@ export function CategoriesAdmin() {
 
   const loadCategories = useCallback(async () => {
     setLoading(true);
-    const params = typeFilter !== 'all' ? { type: typeFilter } : {};
-    const res = await adminCategories.list(params);
-    if (res.success && res.data) {
-      // The API returns { data: [...] } envelope; the api client unwraps it
-      const data = res.data as unknown;
-      if (Array.isArray(data)) {
-        setCategories(data);
-      } else if (data && typeof data === 'object' && 'data' in data) {
-        setCategories((data as { data: AdminCategory[] }).data || []);
+    setLoadError(null);
+    try {
+      const params = typeFilter !== 'all' ? { type: typeFilter } : {};
+      const res = await adminCategories.list(params);
+      if (res.success && res.data) {
+        // The API returns { data: [...] } envelope; the api client unwraps it
+        const data = res.data as unknown;
+        if (Array.isArray(data)) {
+          setCategories(data);
+        } else if (data && typeof data === 'object' && 'data' in data) {
+          setCategories((data as { data: AdminCategory[] }).data || []);
+        }
+      } else {
+        setLoadError(t('categories.failed_to_load_categories'));
+        toast.error(t('categories.failed_to_load_categories'));
       }
-    } else {
+    } catch {
+      setLoadError(t('categories.failed_to_load_categories'));
       toast.error(t('categories.failed_to_load_categories'));
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  }, [typeFilter, toast]);
+  }, [typeFilter, toast, t]);
 
   useEffect(() => {
     loadCategories();
@@ -343,7 +351,16 @@ export function CategoriesAdmin() {
         </Tabs>
       </div>
 
-      {categories.length === 0 && !loading ? (
+      {loadError && !loading ? (
+        <Card shadow="sm">
+          <CardBody className="flex flex-col items-center gap-3 py-10 text-center">
+            <AlertTriangle size={32} className="text-danger" />
+            <div className="text-base font-semibold">{t('common.error_loading_data')}</div>
+            <div className="text-sm text-default-500">{loadError}</div>
+            <Button color="primary" variant="flat" onPress={loadCategories}>{t('common.retry')}</Button>
+          </CardBody>
+        </Card>
+      ) : categories.length === 0 && !loading ? (
         <EmptyState
           icon={FolderOpen}
           title={t('no_data')}

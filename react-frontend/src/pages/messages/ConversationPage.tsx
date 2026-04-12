@@ -17,7 +17,7 @@ import { useState, useEffect, useRef, useCallback, type ChangeEvent, type FormEv
 import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { Button, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Input, Tooltip } from '@heroui/react';
+import { Button, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Input, Tooltip, Skeleton } from '@heroui/react';
 import { ArrowLeft, Info, Loader2, MoreVertical, Trash2, Search, X, FileText, AlertTriangle, Languages } from 'lucide-react';
 import { useToast } from '@/contexts';
 import { GlassCard } from '@/components/ui';
@@ -189,6 +189,7 @@ export function ConversationPage() {
   const [autoTranslations, setAutoTranslations] = useState<Map<number, string>>(new Map());
   const autoTranslatingRef = useRef(false);
   const translatedIdsRef = useRef<Set<number>>(new Set());
+  const autoTranslateAbortRef = useRef<AbortController | null>(null);
 
   // Sync autoTranslateOn from localStorage when the other user changes
   useEffect(() => {
@@ -220,14 +221,23 @@ export function ConversationPage() {
     }
     autoTranslatingRef.current = true;
 
+    // Abort any previous in-flight translation loop (e.g., conversation switch)
+    if (autoTranslateAbortRef.current) {
+      autoTranslateAbortRef.current.abort();
+    }
+    const controller = new AbortController();
+    autoTranslateAbortRef.current = controller;
+
     // Translate each message sequentially to avoid overwhelming the API
     (async () => {
       const newTranslations = new Map(autoTranslations);
       for (const msg of untranslated) {
+        if (controller.signal.aborted || !isMountedRef.current) return;
         try {
           const response = await api.post<{ translated_text: string }>(`/v2/messages/${msg.id}/translate`, {
             target_language: targetLang,
-          });
+          }, { signal: controller.signal });
+          if (controller.signal.aborted || !isMountedRef.current) return;
           const translated = response.data?.translated_text;
           if (translated) {
             newTranslations.set(msg.id, translated);
@@ -237,6 +247,7 @@ export function ConversationPage() {
           translatedIdsRef.current.delete(msg.id);
         }
       }
+      if (controller.signal.aborted || !isMountedRef.current) return;
       setAutoTranslations(newTranslations);
       autoTranslatingRef.current = false;
     })();
@@ -360,9 +371,11 @@ export function ConversationPage() {
     });
 
     return () => {
-      pusher.unsubscribeFromConversation(otherUserId);
-      unsubMessage();
-      unsubTyping();
+      if (pusher) {
+        pusher.unsubscribeFromConversation(otherUserId);
+        if (typeof unsubMessage === 'function') unsubMessage();
+        if (typeof unsubTyping === 'function') unsubTyping();
+      }
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
@@ -447,6 +460,10 @@ export function ConversationPage() {
     if (!targetId) return;
 
     // Clear auto-translate state from previous conversation
+    if (autoTranslateAbortRef.current) {
+      autoTranslateAbortRef.current.abort();
+      autoTranslateAbortRef.current = null;
+    }
     setAutoTranslations(new Map());
     translatedIdsRef.current.clear();
     autoTranslatingRef.current = false;
@@ -527,7 +544,13 @@ export function ConversationPage() {
   // Cleanup ref for unmount guard
   useEffect(() => {
     isMountedRef.current = true;
-    return () => { isMountedRef.current = false; };
+    return () => {
+      isMountedRef.current = false;
+      if (autoTranslateAbortRef.current) {
+        autoTranslateAbortRef.current.abort();
+        autoTranslateAbortRef.current = null;
+      }
+    };
   }, []);
 
   // Load initial conversation
@@ -1366,7 +1389,13 @@ export function ConversationPage() {
               />
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h2 className="font-semibold text-theme-primary">{other_user.name}</h2>
+                  {other_user.name ? (
+                    <h2 className="font-semibold text-theme-primary">{other_user.name}</h2>
+                  ) : (
+                    <Skeleton className="rounded-md">
+                      <div className="h-4 w-32 rounded-md bg-default-300" />
+                    </Skeleton>
+                  )}
                   <VerificationBadgeRow userId={other_user.id} size="sm" />
                 </div>
                 {other_user.tagline && (

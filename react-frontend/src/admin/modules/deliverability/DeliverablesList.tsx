@@ -10,8 +10,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Spinner } from '@heroui/react';
-import { Target, Plus, Trash2 } from 'lucide-react';
+import { Button, Spinner, Card, CardBody } from '@heroui/react';
+import { Target, Plus, Trash2, Pencil, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
@@ -39,11 +39,13 @@ export function DeliverablesList() {
 
   const [data, setData] = useState<DeliverableItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<DeliverableItem | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const res = await adminDeliverability.list();
       if (res.success && res.data) {
@@ -54,13 +56,16 @@ export function DeliverablesList() {
           const pd = result as { data?: DeliverableItem[] };
           setData(pd.data || []);
         }
+      } else {
+        setLoadError(t('deliverability.failed_to_load_deliverables'));
       }
     } catch {
+      setLoadError(t('deliverability.failed_to_load_deliverables'));
       toast.error(t('deliverability.failed_to_load_deliverables'));
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t]);
 
   useEffect(() => {
     fetchData();
@@ -126,7 +131,15 @@ export function DeliverablesList() {
       label: t('deliverability.col_actions'),
       render: (item) => (
         <div className="flex gap-1">
-          {/* TODO: Edit deliverable page not yet implemented (backend PUT /v2/admin/deliverability/{id} exists) */}
+          <Button
+            isIconOnly
+            size="sm"
+            variant="flat"
+            onPress={() => navigate(tenantPath(`/admin/deliverability/edit/${item.id}`))}
+            aria-label={t('deliverability.label_edit_deliverable')}
+          >
+            <Pencil size={14} />
+          </Button>
           <Button
             isIconOnly
             size="sm"
@@ -167,7 +180,16 @@ export function DeliverablesList() {
         }
       />
 
-      {data.length === 0 ? (
+      {loadError ? (
+        <Card shadow="sm">
+          <CardBody className="flex flex-col items-center gap-3 py-10 text-center">
+            <AlertTriangle size={32} className="text-danger" />
+            <div className="text-base font-semibold">{t('common.error_loading_data')}</div>
+            <div className="text-sm text-default-500">{loadError}</div>
+            <Button color="primary" variant="flat" onPress={fetchData}>{t('common.retry')}</Button>
+          </CardBody>
+        </Card>
+      ) : data.length === 0 ? (
         <EmptyState
           icon={Target}
           title={t('deliverability.no_deliverables')}

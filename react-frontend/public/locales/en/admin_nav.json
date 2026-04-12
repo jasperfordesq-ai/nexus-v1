@@ -133,6 +133,12 @@
   "federation_webhooks": "Webhooks",
   "onboarding_settings": "Onboarding Settings",
   "safeguarding_options": "Safeguarding Options",
+  "landing_page": "Landing Page",
+  "marketplace": "Marketplace",
+  "marketplace_dashboard": "Marketplace Dashboard",
+  "marketplace_moderation": "Marketplace Moderation",
+  "marketplace_sellers": "Marketplace Sellers",
+  "translation_config": "Translation Config",
   "sections": {
     "content": "Content",
     "community": "Community",

@@ -100,10 +100,6 @@ sudo bash scripts/safe-deploy.sh status
 | `nexus-php-redis` | `redis:7-alpine` | — | Cache + sessions |
 | `nexus-sales-site` | Built from `sales-site/Dockerfile` | Nginx | Marketing site |
 
-### Other Project Containers (NEVER TOUCH)
-
-`nexus-backend-*`, `nexus-frontend-*`, `nexus-uk-*`, `nexus-civic-*` — belong to other projects on the same VM.
-
 ---
 
 ## Dev vs Production Dockerfiles
@@ -265,3 +261,30 @@ ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.
     "sudo docker exec nexus-php-db mysql -u nexus -pYOUR_DB_PASS nexus \
     -e \"SHOW TABLES LIKE 'your_table%';\""
 ```
+
+---
+
+## Scheduled Jobs
+
+Laravel's scheduler runs via `php artisan schedule:run` every minute inside `nexus-php-app` (triggered by the host crontab). Scheduled jobs are defined in `bootstrap/app.php` under `withSchedule()`.
+
+### Log Retention (`nexus:prune-logs`)
+
+Runs **daily at 03:00** (container timezone) and chunk-deletes rows older than the retention window from unbounded logging tables. Deletions are performed 1,000 rows at a time to avoid long row-locks. Implemented by `app/Console/Commands/PruneLogs.php`.
+
+| Table | Retention | Timestamp column |
+|-------|-----------|------------------|
+| `cron_logs` | 90 days | `executed_at` |
+| `activity_log` | 180 days | `created_at` |
+| `error_404_log` | 30 days | `last_seen_at` |
+| `api_logs` | 30 days | `created_at` |
+| `federation_api_logs` | 30 days | `created_at` |
+
+To run manually (e.g. after a noisy backfill):
+
+```bash
+ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
+    "sudo docker exec nexus-php-app php artisan nexus:prune-logs"
+```
+
+To tune retention windows, edit the `RETENTION` array in `app/Console/Commands/PruneLogs.php` and redeploy.

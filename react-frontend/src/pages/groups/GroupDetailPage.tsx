@@ -61,7 +61,7 @@ import { SafeHtml } from '@/components/ui/SafeHtml';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { Breadcrumbs } from '@/components/navigation';
 import { ComposeHub } from '@/components/compose';
-import { LoadingScreen, EmptyState } from '@/components/feedback';
+import { LoadingScreen, EmptyState, ErrorBoundary } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -1587,13 +1587,25 @@ export function GroupDetailPage() {
                   <label className="text-sm text-theme-muted mb-1 block">
                     {t('detail.discussion_content_label')}
                   </label>
-                  <Suspense fallback={<Textarea placeholder={t('detail.discussion_content_placeholder')} minRows={4} value={newDiscussionContent} onChange={(e) => setNewDiscussionContent(e.target.value)} classNames={{ input: 'bg-transparent text-theme-primary', inputWrapper: 'bg-theme-elevated border-theme-default' }} />}>
-                    <RichTextEditor
-                      value={newDiscussionContent}
-                      onChange={setNewDiscussionContent}
-                      placeholder={t('detail.discussion_content_placeholder')}
-                    />
-                  </Suspense>
+                  <ErrorBoundary
+                    fallback={
+                      <Textarea
+                        placeholder={t('detail.discussion_content_placeholder')}
+                        minRows={4}
+                        value={newDiscussionContent}
+                        onChange={(e) => setNewDiscussionContent(e.target.value)}
+                        classNames={{ input: 'bg-transparent text-theme-primary', inputWrapper: 'bg-theme-elevated border-theme-default' }}
+                      />
+                    }
+                  >
+                    <Suspense fallback={<div className="flex justify-center py-4"><Spinner size="sm" /></div>}>
+                      <RichTextEditor
+                        value={newDiscussionContent}
+                        onChange={setNewDiscussionContent}
+                        placeholder={t('detail.discussion_content_placeholder')}
+                      />
+                    </Suspense>
+                  </ErrorBoundary>
                 </div>
               </ModalBody>
               <ModalFooter>

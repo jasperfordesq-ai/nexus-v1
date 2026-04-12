@@ -584,6 +584,11 @@
     "label_type": "Type",
     "page_title": "Categories",
     "placeholder_name": "Name...",
+    "type_blog": "Blog",
+    "type_event": "Event",
+    "type_listing": "Listing",
+    "type_resource": "Resource / KB",
+    "type_vol_opportunity": "Volunteering",
     "volunteering": "Volunteering"
   },
   "common": {
@@ -602,7 +607,9 @@
     "planned": "Planned",
     "refresh": "Refresh",
     "unexpected_error": "Unexpected error",
-    "unfeature": "Unfeature"
+    "unfeature": "Unfeature",
+    "error_loading_data": "Error loading data",
+    "retry": "Retry"
   },
   "community": {
     "active_matching_users": "Active Matching Users",
@@ -776,7 +783,8 @@
     "tier": "Tier",
     "tier_level": "Tier Level",
     "tier_level_desc": "Manage and configure tier level settings",
-    "trial_ends": "Trial Ends"
+    "trial_ends": "Trial Ends",
+    "invalid_number_field": "{{field}} must be a valid non-negative number"
   },
   "crm": {
     "action_cancel": "Cancel",
@@ -1045,7 +1053,12 @@
     "status_label": "Status Label",
     "title_label": "Title Label",
     "title_placeholder": "Title Placeholder",
-    "title_required": "Title Required"
+    "title_required": "Title Required",
+    "edit_title": "Edit Deliverable",
+    "edit_description": "Update deliverable details",
+    "updated_success": "Deliverable updated successfully",
+    "update_failed": "Failed to update deliverable",
+    "label_edit_deliverable": "Edit deliverable"
   },
   "details": "Details",
   "diagnostics": {
@@ -3931,7 +3944,15 @@
     "title": "Users",
     "user_action_failed": "User Action Failed",
     "user_action_success": "User Action successfully",
-    "user_approved_email_warning": "User Approved Email"
+    "user_approved_email_warning": "User Approved Email",
+    "permissions_title": "User Permissions",
+    "permissions_description": "View the roles and permissions assigned to this user.",
+    "failed_to_load_user": "Failed to load user",
+    "role_label": "Role",
+    "permissions_granted": "Granted permissions",
+    "no_explicit_permissions": "No explicit permissions. Capabilities are derived from the user role.",
+    "permissions_editor_coming_soon_title": "Permission editor coming soon",
+    "permissions_editor_coming_soon_desc": "A full per-permission editor is in progress. In the meantime, change the user role from the user edit screen to grant administrative capabilities."
   },
   "view_all": "View All",
   "visibility_rules": {
@@ -3979,5 +4000,9 @@
     "volunteer_organizations_title": "Volunteer Organizations",
     "volunteering_overview_desc": "Manage and configure volunteering overview settings",
     "volunteering_overview_title": "Volunteering Overview"
+  },
+  "bulk_operations": {
+    "final_confirm_move": "You are about to move {{count}} user(s) to another tenant. This action cannot be undone automatically. Continue?",
+    "final_confirm_update": "You are about to {{action}} {{count}} tenant(s). This affects all users on those tenants. Continue?"
   }
 }

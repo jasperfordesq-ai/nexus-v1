@@ -11,11 +11,10 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * CookieInventoryItem — represents a row in cookie_inventory.
- *
- * Not tenant-scoped with the global scope because cookies can be
- * global (tenant_id IS NULL) or tenant-specific. Scoping is handled
- * explicitly in the service.
  */
+// INTENTIONAL: No tenant scope — cookie_inventory.tenant_id is NULLABLE where NULL represents
+// a platform-wide cookie shared across all tenants. A global TenantScope would hide these
+// global cookies from tenant-scoped queries. Scoping is applied explicitly in services.
 class CookieInventoryItem extends Model
 {
     use HasFactory;

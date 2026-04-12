@@ -60,6 +60,15 @@ export function BulkOperations() {
   };
 
   const handleBulkMoveUsers = async () => {
+    // Final hard confirmation — destructive cross-tenant move
+    const message = t('bulk_operations.final_confirm_move', {
+      count: selectedUserIds.size,
+      defaultValue: `You are about to move ${selectedUserIds.size} user(s) to another tenant. This action cannot be undone automatically. Continue?`,
+    });
+    if (typeof window !== 'undefined' && !window.confirm(message)) {
+      setMoveConfirm(false);
+      return;
+    }
     setMoveLoading(true);
     const res = await adminSuper.bulkMoveUsers({
       user_ids: Array.from(selectedUserIds),
@@ -79,6 +88,16 @@ export function BulkOperations() {
   };
 
   const handleBulkUpdateTenants = async () => {
+    // Final hard confirmation for destructive/impactful bulk updates
+    const message = t('bulk_operations.final_confirm_update', {
+      action: bulkAction.replace('_', ' '),
+      count: selectedTenantIds.size,
+      defaultValue: `You are about to ${bulkAction.replace('_', ' ')} ${selectedTenantIds.size} tenant(s). This affects all users on those tenants. Continue?`,
+    });
+    if (typeof window !== 'undefined' && !window.confirm(message)) {
+      setTenantConfirm(false);
+      return;
+    }
     setTenantLoading(true);
     const res = await adminSuper.bulkUpdateTenants({
       tenant_ids: Array.from(selectedTenantIds),

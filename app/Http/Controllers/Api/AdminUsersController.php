@@ -1139,6 +1139,11 @@ class AdminUsersController extends BaseApiController
 
             return $this->respondWithData(['id' => $id, 'is_tenant_super_admin' => $grant]);
         } catch (\Exception $e) {
+            Log::error('AdminUsersController::setTenantSuperAdmin failed', [
+                'user_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'super admin status']), null, 500);
         }
     }
@@ -1201,6 +1206,11 @@ class AdminUsersController extends BaseApiController
 
             return $this->respondWithData(['id' => $id, 'is_super_admin' => $grant]);
         } catch (\Exception $e) {
+            Log::error('AdminUsersController::setGlobalSuperAdmin failed', [
+                'user_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'global super admin status']), null, 500);
         }
     }
@@ -1470,6 +1480,11 @@ class AdminUsersController extends BaseApiController
                         );
                     } catch (\Exception $e) {
                         // Non-critical — federation settings can be seeded later
+                        Log::error('AdminUsersController::importUsers federation_user_settings seed failed', [
+                            'user_id' => $newUserId,
+                            'error' => $e->getMessage(),
+                            'trace' => $e->getTraceAsString(),
+                        ]);
                     }
                 }
 

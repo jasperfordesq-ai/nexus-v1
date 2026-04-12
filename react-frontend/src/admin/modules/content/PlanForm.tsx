@@ -90,6 +90,28 @@ export function PlanForm() {
       toast.warning(t('content.plan_name_required', 'Plan name is required'));
       return;
     }
+
+    // Validate numeric fields — reject NaN/negative
+    const numericChecks: Array<{ label: string; value: string; allowZero?: boolean }> = [
+      { label: t('content.monthly_price', 'Monthly Price'), value: formData.price_monthly, allowZero: true },
+      { label: t('content.annual_price', 'Annual Price'), value: formData.price_yearly, allowZero: true },
+      { label: t('content.tier_level', 'Tier Level'), value: formData.tier_level, allowZero: true },
+      { label: t('content.max_menus', 'Max Menus'), value: formData.max_menus, allowZero: true },
+      { label: t('content.max_menu_items', 'Max Menu Items'), value: formData.max_menu_items, allowZero: true },
+    ];
+    for (const check of numericChecks) {
+      if (check.value === undefined || check.value === null || check.value === '') continue;
+      const n = Number(check.value);
+      if (Number.isNaN(n)) {
+        toast.error(t('content.invalid_number_field', `${check.label} must be a valid number`, { field: check.label }));
+        return;
+      }
+      if (n < 0 || (!check.allowZero && n === 0)) {
+        toast.error(t('content.invalid_number_field', `${check.label} must be a valid number`, { field: check.label }));
+        return;
+      }
+    }
+
     setSaving(true);
 
     // Parse comma-separated strings into arrays
@@ -177,6 +199,8 @@ export function PlanForm() {
             <Input
               label={t('content.monthly_price', 'Monthly Price')}
               type="number"
+              min="0"
+              step="0.01"
               placeholder="9.99"
               variant="bordered"
               startContent={<span className="text-default-400 text-sm">EUR</span>}
@@ -186,6 +210,8 @@ export function PlanForm() {
             <Input
               label={t('content.annual_price', 'Annual Price')}
               type="number"
+              min="0"
+              step="0.01"
               placeholder="99.99"
               variant="bordered"
               startContent={<span className="text-default-400 text-sm">EUR</span>}
@@ -196,6 +222,8 @@ export function PlanForm() {
           <Input
             label={t('content.tier_level', 'Tier Level')}
             type="number"
+            min="0"
+            step="1"
             placeholder="1"
             variant="bordered"
             description={t('content.tier_level_desc', 'Higher tier = more features (0 = free, 1 = basic, 2 = pro, etc.)')}
@@ -206,6 +234,8 @@ export function PlanForm() {
             <Input
               label={t('content.max_menus', 'Max Menus')}
               type="number"
+              min="0"
+              step="1"
               placeholder="e.g., 10"
               variant="bordered"
               description={t('content.max_menus_desc', 'Maximum navigation menus allowed')}
@@ -215,6 +245,8 @@ export function PlanForm() {
             <Input
               label={t('content.max_menu_items', 'Max Menu Items')}
               type="number"
+              min="0"
+              step="1"
               placeholder="e.g., 50"
               variant="bordered"
               description={t('content.max_menu_items_desc', 'Maximum menu items allowed')}

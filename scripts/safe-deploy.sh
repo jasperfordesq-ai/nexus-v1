@@ -262,10 +262,12 @@ check_lock() {
     if [ -f "$LOCK_FILE" ]; then
         LOCK_PID=$(cat "$LOCK_FILE" 2>/dev/null || echo "0")
 
-        # Lock files older than 30 minutes are always stale (no deploy takes that long)
+        # Lock files older than 2 hours are always stale (no legitimate deploy takes that long,
+        # even with --no-cache full rebuilds + migrations). This is a safety net — the EXIT trap
+        # should already have removed the lock in normal failure paths.
         LOCK_AGE=$(( $(date +%s) - $(stat -c %Y "$LOCK_FILE" 2>/dev/null || echo "0") ))
-        if [ "$LOCK_AGE" -gt 1800 ]; then
-            log_warn "Lock file is $((LOCK_AGE / 60))m old — removing stale lock"
+        if [ "$LOCK_AGE" -gt 7200 ]; then
+            log_warn "Lock file is $((LOCK_AGE / 60))m old (>2h) — removing stale lock"
             rm -f "$LOCK_FILE"
             return
         fi

@@ -1,3 +1,11 @@
+# PHPStan configuration.
+#
+# NOTE on baselines: PHPStan 1.12's --generate-baseline emits invalid NEON
+# (escaped colons like "\:" that the NEON parser rejects). Do NOT run
+# --generate-baseline until the upstream bug is fixed. Instead, the
+# pre-existing ~123 errors are suppressed via explicit `ignoreErrors`
+# patterns below. CI/pre-push run phpstan as warning-only (|| true).
+# See memory: feedback / PHPStan section in MEMORY.md.
 parameters:
     level: 3
     paths:

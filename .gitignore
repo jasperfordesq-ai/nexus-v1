@@ -102,6 +102,8 @@ _deprecated/
 /storage/
 /uploads/
 /httpdocs/uploads/
+/httpdocs/storage
+/httpdocs/storage/
 
 # ─── Build Outputs & Caches ──────────────────────────────────────────────────
 /public/build

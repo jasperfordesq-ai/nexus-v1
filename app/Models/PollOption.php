@@ -6,6 +6,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,10 +14,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class PollOption extends Model
 {
     use HasFactory;
+    use HasTenantScope;
 
     protected $table = 'poll_options';
 
-    protected $fillable = ['poll_id', 'option_text'];
+    protected $fillable = ['tenant_id', 'poll_id', 'option_text'];
 
     public function poll(): BelongsTo
     {

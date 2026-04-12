@@ -111,7 +111,7 @@ export function EventsPage() {
     };
   }, [searchQuery]);
 
-  const loadEvents = useCallback(async (append = false) => {
+  const loadEvents = useCallback(async (append = false): Promise<void> => {
     // Abort any in-flight request to prevent race conditions
     if (!append && abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -122,6 +122,7 @@ export function EventsPage() {
     }
 
     try {
+      if (controller.signal.aborted) return;
       if (!append) {
         setIsLoading(true);
         setError(null);
@@ -151,16 +152,19 @@ export function EventsPage() {
       const response = await api.get<Event[]>(`${endpoint}?${params}`);
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
+        if (controller.signal.aborted) return;
         if (append) {
           setEvents((prev) => [...prev, ...response.data!]);
         } else {
           setEvents(response.data);
         }
+        if (controller.signal.aborted) return;
         const cursor = response.meta?.cursor ?? null;
         nextCursorRef.current = cursor;
         setNextCursor(cursor);
         setHasMore(response.meta?.has_more ?? (response.data?.length ?? 0) >= ITEMS_PER_PAGE);
       } else {
+        if (controller.signal.aborted) return;
         if (!append) {
           setError(tRef.current('unable_to_load'));
         }

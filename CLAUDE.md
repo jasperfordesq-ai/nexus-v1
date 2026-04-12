@@ -114,7 +114,8 @@ See [docs/LOCAL_DEV_SETUP.md](docs/LOCAL_DEV_SETUP.md) for full setup guide.
 ### WebAuthn / Passkeys — Windows Dev Environment
 
 **RP ID:** `project-nexus.ie` (covers both `app.project-nexus.ie` and `api.project-nexus.ie`)
-- Set via `WEBAUTHN_RP_ID=project-nexus.ie` in `.env` — do NOT use `staging.timebank.local` (stale, deleted)
+- Production/Azure: set `WEBAUTHN_RP_ID=project-nexus.ie` in `.env`
+- Local dev: set `WEBAUTHN_RP_ID=localhost`
 - Production Docker env (`compose.prod.yml`) derives it correctly from HTTP_ORIGIN fallback
 
 **Windows Hello requirement:** Chrome uses the native Windows WebAuthn API which requires `WbioSrvc` (Windows Biometric Service) to be **running** at the moment the passkey dialog opens. This service idles down and stops automatically — if it's stopped, Chrome's "Choose a passkey" dialog will show NO "This Windows device" / Windows Hello option.
