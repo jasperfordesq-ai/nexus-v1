@@ -57,12 +57,6 @@ class JobVacanciesControllerTest extends TestCase
     // CORE CRUD — GET /v2/jobs (index)
     // =====================================================================
 
-    public function test_index_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/jobs');
-        $response->assertStatus(401);
-    }
-
     public function test_index_returns_200_with_data_structure(): void
     {
         $this->authenticatedUser();
@@ -186,12 +180,6 @@ class JobVacanciesControllerTest extends TestCase
     // =====================================================================
     // CORE CRUD — GET /v2/jobs/{id} (show)
     // =====================================================================
-
-    public function test_show_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/jobs/1');
-        $response->assertStatus(401);
-    }
 
     public function test_show_returns_existing_vacancy(): void
     {

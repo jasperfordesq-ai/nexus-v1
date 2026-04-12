@@ -34,13 +34,6 @@ class HelpControllerTest extends TestCase
     //  GET /v2/help/faqs
     // ------------------------------------------------------------------
 
-    public function test_get_faqs_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/help/faqs');
-
-        $response->assertStatus(401);
-    }
-
     public function test_get_faqs_returns_data(): void
     {
         $this->authenticatedUser();

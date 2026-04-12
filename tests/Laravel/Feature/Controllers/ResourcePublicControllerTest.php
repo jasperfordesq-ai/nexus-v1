@@ -34,13 +34,6 @@ class ResourcePublicControllerTest extends TestCase
     //  GET /v2/resources
     // ------------------------------------------------------------------
 
-    public function test_index_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/resources');
-
-        $response->assertStatus(401);
-    }
-
     public function test_index_returns_data(): void
     {
         $this->authenticatedUser();

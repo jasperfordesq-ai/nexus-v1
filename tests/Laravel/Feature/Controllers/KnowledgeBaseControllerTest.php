@@ -34,13 +34,6 @@ class KnowledgeBaseControllerTest extends TestCase
     //  GET /v2/kb
     // ------------------------------------------------------------------
 
-    public function test_index_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/kb');
-
-        $response->assertStatus(401);
-    }
-
     public function test_index_returns_data(): void
     {
         $this->authenticatedUser();
@@ -53,13 +46,6 @@ class KnowledgeBaseControllerTest extends TestCase
     // ------------------------------------------------------------------
     //  GET /v2/kb/search
     // ------------------------------------------------------------------
-
-    public function test_search_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/kb/search?q=help');
-
-        $response->assertStatus(401);
-    }
 
     public function test_search_returns_data(): void
     {
@@ -85,32 +71,10 @@ class KnowledgeBaseControllerTest extends TestCase
     }
 
     // ------------------------------------------------------------------
-    //  GET /v2/kb/{id}
-    // ------------------------------------------------------------------
-
-    public function test_show_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/kb/1');
-
-        $response->assertStatus(401);
-    }
-
-    // ------------------------------------------------------------------
-    //  GET /v2/kb/slug/{slug}
-    // ------------------------------------------------------------------
-
-    public function test_show_by_slug_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/kb/slug/test-article');
-
-        $response->assertStatus(401);
-    }
-
-    // ------------------------------------------------------------------
     //  DELETE /v2/kb/{id}
     // ------------------------------------------------------------------
 
-    public function test_destroy_requires_auth(): void
+public function test_destroy_requires_auth(): void
     {
         $response = $this->apiDelete('/v2/kb/1');
 

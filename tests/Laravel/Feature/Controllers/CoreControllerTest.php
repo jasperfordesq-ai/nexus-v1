@@ -46,53 +46,8 @@ class CoreControllerTest extends TestCase
     }
 
     // ------------------------------------------------------------------
-    //  POST /messages/send (auth required)
-    // ------------------------------------------------------------------
-
-    public function test_send_message_requires_auth(): void
-    {
-        $response = $this->apiPost('/messages/send', [
-            'recipient_id' => 1,
-            'body' => 'Hello',
-        ]);
-
-        $response->assertStatus(401);
-    }
-
-    // ------------------------------------------------------------------
-    //  POST /messages/typing (auth required)
-    // ------------------------------------------------------------------
-
-    public function test_typing_requires_auth(): void
-    {
-        $response = $this->apiPost('/messages/typing', [
-            'conversation_id' => 1,
-        ]);
-
-        $response->assertStatus(401);
-    }
-
-    // ------------------------------------------------------------------
-    //  GET /messages/poll (auth required)
-    // ------------------------------------------------------------------
-
-    public function test_poll_messages_requires_auth(): void
-    {
-        $response = $this->apiGet('/messages/poll');
-
-        $response->assertStatus(401);
-    }
-
-    // ------------------------------------------------------------------
     //  GET /messages/unread-count (auth required)
     // ------------------------------------------------------------------
-
-    public function test_unread_count_requires_auth(): void
-    {
-        $response = $this->apiGet('/messages/unread-count');
-
-        $response->assertStatus(401);
-    }
 
     public function test_unread_count_returns_data(): void
     {

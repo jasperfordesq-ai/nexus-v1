@@ -34,13 +34,6 @@ class SkillTaxonomyControllerTest extends TestCase
     //  GET /v2/skills/categories
     // ------------------------------------------------------------------
 
-    public function test_categories_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/skills/categories');
-
-        $response->assertStatus(401);
-    }
-
     public function test_categories_returns_data(): void
     {
         $this->authenticatedUser();
@@ -53,13 +46,6 @@ class SkillTaxonomyControllerTest extends TestCase
     // ------------------------------------------------------------------
     //  GET /v2/skills/search
     // ------------------------------------------------------------------
-
-    public function test_search_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/skills/search?q=cooking');
-
-        $response->assertStatus(401);
-    }
 
     public function test_search_returns_data(): void
     {

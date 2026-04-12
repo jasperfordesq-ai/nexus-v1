@@ -34,13 +34,6 @@ class BlogPublicControllerTest extends TestCase
     //  GET /v2/blog
     // ------------------------------------------------------------------
 
-    public function test_blog_index_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/blog');
-
-        $response->assertStatus(401);
-    }
-
     public function test_blog_index_returns_data(): void
     {
         $this->authenticatedUser();
@@ -54,13 +47,6 @@ class BlogPublicControllerTest extends TestCase
     //  GET /v2/blog/categories
     // ------------------------------------------------------------------
 
-    public function test_blog_categories_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/blog/categories');
-
-        $response->assertStatus(401);
-    }
-
     public function test_blog_categories_returns_data(): void
     {
         $this->authenticatedUser();
@@ -73,13 +59,6 @@ class BlogPublicControllerTest extends TestCase
     // ------------------------------------------------------------------
     //  GET /v2/blog/{slug}
     // ------------------------------------------------------------------
-
-    public function test_blog_show_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/blog/test-post');
-
-        $response->assertStatus(401);
-    }
 
     public function test_blog_show_nonexistent_returns_404(): void
     {

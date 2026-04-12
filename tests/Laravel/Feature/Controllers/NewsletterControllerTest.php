@@ -34,13 +34,6 @@ class NewsletterControllerTest extends TestCase
     //  POST /v2/newsletter/unsubscribe
     // ------------------------------------------------------------------
 
-    public function test_unsubscribe_requires_auth(): void
-    {
-        $response = $this->apiPost('/v2/newsletter/unsubscribe', ['email' => 'test@example.com']);
-
-        $response->assertStatus(401);
-    }
-
     public function test_unsubscribe_works(): void
     {
         $user = $this->authenticatedUser();

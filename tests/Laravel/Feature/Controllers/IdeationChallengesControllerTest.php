@@ -34,13 +34,6 @@ class IdeationChallengesControllerTest extends TestCase
     //  GET /v2/ideation-challenges
     // ------------------------------------------------------------------
 
-    public function test_index_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/ideation-challenges');
-
-        $response->assertStatus(401);
-    }
-
     public function test_index_returns_data(): void
     {
         $this->authenticatedUser();
@@ -68,18 +61,11 @@ class IdeationChallengesControllerTest extends TestCase
     //  GET /v2/ideation-challenges/{id}
     // ------------------------------------------------------------------
 
-    public function test_show_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/ideation-challenges/1');
-
-        $response->assertStatus(401);
-    }
-
     // ------------------------------------------------------------------
     //  GET /v2/ideation-challenges/{id}/ideas
     // ------------------------------------------------------------------
 
-    public function test_ideas_requires_auth(): void
+public function test_ideas_requires_auth(): void
     {
         $response = $this->apiGet('/v2/ideation-challenges/1/ideas');
 

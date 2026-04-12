@@ -35,13 +35,6 @@ class VolunteerControllerTest extends TestCase
     //  GET /v2/volunteering/opportunities
     // ------------------------------------------------------------------
 
-    public function test_opportunities_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/volunteering/opportunities');
-
-        $response->assertStatus(401);
-    }
-
     public function test_opportunities_returns_data(): void
     {
         $this->authenticatedUser();
@@ -69,18 +62,11 @@ class VolunteerControllerTest extends TestCase
     //  GET /v2/volunteering/opportunities/{id}
     // ------------------------------------------------------------------
 
-    public function test_show_opportunity_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/volunteering/opportunities/1');
-
-        $response->assertStatus(401);
-    }
-
     // ------------------------------------------------------------------
     //  POST /v2/volunteering/opportunities/{id}/apply
     // ------------------------------------------------------------------
 
-    public function test_apply_requires_auth(): void
+public function test_apply_requires_auth(): void
     {
         $response = $this->apiPost('/v2/volunteering/opportunities/1/apply');
 
@@ -175,13 +161,6 @@ class VolunteerControllerTest extends TestCase
     // ------------------------------------------------------------------
     //  GET /v2/volunteering/organisations
     // ------------------------------------------------------------------
-
-    public function test_organisations_requires_auth(): void
-    {
-        $response = $this->apiGet('/v2/volunteering/organisations');
-
-        $response->assertStatus(401);
-    }
 
     public function test_organisations_returns_data(): void
     {

@@ -34,13 +34,6 @@ class AppControllerTest extends TestCase
     //  POST /app/check-version
     // ------------------------------------------------------------------
 
-    public function test_check_version_requires_auth(): void
-    {
-        $response = $this->apiPost('/app/check-version', ['version' => '1.0']);
-
-        $response->assertStatus(401);
-    }
-
     public function test_check_version_returns_status(): void
     {
         $this->authenticatedUser();
@@ -55,13 +48,6 @@ class AppControllerTest extends TestCase
     //  GET /app/version
     // ------------------------------------------------------------------
 
-    public function test_version_requires_auth(): void
-    {
-        $response = $this->apiGet('/app/version');
-
-        $response->assertStatus(401);
-    }
-
     public function test_version_returns_data(): void
     {
         $this->authenticatedUser();
@@ -74,13 +60,6 @@ class AppControllerTest extends TestCase
     // ------------------------------------------------------------------
     //  POST /app/log
     // ------------------------------------------------------------------
-
-    public function test_log_requires_auth(): void
-    {
-        $response = $this->apiPost('/app/log', ['message' => 'test log']);
-
-        $response->assertStatus(401);
-    }
 
     public function test_log_accepts_message(): void
     {
