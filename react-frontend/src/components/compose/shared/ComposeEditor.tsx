@@ -304,7 +304,7 @@ function ComposeToolbar({ isDisabled }: { isDisabled?: boolean }) {
           <Input
             ref={linkInputRef}
             size="sm"
-            placeholder="https://example.com"
+            placeholder={t('compose.placeholder_url')}
             value={linkUrl}
             onValueChange={setLinkUrl}
             onKeyDown={handleLinkKeyDown}

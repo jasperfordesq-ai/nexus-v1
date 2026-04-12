@@ -389,6 +389,10 @@
   },
   "hours_display_one": "{{count}} hour",
   "hours_display_other": "{{count}} hours",
+  "compose": {
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1"
+  },
   "toast": {
     "aria_notifications": "Notifications",
     "aria_dismiss_notification": "Dismiss notification"

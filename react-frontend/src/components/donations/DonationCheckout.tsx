@@ -193,7 +193,7 @@ export function DonationCheckout({
                     onValueChange={setAmount}
                     startContent={<Banknote className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
                     isRequired
-                    placeholder="0.00"
+                    placeholder={t('donations.placeholder_amount', '0.00')}
                   />
 
                   <Select

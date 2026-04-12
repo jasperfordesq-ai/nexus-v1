@@ -15,6 +15,7 @@
 
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
+import { Button } from '@heroui/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { resolveAssetUrl } from '@/lib/helpers';
@@ -162,32 +163,34 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
 
         {/* Left arrow */}
         {currentIndex > 0 && (
-          <button
-            type="button"
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/50 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-white/50"
-            onClick={(e) => {
-              e.stopPropagation();
-              goPrev();
-            }}
+          <Button
+            isIconOnly
+            radius="full"
+            size="sm"
+            variant="flat"
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-[var(--surface-overlay)] backdrop-blur-sm text-white opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+            onPress={goPrev}
+            onClick={(e) => e.stopPropagation()}
             aria-label={t('carousel.previous', 'Previous image')}
           >
             <ChevronLeft className="w-5 h-5" />
-          </button>
+          </Button>
         )}
 
         {/* Right arrow */}
         {currentIndex < total - 1 && (
-          <button
-            type="button"
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/50 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-white/50"
-            onClick={(e) => {
-              e.stopPropagation();
-              goNext();
-            }}
+          <Button
+            isIconOnly
+            radius="full"
+            size="sm"
+            variant="flat"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-[var(--surface-overlay)] backdrop-blur-sm text-white opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+            onPress={goNext}
+            onClick={(e) => e.stopPropagation()}
             aria-label={t('carousel.next', 'Next image')}
           >
             <ChevronRight className="w-5 h-5" />
-          </button>
+          </Button>
         )}
 
         {/* Dot indicators — collapses to max 7 visible dots for 8+ images */}

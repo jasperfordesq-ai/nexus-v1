@@ -1110,7 +1110,7 @@ export function InsuranceCertificates() {
         message={deleteItem
           ? t('broker.delete_insurance_certificate_confirm', { name: `${deleteItem.first_name} ${deleteItem.last_name}` })
           : ''}
-        confirmLabel="Delete"
+        confirmLabel={t('common.delete')}
         confirmColor="danger"
         isLoading={deleteLoading}
       />

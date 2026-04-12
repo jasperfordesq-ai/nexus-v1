@@ -37,12 +37,13 @@ export function ConfirmModal({
   onConfirm,
   title,
   message,
-  confirmLabel = 'Confirm',
+  confirmLabel,
   confirmColor = 'danger',
   isLoading = false,
   children,
 }: ConfirmModalProps) {
   const { t } = useTranslation('admin');
+  const resolvedConfirmLabel = confirmLabel ?? t('common.confirm');
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
       <ModalContent>
@@ -59,12 +60,13 @@ export function ConfirmModal({
             {t('cancel')}
           </Button>
           <Button
+            autoFocus
             color={confirmColor}
             onPress={onConfirm}
             isLoading={isLoading}
             isDisabled={isLoading}
           >
-            {confirmLabel}
+            {resolvedConfirmLabel}
           </Button>
         </ModalFooter>
       </ModalContent>

@@ -49,11 +49,11 @@ export function AiReplySuggestion({
     setError(null);
 
     try {
-      const response = await api.post(`/v2/marketplace/listings/${listingId}/auto-reply`, {
-        message: buyerMessage,
-      });
-      const data = (response.data as any).data ?? response.data;
-      setReply(data.reply ?? '');
+      const response = await api.post<{ reply?: string }>(
+        `/v2/marketplace/listings/${listingId}/auto-reply`,
+        { message: buyerMessage },
+      );
+      setReply(response.data?.reply ?? '');
       setGenerated(true);
     } catch (err) {
       logError('Failed to generate AI reply', err);

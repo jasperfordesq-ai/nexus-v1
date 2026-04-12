@@ -258,6 +258,7 @@
       "amount": "Amount",
       "message": "Message (optional)"
     },
+    "placeholder_amount": "0.00",
     "anonymous_toggle_on": "Donating anonymously",
     "anonymous_toggle_off": "Donate anonymously",
     "cancel": "Cancel",

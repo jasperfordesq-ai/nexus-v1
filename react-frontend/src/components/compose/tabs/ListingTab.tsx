@@ -341,7 +341,7 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
         <Input
           type="number"
           label={t('compose.estimated_hours_label')}
-          placeholder="1"
+          placeholder={t('compose.placeholder_hours')}
           value={hoursEstimate}
           onChange={(e) => setHoursEstimate(e.target.value)}
           min={0.5}

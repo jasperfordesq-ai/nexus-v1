@@ -93,6 +93,7 @@
     "category_label": "Category",
     "category_placeholder": "Select a category",
     "estimated_hours_label": "Estimated Hours",
+    "placeholder_hours": "1",
     "listing_created": "Listing created!",
     "listing_failed": "Failed to create listing.",
     "create_listing": "Create Listing",

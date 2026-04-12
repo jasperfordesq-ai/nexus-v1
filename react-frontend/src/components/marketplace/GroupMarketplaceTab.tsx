@@ -68,17 +68,32 @@ export function GroupMarketplaceTab({ groupId }: GroupMarketplaceTabProps) {
         qs.set('category_id', String(categoryId));
       }
 
-      const response = await api.get(`/v2/marketplace/groups/${groupId}/listings?${qs.toString()}`);
-      const data = response.data as any;
-      const items = data.data ?? data.items ?? [];
+      const response = await api.get<{
+        items?: MarketplaceListingItem[];
+        cursor?: string | null;
+        has_more?: boolean;
+        meta?: { cursor?: string | null; has_more?: boolean };
+      } | MarketplaceListingItem[]>(
+        `/v2/marketplace/groups/${groupId}/listings?${qs.toString()}`,
+      );
+      const payload = response.data;
+      const items: MarketplaceListingItem[] = Array.isArray(payload)
+        ? payload
+        : payload?.items ?? [];
+      const nextCursor = Array.isArray(payload)
+        ? null
+        : payload?.meta?.cursor ?? payload?.cursor ?? null;
+      const moreAvailable = Array.isArray(payload)
+        ? false
+        : payload?.meta?.has_more ?? payload?.has_more ?? false;
 
       if (append) {
         setListings(prev => [...prev, ...items]);
       } else {
         setListings(items);
       }
-      setCursor(data.meta?.cursor ?? data.cursor ?? null);
-      setHasMore(data.meta?.has_more ?? data.has_more ?? false);
+      setCursor(nextCursor);
+      setHasMore(moreAvailable);
     } catch (err) {
       logError('Failed to load group marketplace listings', err);
     } finally {
@@ -89,9 +104,8 @@ export function GroupMarketplaceTab({ groupId }: GroupMarketplaceTabProps) {
 
   const loadStats = useCallback(async () => {
     try {
-      const response = await api.get(`/v2/marketplace/groups/${groupId}/stats`);
-      const raw = response.data as any;
-      setStats(raw.data ?? raw);
+      const response = await api.get<GroupMarketplaceStats>(`/v2/marketplace/groups/${groupId}/stats`);
+      if (response.data) setStats(response.data);
     } catch (err) {
       logError('Failed to load group marketplace stats', err);
     }
