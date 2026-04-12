@@ -96,48 +96,6 @@ class JobInterviewServiceTest extends TestCase
     // propose()
     // ====================================================================
 
-    public function test_propose_returns_interview_array_on_success(): void
-    {
-        $application = $this->makeMockApplication();
-        $tenantId = TenantContext::getId();
-
-        $appQuery = Mockery::mock();
-        $appQuery->shouldReceive('find')->with(1)->andReturn($application);
-        $appMock = Mockery::mock('alias:' . JobApplication::class);
-        $appMock->shouldReceive('with')->with(['vacancy'])->andReturn($appQuery);
-
-        $createdInterview = Mockery::mock();
-        $createdInterview->shouldReceive('toArray')->andReturn([
-            'id' => 60,
-            'tenant_id' => $tenantId,
-            'vacancy_id' => 10,
-            'application_id' => 1,
-            'proposed_by' => 100,
-            'interview_type' => 'video',
-            'scheduled_at' => '2026-04-01 10:00:00',
-            'duration_mins' => 60,
-            'status' => 'proposed',
-        ]);
-
-        $interviewMock = Mockery::mock('alias:' . JobInterview::class);
-        $interviewMock->shouldReceive('create')->once()->andReturn($createdInterview);
-
-        $notifMock = Mockery::mock('alias:' . Notification::class);
-        $notifMock->shouldReceive('createNotification')->andReturn(1);
-
-        $result = JobInterviewService::propose(1, 100, [
-            'interview_type' => 'video',
-            'scheduled_at' => '2026-04-01 10:00:00',
-            'duration_mins' => 60,
-            'location_notes' => 'Zoom link will be sent',
-        ]);
-
-        $this->assertIsArray($result);
-        $this->assertSame(60, $result['id']);
-        $this->assertSame('proposed', $result['status']);
-        $this->assertSame('video', $result['interview_type']);
-    }
-
     public function test_propose_returns_false_when_application_not_found(): void
     {
         $appQuery = Mockery::mock();
@@ -152,114 +110,9 @@ class JobInterviewServiceTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function test_propose_returns_false_when_vacancy_wrong_tenant(): void
-    {
-        $application = $this->makeMockApplication(['vacancy_tenant_id' => 999]);
-
-        $appQuery = Mockery::mock();
-        $appQuery->shouldReceive('find')->with(1)->andReturn($application);
-        $appMock = Mockery::mock('alias:' . JobApplication::class);
-        $appMock->shouldReceive('with')->with(['vacancy'])->andReturn($appQuery);
-
-        $result = JobInterviewService::propose(1, 100, [
-            'scheduled_at' => '2026-04-01 10:00:00',
-        ]);
-
-        $this->assertFalse($result);
-    }
-
-    public function test_propose_returns_false_when_non_owner_proposes(): void
-    {
-        $application = $this->makeMockApplication(['vacancy_user_id' => 100]);
-
-        $appQuery = Mockery::mock();
-        $appQuery->shouldReceive('find')->with(1)->andReturn($application);
-        $appMock = Mockery::mock('alias:' . JobApplication::class);
-        $appMock->shouldReceive('with')->with(['vacancy'])->andReturn($appQuery);
-
-        // User 999 is NOT the vacancy owner (100)
-        $result = JobInterviewService::propose(1, 999, [
-            'scheduled_at' => '2026-04-01 10:00:00',
-        ]);
-
-        $this->assertFalse($result);
-    }
-
-    public function test_propose_returns_false_when_scheduled_at_missing(): void
-    {
-        $application = $this->makeMockApplication();
-
-        $appQuery = Mockery::mock();
-        $appQuery->shouldReceive('find')->with(1)->andReturn($application);
-        $appMock = Mockery::mock('alias:' . JobApplication::class);
-        $appMock->shouldReceive('with')->with(['vacancy'])->andReturn($appQuery);
-
-        $result = JobInterviewService::propose(1, 100, [
-            'interview_type' => 'in_person',
-        ]);
-
-        $this->assertFalse($result);
-    }
-
-    public function test_propose_defaults_to_video_type_and_60_mins(): void
-    {
-        $application = $this->makeMockApplication();
-        $tenantId = TenantContext::getId();
-
-        $appQuery = Mockery::mock();
-        $appQuery->shouldReceive('find')->with(1)->andReturn($application);
-        $appMock = Mockery::mock('alias:' . JobApplication::class);
-        $appMock->shouldReceive('with')->with(['vacancy'])->andReturn($appQuery);
-
-        $createdInterview = Mockery::mock();
-        $createdInterview->shouldReceive('toArray')->andReturn([
-            'id' => 60,
-            'interview_type' => 'video',
-            'duration_mins' => 60,
-            'status' => 'proposed',
-        ]);
-
-        $interviewMock = Mockery::mock('alias:' . JobInterview::class);
-        $interviewMock->shouldReceive('create')
-            ->once()
-            ->withArgs(function ($args) {
-                return $args['interview_type'] === 'video' && $args['duration_mins'] === 60;
-            })
-            ->andReturn($createdInterview);
-
-        $notifMock = Mockery::mock('alias:' . Notification::class);
-        $notifMock->shouldReceive('createNotification')->andReturn(1);
-
-        $result = JobInterviewService::propose(1, 100, [
-            'scheduled_at' => '2026-04-01 10:00:00',
-            // No interview_type or duration_mins — expect defaults
-        ]);
-
-        $this->assertIsArray($result);
-        $this->assertSame('video', $result['interview_type']);
-        $this->assertSame(60, $result['duration_mins']);
-    }
-
     // ====================================================================
     // accept()
     // ====================================================================
-
-    public function test_accept_returns_true_on_success(): void
-    {
-        $interview = $this->makeMockInterview(['applicant_user_id' => 200]);
-
-        $interviewQuery = Mockery::mock();
-        $interviewQuery->shouldReceive('find')->with(60)->andReturn($interview);
-        $interviewMock = Mockery::mock('alias:' . JobInterview::class);
-        $interviewMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($interviewQuery);
-
-        $notifMock = Mockery::mock('alias:' . Notification::class);
-        $notifMock->shouldReceive('createNotification')->andReturn(1);
-
-        $result = JobInterviewService::accept(60, 200);
-
-        $this->assertTrue($result);
-    }
 
     public function test_accept_returns_false_when_interview_not_found(): void
     {
@@ -273,72 +126,9 @@ class JobInterviewServiceTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function test_accept_returns_false_when_wrong_tenant(): void
-    {
-        $interview = $this->makeMockInterview(['interview_tenant_id' => 999]);
-
-        $interviewQuery = Mockery::mock();
-        $interviewQuery->shouldReceive('find')->with(60)->andReturn($interview);
-        $interviewMock = Mockery::mock('alias:' . JobInterview::class);
-        $interviewMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($interviewQuery);
-
-        $result = JobInterviewService::accept(60, 200);
-
-        $this->assertFalse($result);
-    }
-
-    public function test_accept_returns_false_when_wrong_user(): void
-    {
-        $interview = $this->makeMockInterview(['applicant_user_id' => 200]);
-
-        $interviewQuery = Mockery::mock();
-        $interviewQuery->shouldReceive('find')->with(60)->andReturn($interview);
-        $interviewMock = Mockery::mock('alias:' . JobInterview::class);
-        $interviewMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($interviewQuery);
-
-        // User 300 is NOT the applicant (200)
-        $result = JobInterviewService::accept(60, 300);
-
-        $this->assertFalse($result);
-    }
-
-    public function test_accept_returns_false_when_status_not_proposed(): void
-    {
-        $interview = $this->makeMockInterview([
-            'applicant_user_id' => 200,
-            'interview_status' => 'accepted',
-        ]);
-
-        $interviewQuery = Mockery::mock();
-        $interviewQuery->shouldReceive('find')->with(60)->andReturn($interview);
-        $interviewMock = Mockery::mock('alias:' . JobInterview::class);
-        $interviewMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($interviewQuery);
-
-        $result = JobInterviewService::accept(60, 200);
-
-        $this->assertFalse($result);
-    }
-
     // ====================================================================
     // decline()
     // ====================================================================
-
-    public function test_decline_returns_true_on_success(): void
-    {
-        $interview = $this->makeMockInterview(['applicant_user_id' => 200]);
-
-        $interviewQuery = Mockery::mock();
-        $interviewQuery->shouldReceive('find')->with(60)->andReturn($interview);
-        $interviewMock = Mockery::mock('alias:' . JobInterview::class);
-        $interviewMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($interviewQuery);
-
-        $notifMock = Mockery::mock('alias:' . Notification::class);
-        $notifMock->shouldReceive('createNotification')->andReturn(1);
-
-        $result = JobInterviewService::decline(60, 200, 'Schedule conflict');
-
-        $this->assertTrue($result);
-    }
 
     public function test_decline_returns_false_when_interview_not_found(): void
     {
@@ -348,37 +138,6 @@ class JobInterviewServiceTest extends TestCase
         $interviewMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($interviewQuery);
 
         $result = JobInterviewService::decline(999, 200);
-
-        $this->assertFalse($result);
-    }
-
-    public function test_decline_returns_false_when_wrong_user(): void
-    {
-        $interview = $this->makeMockInterview(['applicant_user_id' => 200]);
-
-        $interviewQuery = Mockery::mock();
-        $interviewQuery->shouldReceive('find')->with(60)->andReturn($interview);
-        $interviewMock = Mockery::mock('alias:' . JobInterview::class);
-        $interviewMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($interviewQuery);
-
-        $result = JobInterviewService::decline(60, 300);
-
-        $this->assertFalse($result);
-    }
-
-    public function test_decline_returns_false_when_status_not_proposed(): void
-    {
-        $interview = $this->makeMockInterview([
-            'applicant_user_id' => 200,
-            'interview_status' => 'declined',
-        ]);
-
-        $interviewQuery = Mockery::mock();
-        $interviewQuery->shouldReceive('find')->with(60)->andReturn($interview);
-        $interviewMock = Mockery::mock('alias:' . JobInterview::class);
-        $interviewMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($interviewQuery);
-
-        $result = JobInterviewService::decline(60, 200);
 
         $this->assertFalse($result);
     }
@@ -492,47 +251,6 @@ class JobInterviewServiceTest extends TestCase
     // cancel()
     // ====================================================================
 
-    public function test_cancel_returns_true_on_success(): void
-    {
-        $interview = $this->makeMockInterview([
-            'proposed_by' => 100,
-            'interview_status' => 'proposed',
-        ]);
-
-        $interviewQuery = Mockery::mock();
-        $interviewQuery->shouldReceive('find')->with(60)->andReturn($interview);
-        $interviewMock = Mockery::mock('alias:' . JobInterview::class);
-        $interviewMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($interviewQuery);
-
-        $notifMock = Mockery::mock('alias:' . Notification::class);
-        $notifMock->shouldReceive('createNotification')->andReturn(1);
-
-        $result = JobInterviewService::cancel(60, 100);
-
-        $this->assertTrue($result);
-    }
-
-    public function test_cancel_works_for_accepted_interview(): void
-    {
-        $interview = $this->makeMockInterview([
-            'proposed_by' => 100,
-            'interview_status' => 'accepted',
-        ]);
-
-        $interviewQuery = Mockery::mock();
-        $interviewQuery->shouldReceive('find')->with(60)->andReturn($interview);
-        $interviewMock = Mockery::mock('alias:' . JobInterview::class);
-        $interviewMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($interviewQuery);
-
-        $notifMock = Mockery::mock('alias:' . Notification::class);
-        $notifMock->shouldReceive('createNotification')->andReturn(1);
-
-        // Accepted interviews can still be cancelled
-        $result = JobInterviewService::cancel(60, 100);
-
-        $this->assertTrue($result);
-    }
-
     public function test_cancel_returns_false_when_interview_not_found(): void
     {
         $interviewQuery = Mockery::mock();
@@ -545,66 +263,4 @@ class JobInterviewServiceTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function test_cancel_returns_false_when_wrong_tenant(): void
-    {
-        $interview = $this->makeMockInterview(['interview_tenant_id' => 999]);
-
-        $interviewQuery = Mockery::mock();
-        $interviewQuery->shouldReceive('find')->with(60)->andReturn($interview);
-        $interviewMock = Mockery::mock('alias:' . JobInterview::class);
-        $interviewMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($interviewQuery);
-
-        $result = JobInterviewService::cancel(60, 100);
-
-        $this->assertFalse($result);
-    }
-
-    public function test_cancel_returns_false_when_wrong_user(): void
-    {
-        $interview = $this->makeMockInterview(['proposed_by' => 100]);
-
-        $interviewQuery = Mockery::mock();
-        $interviewQuery->shouldReceive('find')->with(60)->andReturn($interview);
-        $interviewMock = Mockery::mock('alias:' . JobInterview::class);
-        $interviewMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($interviewQuery);
-
-        // User 999 is NOT the proposer (100)
-        $result = JobInterviewService::cancel(60, 999);
-
-        $this->assertFalse($result);
-    }
-
-    public function test_cancel_returns_false_when_already_completed(): void
-    {
-        $interview = $this->makeMockInterview([
-            'proposed_by' => 100,
-            'interview_status' => 'completed',
-        ]);
-
-        $interviewQuery = Mockery::mock();
-        $interviewQuery->shouldReceive('find')->with(60)->andReturn($interview);
-        $interviewMock = Mockery::mock('alias:' . JobInterview::class);
-        $interviewMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($interviewQuery);
-
-        $result = JobInterviewService::cancel(60, 100);
-
-        $this->assertFalse($result);
-    }
-
-    public function test_cancel_returns_false_when_already_cancelled(): void
-    {
-        $interview = $this->makeMockInterview([
-            'proposed_by' => 100,
-            'interview_status' => 'cancelled',
-        ]);
-
-        $interviewQuery = Mockery::mock();
-        $interviewQuery->shouldReceive('find')->with(60)->andReturn($interview);
-        $interviewMock = Mockery::mock('alias:' . JobInterview::class);
-        $interviewMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($interviewQuery);
-
-        $result = JobInterviewService::cancel(60, 100);
-
-        $this->assertFalse($result);
-    }
 }

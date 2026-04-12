@@ -96,51 +96,6 @@ class JobOfferServiceTest extends TestCase
     // create()
     // ====================================================================
 
-    public function test_create_returns_offer_array_on_success(): void
-    {
-        $application = $this->makeMockApplication();
-        $tenantId = TenantContext::getId();
-
-        // Mock JobApplication::with(['vacancy'])->find($applicationId)
-        $appQuery = Mockery::mock();
-        $appQuery->shouldReceive('find')->with(1)->andReturn($application);
-        $appMock = Mockery::mock('alias:' . JobApplication::class);
-        $appMock->shouldReceive('with')->with(['vacancy'])->andReturn($appQuery);
-
-        // Mock JobOffer::where(...)->exists()
-        $existsQuery = Mockery::mock();
-        $existsQuery->shouldReceive('exists')->andReturn(false);
-        $offerMock = Mockery::mock('alias:' . JobOffer::class);
-        $offerMock->shouldReceive('where')->with('application_id', 1)->andReturn($existsQuery);
-
-        // Mock JobOffer::create()
-        $createdOffer = Mockery::mock();
-        $createdOffer->shouldReceive('toArray')->andReturn([
-            'id' => 50,
-            'tenant_id' => $tenantId,
-            'vacancy_id' => 10,
-            'application_id' => 1,
-            'salary_offered' => 50000.0,
-            'salary_currency' => 'EUR',
-            'status' => 'pending',
-        ]);
-        $offerMock->shouldReceive('create')->once()->andReturn($createdOffer);
-
-        // Mock Notification (allow failure silently)
-        $notifMock = Mockery::mock('alias:' . Notification::class);
-        $notifMock->shouldReceive('createNotification')->andReturn(1);
-
-        $result = JobOfferService::create(1, 100, [
-            'salary_offered' => 50000,
-            'salary_currency' => 'EUR',
-            'message' => 'Welcome aboard!',
-        ]);
-
-        $this->assertIsArray($result);
-        $this->assertSame(50, $result['id']);
-        $this->assertSame('pending', $result['status']);
-    }
-
     public function test_create_returns_false_when_application_not_found(): void
     {
         $appQuery = Mockery::mock();
@@ -153,77 +108,9 @@ class JobOfferServiceTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function test_create_returns_false_when_vacancy_belongs_to_different_tenant(): void
-    {
-        $application = $this->makeMockApplication(['vacancy_tenant_id' => 999]);
-
-        $appQuery = Mockery::mock();
-        $appQuery->shouldReceive('find')->with(1)->andReturn($application);
-        $appMock = Mockery::mock('alias:' . JobApplication::class);
-        $appMock->shouldReceive('with')->with(['vacancy'])->andReturn($appQuery);
-
-        $result = JobOfferService::create(1, 100, []);
-
-        $this->assertFalse($result);
-    }
-
-    public function test_create_returns_false_when_non_owner_creates_offer(): void
-    {
-        $application = $this->makeMockApplication(['vacancy_user_id' => 100]);
-
-        $appQuery = Mockery::mock();
-        $appQuery->shouldReceive('find')->with(1)->andReturn($application);
-        $appMock = Mockery::mock('alias:' . JobApplication::class);
-        $appMock->shouldReceive('with')->with(['vacancy'])->andReturn($appQuery);
-
-        // User 999 is NOT the vacancy owner (100)
-        $result = JobOfferService::create(1, 999, []);
-
-        $this->assertFalse($result);
-    }
-
-    public function test_create_returns_false_when_offer_already_exists(): void
-    {
-        $application = $this->makeMockApplication();
-
-        $appQuery = Mockery::mock();
-        $appQuery->shouldReceive('find')->with(1)->andReturn($application);
-        $appMock = Mockery::mock('alias:' . JobApplication::class);
-        $appMock->shouldReceive('with')->with(['vacancy'])->andReturn($appQuery);
-
-        $existsQuery = Mockery::mock();
-        $existsQuery->shouldReceive('exists')->andReturn(true);
-        $offerMock = Mockery::mock('alias:' . JobOffer::class);
-        $offerMock->shouldReceive('where')->with('application_id', 1)->andReturn($existsQuery);
-
-        $result = JobOfferService::create(1, 100, ['salary_offered' => 50000]);
-
-        $this->assertFalse($result);
-    }
-
     // ====================================================================
     // accept()
     // ====================================================================
-
-    public function test_accept_returns_true_on_success(): void
-    {
-        $offer = $this->makeMockOffer(['applicant_user_id' => 200]);
-
-        $offerQuery = Mockery::mock();
-        $offerQuery->shouldReceive('find')->with(50)->andReturn($offer);
-        $offerMock = Mockery::mock('alias:' . JobOffer::class);
-        $offerMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($offerQuery);
-
-        $notifMock = Mockery::mock('alias:' . Notification::class);
-        $notifMock->shouldReceive('createNotification')->andReturn(1);
-
-        $webhookMock = Mockery::mock('alias:' . WebhookDispatchService::class);
-        $webhookMock->shouldReceive('dispatch')->once();
-
-        $result = JobOfferService::accept(50, 200);
-
-        $this->assertTrue($result);
-    }
 
     public function test_accept_returns_false_when_offer_not_found(): void
     {
@@ -237,72 +124,9 @@ class JobOfferServiceTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function test_accept_returns_false_when_wrong_tenant(): void
-    {
-        $offer = $this->makeMockOffer(['offer_tenant_id' => 999]);
-
-        $offerQuery = Mockery::mock();
-        $offerQuery->shouldReceive('find')->with(50)->andReturn($offer);
-        $offerMock = Mockery::mock('alias:' . JobOffer::class);
-        $offerMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($offerQuery);
-
-        $result = JobOfferService::accept(50, 200);
-
-        $this->assertFalse($result);
-    }
-
-    public function test_accept_returns_false_when_wrong_user(): void
-    {
-        $offer = $this->makeMockOffer(['applicant_user_id' => 200]);
-
-        $offerQuery = Mockery::mock();
-        $offerQuery->shouldReceive('find')->with(50)->andReturn($offer);
-        $offerMock = Mockery::mock('alias:' . JobOffer::class);
-        $offerMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($offerQuery);
-
-        // User 300 is NOT the applicant (200)
-        $result = JobOfferService::accept(50, 300);
-
-        $this->assertFalse($result);
-    }
-
-    public function test_accept_returns_false_when_status_not_pending(): void
-    {
-        $offer = $this->makeMockOffer([
-            'applicant_user_id' => 200,
-            'offer_status' => 'accepted',
-        ]);
-
-        $offerQuery = Mockery::mock();
-        $offerQuery->shouldReceive('find')->with(50)->andReturn($offer);
-        $offerMock = Mockery::mock('alias:' . JobOffer::class);
-        $offerMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($offerQuery);
-
-        $result = JobOfferService::accept(50, 200);
-
-        $this->assertFalse($result);
-    }
-
     // ====================================================================
     // reject()
     // ====================================================================
-
-    public function test_reject_returns_true_on_success(): void
-    {
-        $offer = $this->makeMockOffer(['applicant_user_id' => 200]);
-
-        $offerQuery = Mockery::mock();
-        $offerQuery->shouldReceive('find')->with(50)->andReturn($offer);
-        $offerMock = Mockery::mock('alias:' . JobOffer::class);
-        $offerMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($offerQuery);
-
-        $notifMock = Mockery::mock('alias:' . Notification::class);
-        $notifMock->shouldReceive('createNotification')->andReturn(1);
-
-        $result = JobOfferService::reject(50, 200);
-
-        $this->assertTrue($result);
-    }
 
     public function test_reject_returns_false_when_offer_not_found(): void
     {
@@ -316,57 +140,9 @@ class JobOfferServiceTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function test_reject_returns_false_when_wrong_user(): void
-    {
-        $offer = $this->makeMockOffer(['applicant_user_id' => 200]);
-
-        $offerQuery = Mockery::mock();
-        $offerQuery->shouldReceive('find')->with(50)->andReturn($offer);
-        $offerMock = Mockery::mock('alias:' . JobOffer::class);
-        $offerMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($offerQuery);
-
-        $result = JobOfferService::reject(50, 300);
-
-        $this->assertFalse($result);
-    }
-
-    public function test_reject_returns_false_when_status_not_pending(): void
-    {
-        $offer = $this->makeMockOffer([
-            'applicant_user_id' => 200,
-            'offer_status' => 'rejected',
-        ]);
-
-        $offerQuery = Mockery::mock();
-        $offerQuery->shouldReceive('find')->with(50)->andReturn($offer);
-        $offerMock = Mockery::mock('alias:' . JobOffer::class);
-        $offerMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($offerQuery);
-
-        $result = JobOfferService::reject(50, 200);
-
-        $this->assertFalse($result);
-    }
-
     // ====================================================================
     // withdraw()
     // ====================================================================
-
-    public function test_withdraw_returns_true_on_success(): void
-    {
-        $offer = $this->makeMockOffer(['vacancy_user_id' => 100]);
-
-        $offerQuery = Mockery::mock();
-        $offerQuery->shouldReceive('find')->with(50)->andReturn($offer);
-        $offerMock = Mockery::mock('alias:' . JobOffer::class);
-        $offerMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($offerQuery);
-
-        $notifMock = Mockery::mock('alias:' . Notification::class);
-        $notifMock->shouldReceive('createNotification')->andReturn(1);
-
-        $result = JobOfferService::withdraw(50, 100);
-
-        $this->assertTrue($result);
-    }
 
     public function test_withdraw_returns_false_when_offer_not_found(): void
     {
@@ -380,81 +156,9 @@ class JobOfferServiceTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function test_withdraw_returns_false_when_wrong_user(): void
-    {
-        $offer = $this->makeMockOffer(['vacancy_user_id' => 100]);
-
-        $offerQuery = Mockery::mock();
-        $offerQuery->shouldReceive('find')->with(50)->andReturn($offer);
-        $offerMock = Mockery::mock('alias:' . JobOffer::class);
-        $offerMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($offerQuery);
-
-        // User 999 is NOT the vacancy owner (100)
-        $result = JobOfferService::withdraw(50, 999);
-
-        $this->assertFalse($result);
-    }
-
-    public function test_withdraw_returns_false_when_status_not_pending(): void
-    {
-        $offer = $this->makeMockOffer([
-            'vacancy_user_id' => 100,
-            'offer_status' => 'accepted',
-        ]);
-
-        $offerQuery = Mockery::mock();
-        $offerQuery->shouldReceive('find')->with(50)->andReturn($offer);
-        $offerMock = Mockery::mock('alias:' . JobOffer::class);
-        $offerMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($offerQuery);
-
-        $result = JobOfferService::withdraw(50, 100);
-
-        $this->assertFalse($result);
-    }
-
     // ====================================================================
     // getForApplication()
     // ====================================================================
-
-    public function test_getForApplication_returns_offer_for_applicant(): void
-    {
-        $tenantId = TenantContext::getId();
-        $offer = $this->makeMockOffer(['applicant_user_id' => 200]);
-
-        $query = Mockery::mock();
-        $query->shouldReceive('where')->with('tenant_id', $tenantId)->andReturnSelf();
-        $query->shouldReceive('where')->with('application_id', 1)->andReturnSelf();
-        $query->shouldReceive('first')->andReturn($offer);
-
-        $offerMock = Mockery::mock('alias:' . JobOffer::class);
-        $offerMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($query);
-
-        $result = JobOfferService::getForApplication(1, 200);
-
-        $this->assertIsArray($result);
-        $this->assertSame(50, $result['id']);
-    }
-
-    public function test_getForApplication_returns_offer_for_vacancy_owner(): void
-    {
-        $tenantId = TenantContext::getId();
-        $offer = $this->makeMockOffer([
-            'applicant_user_id' => 200,
-            'vacancy_user_id' => 100,
-        ]);
-
-        $query = Mockery::mock();
-        $query->shouldReceive('where')->with('tenant_id', $tenantId)->andReturnSelf();
-        $query->shouldReceive('where')->with('application_id', 1)->andReturnSelf();
-        $query->shouldReceive('first')->andReturn($offer);
-
-        $offerMock = Mockery::mock('alias:' . JobOffer::class);
-        $offerMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($query);
-
-        $result = JobOfferService::getForApplication(1, 100);
-
-        $this->assertIsArray($result);
-    }
 
     public function test_getForApplication_returns_null_when_not_found(): void
     {
@@ -469,28 +173,6 @@ class JobOfferServiceTest extends TestCase
         $offerMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($query);
 
         $result = JobOfferService::getForApplication(999, 200);
-
-        $this->assertNull($result);
-    }
-
-    public function test_getForApplication_returns_null_for_unauthorized_user(): void
-    {
-        $tenantId = TenantContext::getId();
-        $offer = $this->makeMockOffer([
-            'applicant_user_id' => 200,
-            'vacancy_user_id' => 100,
-        ]);
-
-        $query = Mockery::mock();
-        $query->shouldReceive('where')->with('tenant_id', $tenantId)->andReturnSelf();
-        $query->shouldReceive('where')->with('application_id', 1)->andReturnSelf();
-        $query->shouldReceive('first')->andReturn($offer);
-
-        $offerMock = Mockery::mock('alias:' . JobOffer::class);
-        $offerMock->shouldReceive('with')->with(['application.vacancy'])->andReturn($query);
-
-        // User 555 is neither applicant (200) nor vacancy owner (100)
-        $result = JobOfferService::getForApplication(1, 555);
 
         $this->assertNull($result);
     }

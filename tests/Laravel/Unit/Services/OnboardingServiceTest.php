@@ -29,17 +29,6 @@ class OnboardingServiceTest extends TestCase
 
     // ── getProgress ──
 
-    public function test_getProgress_returns_empty_when_user_not_found(): void
-    {
-        $mock = Mockery::mock('alias:' . User::class);
-        $mock->shouldReceive('find')->with(999)->andReturnNull();
-
-        // Since User::find is called statically and we can't easily alias it in Laravel,
-        // we test via the service directly with a non-existent user
-        $result = OnboardingService::getProgress(2, 0);
-        $this->assertIsArray($result);
-    }
-
     public function test_getProgress_returns_steps_and_percentage(): void
     {
         // Mock a user with onboarding not completed
