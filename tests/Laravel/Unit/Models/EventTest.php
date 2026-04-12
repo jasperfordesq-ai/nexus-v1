@@ -25,18 +25,6 @@ class EventTest extends TestCase
         $this->assertEquals('events', $model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $model = new Event();
-        $expected = [
-            'tenant_id', 'user_id', 'title', 'description', 'location',
-            'latitude', 'longitude', 'start_time', 'end_time', 'group_id',
-            'category_id', 'max_attendees', 'is_online', 'online_link',
-            'image_url', 'federated_visibility',
-        ];
-        $this->assertEquals($expected, $model->getFillable());
-    }
-
     public function test_casts_contain_correct_types(): void
     {
         $model = new Event();

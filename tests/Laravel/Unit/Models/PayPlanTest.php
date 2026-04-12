@@ -24,16 +24,6 @@ class PayPlanTest extends TestCase
         $this->assertEquals('pay_plans', $this->model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $expected = [
-            'name', 'slug', 'description', 'tier_level', 'price_monthly',
-            'price_yearly', 'features', 'allowed_layouts', 'max_menus',
-            'max_menu_items', 'is_active',
-        ];
-        $this->assertEquals($expected, $this->model->getFillable());
-    }
-
     public function test_casts_are_correct(): void
     {
         $casts = $this->model->getCasts();

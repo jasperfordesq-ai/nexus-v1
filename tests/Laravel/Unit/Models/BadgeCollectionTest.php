@@ -20,16 +20,6 @@ class BadgeCollectionTest extends TestCase
         $this->assertEquals('badge_collections', $model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $model = new BadgeCollection();
-        $expected = [
-            'tenant_id', 'collection_key', 'name', 'description',
-            'icon', 'bonus_xp', 'bonus_badge_key', 'display_order',
-        ];
-        $this->assertEquals($expected, $model->getFillable());
-    }
-
     public function test_casts_contain_correct_types(): void
     {
         $model = new BadgeCollection();

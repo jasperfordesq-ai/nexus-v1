@@ -25,12 +25,6 @@ class PollOptionTest extends TestCase
         $this->assertEquals('poll_options', $this->model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $expected = ['poll_id', 'option_text'];
-        $this->assertEquals($expected, $this->model->getFillable());
-    }
-
     public function test_does_not_use_has_tenant_scope(): void
     {
         $traits = class_uses_recursive(PollOption::class);

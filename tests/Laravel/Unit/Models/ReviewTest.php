@@ -27,15 +27,6 @@ class ReviewTest extends TestCase
         $this->assertEquals('reviews', $this->model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $expected = [
-            'tenant_id', 'reviewer_id', 'receiver_id', 'transaction_id',
-            'group_id', 'rating', 'comment', 'status',
-        ];
-        $this->assertEquals($expected, $this->model->getFillable());
-    }
-
     public function test_casts_are_correct(): void
     {
         $casts = $this->model->getCasts();

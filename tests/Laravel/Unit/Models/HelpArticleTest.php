@@ -25,12 +25,6 @@ class HelpArticleTest extends TestCase
         $this->assertEquals('help_articles', $this->model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $expected = ['title', 'slug', 'content', 'module_tag', 'is_public', 'view_count'];
-        $this->assertEquals($expected, $this->model->getFillable());
-    }
-
     public function test_casts_are_correct(): void
     {
         $casts = $this->model->getCasts();

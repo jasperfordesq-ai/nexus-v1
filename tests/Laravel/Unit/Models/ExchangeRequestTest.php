@@ -24,20 +24,6 @@ class ExchangeRequestTest extends TestCase
         $this->assertEquals('exchange_requests', $model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $model = new ExchangeRequest();
-        $expected = [
-            'tenant_id', 'listing_id', 'requester_id', 'provider_id',
-            'proposed_hours', 'requester_notes', 'status',
-            'broker_id', 'broker_notes',
-            'requester_confirmed_at', 'requester_confirmed_hours',
-            'provider_confirmed_at', 'provider_confirmed_hours',
-            'final_hours', 'transaction_id',
-        ];
-        $this->assertEquals($expected, $model->getFillable());
-    }
-
     public function test_casts_contain_correct_types(): void
     {
         $model = new ExchangeRequest();

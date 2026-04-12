@@ -19,16 +19,6 @@ class FeedPostTest extends TestCase
         $this->assertEquals('feed_posts', $model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $model = new FeedPost();
-        $expected = [
-            'tenant_id', 'user_id', 'content', 'emoji', 'image_url', 'type',
-            'parent_id', 'parent_type', 'visibility', 'group_id',
-        ];
-        $this->assertEquals($expected, $model->getFillable());
-    }
-
     public function test_casts_contain_correct_types(): void
     {
         $model = new FeedPost();

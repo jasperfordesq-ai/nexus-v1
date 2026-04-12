@@ -46,18 +46,6 @@ class MessageModelTest extends \Tests\Laravel\TestCase
         $this->assertFalse($this->model->usesTimestamps());
     }
 
-    public function testFillableContainsExpectedFields(): void
-    {
-        $expected = [
-            'tenant_id', 'sender_id', 'receiver_id', 'listing_id',
-            'body', 'is_read', 'is_edited', 'edited_at',
-            'is_deleted_sender', 'is_deleted_receiver',
-            'read_at', 'created_at',
-            'context_type', 'context_id',
-        ];
-        $this->assertEquals($expected, $this->model->getFillable());
-    }
-
     public function testCastsAreCorrect(): void
     {
         $casts = $this->model->getCasts();

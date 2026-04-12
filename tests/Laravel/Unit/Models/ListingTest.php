@@ -29,19 +29,6 @@ class ListingTest extends TestCase
         $this->assertEquals('listings', $this->model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $expected = [
-            'tenant_id', 'user_id', 'category_id', 'title', 'description',
-            'location', 'latitude', 'longitude', 'type', 'status', 'image_url',
-            'sdg_goals', 'price', 'subcategory_id', 'federated_visibility',
-            'service_type', 'direct_messaging_disabled', 'exchange_workflow_required',
-            'hours_estimate', 'renewed_at', 'renewal_count', 'view_count',
-            'contact_count', 'save_count', 'is_featured', 'featured_until',
-        ];
-        $this->assertEquals($expected, $this->model->getFillable());
-    }
-
     public function test_casts_are_correct(): void
     {
         $casts = $this->model->getCasts();

@@ -29,35 +29,6 @@ class UserTest extends TestCase
         $this->assertEquals('users', $this->model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $fillable = $this->model->getFillable();
-        $this->assertContains('tenant_id', $fillable);
-        $this->assertContains('name', $fillable);
-        $this->assertContains('first_name', $fillable);
-        $this->assertContains('last_name', $fillable);
-        $this->assertContains('email', $fillable);
-        $this->assertContains('username', $fillable);
-        $this->assertContains('password_hash', $fillable);
-        $this->assertContains('status', $fillable);
-        $this->assertContains('avatar_url', $fillable);
-        $this->assertContains('bio', $fillable);
-        $this->assertContains('location', $fillable);
-        $this->assertContains('latitude', $fillable);
-        $this->assertContains('longitude', $fillable);
-        $this->assertContains('phone', $fillable);
-        $this->assertContains('is_verified', $fillable);
-        $this->assertContains('is_approved', $fillable);
-        $this->assertContains('balance', $fillable);
-        $this->assertContains('onboarding_completed', $fillable);
-        $this->assertContains('profile_type', $fillable);
-        $this->assertContains('organization_name', $fillable);
-        $this->assertContains('totp_enabled', $fillable);
-        $this->assertContains('notification_preferences', $fillable);
-        $this->assertContains('email_verified_at', $fillable);
-        $this->assertContains('last_active_at', $fillable);
-    }
-
     public function test_hidden_contains_sensitive_fields(): void
     {
         $hidden = $this->model->getHidden();

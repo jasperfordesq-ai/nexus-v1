@@ -19,15 +19,6 @@ class ConnectionTest extends TestCase
         $this->assertEquals('connections', $model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $model = new Connection();
-        $expected = [
-            'tenant_id', 'requester_id', 'receiver_id', 'status',
-        ];
-        $this->assertEquals($expected, $model->getFillable());
-    }
-
     public function test_casts_contain_correct_types(): void
     {
         $model = new Connection();

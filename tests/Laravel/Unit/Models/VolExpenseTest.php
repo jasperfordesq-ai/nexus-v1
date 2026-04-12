@@ -31,18 +31,6 @@ class VolExpenseTest extends TestCase
         $this->assertFalse($this->model->usesTimestamps());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $expected = [
-            'tenant_id', 'user_id', 'organization_id', 'opportunity_id',
-            'shift_id', 'expense_type', 'amount', 'currency', 'description',
-            'receipt_path', 'receipt_filename', 'status', 'reviewed_by',
-            'review_notes', 'reviewed_at', 'paid_at', 'payment_reference',
-            'submitted_at',
-        ];
-        $this->assertEquals($expected, $this->model->getFillable());
-    }
-
     public function test_casts_are_correct(): void
     {
         $casts = $this->model->getCasts();

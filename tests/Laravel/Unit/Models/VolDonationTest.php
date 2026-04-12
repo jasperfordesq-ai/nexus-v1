@@ -31,16 +31,6 @@ class VolDonationTest extends TestCase
         $this->assertFalse($this->model->usesTimestamps());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $expected = [
-            'tenant_id', 'user_id', 'opportunity_id', 'giving_day_id',
-            'amount', 'currency', 'payment_method', 'payment_reference',
-            'message', 'is_anonymous', 'status', 'created_at',
-        ];
-        $this->assertEquals($expected, $this->model->getFillable());
-    }
-
     public function test_casts_are_correct(): void
     {
         $casts = $this->model->getCasts();

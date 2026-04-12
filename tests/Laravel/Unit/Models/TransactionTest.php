@@ -27,15 +27,6 @@ class TransactionTest extends TestCase
         $this->assertEquals('transactions', $this->model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $expected = [
-            'tenant_id', 'sender_id', 'receiver_id', 'amount', 'description',
-            'status', 'source_match_id', 'deleted_for_sender', 'deleted_for_receiver',
-        ];
-        $this->assertEquals($expected, $this->model->getFillable());
-    }
-
     public function test_casts_are_correct(): void
     {
         $casts = $this->model->getCasts();

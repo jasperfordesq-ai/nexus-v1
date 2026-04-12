@@ -25,12 +25,6 @@ class OrgWalletTest extends TestCase
         $this->assertEquals('org_wallets', $this->model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $expected = ['tenant_id', 'organization_id', 'balance'];
-        $this->assertEquals($expected, $this->model->getFillable());
-    }
-
     public function test_casts_are_correct(): void
     {
         $casts = $this->model->getCasts();

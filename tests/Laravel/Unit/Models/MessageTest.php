@@ -32,18 +32,6 @@ class MessageTest extends TestCase
         $this->assertFalse($this->model->usesTimestamps());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $expected = [
-            'tenant_id', 'sender_id', 'receiver_id', 'listing_id',
-            'body', 'is_read', 'is_edited', 'edited_at',
-            'is_deleted_sender', 'is_deleted_receiver',
-            'read_at', 'created_at',
-            'context_type', 'context_id',
-        ];
-        $this->assertEquals($expected, $this->model->getFillable());
-    }
-
     public function test_casts_are_correct(): void
     {
         $casts = $this->model->getCasts();

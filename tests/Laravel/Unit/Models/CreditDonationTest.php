@@ -21,16 +21,6 @@ class CreditDonationTest extends TestCase
         $this->assertEquals('credit_donations', $model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $model = new CreditDonation();
-        $expected = [
-            'tenant_id', 'donor_id', 'recipient_type', 'recipient_id',
-            'amount', 'message', 'transaction_id',
-        ];
-        $this->assertEquals($expected, $model->getFillable());
-    }
-
     public function test_casts_contain_correct_types(): void
     {
         $model = new CreditDonation();

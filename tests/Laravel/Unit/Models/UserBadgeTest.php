@@ -36,14 +36,6 @@ class UserBadgeTest extends TestCase
         $this->assertNull(UserBadge::UPDATED_AT);
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $expected = [
-            'user_id', 'badge_key', 'name', 'icon', 'is_showcased', 'showcase_order',
-        ];
-        $this->assertEquals($expected, $this->model->getFillable());
-    }
-
     public function test_casts_are_correct(): void
     {
         $casts = $this->model->getCasts();

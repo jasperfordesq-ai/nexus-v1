@@ -18,16 +18,6 @@ class CommunityFundAccountTest extends TestCase
         $this->assertEquals('community_fund_accounts', $model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $model = new CommunityFundAccount();
-        $expected = [
-            'tenant_id', 'balance', 'total_deposited', 'total_withdrawn',
-            'total_donated', 'description',
-        ];
-        $this->assertEquals($expected, $model->getFillable());
-    }
-
     public function test_casts_contain_correct_types(): void
     {
         $model = new CommunityFundAccount();

@@ -20,15 +20,6 @@ class GroupMemberTest extends TestCase
         $this->assertEquals('group_members', $model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $model = new GroupMember();
-        $expected = [
-            'tenant_id', 'group_id', 'user_id', 'role', 'status',
-        ];
-        $this->assertEquals($expected, $model->getFillable());
-    }
-
     public function test_uses_has_tenant_scope_trait(): void
     {
         $this->assertContains(

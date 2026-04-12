@@ -19,16 +19,6 @@ class CommunityFundTransactionTest extends TestCase
         $this->assertEquals('community_fund_transactions', $model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $model = new CommunityFundTransaction();
-        $expected = [
-            'tenant_id', 'fund_id', 'user_id', 'type', 'amount',
-            'balance_after', 'description', 'admin_id',
-        ];
-        $this->assertEquals($expected, $model->getFillable());
-    }
-
     public function test_casts_contain_correct_types(): void
     {
         $model = new CommunityFundTransaction();

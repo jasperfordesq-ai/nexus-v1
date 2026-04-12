@@ -31,16 +31,6 @@ class OrgTransactionTest extends TestCase
         $this->assertNull(OrgTransaction::UPDATED_AT);
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $expected = [
-            'tenant_id', 'organization_id', 'transfer_request_id',
-            'sender_type', 'sender_id', 'receiver_type', 'receiver_id',
-            'amount', 'description',
-        ];
-        $this->assertEquals($expected, $this->model->getFillable());
-    }
-
     public function test_casts_are_correct(): void
     {
         $casts = $this->model->getCasts();

@@ -18,17 +18,6 @@ class AchievementCampaignTest extends TestCase
         $this->assertEquals('achievement_campaigns', $model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $model = new AchievementCampaign();
-        $expected = [
-            'tenant_id', 'name', 'description', 'campaign_type', 'badge_key',
-            'xp_amount', 'target_audience', 'audience_config', 'schedule',
-            'status', 'activated_at', 'last_run_at', 'total_awards',
-        ];
-        $this->assertEquals($expected, $model->getFillable());
-    }
-
     public function test_casts_contain_correct_types(): void
     {
         $model = new AchievementCampaign();

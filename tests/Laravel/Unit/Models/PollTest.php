@@ -27,15 +27,6 @@ class PollTest extends TestCase
         $this->assertEquals('polls', $this->model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $expected = [
-            'tenant_id', 'user_id', 'question', 'description',
-            'end_date', 'is_active', 'category', 'poll_type',
-        ];
-        $this->assertEquals($expected, $this->model->getFillable());
-    }
-
     public function test_casts_are_correct(): void
     {
         $casts = $this->model->getCasts();

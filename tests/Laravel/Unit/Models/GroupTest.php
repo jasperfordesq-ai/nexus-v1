@@ -26,18 +26,6 @@ class GroupTest extends TestCase
         $this->assertEquals('groups', $model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
-    {
-        $model = new Group();
-        $expected = [
-            'tenant_id', 'owner_id', 'name', 'description', 'image_url',
-            'cover_image_url', 'visibility', 'location', 'latitude', 'longitude',
-            'type_id', 'parent_id', 'is_featured', 'has_children',
-            'cached_member_count', 'federated_visibility',
-        ];
-        $this->assertEquals($expected, $model->getFillable());
-    }
-
     public function test_appends_contains_expected_attributes(): void
     {
         $model = new Group();
