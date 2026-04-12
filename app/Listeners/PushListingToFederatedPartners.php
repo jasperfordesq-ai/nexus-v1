@@ -66,9 +66,7 @@ class PushListingToFederatedPartners implements ShouldQueue
                 }
 
                 try {
-                    $adapter = FederationExternalApiClient::resolveAdapter($partnerId);
-                    $endpoint = $adapter->mapEndpoint('listings');
-                    $result = FederationExternalApiClient::post($partnerId, $endpoint, $payload);
+                    $result = FederationExternalApiClient::sendListing($partnerId, $payload);
 
                     if (empty($result['success'])) {
                         Log::warning('PushListingToFederatedPartners: partner rejected listing', [

@@ -79,6 +79,41 @@ interface FederationProtocolAdapter
      */
     public function transformOutboundMessage(array $nexusMessage): array;
 
+    /**
+     * Transform a Nexus listing into the protocol's outbound format.
+     */
+    public function transformOutboundListing(array $listing): array;
+
+    /**
+     * Transform a Nexus review into the protocol's outbound format.
+     */
+    public function transformOutboundReview(array $review): array;
+
+    /**
+     * Transform a Nexus event into the protocol's outbound format.
+     */
+    public function transformOutboundEvent(array $event): array;
+
+    /**
+     * Transform a Nexus group into the protocol's outbound format.
+     */
+    public function transformOutboundGroup(array $group): array;
+
+    /**
+     * Transform a Nexus connection (friendship/link request) into the protocol's outbound format.
+     */
+    public function transformOutboundConnection(array $connection): array;
+
+    /**
+     * Transform a Nexus volunteering opportunity into the protocol's outbound format.
+     */
+    public function transformOutboundVolunteering(array $opportunity): array;
+
+    /**
+     * Transform a Nexus member (profile / identity snapshot) into the protocol's outbound format.
+     */
+    public function transformOutboundMember(array $member): array;
+
     // ─────────────────────────────────────────────────────────────────────────
     // Inbound: Protocol format → Nexus
     // ─────────────────────────────────────────────────────────────────────────

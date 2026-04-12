@@ -12,6 +12,7 @@ use App\Contracts\FederationProtocolAdapter;
 use App\Services\Protocols\CreditCommonsAdapter;
 use App\Services\Protocols\KomunitinAdapter;
 use App\Services\Protocols\NexusAdapter;
+use App\Services\Protocols\TimeOverflowAdapter;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -326,6 +327,104 @@ class FederationExternalApiClient
         }
 
         return $result;
+    }
+
+    /**
+     * Send a Nexus listing to an external partner.
+     *
+     * @return array{success: bool, data?: array, error?: string, status_code?: int}
+     */
+    public static function sendListing(int $partnerId, array $listing): array
+    {
+        $adapter = self::resolveAdapter($partnerId);
+        $endpoint = $adapter->mapEndpoint('listings');
+        $transformed = $adapter->transformOutboundListing($listing);
+
+        return self::post($partnerId, $endpoint, $transformed);
+    }
+
+    /**
+     * Send a Nexus review to an external partner.
+     *
+     * @return array{success: bool, data?: array, error?: string, status_code?: int}
+     */
+    public static function sendReview(int $partnerId, array $review): array
+    {
+        $adapter = self::resolveAdapter($partnerId);
+        $endpoint = $adapter->mapEndpoint('reviews');
+        $transformed = $adapter->transformOutboundReview($review);
+
+        return self::post($partnerId, $endpoint, $transformed);
+    }
+
+    /**
+     * Send a Nexus event to an external partner.
+     *
+     * @return array{success: bool, data?: array, error?: string, status_code?: int}
+     */
+    public static function sendEvent(int $partnerId, array $event): array
+    {
+        $adapter = self::resolveAdapter($partnerId);
+        $endpoint = $adapter->mapEndpoint('events');
+        $transformed = $adapter->transformOutboundEvent($event);
+
+        return self::post($partnerId, $endpoint, $transformed);
+    }
+
+    /**
+     * Send a Nexus group to an external partner.
+     *
+     * @return array{success: bool, data?: array, error?: string, status_code?: int}
+     */
+    public static function sendGroup(int $partnerId, array $group): array
+    {
+        $adapter = self::resolveAdapter($partnerId);
+        $endpoint = $adapter->mapEndpoint('groups');
+        $transformed = $adapter->transformOutboundGroup($group);
+
+        return self::post($partnerId, $endpoint, $transformed);
+    }
+
+    /**
+     * Send a Nexus connection (friendship/link request) to an external partner.
+     *
+     * @return array{success: bool, data?: array, error?: string, status_code?: int}
+     */
+    public static function sendConnection(int $partnerId, array $connection): array
+    {
+        $adapter = self::resolveAdapter($partnerId);
+        $endpoint = $adapter->mapEndpoint('connections');
+        $transformed = $adapter->transformOutboundConnection($connection);
+
+        return self::post($partnerId, $endpoint, $transformed);
+    }
+
+    /**
+     * Send a Nexus volunteering opportunity to an external partner.
+     *
+     * @return array{success: bool, data?: array, error?: string, status_code?: int}
+     */
+    public static function sendVolunteering(int $partnerId, array $opportunity): array
+    {
+        $adapter = self::resolveAdapter($partnerId);
+        $endpoint = $adapter->mapEndpoint('volunteering');
+        $transformed = $adapter->transformOutboundVolunteering($opportunity);
+
+        return self::post($partnerId, $endpoint, $transformed);
+    }
+
+    /**
+     * Send a Nexus member profile snapshot to an external partner.
+     *
+     * @return array{success: bool, data?: array, error?: string, status_code?: int}
+     */
+    public static function sendMember(int $partnerId, array $member): array
+    {
+        $adapter = self::resolveAdapter($partnerId);
+        $endpoint = $adapter->mapEndpoint('members');
+        $transformed = $adapter->transformOutboundMember($member);
+
+        return self::post($partnerId, $endpoint, $transformed);
     }
 
     /**

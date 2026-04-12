@@ -40,14 +40,19 @@ class NexusAdapter implements FederationProtocolAdapter
         $id = $params['id'] ?? null;
 
         return match ($action) {
-            'members'      => '/members',
-            'member'       => "/members/{$id}",
-            'listings'     => '/listings',
-            'listing'      => "/listings/{$id}",
-            'transactions' => '/transactions',
-            'messages'     => '/messages',
-            'health'       => '/health',
-            default        => "/{$action}",
+            'members'       => '/members',
+            'member'        => "/members/{$id}",
+            'listings'      => '/listings',
+            'listing'       => "/listings/{$id}",
+            'transactions'  => '/transactions',
+            'messages'      => '/messages',
+            'reviews'       => '/reviews',
+            'events'        => '/events',
+            'groups'        => '/groups',
+            'connections'   => '/connections',
+            'volunteering'  => '/volunteering',
+            'health'        => '/health',
+            default         => "/{$action}",
         };
     }
 
@@ -68,6 +73,41 @@ class NexusAdapter implements FederationProtocolAdapter
     public function transformOutboundMessage(array $nexusMessage): array
     {
         return $nexusMessage;
+    }
+
+    public function transformOutboundListing(array $listing): array
+    {
+        return $listing;
+    }
+
+    public function transformOutboundReview(array $review): array
+    {
+        return $review;
+    }
+
+    public function transformOutboundEvent(array $event): array
+    {
+        return $event;
+    }
+
+    public function transformOutboundGroup(array $group): array
+    {
+        return $group;
+    }
+
+    public function transformOutboundConnection(array $connection): array
+    {
+        return $connection;
+    }
+
+    public function transformOutboundVolunteering(array $opportunity): array
+    {
+        return $opportunity;
+    }
+
+    public function transformOutboundMember(array $member): array
+    {
+        return $member;
     }
 
     // ─────────────────────────────────────────────────────────────────────────

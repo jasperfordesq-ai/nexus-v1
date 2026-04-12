@@ -137,7 +137,7 @@ class ReputationPortabilityTest extends TestCase
     {
         $adapter = new KomunitinAdapter();
 
-        $envelope = $adapter->sendReview([
+        $envelope = $adapter->transformOutboundReview([
             'rating'                => 4,
             'comment'               => 'Solid work',
             'transaction_ref'       => 'txn-abc-123',
@@ -146,7 +146,7 @@ class ReputationPortabilityTest extends TestCase
             'reviewer_tenant'       => $this->testTenantId,
             'receiver_external_id'  => 'remote-user-777',
             'created_at'            => '2026-04-12T10:00:00Z',
-        ], 1);
+        ]);
 
         $this->assertArrayHasKey('data', $envelope);
         $this->assertSame('reviews', $envelope['data']['type']);

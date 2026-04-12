@@ -99,6 +99,11 @@ class CreditCommonsAdapter implements FederationProtocolAdapter
             'forms'                 => '/forms',
             'health'                => '/about',
             'messages'              => '/messages',    // CC has no native messaging
+            'reviews'               => '/reviews',      // CC extension
+            'events'                => '/events',       // CC extension
+            'groups'                => '/groups',       // CC extension
+            'connections'           => '/connections',  // CC extension
+            'volunteering'          => '/volunteering', // CC extension
             default                 => "/{$action}",
         };
     }
@@ -159,6 +164,117 @@ class CreditCommonsAdapter implements FederationProtocolAdapter
             'subject' => $nexusMessage['subject'] ?? '',
             'body' => $nexusMessage['body'] ?? '',
         ];
+    }
+
+    /**
+     * Graceful degraded extension envelope for entities CC doesn't natively support.
+     *
+     * CC nodes that don't understand the extension can safely ignore it; nodes
+     * that do can inspect the `payload` key. We do NOT throw on these.
+     */
+    private static function extensionEnvelope(string $entity, array $payload): array
+    {
+        return [
+            'type'    => 'nexus_extension_' . $entity,
+            'payload' => $payload,
+            'source_platform' => self::PLATFORM_TYPE === 'credit_commons' ? 'nexus' : 'nexus',
+        ];
+    }
+
+    public function transformOutboundListing(array $listing): array
+    {
+        // CC has no listing concept natively — send as an extension.
+        return self::extensionEnvelope('listing', [
+            'id'          => $listing['id'] ?? null,
+            'title'       => $listing['title'] ?? 'Untitled',
+            'description' => $listing['description'] ?? null,
+            'type'        => $listing['type'] ?? 'offer',
+            'author'      => self::toAccountPath((string) ($listing['user_id'] ?? $listing['author_id'] ?? '')),
+            'tags'        => $listing['tags'] ?? [],
+            'created_at'  => $listing['created_at'] ?? null,
+        ]);
+    }
+
+    public function transformOutboundReview(array $review): array
+    {
+        return self::extensionEnvelope('review', [
+            'id'              => $review['id'] ?? null,
+            'rating'          => (int) ($review['rating'] ?? 0),
+            'comment'         => $review['comment'] ?? null,
+            'reviewer'        => self::toAccountPath((string) ($review['reviewer_id'] ?? '')),
+            'receiver'        => self::toAccountPath((string) ($review['receiver_external_id'] ?? $review['receiver_id'] ?? '')),
+            'transaction_ref' => $review['federation_transaction_id']
+                ?? $review['transaction_id']
+                ?? null,
+            'created_at'      => $review['created_at'] ?? null,
+        ]);
+    }
+
+    public function transformOutboundEvent(array $event): array
+    {
+        return self::extensionEnvelope('event', [
+            'id'          => $event['id'] ?? null,
+            'title'       => $event['title'] ?? $event['name'] ?? 'Untitled event',
+            'description' => $event['description'] ?? null,
+            'starts_at'   => $event['starts_at'] ?? $event['start_time'] ?? null,
+            'ends_at'     => $event['ends_at'] ?? $event['end_time'] ?? null,
+            'location'    => $event['location'] ?? null,
+            'created_at'  => $event['created_at'] ?? null,
+        ]);
+    }
+
+    public function transformOutboundGroup(array $group): array
+    {
+        return self::extensionEnvelope('group', [
+            'id'          => $group['id'] ?? null,
+            'name'        => $group['name'] ?? 'Untitled group',
+            'description' => $group['description'] ?? null,
+            'privacy'     => $group['privacy'] ?? $group['visibility'] ?? 'public',
+            'created_at'  => $group['created_at'] ?? null,
+        ]);
+    }
+
+    public function transformOutboundConnection(array $connection): array
+    {
+        return self::extensionEnvelope('connection', [
+            'id'        => $connection['id'] ?? null,
+            'requester' => self::toAccountPath((string) ($connection['requester_id'] ?? '')),
+            'recipient' => self::toAccountPath((string) ($connection['recipient_id'] ?? '')),
+            'status'    => $connection['status'] ?? 'pending',
+            'note'      => $connection['note'] ?? null,
+            'created_at' => $connection['created_at'] ?? null,
+        ]);
+    }
+
+    public function transformOutboundVolunteering(array $opportunity): array
+    {
+        return self::extensionEnvelope('volunteering', [
+            'id'          => $opportunity['id'] ?? null,
+            'title'       => $opportunity['title'] ?? 'Untitled opportunity',
+            'description' => $opportunity['description'] ?? null,
+            'organization' => $opportunity['organization_name'] ?? $opportunity['organization'] ?? null,
+            'starts_at'   => $opportunity['starts_at'] ?? null,
+            'ends_at'     => $opportunity['ends_at'] ?? null,
+            'location'    => $opportunity['location'] ?? null,
+            'hours'       => $opportunity['hours'] ?? null,
+            'created_at'  => $opportunity['created_at'] ?? null,
+        ]);
+    }
+
+    public function transformOutboundMember(array $member): array
+    {
+        // CC does support members via /accounts, but the account path format
+        // differs. Emit as an extension so receivers with full CC semantics
+        // can promote it into a real account.
+        return self::extensionEnvelope('member', [
+            'id'       => $member['id'] ?? null,
+            'acc_path' => self::toAccountPath((string) ($member['slug'] ?? $member['username'] ?? $member['id'] ?? '')),
+            'name'     => $member['name'] ?? $member['display_name'] ?? null,
+            'email'    => $member['email'] ?? null,
+            'balance'  => (float) ($member['balance'] ?? 0),
+            'active'   => (bool) ($member['active'] ?? true),
+            'created_at' => $member['created_at'] ?? null,
+        ]);
     }
 
     // ─────────────────────────────────────────────────────────────────────────

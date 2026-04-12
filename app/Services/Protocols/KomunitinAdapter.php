@@ -63,6 +63,10 @@ class KomunitinAdapter implements FederationProtocolAdapter
             'reviews'             => '/reviews',
             'review'              => "/reviews/{$id}",
             'member_reviews'      => "/{$currencyCode}/accounts/{$id}/reviews",
+            'events'              => '/events',
+            'groups'              => '/groups',
+            'connections'         => '/connections',
+            'volunteering'        => '/volunteering',
             default               => "/{$action}",
         };
     }
@@ -131,8 +135,7 @@ class KomunitinAdapter implements FederationProtocolAdapter
     }
 
     /**
-     * Transform a Nexus review into a Komunitin-compatible JSON:API resource
-     * and return the request envelope ready for POST /reviews.
+     * Transform a Nexus review into a Komunitin-compatible JSON:API resource.
      *
      * Komunitin does not yet ship a first-class "reviews" resource in its
      * public spec, but the platform is JSON:API-native — any resource follows
@@ -141,16 +144,11 @@ class KomunitinAdapter implements FederationProtocolAdapter
      * `attestation` object carrying the reviewer's identity so the receiving
      * node can verify origin.
      *
-     * @param array              $review  Review payload (rating, comment, transaction_ref, etc.)
-     * @param int|array|object   $partner Partner ID, partner row, or FederationPartner model
+     * @param array $review Review payload (rating, comment, transaction_ref, etc.)
      * @return array JSON:API envelope suitable for POST
      */
-    public function sendReview(array $review, int|array|object $partner = 0): array
+    public function transformOutboundReview(array $review): array
     {
-        $partnerId = is_int($partner)
-            ? $partner
-            : (int) (is_array($partner) ? ($partner['id'] ?? 0) : ($partner->id ?? 0));
-
         $attributes = [
             'rating'          => (int) ($review['rating'] ?? 0),
             'comment'         => $review['comment'] ?? null,
@@ -190,10 +188,133 @@ class KomunitinAdapter implements FederationProtocolAdapter
             $resource['relationships'] = $relationships;
         }
 
-        // Tag the payload with the partner for logging; harmless to senders.
-        unset($partnerId);
+        return ['data' => $resource];
+    }
+
+    /**
+     * Transform a Nexus listing into a JSON:API "offers" resource.
+     */
+    public function transformOutboundListing(array $listing): array
+    {
+        $type = strtolower((string) ($listing['type'] ?? 'offer'));
+        $jsonApiType = in_array($type, ['request', 'need', 'inquiry', 'want'], true) ? 'needs' : 'offers';
+
+        return self::wrapAsJsonApi($jsonApiType, [
+            'title'       => $listing['title'] ?? 'Untitled',
+            'description' => $listing['description'] ?? null,
+            'category'    => $listing['category_name'] ?? $listing['category'] ?? null,
+            'tags'        => $listing['tags'] ?? [],
+            'created'     => $listing['created_at'] ?? null,
+            'updated'     => $listing['updated_at'] ?? null,
+            'source_platform' => 'nexus',
+        ], isset($listing['id']) ? (string) $listing['id'] : null);
+    }
+
+    /**
+     * Transform a Nexus event into a JSON:API "events" resource.
+     */
+    public function transformOutboundEvent(array $event): array
+    {
+        return self::wrapAsJsonApi('events', [
+            'title'       => $event['title'] ?? $event['name'] ?? 'Untitled event',
+            'description' => $event['description'] ?? null,
+            'starts_at'   => $event['starts_at'] ?? $event['start_time'] ?? null,
+            'ends_at'     => $event['ends_at'] ?? $event['end_time'] ?? null,
+            'location'    => $event['location'] ?? null,
+            'tags'        => $event['tags'] ?? [],
+            'created'     => $event['created_at'] ?? null,
+            'source_platform' => 'nexus',
+        ], isset($event['id']) ? (string) $event['id'] : null);
+    }
+
+    /**
+     * Transform a Nexus group into a JSON:API "groups" resource.
+     */
+    public function transformOutboundGroup(array $group): array
+    {
+        return self::wrapAsJsonApi('groups', [
+            'name'        => $group['name'] ?? 'Untitled group',
+            'description' => $group['description'] ?? null,
+            'privacy'     => $group['privacy'] ?? $group['visibility'] ?? 'public',
+            'member_count' => $group['member_count'] ?? null,
+            'tags'        => $group['tags'] ?? [],
+            'created'     => $group['created_at'] ?? null,
+            'source_platform' => 'nexus',
+        ], isset($group['id']) ? (string) $group['id'] : null);
+    }
+
+    /**
+     * Transform a Nexus connection (friendship/link) into a JSON:API "connections" resource.
+     */
+    public function transformOutboundConnection(array $connection): array
+    {
+        $resource = [
+            'type' => 'connections',
+            'attributes' => [
+                'status'    => $connection['status'] ?? 'pending',
+                'note'      => $connection['note'] ?? null,
+                'created'   => $connection['created_at'] ?? null,
+                'source_platform' => 'nexus',
+            ],
+            'relationships' => [
+                'requester' => [
+                    'data' => [
+                        'type' => 'accounts',
+                        'id'   => (string) ($connection['requester_external_id'] ?? $connection['requester_id'] ?? ''),
+                    ],
+                ],
+                'recipient' => [
+                    'data' => [
+                        'type' => 'accounts',
+                        'id'   => (string) ($connection['recipient_external_id'] ?? $connection['recipient_id'] ?? ''),
+                    ],
+                ],
+            ],
+        ];
+
+        if (isset($connection['id'])) {
+            $resource['id'] = (string) $connection['id'];
+        }
 
         return ['data' => $resource];
+    }
+
+    /**
+     * Transform a Nexus volunteering opportunity into a JSON:API "volunteering" resource.
+     */
+    public function transformOutboundVolunteering(array $opportunity): array
+    {
+        return self::wrapAsJsonApi('volunteering', [
+            'title'       => $opportunity['title'] ?? 'Untitled opportunity',
+            'description' => $opportunity['description'] ?? null,
+            'organization' => $opportunity['organization_name'] ?? $opportunity['organization'] ?? null,
+            'starts_at'   => $opportunity['starts_at'] ?? null,
+            'ends_at'     => $opportunity['ends_at'] ?? null,
+            'location'    => $opportunity['location'] ?? null,
+            'hours'       => $opportunity['hours'] ?? null,
+            'skills'      => $opportunity['skills'] ?? [],
+            'created'     => $opportunity['created_at'] ?? null,
+            'source_platform' => 'nexus',
+        ], isset($opportunity['id']) ? (string) $opportunity['id'] : null);
+    }
+
+    /**
+     * Transform a Nexus member profile into a JSON:API "accounts" resource.
+     */
+    public function transformOutboundMember(array $member): array
+    {
+        return self::wrapAsJsonApi('accounts', [
+            'code'        => $member['slug'] ?? $member['username'] ?? $member['name'] ?? null,
+            'name'        => $member['name'] ?? $member['display_name'] ?? null,
+            'email'       => $member['email'] ?? null,
+            'description' => $member['bio'] ?? null,
+            'balance'     => self::hoursToMinorUnits((float) ($member['balance'] ?? 0)),
+            'tags'        => $member['skills'] ?? [],
+            'location'    => $member['location'] ?? null,
+            'status'      => ($member['active'] ?? true) ? 'active' : 'inactive',
+            'created'     => $member['created_at'] ?? null,
+            'source_platform' => 'nexus',
+        ], isset($member['id']) ? (string) $member['id'] : null);
     }
 
     public function transformOutboundMessage(array $nexusMessage): array

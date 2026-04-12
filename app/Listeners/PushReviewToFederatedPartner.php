@@ -14,7 +14,6 @@ use App\Models\FederatedIdentity;
 use App\Models\Review;
 use App\Services\FederationExternalApiClient;
 use App\Services\FederationFeatureService;
-use App\Services\Protocols\KomunitinAdapter;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
@@ -94,38 +93,28 @@ class PushReviewToFederatedPartner implements ShouldQueue
     }
 
     /**
-     * Send a single review to a single partner, preferring the Komunitin
-     * adapter when the partner speaks that protocol, otherwise falling back
-     * to a generic POST.
+     * Send a single review to a single partner via the adapter-aware
+     * FederationExternalApiClient::sendReview() helper, which resolves the
+     * protocol adapter, runs transformOutboundReview(), and POSTs to the
+     * protocol-specific endpoint from mapEndpoint('reviews').
      */
     private function pushToPartner(Review $review, FederatedIdentity $identity): void
     {
         $partnerId = (int) $identity->partner_id;
 
         $payload = [
-            'rating'                   => (int) $review->rating,
-            'comment'                  => $review->comment,
-            'transaction_id'           => $review->transaction_id,
+            'rating'                    => (int) $review->rating,
+            'comment'                   => $review->comment,
+            'transaction_id'            => $review->transaction_id,
             'federation_transaction_id' => $review->federation_transaction_id ?? null,
-            'reviewer_id'              => $review->reviewer_id,
-            'reviewer_tenant'          => $review->tenant_id,
-            'receiver_external_id'     => $identity->external_user_id,
-            'created_at'               => $review->created_at?->toIso8601String(),
+            'reviewer_id'               => $review->reviewer_id,
+            'reviewer_tenant'           => $review->tenant_id,
+            'receiver_external_id'      => $identity->external_user_id,
+            'created_at'                => $review->created_at?->toIso8601String(),
         ];
 
         try {
-            $adapter = FederationExternalApiClient::resolveAdapter($partnerId);
-
-            // Prefer Komunitin's JSON:API review envelope when available.
-            if ($adapter instanceof KomunitinAdapter) {
-                $body = $adapter->sendReview($payload, $partnerId);
-                $endpoint = $adapter->mapEndpoint('reviews');
-                FederationExternalApiClient::post($partnerId, $endpoint, $body);
-                return;
-            }
-
-            // Fallback for other protocols: generic POST /reviews with our payload.
-            FederationExternalApiClient::post($partnerId, '/reviews', $payload);
+            FederationExternalApiClient::sendReview($partnerId, $payload);
         } catch (\Throwable $e) {
             Log::warning('Federated review push to partner failed', [
                 'partner_id' => $partnerId,
