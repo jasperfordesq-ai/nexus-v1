@@ -229,7 +229,7 @@ class FederatedMessageService
                 Notification::createNotification(
                     $receiverUserId,
                     $notifyMessage,
-                    '/federation-hub/messages',
+                    '/federation/messages',
                     'federation_message',
                     false,
                     (int) $receiver->tenant_id

@@ -165,6 +165,64 @@ class WalletService
      *
      * @return array<int, array<string, mixed>>
      */
+    /**
+     * Fetch a single inbound federation transaction formatted for display.
+     * Used by WalletController::showTransaction() when id is negative.
+     */
+    public function getFederationTransaction(int $federationTransactionId, int $userId): ?array
+    {
+        try {
+            $tenantId = TenantContext::getId();
+            $r = DB::table('federation_transactions as ft')
+                ->leftJoin('federation_external_partners as ep', 'ep.id', '=', 'ft.external_partner_id')
+                ->where('ft.id', $federationTransactionId)
+                ->where('ft.receiver_user_id', $userId)
+                ->where('ft.receiver_tenant_id', $tenantId)
+                ->first([
+                    'ft.id',
+                    'ft.amount',
+                    'ft.description',
+                    'ft.status',
+                    'ft.created_at',
+                    'ft.external_partner_id',
+                    'ft.external_receiver_name',
+                    'ep.name as partner_name',
+                ]);
+
+            if (!$r) {
+                return null;
+            }
+
+            $senderName = $r->external_receiver_name ?: __('api.external_user_fallback');
+            $partnerName = $r->partner_name ?: __('api.external_partner_fallback');
+            $createdAt = $r->created_at ? \Carbon\Carbon::parse($r->created_at)->toIso8601String() : null;
+
+            return [
+                'id'               => -1 * (int) $r->id,
+                'source'           => 'federation',
+                'type'             => 'credit',
+                'status'           => $r->status ?? 'completed',
+                'amount'           => (float) $r->amount,
+                'description'      => $r->description,
+                'transaction_type' => 'federation',
+                'sender'           => ['id' => 0, 'name' => $senderName . ' (' . $partnerName . ')', 'avatar' => null],
+                'receiver'         => ['id' => $userId, 'name' => '', 'avatar' => null],
+                'other_user'      => ['id' => 0, 'name' => $senderName . ' (' . $partnerName . ')', 'avatar' => null],
+                'balance_after'    => null,
+                'created_at'       => $createdAt,
+                'federation'       => [
+                    'transaction_id' => (int) $r->id,
+                    'partner_id' => (int) $r->external_partner_id,
+                    'partner_name' => $partnerName,
+                    'external_sender_name' => $senderName,
+                ],
+            ];
+        } catch (\Throwable $e) {
+            \Log::warning('Failed to fetch federation transaction', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
     private function getFederationTransactions(int $userId, int $limit): array
     {
         try {
@@ -192,8 +250,13 @@ class WalletService
                 $senderName = $r->external_receiver_name ?: __('api.external_user_fallback');
                 $partnerName = $r->partner_name ?: __('api.external_partner_fallback');
                 $createdAt = $r->created_at ? \Carbon\Carbon::parse($r->created_at)->toIso8601String() : null;
+                // Use a large negative int so id stays numeric (matches TS Transaction.id: number)
+                // AND can never collide with native transaction ids. Callers detect federation
+                // rows via the `source` field rather than by id.
+                $syntheticId = -1 * (int) $r->id;
                 $items[] = [
-                    'id'               => 'fed-' . (int) $r->id,
+                    'id'               => $syntheticId,
+                    'source'           => 'federation',
                     'type'             => 'credit',
                     'status'           => $r->status ?? 'completed',
                     'amount'           => (float) $r->amount,
@@ -213,6 +276,7 @@ class WalletService
                     'balance_after'    => null,
                     'created_at'       => $createdAt,
                     'federation'       => [
+                        'transaction_id' => (int) $r->id,
                         'partner_id' => (int) $r->external_partner_id,
                         'partner_name' => $partnerName,
                         'external_sender_name' => $senderName,

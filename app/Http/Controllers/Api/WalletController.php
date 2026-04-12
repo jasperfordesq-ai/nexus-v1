@@ -95,7 +95,12 @@ class WalletController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('wallet_transactions', 60, 60);
 
-        $transaction = $this->walletService->getTransaction($id, $userId);
+        // Negative ids encode federation_transactions rows (see WalletService::getFederationTransactions)
+        if ($id < 0) {
+            $transaction = $this->walletService->getFederationTransaction(abs($id), $userId);
+        } else {
+            $transaction = $this->walletService->getTransaction($id, $userId);
+        }
 
         if ($transaction === null) {
             return $this->respondWithError('NOT_FOUND', __('api.transaction_not_found'), null, 404);
@@ -171,6 +176,13 @@ class WalletController extends BaseApiController
     {
         $userId = $this->requireAuth();
         $this->rateLimit('wallet_delete', 20, 60);
+
+        // Federation transactions (negative ids) are not user-hideable — they're an
+        // audit trail of external transfers. Return 404 so the frontend doesn't show
+        // a delete affordance for them.
+        if ($id < 0) {
+            return $this->respondWithError('NOT_FOUND', __('api.transaction_not_found'), null, 404);
+        }
 
         $success = $this->walletService->deleteTransaction($id, $userId);
 

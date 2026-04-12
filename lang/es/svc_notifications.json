@@ -5,6 +5,10 @@
   "broker": {
     "message_for_review": "New message for review from {{sender}}"
   },
+  "federation": {
+    "message_received": "Nuevo mensaje federado de {{sender}} ({{partner}})",
+    "transaction_received": "Recibiste {{amount}} créditos de tiempo de {{sender}} ({{partner}})"
+  },
   "challenge": {
     "complete_claim": "Challenge Complete! You finished '{{title}}' — claim your reward!",
     "complete_earned": "Challenge Complete! You finished '{{title}}' and earned {{xp}} XP!"

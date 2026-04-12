@@ -5,6 +5,10 @@
   "broker": {
     "message_for_review": "New message for review from {{sender}}"
   },
+  "federation": {
+    "message_received": "Teachtaireacht chónasctha nua ó {{sender}} ({{partner}})",
+    "transaction_received": "Fuair tú {{amount}} creidiúintí ama ó {{sender}} ({{partner}})"
+  },
   "challenge": {
     "complete_claim": "Challenge Complete! You finished '{{title}}' — claim your reward!",
     "complete_earned": "Challenge Complete! You finished '{{title}}' and earned {{xp}} XP!"

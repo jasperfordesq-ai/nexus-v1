@@ -4,15 +4,19 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+declare(strict_types=1);
+
 namespace Tests\Laravel\Feature\Controllers;
 
-use Tests\Laravel\TestCase;
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Sanctum\Sanctum;
-use App\Models\User;
+use Tests\Laravel\TestCase;
 
 /**
- * Feature tests for RealtimeController — realtime/WebSocket config.
+ * Feature tests for RealtimeController — GET /v2/realtime/config.
+ *
+ * Returns Pusher / WebSocket configuration for authenticated users.
  */
 class RealtimeControllerTest extends TestCase
 {
@@ -24,15 +28,9 @@ class RealtimeControllerTest extends TestCase
             'status' => 'active',
             'is_approved' => true,
         ]);
-
         Sanctum::actingAs($user, ['*']);
-
         return $user;
     }
-
-    // ------------------------------------------------------------------
-    //  GET /v2/realtime/config
-    // ------------------------------------------------------------------
 
     public function test_config_requires_auth(): void
     {
@@ -41,12 +39,39 @@ class RealtimeControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
-    public function test_config_returns_data(): void
+    public function test_config_returns_200_for_authenticated_user(): void
     {
         $this->authenticatedUser();
 
         $response = $this->apiGet('/v2/realtime/config');
 
         $response->assertStatus(200);
+    }
+
+    public function test_config_shape_includes_required_keys(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiGet('/v2/realtime/config');
+
+        $response->assertStatus(200);
+        $data = $response->json('data') ?? $response->json();
+
+        $this->assertIsArray($data);
+        $this->assertArrayHasKey('driver', $data);
+        $this->assertArrayHasKey('key', $data);
+        $this->assertArrayHasKey('cluster', $data);
+        $this->assertArrayHasKey('force_tls', $data);
+    }
+
+    public function test_config_driver_is_pusher(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiGet('/v2/realtime/config');
+
+        $response->assertStatus(200);
+        $driver = $response->json('data.driver') ?? $response->json('driver');
+        $this->assertSame('pusher', $driver);
     }
 }

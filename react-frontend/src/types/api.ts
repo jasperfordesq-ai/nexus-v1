@@ -551,9 +551,18 @@ export interface Transaction {
   created_at: string;
   completed_at?: string;
   // Extended fields (W4, W8)
-  transaction_type?: 'transfer' | 'exchange' | 'donation' | 'starting_balance' | 'admin_grant' | 'community_fund';
+  transaction_type?: 'transfer' | 'exchange' | 'donation' | 'starting_balance' | 'admin_grant' | 'community_fund' | 'federation';
   category_id?: number | null;
   prep_time?: number | null;
+  // Federation inbound (from external partners). `source: 'federation'` signals a read-only audit
+  // row. `id` is negative for federation rows to stay numeric while never colliding with native txns.
+  source?: 'native' | 'federation';
+  federation?: {
+    transaction_id: number;
+    partner_id: number;
+    partner_name: string;
+    external_sender_name: string;
+  };
 }
 
 export interface TransferRequest {
