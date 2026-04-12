@@ -44,10 +44,6 @@ class AdminFederationDataTest extends TestCase
 
     public function test_export_redacts_external_partner_secrets(): void
     {
-        if (!$this->tableExists('federation_external_partners')) {
-            $this->markTestSkipped('federation_external_partners table not present in test DB');
-        }
-
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
         Sanctum::actingAs($admin);
 
@@ -100,10 +96,6 @@ class AdminFederationDataTest extends TestCase
 
     public function test_export_streams_large_api_logs_without_memory_spike(): void
     {
-        if (!$this->tableExists('federation_api_logs') || !$this->tableExists('federation_api_keys')) {
-            $this->markTestSkipped('federation_api_logs / federation_api_keys tables not present in test DB');
-        }
-
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
         Sanctum::actingAs($admin);
 
@@ -188,10 +180,6 @@ class AdminFederationDataTest extends TestCase
 
     public function test_purge_respects_days_param(): void
     {
-        if (!$this->tableExists('federation_api_logs') || !$this->tableExists('federation_api_keys')) {
-            $this->markTestSkipped('federation_api_logs / federation_api_keys tables not present in test DB');
-        }
-
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
         Sanctum::actingAs($admin);
 
@@ -240,15 +228,5 @@ class AdminFederationDataTest extends TestCase
 
         $response = $this->apiPost('/v2/admin/federation/data/purge', ['days' => 365]);
         $response->assertStatus(403);
-    }
-
-    private function tableExists(string $table): bool
-    {
-        try {
-            DB::select("SELECT 1 FROM `{$table}` LIMIT 1");
-            return true;
-        } catch (\Throwable) {
-            return false;
-        }
     }
 }

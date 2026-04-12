@@ -57,24 +57,15 @@ class SeoControllerTest extends TestCase
     {
         $response = $this->apiGet('/v2/seo/metadata/slug-that-does-not-exist-xyz');
 
-        // 200 with defaults if route registered, 404 if not yet wired up
-        $this->assertContains($response->getStatusCode(), [200, 404]);
-
-        if ($response->getStatusCode() === 200) {
-            $response->assertJsonStructure([
-                'data' => ['title', 'description', 'og_image', 'canonical_url', 'robots'],
-            ]);
-        }
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'data' => ['title', 'description', 'og_image', 'canonical_url', 'robots'],
+        ]);
     }
 
     public function test_metadata_returns_null_fields_for_unknown_slug(): void
     {
         $response = $this->apiGet('/v2/seo/metadata/slug-that-does-not-exist-xyz');
-
-        if ($response->getStatusCode() === 404) {
-            // Route not registered — skip further assertions
-            $this->markTestSkipped('SeoController routes are not yet registered in routes/api.php');
-        }
 
         $response->assertStatus(200);
         $response->assertJsonPath('data.title', null);
@@ -128,7 +119,7 @@ class SeoControllerTest extends TestCase
     {
         $response = $this->apiGet('/v2/seo/redirects');
 
-        $this->assertContains($response->getStatusCode(), [401, 403, 404]);
+        $this->assertContains($response->getStatusCode(), [401, 403]);
     }
 
     public function test_redirects_returns_403_for_regular_member(): void
@@ -136,10 +127,6 @@ class SeoControllerTest extends TestCase
         $this->regularUser();
 
         $response = $this->apiGet('/v2/seo/redirects');
-
-        if ($response->getStatusCode() === 404) {
-            $this->markTestSkipped('SeoController routes are not yet registered in routes/api.php');
-        }
 
         $response->assertStatus(403);
     }
@@ -149,10 +136,6 @@ class SeoControllerTest extends TestCase
         $this->adminUser();
 
         $response = $this->apiGet('/v2/seo/redirects');
-
-        if ($response->getStatusCode() === 404) {
-            $this->markTestSkipped('SeoController routes are not yet registered in routes/api.php');
-        }
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['data']);
@@ -171,10 +154,6 @@ class SeoControllerTest extends TestCase
         ]);
 
         $response = $this->apiGet('/v2/seo/redirects');
-
-        if ($response->getStatusCode() === 404) {
-            $this->markTestSkipped('SeoController routes are not yet registered in routes/api.php');
-        }
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['data', 'meta']);

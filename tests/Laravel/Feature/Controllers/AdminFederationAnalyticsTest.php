@@ -103,10 +103,6 @@ class AdminFederationAnalyticsTest extends TestCase
 
         $otherTenantId = $this->testTenantId + 9999;
 
-        if (!$this->federationPartnershipsTableExists()) {
-            $this->markTestSkipped('federation_partnerships table not present in test DB');
-        }
-
         // Insert a partnership for our tenant (active)
         DB::table('federation_partnerships')->insert([
             'tenant_id' => $this->testTenantId,
@@ -132,15 +128,5 @@ class AdminFederationAnalyticsTest extends TestCase
         $this->assertGreaterThanOrEqual(1, $kpis['active_partnerships']);
 
         // Cleanup handled by DatabaseTransactions
-    }
-
-    private function federationPartnershipsTableExists(): bool
-    {
-        try {
-            DB::select('SELECT 1 FROM federation_partnerships LIMIT 1');
-            return true;
-        } catch (\Throwable) {
-            return false;
-        }
     }
 }

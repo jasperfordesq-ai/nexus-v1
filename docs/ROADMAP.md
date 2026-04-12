@@ -42,14 +42,14 @@ Deployed 2026-04-08. Stops the bleeding while the architectural fix is planned.
 | SEO8 | Auto-recache after deploy | ✅ Done | `scripts/recache-prerender.sh` (2-phase: static + sitemap URLs). Integrated into `safe-deploy.sh`. |
 | SEO9 | Cloudflare robots.txt injection | ✅ Done | Disabled Cloudflare AI bot control robots.txt modification across all 8 zones. Was creating duplicate `User-agent: *` groups. |
 
-### Phase B — Build-Time Static Pre-Rendering (In Progress)
+### Phase B — Build-Time Static Pre-Rendering (Partially Done)
 
 Interim solution: pre-render public pages at build time so nginx serves real HTML to everyone (users AND bots), with React hydrating on top. No external services, no runtime rendering.
 
 | # | Item | Status | Priority | Notes |
 |---|------|--------|----------|-------|
-| SEO10 | Playwright pre-render script | 📋 Planned | Critical | `postbuild` script visits ~20 static public routes, saves rendered HTML. nginx serves these directly. |
-| SEO11 | Dynamic route pre-rendering | 📋 Planned | Critical | Blog posts, listings, groups fetched from sitemap at build time and pre-rendered. |
+| SEO10 | Playwright pre-render script | ⚙️ In Progress | Critical | `react-frontend/scripts/prerender.mjs` + `scripts/prerender-worker.mjs` exist and cover ~19 static public routes. Not yet wired as a `postbuild` step in `react-frontend/package.json` — currently invoked separately. |
+| SEO11 | Dynamic route pre-rendering | 📋 Planned | Critical | Blog posts, listings, groups fetched from sitemap at build time and pre-rendered. Prerender.io fallback still used at runtime (see memory: `recache-prerender.sh` integrated into safe-deploy). |
 | SEO12 | Structured data on listings | 📋 Planned | High | Product/Service JSON-LD schema on `ListingDetailPage`. Enables rich snippets. |
 | SEO13 | Article schema completion | 📋 Planned | High | Blog posts: add `dateModified`, `description`, `author.url` to Article JSON-LD. |
 | SEO14 | Homepage internal linking | 📋 Planned | High | Add discoverable links to blog, listings, events, groups in `LandingPageRenderer` for crawlers. |
@@ -124,6 +124,7 @@ Features enabling a **global network of timebanks** communicating across languag
 |---|------|--------|----------|--------|-------|
 | FED1 | Tenant topic/interest tags | ✅ Done | — | — | 24 predefined topics across 7 categories (Care, Skills, Creative, Home, Health, Community, Services). `federation_topics` + `federation_tenant_topics` tables. Tenants select up to 10 topics (3 primary). Topic filter in directory, topic chips on community cards. |
 | FED2 | Federation directory / public tenant listing | ✅ Done | — | — | `FederationDirectoryService` fully implemented. Discoverable timebanks with filtering by search, region, categories. Integrated into federation admin. |
+| FED3 | Protocol REST endpoint coverage (all 9 entities) | ✅ Done | — | — | Complete inbound + outbound coverage across all 9 entity types (profiles, messages, transactions, listings, members, events, groups, reviews, volunteering). Includes Komunitin spec (15 endpoints), event-driven sync, feature-gate enforcement, shadow tables, end-to-end two-way integration tests. Hashchain stub cleaned up (2026-04). |
 
 ---
 
