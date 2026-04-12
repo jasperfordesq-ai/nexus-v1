@@ -1607,7 +1607,11 @@ HTML;
      */
     public static function getSendingMethod(): string
     {
-        if (config('mail.default') === 'gmail' || !empty(config('services.gmail.client_id'))) {
+        // Gmail config lives at mail.gmail_api.* (Mailer::forCurrentTenant uses
+        // this path). `services.gmail.client_id` never existed — the check
+        // always returned null, so the sending-method display said 'SMTP' even
+        // when Gmail API was configured and actually being used.
+        if (config('mail.default') === 'gmail' || !empty(config('mail.gmail_api.client_id'))) {
             return 'Gmail API';
         }
         return 'SMTP';
