@@ -308,9 +308,47 @@ class FederationExternalWebhookController extends BaseApiController
 
     private function handleListingsList(array $data, object $partner): array
     {
-        // Nexus doesn't have a direct "listings" concept matching TO's offers/inquiries
-        // Return an empty array for now — this can be extended when Nexus adds listing support
-        return ['listings' => [], 'count' => 0];
+        $tenantId = TenantContext::getId();
+        $typeFilter = $data['type'] ?? null;
+        $searchFilter = $data['search'] ?? null;
+
+        $query = DB::table('listings')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->whereNull('deleted_at');
+
+        if ($typeFilter) {
+            $query->where('type', $typeFilter);
+        }
+
+        if ($searchFilter) {
+            $query->where(function ($q) use ($searchFilter) {
+                $q->where('title', 'LIKE', "%{$searchFilter}%")
+                  ->orWhere('description', 'LIKE', "%{$searchFilter}%");
+            });
+        }
+
+        $rows = $query->limit(100)
+            ->get(['id', 'title', 'description', 'type', 'category', 'user_id']);
+
+        $listings = [];
+        foreach ($rows as $row) {
+            // Optionally check if the listing owner has opted-in to federation
+            $user = DB::table('users')->where('id', $row->user_id)->first(['first_name', 'last_name']);
+            $username = $user ? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) : null;
+
+            $listings[] = [
+                'id' => $row->id,
+                'title' => $row->title,
+                'description' => $row->description ? mb_substr($row->description, 0, 300) : null,
+                'type' => $row->type,       // "offer" or "inquiry"
+                'category' => $row->category,
+                'user' => $username,
+                'tags' => '',
+            ];
+        }
+
+        return ['listings' => $listings, 'count' => count($listings)];
     }
 
     // ----------------------------------------------------------------
