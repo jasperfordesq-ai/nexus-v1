@@ -285,7 +285,13 @@ export default function BookmarksPage() {
               </Chip>
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
-                  <Button isIconOnly size="sm" variant="light" className="min-w-0 w-6 h-6">
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    variant="light"
+                    className="min-w-0 w-6 h-6"
+                    aria-label={t('bookmarks.collection_actions', 'Collection actions')}
+                  >
                     <MoreHorizontal className="w-3 h-3" />
                   </Button>
                 </DropdownTrigger>

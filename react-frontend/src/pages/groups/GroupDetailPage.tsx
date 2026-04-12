@@ -1677,7 +1677,7 @@ export function GroupDetailPage() {
                       {t('detail.settings_image_label')}
                     </p>
                     {group?.image_url && (
-                      <img src={group.image_url} alt="Group" className="w-12 h-12 rounded-full object-cover mb-2" width={48} height={48} loading="lazy" />
+                      <img src={group.image_url} alt={t('detail.image_alt_group', 'Group')} className="w-12 h-12 rounded-full object-cover mb-2" width={48} height={48} loading="lazy" />
                     )}
                     <label className="flex items-center gap-1.5 text-xs text-primary cursor-pointer hover:underline">
                       <Upload className="w-3 h-3" aria-hidden="true" />
@@ -1697,7 +1697,7 @@ export function GroupDetailPage() {
                       {t('detail.settings_cover_label')}
                     </p>
                     {group?.cover_image_url && (
-                      <img src={group.cover_image_url} alt="Cover" className="w-full h-10 rounded object-cover mb-2" width={400} height={40} loading="lazy" />
+                      <img src={group.cover_image_url} alt={t('detail.image_alt_cover', 'Cover')} className="w-full h-10 rounded object-cover mb-2" width={400} height={40} loading="lazy" />
                     )}
                     <label className="flex items-center gap-1.5 text-xs text-primary cursor-pointer hover:underline">
                       <Upload className="w-3 h-3" aria-hidden="true" />

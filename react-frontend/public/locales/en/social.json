@@ -107,6 +107,7 @@
     "delete_collection_confirm": "Delete this collection? Bookmarks will be kept.",
     "edit_collection": "Edit",
     "delete_collection": "Delete",
+    "collection_actions": "Collection actions",
     "create_collection_title": "Create Collection",
     "edit_collection_title": "Edit Collection",
     "collection_name": "Name",

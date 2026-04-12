@@ -395,19 +395,18 @@ export function CreateGroupPage() {
               </p>
               <div className="flex flex-wrap gap-2">
                 {templates.map((tmpl) => (
-                  <button
+                  <Button
                     key={tmpl.id}
                     type="button"
-                    onClick={() => applyTemplate(tmpl.id)}
-                    className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
-                      selectedTemplate === tmpl.id
-                        ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-theme-default bg-content1 text-theme-primary hover:border-primary/50'
-                    }`}
+                    size="sm"
+                    variant={selectedTemplate === tmpl.id ? 'flat' : 'bordered'}
+                    color={selectedTemplate === tmpl.id ? 'primary' : 'default'}
+                    onPress={() => applyTemplate(tmpl.id)}
+                    className="px-3 py-2"
                   >
                     {tmpl.icon && <span className="mr-1">{tmpl.icon}</span>}
                     {tmpl.name}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>

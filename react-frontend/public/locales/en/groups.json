@@ -124,6 +124,8 @@
     "settings_location_placeholder": "e.g. Skibbereen, Co Cork",
     "settings_image_label": "Group Image",
     "settings_cover_label": "Cover Image",
+    "image_alt_group": "Group",
+    "image_alt_cover": "Cover",
     "uploading": "Uploading...",
     "upload_image": "Upload image",
     "upload_cover": "Upload cover",

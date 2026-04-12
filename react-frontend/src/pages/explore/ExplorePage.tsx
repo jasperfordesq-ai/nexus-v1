@@ -1198,13 +1198,17 @@ export default function ExplorePage() {
                   </Card>
                 </Link>
                 {/* Dismiss button */}
-                <button
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-full bg-[var(--surface-elevated)] hover:bg-[var(--surface-hover)]"
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="flat"
+                  radius="full"
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity min-w-6 w-6 h-6 bg-[var(--surface-elevated)] hover:bg-[var(--surface-hover)]"
                   onClick={(e) => { e.preventDefault(); handleDismiss('listing', listing.id, 'not_relevant'); }}
                   aria-label={t('dismiss')}
                 >
                   <X className="w-3.5 h-3.5 text-[var(--text-muted)]" />
-                </button>
+                </Button>
               </div>
             ))}
           </div>

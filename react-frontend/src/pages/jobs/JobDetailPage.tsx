@@ -2392,7 +2392,13 @@ export function JobDetailPage() {
                 <Sparkles size={18} className="text-secondary" />
                 <span className="font-semibold text-sm">{t('ai_chat.title', { defaultValue: 'Ask AI about this job' })}</span>
               </div>
-              <Button isIconOnly size="sm" variant="light" onPress={() => setAiChatOpen(false)}>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                onPress={() => setAiChatOpen(false)}
+                aria-label={t('ai_chat.close', { defaultValue: 'Close AI chat' })}
+              >
                 <X size={16} />
               </Button>
             </div>
@@ -2428,7 +2434,14 @@ export function JobDetailPage() {
                 onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAiChat(); } }}
                 className="flex-1"
               />
-              <Button isIconOnly size="sm" color="primary" onPress={handleAiChat} isDisabled={!aiChatInput.trim() || aiChatLoading}>
+              <Button
+                isIconOnly
+                size="sm"
+                color="primary"
+                onPress={handleAiChat}
+                isDisabled={!aiChatInput.trim() || aiChatLoading}
+                aria-label={t('ai_chat.send', { defaultValue: 'Send message' })}
+              >
                 <Send size={14} />
               </Button>
             </div>

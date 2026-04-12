@@ -62,25 +62,37 @@ const DEFAULT_ZOOM = 12;
 const CLUSTER_AUTO_THRESHOLD = 10;
 
 // ---------------------------------------------------------------------------
-// Custom cluster renderer — indigo circle with white count label
+// Custom cluster renderer — primary-colored circle with inverse text
+// Leaflet/Google Maps inject cluster DOM outside React, so inline styles are
+// required. We read theme tokens from :root once per render instead of
+// hardcoding hex values, so clusters respect user accent color + theme.
 // ---------------------------------------------------------------------------
+
+function readToken(name: string, fallback: string): string {
+  if (typeof window === 'undefined') return fallback;
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v || fallback;
+}
 
 const clusterRenderer: Renderer = {
   render({ count, position }) {
     const size = count < 10 ? 32 : count < 100 ? 38 : 44;
+    const bg = readToken('--color-primary', '#4f46e5');
+    const fg = readToken('--text-inverse', '#ffffff');
+    const shadow = readToken('--shadow-md', '0 2px 6px rgba(0,0,0,0.35)');
     const el = document.createElement('div');
     el.style.cssText = [
       `width:${size}px`,
       `height:${size}px`,
       'border-radius:50%',
-      'background:#4f46e5',
-      'color:#fff',
+      `background:${bg}`,
+      `color:${fg}`,
       `font-size:12px`,
       'font-weight:700',
       'display:flex',
       'align-items:center',
       'justify-content:center',
-      'box-shadow:0 2px 6px rgba(0,0,0,0.35)',
+      `box-shadow:${shadow}`,
       'cursor:pointer',
     ].join(';');
     el.textContent = String(count);

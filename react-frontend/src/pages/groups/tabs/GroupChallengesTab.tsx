@@ -376,10 +376,12 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
             {/* Completed section (collapsed by default) */}
             {completedChallenges.length > 0 && (
               <div className="mt-6">
-                <button
+                <Button
                   type="button"
-                  className="flex items-center gap-2 text-sm font-medium text-theme-secondary hover:text-theme-primary transition-colors"
-                  onClick={() => setShowCompleted(!showCompleted)}
+                  variant="light"
+                  size="sm"
+                  className="flex items-center gap-2 text-sm font-medium text-theme-secondary hover:text-theme-primary"
+                  onPress={() => setShowCompleted(!showCompleted)}
                   aria-expanded={showCompleted}
                   aria-controls="completed-challenges-list"
                 >
@@ -388,7 +390,7 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
                   <Chip size="sm" variant="flat" color="success">
                     {completedChallenges.length}
                   </Chip>
-                </button>
+                </Button>
 
                 {showCompleted && (
                   <div

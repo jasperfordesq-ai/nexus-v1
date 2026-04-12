@@ -888,5 +888,13 @@
     "qualification_percentage": "Qualification percentage"
   },
   "deadline_countdown_one": "Closes in {{count}} day",
-  "deadline_countdown_other": "Closes in {{count}} days"
+  "deadline_countdown_other": "Closes in {{count}} days",
+  "ai_chat": {
+    "open": "Ask AI about this job",
+    "close": "Close AI chat",
+    "send": "Send message",
+    "title": "Ask AI about this job",
+    "hint": "Ask me anything about this job — qualifications, salary, how to apply, interview tips...",
+    "placeholder": "Type your question..."
+  }
 }
