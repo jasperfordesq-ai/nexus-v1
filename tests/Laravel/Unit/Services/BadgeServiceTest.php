@@ -36,29 +36,52 @@ class BadgeServiceTest extends TestCase
         $this->assertIsArray($result);
     }
 
-    public function test_award_returns_false_when_badge_already_exists(): void
+    public function test_award_returns_false_when_insert_ignore_affects_zero_rows(): void
     {
-        $mockQuery = Mockery::mock();
-        $mockQuery->shouldReceive('where')->andReturnSelf();
-        $mockQuery->shouldReceive('exists')->andReturn(true);
+        // INSERT IGNORE returns 0 affected rows when the unique constraint blocks a duplicate.
+        DB::shouldReceive('affectingStatement')
+            ->once()
+            ->andReturn(0);
 
-        $this->mockUserBadge->shouldReceive('newQuery')->andReturn($mockQuery);
-
-        $result = $this->service->award(1, 1, 2);
+        $result = $this->service->award(1, 'early_adopter', 2);
         $this->assertFalse($result);
     }
 
-    public function test_award_returns_true_and_inserts_when_not_exists(): void
+    public function test_award_returns_true_when_insert_ignore_inserts_row(): void
     {
-        $mockQuery = Mockery::mock();
-        $mockQuery->shouldReceive('where')->andReturnSelf();
-        $mockQuery->shouldReceive('exists')->andReturn(false);
-        $mockQuery->shouldReceive('insert')->once();
+        DB::shouldReceive('affectingStatement')
+            ->once()
+            ->andReturn(1);
 
-        $this->mockUserBadge->shouldReceive('newQuery')->andReturn($mockQuery);
-
-        $result = $this->service->award(1, 1, 2, 10);
+        $result = $this->service->award(1, 'early_adopter', 2, 10);
         $this->assertTrue($result);
+    }
+
+    public function test_award_is_idempotent_on_duplicate_key_exception(): void
+    {
+        // If the DB driver throws on duplicate (instead of INSERT IGNORE silently skipping),
+        // the service must catch and return false — award() is idempotent by contract.
+        DB::shouldReceive('affectingStatement')
+            ->once()
+            ->andThrow(new \Exception('Duplicate entry'));
+
+        $result = $this->service->award(1, 'early_adopter', 2);
+        $this->assertFalse($result);
+    }
+
+    public function test_award_passes_tenant_id_to_bound_parameters(): void
+    {
+        // Regression guard: bound params are [user_id, badge_key, tenant_id].
+        DB::shouldReceive('affectingStatement')
+            ->once()
+            ->withArgs(function ($sql, $params) {
+                return is_string($sql)
+                    && str_contains($sql, 'user_badges')
+                    && $params === [7, 'helpful_neighbour', 999];
+            })
+            ->andReturn(1);
+
+        $this->assertTrue($this->service->award(7, 'helpful_neighbour', 999));
     }
 
     public function test_revoke_returns_true_on_success(): void
@@ -69,7 +92,7 @@ class BadgeServiceTest extends TestCase
 
         $this->mockUserBadge->shouldReceive('newQuery')->andReturn($mockQuery);
 
-        $result = $this->service->revoke(1, 1, 2);
+        $result = $this->service->revoke(1, 'early_adopter', 2);
         $this->assertTrue($result);
     }
 
@@ -81,7 +104,7 @@ class BadgeServiceTest extends TestCase
 
         $this->mockUserBadge->shouldReceive('newQuery')->andReturn($mockQuery);
 
-        $result = $this->service->revoke(1, 999, 2);
+        $result = $this->service->revoke(1, 'nonexistent_badge', 2);
         $this->assertFalse($result);
     }
 

@@ -1388,4 +1388,49 @@ class JobVacanciesControllerTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    // ------------------------------------------------------------------
+    //  Cross-tenant isolation
+    // ------------------------------------------------------------------
+
+    public function test_show_blocks_vacancy_from_different_tenant(): void
+    {
+        // Create vacancy owned by another tenant (999, seeded by TestCase::setUpTenantContext).
+        $otherUser = User::factory()->forTenant(999)->create(['status' => 'active', 'is_approved' => true]);
+        $otherVacancy = JobVacancy::factory()->forTenant(999)->create([
+            'user_id' => $otherUser->id,
+            'status' => 'open',
+        ]);
+
+        // Authenticate as user in the default test tenant.
+        $this->authenticatedUser();
+
+        $response = $this->apiGet("/v2/jobs/{$otherVacancy->id}");
+
+        // Cross-tenant access must be blocked — either 404 (scoped not-found) or 403.
+        $this->assertContains($response->getStatusCode(), [403, 404]);
+    }
+
+    public function test_index_only_returns_current_tenant_vacancies(): void
+    {
+        $user = $this->authenticatedUser();
+        $mineA = $this->createVacancy(['user_id' => $user->id, 'status' => 'open', 'title' => 'Mine A']);
+
+        $otherUser = User::factory()->forTenant(999)->create(['status' => 'active', 'is_approved' => true]);
+        $theirs = JobVacancy::factory()->forTenant(999)->create([
+            'user_id' => $otherUser->id,
+            'status' => 'open',
+            'title' => 'Other Tenant Vacancy',
+        ]);
+
+        $response = $this->apiGet('/v2/jobs');
+
+        $response->assertStatus(200);
+
+        $data = $response->json('data');
+        $this->assertIsArray($data);
+
+        $returnedIds = array_column($data, 'id');
+        $this->assertNotContains($theirs->id, $returnedIds, 'Other tenant vacancy leaked into tenant-scoped listing');
+    }
 }

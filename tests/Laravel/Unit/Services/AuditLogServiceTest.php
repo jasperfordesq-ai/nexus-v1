@@ -7,7 +7,9 @@
 namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
+use App\Core\TenantContext;
 use App\Services\AuditLogService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -125,10 +127,85 @@ class AuditLogServiceTest extends TestCase
 
     public function test_getLogCount_returns_zero_on_exception(): void
     {
+        // count() is the only call wrapped in try/catch in getLogCount().
         DB::shouldReceive('table')->with('org_audit_log')->andReturnSelf();
-        DB::shouldReceive('where')->andThrow(new \Exception('fail'));
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('count')->andThrow(new \Exception('fail'));
 
         $count = AuditLogService::getLogCount(1);
         $this->assertSame(0, $count);
+    }
+
+    // ── Metadata serialization & tenant scoping ──────────────────────
+
+    public function test_logAction_serializes_details_array_as_json(): void
+    {
+        $captured = null;
+        DB::shouldReceive('table')->with('org_audit_log')->andReturnSelf();
+        DB::shouldReceive('insertGetId')
+            ->once()
+            ->withArgs(function ($row) use (&$captured) {
+                $captured = $row;
+                return true;
+            })
+            ->andReturn(1);
+
+        $this->service->logAction(2, 'test_action', 7, ['key' => 'value', 'nested' => ['a' => 1]]);
+
+        $this->assertIsString($captured['details']);
+        $decoded = json_decode($captured['details'], true);
+        $this->assertSame('value', $decoded['key']);
+        $this->assertSame(['a' => 1], $decoded['nested']);
+        // Empty tenant scoping: tenant_id is always bound
+        $this->assertSame(2, $captured['tenant_id']);
+    }
+
+    public function test_logAction_stores_null_details_when_array_empty(): void
+    {
+        $captured = null;
+        DB::shouldReceive('table')->with('org_audit_log')->andReturnSelf();
+        DB::shouldReceive('insertGetId')
+            ->once()
+            ->withArgs(function ($row) use (&$captured) {
+                $captured = $row;
+                return true;
+            })
+            ->andReturn(1);
+
+        $this->service->logAction(2, 'test_action', 7, []);
+
+        $this->assertNull($captured['details']);
+    }
+
+    public function test_static_log_uses_tenant_context_for_tenant_id(): void
+    {
+        // Force tenant via reflection (avoids DB round-trip in setById)
+        $ref = new \ReflectionClass(TenantContext::class);
+        $prop = $ref->getProperty('tenant');
+        $prop->setAccessible(true);
+        $prop->setValue(null, [
+            'id' => 42,
+            'name' => 'Forced Tenant',
+            'slug' => 'forced-42',
+            'domain' => null,
+            'is_active' => true,
+            'features' => '{}',
+        ]);
+
+        $captured = null;
+        DB::shouldReceive('table')->with('org_audit_log')->andReturnSelf();
+        DB::shouldReceive('insertGetId')
+            ->once()
+            ->withArgs(function ($row) use (&$captured) {
+                $captured = $row;
+                return true;
+            })
+            ->andReturn(1);
+
+        AuditLogService::log('test_action', 5, 7, ['foo' => 'bar']);
+
+        $this->assertSame(42, $captured['tenant_id'], 'static log() must read tenant_id from TenantContext');
+        $this->assertSame(5, $captured['organization_id']);
+        $this->assertSame(7, $captured['user_id']);
     }
 }

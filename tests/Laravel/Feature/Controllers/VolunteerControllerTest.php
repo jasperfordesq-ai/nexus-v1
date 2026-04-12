@@ -314,4 +314,71 @@ class VolunteerControllerTest extends TestCase
         $data = $response->json();
         $this->assertIsArray($data);
     }
+
+    // ------------------------------------------------------------------
+    //  Form Request validation — apply / handleApplication / verifyHours
+    // ------------------------------------------------------------------
+
+    public function test_apply_accepts_missing_body_when_authenticated(): void
+    {
+        // ApplyOpportunityRequest has no required fields (message + shift_id are nullable).
+        // With auth + valid form request, the controller should not return 422.
+        // It may 404 (no such opportunity) or 400/409 (business rule) — just not 422.
+        $this->authenticatedUser();
+
+        $response = $this->apiPost('/v2/volunteering/opportunities/999999/apply');
+
+        $this->assertNotEquals(422, $response->getStatusCode());
+    }
+
+    public function test_apply_rejects_oversized_message(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiPost('/v2/volunteering/opportunities/1/apply', [
+            'message' => str_repeat('a', 3000), // max:2000
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_handle_application_rejects_invalid_action(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiPut('/v2/volunteering/applications/1', [
+            'action' => 'maybe',
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_handle_application_rejects_missing_action(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiPut('/v2/volunteering/applications/1', []);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_verify_hours_rejects_invalid_action(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiPut('/v2/volunteering/hours/1/verify', [
+            'action' => 'pending',
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_verify_hours_rejects_missing_action(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiPut('/v2/volunteering/hours/1/verify', []);
+
+        $response->assertStatus(422);
+    }
 }

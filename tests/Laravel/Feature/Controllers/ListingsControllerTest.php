@@ -54,6 +54,35 @@ class ListingsControllerTest extends TestCase
         ]);
     }
 
+    public function test_index_rejects_per_page_above_max(): void
+    {
+        // ListListingsRequest caps per_page at 100.
+        $this->authenticatedUser();
+
+        $response = $this->apiGet('/v2/listings?per_page=500');
+
+        $response->assertStatus(422);
+    }
+
+    public function test_index_rejects_negative_page(): void
+    {
+        // ListListingsRequest requires page >= 1.
+        $this->authenticatedUser();
+
+        $response = $this->apiGet('/v2/listings?page=0');
+
+        $response->assertStatus(422);
+    }
+
+    public function test_index_accepts_valid_pagination(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiGet('/v2/listings?page=1&per_page=10');
+
+        $response->assertStatus(200);
+    }
+
     public function test_index_supports_type_filter(): void
     {
         $user = $this->authenticatedUser();

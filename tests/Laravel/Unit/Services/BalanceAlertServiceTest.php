@@ -109,4 +109,57 @@ class BalanceAlertServiceTest extends TestCase
     {
         $this->markTestIncomplete('Requires integration test — complex join queries with subqueries');
     }
+
+    // ── Threshold boundary edge cases ────────────────────────────────
+
+    public function test_checkBalance_triggers_critical_when_balance_equals_critical_threshold(): void
+    {
+        // Catch-all — any table(...) returns self; shared where/whereDate/first/pluck/raw/insert
+        DB::shouldReceive('table')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereDate')->andReturnSelf();
+        DB::shouldReceive('first')->andReturnNull();
+        DB::shouldReceive('pluck')->andReturn(collect([]));
+        DB::shouldReceive('raw')->andReturn('');
+        DB::shouldReceive('insert')->andReturn(true);
+
+        // Balance exactly at critical threshold (10) — MUST trigger critical, not low
+        $result = $this->service->checkBalance(1, 10.0, 'Test Org');
+
+        $this->assertSame('critical', $result['alert_type']);
+        $this->assertTrue($result['alert_sent']);
+    }
+
+    public function test_checkBalance_triggers_low_when_balance_between_critical_and_low(): void
+    {
+        DB::shouldReceive('table')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereDate')->andReturnSelf();
+        DB::shouldReceive('first')->andReturnNull();
+        DB::shouldReceive('pluck')->andReturn(collect([]));
+        DB::shouldReceive('raw')->andReturn('');
+        DB::shouldReceive('insert')->andReturn(true);
+
+        // Balance between critical (10) and low (50) — triggers low
+        $result = $this->service->checkBalance(1, 25.0, 'Test Org');
+
+        $this->assertSame('low', $result['alert_type']);
+        $this->assertTrue($result['alert_sent']);
+    }
+
+    public function test_checkBalance_does_not_alert_when_balance_above_low_threshold(): void
+    {
+        DB::shouldReceive('table')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereDate')->andReturnSelf();
+        DB::shouldReceive('first')->andReturnNull();
+        DB::shouldReceive('pluck')->andReturn(collect([]));
+        DB::shouldReceive('raw')->andReturn('');
+
+        // Well above low threshold — no alert
+        $result = $this->service->checkBalance(1, 500.0, 'Test Org');
+
+        $this->assertNull($result['alert_type']);
+        $this->assertFalse($result['alert_sent']);
+    }
 }

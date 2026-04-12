@@ -11,11 +11,14 @@ use App\Services\AbuseDetectionService;
 use App\Core\TenantContext;
 use App\Models\AbuseAlert;
 use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Mockery;
 
 class AbuseDetectionServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private AbuseDetectionService $service;
 
     protected function setUp(): void
@@ -39,21 +42,15 @@ class AbuseDetectionServiceTest extends TestCase
 
     public function test_runAllChecks_returns_array_with_all_check_keys(): void
     {
-        DB::shouldReceive('table')->andReturnSelf();
-        DB::shouldReceive('join')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('whereNotIn')->andReturnSelf();
-        DB::shouldReceive('select')->andReturnSelf();
-        DB::shouldReceive('get')->andReturn(collect([]));
-        DB::shouldReceive('raw')->andReturn('');
-        DB::shouldReceive('selectRaw')->andReturnSelf();
-        DB::shouldReceive('groupBy')->andReturnSelf();
-        DB::shouldReceive('orderBy')->andReturnSelf();
-        DB::shouldReceive('limit')->andReturnSelf();
-        DB::shouldReceive('pluck')->andReturn(collect([]));
-
-        // Mock the raw selects that return empty arrays
-        DB::shouldReceive('select')->andReturn([]);
+        // Use a fresh tenant ID with no user/transaction fixtures so every
+        // check returns 0 without needing to mock DB.
+        $emptyTenant = 99001;
+        DB::table('tenants')->insertOrIgnore([
+            'id' => $emptyTenant, 'name' => 'Empty', 'slug' => 'test-99001',
+            'is_active' => true, 'depth' => 0, 'allows_subtenants' => false,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        TenantContext::setById($emptyTenant);
 
         $result = $this->service->runAllChecks();
 
@@ -61,6 +58,76 @@ class AbuseDetectionServiceTest extends TestCase
         $this->assertArrayHasKey('high_velocity', $result);
         $this->assertArrayHasKey('circular_transfers', $result);
         $this->assertArrayHasKey('inactive_high_balance', $result);
+        $this->assertSame(0, $result['large_transfers']);
+        $this->assertSame(0, $result['high_velocity']);
+        $this->assertSame(0, $result['circular_transfers']);
+        $this->assertSame(0, $result['inactive_high_balance']);
+    }
+
+    // ── N+1 regression & tenant isolation (real DB) ──────────────────
+
+    /**
+     * Regression test for the N+1 fix in checkHighVelocity:
+     * when no users match, service must still return 0 without calling
+     * User::whereIn with an empty array (which the fix explicitly guards).
+     * Uses empty tenant 999.
+     */
+    public function test_checkHighVelocity_returns_zero_for_empty_tenant_without_n_plus_1(): void
+    {
+        $emptyTenant = 99002;
+        DB::table('tenants')->insertOrIgnore([
+            'id' => $emptyTenant, 'name' => 'Empty', 'slug' => 'test-99002',
+            'is_active' => true, 'depth' => 0, 'allows_subtenants' => false,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        TenantContext::setById($emptyTenant);
+        $this->assertSame(0, $this->service->checkHighVelocity());
+    }
+
+    /**
+     * Tenant isolation — circular transfer check should only see the
+     * configured tenant's data, regardless of other tenants' activity.
+     */
+    public function test_checkCircularTransfers_scopes_queries_to_active_tenant(): void
+    {
+        $tenantA = 99003;
+        $tenantB = 99004;
+        DB::table('tenants')->insertOrIgnore([
+            'id' => $tenantA, 'name' => 'A', 'slug' => 'test-99003',
+            'is_active' => true, 'depth' => 0, 'allows_subtenants' => false,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        DB::table('tenants')->insertOrIgnore([
+            'id' => $tenantB, 'name' => 'B', 'slug' => 'test-99004',
+            'is_active' => true, 'depth' => 0, 'allows_subtenants' => false,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        $alice = DB::table('users')->insertGetId([
+            'tenant_id' => $tenantB, 'email' => 'alice'.uniqid().'@t.test',
+            'name' => 'Alice', 'first_name' => 'Alice', 'last_name' => 'A',
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        $bob = DB::table('users')->insertGetId([
+            'tenant_id' => $tenantB, 'email' => 'bob'.uniqid().'@t.test',
+            'name' => 'Bob', 'first_name' => 'Bob', 'last_name' => 'B',
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        // Circular transfers exist in tenant B
+        DB::table('transactions')->insert([
+            'tenant_id' => $tenantB, 'sender_id' => $alice, 'receiver_id' => $bob,
+            'amount' => 5, 'created_at' => now()->subMinutes(10), 'updated_at' => now(),
+        ]);
+        DB::table('transactions')->insert([
+            'tenant_id' => $tenantB, 'sender_id' => $bob, 'receiver_id' => $alice,
+            'amount' => 5, 'created_at' => now()->subMinutes(5), 'updated_at' => now(),
+        ]);
+
+        // But we're checking tenant A — should find 0
+        TenantContext::setById($tenantA);
+        $created = $this->service->checkCircularTransfers();
+        $this->assertSame(0, $created, 'Tenant A check must not see tenant B circular transfers');
     }
 
     // ── checkLargeTransfers ──────────────────────────────────────────
