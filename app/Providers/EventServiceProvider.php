@@ -6,24 +6,38 @@
 
 namespace App\Providers;
 
+use App\Events\CommunityEventCreated;
+use App\Events\CommunityEventUpdated;
+use App\Events\ConnectionAccepted;
 use App\Events\ConnectionRequested;
+use App\Events\GroupCreated;
+use App\Events\GroupMemberJoined;
 use App\Events\JobVacancyCreated;
 use App\Events\ListingCreated;
+use App\Events\MemberProfileUpdated;
 use App\Events\MessageSent;
 use App\Events\ReviewCreated;
 use App\Events\SafeguardingFlaggedEvent;
 use App\Events\TransactionCompleted;
 use App\Events\UserRegistered;
+use App\Events\VolunteerOpportunityCreated;
+use App\Events\VolunteerOpportunityUpdated;
 use App\Listeners\CopyMessageForBrokerReview;
 use App\Listeners\NotifyConnectionRequest;
 use App\Listeners\NotifyJobAlertSubscribers;
 use App\Listeners\NotifyMessageReceived;
 use App\Listeners\NotifySafeguardingStaff;
 use App\Listeners\NotifyTransactionCompleted;
+use App\Listeners\PushCommunityEventToFederatedPartners;
+use App\Listeners\PushConnectionAcceptedToFederatedPartner;
+use App\Listeners\PushGroupMembershipToFederatedPartners;
+use App\Listeners\PushGroupToFederatedPartners;
 use App\Listeners\PushListingToFederatedPartners;
+use App\Listeners\PushMemberProfileUpdateToFederatedPartners;
 use App\Listeners\PushMessageToFederatedPartner;
 use App\Listeners\PushReviewToFederatedPartner;
 use App\Listeners\PushTransactionToFederatedPartner;
+use App\Listeners\PushVolunteerOpportunityToFederatedPartners;
 use App\Listeners\SendWelcomeNotification;
 use App\Listeners\UpdateFeedOnListingCreated;
 use App\Listeners\UpdateWalletBalance;
@@ -63,6 +77,10 @@ class EventServiceProvider extends ServiceProvider
             NotifyConnectionRequest::class,
         ],
 
+        ConnectionAccepted::class => [
+            PushConnectionAcceptedToFederatedPartner::class,
+        ],
+
         MessageSent::class => [
             NotifyMessageReceived::class,
             CopyMessageForBrokerReview::class,
@@ -79,6 +97,34 @@ class EventServiceProvider extends ServiceProvider
 
         ReviewCreated::class => [
             PushReviewToFederatedPartner::class,
+        ],
+
+        CommunityEventCreated::class => [
+            PushCommunityEventToFederatedPartners::class,
+        ],
+
+        CommunityEventUpdated::class => [
+            PushCommunityEventToFederatedPartners::class,
+        ],
+
+        GroupCreated::class => [
+            PushGroupToFederatedPartners::class,
+        ],
+
+        GroupMemberJoined::class => [
+            PushGroupMembershipToFederatedPartners::class,
+        ],
+
+        VolunteerOpportunityCreated::class => [
+            PushVolunteerOpportunityToFederatedPartners::class,
+        ],
+
+        VolunteerOpportunityUpdated::class => [
+            PushVolunteerOpportunityToFederatedPartners::class,
+        ],
+
+        MemberProfileUpdated::class => [
+            PushMemberProfileUpdateToFederatedPartners::class,
         ],
     ];
 

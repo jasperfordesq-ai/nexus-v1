@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Events\ConnectionAccepted;
 use App\Events\ConnectionRequested;
 use App\Models\Connection;
 use App\Models\User;
@@ -181,7 +182,7 @@ class ConnectionService
      */
     public static function accept(int $connectionId, int $userId): Connection
     {
-        return DB::transaction(function () use ($connectionId, $userId) {
+        $connection = DB::transaction(function () use ($connectionId, $userId) {
             /** @var Connection $connection */
             $connection = Connection::query()->lockForUpdate()->findOrFail($connectionId);
 
@@ -198,6 +199,24 @@ class ConnectionService
 
             return $connection->fresh(['requester', 'receiver']);
         });
+
+        // Dispatch ConnectionAccepted AFTER commit so failed broadcasts
+        // can't roll back the status transition.
+        try {
+            $tenantId = (int) ($connection->requester?->tenant_id
+                ?? $connection->receiver?->tenant_id
+                ?? 0);
+            if ($tenantId > 0) {
+                ConnectionAccepted::dispatch($connection, $tenantId);
+            }
+        } catch (\Throwable $e) {
+            Log::error('Failed to dispatch ConnectionAccepted event', [
+                'connection_id' => $connection->id,
+                'error'         => $e->getMessage(),
+            ]);
+        }
+
+        return $connection;
     }
 
     /**

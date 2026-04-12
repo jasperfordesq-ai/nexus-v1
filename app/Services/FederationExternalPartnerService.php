@@ -511,6 +511,55 @@ class FederationExternalPartnerService
     }
 
     /**
+     * Get active partners that have a specific `allow_*` flag enabled.
+     *
+     * Used by federation push listeners to scope outbound broadcasts to the
+     * partners that opted in to the given domain (events, groups, connections,
+     * volunteering, member sync).
+     *
+     * @param int    $tenantId  Tenant scope
+     * @param string $allowFlag Column name — must be whitelisted below
+     * @return array<int, array<string, mixed>>
+     */
+    public static function getActivePartnersWithFlag(int $tenantId, string $allowFlag): array
+    {
+        $allowed = [
+            'allow_member_search',
+            'allow_listing_search',
+            'allow_messaging',
+            'allow_transactions',
+            'allow_events',
+            'allow_groups',
+            'allow_connections',
+            'allow_volunteering',
+            'allow_member_sync',
+        ];
+        if (!in_array($allowFlag, $allowed, true)) {
+            return [];
+        }
+
+        try {
+            $rows = DB::select(
+                "SELECT * FROM federation_external_partners
+                 WHERE tenant_id = ? AND status = 'active' AND {$allowFlag} = 1
+                 ORDER BY name ASC",
+                [$tenantId]
+            );
+
+            return array_map(fn ($row) => self::formatPartner($row), $rows);
+        } catch (\Throwable $e) {
+            // Column may not exist yet on older deployments — treat as zero
+            // partners rather than crashing the listener.
+            Log::warning('[FederationExternalPartner] getActivePartnersWithFlag failed', [
+                'tenant_id'  => $tenantId,
+                'allow_flag' => $allowFlag,
+                'error'      => $e->getMessage(),
+            ]);
+            return [];
+        }
+    }
+
+    /**
      * Get API call logs for a partner.
      *
      * @param int $partnerId Partner ID

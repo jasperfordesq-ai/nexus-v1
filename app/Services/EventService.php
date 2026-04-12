@@ -6,6 +6,9 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use App\Events\CommunityEventCreated;
+use App\Events\CommunityEventUpdated;
 use App\Models\Event;
 use App\Models\EventRsvp;
 use Illuminate\Database\Eloquent\Builder;
@@ -213,7 +216,20 @@ class EventService
 
             $event->save();
 
-            return $event->fresh(['user', 'category']);
+            $fresh = $event->fresh(['user', 'category']);
+
+            // Fire-and-forget: federation push is queued; failure must not
+            // break event creation.
+            try {
+                CommunityEventCreated::dispatch($fresh ?? $event, (int) TenantContext::getId());
+            } catch (\Throwable $e) {
+                Log::warning('Failed to dispatch CommunityEventCreated', [
+                    'event_id' => $event->id ?? null,
+                    'error'    => $e->getMessage(),
+                ]);
+            }
+
+            return $fresh ?? $event;
         });
     }
 
@@ -264,6 +280,15 @@ class EventService
 
         $event->fill(collect($data)->only($allowed)->all());
         $event->save();
+
+        try {
+            CommunityEventUpdated::dispatch($event->fresh() ?? $event, (int) TenantContext::getId());
+        } catch (\Throwable $e) {
+            Log::warning('Failed to dispatch CommunityEventUpdated', [
+                'event_id' => $event->id ?? null,
+                'error'    => $e->getMessage(),
+            ]);
+        }
 
         return true;
     }

@@ -7,12 +7,15 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Events\GroupCreated;
+use App\Events\GroupMemberJoined;
 use App\Models\Group;
 use App\Models\GroupDiscussion;
 use App\Models\GroupPost;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * GroupService — Laravel DI-based service for group operations.
@@ -243,7 +246,18 @@ class GroupService
             // Log group creation
             try { GroupAuditService::log(GroupAuditService::ACTION_GROUP_CREATED, $group->id, $userId, ['name' => $group->name]); } catch (\Throwable $e) {}
 
-            return $group->fresh(['creator']);
+            $fresh = $group->fresh(['creator']);
+
+            try {
+                GroupCreated::dispatch($fresh ?? $group, (int) TenantContext::getId());
+            } catch (\Throwable $e) {
+                Log::warning('Failed to dispatch GroupCreated', [
+                    'group_id' => $group->id ?? null,
+                    'error'    => $e->getMessage(),
+                ]);
+            }
+
+            return $fresh ?? $group;
         });
     }
 
@@ -286,6 +300,16 @@ class GroupService
             try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_MEMBER_JOINED, ['user_id' => $userId]); } catch (\Throwable $e) {}
             try { GroupAuditService::log(GroupAuditService::ACTION_MEMBER_JOINED, $groupId, $userId); } catch (\Throwable $e) {}
             try { GroupChallengeService::incrementProgress($groupId, 'members'); } catch (\Throwable $e) {}
+
+            try {
+                GroupMemberJoined::dispatch($groupId, $userId, (int) TenantContext::getId());
+            } catch (\Throwable $e) {
+                Log::warning('Failed to dispatch GroupMemberJoined', [
+                    'group_id' => $groupId,
+                    'user_id'  => $userId,
+                    'error'    => $e->getMessage(),
+                ]);
+            }
         }
 
         return ['success' => true, 'status' => $status];

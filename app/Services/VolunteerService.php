@@ -6,14 +6,17 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use App\Events\VolunteerOpportunityCreated;
+use App\Events\VolunteerOpportunityUpdated;
 use App\Models\VolApplication;
 use App\Models\VolLog;
 use App\Models\VolOpportunity;
 use App\Models\VolOrganization;
 use App\Models\VolShift;
-use App\Core\TenantContext;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * VolunteerService — Laravel DI-based service for volunteering operations.
@@ -107,7 +110,18 @@ class VolunteerService
 
         $opportunity->save();
 
-        return $opportunity->fresh(['creator', 'organization', 'category']);
+        $fresh = $opportunity->fresh(['creator', 'organization', 'category']);
+
+        try {
+            VolunteerOpportunityCreated::dispatch($fresh ?? $opportunity, (int) TenantContext::getId());
+        } catch (\Throwable $e) {
+            Log::warning('Failed to dispatch VolunteerOpportunityCreated', [
+                'opportunity_id' => $opportunity->id ?? null,
+                'error'          => $e->getMessage(),
+            ]);
+        }
+
+        return $fresh ?? $opportunity;
     }
 
     /**
@@ -479,6 +493,18 @@ class VolunteerService
             $params[] = $id;
             $params[] = $tenantId;
             DB::update("UPDATE vol_opportunities SET " . implode(', ', $fields) . " WHERE id = ? AND tenant_id = ?", $params);
+
+            try {
+                $updated = VolOpportunity::query()->find($id);
+                if ($updated) {
+                    VolunteerOpportunityUpdated::dispatch($updated, (int) $tenantId);
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Failed to dispatch VolunteerOpportunityUpdated', [
+                    'opportunity_id' => $id,
+                    'error'          => $e->getMessage(),
+                ]);
+            }
 
             return true;
         } catch (\Exception $e) {

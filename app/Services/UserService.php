@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\EmailTemplate;
 use App\Core\Mailer;
+use App\Events\MemberProfileUpdated;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\OnboardingConfigService;
@@ -366,12 +367,46 @@ class UserService
             }
         }
 
+        // Snapshot BEFORE so we can diff to the set of actually-changed fields.
+        $before = [];
         try {
-            self::update($userId, $data);
+            $beforeUser = User::query()->find($userId);
+            if ($beforeUser) {
+                $before = $beforeUser->only(array_keys($data));
+            }
+        } catch (\Throwable $e) {
+            // Diffing is optional — continue without snapshot
+            $before = [];
+        }
+
+        try {
+            $updated = self::update($userId, $data);
         } catch (\Throwable $e) {
             Log::warning('Profile update failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
             self::setError('UPDATE_FAILED', $e->getMessage());
             return false;
+        }
+
+        // Dispatch MemberProfileUpdated for federation + future listeners.
+        try {
+            $changedFields = [];
+            foreach ($data as $field => $value) {
+                if (!array_key_exists($field, $before) || $before[$field] !== $value) {
+                    $changedFields[] = (string) $field;
+                }
+            }
+            if (!empty($changedFields) && ($updated ?? null) instanceof User) {
+                MemberProfileUpdated::dispatch(
+                    $updated,
+                    $changedFields,
+                    (int) ($updated->tenant_id ?? TenantContext::getId()),
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Failed to dispatch MemberProfileUpdated', [
+                'user_id' => $userId,
+                'error'   => $e->getMessage(),
+            ]);
         }
 
         // Security notification: bell + email to OLD address when email is changed
