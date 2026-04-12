@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
+use App\Http\Requests\Listings\ListListingsRequest;
 use App\Models\ListingImage;
 use App\Models\Notification;
 use App\Services\AiChatService;
@@ -46,7 +47,7 @@ class ListingsController extends BaseApiController
     //  GET /api/v2/listings
     // -----------------------------------------------------------------
 
-    public function index(): JsonResponse
+    public function index(ListListingsRequest $request): JsonResponse
     {
         $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
 

@@ -8,9 +8,14 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Volunteering\ApplyOpportunityRequest;
 use App\Http\Requests\Volunteering\CreateOpportunityRequest;
-use App\Http\Requests\Volunteering\LogHoursRequest;
+use App\Http\Requests\Volunteering\CreateOrganisationRequest;
 use App\Http\Requests\Volunteering\CreateReviewRequest;
+use App\Http\Requests\Volunteering\HandleApplicationRequest;
+use App\Http\Requests\Volunteering\LogHoursRequest;
+use App\Http\Requests\Volunteering\UpdateOpportunityRequest;
+use App\Http\Requests\Volunteering\VerifyHoursRequest;
 use App\Services\VolunteerService;
 use App\Services\VolunteerMatchingService;
 use App\Core\TenantContext;
@@ -110,7 +115,7 @@ class VolunteerController extends BaseApiController
         return $this->respondWithData($opportunity, null, 201);
     }
 
-    public function updateOpportunity($id): JsonResponse
+    public function updateOpportunity(UpdateOpportunityRequest $request, $id): JsonResponse
     {
         $this->ensureFeature();
         $userId = $this->getUserId();
@@ -150,7 +155,7 @@ class VolunteerController extends BaseApiController
     // APPLICATIONS
     // ========================================
 
-    public function apply(int $id): JsonResponse
+    public function apply(ApplyOpportunityRequest $request, int $id): JsonResponse
     {
         $this->ensureFeature();
         $userId = $this->getUserId();
@@ -233,7 +238,7 @@ class VolunteerController extends BaseApiController
         return $this->respondWithData(['items' => $result['items'], 'cursor' => $result['cursor'], 'has_more' => $result['has_more']]);
     }
 
-    public function handleApplication($id): JsonResponse
+    public function handleApplication(HandleApplicationRequest $request, $id): JsonResponse
     {
         $this->ensureFeature();
         $userId = $this->getUserId();
@@ -424,7 +429,7 @@ class VolunteerController extends BaseApiController
         return $this->respondWithData(['items' => $result['items'], 'cursor' => $result['cursor'], 'has_more' => $result['has_more']]);
     }
 
-    public function verifyHours($id): JsonResponse
+    public function verifyHours(VerifyHoursRequest $request, $id): JsonResponse
     {
         $this->ensureFeature();
         $userId = $this->getUserId();
@@ -476,7 +481,7 @@ class VolunteerController extends BaseApiController
         return $this->respondWithData($orgs);
     }
 
-    public function createOrganisation(): JsonResponse
+    public function createOrganisation(CreateOrganisationRequest $request): JsonResponse
     {
         $this->ensureFeature();
         $userId = $this->getUserId();

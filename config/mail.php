@@ -101,6 +101,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | SendGrid Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Platform-wide SendGrid credentials. Per-tenant overrides live in the
+    | email_settings table and are loaded by App\Core\Mailer.
+    |
+    */
+
+    'sendgrid' => [
+        'api_key' => env('SENDGRID_API_KEY'),
+        'from_email' => env('SENDGRID_FROM_EMAIL'),
+        'from_name' => env('SENDGRID_FROM_NAME'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Error & Admin Alerts
     |--------------------------------------------------------------------------
     */

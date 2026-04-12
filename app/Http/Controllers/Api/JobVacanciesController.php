@@ -28,6 +28,7 @@ use App\Services\SalaryBenchmarkService;
 use App\Services\CandidateSearchService;
 use App\Services\JobInterviewSchedulingService;
 use App\Core\TenantContext;
+use App\Http\Requests\Jobs\ListJobVacanciesRequest;
 use App\Models\JobVacancy;
 use App\Models\Review;
 use App\Models\Transaction;
@@ -69,7 +70,7 @@ class JobVacanciesController extends BaseApiController
     // =====================================================================
 
     /** GET /api/v2/jobs — list jobs with filters + cursor pagination */
-    public function index(): JsonResponse
+    public function index(ListJobVacanciesRequest $request): JsonResponse
     {
         $this->ensureFeature();
         $this->rateLimit('jobs_list', 60, 60);

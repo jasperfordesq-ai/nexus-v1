@@ -148,12 +148,12 @@ class ImageUploader
             $result = $converter->convertOnUpload($imagePath);
 
             if ($result['success']) {
-                \error_log("WebP auto-converted: {$imagePath} (saved {$result['savings']}%)");
+                \Log::warning("WebP auto-converted: {$imagePath} (saved {$result['savings']}%)");
             }
 
             return $result;
         } catch (\Exception $e) {
-            \error_log("WebP conversion failed: " . $e->getMessage());
+            \Log::warning("WebP conversion failed: " . $e->getMessage());
             return null;
         }
     }

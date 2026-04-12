@@ -11,6 +11,7 @@ use App\Models\MarketplaceListing;
 use App\Models\MarketplaceSellerProfile;
 use App\Services\MarketplaceConfigurationService;
 use App\Services\MarketplaceReportService;
+use App\Services\TenantSettingsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -74,7 +75,11 @@ class AdminMarketplaceController extends BaseApiController
             'total_sellers' => $totalSellers,
             'total_orders' => $totalOrders,
             'revenue' => $revenue,
-            'currency' => 'EUR', // TODO: derive from tenant's default currency or payment data — global platform
+            'currency' => (string) TenantSettingsService::get(
+                $tenantId,
+                'general.default_currency',
+                config('app.default_currency', 'USD')
+            ),
         ]);
     }
 

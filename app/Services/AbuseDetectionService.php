@@ -130,8 +130,12 @@ class AbuseDetectionService
         );
 
         $alertsCreated = 0;
+        $userIds = array_unique(array_map(static fn ($r) => (int) $r->user_id, $highVelocityUsers));
+        $users = !empty($userIds)
+            ? User::whereIn('id', $userIds)->get()->keyBy('id')
+            : collect();
         foreach ($highVelocityUsers as $row) {
-            $user = User::find($row->user_id);
+            $user = $users->get((int) $row->user_id);
             $userName = $user ? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) : 'Unknown';
 
             $this->createAlert(
@@ -184,9 +188,18 @@ class AbuseDetectionService
         );
 
         $alertsCreated = 0;
+        $circularUserIds = [];
+        foreach ($circularTransfers as $c) {
+            $circularUserIds[] = (int) $c->user_a;
+            $circularUserIds[] = (int) $c->user_b;
+        }
+        $circularUserIds = array_unique($circularUserIds);
+        $circularUsers = !empty($circularUserIds)
+            ? User::whereIn('id', $circularUserIds)->get()->keyBy('id')
+            : collect();
         foreach ($circularTransfers as $circular) {
-            $userA = User::find($circular->user_a);
-            $userB = User::find($circular->user_b);
+            $userA = $circularUsers->get((int) $circular->user_a);
+            $userB = $circularUsers->get((int) $circular->user_b);
 
             $this->createAlert(
                 'circular_transfer',

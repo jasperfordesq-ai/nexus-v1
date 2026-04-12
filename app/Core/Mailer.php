@@ -176,27 +176,32 @@ class Mailer
     }
 
     /**
-     * Load mail configuration values using Laravel's env() helper.
+     * Load mail configuration values via Laravel's config() helper.
+     *
+     * Credentials are pulled from config/mail.php (smtp + gmail_api + sendgrid)
+     * at call time rather than read directly from the environment. This keeps
+     * secrets out of long-lived object properties in downstream callers and
+     * routes all mail credential access through a single auditable surface.
      */
     private function loadEnvValues(): array
     {
         return [
-            'USE_GMAIL_API'       => env('USE_GMAIL_API', 'false'),
-            'GMAIL_CLIENT_ID'     => env('GMAIL_CLIENT_ID', ''),
-            'GMAIL_CLIENT_SECRET' => env('GMAIL_CLIENT_SECRET', ''),
-            'GMAIL_REFRESH_TOKEN' => env('GMAIL_REFRESH_TOKEN', ''),
-            'GMAIL_SENDER_EMAIL'  => env('GMAIL_SENDER_EMAIL', ''),
-            'GMAIL_SENDER_NAME'   => env('GMAIL_SENDER_NAME', ''),
-            'SMTP_HOST'           => env('SMTP_HOST', ''),
-            'SMTP_PORT'           => env('SMTP_PORT', 587),
-            'SMTP_USER'           => env('SMTP_USER', ''),
-            'SMTP_PASS'           => env('SMTP_PASS', ''),
-            'SMTP_ENCRYPTION'     => env('SMTP_ENCRYPTION', 'tls'),
-            'SMTP_FROM_EMAIL'     => env('SMTP_FROM_EMAIL', ''),
-            'SMTP_FROM_NAME'      => env('SMTP_FROM_NAME', 'Project NEXUS'),
-            'SENDGRID_API_KEY'    => env('SENDGRID_API_KEY', ''),
-            'SENDGRID_FROM_EMAIL' => env('SENDGRID_FROM_EMAIL', ''),
-            'SENDGRID_FROM_NAME'  => env('SENDGRID_FROM_NAME', ''),
+            'USE_GMAIL_API'       => config('mail.gmail_api.enabled') ? 'true' : 'false',
+            'GMAIL_CLIENT_ID'     => (string) (config('mail.gmail_api.client_id') ?? ''),
+            'GMAIL_CLIENT_SECRET' => (string) (config('mail.gmail_api.client_secret') ?? ''),
+            'GMAIL_REFRESH_TOKEN' => (string) (config('mail.gmail_api.refresh_token') ?? ''),
+            'GMAIL_SENDER_EMAIL'  => (string) (config('mail.gmail_api.sender_email') ?? ''),
+            'GMAIL_SENDER_NAME'   => (string) (config('mail.gmail_api.sender_name') ?? ''),
+            'SMTP_HOST'           => (string) (config('mail.mailers.smtp.host') ?? ''),
+            'SMTP_PORT'           => config('mail.mailers.smtp.port') ?? 587,
+            'SMTP_USER'           => (string) (config('mail.mailers.smtp.username') ?? ''),
+            'SMTP_PASS'           => (string) (config('mail.mailers.smtp.password') ?? ''),
+            'SMTP_ENCRYPTION'     => (string) (config('mail.mailers.smtp.encryption') ?? 'tls'),
+            'SMTP_FROM_EMAIL'     => (string) (config('mail.from.address') ?? ''),
+            'SMTP_FROM_NAME'      => (string) (config('mail.from.name') ?? 'Project NEXUS'),
+            'SENDGRID_API_KEY'    => (string) (config('mail.sendgrid.api_key') ?? ''),
+            'SENDGRID_FROM_EMAIL' => (string) (config('mail.sendgrid.from_email') ?? ''),
+            'SENDGRID_FROM_NAME'  => (string) (config('mail.sendgrid.from_name') ?? ''),
         ];
     }
 

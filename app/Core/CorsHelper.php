@@ -140,12 +140,38 @@ class CorsHelper
 
         $originScheme = parse_url($origin, PHP_URL_SCHEME) ?: 'https';
 
-        // Check subdomain matches
+        // Explicit subdomain allowlist (security hardening 2026-04-12).
+        // Previously accepted ANY subdomain of an allowed host; now only
+        // subdomains present in CORS_ALLOWED_SUBDOMAINS may match.
+        $allowedSubsRaw = getenv('CORS_ALLOWED_SUBDOMAINS');
+        if ($allowedSubsRaw === false || $allowedSubsRaw === '') {
+            $allowedSubsRaw = $_ENV['CORS_ALLOWED_SUBDOMAINS'] ?? '';
+        }
+        if ($allowedSubsRaw === '') {
+            $allowedSubsRaw = 'app,api,staging,admin,super-admin,project-nexus';
+        }
+        $allowedSubs = array_filter(array_map(
+            static fn ($s) => strtolower(trim($s)),
+            explode(',', $allowedSubsRaw)
+        ));
+
+        // Check subdomain matches against the explicit subdomain allowlist
         foreach ($allowedOrigins as $allowed) {
             $allowedHost = parse_url($allowed, PHP_URL_HOST);
             if ($allowedHost && str_ends_with($originHost, '.' . $allowedHost)) {
                 $allowedScheme = parse_url($allowed, PHP_URL_SCHEME);
-                if ($allowedScheme === $originScheme) {
+                if ($allowedScheme !== $originScheme) {
+                    continue;
+                }
+                // Extract the leading label (e.g. "app" from "app.example.com")
+                $prefixLen = strlen($originHost) - strlen('.' . $allowedHost);
+                if ($prefixLen <= 0) {
+                    continue;
+                }
+                $leadingLabels = substr($originHost, 0, $prefixLen);
+                // Only match when the leading label set is a single entry in
+                // the allowlist (no nested sub-subdomains like a.b.host.com).
+                if (in_array(strtolower($leadingLabels), $allowedSubs, true)) {
                     return true;
                 }
             }

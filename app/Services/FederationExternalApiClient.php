@@ -496,6 +496,8 @@ class FederationExternalApiClient
                 $pending = Http::withHeaders($headers)
                     ->connectTimeout(self::CONNECT_TIMEOUT)
                     ->timeout(self::REQUEST_TIMEOUT)
+                    // Explicit SSL cert validation — auditable, never disabled.
+                    ->withOptions(['verify' => true])
                     ->acceptJson();
 
                 if ($method === 'GET') {
@@ -640,7 +642,7 @@ class FederationExternalApiClient
             $clientSecret = self::decryptCredential($partner['oauth_client_secret']);
             $tokenUrl = $partner['oauth_token_url'];
 
-            $response = Http::timeout(10)->asForm()->post($tokenUrl, [
+            $response = Http::timeout(10)->withOptions(['verify' => true])->asForm()->post($tokenUrl, [
                 'grant_type' => 'client_credentials',
                 'client_id' => $clientId,
                 'client_secret' => $clientSecret,
