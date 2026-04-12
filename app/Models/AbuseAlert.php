@@ -17,6 +17,9 @@ class AbuseAlert extends Model
 
     protected $table = 'abuse_alerts';
 
+    // Table has created_at but no updated_at — disable the UPDATED_AT timestamp.
+    public const UPDATED_AT = null;
+
     protected $fillable = [
         'tenant_id', 'alert_type', 'severity', 'user_id',
         'transaction_id', 'details', 'status',

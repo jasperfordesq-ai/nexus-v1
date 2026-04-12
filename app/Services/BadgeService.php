@@ -34,21 +34,23 @@ class BadgeService
     }
 
     /**
-     * Award a badge to a user.
+     * Award a badge to a user. The badge is identified by its string key
+     * (matches the (tenant_id, user_id, badge_key) unique constraint on user_badges).
      */
-    public function award(int $userId, int $badgeId, int $tenantId, ?int $awardedBy = null): bool
+    public function award(int $userId, string $badgeKey, int $tenantId, ?int $awardedBy = null): bool
     {
-        // Use INSERT IGNORE to atomically prevent duplicate badge awards.
-        // The user_badge_unique (user_id, badge_key) constraint enforces uniqueness.
+        // awarded_by is not a column on user_badges; the parameter is retained for API
+        // compatibility but intentionally unused until the audit trail is re-introduced.
+        unset($awardedBy);
+
         try {
             $affected = DB::affectingStatement(
-                'INSERT IGNORE INTO user_badges (user_id, badge_id, tenant_id, awarded_by, awarded_at, created_at) VALUES (?, ?, ?, ?, NOW(), NOW())',
-                [$userId, $badgeId, $tenantId, $awardedBy]
+                'INSERT IGNORE INTO user_badges (user_id, badge_key, tenant_id, awarded_at) VALUES (?, ?, ?, NOW())',
+                [$userId, $badgeKey, $tenantId]
             );
 
             return $affected > 0;
         } catch (\Throwable $e) {
-            // Duplicate key — badge already awarded
             return false;
         }
     }
@@ -56,11 +58,11 @@ class BadgeService
     /**
      * Revoke a badge from a user.
      */
-    public function revoke(int $userId, int $badgeId, int $tenantId): bool
+    public function revoke(int $userId, string $badgeKey, int $tenantId): bool
     {
         return $this->userBadge->newQuery()
             ->where('user_id', $userId)
-            ->where('badge_id', $badgeId)
+            ->where('badge_key', $badgeKey)
             ->where('tenant_id', $tenantId)
             ->delete() > 0;
     }
@@ -71,10 +73,13 @@ class BadgeService
     public function getUserBadges(int $userId, int $tenantId): array
     {
         return DB::table('user_badges as ub')
-            ->join('badges as b', 'ub.badge_id', '=', 'b.id')
+            ->join('badges as b', function ($join) {
+                $join->on('ub.badge_key', '=', 'b.badge_key')
+                    ->on('ub.tenant_id', '=', 'b.tenant_id');
+            })
             ->where('ub.user_id', $userId)
             ->where('ub.tenant_id', $tenantId)
-            ->select('b.*', 'ub.awarded_at', 'ub.awarded_by')
+            ->select('b.*', 'ub.awarded_at')
             ->get()
             ->map(fn ($r) => (array) $r)
             ->all();
