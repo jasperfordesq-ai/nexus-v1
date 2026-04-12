@@ -232,8 +232,15 @@ class GamificationService
      */
     public static function getLeaderboard(?int $tenantId = null, string $period = 'all_time', int $limit = 20): array
     {
+        // Default to the caller's tenant if not explicitly passed. Without this
+        // scope the leaderboard aggregates users across every tenant on the
+        // platform — a cross-tenant data leak that also breaks per-tenant
+        // gamification semantics.
+        $tenantId = $tenantId ?? \App\Core\TenantContext::getId();
+
         $query = User::query()
             ->select(['id', 'first_name', 'last_name', 'avatar_url', 'xp', 'level', 'points'])
+            ->where('tenant_id', $tenantId)
             ->where('is_approved', true);
 
         $query->orderByRaw('COALESCE(xp, points, 0) DESC')

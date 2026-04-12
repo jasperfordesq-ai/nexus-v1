@@ -95,13 +95,14 @@ class FederationNativeIngestController extends BaseApiController
         }
 
         $tenantId = $partner['tenant_id'] ?? null;
-        if (!$tenantId || !TenantContext::setById((int) $tenantId)) {
+        if (!$tenantId) {
             return $this->respondWithError('TENANT_ERROR',
                 'Unable to resolve tenant for this partner', null, 500);
         }
 
-        // Enforce federation whitelist — if whitelist mode is active the partner
-        // tenant must be explicitly whitelisted, otherwise reject inbound ingest.
+        // Enforce federation whitelist BEFORE binding TenantContext. If we set
+        // the context first and then reject, we have already polluted request-
+        // local state with a tenant we've just declined to serve.
         try {
             $feature = app(FederationFeatureService::class);
             if ($feature->isWhitelistModeActive() && !$feature->isTenantWhitelisted((int) $tenantId)) {
@@ -110,6 +111,11 @@ class FederationNativeIngestController extends BaseApiController
             }
         } catch (\Throwable $e) {
             Log::warning('[FederationIngest] Whitelist check failed', ['error' => $e->getMessage()]);
+        }
+
+        if (!TenantContext::setById((int) $tenantId)) {
+            return $this->respondWithError('TENANT_ERROR',
+                'Unable to resolve tenant for this partner', null, 500);
         }
 
         $payload = $request->json()->all();

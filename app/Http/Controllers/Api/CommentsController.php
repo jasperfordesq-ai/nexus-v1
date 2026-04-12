@@ -106,6 +106,7 @@ class CommentsController extends BaseApiController
     public function update(int $id): JsonResponse
     {
         $userId = $this->getUserId();
+        $this->rateLimit('comments_edit', 30, 60);
 
         $content = trim($this->input('content', ''));
 
@@ -133,6 +134,7 @@ class CommentsController extends BaseApiController
     public function destroy(int $id): JsonResponse
     {
         $userId = $this->getUserId();
+        $this->rateLimit('comments_delete', 30, 60);
 
         $deleted = $this->commentService->delete($id, $userId);
 

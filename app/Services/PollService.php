@@ -98,6 +98,15 @@ class PollService
             ];
         }
 
+        // Ballot integrity: hide per-option counts while the poll is still
+        // open to anyone other than the creator. Seeing running totals mid-
+        // vote lets early voters influence later voters and encourages
+        // strategic (rather than sincere) voting. Totals become visible
+        // once the poll's end_date has passed.
+        $isClosed = !empty($poll->end_date) && strtotime((string) $poll->end_date) <= time();
+        $isCreator = $currentUserId !== null && (int) $poll->user_id === (int) $currentUserId;
+        $canSeeCounts = $isClosed || $isCreator;
+
         $optionRows = DB::table('poll_options')
             ->where('poll_id', $id)
             ->get()
@@ -105,19 +114,29 @@ class PollService
                 'id'         => $o->id,
                 'text'       => $o->label ?? $o->option_text ?? '',
                 'label'      => $o->label ?? $o->option_text ?? '',
-                'vote_count' => (int) DB::table('poll_votes')->where('option_id', $o->id)->count(),
+                'vote_count' => $canSeeCounts ? (int) DB::table('poll_votes')->where('option_id', $o->id)->count() : null,
             ])->all();
 
-        $totalVotes = array_sum(array_column($optionRows, 'vote_count'));
+        // total_votes is safe to expose (only reveals participation volume,
+        // not the distribution) — but per-option numbers stay hidden.
+        $totalVotes = $canSeeCounts
+            ? array_sum(array_column($optionRows, 'vote_count'))
+            : (int) DB::table('poll_votes')->where('poll_id', $id)->count();
 
-        $data['options'] = array_map(function (array $opt) use ($totalVotes) {
-            $opt['percentage'] = $totalVotes > 0
-                ? round(($opt['vote_count'] / $totalVotes) * 100, 1)
-                : 0;
+        $data['options'] = array_map(function (array $opt) use ($totalVotes, $canSeeCounts) {
+            if ($canSeeCounts) {
+                $opt['percentage'] = $totalVotes > 0
+                    ? round(($opt['vote_count'] / $totalVotes) * 100, 1)
+                    : 0;
+            } else {
+                $opt['vote_count'] = null;
+                $opt['percentage'] = null;
+            }
             return $opt;
         }, $optionRows);
 
         $data['total_votes'] = $totalVotes;
+        $data['results_visible'] = $canSeeCounts;
 
         $data['has_voted'] = $currentUserId
             ? DB::table('poll_votes')->where('poll_id', $id)->where('user_id', $currentUserId)->exists()
