@@ -44,9 +44,9 @@ class ReactionService
         }
 
         // Serialise concurrent toggles for the same (user, entity) to avoid duplicate inserts.
-        // NOTE: a DB-level unique index on (tenant_id, user_id, target_type, target_id) is not
-        // yet present on the `reactions` table — flagged for a follow-up migration. The
-        // row-lock + transaction below closes the practical race window.
+        // Belt-and-braces: a DB-level unique index `reactions_unique` on
+        // (tenant_id, user_id, target_type, target_id) is also enforced — see
+        // 2026_04_12_140000_add_unique_index_to_reactions migration.
         [$action, $resultType] = DB::transaction(function () use ($tenantId, $entityType, $entityId, $userId, $reactionType) {
             $existing = DB::table('reactions')
                 ->where('tenant_id', $tenantId)

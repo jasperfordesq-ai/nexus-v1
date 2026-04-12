@@ -5296,7 +5296,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=82 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -7943,7 +7943,7 @@ CREATE TABLE `reactions` (
   `emoji` varchar(50) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_user_reaction` (`user_id`,`target_type`,`target_id`,`emoji`),
+  UNIQUE KEY `reactions_unique` (`tenant_id`,`user_id`,`target_type`,`target_id`),
   KEY `idx_target` (`target_type`,`target_id`),
   KEY `idx_user_target` (`user_id`,`target_type`,`target_id`),
   KEY `idx_tenant` (`tenant_id`),
@@ -11231,7 +11231,8 @@ INSERT INTO `laravel_migrations` VALUES
 (77,'2026_04_12_110000_add_allow_flags_to_federation_external_partners',25),
 (78,'2026_04_12_120000_create_federation_shadow_tables',25),
 (79,'2026_04_12_130000_add_status_to_stripe_webhook_events',26),
-(80,'2026_04_12_100000_add_retry_columns_to_newsletter_queue',27);
+(80,'2026_04_12_100000_add_retry_columns_to_newsletter_queue',27),
+(81,'2026_04_12_140000_add_unique_index_to_reactions',28);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
