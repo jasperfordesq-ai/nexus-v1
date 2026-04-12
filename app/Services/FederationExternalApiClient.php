@@ -229,6 +229,31 @@ class FederationExternalApiClient
     }
 
     /**
+     * Fetch reviews for a specific external member from an external partner.
+     *
+     * Uses the protocol adapter to resolve the endpoint path (e.g. Komunitin
+     * exposes `/accounts/{id}/reviews`). Falls back to a generic
+     * `/members/{id}/reviews` path for non-Komunitin adapters.
+     *
+     * @return array{success: bool, data?: array, error?: string, status_code?: int}
+     */
+    public static function fetchMemberReviews(int $partnerId, string $externalMemberId, array $filters = []): array
+    {
+        $adapter = self::resolveAdapter($partnerId);
+        $endpoint = $adapter->mapEndpoint('member_reviews', ['id' => $externalMemberId])
+            ?: ('/members/' . rawurlencode($externalMemberId) . '/reviews');
+        $result = self::get($partnerId, $endpoint, $filters);
+
+        if ($result['success'] && !empty($result['data']) && method_exists($adapter, 'transformInboundReviews')) {
+            $result['data'] = $adapter->transformInboundReviews(
+                is_array($result['data']) ? $result['data'] : []
+            );
+        }
+
+        return $result;
+    }
+
+    /**
      * Fetch a single member from an external partner.
      *
      * @return array|null Null on failure

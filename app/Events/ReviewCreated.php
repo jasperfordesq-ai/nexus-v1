@@ -18,6 +18,10 @@ use Illuminate\Queue\SerializesModels;
  * Listeners use this to propagate the review to federated partners so that
  * reputation portability works across tenants/platforms (the reviewed user
  * may be a remote member on another federation node).
+ *
+ * Queue workers start with NO tenant context, so we carry the tenant id on
+ * the event payload. Listeners MUST call TenantContext::setById($tenantId)
+ * before any DB query.
  */
 class ReviewCreated
 {
@@ -25,5 +29,6 @@ class ReviewCreated
 
     public function __construct(
         public readonly Review $review,
+        public readonly int $tenantId = 0,
     ) {}
 }

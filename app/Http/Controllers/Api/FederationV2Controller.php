@@ -1174,6 +1174,20 @@ class FederationV2Controller extends BaseApiController
             // Add trust score / reviews if the member allows it
             if ($m['show_reviews_federated']) {
                 $member['trust_score'] = FederationUserService::getTrustScore((int) $m['id'], (int) $m['tenant_id']);
+
+                // Reputation score/count for the federated trust badge (averaged across
+                // local + cross-tenant reviews so reputation follows the user).
+                $aggregate = DB::table('reviews')
+                    ->where('receiver_id', (int) $m['id'])
+                    ->where(function ($q) {
+                        $q->whereNull('status')->orWhereIn('status', ['active', 'approved']);
+                    })
+                    ->selectRaw('COUNT(*) as cnt, AVG(rating) as avg_rating')
+                    ->first();
+                $count = (int) ($aggregate->cnt ?? 0);
+                $avg = $aggregate->avg_rating !== null ? round((float) $aggregate->avg_rating, 2) : 0;
+                $member['reputation_score'] = $avg;
+                $member['reputation_count'] = $count;
             }
 
             // Add connection status with current user
@@ -1197,6 +1211,168 @@ class FederationV2Controller extends BaseApiController
         } catch (\Exception $e) {
             error_log("FederationV2Api::member error: " . $e->getMessage());
             return $this->respondWithError('INTERNAL_ERROR', __('api.fed_member_profile_failed'), null, 500);
+        }
+    }
+
+    /**
+     * GET /api/v2/federation/members/{id}/reviews
+     *
+     * Returns the merged review list for a federated member. Supports two id
+     * forms:
+     *   - plain integer → local user in the current tenant (scoped).
+     *   - `ext-{partnerId}-{externalId}` → fetches reviews from the external
+     *     Komunitin/federation partner for that member.
+     *
+     * Response shape (matches FederationReviewsPanel.tsx contract):
+     *   { success: true, data: FederationReviewItem[] }
+     */
+    public function memberReviews(string $id): JsonResponse
+    {
+        // Feature gate — federation feature must be enabled for tenant.
+        if (!\App\Core\TenantContext::hasFeature('federation')) {
+            return response()->json(['error' => 'Federation feature disabled for this tenant'], 403);
+        }
+
+        $this->getUserId();
+        $tenantId = $this->getTenantId();
+
+        // External member path: ext-{partnerId}-{externalId}
+        if (str_starts_with($id, 'ext-')) {
+            $rest = substr($id, 4);
+            $dashPos = strpos($rest, '-');
+            if ($dashPos === false) {
+                return $this->respondWithData([]);
+            }
+            $partnerId = (int) substr($rest, 0, $dashPos);
+            $externalMemberId = substr($rest, $dashPos + 1);
+            if ($partnerId <= 0 || $externalMemberId === '') {
+                return $this->respondWithData([]);
+            }
+
+            try {
+                $partner = \App\Services\FederationExternalPartnerService::getById($partnerId, $tenantId);
+                if (!$partner) {
+                    return $this->respondWithData([]);
+                }
+
+                $result = \App\Services\FederationExternalApiClient::fetchMemberReviews(
+                    $partnerId,
+                    $externalMemberId
+                );
+
+                if (empty($result['success']) || empty($result['data']) || !is_array($result['data'])) {
+                    return $this->respondWithData([]);
+                }
+
+                $partnerName = $partner['name'] ?? 'External Partner';
+                $partnerSlug = $partner['slug'] ?? null;
+                $baseUrl = rtrim($partner['base_url'] ?? '', '/');
+
+                $formatted = array_map(function ($r) use ($partnerId, $partnerName, $partnerSlug, $baseUrl) {
+                    $reviewer = is_array($r['reviewer'] ?? null) ? $r['reviewer'] : [];
+                    $reviewerName = $reviewer['name']
+                        ?? trim((string) ($reviewer['first_name'] ?? '') . ' ' . (string) ($reviewer['last_name'] ?? ''));
+                    $avatar = $reviewer['avatar'] ?? $reviewer['avatar_url'] ?? null;
+                    if ($avatar && !str_starts_with((string) $avatar, 'http')) {
+                        $avatar = $baseUrl . '/' . ltrim((string) $avatar, '/');
+                    }
+                    return [
+                        'id'         => $r['id'] ?? uniqid('ext-rev-', true),
+                        'rating'     => (int) ($r['rating'] ?? 0),
+                        'comment'    => $r['comment'] ?? null,
+                        'created_at' => $r['created_at'] ?? null,
+                        'reviewer'   => [
+                            'name'   => $reviewerName,
+                            'avatar' => $avatar,
+                        ],
+                        'partner'    => [
+                            'id'   => $partnerId,
+                            'name' => $partnerName,
+                            'slug' => $partnerSlug,
+                        ],
+                        'verified'   => (bool) ($r['verified'] ?? true),
+                    ];
+                }, $result['data']);
+
+                return $this->respondWithData(array_values($formatted));
+            } catch (\Throwable $e) {
+                error_log('FederationV2Api::memberReviews external error: ' . $e->getMessage());
+                return $this->respondWithData([]);
+            }
+        }
+
+        // Local member path — numeric id
+        $userId = (int) $id;
+        if ($userId <= 0) {
+            return $this->respondWithData([]);
+        }
+
+        try {
+            /** @var \App\Services\ReviewService $reviewService */
+            $reviewService = app(\App\Services\ReviewService::class);
+            $result = $reviewService->getForUser($userId, ['limit' => 100]);
+
+            // Resolve partner metadata lazily — most reviews are local, and
+            // the reviewer_tenant_id column identifies cross-tenant origin.
+            $partnerCache = [];
+            $resolvePartner = function (?int $reviewerTenantId) use (&$partnerCache, $tenantId): ?array {
+                if (!$reviewerTenantId || $reviewerTenantId === $tenantId) {
+                    return null;
+                }
+                if (!array_key_exists($reviewerTenantId, $partnerCache)) {
+                    $row = DB::table('tenants')
+                        ->where('id', $reviewerTenantId)
+                        ->first(['id', 'name', 'slug']);
+                    $partnerCache[$reviewerTenantId] = $row ? [
+                        'id'   => (int) $row->id,
+                        'name' => $row->name,
+                        'slug' => $row->slug ?? null,
+                    ] : null;
+                }
+                return $partnerCache[$reviewerTenantId];
+            };
+
+            // Re-query raw review rows to pick up reviewer_tenant_id + review_type
+            // (getForUser returns a formatted projection without those fields).
+            $rawRows = \App\Models\Review::query()
+                ->withFederated()
+                ->with(['reviewer:id,first_name,last_name,avatar_url,organization_name,profile_type'])
+                ->where('receiver_id', $userId)
+                ->where(function ($q) {
+                    $q->whereNull('status')->orWhereIn('status', ['active', 'approved']);
+                })
+                ->orderByDesc('id')
+                ->limit(100)
+                ->get();
+
+            $formatted = $rawRows->map(function (\App\Models\Review $r) use ($resolvePartner) {
+                $reviewer = $r->reviewer;
+                $isAnon = (bool) ($r->is_anonymous ?? false);
+                $reviewerName = ($reviewer && ($reviewer->profile_type ?? null) === 'organisation' && !empty($reviewer->organization_name))
+                    ? $reviewer->organization_name
+                    : trim(((string) ($reviewer->first_name ?? '')) . ' ' . ((string) ($reviewer->last_name ?? '')));
+                $reviewerTenantId = (int) ($r->reviewer_tenant_id ?? 0) ?: null;
+                $partner = $resolvePartner($reviewerTenantId);
+
+                return [
+                    'id'         => (int) $r->id,
+                    'rating'     => (int) $r->rating,
+                    'comment'    => $r->comment,
+                    'created_at' => $r->created_at?->toIso8601String(),
+                    'reviewer'   => [
+                        'id'     => $isAnon ? null : ($reviewer?->id ?? null),
+                        'name'   => $isAnon ? 'Anonymous' : $reviewerName,
+                        'avatar' => $isAnon ? null : ($reviewer?->avatar_url ?? null),
+                    ],
+                    'partner'    => $partner,
+                    'verified'   => ($r->review_type ?? 'local') === 'federated',
+                ];
+            })->all();
+
+            return $this->respondWithData(array_values($formatted));
+        } catch (\Throwable $e) {
+            error_log('FederationV2Api::memberReviews local error: ' . $e->getMessage());
+            return $this->respondWithData([]);
         }
     }
 

@@ -62,6 +62,7 @@ class KomunitinAdapter implements FederationProtocolAdapter
             'messages'            => '/messages',
             'reviews'             => '/reviews',
             'review'              => "/reviews/{$id}",
+            'member_reviews'      => "/{$currencyCode}/accounts/{$id}/reviews",
             default               => "/{$action}",
         };
     }

@@ -23,6 +23,8 @@ class Review extends Model
         'tenant_id', 'reviewer_id', 'receiver_id', 'transaction_id',
         'group_id', 'rating', 'comment', 'status',
         'review_type', 'dimensions',
+        // Federated review fields — required for reputation portability
+        'receiver_tenant_id', 'reviewer_tenant_id', 'show_cross_tenant',
     ];
 
     /**

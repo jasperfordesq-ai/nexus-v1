@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use App\Events\ReviewCreated;
 use App\Models\Review;
 use Illuminate\Database\Eloquent\Builder;
@@ -236,7 +237,7 @@ class ReviewService
         // Fire ReviewCreated so federation listeners can push the review to
         // the receiver's home partner (reputation portability).
         try {
-            ReviewCreated::dispatch($review);
+            ReviewCreated::dispatch($review, (int) TenantContext::getId());
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('ReviewCreated dispatch failed', [
                 'review_id' => $review->id,

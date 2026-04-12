@@ -10,10 +10,13 @@ namespace Tests\Laravel\Unit\Listeners;
 
 use App\Core\TenantContext;
 use App\Events\ListingCreated;
+use App\Events\ReviewCreated;
 use App\Listeners\PushListingToFederatedPartners;
 use App\Listeners\PushMessageToFederatedPartner;
+use App\Listeners\PushReviewToFederatedPartner;
 use App\Listeners\PushTransactionToFederatedPartner;
 use App\Models\Listing;
+use App\Models\Review;
 use App\Models\User;
 use App\Services\FederationExternalApiClient;
 use App\Services\FederationExternalPartnerService;
@@ -74,6 +77,67 @@ class FederationListenersTest extends TestCase
             ShouldQueue::class,
             class_implements(PushTransactionToFederatedPartner::class) ?: []
         );
+        $this->assertContains(
+            ShouldQueue::class,
+            class_implements(PushReviewToFederatedPartner::class) ?: []
+        );
+    }
+
+    public function test_review_listener_skips_when_tenant_feature_disabled(): void
+    {
+        $this->setFederationFeature($this->testTenantId, false);
+
+        // Feature service should never be consulted if hasFeature returned false
+        $featureService = Mockery::mock(FederationFeatureService::class);
+        $featureService->shouldNotReceive('isTenantFederationEnabled');
+
+        Http::fake();
+
+        $review = new Review();
+        $review->id = 700;
+        $review->receiver_id = 1;
+        $review->rating = 5;
+        $review->tenant_id = $this->testTenantId;
+
+        $event = new ReviewCreated($review, $this->testTenantId);
+
+        $listener = new PushReviewToFederatedPartner($featureService);
+        $listener->handle($event);
+
+        Http::assertNothingSent();
+    }
+
+    public function test_review_listener_restores_tenant_context_from_event(): void
+    {
+        // Simulate a queue worker that booted with a different (or stale)
+        // tenant context — the listener must rebind to the event's tenant.
+        $this->setFederationFeature($this->testTenantId, true);
+        TenantContext::setById(999999); // unrelated tenant id
+
+        $featureService = Mockery::mock(FederationFeatureService::class);
+        // If tenant context is restored, isTenantFederationEnabled will be
+        // consulted with the event's tenant id.
+        $featureService->shouldReceive('isTenantFederationEnabled')
+            ->with($this->testTenantId)
+            ->atLeast()->once()
+            ->andReturn(false); // short-circuit before any push
+
+        Http::fake();
+
+        $review = new Review();
+        $review->id = 701;
+        $review->receiver_id = 1;
+        $review->rating = 5;
+        $review->tenant_id = $this->testTenantId;
+
+        $event = new ReviewCreated($review, $this->testTenantId);
+
+        $listener = new PushReviewToFederatedPartner($featureService);
+        $listener->handle($event);
+
+        // After handle(), tenant context should have been restored
+        $this->assertSame($this->testTenantId, TenantContext::getId());
+        Http::assertNothingSent();
     }
 
     public function test_listener_skips_when_tenant_feature_disabled(): void

@@ -8,10 +8,12 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
+use App\Core\TenantContext;
 use App\Events\ReviewCreated;
 use App\Models\FederatedIdentity;
 use App\Models\Review;
 use App\Services\FederationExternalApiClient;
+use App\Services\FederationFeatureService;
 use App\Services\Protocols\KomunitinAdapter;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
@@ -25,12 +27,38 @@ use Illuminate\Support\Facades\Log;
  *
  * Local-only reviews (receiver has no federated identity) are a no-op — the
  * existing local review row is all that's needed.
+ *
+ * Feature-gated the same way as the other federation push listeners:
+ *   1. Tenant-level `federation` feature flag
+ *   2. System-level + whitelist gate via FederationFeatureService
  */
 class PushReviewToFederatedPartner implements ShouldQueue
 {
+    public function __construct(
+        private readonly FederationFeatureService $federationFeatureService,
+    ) {}
+
     public function handle(ReviewCreated $event): void
     {
         try {
+            // Restore tenant context for the queued worker (no tenant is set
+            // on queue boot — all DB reads below must be scoped correctly).
+            if ($event->tenantId > 0) {
+                TenantContext::setById($event->tenantId);
+            }
+
+            // 1. Tenant-level feature gate
+            if (! TenantContext::hasFeature('federation')) {
+                return;
+            }
+
+            // 2. System-level + whitelist gate via FederationFeatureService
+            if ($event->tenantId > 0
+                && ! $this->federationFeatureService->isTenantFederationEnabled($event->tenantId)
+            ) {
+                return;
+            }
+
             $review = $event->review;
 
             if (! $review instanceof Review) {
@@ -59,6 +87,7 @@ class PushReviewToFederatedPartner implements ShouldQueue
         } catch (\Throwable $e) {
             Log::error('PushReviewToFederatedPartner failed', [
                 'review_id' => $event->review->id ?? null,
+                'tenant_id' => $event->tenantId ?? null,
                 'error'     => $e->getMessage(),
             ]);
         }

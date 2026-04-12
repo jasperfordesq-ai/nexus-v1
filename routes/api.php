@@ -409,6 +409,8 @@ Route::get('/v2/federation/events', [\App\Http\Controllers\Api\FederationV2Contr
 Route::get('/v2/federation/listings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'listings']);
 Route::get('/v2/federation/members', [\App\Http\Controllers\Api\FederationV2Controller::class, 'members']);
 Route::get('/v2/federation/members/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'member']);
+Route::get('/v2/federation/members/{id}/reviews', [\App\Http\Controllers\Api\FederationV2Controller::class, 'memberReviews'])
+    ->where('id', '.*');
 Route::get('/v2/federation/messages', [\App\Http\Controllers\Api\FederationV2Controller::class, 'messages']);
 Route::post('/v2/federation/messages', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendMessage']);
 Route::post('/v2/federation/messages/mark-read-batch', [\App\Http\Controllers\Api\FederationV2Controller::class, 'markMessagesReadBatch']);
