@@ -1,18 +1,18 @@
-# Project NEXUS V1 — Open Source Announcement Email
+# Project NEXUS V1.5 — Open Source Announcement Email
 
-**Date:** 2026-03-27 (updated)
+**Date:** 2026-04-12 (updated)
 **Status:** Ready to send
-**Purpose:** Public announcement of Project NEXUS V1 open source release
+**Purpose:** Public announcement of Project NEXUS V1.5 open source release — refreshed with Spring 2026 feature work (Marketplace, Donations, Identity Verification, four-protocol Federation layer including Credit Commons / CEN, 11 languages, SEO at build time, and a hardened security/payments layer).
 
 ---
 
-**Subject: Project NEXUS V1 is Now Open Source — Building the Future of Community Exchange Together**
+**Subject: Project NEXUS V1.5 is Now Open Source — Building the Future of Community Exchange Together**
 
 Dear Community Builders, Developers, and Changemakers,
 
 Today marks a pivotal moment in our mission to reimagine how communities connect, exchange, and thrive.
 
-**We're releasing Project NEXUS V1 to the world — fully open source, built for everyone.**
+**We're releasing Project NEXUS V1.5 to the world — fully open source, built for everyone.**
 
 ---
 
@@ -24,9 +24,9 @@ But NEXUS goes far beyond timebanking. It's a complete ecosystem for building co
 
 ---
 
-## What's Inside V1?
+## What's Inside V1.5?
 
-At a glance: **timebanking engine, real-time messaging, AI-powered matching, multi-tenant architecture, global federation, gamification, and a full social platform** — all production-ready and fully Dockerized.
+At a glance: **timebanking engine, real-time messaging, AI-powered matching, multi-tenant architecture, a four-protocol federation layer (Nexus, Komunitin, Credit Commons, TimeOverflow), a Stripe payments layer (subscriptions, donations, marketplace payouts, identity verification), gamification, and a full social platform in 11 languages** — all production-ready and fully Dockerized.
 
 Here's the full breakdown:
 
@@ -39,7 +39,10 @@ Here's the full breakdown:
 - 🌐 **Federation** — Connect multiple communities into a network for cross-community exchange, shared listings, events, and messaging
 
 **Member Experience:**
-- 📋 **Service Marketplace** — Post offers and requests, browse listings
+- 📋 **Service Listings** — Post offers and requests, browse and smart-match listings
+- 🛒 **Marketplace** — Standalone classifieds module with Stripe Connect payouts, orders, seller profiles, and AI-powered reply suggestions
+- 💳 **Donations** — One-off and recurring donations via Stripe with full dashboards and receipts for organisations
+- 🪪 **Identity Verification** — Optional Stripe Identity flow (document + selfie + name/DOB matching) with a verified-member badge on your profile
 - 🔄 **Exchange Workflow** — Structured service exchange lifecycle with broker approval
 - 👥 **Group Exchanges** — Bulk community service exchanges
 - 📰 **Social Feed** — Posts, comments, likes, polls, hashtags, voice messages, media attachments, link previews, and @mentions
@@ -48,10 +51,10 @@ Here's the full breakdown:
 - 🎉 **Events & Groups** — Community gatherings, interest-based groups, and event reminders
 - 🤝 **Connections** — Follow and connect with community members
 - 👤 **Members Directory** — Browse, filter, and discover people in your community
-- 🏆 **Gamification** — Badges, XP, leaderboards, achievements, challenges, streaks, XP shop rewards, and seasonal leaderboard competitions
+- 🏆 **Gamification** — Verification badges, journeys, XP, leaderboards, achievements, challenges, streaks, XP shop rewards, community dashboard, and seasonal leaderboard competitions
 - 🎯 **Goals & Impact** — Track personal goals and community impact with mentoring and deliverables tracking
 - 💡 **Ideation Challenges** — Innovation hub with campaigns, ideas, voting, and outcomes tracking
-- 🤝 **Volunteering** — Manage volunteer opportunities, track hours, check-ins, expenses, certificates, wellbeing monitoring, and emergency alerts
+- 🤝 **Volunteering** — Manage volunteer opportunities, track hours, check-ins, expenses, certificates, wellbeing monitoring, and emergency alerts — **now with a volunteer organisation time-credit wallet: member deposits, admin adjustments, and time-credit payouts to volunteers on approved hours**
 - 💼 **Job Vacancies** — Full recruitment module with alerts, analytics, and public RSS/JSON job feed syndication for aggregators
 - 🏛️ **Organisations** — Company and employer profiles with sub-accounts and a dedicated organisation wallet
 - 👨‍👩‍👧 **Sub-Accounts / Family Accounts** — Parent-child account relationships for household and family management
@@ -66,7 +69,7 @@ Here's the full breakdown:
 - 📝 **Blog** — Tenant content management and community news
 - 📚 **Resources & Knowledge Base** — Structured articles and shared resource library
 - ❓ **Help Center** — Documentation hub and FAQ
-- 📰 **Newsletter System** — Email campaign manager with smart segments, templates, and send-time optimisation
+- 📰 **Newsletter System** — Email campaign manager with A/B testing, smart segments, geo targeting, recurring sends, templates, send-time optimisation, and full open/click analytics
 - 🤖 **AI Chat** — OpenAI-powered assistant for platform guidance
 - 📄 **Legal Hub** — Versioned legal documents with acceptance gates and audit trail
 - 📊 **Impact Reports** — SROI analysis, member outcome reports, and social impact case studies
@@ -101,18 +104,20 @@ Here's the full breakdown:
 - API: OpenAPI 3.0 specification with Swagger UI docs
 
 **Built for Production:**
-- 🔐 Enterprise security — CSRF, rate limiting, TOTP 2FA, WebAuthn passwordless authentication, email verification gates, and invite-code registration
+- 🔐 Enterprise security — CSRF, rate limiting, TOTP 2FA, WebAuthn passkeys, CSP nonces, a CORS allowlist, Form Request validation, email verification gates, and invite-code registration
+- 💳 Stripe payments layer — subscriptions, donations, marketplace (Connect), and identity verification, with idempotent webhook handling and deep money-flow test coverage
 - 🛡️ GDPR compliance suite — data requests, consent management, cookie consent, breach tracking, and full audit log
 - 🚨 Fraud & abuse detection — automated suspicious activity alerts and content moderation
 - 🛡️ Insurance certificate tracking — volunteer insurance management and verification
 - 🏢 Enterprise RBAC — role-based access control across 13+ modules with a full permission matrix
 - ♿ WCAG 2.1 AA accessibility compliance
-- 🌍 Multi-language support — 7 languages: English, Irish, German, French, Italian, Portuguese, Spanish
+- 🌍 Multi-language support — **11 languages**: English, Irish, German, French, Italian, Portuguese, Spanish, Dutch, Polish, Japanese, and **Arabic with full right-to-left layout**
+- 🔎 SEO at build time — 19+ public pages pre-rendered with Playwright, structured data, sitemaps, and Prerender.io fallback for dynamic routes
 - 🚀 Guided onboarding wizard for new members
 - 📊 Comprehensive admin panel with algorithm controls, diagnostics, cron job monitoring, and email deliverability monitoring
 - 🏗️ Tenant hierarchy — parent-child tenant relationships with feature toggling per tenant
 - 📧 Email webhook processing — SendGrid bounce, complaint, and delivery event handling
-- 🧪 PHPUnit and Vitest test suites
+- 🧪 500+ PHPUnit tests (money flow, webhooks, federation, groups, marketplace) plus Vitest suites
 - 📦 Fully Dockerized
 
 ---
@@ -121,11 +126,11 @@ Here's the full breakdown:
 
 This is where it gets exciting.
 
-**V1 ships with a fully working Federation API** — live today, connecting Project NEXUS communities with each other and with other timebanking platforms around the world. The vision is simple but ambitious: **a global time bank where external federation partners can discover each other, exchange services, and trade time credits across platforms and across borders.**
+**V1.5 ships with native adapters for four federation protocols** — Nexus (our own), the complete [Komunitin specification](https://github.com/komunitin/komunitin-spec) (all 15 endpoints), the [Credit Commons Protocol](https://creditcommons.org/) (11 endpoints, CEN-compatible mutual credit with P→V→C→E→X transaction lifecycle), and TimeOverflow. Two-way sync across 9 entity types (members, listings, events, groups, connections, volunteering, reviews, transfers, messages), event-driven push, reputation portability, and end-to-end integration test coverage. The vision is simple but ambitious: **a global time bank where external federation partners can discover each other, exchange services, and trade time credits across platforms and across borders.**
 
 Imagine a member in Dublin helping someone in São Paulo with web design, while a member in Tokyo teaches Irish students origami — all through interconnected timebanking platforms, all valuing every hour equally.
 
-The Federation API — available in V1 right now — enables:
+The Federation API — available in V1.5 right now — enables:
 - **Cross-platform discovery** — Find members and services on partner timebanking platforms globally
 - **Interoperable time credit exchange** — Trade time credits between different timebanking systems seamlessly
 - **Federation Neighborhoods** — Geographically grouped clusters of federated communities for regional coordination
@@ -241,9 +246,18 @@ The originating Irish timebank initiative [hOUR Timebank CLG](https://hour-timeb
 ### Research Foundation
 This software is informed by and builds upon a social impact study commissioned by the **West Cork Development Partnership**.
 
+### Open Protocol Attribution
+The federation layer implements three independent open protocols developed by the wider mutual-credit and timebanking community:
+- **[Komunitin](https://github.com/komunitin/komunitin-spec)** — JSON:API-based federation specification, independently authored by the Komunitin community.
+- **[Credit Commons Protocol](https://creditcommons.org/)** — recursive mutual-credit accounting standard used by the Credit Commons / CEN network.
+- **TimeOverflow** — the open-source Spanish timebanking platform whose public API we interoperate with.
+
+Each protocol's specifications and reference implementations remain the work of their original authors; NEXUS provides adapter code only.
+
 ### Acknowledgements
 - **West Cork Development Partnership**
 - **Fergal Conlon**, SICAP Manager
+- The **Komunitin**, **Credit Commons / CEN**, and **TimeOverflow** communities for the open protocol specifications that make cross-platform federation possible.
 
 Full attribution details in the [NOTICE](https://github.com/jasperfordesq-ai/nexus-v1/blob/main/NOTICE) and [CONTRIBUTORS.md](https://github.com/jasperfordesq-ai/nexus-v1/blob/main/CONTRIBUTORS.md) files.
 
@@ -261,7 +275,7 @@ Welcome to Project NEXUS. Welcome home.
 
 ---
 
-*Project NEXUS V1 — Built by Jasper Ford — Licensed under AGPL-3.0-or-later*
+*Project NEXUS V1.5 — Built by Jasper Ford — Licensed under AGPL-3.0-or-later*
 
 **"Every hour is equal. Every contribution matters. Every community deserves better. Everywhere."**
 
