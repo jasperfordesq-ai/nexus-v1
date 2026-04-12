@@ -567,8 +567,9 @@ export function ExternalPartners() {
                         komunitin: '/api/v1',
                         credit_commons: '',
                       };
-                      if (paths[String(selected)] !== undefined) {
-                        updateForm('api_path', paths[String(selected)]);
+                      const nextPath = paths[String(selected)];
+                      if (nextPath !== undefined) {
+                        updateForm('api_path', nextPath);
                       }
                     }
                   }}

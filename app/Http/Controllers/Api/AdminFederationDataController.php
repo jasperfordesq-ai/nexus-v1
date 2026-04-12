@@ -43,7 +43,14 @@ class AdminFederationDataController extends BaseApiController
         'federation_external_partners',
         'federation_reputation',
         'federation_api_logs',
+        'federation_api_keys',
     ];
+
+    /** Hard safety cap on api_logs rows emitted per export. */
+    private const API_LOGS_MAX_ROWS = 500000;
+
+    /** Chunk size for cursor-based streaming. */
+    private const STREAM_CHUNK_SIZE = 1000;
 
     /**
      * POST /api/v2/admin/federation/data/export
@@ -66,6 +73,14 @@ class AdminFederationDataController extends BaseApiController
         $filename = sprintf('federation_export_tenant_%d_%s.json', $tenantId, date('Y-m-d_His'));
 
         return new StreamedResponse(function () use ($tenantId): void {
+            // NOTE: we intentionally do NOT call ob_end_flush()/ob_end_clean() here.
+            // Symfony's StreamedResponse already invokes @ob_flush() + flush() after
+            // the callback, and per-chunk @fflush($out) pushes data to PHP's output.
+            // On Apache/PHP-FPM the X-Accel-Buffering: no + Content-Type headers +
+            // chunked encoding are sufficient to avoid full-buffer accumulation.
+            // Popping buffers here breaks PHPUnit's TestResponse::streamedContent()
+            // which relies on its own ob_start/ob_end_clean pair.
+
             $out = fopen('php://output', 'w');
             if ($out === false) {
                 return;
@@ -77,21 +92,24 @@ class AdminFederationDataController extends BaseApiController
                 'format_version' => 1,
             ]) . ',');
 
-            $this->streamSection($out, 'partnerships', $this->fetchPartnerships($tenantId));
+            $this->streamPartnerships($out, $tenantId);
             fwrite($out, ',');
-            $this->streamSection($out, 'external_partners', $this->fetchExternalPartners($tenantId));
+            $this->streamExternalPartners($out, $tenantId);
             fwrite($out, ',');
-            $this->streamSection($out, 'reputation', $this->fetchReputation($tenantId));
+            $this->streamReputation($out, $tenantId);
             fwrite($out, ',');
-            $this->streamSection($out, 'api_logs', $this->fetchApiLogs($tenantId, 90));
+            $this->streamApiLogs($out, $tenantId, 90);
 
             fwrite($out, '}');
+            @fflush($out);
             fclose($out);
         }, 200, [
             'Content-Type' => 'application/json; charset=utf-8',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'X-Content-Type-Options' => 'nosniff',
+            // Apache mod_proxy / nginx: disable response buffering so the client sees the stream as it's written.
+            'X-Accel-Buffering' => 'no',
         ]);
     }
 
@@ -306,112 +324,159 @@ class AdminFederationDataController extends BaseApiController
     // ───────────────────────────────── helpers ─────────────────────────────────
 
     /**
+     * Opens a JSON array for a section and writes rows produced by $producer one-by-one.
+     * $producer is a callable taking a `callable(array):void $emit` that it invokes for each row.
+     * This keeps memory bounded to one row at a time regardless of total row count.
+     *
      * @param resource $out
-     * @param array<int,array<string,mixed>> $rows
+     * @param callable(callable(array<string,mixed>):void):void $producer
      */
-    private function streamSection($out, string $key, array $rows): void
+    private function streamArraySection($out, string $key, callable $producer): void
     {
-        fwrite($out, json_encode($key) . ':');
-        fwrite($out, json_encode($rows, JSON_UNESCAPED_SLASHES));
-    }
+        fwrite($out, json_encode($key) . ':[');
 
-    /** @return array<int,array<string,mixed>> */
-    private function fetchPartnerships(int $tenantId): array
-    {
-        if (!$this->tableExists('federation_partnerships')) {
-            return [];
-        }
-        try {
-            $rows = DB::select(
-                'SELECT id, tenant_id, partner_tenant_id, status, federation_level,
-                        messaging_enabled, transactions_enabled, profiles_enabled,
-                        listings_enabled, events_enabled, groups_enabled,
-                        requested_at, approved_at, terminated_at, notes,
-                        created_at, updated_at
-                 FROM federation_partnerships
-                 WHERE tenant_id = ? OR partner_tenant_id = ?
-                 ORDER BY id ASC',
-                [$tenantId, $tenantId]
-            );
-            return array_map(static fn($r) => (array) $r, $rows);
-        } catch (\Throwable) {
-            return [];
-        }
-    }
-
-    /** @return array<int,array<string,mixed>> */
-    private function fetchExternalPartners(int $tenantId): array
-    {
-        if (!$this->tableExists('federation_external_partners')) {
-            return [];
-        }
-        try {
-            $rows = DB::select(
-                'SELECT * FROM federation_external_partners WHERE tenant_id = ? ORDER BY id ASC',
-                [$tenantId]
-            );
-            $out = [];
-            foreach ($rows as $r) {
-                $arr = (array) $r;
-                foreach (self::EXTERNAL_PARTNER_SECRET_FIELDS as $field) {
-                    if (array_key_exists($field, $arr)) {
-                        $arr[$field] = null; // redact secrets
-                    }
-                }
-                $out[] = $arr;
+        $first = true;
+        $emit = function (array $row) use ($out, &$first): void {
+            if (!$first) {
+                fwrite($out, ',');
             }
-            return $out;
-        } catch (\Throwable) {
-            return [];
+            $first = false;
+            fwrite($out, (string) json_encode($row, JSON_UNESCAPED_SLASHES));
+            // Periodic flush so the client sees progress and PHP releases buffers.
+            @fflush($out);
+        };
+
+        try {
+            $producer($emit);
+        } catch (\Throwable $e) {
+            Log::warning('[FederationData] Stream section failed', [
+                'section' => $key,
+                'error' => $e->getMessage(),
+            ]);
         }
+
+        fwrite($out, ']');
     }
 
-    /** @return array<int,array<string,mixed>> */
-    private function fetchReputation(int $tenantId): array
+    /** @param resource $out */
+    private function streamPartnerships($out, int $tenantId): void
     {
-        if (!$this->tableExists('federation_reputation')) {
-            return [];
-        }
-        try {
-            $rows = DB::select(
-                'SELECT id, user_id, home_tenant_id, trust_score, reliability_score,
-                        responsiveness_score, review_score, total_transactions,
-                        successful_transactions, reviews_received, reviews_given,
-                        hours_given, hours_received, is_verified, share_reputation,
-                        created_at, updated_at
-                 FROM federation_reputation
-                 WHERE home_tenant_id = ?
-                 ORDER BY id ASC',
-                [$tenantId]
-            );
-            return array_map(static fn($r) => (array) $r, $rows);
-        } catch (\Throwable) {
-            return [];
-        }
+        $this->streamArraySection($out, 'partnerships', function (callable $emit) use ($tenantId): void {
+            if (!$this->tableExists('federation_partnerships')) {
+                return;
+            }
+            DB::table('federation_partnerships')
+                ->select([
+                    'id', 'tenant_id', 'partner_tenant_id', 'status', 'federation_level',
+                    'messaging_enabled', 'transactions_enabled', 'profiles_enabled',
+                    'listings_enabled', 'events_enabled', 'groups_enabled',
+                    'requested_at', 'approved_at', 'terminated_at', 'notes',
+                    'created_at', 'updated_at',
+                ])
+                ->where(function ($q) use ($tenantId): void {
+                    $q->where('tenant_id', $tenantId)
+                      ->orWhere('partner_tenant_id', $tenantId);
+                })
+                ->orderBy('id')
+                ->chunkById(self::STREAM_CHUNK_SIZE, function ($rows) use ($emit): void {
+                    foreach ($rows as $r) {
+                        $emit((array) $r);
+                    }
+                });
+        });
     }
 
-    /** @return array<int,array<string,mixed>> */
-    private function fetchApiLogs(int $tenantId, int $days): array
+    /** @param resource $out */
+    private function streamExternalPartners($out, int $tenantId): void
     {
-        if (!$this->tableExists('federation_api_logs') || !$this->tableExists('federation_api_keys')) {
-            return [];
-        }
-        $since = date('Y-m-d H:i:s', strtotime("-{$days} days"));
-        try {
-            $rows = DB::select(
-                'SELECT l.id, l.api_key_id, l.endpoint, l.method, l.ip_address,
-                        l.signature_valid, l.auth_method, l.response_code,
-                        l.response_time_ms, l.created_at
-                 FROM federation_api_logs l
-                 INNER JOIN federation_api_keys k ON k.id = l.api_key_id
-                 WHERE k.tenant_id = ? AND l.created_at >= ?
-                 ORDER BY l.id ASC',
-                [$tenantId, $since]
-            );
-            return array_map(static fn($r) => (array) $r, $rows);
-        } catch (\Throwable) {
-            return [];
-        }
+        $this->streamArraySection($out, 'external_partners', function (callable $emit) use ($tenantId): void {
+            if (!$this->tableExists('federation_external_partners')) {
+                return;
+            }
+            DB::table('federation_external_partners')
+                ->where('tenant_id', $tenantId)
+                ->orderBy('id')
+                ->chunkById(self::STREAM_CHUNK_SIZE, function ($rows) use ($emit): void {
+                    foreach ($rows as $r) {
+                        $arr = (array) $r;
+                        // Redact secrets — MUST NEVER emit these fields.
+                        foreach (self::EXTERNAL_PARTNER_SECRET_FIELDS as $field) {
+                            if (array_key_exists($field, $arr)) {
+                                $arr[$field] = null;
+                            }
+                        }
+                        $emit($arr);
+                    }
+                });
+        });
+    }
+
+    /** @param resource $out */
+    private function streamReputation($out, int $tenantId): void
+    {
+        $this->streamArraySection($out, 'reputation', function (callable $emit) use ($tenantId): void {
+            if (!$this->tableExists('federation_reputation')) {
+                return;
+            }
+            DB::table('federation_reputation')
+                ->select([
+                    'id', 'user_id', 'home_tenant_id', 'trust_score', 'reliability_score',
+                    'responsiveness_score', 'review_score', 'total_transactions',
+                    'successful_transactions', 'reviews_received', 'reviews_given',
+                    'hours_given', 'hours_received', 'is_verified', 'share_reputation',
+                    'created_at', 'updated_at',
+                ])
+                ->where('home_tenant_id', $tenantId)
+                ->orderBy('id')
+                ->chunkById(self::STREAM_CHUNK_SIZE, function ($rows) use ($emit): void {
+                    foreach ($rows as $r) {
+                        $emit((array) $r);
+                    }
+                });
+        });
+    }
+
+    /** @param resource $out */
+    private function streamApiLogs($out, int $tenantId, int $days): void
+    {
+        $this->streamArraySection($out, 'api_logs', function (callable $emit) use ($tenantId, $days): void {
+            if (!$this->tableExists('federation_api_logs') || !$this->tableExists('federation_api_keys')) {
+                return;
+            }
+            $since = date('Y-m-d H:i:s', strtotime("-{$days} days"));
+            $emitted = 0;
+
+            // Resolve tenant-owned api_key ids once so chunkById can operate on a
+            // single-table query (chunkById doesn't play nicely with JOINs).
+            $apiKeyIds = DB::table('federation_api_keys')
+                ->where('tenant_id', $tenantId)
+                ->pluck('id')
+                ->all();
+
+            if (empty($apiKeyIds)) {
+                return;
+            }
+
+            DB::table('federation_api_logs')
+                ->whereIn('api_key_id', $apiKeyIds)
+                ->where('created_at', '>=', $since)
+                ->select([
+                    'id', 'api_key_id', 'endpoint', 'method', 'ip_address',
+                    'signature_valid', 'auth_method', 'response_code',
+                    'response_time_ms', 'created_at',
+                ])
+                ->orderBy('id')
+                ->chunkById(self::STREAM_CHUNK_SIZE, function ($rows) use ($emit, &$emitted): bool {
+                    foreach ($rows as $r) {
+                        if ($emitted >= self::API_LOGS_MAX_ROWS) {
+                            return false; // stop chunking
+                        }
+                        $emit((array) $r);
+                        $emitted++;
+                    }
+                    return true;
+                });
+        });
     }
 
     /**
