@@ -1346,8 +1346,18 @@ class AdminUsersController extends BaseApiController
         }
 
         $file = $_FILES['csv_file'];
-        $allowedTypes = ['text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel'];
-        if (!in_array($file['type'], $allowedTypes)) {
+
+        // SECURITY: Sanitize the original filename defensively — strip path components
+        // and restrict to safe characters before it ever appears in logs or error output.
+        $safeName = basename((string) ($file['name'] ?? 'upload.csv'));
+        $safeName = preg_replace('/[^A-Za-z0-9._-]/', '_', $safeName) ?: 'upload.csv';
+        $file['name'] = $safeName;
+
+        // SECURITY: Tighten MIME allowlist to the two canonical CSV types. Some
+        // browsers also report application/csv / text/plain; keep those but drop
+        // anything else that was historically accepted.
+        $allowedTypes = ['text/csv', 'application/vnd.ms-excel', 'application/csv', 'text/plain'];
+        if (!in_array($file['type'], $allowedTypes, true)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.csv_invalid_type'), null, 400);
         }
 

@@ -508,6 +508,7 @@ class AdminSuperController extends BaseApiController
     {
         $this->requireSuperAdmin();
 
+        // Super-admin: cross-tenant by design — tenant scope enforced via SuperPanelAccess::canAccessTenant() below
         $user = User::findById($id, false);
 
         if (!$user) {
@@ -594,6 +595,7 @@ class AdminSuperController extends BaseApiController
     {
         $this->requireSuperAdmin();
 
+        // Super-admin: cross-tenant by design — tenant scope enforced via SuperPanelAccess::canAccessTenant() below
         $user = User::findById($id, false);
 
         if (!$user) {
@@ -643,6 +645,7 @@ class AdminSuperController extends BaseApiController
     {
         $this->requireSuperAdmin();
 
+        // Super-admin: cross-tenant by design — tenant scope enforced via SuperPanelAccess::canAccessTenant() below
         $user = User::findById($id, false);
 
         if (!$user) {
@@ -678,6 +681,7 @@ class AdminSuperController extends BaseApiController
     {
         $userId = $this->requireSuperAdmin();
 
+        // Super-admin: cross-tenant by design — tenant scope enforced via SuperPanelAccess::canAccessTenant() below
         $user = User::findById($id, false);
 
         if (!$user) {
@@ -713,6 +717,7 @@ class AdminSuperController extends BaseApiController
         $userId = $this->requireSuperAdmin();
         $this->requireGod($userId);
 
+        // Super-admin: cross-tenant by design — restricted to "god" users via requireGod() above
         $user = User::findById($id, false);
 
         if (!$user) {
@@ -743,6 +748,7 @@ class AdminSuperController extends BaseApiController
         $userId = $this->requireSuperAdmin();
         $this->requireGod($userId);
 
+        // Super-admin: cross-tenant by design — restricted to "god" users via requireGod() above
         $user = User::findById($id, false);
 
         if (!$user) {
@@ -779,6 +785,7 @@ class AdminSuperController extends BaseApiController
     {
         $userId = $this->requireSuperAdmin();
 
+        // Super-admin: cross-tenant by design — tenant scope enforced via SuperPanelAccess::canAccessTenant() below (both source and destination tenants)
         $user = User::findById($id, false);
 
         if (!$user) {

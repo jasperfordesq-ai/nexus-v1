@@ -51,6 +51,8 @@ class AdminBlogController extends BaseApiController
             $params[] = $searchTerm;
         }
 
+        // SECURITY: $conditions contains only fixed placeholder strings (no user input);
+        // all user-supplied values flow through $params bound to '?' placeholders below.
         $where = implode(' AND ', $conditions);
 
         $total = (int) DB::selectOne(
