@@ -526,7 +526,9 @@ class TenantContext
 
         // 3. Fallback to config / env
         if (!$currency) {
-            $currency = (string) config('stripe.default_currency', Env::get('STRIPE_DEFAULT_CURRENCY', 'eur'));
+            // config path is services.stripe.default_currency (top-level 'stripe'
+            // doesn't exist as a standalone config file).
+            $currency = (string) config('services.stripe.default_currency', Env::get('STRIPE_DEFAULT_CURRENCY', 'eur'));
         }
 
         // 4. Final guard
