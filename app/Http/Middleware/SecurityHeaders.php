@@ -43,14 +43,17 @@ class SecurityHeaders
         //   to 'self' + explicit https: origins only.
         //   TODO: migrate to nonce/hash-based style-src once HeroUI exposes a
         //   nonce prop and inline style attributes are eliminated.
-        $csp = "default-src 'self' https: data: blob:; "
+        $csp = "default-src 'self' https:; "
             . "script-src 'self' 'nonce-{$nonce}' https:; "
             . "style-src 'self' 'unsafe-inline' https:; "
             . "connect-src 'self' https: wss://*.pusher.com wss://ws-eu.pusher.com; "
             . "img-src 'self' https: data: blob:; "
             . "font-src 'self' https: data:; "
             . "worker-src 'self' blob:; "
-            . "frame-ancestors 'self';";
+            . "frame-ancestors 'self'; "
+            . "form-action 'self'; "
+            . "base-uri 'self'; "
+            . "object-src 'none';";
         $response->headers->set('Content-Security-Policy', $csp);
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
 

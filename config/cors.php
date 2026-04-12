@@ -56,7 +56,9 @@ return [
 
     'exposed_headers' => [],
 
-    'max_age' => 0,
+    // 1 hour — avoids a full CORS preflight before every single request while
+    // staying well short of Firefox's 24h / Chromium's 2h browser caps.
+    'max_age' => 3600,
 
     'supports_credentials' => true,
 

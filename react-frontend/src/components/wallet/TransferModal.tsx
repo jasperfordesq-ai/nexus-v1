@@ -60,7 +60,7 @@ export function TransferModal({
   onTransferComplete,
   initialRecipientId,
 }: TransferModalProps) {
-  const { t } = useTranslation('wallet');
+  const { t, i18n } = useTranslation('wallet');
   // Form state
   const [formData, setFormData] = useState<TransferFormData>({
     recipient: null,
@@ -477,7 +477,7 @@ export function TransferModal({
                     })}
                   </p>
                   <p className="text-theme-subtle text-xs mt-1">
-                    {t('new_balance_after', { balance: (currentBalance - parsedAmount).toFixed(2) })}
+                    {t('new_balance_after', { balance: new Intl.NumberFormat(i18n.language, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(currentBalance - parsedAmount) })}
                   </p>
                 </div>
               )}

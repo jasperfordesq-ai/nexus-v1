@@ -39,7 +39,7 @@ interface DonationReceiptProps {
 /* ───────────────────────── Component ───────────────────────── */
 
 export function DonationReceipt({ donationId }: DonationReceiptProps) {
-  const { t } = useTranslation('volunteering');
+  const { t, i18n } = useTranslation('volunteering');
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -145,7 +145,7 @@ export function DonationReceipt({ donationId }: DonationReceiptProps) {
 
             <div className="flex justify-between">
               <span className="text-theme-muted">{t('donations.receipt_date', 'Date')}</span>
-              <span className="text-theme-primary">{new Date(receipt.date).toLocaleDateString()}</span>
+              <span className="text-theme-primary">{new Date(receipt.date).toLocaleDateString(i18n.language)}</span>
             </div>
 
             <div className="flex justify-between">

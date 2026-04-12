@@ -60,6 +60,8 @@ class CommentsController extends BaseApiController
     public function store(): JsonResponse
     {
         $userId = $this->getUserId();
+        // Rate-limit comment creation per user to block spam/flame floods.
+        $this->rateLimit('comments_create', 30, 60);
         $tenantId = $this->getTenantId();
 
         $data = $this->getAllInput();
