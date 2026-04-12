@@ -267,9 +267,50 @@ class FederationExternalWebhookController extends BaseApiController
             'partnership.activated', 'partnership.approved' => $this->handlePartnershipActivated($partner),
             'partnership.suspended' => $this->handlePartnershipSuspended($partner),
             'partnership.terminated' => $this->handlePartnershipTerminated($partner),
+            'members.list' => $this->handleMembersList($data, $partner),
+            'listings.list' => $this->handleListingsList($data, $partner),
             'health_check' => ['status' => 'ok'],
             default => ['status' => 'unhandled', 'event' => $event],
         };
+    }
+
+    // ----------------------------------------------------------------
+    // Data browsing (members + listings)
+    // ----------------------------------------------------------------
+
+    private function handleMembersList(array $data, object $partner): array
+    {
+        $users = DB::table('users')
+            ->where('tenant_id', TenantContext::getId())
+            ->where('status', 'active')
+            ->limit(100)
+            ->get(['id', 'first_name', 'last_name', 'balance']);
+
+        $members = [];
+        foreach ($users as $user) {
+            // Check federation opt-in
+            $optedIn = DB::table('federation_user_settings')
+                ->where('user_id', $user->id)
+                ->where('federation_optin', 1)
+                ->exists();
+            if (!$optedIn) continue;
+
+            $members[] = [
+                'id' => $user->id,
+                'username' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
+                'balance' => ($user->balance ?? 0) * 3600, // Nexus hours → TO seconds
+                'tags' => '',
+            ];
+        }
+
+        return ['members' => $members, 'count' => count($members)];
+    }
+
+    private function handleListingsList(array $data, object $partner): array
+    {
+        // Nexus doesn't have a direct "listings" concept matching TO's offers/inquiries
+        // Return an empty array for now — this can be extended when Nexus adds listing support
+        return ['listings' => [], 'count' => 0];
     }
 
     // ----------------------------------------------------------------
