@@ -247,6 +247,11 @@ class MarketplacePaymentService
         $client = StripeService::client();
 
         try {
+            // Idempotency key binds a network retry of this create() to the same
+            // PaymentIntent, so a dropped connection / client retry can't end up
+            // charging the buyer twice. Scoped to order id + tenant to avoid
+            // collisions across tenants that share a Stripe account.
+            $idempotencyKey = "market-order-{$tenantId}-{$order->id}";
             $paymentIntent = $client->paymentIntents->create([
                 'amount' => $amountCents,
                 'currency' => $currency,
@@ -262,7 +267,7 @@ class MarketplacePaymentService
                     'nexus_type' => 'marketplace',
                 ],
                 'description' => "Marketplace order {$order->order_number}",
-            ]);
+            ], ['idempotency_key' => $idempotencyKey]);
         } catch (\Exception $e) {
             Log::error('MarketplacePayment: failed to create PaymentIntent', [
                 'order_id' => $order->id,

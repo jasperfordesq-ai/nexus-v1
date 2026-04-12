@@ -303,11 +303,16 @@ class JobVacanciesController extends BaseApiController
             if ($file->getSize() > 5 * 1024 * 1024) {
                 return $this->respondWithError('VALIDATION_FILE_TOO_LARGE', __('api.job_cv_too_large'), 'cv', 422);
             }
-            // MIME whitelist — must match extension, blocks HTML/SVG/PHP disguised as documents
+            // MIME whitelist — must match extension, blocks HTML/SVG/PHP disguised as documents.
+            // We deliberately drop application/octet-stream here because it is the browser
+            // fallback for any unknown/unrecognised file (including .exe) and opens a hole
+            // where a renamed executable would pass validation and later be opened by an
+            // employer. Legitimate .doc/.docx uploads from modern browsers send the proper
+            // Office MIME types; older clients can still upload PDF.
             $allowedMimes = [
                 'pdf'  => ['application/pdf'],
-                'doc'  => ['application/msword', 'application/vnd.ms-office', 'application/octet-stream'],
-                'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip', 'application/octet-stream'],
+                'doc'  => ['application/msword', 'application/vnd.ms-office'],
+                'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip'],
             ];
             $detectedMime = $file->getMimeType();
             if (!$detectedMime || !in_array($detectedMime, $allowedMimes[$ext], true)) {

@@ -95,6 +95,10 @@ class IdentityVerificationPaymentService
         $currency = TenantContext::getCurrency();
 
         try {
+            // One identity-verification fee per (tenant,user) — safe to use a
+            // stable idempotency key so a client retry does not create a second
+            // PaymentIntent and charge the user twice.
+            $idempotencyKey = "identity-{$tenantId}-{$userId}";
             $paymentIntent = $client->paymentIntents->create([
                 'amount' => $feeCents,
                 'currency' => $currency,
@@ -105,7 +109,7 @@ class IdentityVerificationPaymentService
                     'nexus_tenant_id' => (string) $tenantId,
                     'nexus_user_id' => (string) $userId,
                 ],
-            ]);
+            ], ['idempotency_key' => $idempotencyKey]);
         } catch (\Exception $e) {
             Log::error('Stripe: failed to create verification fee PaymentIntent', [
                 'user_id' => $userId,

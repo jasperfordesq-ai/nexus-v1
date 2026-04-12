@@ -251,6 +251,9 @@ class AdminJobsController extends BaseApiController
     public function biasAudit(): JsonResponse
     {
         $this->requireAdmin();
+        // Rate-limit: report aggregates candidate demographics, so prevent
+        // rapid enumeration that could be used to harvest PII patterns.
+        $this->rateLimit('jobs_bias_audit', 10, 60);
         $tenantId = $this->getTenantId();
 
         $jobId = $this->query('job_id') ? $this->queryInt('job_id') : null;

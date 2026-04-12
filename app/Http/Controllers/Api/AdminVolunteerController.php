@@ -662,6 +662,10 @@ class AdminVolunteerController extends BaseApiController
     public function adjustOrgWallet(int $id): JsonResponse
     {
         $this->requireSuperAdmin();
+        // Defence-in-depth: even super-admin adjustments should be rate-limited
+        // so an accidental loop or compromised session cannot drain/inflate a
+        // vol org wallet in seconds.
+        $this->rateLimit('vol_org_admin_adjust', 20, 60);
 
         $amount = (float) $this->input('amount', 0);
         $reason = trim((string) $this->input('reason', ''));

@@ -379,10 +379,14 @@ class JobVacancyService
             }
         }
 
+        // NOTE: organization_id is intentionally NOT in this list. Allowing it on
+        // update lets a poster reassign a job to any organization, even one they
+        // don't belong to (no membership check existed). Organization is a
+        // create-time decision; reassigning requires a dedicated admin flow.
         $allowedFields = [
             'title', 'description', 'location', 'latitude', 'longitude', 'is_remote', 'type', 'commitment',
             'category', 'skills_required', 'hours_per_week', 'time_credits',
-            'contact_email', 'contact_phone', 'deadline', 'status', 'organization_id',
+            'contact_email', 'contact_phone', 'deadline', 'status',
             'salary_min', 'salary_max', 'salary_type', 'salary_currency', 'salary_negotiable',
             'tagline', 'video_url', 'culture_photos', 'company_size', 'benefits',
             'blind_hiring',
