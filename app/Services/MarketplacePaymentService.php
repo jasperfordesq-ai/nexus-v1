@@ -331,8 +331,10 @@ class MarketplacePaymentService
             throw new \RuntimeException('Order not found for this payment intent.');
         }
 
-        // Idempotency: check if payment already recorded
-        $existingPayment = MarketplacePayment::where('stripe_payment_intent_id', $paymentIntentId)->first();
+        // Idempotency: check if payment already recorded (scoped by tenant)
+        $existingPayment = MarketplacePayment::where('stripe_payment_intent_id', $paymentIntentId)
+            ->where('tenant_id', $tenantId)
+            ->first();
         if ($existingPayment) {
             return $existingPayment;
         }
@@ -356,9 +358,10 @@ class MarketplacePaymentService
 
         $payment = DB::transaction(function () use (
             $order, $paymentIntentId, $chargeId, $totalAmount,
-            $platformFee, $sellerPayout, $paymentIntent
+            $platformFee, $sellerPayout, $paymentIntent, $tenantId
         ) {
             $payment = new MarketplacePayment();
+            $payment->tenant_id = $tenantId;
             $payment->order_id = $order->id;
             $payment->stripe_payment_intent_id = $paymentIntentId;
             $payment->stripe_charge_id = $chargeId;
@@ -471,11 +474,35 @@ class MarketplacePaymentService
 
         $isFullRefund = abs($refundAmount - (float) $payment->amount) < 0.01;
 
-        DB::transaction(function () use ($payment, $order, $refundAmount, $reason, $isFullRefund) {
+        // Compensating ledger reversal: compute the proportional platform fee
+        // being reversed on this refund. Stripe reverses the application_fee via
+        // refund_application_fee=true above — we mirror that on our local books
+        // so reports/payouts don't double-count the fee as revenue.
+        $originalAmount = (float) $payment->amount;
+        $originalPlatformFee = (float) $payment->platform_fee;
+        $originalSellerPayout = (float) $payment->seller_payout;
+        $feeReversal = $originalAmount > 0
+            ? round($originalPlatformFee * ($refundAmount / $originalAmount), 2)
+            : 0.0;
+        $payoutReversal = round($refundAmount - $feeReversal, 2);
+
+        DB::transaction(function () use (
+            $payment, $order, $refundAmount, $reason, $isFullRefund,
+            $originalPlatformFee, $originalSellerPayout, $feeReversal, $payoutReversal
+        ) {
             $payment->refund_amount = ($payment->refund_amount ?? 0) + $refundAmount;
             $payment->refund_reason = $reason;
             $payment->refunded_at = now();
             $payment->status = $isFullRefund ? 'refunded' : 'partially_refunded';
+            // Reverse platform fee + seller payout proportionally on the local
+            // books so accounting reflects the refund (Stripe side is handled
+            // via refund_application_fee=true / reverse_transfer=true).
+            $payment->platform_fee = $isFullRefund
+                ? 0
+                : max(0, round($originalPlatformFee - $feeReversal, 2));
+            $payment->seller_payout = $isFullRefund
+                ? 0
+                : max(0, round($originalSellerPayout - $payoutReversal, 2));
             $payment->save();
 
             if ($isFullRefund) {
@@ -492,6 +519,18 @@ class MarketplacePaymentService
                 }
             }
         });
+
+        // Audit trail for the compensating fee reversal — structured log acts as
+        // the ledger entry until a dedicated marketplace_ledger table exists.
+        Log::info('MarketplacePayment: platform fee reversed on refund', [
+            'payment_id' => $payment->id,
+            'order_id' => $order->id,
+            'tenant_id' => $payment->tenant_id,
+            'refund_amount' => $refundAmount,
+            'platform_fee_reversal' => $feeReversal,
+            'seller_payout_reversal' => $payoutReversal,
+            'full_refund' => $isFullRefund,
+        ]);
 
         Log::info('MarketplacePayment: refund processed', [
             'order_id' => $order->id,

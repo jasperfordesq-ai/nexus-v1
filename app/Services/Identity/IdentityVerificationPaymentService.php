@@ -92,11 +92,15 @@ class IdentityVerificationPaymentService
 
         $tenant = TenantContext::get();
         $tenantName = $tenant['name'] ?? 'Community';
+        $currency = strtolower((string) (
+            TenantContext::getSetting('currency')
+            ?: config('stripe.default_currency', env('STRIPE_DEFAULT_CURRENCY', 'eur'))
+        ));
 
         try {
             $paymentIntent = $client->paymentIntents->create([
                 'amount' => $feeCents,
-                'currency' => 'eur',
+                'currency' => $currency,
                 'customer' => $stripeCustomerId,
                 'description' => "Identity Verification Fee — {$tenantName}",
                 'metadata' => [

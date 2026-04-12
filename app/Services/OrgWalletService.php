@@ -64,13 +64,25 @@ class OrgWalletService
         }
 
         return DB::transaction(function () use ($fromOrgId, $toOrgId, $amount, $tenantId, $note) {
-            $from = DB::table('organizations')
-                ->where('id', $fromOrgId)
-                ->where('tenant_id', $tenantId)
-                ->lockForUpdate()
-                ->first();
+            // Lock BOTH rows in ascending ID order to avoid deadlocks when two
+            // concurrent transfers touch the same pair of orgs in opposite
+            // directions. Locking only the sender allowed races where the
+            // receiver's balance could be stale or the transfer could dead-lock.
+            $ids = [$fromOrgId, $toOrgId];
+            sort($ids, SORT_NUMERIC);
 
-            if (! $from || (float) $from->balance < $amount) {
+            $rows = DB::table('organizations')
+                ->whereIn('id', $ids)
+                ->where('tenant_id', $tenantId)
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
+
+            $from = $rows[$fromOrgId] ?? null;
+            $to = $rows[$toOrgId] ?? null;
+
+            if (! $from || ! $to || (float) $from->balance < $amount) {
                 return false;
             }
 

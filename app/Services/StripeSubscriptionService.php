@@ -37,6 +37,10 @@ class StripeSubscriptionService
             $updates = [];
             $params = [];
 
+            // TODO: support per-tenant / per-plan currency override once pay_plans
+            // grows a currency column. For now fall back to platform default.
+            $currency = strtolower((string) config('stripe.default_currency', env('STRIPE_DEFAULT_CURRENCY', 'eur')));
+
             // --- Product ---
             if (empty($plan->stripe_product_id)) {
                 $product = $client->products->create([
@@ -64,7 +68,7 @@ class StripeSubscriptionService
                 $monthlyPrice = $client->prices->create([
                     'product' => $stripeProductId,
                     'unit_amount' => (int) round($plan->price_monthly * 100),
-                    'currency' => 'eur',
+                    'currency' => $currency,
                     'recurring' => ['interval' => 'month'],
                     'metadata' => ['nexus_plan_id' => (string) $planId, 'interval' => 'monthly'],
                 ]);
@@ -79,7 +83,7 @@ class StripeSubscriptionService
                 $yearlyPrice = $client->prices->create([
                     'product' => $stripeProductId,
                     'unit_amount' => (int) round($plan->price_yearly * 100),
-                    'currency' => 'eur',
+                    'currency' => $currency,
                     'recurring' => ['interval' => 'year'],
                     'metadata' => ['nexus_plan_id' => (string) $planId, 'interval' => 'yearly'],
                 ]);

@@ -69,22 +69,32 @@ class StripeWebhookController extends BaseApiController
             );
         }
 
-        // Idempotency check — skip already-processed events
+        // Atomic idempotency claim — INSERT IGNORE relies on the UNIQUE index
+        // on stripe_webhook_events.event_id. Exactly one concurrent caller
+        // wins the insert; losers get 0 affected rows and bail out.
         $eventId = $event->id;
-        $existing = DB::table('stripe_webhook_events')
-            ->where('event_id', $eventId)
-            ->first();
+        $nowTs = now();
 
-        if ($existing && $existing->status === 'processed') {
+        $inserted = DB::affectingStatement(
+            "INSERT IGNORE INTO stripe_webhook_events (event_id, event_type, status, processed_at)
+             VALUES (?, ?, 'processing', ?)",
+            [$eventId, $event->type, $nowTs]
+        );
+
+        if ($inserted === 0) {
+            // Another delivery already claimed this event. Ack 200 so Stripe
+            // stops retrying — we either already processed it or another
+            // worker is currently processing it.
+            $existing = DB::table('stripe_webhook_events')
+                ->where('event_id', $eventId)
+                ->first();
+
+            Log::info('Stripe webhook: duplicate delivery suppressed', [
+                'event_id' => $eventId,
+                'existing_status' => $existing->status ?? null,
+            ]);
             return $this->respondWithData(['received' => true]);
         }
-
-        // Atomic upsert — prevents TOCTOU race where two concurrent deliveries
-        // both pass the above check and double-process the same event
-        DB::table('stripe_webhook_events')->updateOrInsert(
-            ['event_id' => $eventId],
-            ['event_type' => $event->type, 'status' => 'processing', 'processed_at' => now()]
-        );
 
         // Dispatch to the appropriate handler
         try {

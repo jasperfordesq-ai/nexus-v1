@@ -173,13 +173,23 @@ class StripeDonationService
             return;
         }
 
-        $donation = DB::table('vol_donations')
-            ->where('stripe_payment_intent_id', $piId)
-            ->first();
+        // Tenant scoping: derive tenant from PaymentIntent metadata when present,
+        // and cross-check against the donation record to prevent cross-tenant
+        // mix-ups on lookup-by-PI (PI IDs are globally unique, but defense-in-depth).
+        $metaTenantId = isset($paymentIntent->metadata->nexus_tenant_id)
+            ? (int) $paymentIntent->metadata->nexus_tenant_id
+            : null;
+
+        $query = DB::table('vol_donations')->where('stripe_payment_intent_id', $piId);
+        if ($metaTenantId) {
+            $query->where('tenant_id', $metaTenantId);
+        }
+        $donation = $query->first();
 
         if (!$donation) {
             Log::info('Stripe donation: no matching donation for PaymentIntent', [
                 'payment_intent_id' => $piId,
+                'meta_tenant_id' => $metaTenantId,
             ]);
             return;
         }
@@ -196,6 +206,7 @@ class StripeDonationService
         DB::transaction(function () use ($donation, $piId) {
             DB::table('vol_donations')
                 ->where('id', $donation->id)
+                ->where('tenant_id', $donation->tenant_id)
                 ->update(['status' => 'completed']);
 
             // Increment giving day raised_amount if applicable
@@ -230,19 +241,27 @@ class StripeDonationService
             return;
         }
 
-        $donation = DB::table('vol_donations')
-            ->where('stripe_payment_intent_id', $piId)
-            ->first();
+        $metaTenantId = isset($paymentIntent->metadata->nexus_tenant_id)
+            ? (int) $paymentIntent->metadata->nexus_tenant_id
+            : null;
+
+        $query = DB::table('vol_donations')->where('stripe_payment_intent_id', $piId);
+        if ($metaTenantId) {
+            $query->where('tenant_id', $metaTenantId);
+        }
+        $donation = $query->first();
 
         if (!$donation) {
             Log::info('Stripe donation: no matching donation for failed PaymentIntent', [
                 'payment_intent_id' => $piId,
+                'meta_tenant_id' => $metaTenantId,
             ]);
             return;
         }
 
         DB::table('vol_donations')
             ->where('id', $donation->id)
+            ->where('tenant_id', $donation->tenant_id)
             ->update(['status' => 'failed']);
 
         Log::warning('Stripe donation: payment failed', [
@@ -267,13 +286,21 @@ class StripeDonationService
             return;
         }
 
-        $donation = DB::table('vol_donations')
-            ->where('stripe_payment_intent_id', $piId)
-            ->first();
+        // Pull tenant from charge.metadata if Stripe copied it from the PI
+        $metaTenantId = isset($charge->metadata->nexus_tenant_id)
+            ? (int) $charge->metadata->nexus_tenant_id
+            : null;
+
+        $query = DB::table('vol_donations')->where('stripe_payment_intent_id', $piId);
+        if ($metaTenantId) {
+            $query->where('tenant_id', $metaTenantId);
+        }
+        $donation = $query->first();
 
         if (!$donation) {
             Log::info('Stripe donation: no matching donation for refunded charge', [
                 'payment_intent_id' => $piId,
+                'meta_tenant_id' => $metaTenantId,
             ]);
             return;
         }
@@ -288,6 +315,7 @@ class StripeDonationService
         DB::transaction(function () use ($donation) {
             DB::table('vol_donations')
                 ->where('id', $donation->id)
+                ->where('tenant_id', $donation->tenant_id)
                 ->update(['status' => 'refunded']);
 
             if (!empty($donation->giving_day_id)) {

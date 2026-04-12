@@ -272,16 +272,24 @@ class VolOrgWalletService
                 return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.volunteer_not_found')];
             }
 
-            // Deduct from org
+            // users.balance is an INT (whole hours). If the org is paying out
+            // a fractional amount, we pay only the integer floor to the
+            // volunteer and retain the fractional remainder in the org balance
+            // so no hours vanish.
+            $intAmount = (int) floor($amount);
+            $fractional = round($amount - $intAmount, 4);
+            $netOrgDebit = $amount - $fractional; // == $intAmount as float
+
+            // Deduct from org (only the integer portion actually leaves the org;
+            // the fractional remainder stays so it can accumulate with future payouts)
             DB::update(
                 "UPDATE vol_organizations SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
-                [$amount, $volOrgId, $tenantId]
+                [$netOrgDebit, $volOrgId, $tenantId]
             );
 
-            $newOrgBalance = (float) $org->balance - $amount;
+            $newOrgBalance = (float) $org->balance - $netOrgDebit;
 
             // Credit to volunteer (users.balance is INT)
-            $intAmount = (int) floor($amount);
             if ($intAmount > 0) {
                 DB::update(
                     "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
