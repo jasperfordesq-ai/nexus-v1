@@ -373,8 +373,9 @@ function MentionInput({
   };
 
   const selectMention = (user: MentionUser) => {
-    // Replace @query with @Username
-    const newValue = value.replace(new RegExp(`@${mentionQuery}$`), `@${user.name} `);
+    // Replace @query with @Username — escape regex metacharacters in the query
+    const escaped = mentionQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const newValue = value.replace(new RegExp(`@${escaped}$`), `@${user.name} `);
     onChange(newValue);
     setShowMentions(false);
     setMentionResults([]);

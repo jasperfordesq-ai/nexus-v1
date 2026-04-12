@@ -660,13 +660,12 @@ class WebAuthnController extends BaseApiController
             return $envRpId;
         }
 
+        // Deliberately fall back to HTTP_HOST (validated by web server against
+        // configured server_name / ServerName) rather than HTTP_ORIGIN which is
+        // client-controlled. If WEBAUTHN_RP_ID is unset, log a warning so ops
+        // can fix prod config; the prod env SHOULD always set this var.
+        \Log::warning('[WebAuthn] WEBAUTHN_RP_ID not configured — falling back to HTTP_HOST');
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        if (!empty($_SERVER['HTTP_ORIGIN'])) {
-            $parsed = parse_url($_SERVER['HTTP_ORIGIN']);
-            if ($parsed && isset($parsed['host'])) {
-                $host = $parsed['host'];
-            }
-        }
 
         $host = preg_replace('/:\d+$/', '', $host);
 

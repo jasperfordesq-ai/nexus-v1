@@ -248,7 +248,10 @@ export function GroupDiscussionTab({
                                           {formatRelativeTime(msg.created_at)}
                                         </time>
                                       </div>
-                                      <div className="text-sm text-theme-muted mt-1 whitespace-pre-wrap prose prose-sm max-w-none dark:prose-invert" dangerouslySetInnerHTML={msg.content.startsWith('<') ? { __html: msg.content } : undefined}>{msg.content.startsWith('<') ? undefined : msg.content}</div>
+                                      <SafeHtml
+                                        content={msg.content}
+                                        className="text-sm text-theme-muted mt-1 whitespace-pre-wrap prose prose-sm max-w-none dark:prose-invert"
+                                      />
                                     </div>
                                   </div>
                                 ))}

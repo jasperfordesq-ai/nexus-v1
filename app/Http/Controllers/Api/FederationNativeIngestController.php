@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Core\FederationApiMiddleware;
 use App\Core\TenantContext;
+use App\Services\FederationFeatureService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -97,6 +98,18 @@ class FederationNativeIngestController extends BaseApiController
         if (!$tenantId || !TenantContext::setById((int) $tenantId)) {
             return $this->respondWithError('TENANT_ERROR',
                 'Unable to resolve tenant for this partner', null, 500);
+        }
+
+        // Enforce federation whitelist — if whitelist mode is active the partner
+        // tenant must be explicitly whitelisted, otherwise reject inbound ingest.
+        try {
+            $feature = app(FederationFeatureService::class);
+            if ($feature->isWhitelistModeActive() && !$feature->isTenantWhitelisted((int) $tenantId)) {
+                return $this->respondWithError('TENANT_NOT_WHITELISTED',
+                    'Partner tenant is not whitelisted for federation', null, 403);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[FederationIngest] Whitelist check failed', ['error' => $e->getMessage()]);
         }
 
         $payload = $request->json()->all();

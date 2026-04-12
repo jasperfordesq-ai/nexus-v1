@@ -792,23 +792,35 @@ class FederationController extends BaseApiController
         // Fix 1: Wrap transaction creation in DB transaction for atomicity
         DB::beginTransaction();
         try {
-            // Fix 2: Deduct sender balance (atomic double-spend prevention)
-            $deducted = DB::update(
-                "UPDATE users SET balance = balance - ? WHERE id = ? AND balance >= ?",
-                [$amount, $senderId, $amount]
-            );
-            if ($deducted === 0) {
-                DB::rollBack();
-                return $this->fedError(400, 'Insufficient balance', 'INSUFFICIENT_BALANCE');
+            // Fix 2: Deduct sender balance (atomic double-spend prevention).
+            // For external partners the sender lives on the remote server and has
+            // no local row — skip the local deduction; the remote node is
+            // responsible for debiting the remote sender. For internal partners
+            // the sender was verified above to belong to $partnerTenantId, but
+            // we re-assert it here so the atomic UPDATE cannot match a
+            // coincidentally-id'd user in a different tenant.
+            if (!$isExternal) {
+                $deducted = DB::update(
+                    "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
+                    [$amount, $senderId, $partnerTenantId, $amount]
+                );
+                if ($deducted === 0) {
+                    DB::rollBack();
+                    return $this->fedError(400, 'Insufficient balance', 'INSUFFICIENT_BALANCE');
+                }
             }
 
+            // Use the validated recipient id from the authoritative SELECT above,
+            // not the raw request body, to avoid TOCTOU drift.
+            $validatedRecipientId = (int) $recipient['id'];
+
             $stmt = $db->prepare("INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at) VALUES (?, ?, ?, ?, ?, 'pending', 1, ?, ?, NOW())");
-            $stmt->execute([$recipient['tenant_id'], $senderId, $input['recipient_id'], $amount, $input['description'], $partnerTenantId, $recipient['tenant_id']]);
+            $stmt->execute([$recipient['tenant_id'], $senderId, $validatedRecipientId, $amount, $input['description'], $partnerTenantId, $recipient['tenant_id']]);
             $transactionId = $db->lastInsertId();
 
             $status = 'pending';
             if ($isExternal) {
-                $db->prepare("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?")->execute([$amount, $input['recipient_id'], $partnerTenantId]);
+                $db->prepare("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?")->execute([$amount, $validatedRecipientId, $partnerTenantId]);
                 $db->prepare("UPDATE transactions SET status = 'completed' WHERE id = ?")->execute([$transactionId]);
                 $status = 'completed';
             }
