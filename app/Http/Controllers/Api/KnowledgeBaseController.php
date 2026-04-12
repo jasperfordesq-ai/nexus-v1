@@ -383,13 +383,25 @@ class KnowledgeBaseController extends BaseApiController
      */
     public function downloadAttachment(int $id, int $attachmentId): \Symfony\Component\HttpFoundation\Response
     {
-        // Verify the article exists and get its tenant_id for cross-tenant scoping
+        // Verify the article exists and get its tenant_id + visibility.
+        // Unpublished articles are admin-only everywhere else; attachments
+        // must follow the same rule, otherwise anyone who guesses an
+        // attachment id can exfiltrate draft content via direct download.
         $article = DB::table('knowledge_base_articles')
             ->where('id', $id)
-            ->first(['id', 'tenant_id']);
+            ->first(['id', 'tenant_id', 'is_published']);
 
         if (! $article) {
             return $this->respondWithError('NOT_FOUND', __('api_controllers_2.knowledge_base.article_not_found'), null, 404);
+        }
+
+        if (isset($article->is_published) && !$article->is_published) {
+            // Only admins may download attachments of an unpublished article.
+            try {
+                $this->requireAdmin();
+            } catch (\Throwable $e) {
+                return $this->respondWithError('NOT_FOUND', __('api_controllers_2.knowledge_base.article_not_found'), null, 404);
+            }
         }
 
         // Scope attachment lookup to the article's tenant to prevent cross-tenant access

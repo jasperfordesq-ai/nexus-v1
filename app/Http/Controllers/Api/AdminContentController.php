@@ -558,7 +558,17 @@ class AdminContentController extends BaseApiController
         $params = [];
 
         if (isset($input['label'])) { $updates[] = 'label = ?'; $params[] = trim($input['label']); }
-        if (isset($input['type'])) { $updates[] = 'type = ?'; $params[] = $input['type']; }
+        if (isset($input['type'])) {
+            // Whitelist menu-item types so callers cannot smuggle arbitrary
+            // strings through to the database (was previously accepting any
+            // value, leaking into the admin UI's rendering logic).
+            $allowedTypes = ['link', 'page', 'custom', 'divider', 'route'];
+            if (!in_array($input['type'], $allowedTypes, true)) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_menu_item_type'), 'type', 422);
+            }
+            $updates[] = 'type = ?';
+            $params[] = $input['type'];
+        }
         if (array_key_exists('url', $input)) { $updates[] = 'url = ?'; $params[] = $input['url']; }
         if (array_key_exists('route_name', $input)) { $updates[] = 'route_name = ?'; $params[] = $input['route_name']; }
         if (array_key_exists('page_id', $input)) {

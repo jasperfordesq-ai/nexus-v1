@@ -158,11 +158,21 @@ class AdminTimebankingController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $userId = $this->inputInt('user_id');
-        $amount = (float) $this->input('amount', 0);
+        $rawAmount = $this->input('amount', 0);
+        $amount = (float) $rawAmount;
         $reason = trim($this->input('reason', ''));
 
         if (!$userId) return $this->respondWithError('VALIDATION_ERROR', __('api.user_id_required'), 'user_id', 400);
         if ($amount == 0) return $this->respondWithError('VALIDATION_ERROR', __('api.amount_must_be_nonzero'), 'amount', 400);
+        // Reject NaN / infinity / scientific-notation silliness, and cap the
+        // adjustment at a sane hour-credit ceiling so a typo can't inflate a
+        // user's balance by 1e100.
+        if (is_nan($amount) || is_infinite($amount) || !is_numeric($rawAmount)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.amount_invalid'), 'amount', 400);
+        }
+        if (abs($amount) > 100000) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.amount_out_of_range'), 'amount', 400);
+        }
         if (empty($reason)) return $this->respondWithError('VALIDATION_ERROR', __('api.reason_required'), 'reason', 400);
 
         // Verify user exists (non-locking read for early 404)

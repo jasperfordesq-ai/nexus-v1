@@ -35,6 +35,11 @@ class AdminCrmController extends BaseApiController
         $page = $this->queryInt('page', 1, 1);
         $perPage = $this->queryInt('per_page', 20, 1, 100);
         $search = $this->query('q');
+        // Cap search length so a multi-kilobyte wildcard-rich term can't
+        // turn into an expensive LIKE scan and a DB-level DoS.
+        if ($search !== null && strlen((string) $search) > 100) {
+            $search = substr((string) $search, 0, 100);
+        }
         $offset = ($page - 1) * $perPage;
 
         if ($search) {
