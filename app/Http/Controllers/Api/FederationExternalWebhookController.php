@@ -1028,18 +1028,28 @@ class FederationExternalWebhookController extends BaseApiController
         }
 
         $externalTxId = $data['external_transaction_id'] ?? null;
-        $amount = (float) ($data['amount'] ?? 0);
-        $recipientId = $data['recipient_id'] ?? $data['local_member_id'] ?? null;
+        $rawAmount = (float) ($data['amount'] ?? 0);
+
+        // TimeOverflow sends amount in SECONDS — convert to hours for Nexus
+        // Detect: if amount > 100, it's almost certainly seconds (nobody sends 100+ hours)
+        $amountInHours = $rawAmount > 100 ? round($rawAmount / 3600, 2) : $rawAmount;
+
+        // Accept multiple field names for recipient — different platforms use different keys
+        $recipientId = $data['recipient_id']
+            ?? $data['remote_user_identifier']
+            ?? $data['local_member_id']
+            ?? null;
 
         Log::info('[FederationExternalWebhook] Transaction requested', [
             'partner' => $partner->name,
             'external_transaction_id' => $externalTxId,
-            'amount' => $amount,
+            'raw_amount' => $rawAmount,
+            'amount_hours' => $amountInHours,
             'recipient_id' => $recipientId,
         ]);
 
         // Validate basic fields
-        if (!$recipientId || $amount <= 0) {
+        if (!$recipientId || $amountInHours <= 0) {
             return ['status' => 'rejected', 'reason' => 'Missing recipient_id or invalid amount'];
         }
 
@@ -1049,7 +1059,7 @@ class FederationExternalWebhookController extends BaseApiController
             ->where('id', $receiverUserId)
             ->where('tenant_id', TenantContext::getId())
             ->where('status', 'active')
-            ->exists();
+            ->first();
 
         if (!$receiver) {
             return ['status' => 'rejected', 'reason' => "Recipient user #{$recipientId} not found in this tenant"];
@@ -1066,22 +1076,37 @@ class FederationExternalWebhookController extends BaseApiController
             }
         }
 
-        // Record as pending — awaits a transaction.completed event to credit the balance
+        // Record the transaction AND credit the user immediately
         DB::table('federation_transactions')->insert([
             'sender_tenant_id'        => 0,
             'sender_user_id'          => (int) ($data['sender_id'] ?? 0),
             'receiver_tenant_id'      => TenantContext::getId(),
             'receiver_user_id'        => $receiverUserId,
-            'amount'                  => $amount,
-            'description'             => $data['description'] ?? '',
-            'status'                  => 'pending',
+            'amount'                  => $amountInHours,
+            'description'             => $data['reason'] ?? $data['description'] ?? '',
+            'status'                  => 'completed',
             'external_partner_id'     => $partner->id,
-            'external_receiver_name'  => $data['sender_name'] ?? 'External User',
+            'external_receiver_name'  => $data['sender_name'] ?? $data['source_organization_name'] ?? 'External User',
             'external_transaction_id' => $externalTxId,
             'created_at'              => now(),
         ]);
 
-        return ['status' => 'accepted'];
+        // Auto-credit the recipient's balance
+        DB::table('users')
+            ->where('id', $receiverUserId)
+            ->increment('balance', $amountInHours);
+
+        Log::info('[FederationExternalWebhook] Auto-credited user', [
+            'user_id' => $receiverUserId,
+            'amount_hours' => $amountInHours,
+            'new_balance' => DB::table('users')->where('id', $receiverUserId)->value('balance'),
+        ]);
+
+        return [
+            'status' => 'completed',
+            'amount_credited' => $amountInHours,
+            'recipient_id' => $receiverUserId,
+        ];
     }
 
     // ----------------------------------------------------------------
