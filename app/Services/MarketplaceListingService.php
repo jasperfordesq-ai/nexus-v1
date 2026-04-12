@@ -98,27 +98,30 @@ class MarketplaceListingService
             }
 
             if (!empty($filters['price_type'])) {
-                $meiliFilters[] = "price_type = '" . str_replace("'", "\\'", $filters['price_type']) . "'";
+                $meiliFilters[] = SearchService::buildEqFilter('marketplace_listings', 'price_type', (string) $filters['price_type']);
             }
 
             if (!empty($filters['condition'])) {
                 $conditions = is_array($filters['condition'])
                     ? $filters['condition']
                     : explode(',', $filters['condition']);
+                $conditions = array_values(array_filter(array_map('strval', $conditions), fn($c) => $c !== ''));
                 if (count($conditions) === 1) {
-                    $meiliFilters[] = "condition = '" . str_replace("'", "\\'", $conditions[0]) . "'";
-                } else {
-                    $parts = array_map(fn($c) => "condition = '" . str_replace("'", "\\'", $c) . "'", $conditions);
-                    $meiliFilters[] = '(' . implode(' OR ', $parts) . ')';
+                    $meiliFilters[] = SearchService::buildEqFilter('marketplace_listings', 'condition', $conditions[0]);
+                } elseif (count($conditions) > 1) {
+                    $inFilter = SearchService::buildInFilter('condition', $conditions);
+                    if ($inFilter !== null) {
+                        $meiliFilters[] = $inFilter;
+                    }
                 }
             }
 
             if (!empty($filters['seller_type'])) {
-                $meiliFilters[] = "seller_type = '" . str_replace("'", "\\'", $filters['seller_type']) . "'";
+                $meiliFilters[] = SearchService::buildEqFilter('marketplace_listings', 'seller_type', (string) $filters['seller_type']);
             }
 
             if (!empty($filters['delivery_method'])) {
-                $meiliFilters[] = "delivery_method = '" . str_replace("'", "\\'", $filters['delivery_method']) . "'";
+                $meiliFilters[] = SearchService::buildEqFilter('marketplace_listings', 'delivery_method', (string) $filters['delivery_method']);
             }
 
             $meiliResult = SearchService::searchMarketplaceListingIds(

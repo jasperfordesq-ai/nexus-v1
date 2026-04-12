@@ -52,6 +52,97 @@ class SearchService
         );
     }
 
+    // =========================================================================
+    // Filter-string escaping helpers (safe Meilisearch filter construction)
+    // =========================================================================
+
+    /**
+     * Whitelisted filterable attribute names per index.
+     *
+     * Field names MUST come from this list — never directly from user input —
+     * to prevent filter injection via attacker-controlled field references.
+     *
+     * Keep in sync with updateFilterableAttributes() calls in ensureIndexes().
+     */
+    private const FILTERABLE_ATTRIBUTES = [
+        'listings'             => ['tenant_id', 'status', 'category_id', 'type', 'user_id', 'skill_tags'],
+        'users'                => ['tenant_id', 'status', 'profile_type'],
+        'events'               => ['tenant_id', 'status', 'start_time', 'is_online'],
+        'groups'               => ['tenant_id', 'status', 'privacy'],
+        'marketplace_listings' => ['tenant_id', 'category_id', 'status', 'moderation_status', 'price_type', 'condition', 'seller_type', 'delivery_method'],
+        'group_content'        => ['tenant_id', 'group_id', 'content_type'],
+    ];
+
+    /**
+     * Escape a scalar value for inclusion in a Meilisearch filter string.
+     *
+     * - Strings are wrapped in double quotes with `\` and `"` backslash-escaped.
+     *   The backslash MUST be replaced FIRST, otherwise subsequent replacements
+     *   double-escape themselves.
+     * - Integers and floats are emitted as bare numerics (Meilisearch accepts
+     *   both quoted and unquoted numerics but unquoted is unambiguous).
+     * - Booleans become true/false literals.
+     *
+     * Reference: https://www.meilisearch.com/docs/learn/filtering_and_sorting/filter_expression_reference
+     */
+    public static function escapeFilterValue(string|int|float|bool $value): string
+    {
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+        if (is_int($value) || is_float($value)) {
+            return (string) $value;
+        }
+        // String: escape backslash FIRST, then double-quote
+        $escaped = str_replace(['\\', '"'], ['\\\\', '\\"'], $value);
+        return '"' . $escaped . '"';
+    }
+
+    /**
+     * Build an `IN [..]` filter fragment from a list of scalar values.
+     * Each value is escaped individually. Returns null for an empty list.
+     *
+     * @param string $field Whitelisted field name (caller must validate via assertFilterableField)
+     * @param array<int, string|int|float|bool> $values
+     */
+    public static function buildInFilter(string $field, array $values): ?string
+    {
+        $values = array_values(array_filter($values, fn($v) => $v !== null && $v !== ''));
+        if (empty($values)) {
+            return null;
+        }
+        $escaped = array_map([self::class, 'escapeFilterValue'], $values);
+        return $field . ' IN [' . implode(', ', $escaped) . ']';
+    }
+
+    /**
+     * Build a single `field = value` filter fragment.
+     *
+     * @param string $index One of the keys in FILTERABLE_ATTRIBUTES
+     * @param string $field Attribute name (validated against whitelist)
+     * @throws \InvalidArgumentException if $field is not whitelisted for $index
+     */
+    public static function buildEqFilter(string $index, string $field, string|int|float|bool $value): string
+    {
+        self::assertFilterableField($index, $field);
+        return $field . ' = ' . self::escapeFilterValue($value);
+    }
+
+    /**
+     * Assert that a field name is whitelisted for the given index. Throws on
+     * unknown index or unknown field to prevent filter injection via dynamic
+     * field names (e.g. user-controlled sort/filter keys).
+     */
+    public static function assertFilterableField(string $index, string $field): void
+    {
+        if (!isset(self::FILTERABLE_ATTRIBUTES[$index])) {
+            throw new \InvalidArgumentException("Unknown Meilisearch index: {$index}");
+        }
+        if (!in_array($field, self::FILTERABLE_ATTRIBUTES[$index], true)) {
+            throw new \InvalidArgumentException("Field '{$field}' is not filterable on index '{$index}'");
+        }
+    }
+
     /**
      * Check if Meilisearch is reachable. Result is cached for the process lifetime.
      * Can be called statically (sync script) or on an instance (DI controller).

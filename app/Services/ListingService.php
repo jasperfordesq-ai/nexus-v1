@@ -101,8 +101,7 @@ class ListingService
             }
 
             if (!empty($filters['type']) && is_string($filters['type'])) {
-                $safeType = str_replace("'", "\\'", $filters['type']);
-                $meiliFilters[] = "type = '{$safeType}'";
+                $meiliFilters[] = SearchService::buildEqFilter('listings', 'type', $filters['type']);
             }
 
             if (!empty($filters['user_id'])) {
@@ -114,7 +113,7 @@ class ListingService
                     ? $filters['skills']
                     : explode(',', $filters['skills']);
                 foreach (array_filter(array_map(fn($s) => strtolower(trim($s)), $skills)) as $skill) {
-                    $meiliFilters[] = "skill_tags = '" . str_replace("'", "\\'", $skill) . "'";
+                    $meiliFilters[] = SearchService::buildEqFilter('listings', 'skill_tags', $skill);
                 }
             }
 
@@ -396,8 +395,7 @@ class ListingService
                 }
             }
             if (!empty($filters['type']) && is_string($filters['type'])) {
-                $safeType = str_replace("'", "\\'", $filters['type']);
-                $meiliFilters[] = "type = '{$safeType}'";
+                $meiliFilters[] = SearchService::buildEqFilter('listings', 'type', $filters['type']);
             }
             if (!empty($filters['user_id'])) {
                 $meiliFilters[] = 'user_id = ' . (int) $filters['user_id'];
@@ -407,7 +405,7 @@ class ListingService
                     ? $filters['skills']
                     : explode(',', $filters['skills']);
                 foreach (array_filter(array_map(fn($s) => strtolower(trim($s)), $skills)) as $skill) {
-                    $meiliFilters[] = "skill_tags = '" . str_replace("'", "\\'", $skill) . "'";
+                    $meiliFilters[] = SearchService::buildEqFilter('listings', 'skill_tags', $skill);
                 }
             }
             $meiliResult = SearchService::searchListingIds($filters['search'], $tenantId, $meiliFilters, 1, 0);
