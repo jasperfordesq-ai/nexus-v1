@@ -42,14 +42,18 @@ class FederationJwtServiceTest extends TestCase
     {
         config(['app.key' => 'base64:' . base64_encode('test-secret-key-32bytes-12345678')]);
 
-        $result = FederationJwtService::generateToken('p', 'u', 2, [], 1); // Too short
-        if ($result) {
-            $this->assertGreaterThanOrEqual(60, $result['expires_in']);
+        $shortResult = FederationJwtService::generateToken('p', 'u', 2, [], 1); // Too short
+        $longResult = FederationJwtService::generateToken('p', 'u', 2, [], 999999); // Too long
+
+        if ($shortResult === null && $longResult === null) {
+            $this->markTestSkipped('Signing secret unavailable — cannot generate token in this environment');
         }
 
-        $result = FederationJwtService::generateToken('p', 'u', 2, [], 999999); // Too long
-        if ($result) {
-            $this->assertLessThanOrEqual(86400, $result['expires_in']);
+        if ($shortResult) {
+            $this->assertGreaterThanOrEqual(60, $shortResult['expires_in']);
+        }
+        if ($longResult) {
+            $this->assertLessThanOrEqual(86400, $longResult['expires_in']);
         }
     }
 

@@ -70,10 +70,7 @@ class FederationTest extends TestCase
     public function test_federation_requires_system_level_enable(): void
     {
         // Ensure system federation is disabled
-        DB::table('federation_system_control')->updateOrInsert(
-            ['setting_key' => FederationFeatureService::SYSTEM_FEDERATION_ENABLED],
-            ['setting_value' => '0', 'updated_at' => now()]
-        );
+        $this->setSystemFederationEnabled(false);
 
         $user = $this->actAsMember();
 
@@ -100,10 +97,7 @@ class FederationTest extends TestCase
     public function test_cross_tenant_discovery_with_whitelist(): void
     {
         // Enable federation system-wide
-        DB::table('federation_system_control')->updateOrInsert(
-            ['setting_key' => FederationFeatureService::SYSTEM_FEDERATION_ENABLED],
-            ['setting_value' => '1', 'updated_at' => now()]
-        );
+        $this->setSystemFederationEnabled(true);
 
         // Enable federation for tenant A
         DB::table('federation_tenant_features')->updateOrInsert(
@@ -111,24 +105,28 @@ class FederationTest extends TestCase
                 'tenant_id'   => $this->tenantAId,
                 'feature_key' => FederationFeatureService::TENANT_FEDERATION_ENABLED,
             ],
-            ['feature_value' => '1', 'updated_at' => now()]
+            ['is_enabled' => 1, 'updated_at' => now()]
         );
 
-        // Add tenant B to tenant A's whitelist
+        // Add both tenants to the global federation whitelist (schema is a
+        // single-column approval list, not pair-based).
         DB::table('federation_tenant_whitelist')->insertOrIgnore([
-            'tenant_id'         => $this->tenantAId,
-            'partner_tenant_id' => $this->tenantBId,
-            'status'            => 'active',
-            'approved_at'       => now(),
-            'created_at'        => now(),
-            'updated_at'        => now(),
+            'tenant_id'   => $this->tenantAId,
+            'approved_at' => now(),
+            'approved_by' => 1,
+        ]);
+        DB::table('federation_tenant_whitelist')->insertOrIgnore([
+            'tenant_id'   => $this->tenantBId,
+            'approved_at' => now(),
+            'approved_by' => 1,
         ]);
 
-        // Create a user on tenant B that is federation-visible
+        // Create a user on tenant B. Note: `federation_visible` was a legacy column,
+        // visibility is now controlled via federation_user_settings, so we just
+        // create an approved/active user here.
         $partnerUser = User::factory()->forTenant($this->tenantBId)->create([
-            'status'             => 'active',
-            'is_approved'        => true,
-            'federation_visible' => true,
+            'status'      => 'active',
+            'is_approved' => true,
         ]);
 
         $user = $this->actAsMember();
@@ -148,10 +146,7 @@ class FederationTest extends TestCase
     public function test_cross_tenant_members_requires_whitelist(): void
     {
         // Enable federation system-wide
-        DB::table('federation_system_control')->updateOrInsert(
-            ['setting_key' => FederationFeatureService::SYSTEM_FEDERATION_ENABLED],
-            ['setting_value' => '1', 'updated_at' => now()]
-        );
+        $this->setSystemFederationEnabled(true);
 
         // Do NOT whitelist tenant B — discovery should return empty
         $user = $this->actAsMember();
@@ -182,10 +177,7 @@ class FederationTest extends TestCase
     public function test_federation_feature_gating_per_tenant(): void
     {
         // Enable federation system-wide
-        DB::table('federation_system_control')->updateOrInsert(
-            ['setting_key' => FederationFeatureService::SYSTEM_FEDERATION_ENABLED],
-            ['setting_value' => '1', 'updated_at' => now()]
-        );
+        $this->setSystemFederationEnabled(true);
 
         // Disable federation for tenant A specifically
         DB::table('federation_tenant_features')->updateOrInsert(
@@ -193,7 +185,7 @@ class FederationTest extends TestCase
                 'tenant_id'   => $this->tenantAId,
                 'feature_key' => FederationFeatureService::TENANT_FEDERATION_ENABLED,
             ],
-            ['feature_value' => '0', 'updated_at' => now()]
+            ['is_enabled' => 0, 'updated_at' => now()]
         );
 
         $user = $this->actAsMember();
@@ -220,10 +212,7 @@ class FederationTest extends TestCase
     public function test_federation_opt_in_flow(): void
     {
         // Enable federation system-wide
-        DB::table('federation_system_control')->updateOrInsert(
-            ['setting_key' => FederationFeatureService::SYSTEM_FEDERATION_ENABLED],
-            ['setting_value' => '1', 'updated_at' => now()]
-        );
+        $this->setSystemFederationEnabled(true);
 
         $user = $this->actAsMember();
 
@@ -274,10 +263,7 @@ class FederationTest extends TestCase
     public function test_federation_emergency_lockdown(): void
     {
         // Enable system lockdown
-        DB::table('federation_system_control')->updateOrInsert(
-            ['setting_key' => FederationFeatureService::SYSTEM_EMERGENCY_LOCKDOWN],
-            ['setting_value' => '1', 'updated_at' => now()]
-        );
+        $this->setEmergencyLockdown(true);
 
         $user = $this->actAsMember();
 
@@ -309,5 +295,52 @@ class FederationTest extends TestCase
             'Cross-tenant transactions require exchange workflow + federation wallet bridging — '
             . 'too complex for automated integration test without real federation infrastructure.'
         );
+    }
+
+    /**
+     * Upsert the single-row federation_system_control (id=1) with federation enabled/disabled.
+     * The real table is column-based (federation_enabled, emergency_lockdown_active, etc.),
+     * NOT key/value. This helper normalizes that.
+     */
+    private function setSystemFederationEnabled(bool $enabled): void
+    {
+        $exists = DB::table('federation_system_control')->where('id', 1)->exists();
+        if ($exists) {
+            DB::table('federation_system_control')->where('id', 1)->update([
+                'federation_enabled' => $enabled ? 1 : 0,
+                'updated_at' => now(),
+            ]);
+        } else {
+            DB::table('federation_system_control')->insert([
+                'id' => 1,
+                'federation_enabled' => $enabled ? 1 : 0,
+                'whitelist_mode_enabled' => 1,
+                'max_federation_level' => 0,
+                'emergency_lockdown_active' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+    }
+
+    private function setEmergencyLockdown(bool $active): void
+    {
+        $exists = DB::table('federation_system_control')->where('id', 1)->exists();
+        if ($exists) {
+            DB::table('federation_system_control')->where('id', 1)->update([
+                'emergency_lockdown_active' => $active ? 1 : 0,
+                'updated_at' => now(),
+            ]);
+        } else {
+            DB::table('federation_system_control')->insert([
+                'id' => 1,
+                'federation_enabled' => 0,
+                'whitelist_mode_enabled' => 1,
+                'max_federation_level' => 0,
+                'emergency_lockdown_active' => $active ? 1 : 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 }

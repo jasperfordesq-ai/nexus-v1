@@ -287,7 +287,7 @@ class FederationExternalPartnerServiceTest extends \Tests\Laravel\TestCase
     public function testGetLogsReturnsArray(): void
     {
         try {
-            $result = FederationExternalPartnerService::getLogs(999999);
+            $result = FederationExternalPartnerService::getLogs(999999, 2);
             $this->assertIsArray($result);
         } catch (\Exception $e) {
             $this->markTestSkipped('federation_external_partner_logs table may not exist');

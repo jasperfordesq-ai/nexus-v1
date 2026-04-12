@@ -6,7 +6,7 @@
 
 namespace Tests\Laravel\Unit\Middleware;
 
-use App\Middleware\FederationApiMiddleware;
+use App\Core\FederationApiMiddleware;
 use Tests\Laravel\TestCase;
 
 /**

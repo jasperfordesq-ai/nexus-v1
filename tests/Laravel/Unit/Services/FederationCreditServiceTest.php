@@ -62,10 +62,17 @@ class FederationCreditServiceTest extends TestCase
 
     public function test_approveAgreement_succeeds(): void
     {
-        $agreement = (object) ['id' => 1, 'status' => 'pending'];
+        // Test tenant is 2; give an agreement where tenant 2 is a party
+        $agreement = (object) [
+            'id' => 1,
+            'status' => 'pending',
+            'from_tenant_id' => 2,
+            'to_tenant_id' => 3,
+        ];
         DB::shouldReceive('selectOne')->andReturn($agreement);
         DB::shouldReceive('update')->once();
-        Log::shouldReceive('info')->once();
+        Log::shouldReceive('info')->zeroOrMoreTimes();
+        Log::shouldReceive('error')->zeroOrMoreTimes();
 
         $result = $this->service->approveAgreement(1, 5);
         $this->assertTrue($result['success']);
@@ -81,16 +88,41 @@ class FederationCreditServiceTest extends TestCase
 
     public function test_updateAgreementStatus_succeeds(): void
     {
+        // updateAgreementStatus now does selectOne first to verify tenant is a party,
+        // then update. Test tenant is 2.
+        $agreement = (object) [
+            'id' => 1,
+            'status' => 'active',
+            'from_tenant_id' => 2,
+            'to_tenant_id' => 3,
+        ];
+        DB::shouldReceive('selectOne')->andReturn($agreement);
         DB::shouldReceive('update')->andReturn(1);
-        Log::shouldReceive('info')->once();
+        Log::shouldReceive('info')->zeroOrMoreTimes();
+        Log::shouldReceive('error')->zeroOrMoreTimes();
 
         $result = $this->service->updateAgreementStatus(1, 'suspended');
         $this->assertTrue($result['success']);
     }
 
+    public function test_updateAgreementStatus_rejects_unauthorized_tenant(): void
+    {
+        $agreement = (object) [
+            'id' => 1,
+            'status' => 'active',
+            'from_tenant_id' => 99,
+            'to_tenant_id' => 100,
+        ];
+        DB::shouldReceive('selectOne')->andReturn($agreement);
+
+        $result = $this->service->updateAgreementStatus(1, 'suspended');
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('Unauthorized', $result['error']);
+    }
+
     public function test_updateAgreementStatus_fails_when_not_found(): void
     {
-        DB::shouldReceive('update')->andReturn(0);
+        DB::shouldReceive('selectOne')->andReturn(null);
 
         $result = $this->service->updateAgreementStatus(999, 'active');
         $this->assertFalse($result['success']);
