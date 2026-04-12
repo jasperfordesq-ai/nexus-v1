@@ -1,77 +1,77 @@
 {
   "badge_collection": {
-    "collection_complete": "Collection Complete! You finished '{{name}}' and earned {{xp}} bonus XP! {{icon}}"
+    "collection_complete": "コレクション達成!「{{name}}」を完了し、{{xp}} のボーナス XP を獲得しました!{{icon}}"
   },
   "broker": {
-    "message_for_review": "New message for review from {{sender}}"
+    "message_for_review": "{{sender}} さんからレビュー待ちの新しいメッセージがあります"
   },
   "challenge": {
-    "complete_claim": "Challenge Complete! You finished '{{title}}' — claim your reward!",
-    "complete_earned": "Challenge Complete! You finished '{{title}}' and earned {{xp}} XP!"
+    "complete_claim": "チャレンジ達成!「{{title}}」を完了しました — 報酬を受け取りましょう!",
+    "complete_earned": "チャレンジ達成!「{{title}}」を完了し、{{xp}} XP を獲得しました!"
   },
   "gamification": {
-    "badge_earned": "You earned the '{{name}}' badge! {{icon}}",
-    "level_up": "Congratulations! You've reached Level {{level}}!"
+    "badge_earned": "「{{name}}」バッジを獲得しました!{{icon}}",
+    "level_up": "おめでとうございます!レベル {{level}} に到達しました!"
   },
   "job_offer": {
-    "received_bell": "You have received a job offer for {{title}}",
-    "received_push_title": "Job Offer Received!",
-    "received_push_message": "You have received a job offer for {{title}}",
-    "credits_earned_bell": "You earned {{amount}} time credits for completing {{title}}!",
-    "credits_earned_push_title": "Time Credits Earned!",
-    "credits_earned_push_message": "You earned {{amount}} time credits for completing {{title}}!",
-    "accepted_bell": "Offer accepted for {{title}}",
-    "accepted_push_title": "Offer accepted for {{title}}",
-    "accepted_push_message": "Offer accepted for {{title}}",
-    "rejected_bell": "Offer rejected for {{title}}",
-    "rejected_push_title": "Offer rejected for {{title}}",
-    "rejected_push_message": "Offer rejected for {{title}}",
-    "withdrawn_bell": "Job offer withdrawn for {{title}}",
-    "withdrawn_push_title": "Job offer withdrawn for {{title}}",
-    "withdrawn_push_message": "Job offer withdrawn for {{title}}"
+    "received_bell": "{{title}} の仕事のオファーを受け取りました",
+    "received_push_title": "仕事のオファーを受け取りました!",
+    "received_push_message": "{{title}} の仕事のオファーを受け取りました",
+    "credits_earned_bell": "{{title}} の完了により {{amount}} タイムクレジットを獲得しました!",
+    "credits_earned_push_title": "タイムクレジットを獲得!",
+    "credits_earned_push_message": "{{title}} の完了により {{amount}} タイムクレジットを獲得しました!",
+    "accepted_bell": "{{title}} のオファーが承諾されました",
+    "accepted_push_title": "{{title}} のオファーが承諾されました",
+    "accepted_push_message": "{{title}} のオファーが承諾されました",
+    "rejected_bell": "{{title}} のオファーが却下されました",
+    "rejected_push_title": "{{title}} のオファーが却下されました",
+    "rejected_push_message": "{{title}} のオファーが却下されました",
+    "withdrawn_bell": "{{title}} の仕事のオファーが取り下げられました",
+    "withdrawn_push_title": "{{title}} の仕事のオファーが取り下げられました",
+    "withdrawn_push_message": "{{title}} の仕事のオファーが取り下げられました"
   },
   "job_alert": {
-    "match_bell": "New job matching your alert: {{title}}",
-    "match_push_title": "New Job Match",
-    "match_push_message": "New job matching your alert: {{title}}"
+    "match_bell": "アラートに一致する新しい求人: {{title}}",
+    "match_push_title": "新しい求人マッチ",
+    "match_push_message": "アラートに一致する新しい求人: {{title}}"
   },
   "legal": {
-    "update_title": "Updated: {{title}}",
-    "update_message": "Please review version {{version}} of our {{title}}"
+    "update_title": "更新: {{title}}",
+    "update_message": "{{title}} のバージョン {{version}} をご確認ください"
   },
   "verification_badge": {
-    "granted": "You have been granted the '{{label}}' verification badge"
+    "granted": "「{{label}}」認証バッジが付与されました"
   },
   "mention": {
-    "mentioned_in": "@{{name}} mentioned you in a {{entity}}",
-    "mentioned_in_with_preview": "@{{name}} mentioned you in a {{entity}}: \"{{preview}}\""
+    "mentioned_in": "@{{name}} さんが{{entity}}であなたをメンションしました",
+    "mentioned_in_with_preview": "@{{name}} さんが{{entity}}であなたをメンションしました: 「{{preview}}」"
   },
   "story": {
-    "reaction": "{{name}} reacted {{emoji}} to your story"
+    "reaction": "{{name}} さんがあなたのストーリーに {{emoji}} でリアクションしました"
   },
   "sub_account": {
-    "management_request": "{{name}} has requested to manage your account as a {{type}}"
+    "management_request": "{{name}} さんがあなたのアカウントを {{type}} として管理することを申請しました"
   },
   "totp": {
-    "rate_limited": "Too many failed attempts. Please try again in {{minutes}} minutes."
+    "rate_limited": "試行回数が多すぎます。{{minutes}} 分後にもう一度お試しください。"
   },
   "registration": {
-    "admin_pending_approval": "New user {{name}} ({{email}}) requires approval"
+    "admin_pending_approval": "新規ユーザー {{name}}({{email}})の承認が必要です"
   },
   "nexus_score": {
-    "strength_title": "{{name}} is your strongest area!",
-    "strength_message": "You're in the top tier with {{percentage}}% in {{name}}.",
-    "improvement_title": "Grow your {{name}} score",
-    "tip_engagement": "Try sending and receiving time credits with different community members.",
-    "tip_quality": "Focus on completing transactions successfully and earning positive reviews.",
-    "tip_volunteer": "Log your volunteer hours regularly and maintain consistency.",
-    "tip_activity": "Create listings, join groups, and maintain a daily login streak.",
-    "tip_badges": "Complete challenges to earn more badges and achievements.",
-    "tip_impact": "Share posts and engage with the community feed.",
-    "tip_default": "Keep participating in the community!",
-    "suggestion_connect_title": "Connect with more community members",
-    "suggestion_connect_message": "Exchange credits with new people to increase your network diversity.",
-    "suggestion_exchanges_title": "Complete more exchanges",
-    "suggestion_exchanges_message": "Build your reputation by completing transactions and earning reviews."
+    "strength_title": "{{name}} はあなたの最も得意な分野です!",
+    "strength_message": "{{name}} で上位 {{percentage}}% に入っています。",
+    "improvement_title": "{{name}} のスコアを伸ばしましょう",
+    "tip_engagement": "さまざまなコミュニティメンバーとタイムクレジットを送受信してみましょう。",
+    "tip_quality": "取引を成功裏に完了し、良いレビューを獲得することに注力しましょう。",
+    "tip_volunteer": "ボランティア時間を定期的に記録し、継続しましょう。",
+    "tip_activity": "リスティングを作成し、グループに参加し、毎日のログインを続けましょう。",
+    "tip_badges": "チャレンジを完了して、より多くのバッジや実績を獲得しましょう。",
+    "tip_impact": "投稿を共有し、コミュニティフィードと交流しましょう。",
+    "tip_default": "コミュニティへの参加を続けましょう!",
+    "suggestion_connect_title": "もっと多くのコミュニティメンバーとつながりましょう",
+    "suggestion_connect_message": "新しい人とクレジットを交換して、ネットワークの多様性を高めましょう。",
+    "suggestion_exchanges_title": "より多くの交換を完了しましょう",
+    "suggestion_exchanges_message": "取引を完了し、レビューを獲得して評判を築きましょう。"
   }
 }

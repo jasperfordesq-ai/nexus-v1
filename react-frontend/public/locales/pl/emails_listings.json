@@ -1,42 +1,42 @@
 {
   "listings": {
     "expired": {
-      "notification": "Your listing \"{{title}}\" has expired. You can renew it to make it active again.",
-      "subject": "Your listing has expired",
-      "heading": "Your listing has expired",
-      "subheading": "Renew your listing to keep it active.",
-      "body_expired": "Your listing <strong>\"{{title}}\"</strong> has expired.",
-      "body_renew": "You can renew it to make it visible to the community again.",
-      "cta": "Renew Listing"
+      "notification": "Twoje ogłoszenie „{{title}}” wygasło. Możesz je odnowić, aby ponownie było aktywne.",
+      "subject": "Twoje ogłoszenie wygasło",
+      "heading": "Twoje ogłoszenie wygasło",
+      "subheading": "Odnów ogłoszenie, aby pozostało aktywne.",
+      "body_expired": "Twoje ogłoszenie <strong>„{{title}}”</strong> wygasło.",
+      "body_renew": "Możesz je odnowić, aby ponownie było widoczne dla społeczności.",
+      "cta": "Odnów ogłoszenie"
     },
     "expiry_reminder": {
-      "notification": "Your listing \"{{title}}\" expires in {{days_text}} (on {{expiry_date}}) — renew it to keep it active.",
-      "subject": "Your listing expires in {{days_text}}",
-      "heading": "Your listing expires in {{days_text}}",
-      "subheading": "Don't miss out — renew your listing to keep it active.",
-      "body_expires": "Your listing <strong>\"{{title}}\"</strong> expires in {{days_text}} (on {{expiry_date}}).",
-      "body_renew": "Renew it now to keep it visible to the community.",
-      "cta": "View Listing",
-      "days_one": "1 day",
-      "days_other": "{{count}} days"
+      "notification": "Twoje ogłoszenie „{{title}}” wygasa za {{days_text}} (dnia {{expiry_date}}) — odnów je, aby pozostało aktywne.",
+      "subject": "Twoje ogłoszenie wygasa za {{days_text}}",
+      "heading": "Twoje ogłoszenie wygasa za {{days_text}}",
+      "subheading": "Nie przegap — odnów ogłoszenie, aby pozostało aktywne.",
+      "body_expires": "Twoje ogłoszenie <strong>„{{title}}”</strong> wygasa za {{days_text}} (dnia {{expiry_date}}).",
+      "body_renew": "Odnów je teraz, aby pozostało widoczne dla społeczności.",
+      "cta": "Zobacz ogłoszenie",
+      "days_one": "1 dzień",
+      "days_other": "{{count}} dni"
     },
     "approved": {
-      "notification": "Your listing \"{{title}}\" has been approved and is now active.",
-      "notification_short": "Your listing \"{{title}}\" has been approved!"
+      "notification": "Twoje ogłoszenie „{{title}}” zostało zatwierdzone i jest już aktywne.",
+      "notification_short": "Twoje ogłoszenie „{{title}}” zostało zatwierdzone!"
     },
     "rejected": {
-      "notification": "Your listing \"{{title}}\" was not approved. Reason: {{reason}}",
-      "notification_no_reason": "Your listing \"{{title}}\" was not approved.",
-      "subject": "Your listing needs changes",
-      "heading": "Your listing needs changes",
-      "subheading": "Your listing was not approved — here's what to do next.",
-      "body_not_approved": "Your listing <strong>\"{{title}}\"</strong> was not approved.",
-      "body_reason": "<strong>Reason:</strong> {{reason}}",
-      "body_resubmit": "Please review and update your listing, then resubmit for approval.",
-      "cta": "Edit Listing"
+      "notification": "Twoje ogłoszenie „{{title}}” nie zostało zatwierdzone. Powód: {{reason}}",
+      "notification_no_reason": "Twoje ogłoszenie „{{title}}” nie zostało zatwierdzone.",
+      "subject": "Twoje ogłoszenie wymaga zmian",
+      "heading": "Twoje ogłoszenie wymaga zmian",
+      "subheading": "Twoje ogłoszenie nie zostało zatwierdzone — oto, co robić dalej.",
+      "body_not_approved": "Twoje ogłoszenie <strong>„{{title}}”</strong> nie zostało zatwierdzone.",
+      "body_reason": "<strong>Powód:</strong> {{reason}}",
+      "body_resubmit": "Prosimy o przejrzenie i zaktualizowanie ogłoszenia, a następnie ponowne przesłanie do zatwierdzenia.",
+      "cta": "Edytuj ogłoszenie"
     },
     "removed": {
-      "notification": "Your listing \"{{title}}\" has been removed by a moderator."
+      "notification": "Twoje ogłoszenie „{{title}}” zostało usunięte przez moderatora."
     }
   }
 }

@@ -1,182 +1,182 @@
 {
     "admin_analytics_reports": {
-        "members_marked_notified": ":count member(s) marked as notified"
+        "members_marked_notified": "Członków oznaczonych jako powiadomieni: :count"
     },
     "admin_cron": {
-        "log_not_found": "Log not found",
-        "deleted_log_entries": "Deleted :count log entries"
+        "log_not_found": "Nie znaleziono logu",
+        "deleted_log_entries": "Usunięto wpisów logu: :count"
     },
     "admin_enterprise": {
-        "breach_reported": "Breach reported successfully",
-        "gdpr_request_created": "GDPR request created successfully",
-        "gdpr_request_create_failed": "Failed to create GDPR request",
-        "data_export_generated": "Data export generated successfully",
-        "data_export_failed": "Failed to generate data export",
-        "dpa_notification_recorded": "DPA notification recorded successfully",
-        "dpa_notification_failed": "Failed to record DPA notification",
-        "log_file_cleared": "Log file cleared successfully",
-        "log_file_only_allowed": "Only .log files are allowed",
-        "log_file_not_found": "Log file not found",
-        "log_file_clear_failed": "Failed to clear log file",
-        "secret_rotation_requires_ssh": "Secret rotation requires server access. Use SSH to rotate secrets in the .env file.",
-        "secret_deletion_requires_ssh": "Secret deletion requires server access. Use SSH to remove secrets from the .env file."
+        "breach_reported": "Naruszenie zgłoszone pomyślnie",
+        "gdpr_request_created": "Wniosek RODO utworzony pomyślnie",
+        "gdpr_request_create_failed": "Nie udało się utworzyć wniosku RODO",
+        "data_export_generated": "Eksport danych wygenerowany pomyślnie",
+        "data_export_failed": "Nie udało się wygenerować eksportu danych",
+        "dpa_notification_recorded": "Powiadomienie organu ochrony danych zarejestrowane pomyślnie",
+        "dpa_notification_failed": "Nie udało się zarejestrować powiadomienia organu ochrony danych",
+        "log_file_cleared": "Plik logu wyczyszczony pomyślnie",
+        "log_file_only_allowed": "Dozwolone są tylko pliki .log",
+        "log_file_not_found": "Nie znaleziono pliku logu",
+        "log_file_clear_failed": "Nie udało się wyczyścić pliku logu",
+        "secret_rotation_requires_ssh": "Rotacja sekretów wymaga dostępu do serwera. Użyj SSH, aby rotować sekrety w pliku .env.",
+        "secret_deletion_requires_ssh": "Usunięcie sekretów wymaga dostępu do serwera. Użyj SSH, aby usunąć sekrety z pliku .env."
     },
     "admin_feed": {
-        "item_hidden": "Item hidden",
-        "item_deleted": "Item deleted"
+        "item_hidden": "Element ukryty",
+        "item_deleted": "Element usunięty"
     },
     "admin_gamification": {
-        "badge_recheck_completed": "Badge recheck completed for :count users"
+        "badge_recheck_completed": "Ponowne sprawdzenie odznak zakończone dla :count użytkowników"
     },
     "admin_groups": {
-        "group_archived": "Group archived",
-        "group_unarchived": "Group unarchived",
-        "ownership_transferred": "Ownership transferred",
-        "groups_merged": "Groups merged successfully",
-        "group_cloned": "Group cloned",
-        "tag_deleted": "Tag deleted",
-        "collection_updated": "Updated",
-        "collection_deleted": "Deleted",
-        "collection_groups_set": "Groups set",
-        "rule_deleted": "Rule deleted"
+        "group_archived": "Grupa zarchiwizowana",
+        "group_unarchived": "Grupa przywrócona z archiwum",
+        "ownership_transferred": "Własność przekazana",
+        "groups_merged": "Grupy scalone pomyślnie",
+        "group_cloned": "Grupa sklonowana",
+        "tag_deleted": "Tag usunięty",
+        "collection_updated": "Zaktualizowano",
+        "collection_deleted": "Usunięto",
+        "collection_groups_set": "Grupy ustawione",
+        "rule_deleted": "Reguła usunięta"
     },
     "admin_impact_report": {
-        "config_updated": "Configuration updated"
+        "config_updated": "Konfiguracja zaktualizowana"
     },
     "admin_marketplace": {
-        "feature_not_enabled": "Marketplace feature is not enabled for this tenant.",
-        "listing_approved": "Listing approved.",
-        "listing_rejected": "Listing rejected.",
-        "listing_removed": "Listing removed.",
-        "only_business_sellers_verified": "Only business sellers can be verified.",
-        "seller_verified": "Seller verified.",
-        "seller_suspended": "Seller suspended and all listings deactivated.",
-        "report_acknowledged": "Report acknowledged.",
-        "report_resolved": "Report resolved."
+        "feature_not_enabled": "Funkcja marketplace nie jest włączona dla tego tenanta.",
+        "listing_approved": "Ogłoszenie zatwierdzone.",
+        "listing_rejected": "Ogłoszenie odrzucone.",
+        "listing_removed": "Ogłoszenie usunięte.",
+        "only_business_sellers_verified": "Tylko sprzedawcy biznesowi mogą być weryfikowani.",
+        "seller_verified": "Sprzedawca zweryfikowany.",
+        "seller_suspended": "Sprzedawca zawieszony, a wszystkie ogłoszenia dezaktywowane.",
+        "report_acknowledged": "Zgłoszenie potwierdzone.",
+        "report_resolved": "Zgłoszenie rozwiązane."
     },
     "admin_newsletter": {
-        "newsletter_queued": "Newsletter queued for :count recipients",
-        "test_email_sent": "Test email sent to :email"
+        "newsletter_queued": "Newsletter w kolejce dla :count odbiorców",
+        "test_email_sent": "Testowy e-mail wysłany do :email"
     },
     "admin_onboarding": {
-        "settings_updated": "Onboarding settings updated",
-        "preset_applied": "Applied :preset preset"
+        "settings_updated": "Ustawienia onboardingu zaktualizowane",
+        "preset_applied": "Zastosowano ustawienie: :preset"
     },
     "admin_reports": {
-        "report_resolved": "Report resolved",
-        "report_dismissed": "Report dismissed"
+        "report_resolved": "Zgłoszenie rozwiązane",
+        "report_dismissed": "Zgłoszenie odrzucone"
     },
     "admin_reviews": {
-        "review_flagged": "Review flagged for attention",
-        "review_hidden": "Review hidden",
-        "review_deleted": "Review deleted"
+        "review_flagged": "Recenzja oznaczona do uwagi",
+        "review_hidden": "Recenzja ukryta",
+        "review_deleted": "Recenzja usunięta"
     },
     "admin_safeguarding": {
-        "guardian_assigned_notification": "You have been assigned as a safeguarding guardian for :name",
-        "ward_assigned_notification": ":guardian has been assigned as your safeguarding support contact. You can give or revoke consent in your settings.",
-        "a_member": "a member",
-        "a_coordinator": "A community coordinator"
+        "guardian_assigned_notification": "Zostałeś(-aś) przypisany(-a) jako opiekun ochrony dla :name",
+        "ward_assigned_notification": ":guardian został(-a) przypisany(-a) jako Twoja osoba wsparcia ds. ochrony. Zgodę możesz wyrazić lub cofnąć w ustawieniach.",
+        "a_member": "członek",
+        "a_coordinator": "Koordynator społeczności"
     },
     "admin_safeguarding_options": {
-        "option_updated": "Option updated",
-        "option_deactivated": "Option deactivated",
-        "options_reordered": "Options reordered"
+        "option_updated": "Opcja zaktualizowana",
+        "option_deactivated": "Opcja dezaktywowana",
+        "options_reordered": "Kolejność opcji zmieniona"
     },
     "admin_super": {
-        "tenant_created": "Tenant ':name' created successfully",
-        "lockdown_activated": "Emergency lockdown activated",
-        "lockdown_lifted": "Emergency lockdown lifted"
+        "tenant_created": "Tenant „:name” utworzony pomyślnie",
+        "lockdown_activated": "Awaryjna blokada aktywowana",
+        "lockdown_lifted": "Awaryjna blokada zniesiona"
     },
     "admin_tools": {
-        "connection_failed": "Connection failed",
-        "conversion_queued": "Conversion queued",
-        "seed_generation_queued": "Seed generation queued",
-        "blog_backup_restore_queued": "Blog backup restore queued"
+        "connection_failed": "Połączenie nieudane",
+        "conversion_queued": "Konwersja w kolejce",
+        "seed_generation_queued": "Generowanie danych testowych w kolejce",
+        "blog_backup_restore_queued": "Przywracanie kopii zapasowej bloga w kolejce"
     },
     "admin_volunteer": {
-        "application_approved": "Application approved",
-        "application_declined": "Application declined",
-        "org_status_updated": "Organization status updated to :status",
-        "amount_cannot_be_zero": "Amount cannot be zero",
-        "reason_required": "Reason is required",
-        "status_must_be_active_or_suspended": "Status must be active or suspended",
-        "organization_not_found": "Organization not found",
-        "org_status_update_failed": "Failed to update organization status"
+        "application_approved": "Zgłoszenie zatwierdzone",
+        "application_declined": "Zgłoszenie odrzucone",
+        "org_status_updated": "Status organizacji zaktualizowany na: :status",
+        "amount_cannot_be_zero": "Kwota nie może wynosić zero",
+        "reason_required": "Powód jest wymagany",
+        "status_must_be_active_or_suspended": "Status musi być „active” lub „suspended”",
+        "organization_not_found": "Nie znaleziono organizacji",
+        "org_status_update_failed": "Nie udało się zaktualizować statusu organizacji"
     },
     "admin_wallet_grant": {
-        "credits_granted": "Credits granted successfully"
+        "credits_granted": "Kredyty przyznane pomyślnie"
     },
     "ai_chat": {
-        "not_available": "AI chat is not currently available. Please try again later.",
-        "connection_test_failed": "Connection test failed"
+        "not_available": "Czat AI jest obecnie niedostępny. Spróbuj ponownie później.",
+        "connection_test_failed": "Test połączenia nie powiódł się"
     },
     "app": {
-        "log_recorded": "Log recorded"
+        "log_recorded": "Log zarejestrowany"
     },
     "auth": {
-        "two_factor_required": "Two-factor authentication required",
-        "logged_out": "Logged out successfully",
-        "session_refreshed": "Session refreshed",
-        "session_restored": "Session restored from token",
-        "session_deprecated": "This endpoint is deprecated. Mobile apps should use Bearer tokens directly without session sync.",
-        "tokens_revoked": "All refresh tokens have been revoked. You will need to log in again on all devices."
+        "two_factor_required": "Wymagane uwierzytelnianie dwuetapowe",
+        "logged_out": "Wylogowano pomyślnie",
+        "session_refreshed": "Sesja odświeżona",
+        "session_restored": "Sesja przywrócona z tokenu",
+        "session_deprecated": "Ten endpoint jest przestarzały. Aplikacje mobilne powinny używać tokenów Bearer bezpośrednio, bez synchronizacji sesji.",
+        "tokens_revoked": "Wszystkie tokeny odświeżające zostały unieważnione. Musisz zalogować się ponownie na wszystkich urządzeniach."
     },
     "block_user": {
-        "user_blocked": "User blocked",
-        "user_unblocked": "User unblocked",
-        "user_not_blocked": "User was not blocked"
+        "user_blocked": "Użytkownik zablokowany",
+        "user_unblocked": "Użytkownik odblokowany",
+        "user_not_blocked": "Użytkownik nie był zablokowany"
     },
     "cookie_consent": {
-        "preferences_updated": "Consent preferences updated successfully",
-        "consent_withdrawn": "Consent withdrawn successfully"
+        "preferences_updated": "Preferencje zgody zaktualizowane pomyślnie",
+        "consent_withdrawn": "Zgoda wycofana pomyślnie"
     },
     "email_verification": {
-        "already_verified": "Email address is already verified",
-        "verified_successfully": "Email address verified successfully",
-        "verification_sent": "Verification email sent",
-        "generic_resend": "If an account with that email exists and is unverified, a new verification email has been sent."
+        "already_verified": "Adres e-mail jest już zweryfikowany",
+        "verified_successfully": "Adres e-mail zweryfikowany pomyślnie",
+        "verification_sent": "Wiadomość weryfikacyjna wysłana",
+        "generic_resend": "Jeśli konto z tym adresem e-mail istnieje i nie jest zweryfikowane, wysłano nową wiadomość weryfikacyjną."
     },
     "endorsement": {
-        "endorsement_added": "Endorsement added",
-        "endorsement_removed": "Endorsement removed"
+        "endorsement_added": "Rekomendacja dodana",
+        "endorsement_removed": "Rekomendacja usunięta"
     },
     "federation": {
-        "already_opted_in": "Already opted in to federation.",
-        "enabled_successfully": "Federation enabled successfully.",
-        "disabled_successfully": "Federation disabled successfully.",
-        "signature_verified": "Signature verified successfully",
-        "settings_updated": "Settings updated successfully."
+        "already_opted_in": "Już dołączono do federacji.",
+        "enabled_successfully": "Federacja włączona pomyślnie.",
+        "disabled_successfully": "Federacja wyłączona pomyślnie.",
+        "signature_verified": "Podpis zweryfikowany pomyślnie",
+        "settings_updated": "Ustawienia zaktualizowane pomyślnie."
     },
     "federation_v2": {
-        "receiver_id_required": "receiver_id is required.",
-        "receiver_tenant_id_required": "receiver_tenant_id is required.",
-        "message_body_required": "Message body is required.",
-        "subject_max_length": "Subject must not exceed 255 characters.",
-        "body_max_length": "Message body must not exceed 10,000 characters."
+        "receiver_id_required": "receiver_id jest wymagany.",
+        "receiver_tenant_id_required": "receiver_tenant_id jest wymagany.",
+        "message_body_required": "Treść wiadomości jest wymagana.",
+        "subject_max_length": "Temat nie może przekraczać 255 znaków.",
+        "body_max_length": "Treść wiadomości nie może przekraczać 10 000 znaków."
     },
     "feed_social": {
-        "post_unshared": "Post unshared"
+        "post_unshared": "Udostępnienie posta cofnięte"
     },
     "gamification": {
-        "invalid_leaderboard_type": "Invalid leaderboard type",
-        "showcase_updated": "Showcase updated",
-        "score_recalculation_initiated": "Score recalculation initiated"
+        "invalid_leaderboard_type": "Nieprawidłowy typ rankingu",
+        "showcase_updated": "Galeria zaktualizowana",
+        "score_recalculation_initiated": "Przeliczanie wyniku rozpoczęte"
     },
     "gdpr": {
-        "request_submitted": "Your request has been submitted and will be processed within 30 days.",
-        "account_deletion_submitted": "Your account deletion request has been submitted. You will receive confirmation via email."
+        "request_submitted": "Twój wniosek został przesłany i zostanie rozpatrzony w ciągu 30 dni.",
+        "account_deletion_submitted": "Twój wniosek o usunięcie konta został przesłany. Otrzymasz potwierdzenie e-mailem."
     },
     "group_challenge": {
-        "challenge_deleted": "Challenge deleted"
+        "challenge_deleted": "Wyzwanie usunięte"
     },
     "group_exchange": {
-        "exchange_cancelled": "Exchange cancelled",
-        "exchange_completed": "Exchange completed successfully"
+        "exchange_cancelled": "Wymiana anulowana",
+        "exchange_completed": "Wymiana zakończona pomyślnie"
     },
     "group_files": {
-        "file_deleted": "File deleted"
+        "file_deleted": "Plik usunięty"
     },
     "group_invite": {
-        "invite_revoked": "Invite revoked"
+        "invite_revoked": "Zaproszenie unieważnione"
     }
 }

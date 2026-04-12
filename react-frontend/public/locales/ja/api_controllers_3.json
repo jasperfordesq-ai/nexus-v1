@@ -1,39 +1,39 @@
 {
     "federation_webhooks": {
-        "test_message": "This is a test webhook delivery from Project NEXUS."
+        "test_message": "Project NEXUS からのテスト用 Webhook 配信です。"
     },
     "group_media": {
-        "media_deleted": "Media deleted"
+        "media_deleted": "メディアを削除しました"
     },
     "group_notification_pref": {
-        "preferences_updated": "Preferences updated"
+        "preferences_updated": "設定を更新しました"
     },
     "group_qa": {
-        "answer_accepted": "Answer accepted",
-        "vote_recorded": "Vote recorded",
-        "failed_accept_answer": "Failed to accept answer",
-        "failed_record_vote": "Failed to record vote",
-        "title_required": "Title is required",
-        "body_required": "Body is required",
-        "failed_create_question": "Failed to create question",
-        "question_not_found": "Question not found",
-        "failed_post_answer": "Failed to post answer",
-        "type_must_be_question_or_answer": "Type must be \"question\" or \"answer\"",
-        "valid_target_id_required": "A valid target_id is required",
-        "vote_must_be_up_down": "Vote must be \"up\"/\"down\" or 1/-1"
+        "answer_accepted": "回答を採用しました",
+        "vote_recorded": "投票を記録しました",
+        "failed_accept_answer": "回答の採用に失敗しました",
+        "failed_record_vote": "投票の記録に失敗しました",
+        "title_required": "タイトルは必須です",
+        "body_required": "本文は必須です",
+        "failed_create_question": "質問の作成に失敗しました",
+        "question_not_found": "質問が見つかりません",
+        "failed_post_answer": "回答の投稿に失敗しました",
+        "type_must_be_question_or_answer": "種類は「question」または「answer」である必要があります",
+        "valid_target_id_required": "有効な target_id が必要です",
+        "vote_must_be_up_down": "投票は「up」/「down」または 1/-1 である必要があります"
     },
     "group_scheduled_post": {
-        "cancelled": "Cancelled",
-        "not_found_or_published": "Not found or already published"
+        "cancelled": "キャンセルしました",
+        "not_found_or_published": "見つからないか、既に公開されています"
     },
     "group_webhook": {
-        "webhook_deleted": "Webhook deleted",
-        "webhook_not_found": "Webhook not found"
+        "webhook_deleted": "Webhook を削除しました",
+        "webhook_not_found": "Webhook が見つかりません"
     },
     "group_wiki": {
-        "wiki_page_deleted": "Wiki page deleted"
+        "wiki_page_deleted": "Wiki ページを削除しました"
     },
     "listings": {
-        "listing_saved_notification": ":saver_name saved your listing \":title\""
+        "listing_saved_notification": ":saver_name さんがあなたのリスティング「:title」を保存しました"
     }
 }

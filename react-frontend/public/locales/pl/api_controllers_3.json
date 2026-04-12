@@ -1,39 +1,39 @@
 {
     "federation_webhooks": {
-        "test_message": "This is a test webhook delivery from Project NEXUS."
+        "test_message": "To jest testowa dostawa webhooka z Project NEXUS."
     },
     "group_media": {
-        "media_deleted": "Media deleted"
+        "media_deleted": "Media usunięte"
     },
     "group_notification_pref": {
-        "preferences_updated": "Preferences updated"
+        "preferences_updated": "Preferencje zaktualizowane"
     },
     "group_qa": {
-        "answer_accepted": "Answer accepted",
-        "vote_recorded": "Vote recorded",
-        "failed_accept_answer": "Failed to accept answer",
-        "failed_record_vote": "Failed to record vote",
-        "title_required": "Title is required",
-        "body_required": "Body is required",
-        "failed_create_question": "Failed to create question",
-        "question_not_found": "Question not found",
-        "failed_post_answer": "Failed to post answer",
-        "type_must_be_question_or_answer": "Type must be \"question\" or \"answer\"",
-        "valid_target_id_required": "A valid target_id is required",
-        "vote_must_be_up_down": "Vote must be \"up\"/\"down\" or 1/-1"
+        "answer_accepted": "Odpowiedź zaakceptowana",
+        "vote_recorded": "Głos zapisany",
+        "failed_accept_answer": "Nie udało się zaakceptować odpowiedzi",
+        "failed_record_vote": "Nie udało się zapisać głosu",
+        "title_required": "Tytuł jest wymagany",
+        "body_required": "Treść jest wymagana",
+        "failed_create_question": "Nie udało się utworzyć pytania",
+        "question_not_found": "Nie znaleziono pytania",
+        "failed_post_answer": "Nie udało się opublikować odpowiedzi",
+        "type_must_be_question_or_answer": "Typ musi być „question” lub „answer”",
+        "valid_target_id_required": "Wymagany jest prawidłowy target_id",
+        "vote_must_be_up_down": "Głos musi być „up”/„down” lub 1/-1"
     },
     "group_scheduled_post": {
-        "cancelled": "Cancelled",
-        "not_found_or_published": "Not found or already published"
+        "cancelled": "Anulowano",
+        "not_found_or_published": "Nie znaleziono lub już opublikowano"
     },
     "group_webhook": {
-        "webhook_deleted": "Webhook deleted",
-        "webhook_not_found": "Webhook not found"
+        "webhook_deleted": "Webhook usunięty",
+        "webhook_not_found": "Nie znaleziono webhooka"
     },
     "group_wiki": {
-        "wiki_page_deleted": "Wiki page deleted"
+        "wiki_page_deleted": "Strona wiki usunięta"
     },
     "listings": {
-        "listing_saved_notification": ":saver_name saved your listing \":title\""
+        "listing_saved_notification": ":saver_name zapisał(-a) Twoje ogłoszenie „:title”"
     }
 }

@@ -1,69 +1,69 @@
 {
   "registration": {
-    "verify_subject": "Verify Your Email - {{tenant}}",
-    "verify_title": "Verify Your Email Address",
-    "verify_greeting": "Hi {{name}}, welcome to {{tenant}}!",
-    "verify_body": "Please verify your email address by clicking the button below.<br><br>If you did not create an account, please ignore this email.",
-    "verify_cta": "Verify Email Address",
-    "success_message": "Registration successful. Please check your email to verify your account.",
-    "error_generic": "Registration could not be completed. Please try again or contact support."
+    "verify_subject": "Deimhnigh do Ríomhphost - {{tenant}}",
+    "verify_title": "Deimhnigh do Sheoladh Ríomhphoist",
+    "verify_greeting": "Dia duit {{name}}, fáilte chuig {{tenant}}!",
+    "verify_body": "Deimhnigh do sheoladh ríomhphoist trí chliceáil ar an gcnaipe thíos, le do thoil.<br><br>Mura raibh tú tar éis cuntas a chruthú, déan neamhaird den ríomhphost seo.",
+    "verify_cta": "Deimhnigh an Seoladh Ríomhphoist",
+    "success_message": "D'éirigh leis an gclárú. Seiceáil do ríomhphost le do thoil chun do chuntas a dheimhniú.",
+    "error_generic": "Níorbh fhéidir an clárú a chríochnú. Bain triail eile as nó déan teagmháil le tacaíocht."
   },
   "stories": {
-    "new_story_notification": "{{name}} shared a new story"
+    "new_story_notification": "Roinn {{name}} scéal nua"
   },
   "jobs": {
-    "posting_approved": "Your job posting has been approved!",
-    "posting_not_approved": "Your job posting was not approved",
-    "interview_requested": "Interview requested for {{title}}",
-    "interview_accepted": "Interview accepted for {{title}}",
-    "interview_declined": "Interview declined for {{title}}",
-    "interview_cancelled": "Interview cancelled for {{title}}",
-    "interview_reminder": "Interview reminder: {{title}} — {{time_label}} ({{scheduled_at}})",
-    "interview_reminder_push_title": "Interview Reminder",
-    "interview_in_1_hour": "in 1 hour",
-    "interview_in_hours": "in {{hours}} hours",
-    "expiry_greeting": "Hi {{name}},"
+    "posting_approved": "Tá do phostáil poist ceadaithe!",
+    "posting_not_approved": "Níor ceadaíodh do phostáil poist",
+    "interview_requested": "Agallamh iarrtha do {{title}}",
+    "interview_accepted": "Agallamh glactha do {{title}}",
+    "interview_declined": "Agallamh diúltaithe do {{title}}",
+    "interview_cancelled": "Agallamh curtha ar ceal do {{title}}",
+    "interview_reminder": "Meabhrúchán agallaimh: {{title}} — {{time_label}} ({{scheduled_at}})",
+    "interview_reminder_push_title": "Meabhrúchán Agallaimh",
+    "interview_in_1_hour": "i gceann uair an chloig",
+    "interview_in_hours": "i gceann {{hours}} uair an chloig",
+    "expiry_greeting": "Dia duit {{name}},"
   },
   "guardian": {
-    "consent_title": "Guardian Consent Request",
-    "consent_preview": "A minor in your care needs your consent to participate in volunteering",
-    "consent_body": "A minor in your care has requested your consent to participate in volunteering activities on <strong>Project NEXUS</strong>.",
-    "consent_highlight": "Your consent is required before they can participate. Please review and respond using the button below.",
-    "consent_expires_label": "in {{days}} days",
-    "consent_cta": "Grant Consent",
-    "consent_ignore": "If you did not expect this request, you can safely ignore this email. No action will be taken without your explicit consent.",
-    "consent_subject": "Guardian Consent Request — Project NEXUS"
+    "consent_title": "Iarratas Toilithe Caomhnóra",
+    "consent_preview": "Tá toiliú uait ó mhionaoiseach i do chúram chun páirt a ghlacadh in obair dheonach",
+    "consent_body": "D'iarr mionaoiseach i do chúram do thoiliú chun páirt a ghlacadh i ngníomhaíochtaí deonacha ar <strong>Project NEXUS</strong>.",
+    "consent_highlight": "Tá do thoiliú riachtanach sula bhféadfaidh siad páirt a ghlacadh. Athbhreithnigh é agus freagair ag úsáid an chnaipe thíos.",
+    "consent_expires_label": "i gceann {{days}} lá",
+    "consent_cta": "Tabhair Toiliú",
+    "consent_ignore": "Mura raibh tú ag súil leis an iarratas seo, is féidir leat neamhaird shábháilte a dhéanamh den ríomhphost seo. Ní thógfar aon ghníomh gan do thoiliú sainráite.",
+    "consent_subject": "Iarratas Toilithe Caomhnóra — Project NEXUS"
   },
   "safeguarding": {
-    "training_verified": "Your {{training_name}} record has been verified!",
-    "training_not_approved": "Your {{training_name}} record was not approved. Please contact support for details.",
-    "dlp_assigned_bell": "You have been assigned as the Designated Liaison Person for safeguarding incident #{{incident_id}}",
-    "dlp_assigned_title": "DLP Assignment — Incident #{{incident_id}}",
-    "dlp_assigned_preview": "[{{severity}}] You've been assigned as DLP for incident #{{incident_id}}",
-    "dlp_assigned_highlight": "You have been assigned as the <strong>Designated Liaison Person (DLP)</strong> for a safeguarding incident.",
-    "dlp_assigned_body": "As DLP, you are responsible for coordinating the safeguarding response for this incident. Please review this immediately.",
-    "dlp_assigned_audit_note": "All access to safeguarding data is audit-logged.",
-    "dlp_assigned_cta": "Review Incident",
-    "dlp_assigned_subject": "[NEXUS] [{{severity}}] DLP Assignment — Safeguarding Incident #{{incident_id}}",
-    "incident_reported_title": "Safeguarding Incident Reported",
-    "incident_reported_preview": "[{{severity}}] New {{type}} incident reported by {{reporter}}",
-    "incident_reported_highlight": "A <strong>{{severity}}</strong> safeguarding incident has been reported.",
-    "incident_reported_review": "Please review this in the admin panel and take appropriate action.",
-    "incident_reported_auto_note": "This is an automated notification from the platform safeguarding system.",
-    "incident_reported_cta": "Review in Admin Panel",
-    "incident_reported_subject": "[NEXUS] [{{severity}}] Safeguarding Incident — {{title}}",
-    "incident_reported_bell": "[{{severity}}] Safeguarding incident reported by {{reporter}}: {{title}}",
-    "incident_status_changed": "Your safeguarding incident #{{incident_id}} has been marked as {{status}}",
-    "incident_status_dlp_bell": "Safeguarding incident #{{incident_id}} status changed to {{status}}",
-    "incident_updated_title": "Safeguarding Incident Updated",
-    "incident_updated_preview": "[{{severity}}] Incident #{{incident_id}} status changed to {{status}}",
-    "incident_updated_review": "Please review this in the admin panel.",
-    "incident_updated_subject": "[NEXUS] [{{severity}}] Safeguarding Incident #{{incident_id}} — {{status}}"
+    "training_verified": "Tá do thaifead {{training_name}} deimhnithe!",
+    "training_not_approved": "Níor ceadaíodh do thaifead {{training_name}}. Déan teagmháil le tacaíocht le haghaidh sonraí.",
+    "dlp_assigned_bell": "Sannadh tú mar Dhuine Idirchaidrimh Ainmnithe le haghaidh eachtra cosanta #{{incident_id}}",
+    "dlp_assigned_title": "Sannadh DLP — Eachtra #{{incident_id}}",
+    "dlp_assigned_preview": "[{{severity}}] Sannadh tú mar DLP d'eachtra #{{incident_id}}",
+    "dlp_assigned_highlight": "Sannadh tú mar <strong>Dhuine Idirchaidrimh Ainmnithe (DLP)</strong> le haghaidh eachtra cosanta.",
+    "dlp_assigned_body": "Mar DLP, tá tú freagrach as freagairt cosanta don eachtra seo a chomhordú. Athbhreithnigh é seo láithreach.",
+    "dlp_assigned_audit_note": "Taifeadtar gach rochtain ar shonraí cosanta in iniúchadh.",
+    "dlp_assigned_cta": "Athbhreithnigh an Eachtra",
+    "dlp_assigned_subject": "[NEXUS] [{{severity}}] Sannadh DLP — Eachtra Chosanta #{{incident_id}}",
+    "incident_reported_title": "Eachtra Chosanta Tuairiscithe",
+    "incident_reported_preview": "[{{severity}}] Eachtra nua {{type}} tuairiscithe ag {{reporter}}",
+    "incident_reported_highlight": "Tuairiscíodh eachtra chosanta <strong>{{severity}}</strong>.",
+    "incident_reported_review": "Athbhreithnigh é seo sa phainéal riaracháin agus déan gníomh cuí.",
+    "incident_reported_auto_note": "Is fógra uathoibríoch é seo ó chóras cosanta an ardáin.",
+    "incident_reported_cta": "Athbhreithnigh sa Phainéal Riaracháin",
+    "incident_reported_subject": "[NEXUS] [{{severity}}] Eachtra Chosanta — {{title}}",
+    "incident_reported_bell": "[{{severity}}] Eachtra chosanta tuairiscithe ag {{reporter}}: {{title}}",
+    "incident_status_changed": "Marcáladh d'eachtra chosanta #{{incident_id}} mar {{status}}",
+    "incident_status_dlp_bell": "Athraíodh stádas eachtra chosanta #{{incident_id}} go {{status}}",
+    "incident_updated_title": "Eachtra Chosanta Nuashonraithe",
+    "incident_updated_preview": "[{{severity}}] Athraíodh stádas eachtra #{{incident_id}} go {{status}}",
+    "incident_updated_review": "Athbhreithnigh é seo sa phainéal riaracháin.",
+    "incident_updated_subject": "[NEXUS] [{{severity}}] Eachtra Chosanta #{{incident_id}} — {{status}}"
   },
   "social": {
-    "connection_request": "{{name}} sent you a connection request"
+    "connection_request": "Sheol {{name}} iarratas nasctha chugat"
   },
   "marketplace": {
-    "listing_pending_notice": "Your listing has been submitted for review and will be published once approved."
+    "listing_pending_notice": "Cuireadh do liosta isteach le haghaidh athbhreithnithe agus foilseofar é nuair a cheadófar é."
   }
 }

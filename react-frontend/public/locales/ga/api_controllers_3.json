@@ -1,39 +1,39 @@
 {
     "federation_webhooks": {
-        "test_message": "This is a test webhook delivery from Project NEXUS."
+        "test_message": "Is seachadadh tástála webhook ó Project NEXUS é seo."
     },
     "group_media": {
-        "media_deleted": "Media deleted"
+        "media_deleted": "Meáin scriosta"
     },
     "group_notification_pref": {
-        "preferences_updated": "Preferences updated"
+        "preferences_updated": "Sainroghanna nuashonraithe"
     },
     "group_qa": {
-        "answer_accepted": "Answer accepted",
-        "vote_recorded": "Vote recorded",
-        "failed_accept_answer": "Failed to accept answer",
-        "failed_record_vote": "Failed to record vote",
-        "title_required": "Title is required",
-        "body_required": "Body is required",
-        "failed_create_question": "Failed to create question",
-        "question_not_found": "Question not found",
-        "failed_post_answer": "Failed to post answer",
-        "type_must_be_question_or_answer": "Type must be \"question\" or \"answer\"",
-        "valid_target_id_required": "A valid target_id is required",
-        "vote_must_be_up_down": "Vote must be \"up\"/\"down\" or 1/-1"
+        "answer_accepted": "Freagra glactha",
+        "vote_recorded": "Vóta taifeadta",
+        "failed_accept_answer": "Theip ar ghlacadh leis an bhfreagra",
+        "failed_record_vote": "Theip ar thaifeadadh an vóta",
+        "title_required": "Tá teideal riachtanach",
+        "body_required": "Tá an corp riachtanach",
+        "failed_create_question": "Theip ar chruthú ceiste",
+        "question_not_found": "Ceist gan aimsiú",
+        "failed_post_answer": "Theip ar phostáil an fhreagra",
+        "type_must_be_question_or_answer": "Ní mór don chineál a bheith \"question\" nó \"answer\"",
+        "valid_target_id_required": "Tá target_id bailí riachtanach",
+        "vote_must_be_up_down": "Ní mór don vóta a bheith \"up\"/\"down\" nó 1/-1"
     },
     "group_scheduled_post": {
-        "cancelled": "Cancelled",
-        "not_found_or_published": "Not found or already published"
+        "cancelled": "Curtha ar ceal",
+        "not_found_or_published": "Gan aimsiú nó foilsithe cheana féin"
     },
     "group_webhook": {
-        "webhook_deleted": "Webhook deleted",
-        "webhook_not_found": "Webhook not found"
+        "webhook_deleted": "Webhook scriosta",
+        "webhook_not_found": "Webhook gan aimsiú"
     },
     "group_wiki": {
-        "wiki_page_deleted": "Wiki page deleted"
+        "wiki_page_deleted": "Leathanach vicí scriosta"
     },
     "listings": {
-        "listing_saved_notification": ":saver_name saved your listing \":title\""
+        "listing_saved_notification": "Shábháil :saver_name do liosta \":title\""
     }
 }
