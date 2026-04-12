@@ -1753,7 +1753,9 @@ Route::post('/social/delete-comment', [\App\Http\Controllers\Api\SocialControlle
 Route::post('/social/mention-search', [\App\Http\Controllers\Api\SocialController::class, 'mentionSearch']); // deprecated: use V2 GET equivalent
 Route::post('/social/feed', [\App\Http\Controllers\Api\SocialController::class, 'feed']); // deprecated: use GET /v2/feed
 Route::post('/social/create-post', [\App\Http\Controllers\Api\SocialController::class, 'createPost']);
-Route::post('/upload', [\App\Http\Controllers\Api\UploadController::class, 'store']);
+// /upload is a generic authenticated upload endpoint — throttle to prevent
+// storage DoS via high-frequency small-file uploads.
+Route::middleware('throttle:30,1')->post('/upload', [\App\Http\Controllers\Api\UploadController::class, 'store']);
 Route::post('/push/subscribe', [\App\Http\Controllers\Api\PushController::class, 'subscribe']);
 Route::post('/push/unsubscribe', [\App\Http\Controllers\Api\PushController::class, 'unsubscribe']);
 Route::post('/push/send', [\App\Http\Controllers\Api\PushController::class, 'send']);

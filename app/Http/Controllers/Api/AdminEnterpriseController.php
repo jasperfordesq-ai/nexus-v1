@@ -1099,6 +1099,9 @@ class AdminEnterpriseController extends BaseApiController
     public function generateGdprExport(int $id): JsonResponse
     {
         $this->requireAdmin();
+        // Exports can produce 100MB+ ZIPs. Cap to a handful of runs per hour
+        // per admin so a loop (or compromised session) cannot fill storage.
+        $this->rateLimit('gdpr_export', 5, 3600);
         $tenantId = $this->getTenantId();
 
         try {

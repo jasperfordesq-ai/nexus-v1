@@ -868,10 +868,21 @@ class GdprService
                 [$anonymizedEmail, $userId, $this->tenantId]
             );
 
-            // 3. Delete personal content
+            // 3. Delete personal content.
+            // Messages: we do NOT hard-delete. Doing so orphans message
+            // threads for the *other* participant — they'd see half a
+            // conversation with no attribution, breaking their right to
+            // retain records of communication they received. Instead we
+            // anonymise the sender/receiver side belonging to the erased
+            // user and scrub the body where this user authored it. The row
+            // stays so the counterparty's audit trail remains intact.
             $this->query(
-                "DELETE FROM messages WHERE (sender_id = ? OR receiver_id = ?) AND tenant_id = ?",
-                [$userId, $userId, $this->tenantId]
+                "UPDATE messages
+                    SET body = CASE WHEN sender_id = ? THEN '[message removed — account erased]' ELSE body END,
+                        transcript = CASE WHEN sender_id = ? THEN NULL ELSE transcript END,
+                        audio_url = CASE WHEN sender_id = ? THEN NULL ELSE audio_url END
+                  WHERE (sender_id = ? OR receiver_id = ?) AND tenant_id = ?",
+                [$userId, $userId, $userId, $userId, $userId, $this->tenantId]
             );
             $this->query(
                 "DELETE FROM notifications WHERE user_id = ? AND tenant_id = ?",

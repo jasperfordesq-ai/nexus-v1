@@ -73,10 +73,19 @@ class GroupInviteController extends BaseApiController
             return $userId;
         }
 
+        // Email fan-out is a reflection/DoS target — an attacker can use us as
+        // a relay to spam external addresses. Cap per-user per-hour. The
+        // per-invite batch is additionally capped inside sendEmailInvites.
+        $this->rateLimit('group_invite_email', 10, 3600);
+
         $emails = request()->input('emails');
 
         if (!is_array($emails) || empty($emails)) {
             return $this->errorResponse('A valid emails array is required', 422);
+        }
+        // Hard ceiling on batch size so one call can't mail 10k addresses.
+        if (count($emails) > 50) {
+            return $this->errorResponse('Maximum 50 invites per request', 422);
         }
 
         $message = request()->input('message', '');

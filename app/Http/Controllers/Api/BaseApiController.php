@@ -571,9 +571,17 @@ abstract class BaseApiController extends Controller
     }
 
     /**
-     * Require super admin role
+     * Require super-admin role (tenant-scoped or platform-wide).
      *
-     * Checks role claim AND is_super_admin flag.
+     * Accepts both platform super-admins (is_super_admin, role=super_admin|god)
+     * AND tenant-scoped super-admins (is_tenant_super_admin). This is the right
+     * check for endpoints that operate within the caller's own tenant — the
+     * middleware stack still pins operations to the caller's tenant_id.
+     *
+     * For endpoints that act ACROSS tenants (platform-wide config, tenant
+     * creation, federation whitelist, cross-tenant user moves), use
+     * requirePlatformSuperAdmin() instead — otherwise a tenant super-admin can
+     * reach platform-level controls and laterally move into other tenants.
      *
      * @return int User ID
      *
@@ -595,6 +603,35 @@ abstract class BaseApiController extends Controller
         }
 
         if ($user->is_tenant_super_admin ?? false) {
+            return $userId;
+        }
+
+        throw new \Illuminate\Http\Exceptions\HttpResponseException(
+            $this->error(__('api.super_admin_required'), 403, 'AUTH_INSUFFICIENT_PERMISSIONS')
+        );
+    }
+
+    /**
+     * Require PLATFORM super-admin (cross-tenant). Rejects tenant super-admins.
+     *
+     * Use for: creating tenants, federation whitelist mutation, god-mode
+     * queries that span tenants, cross-tenant user moves, platform-global
+     * config. A tenant super-admin must NEVER reach these endpoints —
+     * otherwise a compromised tenant admin account becomes a platform
+     * compromise.
+     *
+     * @return int User ID
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException if not platform super admin
+     */
+    protected function requirePlatformSuperAdmin(): int
+    {
+        $userId = $this->requireAuth();
+        $user = $this->resolveUser();
+
+        $role = $user->role ?? 'member';
+
+        // Explicitly NOT accepting is_tenant_super_admin.
+        if (in_array($role, ['super_admin', 'god'], true) || ($user->is_super_admin ?? false) || ($user->is_god ?? false)) {
             return $userId;
         }
 
