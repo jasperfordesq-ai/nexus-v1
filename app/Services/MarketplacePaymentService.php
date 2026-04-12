@@ -242,7 +242,7 @@ class MarketplacePaymentService
         $amountCents = (int) round($totalAmount * 100);
         $feeCents = (int) round($platformFee * 100);
 
-        $currency = strtolower($order->currency ?? 'eur');
+        $currency = strtolower($order->currency ?? TenantContext::getCurrency());
 
         $client = StripeService::client();
 
@@ -366,7 +366,7 @@ class MarketplacePaymentService
             $payment->stripe_payment_intent_id = $paymentIntentId;
             $payment->stripe_charge_id = $chargeId;
             $payment->amount = $totalAmount;
-            $payment->currency = strtoupper($paymentIntent->currency ?? 'eur');
+            $payment->currency = strtoupper($paymentIntent->currency ?? TenantContext::getCurrency());
             $payment->platform_fee = $platformFee;
             $payment->seller_payout = $sellerPayout;
             $payment->payment_method = $paymentIntent->payment_method_types[0] ?? 'card';

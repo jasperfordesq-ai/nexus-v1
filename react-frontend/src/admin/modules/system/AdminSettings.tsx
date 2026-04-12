@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardBody, CardHeader, Input, Switch, Button, Textarea, Spinner } from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Switch, Button, Textarea, Spinner, Select, SelectItem } from '@heroui/react';
 import { Settings, Save, ShieldCheck, Scale } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
@@ -30,7 +30,17 @@ interface SettingsForm {
   admin_approval: boolean;    // general.admin_approval
   maintenance_mode: boolean;  // general.maintenance_mode
   footer_text: string;        // general.footer_text (charity number, legal name, etc.)
+  default_currency: string;   // general.default_currency (ISO 4217 lowercase, e.g. 'eur', 'usd')
 }
+
+const CURRENCY_OPTIONS: Array<{ code: string; label: string }> = [
+  { code: 'eur', label: 'EUR — Euro' },
+  { code: 'usd', label: 'USD — US Dollar' },
+  { code: 'gbp', label: 'GBP — British Pound' },
+  { code: 'cad', label: 'CAD — Canadian Dollar' },
+  { code: 'aud', label: 'AUD — Australian Dollar' },
+  { code: 'jpy', label: 'JPY — Japanese Yen' },
+];
 
 const DEFAULT_SETTINGS: SettingsForm = {
   name: '',
@@ -42,6 +52,7 @@ const DEFAULT_SETTINGS: SettingsForm = {
   admin_approval: false,
   maintenance_mode: false,
   footer_text: '',
+  default_currency: 'eur',
 };
 
 export function AdminSettings() {
@@ -75,6 +86,7 @@ export function AdminSettings() {
           admin_approval: settings.admin_approval === 'true' || settings.admin_approval === '1',
           maintenance_mode: settings.maintenance_mode === 'true' || settings.maintenance_mode === '1',
           footer_text: (settings.footer_text as string) ?? '',
+          default_currency: (settings.default_currency as string)?.toLowerCase() || 'eur',
         };
         setForm(loaded);
         setOriginalForm(loaded);
@@ -104,6 +116,7 @@ export function AdminSettings() {
       if (form.email_verification !== originalForm.email_verification) changes.email_verification = String(form.email_verification);
       if (form.admin_approval !== originalForm.admin_approval) changes.admin_approval = String(form.admin_approval);
       if (form.footer_text !== originalForm.footer_text) changes.footer_text = form.footer_text;
+      if (form.default_currency !== originalForm.default_currency) changes.default_currency = form.default_currency;
 
       if (Object.keys(changes).length === 0) {
         toast.error(t('system.no_changes_to_save'));
@@ -180,6 +193,20 @@ export function AdminSettings() {
               value={form.contact_phone}
               onValueChange={(val) => setForm(prev => ({ ...prev, contact_phone: val }))}
             />
+            <Select
+              label="Default Currency"
+              description="Currency used for Stripe subscriptions, donations, marketplace orders, and identity verification fees."
+              variant="bordered"
+              selectedKeys={[form.default_currency]}
+              onSelectionChange={(keys) => {
+                const val = Array.from(keys)[0] as string | undefined;
+                if (val) setForm(prev => ({ ...prev, default_currency: val }));
+              }}
+            >
+              {CURRENCY_OPTIONS.map(opt => (
+                <SelectItem key={opt.code}>{opt.label}</SelectItem>
+              ))}
+            </Select>
           </CardBody>
         </Card>
 

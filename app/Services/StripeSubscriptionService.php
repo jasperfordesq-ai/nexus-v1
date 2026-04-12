@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -37,9 +38,9 @@ class StripeSubscriptionService
             $updates = [];
             $params = [];
 
-            // TODO: support per-tenant / per-plan currency override once pay_plans
-            // grows a currency column. For now fall back to platform default.
-            $currency = strtolower((string) config('stripe.default_currency', env('STRIPE_DEFAULT_CURRENCY', 'eur')));
+            // Per-tenant currency (falls back to config, then 'eur').
+            // Per-plan currency override would still require a currency column on pay_plans.
+            $currency = TenantContext::getCurrency();
 
             // --- Product ---
             if (empty($plan->stripe_product_id)) {

@@ -41,7 +41,7 @@ class StripeDonationService
     public static function createPaymentIntent(int $userId, int $tenantId, array $data): array
     {
         $amount = (float) ($data['amount'] ?? 0);
-        $currency = strtolower(trim($data['currency'] ?? 'eur'));
+        $currency = strtolower(trim($data['currency'] ?? TenantContext::getCurrency()));
 
         if ($amount < 0.50) {
             throw new \InvalidArgumentException('Donation amount must be at least 0.50.');

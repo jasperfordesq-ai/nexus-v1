@@ -730,6 +730,16 @@ class AdminConfigController extends BaseApiController
             }
         }
 
+        // Validate default_currency — must be a 3-letter ISO 4217 code (lowercase).
+        // Stripe accepts ~135 currencies; allow any 3-letter code and normalize to lowercase.
+        if (isset($kvUpdates['default_currency'])) {
+            $cur = strtolower(trim((string) $kvUpdates['default_currency']));
+            if (!preg_match('/^[a-z]{3}$/', $cur)) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.default_currency_invalid', []), 'default_currency', 422);
+            }
+            $kvUpdates['default_currency'] = $cur;
+        }
+
         foreach ($kvUpdates as $key => $value) {
             $this->upsertSetting($tenantId, 'general.' . $key, (string) $value, $adminId);
         }

@@ -482,6 +482,58 @@ class TenantContext
         return 'https://app.project-nexus.ie';
     }
 
+    /**
+     * Get the tenant's preferred payment currency (ISO 4217, lowercase).
+     *
+     * Resolution order:
+     *   1. tenant_settings table key `default_currency` (per-tenant override)
+     *   2. tenants.configuration JSON `general.currency` (legacy/alt override)
+     *   3. config('stripe.default_currency') / STRIPE_DEFAULT_CURRENCY env
+     *   4. hardcoded 'eur' fallback
+     *
+     * @return string Lowercase 3-letter ISO currency code (e.g. 'eur', 'usd', 'gbp')
+     */
+    public static function getCurrency(): string
+    {
+        $currency = null;
+
+        // 1. Per-tenant override in tenant_settings key-value table.
+        // Two key conventions exist historically — check both:
+        //   - 'general.default_currency' (AdminSettingsController)
+        //   - 'default_currency'         (AdminConfigController)
+        try {
+            $tenantId = (int) (self::get()['id'] ?? 0);
+            if ($tenantId > 0 && class_exists(\App\Services\TenantSettingsService::class)) {
+                foreach (['general.default_currency', 'default_currency'] as $settingKey) {
+                    $value = \App\Services\TenantSettingsService::get($tenantId, $settingKey);
+                    if (is_string($value) && strlen(trim($value)) === 3) {
+                        $currency = trim($value);
+                        break;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // Ignore — fall through to other sources
+        }
+
+        // 2. Fallback to tenants.configuration JSON (general.currency)
+        if (!$currency) {
+            $json = self::getSetting('general.currency');
+            if (is_string($json) && strlen(trim($json)) === 3) {
+                $currency = trim($json);
+            }
+        }
+
+        // 3. Fallback to config / env
+        if (!$currency) {
+            $currency = (string) config('stripe.default_currency', Env::get('STRIPE_DEFAULT_CURRENCY', 'eur'));
+        }
+
+        // 4. Final guard
+        $currency = strtolower(trim($currency));
+        return strlen($currency) === 3 ? $currency : 'eur';
+    }
+
     public static function hasFeature($feature)
     {
         $tenant = self::get();
