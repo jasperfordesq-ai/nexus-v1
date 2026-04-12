@@ -79,12 +79,21 @@ class MemberRankingService
             ->pluck('cnt', 'user_id')
             ->all();
 
-        // Reputation: average review rating
+        // Reputation: average review rating across BOTH local reviews (tenant_id scope)
+        // AND federated reviews received from other tenants (reputation portability).
+        // A single AVG(rating) merges both sets so members carry reputation globally.
         $ratingMap = DB::table('reviews')
-            ->where('tenant_id', $tenantId)
-            ->whereIn('reviewed_user_id', $userIds)
-            ->select('reviewed_user_id as user_id', DB::raw('AVG(rating) as avg_rating'))
-            ->groupBy('reviewed_user_id')
+            ->whereIn('receiver_id', $userIds)
+            ->where(function ($q) use ($tenantId) {
+                $q->where('tenant_id', $tenantId)
+                  ->orWhere(function ($q2) use ($tenantId) {
+                      $q2->where('receiver_tenant_id', $tenantId)
+                         ->where('review_type', 'federated')
+                         ->where('show_cross_tenant', 1);
+                  });
+            })
+            ->select('receiver_id as user_id', DB::raw('AVG(rating) as avg_rating'))
+            ->groupBy('receiver_id')
             ->pluck('avg_rating', 'user_id')
             ->all();
 

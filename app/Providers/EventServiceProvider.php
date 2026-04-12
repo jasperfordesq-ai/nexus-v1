@@ -10,6 +10,7 @@ use App\Events\ConnectionRequested;
 use App\Events\JobVacancyCreated;
 use App\Events\ListingCreated;
 use App\Events\MessageSent;
+use App\Events\ReviewCreated;
 use App\Events\SafeguardingFlaggedEvent;
 use App\Events\TransactionCompleted;
 use App\Events\UserRegistered;
@@ -19,6 +20,10 @@ use App\Listeners\NotifyJobAlertSubscribers;
 use App\Listeners\NotifyMessageReceived;
 use App\Listeners\NotifySafeguardingStaff;
 use App\Listeners\NotifyTransactionCompleted;
+use App\Listeners\PushListingToFederatedPartners;
+use App\Listeners\PushMessageToFederatedPartner;
+use App\Listeners\PushReviewToFederatedPartner;
+use App\Listeners\PushTransactionToFederatedPartner;
 use App\Listeners\SendWelcomeNotification;
 use App\Listeners\UpdateFeedOnListingCreated;
 use App\Listeners\UpdateWalletBalance;
@@ -45,11 +50,13 @@ class EventServiceProvider extends ServiceProvider
 
         ListingCreated::class => [
             UpdateFeedOnListingCreated::class,
+            PushListingToFederatedPartners::class,
         ],
 
         TransactionCompleted::class => [
             UpdateWalletBalance::class,
             NotifyTransactionCompleted::class,
+            PushTransactionToFederatedPartner::class,
         ],
 
         ConnectionRequested::class => [
@@ -59,6 +66,7 @@ class EventServiceProvider extends ServiceProvider
         MessageSent::class => [
             NotifyMessageReceived::class,
             CopyMessageForBrokerReview::class,
+            PushMessageToFederatedPartner::class,
         ],
 
         JobVacancyCreated::class => [
@@ -67,6 +75,10 @@ class EventServiceProvider extends ServiceProvider
 
         SafeguardingFlaggedEvent::class => [
             NotifySafeguardingStaff::class,
+        ],
+
+        ReviewCreated::class => [
+            PushReviewToFederatedPartner::class,
         ],
     ];
 

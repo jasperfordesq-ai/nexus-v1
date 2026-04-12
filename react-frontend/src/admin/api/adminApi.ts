@@ -1416,6 +1416,46 @@ export const adminFederation = {
 
   getCreditBalances: () =>
     api.get<{ balances: Array<{ agreement_id: number; partner_tenant_id: number; partner_name: string; credits_sent: number; credits_received: number; net_balance: number }>; net_total: number }>('/v2/admin/federation/credit-balances'),
+
+  // Enhanced analytics overview (KPIs + chart data)
+  getAnalyticsOverview: (range: '7d' | '30d' | '90d' = '30d') =>
+    api.get<{
+      range_days: number;
+      kpis: {
+        total_partnerships: number;
+        active_partnerships: number;
+        pending_partnerships: number;
+        external_partners: number;
+        federated_transactions: number;
+        federated_messages: number;
+        federated_listings: number;
+        inbound_reviews: number;
+      };
+      daily_calls: Array<{ date: string; count: number }>;
+      top_partners: Array<{ tenant_id: number; name: string; activity: number }>;
+      recent_errors: Array<{ id: number; endpoint: string; method: string; response_code: number; ip_address: string; created_at: string }>;
+    }>(`/v2/admin/federation/analytics/overview?range=${range}`),
+
+  // Data management: bulk export (streamed JSON), import (multipart), purge
+  exportFederationData: () =>
+    api.download('/v2/admin/federation/data/export', {
+      method: 'POST',
+      filename: `federation_export_${new Date().toISOString().slice(0, 10)}.json`,
+    }),
+
+  importFederationData: (file: File, dryRun: boolean) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('dry_run', dryRun ? '1' : '0');
+    return api.upload<{
+      dry_run: boolean;
+      partnerships: { new: number; skipped: number; invalid: number };
+      external_partners: { new: number; skipped: number; invalid: number };
+    }>('/v2/admin/federation/data/import', fd);
+  },
+
+  purgeFederationData: (days: number) =>
+    api.post<{ deleted: number; cutoff: string; days: number }>('/v2/admin/federation/data/purge', { days }),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -60,6 +60,38 @@ class Review extends Model
         return $query->where('receiver_id', $userId);
     }
 
+    /**
+     * Include both local reviews (tenant-scoped by the global TenantScope)
+     * AND federated reviews where `receiver_tenant_id` = current tenant and
+     * `review_type = 'federated'` and `show_cross_tenant = 1`.
+     *
+     * We drop the global TenantScope and re-express the filter as a single
+     * OR clause. This supports reputation portability: members keep their
+     * reviews when they interact across tenants.
+     */
+    public function scopeWithFederated(Builder $query): Builder
+    {
+        $tenantId = \App\Core\TenantContext::getId();
+
+        // Without an active tenant context we can't safely expand the scope,
+        // so leave the query unchanged (global scope still applies).
+        if (! $tenantId) {
+            return $query;
+        }
+
+        $table = $this->getTable();
+
+        return $query->withoutGlobalScope(\App\Scopes\TenantScope::class)
+            ->where(function (Builder $q) use ($tenantId, $table) {
+                $q->where($table . '.tenant_id', $tenantId)
+                  ->orWhere(function (Builder $q2) use ($tenantId, $table) {
+                      $q2->where($table . '.receiver_tenant_id', $tenantId)
+                         ->where($table . '.review_type', 'federated')
+                         ->where($table . '.show_cross_tenant', 1);
+                  });
+            });
+    }
+
     public function scopeInGroup(Builder $query, int $groupId): Builder
     {
         return $query->where('group_id', $groupId);

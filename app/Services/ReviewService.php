@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Events\ReviewCreated;
 use App\Models\Review;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -35,6 +36,7 @@ class ReviewService
         $cursor = $filters['cursor'] ?? null;
 
         $query = $this->review->newQuery()
+            ->withFederated()
             ->with(['reviewer:id,first_name,last_name,avatar_url,organization_name,profile_type'])
             ->where('receiver_id', $userId)
             ->where(function (Builder $q) {
@@ -85,8 +87,9 @@ class ReviewService
             ];
         })->all();
 
-        // Aggregate stats
+        // Aggregate stats — include federated reviews so reputation follows the user
         $avgRating = $this->review->newQuery()
+            ->withFederated()
             ->where('receiver_id', $userId)
             ->where(function (Builder $q) {
                 $q->whereNull('status')->orWhereIn('status', ['active', 'approved']);
@@ -94,6 +97,7 @@ class ReviewService
             ->avg('rating');
 
         $total = $this->review->newQuery()
+            ->withFederated()
             ->where('receiver_id', $userId)
             ->where(function (Builder $q) {
                 $q->whereNull('status')->orWhereIn('status', ['active', 'approved']);
@@ -117,6 +121,7 @@ class ReviewService
     public function getStats(int $userId): array
     {
         $baseQuery = fn () => $this->review->newQuery()
+            ->withFederated()
             ->where('receiver_id', $userId)
             ->where(function (Builder $q) {
                 $q->whereNull('status')->orWhereIn('status', ['active', 'approved']);
@@ -150,6 +155,7 @@ class ReviewService
     {
         /** @var Review|null $review */
         $review = $this->review->newQuery()
+            ->withFederated()
             ->with([
                 'reviewer:id,first_name,last_name,avatar_url,organization_name,profile_type',
                 'receiver:id,first_name,last_name,avatar_url,organization_name,profile_type',
@@ -226,6 +232,17 @@ class ReviewService
         $review->save();
 
         $review = $review->fresh(['reviewer', 'receiver']);
+
+        // Fire ReviewCreated so federation listeners can push the review to
+        // the receiver's home partner (reputation portability).
+        try {
+            ReviewCreated::dispatch($review);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('ReviewCreated dispatch failed', [
+                'review_id' => $review->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return [
             'id'          => $review->id,

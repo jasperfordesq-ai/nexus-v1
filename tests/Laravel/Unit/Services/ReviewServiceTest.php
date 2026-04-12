@@ -28,6 +28,7 @@ class ReviewServiceTest extends TestCase
     public function test_getById_returns_null_when_not_found(): void
     {
         $mockQuery = Mockery::mock();
+        $mockQuery->shouldReceive('withFederated')->andReturnSelf();
         $mockQuery->shouldReceive('with')->andReturnSelf();
         $mockQuery->shouldReceive('find')->with(999)->andReturnNull();
         $this->mockReview->shouldReceive('newQuery')->andReturn($mockQuery);
@@ -41,6 +42,7 @@ class ReviewServiceTest extends TestCase
     public function test_getStats_returns_zero_for_user_without_reviews(): void
     {
         $mockQuery = Mockery::mock();
+        $mockQuery->shouldReceive('withFederated')->andReturnSelf();
         $mockQuery->shouldReceive('where')->andReturnSelf();
         $mockQuery->shouldReceive('count')->andReturn(0);
         $mockQuery->shouldReceive('avg')->andReturn(null);

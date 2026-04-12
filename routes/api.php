@@ -1480,6 +1480,14 @@ Route::post('/v2/admin/federation/api-keys', [\App\Http\Controllers\Api\AdminFed
 Route::post('/v2/admin/federation/api-keys/{id}/revoke', [\App\Http\Controllers\Api\AdminFederationController::class, 'revokeApiKey']);
 Route::get('/v2/admin/federation/data', [\App\Http\Controllers\Api\AdminFederationController::class, 'dataManagement']);
 Route::get('/v2/admin/federation/export/{type}', [\App\Http\Controllers\Api\AdminFederationController::class, 'exportData']);
+// Enhanced federation analytics overview (KPIs + chart data)
+Route::get('/v2/admin/federation/analytics/overview', [\App\Http\Controllers\Api\AdminFederationAnalyticsController::class, 'overview']);
+// Federation data management: full export / import / purge
+Route::post('/v2/admin/federation/data/export', [\App\Http\Controllers\Api\AdminFederationDataController::class, 'export'])
+    ->middleware('throttle:1,1');
+Route::post('/v2/admin/federation/data/import', [\App\Http\Controllers\Api\AdminFederationDataController::class, 'import'])
+    ->middleware('throttle:1,1');
+Route::post('/v2/admin/federation/data/purge', [\App\Http\Controllers\Api\AdminFederationDataController::class, 'purge']);
 Route::get('/v2/admin/federation/neighborhoods', [\App\Http\Controllers\Api\AdminFederationNeighborhoodsController::class, 'index']);
 Route::post('/v2/admin/federation/neighborhoods', [\App\Http\Controllers\Api\AdminFederationNeighborhoodsController::class, 'store']);
 Route::get('/v2/admin/federation/available-tenants', [\App\Http\Controllers\Api\AdminFederationNeighborhoodsController::class, 'availableTenants']);

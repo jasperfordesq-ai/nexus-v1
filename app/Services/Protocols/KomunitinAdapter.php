@@ -60,6 +60,8 @@ class KomunitinAdapter implements FederationProtocolAdapter
             'currency'            => "/currencies/{$id}",
             'health'              => '/health',
             'messages'            => '/messages',
+            'reviews'             => '/reviews',
+            'review'              => "/reviews/{$id}",
             default               => "/{$action}",
         };
     }
@@ -125,6 +127,72 @@ class KomunitinAdapter implements FederationProtocolAdapter
                 ],
             ],
         ];
+    }
+
+    /**
+     * Transform a Nexus review into a Komunitin-compatible JSON:API resource
+     * and return the request envelope ready for POST /reviews.
+     *
+     * Komunitin does not yet ship a first-class "reviews" resource in its
+     * public spec, but the platform is JSON:API-native — any resource follows
+     * the { data: { type, attributes, relationships } } shape. We use type
+     * "reviews" with attributes mirroring our Review model plus an
+     * `attestation` object carrying the reviewer's identity so the receiving
+     * node can verify origin.
+     *
+     * @param array              $review  Review payload (rating, comment, transaction_ref, etc.)
+     * @param int|array|object   $partner Partner ID, partner row, or FederationPartner model
+     * @return array JSON:API envelope suitable for POST
+     */
+    public function sendReview(array $review, int|array|object $partner = 0): array
+    {
+        $partnerId = is_int($partner)
+            ? $partner
+            : (int) (is_array($partner) ? ($partner['id'] ?? 0) : ($partner->id ?? 0));
+
+        $attributes = [
+            'rating'          => (int) ($review['rating'] ?? 0),
+            'comment'         => $review['comment'] ?? null,
+            'review_type'     => 'federated',
+            'transaction_ref' => $review['transaction_ref']
+                ?? $review['federation_transaction_id']
+                ?? $review['transaction_id']
+                ?? null,
+            'created_at'      => $review['created_at'] ?? null,
+            // Attestation: who the reviewer is on our side. The receiving
+            // node should use this to resolve the local-tenant reviewer identity.
+            'attestation'     => [
+                'reviewer_external_id' => $review['reviewer_external_id']
+                    ?? (string) ($review['reviewer_id'] ?? ''),
+                'reviewer_handle'      => $review['reviewer_handle'] ?? null,
+                'reviewer_tenant'      => $review['reviewer_tenant'] ?? null,
+                'source_platform'      => 'nexus',
+            ],
+        ];
+
+        $relationships = [];
+        if (!empty($review['receiver_external_id'])) {
+            $relationships['receiver'] = [
+                'data' => [
+                    'type' => 'accounts',
+                    'id'   => (string) $review['receiver_external_id'],
+                ],
+            ];
+        }
+
+        $resource = [
+            'type'       => 'reviews',
+            'attributes' => $attributes,
+        ];
+
+        if (!empty($relationships)) {
+            $resource['relationships'] = $relationships;
+        }
+
+        // Tag the payload with the partner for logging; harmless to senders.
+        unset($partnerId);
+
+        return ['data' => $resource];
     }
 
     public function transformOutboundMessage(array $nexusMessage): array
