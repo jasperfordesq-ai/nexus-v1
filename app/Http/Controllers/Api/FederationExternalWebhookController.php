@@ -9,6 +9,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Events\FederatedCommunityEventReceived;
+use App\Events\FederatedConnectionReceived;
+use App\Events\FederatedGroupReceived;
+use App\Events\FederatedListingReceived;
+use App\Events\FederatedMemberUpdated;
+use App\Events\FederatedReviewReceived;
+use App\Events\FederatedVolunteeringReceived;
 use App\Services\FederatedMessageService;
 use App\Services\FederationExternalApiClient;
 use App\Services\FederationExternalPartnerService;
@@ -128,6 +135,11 @@ class FederationExternalWebhookController extends BaseApiController
                 'event' => $event,
                 'result' => $result,
             ]);
+        } catch (InboundValidationException $e) {
+            DB::table('federation_external_partner_logs')
+                ->where('id', $logId)
+                ->update(['response_code' => 400, 'success' => false, 'error_message' => substr($e->getMessage(), 0, 1000)]);
+            return $this->respondWithError('INVALID_PAYLOAD', $e->getMessage(), $e->field, 400);
         } catch (\Throwable $e) {
             Log::error("[FederationExternalWebhook] Event processing failed: {$e->getMessage()}", [
                 'event' => $event,
@@ -269,9 +281,448 @@ class FederationExternalWebhookController extends BaseApiController
             'partnership.terminated' => $this->handlePartnershipTerminated($partner),
             'members.list' => $this->handleMembersList($data, $partner),
             'listings.list' => $this->handleListingsList($data, $partner),
+            // New inbound PUSH handlers (partner-initiated create/update)
+            'review.created' => $this->handleInboundReview($data, $partner),
+            'listing.created', 'listing.updated' => $this->handleInboundListing($data, $partner),
+            'event.created', 'event.updated' => $this->handleInboundCommunityEvent($data, $partner),
+            'group.created', 'group.updated' => $this->handleInboundGroup($data, $partner),
+            'group.member_joined' => $this->handleInboundGroupMembership($data, $partner),
+            'connection.requested', 'connection.accepted' => $this->handleInboundConnection($data, $partner, $event),
+            'volunteering.created', 'volunteering.updated' => $this->handleInboundVolunteering($data, $partner),
+            'member.profile_updated' => $this->handleInboundMemberSync($data, $partner),
             'health_check' => ['status' => 'ok'],
             default => ['status' => 'unhandled', 'event' => $event],
         };
+    }
+
+    // ----------------------------------------------------------------
+    // Inbound PUSH handlers (partner-initiated create/update)
+    // ----------------------------------------------------------------
+
+    /**
+     * Require a string field from the payload, throwing InboundValidationException
+     * if it is missing or empty.
+     */
+    private function requireString(array $data, string $field): string
+    {
+        $value = $data[$field] ?? null;
+        if ($value === null || $value === '' || !is_scalar($value)) {
+            throw new InboundValidationException("Missing required field: {$field}", $field);
+        }
+        $value = (string) $value;
+        if (mb_strlen($value) > 10000) {
+            throw new InboundValidationException("Field '{$field}' exceeds maximum length", $field);
+        }
+        return $value;
+    }
+
+    private function optionalString(array $data, string $field, int $max = 10000): ?string
+    {
+        $value = $data[$field] ?? null;
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (!is_scalar($value)) {
+            return null;
+        }
+        $value = (string) $value;
+        if (mb_strlen($value) > $max) {
+            $value = mb_substr($value, 0, $max);
+        }
+        return $value;
+    }
+
+    private function parseDateTime(?string $value): ?string
+    {
+        if (!$value) {
+            return null;
+        }
+        try {
+            $dt = new \DateTimeImmutable($value);
+            return $dt->format('Y-m-d H:i:s');
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    private function handleInboundReview(array $data, object $partner): array
+    {
+        $externalId = $this->requireString($data, 'external_id');
+        $rating = (int) ($data['rating'] ?? 0);
+        if ($rating < 1 || $rating > 5) {
+            throw new InboundValidationException('rating must be between 1 and 5', 'rating');
+        }
+        $receiverId = (int) ($data['receiver_id'] ?? $data['local_member_id'] ?? 0);
+        if ($receiverId <= 0) {
+            throw new InboundValidationException('Missing required field: receiver_id', 'receiver_id');
+        }
+
+        $tenantId = (int) TenantContext::getId();
+
+        // Validate the receiver belongs to this tenant
+        $receiver = DB::table('users')
+            ->where('id', $receiverId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->first(['id']);
+        if (!$receiver) {
+            throw new InboundValidationException("Receiver user #{$receiverId} not found in this tenant", 'receiver_id');
+        }
+
+        // Dedup by (external_partner_id, external_id) stored in comment-tagged pattern —
+        // since reviews has no external_id column, we dedup via federation_transaction_id
+        // when provided, otherwise via comment prefix or just allow multiple.
+        $externalTxId = $this->optionalString($data, 'external_transaction_id', 128);
+        $reviewerExternalId = (int) ($data['reviewer_external_id'] ?? $data['reviewer_id'] ?? 0);
+        $reviewerTenantId = (int) ($data['reviewer_tenant_id'] ?? 0);
+
+        $existing = null;
+        if ($externalTxId) {
+            $tx = DB::table('federation_transactions')
+                ->where('external_transaction_id', $externalTxId)
+                ->where('external_partner_id', $partner->id)
+                ->first(['id']);
+            if ($tx) {
+                $existing = DB::table('reviews')
+                    ->where('federation_transaction_id', $tx->id)
+                    ->where('reviewer_id', $reviewerExternalId)
+                    ->where('receiver_id', $receiverId)
+                    ->first(['id']);
+            }
+        }
+
+        if ($existing) {
+            return ['status' => 'duplicate', 'local_id' => (int) $existing->id];
+        }
+
+        $comment = $this->optionalString($data, 'comment', 5000);
+
+        $localId = DB::table('reviews')->insertGetId([
+            'tenant_id'          => $tenantId,
+            'reviewer_id'        => $reviewerExternalId,
+            'reviewer_tenant_id' => $reviewerTenantId ?: null,
+            'receiver_id'        => $receiverId,
+            'receiver_tenant_id' => $tenantId,
+            'rating'             => $rating,
+            'comment'            => $comment,
+            'status'             => 'approved',
+            'review_type'        => 'federated',
+            'show_cross_tenant'  => 1,
+            'created_at'         => now(),
+        ]);
+
+        $shadowRow = [
+            'id' => $localId,
+            'external_id' => $externalId,
+            'external_partner_id' => $partner->id,
+            'rating' => $rating,
+            'receiver_id' => $receiverId,
+            'reviewer_external_id' => $reviewerExternalId,
+            'comment' => $comment,
+        ];
+        event(new FederatedReviewReceived($tenantId, (int) $partner->id, (int) $localId, $shadowRow));
+
+        return ['status' => 'handled', 'local_id' => (int) $localId];
+    }
+
+    private function handleInboundListing(array $data, object $partner): array
+    {
+        $externalId = $this->requireString($data, 'external_id');
+        $title = $this->requireString($data, 'title');
+        $tenantId = (int) TenantContext::getId();
+
+        $row = [
+            'tenant_id' => $tenantId,
+            'external_partner_id' => (int) $partner->id,
+            'external_id' => $externalId,
+            'title' => $title,
+            'description' => $this->optionalString($data, 'description', 10000),
+            'type' => $this->optionalString($data, 'type', 32),
+            'category' => $this->optionalString($data, 'category', 128),
+            'external_user_id' => $this->optionalString($data, 'external_user_id', 128)
+                ?? $this->optionalString($data, 'user_id', 128),
+            'external_user_name' => $this->optionalString($data, 'external_user_name', 255)
+                ?? $this->optionalString($data, 'user', 255),
+            'metadata' => isset($data['metadata']) && is_array($data['metadata'])
+                ? json_encode($data['metadata'])
+                : null,
+            'updated_at' => now(),
+        ];
+
+        $existing = DB::table('federation_listings')
+            ->where('external_partner_id', $partner->id)
+            ->where('external_id', $externalId)
+            ->first(['id']);
+
+        if ($existing) {
+            DB::table('federation_listings')->where('id', $existing->id)->update($row);
+            $localId = (int) $existing->id;
+        } else {
+            $row['created_at'] = now();
+            $localId = (int) DB::table('federation_listings')->insertGetId($row);
+        }
+
+        $row['id'] = $localId;
+        event(new FederatedListingReceived($tenantId, (int) $partner->id, $localId, $row));
+
+        return ['status' => 'handled', 'local_id' => $localId];
+    }
+
+    private function handleInboundCommunityEvent(array $data, object $partner): array
+    {
+        $externalId = $this->requireString($data, 'external_id');
+        $title = $this->requireString($data, 'title');
+        $tenantId = (int) TenantContext::getId();
+
+        $row = [
+            'tenant_id' => $tenantId,
+            'external_partner_id' => (int) $partner->id,
+            'external_id' => $externalId,
+            'title' => $title,
+            'description' => $this->optionalString($data, 'description', 10000),
+            'starts_at' => $this->parseDateTime($this->optionalString($data, 'starts_at', 64)),
+            'ends_at' => $this->parseDateTime($this->optionalString($data, 'ends_at', 64)),
+            'location' => $this->optionalString($data, 'location', 500),
+            'metadata' => isset($data['metadata']) && is_array($data['metadata'])
+                ? json_encode($data['metadata'])
+                : null,
+            'updated_at' => now(),
+        ];
+
+        $existing = DB::table('federation_events')
+            ->where('external_partner_id', $partner->id)
+            ->where('external_id', $externalId)
+            ->first(['id']);
+
+        if ($existing) {
+            DB::table('federation_events')->where('id', $existing->id)->update($row);
+            $localId = (int) $existing->id;
+        } else {
+            $row['created_at'] = now();
+            $localId = (int) DB::table('federation_events')->insertGetId($row);
+        }
+
+        $row['id'] = $localId;
+        event(new FederatedCommunityEventReceived($tenantId, (int) $partner->id, $localId, $row));
+
+        return ['status' => 'handled', 'local_id' => $localId];
+    }
+
+    private function handleInboundGroup(array $data, object $partner): array
+    {
+        $externalId = $this->requireString($data, 'external_id');
+        $name = $this->requireString($data, 'name');
+        $tenantId = (int) TenantContext::getId();
+
+        $row = [
+            'tenant_id' => $tenantId,
+            'external_partner_id' => (int) $partner->id,
+            'external_id' => $externalId,
+            'name' => $name,
+            'description' => $this->optionalString($data, 'description', 10000),
+            'privacy' => $this->optionalString($data, 'privacy', 32) ?? 'public',
+            'member_count' => max(0, (int) ($data['member_count'] ?? 0)),
+            'metadata' => isset($data['metadata']) && is_array($data['metadata'])
+                ? json_encode($data['metadata'])
+                : null,
+            'updated_at' => now(),
+        ];
+
+        $existing = DB::table('federation_groups')
+            ->where('external_partner_id', $partner->id)
+            ->where('external_id', $externalId)
+            ->first(['id']);
+
+        if ($existing) {
+            DB::table('federation_groups')->where('id', $existing->id)->update($row);
+            $localId = (int) $existing->id;
+        } else {
+            $row['created_at'] = now();
+            $localId = (int) DB::table('federation_groups')->insertGetId($row);
+        }
+
+        $row['id'] = $localId;
+        event(new FederatedGroupReceived($tenantId, (int) $partner->id, $localId, $row, 'group'));
+
+        return ['status' => 'handled', 'local_id' => $localId];
+    }
+
+    private function handleInboundGroupMembership(array $data, object $partner): array
+    {
+        $externalId = $this->requireString($data, 'external_id');
+        $tenantId = (int) TenantContext::getId();
+
+        // Increment the shadow group's member_count if we have it
+        $existing = DB::table('federation_groups')
+            ->where('external_partner_id', $partner->id)
+            ->where('external_id', $externalId)
+            ->first(['id', 'member_count']);
+
+        if (!$existing) {
+            throw new InboundValidationException("Unknown group external_id: {$externalId}", 'external_id');
+        }
+
+        $newCount = isset($data['member_count'])
+            ? max(0, (int) $data['member_count'])
+            : ((int) $existing->member_count + 1);
+
+        DB::table('federation_groups')
+            ->where('id', $existing->id)
+            ->update([
+                'member_count' => $newCount,
+                'updated_at'   => now(),
+            ]);
+
+        $shadowRow = [
+            'id' => (int) $existing->id,
+            'external_partner_id' => (int) $partner->id,
+            'external_id' => $externalId,
+            'member_count' => $newCount,
+            'external_user_id' => $this->optionalString($data, 'external_user_id', 128),
+        ];
+        event(new FederatedGroupReceived($tenantId, (int) $partner->id, (int) $existing->id, $shadowRow, 'member_joined'));
+
+        return ['status' => 'handled', 'local_id' => (int) $existing->id];
+    }
+
+    private function handleInboundConnection(array $data, object $partner, string $event): array
+    {
+        $localUserId = (int) ($data['local_user_id'] ?? $data['recipient_id'] ?? 0);
+        $externalUserId = $this->requireString($data, 'external_user_id');
+
+        if ($localUserId <= 0) {
+            throw new InboundValidationException('Missing required field: local_user_id', 'local_user_id');
+        }
+
+        $tenantId = (int) TenantContext::getId();
+
+        // Verify local_user_id exists in THIS tenant
+        $localUser = DB::table('users')
+            ->where('id', $localUserId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->first(['id']);
+        if (!$localUser) {
+            throw new InboundValidationException(
+                "Local user #{$localUserId} not found in this tenant",
+                'local_user_id'
+            );
+        }
+
+        $status = $event === 'connection.accepted' ? 'accepted' : 'pending';
+        $message = $this->optionalString($data, 'message', 1000);
+
+        $existing = DB::table('federation_inbound_connections')
+            ->where('external_partner_id', $partner->id)
+            ->where('local_user_id', $localUserId)
+            ->where('external_user_id', $externalUserId)
+            ->first(['id']);
+
+        $row = [
+            'tenant_id' => $tenantId,
+            'external_partner_id' => (int) $partner->id,
+            'local_user_id' => $localUserId,
+            'external_user_id' => $externalUserId,
+            'status' => $status,
+            'message' => $message,
+            'updated_at' => now(),
+        ];
+
+        if ($existing) {
+            DB::table('federation_inbound_connections')->where('id', $existing->id)->update($row);
+            $localId = (int) $existing->id;
+        } else {
+            $row['created_at'] = now();
+            $localId = (int) DB::table('federation_inbound_connections')->insertGetId($row);
+        }
+
+        $row['id'] = $localId;
+        event(new FederatedConnectionReceived($tenantId, (int) $partner->id, $localId, $row));
+
+        return ['status' => 'handled', 'local_id' => $localId];
+    }
+
+    private function handleInboundVolunteering(array $data, object $partner): array
+    {
+        $externalId = $this->requireString($data, 'external_id');
+        $title = $this->requireString($data, 'title');
+        $tenantId = (int) TenantContext::getId();
+
+        $row = [
+            'tenant_id' => $tenantId,
+            'external_partner_id' => (int) $partner->id,
+            'external_id' => $externalId,
+            'title' => $title,
+            'description' => $this->optionalString($data, 'description', 10000),
+            'hours_requested' => isset($data['hours_requested']) && is_numeric($data['hours_requested'])
+                ? (float) $data['hours_requested']
+                : null,
+            'location' => $this->optionalString($data, 'location', 500),
+            'starts_at' => $this->parseDateTime($this->optionalString($data, 'starts_at', 64)),
+            'metadata' => isset($data['metadata']) && is_array($data['metadata'])
+                ? json_encode($data['metadata'])
+                : null,
+            'updated_at' => now(),
+        ];
+
+        $existing = DB::table('federation_volunteering')
+            ->where('external_partner_id', $partner->id)
+            ->where('external_id', $externalId)
+            ->first(['id']);
+
+        if ($existing) {
+            DB::table('federation_volunteering')->where('id', $existing->id)->update($row);
+            $localId = (int) $existing->id;
+        } else {
+            $row['created_at'] = now();
+            $localId = (int) DB::table('federation_volunteering')->insertGetId($row);
+        }
+
+        $row['id'] = $localId;
+        event(new FederatedVolunteeringReceived($tenantId, (int) $partner->id, $localId, $row));
+
+        return ['status' => 'handled', 'local_id' => $localId];
+    }
+
+    private function handleInboundMemberSync(array $data, object $partner): array
+    {
+        $externalId = $this->requireString($data, 'external_id');
+        $tenantId = (int) TenantContext::getId();
+
+        $row = [
+            'tenant_id' => $tenantId,
+            'external_partner_id' => (int) $partner->id,
+            'external_id' => $externalId,
+            'username' => $this->optionalString($data, 'username', 255),
+            'display_name' => $this->optionalString($data, 'display_name', 255),
+            'bio' => $this->optionalString($data, 'bio', 5000),
+            'location' => $this->optionalString($data, 'location', 255),
+            'avatar_url' => $this->optionalString($data, 'avatar_url', 1000),
+            'metadata' => isset($data['metadata']) && is_array($data['metadata'])
+                ? json_encode($data['metadata'])
+                : null,
+            'profile_updated_at' => $this->parseDateTime($this->optionalString($data, 'profile_updated_at', 64))
+                ?? now(),
+            'updated_at' => now(),
+        ];
+
+        $existing = DB::table('federation_members')
+            ->where('external_partner_id', $partner->id)
+            ->where('external_id', $externalId)
+            ->first(['id']);
+
+        if ($existing) {
+            DB::table('federation_members')->where('id', $existing->id)->update($row);
+            $localId = (int) $existing->id;
+        } else {
+            $row['created_at'] = now();
+            $localId = (int) DB::table('federation_members')->insertGetId($row);
+        }
+
+        $row['id'] = $localId;
+        event(new FederatedMemberUpdated($tenantId, (int) $partner->id, $localId, $row));
+
+        return ['status' => 'handled', 'local_id' => $localId];
     }
 
     // ----------------------------------------------------------------
@@ -704,5 +1155,18 @@ class FederationExternalWebhookController extends BaseApiController
             'response_time_ms' => 0,
             'created_at' => now(),
         ]);
+    }
+}
+
+/**
+ * Internal exception thrown by inbound handlers when the incoming payload
+ * is malformed or missing required fields. Caught in receive() and mapped
+ * to a 400 response.
+ */
+final class InboundValidationException extends \RuntimeException
+{
+    public function __construct(string $message, public readonly ?string $field = null)
+    {
+        parent::__construct($message);
     }
 }
