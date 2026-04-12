@@ -200,10 +200,17 @@ class FederationRealtimeService
             return true;
         }
 
-        // Conversation channel — user must be one of the participants
+        // Conversation channel — user must be one of the two participants.
+        // Channel format:
+        //   private-federation.conversation.{userA-tenantA}.{userB-tenantB}
+        // Substring match (str_contains) was spoofable — e.g. pair "1-1"
+        // appears inside "11-1" / "1-11" / "...1-1000". Require the pair to
+        // appear as a whole dotted segment.
         if (str_starts_with($channelName, 'private-federation.conversation.')) {
             $userPair = "{$userId}-{$tenantId}";
-            return str_contains($channelName, $userPair);
+            $suffix = substr($channelName, strlen('private-federation.conversation.'));
+            $parts = explode('.', $suffix);
+            return in_array($userPair, $parts, true);
         }
 
         return false;

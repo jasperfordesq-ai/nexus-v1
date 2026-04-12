@@ -108,11 +108,45 @@ class PusherService
      *
      * Convention: private-tenant.{tenantId}.user.{userId}
      * Must match the React frontend PusherContext subscription format.
+     *
+     * Static because callers (GamificationRealtimeService, etc.) use it in
+     * static context. Instance-style ($service->getUserChannel()) still works
+     * via late-static-binding.
      */
-    public function getUserChannel(int $userId): string
+    public static function getUserChannel(int $userId): string
     {
         $tenantId = \App\Core\TenantContext::getId();
         return "private-tenant.{$tenantId}.user.{$userId}";
+    }
+
+    /**
+     * Broadcast an event to a Pusher channel. No-op if Pusher is not
+     * configured. Safe to call from any request / job context — any SDK
+     * failure is logged and swallowed so the caller's flow isn't broken
+     * by a transient broadcast fault.
+     *
+     * Added to close the gap where GamificationRealtimeService (and other
+     * realtime services) called PusherService::trigger() expecting a
+     * static helper that didn't exist — every gamification event was
+     * throwing "Call to undefined method" at runtime.
+     */
+    public static function trigger(string $channel, string $event, array $data): bool
+    {
+        $pusher = self::getInstance();
+        if (!$pusher) {
+            return false;
+        }
+        try {
+            $pusher->trigger($channel, $event, $data);
+            return true;
+        } catch (\Throwable $e) {
+            Log::warning('PusherService::trigger failed', [
+                'channel' => $channel,
+                'event' => $event,
+                'error' => $e->getMessage(),
+            ]);
+            return false;
+        }
     }
 
     /**
@@ -174,6 +208,17 @@ class PusherService
         $pusher = self::getInstance();
         if ($pusher === null) {
             return null;
+        }
+
+        // Tenant gate: presence channel names are `presence-tenant.{T}.*`.
+        // Without this check a user in tenant A could subscribe to the
+        // presence channel of tenant B and enumerate its active members.
+        if (preg_match('/^presence-tenant\.(\d+)\b/', $channelName, $m)) {
+            $channelTenantId = (int) $m[1];
+            $currentTenantId = \App\Core\TenantContext::getId();
+            if ($channelTenantId !== $currentTenantId) {
+                return null;
+            }
         }
 
         try {

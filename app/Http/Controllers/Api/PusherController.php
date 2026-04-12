@@ -40,6 +40,10 @@ class PusherController extends BaseApiController
     public function auth(): JsonResponse
     {
         $userId = $this->requireAuth();
+        // Pusher SDK calls this on every subscribe; a well-behaved client hits
+        // it a handful of times per session. 120/min is generous and blocks a
+        // spam loop that'd exhaust the Pusher app auth quota.
+        $this->rateLimit('pusher_auth', 120, 60);
 
         try {
             $socketId = $this->input('socket_id') ?? request()->request->get('socket_id');
