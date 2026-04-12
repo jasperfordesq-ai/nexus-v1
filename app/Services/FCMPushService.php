@@ -239,10 +239,31 @@ class FCMPushService
                         $failed++;
                         $responseBody = $response->json();
                         $errorMsg = $responseBody['error']['message'] ?? $response->body();
+                        $errorStatus = $responseBody['error']['status'] ?? '';
                         $errors[] = "Token {$token}: {$errorMsg}";
 
-                        // Remove invalid/expired tokens
-                        if ($response->status() === 404 || str_contains($errorMsg, 'UNREGISTERED')) {
+                        // Remove invalid/expired/unauthenticated tokens.
+                        // FCM v1 dead-token signals:
+                        //   - 404 UNREGISTERED — token permanently invalid (app uninstalled, token refreshed)
+                        //   - 400 INVALID_ARGUMENT / InvalidRegistration — malformed or foreign-app token
+                        //   - 401 UNAUTHENTICATED — stale / revoked token
+                        $httpStatus = $response->status();
+                        $isDeadToken = $httpStatus === 404
+                            || $httpStatus === 401
+                            || str_contains($errorMsg, 'UNREGISTERED')
+                            || str_contains($errorStatus, 'UNREGISTERED')
+                            || str_contains($errorStatus, 'UNAUTHENTICATED')
+                            || (
+                                $httpStatus === 400
+                                && (
+                                    str_contains($errorMsg, 'INVALID_ARGUMENT')
+                                    || str_contains($errorMsg, 'InvalidRegistration')
+                                    || str_contains($errorMsg, 'invalid registration')
+                                    || str_contains($errorStatus, 'INVALID_ARGUMENT')
+                                )
+                            );
+
+                        if ($isDeadToken) {
                             DB::table('fcm_device_tokens')->where('token', $token)->delete();
                         }
                     }
@@ -288,14 +309,32 @@ class FCMPushService
                         $errorMsg = $result['results'][0]['error'] ?? 'Unknown error';
                         $errors[] = "Token {$token}: {$errorMsg}";
 
-                        // Remove invalid tokens
-                        if (in_array($errorMsg, ['NotRegistered', 'InvalidRegistration'])) {
+                        // Remove invalid tokens (legacy error strings from FCM HTTP API).
+                        if (in_array($errorMsg, ['NotRegistered', 'InvalidRegistration', 'MismatchSenderId'], true)) {
                             DB::table('fcm_device_tokens')->where('token', $token)->delete();
                         }
                     }
                 } else {
                     $failed++;
-                    $errors[] = "Token {$token}: HTTP {$response->status()}";
+                    $status = $response->status();
+                    $errors[] = "Token {$token}: HTTP {$status}";
+
+                    // Legacy API HTTP status-based dead-token cleanup:
+                    //   - 401 — stale server/API key (token can't be validated, keep the key-rotation team's record clean)
+                    //   - 404 — token no longer exists
+                    //   - 400 w/ InvalidRegistration / NotRegistered body — malformed token
+                    $body = $response->body();
+                    if (
+                        $status === 404
+                        || $status === 401
+                        || ($status === 400 && (
+                            str_contains($body, 'InvalidRegistration')
+                            || str_contains($body, 'NotRegistered')
+                            || str_contains($body, 'INVALID_ARGUMENT')
+                        ))
+                    ) {
+                        DB::table('fcm_device_tokens')->where('token', $token)->delete();
+                    }
                 }
             } catch (\Throwable $e) {
                 $failed++;

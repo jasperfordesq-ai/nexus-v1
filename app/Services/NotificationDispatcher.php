@@ -71,12 +71,31 @@ class NotificationDispatcher
         switch ($frequency) {
             case 'instant':
                 self::queueNotification($userId, $activityType, $content, $link, 'instant', $htmlContent);
-                // Also dispatch a real-time web push notification
+                // Also dispatch a real-time web push notification.
+                // Runs AFTER the HTTP response is sent so a slow WebPush POST
+                // (VAPID endpoints can block 5–30s) never delays the caller.
+                // Falls back to inline try/catch if afterResponse dispatch
+                // is unavailable (CLI / tests).
+                $pushTitle = self::getPushTitle($activityType);
+                $uid = (int) $userId;
+                $pushContent = $content;
+                $pushLink = $link;
+
+                $send = function () use ($uid, $pushTitle, $pushContent, $pushLink) {
+                    try {
+                        \App\Services\WebPushService::sendToUserStatic($uid, $pushTitle, $pushContent, $pushLink);
+                    } catch (\Throwable $e) {
+                        Log::debug('[NotificationDispatcher] WebPush failed: ' . $e->getMessage());
+                    }
+                };
+
                 try {
-                    $pushTitle = self::getPushTitle($activityType);
-                    \App\Services\WebPushService::sendToUserStatic($userId, $pushTitle, $content, $link);
+                    // Laravel's afterResponse() closure dispatch: flushes response,
+                    // then runs the closure. Non-blocking for the HTTP request.
+                    dispatch($send)->afterResponse();
                 } catch (\Throwable $e) {
-                    Log::debug('[NotificationDispatcher] WebPush failed: ' . $e->getMessage());
+                    // No container / running in CLI / queue misconfigured — run inline.
+                    $send();
                 }
                 break;
 

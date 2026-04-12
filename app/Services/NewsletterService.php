@@ -30,6 +30,13 @@ class NewsletterService
     /** Rate limiting: microseconds between each email (250ms = max 4 emails/sec) */
     private const EMAIL_DELAY_MICROSECONDS = NEWSLETTER_EMAIL_DELAY_MICROSECONDS;
 
+    /**
+     * Maximum delivery attempts before a queue row is abandoned as permanently failed.
+     * After this many failures, processQueue() will no longer re-claim the row.
+     * Exponential backoff between attempts: pow(attempts, 2) * 60 seconds.
+     */
+    private const MAX_SEND_ATTEMPTS = 5;
+
     public function __construct(
         private readonly Newsletter $newsletter,
     ) {}
@@ -230,14 +237,26 @@ class NewsletterService
 
         // Process all pending items in batches with ATOMIC CLAIMING.
         // Step 1: UPDATE status to 'processing' (claim) — prevents other runners
-        //         from picking up the same items.
+        //         from picking up the same items. Also re-claims previously
+        //         'failed' rows whose exponential backoff window has elapsed
+        //         and whose attempts counter is still under the permanent-fail
+        //         threshold (MAX_SEND_ATTEMPTS).
         // Step 2: SELECT only 'processing' items (ours) — safe from races.
         do {
             $claimed = DB::update(
                 "UPDATE newsletter_queue SET status = 'processing'
-                 WHERE newsletter_id = ? AND status = 'pending'
+                 WHERE newsletter_id = ?
+                   AND (
+                        status = 'pending'
+                        OR (
+                            status = 'failed'
+                            AND attempts < ?
+                            AND (last_attempted_at IS NULL
+                                 OR NOW() >= last_attempted_at + INTERVAL (POW(attempts, 2) * 60) SECOND)
+                        )
+                   )
                  ORDER BY id ASC LIMIT ?",
-                [$newsletterId, $batchSize]
+                [$newsletterId, self::MAX_SEND_ATTEMPTS, $batchSize]
             );
 
             if ($claimed === 0) {
@@ -281,20 +300,25 @@ class NewsletterService
                     if ($success) {
                         DB::table('newsletter_queue')
                             ->where('id', $item->id)
-                            ->update(['status' => 'sent', 'sent_at' => now()]);
+                            ->update([
+                                'status' => 'sent',
+                                'sent_at' => now(),
+                                'last_attempted_at' => now(),
+                            ]);
+                        // Bump attempts counter via raw statement so column stays accurate
+                        DB::statement(
+                            'UPDATE newsletter_queue SET attempts = attempts + 1 WHERE id = ?',
+                            [$item->id]
+                        );
                         $sent++;
                     } else {
-                        DB::table('newsletter_queue')
-                            ->where('id', $item->id)
-                            ->update(['status' => 'failed', 'error_message' => 'Email send failed']);
+                        self::markAttemptFailed((int) $item->id, 'Email send failed');
                         $failed++;
                     }
 
                     usleep(self::EMAIL_DELAY_MICROSECONDS);
                 } catch (\Exception $e) {
-                    DB::table('newsletter_queue')
-                        ->where('id', $item->id)
-                        ->update(['status' => 'failed', 'error_message' => $e->getMessage()]);
+                    self::markAttemptFailed((int) $item->id, $e->getMessage());
                     $failed++;
                     Log::error("Newsletter send error for {$item->email}: " . $e->getMessage());
                 }
@@ -328,6 +352,27 @@ class NewsletterService
         }
 
         return ['sent' => $sent, 'failed' => $failed];
+    }
+
+    /**
+     * Record a failed send attempt on a newsletter_queue row.
+     *
+     * Increments `attempts`, stamps `last_attempted_at`, stores the error message,
+     * and flips status back to 'failed'. Rows remain retry-eligible until
+     * `attempts >= MAX_SEND_ATTEMPTS`, at which point processQueue() stops
+     * re-claiming them (permanent failure).
+     */
+    private static function markAttemptFailed(int $queueId, string $error): void
+    {
+        DB::statement(
+            "UPDATE newsletter_queue
+             SET status = 'failed',
+                 attempts = attempts + 1,
+                 last_attempted_at = NOW(),
+                 error_message = ?
+             WHERE id = ?",
+            [mb_substr($error, 0, 2000), $queueId]
+        );
     }
 
     /**

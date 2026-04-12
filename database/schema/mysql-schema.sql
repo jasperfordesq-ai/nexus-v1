@@ -5296,7 +5296,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6885,6 +6885,8 @@ CREATE TABLE `newsletter_queue` (
   `last_name` varchar(100) NOT NULL DEFAULT '',
   `status` enum('pending','sent','failed') DEFAULT 'pending',
   `error_message` text DEFAULT NULL,
+  `attempts` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `last_attempted_at` timestamp NULL DEFAULT NULL,
   `unsubscribe_token` varchar(64) DEFAULT NULL,
   `tracking_token` varchar(64) DEFAULT NULL,
   `ab_variant` char(1) DEFAULT NULL,
@@ -6903,6 +6905,7 @@ CREATE TABLE `newsletter_queue` (
   KEY `idx_newsletter_queue_user_status` (`user_id`,`status`),
   KEY `idx_newsletter_queue_email_newsletter` (`email`,`newsletter_id`),
   KEY `idx_newsletter_queue_sent_at` (`sent_at`),
+  KEY `idx_newsletter_queue_retry` (`newsletter_id`,`status`,`last_attempted_at`),
   CONSTRAINT `newsletter_queue_ibfk_1` FOREIGN KEY (`newsletter_id`) REFERENCES `newsletters` (`id`) ON DELETE CASCADE,
   CONSTRAINT `newsletter_queue_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=1124 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -11227,7 +11230,8 @@ INSERT INTO `laravel_migrations` VALUES
 (76,'2026_04_12_100000_create_federated_identities_table',25),
 (77,'2026_04_12_110000_add_allow_flags_to_federation_external_partners',25),
 (78,'2026_04_12_120000_create_federation_shadow_tables',25),
-(79,'2026_04_12_130000_add_status_to_stripe_webhook_events',26);
+(79,'2026_04_12_130000_add_status_to_stripe_webhook_events',26),
+(80,'2026_04_12_100000_add_retry_columns_to_newsletter_queue',27);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
