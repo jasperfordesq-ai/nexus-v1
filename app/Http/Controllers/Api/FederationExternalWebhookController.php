@@ -16,6 +16,7 @@ use App\Events\FederatedListingReceived;
 use App\Events\FederatedMemberUpdated;
 use App\Events\FederatedReviewReceived;
 use App\Events\FederatedVolunteeringReceived;
+use App\Models\Notification;
 use App\Services\FederatedMessageService;
 use App\Services\FederationExternalApiClient;
 use App\Services\FederationExternalPartnerService;
@@ -962,6 +963,26 @@ class FederationExternalWebhookController extends BaseApiController
                     'external_transaction_id' => $externalTxId,
                 ]);
                 return ['status' => 'error', 'reason' => 'Failed to record transaction'];
+            }
+
+            try {
+                $senderName = $data['sender_name'] ?? __('api.external_user_fallback');
+                $partnerName = $partner->name ?? __('api.external_partner_fallback');
+                $notifyMessage = __('svc_notifications.federation.transaction_received', [
+                    'amount' => rtrim(rtrim(number_format($amount, 2), '0'), '.'),
+                    'sender' => $senderName,
+                    'partner' => $partnerName,
+                ]);
+                Notification::createNotification(
+                    $receiverUserId,
+                    $notifyMessage,
+                    '/wallet',
+                    'federation_transaction',
+                    false,
+                    (int) TenantContext::getId()
+                );
+            } catch (\Throwable $e) {
+                Log::warning('Failed to dispatch federation transaction notification', ['error' => $e->getMessage()]);
             }
         }
 

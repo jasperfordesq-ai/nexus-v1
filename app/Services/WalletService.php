@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -51,6 +52,22 @@ class WalletService
         $pendingIncoming = (float) ($stats->pending_incoming ?? 0);
         $pendingOutgoing = (float) ($stats->pending_outgoing ?? 0);
         $txCount = (int) ($stats->tx_count ?? 0);
+
+        // Include federation inbound transactions in earnings/count totals
+        try {
+            $fedStats = DB::table('federation_transactions')
+                ->where('receiver_user_id', $userId)
+                ->where('receiver_tenant_id', TenantContext::getId())
+                ->where('status', 'completed')
+                ->selectRaw('COALESCE(SUM(amount), 0) as fed_earned, COUNT(*) as fed_count')
+                ->first();
+            if ($fedStats) {
+                $totalEarned += (float) $fedStats->fed_earned;
+                $txCount += (int) $fedStats->fed_count;
+            }
+        } catch (\Throwable $e) {
+            // federation_transactions table may not exist in older tenants — ignore
+        }
 
         return [
             'balance'           => (float) ($user->balance ?? 0),
@@ -120,11 +137,93 @@ class WalletService
         // Format each transaction into the standard API shape expected by the frontend
         $formatted = $items->map(fn (Transaction $txn) => $this->formatTransaction($txn, $userId))->all();
 
+        // Merge federation_transactions (inbound from external partners) on the first page only.
+        // Cursor pagination stays keyed to the native transactions table; federation rows
+        // appear as an overlay on page 1, re-sorted by created_at so they interleave correctly.
+        if ($cursor === null && $type !== 'sent') {
+            $fedItems = $this->getFederationTransactions($userId, $limit);
+            if (!empty($fedItems)) {
+                $merged = array_merge($formatted, $fedItems);
+                usort($merged, static function (array $a, array $b): int {
+                    return strcmp((string) ($b['created_at'] ?? ''), (string) ($a['created_at'] ?? ''));
+                });
+                $formatted = array_slice($merged, 0, $limit);
+            }
+        }
+
         return [
             'items'    => $formatted,
             'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
             'has_more' => $hasMore,
         ];
+    }
+
+    /**
+     * Fetch inbound federation transactions (from external partners like TimeOverflow)
+     * for display alongside native transactions. These are already credited to the
+     * user's balance by the federation webhook handler.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function getFederationTransactions(int $userId, int $limit): array
+    {
+        try {
+            $tenantId = TenantContext::getId();
+            $rows = DB::table('federation_transactions as ft')
+                ->leftJoin('federation_external_partners as ep', 'ep.id', '=', 'ft.external_partner_id')
+                ->where('ft.receiver_user_id', $userId)
+                ->where('ft.receiver_tenant_id', $tenantId)
+                ->where('ft.status', 'completed')
+                ->orderByDesc('ft.created_at')
+                ->limit($limit)
+                ->get([
+                    'ft.id',
+                    'ft.amount',
+                    'ft.description',
+                    'ft.status',
+                    'ft.created_at',
+                    'ft.external_partner_id',
+                    'ft.external_receiver_name',
+                    'ep.name as partner_name',
+                ]);
+
+            $items = [];
+            foreach ($rows as $r) {
+                $senderName = $r->external_receiver_name ?: __('api.external_user_fallback');
+                $partnerName = $r->partner_name ?: __('api.external_partner_fallback');
+                $createdAt = $r->created_at ? \Carbon\Carbon::parse($r->created_at)->toIso8601String() : null;
+                $items[] = [
+                    'id'               => 'fed-' . (int) $r->id,
+                    'type'             => 'credit',
+                    'status'           => $r->status ?? 'completed',
+                    'amount'           => (float) $r->amount,
+                    'description'      => $r->description,
+                    'transaction_type' => 'federation',
+                    'sender'           => [
+                        'id' => 0,
+                        'name' => $senderName . ' (' . $partnerName . ')',
+                        'avatar' => null,
+                    ],
+                    'receiver'         => ['id' => $userId, 'name' => '', 'avatar' => null],
+                    'other_user'       => [
+                        'id' => 0,
+                        'name' => $senderName . ' (' . $partnerName . ')',
+                        'avatar' => null,
+                    ],
+                    'balance_after'    => null,
+                    'created_at'       => $createdAt,
+                    'federation'       => [
+                        'partner_id' => (int) $r->external_partner_id,
+                        'partner_name' => $partnerName,
+                        'external_sender_name' => $senderName,
+                    ],
+                ];
+            }
+            return $items;
+        } catch (\Throwable $e) {
+            \Log::warning('Failed to fetch federation transactions for wallet', ['error' => $e->getMessage()]);
+            return [];
+        }
     }
 
     /**

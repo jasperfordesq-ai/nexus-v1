@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -219,6 +220,23 @@ class FederatedMessageService
                 'status'                 => 'pending',
                 'created_at'             => now(),
             ]);
+
+            try {
+                $notifyMessage = __('svc_notifications.federation.message_received', [
+                    'sender' => $senderName,
+                    'partner' => $partnerName,
+                ]);
+                Notification::createNotification(
+                    $receiverUserId,
+                    $notifyMessage,
+                    '/federation-hub/messages',
+                    'federation_message',
+                    false,
+                    (int) $receiver->tenant_id
+                );
+            } catch (\Throwable $e) {
+                Log::warning('Failed to dispatch federation message notification', ['error' => $e->getMessage()]);
+            }
 
             return ['success' => true, 'message_id' => $messageId];
         } catch (\Throwable $e) {
