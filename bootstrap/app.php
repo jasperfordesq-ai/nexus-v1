@@ -119,6 +119,16 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->hourly()
             ->name('marketplace:process-unacknowledged-reports')
             ->withoutOverlapping(5);
+
+        // Identity: fallback-poll stuck Stripe Identity sessions.
+        // Stripe Identity webhooks are unreliable — users who leave the
+        // verification page before webhook delivery get stuck in pending
+        // forever. This hourly poll catches them.
+        $schedule->command('nexus:identity:poll-stuck')
+            ->hourly()
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->name('identity-poll-stuck');
     })
     ->withRouting(
         // Routes loaded by RouteServiceProvider (no /api prefix).
