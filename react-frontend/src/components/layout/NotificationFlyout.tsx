@@ -131,7 +131,7 @@ export function NotificationFlyout() {
       <h3 className="text-sm font-semibold text-theme-primary">
         {t('title')}
         {unreadCount > 0 && (
-          <span className="ml-2 text-xs font-normal text-theme-subtle">
+          <span className="ms-2 text-xs font-normal text-theme-subtle">
             ({unreadCount} {t('flyout.unread_count')})
           </span>
         )}
@@ -193,7 +193,7 @@ export function NotificationFlyout() {
                 key={notification.id}
                 type="button"
                 onClick={() => handleNotificationClick(notification)}
-                className={`w-full flex items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-theme-hover ${
+                className={`w-full flex items-start gap-3 px-4 py-3 text-start transition-colors hover:bg-theme-hover ${
                   isUnread ? 'bg-indigo-50/50 dark:bg-indigo-500/5' : ''
                 }`}
               >

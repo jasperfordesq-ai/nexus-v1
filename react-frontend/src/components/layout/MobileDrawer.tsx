@@ -249,7 +249,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
         key={item.href}
         type="button"
         onClick={() => { onClose(); setTimeout(() => navigate(resolvedHref), 150); }}
-        className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-left ${
+        className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-start ${
           isActive
             ? 'bg-theme-active text-theme-primary'
             : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
@@ -326,7 +326,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               <button
                 type="button"
                 onClick={() => { onClose(); setTimeout(() => navigate(tenantPath('/profile')), 150); }}
-                className="flex items-center gap-3 w-full text-left"
+                className="flex items-center gap-3 w-full text-start"
               >
                 <Avatar
                   name={`${user.first_name} ${user.last_name}`}

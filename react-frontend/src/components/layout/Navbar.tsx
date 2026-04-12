@@ -493,7 +493,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               >
                 <Search className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                 <span className="hidden md:inline">Search</span>
-                <kbd className="hidden lg:inline-flex items-center gap-0.5 ml-0.5 px-1 py-0 rounded bg-theme-hover/60 text-[10px] font-medium text-theme-subtle">
+                <kbd className="hidden lg:inline-flex items-center gap-0.5 ms-0.5 px-1 py-0 rounded bg-theme-hover/60 text-[10px] font-medium text-theme-subtle">
                   <span className="text-xs">⌘</span>K
                 </kbd>
               </Button>
@@ -620,7 +620,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   <MessageSquare className="w-4 h-4" aria-hidden="true" />
                   <span>{t('nav.messages')}</span>
                   {counts.messages > 0 && isAuthenticated && (
-                    <span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold bg-red-500 text-white rounded-full">
+                    <span className="ms-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold bg-red-500 text-white rounded-full">
                       {counts.messages > 99 ? '99+' : counts.messages}
                     </span>
                   )}

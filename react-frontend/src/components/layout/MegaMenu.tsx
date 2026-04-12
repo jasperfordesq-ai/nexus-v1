@@ -146,7 +146,7 @@ export function MegaMenu({
       data-mega-item
       onPress={() => onNavigate(item.href)}
       variant="light"
-      className={`w-full flex items-start gap-3 px-3 py-2 rounded-lg text-left transition-colors motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 h-auto justify-start ${
+      className={`w-full flex items-start gap-3 px-3 py-2 rounded-lg text-start transition-colors motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 h-auto justify-start ${
         location.pathname.startsWith(item.href)
           ? 'bg-theme-active text-theme-primary'
           : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'

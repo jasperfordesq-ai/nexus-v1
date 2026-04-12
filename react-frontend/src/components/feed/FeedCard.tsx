@@ -331,7 +331,7 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
         </div>
         <div className="flex items-center gap-3 mt-1 px-1">
           <span className="text-[10px] text-[var(--text-subtle)]">
-            <Clock className="w-2.5 h-2.5 inline mr-0.5 -mt-px" aria-hidden="true" />
+            <Clock className="w-2.5 h-2.5 inline me-0.5 -mt-px" aria-hidden="true" />
             {formatRelativeTime(comment.created_at)}
           </span>
           {comment.replies && comment.replies.length > 0 && (
@@ -375,7 +375,7 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="mt-2 ml-2 space-y-2 border-l-2 border-[var(--color-primary)]/30 pl-3"
+              className="mt-2 ms-2 space-y-2 border-s-2 border-[var(--color-primary)]/30 ps-3"
             >
               {comment.replies.map((reply) => (
                 <div key={reply.id} className="flex items-start gap-2">
@@ -390,7 +390,7 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
                       <span className="text-[10px] font-semibold text-[var(--text-primary)]">{reply.author.name}</span>
                       <p className="text-[11px] text-[var(--text-secondary)] whitespace-pre-wrap">{reply.content}</p>
                     </div>
-                    <span className="text-[10px] text-[var(--text-subtle)] ml-1">
+                    <span className="text-[10px] text-[var(--text-subtle)] ms-1">
                       {formatRelativeTime(reply.created_at)}
                     </span>
                   </div>
@@ -1077,10 +1077,10 @@ const FeedCard = React.memo(function FeedCard({
                           <div className="relative">
                             <div className="flex items-center justify-between mb-1.5">
                               <span className={`text-sm ${isVoted ? 'font-semibold text-[var(--color-primary)]' : 'text-[var(--text-primary)]'}`}>
-                                {isVoted && <Check className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" aria-hidden="true" />}
+                                {isVoted && <Check className="w-3.5 h-3.5 inline me-1.5 -mt-0.5" aria-hidden="true" />}
                                 {option.text}
                               </span>
-                              <span className={`text-xs font-medium ml-2 ${isVoted ? 'text-[var(--color-primary)]' : 'text-[var(--text-muted)]'}`}>
+                              <span className={`text-xs font-medium ms-2 ${isVoted ? 'text-[var(--color-primary)]' : 'text-[var(--text-muted)]'}`}>
                                 {option.percentage}%
                               </span>
                             </div>

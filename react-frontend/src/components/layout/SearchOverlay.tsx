@@ -327,7 +327,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                           onClick={() => { action.action(); handleClose(); }}
                           onMouseEnter={() => setSelectedIndex(i)}
                           onFocus={() => setSelectedIndex(i)}
-                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left ${
+                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-start ${
                             i === selectedIndex
                               ? 'bg-indigo-50 dark:bg-indigo-500/10'
                               : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
@@ -356,14 +356,14 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                         type="button"
                         onClick={() => goToSuggestion(s)}
                         onMouseEnter={() => setSelectedIndex(i)}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left ${
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-start ${
                           i === selectedIndex
                             ? 'bg-indigo-50 dark:bg-indigo-500/10'
                             : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
                         }`}
                       >
                         <span className="text-sm text-zinc-800 dark:text-zinc-200 truncate">{s.title || s.name}</span>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full ${type.color} ml-2 flex-shrink-0`}>{type.label}</span>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full ${type.color} ms-2 flex-shrink-0`}>{type.label}</span>
                       </button>
                     );
                   })}
@@ -422,7 +422,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                             navigate(tenantPath(`/search?q=${encodeURIComponent(q)}`));
                             handleClose();
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-left hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                          className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-start hover:bg-zinc-50 dark:hover:bg-zinc-800"
                         >
                           <Clock className="w-3.5 h-3.5 text-zinc-400" />
                           <span className="text-sm text-zinc-600 dark:text-zinc-400">{q}</span>

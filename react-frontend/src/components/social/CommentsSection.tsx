@@ -109,7 +109,7 @@ function CommentItemInner({
   const hasReactions = Object.keys(reactions).length > 0;
 
   return (
-    <div className={`flex items-start gap-2.5 ${depth > 0 ? 'ml-6 sm:ml-8 pl-3 border-l-2 border-[var(--color-primary)]/20' : ''}`}>
+    <div className={`flex items-start gap-2.5 ${depth > 0 ? 'ms-6 sm:ms-8 ps-3 border-s-2 border-[var(--color-primary)]/20' : ''}`}>
       <UserHoverCard userId={comment.author.id}>
         <Link to={tenantPath(`/profile/${comment.author.id}`)}>
           <Avatar
@@ -187,7 +187,7 @@ function CommentItemInner({
         {/* Action row */}
         <div className="flex items-center gap-3 mt-1 px-1 flex-wrap">
           <span className="text-[10px] text-[var(--text-subtle)]">
-            <Clock className="w-2.5 h-2.5 inline mr-0.5 -mt-px" aria-hidden="true" />
+            <Clock className="w-2.5 h-2.5 inline me-0.5 -mt-px" aria-hidden="true" />
             {formatRelativeTime(comment.created_at)}
           </span>
 
@@ -440,7 +440,7 @@ function MentionInput({
               onPress={() => selectMention(user)}
               onMouseDown={(e) => { e.preventDefault(); }}
               onMouseEnter={() => setSelectedIndex(idx)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors justify-start h-auto rounded-none ${
+              className={`w-full flex items-center gap-2.5 px-3 py-2 text-start transition-colors justify-start h-auto rounded-none ${
                 idx === selectedIndex
                   ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
                   : 'text-[var(--text-primary)] hover:bg-[var(--surface-hover)]'

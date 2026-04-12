@@ -160,7 +160,7 @@ export function FeedContentRenderer({
       {truncated && detailPath && (
         <Link
           to={detailPath}
-          className="text-[var(--color-primary)] hover:underline ml-1 text-sm font-medium"
+          className="text-[var(--color-primary)] hover:underline ms-1 text-sm font-medium"
         >
           {t('card.read_more', 'read more')}
         </Link>

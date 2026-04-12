@@ -36,7 +36,7 @@ export function DevelopmentStatusBanner() {
         </span>
         <Link
           to={RELEASE_STATUS.readMorePath}
-          className="underline font-medium ml-1 focus:outline-none focus:ring-2 focus:ring-amber-500 rounded whitespace-nowrap"
+          className="underline font-medium ms-1 focus:outline-none focus:ring-2 focus:ring-amber-500 rounded whitespace-nowrap"
         >
           {t('dev_banner.read_more', 'Read more')}
         </Link>
