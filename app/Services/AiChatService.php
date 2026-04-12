@@ -27,7 +27,7 @@ class AiChatService
 
     public function chat(int $userId, string $message, array $context = []): array
     {
-        $apiKey = config('services.openai.key');
+        $apiKey = config('services.openai.api_key');
         if (empty($apiKey)) {
             return ['reply' => 'AI chat is not configured.', 'error' => true];
         }
@@ -102,7 +102,7 @@ class AiChatService
      */
     public static function parseResume(string $filePath): array
     {
-        $apiKey = config('services.openai.key');
+        $apiKey = config('services.openai.api_key');
         if (empty($apiKey)) {
             return ['error' => 'AI service is not configured.'];
         }
