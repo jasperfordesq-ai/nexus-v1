@@ -14,7 +14,7 @@ use App\Services\FederationExternalApiClient;
 use App\Services\Protocols\NexusAdapter;
 use App\Services\Protocols\KomunitinAdapter;
 use App\Services\Protocols\CreditCommonsAdapter;
-use App\Services\TimeOverflowAdapter;
+use App\Services\Protocols\TimeOverflowAdapter;
 
 /**
  * Tests for FederationExternalApiClient adapter resolution and protocol registry.

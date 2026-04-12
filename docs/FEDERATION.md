@@ -220,6 +220,77 @@ column if the peer rejects content.
 | `federation_api_logs` table | Inbound HTTP calls (auth method, signature validity, IP) |
 | `federation_audit_log` table | Admin actions (partner create/suspend, key rotation, opt-in/out) |
 
+## Protocol endpoint matrix
+
+All inbound protocol endpoints are tenant-scoped and gated by
+`FederationApiMiddleware` (accepts API key, HMAC-SHA256, or JWT). Write
+operations that mutate currency/account metadata require `admin` or `*`
+scope on the authenticating API key.
+
+### Komunitin (JSON:API, `/api/v2/federation/komunitin/...`)
+
+| Method | Path | Auth | Purpose |
+|--------|------|------|---------|
+| GET    | `/currencies`                  | federation.api | List currencies |
+| POST   | `/currencies`                  | federation.api | Create currency (no-op, NEXUS uses fixed 'hours') |
+| GET    | `/{code}/currency`             | federation.api | Single currency detail |
+| PATCH  | `/{code}/currency`             | federation.api | Update currency metadata |
+| DELETE | `/{code}/currency`             | admin          | Soft-delete currency (marks inactive) |
+| GET    | `/{code}/currency/settings`    | federation.api | Currency settings |
+| PATCH  | `/{code}/currency/settings`    | federation.api | Update settings |
+| GET    | `/{code}/accounts`             | federation.api | List accounts (paginated) |
+| POST   | `/{code}/accounts`             | federation.api | Create external account shell |
+| GET    | `/{code}/accounts/{id}`        | federation.api | Single account |
+| PATCH  | `/{code}/accounts/{id}`        | federation.api | Update account |
+| DELETE | `/{code}/accounts/{id}`        | admin          | Deactivate account (status=inactive) |
+| GET    | `/{code}/transfers`            | federation.api | List transfers |
+| GET    | `/{code}/transfers/{id}`       | federation.api | Single transfer |
+| POST   | `/{code}/transfers`            | federation.api | Create transfer (atomic) |
+| PATCH  | `/{code}/transfers/{id}`       | federation.api | Update transfer state |
+| DELETE | `/{code}/transfers/{id}`       | federation.api | Delete pending transfer |
+
+### Credit Commons (`/api/v2/federation/cc/...`)
+
+| Method | Path | Auth | Purpose |
+|--------|------|------|---------|
+| GET    | `/about`                          | federation.api | Node metadata + stats |
+| GET    | `/accounts`                       | federation.api | Account autocomplete |
+| GET    | `/account` \| `/account/{acc_id}` | federation.api | Trading stats |
+| GET    | `/account/history[/{acc_id}]`     | federation.api | Balance history |
+| GET    | `/transactions`                   | federation.api | List transactions |
+| POST   | `/transaction`                    | federation.api | Direct transaction (immediate complete) |
+| GET    | `/transaction/{uuid}`             | federation.api | Single transaction |
+| PATCH  | `/transaction/{uuid}/{state}`     | federation.api | Generic state transition |
+| POST   | `/transaction/relay`              | federation.api | Hashchain-verified relay |
+| GET    | `/entries` \| `/entries/{uuid}`   | federation.api | Double-entry view |
+| GET    | `/forms`                          | federation.api | Available workflows |
+| POST   | `/transactions/propose`           | federation.api | External node proposes pending (P) |
+| POST   | `/transactions/{uuid}/validate`   | federation.api | Approve (P→V) |
+| POST   | `/transactions/{uuid}/commit`     | federation.api | Finalize (V→C) + hashchain |
+
+### Nexus Native V2 inbound (`/api/v2/federation/...`)
+
+Thin ingest layer for partners using the Nexus protocol to push entities to us.
+Authenticated via `federation.api` middleware; persistence is handled by
+dedicated listeners downstream (see `FederationNativeIngestController`).
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/reviews`         | Receive a review |
+| POST | `/listings`        | Receive a listing |
+| POST | `/events`          | Receive a community event |
+| POST | `/groups`          | Receive a group |
+| POST | `/connections`     | Receive a connection request |
+| POST | `/volunteering`    | Receive a volunteering opportunity |
+| POST | `/members/sync`    | Receive a member profile update |
+
+### TimeOverflow
+
+TimeOverflow has no native REST spec; inbound traffic uses the generic
+`POST /api/v2/federation/external/webhooks/receive` HMAC-authenticated
+receiver. Outbound calls go through `TimeOverflowAdapter` (now in
+`App\Services\Protocols\`, matching the other adapter namespaces).
+
 ## See also
 
 - [API_REFERENCE.md](API_REFERENCE.md) — full endpoint map (15 Komunitin + 11 Credit Commons + Nexus v1/v2)

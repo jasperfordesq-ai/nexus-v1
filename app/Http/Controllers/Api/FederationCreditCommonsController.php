@@ -816,6 +816,190 @@ class FederationCreditCommonsController extends BaseApiController
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+    // POST /transactions/propose — External node proposes a pending transaction
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * POST /transactions/propose — Accept a proposed transaction from a remote CC node.
+     *
+     * Creates a federation_cc_entries row in STATE_PENDING without mutating balances.
+     * Returns the proposal UUID. Subsequent calls to /transactions/{uuid}/validate and
+     * /transactions/{uuid}/commit advance the state machine.
+     */
+    public function proposeTransaction(Request $request): JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+        $payload = $request->json()->all();
+
+        // Optional hashchain verification if a Last-hash header is present
+        $remoteHash = $request->header('Last-hash');
+        if ($remoteHash !== null && !CreditCommonsNodeService::verifyHash($remoteHash, $tenantId)) {
+            return $this->ccError('HashMismatch',
+                'Hashchain verification failed — last hashes do not match', 500);
+        }
+
+        $payerPath = $payload['payer'] ?? null;
+        $payeePath = $payload['payee'] ?? null;
+        $quant = (float) ($payload['quant'] ?? 0);
+        $description = $payload['description'] ?? '';
+        $workflow = $payload['workflow'] ?? '+|PPC-PE+CE-';
+
+        if (!$payerPath || !$payeePath || $quant <= 0) {
+            return $this->ccError('MissingParameter', 'Required: payer, payee, quant > 0', 400);
+        }
+
+        if ($quant > 999999.99) {
+            return $this->ccError('MissingParameter', 'Amount exceeds maximum (999999.99)', 400);
+        }
+
+        $uuid = (string) Str::uuid();
+
+        DB::table('federation_cc_entries')->insert([
+            'tenant_id' => $tenantId,
+            'transaction_uuid' => $uuid,
+            'federation_transaction_id' => null,
+            'payer' => $payerPath,
+            'payee' => $payeePath,
+            'quant' => $quant,
+            'description' => $description,
+            'state' => CreditCommonsAdapter::STATE_PENDING,
+            'workflow' => $workflow,
+            'author' => $payerPath,
+            'written_at' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return response()->json([
+            'data' => [
+                'uuid' => $uuid,
+                'state' => CreditCommonsAdapter::STATE_PENDING,
+                'workflow' => $workflow,
+                'entries' => [[
+                    'payer' => $payerPath,
+                    'payee' => $payeePath,
+                    'quant' => $quant,
+                    'description' => $description,
+                ]],
+            ],
+            'meta' => [
+                'transitions' => CreditCommonsAdapter::STATE_TRANSITIONS[CreditCommonsAdapter::STATE_PENDING] ?? [],
+            ],
+        ], 201);
+    }
+
+    /**
+     * POST /transactions/{id}/validate — External node signs/approves the proposal.
+     *
+     * Transitions from pending (P) → validated (V).
+     */
+    public function validateTransaction(Request $request, string $uuid): JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+
+        $entry = DB::table('federation_cc_entries')
+            ->where('transaction_uuid', $uuid)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$entry) {
+            return $this->ccError('DoesNotExist', "Transaction {$uuid} not found", 400);
+        }
+
+        if (!CreditCommonsAdapter::isValidTransition($entry->state, CreditCommonsAdapter::STATE_VALIDATED)) {
+            return $this->ccError('InvalidStateTransition',
+                "Cannot transition from {$entry->state} to V", 400);
+        }
+
+        DB::table('federation_cc_entries')
+            ->where('id', $entry->id)
+            ->update([
+                'state' => CreditCommonsAdapter::STATE_VALIDATED,
+                'updated_at' => now(),
+            ]);
+
+        return response()->json([
+            'data' => [
+                'uuid' => $uuid,
+                'state' => CreditCommonsAdapter::STATE_VALIDATED,
+            ],
+        ], 200);
+    }
+
+    /**
+     * POST /transactions/{id}/commit — Final commit, applies balance changes and
+     * advances hashchain. Transitions from validated (V) → completed (C).
+     */
+    public function commitTransaction(Request $request, string $uuid): JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+
+        $entry = DB::table('federation_cc_entries')
+            ->where('transaction_uuid', $uuid)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$entry) {
+            return $this->ccError('DoesNotExist', "Transaction {$uuid} not found", 400);
+        }
+
+        if (!CreditCommonsAdapter::isValidTransition($entry->state, CreditCommonsAdapter::STATE_COMPLETED)) {
+            return $this->ccError('InvalidStateTransition',
+                "Cannot transition from {$entry->state} to C", 400);
+        }
+
+        $payerId = $this->resolveAccountId($entry->payer, $tenantId);
+        $payeeId = $this->resolveAccountId($entry->payee, $tenantId);
+        $quant = (float) $entry->quant;
+
+        DB::beginTransaction();
+        try {
+            // Apply balances only when accounts are local. Remote-only entries
+            // are recorded as audit rows (relay case).
+            if ($payerId) {
+                $updated = DB::update(
+                    "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
+                    [$quant, $payerId, $tenantId, $quant]
+                );
+                if ($updated === 0) {
+                    DB::rollBack();
+                    return $this->ccError('InsufficientBalance', 'Payer has insufficient balance', 400);
+                }
+            }
+            if ($payeeId) {
+                DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
+                    [$quant, $payeeId, $tenantId]);
+            }
+
+            DB::table('federation_cc_entries')
+                ->where('id', $entry->id)
+                ->update([
+                    'state' => CreditCommonsAdapter::STATE_COMPLETED,
+                    'written_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+            $newHash = CreditCommonsNodeService::advanceHashchain(
+                $tenantId, $uuid, $quant, $entry->payer, $entry->payee
+            );
+
+            DB::commit();
+
+            return response()->json([
+                'data' => [
+                    'uuid' => $uuid,
+                    'state' => CreditCommonsAdapter::STATE_COMPLETED,
+                    'written' => now()->format('Y-m-d'),
+                ],
+            ], 200, ['Last-hash' => $newHash]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('[FederationCC] Commit failed', ['error' => $e->getMessage()]);
+            return $this->ccError('Other', 'Commit processing failed', 500);
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
     // Helpers
     // ─────────────────────────────────────────────────────────────────────────
 

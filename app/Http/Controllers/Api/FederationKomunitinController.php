@@ -322,6 +322,109 @@ class FederationKomunitinController extends BaseApiController
     }
 
     /**
+     * DELETE /{code}/currency — Soft-delete the currency (mark inactive).
+     *
+     * NEXUS uses a fixed 'hours' currency per tenant, so this does not drop any
+     * ledger rows. It flips a `federation.komunitin.currency_inactive` flag in
+     * tenant_settings so subsequent GETs report status=inactive.
+     *
+     * Admin-only: requires 'admin' or '*' permission on the authenticated key.
+     */
+    public function deleteCurrency(Request $request, string $code): JsonResponse
+    {
+        if (!$this->requireAdminScope()) {
+            return $this->jsonApiError('Forbidden', 'Forbidden',
+                'Admin scope required for currency deletion', 403);
+        }
+
+        $tenantId = TenantContext::getId();
+
+        DB::table('tenant_settings')->updateOrInsert(
+            [
+                'tenant_id' => $tenantId,
+                'setting_key' => 'federation.komunitin.currency_inactive',
+            ],
+            [
+                'setting_value' => '1',
+                'updated_at' => now(),
+            ]
+        );
+
+        Log::info('[FederationKomunitin] Currency soft-deleted', [
+            'tenant_id' => $tenantId, 'code' => $code,
+        ]);
+
+        return response()->json(null, 204, [
+            'Content-Type' => 'application/vnd.api+json',
+        ]);
+    }
+
+    /**
+     * DELETE /{code}/accounts/{id} — Deactivate an account (status=inactive).
+     *
+     * Balance and history are preserved per Komunitin spec.
+     * Admin-only.
+     */
+    public function deleteAccount(Request $request, string $code, string $id): JsonResponse
+    {
+        if (!$this->requireAdminScope()) {
+            return $this->jsonApiError('Forbidden', 'Forbidden',
+                'Admin scope required for account deletion', 403);
+        }
+
+        $tenantId = TenantContext::getId();
+
+        $user = DB::table('users')
+            ->where('id', (int) $id)
+            ->where('tenant_id', $tenantId)
+            ->first(['id', 'status']);
+
+        if (!$user) {
+            return $this->jsonApiError('NotFound', 'Not Found',
+                "Account id {$id} not found in currency {$code}", 404);
+        }
+
+        DB::table('users')
+            ->where('id', (int) $id)
+            ->where('tenant_id', $tenantId)
+            ->update([
+                'status' => 'inactive',
+                'updated_at' => now(),
+            ]);
+
+        Log::info('[FederationKomunitin] Account deactivated', [
+            'tenant_id' => $tenantId, 'user_id' => $id,
+        ]);
+
+        return response()->json(null, 204, [
+            'Content-Type' => 'application/vnd.api+json',
+        ]);
+    }
+
+    /**
+     * Check if the authenticated federation API key has admin scope.
+     *
+     * Returns true if the partner's permissions include '*' or 'admin',
+     * or if no permissions column is enforced.
+     */
+    private function requireAdminScope(): bool
+    {
+        $partner = \App\Core\FederationApiMiddleware::getPartner();
+        if (!$partner) {
+            return false;
+        }
+
+        $perms = $partner['permissions'] ?? null;
+        if ($perms === null) {
+            // No permissions column — allow by default
+            return true;
+        }
+
+        $permsArr = is_string($perms) ? (json_decode($perms, true) ?: []) : (array) $perms;
+        return in_array('*', $permsArr, true) || in_array('admin', $permsArr, true);
+    }
+
+    /**
      * PATCH /{code}/accounts/{id} — Update account attributes (e.g., credit limit).
      */
     public function updateAccount(Request $request, string $code, string $id): JsonResponse
@@ -678,12 +781,22 @@ class FederationKomunitinController extends BaseApiController
         $tenant = DB::table('tenants')->where('id', $tenantId)->first(['slug', 'name']);
         $currencyCode = strtoupper($tenant->slug ?? 'HOURS');
 
+        $inactive = false;
+        try {
+            $inactive = (bool) DB::table('tenant_settings')
+                ->where('tenant_id', $tenantId)
+                ->where('setting_key', 'federation.komunitin.currency_inactive')
+                ->value('setting_value');
+        } catch (\Throwable $e) {
+            // tenant_settings table may be missing in minimal test schemas
+        }
+
         return [
             'type' => 'currencies',
             'id' => "hours-{$tenantId}",
             'attributes' => [
                 'code' => $currencyCode,
-                'status' => 'active',
+                'status' => $inactive ? 'inactive' : 'active',
                 'name' => 'Hours',
                 'namePlural' => 'Hours',
                 'symbol' => 'h',

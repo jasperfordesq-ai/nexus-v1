@@ -2134,6 +2134,8 @@ Route::middleware(['federation.api', 'throttle:200,1'])->group(function () {
     Route::post('/v2/federation/komunitin/{code}/accounts', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'createAccount']);
     Route::get('/v2/federation/komunitin/{code}/accounts/{id}', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'account']);
     Route::patch('/v2/federation/komunitin/{code}/accounts/{id}', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'updateAccount']);
+    Route::delete('/v2/federation/komunitin/{code}/accounts/{id}', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'deleteAccount']);
+    Route::delete('/v2/federation/komunitin/{code}/currency', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'deleteCurrency']);
     Route::get('/v2/federation/komunitin/{code}/transfers', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'transfers']);
     Route::get('/v2/federation/komunitin/{code}/transfers/{id}', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'transfer']);
     Route::post('/v2/federation/komunitin/{code}/transfers', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'createTransfer']);
@@ -2155,6 +2157,22 @@ Route::middleware(['federation.api', 'throttle:200,1'])->group(function () {
     Route::get('/v2/federation/cc/entries', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'entries']);
     Route::get('/v2/federation/cc/entries/{uuid}', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'transactionEntries']);
     Route::get('/v2/federation/cc/forms', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'forms']);
+
+    // --- Credit Commons three-phase proposal (external-node inbound) ---
+    Route::post('/v2/federation/cc/transactions/propose', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'proposeTransaction']);
+    Route::post('/v2/federation/cc/transactions/{uuid}/validate', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'validateTransaction']);
+    Route::post('/v2/federation/cc/transactions/{uuid}/commit', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'commitTransaction']);
+
+    // --- Nexus Native V2 inbound entity push (REST) ---
+    // Partners using the Nexus protocol POST entities here; persistence is
+    // handled downstream by dedicated listeners (see FederationNativeIngestController).
+    Route::post('/v2/federation/reviews', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'reviews']);
+    Route::post('/v2/federation/listings', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'listings']);
+    Route::post('/v2/federation/events', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'events']);
+    Route::post('/v2/federation/groups', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'groups']);
+    Route::post('/v2/federation/connections', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'connections']);
+    Route::post('/v2/federation/volunteering', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'volunteering']);
+    Route::post('/v2/federation/members/sync', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'membersSync']);
 });
 
 // ============================================

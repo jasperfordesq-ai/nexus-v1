@@ -10,7 +10,7 @@ namespace Tests\Laravel\Unit\Services\Protocols;
 
 use Tests\Laravel\TestCase;
 use App\Contracts\FederationProtocolAdapter;
-use App\Services\TimeOverflowAdapter;
+use App\Services\Protocols\TimeOverflowAdapter;
 
 /**
  * Tests that TimeOverflowAdapter correctly implements the FederationProtocolAdapter
