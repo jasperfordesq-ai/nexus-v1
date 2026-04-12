@@ -26,11 +26,24 @@ class GroupTagService
             ->where('tenant_id', $tenantId);
 
         if (!empty($filters['search'])) {
-            $query->where('name', 'LIKE', '%' . $filters['search'] . '%');
+            // Escape LIKE metacharacters (% and _) so a search for "50%" doesn't
+            // become a "match anything containing 50" wildcard query.
+            $search = addcslashes((string) $filters['search'], '\\%_');
+            $query->where('name', 'LIKE', '%' . $search . '%');
         }
 
-        $orderBy = $filters['order_by'] ?? 'usage_count';
-        $direction = $filters['direction'] ?? 'desc';
+        // Whitelist order-by column and direction to block SQL injection via
+        // a request that reaches this method with attacker-controlled filters
+        // (currently no caller exposes these, but the latent hole shouldn't
+        // exist in the service either).
+        $allowedOrderBy = ['id', 'name', 'slug', 'usage_count', 'created_at'];
+        $orderBy = in_array($filters['order_by'] ?? '', $allowedOrderBy, true)
+            ? $filters['order_by']
+            : 'usage_count';
+        $direction = strtolower((string) ($filters['direction'] ?? 'desc'));
+        if (!in_array($direction, ['asc', 'desc'], true)) {
+            $direction = 'desc';
+        }
         $query->orderBy($orderBy, $direction);
 
         $limit = min($filters['limit'] ?? 100, 500);

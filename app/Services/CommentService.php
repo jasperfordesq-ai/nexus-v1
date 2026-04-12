@@ -606,11 +606,15 @@ class CommentService
             ->first();
 
         foreach ($usernames as $username) {
+            // Escape LIKE wildcards so a malicious @mention like "@%_" can't
+            // broadly match every user and spam unrelated people with mention
+            // notifications.
+            $likeName = '%' . addcslashes($username, '\\%_') . '%';
             $user = DB::table('users')
                 ->where('tenant_id', $tenantId)
-                ->where(function ($q) use ($username) {
+                ->where(function ($q) use ($username, $likeName) {
                     $q->where('username', $username)
-                      ->orWhere('name', 'LIKE', "%{$username}%")
+                      ->orWhere('name', 'LIKE', $likeName)
                       ->orWhere('first_name', $username);
                 })
                 ->select(['id'])

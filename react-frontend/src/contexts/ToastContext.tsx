@@ -57,7 +57,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const addToast = useCallback((toast: Omit<Toast, 'id'>) => {
     const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const duration = toast.duration ?? (toast.type === 'error' ? 6000 : 4000);
+    // Errors stay longer so screen-reader users finish hearing them before
+    // auto-dismiss, and so a user who looks up partway through an error
+    // can still read the full message.
+    const duration = toast.duration ?? (toast.type === 'error' ? 9000 : 4000);
 
     setToasts((prev) => [...prev, { ...toast, id }]);
 
