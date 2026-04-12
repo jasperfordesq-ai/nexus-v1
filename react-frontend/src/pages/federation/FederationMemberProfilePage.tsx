@@ -40,11 +40,13 @@ import {
   User,
   UserPlus,
   Coins,
+  Star,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo';
+import { FederatedTrustBadge, FederationReviewsPanel } from '@/components/federation';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -303,9 +305,19 @@ export function FederationMemberProfilePage() {
 
             {/* Info */}
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl font-bold text-theme-primary">
-                {displayName}
-              </h1>
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="text-2xl font-bold text-theme-primary">
+                  {displayName}
+                </h1>
+                {typeof member.reputation_score === 'number' && (member.reputation_count ?? 0) > 0 && (
+                  <FederatedTrustBadge
+                    score={member.reputation_score}
+                    reviewCount={member.reputation_count ?? 0}
+                    isFederated
+                    size="md"
+                  />
+                )}
+              </div>
 
               {/* Community badge */}
               <Chip
@@ -433,6 +445,17 @@ export function FederationMemberProfilePage() {
           </GlassCard>
         </motion.div>
       )}
+      {/* Reviews */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        <GlassCard className="p-6">
+          <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+            <Star className="w-5 h-5 text-amber-500" aria-hidden="true" />
+            {t('reviews.title')}
+          </h2>
+          <FederationReviewsPanel memberId={member.id} />
+        </GlassCard>
+      </motion.div>
+
       {/* Send Credits Modal */}
       {member && (
         <Modal isOpen={txModal.isOpen} onOpenChange={txModal.onOpenChange} size="md">

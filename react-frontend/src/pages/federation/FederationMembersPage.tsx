@@ -40,6 +40,7 @@ import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
+import { FederatedTrustBadge } from '@/components/federation';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -544,6 +545,14 @@ const FederatedMemberCard = memo(function FederatedMemberCard({
               >
                 {t('federation.external', 'External')}
               </Chip>
+            )}
+            {typeof member.reputation_score === 'number' && (member.reputation_count ?? 0) > 0 && (
+              <FederatedTrustBadge
+                score={member.reputation_score}
+                reviewCount={member.reputation_count ?? 0}
+                isFederated
+                size="sm"
+              />
             )}
           </div>
         </div>

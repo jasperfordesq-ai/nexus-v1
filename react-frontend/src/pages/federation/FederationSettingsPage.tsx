@@ -415,6 +415,7 @@ export function FederationSettingsPage() {
               description={t('settings.show_reviews_description')}
               checked={settings.show_reviews_federated}
               onChange={(v) => updateSetting('show_reviews_federated', v)}
+              help={t('settings.show_reviews_federated.help')}
             />
           </div>
         </GlassCard>
@@ -533,9 +534,10 @@ interface SettingToggleProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
   icon?: React.ReactNode;
+  help?: string;
 }
 
-function SettingToggle({ label, description, checked, onChange, icon }: SettingToggleProps) {
+function SettingToggle({ label, description, checked, onChange, icon, help }: SettingToggleProps) {
   return (
     <div className="flex items-center justify-between p-4 rounded-lg bg-theme-elevated">
       <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -545,6 +547,9 @@ function SettingToggle({ label, description, checked, onChange, icon }: SettingT
         <div className="min-w-0">
           <p className="font-medium text-theme-primary">{label}</p>
           <p className="text-sm text-theme-subtle">{description}</p>
+          {help && (
+            <p className="text-xs text-theme-subtle/80 mt-1 italic">{help}</p>
+          )}
         </div>
       </div>
       <Switch

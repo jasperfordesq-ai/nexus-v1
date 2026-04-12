@@ -52,6 +52,7 @@ import { ReviewModal } from '@/components/reviews';
 import { TransferModal } from '@/components/wallet';
 import { ProfileFeed } from '@/components/profile/ProfileFeed';
 import { VerificationBadgeRow, VerificationBadgeSummary } from '@/components/verification/VerificationBadge';
+import { FederatedTrustBadge } from '@/components/federation';
 import { EndorseButton } from '@/components/endorsements/EndorseButton';
 import { AvailabilityGrid } from '@/components/availability/AvailabilityGrid';
 import { StoryHighlights } from '@/components/stories/StoryHighlights';
@@ -498,6 +499,15 @@ export function ProfilePage() {
                 <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-theme-primary">{profile.name}</h1>
                 {/* Verification badges */}
                 <VerificationBadgeRow userId={profile.id} size="md" />
+                {/* Cross-federation reputation badge */}
+                {profile.federated_partner_id != null && typeof profile.federated_reputation_score === 'number' && (
+                  <FederatedTrustBadge
+                    score={profile.federated_reputation_score}
+                    reviewCount={profile.federated_reputation_count ?? 0}
+                    isFederated
+                    size="md"
+                  />
+                )}
                 {/* Connected chip for other users */}
                 {!isOwnProfile && connectionStatus === 'connected' && (
                   <Chip

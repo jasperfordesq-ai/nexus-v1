@@ -466,5 +466,20 @@
   "members.external_profile_title": "External Member",
   "members.external_profile_message": "This member belongs to an external partner community. You can message them or send credits from the Members page.",
   "member_profile.external_member_title": "External Member",
-  "member_profile.external_member_description": "External member profiles are displayed on their home community's platform. You can message them or send credits from the Members page."
+  "member_profile.external_member_description": "External member profiles are displayed on their home community's platform. You can message them or send credits from the Members page.",
+  "member_profile.reviews_tab": "Reviews",
+  "member_profile.about_tab": "About",
+  "reviews.title": "Reviews",
+  "reviews.empty": "No reviews yet from partner communities.",
+  "reviews.unavailable": "Reviews not yet available for this federated member.",
+  "reviews.from_partner": "via {{partner}}",
+  "reviews.verified": "Verified",
+  "reviews.rating_label": "Rated {{rating}} out of 5",
+  "reviews.load_error": "Failed to load reviews. Please try again.",
+  "reviews.anonymous": "Anonymous",
+  "reputation.chip_label": "{{score}} ({{count}})",
+  "reputation.tooltip_federated": "Reputation aggregated across {{count}} partner communities",
+  "reputation.tooltip_local": "Based on {{count}} reviews in this community",
+  "reputation.aria_label": "Federated reputation {{score}} from {{count}} reviews",
+  "settings.show_reviews_federated.help": "When enabled, your reviews will be visible to members on federated partner platforms."
 }

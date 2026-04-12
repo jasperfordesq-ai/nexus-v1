@@ -60,6 +60,12 @@ export interface User {
   last_login_at?: string;
   distance?: number;
   is_verified?: boolean;
+  /** If set, this user originates from a federated partner tenant. */
+  federated_partner_id?: number | string | null;
+  /** Aggregated cross-federation reputation score (0–5). */
+  federated_reputation_score?: number;
+  /** Total number of federated reviews aggregated across partners. */
+  federated_reputation_count?: number;
 }
 
 export interface UserProfile extends User {
@@ -1604,6 +1610,10 @@ export interface FederatedMember {
   };
   is_external?: boolean;
   partner_name?: string;
+  /** Aggregated cross-federation reputation score (0–5). */
+  reputation_score?: number;
+  /** Total number of reviews aggregated across partners. */
+  reputation_count?: number;
 }
 
 export interface FederationConnection {
