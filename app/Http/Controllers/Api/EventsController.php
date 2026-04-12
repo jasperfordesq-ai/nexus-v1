@@ -64,12 +64,21 @@ class EventsController extends BaseApiController
 
         $result = $this->eventService->getAll($filters);
 
-        // Batch-load user RSVP statuses (single query instead of N+1)
-        if ($userId && !empty($result['items'])) {
-            $eventIds = array_column($result['items'], 'id');
-            $rsvpMap = $this->eventService->getUserRsvpsBatch($eventIds, $userId);
-            foreach ($result['items'] as &$event) {
-                $event['user_rsvp'] = $rsvpMap[(int) $event['id']] ?? null;
+        // Batch-load user RSVP statuses (single query instead of N+1).
+        // Anonymous viewers always get null — never fall through to a per-event lookup.
+        if (!empty($result['items'])) {
+            if ($userId) {
+                $eventIds = array_column($result['items'], 'id');
+                $rsvpMap = $this->eventService->getUserRsvpsBatch($eventIds, $userId);
+                foreach ($result['items'] as &$event) {
+                    $event['user_rsvp'] = $rsvpMap[(int) $event['id']] ?? null;
+                }
+                unset($event);
+            } else {
+                foreach ($result['items'] as &$event) {
+                    $event['user_rsvp'] = null;
+                }
+                unset($event);
             }
         }
 

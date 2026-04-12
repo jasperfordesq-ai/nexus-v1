@@ -61,8 +61,13 @@ class GroupService
         }
 
         if (! empty($filters['user_id'])) {
-            $query->whereHas('activeMembers', function (Builder $q) use ($filters) {
-                $q->where('users.id', (int) $filters['user_id']);
+            // Direct subquery on group_members avoids a JOIN to users + withCount-triggered N+1
+            $uid = (int) $filters['user_id'];
+            $query->whereIn('id', function ($sub) use ($uid) {
+                $sub->select('group_id')
+                    ->from('group_members')
+                    ->where('user_id', $uid)
+                    ->where('status', 'active');
             });
         }
 

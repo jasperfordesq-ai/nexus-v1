@@ -141,11 +141,17 @@ class JobVacanciesController extends BaseApiController
 
         $result = $this->jobService->getAll($filters, $userId);
 
+        $extraMeta = [];
+        if (isset($result['total'])) {
+            $extraMeta['total'] = (int) $result['total'];
+        }
+
         return $this->respondWithCollection(
             $result['items'],
             $result['cursor'],
             $filters['limit'],
-            $result['has_more']
+            $result['has_more'],
+            $extraMeta
         );
     }
 
@@ -291,20 +297,29 @@ class JobVacanciesController extends BaseApiController
             $file = request()->file('cv');
             $allowed = ['pdf', 'doc', 'docx'];
             $ext = strtolower($file->getClientOriginalExtension());
-            if (!in_array($ext, $allowed)) {
+            if (!in_array($ext, $allowed, true)) {
                 return $this->respondWithError('VALIDATION_INVALID_VALUE', __('api.job_cv_invalid_type'), 'cv', 422);
             }
             if ($file->getSize() > 5 * 1024 * 1024) {
                 return $this->respondWithError('VALIDATION_FILE_TOO_LARGE', __('api.job_cv_too_large'), 'cv', 422);
             }
-            // MIME content inspection — block HTML/SVG/PHP disguised as document extensions
+            // MIME whitelist — must match extension, blocks HTML/SVG/PHP disguised as documents
+            $allowedMimes = [
+                'pdf'  => ['application/pdf'],
+                'doc'  => ['application/msword', 'application/vnd.ms-office', 'application/octet-stream'],
+                'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip', 'application/octet-stream'],
+            ];
             $detectedMime = $file->getMimeType();
-            $blockedMimes = ['text/html', 'application/xhtml+xml', 'image/svg+xml', 'application/x-httpd-php'];
-            if ($detectedMime && in_array($detectedMime, $blockedMimes, true)) {
+            if (!$detectedMime || !in_array($detectedMime, $allowedMimes[$ext], true)) {
                 return $this->respondWithError('VALIDATION_INVALID_VALUE', __('api.job_cv_type_not_allowed'), 'cv', 422);
             }
+            // Sanitize original filename: basename() to strip any path traversal, then allow only alnum/dot/dash/underscore
+            $rawName = basename($file->getClientOriginalName());
+            $safeName = preg_replace('/[^A-Za-z0-9._-]/', '_', $rawName) ?: 'cv';
+            // Cap length and ensure extension preserved
+            $safeName = substr($safeName, 0, 120);
             $cvPath = $file->store("job-applications/{$tenantId}", 'local');
-            $cvFilename = $file->getClientOriginalName();
+            $cvFilename = $safeName;
             $cvSize = $file->getSize();
         }
 

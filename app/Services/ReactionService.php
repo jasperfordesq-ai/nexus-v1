@@ -43,25 +43,30 @@ class ReactionService
             throw new \InvalidArgumentException("Invalid entity type: {$entityType}");
         }
 
-        // Check existing reaction
-        $existing = DB::table('reactions')
-            ->where('tenant_id', $tenantId)
-            ->where('target_type', $entityType)
-            ->where('target_id', $entityId)
-            ->where('user_id', $userId)
-            ->first();
+        // Serialise concurrent toggles for the same (user, entity) to avoid duplicate inserts.
+        // NOTE: a DB-level unique index on (tenant_id, user_id, target_type, target_id) is not
+        // yet present on the `reactions` table — flagged for a follow-up migration. The
+        // row-lock + transaction below closes the practical race window.
+        [$action, $resultType] = DB::transaction(function () use ($tenantId, $entityType, $entityId, $userId, $reactionType) {
+            $existing = DB::table('reactions')
+                ->where('tenant_id', $tenantId)
+                ->where('target_type', $entityType)
+                ->where('target_id', $entityId)
+                ->where('user_id', $userId)
+                ->lockForUpdate()
+                ->first();
 
-        if ($existing) {
-            if ($existing->emoji === $reactionType) {
-                // Same type: remove
-                DB::table('reactions')
-                    ->where('id', $existing->id)
-                    ->where('tenant_id', $tenantId)
-                    ->delete();
+            if ($existing) {
+                if ($existing->emoji === $reactionType) {
+                    // Same type: remove
+                    DB::table('reactions')
+                        ->where('id', $existing->id)
+                        ->where('tenant_id', $tenantId)
+                        ->delete();
 
-                $action = 'removed';
-                $resultType = null;
-            } else {
+                    return ['removed', null];
+                }
+
                 // Different type: update
                 DB::table('reactions')
                     ->where('id', $existing->id)
@@ -71,10 +76,9 @@ class ReactionService
                         'created_at' => now(),
                     ]);
 
-                $action = 'updated';
-                $resultType = $reactionType;
+                return ['updated', $reactionType];
             }
-        } else {
+
             // No existing reaction: insert
             DB::table('reactions')->insert([
                 'tenant_id' => $tenantId,
@@ -85,9 +89,8 @@ class ReactionService
                 'created_at' => now(),
             ]);
 
-            $action = 'added';
-            $resultType = $reactionType;
-        }
+            return ['added', $reactionType];
+        });
 
         // Return updated reaction state
         $reactions = $this->getReactions($entityId, $entityType, $userId);

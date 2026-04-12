@@ -475,14 +475,36 @@ class AdminVolunteerController extends BaseApiController
 
         if ($this->tableExists('vol_organizations')) {
             try {
+                // Single query: LEFT JOIN grouped aggregates per org instead of per-row correlated subqueries
                 $results = DB::select(
                     "SELECT vo.id, vo.id as org_id, vo.name as org_name, vo.status, vo.created_at,
-                            COALESCE((SELECT COUNT(*) FROM org_members om WHERE om.tenant_id = vo.tenant_id AND om.organization_id = vo.id AND om.status = 'active'), 0) as member_count,
-                            COALESCE((SELECT COUNT(*) FROM vol_opportunities opp WHERE opp.tenant_id = vo.tenant_id AND opp.organization_id = vo.id AND opp.is_active = 1), 0) as opportunity_count,
-                            COALESCE((SELECT SUM(vl.hours) FROM vol_logs vl WHERE vl.tenant_id = vo.tenant_id AND vl.organization_id = vo.id AND vl.status = 'approved'), 0) as total_hours,
+                            COALESCE(mc.member_count, 0) as member_count,
+                            COALESCE(oc.opportunity_count, 0) as opportunity_count,
+                            COALESCE(hc.total_hours, 0) as total_hours,
                             0 as balance, 0 as total_in, 0 as total_out
-                     FROM vol_organizations vo WHERE vo.tenant_id = ? ORDER BY vo.name ASC LIMIT 100",
-                    [$tenantId]
+                     FROM vol_organizations vo
+                     LEFT JOIN (
+                         SELECT organization_id, COUNT(*) as member_count
+                         FROM org_members
+                         WHERE tenant_id = ? AND status = 'active'
+                         GROUP BY organization_id
+                     ) mc ON mc.organization_id = vo.id
+                     LEFT JOIN (
+                         SELECT organization_id, COUNT(*) as opportunity_count
+                         FROM vol_opportunities
+                         WHERE tenant_id = ? AND is_active = 1
+                         GROUP BY organization_id
+                     ) oc ON oc.organization_id = vo.id
+                     LEFT JOIN (
+                         SELECT organization_id, SUM(hours) as total_hours
+                         FROM vol_logs
+                         WHERE tenant_id = ? AND status = 'approved'
+                         GROUP BY organization_id
+                     ) hc ON hc.organization_id = vo.id
+                     WHERE vo.tenant_id = ?
+                     ORDER BY vo.name ASC
+                     LIMIT 100",
+                    [$tenantId, $tenantId, $tenantId, $tenantId]
                 );
                 return $this->respondWithData(array_map(fn($r) => (array)$r, $results));
             } catch (\Throwable $e) {}

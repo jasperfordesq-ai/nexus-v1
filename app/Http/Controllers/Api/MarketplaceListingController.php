@@ -397,7 +397,37 @@ class MarketplaceListingController extends BaseApiController
 
         $uploadedImages = [];
 
+        // Trusted MIME whitelist — verified via Symfony MIME detection, not client extension
+        $allowedImageMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        $extMimeMap = [
+            'jpg'  => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png'  => 'image/png',
+            'webp' => 'image/webp',
+            'gif'  => 'image/gif',
+        ];
+
         foreach ($files as $file) {
+            // Reject files whose detected MIME isn't whitelisted OR doesn't match extension
+            $detectedMime = $file->getMimeType();
+            $ext = strtolower($file->getClientOriginalExtension());
+            if (!in_array($detectedMime, $allowedImageMimes, true)) {
+                \Illuminate\Support\Facades\Log::warning('Marketplace image upload rejected (bad MIME)', [
+                    'listing_id' => $id,
+                    'mime'       => $detectedMime,
+                    'ext'        => $ext,
+                ]);
+                continue;
+            }
+            if (isset($extMimeMap[$ext]) && $extMimeMap[$ext] !== $detectedMime) {
+                \Illuminate\Support\Facades\Log::warning('Marketplace image upload rejected (ext/MIME mismatch)', [
+                    'listing_id' => $id,
+                    'mime'       => $detectedMime,
+                    'ext'        => $ext,
+                ]);
+                continue;
+            }
+
             try {
                 $result = $this->imageUploadService->upload($file, 'marketplace');
 
@@ -506,7 +536,8 @@ class MarketplaceListingController extends BaseApiController
         $allowedMimes = ['video/mp4', 'video/webm', 'video/quicktime'];
         $maxSize = 50 * 1024 * 1024; // 50 MB
 
-        if (!in_array($file->getMimeType(), $allowedMimes, true)) {
+        $detectedMime = $file->getMimeType();
+        if (!in_array($detectedMime, $allowedMimes, true)) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
                 __('api_controllers_2.marketplace_listing.invalid_video_type'),
@@ -524,9 +555,17 @@ class MarketplaceListingController extends BaseApiController
             );
         }
 
+        // Derive extension from trusted MIME (never from guessExtension() which can return php/exe variants)
+        $mimeToExt = [
+            'video/mp4'        => 'mp4',
+            'video/webm'       => 'webm',
+            'video/quicktime'  => 'mov',
+        ];
+        $safeExt = $mimeToExt[$detectedMime] ?? 'mp4';
+
         $tenantId = TenantContext::getId();
         $dir = "uploads/marketplace/videos/{$tenantId}";
-        $filename = time() . '_' . uniqid() . '.' . ($file->guessExtension() ?: 'mp4');
+        $filename = time() . '_' . uniqid() . '.' . $safeExt;
 
         $path = $file->storeAs($dir, $filename, 'public');
         $url = '/storage/' . $path;

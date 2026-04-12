@@ -183,6 +183,9 @@ class JobVacancyService
             ];
         }
 
+        // Total count for the unpaginated query (used by UI for pagination display)
+        $total = (clone $query)->count();
+
         // Cursor-based pagination (default for all other callers)
         if ($cursor !== null) {
             $cursorId = base64_decode($cursor, true);
@@ -203,6 +206,7 @@ class JobVacancyService
             'items' => $enriched,
             'cursor' => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
             'has_more' => $hasMore,
+            'total' => $total,
         ];
     }
 
