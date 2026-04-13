@@ -77,20 +77,8 @@ interface ConfigGroup {
 // Config schema definition
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Supported platform languages — generated programmatically to avoid Irish-first bias
-const SUPPORTED_LOCALES: { code: string; name: string }[] = [
-  { code: 'en', name: 'English' },
-  { code: 'ga', name: 'Irish' },
-  { code: 'de', name: 'German' },
-  { code: 'fr', name: 'French' },
-  { code: 'it', name: 'Italian' },
-  { code: 'pt', name: 'Portuguese' },
-  { code: 'es', name: 'Spanish' },
-  { code: 'nl', name: 'Dutch' },
-  { code: 'pl', name: 'Polish' },
-  { code: 'ja', name: 'Japanese' },
-  { code: 'ar', name: 'Arabic' },
-];
+// Supported platform language codes — names resolved via i18n inside the component
+const SUPPORTED_LOCALE_CODES = ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar'] as const;
 
 const CONFIG_SCHEMA: ConfigGroup[] = [
   {
@@ -107,7 +95,7 @@ const CONFIG_SCHEMA: ConfigGroup[] = [
       { key: 'footer_text', label: 'Footer / Legal Text', description: 'Displayed in the site footer (e.g., charity number, company registration)', type: 'textarea', default: '' },
       {
         key: 'locale', label: 'Default Locale', description: 'Default language for the platform', type: 'select', default: 'en',
-        options: SUPPORTED_LOCALES.map(({ code, name }) => ({ label: name, value: code })),
+        options: SUPPORTED_LOCALE_CODES.map((code) => ({ label: code, value: code })),
       },
     ],
   },
@@ -292,6 +280,12 @@ export function SystemConfig() {
   // Track whether there are unsaved changes
   const hasChanges = JSON.stringify(config) !== JSON.stringify(edited);
 
+  // Translated locale options — built inside the component so t() is available
+  const localeOptions = SUPPORTED_LOCALE_CODES.map((code) => ({
+    label: t(`system.lang_${code}`),
+    value: code,
+  }));
+
   // ── Data loading ──────────────────────────────────────────────────────
 
   const loadData = useCallback(async () => {
@@ -469,7 +463,7 @@ export function SystemConfig() {
               isInvalid={!!error}
               errorMessage={error}
             >
-              {(def.options ?? []).map((opt) => (
+              {(def.key === 'locale' ? localeOptions : (def.options ?? [])).map((opt) => (
                 <SelectItem key={opt.value}>{opt.label}</SelectItem>
               ))}
             </Select>
@@ -655,7 +649,7 @@ export function SystemConfig() {
                 <Settings2 size={18} />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-base font-semibold text-foreground">Advanced / Custom Settings</h3>
+                <h3 className="text-base font-semibold text-foreground">{t('system.advanced_custom_settings')}</h3>
                 <p className="text-xs text-default-400">
                   Configuration keys not defined in the standard schema. These are preserved as raw key-value pairs.
                 </p>

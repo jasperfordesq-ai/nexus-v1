@@ -99,8 +99,8 @@ export function SystemRequirements() {
   return (
     <div>
       <PageHeader
-        title="System Requirements"
-        description="Check server configuration and dependencies"
+        title={t('system.system_requirements_title')}
+        description={t('system.system_requirements_desc')}
         actions={
           <Button
             variant="flat"
@@ -130,7 +130,7 @@ export function SystemRequirements() {
                 })()}
               </div>
               <div>
-                <h3 className="text-lg font-bold text-foreground">Overall Status</h3>
+                <h3 className="text-lg font-bold text-foreground">{t('system.overall_status')}</h3>
                 <Chip size="sm" variant="flat" color={statusConfig[status].color} className="mt-1">
                   {statusConfig[status].label}
                 </Chip>
@@ -142,7 +142,7 @@ export function SystemRequirements() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-6 pt-5 pb-0">
               <Code size={18} className="text-primary" />
-              <h3 className="text-base font-semibold">PHP Version</h3>
+              <h3 className="text-base font-semibold">{t('system.php_version')}</h3>
             </CardHeader>
             <CardBody className="px-6 pb-5">
               <div className="flex items-center gap-4">
@@ -164,7 +164,7 @@ export function SystemRequirements() {
             <CardHeader className="flex items-center justify-between px-6 pt-5 pb-0">
               <div className="flex items-center gap-2">
                 <Puzzle size={18} className="text-secondary" />
-                <h3 className="text-base font-semibold">PHP Extensions</h3>
+                <h3 className="text-base font-semibold">{t('system.php_extensions')}</h3>
                 <Chip size="sm" variant="flat" color="default">
                   {loadedCount} of {data.extensions.length} loaded ({requiredCount} required)
                 </Chip>
@@ -207,7 +207,7 @@ export function SystemRequirements() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-6 pt-5 pb-0">
               <FolderOpen size={18} className="text-warning" />
-              <h3 className="text-base font-semibold">Writable Directories</h3>
+              <h3 className="text-base font-semibold">{t('system.writable_directories')}</h3>
             </CardHeader>
             <CardBody className="px-6 pb-5">
               <div className="space-y-2">
@@ -232,7 +232,7 @@ export function SystemRequirements() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-6 pt-5 pb-0">
               <Server size={18} className="text-success" />
-              <h3 className="text-base font-semibold">Services</h3>
+              <h3 className="text-base font-semibold">{t('system.services')}</h3>
             </CardHeader>
             <CardBody className="px-6 pb-5">
               <div className="flex gap-4">
@@ -258,7 +258,7 @@ export function SystemRequirements() {
             <Card shadow="sm">
               <CardHeader className="flex items-center gap-2 px-6 pt-5 pb-0">
                 <Settings size={18} className="text-default-500" />
-                <h3 className="text-base font-semibold">INI Settings</h3>
+                <h3 className="text-base font-semibold">{t('system.ini_settings')}</h3>
               </CardHeader>
               <CardBody className="px-6 pb-5">
                 <div className="divide-y divide-divider">

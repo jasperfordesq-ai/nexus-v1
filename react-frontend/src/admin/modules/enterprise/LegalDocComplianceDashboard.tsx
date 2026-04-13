@@ -147,7 +147,7 @@ export default function LegalDocComplianceDashboard() {
     return (
       <div className="text-center py-12">
         <AlertCircle size={48} className="mx-auto text-[var(--color-text-tertiary)] mb-4" />
-        <p className="text-[var(--color-text-secondary)]">Failed to load compliance data</p>
+        <p className="text-[var(--color-text-secondary)]">{t('enterprise.failed_to_load_compliance_data')}</p>
       </div>
     );
   }
@@ -156,7 +156,7 @@ export default function LegalDocComplianceDashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Legal Compliance Dashboard</h1>
+        <h1 className="text-3xl font-bold">{t('enterprise.legal_compliance_dashboard')}</h1>
         <p className="text-[var(--color-text-secondary)] mt-1">
           Track user acceptance rates and compliance metrics
         </p>
@@ -171,7 +171,7 @@ export default function LegalDocComplianceDashboard() {
                 <Users size={24} className="text-primary" />
               </div>
               <div>
-                <p className="text-sm text-[var(--color-text-secondary)]">Total Users</p>
+                <p className="text-sm text-[var(--color-text-secondary)]">{t('enterprise.label_total_users')}</p>
                 <p className="text-2xl font-bold">{stats.total_users.toLocaleString()}</p>
               </div>
             </div>
@@ -185,7 +185,7 @@ export default function LegalDocComplianceDashboard() {
                 <CheckCircle2 size={24} className="text-success" />
               </div>
               <div>
-                <p className="text-sm text-[var(--color-text-secondary)]">Fully Compliant</p>
+                <p className="text-sm text-[var(--color-text-secondary)]">{t('enterprise.fully_compliant')}</p>
                 <p className="text-2xl font-bold">
                   {(stats.total_users - stats.users_pending_acceptance).toLocaleString()}
                 </p>
@@ -217,7 +217,7 @@ export default function LegalDocComplianceDashboard() {
                 <TrendingUp size={24} className="text-primary" />
               </div>
               <div>
-                <p className="text-sm text-[var(--color-text-secondary)]">Overall Compliance</p>
+                <p className="text-sm text-[var(--color-text-secondary)]">{t('enterprise.overall_compliance')}</p>
                 <p className="text-2xl font-bold">{stats.overall_compliance_rate.toFixed(1)}%</p>
               </div>
             </div>
@@ -228,7 +228,7 @@ export default function LegalDocComplianceDashboard() {
       {/* Per-Document Breakdown */}
       <Card>
         <CardHeader>
-          <h2 className="text-xl font-semibold">Document Acceptance Rates</h2>
+          <h2 className="text-xl font-semibold">{t('enterprise.document_acceptance_rates')}</h2>
         </CardHeader>
         <CardBody>
           {stats.documents.length === 0 ? (
@@ -239,10 +239,10 @@ export default function LegalDocComplianceDashboard() {
           ) : (
             <Table aria-label={t('enterprise.label_document_compliance_table')}>
               <TableHeader>
-                <TableColumn>Document</TableColumn>
-                <TableColumn>Version</TableColumn>
-                <TableColumn>Effective Date</TableColumn>
-                <TableColumn>Acceptance Rate</TableColumn>
+                <TableColumn>{t('enterprise.col_document')}</TableColumn>
+                <TableColumn>{t('enterprise.col_version')}</TableColumn>
+                <TableColumn>{t('enterprise.col_effective_date')}</TableColumn>
+                <TableColumn>{t('enterprise.col_acceptance_rate')}</TableColumn>
                 <TableColumn>Users Accepted</TableColumn>
                 <TableColumn>Users Pending</TableColumn>
                 <TableColumn>Actions</TableColumn>

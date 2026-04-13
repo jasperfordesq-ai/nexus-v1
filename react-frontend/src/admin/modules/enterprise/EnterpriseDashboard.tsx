@@ -118,7 +118,7 @@ export function EnterpriseDashboard() {
       {stats && (
         <Card shadow="sm" className="mb-6">
           <CardBody className="p-4">
-            <p className="text-sm font-semibold text-default-700 mb-3">System Health</p>
+            <p className="text-sm font-semibold text-default-700 mb-3">{t('enterprise.label_system_health')}</p>
             <div className="flex flex-wrap gap-3">
               <Chip color={stats.db_connected ? 'success' : 'danger'} variant="flat" size="sm" startContent={<Database size={12} />}>
                 Database {stats.db_connected ? 'Connected' : 'Disconnected'}
@@ -169,7 +169,7 @@ export function EnterpriseDashboard() {
       {stats?.recent_gdpr_activity && stats.recent_gdpr_activity.length > 0 && (
         <Card shadow="sm" className="mt-6">
           <CardBody className="p-4">
-            <p className="text-sm font-semibold text-default-700 mb-3">Recent GDPR Activity</p>
+            <p className="text-sm font-semibold text-default-700 mb-3">{t('enterprise.recent_gdpr_activity')}</p>
             <div className="space-y-2">
               {stats.recent_gdpr_activity.map((entry) => (
                 <div key={entry.id} className="flex items-center justify-between text-sm border-b border-divider pb-2 last:border-0">
