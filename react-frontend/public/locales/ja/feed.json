@@ -198,7 +198,9 @@
     "media_compression_failed": "{{count}}画像の処理に失敗しました",
     "media_upload_error": "画像の処理に失敗しました",
     "sdg_selected_one": "{{count}}目標が選択されました",
-    "sdg_selected_other": "{{count}}目標が選択されました"
+    "sdg_selected_other": "{{count}}目標が選択されました",
+    "save_changes": "Save",
+    "placeholder_hours": "1"
   },
   "card": {
     "edited": "edited",
@@ -266,7 +268,8 @@
     "detail_job": "仕事を見る",
     "detail_challenge": "チャレンジを見る",
     "detail_volunteer": "機会を見る",
-    "detail_blog": "記事を読む"
+    "detail_blog": "記事を読む",
+    "scheduled": "Scheduled"
   },
   "hashtag": {
     "title": "Hashtag",
@@ -322,7 +325,12 @@
     "dm_no_results": "メンバーが見つかりませんでした",
     "dm_hint": "検索するには少なくとも2文字入力してください",
     "dm_sent": "{{name}}と共有された投稿",
-    "dm_failed": "メッセージの送信に失敗しました"
+    "dm_failed": "メッセージの送信に失敗しました",
+    "repost": "Repost",
+    "quote_submit": "Post",
+    "dm_sent_label": "Sent",
+    "dm_send": "Send",
+    "dm_done": "Done"
   },
   "trending": {
     "title": "Trending",
@@ -466,6 +474,11 @@
   },
   "analytics": {
     "title": "投稿分析",
-    "reactions_breakdown": "反応の内訳"
+    "reactions_breakdown": "反応の内訳",
+    "views": "Views",
+    "likes": "Likes",
+    "comments": "Comments",
+    "shares": "Shares",
+    "reach": "Reach"
   }
 }

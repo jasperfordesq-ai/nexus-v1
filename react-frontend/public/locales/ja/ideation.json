@@ -399,6 +399,9 @@
     },
     "create_challenge": {
       "title": "チャレンジを作成"
+    },
+    "campaigns": {
+      "title": "Campaigns"
     }
   }
 }

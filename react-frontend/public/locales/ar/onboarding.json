@@ -100,5 +100,8 @@
     "save_failed": "فشل في الحفظ",
     "save_continue": "احفظ واستمر",
     "required_fields": "الحقول المطلوبة"
+  },
+  "page_meta": {
+    "title": "Onboarding"
   }
 }

@@ -399,6 +399,9 @@
     },
     "create_challenge": {
       "title": "Uitdaging Creëren"
+    },
+    "campaigns": {
+      "title": "Campaigns"
     }
   }
 }

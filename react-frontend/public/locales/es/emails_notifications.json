@@ -86,7 +86,10 @@
     "label_under_review": "En revisión:",
     "label_remember": "Recuerda:",
     "label_action_needed": "Acción necesaria:",
-    "label_why_approval": "¿Por qué aprobación?"
+    "label_why_approval": "¿Por qué aprobación?",
+    "label_service": "Service",
+    "label_requester": "Requester",
+    "label_provider": "Provider"
   },
   "volunteering": {
     "heading_accepted": "¡Solicitud aceptada!",
@@ -114,7 +117,8 @@
     "heading_application_received": "Nueva Solicitud de Voluntariado",
     "application_received_body": "{{name}} ha solicitado ser voluntario con tu organización.",
     "application_received_note": "Revisa su solicitud y aprueba o rechaza desde el panel de control de tu organización.",
-    "btn_review_application": "Revisar Solicitud"
+    "btn_review_application": "Revisar Solicitud",
+    "label_opportunity": "Opportunity"
   },
   "default_notification": "Notificación: {{type}}"
 }

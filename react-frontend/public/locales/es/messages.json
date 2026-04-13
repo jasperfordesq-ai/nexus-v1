@@ -170,5 +170,32 @@
   "group_name_updated": "Nombre del grupo actualizado",
   "group_member_added": "Miembro agregado al grupo",
   "group_member_removed": "Miembro eliminado del grupo",
-  "group_left": "Has salido del grupo"
+  "group_left": "Has salido del grupo",
+  "translate.translate": "Translate",
+  "translate.translate_to": "Translate to",
+  "translate.view_original": "View original",
+  "translate.show_translation": "Show translation",
+  "translate.translating": "Translating...",
+  "translate.translation_failed": "Translation failed. Please try again.",
+  "translate.translated_label": "Translated",
+  "translate_hint.title": "Translation is available",
+  "translate_hint.body": "You and this person can each write in your own language. Tap \"Translate\" on any message to read it in yours, or use the translate button in the header to translate everything automatically.",
+  "translate_hint.dismiss": "Dismiss translation hint",
+  "auto_translate.tooltip_off": "Translate all messages automatically",
+  "auto_translate.tooltip_on": "Auto-translate is on — click to turn off",
+  "auto_translate.active_banner": "Messages in this conversation are being automatically translated into your language.",
+  "auto_translate.turn_off": "Turn off",
+  "group_participants": "Participants",
+  "group_admin": "Admin",
+  "group_member": "Member",
+  "group_remove_member": "Remove",
+  "group_tab": "Groups",
+  "page_meta": {
+    "list": {
+      "title": "Messages"
+    },
+    "conversation": {
+      "title": "Conversation"
+    }
+  }
 }

@@ -67,14 +67,17 @@
   "try_again": "Bain Triail Eile As",
   "collapse": "Laghdaigh",
   "expand": "Cruthaigh pobalbhreith",
-  "poll_type": "Cine\u00e1l Pobalbhreithe",
-  "poll_type_standard": "Caighde\u00e1nach (roghnaigh ceann amh\u00e1in)",
-  "poll_type_ranked": "Rogha Rang\u00fa (ord\u00fa de r\u00e9ir tosa\u00edochta)",
-  "category_label": "Catag\u00f3ir (roghnach)",
-  "category_placeholder": "m.sh. Pobal, Imeachta\u00ed, Aiseolas",
-  "anonymous_voting": "V\u00f3t\u00e1il Gan Ainm",
-  "anonymous_voting_desc": "Ceil aitheantas na v\u00f3t\u00e1laithe sna tortha\u00ed",
+  "poll_type": "Cineál Pobalbhreithe",
+  "poll_type_standard": "Caighdeánach (roghnaigh ceann amháin)",
+  "poll_type_ranked": "Rogha Rangú (ordú de réir tosaíochta)",
+  "category_label": "Catagóir (roghnach)",
+  "category_placeholder": "m.sh. Pobal, Imeachtaí, Aiseolas",
+  "anonymous_voting": "Vótáil Gan Ainm",
+  "anonymous_voting_desc": "Ceil aitheantas na vótálaithe sna torthaí",
   "aria": {
-    "export_csv": "Easp\u00f3rt\u00e1il tortha\u00ed mar CSV"
+    "export_csv": "Easpórtáil torthaí mar CSV"
+  },
+  "page_meta": {
+    "title": "Polls"
   }
 }

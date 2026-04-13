@@ -33,5 +33,8 @@
   "toast_disconnected": "Disconnected",
   "toast_disconnect_failed": "Kon niet ontkoppelen",
   "toast_cancelled": "Verzoek geannuleerd",
-  "toast_cancel_failed": "Kon verzoek niet annuleren"
+  "toast_cancel_failed": "Kon verzoek niet annuleren",
+  "page_meta": {
+    "title": "Connections"
+  }
 }

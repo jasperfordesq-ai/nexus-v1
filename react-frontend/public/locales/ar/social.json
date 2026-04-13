@@ -76,7 +76,9 @@
     "save_to": "حفظ في المجموعة",
     "no_collection": "عام (بدون مجموعة)",
     "new_collection": "مجموعة جديدة",
-    "collection_name": "اسم المجموعة"
+    "collection_name": "اسم المجموعة",
+    "save": "Save",
+    "saved": "Saved"
   },
   "bookmarks": {
     "title": "العناصر المحفوظة",
@@ -97,6 +99,21 @@
     "collection_actions": "إجراءات المجموعة",
     "create_collection_title": "إنشاء مجموعة",
     "edit_collection_title": "تعديل المجموعة",
-    "collection_description": "الوصف (اختياري)"
+    "collection_description": "الوصف (اختياري)",
+    "page_title": "Saved",
+    "all_items": "All",
+    "tab_all": "All",
+    "type_post": "Post",
+    "type_listing": "Listing",
+    "type_event": "Event",
+    "type_job": "Job",
+    "type_blog": "Blog",
+    "type_discussion": "Discussion",
+    "edit_collection": "Edit",
+    "delete_collection": "Delete",
+    "collection_name": "Name",
+    "cancel": "Cancel",
+    "save": "Save",
+    "create": "Create"
   }
 }

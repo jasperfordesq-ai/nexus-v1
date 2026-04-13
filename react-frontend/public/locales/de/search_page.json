@@ -67,5 +67,8 @@
   "delete_saved_search": "Gespeicherte Suche löschen",
   "aria": {
     "loading_search_results": "Suchergebnisse werden geladen"
+  },
+  "page_meta": {
+    "title": "Search"
   }
 }

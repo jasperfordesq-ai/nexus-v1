@@ -198,7 +198,9 @@
     "media_compression_failed": "{{count}} afbeelding(en) konden niet worden verwerkt",
     "media_upload_error": "Verwerken van afbeeldingen mislukt",
     "sdg_selected_one": "{{count}} doel geselecteerd",
-    "sdg_selected_other": "{{count}} doelen geselecteerd"
+    "sdg_selected_other": "{{count}} doelen geselecteerd",
+    "save_changes": "Save",
+    "placeholder_hours": "1"
   },
   "card": {
     "edited": "edited",
@@ -266,7 +268,8 @@
     "detail_job": "Bekijk Taak",
     "detail_challenge": "Bekijk Uitdaging",
     "detail_volunteer": "Bekijk Kans",
-    "detail_blog": "Lees Artikel"
+    "detail_blog": "Lees Artikel",
+    "scheduled": "Scheduled"
   },
   "hashtag": {
     "title": "Hashtag",
@@ -322,7 +325,12 @@
     "dm_no_results": "Geen leden gevonden",
     "dm_hint": "Typ minstens 2 tekens om te zoeken",
     "dm_sent": "Bericht gedeeld met {{name}}",
-    "dm_failed": "Mislukt om bericht te versturen"
+    "dm_failed": "Mislukt om bericht te versturen",
+    "repost": "Repost",
+    "quote_submit": "Post",
+    "dm_sent_label": "Sent",
+    "dm_send": "Send",
+    "dm_done": "Done"
   },
   "trending": {
     "title": "Trending",
@@ -466,6 +474,11 @@
   },
   "analytics": {
     "title": "Postanalyse",
-    "reactions_breakdown": "Reacties overzicht"
+    "reactions_breakdown": "Reacties overzicht",
+    "views": "Views",
+    "likes": "Likes",
+    "comments": "Comments",
+    "shares": "Shares",
+    "reach": "Reach"
   }
 }

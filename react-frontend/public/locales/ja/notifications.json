@@ -66,5 +66,8 @@
     "toast_vol_hours_declined": "時間が却下されました",
     "toast_vol_opportunity_closed": "機会が終了しました",
     "toast_default": "Notification"
+  },
+  "page_meta": {
+    "title": "Notifications"
   }
 }

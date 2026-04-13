@@ -182,5 +182,8 @@
     "create": {
       "title": "Vermelding maken"
     }
-  }
+  },
+  "filters_label": "Filters",
+  "filter_hours": "Duration",
+  "filter_today": "Today"
 }

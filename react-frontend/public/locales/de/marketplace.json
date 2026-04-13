@@ -18,7 +18,9 @@
     "advanced_search": "Erweiterte Suche",
     "saved_items": "Gespeicherte Artikel",
     "unable_to_load": "Konnte die Angebote nicht laden",
-    "load_more_failed": "Konnte keine weiteren Angebote laden"
+    "load_more_failed": "Konnte keine weiteren Angebote laden",
+    "all": "All",
+    "categories": "Categories"
   },
   "hub_feature_gate": {
     "title": "Marktplatz nicht verfügbar",
@@ -44,7 +46,20 @@
     "view_image": "View image {{number}}",
     "image_alt": "Image {{number}}",
     "thumbnail_alt": "Thumbnail {{number}}",
-    "link_copied": "Link copied to clipboard"
+    "link_copied": "Link copied to clipboard",
+    "marketplace": "Marketplace",
+    "negotiable": "Negotiable",
+    "free": "Free",
+    "featured": "Featured",
+    "seller": "Seller",
+    "seller_type_business": "Business",
+    "seller_type_private": "Private",
+    "delivery": "Delivery",
+    "description": "Description",
+    "details": "Details",
+    "share_aria": "Share",
+    "unsave_aria": "Unsave",
+    "save_aria": "Save"
   },
   "offer": {
     "modal_title": "Make an Offer",
@@ -59,7 +74,20 @@
     "above_price": "{{percent}}% above the listing price",
     "below_price": "{{percent}}% below the listing price",
     "counter_amount": "Counter: {{amount}}",
-    "accept_counter": "Accept Counter"
+    "accept_counter": "Accept Counter",
+    "cancel": "Cancel",
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "declined": "Declined",
+      "countered": "Countered",
+      "withdrawn": "Withdrawn",
+      "expired": "Expired"
+    },
+    "accept": "Accept",
+    "decline": "Decline",
+    "counter": "Counter",
+    "withdraw": "Withdraw"
   },
   "create": {
     "page_title": "Sell Something - Marketplace",
@@ -93,7 +121,21 @@
     "price_invalid": "Bitte geben Sie einen gültigen Preis ein",
     "created_success": "Anzeige erfolgreich erstellt!",
     "created_error": "Erstellung der Anzeige fehlgeschlagen",
-    "created_error_retry": "Erstellung der Anzeige fehlgeschlagen. Bitte versuchen Sie es erneut."
+    "created_error_retry": "Erstellung der Anzeige fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "photos": "Photos",
+    "cover": "Cover",
+    "add": "Add",
+    "details": "Details",
+    "title_label": "Title",
+    "description_label": "Description",
+    "category_label": "Category",
+    "condition_label": "Condition",
+    "quantity_label": "Quantity",
+    "pricing": "Pricing",
+    "price_label": "Price",
+    "currency_label": "Currency",
+    "location_label": "Location",
+    "cancel": "Cancel"
   },
   "search": {
     "page_title": "Marktplatz durchsuchen",
@@ -123,7 +165,19 @@
     "price_from": "Von {{min}}",
     "price_up_to": "Bis zu {{max}}",
     "last_days_one": "Letzter {{count}} Tag",
-    "last_days_other": "Letzte {{count}} Tage"
+    "last_days_other": "Letzte {{count}} Tage",
+    "breadcrumb_search": "Search",
+    "filters": "Filters",
+    "filters_title": "Filters",
+    "category_label": "Category",
+    "price_min": "Min",
+    "price_max": "Max",
+    "condition_label": "Condition",
+    "private": "Private",
+    "business": "Business",
+    "delivery_label": "Delivery",
+    "today": "Today",
+    "results_for": "for"
   },
   "seller": {
     "page_title": "Verkäuferprofil",
@@ -142,7 +196,13 @@
     "no_listings_description": "{{name}} hat derzeit keine aktiven Angebote.",
     "reviews_coming_soon_title": "Bewertungen kommen bald",
     "reviews_coming_soon_description": "Käuferbewertungen werden in Phase 2 verfügbar sein. Schau später wieder vorbei, um zu sehen, was die Gemeinschaft über diesen Verkäufer denkt.",
-    "view_listings": "Sieh dir die Marktplatzangebote von {{name}} an."
+    "view_listings": "Sieh dir die Marktplatzangebote von {{name}} an.",
+    "marketplace": "Marketplace",
+    "verified": "Verified",
+    "seller_type_business": "Business",
+    "message": "Message",
+    "tab_listings": "Listings",
+    "tab_reviews": "Reviews"
   },
   "category": {
     "not_found_title": "Kategorie nicht gefunden",
@@ -162,7 +222,13 @@
     "results_count_one": "{{count}} Ergebnis",
     "results_count_other": "{{count}} Ergebnisse",
     "load_more": "Mehr laden",
-    "browse_description": "Durchsuche {{name}} Angebote im Marktplatz."
+    "browse_description": "Durchsuche {{name}} Angebote im Marktplatz.",
+    "marketplace": "Marketplace",
+    "filters": "Filters",
+    "filters_title": "Filters",
+    "price_min": "Min",
+    "price_max": "Max",
+    "condition_label": "Condition"
   },
   "common": {
     "save_listing": "Angebot speichern",
@@ -173,13 +239,24 @@
     "sign_in_to_save": "Bitte melden Sie sich an, um Auflistungen zu speichern",
     "load_more": "Mehr laden",
     "try_again": "Erneut versuchen",
-    "sort_by": "Sortieren nach"
+    "sort_by": "Sortieren nach",
+    "free": "Free",
+    "negotiable": "Negotiable",
+    "save": "Save",
+    "unsave": "Unsave",
+    "cancel": "Cancel"
   },
   "condition": {
-    "like_new": "Wie neu"
+    "like_new": "Wie neu",
+    "new": "New",
+    "good": "Good",
+    "fair": "Fair",
+    "poor": "Poor"
   },
   "price_type": {
-    "fixed": "Festpreis"
+    "fixed": "Festpreis",
+    "negotiable": "Negotiable",
+    "free": "Free"
   },
   "delivery_method": {
     "pickup": "Nur Abholung",
@@ -200,7 +277,8 @@
     "days_ago": "{{count}}d vor"
   },
   "categories": {
-    "label": "Nach Kategorie filtern"
+    "label": "Nach Kategorie filtern",
+    "all": "All"
   },
   "filters": {
     "price_range": "Preisspanne",
@@ -210,7 +288,18 @@
     "sort": "Sortieren nach",
     "posted_within": "Veröffentlicht innerhalb",
     "apply": "Filter anwenden",
-    "clear": "Alle löschen"
+    "clear": "Alle löschen",
+    "category": "Category",
+    "min": "Min",
+    "max": "Max",
+    "condition": "Condition",
+    "seller_all": "All",
+    "seller_private": "Private",
+    "seller_business": "Business",
+    "delivery_all": "All",
+    "delivery_shipping": "Shipping",
+    "delivery_both": "Both",
+    "title": "Filters"
   },
   "gallery": {
     "no_images": "Keine Bilder verfügbar",
@@ -220,7 +309,9 @@
   },
   "collection_image": "Sammlungsbild {{number}}",
   "price": {
-    "contact": "Kontakt für Preis"
+    "contact": "Kontakt für Preis",
+    "free": "Free",
+    "negotiable": "Negotiable"
   },
   "empty": {
     "no_listings": "Noch keine Angebote",
@@ -259,7 +350,17 @@
     "empty_sold_title": "Noch keine Verkäufe",
     "empty_sold_description": "Sie haben noch keine Artikel verkauft.",
     "empty_expired_title": "Keine abgelaufenen Angebote",
-    "empty_expired_description": "Sie haben keine abgelaufenen Angebote."
+    "empty_expired_description": "Sie haben keine abgelaufenen Angebote.",
+    "tab_active": "Active",
+    "tab_draft": "Drafts",
+    "tab_sold": "Sold",
+    "tab_expired": "Expired",
+    "stat_active": "Active",
+    "stat_sold": "Sold",
+    "stat_revenue": "Revenue",
+    "action_edit": "Edit",
+    "action_renew": "Renew",
+    "action_remove": "Remove"
   },
   "my_offers": {
     "page_title": "Meine Angebote - Marktplatz",
@@ -281,7 +382,9 @@
     "counter_message_label": "Nachricht (optional)",
     "counter_message_placeholder": "Erklären Sie Ihr Gegenangebot...",
     "counter_sent_success": "Gegenangebot gesendet",
-    "send_counter": "Gegenangebot senden"
+    "send_counter": "Gegenangebot senden",
+    "tab_sent": "Sent",
+    "tab_received": "Received"
   },
   "collections": {
     "page_title": "Meine Sammlungen",
@@ -309,7 +412,13 @@
     "empty_collections_title": "Noch keine Sammlungen",
     "empty_collections_description": "Erstelle eine Sammlung, um deine Lieblingsartikel im Marktplatz zu organisieren.",
     "sign_in_title": "Anmeldung erforderlich",
-    "sign_in_description": "Melde dich an, um deine Sammlungen und gespeicherten Suchen zu verwalten."
+    "sign_in_description": "Melde dich an, um deine Sammlungen und gespeicherten Suchen zu verwalten.",
+    "tab_collections": "Collections",
+    "name_label": "Name",
+    "public": "Public",
+    "private": "Private",
+    "category": "Category",
+    "remove_item": "Remove"
   },
   "saved_searches": {
     "tab_title": "Gespeicherte Suchen",
@@ -320,7 +429,12 @@
     "delete_error": "Löschen fehlgeschlagen",
     "delete": "Gespeicherte Suche löschen",
     "toggle_active": "Aktiv umschalten",
-    "channel_both": "E-Mail & Push"
+    "channel_both": "E-Mail & Push",
+    "frequency_instant": "Instant",
+    "frequency_daily": "Daily",
+    "frequency_weekly": "Weekly",
+    "channel_email": "Email",
+    "channel_push": "Push"
   },
   "promotions": {
     "title": "Anzeige fördern",
@@ -331,7 +445,8 @@
     "bump": "Nach oben verschieben",
     "featured": "Empfohlene Anzeige",
     "top_of_category": "Oben in der Kategorie",
-    "homepage_carousel": "Startseiten-Karussell"
+    "homepage_carousel": "Startseiten-Karussell",
+    "free_label": "Free"
   },
   "free": {
     "page_title": "Kostenlose Artikel",
@@ -350,7 +465,9 @@
     "total_listed": "insgesamt gelistet",
     "sell_to_group": "An die Gruppe verkaufen",
     "empty_title": "Noch keine Gruppenangebote",
-    "empty_description": "Seien Sie das erste Gruppenmitglied, das etwas zum Verkauf anbietet!"
+    "empty_description": "Seien Sie das erste Gruppenmitglied, das etwas zum Verkauf anbietet!",
+    "sellers": "sellers",
+    "tab_label": "Marketplace"
   },
   "hybrid_pricing": {
     "tooltip": "Zeitguthaben, die durch Gemeinschaftszeitbanking verdient wurden",
@@ -381,13 +498,18 @@
     "offer_accepted": "Lieferangebot akzeptiert!",
     "accept_failed": "Fehler beim Akzeptieren des Angebots",
     "delivery_confirmed": "Lieferung bestätigt! Zeitgutschriften wurden vergeben.",
-    "confirm_failed": "Fehler bei der Bestätigung der Lieferung"
+    "confirm_failed": "Fehler bei der Bestätigung der Lieferung",
+    "unknown": "Unknown",
+    "accept": "Accept"
   },
   "ai_reply": {
     "suggest": "Vorschlag zur Antwort",
     "suggested_reply": "AI-Vorgeschlagene Antwort",
     "use_reply": "Diese Antwort verwenden",
-    "error": "Fehler beim Generieren einer Antwort. Bitte versuchen Sie es erneut."
+    "error": "Fehler beim Generieren einer Antwort. Bitte versuchen Sie es erneut.",
+    "regenerate": "Regenerate",
+    "copy": "Copy",
+    "copied": "Copied"
   },
   "map": {
     "page_title": "Karten-Suche - Marktplatz",
@@ -408,7 +530,8 @@
     "use_my_location": "Meinen Standort verwenden",
     "search_this_area": "Diese Gegend durchsuchen",
     "distance_km": "{{km}} km entfernt",
-    "distance_meters": "{{m}} m entfernt"
+    "distance_meters": "{{m}} m entfernt",
+    "refresh": "Refresh"
   },
   "shipping": {
     "title": "Versandoptionen",
@@ -435,10 +558,16 @@
     "local_pickup": "Abholung vor Ort",
     "local_pickup_subtitle": "Persönlich abholen",
     "loading": "Lade Versandoptionen...",
-    "no_options": "Keine Versandoptionen für diesen Verkäufer verfügbar."
+    "no_options": "Keine Versandoptionen für diesen Verkäufer verfügbar.",
+    "price": "Price",
+    "currency": "Currency",
+    "default_badge": "Default",
+    "recommended": "Recommended"
   },
   "listing_location": {
-    "approximate_location": "Ungefähre Lage"
+    "approximate_location": "Ungefähre Lage",
+    "location_title": "Location",
+    "get_directions": "Directions"
   },
   "orders": {
     "load_error": "Fehler beim Laden der Bestellungen",
@@ -446,7 +575,14 @@
     "tracking_number": "Sendungsverfolgung:",
     "tab_cancelled": "Storniert / Erstattet",
     "status": {
-      "pending_payment": "Zahlung ausstehend"
+      "pending_payment": "Zahlung ausstehend",
+      "paid": "Paid",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "completed": "Completed",
+      "disputed": "Disputed",
+      "refunded": "Refunded",
+      "cancelled": "Cancelled"
     },
     "buyer": {
       "page_title": "Meine Bestellungen - Marktplatz",
@@ -460,7 +596,8 @@
       "delivery_confirmed": "Lieferung bestätigt!",
       "rate_order": "Bestellung bewerten",
       "leave_rating": "Bewertung hinterlassen",
-      "dispute_open": "Streitfall offen"
+      "dispute_open": "Streitfall offen",
+      "rated": "Rated"
     },
     "seller": {
       "page_title": "Meine Verkäufe - Marktplatz",
@@ -487,7 +624,8 @@
       "tracking_url_label": "Tracking-URL (optional)",
       "tracking_url_placeholder": "z.B. https://track.example.com/...",
       "confirm_shipped": "Versand bestätigen",
-      "shipped_success": "Bestellung als versendet markiert!"
+      "shipped_success": "Bestellung als versendet markiert!",
+      "shipping_method_other": "Other"
     },
     "buy": {
       "buy_now": "Jetzt kaufen",
@@ -507,8 +645,13 @@
       "submit": "Bewertung einreichen",
       "select_rating": "Bitte wählen Sie eine Bewertung aus",
       "success": "Bewertung erfolgreich eingereicht!",
-      "error": "Fehler beim Einreichen der Bewertung"
-    }
+      "error": "Fehler beim Einreichen der Bewertung",
+      "stars_label": "Rating"
+    },
+    "track": "Track",
+    "tab_all": "All",
+    "tab_active": "Active",
+    "tab_completed": "Completed"
   },
   "onboarding": {
     "page_title": "Verkäufer-Onboarding - Marktplatz",
@@ -534,5 +677,6 @@
     "continue_onboarding": "Onboarding fortsetzen",
     "check_status": "Status überprüfen",
     "start_error": "Onboarding konnte nicht gestartet werden"
-  }
+  },
+  "page_title": "Marketplace"
 }

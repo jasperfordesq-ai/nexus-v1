@@ -100,5 +100,8 @@
     "save_failed": "Zapis nie powiódł się",
     "save_continue": "Zapisz i kontynuuj",
     "required_fields": "Wymagane pola"
+  },
+  "page_meta": {
+    "title": "Onboarding"
   }
 }

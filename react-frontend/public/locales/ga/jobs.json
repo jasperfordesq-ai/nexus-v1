@@ -114,7 +114,7 @@
     "target": "Bog go",
     "add": "Cuir Riail Leis",
     "delete": "Scrios",
-    "action_move_stage": "Bog c\u00e9im",
+    "action_move_stage": "Bog céim",
     "action_auto_reject": "Uathdhiúltú",
     "action_notify_me": "Cuir ar an eolas mé"
   },
@@ -823,7 +823,7 @@
     "first_time_banner": "An chéad uair ag postáil?",
     "first_time_desc": "Treorófar tú ag ár ndraoi iontráil tríd an gcéad phost a phostáil.",
     "start_wizard": "Tosaigh Draoi",
-    "aria_progress": "Dul chun cinn ionchorpr\u00fa"
+    "aria_progress": "Dul chun cinn ionchorprú"
   },
   "preview": {
     "title": "Réamhamharc Poist",
@@ -885,8 +885,45 @@
     "jobs": "Poist"
   },
   "aria": {
-    "qualification_percentage": "C\u00e9atad\u00e1n c\u00e1il\u00edochta"
+    "qualification_percentage": "Céatadán cáilíochta"
   },
   "deadline_countdown_one": "Ag dúnadh i gceann {{count}} lá",
-  "deadline_countdown_other": "Ag dúnadh i gceann {{count}} lá"
+  "deadline_countdown_other": "Ag dúnadh i gceann {{count}} lá",
+  "ai_chat": {
+    "open": "Ask AI about this job",
+    "close": "Close AI chat",
+    "send": "Send message",
+    "title": "Ask AI about this job",
+    "hint": "Ask me anything about this job — qualifications, salary, how to apply, interview tips...",
+    "placeholder": "Type your question..."
+  },
+  "page_meta": {
+    "bias_audit": {
+      "title": "Bias Audit"
+    },
+    "create": {
+      "title": "Post a Job"
+    },
+    "talent_search": {
+      "title": "Talent Search"
+    },
+    "my_applications": {
+      "title": "My Applications"
+    },
+    "analytics": {
+      "title": "Job Analytics"
+    },
+    "kanban": {
+      "title": "Job Applications"
+    },
+    "alerts": {
+      "title": "Job Alerts"
+    },
+    "employer_onboarding": {
+      "title": "Employer Onboarding"
+    },
+    "employer_brand": {
+      "title": "Employer Brand"
+    }
+  }
 }

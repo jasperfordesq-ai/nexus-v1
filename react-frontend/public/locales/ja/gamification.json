@@ -95,7 +95,21 @@
       "not_earned": "まだ取得していません",
       "not_earned_desc": "その調子で進んでください — すぐにこのバッジが解除されます！",
       "xp_reward": "XP報酬",
-      "load_failed": "バッジの詳細を読み込めませんでした。"
+      "load_failed": "バッジの詳細を読み込めませんでした。",
+      "type": "Category",
+      "threshold": "Requirement",
+      "threshold_value": "{{threshold}} {{type}}",
+      "rarity": "Rarity",
+      "tier": "Tier",
+      "close": "Close",
+      "rarity_common": "Common",
+      "rarity_uncommon": "Uncommon",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "rarity_legendary": "Legendary",
+      "tier_core": "Core",
+      "tier_template": "Standard",
+      "tier_custom": "Custom"
     },
     "showcase": {
       "manage_title": "バッジショーケースを管理",
@@ -285,7 +299,17 @@
   },
   "page_meta": {
     "leaderboard": {
-      "description": "コミュニティリーダーボード — トップ貢献者と最もアクティブなメンバーを確認しましょう。"
+      "description": "コミュニティリーダーボード — トップ貢献者と最もアクティブなメンバーを確認しましょう。",
+      "title": "Leaderboard"
+    },
+    "achievements": {
+      "title": "Achievements"
+    },
+    "goals": {
+      "title": "Goals"
+    },
+    "nexus_score": {
+      "title": "NexusScore"
     }
   }
 }

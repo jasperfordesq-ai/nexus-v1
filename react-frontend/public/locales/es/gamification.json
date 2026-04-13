@@ -95,7 +95,21 @@
       "not_earned": "Aún no ganada",
       "not_earned_desc": "¡Sigue adelante — desbloquearás esta insignia pronto!",
       "xp_reward": "Recompensa de XP",
-      "load_failed": "No se pudieron cargar los detalles de la insignia."
+      "load_failed": "No se pudieron cargar los detalles de la insignia.",
+      "type": "Category",
+      "threshold": "Requirement",
+      "threshold_value": "{{threshold}} {{type}}",
+      "rarity": "Rarity",
+      "tier": "Tier",
+      "close": "Close",
+      "rarity_common": "Common",
+      "rarity_uncommon": "Uncommon",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "rarity_legendary": "Legendary",
+      "tier_core": "Core",
+      "tier_template": "Standard",
+      "tier_custom": "Custom"
     },
     "showcase": {
       "manage_title": "Gestionar Vitrina de Insignias",
@@ -285,7 +299,17 @@
   },
   "page_meta": {
     "leaderboard": {
-      "description": "Tabla de clasificación de la comunidad — ve a los principales contribuyentes y miembros más activos."
+      "description": "Tabla de clasificación de la comunidad — ve a los principales contribuyentes y miembros más activos.",
+      "title": "Leaderboard"
+    },
+    "achievements": {
+      "title": "Achievements"
+    },
+    "goals": {
+      "title": "Goals"
+    },
+    "nexus_score": {
+      "title": "NexusScore"
     }
   }
 }

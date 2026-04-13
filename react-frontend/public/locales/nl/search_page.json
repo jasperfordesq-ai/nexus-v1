@@ -67,5 +67,8 @@
   "delete_saved_search": "Verwijder opgeslagen zoekopdracht",
   "aria": {
     "loading_search_results": "Zoekresultaten laden"
+  },
+  "page_meta": {
+    "title": "Search"
   }
 }

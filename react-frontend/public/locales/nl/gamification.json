@@ -95,7 +95,21 @@
       "not_earned": "Nog niet verdiend",
       "not_earned_desc": "Ga door — je ontgrendelt deze badge snel!",
       "xp_reward": "XP-beloning",
-      "load_failed": "Kon de badge-details niet laden."
+      "load_failed": "Kon de badge-details niet laden.",
+      "type": "Category",
+      "threshold": "Requirement",
+      "threshold_value": "{{threshold}} {{type}}",
+      "rarity": "Rarity",
+      "tier": "Tier",
+      "close": "Close",
+      "rarity_common": "Common",
+      "rarity_uncommon": "Uncommon",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "rarity_legendary": "Legendary",
+      "tier_core": "Core",
+      "tier_template": "Standard",
+      "tier_custom": "Custom"
     },
     "showcase": {
       "manage_title": "Beheer Badge Showcase",
@@ -285,7 +299,17 @@
   },
   "page_meta": {
     "leaderboard": {
-      "description": "Gemeenschapsranglijst — zie de beste bijdragers en meest actieve leden."
+      "description": "Gemeenschapsranglijst — zie de beste bijdragers en meest actieve leden.",
+      "title": "Leaderboard"
+    },
+    "achievements": {
+      "title": "Achievements"
+    },
+    "goals": {
+      "title": "Goals"
+    },
+    "nexus_score": {
+      "title": "NexusScore"
     }
   }
 }

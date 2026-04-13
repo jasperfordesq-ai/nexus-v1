@@ -161,6 +161,9 @@
     },
     "detail": {
       "title": "Uitwisselingsdetails"
+    },
+    "list": {
+      "title": "Exchanges"
     }
   }
 }

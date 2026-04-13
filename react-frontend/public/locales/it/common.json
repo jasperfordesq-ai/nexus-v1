@@ -48,7 +48,9 @@
     "knowledge_base": "Base di conoscenza",
     "unread_notifications": "{{count}} notifiche non lette",
     "timebanking": "Banca del tempo",
-    "explore": "Esplora"
+    "explore": "Esplora",
+    "saved": "Saved",
+    "marketplace": "Marketplace"
   },
   "nav_desc": {
     "feed": "Feed della comunità",
@@ -388,7 +390,9 @@
   "hours_display_other": "{{count}} ore",
   "compose": {
     "aria_insert_link": "Inserisci link",
-    "aria_remove_link": "Rimuovi link"
+    "aria_remove_link": "Rimuovi link",
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1"
   },
   "toast": {
     "aria_notifications": "Notifiche",
@@ -402,7 +406,8 @@
       "title": "Esplora Competenze"
     },
     "members": {
-      "description": "Esplora i membri della comunità, connettiti e scambia crediti di tempo."
+      "description": "Esplora i membri della comunità, connettiti e scambia crediti di tempo.",
+      "title": "Members"
     }
   }
 }

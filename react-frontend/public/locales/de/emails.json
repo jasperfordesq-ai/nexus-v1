@@ -22,7 +22,10 @@
     "cta_primary": "Öffne die Plattform",
     "cta_secondary": "Sieh dir den vollständigen Entwicklungsstatus an",
     "thanks": "Danke, dass du Teil dieser Gemeinschaft bist — bald gibt es mehr.",
-    "signoff": "— Das {{community}} Team"
+    "signoff": "— Das {{community}} Team",
+    "section_marketplace_title": "Marketplace",
+    "section_donations_title": "Donations",
+    "section_federation_title": "Federation"
   },
   "welcome": {
     "subject": "Willkommen bei {{community}}!",
@@ -87,7 +90,9 @@
     "jobs_match_plural": "Jobs übereinstimmen",
     "receiving_notice": "Sie erhalten dies, weil Sie einen Job-Alarm eingerichtet haben.",
     "manage_alerts": "Verwalten Sie Ihre Alarme hier",
-    "unsubscribe": "Um sich abzumelden, {{link}}."
+    "unsubscribe": "Um sich abzumelden, {{link}}.",
+    "remote": "Remote",
+    "deadline_open": "Open"
   },
   "gamification_digest": {
     "subject": "Ihr wöchentlicher Fortschrittsbericht",
@@ -97,7 +102,10 @@
     "xp_earned": "Verdiente XP",
     "streak_days": "{{days}} Tage",
     "encouragement": "Machen Sie weiter so – Ihre Beiträge stärken die Gemeinschaft!",
-    "view_leaderboard": "Leaderboard ansehen"
+    "view_leaderboard": "Leaderboard ansehen",
+    "level": "Level",
+    "rank": "Rank",
+    "streak": "Streak"
   },
   "gamification_milestone": {
     "level_up_subject": "Herzlichen Glückwunsch! Sie haben Level {{level}} erreicht",
@@ -156,7 +164,15 @@
     "partnership_title": "Föderationspartnerschaftsanfrage",
     "partnership_preview": "{{community}} möchte mit Ihrer Gemeinschaft zusammenarbeiten",
     "partnership_body": "{{community}} hat Ihrer Gemeinschaft eine Anfrage zur Föderationspartnerschaft gesendet.",
-    "review_request": "Anfrage überprüfen"
+    "review_request": "Anfrage überprüfen",
+    "label_from": "From",
+    "label_community": "Community",
+    "label_amount": "Amount",
+    "label_description": "Description",
+    "label_to": "To",
+    "label_messages": "Messages",
+    "label_transactions": "Transactions",
+    "label_connections": "Connections"
   },
   "group_digest": {
     "subject": "Wöchentlicher Bericht: {{group}}",
@@ -177,7 +193,8 @@
     "manage_preferences": "Einstellungen verwalten",
     "manage_email_preferences": "E-Mail-Einstellungen verwalten",
     "test_prefix": "[TEST]",
-    "no_subject": "Kein Betreff"
+    "no_subject": "Kein Betreff",
+    "unsubscribe": "Unsubscribe"
   },
   "notification": {
     "sent_by": "Diese E-Mail wurde von {{community}} gesendet",
@@ -185,7 +202,10 @@
     "view_wallet": "Dein Wallet ansehen",
     "review_title": "Neue Bewertung erhalten!",
     "credit_received_title": "Du hast Zeitguthaben erhalten!",
-    "credit_sent_body": "<strong>{{sender}}</strong> hat dir <strong>{{amount}}</strong> am {{community}} gesendet."
+    "credit_sent_body": "<strong>{{sender}}</strong> hat dir <strong>{{amount}}</strong> am {{community}} gesendet.",
+    "review_subject": "{{reviewer}} left you a {{rating}}-star review on {{community}}",
+    "credit_received_subject": "{{sender}} sent you {{amount}} on {{community}}",
+    "someone": "Someone"
   },
   "digest": {
     "title": "Dein {{frequency}} Digest",
@@ -279,7 +299,9 @@
     "reminder_time_note_1h": "beginnt in etwa 1 Stunde",
     "reminder_body": "Dies ist eine freundliche Erinnerung, dass <strong>\"{{title}}\"</strong> {{time_note}}.",
     "online_event": "Online-Event",
-    "location_label": "Ort: {{location}}"
+    "location_label": "Ort: {{location}}",
+    "rsvp_badge_going": "Going",
+    "rsvp_badge_interested": "Interested"
   },
   "match_mutual": {
     "title": "Gegenseitige Übereinstimmung gefunden!",
@@ -317,5 +339,8 @@
     "exchange_cancelled": "Austausch storniert",
     "exchange_disputed": "⚠️ Austauschstreit - Broker-Überprüfung erforderlich",
     "default": "Benachrichtigung von Project NEXUS"
+  },
+  "vetting": {
+    "subject": "{{heading}} - {{tenant}}"
   }
 }

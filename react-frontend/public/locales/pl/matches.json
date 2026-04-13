@@ -24,5 +24,8 @@
   "view_details": "Zobacz szczegóły dopasowania",
   "not_interested": "Nie jestem zainteresowany",
   "load_failed": "Nie udało się załadować dopasowań",
-  "match_hidden": "Dopasowanie ukryte — pokażemy Ci mniej takich"
+  "match_hidden": "Dopasowanie ukryte — pokażemy Ci mniej takich",
+  "page_meta": {
+    "title": "Matches"
+  }
 }

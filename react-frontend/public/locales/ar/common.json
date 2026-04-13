@@ -48,7 +48,9 @@
     "knowledge_base": "قاعدة المعرفة",
     "unread_notifications": "{{count}} إشعارات غير مقروءة",
     "timebanking": "بنك الوقت",
-    "explore": "استكشاف"
+    "explore": "استكشاف",
+    "saved": "Saved",
+    "marketplace": "Marketplace"
   },
   "nav_desc": {
     "feed": "موجز المجتمع",
@@ -388,7 +390,9 @@
   "hours_display_other": "{{count}} ساعات",
   "compose": {
     "aria_insert_link": "أدخل الرابط",
-    "aria_remove_link": "إزالة الرابط"
+    "aria_remove_link": "إزالة الرابط",
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1"
   },
   "toast": {
     "aria_notifications": "الإشعارات",
@@ -402,7 +406,8 @@
       "title": "تصفح المهارات"
     },
     "members": {
-      "description": "تصفح أعضاء المجتمع، تواصل وتبادل أرصدة الوقت."
+      "description": "تصفح أعضاء المجتمع، تواصل وتبادل أرصدة الوقت.",
+      "title": "Members"
     }
   }
 }

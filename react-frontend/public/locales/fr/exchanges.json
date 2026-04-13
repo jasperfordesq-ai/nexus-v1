@@ -161,6 +161,9 @@
     },
     "detail": {
       "title": "Détails de l'échange"
+    },
+    "list": {
+      "title": "Exchanges"
     }
   }
 }

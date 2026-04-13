@@ -51,5 +51,8 @@
     "default": "Gníomhaíocht"
   },
   "endorsements_count_one": "{{count}} tacaíocht",
-  "endorsements_count_other": "{{count}} tacaíocht"
+  "endorsements_count_other": "{{count}} tacaíocht",
+  "page_meta": {
+    "title": "Activity Dashboard"
+  }
 }

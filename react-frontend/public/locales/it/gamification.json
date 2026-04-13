@@ -95,7 +95,21 @@
       "not_earned": "Non ancora guadagnato",
       "not_earned_desc": "Continua così — sbloccherai presto questo badge!",
       "xp_reward": "Ricompensa XP",
-      "load_failed": "Impossibile caricare i dettagli del badge."
+      "load_failed": "Impossibile caricare i dettagli del badge.",
+      "type": "Category",
+      "threshold": "Requirement",
+      "threshold_value": "{{threshold}} {{type}}",
+      "rarity": "Rarity",
+      "tier": "Tier",
+      "close": "Close",
+      "rarity_common": "Common",
+      "rarity_uncommon": "Uncommon",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "rarity_legendary": "Legendary",
+      "tier_core": "Core",
+      "tier_template": "Standard",
+      "tier_custom": "Custom"
     },
     "showcase": {
       "manage_title": "Gestisca la vetrina badge",
@@ -285,7 +299,17 @@
   },
   "page_meta": {
     "leaderboard": {
-      "description": "Classifica della comunità — guarda i migliori contributori e i membri più attivi."
+      "description": "Classifica della comunità — guarda i migliori contributori e i membri più attivi.",
+      "title": "Leaderboard"
+    },
+    "achievements": {
+      "title": "Achievements"
+    },
+    "goals": {
+      "title": "Goals"
+    },
+    "nexus_score": {
+      "title": "NexusScore"
     }
   }
 }

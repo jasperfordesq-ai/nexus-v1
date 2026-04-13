@@ -440,13 +440,19 @@
     "unblocked_desc": "{{name}} wurde entsperrt.",
     "unblock_error": "Fehler beim Entsperren des Benutzers",
     "blocked_on": "Blockiert auf {{date}}",
-    "link": "Blockierte Benutzer"
+    "link": "Blockierte Benutzer",
+    "unblock": "Unblock"
   },
   "block_user": {
     "title": "Blockieren {{name}}?",
     "body": "Sie können Ihr Profil nicht sehen, Ihnen keine Nachrichten senden oder mit Ihren Inhalten interagieren. Jede bestehende Verbindung wird entfernt.",
     "blocked": "Benutzer blockiert",
     "blocked_desc": "{{name}} wurde blockiert.",
-    "error": "Fehler beim Blockieren des Benutzers"
+    "error": "Fehler beim Blockieren des Benutzers",
+    "confirm": "Block",
+    "cancel": "Cancel"
+  },
+  "page_meta": {
+    "title": "Settings"
   }
 }

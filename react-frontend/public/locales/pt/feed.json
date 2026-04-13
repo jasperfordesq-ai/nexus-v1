@@ -198,7 +198,9 @@
     "media_compression_failed": "{{count}} imagem(ns) não foram processadas",
     "media_upload_error": "Falha ao processar imagens",
     "sdg_selected_one": "{{count}} objetivo selecionado",
-    "sdg_selected_other": "{{count}} objetivos selecionados"
+    "sdg_selected_other": "{{count}} objetivos selecionados",
+    "save_changes": "Save",
+    "placeholder_hours": "1"
   },
   "card": {
     "edited": "editado",
@@ -266,7 +268,8 @@
     "detail_job": "Ver Emprego",
     "detail_challenge": "Ver Desafio",
     "detail_volunteer": "Ver Oportunidade",
-    "detail_blog": "Ler Artigo"
+    "detail_blog": "Ler Artigo",
+    "scheduled": "Scheduled"
   },
   "hashtag": {
     "title": "Hashtag",
@@ -322,7 +325,12 @@
     "dm_no_results": "Nenhum membro encontrado",
     "dm_hint": "Digite pelo menos 2 caracteres para pesquisar",
     "dm_sent": "Post compartilhado com {{name}}",
-    "dm_failed": "Falha ao enviar mensagem"
+    "dm_failed": "Falha ao enviar mensagem",
+    "repost": "Repost",
+    "quote_submit": "Post",
+    "dm_sent_label": "Sent",
+    "dm_send": "Send",
+    "dm_done": "Done"
   },
   "trending": {
     "title": "Em alta",
@@ -466,6 +474,11 @@
   },
   "analytics": {
     "title": "Análise do Post",
-    "reactions_breakdown": "Divisão das Reações"
+    "reactions_breakdown": "Divisão das Reações",
+    "views": "Views",
+    "likes": "Likes",
+    "comments": "Comments",
+    "shares": "Shares",
+    "reach": "Reach"
   }
 }

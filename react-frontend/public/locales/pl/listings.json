@@ -182,5 +182,8 @@
     "create": {
       "title": "Utwórz ogłoszenie"
     }
-  }
+  },
+  "filters_label": "Filters",
+  "filter_hours": "Duration",
+  "filter_today": "Today"
 }

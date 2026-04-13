@@ -48,7 +48,9 @@
     "knowledge_base": "Baza wiedzy",
     "unread_notifications": "{{count}} nieprzeczytanych powiadomień",
     "timebanking": "Bank czasu",
-    "explore": "Odkrywaj"
+    "explore": "Odkrywaj",
+    "saved": "Saved",
+    "marketplace": "Marketplace"
   },
   "nav_desc": {
     "feed": "Aktualności społeczności",
@@ -388,7 +390,9 @@
   "hours_display_other": "{{count}} godzin",
   "compose": {
     "aria_insert_link": "Wstaw link",
-    "aria_remove_link": "Usuń link"
+    "aria_remove_link": "Usuń link",
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1"
   },
   "toast": {
     "aria_notifications": "Powiadomienia",
@@ -402,7 +406,8 @@
       "title": "Przeglądaj umiejętności"
     },
     "members": {
-      "description": "Przeglądaj członków społeczności, łącz się i wymieniaj kredyty czasowe."
+      "description": "Przeglądaj członków społeczności, łącz się i wymieniaj kredyty czasowe.",
+      "title": "Members"
     }
   }
 }

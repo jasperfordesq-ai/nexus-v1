@@ -128,5 +128,8 @@
     "cancel": "Cancel",
     "submit": "レビューを送信",
     "submit_failed_fallback": "レビューの送信に失敗しました"
+  },
+  "page_meta": {
+    "title": "Profile"
   }
 }

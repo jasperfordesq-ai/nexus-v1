@@ -128,5 +128,8 @@
     "cancel": "Annuler",
     "submit": "Soumettre l'avis",
     "submit_failed_fallback": "Impossible de soumettre l'avis"
+  },
+  "page_meta": {
+    "title": "Profile"
   }
 }

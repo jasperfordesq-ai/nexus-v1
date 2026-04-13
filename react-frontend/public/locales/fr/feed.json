@@ -198,7 +198,9 @@
     "media_compression_failed": "{{count}} image(s) n'ont pas pu être traitée(s)",
     "media_upload_error": "Échec du traitement des images",
     "sdg_selected_one": "{{count}} objectif sélectionné",
-    "sdg_selected_other": "{{count}} objectifs sélectionnés"
+    "sdg_selected_other": "{{count}} objectifs sélectionnés",
+    "save_changes": "Save",
+    "placeholder_hours": "1"
   },
   "card": {
     "edited": "modifié",
@@ -266,7 +268,8 @@
     "detail_job": "Voir l'offre",
     "detail_challenge": "Voir le défi",
     "detail_volunteer": "Voir l'opportunité",
-    "detail_blog": "Lire l'article"
+    "detail_blog": "Lire l'article",
+    "scheduled": "Scheduled"
   },
   "hashtag": {
     "title": "Hashtag",
@@ -322,7 +325,12 @@
     "dm_no_results": "Aucun membre trouvé",
     "dm_hint": "Tapez au moins 2 caractères pour rechercher",
     "dm_sent": "Publication partagée avec {{name}}",
-    "dm_failed": "Échec de l'envoi du message"
+    "dm_failed": "Échec de l'envoi du message",
+    "repost": "Repost",
+    "quote_submit": "Post",
+    "dm_sent_label": "Sent",
+    "dm_send": "Send",
+    "dm_done": "Done"
   },
   "trending": {
     "title": "Tendances",
@@ -466,6 +474,11 @@
   },
   "analytics": {
     "title": "Analyse des publications",
-    "reactions_breakdown": "Répartition des réactions"
+    "reactions_breakdown": "Répartition des réactions",
+    "views": "Views",
+    "likes": "Likes",
+    "comments": "Comments",
+    "shares": "Shares",
+    "reach": "Reach"
   }
 }

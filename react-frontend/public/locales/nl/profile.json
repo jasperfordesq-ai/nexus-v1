@@ -128,5 +128,8 @@
     "cancel": "Cancel",
     "submit": "Beoordeling Indienen",
     "submit_failed_fallback": "Indienen van beoordeling mislukt"
+  },
+  "page_meta": {
+    "title": "Profile"
   }
 }

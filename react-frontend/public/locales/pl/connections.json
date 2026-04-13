@@ -33,5 +33,8 @@
   "toast_disconnected": "Disconnected",
   "toast_disconnect_failed": "Nie udało się rozłączyć",
   "toast_cancelled": "Prośba anulowana",
-  "toast_cancel_failed": "Nie udało się anulować prośby"
+  "toast_cancel_failed": "Nie udało się anulować prośby",
+  "page_meta": {
+    "title": "Connections"
+  }
 }

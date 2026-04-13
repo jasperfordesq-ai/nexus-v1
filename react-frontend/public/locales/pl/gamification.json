@@ -95,7 +95,21 @@
       "not_earned": "Jeszcze nie zdobyta",
       "not_earned_desc": "Nie poddawaj się — wkrótce odblokujesz tę odznakę!",
       "xp_reward": "Nagroda XP",
-      "load_failed": "Nie można załadować szczegółów odznaki."
+      "load_failed": "Nie można załadować szczegółów odznaki.",
+      "type": "Category",
+      "threshold": "Requirement",
+      "threshold_value": "{{threshold}} {{type}}",
+      "rarity": "Rarity",
+      "tier": "Tier",
+      "close": "Close",
+      "rarity_common": "Common",
+      "rarity_uncommon": "Uncommon",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "rarity_legendary": "Legendary",
+      "tier_core": "Core",
+      "tier_template": "Standard",
+      "tier_custom": "Custom"
     },
     "showcase": {
       "manage_title": "Zarządzaj wystawą odznak",
@@ -285,7 +299,17 @@
   },
   "page_meta": {
     "leaderboard": {
-      "description": "Ranking społeczności — zobacz najlepszych współpracowników i najbardziej aktywnych członków."
+      "description": "Ranking społeczności — zobacz najlepszych współpracowników i najbardziej aktywnych członków.",
+      "title": "Leaderboard"
+    },
+    "achievements": {
+      "title": "Achievements"
+    },
+    "goals": {
+      "title": "Goals"
+    },
+    "nexus_score": {
+      "title": "NexusScore"
     }
   }
 }

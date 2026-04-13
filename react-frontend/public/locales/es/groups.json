@@ -149,7 +149,19 @@
     "feed_empty_desc": "¡Sé el primero en compartir algo con este grupo!",
     "feed_create_post": "Crear Publicación",
     "feed_load_more": "Cargar Más",
-    "member_actions_aria": "Acciones de miembro"
+    "member_actions_aria": "Acciones de miembro",
+    "tab_wiki": "Wiki",
+    "tab_media": "Gallery",
+    "tab_challenges": "Challenges",
+    "tab_analytics": "Analytics",
+    "tab_section_content": "Content",
+    "tab_section_collab": "Collaboration",
+    "tab_section_admin": "Admin",
+    "tab_more_label": "More",
+    "invite": "Invite",
+    "copy": "Copy",
+    "image_alt_group": "Group",
+    "image_alt_cover": "Cover"
   },
   "form": {
     "create_title": "Crear Nuevo Grupo",
@@ -278,7 +290,8 @@
     "folder_placeholder": "p. ej. Documentos, Fotos",
     "description_label": "Descripción (opcional)",
     "description_placeholder": "Breve descripción del archivo",
-    "remove_file": "Eliminar archivo"
+    "remove_file": "Eliminar archivo",
+    "upload_btn": "Upload"
   },
   "toast": {
     "left": "Saliste del grupo",
@@ -357,11 +370,21 @@
     "answer_posted_success": "¡Respuesta publicada!",
     "answer_posted_error": "Error al publicar la respuesta",
     "vote_error": "Error al votar",
-    "accept_error": "Error al aceptar la respuesta"
+    "accept_error": "Error al aceptar la respuesta",
+    "sort_newest": "Newest",
+    "sort_unanswered": "Unanswered",
+    "question_title_label": "Title",
+    "question_body_label": "Details",
+    "cancel": "Cancel",
+    "answers": "answers",
+    "accepted": "Accepted",
+    "vote_up": "Upvote",
+    "vote_down": "Downvote"
   },
   "page_meta": {
     "create": {
       "title": "Crear Grupo"
     }
-  }
+  },
+  "page_title": "Groups"
 }

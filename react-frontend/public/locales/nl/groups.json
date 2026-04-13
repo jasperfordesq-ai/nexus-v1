@@ -149,7 +149,19 @@
     "feed_empty_desc": "Wees de eerste om iets met deze groep te delen!",
     "feed_create_post": "Bericht aanmaken",
     "feed_load_more": "Laad meer",
-    "member_actions_aria": "Acties van leden"
+    "member_actions_aria": "Acties van leden",
+    "tab_wiki": "Wiki",
+    "tab_media": "Gallery",
+    "tab_challenges": "Challenges",
+    "tab_analytics": "Analytics",
+    "tab_section_content": "Content",
+    "tab_section_collab": "Collaboration",
+    "tab_section_admin": "Admin",
+    "tab_more_label": "More",
+    "invite": "Invite",
+    "copy": "Copy",
+    "image_alt_group": "Group",
+    "image_alt_cover": "Cover"
   },
   "form": {
     "create_title": "Nieuwe groep aanmaken",
@@ -278,7 +290,8 @@
     "folder_placeholder": "bijv. Documenten, Foto's",
     "description_label": "Beschrijving (optioneel)",
     "description_placeholder": "Korte beschrijving van het bestand",
-    "remove_file": "Verwijder bestand"
+    "remove_file": "Verwijder bestand",
+    "upload_btn": "Upload"
   },
   "toast": {
     "left": "Verliet de groep",
@@ -357,11 +370,21 @@
     "answer_posted_success": "Antwoord geplaatst!",
     "answer_posted_error": "Het plaatsen van het antwoord is mislukt",
     "vote_error": "Stemmen is mislukt",
-    "accept_error": "Accepteren van het antwoord is mislukt"
+    "accept_error": "Accepteren van het antwoord is mislukt",
+    "sort_newest": "Newest",
+    "sort_unanswered": "Unanswered",
+    "question_title_label": "Title",
+    "question_body_label": "Details",
+    "cancel": "Cancel",
+    "answers": "answers",
+    "accepted": "Accepted",
+    "vote_up": "Upvote",
+    "vote_down": "Downvote"
   },
   "page_meta": {
     "create": {
       "title": "Groep Aanmaken"
     }
-  }
+  },
+  "page_title": "Groups"
 }

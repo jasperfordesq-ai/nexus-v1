@@ -11,15 +11,27 @@
     "back_to_site": "Volver al Sitio",
     "user_menu": "Menú de usuario",
     "my_profile": "Mi Perfil",
-    "sign_out": "Cerrar sesión"
+    "sign_out": "Cerrar sesión",
+    "notifications": "Notifications"
   },
   "nav": {
-    "vetting": "Verificación y DBS"
+    "vetting": "Verificación y DBS",
+    "dashboard": "Dashboard",
+    "members": "Members",
+    "onboarding": "Onboarding",
+    "safeguarding": "Safeguarding",
+    "exchanges": "Exchanges",
+    "messages": "Messages"
   },
   "breadcrumbs": {
     "aria_label": "Navegación de migas de pan",
     "dashboard": "Panel de Corredor",
-    "vetting": "Verificación y DBS"
+    "vetting": "Verificación y DBS",
+    "members": "Members",
+    "onboarding": "Onboarding",
+    "safeguarding": "Safeguarding",
+    "exchanges": "Exchanges",
+    "messages": "Messages"
   },
   "dashboard": {
     "title": "Tablero del Corredor",
@@ -57,7 +69,22 @@
     "approved_success": "Miembro aprobado con éxito.",
     "suspended_success": "Miembro suspendido con éxito.",
     "reactivated_success": "Miembro reactivado con éxito.",
-    "action_failed": "La acción falló. Por favor, inténtalo de nuevo."
+    "action_failed": "La acción falló. Por favor, inténtalo de nuevo.",
+    "title": "Members",
+    "tab_all": "All",
+    "tab_pending": "Pending",
+    "tab_active": "Active",
+    "tab_suspended": "Suspended",
+    "col_name": "Member",
+    "col_email": "Email",
+    "col_status": "Status",
+    "col_balance": "Balance",
+    "col_joined": "Joined",
+    "col_actions": "Actions",
+    "approve": "Approve",
+    "suspend": "Suspend",
+    "reactivate": "Reactivate",
+    "notes": "Notes"
   },
   "onboarding": {
     "description": "Sigue el progreso de nuevos miembros y aprueba registros pendientes.",
@@ -66,7 +93,9 @@
     "stage_profile_complete": "Perfil completo",
     "stage_first_exchange": "Primer intercambio",
     "pending_approvals": "Aprobaciones pendientes",
-    "no_pending": "No hay miembros pendientes por aprobar."
+    "no_pending": "No hay miembros pendientes por aprobar.",
+    "title": "Onboarding",
+    "stage_registered": "Registered"
   },
   "safeguarding": {
     "description": "Monitorea alertas de protección, asignaciones de guardianes y preferencias de miembros.",
@@ -79,7 +108,19 @@
     "reviewed_success": "Mensaje revisado con éxito.",
     "no_flagged": "No hay mensajes marcados para revisar.",
     "no_assignments": "No hay asignaciones de guardianes.",
-    "no_preferences": "No se han registrado preferencias de protección de miembros."
+    "no_preferences": "No se han registrado preferencias de protección de miembros.",
+    "title": "Safeguarding",
+    "col_sender": "Sender",
+    "col_receiver": "Receiver",
+    "col_severity": "Severity",
+    "col_date": "Date",
+    "col_status": "Status",
+    "col_ward": "Ward",
+    "col_guardian": "Guardian",
+    "col_assigned": "Assigned",
+    "col_consent": "Consent",
+    "col_member": "Member",
+    "col_options": "Preferences"
   },
   "vetting": {
     "title": "Verificación y DBS",
@@ -89,7 +130,17 @@
     "reject_reason_placeholder": "Razón de rechazo...",
     "verified_success": "Registro de verificación verificado.",
     "rejected_success": "Registro de verificación rechazado.",
-    "no_records": "No se encontraron registros de verificación."
+    "no_records": "No se encontraron registros de verificación.",
+    "tab_all": "All",
+    "tab_pending": "Pending",
+    "tab_verified": "Verified",
+    "col_member": "Member",
+    "col_type": "Type",
+    "col_reference": "Reference",
+    "col_status": "Status",
+    "col_actions": "Actions",
+    "verify": "Verify",
+    "reject": "Reject"
   },
   "exchanges": {
     "description": "Supervisa las solicitudes de intercambio y disputas pendientes.",
@@ -97,18 +148,63 @@
     "reason_placeholder": "Razón de rechazo...",
     "approved_success": "Intercambio aprobado.",
     "rejected_success": "Intercambio rechazado.",
-    "no_exchanges": "No se encontraron intercambios."
+    "no_exchanges": "No se encontraron intercambios.",
+    "title": "Exchanges",
+    "tab_all": "All",
+    "tab_pending": "Pending",
+    "tab_approved": "Approved",
+    "tab_disputed": "Disputed",
+    "col_from": "From",
+    "col_to": "To",
+    "col_service": "Service",
+    "col_hours": "Hours",
+    "col_status": "Status",
+    "col_date": "Date",
+    "col_actions": "Actions",
+    "approve": "Approve",
+    "reject": "Reject"
   },
   "messages": {
     "title": "Revisión de Mensajes",
     "description": "Revisa las conversaciones marcadas que requieren supervisión del corredor.",
     "mark_reviewed": "Marcar como Revisado",
     "reviewed_success": "Mensaje marcado como revisado.",
-    "no_messages": "No hay mensajes para revisar."
+    "no_messages": "No hay mensajes para revisar.",
+    "filter_unreviewed": "Unreviewed",
+    "filter_all": "All",
+    "filter_flagged": "Flagged",
+    "col_sender": "Sender",
+    "col_receiver": "Receiver",
+    "col_preview": "Preview",
+    "col_reason": "Reason",
+    "col_severity": "Severity",
+    "col_date": "Date",
+    "col_actions": "Actions"
   },
   "common": {
     "loading": "Cargando...",
     "error": "Algo salió mal. Por favor, inténtalo de nuevo.",
-    "no_data": "No hay datos disponibles."
+    "no_data": "No hay datos disponibles.",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "refresh": "Refresh"
+  },
+  "status": {
+    "active": "Active",
+    "pending": "Pending",
+    "suspended": "Suspended",
+    "banned": "Banned",
+    "verified": "Verified",
+    "expired": "Expired",
+    "rejected": "Rejected",
+    "approved": "Approved",
+    "disputed": "Disputed",
+    "reviewed": "Reviewed",
+    "unreviewed": "Unreviewed",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "critical": "Critical"
   }
 }

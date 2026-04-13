@@ -182,5 +182,8 @@
     "create": {
       "title": "Angebot erstellen"
     }
-  }
+  },
+  "filters_label": "Filters",
+  "filter_hours": "Duration",
+  "filter_today": "Today"
 }

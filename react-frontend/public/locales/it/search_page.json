@@ -67,5 +67,8 @@
   "delete_saved_search": "Elimina ricerca salvata",
   "aria": {
     "loading_search_results": "Caricamento risultati di ricerca"
+  },
+  "page_meta": {
+    "title": "Search"
   }
 }

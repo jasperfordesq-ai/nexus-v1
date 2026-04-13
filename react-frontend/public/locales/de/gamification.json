@@ -95,7 +95,21 @@
       "not_earned": "Noch nicht verdient",
       "not_earned_desc": "Mach weiter — du wirst dieses Abzeichen bald freischalten!",
       "xp_reward": "XP Belohnung",
-      "load_failed": "Konnte die Abzeichendetails nicht laden."
+      "load_failed": "Konnte die Abzeichendetails nicht laden.",
+      "type": "Category",
+      "threshold": "Requirement",
+      "threshold_value": "{{threshold}} {{type}}",
+      "rarity": "Rarity",
+      "tier": "Tier",
+      "close": "Close",
+      "rarity_common": "Common",
+      "rarity_uncommon": "Uncommon",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "rarity_legendary": "Legendary",
+      "tier_core": "Core",
+      "tier_template": "Standard",
+      "tier_custom": "Custom"
     },
     "showcase": {
       "manage_title": "Abzeichen-Vitrine verwalten",
@@ -285,7 +299,17 @@
   },
   "page_meta": {
     "leaderboard": {
-      "description": "Community-Rangliste — sieh dir die besten Mitwirkenden und aktivsten Mitglieder an."
+      "description": "Community-Rangliste — sieh dir die besten Mitwirkenden und aktivsten Mitglieder an.",
+      "title": "Leaderboard"
+    },
+    "achievements": {
+      "title": "Achievements"
+    },
+    "goals": {
+      "title": "Goals"
+    },
+    "nexus_score": {
+      "title": "NexusScore"
     }
   }
 }

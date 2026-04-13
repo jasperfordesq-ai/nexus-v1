@@ -276,5 +276,10 @@
     "generate_failed": "Failed to generate certificate. Please try again.",
     "load_failed": "Failed to load certificates. Please try again.",
     "load_error": "Unable to load certificates. Please try again."
+  },
+  "page_meta": {
+    "register_organisation": {
+      "title": "Register Organisation"
+    }
   }
 }

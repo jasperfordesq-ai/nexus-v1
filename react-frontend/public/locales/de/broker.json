@@ -11,15 +11,27 @@
     "back_to_site": "Zurück zur Seite",
     "user_menu": "Benutzermenü",
     "my_profile": "Mein Profil",
-    "sign_out": "Abmelden"
+    "sign_out": "Abmelden",
+    "notifications": "Notifications"
   },
   "nav": {
-    "vetting": "Überprüfung & DBS"
+    "vetting": "Überprüfung & DBS",
+    "dashboard": "Dashboard",
+    "members": "Members",
+    "onboarding": "Onboarding",
+    "safeguarding": "Safeguarding",
+    "exchanges": "Exchanges",
+    "messages": "Messages"
   },
   "breadcrumbs": {
     "aria_label": "Breadcrumb-Navigation",
     "dashboard": "Broker-Panel",
-    "vetting": "Überprüfung & DBS"
+    "vetting": "Überprüfung & DBS",
+    "members": "Members",
+    "onboarding": "Onboarding",
+    "safeguarding": "Safeguarding",
+    "exchanges": "Exchanges",
+    "messages": "Messages"
   },
   "dashboard": {
     "title": "Broker-Dashboard",
@@ -57,7 +69,22 @@
     "approved_success": "Mitglied erfolgreich genehmigt.",
     "suspended_success": "Mitglied erfolgreich ausgesetzt.",
     "reactivated_success": "Mitglied erfolgreich reaktiviert.",
-    "action_failed": "Aktion fehlgeschlagen. Bitte versuchen Sie es erneut."
+    "action_failed": "Aktion fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "title": "Members",
+    "tab_all": "All",
+    "tab_pending": "Pending",
+    "tab_active": "Active",
+    "tab_suspended": "Suspended",
+    "col_name": "Member",
+    "col_email": "Email",
+    "col_status": "Status",
+    "col_balance": "Balance",
+    "col_joined": "Joined",
+    "col_actions": "Actions",
+    "approve": "Approve",
+    "suspend": "Suspend",
+    "reactivate": "Reactivate",
+    "notes": "Notes"
   },
   "onboarding": {
     "description": "Verfolgen Sie den Fortschritt neuer Mitglieder und genehmigen Sie ausstehende Registrierungen.",
@@ -66,7 +93,9 @@
     "stage_profile_complete": "Profil vollständig",
     "stage_first_exchange": "Erster Austausch",
     "pending_approvals": "Ausstehende Genehmigungen",
-    "no_pending": "Keine ausstehenden Mitglieder zur Genehmigung."
+    "no_pending": "Keine ausstehenden Mitglieder zur Genehmigung.",
+    "title": "Onboarding",
+    "stage_registered": "Registered"
   },
   "safeguarding": {
     "description": "Überwachen Sie Sicherheitswarnungen, Betreuerzuweisungen und Mitgliederpräferenzen.",
@@ -79,7 +108,19 @@
     "reviewed_success": "Nachricht erfolgreich überprüft.",
     "no_flagged": "Keine markierten Nachrichten zur Überprüfung.",
     "no_assignments": "Keine Aufträge für Wächter.",
-    "no_preferences": "Keine Präferenzen zum Schutz der Mitglieder aufgezeichnet."
+    "no_preferences": "Keine Präferenzen zum Schutz der Mitglieder aufgezeichnet.",
+    "title": "Safeguarding",
+    "col_sender": "Sender",
+    "col_receiver": "Receiver",
+    "col_severity": "Severity",
+    "col_date": "Date",
+    "col_status": "Status",
+    "col_ward": "Ward",
+    "col_guardian": "Guardian",
+    "col_assigned": "Assigned",
+    "col_consent": "Consent",
+    "col_member": "Member",
+    "col_options": "Preferences"
   },
   "vetting": {
     "title": "Überprüfung & DBS",
@@ -89,7 +130,17 @@
     "reject_reason_placeholder": "Grund für die Ablehnung...",
     "verified_success": "Überprüfungsunterlagen verifiziert.",
     "rejected_success": "Überprüfungsunterlagen abgelehnt.",
-    "no_records": "Keine Überprüfungsunterlagen gefunden."
+    "no_records": "Keine Überprüfungsunterlagen gefunden.",
+    "tab_all": "All",
+    "tab_pending": "Pending",
+    "tab_verified": "Verified",
+    "col_member": "Member",
+    "col_type": "Type",
+    "col_reference": "Reference",
+    "col_status": "Status",
+    "col_actions": "Actions",
+    "verify": "Verify",
+    "reject": "Reject"
   },
   "exchanges": {
     "description": "Überwachen Sie ausstehende Austauschanforderungen und Streitigkeiten.",
@@ -97,18 +148,63 @@
     "reason_placeholder": "Grund für die Ablehnung...",
     "approved_success": "Austausch genehmigt.",
     "rejected_success": "Austausch abgelehnt.",
-    "no_exchanges": "Keine Austausche gefunden."
+    "no_exchanges": "Keine Austausche gefunden.",
+    "title": "Exchanges",
+    "tab_all": "All",
+    "tab_pending": "Pending",
+    "tab_approved": "Approved",
+    "tab_disputed": "Disputed",
+    "col_from": "From",
+    "col_to": "To",
+    "col_service": "Service",
+    "col_hours": "Hours",
+    "col_status": "Status",
+    "col_date": "Date",
+    "col_actions": "Actions",
+    "approve": "Approve",
+    "reject": "Reject"
   },
   "messages": {
     "title": "Nachrichtenüberprüfung",
     "description": "Überprüfen Sie markierte Gespräche, die eine Aufsicht des Brokers erfordern.",
     "mark_reviewed": "Markiert als Überprüft",
     "reviewed_success": "Nachricht als überprüft markiert.",
-    "no_messages": "Keine Nachrichten zur Überprüfung."
+    "no_messages": "Keine Nachrichten zur Überprüfung.",
+    "filter_unreviewed": "Unreviewed",
+    "filter_all": "All",
+    "filter_flagged": "Flagged",
+    "col_sender": "Sender",
+    "col_receiver": "Receiver",
+    "col_preview": "Preview",
+    "col_reason": "Reason",
+    "col_severity": "Severity",
+    "col_date": "Date",
+    "col_actions": "Actions"
   },
   "common": {
     "loading": "Lädt...",
     "error": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
-    "no_data": "Keine Daten verfügbar."
+    "no_data": "Keine Daten verfügbar.",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "refresh": "Refresh"
+  },
+  "status": {
+    "active": "Active",
+    "pending": "Pending",
+    "suspended": "Suspended",
+    "banned": "Banned",
+    "verified": "Verified",
+    "expired": "Expired",
+    "rejected": "Rejected",
+    "approved": "Approved",
+    "disputed": "Disputed",
+    "reviewed": "Reviewed",
+    "unreviewed": "Unreviewed",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "critical": "Critical"
   }
 }

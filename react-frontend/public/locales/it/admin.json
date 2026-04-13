@@ -2107,7 +2107,13 @@
     "total_score_formula_label": "Total Score Formula Label",
     "unknown": "Unknown",
     "view_group": "View Group",
-    "visibility": "Visibility"
+    "visibility": "Visibility",
+    "archive": "Archive",
+    "geocode_description": "Batch-geocode group locations so they appear on the map.",
+    "geocode_not_migrated_desc": "The batch geocoding admin screen has not yet been rebuilt in React. For now, run the Artisan command on the server:",
+    "geocode_not_migrated_note": "TODO: rebuild this screen with progress reporting, retry controls and per-group status.",
+    "geocode_not_migrated_title": "Admin UI not yet migrated",
+    "geocode_title": "Geocode Groups"
   },
   "header": {
     "admin_menu": "Menu di amministrazione",
@@ -2183,7 +2189,8 @@
     "label_social_multiplier": "Social Multiplier",
     "label_social_value": "Social Value",
     "label_total_hours": "Total Hours",
-    "page_title": "Impact"
+    "page_title": "Impact",
+    "save_configuration": "Save Configuration"
   },
   "jobs": {
     "add_edit_notes": "Add Edit Notes",
@@ -2424,7 +2431,8 @@
     "weight_proximity": "Proximity",
     "weight_quality": "Quality",
     "weight_reciprocity": "Reciprocity",
-    "weight_skill": "Skill"
+    "weight_skill": "Skill",
+    "failed_to_load_match_approval": "Failed to load match approval"
   },
   "moderation": {
     "action_failed": "Failed",
@@ -2686,7 +2694,8 @@
     "subscribers_desc": "Manage and configure subscribers settings",
     "subscribers_title": "Subscribers",
     "templates_desc": "Manage and configure templates settings",
-    "templates_title": "Templates"
+    "templates_title": "Templates",
+    "failed_to_save_segment": "Failed to save segment. Please try again."
   },
   "no_data": "Nessun dato disponibile",
   "not_found": {
@@ -3600,7 +3609,11 @@
     "total_jobs": "Total Jobs",
     "twenty_four_h_failures": "Twenty Four H Failures",
     "webp_converter_desc": "Manage and configure webp converter settings",
-    "webp_converter_title": "WebP Converter"
+    "webp_converter_title": "WebP Converter",
+    "clear_logs": "Clear Logs",
+    "clear_old_logs": "Clear Old Logs",
+    "clear_old_logs_warning": "Delete all logs executed before the selected date. This action cannot be undone.",
+    "loading_logs": "Loading logs..."
   },
   "timebanking": {
     "a_reason_is_required_for_balance_adjustm": "A Reason is Required for Balance Adjustm",

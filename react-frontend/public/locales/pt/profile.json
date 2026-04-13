@@ -128,5 +128,8 @@
     "cancel": "Cancelar",
     "submit": "Submeter avaliação",
     "submit_failed_fallback": "Falha ao submeter avaliação"
+  },
+  "page_meta": {
+    "title": "Profile"
   }
 }

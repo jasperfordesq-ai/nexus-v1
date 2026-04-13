@@ -24,5 +24,8 @@
   "score_percent": "{{score}}% Übereinstimmung",
   "reasons_more": "+{{count}} mehr",
   "view_details": "Treffer-Details ansehen",
-  "not_interested": "Kein Interesse"
+  "not_interested": "Kein Interesse",
+  "page_meta": {
+    "title": "Matches"
+  }
 }

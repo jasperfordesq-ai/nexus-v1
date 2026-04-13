@@ -500,6 +500,9 @@
   "page_meta": {
     "development_status": {
       "title": "Statut de Développement"
+    },
+    "maintenance": {
+      "title": "Maintenance"
     }
   }
 }

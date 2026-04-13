@@ -1,0 +1,39 @@
+{
+  "federation_webhooks": {
+    "test_message": "This is a test webhook delivery from Project NEXUS."
+  },
+  "group_media": {
+    "media_deleted": "Media deleted"
+  },
+  "group_notification_pref": {
+    "preferences_updated": "Preferences updated"
+  },
+  "group_qa": {
+    "answer_accepted": "Answer accepted",
+    "vote_recorded": "Vote recorded",
+    "failed_accept_answer": "Failed to accept answer",
+    "failed_record_vote": "Failed to record vote",
+    "title_required": "Title is required",
+    "body_required": "Body is required",
+    "failed_create_question": "Failed to create question",
+    "question_not_found": "Question not found",
+    "failed_post_answer": "Failed to post answer",
+    "type_must_be_question_or_answer": "Type must be \"question\" or \"answer\"",
+    "valid_target_id_required": "A valid target_id is required",
+    "vote_must_be_up_down": "Vote must be \"up\"/\"down\" or 1/-1"
+  },
+  "group_scheduled_post": {
+    "cancelled": "Cancelled",
+    "not_found_or_published": "Not found or already published"
+  },
+  "group_webhook": {
+    "webhook_deleted": "Webhook deleted",
+    "webhook_not_found": "Webhook not found"
+  },
+  "group_wiki": {
+    "wiki_page_deleted": "Wiki page deleted"
+  },
+  "listings": {
+    "listing_saved_notification": ":saver_name saved your listing \":title\""
+  }
+}

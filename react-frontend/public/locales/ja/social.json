@@ -76,7 +76,9 @@
     "save_to": "コレクションに保存",
     "no_collection": "一般（コレクションなし）",
     "new_collection": "新しいコレクション",
-    "collection_name": "コレクション名"
+    "collection_name": "コレクション名",
+    "save": "Save",
+    "saved": "Saved"
   },
   "bookmarks": {
     "title": "保存したアイテム",
@@ -97,6 +99,21 @@
     "collection_actions": "コレクションのアクション",
     "create_collection_title": "コレクションを作成",
     "edit_collection_title": "コレクションを編集",
-    "collection_description": "説明（任意）"
+    "collection_description": "説明（任意）",
+    "page_title": "Saved",
+    "all_items": "All",
+    "tab_all": "All",
+    "type_post": "Post",
+    "type_listing": "Listing",
+    "type_event": "Event",
+    "type_job": "Job",
+    "type_blog": "Blog",
+    "type_discussion": "Discussion",
+    "edit_collection": "Edit",
+    "delete_collection": "Delete",
+    "collection_name": "Name",
+    "cancel": "Cancel",
+    "save": "Save",
+    "create": "Create"
   }
 }

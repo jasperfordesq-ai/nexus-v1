@@ -76,7 +76,9 @@
     "save_to": "Opslaan in collectie",
     "no_collection": "Algemeen (geen collectie)",
     "new_collection": "Nieuwe collectie",
-    "collection_name": "Collectienaam"
+    "collection_name": "Collectienaam",
+    "save": "Save",
+    "saved": "Saved"
   },
   "bookmarks": {
     "title": "Opgeslagen Items",
@@ -97,6 +99,21 @@
     "collection_actions": "Acties voor verzameling",
     "create_collection_title": "Verzameling aanmaken",
     "edit_collection_title": "Verzameling bewerken",
-    "collection_description": "Beschrijving (optioneel)"
+    "collection_description": "Beschrijving (optioneel)",
+    "page_title": "Saved",
+    "all_items": "All",
+    "tab_all": "All",
+    "type_post": "Post",
+    "type_listing": "Listing",
+    "type_event": "Event",
+    "type_job": "Job",
+    "type_blog": "Blog",
+    "type_discussion": "Discussion",
+    "edit_collection": "Edit",
+    "delete_collection": "Delete",
+    "collection_name": "Name",
+    "cancel": "Cancel",
+    "save": "Save",
+    "create": "Create"
   }
 }

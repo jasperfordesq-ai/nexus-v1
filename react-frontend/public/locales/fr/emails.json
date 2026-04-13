@@ -22,7 +22,10 @@
     "cta_primary": "Ouvrir la plateforme",
     "cta_secondary": "Voir le statut complet du développement",
     "thanks": "Merci de faire partie de cette communauté — d'autres nouveautés à venir bientôt.",
-    "signoff": "— L'équipe {{community}}"
+    "signoff": "— L'équipe {{community}}",
+    "section_marketplace_title": "Marketplace",
+    "section_donations_title": "Donations",
+    "section_federation_title": "Federation"
   },
   "welcome": {
     "subject": "Bienvenue dans {{community}} !",
@@ -87,7 +90,9 @@
     "jobs_match_plural": "correspondance d'emplois",
     "receiving_notice": "Vous recevez ceci parce que vous avez configuré une alerte emploi.",
     "manage_alerts": "gérez vos alertes ici",
-    "unsubscribe": "Pour vous désinscrire, {{link}}."
+    "unsubscribe": "Pour vous désinscrire, {{link}}.",
+    "remote": "Remote",
+    "deadline_open": "Open"
   },
   "gamification_digest": {
     "subject": "Votre résumé hebdomadaire de progrès",
@@ -97,7 +102,10 @@
     "xp_earned": "XP Gagné",
     "streak_days": "{{days}} jours",
     "encouragement": "Continuez votre excellent travail — vos contributions rendent la communauté plus forte !",
-    "view_leaderboard": "Voir le classement"
+    "view_leaderboard": "Voir le classement",
+    "level": "Level",
+    "rank": "Rank",
+    "streak": "Streak"
   },
   "gamification_milestone": {
     "level_up_subject": "Félicitations ! Vous avez atteint le niveau {{level}}",
@@ -156,7 +164,15 @@
     "partnership_title": "Demande de partenariat de la Fédération",
     "partnership_preview": "{{community}} souhaite s'associer à votre communauté",
     "partnership_body": "{{community}} a envoyé à votre communauté une demande de partenariat de la fédération.",
-    "review_request": "Examiner la demande"
+    "review_request": "Examiner la demande",
+    "label_from": "From",
+    "label_community": "Community",
+    "label_amount": "Amount",
+    "label_description": "Description",
+    "label_to": "To",
+    "label_messages": "Messages",
+    "label_transactions": "Transactions",
+    "label_connections": "Connections"
   },
   "group_digest": {
     "subject": "Résumé hebdomadaire : {{group}}",
@@ -177,7 +193,8 @@
     "manage_preferences": "Gérer les préférences",
     "manage_email_preferences": "Gérer les préférences d'e-mail",
     "test_prefix": "[TEST]",
-    "no_subject": "Pas de sujet"
+    "no_subject": "Pas de sujet",
+    "unsubscribe": "Unsubscribe"
   },
   "notification": {
     "sent_by": "Cet e-mail a été envoyé par {{community}}",
@@ -185,7 +202,10 @@
     "view_wallet": "Voir votre portefeuille",
     "review_title": "Nouvelle évaluation reçue !",
     "credit_received_title": "Vous avez reçu des crédits de temps !",
-    "credit_sent_body": "<strong>{{sender}}</strong> vous a envoyé <strong>{{amount}}</strong> le {{community}}."
+    "credit_sent_body": "<strong>{{sender}}</strong> vous a envoyé <strong>{{amount}}</strong> le {{community}}.",
+    "review_subject": "{{reviewer}} left you a {{rating}}-star review on {{community}}",
+    "credit_received_subject": "{{sender}} sent you {{amount}} on {{community}}",
+    "someone": "Someone"
   },
   "digest": {
     "title": "Votre résumé {{frequency}}",
@@ -279,7 +299,9 @@
     "reminder_time_note_1h": "commence dans environ 1 heure",
     "reminder_body": "Ceci est un rappel amical que <strong>\"{{title}}\"</strong> {{time_note}}.",
     "online_event": "Événement en ligne",
-    "location_label": "Lieu : {{location}}"
+    "location_label": "Lieu : {{location}}",
+    "rsvp_badge_going": "Going",
+    "rsvp_badge_interested": "Interested"
   },
   "match_mutual": {
     "title": "Correspondance mutuelle trouvée !",
@@ -317,5 +339,8 @@
     "exchange_cancelled": "Échange Annulé",
     "exchange_disputed": "⚠️ Litige d'Échange - Révision par un Médiateur Nécessaire",
     "default": "Notification de Project NEXUS"
+  },
+  "vetting": {
+    "subject": "{{heading}} - {{tenant}}"
   }
 }

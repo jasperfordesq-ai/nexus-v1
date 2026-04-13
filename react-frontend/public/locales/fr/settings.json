@@ -440,13 +440,19 @@
     "unblocked_desc": "{{name}} a été débloqué.",
     "unblock_error": "Échec du déblocage de l'utilisateur",
     "blocked_on": "Bloqué sur {{date}}",
-    "link": "Utilisateurs bloqués"
+    "link": "Utilisateurs bloqués",
+    "unblock": "Unblock"
   },
   "block_user": {
     "title": "Bloquer {{name}} ?",
     "body": "Ils ne pourront pas voir votre profil, vous envoyer des messages ou interagir avec votre contenu. Toute connexion existante sera supprimée.",
     "blocked": "Utilisateur bloqué",
     "blocked_desc": "{{name}} a été bloqué.",
-    "error": "Échec du blocage de l'utilisateur"
+    "error": "Échec du blocage de l'utilisateur",
+    "confirm": "Block",
+    "cancel": "Cancel"
+  },
+  "page_meta": {
+    "title": "Settings"
   }
 }

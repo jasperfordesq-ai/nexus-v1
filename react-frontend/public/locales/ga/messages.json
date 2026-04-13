@@ -133,6 +133,69 @@
     "show_translation": "Taispeáin an t-aistriúchán",
     "translating": "Ag aistriú...",
     "translation_failed": "Theip ar an aistriúchán. Bain triail eile as.",
-    "translated_label": "Aistrithe"
+    "translated_label": "Aistrithe",
+    "translate_to": "Translate to"
+  },
+  "translate.translate": "Translate",
+  "translate.translate_to": "Translate to",
+  "translate.view_original": "View original",
+  "translate.show_translation": "Show translation",
+  "translate.translating": "Translating...",
+  "translate.translation_failed": "Translation failed. Please try again.",
+  "translate.translated_label": "Translated",
+  "auto_translate": {
+    "enable": "Auto-translate",
+    "enabled_toast": "Messages will be automatically translated",
+    "disabled_toast": "Auto-translate disabled",
+    "translating_all": "Translating messages...",
+    "tooltip_off": "Translate all messages automatically",
+    "tooltip_on": "Auto-translate is on — click to turn off",
+    "active_banner": "Messages in this conversation are being automatically translated into your language.",
+    "turn_off": "Turn off"
+  },
+  "translate_hint": {
+    "title": "Translation is available",
+    "body": "You and this person can each write in your own language. Tap \"Translate\" on any message to read it in yours, or use the translate button in the header to translate everything automatically.",
+    "dismiss": "Dismiss translation hint"
+  },
+  "translate_hint.title": "Translation is available",
+  "translate_hint.body": "You and this person can each write in your own language. Tap \"Translate\" on any message to read it in yours, or use the translate button in the header to translate everything automatically.",
+  "translate_hint.dismiss": "Dismiss translation hint",
+  "auto_translate.tooltip_off": "Translate all messages automatically",
+  "auto_translate.tooltip_on": "Auto-translate is on — click to turn off",
+  "auto_translate.active_banner": "Messages in this conversation are being automatically translated into your language.",
+  "auto_translate.turn_off": "Turn off",
+  "new_group": "New Group",
+  "create_group": "Create Group",
+  "create_group_title": "Create Group Conversation",
+  "group_name_label": "Group Name",
+  "group_name_placeholder": "Enter a name for this group...",
+  "add_members": "Add Members",
+  "add_members_hint": "Search for members to add (minimum 2)",
+  "selected_members": "Selected ({{count}})",
+  "create_group_error": "Failed to create group conversation",
+  "group_created": "Group Created",
+  "group_created_desc": "Your group conversation has been created.",
+  "group_members": "{{count}} members",
+  "group_participants": "Participants",
+  "group_admin": "Admin",
+  "group_member": "Member",
+  "group_leave": "Leave Group",
+  "group_leave_confirm": "Are you sure you want to leave this group? You won't receive new messages.",
+  "group_add_member": "Add Member",
+  "group_remove_member": "Remove",
+  "group_edit_name": "Edit Name",
+  "group_name_updated": "Group name updated",
+  "group_member_added": "Member added to group",
+  "group_member_removed": "Member removed from group",
+  "group_left": "You left the group",
+  "group_tab": "Groups",
+  "page_meta": {
+    "list": {
+      "title": "Messages"
+    },
+    "conversation": {
+      "title": "Conversation"
+    }
   }
 }

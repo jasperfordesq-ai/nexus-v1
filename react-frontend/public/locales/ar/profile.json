@@ -128,5 +128,8 @@
     "cancel": "Cancel",
     "submit": "أرسل المراجعة",
     "submit_failed_fallback": "فشل في إرسال المراجعة"
+  },
+  "page_meta": {
+    "title": "Profile"
   }
 }

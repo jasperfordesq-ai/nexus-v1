@@ -149,7 +149,19 @@
     "feed_empty_desc": "كن أول من يشارك شيئًا مع هذه المجموعة!",
     "feed_create_post": "إنشاء منشور",
     "feed_load_more": "تحميل المزيد",
-    "member_actions_aria": "إجراءات الأعضاء"
+    "member_actions_aria": "إجراءات الأعضاء",
+    "tab_wiki": "Wiki",
+    "tab_media": "Gallery",
+    "tab_challenges": "Challenges",
+    "tab_analytics": "Analytics",
+    "tab_section_content": "Content",
+    "tab_section_collab": "Collaboration",
+    "tab_section_admin": "Admin",
+    "tab_more_label": "More",
+    "invite": "Invite",
+    "copy": "Copy",
+    "image_alt_group": "Group",
+    "image_alt_cover": "Cover"
   },
   "form": {
     "create_title": "إنشاء مجموعة جديدة",
@@ -278,7 +290,8 @@
     "folder_placeholder": "مثل: مستندات، صور",
     "description_label": "الوصف (اختياري)",
     "description_placeholder": "وصف مختصر للملف",
-    "remove_file": "إزالة الملف"
+    "remove_file": "إزالة الملف",
+    "upload_btn": "Upload"
   },
   "toast": {
     "left": "غادر المجموعة",
@@ -357,11 +370,21 @@
     "answer_posted_success": "تم نشر الإجابة!",
     "answer_posted_error": "فشل في نشر الإجابة",
     "vote_error": "فشل في التصويت",
-    "accept_error": "فشل في قبول الإجابة"
+    "accept_error": "فشل في قبول الإجابة",
+    "sort_newest": "Newest",
+    "sort_unanswered": "Unanswered",
+    "question_title_label": "Title",
+    "question_body_label": "Details",
+    "cancel": "Cancel",
+    "answers": "answers",
+    "accepted": "Accepted",
+    "vote_up": "Upvote",
+    "vote_down": "Downvote"
   },
   "page_meta": {
     "create": {
       "title": "إنشاء مجموعة"
     }
-  }
+  },
+  "page_title": "Groups"
 }

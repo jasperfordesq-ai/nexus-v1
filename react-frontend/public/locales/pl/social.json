@@ -76,7 +76,9 @@
     "save_to": "Zapisz do kolekcji",
     "no_collection": "Ogólne (bez kolekcji)",
     "new_collection": "Nowa kolekcja",
-    "collection_name": "Nazwa kolekcji"
+    "collection_name": "Nazwa kolekcji",
+    "save": "Save",
+    "saved": "Saved"
   },
   "bookmarks": {
     "title": "Zapisane przedmioty",
@@ -97,6 +99,21 @@
     "collection_actions": "Akcje zbioru",
     "create_collection_title": "Utwórz zbiór",
     "edit_collection_title": "Edytuj zbiór",
-    "collection_description": "Opis (opcjonalnie)"
+    "collection_description": "Opis (opcjonalnie)",
+    "page_title": "Saved",
+    "all_items": "All",
+    "tab_all": "All",
+    "type_post": "Post",
+    "type_listing": "Listing",
+    "type_event": "Event",
+    "type_job": "Job",
+    "type_blog": "Blog",
+    "type_discussion": "Discussion",
+    "edit_collection": "Edit",
+    "delete_collection": "Delete",
+    "collection_name": "Name",
+    "cancel": "Cancel",
+    "save": "Save",
+    "create": "Create"
   }
 }

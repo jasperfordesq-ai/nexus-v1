@@ -67,5 +67,8 @@
   "delete_saved_search": "حذف البحث المحفوظ",
   "aria": {
     "loading_search_results": "جارٍ تحميل نتائج البحث"
+  },
+  "page_meta": {
+    "title": "Search"
   }
 }

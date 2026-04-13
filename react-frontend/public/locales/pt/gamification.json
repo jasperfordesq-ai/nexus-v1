@@ -95,7 +95,21 @@
       "not_earned": "Ainda não conquistado",
       "not_earned_desc": "Continue assim — você desbloqueará este distintivo em breve!",
       "xp_reward": "Recompensa de XP",
-      "load_failed": "Não foi possível carregar os detalhes do distintivo."
+      "load_failed": "Não foi possível carregar os detalhes do distintivo.",
+      "type": "Category",
+      "threshold": "Requirement",
+      "threshold_value": "{{threshold}} {{type}}",
+      "rarity": "Rarity",
+      "tier": "Tier",
+      "close": "Close",
+      "rarity_common": "Common",
+      "rarity_uncommon": "Uncommon",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "rarity_legendary": "Legendary",
+      "tier_core": "Core",
+      "tier_template": "Standard",
+      "tier_custom": "Custom"
     },
     "showcase": {
       "manage_title": "Gerir Montra de Insígnias",
@@ -285,7 +299,17 @@
   },
   "page_meta": {
     "leaderboard": {
-      "description": "Classificação da comunidade — veja os principais colaboradores e os membros mais ativos."
+      "description": "Classificação da comunidade — veja os principais colaboradores e os membros mais ativos.",
+      "title": "Leaderboard"
+    },
+    "achievements": {
+      "title": "Achievements"
+    },
+    "goals": {
+      "title": "Goals"
+    },
+    "nexus_score": {
+      "title": "NexusScore"
     }
   }
 }

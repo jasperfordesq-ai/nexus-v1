@@ -76,5 +76,8 @@
   "anonymous_voting_desc": "إخفاء هويات الناخبين في النتائج",
   "aria": {
     "export_csv": "تصدير النتائج كـ CSV"
+  },
+  "page_meta": {
+    "title": "Polls"
   }
 }

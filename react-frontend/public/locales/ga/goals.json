@@ -60,5 +60,11 @@
     "retry": "Bain Triail Eile As",
     "no_activity": "Níl gníomhaíocht ar bith taifeadta fós.",
     "progress_aria": "Dul chun cinn: {{percent}}%"
+  },
+  "template_picker": {
+    "load_error": "Failed to load templates. Please try again.",
+    "try_again": "Try again",
+    "none_available": "No templates available yet.",
+    "none_in_category": "No templates in this category."
   }
 }

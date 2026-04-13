@@ -15,12 +15,12 @@
     "tab_challenges": "Dushláin",
     "tab_collections": "Bailiucháin",
     "tab_journeys": "Turais",
-    "tab_engagement": "Rannph\u00e1irt\u00edocht",
+    "tab_engagement": "Rannpháirtíocht",
     "tab_shop": "Siopa XP",
     "engagement": {
-      "title": "Rannph\u00e1irt\u00edocht Mh\u00edos\u00fail",
-      "months_active": "{{count}} as 12 mh\u00ed",
-      "description": "M\u00edonna inar chom\u00e1in t\u00fa gn\u00edomha\u00edocht fhiúntach amháin ar a laghad (malartú, liostú, léirmheas, nó uaireanta deonacha)."
+      "title": "Rannpháirtíocht Mhíosúil",
+      "months_active": "{{count}} as 12 mhí",
+      "description": "Míonna inar chomáin tú gníomhaíocht fhiúntach amháin ar a laghad (malartú, liostú, léirmheas, nó uaireanta deonacha)."
     },
     "filter_by_type": "Scag de réir cineáil",
     "filter_badges_aria": "Scag suaitheantais de réir cineáil",
@@ -103,7 +103,29 @@
       "save_failed_desc": "Ní fhéadfaí an taispeántas a nuashonrú.",
       "save_error": "Chuaigh rud éigin mícheart."
     },
-    "load_error": "Theip ar lódáil na n-éachtaí. Bain triail eile as le do thoil."
+    "load_error": "Theip ar lódáil na n-éachtaí. Bain triail eile as le do thoil.",
+    "badge_detail": {
+      "title": "Badge Details",
+      "earned_on": "Earned on {{date}}",
+      "not_earned": "Not yet earned",
+      "not_earned_desc": "Keep going — you'll unlock this badge soon!",
+      "type": "Category",
+      "threshold": "Requirement",
+      "threshold_value": "{{threshold}} {{type}}",
+      "rarity": "Rarity",
+      "xp_reward": "XP Reward",
+      "tier": "Tier",
+      "close": "Close",
+      "rarity_common": "Common",
+      "rarity_uncommon": "Uncommon",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "rarity_legendary": "Legendary",
+      "tier_core": "Core",
+      "tier_template": "Standard",
+      "tier_custom": "Custom",
+      "load_failed": "Could not load badge details."
+    }
   },
   "goals": {
     "page_title": "Spriocanna",
@@ -193,13 +215,13 @@
     "page_title": "Clár Ceannairí",
     "title": "Clár Ceannairí",
     "subtitle": "Féach cé atá chun tosaigh sa phobal",
-    "subtitle_redesign": "F\u00e9ach conas at\u00e1 \u00e1r bpobal ag f\u00e1s le ch\u00e9ile",
+    "subtitle_redesign": "Féach conas atá ár bpobal ag fás le chéile",
     "tabs_aria": "Amhairc phobail",
     "tab": {
       "community": "Tionchar Pobail",
       "journey": "Mo Thuras",
       "spotlight": "Spotsholas",
-      "competitive": "Is Gn\u00edomha\u00ed"
+      "competitive": "Is Gníomhaí"
     },
     "unable_to_load": "Ní Féidir an Clár Ceannairí a Lódáil",
     "try_again": "Bain Triail Eile As",
@@ -274,5 +296,20 @@
     "member_since": "Ball ó",
     "empty_title": "Gan Spotsholas fós",
     "empty_description": "Cuirfear baill ghníomhacha i láthair anseo nuair a thosóidh an pobal ag malartú."
+  },
+  "page_meta": {
+    "achievements": {
+      "title": "Achievements"
+    },
+    "leaderboard": {
+      "title": "Leaderboard",
+      "description": "Community leaderboard — see top contributors and most active members."
+    },
+    "goals": {
+      "title": "Goals"
+    },
+    "nexus_score": {
+      "title": "NexusScore"
+    }
   }
 }

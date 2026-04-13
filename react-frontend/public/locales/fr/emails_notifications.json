@@ -86,7 +86,10 @@
     "label_under_review": "En cours d'examen :",
     "label_remember": "Rappelez-vous :",
     "label_action_needed": "Action requise :",
-    "label_why_approval": "Pourquoi une approbation ?"
+    "label_why_approval": "Pourquoi une approbation ?",
+    "label_service": "Service",
+    "label_requester": "Requester",
+    "label_provider": "Provider"
   },
   "volunteering": {
     "heading_accepted": "Demande acceptée !",
@@ -114,7 +117,8 @@
     "heading_application_received": "Nouvelle demande de bénévolat",
     "application_received_body": "{{name}} a postulé pour faire du bénévolat avec votre organisation.",
     "application_received_note": "Examinez leur demande et approuvez ou refusez depuis le tableau de bord de votre organisation.",
-    "btn_review_application": "Examiner la demande"
+    "btn_review_application": "Examiner la demande",
+    "label_opportunity": "Opportunity"
   },
   "default_notification": "Notification : {{type}}"
 }

@@ -48,7 +48,9 @@
     "knowledge_base": "Bunachar eolais",
     "unread_notifications": "{{count}} fógra gan léamh",
     "timebanking": "Baincéireacht ama",
-    "explore": "Féach Thart"
+    "explore": "Féach Thart",
+    "saved": "Saved",
+    "marketplace": "Marketplace"
   },
   "nav_desc": {
     "feed": "Fotha an phobail",
@@ -92,7 +94,9 @@
     "impact_report": "Sonraí mionsonraithe tionchair",
     "strategic_plan": "Ár dtreo straitéiseach",
     "timebanking_listings": "Tairiscintí agus iarratais",
-    "messages": "Do theachtaireachtaí"
+    "messages": "Do theachtaireachtaí",
+    "saved": "Your bookmarked items",
+    "marketplace": "Buy & sell in your community"
   },
   "user_menu": {
     "my_profile": "Mo Phróifíl",
@@ -287,7 +291,9 @@
     "trending": "Ag Treáil",
     "no_results": "Níor aimsíodh GIFanna",
     "powered_by": "Cumhachtaithe ag GIPHY",
-    "button_label": "Cuir GIF leis"
+    "button_label": "Cuir GIF leis",
+    "select": "Select GIF",
+    "preview_alt": "GIF preview"
   },
   "loading": "Á Lódáil...",
   "feature_error": {
@@ -301,46 +307,46 @@
     "read_more": "Léigh tuilleadh"
   },
   "aria": {
-    "view_mode": "M\u00f3d amhairc",
+    "view_mode": "Mód amhairc",
     "grid_view": "Amharc greille",
     "list_view": "Amharc liosta",
-    "map_view": "Amharc l\u00e9arsc\u00e1ile",
-    "loading_members": "Baill \u00e1 lucht\u00fa",
+    "map_view": "Amharc léarscáile",
+    "loading_members": "Baill á luchtú",
     "bold": "Trom",
-    "italic": "Iod\u00e1lach",
-    "underline": "Fol\u00edne",
+    "italic": "Iodálach",
+    "underline": "Folíne",
     "bullet_list": "Liosta Urchar",
     "numbered_list": "Liosta Uimhrithe",
-    "loading_community": "Pobal \u00e1 lucht\u00fa",
+    "loading_community": "Pobal á luchtú",
     "link_url": "URL naisc",
     "confirm_link": "Deimhnigh nasc",
     "cancel_link": "Cealaigh nasc",
-    "post_content_editor": "Eagarth\u00f3ir \u00e1bhair phost\u00e1la",
-    "drag_to_reorder": "Tarraing chun athord\u00fa",
-    "click_or_drag_to_upload": "Clice\u00e1il n\u00f3 tarraing chun \u00edomh\u00e1nna a uasl\u00f3d\u00e1il",
+    "post_content_editor": "Eagarthóir ábhair phostála",
+    "drag_to_reorder": "Tarraing chun athordú",
+    "click_or_drag_to_upload": "Cliceáil nó tarraing chun íomhánna a uaslódáil",
     "add_more_photos": "Cuir tuilleadh grianghraf leis",
-    "main_navigation": "Pr\u00edomhnascl\u00e9an\u00faint",
-    "timebanking_navigation": "Nascl\u00e9an\u00faint bainc\u00e9ireachta ama",
-    "community_navigation": "Nascl\u00e9an\u00faint phobail",
-    "create_actions": "Gn\u00edomhartha cruth\u00fach\u00e1in",
-    "user_actions": "Gn\u00edomhartha \u00fas\u00e1ideora",
-    "close_menu": "D\u00fan roghchl\u00e1r",
+    "main_navigation": "Príomhnascléanúint",
+    "timebanking_navigation": "Nascléanúint baincéireachta ama",
+    "community_navigation": "Nascléanúint phobail",
+    "create_actions": "Gníomhartha cruthúcháin",
+    "user_actions": "Gníomhartha úsáideora",
+    "close_menu": "Dún roghchlár",
     "open_search": "Oscail cuardach",
-    "mobile_navigation": "Nascl\u00e9an\u00faint mh\u00f3ibile\u00e1in",
-    "engage_navigation": "Nascl\u00e9an\u00faint rannph\u00e1irt\u00edochta",
-    "explore_navigation": "Nascl\u00e9an\u00faint aimsigh",
-    "federation_navigation": "Nascl\u00e9an\u00faint ch\u00f3naidhme",
-    "about_navigation": "Nascl\u00e9an\u00faint faoi",
-    "legal_navigation": "Nascl\u00e9an\u00faint dhl\u00edthi\u00fail",
-    "more_navigation": "Nascl\u00e9an\u00faint tuilleadh",
-    "cookie_settings": "Socruit\u00ed fian\u00e1n",
+    "mobile_navigation": "Nascléanúint mhóibileáin",
+    "engage_navigation": "Nascléanúint rannpháirtíochta",
+    "explore_navigation": "Nascléanúint aimsigh",
+    "federation_navigation": "Nascléanúint chónaidhme",
+    "about_navigation": "Nascléanúint faoi",
+    "legal_navigation": "Nascléanúint dhlíthiúil",
+    "more_navigation": "Nascléanúint tuilleadh",
+    "cookie_settings": "Socruití fianán",
     "clear": "Glan",
-    "scroll_left": "Scroll\u00e1igh ar chl\u00e9",
-    "scroll_right": "Scroll\u00e1igh ar dheas",
+    "scroll_left": "Scrolláigh ar chlé",
+    "scroll_right": "Scrolláigh ar dheas",
     "select_language": "Roghnaigh teanga",
-    "clear_location": "Glan su\u00edomh",
-    "select_category": "Roghnaigh catag\u00f3ir",
-    "verification_badges": "Suaitheantais fh\u00edr\u00fach\u00e1in",
+    "clear_location": "Glan suíomh",
+    "select_category": "Roghnaigh catagóir",
+    "verification_badges": "Suaitheantais fhírúcháin",
     "search_skills": "Cuardaigh scileanna"
   },
   "skills": {
@@ -376,14 +382,32 @@
       "expert": "Saineolaí"
     },
     "aria_clear_search": "Glan cuardach",
-    "aria_close_members_list": "D\u00fan liosta ball",
-    "category_optional": "Catag\u00f3ir (roghnach)",
-    "proficiency_level": "Leibh\u00e9al Inni\u00falachta"
+    "aria_close_members_list": "Dún liosta ball",
+    "category_optional": "Catagóir (roghnach)",
+    "proficiency_level": "Leibhéal Inniúlachta"
   },
   "hours_display_one": "{{count}} uair",
   "hours_display_other": "{{count}} uair",
   "toast": {
-    "aria_notifications": "F\u00f3gra\u00ed",
-    "aria_dismiss_notification": "D\u00edbir f\u00f3gra"
+    "aria_notifications": "Fógraí",
+    "aria_dismiss_notification": "Díbir fógra"
+  },
+  "compose": {
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1",
+    "aria_insert_link": "Insert link",
+    "aria_remove_link": "Remove link"
+  },
+  "verification": {
+    "not_id_verified": "Not ID Verified"
+  },
+  "page_meta": {
+    "skills_browse": {
+      "title": "Browse Skills"
+    },
+    "members": {
+      "title": "Members",
+      "description": "Browse community members, connect and exchange time credits."
+    }
   }
 }

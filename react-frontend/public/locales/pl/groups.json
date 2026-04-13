@@ -149,7 +149,19 @@
     "feed_empty_desc": "Bądź pierwszym, który podzieli się czymś z tą grupą!",
     "feed_create_post": "Utwórz post",
     "feed_load_more": "Załaduj więcej",
-    "member_actions_aria": "Akcje członków"
+    "member_actions_aria": "Akcje członków",
+    "tab_wiki": "Wiki",
+    "tab_media": "Gallery",
+    "tab_challenges": "Challenges",
+    "tab_analytics": "Analytics",
+    "tab_section_content": "Content",
+    "tab_section_collab": "Collaboration",
+    "tab_section_admin": "Admin",
+    "tab_more_label": "More",
+    "invite": "Invite",
+    "copy": "Copy",
+    "image_alt_group": "Group",
+    "image_alt_cover": "Cover"
   },
   "form": {
     "create_title": "Utwórz nową grupę",
@@ -278,7 +290,8 @@
     "folder_placeholder": "np. Dokumenty, Zdjęcia",
     "description_label": "Opis (opcjonalnie)",
     "description_placeholder": "Krótki opis pliku",
-    "remove_file": "Usuń plik"
+    "remove_file": "Usuń plik",
+    "upload_btn": "Upload"
   },
   "toast": {
     "left": "Opuszczono grupę",
@@ -357,11 +370,21 @@
     "answer_posted_success": "Odpowiedź opublikowana!",
     "answer_posted_error": "Nie udało się opublikować odpowiedzi",
     "vote_error": "Nie udało się zagłosować",
-    "accept_error": "Nie udało się zaakceptować odpowiedzi"
+    "accept_error": "Nie udało się zaakceptować odpowiedzi",
+    "sort_newest": "Newest",
+    "sort_unanswered": "Unanswered",
+    "question_title_label": "Title",
+    "question_body_label": "Details",
+    "cancel": "Cancel",
+    "answers": "answers",
+    "accepted": "Accepted",
+    "vote_up": "Upvote",
+    "vote_down": "Downvote"
   },
   "page_meta": {
     "create": {
       "title": "Utwórz grupę"
     }
-  }
+  },
+  "page_title": "Groups"
 }

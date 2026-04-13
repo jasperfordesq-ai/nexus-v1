@@ -78,7 +78,7 @@
     "share": "Share",
     "event_link": "Event Link",
     "delete_modal_title": "Delete Event",
-    "delete_confirm": "Are you sure you want to delete \u201c{{title}}\u201d? This action cannot be undone.",
+    "delete_confirm": "Are you sure you want to delete “{{title}}”? This action cannot be undone.",
     "cancel": "Cancel",
     "delete_confirm_btn": "Delete Event",
     "cover_alt": "Cover for {{title}}",
@@ -91,7 +91,7 @@
     "event_full": "Full",
     "waitlist_count": "{{count}} on waitlist",
     "cancel_modal_title": "Cancel Event",
-    "cancel_confirm": "Are you sure you want to cancel \u201c{{title}}\u201d? This will notify all attendees.",
+    "cancel_confirm": "Are you sure you want to cancel “{{title}}”? This will notify all attendees.",
     "cancel_reason_placeholder": "Reason for cancellation (optional)",
     "keep_event": "Keep Event",
     "cancel_event": "Cancel Event",
@@ -199,7 +199,8 @@
     },
     "attach_polls_label": "Attach Polls (optional)",
     "attach_polls_placeholder": "Select polls to attach...",
-    "attach_polls_hint": "Attach existing community polls to this event."
+    "attach_polls_hint": "Attach existing community polls to this event.",
+    "group_event_notice": "This event will be associated with your group."
   },
   "toast": {
     "rsvp_removed": "RSVP removed",
@@ -234,5 +235,15 @@
     "vote_success": "Vote recorded!",
     "vote_failed": "Failed to record vote",
     "view_full": "View full poll"
+  },
+  "page_title": "Events",
+  "page_description": "Discover community events, workshops, and meetups near you.",
+  "near_me": "Near me",
+  "near_me_no_location": "Set your location in your profile to use Near me",
+  "radius_label": "Radius",
+  "page_meta": {
+    "create": {
+      "title": "Create Event"
+    }
   }
 }

@@ -276,5 +276,10 @@
     "generate_failed": "Theip ar theastas a ghiniúint. Bain triail eile as le do thoil.",
     "load_failed": "Theip ar theastais a lódáil",
     "load_error": "Ní féidir teastais a lódáil."
+  },
+  "page_meta": {
+    "register_organisation": {
+      "title": "Register Organisation"
+    }
   }
 }

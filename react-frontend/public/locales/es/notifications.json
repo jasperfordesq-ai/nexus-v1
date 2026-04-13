@@ -66,5 +66,8 @@
     "toast_vol_hours_declined": "Horas Rechazadas",
     "toast_vol_opportunity_closed": "Oportunidad Cerrada",
     "toast_default": "Notificación"
+  },
+  "page_meta": {
+    "title": "Notifications"
   }
 }

@@ -48,7 +48,9 @@
     "knowledge_base": "ナレッジベース",
     "unread_notifications": "未読通知 {{count}}件",
     "timebanking": "タイムバンキング",
-    "explore": "探索"
+    "explore": "探索",
+    "saved": "Saved",
+    "marketplace": "Marketplace"
   },
   "nav_desc": {
     "feed": "コミュニティフィード",
@@ -388,7 +390,9 @@
   "hours_display_other": "{{count}}時間",
   "compose": {
     "aria_insert_link": "リンクを挿入",
-    "aria_remove_link": "リンクを削除"
+    "aria_remove_link": "リンクを削除",
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1"
   },
   "toast": {
     "aria_notifications": "通知",
@@ -402,7 +406,8 @@
       "title": "スキルをブラウズ"
     },
     "members": {
-      "description": "コミュニティメンバーをブラウズし、つながり、時間クレジットを交換しましょう。"
+      "description": "コミュニティメンバーをブラウズし、つながり、時間クレジットを交換しましょう。",
+      "title": "Members"
     }
   }
 }

@@ -18,7 +18,9 @@
     "advanced_search": "بحث متقدم",
     "saved_items": "العناصر المحفوظة",
     "unable_to_load": "غير قادر على تحميل القوائم",
-    "load_more_failed": "فشل في تحميل المزيد من القوائم"
+    "load_more_failed": "فشل في تحميل المزيد من القوائم",
+    "all": "All",
+    "categories": "Categories"
   },
   "hub_feature_gate": {
     "title": "السوق غير متاح",
@@ -44,7 +46,20 @@
     "view_image": "عرض الصورة {{number}}",
     "image_alt": "الصورة {{number}}",
     "thumbnail_alt": "صورة مصغرة {{number}}",
-    "link_copied": "تم نسخ الرابط إلى الحافظة"
+    "link_copied": "تم نسخ الرابط إلى الحافظة",
+    "marketplace": "Marketplace",
+    "negotiable": "Negotiable",
+    "free": "Free",
+    "featured": "Featured",
+    "seller": "Seller",
+    "seller_type_business": "Business",
+    "seller_type_private": "Private",
+    "delivery": "Delivery",
+    "description": "Description",
+    "details": "Details",
+    "share_aria": "Share",
+    "unsave_aria": "Unsave",
+    "save_aria": "Save"
   },
   "offer": {
     "modal_title": "قدم عرضاً",
@@ -59,7 +74,20 @@
     "above_price": "{{percent}}% فوق سعر القائمة",
     "below_price": "{{percent}}% تحت سعر القائمة",
     "counter_amount": "العداد: {{amount}}",
-    "accept_counter": "قبول العداد"
+    "accept_counter": "قبول العداد",
+    "cancel": "Cancel",
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "declined": "Declined",
+      "countered": "Countered",
+      "withdrawn": "Withdrawn",
+      "expired": "Expired"
+    },
+    "accept": "Accept",
+    "decline": "Decline",
+    "counter": "Counter",
+    "withdraw": "Withdraw"
   },
   "create": {
     "page_title": "بيع شيء ما - السوق",
@@ -93,7 +121,21 @@
     "price_invalid": "يرجى إدخال سعر صالح",
     "created_success": "تم إنشاء القائمة بنجاح!",
     "created_error": "فشل في إنشاء القائمة",
-    "created_error_retry": "فشل في إنشاء القائمة. يرجى المحاولة مرة أخرى."
+    "created_error_retry": "فشل في إنشاء القائمة. يرجى المحاولة مرة أخرى.",
+    "photos": "Photos",
+    "cover": "Cover",
+    "add": "Add",
+    "details": "Details",
+    "title_label": "Title",
+    "description_label": "Description",
+    "category_label": "Category",
+    "condition_label": "Condition",
+    "quantity_label": "Quantity",
+    "pricing": "Pricing",
+    "price_label": "Price",
+    "currency_label": "Currency",
+    "location_label": "Location",
+    "cancel": "Cancel"
   },
   "search": {
     "page_title": "ابحث في السوق",
@@ -123,7 +165,19 @@
     "price_from": "من {{min}}",
     "price_up_to": "حتى {{max}}",
     "last_days_one": "آخر {{count}} يوم",
-    "last_days_other": "آخر {{count}} أيام"
+    "last_days_other": "آخر {{count}} أيام",
+    "breadcrumb_search": "Search",
+    "filters": "Filters",
+    "filters_title": "Filters",
+    "category_label": "Category",
+    "price_min": "Min",
+    "price_max": "Max",
+    "condition_label": "Condition",
+    "private": "Private",
+    "business": "Business",
+    "delivery_label": "Delivery",
+    "today": "Today",
+    "results_for": "for"
   },
   "seller": {
     "page_title": "ملف البائع",
@@ -142,7 +196,13 @@
     "no_listings_description": "{{name}} ليس لديه أي قوائم نشطة في الوقت الحالي.",
     "reviews_coming_soon_title": "المراجعات قادمة قريبًا",
     "reviews_coming_soon_description": "ستكون مراجعات المشترين متاحة في المرحلة 2. تحقق لاحقًا لترى ما يفكر فيه المجتمع حول هذا البائع.",
-    "view_listings": "عرض قوائم السوق الخاصة بـ {{name}}."
+    "view_listings": "عرض قوائم السوق الخاصة بـ {{name}}.",
+    "marketplace": "Marketplace",
+    "verified": "Verified",
+    "seller_type_business": "Business",
+    "message": "Message",
+    "tab_listings": "Listings",
+    "tab_reviews": "Reviews"
   },
   "category": {
     "not_found_title": "الفئة غير موجودة",
@@ -162,7 +222,13 @@
     "results_count_one": "{{count}} نتيجة",
     "results_count_other": "{{count}} نتائج",
     "load_more": "تحميل المزيد",
-    "browse_description": "تصفح قوائم {{name}} في السوق."
+    "browse_description": "تصفح قوائم {{name}} في السوق.",
+    "marketplace": "Marketplace",
+    "filters": "Filters",
+    "filters_title": "Filters",
+    "price_min": "Min",
+    "price_max": "Max",
+    "condition_label": "Condition"
   },
   "common": {
     "save_listing": "حفظ القائمة",
@@ -173,13 +239,24 @@
     "sign_in_to_save": "يرجى تسجيل الدخول لحفظ الإعلانات",
     "load_more": "تحميل المزيد",
     "try_again": "حاول مرة أخرى",
-    "sort_by": "فرز حسب"
+    "sort_by": "فرز حسب",
+    "free": "Free",
+    "negotiable": "Negotiable",
+    "save": "Save",
+    "unsave": "Unsave",
+    "cancel": "Cancel"
   },
   "condition": {
-    "like_new": "مثل الجديد"
+    "like_new": "مثل الجديد",
+    "new": "New",
+    "good": "Good",
+    "fair": "Fair",
+    "poor": "Poor"
   },
   "price_type": {
-    "fixed": "سعر ثابت"
+    "fixed": "سعر ثابت",
+    "negotiable": "Negotiable",
+    "free": "Free"
   },
   "delivery_method": {
     "pickup": "استلام فقط",
@@ -200,7 +277,8 @@
     "days_ago": "{{count}}منذ يوم"
   },
   "categories": {
-    "label": "تصفية حسب الفئة"
+    "label": "تصفية حسب الفئة",
+    "all": "All"
   },
   "filters": {
     "price_range": "نطاق السعر",
@@ -210,7 +288,18 @@
     "sort": "فرز حسب",
     "posted_within": "تم النشر خلال",
     "apply": "تطبيق الفلاتر",
-    "clear": "مسح الكل"
+    "clear": "مسح الكل",
+    "category": "Category",
+    "min": "Min",
+    "max": "Max",
+    "condition": "Condition",
+    "seller_all": "All",
+    "seller_private": "Private",
+    "seller_business": "Business",
+    "delivery_all": "All",
+    "delivery_shipping": "Shipping",
+    "delivery_both": "Both",
+    "title": "Filters"
   },
   "gallery": {
     "no_images": "لا توجد صور متاحة",
@@ -220,7 +309,9 @@
   },
   "collection_image": "صورة المجموعة {{number}}",
   "price": {
-    "contact": "تواصل للسعر"
+    "contact": "تواصل للسعر",
+    "free": "Free",
+    "negotiable": "Negotiable"
   },
   "empty": {
     "no_listings": "لا توجد قوائم حتى الآن",
@@ -259,7 +350,17 @@
     "empty_sold_title": "لا مبيعات حتى الآن",
     "empty_sold_description": "لم تقم ببيع أي عناصر حتى الآن.",
     "empty_expired_title": "لا توجد قوائم منتهية",
-    "empty_expired_description": "ليس لديك أي قوائم منتهية."
+    "empty_expired_description": "ليس لديك أي قوائم منتهية.",
+    "tab_active": "Active",
+    "tab_draft": "Drafts",
+    "tab_sold": "Sold",
+    "tab_expired": "Expired",
+    "stat_active": "Active",
+    "stat_sold": "Sold",
+    "stat_revenue": "Revenue",
+    "action_edit": "Edit",
+    "action_renew": "Renew",
+    "action_remove": "Remove"
   },
   "my_offers": {
     "page_title": "عروضى - السوق",
@@ -281,7 +382,9 @@
     "counter_message_label": "رسالة (اختياري)",
     "counter_message_placeholder": "اشرح عرضك المضاد...",
     "counter_sent_success": "تم إرسال العرض المضاد",
-    "send_counter": "إرسال عرض مضاد"
+    "send_counter": "إرسال عرض مضاد",
+    "tab_sent": "Sent",
+    "tab_received": "Received"
   },
   "collections": {
     "page_title": "مجموعاتي",
@@ -309,7 +412,13 @@
     "empty_collections_title": "لا توجد مجموعات بعد",
     "empty_collections_description": "أنشئ مجموعة لتنظيم العناصر المفضلة لديك في السوق.",
     "sign_in_title": "تسجيل الدخول مطلوب",
-    "sign_in_description": "قم بتسجيل الدخول لإدارة مجموعاتك والبحث المحفوظ."
+    "sign_in_description": "قم بتسجيل الدخول لإدارة مجموعاتك والبحث المحفوظ.",
+    "tab_collections": "Collections",
+    "name_label": "Name",
+    "public": "Public",
+    "private": "Private",
+    "category": "Category",
+    "remove_item": "Remove"
   },
   "saved_searches": {
     "tab_title": "البحث المحفوظ",
@@ -320,7 +429,12 @@
     "delete_error": "فشل في الحذف",
     "delete": "احذف البحث المحفوظ",
     "toggle_active": "تبديل النشط",
-    "channel_both": "البريد الإلكتروني والإشعارات"
+    "channel_both": "البريد الإلكتروني والإشعارات",
+    "frequency_instant": "Instant",
+    "frequency_daily": "Daily",
+    "frequency_weekly": "Weekly",
+    "channel_email": "Email",
+    "channel_push": "Push"
   },
   "promotions": {
     "title": "ترقية القائمة",
@@ -331,7 +445,8 @@
     "bump": "رفع إلى الأعلى",
     "featured": "قائمة مميزة",
     "top_of_category": "أعلى الفئة",
-    "homepage_carousel": "دوار الصفحة الرئيسية"
+    "homepage_carousel": "دوار الصفحة الرئيسية",
+    "free_label": "Free"
   },
   "free": {
     "page_title": "أشياء مجانية",
@@ -350,7 +465,9 @@
     "total_listed": "الإجمالي المدرج",
     "sell_to_group": "بيع للمجموعة",
     "empty_title": "لا توجد قوائم للمجموعة بعد",
-    "empty_description": "كن أول عضو في المجموعة يقوم بإدراج شيء للبيع!"
+    "empty_description": "كن أول عضو في المجموعة يقوم بإدراج شيء للبيع!",
+    "sellers": "sellers",
+    "tab_label": "Marketplace"
   },
   "hybrid_pricing": {
     "tooltip": "رصيد الوقت المكتسب من خلال تبادل الوقت المجتمعي",
@@ -381,13 +498,18 @@
     "offer_accepted": "تم قبول عرض التوصيل!",
     "accept_failed": "فشل في قبول العرض",
     "delivery_confirmed": "تم تأكيد التوصيل! تم منح اعتمادات زمنية.",
-    "confirm_failed": "فشل في تأكيد التوصيل"
+    "confirm_failed": "فشل في تأكيد التوصيل",
+    "unknown": "Unknown",
+    "accept": "Accept"
   },
   "ai_reply": {
     "suggest": "اقترح ردًا",
     "suggested_reply": "رد مقترح بواسطة الذكاء الاصطناعي",
     "use_reply": "استخدم هذا الرد",
-    "error": "فشل في توليد رد. يرجى المحاولة مرة أخرى."
+    "error": "فشل في توليد رد. يرجى المحاولة مرة أخرى.",
+    "regenerate": "Regenerate",
+    "copy": "Copy",
+    "copied": "Copied"
   },
   "map": {
     "page_title": "بحث الخريطة - السوق",
@@ -408,7 +530,8 @@
     "use_my_location": "استخدم موقعي",
     "search_this_area": "ابحث في هذه المنطقة",
     "distance_km": "{{km}} كم بعيد",
-    "distance_meters": "{{m}}م بعيد"
+    "distance_meters": "{{m}}م بعيد",
+    "refresh": "Refresh"
   },
   "shipping": {
     "title": "خيارات الشحن",
@@ -435,10 +558,16 @@
     "local_pickup": "استلام محلي",
     "local_pickup_subtitle": "جمع شخصيًا",
     "loading": "جارٍ تحميل خيارات الشحن...",
-    "no_options": "لا توجد خيارات شحن متاحة لهذا البائع."
+    "no_options": "لا توجد خيارات شحن متاحة لهذا البائع.",
+    "price": "Price",
+    "currency": "Currency",
+    "default_badge": "Default",
+    "recommended": "Recommended"
   },
   "listing_location": {
-    "approximate_location": "الموقع التقريبي"
+    "approximate_location": "الموقع التقريبي",
+    "location_title": "Location",
+    "get_directions": "Directions"
   },
   "orders": {
     "load_error": "فشل في تحميل الطلبات",
@@ -446,7 +575,14 @@
     "tracking_number": "تتبع:",
     "tab_cancelled": "ملغى / مسترد",
     "status": {
-      "pending_payment": "في انتظار الدفع"
+      "pending_payment": "في انتظار الدفع",
+      "paid": "Paid",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "completed": "Completed",
+      "disputed": "Disputed",
+      "refunded": "Refunded",
+      "cancelled": "Cancelled"
     },
     "buyer": {
       "page_title": "طلباتي - السوق",
@@ -460,7 +596,8 @@
       "delivery_confirmed": "تم تأكيد التسليم!",
       "rate_order": "قيم الطلب",
       "leave_rating": "تقييم المغادرة",
-      "dispute_open": "النزاع مفتوح"
+      "dispute_open": "النزاع مفتوح",
+      "rated": "Rated"
     },
     "seller": {
       "page_title": "مبيعاتي - السوق",
@@ -487,7 +624,8 @@
       "tracking_url_label": "رابط التتبع (اختياري)",
       "tracking_url_placeholder": "مثل https://track.example.com/...",
       "confirm_shipped": "تأكيد الشحن",
-      "shipped_success": "تم تحديد الطلب كتم الشحن!"
+      "shipped_success": "تم تحديد الطلب كتم الشحن!",
+      "shipping_method_other": "Other"
     },
     "buy": {
       "buy_now": "اشترِ الآن",
@@ -507,8 +645,13 @@
       "submit": "إرسال التقييم",
       "select_rating": "يرجى اختيار تقييم",
       "success": "تم إرسال التقييم بنجاح!",
-      "error": "فشل في إرسال التقييم"
-    }
+      "error": "فشل في إرسال التقييم",
+      "stars_label": "Rating"
+    },
+    "track": "Track",
+    "tab_all": "All",
+    "tab_active": "Active",
+    "tab_completed": "Completed"
   },
   "onboarding": {
     "page_title": "توجيه البائع - السوق",
@@ -534,5 +677,6 @@
     "continue_onboarding": "تابع عملية الانضمام",
     "check_status": "تحقق من الحالة",
     "start_error": "فشل في بدء عملية الانضمام"
-  }
+  },
+  "page_title": "Marketplace"
 }

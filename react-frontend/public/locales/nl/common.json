@@ -48,7 +48,9 @@
     "knowledge_base": "Kennisbank",
     "unread_notifications": "{{count}} ongelezen meldingen",
     "timebanking": "Tijdbank",
-    "explore": "Ontdekken"
+    "explore": "Ontdekken",
+    "saved": "Saved",
+    "marketplace": "Marketplace"
   },
   "nav_desc": {
     "feed": "Gemeenschapsfeed",
@@ -388,7 +390,9 @@
   "hours_display_other": "{{count}} uren",
   "compose": {
     "aria_insert_link": "Voeg link in",
-    "aria_remove_link": "Verwijder link"
+    "aria_remove_link": "Verwijder link",
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1"
   },
   "toast": {
     "aria_notifications": "Meldingen",
@@ -402,7 +406,8 @@
       "title": "Bekijk Vaardigheden"
     },
     "members": {
-      "description": "Bekijk gemeenschapsleden, verbind en wissel tijdcredits uit."
+      "description": "Bekijk gemeenschapsleden, verbind en wissel tijdcredits uit.",
+      "title": "Members"
     }
   }
 }

@@ -198,7 +198,9 @@
     "media_compression_failed": "{{count}} صورة(صور) فشلت في المعالجة",
     "media_upload_error": "فشل في معالجة الصور",
     "sdg_selected_one": "{{count}} هدف محدد",
-    "sdg_selected_other": "{{count}} أهداف محددة"
+    "sdg_selected_other": "{{count}} أهداف محددة",
+    "save_changes": "Save",
+    "placeholder_hours": "1"
   },
   "card": {
     "edited": "edited",
@@ -266,7 +268,8 @@
     "detail_job": "عرض الوظيفة",
     "detail_challenge": "عرض التحدي",
     "detail_volunteer": "عرض الفرصة",
-    "detail_blog": "اقرأ المقال"
+    "detail_blog": "اقرأ المقال",
+    "scheduled": "Scheduled"
   },
   "hashtag": {
     "title": "Hashtag",
@@ -322,7 +325,12 @@
     "dm_no_results": "لم يتم العثور على أعضاء",
     "dm_hint": "اكتب على الأقل حرفين للبحث",
     "dm_sent": "تم مشاركة المنشور مع {{name}}",
-    "dm_failed": "فشل في إرسال الرسالة"
+    "dm_failed": "فشل في إرسال الرسالة",
+    "repost": "Repost",
+    "quote_submit": "Post",
+    "dm_sent_label": "Sent",
+    "dm_send": "Send",
+    "dm_done": "Done"
   },
   "trending": {
     "title": "Trending",
@@ -466,6 +474,11 @@
   },
   "analytics": {
     "title": "تحليلات المنشور",
-    "reactions_breakdown": "تفصيل ردود الفعل"
+    "reactions_breakdown": "تفصيل ردود الفعل",
+    "views": "Views",
+    "likes": "Likes",
+    "comments": "Comments",
+    "shares": "Shares",
+    "reach": "Reach"
   }
 }

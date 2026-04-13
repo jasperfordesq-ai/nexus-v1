@@ -92,7 +92,8 @@
     "platform_linux_step2": "Of klik op \"Telefoon, tablet of beveiligingssleutel\" om een USB-beveiligingssleutel te gebruiken of een QR-code met je telefoon te scannen.",
     "platform_unknown_title": "Een toegangscode instellen",
     "platform_unknown_step1": "Klik op \"Dit apparaat\" om een toegangscode te maken op het apparaat dat je nu gebruikt.",
-    "platform_unknown_step2": "Of klik op \"Telefoon, tablet of beveiligingssleutel\" om een ander apparaat te registreren."
+    "platform_unknown_step2": "Of klik op \"Telefoon, tablet of beveiligingssleutel\" om een ander apparaat te registreren.",
+    "label_passkey": "Passkey"
   },
   "passkey_setup_subtitle": "Instelling voor dit apparaat",
   "passkey_multi_device_note": "Je kunt toegangscodes registreren op meerdere apparaten. Elk apparaat heeft zijn eigen toegangscode nodig, tenzij je toegangscodeprovider ze synchroniseert (bijv. iCloud Sleutelhanger synchroniseert tussen Apple-apparaten, Google Wachtwoordmanager synchroniseert tussen Android en Chrome).",
@@ -439,13 +440,19 @@
     "unblocked_desc": "{{name}} is ontgrendeld.",
     "unblock_error": "Kon gebruiker niet ontgrendelen",
     "blocked_on": "Geblokkeerd op {{date}}",
-    "link": "Geblokkeerde gebruikers"
+    "link": "Geblokkeerde gebruikers",
+    "unblock": "Unblock"
   },
   "block_user": {
     "title": "Blokkeer {{name}}?",
     "body": "Ze kunnen je profiel niet zien, je geen berichten sturen of met je inhoud interageren. Elke bestaande verbinding wordt verwijderd.",
     "blocked": "Gebruiker geblokkeerd",
     "blocked_desc": "{{name}} is geblokkeerd.",
-    "error": "Kon gebruiker niet blokkeren"
+    "error": "Kon gebruiker niet blokkeren",
+    "confirm": "Block",
+    "cancel": "Cancel"
+  },
+  "page_meta": {
+    "title": "Settings"
   }
 }

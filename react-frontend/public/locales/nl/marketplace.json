@@ -18,7 +18,9 @@
     "advanced_search": "Geavanceerd Zoeken",
     "saved_items": "Opgeslagen Items",
     "unable_to_load": "Kon lijsten niet laden",
-    "load_more_failed": "Kon meer lijsten niet laden"
+    "load_more_failed": "Kon meer lijsten niet laden",
+    "all": "All",
+    "categories": "Categories"
   },
   "hub_feature_gate": {
     "title": "Marktplaats Niet Beschikbaar",
@@ -44,7 +46,20 @@
     "view_image": "Bekijk afbeelding {{number}}",
     "image_alt": "Afbeelding {{number}}",
     "thumbnail_alt": "Miniatuur {{number}}",
-    "link_copied": "Link gekopieerd naar klembord"
+    "link_copied": "Link gekopieerd naar klembord",
+    "marketplace": "Marketplace",
+    "negotiable": "Negotiable",
+    "free": "Free",
+    "featured": "Featured",
+    "seller": "Seller",
+    "seller_type_business": "Business",
+    "seller_type_private": "Private",
+    "delivery": "Delivery",
+    "description": "Description",
+    "details": "Details",
+    "share_aria": "Share",
+    "unsave_aria": "Unsave",
+    "save_aria": "Save"
   },
   "offer": {
     "modal_title": "Doe een bod",
@@ -59,7 +74,20 @@
     "above_price": "{{percent}}% boven de vraagprijs",
     "below_price": "{{percent}}% onder de vraagprijs",
     "counter_amount": "Teller: {{amount}}",
-    "accept_counter": "Accepteer tegenbod"
+    "accept_counter": "Accepteer tegenbod",
+    "cancel": "Cancel",
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "declined": "Declined",
+      "countered": "Countered",
+      "withdrawn": "Withdrawn",
+      "expired": "Expired"
+    },
+    "accept": "Accept",
+    "decline": "Decline",
+    "counter": "Counter",
+    "withdraw": "Withdraw"
   },
   "create": {
     "page_title": "Verkoop iets - Marktplaats",
@@ -93,7 +121,21 @@
     "price_invalid": "Voer een geldige prijs in",
     "created_success": "Advertentie succesvol aangemaakt!",
     "created_error": "Mislukt om advertentie aan te maken",
-    "created_error_retry": "Mislukt om advertentie aan te maken. Probeer het opnieuw."
+    "created_error_retry": "Mislukt om advertentie aan te maken. Probeer het opnieuw.",
+    "photos": "Photos",
+    "cover": "Cover",
+    "add": "Add",
+    "details": "Details",
+    "title_label": "Title",
+    "description_label": "Description",
+    "category_label": "Category",
+    "condition_label": "Condition",
+    "quantity_label": "Quantity",
+    "pricing": "Pricing",
+    "price_label": "Price",
+    "currency_label": "Currency",
+    "location_label": "Location",
+    "cancel": "Cancel"
   },
   "search": {
     "page_title": "Zoek Marktplaats",
@@ -123,7 +165,19 @@
     "price_from": "Van {{min}}",
     "price_up_to": "Tot {{max}}",
     "last_days_one": "Laatste {{count}} dag",
-    "last_days_other": "Laatste {{count}} dagen"
+    "last_days_other": "Laatste {{count}} dagen",
+    "breadcrumb_search": "Search",
+    "filters": "Filters",
+    "filters_title": "Filters",
+    "category_label": "Category",
+    "price_min": "Min",
+    "price_max": "Max",
+    "condition_label": "Condition",
+    "private": "Private",
+    "business": "Business",
+    "delivery_label": "Delivery",
+    "today": "Today",
+    "results_for": "for"
   },
   "seller": {
     "page_title": "Verkoper profiel",
@@ -142,7 +196,13 @@
     "no_listings_description": "{{name}} heeft momenteel geen actieve lijsten.",
     "reviews_coming_soon_title": "Beoordelingen Binnenkort",
     "reviews_coming_soon_description": "Kopersbeoordelingen zullen beschikbaar zijn in Fase 2. Kom later terug om te zien wat de gemeenschap van deze verkoper vindt.",
-    "view_listings": "Bekijk de marktplaatslijsten van {{name}}."
+    "view_listings": "Bekijk de marktplaatslijsten van {{name}}.",
+    "marketplace": "Marketplace",
+    "verified": "Verified",
+    "seller_type_business": "Business",
+    "message": "Message",
+    "tab_listings": "Listings",
+    "tab_reviews": "Reviews"
   },
   "category": {
     "not_found_title": "Categorie Niet Gevonden",
@@ -162,7 +222,13 @@
     "results_count_one": "{{count}} resultaat",
     "results_count_other": "{{count}} resultaten",
     "load_more": "Laad Meer",
-    "browse_description": "Blader door {{name}} lijsten op de marktplaats."
+    "browse_description": "Blader door {{name}} lijsten op de marktplaats.",
+    "marketplace": "Marketplace",
+    "filters": "Filters",
+    "filters_title": "Filters",
+    "price_min": "Min",
+    "price_max": "Max",
+    "condition_label": "Condition"
   },
   "common": {
     "save_listing": "Lijst Opslaan",
@@ -173,13 +239,24 @@
     "sign_in_to_save": "Log in om lijsten op te slaan",
     "load_more": "Laad Meer",
     "try_again": "Probeer Opnieuw",
-    "sort_by": "Sorteer op"
+    "sort_by": "Sorteer op",
+    "free": "Free",
+    "negotiable": "Negotiable",
+    "save": "Save",
+    "unsave": "Unsave",
+    "cancel": "Cancel"
   },
   "condition": {
-    "like_new": "Bijna Nieuw"
+    "like_new": "Bijna Nieuw",
+    "new": "New",
+    "good": "Good",
+    "fair": "Fair",
+    "poor": "Poor"
   },
   "price_type": {
-    "fixed": "Vaste Prijs"
+    "fixed": "Vaste Prijs",
+    "negotiable": "Negotiable",
+    "free": "Free"
   },
   "delivery_method": {
     "pickup": "Alleen Afhalen",
@@ -200,7 +277,8 @@
     "days_ago": "{{count}}d geleden"
   },
   "categories": {
-    "label": "Filter op categorie"
+    "label": "Filter op categorie",
+    "all": "All"
   },
   "filters": {
     "price_range": "Prijsbereik",
@@ -210,7 +288,18 @@
     "sort": "Sorteer Op",
     "posted_within": "Geplaatst Binnen",
     "apply": "Pas Filters Toe",
-    "clear": "Alles wissen"
+    "clear": "Alles wissen",
+    "category": "Category",
+    "min": "Min",
+    "max": "Max",
+    "condition": "Condition",
+    "seller_all": "All",
+    "seller_private": "Private",
+    "seller_business": "Business",
+    "delivery_all": "All",
+    "delivery_shipping": "Shipping",
+    "delivery_both": "Both",
+    "title": "Filters"
   },
   "gallery": {
     "no_images": "Geen afbeeldingen beschikbaar",
@@ -220,7 +309,9 @@
   },
   "collection_image": "Verzamelafbeelding {{number}}",
   "price": {
-    "contact": "Neem contact op voor prijs"
+    "contact": "Neem contact op voor prijs",
+    "free": "Free",
+    "negotiable": "Negotiable"
   },
   "empty": {
     "no_listings": "Nog geen aanbiedingen",
@@ -259,7 +350,17 @@
     "empty_sold_title": "Nog Geen Verkopen",
     "empty_sold_description": "Je hebt nog geen artikelen verkocht.",
     "empty_expired_title": "Geen Verlopen Aanbiedingen",
-    "empty_expired_description": "Je hebt geen verlopen aanbiedingen."
+    "empty_expired_description": "Je hebt geen verlopen aanbiedingen.",
+    "tab_active": "Active",
+    "tab_draft": "Drafts",
+    "tab_sold": "Sold",
+    "tab_expired": "Expired",
+    "stat_active": "Active",
+    "stat_sold": "Sold",
+    "stat_revenue": "Revenue",
+    "action_edit": "Edit",
+    "action_renew": "Renew",
+    "action_remove": "Remove"
   },
   "my_offers": {
     "page_title": "Mijn Aanbiedingen - Marketplace",
@@ -281,7 +382,9 @@
     "counter_message_label": "Bericht (optioneel)",
     "counter_message_placeholder": "Leg je tegenaanbieding uit...",
     "counter_sent_success": "Tegenaanbieding verzonden",
-    "send_counter": "Verzend Tegenaanbieding"
+    "send_counter": "Verzend Tegenaanbieding",
+    "tab_sent": "Sent",
+    "tab_received": "Received"
   },
   "collections": {
     "page_title": "Mijn Collecties",
@@ -309,7 +412,13 @@
     "empty_collections_title": "Nog Geen Collecties",
     "empty_collections_description": "Maak een collectie aan om je favoriete marktplaatsitems te organiseren.",
     "sign_in_title": "Inloggen Vereist",
-    "sign_in_description": "Log in om je collecties en opgeslagen zoekopdrachten te beheren."
+    "sign_in_description": "Log in om je collecties en opgeslagen zoekopdrachten te beheren.",
+    "tab_collections": "Collections",
+    "name_label": "Name",
+    "public": "Public",
+    "private": "Private",
+    "category": "Category",
+    "remove_item": "Remove"
   },
   "saved_searches": {
     "tab_title": "Opgeslagen Zoekopdrachten",
@@ -320,7 +429,12 @@
     "delete_error": "Verwijderen mislukt",
     "delete": "Verwijder opgeslagen zoekopdracht",
     "toggle_active": "Schakel actief in",
-    "channel_both": "E-mail & Push"
+    "channel_both": "E-mail & Push",
+    "frequency_instant": "Instant",
+    "frequency_daily": "Daily",
+    "frequency_weekly": "Weekly",
+    "channel_email": "Email",
+    "channel_push": "Push"
   },
   "promotions": {
     "title": "Promoot Vermelding",
@@ -331,7 +445,8 @@
     "bump": "Bump naar Boven",
     "featured": "Uitgelichte Vermelding",
     "top_of_category": "Bovenaan Categorie",
-    "homepage_carousel": "Homepage Carrousel"
+    "homepage_carousel": "Homepage Carrousel",
+    "free_label": "Free"
   },
   "free": {
     "page_title": "Gratis Items",
@@ -350,7 +465,9 @@
     "total_listed": "totaal vermeld",
     "sell_to_group": "Verkoop aan Groep",
     "empty_title": "Nog Geen Groepsvermeldingen",
-    "empty_description": "Wees de eerste groepslid die iets te koop aanbiedt!"
+    "empty_description": "Wees de eerste groepslid die iets te koop aanbiedt!",
+    "sellers": "sellers",
+    "tab_label": "Marketplace"
   },
   "hybrid_pricing": {
     "tooltip": "Tijdcredits verdiend via gemeenschaps timebanking",
@@ -381,13 +498,18 @@
     "offer_accepted": "Leveringsaanbod geaccepteerd!",
     "accept_failed": "Accepteren van aanbod mislukt",
     "delivery_confirmed": "Levering bevestigd! Tijdcredits toegekend.",
-    "confirm_failed": "Bevestigen van levering mislukt"
+    "confirm_failed": "Bevestigen van levering mislukt",
+    "unknown": "Unknown",
+    "accept": "Accept"
   },
   "ai_reply": {
     "suggest": "Stel Antwoord Voor",
     "suggested_reply": "AI Voorgesteld Antwoord",
     "use_reply": "Gebruik Dit Antwoord",
-    "error": "Genereren van een antwoord mislukt. Probeer het opnieuw."
+    "error": "Genereren van een antwoord mislukt. Probeer het opnieuw.",
+    "regenerate": "Regenerate",
+    "copy": "Copy",
+    "copied": "Copied"
   },
   "map": {
     "page_title": "Kaart Zoekopdracht - Marktplaats",
@@ -408,7 +530,8 @@
     "use_my_location": "Gebruik Mijn Locatie",
     "search_this_area": "Zoek Dit Gebied",
     "distance_km": "{{km}} km afstand",
-    "distance_meters": "{{m}}m afstand"
+    "distance_meters": "{{m}}m afstand",
+    "refresh": "Refresh"
   },
   "shipping": {
     "title": "Verzendopties",
@@ -435,10 +558,16 @@
     "local_pickup": "Lokale afhaling",
     "local_pickup_subtitle": "Persoonlijk ophalen",
     "loading": "Verzendopties laden...",
-    "no_options": "Geen verzendopties beschikbaar voor deze verkoper."
+    "no_options": "Geen verzendopties beschikbaar voor deze verkoper.",
+    "price": "Price",
+    "currency": "Currency",
+    "default_badge": "Default",
+    "recommended": "Recommended"
   },
   "listing_location": {
-    "approximate_location": "Geschatte locatie"
+    "approximate_location": "Geschatte locatie",
+    "location_title": "Location",
+    "get_directions": "Directions"
   },
   "orders": {
     "load_error": "Kon bestellingen niet laden",
@@ -446,7 +575,14 @@
     "tracking_number": "Volgen:",
     "tab_cancelled": "Geannuleerd / Terugbetaald",
     "status": {
-      "pending_payment": "In afwachting van betaling"
+      "pending_payment": "In afwachting van betaling",
+      "paid": "Paid",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "completed": "Completed",
+      "disputed": "Disputed",
+      "refunded": "Refunded",
+      "cancelled": "Cancelled"
     },
     "buyer": {
       "page_title": "Mijn Bestellingen - Marketplace",
@@ -460,7 +596,8 @@
       "delivery_confirmed": "Levering bevestigd!",
       "rate_order": "Beoordeel bestelling",
       "leave_rating": "Beoordeling Verlaten",
-      "dispute_open": "Geschil Open"
+      "dispute_open": "Geschil Open",
+      "rated": "Rated"
     },
     "seller": {
       "page_title": "Mijn Verkopen - Marketplace",
@@ -487,7 +624,8 @@
       "tracking_url_label": "Volg URL (optioneel)",
       "tracking_url_placeholder": "bijv. https://track.example.com/...",
       "confirm_shipped": "Bevestig Verzonden",
-      "shipped_success": "Bestelling gemarkeerd als verzonden!"
+      "shipped_success": "Bestelling gemarkeerd als verzonden!",
+      "shipping_method_other": "Other"
     },
     "buy": {
       "buy_now": "Koop Nu",
@@ -507,8 +645,13 @@
       "submit": "Beoordeling indienen",
       "select_rating": "Selecteer een beoordeling",
       "success": "Beoordeling succesvol ingediend!",
-      "error": "Het indienen van de beoordeling is mislukt"
-    }
+      "error": "Het indienen van de beoordeling is mislukt",
+      "stars_label": "Rating"
+    },
+    "track": "Track",
+    "tab_all": "All",
+    "tab_active": "Active",
+    "tab_completed": "Completed"
   },
   "onboarding": {
     "page_title": "Verkoper Onboarding - Marketplace",
@@ -534,5 +677,6 @@
     "continue_onboarding": "Ga Door met Onboarding",
     "check_status": "Controleer Status",
     "start_error": "Starten van onboarding is mislukt"
-  }
+  },
+  "page_title": "Marketplace"
 }

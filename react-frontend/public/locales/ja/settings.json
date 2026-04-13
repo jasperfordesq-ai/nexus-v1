@@ -92,7 +92,8 @@
     "platform_linux_step2": "または「電話、タブレット、またはセキュリティキー」をクリックして、USBセキュリティキーを使用するか、電話でQRコードをスキャンします。",
     "platform_unknown_title": "パスキーの設定",
     "platform_unknown_step1": "「このデバイス」をクリックして、現在使用しているデバイスでパスキーを作成します。",
-    "platform_unknown_step2": "または「電話、タブレット、またはセキュリティキー」をクリックして、別のデバイスを登録します。"
+    "platform_unknown_step2": "または「電話、タブレット、またはセキュリティキー」をクリックして、別のデバイスを登録します。",
+    "label_passkey": "Passkey"
   },
   "passkey_setup_subtitle": "このデバイスの設定",
   "passkey_multi_device_note": "複数のデバイスでパスキーを登録できます。各デバイスには独自のパスキーが必要です（例：iCloudキーチェーンはAppleデバイス間で同期し、GoogleパスワードマネージャーはAndroidとChrome間で同期します）。",
@@ -439,13 +440,19 @@
     "unblocked_desc": "{{name}}のブロックを解除しました。",
     "unblock_error": "ユーザーのブロック解除に失敗しました",
     "blocked_on": "{{date}}をブロックしました",
-    "link": "ブロックされたユーザー"
+    "link": "ブロックされたユーザー",
+    "unblock": "Unblock"
   },
   "block_user": {
     "title": "{{name}}をブロックしますか？",
     "body": "彼らはあなたのプロフィールを見ることができず、メッセージを送ったり、あなたのコンテンツに対してやり取りすることができません。既存の接続はすべて削除されます。",
     "blocked": "ユーザーをブロックしました",
     "blocked_desc": "{{name}}をブロックしました。",
-    "error": "ユーザーのブロックに失敗しました"
+    "error": "ユーザーのブロックに失敗しました",
+    "confirm": "Block",
+    "cancel": "Cancel"
+  },
+  "page_meta": {
+    "title": "Settings"
   }
 }

@@ -182,5 +182,8 @@
     "create": {
       "title": "Crea annuncio"
     }
-  }
+  },
+  "filters_label": "Filters",
+  "filter_hours": "Duration",
+  "filter_today": "Today"
 }

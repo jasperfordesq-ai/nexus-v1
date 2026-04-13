@@ -24,5 +24,8 @@
   "view_details": "Bekijk matchdetails",
   "not_interested": "Niet geïnteresseerd",
   "load_failed": "Kon matches niet laden",
-  "match_hidden": "Match verborgen — we tonen je er minder zoals deze"
+  "match_hidden": "Match verborgen — we tonen je er minder zoals deze",
+  "page_meta": {
+    "title": "Matches"
+  }
 }

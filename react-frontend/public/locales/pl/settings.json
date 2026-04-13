@@ -92,7 +92,8 @@
     "platform_linux_step2": "Lub kliknij \"Telefon, tablet lub klucz zabezpieczeń\", aby użyć klucza zabezpieczeń USB lub zeskanować kod QR za pomocą telefonu.",
     "platform_unknown_title": "Konfiguracja klucza dostępu",
     "platform_unknown_step1": "Kliknij \"To urządzenie\", aby utworzyć klucz dostępu na urządzeniu, którego teraz używasz.",
-    "platform_unknown_step2": "Lub kliknij \"Telefon, tablet lub klucz zabezpieczeń\", aby zarejestrować inne urządzenie."
+    "platform_unknown_step2": "Lub kliknij \"Telefon, tablet lub klucz zabezpieczeń\", aby zarejestrować inne urządzenie.",
+    "label_passkey": "Passkey"
   },
   "passkey_setup_subtitle": "Konfiguracja dla tego urządzenia",
   "passkey_multi_device_note": "Możesz rejestrować klucze dostępu na wielu urządzeniach. Każde urządzenie potrzebuje własnego klucza dostępu, chyba że Twój dostawca kluczy dostępu synchronizuje je (np. iCloud Keychain synchronizuje między urządzeniami Apple, Google Password Manager synchronizuje między Androidem a Chrome).",
@@ -439,13 +440,19 @@
     "unblocked_desc": "{{name}} został odblokowany.",
     "unblock_error": "Nie udało się odblokować użytkownika",
     "blocked_on": "Zablokowany na {{date}}",
-    "link": "Zablokowani użytkownicy"
+    "link": "Zablokowani użytkownicy",
+    "unblock": "Unblock"
   },
   "block_user": {
     "title": "Zablokować {{name}}?",
     "body": "Nie będą mogli zobaczyć Twojego profilu, wysłać Ci wiadomości ani wchodzić w interakcje z Twoją treścią. Wszystkie istniejące połączenia zostaną usunięte.",
     "blocked": "Użytkownik zablokowany",
     "blocked_desc": "{{name}} został zablokowany.",
-    "error": "Nie udało się zablokować użytkownika"
+    "error": "Nie udało się zablokować użytkownika",
+    "confirm": "Block",
+    "cancel": "Cancel"
+  },
+  "page_meta": {
+    "title": "Settings"
   }
 }

@@ -55,7 +55,7 @@
     "load_error": "Theip ar an liosta a luchtú",
     "update_success": "Liosta nuashonraithe go rathúil",
     "create_success": "Liosta cruthaithe go rathúil",
-    "aria_remove_image": "Bain \u00edomh\u00e1"
+    "aria_remove_image": "Bain íomhá"
   },
   "page_subtitle": "Brabhsáil seirbhísí agus iarratais ón bpobal",
   "search_placeholder": "Cuardaigh de réir teideal, cur síos, suíomh nó ainm...",
@@ -147,8 +147,8 @@
     "aria_add": "Cuir clib scile leis"
   },
   "aria": {
-    "view_mode": "M\u00f3d amhairc",
-    "loading_listings": "Liosta\u00ed \u00e1 lucht\u00fa"
+    "view_mode": "Mód amhairc",
+    "loading_listings": "Liostaí á luchtú"
   },
   "analytics": {
     "title": "Anailísíocht Liostaithe",
@@ -161,5 +161,29 @@
     "trend_7day": "Treocht 7 Lá",
     "vs_previous_week": "vs. an tseachtain roimhe",
     "views_last_days": "Amhairc ({{days}} Lá Deiridh)"
+  },
+  "more_filters": "More filters",
+  "filters_label": "Filters",
+  "filter_hours": "Duration",
+  "filter_any_duration": "Any duration",
+  "filter_quick": "Quick (under 1h)",
+  "filter_short": "Short (1-3h)",
+  "filter_half_day": "Half day (3-6h)",
+  "filter_full_day": "Full day (6h+)",
+  "filter_service_mode": "Service mode",
+  "filter_any_mode": "Any mode",
+  "filter_remote": "Remote available",
+  "filter_in_person": "In-person only",
+  "filter_posted_date": "Posted date",
+  "filter_any_time": "Any time",
+  "filter_today": "Today",
+  "filter_this_week": "This week",
+  "filter_this_month": "This month",
+  "clear_filters": "Clear filters",
+  "results_count": "{{count}} listings found",
+  "page_meta": {
+    "create": {
+      "title": "Create Listing"
+    }
   }
 }

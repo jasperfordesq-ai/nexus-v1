@@ -67,5 +67,8 @@
   "delete_saved_search": "保存された検索を削除",
   "aria": {
     "loading_search_results": "検索結果を読み込んでいます"
+  },
+  "page_meta": {
+    "title": "Search"
   }
 }

@@ -161,6 +161,9 @@
     },
     "detail": {
       "title": "Detalhes da Troca"
+    },
+    "list": {
+      "title": "Exchanges"
     }
   }
 }

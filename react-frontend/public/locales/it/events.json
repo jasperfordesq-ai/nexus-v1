@@ -243,5 +243,7 @@
     "create": {
       "title": "Crea Evento"
     }
-  }
+  },
+  "page_title": "Events",
+  "radius_label": "Radius"
 }

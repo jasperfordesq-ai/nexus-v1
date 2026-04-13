@@ -440,13 +440,19 @@
     "unblocked_desc": "{{name}} foi desbloqueado.",
     "unblock_error": "Falha ao desbloquear usuário",
     "blocked_on": "Bloqueado em {{date}}",
-    "link": "Usuários Bloqueados"
+    "link": "Usuários Bloqueados",
+    "unblock": "Unblock"
   },
   "block_user": {
     "title": "Bloquear {{name}}?",
     "body": "Eles não poderão ver seu perfil, enviar mensagens ou interagir com seu conteúdo. Qualquer conexão existente será removida.",
     "blocked": "Usuário bloqueado",
     "blocked_desc": "{{name}} foi bloqueado.",
-    "error": "Falha ao bloquear usuário"
+    "error": "Falha ao bloquear usuário",
+    "confirm": "Block",
+    "cancel": "Cancel"
+  },
+  "page_meta": {
+    "title": "Settings"
   }
 }

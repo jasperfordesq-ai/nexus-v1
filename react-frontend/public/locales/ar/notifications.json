@@ -66,5 +66,8 @@
     "toast_vol_hours_declined": "الساعات المرفوضة",
     "toast_vol_opportunity_closed": "تم إغلاق الفرصة",
     "toast_default": "Notification"
+  },
+  "page_meta": {
+    "title": "Notifications"
   }
 }

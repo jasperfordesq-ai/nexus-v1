@@ -199,7 +199,8 @@
     },
     "attach_polls_label": "Ceangail pobalbhreitheanna (roghnach)",
     "attach_polls_placeholder": "Roghnaigh pobalbhreitheanna le ceangal...",
-    "attach_polls_hint": "Ceangail pobalbhreitheanna pobail reatha leis an imeacht seo."
+    "attach_polls_hint": "Ceangail pobalbhreitheanna pobail reatha leis an imeacht seo.",
+    "group_event_notice": "This event will be associated with your group."
   },
   "toast": {
     "rsvp_removed": "RSVP bainte",
@@ -234,5 +235,15 @@
     "vote_success": "Vóta taifeadta!",
     "vote_failed": "Theip ar vóta a thaifeadadh",
     "view_full": "Féach ar an bpobalbhreith iomlán"
+  },
+  "page_title": "Events",
+  "page_description": "Discover community events, workshops, and meetups near you.",
+  "near_me": "Near me",
+  "near_me_no_location": "Set your location in your profile to use Near me",
+  "radius_label": "Radius",
+  "page_meta": {
+    "create": {
+      "title": "Create Event"
+    }
   }
 }

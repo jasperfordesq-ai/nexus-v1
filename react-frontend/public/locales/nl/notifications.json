@@ -66,5 +66,8 @@
     "toast_vol_hours_declined": "Uren Geweigerd",
     "toast_vol_opportunity_closed": "Kans Gesloten",
     "toast_default": "Notification"
+  },
+  "page_meta": {
+    "title": "Notifications"
   }
 }

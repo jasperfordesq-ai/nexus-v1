@@ -100,14 +100,14 @@
   "listing_image_alt": "Íomhá liostaithe",
   "credits_sent_success": "Creidmheasanna seolta chuig {{name}}",
   "aria": {
-    "profile_sections": "Rann\u00f3ga pr\u00f3if\u00edle",
-    "about_this_user": "Faoin \u00fas\u00e1ideoir seo",
-    "user_listings": "Liosta\u00ed \u00fas\u00e1ideora",
-    "user_activity_feed": "Fotha gn\u00edomha\u00edochta \u00fas\u00e1ideora",
-    "user_availability": "Inf\u00e1ilteacht \u00fas\u00e1ideora",
-    "user_reviews": "L\u00e9irmheasanna \u00fas\u00e1ideora",
-    "user_achievements": "\u00c9achtai \u00fas\u00e1ideora",
-    "loading_reviews": "L\u00e9irmheasanna \u00e1 lucht\u00fa"
+    "profile_sections": "Rannóga próifíle",
+    "about_this_user": "Faoin úsáideoir seo",
+    "user_listings": "Liostaí úsáideora",
+    "user_activity_feed": "Fotha gníomhaíochta úsáideora",
+    "user_availability": "Infáilteacht úsáideora",
+    "user_reviews": "Léirmheasanna úsáideora",
+    "user_achievements": "Éachtai úsáideora",
+    "loading_reviews": "Léirmheasanna á luchtú"
   },
   "review_modal": {
     "title": "Scríobh Léirmheas",
@@ -128,5 +128,8 @@
     "cancel": "Cealaigh",
     "submit": "Seol Léirmheas",
     "submit_failed_fallback": "Theip ar léirmheas a sheoladh"
+  },
+  "page_meta": {
+    "title": "Profile"
   }
 }

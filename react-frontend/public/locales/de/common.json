@@ -48,7 +48,9 @@
     "knowledge_base": "Wissensdatenbank",
     "unread_notifications": "{{count}} ungelesene Benachrichtigungen",
     "timebanking": "Zeitbank",
-    "explore": "Entdecken"
+    "explore": "Entdecken",
+    "saved": "Saved",
+    "marketplace": "Marketplace"
   },
   "nav_desc": {
     "feed": "Community-Feed",
@@ -388,7 +390,9 @@
   "hours_display_other": "{{count}} Stunden",
   "compose": {
     "aria_insert_link": "Link einfügen",
-    "aria_remove_link": "Link entfernen"
+    "aria_remove_link": "Link entfernen",
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1"
   },
   "toast": {
     "aria_notifications": "Benachrichtigungen",
@@ -402,7 +406,8 @@
       "title": "Fähigkeiten durchsuchen"
     },
     "members": {
-      "description": "Durchsuchen Sie die Mitglieder der Gemeinschaft, verbinden Sie sich und tauschen Sie Zeitguthaben aus."
+      "description": "Durchsuchen Sie die Mitglieder der Gemeinschaft, verbinden Sie sich und tauschen Sie Zeitguthaben aus.",
+      "title": "Members"
     }
   }
 }

@@ -100,5 +100,8 @@
     "save_failed": "保存に失敗しました",
     "save_continue": "保存して続行",
     "required_fields": "必須項目"
+  },
+  "page_meta": {
+    "title": "Onboarding"
   }
 }

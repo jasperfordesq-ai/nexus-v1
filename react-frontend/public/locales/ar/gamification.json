@@ -95,7 +95,21 @@
       "not_earned": "لم يتم الحصول عليها بعد",
       "not_earned_desc": "استمر في العمل — ستفتح هذه الشارة قريبًا!",
       "xp_reward": "مكافأة XP",
-      "load_failed": "تعذر تحميل تفاصيل الشارة."
+      "load_failed": "تعذر تحميل تفاصيل الشارة.",
+      "type": "Category",
+      "threshold": "Requirement",
+      "threshold_value": "{{threshold}} {{type}}",
+      "rarity": "Rarity",
+      "tier": "Tier",
+      "close": "Close",
+      "rarity_common": "Common",
+      "rarity_uncommon": "Uncommon",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "rarity_legendary": "Legendary",
+      "tier_core": "Core",
+      "tier_template": "Standard",
+      "tier_custom": "Custom"
     },
     "showcase": {
       "manage_title": "إدارة عرض الشارات",
@@ -285,7 +299,17 @@
   },
   "page_meta": {
     "leaderboard": {
-      "description": "لوحة القيادة المجتمعية — شاهد أفضل المساهمين والأعضاء الأكثر نشاطًا."
+      "description": "لوحة القيادة المجتمعية — شاهد أفضل المساهمين والأعضاء الأكثر نشاطًا.",
+      "title": "Leaderboard"
+    },
+    "achievements": {
+      "title": "Achievements"
+    },
+    "goals": {
+      "title": "Goals"
+    },
+    "nexus_score": {
+      "title": "NexusScore"
     }
   }
 }

@@ -33,5 +33,8 @@
   "toast_disconnected": "Disconnected",
   "toast_disconnect_failed": "切断に失敗しました",
   "toast_cancelled": "リクエストがキャンセルされました",
-  "toast_cancel_failed": "リクエストをキャンセルできませんでした"
+  "toast_cancel_failed": "リクエストをキャンセルできませんでした",
+  "page_meta": {
+    "title": "Connections"
+  }
 }

@@ -157,9 +157,9 @@
   "hours": "uaireanta",
   "hours_review": {
     "approve": "Ceadaigh",
-    "decline": "Di\u00faltaigh",
+    "decline": "Diúltaigh",
     "approve_aria": "Ceadaigh uaireanta do {{name}}",
-    "decline_aria": "Di\u00faltaigh uaireanta do {{name}}"
+    "decline_aria": "Diúltaigh uaireanta do {{name}}"
   },
   "expenses": {
     "heading": "Mo Chostais",
@@ -317,7 +317,8 @@
     "receipt_method": "Modh Íocaíochta",
     "receipt_message": "Teachtaireacht",
     "receipt_error": "Theip ar admháil a lódáil.",
-    "receipt_not_found": "Admháil gan aimsiú."
+    "receipt_not_found": "Admháil gan aimsiú.",
+    "placeholder_amount": "0.00"
   },
   "safeguarding": {
     "heading": "Cosaint",
@@ -408,15 +409,15 @@
     }
   },
   "aria": {
-    "volunteering_sections": "Rann\u00f3ga oibre deonaí"
+    "volunteering_sections": "Rannóga oibre deonaí"
   },
   "credentials": {
     "aria_remove_file": "Bain an comhad roghnaithe",
-    "aria_upload_document": "Uasl\u00f3d\u00e1il doicim\u00e9ad dintiúir"
+    "aria_upload_document": "Uaslódáil doiciméad dintiúir"
   },
   "applications": {
     "aria_select_all": "Roghnaigh gach iarratas ar feitheamh infheicthe",
-    "aria_search_volunteers": "Cuardaigh oibr\u00ed deonacha de r\u00e9ir ainm"
+    "aria_search_volunteers": "Cuardaigh oibrí deonacha de réir ainm"
   },
   "common": {
     "refresh": "Athnuaigh",
@@ -492,5 +493,11 @@
     "suggested_rest_days": "Laethanta Scíthe Molta",
     "rest_days_desc": "Bunaithe ar do ghníomhaíocht le déanaí, molaimid sos a ghlacadh na laethanta seo:",
     "recent_checkins": "Seiceálacha Giúmair Le Déanaí"
+  },
+  "page_description": "Discover volunteering opportunities in your community. Sign up, track your hours, and make an impact.",
+  "page_meta": {
+    "create_opportunity": {
+      "title": "Create Opportunity"
+    }
   }
 }

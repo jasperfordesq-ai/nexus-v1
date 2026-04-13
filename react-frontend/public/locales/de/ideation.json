@@ -399,6 +399,9 @@
     },
     "create_challenge": {
       "title": "Herausforderung erstellen"
+    },
+    "campaigns": {
+      "title": "Campaigns"
     }
   }
 }

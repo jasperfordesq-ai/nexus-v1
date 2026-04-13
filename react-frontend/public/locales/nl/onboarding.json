@@ -100,5 +100,8 @@
     "save_failed": "Opslaan mislukt",
     "save_continue": "Opslaan & Doorgaan",
     "required_fields": "Vereiste velden"
+  },
+  "page_meta": {
+    "title": "Onboarding"
   }
 }

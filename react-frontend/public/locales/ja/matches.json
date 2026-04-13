@@ -24,5 +24,8 @@
   "view_details": "マッチの詳細を見る",
   "not_interested": "興味がない",
   "load_failed": "マッチの読み込みに失敗しました",
-  "match_hidden": "マッチが非表示 — このようなものは少なく表示します"
+  "match_hidden": "マッチが非表示 — このようなものは少なく表示します",
+  "page_meta": {
+    "title": "Matches"
+  }
 }
