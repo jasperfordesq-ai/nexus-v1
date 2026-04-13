@@ -195,7 +195,8 @@ const tooltipStyle = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatCurrency(value: number, currency: string): string {
+function formatCurrency(value: number | null | undefined, currency: string): string {
+  if (value == null) return '—';
   const symbol = CURRENCY_SYMBOLS[currency] || currency;
   return `${symbol}${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }

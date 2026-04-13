@@ -41,7 +41,7 @@ class GoalProgressService
             $rows->pop();
         }
 
-        $items = $rows->map(fn ($r) => (array) $r)->all();
+        $items = $rows->map(fn ($r) => array_merge((array) $r, ['type' => $r->event_type]))->all();
 
         return [
             'items'    => $items,
