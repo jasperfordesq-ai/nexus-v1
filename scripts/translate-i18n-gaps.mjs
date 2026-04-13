@@ -229,9 +229,19 @@ ${JSON.stringify(toTranslate, null, 2)}`;
 
     let parsed;
     try {
-      // Model returns {"translations": [...]} or just [...]
+      // Model may return {"translations": [...]} or {"1": "a", "2": "b"} or just [...]
       const obj = JSON.parse(content);
-      parsed = Array.isArray(obj) ? obj : (obj.translations || obj.results || Object.values(obj));
+      if (Array.isArray(obj)) {
+        parsed = obj;
+      } else if (Array.isArray(obj.translations)) {
+        parsed = obj.translations;
+      } else if (Array.isArray(obj.results)) {
+        parsed = obj.results;
+      } else {
+        // Object.values can return [["a","b","c"]] if one key holds the whole array — flatten one level
+        const vals = Object.values(obj);
+        parsed = (vals.length === 1 && Array.isArray(vals[0])) ? vals[0] : vals;
+      }
     } catch {
       throw new Error(`OpenAI returned non-JSON: ${content.substring(0, 200)}`);
     }
