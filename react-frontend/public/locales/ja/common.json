@@ -48,7 +48,9 @@
     "knowledge_base": "ナレッジベース",
     "unread_notifications": "未読通知 {{count}}件",
     "timebanking": "タイムバンキング",
-    "explore": "探索"
+    "explore": "探索",
+    "saved": "Saved",
+    "marketplace": "Marketplace"
   },
   "nav_desc": {
     "feed": "コミュニティフィード",
@@ -92,7 +94,9 @@
     "impact_report": "詳細な影響データ",
     "strategic_plan": "戦略的方向性",
     "timebanking_listings": "オファーとリクエスト",
-    "messages": "あなたのメッセージ"
+    "messages": "あなたのメッセージ",
+    "saved": "Your bookmarked items",
+    "marketplace": "Buy & sell in your community"
   },
   "user_menu": {
     "my_profile": "マイプロフィール",
@@ -287,7 +291,9 @@
     "trending": "トレンド",
     "no_results": "GIFが見つかりません",
     "powered_by": "Powered by GIPHY",
-    "button_label": "GIFを追加"
+    "button_label": "GIFを追加",
+    "select": "Select GIF",
+    "preview_alt": "GIF preview"
   },
   "loading": "読み込み中...",
   "feature_error": {
@@ -385,5 +391,23 @@
   "toast": {
     "aria_notifications": "通知",
     "aria_dismiss_notification": "通知を閉じる"
+  },
+  "compose": {
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1",
+    "aria_insert_link": "Insert link",
+    "aria_remove_link": "Remove link"
+  },
+  "verification": {
+    "not_id_verified": "Not ID Verified"
+  },
+  "page_meta": {
+    "skills_browse": {
+      "title": "Browse Skills"
+    },
+    "members": {
+      "title": "Members",
+      "description": "Browse community members, connect and exchange time credits."
+    }
   }
 }

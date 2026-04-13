@@ -199,7 +199,8 @@
     },
     "attach_polls_label": "Allega sondaggi (opzionale)",
     "attach_polls_placeholder": "Seleziona sondaggi da allegare...",
-    "attach_polls_hint": "Allega sondaggi della comunità esistenti a questo evento."
+    "attach_polls_hint": "Allega sondaggi della comunità esistenti a questo evento.",
+    "group_event_notice": "This event will be associated with your group."
   },
   "toast": {
     "rsvp_removed": "RSVP rimosso",
@@ -234,5 +235,15 @@
     "vote_success": "Voto registrato!",
     "vote_failed": "Impossibile registrare il voto",
     "view_full": "Visualizza sondaggio completo"
+  },
+  "page_title": "Events",
+  "page_description": "Discover community events, workshops, and meetups near you.",
+  "near_me": "Near me",
+  "near_me_no_location": "Set your location in your profile to use Near me",
+  "radius_label": "Radius",
+  "page_meta": {
+    "create": {
+      "title": "Create Event"
+    }
   }
 }

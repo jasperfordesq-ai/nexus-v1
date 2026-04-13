@@ -317,7 +317,8 @@
     "receipt_method": "Payment Method",
     "receipt_message": "Message",
     "receipt_error": "Failed to load receipt.",
-    "receipt_not_found": "Receipt not found."
+    "receipt_not_found": "Receipt not found.",
+    "placeholder_amount": "0.00"
   },
   "safeguarding": {
     "heading": "Safeguarding",
@@ -492,5 +493,11 @@
     "suggested_rest_days": "Suggested Rest Days",
     "rest_days_desc": "Based on your recent activity, we recommend taking a break on these days:",
     "recent_checkins": "Recent Mood Check-ins"
+  },
+  "page_description": "Discover volunteering opportunities in your community. Sign up, track your hours, and make an impact.",
+  "page_meta": {
+    "create_opportunity": {
+      "title": "Create Opportunity"
+    }
   }
 }

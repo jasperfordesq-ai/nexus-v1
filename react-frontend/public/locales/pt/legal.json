@@ -93,7 +93,8 @@
     "cta_title": "Tem Perguntas?",
     "cta_body": "Se tiver questões sobre estes Termos de Serviço ou precisar de esclarecimentos, a nossa equipa está aqui para ajudar.",
     "contact_us": "Contacte-nos",
-    "privacy_policy_link": "Política de Privacidade"
+    "privacy_policy_link": "Política de Privacidade",
+    "meta_description": "Terms and conditions governing the use of our community timebanking platform."
   },
   "privacy": {
     "page_title": "Política de Privacidade",
@@ -203,7 +204,8 @@
     "retention_logs_desc": "Endereços IP e registos de acesso retidos por 12 meses",
     "cta_title": "Perguntas Sobre a Sua Privacidade?",
     "cta_body": "Estamos aqui para ajudar. Se tiver questões sobre esta política ou quiser exercer os seus direitos de dados, não hesite em contactar-nos.",
-    "contact_privacy_team": "Contactar a Nossa Equipa de Privacidade"
+    "contact_privacy_team": "Contactar a Nossa Equipa de Privacidade",
+    "meta_description": "How we collect, use, and protect your personal data on our community platform."
   },
   "cookies": {
     "page_title": "Política de Cookies",
@@ -284,7 +286,8 @@
     "cta_title": "Perguntas Sobre Cookies?",
     "cta_body": "Se tiver questões sobre a nossa utilização de cookies ou esta política, não hesite em contactar-nos.",
     "contact_us": "Contacte-nos",
-    "privacy_policy_link": "Política de Privacidade"
+    "privacy_policy_link": "Política de Privacidade",
+    "meta_description": "Information about how we use cookies to improve your experience on our platform."
   },
   "accessibility": {
     "page_title": "Acessibilidade",
@@ -330,7 +333,8 @@
     "tech_svg": "SVG com alternativas apropriadas",
     "tech_react": "React com biblioteca de componentes acessíveis",
     "tech_recommendation": "Estas tecnologias são utilizadas para conformidade com os padrões de acessibilidade utilizados. Recomendamos usar a versão mais recente do seu navegador com tecnologia assistiva atualizada para a melhor experiência.",
-    "last_updated": "Esta declaração foi atualizada pela última vez em fevereiro de 2026."
+    "last_updated": "Esta declaração foi atualizada pela última vez em fevereiro de 2026.",
+    "meta_description": "Our commitment to making the platform accessible to everyone, following WCAG 2.1 AA standards."
   },
   "hub": {
     "page_title": "Jurídico",
@@ -435,5 +439,35 @@
     "cta_title": "Tem Questões?",
     "cta_body": "Se tiver alguma questão sobre este documento, por favor contacte-nos.",
     "contact_us": "Contacte-nos"
+  },
+  "page_meta": {
+    "platform_terms": {
+      "title": "Platform Terms of Service",
+      "description": "Terms of service governing use of the NEXUS community timebanking platform."
+    },
+    "platform_privacy": {
+      "title": "Platform Privacy Policy",
+      "description": "How the NEXUS platform collects, processes, and protects your personal data."
+    },
+    "platform_disclaimer": {
+      "title": "Platform Disclaimer",
+      "description": "Important disclaimers about the use of the NEXUS community timebanking platform."
+    },
+    "community_guidelines": {
+      "title": "Community Guidelines",
+      "description": "Community guidelines for respectful and productive timebanking."
+    },
+    "acceptable_use": {
+      "title": "Acceptable Use Policy",
+      "description": "Acceptable use policy for our community timebanking platform."
+    },
+    "legal_hub": {
+      "title": "Legal Information",
+      "description": "Legal documents, policies, and compliance information."
+    },
+    "legal_version_history": {
+      "title": "Legal Version History",
+      "description": "Version history of our legal documents and policies."
+    }
   }
 }

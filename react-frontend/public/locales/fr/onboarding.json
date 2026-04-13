@@ -91,7 +91,6 @@
   "toast_profile_all_set": "Votre profil est prêt.",
   "toast_complete_profile_first": "Complétez d'abord votre profil",
   "toast_photo_bio_required": "La photo et la biographie sont requises.",
-
   "safeguarding": {
     "load_error": "Impossible de charger les options",
     "try_again": "Veuillez réessayer.",
@@ -101,5 +100,8 @@
     "save_failed": "Échec de la sauvegarde",
     "save_continue": "Enregistrer et continuer",
     "required_fields": "Champs obligatoires"
+  },
+  "page_meta": {
+    "title": "Onboarding"
   }
 }

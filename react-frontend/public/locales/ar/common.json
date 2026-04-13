@@ -48,7 +48,9 @@
     "knowledge_base": "قاعدة المعرفة",
     "unread_notifications": "{{count}} إشعارات غير مقروءة",
     "timebanking": "بنك الوقت",
-    "explore": "استكشاف"
+    "explore": "استكشاف",
+    "saved": "Saved",
+    "marketplace": "Marketplace"
   },
   "nav_desc": {
     "feed": "موجز المجتمع",
@@ -92,7 +94,9 @@
     "impact_report": "بيانات التأثير التفصيلية",
     "strategic_plan": "اتجاهنا الاستراتيجي",
     "timebanking_listings": "العروض والطلبات",
-    "messages": "رسائلك"
+    "messages": "رسائلك",
+    "saved": "Your bookmarked items",
+    "marketplace": "Buy & sell in your community"
   },
   "user_menu": {
     "my_profile": "ملفي الشخصي",
@@ -287,7 +291,9 @@
     "trending": "رائج",
     "no_results": "لم يتم العثور على صور GIF",
     "powered_by": "مدعوم من GIPHY",
-    "button_label": "إضافة GIF"
+    "button_label": "إضافة GIF",
+    "select": "Select GIF",
+    "preview_alt": "GIF preview"
   },
   "loading": "جارٍ التحميل...",
   "feature_error": {
@@ -385,5 +391,23 @@
   "toast": {
     "aria_notifications": "الإشعارات",
     "aria_dismiss_notification": "تجاهل الإشعار"
+  },
+  "compose": {
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1",
+    "aria_insert_link": "Insert link",
+    "aria_remove_link": "Remove link"
+  },
+  "verification": {
+    "not_id_verified": "Not ID Verified"
+  },
+  "page_meta": {
+    "skills_browse": {
+      "title": "Browse Skills"
+    },
+    "members": {
+      "title": "Members",
+      "description": "Browse community members, connect and exchange time credits."
+    }
   }
 }

@@ -128,5 +128,8 @@
     "cancel": "Cancel",
     "submit": "Submit Review",
     "submit_failed_fallback": "Failed to submit review"
+  },
+  "page_meta": {
+    "title": "Profile"
   }
 }

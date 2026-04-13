@@ -87,7 +87,7 @@
     "add_as_role": "Cuir leis mar {{role}}",
     "no_members_found": "Níor aimsíodh aon bhaill a mheaitseálann do chuardach.",
     "done": "Déanta",
-    "aria_exchange_participants": "Rannph\u00e1irtithe malart\u00fa",
+    "aria_exchange_participants": "Rannpháirtithe malartú",
     "aria_hour_split": "Roinnt uaireanta"
   },
   "create": {
@@ -142,7 +142,7 @@
     "weight_placeholder": "Ualú",
     "hours_for": "Uaireanta do {{name}}",
     "weight_for": "Ualú do {{name}}",
-    "aria_hour_split_preview": "R\u00e9amhamharc roinnt uaireanta"
+    "aria_hour_split_preview": "Réamhamharc roinnt uaireanta"
   },
   "toast": {
     "load_more_failed": "Theip ar thuilleadh malartuithe a lódáil",
@@ -168,5 +168,16 @@
   "participants_count_one": "{{count}} rannpháirtí",
   "participants_count_other": "{{count}} rannpháirtithe",
   "hours_count_one": "{{count}} uair",
-  "hours_count_other": "{{count}} uair"
+  "hours_count_other": "{{count}} uair",
+  "page_meta": {
+    "list": {
+      "title": "Group Exchanges"
+    },
+    "detail": {
+      "title": "Group Exchange"
+    },
+    "create": {
+      "title": "Create Group Exchange"
+    }
+  }
 }

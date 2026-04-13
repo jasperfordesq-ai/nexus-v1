@@ -75,7 +75,8 @@
       "title": "Réidh le tosú?",
       "description": "Bí páirteach leis na mílte ball pobail atá cheana féin ag malartú scileanna agus ag tógáil naisc fhiúntacha.",
       "button": "Cruthaigh Do Chuntas Saor in Aisce"
-    }
+    },
+    "meta_title": "Community Timebanking Platform"
   },
   "about": {
     "meta_title": "Maidir le {{name}}",
@@ -182,7 +183,8 @@
       "login_prompt_before": "An bhfuil cuntas agat cheana?",
       "login_link": "Logáil isteach",
       "login_prompt_after": "le haghaidh tacaíocht níos tapúla."
-    }
+    },
+    "meta_description": "Get in touch with our community support team. We're here to help."
   },
   "faq": {
     "title": "Ceisteanna Coitianta",
@@ -376,7 +378,9 @@
           "item4": "Comhlíonaimid GDPR agus rialacháin cosanta sonraí"
         }
       }
-    }
+    },
+    "page_title": "Frequently Asked Questions",
+    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features."
   },
   "maintenance": {
     "title": "Beimid ar ais go luath!",
@@ -442,7 +446,14 @@
       "platform_item5": "7 teanga — Béarla, Gaeilge, Gearmáinis, Fraincis, Iodáilis, Portaingéilis, agus Spáinnis",
       "platform_item6": "Painéal riaracháin — cumraíocht tionónta, bainistíocht úsáideoirí, anailísíocht agus modhnóireacht",
       "platform_item7": "Rialuithe algartaim — deais sláinte beo agus tiúnadh do gach córas rangaithe",
-      "platform_item8": "Mód dorcha agus comhéadan freagrach do ghutháin"
+      "platform_item8": "Mód dorcha agus comhéadan freagrach do ghutháin",
+      "member_item20": "Marketplace — standalone classifieds module with Stripe Connect payouts, orders, and seller profiles",
+      "member_item21": "Donations — one-off and recurring donations via Stripe with organisation dashboards and receipts",
+      "member_item22": "Identity verification — optional Stripe Identity flow (document + selfie + name/DOB matching) with a verified-member badge",
+      "member_item23": "AI reply suggestions — in-marketplace assistant that drafts responses to listing enquiries",
+      "platform_item9": "SEO at build time — 19+ public pages pre-rendered with Playwright, structured data, sitemaps, and Prerender.io fallback for dynamic routes",
+      "platform_item10": "Federation — four protocol adapters live: Nexus (native), Komunitin (all 15 endpoints), Credit Commons (11 endpoints, CEN-compatible mutual credit), and TimeOverflow; two-way sync across 9 entity types, event-driven push, and reputation portability",
+      "platform_item11": "Payments layer — Stripe for subscriptions, donations, marketplace (Connect), and identity verification, with idempotent webhook handling"
     },
     "whats_rough": {
       "title": "Cad a d'fhéadfadh a bheith garbh fós",
@@ -485,5 +496,13 @@
     "title": "Bonn Eolais",
     "description": "Faigh freagraí, treoir, agus acmhainní cabhrach",
     "search_placeholder": "Cuardaigh an bonn eolais..."
+  },
+  "page_meta": {
+    "development_status": {
+      "title": "Development Status"
+    },
+    "maintenance": {
+      "title": "Maintenance"
+    }
   }
 }

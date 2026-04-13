@@ -24,5 +24,8 @@
   "score_percent": "{{score}}% meaitseáil",
   "reasons_more": "+{{count}} eile",
   "view_details": "Féach ar shonraí meaitseála",
-  "not_interested": "Níl suim agam"
+  "not_interested": "Níl suim agam",
+  "page_meta": {
+    "title": "Matches"
+  }
 }

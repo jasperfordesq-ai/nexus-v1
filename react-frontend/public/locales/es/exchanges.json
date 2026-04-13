@@ -154,5 +154,16 @@
     "broker_approval_description": "Este intercambio necesitará ser aprobado por un coordinador de la comunidad antes de poder proceder.",
     "cancel": "Cancelar",
     "send_request": "Enviar Solicitud"
+  },
+  "page_meta": {
+    "list": {
+      "title": "Exchanges"
+    },
+    "request": {
+      "title": "Request Exchange"
+    },
+    "detail": {
+      "title": "Exchange Details"
+    }
   }
 }

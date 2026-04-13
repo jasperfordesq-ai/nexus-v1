@@ -1,13 +1,11 @@
 {
   "checking_permissions": "権限を確認中…",
-
   "sidebar": {
     "title": "ブローカーパネル",
     "expand": "サイドバーを展開",
     "collapse": "サイドバーを折りたたむ",
     "full_admin": "管理パネル全体"
   },
-
   "header": {
     "toggle_sidebar": "サイドバーを切り替え",
     "back_to_site": "サイトに戻る",
@@ -16,7 +14,6 @@
     "my_profile": "マイプロフィール",
     "sign_out": "サインアウト"
   },
-
   "nav": {
     "dashboard": "ダッシュボード",
     "members": "メンバー",
@@ -26,7 +23,6 @@
     "exchanges": "交換",
     "messages": "メッセージ"
   },
-
   "breadcrumbs": {
     "aria_label": "パンくずナビゲーション",
     "dashboard": "ブローカーパネル",
@@ -37,7 +33,6 @@
     "exchanges": "交換",
     "messages": "メッセージ"
   },
-
   "dashboard": {
     "title": "ブローカーダッシュボード",
     "description": "コミュニティ運営タスクの毎日の概要。",
@@ -55,7 +50,6 @@
     "no_activity": "最近のアクティビティはありません。",
     "view_all": "すべて表示"
   },
-
   "members": {
     "title": "メンバー",
     "description": "コミュニティメンバーを表示・管理します。",
@@ -92,7 +86,6 @@
     "reactivated_success": "メンバーを再有効化しました。",
     "action_failed": "操作に失敗しました。もう一度お試しください。"
   },
-
   "onboarding": {
     "title": "オンボーディング",
     "description": "新規メンバーの進捗を追跡し、保留中の登録を承認します。",
@@ -104,7 +97,6 @@
     "pending_approvals": "保留中の承認",
     "no_pending": "承認待ちのメンバーはいません。"
   },
-
   "safeguarding": {
     "title": "セーフガーディング",
     "description": "セーフガーディング警告、保護者の割り当て、メンバーの設定を監視します。",
@@ -130,7 +122,6 @@
     "no_assignments": "保護者の割り当てはありません。",
     "no_preferences": "メンバーのセーフガーディング設定は記録されていません。"
   },
-
   "vetting": {
     "title": "審査・DBS",
     "description": "審査記録、DBS チェック、有効期限の追跡を管理します。",
@@ -151,7 +142,6 @@
     "rejected_success": "審査記録を却下しました。",
     "no_records": "審査記録が見つかりません。"
   },
-
   "exchanges": {
     "title": "交換",
     "description": "保留中の交換リクエストと異議を管理します。",
@@ -174,7 +164,6 @@
     "rejected_success": "交換を却下しました。",
     "no_exchanges": "交換が見つかりません。"
   },
-
   "messages": {
     "title": "メッセージレビュー",
     "description": "ブローカーの確認が必要なフラグ付き会話をレビューします。",
@@ -192,7 +181,6 @@
     "reviewed_success": "メッセージをレビュー済みとしてマークしました。",
     "no_messages": "レビューするメッセージはありません。"
   },
-
   "status": {
     "active": "有効",
     "pending": "保留中",
@@ -210,7 +198,6 @@
     "high": "高",
     "critical": "重大"
   },
-
   "common": {
     "loading": "読み込み中…",
     "error": "問題が発生しました。もう一度お試しください。",

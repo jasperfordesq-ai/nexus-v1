@@ -178,7 +178,18 @@
     "subject": "{{heading}} - {{tenant}}"
   },
   "group_digest": {
-    "subject": "Weekly Digest: {{group}}"
+    "subject": "Weekly Digest: {{group}}",
+    "title": "Group Weekly Summary",
+    "preview": "This week in \"{{group}}\" on {{community}}",
+    "intro": "Here's your weekly summary for <strong>&ldquo;{{group}}&rdquo;</strong> on <strong>{{community}}</strong>.",
+    "stat_new_members": "New Members",
+    "stat_new_discussions": "New Discussions",
+    "stat_new_posts": "New Posts",
+    "stat_new_events": "New Events",
+    "quiet_week": "It was a quiet week in this group — check back next week!",
+    "total_members_label": "Total Members",
+    "thanks": "Thank you for keeping your community active!",
+    "visit_button": "Visit Group"
   },
   "newsletter": {
     "subscriber_notice": "You received this email because you're subscribed to the {{community}} newsletter.",
@@ -316,20 +327,20 @@
   "notification_subject": {
     "new_topic": "New Discussion: {{snippet}}",
     "new_reply": "New Reply to Discussion",
-    "new_message": "\uD83D\uDCAC New Message",
-    "hot_match": "\uD83D\uDD25 Hot Match Found!",
-    "mutual_match": "\uD83E\uDD1D Mutual Match Opportunity",
-    "match_digest": "\uD83D\uDCCA Your Match Digest",
-    "match_approval_request": "\uD83D\uDCCB Match Needs Approval",
-    "match_approved": "\u2705 You've Been Matched!",
+    "new_message": "💬 New Message",
+    "hot_match": "🔥 Hot Match Found!",
+    "mutual_match": "🤝 Mutual Match Opportunity",
+    "match_digest": "📊 Your Match Digest",
+    "match_approval_request": "📋 Match Needs Approval",
+    "match_approved": "✅ You've Been Matched!",
     "match_rejected": "Match Update",
-    "exchange_request_received": "\uD83D\uDCE5 New Exchange Request",
+    "exchange_request_received": "📥 New Exchange Request",
     "exchange_request_declined": "Exchange Request Declined",
-    "exchange_approved": "\u2705 Exchange Approved - Ready to Begin!",
+    "exchange_approved": "✅ Exchange Approved - Ready to Begin!",
     "exchange_rejected": "Exchange Not Approved",
-    "exchange_completed": "\uD83C\uDF89 Exchange Completed!",
+    "exchange_completed": "🎉 Exchange Completed!",
     "exchange_cancelled": "Exchange Cancelled",
-    "exchange_disputed": "\u26A0\uFE0F Exchange Dispute - Broker Review Needed",
+    "exchange_disputed": "⚠️ Exchange Dispute - Broker Review Needed",
     "default": "Notification from Project NEXUS"
   }
 }

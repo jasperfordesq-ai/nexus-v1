@@ -1,7 +1,6 @@
 {
   "page_title": "Margadh",
   "meta_description": "Ceannaigh, díol agus trádáil earraí i margadh do phobail.",
-
   "hub": {
     "subtitle": "Ceannaigh, díol agus trádáil earraí i do phobal",
     "sell_something": "Díol Rud Éigin",
@@ -24,12 +23,10 @@
     "unable_to_load": "Ní féidir na liostaí a luchtú",
     "load_more_failed": "Theip ar luchtú tuilleadh liostaí"
   },
-
   "hub_feature_gate": {
     "title": "Níl an Margadh ar Fáil",
     "description": "Níl gné an mhargaidh cumasaithe don phobal seo."
   },
-
   "listing": {
     "not_found_title": "Liosta Gan Aimsiú",
     "not_found_description": "B'fhéidir gur baineadh an liosta seo nó níl sé ar fáil a thuilleadh.",
@@ -65,7 +62,6 @@
     "thumbnail_alt": "Mionsamhail {{number}}",
     "link_copied": "Nasc cóipeáilte chuig an ngearrthaisce"
   },
-
   "offer": {
     "modal_title": "Déan Tairiscint",
     "asking_price": "Praghas iarrtha:",
@@ -94,7 +90,6 @@
     "withdraw": "Tarraing Siar",
     "accept_counter": "Glac leis an bhFrith-thairiscint"
   },
-
   "create": {
     "page_title": "Díol Rud Éigin - Margadh",
     "title": "Díol Rud Éigin",
@@ -143,7 +138,6 @@
     "created_error": "Theip ar chruthú an liosta",
     "created_error_retry": "Theip ar chruthú an liosta. Bain triail eile as."
   },
-
   "search": {
     "page_title": "Cuardaigh an Margadh",
     "meta_description": "Cuardaigh agus scag earraí i margadh an phobail.",
@@ -186,7 +180,6 @@
     "last_days_one": "{{count}} lá seo caite",
     "last_days_other": "{{count}} lá seo caite"
   },
-
   "seller": {
     "page_title": "Próifíl an Díoltóra",
     "not_found_title": "Níor Aimsíodh an Díoltóir",
@@ -212,7 +205,6 @@
     "reviews_coming_soon_description": "Beidh léirmheasanna ceannaitheoirí ar fáil i gCéim 2. Seiceáil ar ais níos déanaí chun a fheiceáil cad a cheapann an pobal faoin díoltóir seo.",
     "view_listings": "Féach ar liostaí margaidh {{name}}."
   },
-
   "category": {
     "not_found_title": "Níor Aimsíodh an Chatagóir",
     "not_found_description": "Níl an chatagóir seo ann.",
@@ -239,7 +231,6 @@
     "load_more": "Luchtaigh Tuilleadh",
     "browse_description": "Brabhsáil liostaí {{name}} sa mhargadh."
   },
-
   "common": {
     "free": "Saor in Aisce",
     "negotiable": "Inchaibidle",
@@ -256,7 +247,6 @@
     "cancel": "Cealaigh",
     "sort_by": "Sórtáil de réir"
   },
-
   "condition": {
     "new": "Nua",
     "like_new": "Cosúil le Nua",
@@ -264,39 +254,33 @@
     "fair": "Cuíosach",
     "poor": "Lag"
   },
-
   "price_type": {
     "fixed": "Praghas Seasta",
     "negotiable": "Inchaibidle",
     "free": "Saor in Aisce"
   },
-
   "delivery_method": {
     "pickup": "Bailiúchán Amháin",
     "shipping": "Loingseoireacht Amháin",
     "both": "Bailiúchán nó Loingseoireacht",
     "community_delivery": "Seachadadh Pobail"
   },
-
   "sort": {
     "newest": "Is Nuaí ar dTús",
     "price_asc": "Praghas: Íseal go hArd",
     "price_desc": "Praghas: Ard go hÍseal",
     "popular": "Is Coitianta"
   },
-
   "time_ago": {
     "just_now": "Díreach anois",
     "minutes_ago": "{{count}}n ó shin",
     "hours_ago": "{{count}}u ó shin",
     "days_ago": "{{count}}l ó shin"
   },
-
   "categories": {
     "label": "Scag de réir catagóire",
     "all": "Gach"
   },
-
   "filters": {
     "category": "Catagóir",
     "price_range": "Raon Praghais",
@@ -318,28 +302,23 @@
     "clear": "Glan Gach",
     "title": "Scagairí"
   },
-
   "gallery": {
     "no_images": "Níl aon íomhánna ar fáil",
     "image_alt": "Íomhá an liosta",
     "select_image": "Féach ar íomhá {{number}}",
     "thumbnail_alt": "Íomhá {{number}}"
   },
-
   "collection_image": "Íomhá bailiúcháin {{number}}",
-
   "price": {
     "free": "Saor in Aisce",
     "contact": "Déan teagmháil le haghaidh praghais",
     "negotiable": "Inchaibidle"
   },
-
   "empty": {
     "no_listings": "Níl aon liostaí ann fós",
     "subtitle": "Seiceáil ar ais níos déanaí nó bí ar an gcéad duine chun rud a liostáil.",
     "start_selling": "Tosaigh ag Díol"
   },
-
   "edit": {
     "page_title": "Cuir Liosta in Eagar - Margadh",
     "title": "Cuir Liosta in Eagar",
@@ -353,7 +332,6 @@
     "updated_error": "Theip ar nuashonrú an liosta",
     "updated_error_retry": "Theip ar nuashonrú an liosta. Bain triail eile as."
   },
-
   "my_listings": {
     "page_title": "Mo Liostaí - Margadh",
     "title": "Mo Liostaí",
@@ -385,7 +363,6 @@
     "empty_expired_title": "Gan Liostaí in Éag",
     "empty_expired_description": "Níl aon liostaí in éag agat."
   },
-
   "my_offers": {
     "page_title": "Mo Thairiscintí - Margadh",
     "title": "Mo Thairiscintí",
@@ -410,7 +387,6 @@
     "counter_sent_success": "Seoladh an fhrith-thairiscint",
     "send_counter": "Seol Frith-thairiscint"
   },
-
   "collections": {
     "page_title": "Mo Bhailiúcháin",
     "meta_description": "Bainistigh do bhailiúcháin margaidh agus cuardaigh shábháilte.",
@@ -445,7 +421,6 @@
     "sign_in_title": "Síniú Isteach de Dhíth",
     "sign_in_description": "Sínigh isteach chun do bhailiúcháin agus cuardaigh shábháilte a bhainistiú."
   },
-
   "saved_searches": {
     "tab_title": "Cuardaigh Shábháilte",
     "empty_title": "Gan Cuardaigh Shábháilte",
@@ -462,7 +437,6 @@
     "channel_push": "Brúfhógra",
     "channel_both": "Ríomhphost & Brúfhógra"
   },
-
   "promotions": {
     "title": "Cur Chun Cinn an Liosta",
     "load_error": "Theip ar luchtú na roghanna cur chun cinn.",
@@ -475,7 +449,6 @@
     "top_of_category": "Barr na Catagóire",
     "homepage_carousel": "Carbhsheó an Leathanaigh Bhaile"
   },
-
   "free": {
     "page_title": "Earraí Saor in Aisce",
     "meta_description": "Brabhsáil earraí saor in aisce atá ar fáil i margadh do phobail.",
@@ -488,7 +461,6 @@
     "no_items_title": "Gan Earraí Saor in Aisce",
     "no_items_description": "Níl aon earraí saor in aisce ar fáil faoi láthair. Seiceáil ar ais níos déanaí nó bí ar an gcéad duine chun rud a thabhairt uait!"
   },
-
   "group_marketplace": {
     "active_listings": "liostaí gníomhacha",
     "total_listed": "liostáilte san iomlán",
@@ -498,14 +470,12 @@
     "empty_description": "Bí ar an gcéad bhall den ghrúpa chun rud a liostáil le díol!",
     "tab_label": "Margadh"
   },
-
   "hybrid_pricing": {
     "tooltip": "Creidmheasanna ama a thuilltear trí bhaincéireacht ama an phobail",
     "explanation": "Ligeann praghsáil hibrideach duit íoc le meascán d'airgeadra rialta agus de chreidmheasanna ama a thuill tú trí sheirbhís phobail.",
     "label": "Íoc le hairgead tirim + creidmheasanna ama",
     "learn_more": "Cad iad creidmheasanna ama?"
   },
-
   "community_delivery": {
     "title": "Seachadadh Pobail",
     "description": "Is féidir le ball pobail an t-earra seo a sheachadadh agus creidmheasanna ama a thuilleamh.",
@@ -533,7 +503,6 @@
     "delivery_confirmed": "Deimhníodh an seachadadh! Bronnadh creidmheasanna ama.",
     "confirm_failed": "Theip ar dheimhniú an tseachadta"
   },
-
   "ai_reply": {
     "suggest": "Mol Freagra",
     "suggested_reply": "Freagra Molta ag AI",
@@ -543,7 +512,6 @@
     "use_reply": "Úsáid an Freagra Seo",
     "error": "Theip ar ghiniúint freagra. Bain triail eile as."
   },
-
   "map": {
     "page_title": "Cuardach Léarscáile - Margadh",
     "meta_description": "Aimsigh liostaí margaidh in aice leat ar an léarscáil.",
@@ -566,7 +534,6 @@
     "distance_km": "{{km}} km ar shiúl",
     "distance_meters": "{{m}}m ar shiúl"
   },
-
   "shipping": {
     "title": "Roghanna Loingseoireachta",
     "add_option": "Cuir Rogha Loingseoireachta Leis",
@@ -598,13 +565,11 @@
     "loading": "Roghanna loingseoireachta á luchtú...",
     "no_options": "Níl aon roghanna loingseoireachta ar fáil don díoltóir seo."
   },
-
   "listing_location": {
     "location_title": "Suíomh",
     "approximate_location": "Suíomh neastachta",
     "get_directions": "Treoracha"
   },
-
   "orders": {
     "load_error": "Theip ar luchtú na n-orduithe",
     "action_error": "Theip ar an ngníomh",
@@ -689,7 +654,6 @@
       "error": "Theip ar chur isteach na rátála"
     }
   },
-
   "onboarding": {
     "page_title": "Ionduchtú an Díoltóra - Margadh",
     "title": "Socrú Íocaíochta an Díoltóra",

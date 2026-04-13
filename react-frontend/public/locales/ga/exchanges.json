@@ -154,5 +154,16 @@
     "broker_approval_description": "Beidh gá le faomhadh ó chomhordaitheoir pobail sula bhféadfaidh an malartú seo dul ar aghaidh.",
     "cancel": "Cealaigh",
     "send_request": "Seol Iarratas"
+  },
+  "page_meta": {
+    "list": {
+      "title": "Exchanges"
+    },
+    "request": {
+      "title": "Request Exchange"
+    },
+    "detail": {
+      "title": "Exchange Details"
+    }
   }
 }

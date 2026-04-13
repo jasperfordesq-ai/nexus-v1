@@ -33,5 +33,8 @@
   "toast_disconnected": "Getrennt",
   "toast_disconnect_failed": "Verbindung konnte nicht getrennt werden",
   "toast_cancelled": "Anfrage storniert",
-  "toast_cancel_failed": "Anfrage konnte nicht abgebrochen werden"
+  "toast_cancel_failed": "Anfrage konnte nicht abgebrochen werden",
+  "page_meta": {
+    "title": "Connections"
+  }
 }

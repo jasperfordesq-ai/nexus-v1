@@ -25,5 +25,8 @@
   "starter_q2": "Cad iad na scileanna atá baill phobail ag tairiscint faoi láthair?",
   "starter_q3": "Conas a oibríonn baincéireacht ama?",
   "starter_q4": "Cad iad na himeachtaí atá le teacht?",
-  "starter_q5": "Conas a chruthaím liostú chun mo scileanna a thairiscint?"
+  "starter_q5": "Conas a chruthaím liostú chun mo scileanna a thairiscint?",
+  "page_meta": {
+    "title": "AI Chat"
+  }
 }

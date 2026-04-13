@@ -317,7 +317,8 @@
     "receipt_method": "Zahlungsmethode",
     "receipt_message": "Nachricht",
     "receipt_error": "Beleg konnte nicht geladen werden.",
-    "receipt_not_found": "Beleg nicht gefunden."
+    "receipt_not_found": "Beleg nicht gefunden.",
+    "placeholder_amount": "0.00"
   },
   "safeguarding": {
     "heading": "Kinderschutz",
@@ -492,5 +493,11 @@
     "suggested_rest_days": "Empfohlene Ruhetage",
     "rest_days_desc": "Basierend auf Ihrer letzten Aktivität empfehlen wir, an diesen Tagen eine Pause einzulegen:",
     "recent_checkins": "Letzte Stimmungs-Check-ins"
+  },
+  "page_description": "Discover volunteering opportunities in your community. Sign up, track your hours, and make an impact.",
+  "page_meta": {
+    "create_opportunity": {
+      "title": "Create Opportunity"
+    }
   }
 }

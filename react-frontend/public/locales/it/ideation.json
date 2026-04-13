@@ -391,5 +391,17 @@
     "url_required": "L'URL e obbligatorio",
     "name_required": "Il nome e obbligatorio",
     "file_required": "Il file e obbligatorio"
+  },
+  "page_description": "Browse community challenges, submit ideas, and vote on solutions. Help shape the future of your community.",
+  "page_meta": {
+    "outcomes": {
+      "title": "Outcomes Dashboard"
+    },
+    "create_challenge": {
+      "title": "Create Challenge"
+    },
+    "campaigns": {
+      "title": "Campaigns"
+    }
   }
 }

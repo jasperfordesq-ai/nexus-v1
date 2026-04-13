@@ -24,5 +24,8 @@
   "score_percent": "{{score}}% de correspondance",
   "reasons_more": "+{{count}} de plus",
   "view_details": "Voir les détails de la correspondance",
-  "not_interested": "Pas intéressé(e)"
+  "not_interested": "Pas intéressé(e)",
+  "page_meta": {
+    "title": "Matches"
+  }
 }

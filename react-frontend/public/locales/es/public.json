@@ -75,7 +75,8 @@
       "title": "¿Listo para empezar?",
       "description": "Únete a miles de miembros de la comunidad que ya están intercambiando habilidades y construyendo conexiones significativas.",
       "button": "Crea Tu Cuenta Gratis"
-    }
+    },
+    "meta_title": "Community Timebanking Platform"
   },
   "about": {
     "meta_title": "Acerca de {{name}}",
@@ -182,7 +183,8 @@
       "login_prompt_before": "¿Ya tienes una cuenta?",
       "login_link": "Inicia sesión",
       "login_prompt_after": "para soporte más rápido."
-    }
+    },
+    "meta_description": "Get in touch with our community support team. We're here to help."
   },
   "faq": {
     "title": "Preguntas Frecuentes",
@@ -376,7 +378,9 @@
           "item4": "Cumplimos con el RGPD y las regulaciones de protección de datos"
         }
       }
-    }
+    },
+    "page_title": "Frequently Asked Questions",
+    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features."
   },
   "maintenance": {
     "title": "¡Volveremos pronto!",
@@ -442,7 +446,14 @@
       "platform_item5": "7 idiomas — inglés, irlandés, alemán, francés, italiano, portugués y español",
       "platform_item6": "Panel de administración — configuración del tenant, gestión de usuarios, análisis y moderación",
       "platform_item7": "Controles algorítmicos — panel de salud en vivo y ajuste de todos los sistemas de clasificación",
-      "platform_item8": "Modo oscuro e interfaz responsive para móvil"
+      "platform_item8": "Modo oscuro e interfaz responsive para móvil",
+      "member_item20": "Marketplace — standalone classifieds module with Stripe Connect payouts, orders, and seller profiles",
+      "member_item21": "Donations — one-off and recurring donations via Stripe with organisation dashboards and receipts",
+      "member_item22": "Identity verification — optional Stripe Identity flow (document + selfie + name/DOB matching) with a verified-member badge",
+      "member_item23": "AI reply suggestions — in-marketplace assistant that drafts responses to listing enquiries",
+      "platform_item9": "SEO at build time — 19+ public pages pre-rendered with Playwright, structured data, sitemaps, and Prerender.io fallback for dynamic routes",
+      "platform_item10": "Federation — four protocol adapters live: Nexus (native), Komunitin (all 15 endpoints), Credit Commons (11 endpoints, CEN-compatible mutual credit), and TimeOverflow; two-way sync across 9 entity types, event-driven push, and reputation portability",
+      "platform_item11": "Payments layer — Stripe for subscriptions, donations, marketplace (Connect), and identity verification, with idempotent webhook handling"
     },
     "whats_rough": {
       "title": "Lo que aún puede tener problemas",
@@ -485,5 +496,13 @@
     "title": "Base de conocimiento",
     "description": "Encuentre respuestas, guías y recursos útiles",
     "search_placeholder": "Buscar en la base de conocimiento..."
+  },
+  "page_meta": {
+    "development_status": {
+      "title": "Development Status"
+    },
+    "maintenance": {
+      "title": "Maintenance"
+    }
   }
 }

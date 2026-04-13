@@ -168,5 +168,16 @@
   "participants_count_one": "{{count}} partecipante",
   "participants_count_other": "{{count}} partecipanti",
   "hours_count_one": "{{count}} ora",
-  "hours_count_other": "{{count}} ore"
+  "hours_count_other": "{{count}} ore",
+  "page_meta": {
+    "list": {
+      "title": "Group Exchanges"
+    },
+    "detail": {
+      "title": "Group Exchange"
+    },
+    "create": {
+      "title": "Create Group Exchange"
+    }
+  }
 }

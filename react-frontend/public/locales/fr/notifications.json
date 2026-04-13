@@ -66,5 +66,8 @@
     "toast_vol_hours_declined": "Heures refusées",
     "toast_vol_opportunity_closed": "Opportunité fermée",
     "toast_default": "Notification"
+  },
+  "page_meta": {
+    "title": "Notifications"
   }
 }

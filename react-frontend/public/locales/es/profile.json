@@ -128,5 +128,8 @@
     "cancel": "Cancelar",
     "submit": "Enviar reseña",
     "submit_failed_fallback": "No se pudo enviar la reseña"
+  },
+  "page_meta": {
+    "title": "Profile"
   }
 }

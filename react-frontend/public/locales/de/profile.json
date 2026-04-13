@@ -128,5 +128,8 @@
     "cancel": "Abbrechen",
     "submit": "Bewertung absenden",
     "submit_failed_fallback": "Bewertung konnte nicht abgesendet werden"
+  },
+  "page_meta": {
+    "title": "Profile"
   }
 }

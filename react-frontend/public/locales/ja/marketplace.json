@@ -1,7 +1,6 @@
 {
   "page_title": "マーケットプレイス",
   "meta_description": "コミュニティマーケットプレイスでアイテムを売買・交換しましょう。",
-
   "hub": {
     "subtitle": "コミュニティ内でアイテムを売買・交換",
     "sell_something": "出品する",
@@ -24,12 +23,10 @@
     "unable_to_load": "リスティングを読み込めません",
     "load_more_failed": "追加のリスティングの読み込みに失敗しました"
   },
-
   "hub_feature_gate": {
     "title": "マーケットプレイスはご利用いただけません",
     "description": "このコミュニティではマーケットプレイス機能が有効になっていません。"
   },
-
   "listing": {
     "not_found_title": "リスティングが見つかりません",
     "not_found_description": "このリスティングは削除されたか、利用できなくなった可能性があります。",
@@ -65,7 +62,6 @@
     "thumbnail_alt": "サムネイル {{number}}",
     "link_copied": "リンクをクリップボードにコピーしました"
   },
-
   "offer": {
     "modal_title": "オファーを出す",
     "asking_price": "希望価格:",
@@ -94,7 +90,6 @@
     "withdraw": "取り下げ",
     "accept_counter": "カウンターを承諾"
   },
-
   "create": {
     "page_title": "出品する - マーケットプレイス",
     "title": "出品する",
@@ -143,7 +138,6 @@
     "created_error": "リスティングの作成に失敗しました",
     "created_error_retry": "リスティングの作成に失敗しました。もう一度お試しください。"
   },
-
   "search": {
     "page_title": "マーケットプレイスを検索",
     "meta_description": "コミュニティマーケットプレイスでアイテムを検索・絞り込みできます。",
@@ -186,7 +180,6 @@
     "last_days_one": "過去 {{count}} 日間",
     "last_days_other": "過去 {{count}} 日間"
   },
-
   "seller": {
     "page_title": "セラープロフィール",
     "not_found_title": "セラーが見つかりません",
@@ -212,7 +205,6 @@
     "reviews_coming_soon_description": "バイヤーのレビューはフェーズ2で利用可能になります。後ほどご確認ください。",
     "view_listings": "{{name}} のマーケットプレイスリスティングを表示。"
   },
-
   "category": {
     "not_found_title": "カテゴリが見つかりません",
     "not_found_description": "このカテゴリは存在しません。",
@@ -239,7 +231,6 @@
     "load_more": "さらに読み込む",
     "browse_description": "マーケットプレイスで {{name}} のリスティングを閲覧。"
   },
-
   "common": {
     "free": "無料",
     "negotiable": "応相談",
@@ -256,7 +247,6 @@
     "cancel": "キャンセル",
     "sort_by": "並び替え"
   },
-
   "condition": {
     "new": "新品",
     "like_new": "ほぼ新品",
@@ -264,39 +254,33 @@
     "fair": "普通",
     "poor": "劣化あり"
   },
-
   "price_type": {
     "fixed": "定価",
     "negotiable": "応相談",
     "free": "無料"
   },
-
   "delivery_method": {
     "pickup": "引き取りのみ",
     "shipping": "配送のみ",
     "both": "引き取りまたは配送",
     "community_delivery": "コミュニティ配送"
   },
-
   "sort": {
     "newest": "新着順",
     "price_asc": "価格が安い順",
     "price_desc": "価格が高い順",
     "popular": "人気順"
   },
-
   "time_ago": {
     "just_now": "たった今",
     "minutes_ago": "{{count}}分前",
     "hours_ago": "{{count}}時間前",
     "days_ago": "{{count}}日前"
   },
-
   "categories": {
     "label": "カテゴリで絞り込み",
     "all": "すべて"
   },
-
   "filters": {
     "category": "カテゴリ",
     "price_range": "価格帯",
@@ -318,28 +302,23 @@
     "clear": "すべてクリア",
     "title": "フィルター"
   },
-
   "gallery": {
     "no_images": "画像はありません",
     "image_alt": "リスティング画像",
     "select_image": "画像 {{number}} を表示",
     "thumbnail_alt": "画像 {{number}}"
   },
-
   "collection_image": "コレクション画像 {{number}}",
-
   "price": {
     "free": "無料",
     "contact": "価格はお問い合わせください",
     "negotiable": "応相談"
   },
-
   "empty": {
     "no_listings": "リスティングはまだありません",
     "subtitle": "後でもう一度ご確認いただくか、最初の出品者になりましょう。",
     "start_selling": "出品を始める"
   },
-
   "edit": {
     "page_title": "リスティングを編集 - マーケットプレイス",
     "title": "リスティングを編集",
@@ -353,7 +332,6 @@
     "updated_error": "リスティングの更新に失敗しました",
     "updated_error_retry": "リスティングの更新に失敗しました。もう一度お試しください。"
   },
-
   "my_listings": {
     "page_title": "マイリスティング - マーケットプレイス",
     "title": "マイリスティング",
@@ -385,7 +363,6 @@
     "empty_expired_title": "期限切れのリスティングはありません",
     "empty_expired_description": "期限切れのリスティングはありません。"
   },
-
   "my_offers": {
     "page_title": "マイオファー - マーケットプレイス",
     "title": "マイオファー",
@@ -410,7 +387,6 @@
     "counter_sent_success": "カウンターオファーを送信しました",
     "send_counter": "カウンターを送信"
   },
-
   "collections": {
     "page_title": "マイコレクション",
     "meta_description": "マーケットプレイスのコレクションと保存した検索を管理します。",
@@ -445,7 +421,6 @@
     "sign_in_title": "サインインが必要です",
     "sign_in_description": "コレクションと保存した検索を管理するにはサインインしてください。"
   },
-
   "saved_searches": {
     "tab_title": "保存した検索",
     "empty_title": "保存した検索はありません",
@@ -462,7 +437,6 @@
     "channel_push": "プッシュ",
     "channel_both": "メールとプッシュ"
   },
-
   "promotions": {
     "title": "リスティングをプロモート",
     "load_error": "プロモーションオプションの読み込みに失敗しました。",
@@ -475,7 +449,6 @@
     "top_of_category": "カテゴリのトップ",
     "homepage_carousel": "ホームページカルーセル"
   },
-
   "free": {
     "page_title": "無料アイテム",
     "meta_description": "コミュニティマーケットプレイスで利用できる無料アイテムを閲覧。",
@@ -488,7 +461,6 @@
     "no_items_title": "無料アイテムはありません",
     "no_items_description": "現在利用できる無料アイテムはありません。後ほどご確認いただくか、最初に譲ってみませんか!"
   },
-
   "group_marketplace": {
     "active_listings": "有効なリスティング",
     "total_listed": "累計出品数",
@@ -498,14 +470,12 @@
     "empty_description": "最初のグループメンバーとして出品してみませんか!",
     "tab_label": "マーケットプレイス"
   },
-
   "hybrid_pricing": {
     "tooltip": "コミュニティのタイムバンキングで獲得したタイムクレジット",
     "explanation": "ハイブリッド価格では、通常の通貨とコミュニティ活動で獲得したタイムクレジットを組み合わせて支払うことができます。",
     "label": "現金 + タイムクレジットで支払う",
     "learn_more": "タイムクレジットとは?"
   },
-
   "community_delivery": {
     "title": "コミュニティ配送",
     "description": "コミュニティメンバーがこのアイテムを配達し、タイムクレジットを獲得できます。",
@@ -533,7 +503,6 @@
     "delivery_confirmed": "配達を確認しました!タイムクレジットが付与されました。",
     "confirm_failed": "配達の確認に失敗しました"
   },
-
   "ai_reply": {
     "suggest": "返信を提案",
     "suggested_reply": "AI による返信案",
@@ -543,7 +512,6 @@
     "use_reply": "この返信を使用",
     "error": "返信の生成に失敗しました。もう一度お試しください。"
   },
-
   "map": {
     "page_title": "マップ検索 - マーケットプレイス",
     "meta_description": "近くのマーケットプレイスのリスティングをマップで探す。",
@@ -566,7 +534,6 @@
     "distance_km": "{{km}} km 先",
     "distance_meters": "{{m}} m 先"
   },
-
   "shipping": {
     "title": "配送オプション",
     "add_option": "配送オプションを追加",
@@ -598,13 +565,11 @@
     "loading": "配送オプションを読み込み中…",
     "no_options": "このセラーには利用可能な配送オプションがありません。"
   },
-
   "listing_location": {
     "location_title": "場所",
     "approximate_location": "おおよその場所",
     "get_directions": "経路案内"
   },
-
   "orders": {
     "load_error": "注文の読み込みに失敗しました",
     "action_error": "操作に失敗しました",
@@ -689,7 +654,6 @@
       "error": "評価の送信に失敗しました"
     }
   },
-
   "onboarding": {
     "page_title": "セラーオンボーディング - マーケットプレイス",
     "title": "セラーの支払い設定",

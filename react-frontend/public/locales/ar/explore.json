@@ -150,5 +150,6 @@
   "empty_groups": "No active groups yet. Start a group around your interests!",
   "create_listing": "Create Listing",
   "create_event": "Create Event",
-  "create_group": "Create Group"
+  "create_group": "Create Group",
+  "page_description": "Explore listings, events, groups, and opportunities across the community."
 }

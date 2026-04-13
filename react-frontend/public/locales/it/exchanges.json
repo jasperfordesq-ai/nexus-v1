@@ -154,5 +154,16 @@
     "broker_approval_description": "Questo scambio dovrà essere approvato da un coordinatore della comunità prima di poter procedere.",
     "cancel": "Annulla",
     "send_request": "Invia richiesta"
+  },
+  "page_meta": {
+    "list": {
+      "title": "Exchanges"
+    },
+    "request": {
+      "title": "Request Exchange"
+    },
+    "detail": {
+      "title": "Exchange Details"
+    }
   }
 }

@@ -182,6 +182,8 @@ jobs:
         run: |
           # Seed .env from example so env() calls resolve
           [ -f .env ] || cp .env.example .env
+          # Ensure bootstrap/cache exists (gitignored — absent in fresh CI clone)
+          mkdir -p bootstrap/cache
           # Ensure APP_KEY is set (required by config:cache)
           php artisan key:generate --force --ansi
           php artisan config:cache

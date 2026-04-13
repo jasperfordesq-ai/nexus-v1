@@ -66,5 +66,8 @@
     "toast_vol_hours_declined": "Uaireanta Diúltaithe",
     "toast_vol_opportunity_closed": "Deis Dúnta",
     "toast_default": "Fógra"
+  },
+  "page_meta": {
+    "title": "Notifications"
   }
 }

@@ -93,7 +93,8 @@
     "cta_title": "Ceisteanna Agat?",
     "cta_body": "Ma ta aon cheisteanna agat faoi na Tearmai Seirbhise seo no ma theastaionn soileiriu ar aon phointai uait, ta ar bhfoireann anseo chun cabhru leat.",
     "contact_us": "Dean Teagmhail Linn",
-    "privacy_policy_link": "Polasai Priobhaideachta"
+    "privacy_policy_link": "Polasai Priobhaideachta",
+    "meta_description": "Terms and conditions governing the use of our community timebanking platform."
   },
   "privacy": {
     "page_title": "Polasai Priobhaideachta",
@@ -203,7 +204,8 @@
     "retention_logs_desc": "Coinnitear seoltai IP agus logai rochtana ar feadh 12 mi",
     "cta_title": "Ceisteanna faoi do Phriobhaideacht?",
     "cta_body": "Taimid anseo chun cabhru leat. Ma ta aon cheisteanna agat faoin bpolasai seo no ma theastaionn uait do chearta sonrai a fheidhmiu, na bith drogallach teagmhail a dheanamh linn.",
-    "contact_privacy_team": "Dean Teagmhail lenr bhFoireann Priobhaideachta"
+    "contact_privacy_team": "Dean Teagmhail lenr bhFoireann Priobhaideachta",
+    "meta_description": "How we collect, use, and protect your personal data on our community platform."
   },
   "cookies": {
     "page_title": "Polasai Fianain",
@@ -284,7 +286,8 @@
     "cta_title": "Ceisteanna faoi Fhianain?",
     "cta_body": "Ma ta aon cheisteanna agat faoin usaid a bhainimid as fianain no faoin bpolasai seo, na bith drogallach teagmhail a dheanamh linn.",
     "contact_us": "Dean Teagmhail Linn",
-    "privacy_policy_link": "Polasai Priobhaideachta"
+    "privacy_policy_link": "Polasai Priobhaideachta",
+    "meta_description": "Information about how we use cookies to improve your experience on our platform."
   },
   "accessibility": {
     "page_title": "Inrochtaineacht",
@@ -330,7 +333,8 @@
     "tech_svg": "SVG le roghanna malartacha cuio",
     "tech_react": "React le leabharlann chomhphairteanna inrochtana",
     "tech_recommendation": "Braitear ar na teicneolaiochtai seo le haghaidh comhliontachta leis na caighdeain inrochtaineachta a usaidtear. Molaimid an leagan is deanaiohe de do bhrosalai a usaid le teicneolaiocht chunta cothrom le data chun an taithi is fearr a fhail.",
-    "last_updated": "Nuashonraiodh an raitis seo go deireanach i bhFeabhra 2026."
+    "last_updated": "Nuashonraiodh an raitis seo go deireanach i bhFeabhra 2026.",
+    "meta_description": "Our commitment to making the platform accessible to everyone, following WCAG 2.1 AA standards."
   },
   "hub": {
     "page_title": "Dli",
@@ -435,5 +439,35 @@
     "cta_title": "Ceisteanna Agat?",
     "cta_body": "Má tá aon cheisteanna agat faoin doiciméad seo, déan teagmháil linn le do thoil.",
     "contact_us": "Déan Teagmháil Linn"
+  },
+  "page_meta": {
+    "platform_terms": {
+      "title": "Platform Terms of Service",
+      "description": "Terms of service governing use of the NEXUS community timebanking platform."
+    },
+    "platform_privacy": {
+      "title": "Platform Privacy Policy",
+      "description": "How the NEXUS platform collects, processes, and protects your personal data."
+    },
+    "platform_disclaimer": {
+      "title": "Platform Disclaimer",
+      "description": "Important disclaimers about the use of the NEXUS community timebanking platform."
+    },
+    "community_guidelines": {
+      "title": "Community Guidelines",
+      "description": "Community guidelines for respectful and productive timebanking."
+    },
+    "acceptable_use": {
+      "title": "Acceptable Use Policy",
+      "description": "Acceptable use policy for our community timebanking platform."
+    },
+    "legal_hub": {
+      "title": "Legal Information",
+      "description": "Legal documents, policies, and compliance information."
+    },
+    "legal_version_history": {
+      "title": "Legal Version History",
+      "description": "Version history of our legal documents and policies."
+    }
   }
 }

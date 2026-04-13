@@ -93,7 +93,8 @@
     "cta_title": "Have Questions?",
     "cta_body": "If you have any questions about these Terms of Service or need clarification on any points, our team is here to help.",
     "contact_us": "Contact Us",
-    "privacy_policy_link": "Privacy Policy"
+    "privacy_policy_link": "Privacy Policy",
+    "meta_description": "Terms and conditions governing the use of our community timebanking platform."
   },
   "privacy": {
     "page_title": "Privacy Policy",
@@ -203,7 +204,8 @@
     "retention_logs_desc": "IP addresses and access logs retained for 12 months",
     "cta_title": "Questions About Your Privacy?",
     "cta_body": "We are here to help. If you have any questions about this policy or want to exercise your data rights, please do not hesitate to reach out.",
-    "contact_privacy_team": "Contact Our Privacy Team"
+    "contact_privacy_team": "Contact Our Privacy Team",
+    "meta_description": "How we collect, use, and protect your personal data on our community platform."
   },
   "cookies": {
     "page_title": "Cookie Policy",
@@ -284,7 +286,8 @@
     "cta_title": "Questions About Cookies?",
     "cta_body": "If you have any questions about our use of cookies or this policy, please do not hesitate to contact us.",
     "contact_us": "Contact Us",
-    "privacy_policy_link": "Privacy Policy"
+    "privacy_policy_link": "Privacy Policy",
+    "meta_description": "Information about how we use cookies to improve your experience on our platform."
   },
   "accessibility": {
     "page_title": "Accessibility",
@@ -330,7 +333,8 @@
     "tech_svg": "SVG with appropriate alternatives",
     "tech_react": "React with accessible component library",
     "tech_recommendation": "These technologies are relied upon for conformance with the accessibility standards used. We recommend using the latest version of your browser with up-to-date assistive technology for the best experience.",
-    "last_updated": "This statement was last updated on February 2026."
+    "last_updated": "This statement was last updated on February 2026.",
+    "meta_description": "Our commitment to making the platform accessible to everyone, following WCAG 2.1 AA standards."
   },
   "hub": {
     "page_title": "Legal",
@@ -425,7 +429,7 @@
     "read": "Read",
     "consent_text": "By clicking Accept, you confirm you have read and agree to the documents listed above.",
     "accept_aria": "Accept all updated legal documents and continue",
-    "accepting": "Accepting\u2026",
+    "accepting": "Accepting…",
     "accept_continue": "Accept & Continue"
   },
   "custom": {
@@ -435,5 +439,35 @@
     "cta_title": "Have Questions?",
     "cta_body": "If you have any questions about this document, please contact us.",
     "contact_us": "Contact Us"
+  },
+  "page_meta": {
+    "platform_terms": {
+      "title": "Platform Terms of Service",
+      "description": "Terms of service governing use of the NEXUS community timebanking platform."
+    },
+    "platform_privacy": {
+      "title": "Platform Privacy Policy",
+      "description": "How the NEXUS platform collects, processes, and protects your personal data."
+    },
+    "platform_disclaimer": {
+      "title": "Platform Disclaimer",
+      "description": "Important disclaimers about the use of the NEXUS community timebanking platform."
+    },
+    "community_guidelines": {
+      "title": "Community Guidelines",
+      "description": "Community guidelines for respectful and productive timebanking."
+    },
+    "acceptable_use": {
+      "title": "Acceptable Use Policy",
+      "description": "Acceptable use policy for our community timebanking platform."
+    },
+    "legal_hub": {
+      "title": "Legal Information",
+      "description": "Legal documents, policies, and compliance information."
+    },
+    "legal_version_history": {
+      "title": "Legal Version History",
+      "description": "Version history of our legal documents and policies."
+    }
   }
 }

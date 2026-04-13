@@ -33,5 +33,8 @@
   "toast_disconnected": "Desconectado",
   "toast_disconnect_failed": "Falha ao desconectar",
   "toast_cancelled": "Pedido cancelado",
-  "toast_cancel_failed": "Falha ao cancelar pedido"
+  "toast_cancel_failed": "Falha ao cancelar pedido",
+  "page_meta": {
+    "title": "Connections"
+  }
 }

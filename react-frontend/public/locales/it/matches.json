@@ -24,5 +24,8 @@
   "score_percent": "{{score}}% compatibilità",
   "reasons_more": "+{{count}} altri",
   "view_details": "Vedi dettagli abbinamento",
-  "not_interested": "Non interessato"
+  "not_interested": "Non interessato",
+  "page_meta": {
+    "title": "Matches"
+  }
 }

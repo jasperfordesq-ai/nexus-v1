@@ -128,5 +128,8 @@
     "cancel": "Annulla",
     "submit": "Invia recensione",
     "submit_failed_fallback": "Impossibile inviare la recensione"
+  },
+  "page_meta": {
+    "title": "Profile"
   }
 }

@@ -888,5 +888,42 @@
     "qualification_percentage": "Qualifikationsprozentsatz"
   },
   "deadline_countdown_one": "Schließt in {{count}} Tag",
-  "deadline_countdown_other": "Schließt in {{count}} Tagen"
+  "deadline_countdown_other": "Schließt in {{count}} Tagen",
+  "ai_chat": {
+    "open": "Ask AI about this job",
+    "close": "Close AI chat",
+    "send": "Send message",
+    "title": "Ask AI about this job",
+    "hint": "Ask me anything about this job — qualifications, salary, how to apply, interview tips...",
+    "placeholder": "Type your question..."
+  },
+  "page_meta": {
+    "bias_audit": {
+      "title": "Bias Audit"
+    },
+    "create": {
+      "title": "Post a Job"
+    },
+    "talent_search": {
+      "title": "Talent Search"
+    },
+    "my_applications": {
+      "title": "My Applications"
+    },
+    "analytics": {
+      "title": "Job Analytics"
+    },
+    "kanban": {
+      "title": "Job Applications"
+    },
+    "alerts": {
+      "title": "Job Alerts"
+    },
+    "employer_onboarding": {
+      "title": "Employer Onboarding"
+    },
+    "employer_brand": {
+      "title": "Employer Brand"
+    }
+  }
 }

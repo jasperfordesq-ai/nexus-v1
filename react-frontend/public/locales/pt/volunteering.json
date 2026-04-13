@@ -317,7 +317,8 @@
     "receipt_method": "Método de pagamento",
     "receipt_message": "Mensagem",
     "receipt_error": "Falha ao carregar recibo.",
-    "receipt_not_found": "Recibo não encontrado."
+    "receipt_not_found": "Recibo não encontrado.",
+    "placeholder_amount": "0.00"
   },
   "safeguarding": {
     "heading": "Salvaguarda",
@@ -492,5 +493,11 @@
     "suggested_rest_days": "Dias de Descanso Sugeridos",
     "rest_days_desc": "Com base na sua atividade recente, recomendamos que descanse nestes dias:",
     "recent_checkins": "Check-ins de Humor Recentes"
+  },
+  "page_description": "Discover volunteering opportunities in your community. Sign up, track your hours, and make an impact.",
+  "page_meta": {
+    "create_opportunity": {
+      "title": "Create Opportunity"
+    }
   }
 }

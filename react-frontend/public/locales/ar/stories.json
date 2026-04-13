@@ -10,7 +10,7 @@
     "upload_photo": "Upload a photo",
     "take_photo": "Take a photo",
     "upload_video": "Upload a video",
-    "record_video": "Record a video",
+    "record_video": "Record video",
     "preview_alt": "Story preview",
     "draw_toggle": "Toggle drawing mode",
     "draw_clear": "Clear drawing",
@@ -76,7 +76,6 @@
     "open_camera": "Open camera",
     "select_image": "Select image from device",
     "choose_image_file": "Choose image file",
-    "record_video": "Record video",
     "select_video": "Select video from device",
     "choose_video_file": "Choose video file",
     "aria_poll_question": "Poll question"

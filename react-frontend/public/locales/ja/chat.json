@@ -25,5 +25,8 @@
   "starter_q2": "What skills are community members currently offering?",
   "starter_q3": "How does timebanking work?",
   "starter_q4": "What upcoming events are happening?",
-  "starter_q5": "How do I create a listing to offer my skills?"
+  "starter_q5": "How do I create a listing to offer my skills?",
+  "page_meta": {
+    "title": "AI Chat"
+  }
 }

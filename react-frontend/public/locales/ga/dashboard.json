@@ -83,14 +83,14 @@
     "streak_days_other": "{{count}} la"
   },
   "aria": {
-    "loading_listings": "Liosta\u00ed \u00e1 lucht\u00fa",
-    "loading_activity": "Gn\u00edomha\u00edocht \u00e1 lucht\u00fa",
-    "loading_events": "Imeachta\u00ed \u00e1 lucht\u00fa",
-    "loading_groups": "Gr\u00fapa\u00ed \u00e1 lucht\u00fa",
-    "loading_progress": "Dul chun cinn \u00e1 lucht\u00fa",
-    "loading_suggestions": "Molta\u00ed \u00e1 lucht\u00fa",
-    "loading_endorsements": "Formhuinith\u00ed \u00e1 lucht\u00fa",
-    "loading_pending_reviews": "L\u00e9irmheasanna ar feitheamh \u00e1 lucht\u00fa"
+    "loading_listings": "Liostaí á luchtú",
+    "loading_activity": "Gníomhaíocht á luchtú",
+    "loading_events": "Imeachtaí á luchtú",
+    "loading_groups": "Grúpaí á luchtú",
+    "loading_progress": "Dul chun cinn á luchtú",
+    "loading_suggestions": "Moltaí á luchtú",
+    "loading_endorsements": "Formhuinithí á luchtú",
+    "loading_pending_reviews": "Léirmheasanna ar feitheamh á luchtú"
   },
   "reviews": {
     "sent": "Seolta {{amount}}u",

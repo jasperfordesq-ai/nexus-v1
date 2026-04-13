@@ -48,7 +48,9 @@
     "knowledge_base": "Wissensdatenbank",
     "unread_notifications": "{{count}} ungelesene Benachrichtigungen",
     "timebanking": "Zeitbank",
-    "explore": "Entdecken"
+    "explore": "Entdecken",
+    "saved": "Saved",
+    "marketplace": "Marketplace"
   },
   "nav_desc": {
     "feed": "Community-Feed",
@@ -92,7 +94,9 @@
     "impact_report": "Detaillierte Wirkungsdaten",
     "strategic_plan": "Unsere strategische Ausrichtung",
     "timebanking_listings": "Angebote & Gesuche",
-    "messages": "Ihre Nachrichten"
+    "messages": "Ihre Nachrichten",
+    "saved": "Your bookmarked items",
+    "marketplace": "Buy & sell in your community"
   },
   "user_menu": {
     "my_profile": "Mein Profil",
@@ -287,7 +291,9 @@
     "trending": "Beliebt",
     "no_results": "Keine GIFs gefunden",
     "powered_by": "Unterstützt von GIPHY",
-    "button_label": "GIF hinzufügen"
+    "button_label": "GIF hinzufügen",
+    "select": "Select GIF",
+    "preview_alt": "GIF preview"
   },
   "loading": "Wird geladen...",
   "feature_error": {
@@ -385,5 +391,23 @@
   "toast": {
     "aria_notifications": "Benachrichtigungen",
     "aria_dismiss_notification": "Benachrichtigung schließen"
+  },
+  "compose": {
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1",
+    "aria_insert_link": "Insert link",
+    "aria_remove_link": "Remove link"
+  },
+  "verification": {
+    "not_id_verified": "Not ID Verified"
+  },
+  "page_meta": {
+    "skills_browse": {
+      "title": "Browse Skills"
+    },
+    "members": {
+      "title": "Members",
+      "description": "Browse community members, connect and exchange time credits."
+    }
   }
 }

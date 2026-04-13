@@ -7,7 +7,10 @@
   },
   "federation": {
     "message_received": "Nova mensagem federada de {{sender}} ({{partner}})",
-    "transaction_received": "Você recebeu {{amount}} créditos de tempo de {{sender}} ({{partner}})"
+    "transaction_received": "Você recebeu {{amount}} créditos de tempo de {{sender}} ({{partner}})",
+    "connection_request": "{{sender}} from {{community}} wants to connect with you",
+    "connection_accepted": "{{name}} accepted your connection request",
+    "connection_declined": "Your connection request was declined"
   },
   "challenge": {
     "complete_claim": "Challenge Complete! You finished '{{title}}' — claim your reward!",
@@ -77,5 +80,34 @@
     "suggestion_connect_message": "Exchange credits with new people to increase your network diversity.",
     "suggestion_exchanges_title": "Complete more exchanges",
     "suggestion_exchanges_message": "Build your reputation by completing transactions and earning reviews."
+  },
+  "job_application": {
+    "shortlisted": "Your application for {{title}} has been shortlisted!",
+    "rejected": "Your application for {{title}} was not successful",
+    "hired": "Congratulations! You've been hired for {{title}}",
+    "status_updated": "Your application for {{title}} status updated to {{status}}",
+    "status_updated_generic": "Your application status has been updated",
+    "stuck_in_stage": "Application #{{id}} has been in '{{stage}}' for {{days}}+ days"
+  },
+  "job_team": {
+    "added_as_role": "You've been added as a {{role}} for '{{title}}'"
+  },
+  "shift_swap": {
+    "requested": "You have a new shift swap request",
+    "declined": "Your shift swap request was declined",
+    "accepted": "Your shift swap request was accepted",
+    "declined_by_admin": "Your shift swap request was declined by an admin",
+    "accepted_swap_declined_by_admin": "A shift swap you accepted was declined by an admin",
+    "approved_by_admin": "Your shift swap was approved by an admin",
+    "accepted_swap_approved_by_admin": "A shift swap you accepted was approved by an admin"
+  },
+  "user_security": {
+    "email_changed": "Your email address has been changed. If you did not do this, contact support immediately."
+  },
+  "group_mention": {
+    "mentioned_in_group": "You were mentioned in {{group}}"
+  },
+  "idea_team": {
+    "added_to_group": "You've been added to {{group}}"
   }
 }

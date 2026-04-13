@@ -276,5 +276,10 @@
     "generate_failed": "Impossibile generare il certificato. Riprova.",
     "load_failed": "Impossibile caricare i certificati",
     "load_error": "Impossibile caricare i certificati."
+  },
+  "page_meta": {
+    "register_organisation": {
+      "title": "Register Organisation"
+    }
   }
 }

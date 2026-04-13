@@ -50,7 +50,10 @@
     "vote_failed": "Failed to submit vote",
     "post_shared": "Post shared to your feed",
     "share_removed": "Share removed",
-    "share_failed": "Failed to share post"
+    "share_failed": "Failed to share post",
+    "not_interested": "We'll show you less like this",
+    "post_updated": "Post updated",
+    "update_failed": "Failed to update post"
   },
   "realtime": {
     "new_posts_one": "1 new post",
@@ -194,7 +197,9 @@
     "media_compression_failed": "{{count}} image(s) failed to process",
     "media_upload_error": "Failed to process images",
     "sdg_selected_one": "{{count}} goal selected",
-    "sdg_selected_other": "{{count}} goals selected"
+    "sdg_selected_other": "{{count}} goals selected",
+    "save_changes": "Save",
+    "placeholder_hours": "1"
   },
   "card": {
     "edited": "edited",
@@ -258,7 +263,12 @@
     "detail_job": "View Job",
     "detail_challenge": "View Challenge",
     "detail_volunteer": "View Opportunity",
-    "detail_blog": "Read Article"
+    "detail_blog": "Read Article",
+    "block_user": "Block {{name}}",
+    "scheduled": "Scheduled",
+    "edit_post": "Edit Post",
+    "not_interested": "Not interested",
+    "view_analytics": "View Analytics"
   },
   "hashtag": {
     "title": "Hashtag",
@@ -290,7 +300,36 @@
     "tooltip_share": "Share to your feed",
     "button_label": "Share",
     "button_label_count": "Share ({{count}})",
-    "shared_by": "<0>{{name}}</0> shared this"
+    "shared_by": "<0>{{name}}</0> shared this",
+    "menu_label": "Share options",
+    "repost": "Repost",
+    "repost_desc": "Share to your feed",
+    "repost_remove": "Remove Repost",
+    "repost_remove_desc": "Remove repost from your feed",
+    "quote": "Quote Post",
+    "quote_desc": "Repost with your commentary",
+    "quote_title": "Quote Post",
+    "quote_placeholder": "Add your thoughts...",
+    "quote_content_required": "Please add your commentary",
+    "quote_posted": "Quote post created",
+    "quote_failed": "Failed to create quote post",
+    "quote_submit": "Post",
+    "copy_link": "Copy Link",
+    "link_copied": "Link copied to clipboard",
+    "copy_failed": "Failed to copy link",
+    "external": "Share...",
+    "external_title": "Share Post",
+    "share_via": "Share via {{platform}}",
+    "send_dm": "Send via Message",
+    "dm_title": "Send via Message",
+    "dm_search_placeholder": "Search for a member...",
+    "dm_no_results": "No members found",
+    "dm_hint": "Type at least 2 characters to search",
+    "dm_sent": "Post shared with {{name}}",
+    "dm_failed": "Failed to send message",
+    "dm_sent_label": "Sent",
+    "dm_send": "Send",
+    "dm_done": "Done"
   },
   "trending": {
     "title": "Trending",
@@ -416,5 +455,30 @@
     "too_large": "Video must be smaller than {{size}}MB",
     "invalid_type": "Invalid video format. Supported: MP4, WebM, MOV",
     "remove": "Remove video"
+  },
+  "quoted_post_image": "Quoted post image",
+  "why_shown": {
+    "label": "Why am I seeing this?",
+    "title": "Why you're seeing this",
+    "popular": "Popular in your community",
+    "some_engagement": "Getting engagement",
+    "community_content": "Community activity",
+    "fresh": "Recently posted",
+    "has_media": "Includes photos or video",
+    "reactions": "Getting diverse reactions",
+    "from_connection": "From someone you interact with",
+    "trending": "Trending right now",
+    "quality_content": "Quality content",
+    "active_discussion": "Active discussion",
+    "frequently_saved": "Frequently saved by others"
+  },
+  "analytics": {
+    "title": "Post Analytics",
+    "views": "Views",
+    "likes": "Likes",
+    "comments": "Comments",
+    "shares": "Shares",
+    "reach": "Reach",
+    "reactions_breakdown": "Reactions Breakdown"
   }
 }

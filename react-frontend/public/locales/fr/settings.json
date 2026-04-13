@@ -420,5 +420,39 @@
     "density_spacious": "Spacieux",
     "high_contrast": "Contraste élevé",
     "high_contrast_desc": "Augmente les bordures, le contraste du texte et les indicateurs de focus pour une meilleure accessibilité"
+  },
+  "identity": {
+    "page_title": "Verify Identity",
+    "page_title_dob": "Verify Identity — Date of Birth",
+    "page_title_payment": "Verify Identity — Payment",
+    "page_title_verified": "Identity Verified",
+    "page_title_failed": "Verification Failed",
+    "dob_label": "Date of Birth"
+  },
+  "blocked_users": {
+    "title": "Blocked Users",
+    "subtitle": "Manage users you have blocked",
+    "empty": "No blocked users",
+    "empty_desc": "Users you block won't be able to see your profile, message you, or interact with your content.",
+    "unblock": "Unblock",
+    "unblock_confirm": "Unblock {{name}}?",
+    "unblock_confirm_body": "They will be able to see your profile and send you messages again. You will not be reconnected automatically.",
+    "unblocked": "User unblocked",
+    "unblocked_desc": "{{name}} has been unblocked.",
+    "unblock_error": "Failed to unblock user",
+    "blocked_on": "Blocked on {{date}}",
+    "link": "Blocked Users"
+  },
+  "block_user": {
+    "title": "Block {{name}}?",
+    "body": "They won't be able to see your profile, message you, or interact with your content. Any existing connection will be removed.",
+    "confirm": "Block",
+    "cancel": "Cancel",
+    "blocked": "User blocked",
+    "blocked_desc": "{{name}} has been blocked.",
+    "error": "Failed to block user"
+  },
+  "page_meta": {
+    "title": "Settings"
   }
 }

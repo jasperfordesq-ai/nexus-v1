@@ -25,5 +25,8 @@
   "starter_q2": "Quelles compétences les membres de la communauté offrent-ils actuellement ?",
   "starter_q3": "Comment fonctionne la banque de temps ?",
   "starter_q4": "Quels événements sont à venir ?",
-  "starter_q5": "Comment créer une annonce pour offrir mes compétences ?"
+  "starter_q5": "Comment créer une annonce pour offrir mes compétences ?",
+  "page_meta": {
+    "title": "AI Chat"
+  }
 }

@@ -154,5 +154,16 @@
     "broker_approval_description": "Dieses Tauschgeschäft muss von einem Gemeinschaftskoordinator genehmigt werden, bevor es fortfahren kann.",
     "cancel": "Abbrechen",
     "send_request": "Anfrage senden"
+  },
+  "page_meta": {
+    "list": {
+      "title": "Exchanges"
+    },
+    "request": {
+      "title": "Request Exchange"
+    },
+    "detail": {
+      "title": "Exchange Details"
+    }
   }
 }

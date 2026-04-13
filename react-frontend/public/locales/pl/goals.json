@@ -6,7 +6,6 @@
   "reminder_remove_failed": "Failed to remove reminder.",
   "template_created": "Goal created from template!",
   "template_create_failed": "Failed to create goal from template.",
-
   "checkin": {
     "aria_progress_percentage": "Progress percentage",
     "title": "Check In",
@@ -21,7 +20,6 @@
     "submit": "Record Check-in",
     "check_in_button": "Check In"
   },
-
   "mood": {
     "great": "Great",
     "good": "Good",
@@ -30,7 +28,6 @@
     "motivated": "Motivated",
     "grateful": "Grateful"
   },
-
   "reminder": {
     "active": "Reminder Active",
     "set": "Set Reminder",
@@ -40,14 +37,12 @@
     "aria_set": "Set reminder",
     "reminder_set_success": "Reminder set: {{frequency}}"
   },
-
   "frequency": {
     "daily": "Daily",
     "weekly": "Weekly",
     "biweekly": "Every 2 weeks",
     "monthly": "Monthly"
   },
-
   "template": {
     "title": "Start from Template",
     "loading_error": "Failed to load templates. Please try again.",
@@ -60,11 +55,16 @@
     "use_template_aria": "Use template: {{title}}",
     "cancel": "Cancel"
   },
-
   "history": {
     "load_failed": "Failed to load history.",
     "retry": "Retry",
     "no_activity": "No activity recorded yet.",
     "progress_aria": "Progress: {{percent}}%"
+  },
+  "template_picker": {
+    "load_error": "Failed to load templates. Please try again.",
+    "try_again": "Try again",
+    "none_available": "No templates available yet.",
+    "none_in_category": "No templates in this category."
   }
 }

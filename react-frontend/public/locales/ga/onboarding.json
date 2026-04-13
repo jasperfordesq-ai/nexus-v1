@@ -91,7 +91,6 @@
   "toast_profile_all_set": "Tá do phroifíl réidh.",
   "toast_complete_profile_first": "Críochnaigh do phroifíl ar dtús",
   "toast_photo_bio_required": "Tá grianghraf agus beathaisnéis riachtanach.",
-
   "safeguarding": {
     "load_error": "Theip ar roghanna a lódáil",
     "try_again": "Bain triail eile as.",
@@ -101,5 +100,8 @@
     "save_failed": "Theip ar shábháil",
     "save_continue": "Sábháil & Lean ar aghaidh",
     "required_fields": "Réimsí riachtanacha"
+  },
+  "page_meta": {
+    "title": "Onboarding"
   }
 }

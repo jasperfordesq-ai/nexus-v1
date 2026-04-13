@@ -67,5 +67,8 @@
   "delete_saved_search": "Scrios cuardach sábháilte",
   "aria": {
     "loading_search_results": "Torthaí cuardaigh á luchtú"
+  },
+  "page_meta": {
+    "title": "Search"
   }
 }

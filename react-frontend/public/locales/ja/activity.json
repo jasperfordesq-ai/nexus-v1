@@ -51,5 +51,8 @@
     "default": "Activity"
   },
   "endorsements_count_one": "{{count}} endorsement",
-  "endorsements_count_other": "{{count}} endorsements"
+  "endorsements_count_other": "{{count}} endorsements",
+  "page_meta": {
+    "title": "Activity Dashboard"
+  }
 }
