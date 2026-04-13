@@ -4120,5 +4120,17 @@
     "volunteer_organizations_title": "Volunteer Organizations",
     "volunteering_overview_desc": "Manage and configure volunteering overview settings",
     "volunteering_overview_title": "Volunteering Overview"
+  },
+  "bulk_operations": {
+    "manage_individual_users": "Manage individual users",
+    "manage_individual_tenants": "Manage individual tenants",
+    "action_activate": "Activate",
+    "action_activate_desc": "Enable selected tenants",
+    "action_deactivate": "Deactivate",
+    "action_deactivate_desc": "Disable selected tenants",
+    "action_enable_hub": "Enable Hub",
+    "action_enable_hub_desc": "Allow sub-tenants",
+    "action_disable_hub": "Disable Hub",
+    "action_disable_hub_desc": "Remove sub-tenant support"
   }
 }

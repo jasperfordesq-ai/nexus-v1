@@ -60,14 +60,6 @@ export function BulkOperations() {
   };
 
   const handleBulkMoveUsers = async () => {
-    // Final hard confirmation — destructive cross-tenant move
-    const message = t('bulk_operations.final_confirm_move', {
-      count: selectedUserIds.size,
-    });
-    if (typeof window !== 'undefined' && !window.confirm(message)) {
-      setMoveConfirm(false);
-      return;
-    }
     setMoveLoading(true);
     const res = await adminSuper.bulkMoveUsers({
       user_ids: Array.from(selectedUserIds),
@@ -87,15 +79,6 @@ export function BulkOperations() {
   };
 
   const handleBulkUpdateTenants = async () => {
-    // Final hard confirmation for destructive/impactful bulk updates
-    const message = t('bulk_operations.final_confirm_update', {
-      action: bulkAction.replace('_', ' '),
-      count: selectedTenantIds.size,
-    });
-    if (typeof window !== 'undefined' && !window.confirm(message)) {
-      setTenantConfirm(false);
-      return;
-    }
     setTenantLoading(true);
     const res = await adminSuper.bulkUpdateTenants({
       tenant_ids: Array.from(selectedTenantIds),
@@ -157,7 +140,7 @@ export function BulkOperations() {
             </div>
             <p className="text-xs text-default-400">
               {t('bulk_operations.bulk_move_desc')}{' '}
-              <Link to={tenantPath('/admin/super/users')} className="text-primary hover:underline">Manage individual users</Link>
+              <Link to={tenantPath('/admin/super/users')} className="text-primary hover:underline">{t('bulk_operations.manage_individual_users')}</Link>
             </p>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
@@ -221,7 +204,7 @@ export function BulkOperations() {
             </div>
             <p className="text-xs text-default-400">
               {t('bulk_operations.bulk_update_desc')}{' '}
-              <Link to={tenantPath('/admin/super/tenants')} className="text-primary hover:underline">Manage individual tenants</Link>
+              <Link to={tenantPath('/admin/super/tenants')} className="text-primary hover:underline">{t('bulk_operations.manage_individual_tenants')}</Link>
             </p>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
@@ -273,8 +256,8 @@ export function BulkOperations() {
                   >
                     <Radio value="activate" classNames={{ wrapper: 'hidden' }}>
                       <div className="flex flex-col gap-1">
-                        <p className="text-sm font-semibold text-success">Activate</p>
-                        <p className="text-xs text-default-500">Enable selected tenants</p>
+                        <p className="text-sm font-semibold text-success">{t('bulk_operations.action_activate')}</p>
+                        <p className="text-xs text-default-500">{t('bulk_operations.action_activate_desc')}</p>
                       </div>
                     </Radio>
                   </div>
@@ -288,8 +271,8 @@ export function BulkOperations() {
                   >
                     <Radio value="deactivate" classNames={{ wrapper: 'hidden' }}>
                       <div className="flex flex-col gap-1">
-                        <p className="text-sm font-semibold text-danger">Deactivate</p>
-                        <p className="text-xs text-default-500">Disable selected tenants</p>
+                        <p className="text-sm font-semibold text-danger">{t('bulk_operations.action_deactivate')}</p>
+                        <p className="text-xs text-default-500">{t('bulk_operations.action_deactivate_desc')}</p>
                       </div>
                     </Radio>
                   </div>
@@ -303,8 +286,8 @@ export function BulkOperations() {
                   >
                     <Radio value="enable_hub" classNames={{ wrapper: 'hidden' }}>
                       <div className="flex flex-col gap-1">
-                        <p className="text-sm font-semibold text-primary">Enable Hub</p>
-                        <p className="text-xs text-default-500">Allow sub-tenants</p>
+                        <p className="text-sm font-semibold text-primary">{t('bulk_operations.action_enable_hub')}</p>
+                        <p className="text-xs text-default-500">{t('bulk_operations.action_enable_hub_desc')}</p>
                       </div>
                     </Radio>
                   </div>
@@ -318,8 +301,8 @@ export function BulkOperations() {
                   >
                     <Radio value="disable_hub" classNames={{ wrapper: 'hidden' }}>
                       <div className="flex flex-col gap-1">
-                        <p className="text-sm font-semibold text-warning-600 dark:text-warning">Disable Hub</p>
-                        <p className="text-xs text-default-500">Remove sub-tenant support</p>
+                        <p className="text-sm font-semibold text-warning-600 dark:text-warning">{t('bulk_operations.action_disable_hub')}</p>
+                        <p className="text-xs text-default-500">{t('bulk_operations.action_disable_hub_desc')}</p>
                       </div>
                     </Radio>
                   </div>
