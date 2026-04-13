@@ -76,6 +76,7 @@
     "matches": "Fähigkeitsbasiertes Matching",
     "goals": "Persönliche & Community-Ziele",
     "skills": "Fähigkeitsverzeichnis & Empfehlungen",
+    "saved": "Ihre gespeicherten Artikel",
     "activity": "Ihr aktuelles Aktivitätsprotokoll",
     "ai_chat": "KI-gestützter Community-Assistent",
     "federation_hub": "Community-übergreifendes Netzwerk",
@@ -95,8 +96,7 @@
     "strategic_plan": "Unsere strategische Ausrichtung",
     "timebanking_listings": "Angebote & Gesuche",
     "messages": "Ihre Nachrichten",
-    "saved": "Your bookmarked items",
-    "marketplace": "Buy & sell in your community"
+    "marketplace": "Kaufen & Verkaufen in Ihrer Gemeinschaft"
   },
   "user_menu": {
     "my_profile": "Mein Profil",
@@ -292,8 +292,8 @@
     "no_results": "Keine GIFs gefunden",
     "powered_by": "Unterstützt von GIPHY",
     "button_label": "GIF hinzufügen",
-    "select": "Select GIF",
-    "preview_alt": "GIF preview"
+    "select": "GIF auswählen",
+    "preview_alt": "GIF-Vorschau"
   },
   "loading": "Wird geladen...",
   "feature_error": {
@@ -388,26 +388,26 @@
   },
   "hours_display_one": "{{count}} Stunde",
   "hours_display_other": "{{count}} Stunden",
+  "compose": {
+    "aria_insert_link": "Link einfügen",
+    "aria_remove_link": "Link entfernen",
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1"
+  },
   "toast": {
     "aria_notifications": "Benachrichtigungen",
     "aria_dismiss_notification": "Benachrichtigung schließen"
   },
-  "compose": {
-    "placeholder_url": "https://example.com",
-    "placeholder_hours": "1",
-    "aria_insert_link": "Insert link",
-    "aria_remove_link": "Remove link"
-  },
   "verification": {
-    "not_id_verified": "Not ID Verified"
+    "not_id_verified": "Nicht ID-verifiziert"
   },
   "page_meta": {
     "skills_browse": {
-      "title": "Browse Skills"
+      "title": "Fähigkeiten durchsuchen"
     },
     "members": {
-      "title": "Members",
-      "description": "Browse community members, connect and exchange time credits."
+      "description": "Durchsuchen Sie die Mitglieder der Gemeinschaft, verbinden Sie sich und tauschen Sie Zeitguthaben aus.",
+      "title": "Members"
     }
   }
 }

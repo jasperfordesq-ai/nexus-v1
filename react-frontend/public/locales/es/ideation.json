@@ -2,6 +2,7 @@
   "page_title": "Retos de Ideación",
   "title": "Retos de Ideación",
   "subtitle": "Comparte ideas, vota y ayuda a dar forma a tu comunidad",
+  "page_description": "Explora los desafíos de la comunidad, envía ideas y vota por soluciones. Ayuda a dar forma al futuro de tu comunidad.",
   "actions": {
     "retry": "Reintentar"
   },
@@ -392,13 +393,12 @@
     "name_required": "El nombre es obligatorio",
     "file_required": "El archivo es obligatorio"
   },
-  "page_description": "Browse community challenges, submit ideas, and vote on solutions. Help shape the future of your community.",
   "page_meta": {
     "outcomes": {
-      "title": "Outcomes Dashboard"
+      "title": "Tablero de Resultados"
     },
     "create_challenge": {
-      "title": "Create Challenge"
+      "title": "Crear Desafío"
     },
     "campaigns": {
       "title": "Campaigns"

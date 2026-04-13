@@ -422,38 +422,73 @@
     "aria_reply": "Répondre au message",
     "aria_send_reply": "Envoyer la réponse",
     "breadcrumb_messages": "Messages",
-    "message_label": "Message"
+    "message_label": "Message",
+    "translate_to": "Traduire en {{language}}",
+    "view_original": "Voir l'original",
+    "show_translation": "Afficher la traduction",
+    "translating": "Traduction en cours…",
+    "translation_failed": "Échec de la traduction. Veuillez réessayer.",
+    "auto_translate_tooltip_off": "Traduire tous les messages automatiquement",
+    "auto_translate_tooltip_on": "La traduction automatique est activée — cliquez pour désactiver",
+    "auto_translate_enabled": "Les messages seront traduits automatiquement",
+    "auto_translate_disabled": "Traduction automatique désactivée",
+    "auto_translate_active_banner": "Les messages de cette conversation sont traduits automatiquement dans votre langue.",
+    "auto_translate_turn_off": "Désactiver",
+    "external_recipient_info": "Ce message sera envoyé à un serveur partenaire externe."
   },
   "onboarding": {
     "reach_label_remote_ok": "À distance accepté",
     "step_communication": "Communication",
     "summary_communication": "Communication",
-    "summary_transactions": "Transactions"
+    "summary_transactions": "Transactions",
+    "progress_aria": "Étape {{current}} de {{total}}"
   },
   "listings": {},
   "members": {
     "reach_remote_ok": "À distance accepté",
     "aria_search": "Rechercher des membres fédérés",
     "aria_filter_community": "Filtrer par communauté partenaire",
-    "aria_filter_skills": "Filtrer par compétences"
+    "aria_filter_skills": "Filtrer par compétences",
+    "external_profile_title": "Membre externe",
+    "external_profile_message": "Ce membre appartient à une communauté partenaire externe. Vous pouvez leur envoyer un message ou des crédits depuis la page des membres."
   },
   "events": {
     "breadcrumb_federation": "Fédération"
   },
   "partners": {
-    "breadcrumb_federation": "Fédération"
+    "breadcrumb_federation": "Fédération",
+    "level_prefix": "Niveau {{level}}",
+    "permission_groups": "Adhésion au groupe"
   },
   "partner_detail": {
     "federation_partner_badge": "Partenaire de fédération",
-    "breadcrumb_federation": "Fédération"
+    "breadcrumb_federation": "Fédération",
+    "level_prefix": "Niveau {{level}}",
+    "permission_groups": "Adhésion au groupe"
   },
   "member_profile": {
-    "breadcrumb_federation": "Fédération"
+    "breadcrumb_federation": "Fédération",
+    "connect_sent": "Demande de connexion envoyée !",
+    "connect_failed": "Échec de l'envoi de la demande",
+    "request_pending": "Demande en attente",
+    "send_credits": "Envoyer des crédits",
+    "send_credits_to": "Envoyer des crédits à {{name}}",
+    "amount_hours": "Montant (heures)",
+    "tx_description_placeholder": "À quoi sert ce transfert ?",
+    "tx_summary": "{{amount}} heures à {{name}} ({{community}})",
+    "tx_success": "Crédits envoyés !",
+    "tx_success_detail": "Vous avez réussi à envoyer {{amount}} heures à {{name}}",
+    "tx_failed": "Échec du transfert",
+    "external_member_title": "Membre externe",
+    "external_member_description": "Les profils des membres externes sont affichés sur la plateforme de leur communauté d'origine. Vous pouvez leur envoyer un message ou des crédits depuis la page des membres."
   },
   "settings": {
     "breadcrumb_federation": "Fédération",
     "federation_toggled_title": "Fédération {{action}}",
-    "communication": "Communication"
+    "communication": "Communication",
+    "show_reviews_federated": {
+      "help": "Lorsque cette option est activée, vos avis seront visibles par les membres sur les plateformes partenaires fédérées."
+    }
   },
   "connections": {
     "page_title": "Connexions",
@@ -481,7 +516,22 @@
     "accepted_success": "Connexion acceptée !",
     "rejected_success": "Demande de connexion refusée",
     "removed_success": "Connexion supprimée",
-    "action_failed": "L’action a échoué"
+    "action_failed": "L’action a échoué",
+    "load_error": "Échec du chargement des connexions. Veuillez réessayer.",
+    "try_again": "Réessayer"
+  },
+  "reviews": {
+    "empty": "Aucun avis pour le moment de la part des communautés partenaires.",
+    "unavailable": "Avis non encore disponibles pour ce membre fédéré.",
+    "from_partner": "via {{partner}}",
+    "rating_label": "Noté {{rating}} sur 5",
+    "load_error": "Échec du chargement des avis. Veuillez réessayer."
+  },
+  "reputation": {
+    "chip_label": "{{score}} ({{count}})",
+    "tooltip_federated": "Réputation agrégée à travers {{count}} communautés partenaires",
+    "tooltip_local": "Basé sur {{count}} avis dans cette communauté",
+    "aria_label": "Réputation fédérée {{score}} provenant de {{count}} avis"
   },
   "federation.external": "External",
   "onboarding.progress_aria": "Step {{current}} of {{total}}",

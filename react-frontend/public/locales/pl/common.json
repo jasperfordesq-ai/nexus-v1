@@ -76,6 +76,7 @@
     "matches": "Dopasowanie umiejętności",
     "goals": "Cele osobiste i społeczne",
     "skills": "Katalog umiejętności i rekomendacje",
+    "saved": "Twoje zapisane przedmioty",
     "activity": "Twój ostatni dziennik aktywności",
     "ai_chat": "Asystent społeczności oparty na AI",
     "federation_hub": "Sieć między społecznościami",
@@ -95,8 +96,7 @@
     "strategic_plan": "Nasz kierunek strategiczny",
     "timebanking_listings": "Oferty i zapotrzebowania",
     "messages": "Twoje wiadomości",
-    "saved": "Your bookmarked items",
-    "marketplace": "Buy & sell in your community"
+    "marketplace": "Kupuj i sprzedawaj w swojej społeczności"
   },
   "user_menu": {
     "my_profile": "Mój profil",
@@ -227,7 +227,7 @@
     "pages": "Strony",
     "cookie_settings": "Ustawienia cookie",
     "built_on_nexus": "Zbudowane na Project NEXUS — Platforma społeczności open source",
-    "agpl_notice": "AGPL-3.0 — Copyright © 2024–{{year}} Jasper Ford",
+    "agpl_notice": "AGPL-3.0 — Prawa autorskie © 2024–{{year}} Jasper Ford",
     "terms": "Regulamin",
     "privacy": "Prywatność"
   },
@@ -292,8 +292,8 @@
     "no_results": "Nie znaleziono GIF-ów",
     "powered_by": "Obsługiwane przez GIPHY",
     "button_label": "Dodaj GIF",
-    "select": "Select GIF",
-    "preview_alt": "GIF preview"
+    "select": "Wybierz GIF",
+    "preview_alt": "Podgląd GIF-a"
   },
   "loading": "Ładowanie...",
   "feature_error": {
@@ -388,26 +388,26 @@
   },
   "hours_display_one": "{{count}} godzina",
   "hours_display_other": "{{count}} godzin",
+  "compose": {
+    "aria_insert_link": "Wstaw link",
+    "aria_remove_link": "Usuń link",
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1"
+  },
   "toast": {
     "aria_notifications": "Powiadomienia",
     "aria_dismiss_notification": "Odrzuć powiadomienie"
   },
-  "compose": {
-    "placeholder_url": "https://example.com",
-    "placeholder_hours": "1",
-    "aria_insert_link": "Insert link",
-    "aria_remove_link": "Remove link"
-  },
   "verification": {
-    "not_id_verified": "Not ID Verified"
+    "not_id_verified": "Niezweryfikowane ID"
   },
   "page_meta": {
     "skills_browse": {
-      "title": "Browse Skills"
+      "title": "Przeglądaj umiejętności"
     },
     "members": {
-      "title": "Members",
-      "description": "Browse community members, connect and exchange time credits."
+      "description": "Przeglądaj członków społeczności, łącz się i wymieniaj kredyty czasowe.",
+      "title": "Members"
     }
   }
 }

@@ -1,4 +1,120 @@
 {
+  "org_wallet": {
+    "amount_must_be_greater_than_zero": "Le montant doit être supérieur à zéro",
+    "user_not_active_member": "L'utilisateur n'est pas un membre actif de cette organisation",
+    "insufficient_balance": "Solde insuffisant",
+    "requester_not_active_member": "Le demandeur n'est pas un membre actif de cette organisation",
+    "insufficient_org_wallet_balance": "Solde du portefeuille de l'organisation insuffisant",
+    "transfer_request_not_found_or_not_pending": "Demande de transfert non trouvée ou non en attente",
+    "only_admin_or_owner_can_approve": "Seul un administrateur ou le propriétaire peut approuver les demandes",
+    "transfer_request_not_found_or_already_processed": "Demande de transfert non trouvée ou déjà traitée",
+    "only_admin_or_owner_can_reject": "Seul un administrateur ou le propriétaire peut rejeter les demandes",
+    "transfer_request_already_processed": "Demande de transfert déjà traitée",
+    "only_requester_can_cancel": "Seul le demandeur peut annuler cette demande",
+    "admin_user_id_required": "L'ID de l'utilisateur administrateur est requis pour les transferts directs",
+    "only_admin_or_owner_can_direct_transfer": "Seul un administrateur ou le propriétaire peut effectuer des transferts directs"
+  },
+  "vol_org_wallet": {
+    "amount_must_be_greater_than_zero": "Le montant doit être supérieur à 0",
+    "deposit_cannot_exceed_1000": "Le montant du dépôt ne peut pas dépasser 1000 heures",
+    "user_not_found": "Utilisateur non trouvé",
+    "organization_not_found": "Organisation non trouvée",
+    "amount_must_be_at_least_1": "Le montant doit être d'au moins 1 heure",
+    "insufficient_personal_balance": "Solde personnel insuffisant",
+    "deposit_successful": "Dépôt réussi",
+    "insufficient_organization_balance": "Solde de l'organisation insuffisant",
+    "volunteer_not_found": "Bénévole non trouvé",
+    "payment_successful": "Paiement réussi",
+    "amount_cannot_be_zero": "Le montant ne peut pas être zéro",
+    "adjustment_negative_balance": "L'ajustement entraînerait un solde négatif",
+    "adjustment_applied": "Ajustement appliqué"
+  },
+  "registration": {
+    "queued_for_review": "Votre compte a été mis en attente pour un examen manuel.",
+    "complete": "Inscription terminée !",
+    "verification_unavailable": "La vérification d'identité est actuellement indisponible.",
+    "welcome": "Inscription terminée ! Bienvenue à bord.",
+    "pending_admin_approval": "Inscription réussie ! Votre compte est en attente d'approbation par l'administrateur.",
+    "verify_identity": "Inscription réussie ! Veuillez vérifier votre identité pour continuer.",
+    "pending_review": "Inscription reçue. Un administrateur examinera votre demande.",
+    "added_to_waitlist": "Vous avez été ajouté à la liste d'attente. Nous vous informerons lorsqu'une place se libérera.",
+    "user_approved_activated": "L'utilisateur a été approuvé et activé.",
+    "user_verification_rejected": "La vérification de l'utilisateur a été rejetée."
+  },
+  "federation": {
+    "partnership_request_sent": "Demande de partenariat envoyée",
+    "partnership_approved": "Partenariat approuvé",
+    "counter_proposal_sent": "Contre-proposition envoyée",
+    "counter_proposal_accepted": "Contre-proposition acceptée, le partenariat est maintenant actif",
+    "partnership_request_rejected": "Demande de partenariat rejetée",
+    "partnership_suspended": "Partenariat suspendu",
+    "partnership_reactivated": "Partenariat réactivé",
+    "partnership_terminated": "Partenariat résilié",
+    "permissions_updated": "Permissions mises à jour",
+    "notify_partnership_approved": "{{tenant_name}} a approuvé votre demande de partenariat de fédération.",
+    "notify_partnership_rejected": "{{tenant_name}} a rejeté la demande de partenariat de fédération.",
+    "notify_partnership_terminated": "{{tenant_name}} a résilié le partenariat de fédération."
+  },
+  "team_task": {
+    "title_required": "Le titre est requis",
+    "invalid_status": "Statut invalide",
+    "invalid_priority": "Priorité invalide",
+    "task_not_found": "Tâche non trouvée",
+    "title_cannot_be_empty": "Le titre ne peut pas être vide"
+  },
+  "team_document": {
+    "no_file_provided": "Aucun fichier fourni",
+    "file_upload_failed": "Échec du téléchargement du fichier",
+    "file_type_not_allowed": "Type de fichier non autorisé. Acceptés : PDF, images, documents Office, CSV, texte.",
+    "file_must_be_under_20mb": "Le fichier doit faire moins de 20 Mo",
+    "failed_to_save_file": "Échec de l'enregistrement du fichier téléchargé",
+    "document_not_found": "Document non trouvé"
+  },
+  "moderation": {
+    "invalid_decision": "Décision invalide. Doit être approuvée ou rejetée.",
+    "item_not_found": "Élément de la file de modération non trouvé.",
+    "already_reviewed": "Cet élément a déjà été examiné.",
+    "rejection_reason_required": "La raison du rejet est requise.",
+    "content_decision": "Le contenu a été :decision."
+  },
+  "tenant_settings": {
+    "pending_verification": "Votre vérification d'identité est en attente. Veuillez attendre l'approbation.",
+    "verification_failed": "Votre vérification d'identité a échoué. Veuillez contacter le support.",
+    "email_not_verified": "Veuillez vérifier votre adresse e-mail avant de vous connecter.",
+    "pending_admin_approval": "Votre compte est en attente d'approbation par l'administrateur."
+  },
+  "ai": {
+    "provider_not_configured": "Fournisseur non configuré (clé API manquante)",
+    "connection_successful": "Connexion réussie",
+    "ollama_not_configured": "URL de l'hôte Ollama non configurée",
+    "ollama_cannot_connect": "Impossible de se connecter à Ollama : :error",
+    "ollama_connected": "Connecté à Ollama (:count modèles disponibles)",
+    "ollama_http_error": "Ollama a renvoyé HTTP :code"
+  },
+  "report_export": {
+    "no_data": "Aucune donnée trouvée pour le rapport et les filtres sélectionnés."
+  },
+  "transaction_export": {
+    "failed": "Échec de la génération de l'état. Veuillez réessayer."
+  },
+  "streak": {
+    "already_recorded": "Déjà enregistré aujourd'hui"
+  },
+  "safeguarding": {
+    "assignment_created": "Mission de protection créée"
+  },
+  "review": {
+    "submitted_successfully": "Révision soumise avec succès"
+  },
+  "event": {
+    "added_to_waitlist": "Cet événement est complet. Vous avez été ajouté à la liste d'attente."
+  },
+  "comment": {
+    "deleted": "Commentaire supprimé"
+  },
+  "webhook": {
+    "test_delivery": "Ceci est une livraison de webhook de test."
+  },
   "org_wallet.amount_must_be_greater_than_zero": "Amount must be greater than zero",
   "org_wallet.user_not_active_member": "User is not an active member of this organization",
   "org_wallet.insufficient_balance": "Insufficient balance",

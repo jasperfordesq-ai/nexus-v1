@@ -76,6 +76,7 @@
     "matches": "مطابقة المهارات",
     "goals": "الأهداف الشخصية والمجتمعية",
     "skills": "دليل المهارات والتوصيات",
+    "saved": "عناصرك المحفوظة",
     "activity": "سجل نشاطك الأخير",
     "ai_chat": "مساعد المجتمع المدعوم بالذكاء الاصطناعي",
     "federation_hub": "شبكة عبر المجتمعات",
@@ -95,8 +96,7 @@
     "strategic_plan": "اتجاهنا الاستراتيجي",
     "timebanking_listings": "العروض والطلبات",
     "messages": "رسائلك",
-    "saved": "Your bookmarked items",
-    "marketplace": "Buy & sell in your community"
+    "marketplace": "اشترِ وبيع في مجتمعك"
   },
   "user_menu": {
     "my_profile": "ملفي الشخصي",
@@ -292,8 +292,8 @@
     "no_results": "لم يتم العثور على صور GIF",
     "powered_by": "مدعوم من GIPHY",
     "button_label": "إضافة GIF",
-    "select": "Select GIF",
-    "preview_alt": "GIF preview"
+    "select": "اختر GIF",
+    "preview_alt": "معاينة GIF"
   },
   "loading": "جارٍ التحميل...",
   "feature_error": {
@@ -388,26 +388,26 @@
   },
   "hours_display_one": "ساعة واحدة",
   "hours_display_other": "{{count}} ساعات",
+  "compose": {
+    "aria_insert_link": "أدخل الرابط",
+    "aria_remove_link": "إزالة الرابط",
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1"
+  },
   "toast": {
     "aria_notifications": "الإشعارات",
     "aria_dismiss_notification": "تجاهل الإشعار"
   },
-  "compose": {
-    "placeholder_url": "https://example.com",
-    "placeholder_hours": "1",
-    "aria_insert_link": "Insert link",
-    "aria_remove_link": "Remove link"
-  },
   "verification": {
-    "not_id_verified": "Not ID Verified"
+    "not_id_verified": "غير موثق الهوية"
   },
   "page_meta": {
     "skills_browse": {
-      "title": "Browse Skills"
+      "title": "تصفح المهارات"
     },
     "members": {
-      "title": "Members",
-      "description": "Browse community members, connect and exchange time credits."
+      "description": "تصفح أعضاء المجتمع، تواصل وتبادل أرصدة الوقت.",
+      "title": "Members"
     }
   }
 }

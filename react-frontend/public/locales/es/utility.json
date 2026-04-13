@@ -1,5 +1,6 @@
 {
   "help": {
+    "meta_description": "Explora artículos de ayuda, guías y preguntas frecuentes para aprovechar al máximo la plataforma.",
     "page_title": "Centro de Ayuda",
     "heading": "Centro de Ayuda",
     "subtitle": "Encuentra respuestas a preguntas frecuentes sobre {{name}}",
@@ -150,7 +151,7 @@
   },
   "page_meta": {
     "newsletter_unsubscribe": {
-      "title": "Newsletter Unsubscribe"
+      "title": "Cancelar suscripción al boletín"
     }
   }
 }

@@ -2,6 +2,7 @@
   "page_title": "Defis d'ideation",
   "title": "Defis d'ideation",
   "subtitle": "Partagez des idees, votez et contribuez a faconner votre communaute",
+  "page_description": "Parcourez les défis de la communauté, soumettez des idées et votez pour des solutions. Aidez à façonner l'avenir de votre communauté.",
   "actions": {
     "retry": "Reessayer"
   },
@@ -392,13 +393,12 @@
     "name_required": "Le nom est requis",
     "file_required": "Le fichier est requis"
   },
-  "page_description": "Browse community challenges, submit ideas, and vote on solutions. Help shape the future of your community.",
   "page_meta": {
     "outcomes": {
-      "title": "Outcomes Dashboard"
+      "title": "Tableau de bord des résultats"
     },
     "create_challenge": {
-      "title": "Create Challenge"
+      "title": "Créer un défi"
     },
     "campaigns": {
       "title": "Campaigns"

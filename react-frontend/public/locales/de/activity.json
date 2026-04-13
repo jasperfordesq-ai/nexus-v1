@@ -9,6 +9,8 @@
   "error_load_failed_detail": "Ihre Aktivitätsdaten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
   "unable_to_load": "Laden nicht möglich",
   "try_again": "Erneut versuchen",
+  "loading": "Aktivitätsdaten werden geladen...",
+  "refresh": "Aktualisieren",
   "stats": {
     "hours_given": "Gegebene Stunden",
     "hours_received": "Erhaltene Stunden",
@@ -30,15 +32,13 @@
   "quick_stats": "Schnellstatistiken",
   "groups_joined": "Beigetretene Gruppen",
   "posts_30d": "Beiträge (30T)",
-  "likes_received_30d": "Erhaltene Likes (30T)",
-  "net_balance": "Nettobilanz",
-  "my_skills": "Meine Fähigkeiten",
-  "skill_offer": "Angebot",
-  "loading": "Aktivitätsdaten werden geladen...",
-  "refresh": "Aktualisieren",
   "comments_30d": "Kommentare (30T)",
   "likes_given_30d": "Gegebene Likes (30T)",
+  "likes_received_30d": "Erhaltene Likes (30T)",
+  "net_balance": "Nettobilanz",
   "hours_suffix": "Std",
+  "my_skills": "Meine Fähigkeiten",
+  "skill_offer": "Angebot",
   "skill_request": "Anfrage",
   "activity_types": {
     "exchange": "Tausch",
@@ -53,6 +53,6 @@
   "endorsements_count_one": "{{count}} Empfehlung",
   "endorsements_count_other": "{{count}} Empfehlungen",
   "page_meta": {
-    "title": "Activity Dashboard"
+    "title": "Aktivitäts-Dashboard"
   }
 }

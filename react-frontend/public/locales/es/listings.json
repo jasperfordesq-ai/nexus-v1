@@ -146,6 +146,7 @@
     "placeholder": "Escribe una habilidad y pulsa Enter...",
     "aria_add": "Añadir etiqueta de habilidad"
   },
+  "more_filters": "Más filtros",
   "aria": {
     "view_mode": "Modo de vista",
     "loading_listings": "Cargando anuncios"
@@ -162,28 +163,27 @@
     "vs_previous_week": "vs. semana anterior",
     "views_last_days": "Visitas (Últimos {{days}} Días)"
   },
-  "more_filters": "More filters",
-  "filters_label": "Filters",
-  "filter_hours": "Duration",
-  "filter_any_duration": "Any duration",
-  "filter_quick": "Quick (under 1h)",
-  "filter_short": "Short (1-3h)",
-  "filter_half_day": "Half day (3-6h)",
-  "filter_full_day": "Full day (6h+)",
-  "filter_service_mode": "Service mode",
-  "filter_any_mode": "Any mode",
-  "filter_remote": "Remote available",
-  "filter_in_person": "In-person only",
-  "filter_posted_date": "Posted date",
-  "filter_any_time": "Any time",
-  "filter_today": "Today",
-  "filter_this_week": "This week",
-  "filter_this_month": "This month",
-  "clear_filters": "Clear filters",
-  "results_count": "{{count}} listings found",
+  "filter_any_duration": "Cualquier duración",
+  "filter_quick": "Rápido (menos de 1h)",
+  "filter_short": "Corto (1-3h)",
+  "filter_half_day": "Media jornada (3-6h)",
+  "filter_full_day": "Jornada completa (6h+)",
+  "filter_service_mode": "Modo de servicio",
+  "filter_any_mode": "Cualquier modo",
+  "filter_remote": "Remoto disponible",
+  "filter_in_person": "Solo en persona",
+  "filter_posted_date": "Fecha de publicación",
+  "filter_any_time": "Cualquier momento",
+  "filter_this_week": "Esta semana",
+  "filter_this_month": "Este mes",
+  "clear_filters": "Limpiar filtros",
+  "results_count": "{{count}} listados encontrados",
   "page_meta": {
     "create": {
-      "title": "Create Listing"
+      "title": "Crear listado"
     }
-  }
+  },
+  "filters_label": "Filters",
+  "filter_hours": "Duration",
+  "filter_today": "Today"
 }

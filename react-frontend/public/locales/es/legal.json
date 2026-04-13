@@ -1,5 +1,6 @@
 {
   "terms": {
+    "meta_description": "Términos y condiciones que rigen el uso de nuestra plataforma comunitaria de intercambio de tiempo.",
     "page_title": "Términos de Servicio",
     "heading": "Términos de Servicio",
     "subtitle": "Las reglas y directrices para usar nuestra plataforma",
@@ -97,6 +98,7 @@
     "meta_description": "Terms and conditions governing the use of our community timebanking platform."
   },
   "privacy": {
+    "meta_description": "Cómo recopilamos, usamos y protegemos tus datos personales en nuestra plataforma comunitaria.",
     "page_title": "Política de Privacidad",
     "heading": "Política de Privacidad",
     "subtitle": "Cómo recopilamos, usamos y protegemos tu información personal",
@@ -208,6 +210,7 @@
     "meta_description": "How we collect, use, and protect your personal data on our community platform."
   },
   "cookies": {
+    "meta_description": "Información sobre cómo usamos cookies para mejorar tu experiencia en nuestra plataforma.",
     "page_title": "Política de Cookies",
     "heading": "Política de Cookies",
     "subtitle": "Cómo usamos cookies y tecnologías similares en nuestra plataforma",
@@ -290,6 +293,7 @@
     "meta_description": "Information about how we use cookies to improve your experience on our platform."
   },
   "accessibility": {
+    "meta_description": "Nuestro compromiso de hacer la plataforma accesible para todos, siguiendo los estándares WCAG 2.1 AA.",
     "page_title": "Accesibilidad",
     "heading": "Declaración de Accesibilidad",
     "subtitle": "{{name}} está comprometido a asegurar la accesibilidad digital para personas de todas las capacidades.",
@@ -442,32 +446,32 @@
   },
   "page_meta": {
     "platform_terms": {
-      "title": "Platform Terms of Service",
-      "description": "Terms of service governing use of the NEXUS community timebanking platform."
+      "title": "Términos de Servicio de la Plataforma",
+      "description": "Términos de servicio que rigen el uso de la plataforma comunitaria de intercambio de tiempo NEXUS."
     },
     "platform_privacy": {
-      "title": "Platform Privacy Policy",
-      "description": "How the NEXUS platform collects, processes, and protects your personal data."
+      "title": "Política de Privacidad de la Plataforma",
+      "description": "Cómo la plataforma NEXUS recopila, procesa y protege tus datos personales."
     },
     "platform_disclaimer": {
-      "title": "Platform Disclaimer",
-      "description": "Important disclaimers about the use of the NEXUS community timebanking platform."
+      "title": "Descargo de Responsabilidad de la Plataforma",
+      "description": "Importantes descargos de responsabilidad sobre el uso de la plataforma comunitaria de intercambio de tiempo NEXUS."
     },
     "community_guidelines": {
-      "title": "Community Guidelines",
-      "description": "Community guidelines for respectful and productive timebanking."
+      "title": "Directrices de la Comunidad",
+      "description": "Directrices comunitarias para un intercambio de tiempo respetuoso y productivo."
     },
     "acceptable_use": {
-      "title": "Acceptable Use Policy",
-      "description": "Acceptable use policy for our community timebanking platform."
+      "title": "Política de Uso Aceptable",
+      "description": "Política de uso aceptable para nuestra plataforma comunitaria de intercambio de tiempo."
     },
     "legal_hub": {
-      "title": "Legal Information",
-      "description": "Legal documents, policies, and compliance information."
+      "title": "Información Legal",
+      "description": "Documentos legales, políticas e información de cumplimiento."
     },
     "legal_version_history": {
-      "title": "Legal Version History",
-      "description": "Version history of our legal documents and policies."
+      "title": "Historial de Versiones Legales",
+      "description": "Historial de versiones de nuestros documentos y políticas legales."
     }
   }
 }

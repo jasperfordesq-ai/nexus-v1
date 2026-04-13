@@ -156,14 +156,14 @@
     "send_request": "Envoyer la demande"
   },
   "page_meta": {
-    "list": {
-      "title": "Exchanges"
-    },
     "request": {
-      "title": "Request Exchange"
+      "title": "Demander un échange"
     },
     "detail": {
-      "title": "Exchange Details"
+      "title": "Détails de l'échange"
+    },
+    "list": {
+      "title": "Exchanges"
     }
   }
 }

@@ -2,6 +2,7 @@
   "page_title": "Ideenwettbewerbe",
   "title": "Ideenwettbewerbe",
   "subtitle": "Teilen Sie Ideen, stimmen Sie ab und gestalten Sie Ihre Gemeinschaft mit",
+  "page_description": "Durchstöbere die Herausforderungen der Gemeinschaft, reiche Ideen ein und stimme über Lösungen ab. Hilf mit, die Zukunft deiner Gemeinschaft zu gestalten.",
   "actions": {
     "retry": "Erneut versuchen"
   },
@@ -392,13 +393,12 @@
     "name_required": "Name ist erforderlich",
     "file_required": "Datei ist erforderlich"
   },
-  "page_description": "Browse community challenges, submit ideas, and vote on solutions. Help shape the future of your community.",
   "page_meta": {
     "outcomes": {
-      "title": "Outcomes Dashboard"
+      "title": "Ergebnisse-Dashboard"
     },
     "create_challenge": {
-      "title": "Create Challenge"
+      "title": "Herausforderung erstellen"
     },
     "campaigns": {
       "title": "Campaigns"

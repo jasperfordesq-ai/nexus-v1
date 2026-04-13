@@ -86,7 +86,10 @@
     "label_under_review": "In Überprüfung:",
     "label_remember": "Denken Sie daran:",
     "label_action_needed": "Handlung erforderlich:",
-    "label_why_approval": "Warum Genehmigung?"
+    "label_why_approval": "Warum Genehmigung?",
+    "label_service": "Service",
+    "label_requester": "Requester",
+    "label_provider": "Provider"
   },
   "volunteering": {
     "heading_accepted": "Antrag angenommen!",
@@ -114,7 +117,8 @@
     "heading_application_received": "Neue Freiwilligenanmeldung",
     "application_received_body": "{{name}} hat sich beworben, um bei Ihrer Organisation freiwillig zu arbeiten.",
     "application_received_note": "Überprüfen Sie ihre Bewerbung und genehmigen oder lehnen Sie sie von Ihrem Organisations-Dashboard aus ab.",
-    "btn_review_application": "Bewerbung überprüfen"
+    "btn_review_application": "Bewerbung überprüfen",
+    "label_opportunity": "Opportunity"
   },
   "default_notification": "Benachrichtigung: {{type}}"
 }

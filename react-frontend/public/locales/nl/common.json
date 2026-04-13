@@ -76,6 +76,7 @@
     "matches": "Vaardigheidsmatching",
     "goals": "Persoonlijke & gemeenschapsdoelen",
     "skills": "Vaardigheidsgids & aanbevelingen",
+    "saved": "Je opgeslagen items",
     "activity": "Jouw recente activiteitenlog",
     "ai_chat": "AI-aangedreven gemeenschapsassistent",
     "federation_hub": "Cross-community netwerk",
@@ -95,8 +96,7 @@
     "strategic_plan": "Onze strategische richting",
     "timebanking_listings": "Aanbiedingen & verzoeken",
     "messages": "Jouw berichten",
-    "saved": "Your bookmarked items",
-    "marketplace": "Buy & sell in your community"
+    "marketplace": "Koop & verkoop in je gemeenschap"
   },
   "user_menu": {
     "my_profile": "Mijn profiel",
@@ -227,7 +227,7 @@
     "pages": "Pagina's",
     "cookie_settings": "Cookie-instellingen",
     "built_on_nexus": "Gebouwd op Project NEXUS — Open Source Gemeenschapsplatform",
-    "agpl_notice": "AGPL-3.0 — Copyright © 2024–{{year}} Jasper Ford",
+    "agpl_notice": "AGPL-3.0 — Auteursrecht © 2024–{{year}} Jasper Ford",
     "terms": "Voorwaarden",
     "privacy": "Privacy"
   },
@@ -292,8 +292,8 @@
     "no_results": "Geen GIF's gevonden",
     "powered_by": "Mogelijk gemaakt door GIPHY",
     "button_label": "GIF toevoegen",
-    "select": "Select GIF",
-    "preview_alt": "GIF preview"
+    "select": "Selecteer GIF",
+    "preview_alt": "GIF voorbeeld"
   },
   "loading": "Laden...",
   "feature_error": {
@@ -388,26 +388,26 @@
   },
   "hours_display_one": "{{count}} uur",
   "hours_display_other": "{{count}} uren",
+  "compose": {
+    "aria_insert_link": "Voeg link in",
+    "aria_remove_link": "Verwijder link",
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1"
+  },
   "toast": {
     "aria_notifications": "Meldingen",
     "aria_dismiss_notification": "Melding negeren"
   },
-  "compose": {
-    "placeholder_url": "https://example.com",
-    "placeholder_hours": "1",
-    "aria_insert_link": "Insert link",
-    "aria_remove_link": "Remove link"
-  },
   "verification": {
-    "not_id_verified": "Not ID Verified"
+    "not_id_verified": "Niet ID Geverifieerd"
   },
   "page_meta": {
     "skills_browse": {
-      "title": "Browse Skills"
+      "title": "Bekijk Vaardigheden"
     },
     "members": {
-      "title": "Members",
-      "description": "Browse community members, connect and exchange time credits."
+      "description": "Bekijk gemeenschapsleden, verbind en wissel tijdcredits uit.",
+      "title": "Members"
     }
   }
 }

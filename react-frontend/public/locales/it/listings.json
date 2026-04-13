@@ -146,6 +146,7 @@
     "placeholder": "Digita una competenza e premi Invio...",
     "aria_add": "Aggiungi tag competenza"
   },
+  "more_filters": "Altri filtri",
   "aria": {
     "view_mode": "Modalità di visualizzazione",
     "loading_listings": "Caricamento annunci"
@@ -162,28 +163,27 @@
     "vs_previous_week": "vs. settimana precedente",
     "views_last_days": "Visualizzazioni (Ultimi {{days}} Giorni)"
   },
-  "more_filters": "More filters",
-  "filters_label": "Filters",
-  "filter_hours": "Duration",
-  "filter_any_duration": "Any duration",
-  "filter_quick": "Quick (under 1h)",
-  "filter_short": "Short (1-3h)",
-  "filter_half_day": "Half day (3-6h)",
-  "filter_full_day": "Full day (6h+)",
-  "filter_service_mode": "Service mode",
-  "filter_any_mode": "Any mode",
-  "filter_remote": "Remote available",
-  "filter_in_person": "In-person only",
-  "filter_posted_date": "Posted date",
-  "filter_any_time": "Any time",
-  "filter_today": "Today",
-  "filter_this_week": "This week",
-  "filter_this_month": "This month",
-  "clear_filters": "Clear filters",
-  "results_count": "{{count}} listings found",
+  "filter_any_duration": "Qualsiasi durata",
+  "filter_quick": "Veloce (meno di 1h)",
+  "filter_short": "Breve (1-3h)",
+  "filter_half_day": "Mezza giornata (3-6h)",
+  "filter_full_day": "Giornata intera (6h+)",
+  "filter_service_mode": "Modalità servizio",
+  "filter_any_mode": "Qualsiasi modalità",
+  "filter_remote": "Disponibile da remoto",
+  "filter_in_person": "Solo di persona",
+  "filter_posted_date": "Data di pubblicazione",
+  "filter_any_time": "Qualsiasi momento",
+  "filter_this_week": "Questa settimana",
+  "filter_this_month": "Questo mese",
+  "clear_filters": "Cancella filtri",
+  "results_count": "{{count}} annunci trovati",
   "page_meta": {
     "create": {
-      "title": "Create Listing"
+      "title": "Crea annuncio"
     }
-  }
+  },
+  "filters_label": "Filters",
+  "filter_hours": "Duration",
+  "filter_today": "Today"
 }

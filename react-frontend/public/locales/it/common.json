@@ -76,6 +76,7 @@
     "matches": "Corrispondenze basate sulle competenze",
     "goals": "Obiettivi personali e comunitari",
     "skills": "Directory competenze e raccomandazioni",
+    "saved": "I tuoi elementi salvati",
     "activity": "Il tuo registro attività recente",
     "ai_chat": "Assistente comunitario con IA",
     "federation_hub": "Rete intercomunità",
@@ -95,8 +96,7 @@
     "strategic_plan": "La nostra direzione strategica",
     "timebanking_listings": "Offerte e richieste",
     "messages": "I tuoi messaggi",
-    "saved": "Your bookmarked items",
-    "marketplace": "Buy & sell in your community"
+    "marketplace": "Compra e vendi nella tua comunità"
   },
   "user_menu": {
     "my_profile": "Il Mio Profilo",
@@ -292,8 +292,8 @@
     "no_results": "Nessuna GIF trovata",
     "powered_by": "Fornito da GIPHY",
     "button_label": "Aggiungi GIF",
-    "select": "Select GIF",
-    "preview_alt": "GIF preview"
+    "select": "Seleziona GIF",
+    "preview_alt": "Anteprima GIF"
   },
   "loading": "Caricamento...",
   "feature_error": {
@@ -388,26 +388,26 @@
   },
   "hours_display_one": "{{count}} ora",
   "hours_display_other": "{{count}} ore",
+  "compose": {
+    "aria_insert_link": "Inserisci link",
+    "aria_remove_link": "Rimuovi link",
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1"
+  },
   "toast": {
     "aria_notifications": "Notifiche",
     "aria_dismiss_notification": "Ignora notifica"
   },
-  "compose": {
-    "placeholder_url": "https://example.com",
-    "placeholder_hours": "1",
-    "aria_insert_link": "Insert link",
-    "aria_remove_link": "Remove link"
-  },
   "verification": {
-    "not_id_verified": "Not ID Verified"
+    "not_id_verified": "Non verificato ID"
   },
   "page_meta": {
     "skills_browse": {
-      "title": "Browse Skills"
+      "title": "Esplora Competenze"
     },
     "members": {
-      "title": "Members",
-      "description": "Browse community members, connect and exchange time credits."
+      "description": "Esplora i membri della comunità, connettiti e scambia crediti di tempo.",
+      "title": "Members"
     }
   }
 }

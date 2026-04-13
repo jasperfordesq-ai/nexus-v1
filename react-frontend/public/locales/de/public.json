@@ -1,5 +1,6 @@
 {
   "home": {
+    "meta_title": "Community Timebanking Plattform",
     "meta_description": "Tauschen Sie Fähigkeiten und Dienstleistungen mit Zeitguthaben. Treten Sie unserer gemeinschaftsorientierten Zeitbank-Plattform bei.",
     "meta_keywords": "Zeitbank, Fähigkeitenaustausch, Gemeinschaft, Freiwilligenarbeit, Zeitguthaben",
     "badge": "Die Zukunft der Zeitbank",
@@ -157,6 +158,7 @@
     }
   },
   "contact": {
+    "meta_description": "Nehmen Sie Kontakt mit unserem Community-Support-Team auf. Wir sind hier, um zu helfen.",
     "title": "Kontaktieren Sie uns",
     "subtitle": "Haben Sie eine Frage zu {{name}}? Wir freuen uns, von Ihnen zu hören.",
     "success_title": "Nachricht gesendet!",
@@ -187,6 +189,8 @@
     "meta_description": "Get in touch with our community support team. We're here to help."
   },
   "faq": {
+    "page_title": "Häufig gestellte Fragen",
+    "meta_description": "Finden Sie Antworten auf häufige Fragen zu Timebanking, Austausch und Community-Funktionen.",
     "title": "Häufig gestellte Fragen",
     "subtitle_before_link": "Finden Sie nicht, was Sie suchen? Besuchen Sie unser",
     "help_center_link": "Hilfezentrum",
@@ -430,6 +434,10 @@
       "member_item17": "Ideations-Challenges — Innovationshub mit Kampagnen, Ideen, Voting und Ergebnissen",
       "member_item18": "Erfolge und Gamification — XP, Abzeichen, Herausforderungen, Streaks, Rangliste und Nexus Score",
       "member_item19": "Persönliche Einblicke — individuelle Engagement-Metriken und personalisierte Empfehlungen",
+      "member_item20": "Marktplatz — eigenständiges Kleinanzeigenmodul mit Stripe Connect Auszahlungen, Bestellungen und Verkäuferprofilen",
+      "member_item21": "Spenden — einmalige und wiederkehrende Spenden über Stripe mit Organisations-Dashboards und Quittungen",
+      "member_item22": "Identitätsverifizierung — optionaler Stripe Identitätsfluss (Dokument + Selfie + Name/Geburtsdatum-Abgleich) mit einem verifiziertes Mitglieds-Abzeichen",
+      "member_item23": "AI-Antwortvorschläge — Marktplatz-Assistent, der Antworten auf Anfragen zu Angeboten entwirft",
       "content_title": "Inhalte und Kommunikation",
       "content_item1": "Blog — Mandanten-Content-Management und Community-News",
       "content_item2": "Ressourcen und Wissensdatenbank — strukturierte Artikel und geteilte Ressourcenbibliothek",
@@ -447,13 +455,9 @@
       "platform_item6": "Admin-Panel — Mandantenkonfiguration, Benutzerverwaltung, Analytik und Moderation",
       "platform_item7": "Algorithmus-Steuerung — Live-Health-Dashboard und Tuning aller Ranking-Systeme",
       "platform_item8": "Dunkelmodus und mobilfreundliche Benutzeroberfläche",
-      "member_item20": "Marketplace — standalone classifieds module with Stripe Connect payouts, orders, and seller profiles",
-      "member_item21": "Donations — one-off and recurring donations via Stripe with organisation dashboards and receipts",
-      "member_item22": "Identity verification — optional Stripe Identity flow (document + selfie + name/DOB matching) with a verified-member badge",
-      "member_item23": "AI reply suggestions — in-marketplace assistant that drafts responses to listing enquiries",
-      "platform_item9": "SEO at build time — 19+ public pages pre-rendered with Playwright, structured data, sitemaps, and Prerender.io fallback for dynamic routes",
-      "platform_item10": "Federation — four protocol adapters live: Nexus (native), Komunitin (all 15 endpoints), Credit Commons (11 endpoints, CEN-compatible mutual credit), and TimeOverflow; two-way sync across 9 entity types, event-driven push, and reputation portability",
-      "platform_item11": "Payments layer — Stripe for subscriptions, donations, marketplace (Connect), and identity verification, with idempotent webhook handling"
+      "platform_item9": "SEO zur Build-Zeit — 19+ öffentliche Seiten vorgerendert mit Playwright, strukturierte Daten, Sitemaps und Prerender.io-Fallback für dynamische Routen",
+      "platform_item10": "Föderation — vier Protokolladapter live: Nexus (nativ), Komunitin (alle 15 Endpunkte), Credit Commons (11 Endpunkte, CEN-kompatibles gegenseitiges Kreditwesen) und TimeOverflow; bidirektionale Synchronisation über 9 Entitätstypen, ereignisgesteuertes Push und Reputationstransfer",
+      "platform_item11": "Zahlungsschicht — Stripe für Abonnements, Spenden, Marktplatz (Connect) und Identitätsverifizierung, mit idempotenter Webhook-Verarbeitung"
     },
     "whats_rough": {
       "title": "Was noch holprig sein kann",
@@ -499,7 +503,7 @@
   },
   "page_meta": {
     "development_status": {
-      "title": "Development Status"
+      "title": "Entwicklungsstatus"
     },
     "maintenance": {
       "title": "Maintenance"

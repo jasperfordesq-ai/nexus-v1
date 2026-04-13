@@ -1,155 +1,155 @@
 {
   "page_title": "Discover",
+  "page_description": "コミュニティ全体のリスト、イベント、グループ、機会を探索しましょう。",
   "heading": "Discover",
-  "subtitle": "Find skills, events, groups, and more in your community",
-  "search_placeholder": "Discover skills, events, groups...",
+  "subtitle": "あなたのコミュニティでスキル、イベント、グループなどを見つけましょう",
+  "search_placeholder": "スキル、イベント、グループを発見...",
   "stats": {
     "members": "Members",
-    "exchanges_this_month": "Exchanges This Month",
-    "hours_exchanged": "Hours Exchanged",
-    "active_listings": "Active Listings"
+    "exchanges_this_month": "今月の交換",
+    "hours_exchanged": "交換された時間",
+    "active_listings": "アクティブなリスト"
   },
   "trending_posts": {
-    "title": "Trending Posts",
-    "subtitle": "Most engaging posts this week"
+    "title": "トレンドの投稿",
+    "subtitle": "今週の最もエンゲージメントの高い投稿"
   },
   "popular_listings": {
-    "title": "Popular Listings",
-    "subtitle": "Most viewed offers and requests"
+    "title": "人気のリスト",
+    "subtitle": "最も閲覧されたオファーとリクエスト"
   },
   "upcoming_events": {
-    "title": "Upcoming Events",
-    "subtitle": "Join your community",
+    "title": "今後のイベント",
+    "subtitle": "あなたのコミュニティに参加しましょう",
     "online": "Online",
-    "attending": "{{count}} attending"
+    "attending": "{{count}} が参加中"
   },
   "active_groups": {
-    "title": "Active Groups",
-    "subtitle": "Connect with like-minded members",
-    "members": "{{count}} members",
-    "view_group": "View Group"
+    "title": "アクティブなグループ",
+    "subtitle": "志を同じくするメンバーとつながりましょう",
+    "members": "{{count}} メンバー",
+    "view_group": "グループを見る"
   },
   "top_contributors": {
-    "title": "Top Contributors",
-    "subtitle": "Community leaders by experience",
+    "title": "トップ貢献者",
+    "subtitle": "経験によるコミュニティリーダー",
     "level": "Lv.{{level}}"
   },
   "trending_hashtags": {
-    "title": "Trending Hashtags",
-    "subtitle": "Popular topics in your community"
+    "title": "トレンドのハッシュタグ",
+    "subtitle": "あなたのコミュニティで人気のトピック"
   },
   "recommended": {
-    "title": "Recommended For You",
-    "subtitle": "Based on your interests and activity",
-    "by_author": "by {{name}}"
+    "title": "あなたへのおすすめ",
+    "subtitle": "あなたの興味と活動に基づいて",
+    "by_author": "{{name}}によって"
   },
   "new_members": {
-    "title": "Welcome Our Newest Members",
-    "subtitle": "Say hello to recent joiners",
+    "title": "新しいメンバーを歓迎します",
+    "subtitle": "最近参加した人に挨拶しましょう",
     "connect": "Connect"
   },
   "featured_challenges": {
-    "title": "Featured Challenges",
-    "subtitle": "Share your ideas and make an impact",
-    "ideas_count": "{{count}} ideas",
-    "ends": "Ends {{date}}"
+    "title": "注目のチャレンジ",
+    "subtitle": "あなたのアイデアを共有して影響を与えましょう",
+    "ideas_count": "{{count}} アイデア",
+    "ends": "終了 {{date}}"
   },
   "time_ago": {
-    "just_now": "Just now",
-    "hours_ago": "{{count}}h ago",
-    "days_ago": "{{count}}d ago"
+    "just_now": "たった今",
+    "hours_ago": "{{count}}時間前",
+    "days_ago": "{{count}}日前"
   },
-  "error_loading": "We couldn't load the Discover page. This may be a temporary issue.",
+  "error_loading": "Discoverページを読み込めませんでした。これは一時的な問題かもしれません。",
   "retry": "Retry",
   "near_you": {
-    "title": "Near You",
-    "subtitle": "Listings close to your location",
-    "distance": "{{distance}} km away"
+    "title": "あなたの近く",
+    "subtitle": "あなたの位置に近いリスト",
+    "distance": "{{distance}} km離れています"
   },
   "suggested_connections": {
-    "title": "People You May Know",
-    "subtitle": "Connect with members who share your interests",
+    "title": "あなたが知っているかもしれない人々",
+    "subtitle": "あなたの興味を共有するメンバーとつながりましょう",
     "connect": "Connect",
-    "mutual": "Mutual connections",
-    "similar": "Similar interests",
-    "recommended": "Recommended for you"
+    "mutual": "相互接続",
+    "similar": "似たような興味",
+    "recommended": "あなたへのおすすめ"
   },
   "blog_posts": {
-    "title": "From the Blog",
-    "subtitle": "Latest stories from your community",
-    "read_time": "{{count}} min read",
-    "views": "{{count}} views"
+    "title": "ブログから",
+    "subtitle": "あなたのコミュニティの最新のストーリー",
+    "read_time": "{{count}}分で読めます",
+    "views": "{{count}}回の閲覧"
   },
   "volunteering": {
-    "title": "Volunteer Opportunities",
-    "subtitle": "Make a difference in your community",
-    "applications": "{{count}} applied",
-    "view_opportunity": "View Opportunity"
+    "title": "ボランティアの機会",
+    "subtitle": "あなたのコミュニティに変化をもたらしましょう",
+    "applications": "{{count}}件応募済み",
+    "view_opportunity": "機会を表示"
   },
   "organisations": {
     "title": "Organisations",
-    "subtitle": "Community partners making an impact",
-    "opportunities": "{{count}} opportunities"
+    "subtitle": "影響を与えるコミュニティパートナー",
+    "opportunities": "{{count}}件の機会"
   },
   "polls": {
-    "title": "Active Polls",
-    "subtitle": "Have your say on community topics",
-    "votes": "{{count}} votes",
-    "options": "{{count}} options",
-    "vote_now": "Vote Now",
-    "closes": "Closes {{date}}"
+    "title": "アクティブな投票",
+    "subtitle": "コミュニティのトピックについて意見を述べましょう",
+    "votes": "{{count}}票",
+    "options": "{{count}}の選択肢",
+    "vote_now": "今すぐ投票",
+    "closes": "締切 {{date}}"
   },
   "in_demand_skills": {
-    "title": "Skills In Demand",
-    "subtitle": "Most requested skills in your community",
-    "requested": "{{count}} requesting",
-    "offered": "{{count}} offering",
-    "you_can_help": "You can help!"
+    "title": "需要のあるスキル",
+    "subtitle": "あなたのコミュニティで最もリクエストされているスキル",
+    "requested": "{{count}} リクエスト中",
+    "offered": "{{count}} 提供中",
+    "you_can_help": "あなたは助けることができます！"
   },
   "resources": {
-    "title": "Featured Resources",
-    "subtitle": "Guides and materials for your community",
-    "views": "{{count}} views"
+    "title": "特集リソース",
+    "subtitle": "あなたのコミュニティのためのガイドと資料",
+    "views": "{{count}} ビュー"
   },
   "jobs": {
-    "title": "Job Opportunities",
-    "subtitle": "Latest openings from community partners",
-    "applications": "{{count}} applied",
-    "deadline": "Deadline: {{date}}"
+    "title": "仕事の機会",
+    "subtitle": "コミュニティパートナーからの最新の求人",
+    "applications": "{{count}} 応募済み",
+    "deadline": "締切: {{date}}"
   },
   "aria": {
-    "content_tabs": "Explore content tabs"
+    "content_tabs": "コンテンツタブを探索"
   },
   "tabs": {
     "all": "All",
-    "for_you": "For You",
+    "for_you": "あなたのために",
     "listings": "Listings",
     "people": "People",
     "events": "Events",
     "groups": "Groups"
   },
   "recently_viewed": {
-    "title": "Recently Viewed",
-    "subtitle": "Items you've looked at recently",
+    "title": "最近見たもの",
+    "subtitle": "最近見たアイテム",
     "clear": "Clear"
   },
-  "match_score": "{{score}}% match",
-  "dismiss": "Not interested",
+  "match_score": "{{score}}% マッチ",
+  "dismiss": "興味なし",
   "dismiss_reasons": {
-    "not_relevant": "Not relevant",
-    "already_seen": "Already seen",
-    "not_interested": "Not interested in this"
+    "not_relevant": "関連性なし",
+    "already_seen": "すでに見た",
+    "not_interested": "これには興味がない"
   },
-  "loading": "Loading discover content...",
-  "sections_loaded": "Discover content loaded",
-  "for_you_empty": "Interact with listings, posts, and events to get personalised recommendations.",
-  "end_of_feed": "You're all caught up!",
-  "empty_listings": "No listings to show yet. Be the first to create one!",
-  "empty_people": "No members to show yet. Invite someone to join!",
-  "empty_events": "No upcoming events. Create one to bring your community together!",
-  "empty_groups": "No active groups yet. Start a group around your interests!",
-  "create_listing": "Create Listing",
-  "create_event": "Create Event",
-  "create_group": "Create Group",
-  "page_description": "Explore listings, events, groups, and opportunities across the community."
+  "loading": "コンテンツを読み込んでいます...",
+  "sections_loaded": "コンテンツが読み込まれました",
+  "for_you_empty": "リスティング、投稿、イベントと対話して、パーソナライズされたおすすめを受け取りましょう。",
+  "end_of_feed": "すべての情報をキャッチアップしました！",
+  "empty_listings": "表示するリスティングはまだありません。最初に作成してみましょう！",
+  "empty_people": "表示するメンバーはまだいません。誰かを招待して参加させましょう！",
+  "empty_events": "今後のイベントはありません。コミュニティを集めるために作成しましょう！",
+  "empty_groups": "まだアクティブなグループはありません。あなたの興味に基づいてグループを始めましょう！",
+  "create_listing": "リスティングを作成",
+  "create_event": "イベントを作成",
+  "create_group": "グループを作成"
 }

@@ -1,46 +1,46 @@
 {
   "meta": {
     "title": "Dashboard",
-    "description": "Your personal dashboard. View your balance, listings, and activity."
+    "description": "あなたの個人ダッシュボード。残高、リスト、アクティビティを表示します。"
   },
-  "welcome_back": "Welcome back, {{name}}!",
-  "community_activity": "Here's what's happening in your {{community}} community",
-  "unable_to_load": "Unable to Load Dashboard",
-  "try_again": "Try Again",
+  "welcome_back": "おかえりなさい、{{name}}！",
+  "community_activity": "{{community}}コミュニティでの出来事はこちらです",
+  "unable_to_load": "ダッシュボードを読み込めませんでした",
+  "try_again": "再試行",
   "onboarding": {
-    "banner_title": "Complete your profile setup",
-    "banner_subtitle": "Tell us about your interests and skills to get personalized matches",
-    "get_started": "Get Started"
+    "banner_title": "プロフィール設定を完了してください",
+    "banner_subtitle": "あなたの興味やスキルについて教えて、パーソナライズされたマッチを得ましょう",
+    "get_started": "始める"
   },
-  "new_listing": "New Listing",
+  "new_listing": "新しいリスト",
   "stats": {
     "balance": "Balance",
-    "active_listings": "Active Listings",
+    "active_listings": "アクティブなリスト",
     "messages": "Messages",
     "pending": "Pending"
   },
   "sections": {
-    "recent_listings": "Recent Listings",
-    "recent_activity": "Recent Activity",
-    "quick_actions": "Quick Actions",
-    "suggested_for_you": "Suggested for You",
-    "my_groups": "My Groups",
-    "upcoming_events": "Upcoming Events",
-    "your_progress": "Your Progress",
-    "pending_reviews": "Pending Reviews",
+    "recent_listings": "最近のリスト",
+    "recent_activity": "最近のアクティビティ",
+    "quick_actions": "クイックアクション",
+    "suggested_for_you": "あなたへのおすすめ",
+    "my_groups": "私のグループ",
+    "upcoming_events": "今後のイベント",
+    "your_progress": "あなたの進捗",
+    "pending_reviews": "保留中のレビュー",
     "endorsements": "Endorsements"
   },
-  "view_all": "View all",
-  "view_all_caps": "View All",
-  "browse_all": "Browse All",
-  "view_achievements": "View Achievements",
-  "view_all_transactions": "View All Transactions",
+  "view_all": "すべて表示",
+  "view_all_caps": "すべて表示",
+  "browse_all": "すべてをブラウズ",
+  "view_achievements": "実績を表示",
+  "view_all_transactions": "すべての取引を表示",
   "quick_actions": {
-    "create_listing": "Create Listing",
+    "create_listing": "リストを作成",
     "messages": "Messages",
-    "view_wallet": "View Wallet",
-    "find_members": "Find Members",
-    "browse_events": "Browse Events",
+    "view_wallet": "ウォレットを表示",
+    "find_members": "メンバーを探す",
+    "browse_events": "イベントをブラウズ",
     "notifications": "Notifications"
   },
   "listings": {
@@ -48,54 +48,54 @@
     "requesting": "Requesting",
     "offer": "Offer",
     "request": "Request",
-    "empty": "No recent listings",
-    "create_first": "Create your first listing"
+    "empty": "最近のリストはありません",
+    "create_first": "最初のリストを作成してください"
   },
   "activity": {
-    "action_listing": "shared a listing",
-    "action_event": "posted about an event",
-    "action_poll": "created a poll",
-    "action_goal": "set a new goal",
-    "action_post": "shared a post",
-    "empty": "No recent activity",
-    "check_feed": "Check out the feed"
+    "action_listing": "リストを共有しました",
+    "action_event": "イベントについて投稿しました",
+    "action_poll": "投票を作成しました",
+    "action_goal": "新しい目標を設定しました",
+    "action_post": "投稿を共有しました",
+    "empty": "最近の活動はありません",
+    "check_feed": "フィードをチェックしてください"
   },
   "suggestions": {
-    "empty": "No suggestions yet"
+    "empty": "まだ提案はありません"
   },
   "groups": {
-    "members_count": "{{count}} members",
-    "empty": "You haven't joined any groups yet",
-    "discover": "Discover groups"
+    "members_count": "{{count}} メンバー",
+    "empty": "まだグループに参加していません",
+    "discover": "グループを見つける"
   },
   "events": {
-    "online_event": "Online event",
-    "empty": "No upcoming events",
-    "browse": "Browse events"
+    "online_event": "オンラインイベント",
+    "empty": "今後のイベントはありません",
+    "browse": "イベントをブラウズする"
   },
   "gamification": {
-    "level": "Level {{level}}",
+    "level": "レベル {{level}}",
     "badges": "Badges",
     "streak": "Streak",
-    "xp_progress": "XP Progress",
-    "start_earning": "Start earning XP by participating in the community!",
-    "streak_days_one": "{{count}} day",
-    "streak_days_other": "{{count}} days"
+    "xp_progress": "XPの進捗",
+    "start_earning": "コミュニティに参加してXPを獲得し始めましょう！",
+    "streak_days_one": "{{count}} 日",
+    "streak_days_other": "{{count}} 日間"
   },
   "aria": {
-    "loading_listings": "Loading listings",
-    "loading_activity": "Loading activity",
-    "loading_events": "Loading events",
-    "loading_groups": "Loading groups",
-    "loading_progress": "Loading progress",
-    "loading_suggestions": "Loading suggestions",
-    "loading_endorsements": "Loading endorsements",
-    "loading_pending_reviews": "Loading pending reviews"
+    "loading_listings": "リストを読み込み中",
+    "loading_activity": "活動を読み込み中",
+    "loading_events": "イベントを読み込み中",
+    "loading_groups": "グループを読み込み中",
+    "loading_progress": "進捗を読み込み中",
+    "loading_suggestions": "提案を読み込み中",
+    "loading_endorsements": "推薦を読み込み中",
+    "loading_pending_reviews": "保留中のレビューを読み込み中"
   },
   "reviews": {
-    "sent": "Sent {{amount}}h",
-    "received": "Received {{amount}}h",
+    "sent": "{{amount}}hを送信しました",
+    "received": "{{amount}}hを受信しました",
     "review": "Review",
-    "none_pending": "No pending reviews"
+    "none_pending": "保留中のレビューはありません"
   }
 }

@@ -1,5 +1,6 @@
 {
   "help": {
+    "meta_description": "Durchstöbern Sie Hilfsartikel, Anleitungen und FAQs, um das Beste aus der Plattform herauszuholen.",
     "page_title": "Hilfezentrum",
     "heading": "Hilfezentrum",
     "subtitle": "Finden Sie Antworten auf häufige Fragen zu {{name}}",
@@ -150,7 +151,7 @@
   },
   "page_meta": {
     "newsletter_unsubscribe": {
-      "title": "Newsletter Unsubscribe"
+      "title": "Newsletter Abbestellen"
     }
   }
 }

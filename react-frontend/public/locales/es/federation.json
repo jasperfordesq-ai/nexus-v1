@@ -423,25 +423,63 @@
     "aria_delivered": "Entregado",
     "aria_reply": "Responder mensaje",
     "aria_send_reply": "Enviar respuesta",
-    "toast_error": "Error"
+    "toast_error": "Error",
+    "translate_to": "Traducir a {{language}}",
+    "view_original": "Ver original",
+    "show_translation": "Mostrar traducción",
+    "translating": "Traduciendo…",
+    "translation_failed": "La traducción falló. Por favor, inténtalo de nuevo.",
+    "auto_translate_tooltip_off": "Traducir todos los mensajes automáticamente",
+    "auto_translate_tooltip_on": "La traducción automática está activada — haz clic para desactivarla",
+    "auto_translate_enabled": "Los mensajes se traducirán automáticamente",
+    "auto_translate_disabled": "Traducción automática desactivada",
+    "auto_translate_active_banner": "Los mensajes en esta conversación se están traduciendo automáticamente a tu idioma.",
+    "auto_translate_turn_off": "Desactivar",
+    "external_recipient_info": "Este mensaje se enviará a un servidor externo asociado."
   },
   "onboarding": {
-    "reach_label_remote_ok": "Remoto OK"
+    "reach_label_remote_ok": "Remoto OK",
+    "progress_aria": "Paso {{current}} de {{total}}"
   },
   "listings": {},
   "members": {
     "reach_remote_ok": "Remoto OK",
     "aria_search": "Buscar miembros federados",
     "aria_filter_community": "Filtrar por comunidad asociada",
-    "aria_filter_skills": "Filtrar por habilidades"
+    "aria_filter_skills": "Filtrar por habilidades",
+    "external_profile_title": "Miembro Externo",
+    "external_profile_message": "Este miembro pertenece a una comunidad asociada externa. Puedes enviarles un mensaje o créditos desde la página de Miembros."
   },
   "events": {},
-  "partners": {},
-  "partner_detail": {
-    "federation_partner_badge": "Socio de federación"
+  "partners": {
+    "level_prefix": "Nivel {{level}}",
+    "permission_groups": "Membresía del grupo"
   },
-  "member_profile": {},
-  "settings": {},
+  "partner_detail": {
+    "federation_partner_badge": "Socio de federación",
+    "level_prefix": "Nivel {{level}}",
+    "permission_groups": "Membresía del grupo"
+  },
+  "member_profile": {
+    "connect_sent": "¡Solicitud de conexión enviada!",
+    "connect_failed": "Error al enviar la solicitud",
+    "request_pending": "Solicitud pendiente",
+    "send_credits": "Enviar créditos",
+    "send_credits_to": "Enviar créditos a {{name}}",
+    "amount_hours": "Cantidad (horas)",
+    "tx_description_placeholder": "¿Para qué es esta transferencia?",
+    "tx_summary": "{{amount}} horas a {{name}} ({{community}})",
+    "tx_success": "¡Créditos enviados!",
+    "tx_success_detail": "Se enviaron con éxito {{amount}} horas a {{name}}",
+    "tx_failed": "La transferencia falló",
+    "external_member_title": "Miembro Externo",
+    "external_member_description": "Los perfiles de miembros externos se muestran en la plataforma de su comunidad de origen. Puedes enviarles un mensaje o créditos desde la página de Miembros."
+  },
+  "settings": {
+    "show_reviews_federated": {
+      "help": "Cuando esté habilitado, tus reseñas serán visibles para los miembros en plataformas asociadas federadas."
+    }
+  },
   "connections": {
     "page_title": "Conexiones",
     "breadcrumb_federation": "Federación",
@@ -468,7 +506,22 @@
     "accepted_success": "¡Conexión aceptada!",
     "rejected_success": "Solicitud de conexión rechazada",
     "removed_success": "Conexión eliminada",
-    "action_failed": "La acción falló"
+    "action_failed": "La acción falló",
+    "load_error": "Error al cargar las conexiones. Por favor, inténtalo de nuevo.",
+    "try_again": "Inténtalo de nuevo"
+  },
+  "reviews": {
+    "empty": "No hay reseñas aún de comunidades asociadas.",
+    "unavailable": "Reseñas aún no disponibles para este miembro federado.",
+    "from_partner": "a través de {{partner}}",
+    "rating_label": "Calificado {{rating}} de 5",
+    "load_error": "Error al cargar las reseñas. Por favor, intenta de nuevo."
+  },
+  "reputation": {
+    "chip_label": "{{score}} ({{count}})",
+    "tooltip_federated": "Reputación agregada de {{count}} comunidades asociadas",
+    "tooltip_local": "Basado en {{count}} reseñas en esta comunidad",
+    "aria_label": "Reputación federada {{score}} de {{count}} reseñas"
   },
   "federation.external": "External",
   "onboarding.progress_aria": "Step {{current}} of {{total}}",

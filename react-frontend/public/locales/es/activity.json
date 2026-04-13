@@ -9,6 +9,8 @@
   "error_load_failed_detail": "No se pudieron cargar tus datos de actividad. Por favor, inténtalo de nuevo.",
   "unable_to_load": "No se pudo cargar",
   "try_again": "Reintentar",
+  "loading": "Cargando datos de actividad...",
+  "refresh": "Actualizar",
   "stats": {
     "hours_given": "Horas Dadas",
     "hours_received": "Horas Recibidas",
@@ -30,15 +32,13 @@
   "quick_stats": "Estadísticas Rápidas",
   "groups_joined": "Grupos Unidos",
   "posts_30d": "Publicaciones (30d)",
-  "likes_received_30d": "Me gusta Recibidos (30d)",
-  "net_balance": "Balance Neto",
-  "my_skills": "Mis Habilidades",
-  "skill_offer": "Oferta",
-  "loading": "Cargando datos de actividad...",
-  "refresh": "Actualizar",
   "comments_30d": "Comentarios (30d)",
   "likes_given_30d": "Me gusta Dados (30d)",
+  "likes_received_30d": "Me gusta Recibidos (30d)",
+  "net_balance": "Balance Neto",
   "hours_suffix": "h",
+  "my_skills": "Mis Habilidades",
+  "skill_offer": "Oferta",
   "skill_request": "Solicitud",
   "activity_types": {
     "exchange": "Intercambio",
@@ -53,6 +53,6 @@
   "endorsements_count_one": "{{count}} recomendación",
   "endorsements_count_other": "{{count}} recomendaciones",
   "page_meta": {
-    "title": "Activity Dashboard"
+    "title": "Tablero de Actividades"
   }
 }

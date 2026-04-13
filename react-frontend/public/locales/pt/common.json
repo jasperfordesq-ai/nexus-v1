@@ -76,6 +76,7 @@
     "matches": "Correspondências baseadas em competências",
     "goals": "Metas pessoais e comunitárias",
     "skills": "Diretório de competências e recomendações",
+    "saved": "Seus itens favoritos",
     "activity": "O seu registo de atividade recente",
     "ai_chat": "Assistente comunitário com IA",
     "federation_hub": "Rede intercomunidades",
@@ -95,8 +96,7 @@
     "strategic_plan": "A nossa direção estratégica",
     "timebanking_listings": "Ofertas e pedidos",
     "messages": "Suas mensagens",
-    "saved": "Your bookmarked items",
-    "marketplace": "Buy & sell in your community"
+    "marketplace": "Compre e venda na sua comunidade"
   },
   "user_menu": {
     "my_profile": "O Meu Perfil",
@@ -227,7 +227,7 @@
     "pages": "Páginas",
     "cookie_settings": "Definições de Cookies",
     "built_on_nexus": "Construído com Project NEXUS — Plataforma Comunitária de Código Aberto",
-    "agpl_notice": "AGPL-3.0 — Copyright © 2024–{{year}} Jasper Ford",
+    "agpl_notice": "AGPL-3.0 — Direitos autorais © 2024–{{year}} Jasper Ford",
     "terms": "Termos",
     "privacy": "Privacidade"
   },
@@ -292,8 +292,8 @@
     "no_results": "Nenhum GIF encontrado",
     "powered_by": "Fornecido por GIPHY",
     "button_label": "Adicionar GIF",
-    "select": "Select GIF",
-    "preview_alt": "GIF preview"
+    "select": "Selecionar GIF",
+    "preview_alt": "Prévia do GIF"
   },
   "loading": "A carregar...",
   "feature_error": {
@@ -388,26 +388,26 @@
   },
   "hours_display_one": "{{count}} hora",
   "hours_display_other": "{{count}} horas",
+  "compose": {
+    "aria_insert_link": "Inserir link",
+    "aria_remove_link": "Remover link",
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1"
+  },
   "toast": {
     "aria_notifications": "Notificações",
     "aria_dismiss_notification": "Ignorar notificação"
   },
-  "compose": {
-    "placeholder_url": "https://example.com",
-    "placeholder_hours": "1",
-    "aria_insert_link": "Insert link",
-    "aria_remove_link": "Remove link"
-  },
   "verification": {
-    "not_id_verified": "Not ID Verified"
+    "not_id_verified": "Não verificado por ID"
   },
   "page_meta": {
     "skills_browse": {
-      "title": "Browse Skills"
+      "title": "Explorar Habilidades"
     },
     "members": {
-      "title": "Members",
-      "description": "Browse community members, connect and exchange time credits."
+      "description": "Explore os membros da comunidade, conecte-se e troque créditos de tempo.",
+      "title": "Members"
     }
   }
 }

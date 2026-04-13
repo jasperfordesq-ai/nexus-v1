@@ -62,9 +62,9 @@
     "progress_aria": "Progresso: {{percent}}%"
   },
   "template_picker": {
-    "load_error": "Failed to load templates. Please try again.",
-    "try_again": "Try again",
-    "none_available": "No templates available yet.",
-    "none_in_category": "No templates in this category."
+    "load_error": "Impossibile caricare i modelli. Per favore riprova.",
+    "try_again": "Riprova",
+    "none_available": "Nessun modello disponibile ancora.",
+    "none_in_category": "Nessun modello in questa categoria."
   }
 }

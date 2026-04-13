@@ -2,6 +2,7 @@
   "page_title": "Bénévolat",
   "heading": "Bénévolat",
   "subtitle": "Trouvez des opportunités et suivez votre impact",
+  "page_description": "Découvrez des opportunités de bénévolat dans votre communauté. Inscrivez-vous, suivez vos heures et faites une différence.",
   "browse_organisations": "Parcourir les organisations",
   "tab_opportunities": "Opportunités",
   "tab_applications": "Mes candidatures",
@@ -257,6 +258,7 @@
       "amount": "Montant",
       "message": "Message (optionnel)"
     },
+    "placeholder_amount": "0,00",
     "anonymous_toggle_on": "Don anonyme",
     "anonymous_toggle_off": "Faire un don anonymement",
     "cancel": "Annuler",
@@ -494,10 +496,9 @@
     "rest_days_desc": "D'après votre activité récente, nous vous recommandons de prendre une pause ces jours-ci :",
     "recent_checkins": "Bilans d'humeur récents"
   },
-  "page_description": "Discover volunteering opportunities in your community. Sign up, track your hours, and make an impact.",
   "page_meta": {
     "create_opportunity": {
-      "title": "Create Opportunity"
+      "title": "Créer une opportunité"
     }
   }
 }

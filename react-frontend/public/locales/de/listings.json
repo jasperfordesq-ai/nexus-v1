@@ -146,6 +146,7 @@
     "placeholder": "Eine Fähigkeit eingeben und Enter drücken...",
     "aria_add": "Fähigkeits-Tag hinzufügen"
   },
+  "more_filters": "Weitere Filter",
   "aria": {
     "view_mode": "Ansichtsmodus",
     "loading_listings": "Inserate werden geladen"
@@ -162,28 +163,27 @@
     "vs_previous_week": "ggü. Vorwoche",
     "views_last_days": "Aufrufe (letzte {{days}} Tage)"
   },
-  "more_filters": "More filters",
-  "filters_label": "Filters",
-  "filter_hours": "Duration",
-  "filter_any_duration": "Any duration",
-  "filter_quick": "Quick (under 1h)",
-  "filter_short": "Short (1-3h)",
-  "filter_half_day": "Half day (3-6h)",
-  "filter_full_day": "Full day (6h+)",
-  "filter_service_mode": "Service mode",
-  "filter_any_mode": "Any mode",
-  "filter_remote": "Remote available",
-  "filter_in_person": "In-person only",
-  "filter_posted_date": "Posted date",
-  "filter_any_time": "Any time",
-  "filter_today": "Today",
-  "filter_this_week": "This week",
-  "filter_this_month": "This month",
-  "clear_filters": "Clear filters",
-  "results_count": "{{count}} listings found",
+  "filter_any_duration": "Jede Dauer",
+  "filter_quick": "Schnell (unter 1h)",
+  "filter_short": "Kurz (1-3h)",
+  "filter_half_day": "Halber Tag (3-6h)",
+  "filter_full_day": "Ganzer Tag (6h+)",
+  "filter_service_mode": "Dienstmodus",
+  "filter_any_mode": "Jeder Modus",
+  "filter_remote": "Fernzugriff verfügbar",
+  "filter_in_person": "Nur persönlich",
+  "filter_posted_date": "Veröffentlichungsdatum",
+  "filter_any_time": "Jede Zeit",
+  "filter_this_week": "Diese Woche",
+  "filter_this_month": "Diesen Monat",
+  "clear_filters": "Filter zurücksetzen",
+  "results_count": "{{count}} Angebote gefunden",
   "page_meta": {
     "create": {
-      "title": "Create Listing"
+      "title": "Angebot erstellen"
     }
-  }
+  },
+  "filters_label": "Filters",
+  "filter_hours": "Duration",
+  "filter_today": "Today"
 }

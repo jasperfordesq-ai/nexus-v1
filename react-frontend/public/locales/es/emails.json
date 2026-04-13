@@ -22,7 +22,10 @@
     "cta_primary": "Abre la plataforma",
     "cta_secondary": "Ver el estado completo del desarrollo",
     "thanks": "Gracias por ser parte de esta comunidad — pronto habrá más.",
-    "signoff": "— El equipo de {{community}}"
+    "signoff": "— El equipo de {{community}}",
+    "section_marketplace_title": "Marketplace",
+    "section_donations_title": "Donations",
+    "section_federation_title": "Federation"
   },
   "welcome": {
     "subject": "¡Bienvenido a {{community}}!",
@@ -87,7 +90,9 @@
     "jobs_match_plural": "coincidencias de trabajos",
     "receiving_notice": "Estás recibiendo esto porque configuraste una alerta de trabajo.",
     "manage_alerts": "gestiona tus alertas aquí",
-    "unsubscribe": "Para darte de baja, {{link}}."
+    "unsubscribe": "Para darte de baja, {{link}}.",
+    "remote": "Remote",
+    "deadline_open": "Open"
   },
   "gamification_digest": {
     "subject": "Tu Resumen Semanal de Progreso",
@@ -97,7 +102,10 @@
     "xp_earned": "XP Ganado",
     "streak_days": "{{days}} días",
     "encouragement": "¡Sigue con el gran trabajo! — tus contribuciones hacen que la comunidad sea más fuerte.",
-    "view_leaderboard": "Ver Tabla de Clasificación"
+    "view_leaderboard": "Ver Tabla de Clasificación",
+    "level": "Level",
+    "rank": "Rank",
+    "streak": "Streak"
   },
   "gamification_milestone": {
     "level_up_subject": "¡Felicidades! Alcanzaste el Nivel {{level}}",
@@ -156,7 +164,15 @@
     "partnership_title": "Solicitud de Asociación de la Federación",
     "partnership_preview": "{{community}} quiere asociarse con tu comunidad",
     "partnership_body": "{{community}} ha enviado a tu comunidad una solicitud de asociación de la federación.",
-    "review_request": "Revisar Solicitud"
+    "review_request": "Revisar Solicitud",
+    "label_from": "From",
+    "label_community": "Community",
+    "label_amount": "Amount",
+    "label_description": "Description",
+    "label_to": "To",
+    "label_messages": "Messages",
+    "label_transactions": "Transactions",
+    "label_connections": "Connections"
   },
   "group_digest": {
     "subject": "Resumen Semanal: {{group}}",
@@ -176,8 +192,9 @@
     "subscriber_notice": "Recibiste este correo electrónico porque estás suscrito al boletín de {{community}}.",
     "manage_preferences": "Gestionar Preferencias",
     "manage_email_preferences": "Gestionar Preferencias de Correo Electrónico",
-    "test_prefix": "[TEST]",
-    "no_subject": "Sin Asunto"
+    "test_prefix": "[PRUEBA]",
+    "no_subject": "Sin Asunto",
+    "unsubscribe": "Unsubscribe"
   },
   "notification": {
     "sent_by": "Este correo electrónico fue enviado por {{community}}",
@@ -185,7 +202,10 @@
     "view_wallet": "Ver tu billetera",
     "review_title": "¡Nueva reseña recibida!",
     "credit_received_title": "¡Has recibido créditos de tiempo!",
-    "credit_sent_body": "<strong>{{sender}}</strong> te ha enviado <strong>{{amount}}</strong> el {{community}}."
+    "credit_sent_body": "<strong>{{sender}}</strong> te ha enviado <strong>{{amount}}</strong> el {{community}}.",
+    "review_subject": "{{reviewer}} left you a {{rating}}-star review on {{community}}",
+    "credit_received_subject": "{{sender}} sent you {{amount}} on {{community}}",
+    "someone": "Someone"
   },
   "digest": {
     "title": "Tu resumen de {{frequency}}",
@@ -279,7 +299,9 @@
     "reminder_time_note_1h": "comienza en aproximadamente 1 hora",
     "reminder_body": "Este es un recordatorio amistoso de que <strong>\"{{title}}\"</strong> {{time_note}}.",
     "online_event": "Evento en Línea",
-    "location_label": "Ubicación: {{location}}"
+    "location_label": "Ubicación: {{location}}",
+    "rsvp_badge_going": "Going",
+    "rsvp_badge_interested": "Interested"
   },
   "match_mutual": {
     "title": "¡Coincidencia Mutua Encontrada!",
@@ -317,5 +339,8 @@
     "exchange_cancelled": "Intercambio Cancelado",
     "exchange_disputed": "⚠️ Disputa de Intercambio - Revisión del Corredor Necesaria",
     "default": "Notificación de Project NEXUS"
+  },
+  "vetting": {
+    "subject": "{{heading}} - {{tenant}}"
   }
 }

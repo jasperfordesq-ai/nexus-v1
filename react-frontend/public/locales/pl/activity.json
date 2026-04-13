@@ -1,43 +1,43 @@
 {
   "meta": {
-    "title": "Activity Dashboard",
-    "description": "Your activity overview — hours, skills, connections, and recent actions."
+    "title": "Panel Aktywności",
+    "description": "Twoje podsumowanie aktywności — godziny, umiejętności, połączenia i ostatnie działania."
   },
-  "page_title": "Activity Dashboard",
-  "page_subtitle": "Your community participation at a glance.",
-  "error_load_failed": "Failed to load activity dashboard",
-  "error_load_failed_detail": "Failed to load your activity data. Please try again.",
-  "unable_to_load": "Unable to load",
-  "try_again": "Try Again",
-  "loading": "Loading activity data...",
+  "page_title": "Panel Aktywności",
+  "page_subtitle": "Twoje uczestnictwo w społeczności w skrócie.",
+  "error_load_failed": "Nie udało się załadować panelu aktywności",
+  "error_load_failed_detail": "Nie udało się załadować danych o Twojej aktywności. Proszę spróbuj ponownie.",
+  "unable_to_load": "Nie można załadować",
+  "try_again": "Spróbuj ponownie",
+  "loading": "Ładowanie danych o aktywności...",
   "refresh": "Refresh",
   "stats": {
-    "hours_given": "Hours Given",
-    "hours_received": "Hours Received",
+    "hours_given": "Godziny Przekazane",
+    "hours_received": "Godziny Otrzymane",
     "connections": "Connections",
     "exchanges": "Exchanges",
-    "pending_requests": "Pending Requests",
-    "transactions_given": "Transactions Given",
-    "transactions_received": "Transactions Received"
+    "pending_requests": "Oczekujące Prośby",
+    "transactions_given": "Transakcje Przekazane",
+    "transactions_received": "Transakcje Otrzymane"
   },
   "chart": {
     "given": "Given",
     "received": "Received",
-    "monthly_activity": "Monthly Activity",
-    "no_data": "No chart data available"
+    "monthly_activity": "Miesięczna Aktywność",
+    "no_data": "Brak dostępnych danych do wykresu"
   },
-  "recent_activity": "Recent Activity",
-  "empty_title": "No recent activity",
-  "empty_description": "Start participating in your community to see your activity here.",
-  "quick_stats": "Quick Stats",
-  "groups_joined": "Groups Joined",
-  "posts_30d": "Posts (30d)",
-  "comments_30d": "Comments (30d)",
-  "likes_given_30d": "Likes Given (30d)",
-  "likes_received_30d": "Likes Received (30d)",
-  "net_balance": "Net Balance",
+  "recent_activity": "Ostatnia Aktywność",
+  "empty_title": "Brak ostatniej aktywności",
+  "empty_description": "Zacznij uczestniczyć w swojej społeczności, aby zobaczyć swoją aktywność tutaj.",
+  "quick_stats": "Szybkie Statystyki",
+  "groups_joined": "Dołączone Grupy",
+  "posts_30d": "Posty (30d)",
+  "comments_30d": "Komentarze (30d)",
+  "likes_given_30d": "Polubienia Przekazane (30d)",
+  "likes_received_30d": "Polubienia Otrzymane (30d)",
+  "net_balance": "Bilans Netto",
   "hours_suffix": "h",
-  "my_skills": "My Skills",
+  "my_skills": "Moje Umiejętności",
   "skill_offer": "Offer",
   "skill_request": "Request",
   "activity_types": {
@@ -50,9 +50,9 @@
     "post": "Post",
     "default": "Activity"
   },
-  "endorsements_count_one": "{{count}} endorsement",
-  "endorsements_count_other": "{{count}} endorsements",
+  "endorsements_count_one": "{{count}} rekomendacja",
+  "endorsements_count_other": "{{count}} rekomendacje",
   "page_meta": {
-    "title": "Activity Dashboard"
+    "title": "Panel Aktywności"
   }
 }

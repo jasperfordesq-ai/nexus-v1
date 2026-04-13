@@ -76,6 +76,7 @@
     "matches": "スキルマッチング",
     "goals": "個人とコミュニティの目標",
     "skills": "スキルディレクトリと推薦",
+    "saved": "あなたのブックマークしたアイテム",
     "activity": "最近のアクティビティログ",
     "ai_chat": "AI搭載コミュニティアシスタント",
     "federation_hub": "コミュニティ間ネットワーク",
@@ -95,8 +96,7 @@
     "strategic_plan": "戦略的方向性",
     "timebanking_listings": "オファーとリクエスト",
     "messages": "あなたのメッセージ",
-    "saved": "Your bookmarked items",
-    "marketplace": "Buy & sell in your community"
+    "marketplace": "コミュニティで売買する"
   },
   "user_menu": {
     "my_profile": "マイプロフィール",
@@ -227,7 +227,7 @@
     "pages": "ページ",
     "cookie_settings": "Cookie設定",
     "built_on_nexus": "Project NEXUS上に構築 — オープンソースコミュニティプラットフォーム",
-    "agpl_notice": "AGPL-3.0 — Copyright © 2024–{{year}} Jasper Ford",
+    "agpl_notice": "AGPL-3.0 — 著作権 © 2024–{{year}} ジャスパー・フォード",
     "terms": "利用規約",
     "privacy": "プライバシー"
   },
@@ -290,10 +290,10 @@
     "search_placeholder": "GIFを検索...",
     "trending": "トレンド",
     "no_results": "GIFが見つかりません",
-    "powered_by": "Powered by GIPHY",
+    "powered_by": "GIPHYによって提供されています",
     "button_label": "GIFを追加",
-    "select": "Select GIF",
-    "preview_alt": "GIF preview"
+    "select": "GIFを選択",
+    "preview_alt": "GIFプレビュー"
   },
   "loading": "読み込み中...",
   "feature_error": {
@@ -388,26 +388,26 @@
   },
   "hours_display_one": "{{count}}時間",
   "hours_display_other": "{{count}}時間",
+  "compose": {
+    "aria_insert_link": "リンクを挿入",
+    "aria_remove_link": "リンクを削除",
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1"
+  },
   "toast": {
     "aria_notifications": "通知",
     "aria_dismiss_notification": "通知を閉じる"
   },
-  "compose": {
-    "placeholder_url": "https://example.com",
-    "placeholder_hours": "1",
-    "aria_insert_link": "Insert link",
-    "aria_remove_link": "Remove link"
-  },
   "verification": {
-    "not_id_verified": "Not ID Verified"
+    "not_id_verified": "ID確認されていません"
   },
   "page_meta": {
     "skills_browse": {
-      "title": "Browse Skills"
+      "title": "スキルをブラウズ"
     },
     "members": {
-      "title": "Members",
-      "description": "Browse community members, connect and exchange time credits."
+      "description": "コミュニティメンバーをブラウズし、つながり、時間クレジットを交換しましょう。",
+      "title": "Members"
     }
   }
 }

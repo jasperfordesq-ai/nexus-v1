@@ -171,13 +171,13 @@
   "hours_count_other": "{{count}} Stunden",
   "page_meta": {
     "list": {
-      "title": "Group Exchanges"
+      "title": "Gruppenaustausch"
     },
     "detail": {
-      "title": "Group Exchange"
+      "title": "Gruppenaustausch"
     },
     "create": {
-      "title": "Create Group Exchange"
+      "title": "Gruppenaustausch erstellen"
     }
   }
 }

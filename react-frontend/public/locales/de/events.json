@@ -1,4 +1,7 @@
 {
+  "page_description": "Entdecke Gemeinschaftsveranstaltungen, Workshops und Treffen in deiner Nähe.",
+  "near_me": "In meiner Nähe",
+  "near_me_no_location": "Setze deinen Standort in deinem Profil, um In meiner Nähe zu nutzen",
   "title": "Veranstaltungen",
   "subtitle": "Entdecken und nehmen Sie an Gemeinschaftsveranstaltungen teil",
   "create_event": "Veranstaltung erstellen",
@@ -111,6 +114,7 @@
   "form": {
     "create_title": "Neue Veranstaltung erstellen",
     "edit_title": "Veranstaltung bearbeiten",
+    "group_event_notice": "Diese Veranstaltung wird mit deiner Gruppe verbunden sein.",
     "loading": "Veranstaltung wird geladen...",
     "unable_to_load": "Veranstaltung kann nicht geladen werden",
     "back_to_events": "Zurück zu Veranstaltungen",
@@ -236,14 +240,11 @@
     "vote_failed": "Stimme konnte nicht erfasst werden",
     "view_full": "Vollständige Umfrage anzeigen"
   },
-  "page_title": "Events",
-  "page_description": "Discover community events, workshops, and meetups near you.",
-  "near_me": "Near me",
-  "near_me_no_location": "Set your location in your profile to use Near me",
-  "radius_label": "Radius",
   "page_meta": {
     "create": {
-      "title": "Create Event"
+      "title": "Veranstaltung erstellen"
     }
-  }
+  },
+  "page_title": "Events",
+  "radius_label": "Radius"
 }

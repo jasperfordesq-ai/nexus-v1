@@ -1,24 +1,24 @@
 {
-  "checkin_recorded": "Check-in recorded!",
-  "checkin_failed": "Failed to record check-in.",
-  "reminder_set_failed": "Failed to set reminder.",
-  "reminder_removed": "Reminder removed.",
-  "reminder_remove_failed": "Failed to remove reminder.",
-  "template_created": "Goal created from template!",
-  "template_create_failed": "Failed to create goal from template.",
+  "checkin_recorded": "チェックインが記録されました！",
+  "checkin_failed": "チェックインの記録に失敗しました。",
+  "reminder_set_failed": "リマインダーの設定に失敗しました。",
+  "reminder_removed": "リマインダーが削除されました。",
+  "reminder_remove_failed": "リマインダーの削除に失敗しました。",
+  "template_created": "テンプレートから目標が作成されました！",
+  "template_create_failed": "テンプレートから目標の作成に失敗しました。",
   "checkin": {
-    "aria_progress_percentage": "Progress percentage",
-    "title": "Check In",
-    "new_checkin": "New Check-in",
+    "aria_progress_percentage": "進捗の割合",
+    "title": "チェックイン",
+    "new_checkin": "新しいチェックイン",
     "history": "History",
-    "no_checkins": "No check-ins yet. Record your first one!",
+    "no_checkins": "まだチェックインはありません。最初のチェックインを記録しましょう！",
     "progress_label": "Progress",
-    "mood_label": "How are you feeling?",
-    "note_label": "Note (optional)",
-    "note_placeholder": "How's it going? Any wins or challenges?",
+    "mood_label": "気分はいかがですか？",
+    "note_label": "メモ（任意）",
+    "note_placeholder": "調子はどうですか？何か成功や課題はありますか？",
     "cancel": "Cancel",
-    "submit": "Record Check-in",
-    "check_in_button": "Check In"
+    "submit": "チェックインを記録する",
+    "check_in_button": "チェックイン"
   },
   "mood": {
     "great": "Great",
@@ -29,42 +29,42 @@
     "grateful": "Grateful"
   },
   "reminder": {
-    "active": "Reminder Active",
-    "set": "Set Reminder",
-    "currently": "Currently: {{frequency}}",
-    "remove": "Remove Reminder",
-    "aria_active": "Reminder active",
-    "aria_set": "Set reminder",
-    "reminder_set_success": "Reminder set: {{frequency}}"
+    "active": "リマインダーがアクティブ",
+    "set": "リマインダーを設定する",
+    "currently": "現在：{{frequency}}",
+    "remove": "リマインダーを削除する",
+    "aria_active": "リマインダーがアクティブ",
+    "aria_set": "リマインダーを設定する",
+    "reminder_set_success": "リマインダーが設定されました：{{frequency}}"
   },
   "frequency": {
     "daily": "Daily",
     "weekly": "Weekly",
-    "biweekly": "Every 2 weeks",
+    "biweekly": "2週間ごと",
     "monthly": "Monthly"
   },
   "template": {
-    "title": "Start from Template",
-    "loading_error": "Failed to load templates. Please try again.",
-    "try_again": "Try Again",
-    "no_templates": "No templates available yet.",
+    "title": "テンプレートから始める",
+    "loading_error": "テンプレートの読み込みに失敗しました。もう一度お試しください。",
+    "try_again": "もう一度試す",
+    "no_templates": "まだ利用可能なテンプレートはありません。",
     "all_categories": "All",
-    "no_in_category": "No templates in this category.",
-    "target_label": "Target: {{value}}",
+    "no_in_category": "このカテゴリにはテンプレートがありません。",
+    "target_label": "目標：{{value}}",
     "duration_days": "{{days}}d",
-    "use_template_aria": "Use template: {{title}}",
+    "use_template_aria": "テンプレートを使用: {{title}}",
     "cancel": "Cancel"
   },
   "history": {
-    "load_failed": "Failed to load history.",
+    "load_failed": "履歴の読み込みに失敗しました。",
     "retry": "Retry",
-    "no_activity": "No activity recorded yet.",
-    "progress_aria": "Progress: {{percent}}%"
+    "no_activity": "まだアクティビティは記録されていません。",
+    "progress_aria": "進捗: {{percent}}%"
   },
   "template_picker": {
-    "load_error": "Failed to load templates. Please try again.",
-    "try_again": "Try again",
-    "none_available": "No templates available yet.",
-    "none_in_category": "No templates in this category."
+    "load_error": "テンプレートの読み込みに失敗しました。もう一度お試しください。",
+    "try_again": "もう一度試す",
+    "none_available": "まだ利用可能なテンプレートはありません。",
+    "none_in_category": "このカテゴリにはテンプレートがありません。"
   }
 }

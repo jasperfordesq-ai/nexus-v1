@@ -890,40 +890,40 @@
   "deadline_countdown_one": "Chiude tra {{count}} giorno",
   "deadline_countdown_other": "Chiude tra {{count}} giorni",
   "ai_chat": {
-    "open": "Ask AI about this job",
-    "close": "Close AI chat",
-    "send": "Send message",
-    "title": "Ask AI about this job",
-    "hint": "Ask me anything about this job — qualifications, salary, how to apply, interview tips...",
-    "placeholder": "Type your question..."
+    "open": "Chiedi all'AI di questo lavoro",
+    "close": "Chiudi la chat con l'AI",
+    "send": "Invia messaggio",
+    "title": "Chiedi all'AI di questo lavoro",
+    "hint": "Chiedimi qualsiasi cosa su questo lavoro — qualifiche, stipendio, come candidarsi, consigli per il colloquio...",
+    "placeholder": "Scrivi la tua domanda..."
   },
   "page_meta": {
     "bias_audit": {
-      "title": "Bias Audit"
+      "title": "Audit dei pregiudizi"
     },
     "create": {
-      "title": "Post a Job"
+      "title": "Pubblica un lavoro"
     },
     "talent_search": {
-      "title": "Talent Search"
+      "title": "Ricerca talenti"
     },
     "my_applications": {
-      "title": "My Applications"
+      "title": "Le mie candidature"
     },
     "analytics": {
-      "title": "Job Analytics"
+      "title": "Analisi dei lavori"
     },
     "kanban": {
-      "title": "Job Applications"
+      "title": "Candidature ai lavori"
     },
     "alerts": {
-      "title": "Job Alerts"
+      "title": "Avvisi di lavoro"
     },
     "employer_onboarding": {
-      "title": "Employer Onboarding"
+      "title": "Onboarding del datore di lavoro"
     },
     "employer_brand": {
-      "title": "Employer Brand"
+      "title": "Brand del datore di lavoro"
     }
   }
 }

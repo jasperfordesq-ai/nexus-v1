@@ -9,6 +9,8 @@
   "error_load_failed_detail": "Impossibile caricare i dati della tua attività. Riprova.",
   "unable_to_load": "Impossibile caricare",
   "try_again": "Riprova",
+  "loading": "Caricamento dati attività...",
+  "refresh": "Aggiorna",
   "stats": {
     "hours_given": "Ore Date",
     "hours_received": "Ore Ricevute",
@@ -30,15 +32,13 @@
   "quick_stats": "Statistiche Rapide",
   "groups_joined": "Gruppi Iscritti",
   "posts_30d": "Post (30g)",
-  "likes_received_30d": "Mi Piace Ricevuti (30g)",
-  "net_balance": "Saldo Netto",
-  "my_skills": "Le Mie Competenze",
-  "skill_offer": "Offerta",
-  "loading": "Caricamento dati attività...",
-  "refresh": "Aggiorna",
   "comments_30d": "Commenti (30g)",
   "likes_given_30d": "Mi Piace Dati (30g)",
+  "likes_received_30d": "Mi Piace Ricevuti (30g)",
+  "net_balance": "Saldo Netto",
   "hours_suffix": "h",
+  "my_skills": "Le Mie Competenze",
+  "skill_offer": "Offerta",
   "skill_request": "Richiesta",
   "activity_types": {
     "exchange": "Scambio",
@@ -53,6 +53,6 @@
   "endorsements_count_one": "{{count}} referenza",
   "endorsements_count_other": "{{count}} referenze",
   "page_meta": {
-    "title": "Activity Dashboard"
+    "title": "Cruscotto Attività"
   }
 }

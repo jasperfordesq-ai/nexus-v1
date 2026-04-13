@@ -76,6 +76,7 @@
     "matches": "Correspondances basées sur les compétences",
     "goals": "Objectifs personnels et communautaires",
     "skills": "Répertoire de compétences et recommandations",
+    "saved": "Vos éléments favoris",
     "activity": "Votre journal d'activité récente",
     "ai_chat": "Assistant communautaire IA",
     "federation_hub": "Réseau intercommunautaire",
@@ -95,8 +96,7 @@
     "strategic_plan": "Notre orientation stratégique",
     "timebanking_listings": "Offres et demandes",
     "messages": "Vos messages",
-    "saved": "Your bookmarked items",
-    "marketplace": "Buy & sell in your community"
+    "marketplace": "Achetez et vendez dans votre communauté"
   },
   "user_menu": {
     "my_profile": "Mon profil",
@@ -292,8 +292,8 @@
     "no_results": "Aucun GIF trouvé",
     "powered_by": "Propulsé par GIPHY",
     "button_label": "Ajouter un GIF",
-    "select": "Select GIF",
-    "preview_alt": "GIF preview"
+    "select": "Sélectionner un GIF",
+    "preview_alt": "Aperçu du GIF"
   },
   "loading": "Chargement...",
   "feature_error": {
@@ -388,26 +388,26 @@
   },
   "hours_display_one": "{{count}} heure",
   "hours_display_other": "{{count}} heures",
+  "compose": {
+    "aria_insert_link": "Insérer un lien",
+    "aria_remove_link": "Supprimer le lien",
+    "placeholder_url": "https://example.com",
+    "placeholder_hours": "1"
+  },
   "toast": {
     "aria_notifications": "Notifications",
     "aria_dismiss_notification": "Fermer la notification"
   },
-  "compose": {
-    "placeholder_url": "https://example.com",
-    "placeholder_hours": "1",
-    "aria_insert_link": "Insert link",
-    "aria_remove_link": "Remove link"
-  },
   "verification": {
-    "not_id_verified": "Not ID Verified"
+    "not_id_verified": "Non vérifié par ID"
   },
   "page_meta": {
     "skills_browse": {
-      "title": "Browse Skills"
+      "title": "Parcourir les compétences"
     },
     "members": {
-      "title": "Members",
-      "description": "Browse community members, connect and exchange time credits."
+      "description": "Parcourez les membres de la communauté, connectez-vous et échangez des crédits temps.",
+      "title": "Members"
     }
   }
 }

@@ -1,155 +1,155 @@
 {
   "page_title": "Discover",
+  "page_description": "Odkrywaj ogłoszenia, wydarzenia, grupy i możliwości w całej społeczności.",
   "heading": "Discover",
-  "subtitle": "Find skills, events, groups, and more in your community",
-  "search_placeholder": "Discover skills, events, groups...",
+  "subtitle": "Znajdź umiejętności, wydarzenia, grupy i więcej w swojej społeczności",
+  "search_placeholder": "Odkryj umiejętności, wydarzenia, grupy...",
   "stats": {
     "members": "Members",
-    "exchanges_this_month": "Exchanges This Month",
-    "hours_exchanged": "Hours Exchanged",
-    "active_listings": "Active Listings"
+    "exchanges_this_month": "Wymiany w tym miesiącu",
+    "hours_exchanged": "Godziny wymienione",
+    "active_listings": "Aktywne ogłoszenia"
   },
   "trending_posts": {
-    "title": "Trending Posts",
-    "subtitle": "Most engaging posts this week"
+    "title": "Trendy posty",
+    "subtitle": "Najbardziej angażujące posty w tym tygodniu"
   },
   "popular_listings": {
-    "title": "Popular Listings",
-    "subtitle": "Most viewed offers and requests"
+    "title": "Popularne ogłoszenia",
+    "subtitle": "Najczęściej oglądane oferty i prośby"
   },
   "upcoming_events": {
-    "title": "Upcoming Events",
-    "subtitle": "Join your community",
+    "title": "Nadchodzące wydarzenia",
+    "subtitle": "Dołącz do swojej społeczności",
     "online": "Online",
-    "attending": "{{count}} attending"
+    "attending": "{{count}} uczestniczy"
   },
   "active_groups": {
-    "title": "Active Groups",
-    "subtitle": "Connect with like-minded members",
-    "members": "{{count}} members",
-    "view_group": "View Group"
+    "title": "Aktywne grupy",
+    "subtitle": "Połącz się z podobnie myślącymi członkami",
+    "members": "{{count}} członków",
+    "view_group": "Zobacz grupę"
   },
   "top_contributors": {
-    "title": "Top Contributors",
-    "subtitle": "Community leaders by experience",
+    "title": "Najlepsi współpracownicy",
+    "subtitle": "Liderzy społeczności według doświadczenia",
     "level": "Lv.{{level}}"
   },
   "trending_hashtags": {
-    "title": "Trending Hashtags",
-    "subtitle": "Popular topics in your community"
+    "title": "Trendy hashtagi",
+    "subtitle": "Popularne tematy w twojej społeczności"
   },
   "recommended": {
-    "title": "Recommended For You",
-    "subtitle": "Based on your interests and activity",
-    "by_author": "by {{name}}"
+    "title": "Polecane dla Ciebie",
+    "subtitle": "Na podstawie twoich zainteresowań i aktywności",
+    "by_author": "przez {{name}}"
   },
   "new_members": {
-    "title": "Welcome Our Newest Members",
-    "subtitle": "Say hello to recent joiners",
+    "title": "Witamy naszych najnowszych członków",
+    "subtitle": "Przywitaj się z nowymi członkami",
     "connect": "Connect"
   },
   "featured_challenges": {
-    "title": "Featured Challenges",
-    "subtitle": "Share your ideas and make an impact",
-    "ideas_count": "{{count}} ideas",
-    "ends": "Ends {{date}}"
+    "title": "Wyróżnione wyzwania",
+    "subtitle": "Podziel się swoimi pomysłami i wprowadź zmiany",
+    "ideas_count": "{{count}} pomysłów",
+    "ends": "Kończy się {{date}}"
   },
   "time_ago": {
-    "just_now": "Just now",
-    "hours_ago": "{{count}}h ago",
-    "days_ago": "{{count}}d ago"
+    "just_now": "Właśnie teraz",
+    "hours_ago": "{{count}}h temu",
+    "days_ago": "{{count}}d temu"
   },
-  "error_loading": "We couldn't load the Discover page. This may be a temporary issue.",
+  "error_loading": "Nie mogliśmy załadować strony Odkryj. To może być tymczasowy problem.",
   "retry": "Retry",
   "near_you": {
-    "title": "Near You",
-    "subtitle": "Listings close to your location",
-    "distance": "{{distance}} km away"
+    "title": "W Twojej okolicy",
+    "subtitle": "Ogłoszenia blisko Twojej lokalizacji",
+    "distance": "{{distance}} km stąd"
   },
   "suggested_connections": {
-    "title": "People You May Know",
-    "subtitle": "Connect with members who share your interests",
+    "title": "Ludzie, których możesz znać",
+    "subtitle": "Połącz się z członkami, którzy dzielą Twoje zainteresowania",
     "connect": "Connect",
-    "mutual": "Mutual connections",
-    "similar": "Similar interests",
-    "recommended": "Recommended for you"
+    "mutual": "Wzajemne połączenia",
+    "similar": "Podobne zainteresowania",
+    "recommended": "Polecane dla Ciebie"
   },
   "blog_posts": {
-    "title": "From the Blog",
-    "subtitle": "Latest stories from your community",
-    "read_time": "{{count}} min read",
-    "views": "{{count}} views"
+    "title": "Z bloga",
+    "subtitle": "Najnowsze historie z Twojej społeczności",
+    "read_time": "{{count}} min czytania",
+    "views": "{{count}} wyświetleń"
   },
   "volunteering": {
-    "title": "Volunteer Opportunities",
-    "subtitle": "Make a difference in your community",
-    "applications": "{{count}} applied",
-    "view_opportunity": "View Opportunity"
+    "title": "Możliwości wolontariatu",
+    "subtitle": "Zrób różnicę w swojej społeczności",
+    "applications": "{{count}} aplikacji",
+    "view_opportunity": "Zobacz możliwość"
   },
   "organisations": {
     "title": "Organisations",
-    "subtitle": "Community partners making an impact",
-    "opportunities": "{{count}} opportunities"
+    "subtitle": "Partnerzy społecznościowi, którzy mają wpływ",
+    "opportunities": "{{count}} możliwości"
   },
   "polls": {
-    "title": "Active Polls",
-    "subtitle": "Have your say on community topics",
-    "votes": "{{count}} votes",
-    "options": "{{count}} options",
-    "vote_now": "Vote Now",
-    "closes": "Closes {{date}}"
+    "title": "Aktywne ankiety",
+    "subtitle": "Wyraź swoje zdanie na temat spraw społecznościowych",
+    "votes": "{{count}} głosów",
+    "options": "{{count}} opcji",
+    "vote_now": "Głosuj teraz",
+    "closes": "Zamknięcie {{date}}"
   },
   "in_demand_skills": {
-    "title": "Skills In Demand",
-    "subtitle": "Most requested skills in your community",
-    "requested": "{{count}} requesting",
-    "offered": "{{count}} offering",
-    "you_can_help": "You can help!"
+    "title": "Umiejętności w popycie",
+    "subtitle": "Najczęściej poszukiwane umiejętności w Twojej społeczności",
+    "requested": "{{count}} prosi o pomoc",
+    "offered": "{{count}} oferuje pomoc",
+    "you_can_help": "Możesz pomóc!"
   },
   "resources": {
-    "title": "Featured Resources",
-    "subtitle": "Guides and materials for your community",
-    "views": "{{count}} views"
+    "title": "Wyróżnione zasoby",
+    "subtitle": "Przewodniki i materiały dla Twojej społeczności",
+    "views": "{{count}} wyświetleń"
   },
   "jobs": {
-    "title": "Job Opportunities",
-    "subtitle": "Latest openings from community partners",
-    "applications": "{{count}} applied",
-    "deadline": "Deadline: {{date}}"
+    "title": "Oferty pracy",
+    "subtitle": "Najnowsze oferty od partnerów społeczności",
+    "applications": "{{count}} aplikacji",
+    "deadline": "Termin: {{date}}"
   },
   "aria": {
-    "content_tabs": "Explore content tabs"
+    "content_tabs": "Przeglądaj zakładki z treściami"
   },
   "tabs": {
     "all": "All",
-    "for_you": "For You",
+    "for_you": "Dla Ciebie",
     "listings": "Listings",
     "people": "People",
     "events": "Events",
     "groups": "Groups"
   },
   "recently_viewed": {
-    "title": "Recently Viewed",
-    "subtitle": "Items you've looked at recently",
+    "title": "Ostatnio przeglądane",
+    "subtitle": "Przedmioty, które ostatnio oglądałeś",
     "clear": "Clear"
   },
-  "match_score": "{{score}}% match",
-  "dismiss": "Not interested",
+  "match_score": "{{score}}% dopasowanie",
+  "dismiss": "Nie zainteresowany",
   "dismiss_reasons": {
-    "not_relevant": "Not relevant",
-    "already_seen": "Already seen",
-    "not_interested": "Not interested in this"
+    "not_relevant": "Nieistotne",
+    "already_seen": "Już widziane",
+    "not_interested": "Nie interesuje mnie to"
   },
-  "loading": "Loading discover content...",
-  "sections_loaded": "Discover content loaded",
-  "for_you_empty": "Interact with listings, posts, and events to get personalised recommendations.",
-  "end_of_feed": "You're all caught up!",
-  "empty_listings": "No listings to show yet. Be the first to create one!",
-  "empty_people": "No members to show yet. Invite someone to join!",
-  "empty_events": "No upcoming events. Create one to bring your community together!",
-  "empty_groups": "No active groups yet. Start a group around your interests!",
-  "create_listing": "Create Listing",
-  "create_event": "Create Event",
-  "create_group": "Create Group",
-  "page_description": "Explore listings, events, groups, and opportunities across the community."
+  "loading": "Ładowanie treści do odkrycia...",
+  "sections_loaded": "Treści do odkrycia załadowane",
+  "for_you_empty": "Interakcja z ogłoszeniami, postami i wydarzeniami, aby uzyskać spersonalizowane rekomendacje.",
+  "end_of_feed": "Jesteś na bieżąco!",
+  "empty_listings": "Brak ogłoszeń do wyświetlenia. Bądź pierwszym, który je stworzy!",
+  "empty_people": "Brak członków do wyświetlenia. Zaproś kogoś do dołączenia!",
+  "empty_events": "Brak nadchodzących wydarzeń. Stwórz jedno, aby zjednoczyć swoją społeczność!",
+  "empty_groups": "Brak aktywnych grup. Załóż grupę wokół swoich zainteresowań!",
+  "create_listing": "Utwórz ogłoszenie",
+  "create_event": "Utwórz wydarzenie",
+  "create_group": "Utwórz Grupę"
 }

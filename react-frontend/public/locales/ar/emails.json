@@ -196,7 +196,7 @@
     "unsubscribe": "Unsubscribe",
     "manage_preferences": "إدارة التفضيلات",
     "manage_email_preferences": "إدارة تفضيلات البريد الإلكتروني",
-    "test_prefix": "[TEST]",
+    "test_prefix": "[اختبار]",
     "no_subject": "لا يوجد موضوع"
   },
   "notification": {
