@@ -888,5 +888,42 @@
     "qualification_percentage": "Qualifikationsprozentsatz"
   },
   "deadline_countdown_one": "Schließt in {{count}} Tag",
-  "deadline_countdown_other": "Schließt in {{count}} Tagen"
+  "deadline_countdown_other": "Schließt in {{count}} Tagen",
+  "ai_chat": {
+    "open": "Frag die KI zu diesem Job",
+    "close": "KI-Chat schließen",
+    "send": "Nachricht senden",
+    "title": "Frag die KI zu diesem Job",
+    "hint": "Frag mich alles zu diesem Job – Qualifikationen, Gehalt, wie man sich bewirbt, Interviewtipps...",
+    "placeholder": "Tippe deine Frage ein..."
+  },
+  "page_meta": {
+    "bias_audit": {
+      "title": "Bias-Audit"
+    },
+    "create": {
+      "title": "Job posten"
+    },
+    "talent_search": {
+      "title": "Talentsuche"
+    },
+    "my_applications": {
+      "title": "Meine Bewerbungen"
+    },
+    "analytics": {
+      "title": "Jobanalysen"
+    },
+    "kanban": {
+      "title": "Bewerbungen"
+    },
+    "alerts": {
+      "title": "Jobbenachrichtigungen"
+    },
+    "employer_onboarding": {
+      "title": "Arbeitgeber-Onboarding"
+    },
+    "employer_brand": {
+      "title": "Arbeitgebermarke"
+    }
+  }
 }

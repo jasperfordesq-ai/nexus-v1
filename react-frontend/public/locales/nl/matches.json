@@ -2,34 +2,27 @@
   "page_title": "Matches",
   "breadcrumb_dashboard": "Dashboard",
   "breadcrumb_matches": "Matches",
-  "heading": "Your Matches",
-  "subtitle": "Discover connections across listings, jobs, volunteering, and groups",
+  "heading": "Jouw Matches",
+  "subtitle": "Ontdek verbindingen tussen aanbiedingen, banen, vrijwilligerswerk en groepen",
   "refresh": "Refresh",
-
-  "stats_total_matches": "Total Matches",
-  "stats_avg_score": "Avg Score",
-  "stats_hot_matches": "Hot Matches",
-  "stats_source_types": "Source Types",
-
+  "stats_total_matches": "Totaal aantal Matches",
+  "stats_avg_score": "Gemiddelde Score",
+  "stats_hot_matches": "Populaire Matches",
+  "stats_source_types": "Bron Types",
   "filter_all": "All",
-
   "source_listing": "Listing",
   "source_job": "Job",
   "source_volunteering": "Volunteering",
   "source_group": "Group",
-
-  "empty_title_all": "No matches yet",
-  "empty_title_filtered": "No {{source}} matches",
-  "empty_description": "Matches will appear here as the system finds connections for you across the platform.",
-  "browse_listings": "Browse Listings",
-
-  "score_label": "Match score: {{score}}%",
+  "empty_title_all": "Nog geen matches",
+  "empty_title_filtered": "Geen {{source}} matches",
+  "empty_description": "Matches verschijnen hier zodra het systeem verbindingen voor jou vindt op het platform.",
+  "browse_listings": "Blader door Aanbiedingen",
+  "score_label": "Matchscore: {{score}}%",
   "score_percent": "{{score}}% match",
-  "reasons_more": "+{{count}} more",
-
-  "view_details": "View match details",
-  "not_interested": "Not interested",
-
-  "load_failed": "Failed to load matches",
-  "match_hidden": "Match hidden — we'll show you fewer like this"
+  "reasons_more": "+{{count}} meer",
+  "view_details": "Bekijk matchdetails",
+  "not_interested": "Niet geïnteresseerd",
+  "load_failed": "Kon matches niet laden",
+  "match_hidden": "Match verborgen — we tonen je er minder zoals deze"
 }

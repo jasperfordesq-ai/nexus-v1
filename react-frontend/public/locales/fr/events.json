@@ -1,4 +1,7 @@
 {
+  "page_description": "Découvrez des événements communautaires, des ateliers et des rencontres près de chez vous.",
+  "near_me": "Près de chez moi",
+  "near_me_no_location": "Définissez votre emplacement dans votre profil pour utiliser Près de chez moi",
   "title": "Événements",
   "subtitle": "Découvrez et participez aux événements communautaires",
   "create_event": "Créer un événement",
@@ -111,6 +114,7 @@
   "form": {
     "create_title": "Créer un nouvel événement",
     "edit_title": "Modifier l'événement",
+    "group_event_notice": "Cet événement sera associé à votre groupe.",
     "loading": "Chargement de l'événement...",
     "unable_to_load": "Impossible de charger l'événement",
     "back_to_events": "Retour aux événements",
@@ -234,5 +238,10 @@
     "vote_success": "Vote enregistré !",
     "vote_failed": "Impossible d'enregistrer le vote",
     "view_full": "Voir le sondage complet"
+  },
+  "page_meta": {
+    "create": {
+      "title": "Créer un événement"
+    }
   }
 }

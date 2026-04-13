@@ -1,43 +1,43 @@
 {
   "meta": {
-    "title": "Activity Dashboard",
-    "description": "Your activity overview — hours, skills, connections, and recent actions."
+    "title": "アクティビティダッシュボード",
+    "description": "あなたのアクティビティの概要 — 時間、スキル、つながり、最近のアクション。"
   },
-  "page_title": "Activity Dashboard",
-  "page_subtitle": "Your community participation at a glance.",
-  "error_load_failed": "Failed to load activity dashboard",
-  "error_load_failed_detail": "Failed to load your activity data. Please try again.",
-  "unable_to_load": "Unable to load",
-  "try_again": "Try Again",
-  "loading": "Loading activity data...",
+  "page_title": "アクティビティダッシュボード",
+  "page_subtitle": "あなたのコミュニティ参加状況を一目で。",
+  "error_load_failed": "アクティビティダッシュボードの読み込みに失敗しました",
+  "error_load_failed_detail": "あなたのアクティビティデータの読み込みに失敗しました。もう一度お試しください。",
+  "unable_to_load": "読み込みできません",
+  "try_again": "再試行",
+  "loading": "アクティビティデータを読み込んでいます...",
   "refresh": "Refresh",
   "stats": {
-    "hours_given": "Hours Given",
-    "hours_received": "Hours Received",
+    "hours_given": "提供した時間",
+    "hours_received": "受け取った時間",
     "connections": "Connections",
     "exchanges": "Exchanges",
-    "pending_requests": "Pending Requests",
-    "transactions_given": "Transactions Given",
-    "transactions_received": "Transactions Received"
+    "pending_requests": "保留中のリクエスト",
+    "transactions_given": "提供したトランザクション",
+    "transactions_received": "受け取ったトランザクション"
   },
   "chart": {
     "given": "Given",
     "received": "Received",
-    "monthly_activity": "Monthly Activity",
-    "no_data": "No chart data available"
+    "monthly_activity": "月間アクティビティ",
+    "no_data": "チャートデータは利用できません"
   },
-  "recent_activity": "Recent Activity",
-  "empty_title": "No recent activity",
-  "empty_description": "Start participating in your community to see your activity here.",
-  "quick_stats": "Quick Stats",
-  "groups_joined": "Groups Joined",
-  "posts_30d": "Posts (30d)",
-  "comments_30d": "Comments (30d)",
-  "likes_given_30d": "Likes Given (30d)",
-  "likes_received_30d": "Likes Received (30d)",
-  "net_balance": "Net Balance",
+  "recent_activity": "最近のアクティビティ",
+  "empty_title": "最近のアクティビティはありません",
+  "empty_description": "ここであなたのアクティビティを見るために、コミュニティに参加を始めましょう。",
+  "quick_stats": "クイック統計",
+  "groups_joined": "参加したグループ",
+  "posts_30d": "投稿 (30日)",
+  "comments_30d": "コメント (30日)",
+  "likes_given_30d": "いいねを与えた (30日)",
+  "likes_received_30d": "いいねを受け取った (30日)",
+  "net_balance": "ネット残高",
   "hours_suffix": "h",
-  "my_skills": "My Skills",
+  "my_skills": "私のスキル",
   "skill_offer": "Offer",
   "skill_request": "Request",
   "activity_types": {
@@ -50,6 +50,9 @@
     "post": "Post",
     "default": "Activity"
   },
-  "endorsements_count_one": "{{count}} endorsement",
-  "endorsements_count_other": "{{count}} endorsements"
+  "endorsements_count_one": "{{count}} の推薦",
+  "endorsements_count_other": "{{count}} の推薦",
+  "page_meta": {
+    "title": "アクティビティダッシュボード"
+  }
 }

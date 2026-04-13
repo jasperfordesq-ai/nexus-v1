@@ -1,0 +1,114 @@
+{
+  "checking_permissions": "Comprobando permisos...",
+  "sidebar": {
+    "title": "Panel de Corredor",
+    "expand": "Expandir barra lateral",
+    "collapse": "Colapsar barra lateral",
+    "full_admin": "Panel de Administrador Completo"
+  },
+  "header": {
+    "toggle_sidebar": "Alternar barra lateral",
+    "back_to_site": "Volver al Sitio",
+    "user_menu": "Menú de usuario",
+    "my_profile": "Mi Perfil",
+    "sign_out": "Cerrar sesión"
+  },
+  "nav": {
+    "vetting": "Verificación y DBS"
+  },
+  "breadcrumbs": {
+    "aria_label": "Navegación de migas de pan",
+    "dashboard": "Panel de Corredor",
+    "vetting": "Verificación y DBS"
+  },
+  "dashboard": {
+    "title": "Tablero del Corredor",
+    "description": "Tu resumen diario de tareas de gestión comunitaria.",
+    "pending_members": "Miembros Pendientes",
+    "safeguarding_alerts": "Alertas de Protección",
+    "unreviewed_messages": "Mensajes No Revisados",
+    "pending_exchanges": "Intercambios Pendientes",
+    "vetting_expiring": "Verificación Expirando",
+    "monitored_users": "Usuarios Monitoreados",
+    "high_risk_listings": "Listados de Alto Riesgo",
+    "new_signups_today": "Nuevas Inscripciones Hoy",
+    "safeguarding_flags": "Banderas de Protección",
+    "quick_actions": "Acciones Rápidas",
+    "recent_activity": "Actividad Reciente",
+    "no_activity": "No hay actividad reciente.",
+    "view_all": "Ver Todo"
+  },
+  "members": {
+    "description": "Ver y gestionar miembros de la comunidad.",
+    "search_placeholder": "Buscar miembros...",
+    "col_last_active": "Última actividad",
+    "view_profile": "Ver perfil",
+    "send_message": "Enviar mensaje",
+    "notes_for": "Notas — {{name}}",
+    "note_placeholder": "Agrega una nota sobre este miembro...",
+    "note_added": "Nota añadida.",
+    "no_notes": "No hay notas aún para este miembro.",
+    "check_vetting": "Verificación de validación",
+    "onboarding_incomplete": "Integración incompleta",
+    "confirm_approve_title": "Aprobar miembro",
+    "confirm_approve_message": "¿Estás seguro de que deseas aprobar a este miembro? Tendrán acceso completo a la plataforma.",
+    "confirm_suspend_title": "Suspender miembro",
+    "confirm_suspend_message": "¿Estás seguro de que deseas suspender a este miembro? Perderán el acceso a la plataforma.",
+    "approved_success": "Miembro aprobado con éxito.",
+    "suspended_success": "Miembro suspendido con éxito.",
+    "reactivated_success": "Miembro reactivado con éxito.",
+    "action_failed": "La acción falló. Por favor, inténtalo de nuevo."
+  },
+  "onboarding": {
+    "description": "Sigue el progreso de nuevos miembros y aprueba registros pendientes.",
+    "funnel_title": "Embudo de integración",
+    "stage_email_verified": "Correo electrónico verificado",
+    "stage_profile_complete": "Perfil completo",
+    "stage_first_exchange": "Primer intercambio",
+    "pending_approvals": "Aprobaciones pendientes",
+    "no_pending": "No hay miembros pendientes por aprobar."
+  },
+  "safeguarding": {
+    "description": "Monitorea alertas de protección, asignaciones de guardianes y preferencias de miembros.",
+    "tab_flagged": "Mensajes marcados",
+    "tab_guardians": "Asignaciones de guardianes",
+    "tab_preferences": "Preferencias de miembros",
+    "col_reason": "Razón de la marca",
+    "mark_reviewed": "Marcar como Revisado",
+    "review_notes_placeholder": "Agregar notas de revisión...",
+    "reviewed_success": "Mensaje revisado con éxito.",
+    "no_flagged": "No hay mensajes marcados para revisar.",
+    "no_assignments": "No hay asignaciones de guardianes.",
+    "no_preferences": "No se han registrado preferencias de protección de miembros."
+  },
+  "vetting": {
+    "title": "Verificación y DBS",
+    "description": "Gestiona los registros de verificación, las comprobaciones de DBS y el seguimiento de vencimientos.",
+    "tab_expiring": "Próximo a Vencer",
+    "col_expiry": "Fecha de Vencimiento",
+    "reject_reason_placeholder": "Razón de rechazo...",
+    "verified_success": "Registro de verificación verificado.",
+    "rejected_success": "Registro de verificación rechazado.",
+    "no_records": "No se encontraron registros de verificación."
+  },
+  "exchanges": {
+    "description": "Supervisa las solicitudes de intercambio y disputas pendientes.",
+    "notes_placeholder": "Agregar notas...",
+    "reason_placeholder": "Razón de rechazo...",
+    "approved_success": "Intercambio aprobado.",
+    "rejected_success": "Intercambio rechazado.",
+    "no_exchanges": "No se encontraron intercambios."
+  },
+  "messages": {
+    "title": "Revisión de Mensajes",
+    "description": "Revisa las conversaciones marcadas que requieren supervisión del corredor.",
+    "mark_reviewed": "Marcar como Revisado",
+    "reviewed_success": "Mensaje marcado como revisado.",
+    "no_messages": "No hay mensajes para revisar."
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Algo salió mal. Por favor, inténtalo de nuevo.",
+    "no_data": "No hay datos disponibles."
+  }
+}

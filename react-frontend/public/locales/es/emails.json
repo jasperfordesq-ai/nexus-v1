@@ -176,7 +176,7 @@
     "subscriber_notice": "Recibiste este correo electrónico porque estás suscrito al boletín de {{community}}.",
     "manage_preferences": "Gestionar Preferencias",
     "manage_email_preferences": "Gestionar Preferencias de Correo Electrónico",
-    "test_prefix": "[TEST]",
+    "test_prefix": "[PRUEBA]",
     "no_subject": "Sin Asunto"
   },
   "notification": {

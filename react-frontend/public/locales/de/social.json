@@ -68,7 +68,35 @@
     "aria_endorse": "{{skillName}} empfehlen",
     "endorsed": "Empfohlen",
     "endorse": "Empfehlen",
-    "endorse_failed": "Empfehlung konnte nicht abgegeben werden",
-    "remove_failed": "Empfehlung konnte nicht entfernt werden"
+    "remove_failed": "Empfehlung konnte nicht entfernt werden",
+    "endorse_failed": "Empfehlung konnte nicht abgegeben werden"
+  },
+  "bookmark": {
+    "remove": "Von Gespeichert entfernen",
+    "save_to": "In Sammlung speichern",
+    "no_collection": "Allgemein (keine Sammlung)",
+    "new_collection": "Neue Sammlung",
+    "collection_name": "Sammlungsname"
+  },
+  "bookmarks": {
+    "title": "Gespeicherte Artikel",
+    "subtitle": "Ihre markierten Inhalte, organisiert nach Ihren Wünschen.",
+    "new_collection": "Neue Sammlung",
+    "count": "{{count}} gespeicherte Artikel",
+    "removed": "Von Gespeichert entfernt",
+    "remove_failed": "Entfernen fehlgeschlagen",
+    "empty_title": "Noch keine gespeicherten Artikel",
+    "empty_desc": "Tippen Sie auf das Lesezeichen-Symbol bei Beiträgen, Angeboten, Veranstaltungen und mehr, um sie hier zu speichern.",
+    "load_more": "Mehr laden",
+    "collection_updated": "Sammlung aktualisiert",
+    "collection_created": "Sammlung erstellt",
+    "collection_save_failed": "Speichern der Sammlung fehlgeschlagen",
+    "collection_deleted": "Sammlung gelöscht",
+    "collection_delete_failed": "Löschen der Sammlung fehlgeschlagen",
+    "delete_collection_confirm": "Diese Sammlung löschen? Lesezeichen werden behalten.",
+    "collection_actions": "Sammlungsaktionen",
+    "create_collection_title": "Sammlung erstellen",
+    "edit_collection_title": "Sammlung bearbeiten",
+    "collection_description": "Beschreibung (optional)"
   }
 }

@@ -422,27 +422,65 @@
     "aria_read": "Lesen",
     "aria_delivered": "Zugestellt",
     "aria_reply": "Antworten",
-    "aria_send_reply": "Antwort senden"
+    "aria_send_reply": "Antwort senden",
+    "translate_to": "In {{language}} übersetzen",
+    "view_original": "Original anzeigen",
+    "show_translation": "Übersetzung anzeigen",
+    "translating": "Übersetze…",
+    "translation_failed": "Übersetzung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "auto_translate_tooltip_off": "Alle Nachrichten automatisch übersetzen",
+    "auto_translate_tooltip_on": "Automatische Übersetzung ist aktiviert — klicken Sie, um sie auszuschalten",
+    "auto_translate_enabled": "Nachrichten werden automatisch übersetzt",
+    "auto_translate_disabled": "Automatische Übersetzung deaktiviert",
+    "auto_translate_active_banner": "Nachrichten in diesem Gespräch werden automatisch in Ihre Sprache übersetzt.",
+    "auto_translate_turn_off": "Ausschalten",
+    "external_recipient_info": "Diese Nachricht wird an einen externen Partnerserver gesendet."
   },
   "onboarding": {
-    "reach_label_remote_ok": "Remote möglich"
+    "reach_label_remote_ok": "Remote möglich",
+    "progress_aria": "Schritt {{current}} von {{total}}"
   },
   "listings": {},
   "members": {
     "reach_remote_ok": "Remote möglich",
     "aria_search": "Föderationsmitglieder suchen",
     "aria_filter_community": "Nach Partnergemeinschaft filtern",
-    "aria_filter_skills": "Nach Fähigkeiten filtern"
+    "aria_filter_skills": "Nach Fähigkeiten filtern",
+    "external_profile_title": "Externer Mitglied",
+    "external_profile_message": "Dieses Mitglied gehört zu einer externen Partnergemeinschaft. Du kannst ihnen eine Nachricht senden oder Credits von der Mitgliederseite aus senden."
   },
   "events": {
     "online": "Online"
   },
-  "partners": {},
-  "partner_detail": {
-    "federation_partner_badge": "Föderationspartner"
+  "partners": {
+    "level_prefix": "Level {{level}}",
+    "permission_groups": "Gruppenmitgliedschaft"
   },
-  "member_profile": {},
-  "settings": {},
+  "partner_detail": {
+    "federation_partner_badge": "Föderationspartner",
+    "level_prefix": "Level {{level}}",
+    "permission_groups": "Gruppenmitgliedschaft"
+  },
+  "member_profile": {
+    "connect_sent": "Verbindungsanfrage gesendet!",
+    "connect_failed": "Anfrage konnte nicht gesendet werden",
+    "request_pending": "Anfrage ausstehend",
+    "send_credits": "Credits senden",
+    "send_credits_to": "Credits an {{name}} senden",
+    "amount_hours": "Betrag (Stunden)",
+    "tx_description_placeholder": "Wofür ist diese Überweisung?",
+    "tx_summary": "{{amount}} Stunden an {{name}} ({{community}})",
+    "tx_success": "Credits gesendet!",
+    "tx_success_detail": "Erfolgreich {{amount}} Stunden an {{name}} gesendet",
+    "tx_failed": "Übertragung fehlgeschlagen",
+    "external_member_title": "Externer Mitglied",
+    "external_member_description": "Profile externer Mitglieder werden auf der Plattform ihrer Heimatgemeinschaft angezeigt. Du kannst ihnen eine Nachricht senden oder Credits von der Mitgliederseite aus senden."
+  },
+  "settings": {
+    "show_reviews_federated": {
+      "help": "Wenn aktiviert, werden deine Bewertungen für Mitglieder auf föderierten Partnerplattformen sichtbar sein."
+    }
+  },
   "connections": {
     "page_title": "Verbindungen",
     "breadcrumb_federation": "Föderation",
@@ -469,6 +507,21 @@
     "accepted_success": "Verbindung akzeptiert!",
     "rejected_success": "Verbindungsanfrage abgelehnt",
     "removed_success": "Verbindung entfernt",
-    "action_failed": "Aktion fehlgeschlagen"
+    "action_failed": "Aktion fehlgeschlagen",
+    "load_error": "Verbindungen konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+    "try_again": "Erneut versuchen"
+  },
+  "reviews": {
+    "empty": "Noch keine Bewertungen von Partnergemeinschaften.",
+    "unavailable": "Bewertungen sind für dieses föderierte Mitglied noch nicht verfügbar.",
+    "from_partner": "über {{partner}}",
+    "rating_label": "Bewertet mit {{rating}} von 5",
+    "load_error": "Bewertungen konnten nicht geladen werden. Bitte versuche es erneut."
+  },
+  "reputation": {
+    "chip_label": "{{score}} ({{count}})",
+    "tooltip_federated": "Reputation aggregiert aus {{count}} Partnergemeinschaften",
+    "tooltip_local": "Basierend auf {{count}} Bewertungen in dieser Gemeinschaft",
+    "aria_label": "Föderierte Reputation {{score}} aus {{count}} Bewertungen"
   }
 }

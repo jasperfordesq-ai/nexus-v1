@@ -9,6 +9,8 @@
   "error_load_failed_detail": "Échec du chargement de vos données d'activité. Veuillez réessayer.",
   "unable_to_load": "Impossible de charger",
   "try_again": "Réessayer",
+  "loading": "Chargement des données d'activité...",
+  "refresh": "Actualiser",
   "stats": {
     "hours_given": "Heures données",
     "hours_received": "Heures reçues",
@@ -30,15 +32,13 @@
   "quick_stats": "Statistiques rapides",
   "groups_joined": "Groupes rejoints",
   "posts_30d": "Publications (30j)",
-  "likes_received_30d": "J'aime reçus (30j)",
-  "net_balance": "Solde net",
-  "my_skills": "Mes compétences",
-  "skill_offer": "Offre",
-  "loading": "Chargement des données d'activité...",
-  "refresh": "Actualiser",
   "comments_30d": "Commentaires (30j)",
   "likes_given_30d": "J'aime donnés (30j)",
+  "likes_received_30d": "J'aime reçus (30j)",
+  "net_balance": "Solde net",
   "hours_suffix": "h",
+  "my_skills": "Mes compétences",
+  "skill_offer": "Offre",
   "skill_request": "Demande",
   "activity_types": {
     "exchange": "Échange",
@@ -51,5 +51,8 @@
     "default": "Activité"
   },
   "endorsements_count_one": "{{count}} approbation",
-  "endorsements_count_other": "{{count}} approbations"
+  "endorsements_count_other": "{{count}} approbations",
+  "page_meta": {
+    "title": "Tableau de bord des activités"
+  }
 }

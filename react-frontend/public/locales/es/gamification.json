@@ -89,6 +89,14 @@
       "load_failed_desc": "No se pudo cargar la tienda XP."
     },
     "loading": "Cargando logros",
+    "badge_detail": {
+      "title": "Detalles de la insignia",
+      "earned_on": "Ganada el {{date}}",
+      "not_earned": "Aún no ganada",
+      "not_earned_desc": "¡Sigue adelante — desbloquearás esta insignia pronto!",
+      "xp_reward": "Recompensa de XP",
+      "load_failed": "No se pudieron cargar los detalles de la insignia."
+    },
     "showcase": {
       "manage_title": "Gestionar Vitrina de Insignias",
       "select_badges": "Selecciona hasta 5 insignias para mostrar en tu perfil. ({{count}}/5 seleccionadas)",
@@ -274,5 +282,10 @@
     "member_since": "Miembro desde",
     "empty_title": "Sin destacados aún",
     "empty_description": "Los miembros activos aparecerán aquí una vez que la comunidad comience a intercambiar."
+  },
+  "page_meta": {
+    "leaderboard": {
+      "description": "Tabla de clasificación de la comunidad — ve a los principales contribuyentes y miembros más activos."
+    }
   }
 }

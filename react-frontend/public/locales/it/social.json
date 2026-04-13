@@ -68,7 +68,35 @@
     "aria_endorse": "Raccomanda {{skillName}}",
     "endorsed": "Raccomandato",
     "endorse": "Raccomanda",
-    "endorse_failed": "Raccomandazione non riuscita",
-    "remove_failed": "Rimozione della raccomandazione non riuscita"
+    "remove_failed": "Rimozione della raccomandazione non riuscita",
+    "endorse_failed": "Raccomandazione non riuscita"
+  },
+  "bookmark": {
+    "remove": "Rimuovi dai salvati",
+    "save_to": "Salva nella collezione",
+    "no_collection": "Generale (nessuna collezione)",
+    "new_collection": "Nuova collezione",
+    "collection_name": "Nome della collezione"
+  },
+  "bookmarks": {
+    "title": "Elementi salvati",
+    "subtitle": "I tuoi contenuti salvati, organizzati a modo tuo.",
+    "new_collection": "Nuova Collezione",
+    "count": "{{count}} elementi salvati",
+    "removed": "Rimosso dai salvati",
+    "remove_failed": "Impossibile rimuovere",
+    "empty_title": "Nessun elemento salvato ancora",
+    "empty_desc": "Tocca l'icona del segnalibro su post, annunci, eventi e altro per salvarli qui.",
+    "load_more": "Carica di più",
+    "collection_updated": "Collezione aggiornata",
+    "collection_created": "Collezione creata",
+    "collection_save_failed": "Impossibile salvare la collezione",
+    "collection_deleted": "Collezione eliminata",
+    "collection_delete_failed": "Impossibile eliminare la collezione",
+    "delete_collection_confirm": "Eliminare questa collezione? I segnalibri verranno mantenuti.",
+    "collection_actions": "Azioni della collezione",
+    "create_collection_title": "Crea Collezione",
+    "edit_collection_title": "Modifica Collezione",
+    "collection_description": "Descrizione (opzionale)"
   }
 }

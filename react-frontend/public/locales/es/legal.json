@@ -1,5 +1,6 @@
 {
   "terms": {
+    "meta_description": "Términos y condiciones que rigen el uso de nuestra plataforma comunitaria de intercambio de tiempo.",
     "page_title": "Términos de Servicio",
     "heading": "Términos de Servicio",
     "subtitle": "Las reglas y directrices para usar nuestra plataforma",
@@ -96,6 +97,7 @@
     "privacy_policy_link": "Política de Privacidad"
   },
   "privacy": {
+    "meta_description": "Cómo recopilamos, usamos y protegemos tus datos personales en nuestra plataforma comunitaria.",
     "page_title": "Política de Privacidad",
     "heading": "Política de Privacidad",
     "subtitle": "Cómo recopilamos, usamos y protegemos tu información personal",
@@ -206,6 +208,7 @@
     "contact_privacy_team": "Contactar a Nuestro Equipo de Privacidad"
   },
   "cookies": {
+    "meta_description": "Información sobre cómo usamos cookies para mejorar tu experiencia en nuestra plataforma.",
     "page_title": "Política de Cookies",
     "heading": "Política de Cookies",
     "subtitle": "Cómo usamos cookies y tecnologías similares en nuestra plataforma",
@@ -287,6 +290,7 @@
     "privacy_policy_link": "Política de Privacidad"
   },
   "accessibility": {
+    "meta_description": "Nuestro compromiso de hacer la plataforma accesible para todos, siguiendo los estándares WCAG 2.1 AA.",
     "page_title": "Accesibilidad",
     "heading": "Declaración de Accesibilidad",
     "subtitle": "{{name}} está comprometido a asegurar la accesibilidad digital para personas de todas las capacidades.",
@@ -435,5 +439,35 @@
     "cta_title": "¿Tiene Preguntas?",
     "cta_body": "Si tiene alguna pregunta sobre este documento, por favor contáctenos.",
     "contact_us": "Contáctenos"
+  },
+  "page_meta": {
+    "platform_terms": {
+      "title": "Términos de Servicio de la Plataforma",
+      "description": "Términos de servicio que rigen el uso de la plataforma comunitaria de intercambio de tiempo NEXUS."
+    },
+    "platform_privacy": {
+      "title": "Política de Privacidad de la Plataforma",
+      "description": "Cómo la plataforma NEXUS recopila, procesa y protege tus datos personales."
+    },
+    "platform_disclaimer": {
+      "title": "Descargo de Responsabilidad de la Plataforma",
+      "description": "Importantes descargos de responsabilidad sobre el uso de la plataforma comunitaria de intercambio de tiempo NEXUS."
+    },
+    "community_guidelines": {
+      "title": "Directrices de la Comunidad",
+      "description": "Directrices comunitarias para un intercambio de tiempo respetuoso y productivo."
+    },
+    "acceptable_use": {
+      "title": "Política de Uso Aceptable",
+      "description": "Política de uso aceptable para nuestra plataforma comunitaria de intercambio de tiempo."
+    },
+    "legal_hub": {
+      "title": "Información Legal",
+      "description": "Documentos legales, políticas e información de cumplimiento."
+    },
+    "legal_version_history": {
+      "title": "Historial de Versiones Legales",
+      "description": "Historial de versiones de nuestros documentos y políticas legales."
+    }
   }
 }

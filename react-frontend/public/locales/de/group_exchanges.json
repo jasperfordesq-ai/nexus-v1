@@ -168,5 +168,16 @@
   "participants_count_one": "{{count}} Teilnehmer",
   "participants_count_other": "{{count}} Teilnehmende",
   "hours_count_one": "{{count}} Stunde",
-  "hours_count_other": "{{count}} Stunden"
+  "hours_count_other": "{{count}} Stunden",
+  "page_meta": {
+    "list": {
+      "title": "Gruppenaustausch"
+    },
+    "detail": {
+      "title": "Gruppenaustausch"
+    },
+    "create": {
+      "title": "Gruppenaustausch erstellen"
+    }
+  }
 }

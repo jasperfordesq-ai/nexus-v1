@@ -888,5 +888,42 @@
     "qualification_percentage": "Percentuale di qualifica"
   },
   "deadline_countdown_one": "Chiude tra {{count}} giorno",
-  "deadline_countdown_other": "Chiude tra {{count}} giorni"
+  "deadline_countdown_other": "Chiude tra {{count}} giorni",
+  "ai_chat": {
+    "open": "Chiedi all'AI di questo lavoro",
+    "close": "Chiudi la chat con l'AI",
+    "send": "Invia messaggio",
+    "title": "Chiedi all'AI di questo lavoro",
+    "hint": "Chiedimi qualsiasi cosa su questo lavoro — qualifiche, stipendio, come candidarsi, consigli per il colloquio...",
+    "placeholder": "Scrivi la tua domanda..."
+  },
+  "page_meta": {
+    "bias_audit": {
+      "title": "Audit dei pregiudizi"
+    },
+    "create": {
+      "title": "Pubblica un lavoro"
+    },
+    "talent_search": {
+      "title": "Ricerca talenti"
+    },
+    "my_applications": {
+      "title": "Le mie candidature"
+    },
+    "analytics": {
+      "title": "Analisi dei lavori"
+    },
+    "kanban": {
+      "title": "Candidature ai lavori"
+    },
+    "alerts": {
+      "title": "Avvisi di lavoro"
+    },
+    "employer_onboarding": {
+      "title": "Onboarding del datore di lavoro"
+    },
+    "employer_brand": {
+      "title": "Brand del datore di lavoro"
+    }
+  }
 }

@@ -888,5 +888,42 @@
     "qualification_percentage": "Percentagem de qualificação"
   },
   "deadline_countdown_one": "Fecha em {{count}} dia",
-  "deadline_countdown_other": "Fecha em {{count}} dias"
+  "deadline_countdown_other": "Fecha em {{count}} dias",
+  "ai_chat": {
+    "open": "Pergunte à IA sobre este trabalho",
+    "close": "Fechar chat da IA",
+    "send": "Enviar mensagem",
+    "title": "Pergunte à IA sobre este trabalho",
+    "hint": "Pergunte-me qualquer coisa sobre este trabalho — qualificações, salário, como se inscrever, dicas para entrevistas...",
+    "placeholder": "Digite sua pergunta..."
+  },
+  "page_meta": {
+    "bias_audit": {
+      "title": "Auditoria de Viés"
+    },
+    "create": {
+      "title": "Publicar uma Vaga"
+    },
+    "talent_search": {
+      "title": "Busca de Talentos"
+    },
+    "my_applications": {
+      "title": "Minhas Candidaturas"
+    },
+    "analytics": {
+      "title": "Análise de Vagas"
+    },
+    "kanban": {
+      "title": "Candidaturas a Vagas"
+    },
+    "alerts": {
+      "title": "Alertas de Vagas"
+    },
+    "employer_onboarding": {
+      "title": "Integração de Empregadores"
+    },
+    "employer_brand": {
+      "title": "Marca do Empregador"
+    }
+  }
 }

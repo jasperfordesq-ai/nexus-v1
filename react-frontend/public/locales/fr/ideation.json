@@ -2,6 +2,7 @@
   "page_title": "Defis d'ideation",
   "title": "Defis d'ideation",
   "subtitle": "Partagez des idees, votez et contribuez a faconner votre communaute",
+  "page_description": "Parcourez les défis de la communauté, soumettez des idées et votez pour des solutions. Aidez à façonner l'avenir de votre communauté.",
   "actions": {
     "retry": "Reessayer"
   },
@@ -391,5 +392,13 @@
     "url_required": "L'URL est requise",
     "name_required": "Le nom est requis",
     "file_required": "Le fichier est requis"
+  },
+  "page_meta": {
+    "outcomes": {
+      "title": "Tableau de bord des résultats"
+    },
+    "create_challenge": {
+      "title": "Créer un défi"
+    }
   }
 }

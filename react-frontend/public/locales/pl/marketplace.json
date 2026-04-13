@@ -1,7 +1,6 @@
 {
   "page_title": "Marketplace",
   "meta_description": "Kupuj, sprzedawaj i wymieniaj rzeczy na marketplace swojej społeczności.",
-
   "hub": {
     "subtitle": "Kupuj, sprzedawaj i wymieniaj rzeczy w swojej społeczności",
     "sell_something": "Sprzedaj coś",
@@ -24,12 +23,10 @@
     "unable_to_load": "Nie udało się załadować ogłoszeń",
     "load_more_failed": "Nie udało się załadować kolejnych ogłoszeń"
   },
-
   "hub_feature_gate": {
     "title": "Marketplace niedostępny",
     "description": "Funkcja marketplace nie jest włączona dla tej społeczności."
   },
-
   "listing": {
     "not_found_title": "Nie znaleziono ogłoszenia",
     "not_found_description": "To ogłoszenie mogło zostać usunięte lub jest niedostępne.",
@@ -65,7 +62,6 @@
     "thumbnail_alt": "Miniatura {{number}}",
     "link_copied": "Link skopiowany do schowka"
   },
-
   "offer": {
     "modal_title": "Złóż ofertę",
     "asking_price": "Cena wywoławcza:",
@@ -94,7 +90,6 @@
     "withdraw": "Wycofaj",
     "accept_counter": "Zaakceptuj kontrofertę"
   },
-
   "create": {
     "page_title": "Sprzedaj coś - Marketplace",
     "title": "Sprzedaj coś",
@@ -143,7 +138,6 @@
     "created_error": "Nie udało się utworzyć ogłoszenia",
     "created_error_retry": "Nie udało się utworzyć ogłoszenia. Spróbuj ponownie."
   },
-
   "search": {
     "page_title": "Przeszukaj marketplace",
     "meta_description": "Przeszukuj i filtruj przedmioty na marketplace społeczności.",
@@ -186,7 +180,6 @@
     "last_days_one": "Ostatni {{count}} dzień",
     "last_days_other": "Ostatnie {{count}} dni"
   },
-
   "seller": {
     "page_title": "Profil sprzedawcy",
     "not_found_title": "Nie znaleziono sprzedawcy",
@@ -212,7 +205,6 @@
     "reviews_coming_soon_description": "Opinie kupujących będą dostępne w fazie 2. Zajrzyj później, aby zobaczyć, co społeczność sądzi o tym sprzedawcy.",
     "view_listings": "Zobacz ogłoszenia {{name}} na marketplace."
   },
-
   "category": {
     "not_found_title": "Nie znaleziono kategorii",
     "not_found_description": "Ta kategoria nie istnieje.",
@@ -239,7 +231,6 @@
     "load_more": "Załaduj więcej",
     "browse_description": "Przeglądaj ogłoszenia w kategorii {{name}} na marketplace."
   },
-
   "common": {
     "free": "Za darmo",
     "negotiable": "Do negocjacji",
@@ -256,7 +247,6 @@
     "cancel": "Anuluj",
     "sort_by": "Sortuj według"
   },
-
   "condition": {
     "new": "Nowy",
     "like_new": "Jak nowy",
@@ -264,39 +254,33 @@
     "fair": "Zadowalający",
     "poor": "Słaby"
   },
-
   "price_type": {
     "fixed": "Cena stała",
     "negotiable": "Do negocjacji",
     "free": "Za darmo"
   },
-
   "delivery_method": {
     "pickup": "Tylko odbiór osobisty",
     "shipping": "Tylko wysyłka",
     "both": "Odbiór lub wysyłka",
     "community_delivery": "Dostawa społecznościowa"
   },
-
   "sort": {
     "newest": "Najnowsze",
     "price_asc": "Cena: od najniższej",
     "price_desc": "Cena: od najwyższej",
     "popular": "Najpopularniejsze"
   },
-
   "time_ago": {
     "just_now": "Przed chwilą",
     "minutes_ago": "{{count}} min temu",
     "hours_ago": "{{count}} godz. temu",
     "days_ago": "{{count}} dni temu"
   },
-
   "categories": {
     "label": "Filtruj według kategorii",
     "all": "Wszystkie"
   },
-
   "filters": {
     "category": "Kategoria",
     "price_range": "Zakres cen",
@@ -318,28 +302,23 @@
     "clear": "Wyczyść wszystko",
     "title": "Filtry"
   },
-
   "gallery": {
     "no_images": "Brak dostępnych obrazów",
     "image_alt": "Obraz ogłoszenia",
     "select_image": "Zobacz obraz {{number}}",
     "thumbnail_alt": "Obraz {{number}}"
   },
-
   "collection_image": "Obraz kolekcji {{number}}",
-
   "price": {
     "free": "Za darmo",
     "contact": "Cena do uzgodnienia",
     "negotiable": "Do negocjacji"
   },
-
   "empty": {
     "no_listings": "Brak ogłoszeń",
     "subtitle": "Zajrzyj później lub wystaw coś jako pierwszy.",
     "start_selling": "Zacznij sprzedawać"
   },
-
   "edit": {
     "page_title": "Edytuj ogłoszenie - Marketplace",
     "title": "Edytuj ogłoszenie",
@@ -353,7 +332,6 @@
     "updated_error": "Nie udało się zaktualizować ogłoszenia",
     "updated_error_retry": "Nie udało się zaktualizować ogłoszenia. Spróbuj ponownie."
   },
-
   "my_listings": {
     "page_title": "Moje ogłoszenia - Marketplace",
     "title": "Moje ogłoszenia",
@@ -385,7 +363,6 @@
     "empty_expired_title": "Brak wygasłych ogłoszeń",
     "empty_expired_description": "Nie masz żadnych wygasłych ogłoszeń."
   },
-
   "my_offers": {
     "page_title": "Moje oferty - Marketplace",
     "title": "Moje oferty",
@@ -410,7 +387,6 @@
     "counter_sent_success": "Kontroferta wysłana",
     "send_counter": "Wyślij kontrofertę"
   },
-
   "collections": {
     "page_title": "Moje kolekcje",
     "meta_description": "Zarządzaj swoimi kolekcjami i zapisanymi wyszukiwaniami na marketplace.",
@@ -445,7 +421,6 @@
     "sign_in_title": "Wymagane logowanie",
     "sign_in_description": "Zaloguj się, aby zarządzać swoimi kolekcjami i zapisanymi wyszukiwaniami."
   },
-
   "saved_searches": {
     "tab_title": "Zapisane wyszukiwania",
     "empty_title": "Brak zapisanych wyszukiwań",
@@ -462,7 +437,6 @@
     "channel_push": "Push",
     "channel_both": "E-mail i push"
   },
-
   "promotions": {
     "title": "Promuj ogłoszenie",
     "load_error": "Nie udało się załadować opcji promocji.",
@@ -475,7 +449,6 @@
     "top_of_category": "Góra kategorii",
     "homepage_carousel": "Karuzela na stronie głównej"
   },
-
   "free": {
     "page_title": "Darmowe przedmioty",
     "meta_description": "Przeglądaj darmowe przedmioty dostępne na marketplace twojej społeczności.",
@@ -488,7 +461,6 @@
     "no_items_title": "Brak darmowych przedmiotów",
     "no_items_description": "W tej chwili nie ma dostępnych darmowych przedmiotów. Zajrzyj później lub bądź pierwszy, który coś odda!"
   },
-
   "group_marketplace": {
     "active_listings": "aktywnych ogłoszeń",
     "total_listed": "łącznie wystawionych",
@@ -498,14 +470,12 @@
     "empty_description": "Bądź pierwszym członkiem grupy, który wystawi coś na sprzedaż!",
     "tab_label": "Marketplace"
   },
-
   "hybrid_pricing": {
     "tooltip": "Kredyty czasu zdobyte poprzez bank czasu społeczności",
     "explanation": "Cena hybrydowa pozwala zapłacić za pomocą kombinacji zwykłej waluty i kredytów czasu zdobytych dzięki pracy na rzecz społeczności.",
     "label": "Zapłać gotówką + kredytami czasu",
     "learn_more": "Czym są kredyty czasu?"
   },
-
   "community_delivery": {
     "title": "Dostawa społecznościowa",
     "description": "Członek społeczności może dostarczyć ten przedmiot i zdobyć kredyty czasu.",
@@ -533,7 +503,6 @@
     "delivery_confirmed": "Dostawa potwierdzona! Kredyty czasu przyznane.",
     "confirm_failed": "Nie udało się potwierdzić dostawy"
   },
-
   "ai_reply": {
     "suggest": "Zaproponuj odpowiedź",
     "suggested_reply": "Odpowiedź zaproponowana przez AI",
@@ -543,7 +512,6 @@
     "use_reply": "Użyj tej odpowiedzi",
     "error": "Nie udało się wygenerować odpowiedzi. Spróbuj ponownie."
   },
-
   "map": {
     "page_title": "Wyszukiwanie na mapie - Marketplace",
     "meta_description": "Znajdź ogłoszenia marketplace w pobliżu na mapie.",
@@ -566,7 +534,6 @@
     "distance_km": "{{km}} km stąd",
     "distance_meters": "{{m}} m stąd"
   },
-
   "shipping": {
     "title": "Opcje wysyłki",
     "add_option": "Dodaj opcję wysyłki",
@@ -598,13 +565,11 @@
     "loading": "Ładowanie opcji wysyłki...",
     "no_options": "Brak dostępnych opcji wysyłki dla tego sprzedawcy."
   },
-
   "listing_location": {
     "location_title": "Lokalizacja",
     "approximate_location": "Lokalizacja przybliżona",
     "get_directions": "Wskazówki dojazdu"
   },
-
   "orders": {
     "load_error": "Nie udało się załadować zamówień",
     "action_error": "Operacja nie powiodła się",
@@ -689,7 +654,6 @@
       "error": "Nie udało się wysłać oceny"
     }
   },
-
   "onboarding": {
     "page_title": "Wdrożenie sprzedawcy - Marketplace",
     "title": "Konfiguracja płatności sprzedawcy",

@@ -9,6 +9,8 @@
   "error_load_failed_detail": "Falha ao carregar os seus dados de atividade. Por favor, tente novamente.",
   "unable_to_load": "Não foi possível carregar",
   "try_again": "Tentar Novamente",
+  "loading": "A carregar dados de atividade...",
+  "refresh": "Atualizar",
   "stats": {
     "hours_given": "Horas Oferecidas",
     "hours_received": "Horas Recebidas",
@@ -30,15 +32,13 @@
   "quick_stats": "Estatísticas Rápidas",
   "groups_joined": "Grupos Aderidos",
   "posts_30d": "Publicações (30d)",
-  "likes_received_30d": "Gostos Recebidos (30d)",
-  "net_balance": "Saldo Líquido",
-  "my_skills": "As Minhas Competências",
-  "skill_offer": "Oferta",
-  "loading": "A carregar dados de atividade...",
-  "refresh": "Atualizar",
   "comments_30d": "Comentários (30d)",
   "likes_given_30d": "Gostos Dados (30d)",
+  "likes_received_30d": "Gostos Recebidos (30d)",
+  "net_balance": "Saldo Líquido",
   "hours_suffix": "h",
+  "my_skills": "As Minhas Competências",
+  "skill_offer": "Oferta",
   "skill_request": "Pedido",
   "activity_types": {
     "exchange": "Troca",
@@ -51,5 +51,8 @@
     "default": "Atividade"
   },
   "endorsements_count_one": "{{count}} recomendação",
-  "endorsements_count_other": "{{count}} recomendações"
+  "endorsements_count_other": "{{count}} recomendações",
+  "page_meta": {
+    "title": "Painel de Atividades"
+  }
 }

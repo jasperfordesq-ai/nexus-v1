@@ -276,5 +276,10 @@
     "generate_failed": "Falha ao gerar certificado. Tente novamente.",
     "load_failed": "Falha ao carregar certificados",
     "load_error": "Não foi possível carregar certificados."
+  },
+  "page_meta": {
+    "register_organisation": {
+      "title": "Registrar Organização"
+    }
   }
 }

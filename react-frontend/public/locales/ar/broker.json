@@ -1,0 +1,114 @@
+{
+  "checking_permissions": "جارٍ التحقق من الأذونات...",
+  "sidebar": {
+    "title": "لوحة الوسيط",
+    "expand": "توسيع الشريط الجانبي",
+    "collapse": "طي الشريط الجانبي",
+    "full_admin": "لوحة الإدارة الكاملة"
+  },
+  "header": {
+    "toggle_sidebar": "تبديل الشريط الجانبي",
+    "back_to_site": "العودة إلى الموقع",
+    "user_menu": "قائمة المستخدم",
+    "my_profile": "ملفي الشخصي",
+    "sign_out": "تسجيل الخروج"
+  },
+  "nav": {
+    "vetting": "التحقق و DBS"
+  },
+  "breadcrumbs": {
+    "aria_label": "تنقل فتات الخبز",
+    "dashboard": "لوحة الوسيط",
+    "vetting": "التحقق و DBS"
+  },
+  "dashboard": {
+    "title": "لوحة تحكم الوسيط",
+    "description": "نظرة عامة يومية على مهام إدارة المجتمع.",
+    "pending_members": "الأعضاء المعلقون",
+    "safeguarding_alerts": "تنبيهات الحماية",
+    "unreviewed_messages": "رسائل غير مراجعة",
+    "pending_exchanges": "المبادلات المعلقة",
+    "vetting_expiring": "التحقق على وشك الانتهاء",
+    "monitored_users": "المستخدمون المراقبون",
+    "high_risk_listings": "قوائم عالية المخاطر",
+    "new_signups_today": "التسجيلات الجديدة اليوم",
+    "safeguarding_flags": "علامات الحماية",
+    "quick_actions": "إجراءات سريعة",
+    "recent_activity": "النشاط الأخير",
+    "no_activity": "لا يوجد نشاط حديث.",
+    "view_all": "عرض الكل"
+  },
+  "members": {
+    "description": "عرض وإدارة أعضاء المجتمع.",
+    "search_placeholder": "ابحث عن الأعضاء...",
+    "col_last_active": "آخر نشاط",
+    "view_profile": "عرض الملف الشخصي",
+    "send_message": "إرسال رسالة",
+    "notes_for": "ملاحظات — {{name}}",
+    "note_placeholder": "أضف ملاحظة عن هذا العضو...",
+    "note_added": "تمت إضافة الملاحظة.",
+    "no_notes": "لا توجد ملاحظات بعد لهذا العضو.",
+    "check_vetting": "تحقق من التحقق",
+    "onboarding_incomplete": "إجراءات الانضمام غير مكتملة",
+    "confirm_approve_title": "الموافقة على العضو",
+    "confirm_approve_message": "هل أنت متأكد أنك تريد الموافقة على هذا العضو؟ سيحصلون على وصول كامل إلى المنصة.",
+    "confirm_suspend_title": "تعليق العضو",
+    "confirm_suspend_message": "هل أنت متأكد أنك تريد تعليق هذا العضو؟ سيفقدون الوصول إلى المنصة.",
+    "approved_success": "تمت الموافقة على العضو بنجاح.",
+    "suspended_success": "تم تعليق العضو بنجاح.",
+    "reactivated_success": "تم إعادة تنشيط العضو بنجاح.",
+    "action_failed": "فشلت العملية. يرجى المحاولة مرة أخرى."
+  },
+  "onboarding": {
+    "description": "تتبع تقدم الأعضاء الجدد والموافقة على التسجيلات المعلقة.",
+    "funnel_title": "قناة الانضمام",
+    "stage_email_verified": "البريد الإلكتروني تم التحقق منه",
+    "stage_profile_complete": "الملف الشخصي مكتمل",
+    "stage_first_exchange": "أول تبادل",
+    "pending_approvals": "الموافقات المعلقة",
+    "no_pending": "لا توجد أعضاء معلقة للموافقة عليها."
+  },
+  "safeguarding": {
+    "description": "راقب تنبيهات الحماية، وتعيينات الوصي، وتفضيلات الأعضاء.",
+    "tab_flagged": "رسائل مرفوعة",
+    "tab_guardians": "تعيينات الوصي",
+    "tab_preferences": "تفضيلات الأعضاء",
+    "col_reason": "سبب الإبلاغ",
+    "mark_reviewed": "تحديد كمراجعة",
+    "review_notes_placeholder": "أضف ملاحظات المراجعة...",
+    "reviewed_success": "تمت مراجعة الرسالة بنجاح.",
+    "no_flagged": "لا توجد رسائل مميزة للمراجعة.",
+    "no_assignments": "لا توجد مهام وصاية.",
+    "no_preferences": "لا توجد تفضيلات حماية الأعضاء مسجلة."
+  },
+  "vetting": {
+    "title": "التدقيق و DBS",
+    "description": "إدارة سجلات التدقيق، وفحوصات DBS، وتتبع انتهاء الصلاحية.",
+    "tab_expiring": "ستنتهي قريبًا",
+    "col_expiry": "تاريخ انتهاء الصلاحية",
+    "reject_reason_placeholder": "سبب الرفض...",
+    "verified_success": "تم التحقق من سجل التدقيق.",
+    "rejected_success": "تم رفض سجل التدقيق.",
+    "no_records": "لم يتم العثور على سجلات تدقيق."
+  },
+  "exchanges": {
+    "description": "الإشراف على طلبات التبادل والنزاعات المعلقة.",
+    "notes_placeholder": "أضف ملاحظات...",
+    "reason_placeholder": "سبب الرفض...",
+    "approved_success": "تمت الموافقة على التبادل.",
+    "rejected_success": "تم رفض التبادل.",
+    "no_exchanges": "لم يتم العثور على تبادلات."
+  },
+  "messages": {
+    "title": "مراجعة الرسالة",
+    "description": "مراجعة المحادثات المميزة التي تتطلب إشراف الوسيط.",
+    "mark_reviewed": "تحديد كمراجعة",
+    "reviewed_success": "تم تحديد الرسالة كمراجعة.",
+    "no_messages": "لا توجد رسائل للمراجعة."
+  },
+  "common": {
+    "loading": "جارٍ التحميل...",
+    "error": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "no_data": "لا توجد بيانات متاحة."
+  }
+}

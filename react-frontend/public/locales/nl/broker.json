@@ -1,0 +1,114 @@
+{
+  "checking_permissions": "Bezig met het controleren van machtigingen...",
+  "sidebar": {
+    "title": "Broker Paneel",
+    "expand": "Zijbalk uitbreiden",
+    "collapse": "Zijbalk samenvouwen",
+    "full_admin": "Volledig Admin Paneel"
+  },
+  "header": {
+    "toggle_sidebar": "Zijbalk in- of uitschakelen",
+    "back_to_site": "Terug naar de site",
+    "user_menu": "Gebruikersmenu",
+    "my_profile": "Mijn Profiel",
+    "sign_out": "Uitloggen"
+  },
+  "nav": {
+    "vetting": "Vetting & DBS"
+  },
+  "breadcrumbs": {
+    "aria_label": "Broodkruimelnavigatie",
+    "dashboard": "Broker Paneel",
+    "vetting": "Vetting & DBS"
+  },
+  "dashboard": {
+    "title": "Broker Dashboard",
+    "description": "Jouw dagelijkse overzicht van taken voor communitybeheer.",
+    "pending_members": "Lopende Leden",
+    "safeguarding_alerts": "Waarschuwingen voor Bescherming",
+    "unreviewed_messages": "Onbeoordeelde Berichten",
+    "pending_exchanges": "Lopende Uitwisselingen",
+    "vetting_expiring": "Vetting Verloopt",
+    "monitored_users": "Gemonitorde Gebruikers",
+    "high_risk_listings": "Hoge Risico Lijsten",
+    "new_signups_today": "Nieuwe Aanmeldingen Vandaag",
+    "safeguarding_flags": "Vlaggen voor Bescherming",
+    "quick_actions": "Snelle Acties",
+    "recent_activity": "Recente Activiteit",
+    "no_activity": "Geen recente activiteit.",
+    "view_all": "Bekijk Alles"
+  },
+  "members": {
+    "description": "Bekijk en beheer communityleden.",
+    "search_placeholder": "Zoek leden...",
+    "col_last_active": "Laatst Actief",
+    "view_profile": "Bekijk Profiel",
+    "send_message": "Stuur Bericht",
+    "notes_for": "Notities — {{name}}",
+    "note_placeholder": "Voeg een notitie toe over dit lid...",
+    "note_added": "Notitie toegevoegd.",
+    "no_notes": "Nog geen notities voor dit lid.",
+    "check_vetting": "Controleer Goedkeuring",
+    "onboarding_incomplete": "Onboarding niet compleet",
+    "confirm_approve_title": "Goedkeuren Lid",
+    "confirm_approve_message": "Weet je zeker dat je dit lid wilt goedkeuren? Ze krijgen dan volledige toegang tot het platform.",
+    "confirm_suspend_title": "Lid Opschorten",
+    "confirm_suspend_message": "Weet je zeker dat je dit lid wilt opschorten? Ze verliezen dan toegang tot het platform.",
+    "approved_success": "Lid succesvol goedgekeurd.",
+    "suspended_success": "Lid succesvol opgeschort.",
+    "reactivated_success": "Lid succesvol heractiveerd.",
+    "action_failed": "Actie mislukt. Probeer het opnieuw."
+  },
+  "onboarding": {
+    "description": "Volg de voortgang van nieuwe leden en keur wachtende registraties goed.",
+    "funnel_title": "Onboarding Trechter",
+    "stage_email_verified": "E-mail Geverifieerd",
+    "stage_profile_complete": "Profiel Compleet",
+    "stage_first_exchange": "Eerste Uitwisseling",
+    "pending_approvals": "Wachtende Goedkeuringen",
+    "no_pending": "Geen wachtende leden om goed te keuren."
+  },
+  "safeguarding": {
+    "description": "Houd waarschuwingen voor bescherming, toewijzingen van voogden en voorkeuren van leden in de gaten.",
+    "tab_flagged": "Gemarkeerde Berichten",
+    "tab_guardians": "Toewijzingen van Voogden",
+    "tab_preferences": "Voorkeuren van Leden",
+    "col_reason": "Reden voor Markering",
+    "mark_reviewed": "Markeer Beoordeeld",
+    "review_notes_placeholder": "Voeg beoordelingsnotities toe...",
+    "reviewed_success": "Bericht succesvol beoordeeld.",
+    "no_flagged": "Geen gemarkeerde berichten om te beoordelen.",
+    "no_assignments": "Geen voogdijtoewijzingen.",
+    "no_preferences": "Geen voorkeuren voor ledenbescherming geregistreerd."
+  },
+  "vetting": {
+    "title": "Screening & DBS",
+    "description": "Beheer screeningrecords, DBS-controles en vervaldatumtracking.",
+    "tab_expiring": "Vervalt Binnenkort",
+    "col_expiry": "Vervaldatum",
+    "reject_reason_placeholder": "Reden voor afwijzing...",
+    "verified_success": "Screeningrecord geverifieerd.",
+    "rejected_success": "Screeningrecord afgewezen.",
+    "no_records": "Geen screeningrecords gevonden."
+  },
+  "exchanges": {
+    "description": "Toezicht houden op openstaande ruilverzoeken en geschillen.",
+    "notes_placeholder": "Voeg notities toe...",
+    "reason_placeholder": "Reden voor afwijzing...",
+    "approved_success": "Ruil goedgekeurd.",
+    "rejected_success": "Ruil afgewezen.",
+    "no_exchanges": "Geen ruilen gevonden."
+  },
+  "messages": {
+    "title": "Bericht Beoordeling",
+    "description": "Beoordeel gemarkeerde gesprekken die toezicht van een broker vereisen.",
+    "mark_reviewed": "Markeer Beoordeeld",
+    "reviewed_success": "Bericht gemarkeerd als beoordeeld.",
+    "no_messages": "Geen berichten om te beoordelen."
+  },
+  "common": {
+    "loading": "Laden...",
+    "error": "Er is iets misgegaan. Probeer het opnieuw.",
+    "no_data": "Geen gegevens beschikbaar."
+  }
+}

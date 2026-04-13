@@ -276,5 +276,10 @@
     "generate_failed": "Zertifikat konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
     "load_failed": "Failed to load certificates",
     "load_error": "Zertifikate konnten nicht geladen werden."
+  },
+  "page_meta": {
+    "register_organisation": {
+      "title": "Organisation registrieren"
+    }
   }
 }

@@ -276,5 +276,10 @@
     "generate_failed": "Échec de la génération du certificat. Veuillez réessayer.",
     "load_failed": "Échec du chargement des certificats",
     "load_error": "Impossible de charger les certificats."
+  },
+  "page_meta": {
+    "register_organisation": {
+      "title": "Enregistrer l'organisation"
+    }
   }
 }

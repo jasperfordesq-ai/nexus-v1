@@ -68,7 +68,35 @@
     "aria_endorse": "Recomendar {{skillName}}",
     "endorsed": "Recomendado",
     "endorse": "Recomendar",
-    "endorse_failed": "Error al recomendar",
-    "remove_failed": "Error al eliminar la recomendacion"
+    "remove_failed": "Error al eliminar la recomendacion",
+    "endorse_failed": "Error al recomendar"
+  },
+  "bookmark": {
+    "remove": "Eliminar de guardados",
+    "save_to": "Guardar en colección",
+    "no_collection": "General (sin colección)",
+    "new_collection": "Nueva colección",
+    "collection_name": "Nombre de la colección"
+  },
+  "bookmarks": {
+    "title": "Artículos guardados",
+    "subtitle": "Tu contenido guardado, organizado a tu manera.",
+    "new_collection": "Nueva Colección",
+    "count": "{{count}} artículos guardados",
+    "removed": "Eliminado de guardados",
+    "remove_failed": "Error al eliminar",
+    "empty_title": "Aún no hay artículos guardados",
+    "empty_desc": "Toca el ícono de marcador en publicaciones, listados, eventos y más para guardarlos aquí.",
+    "load_more": "Cargar más",
+    "collection_updated": "Colección actualizada",
+    "collection_created": "Colección creada",
+    "collection_save_failed": "Error al guardar la colección",
+    "collection_deleted": "Colección eliminada",
+    "collection_delete_failed": "Error al eliminar la colección",
+    "delete_collection_confirm": "¿Eliminar esta colección? Los marcadores se mantendrán.",
+    "collection_actions": "Acciones de colección",
+    "create_collection_title": "Crear Colección",
+    "edit_collection_title": "Editar Colección",
+    "collection_description": "Descripción (opcional)"
   }
 }

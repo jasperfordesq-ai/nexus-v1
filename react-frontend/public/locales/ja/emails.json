@@ -196,7 +196,7 @@
     "unsubscribe": "Unsubscribe",
     "manage_preferences": "設定を管理する",
     "manage_email_preferences": "メール設定を管理する",
-    "test_prefix": "[TEST]",
+    "test_prefix": "[テスト]",
     "no_subject": "件名なし"
   },
   "notification": {

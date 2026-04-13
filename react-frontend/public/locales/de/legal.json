@@ -1,5 +1,6 @@
 {
   "terms": {
+    "meta_description": "Allgemeine Geschäftsbedingungen für die Nutzung unserer Community-Zeitbanking-Plattform.",
     "page_title": "Nutzungsbedingungen",
     "heading": "Nutzungsbedingungen",
     "subtitle": "Die Regeln und Richtlinien fuer die Nutzung unserer Plattform",
@@ -96,6 +97,7 @@
     "privacy_policy_link": "Datenschutzrichtlinie"
   },
   "privacy": {
+    "meta_description": "Wie wir Ihre persönlichen Daten auf unserer Community-Plattform sammeln, verwenden und schützen.",
     "page_title": "Datenschutzrichtlinie",
     "heading": "Datenschutzrichtlinie",
     "subtitle": "Wie wir Ihre persoenlichen Daten erheben, verwenden und schuetzen",
@@ -206,6 +208,7 @@
     "contact_privacy_team": "Unser Datenschutzteam kontaktieren"
   },
   "cookies": {
+    "meta_description": "Informationen darüber, wie wir Cookies verwenden, um Ihre Erfahrung auf unserer Plattform zu verbessern.",
     "page_title": "Cookie-Richtlinie",
     "heading": "Cookie-Richtlinie",
     "subtitle": "Wie wir Cookies und aehnliche Technologien auf unserer Plattform verwenden",
@@ -287,6 +290,7 @@
     "privacy_policy_link": "Datenschutzrichtlinie"
   },
   "accessibility": {
+    "meta_description": "Unser Engagement, die Plattform für alle zugänglich zu machen, gemäß den WCAG 2.1 AA-Standards.",
     "page_title": "Barrierefreiheit",
     "heading": "Erklaerung zur Barrierefreiheit",
     "subtitle": "{{name}} verpflichtet sich, digitale Barrierefreiheit fuer Menschen aller Faehigkeiten sicherzustellen.",
@@ -387,7 +391,7 @@
     "related_documents": "Verwandte Plattform-Dokumente",
     "cta_title": "Fragen zu diesem Dokument?",
     "cta_body": "Wenn Sie Fragen zu diesem Plattform-Dokument haben, kontaktieren Sie das Project NEXUS-Team. Bei Fragen zu den Richtlinien Ihrer Gemeinschaft, kontaktieren Sie {{tenant}} direkt.",
-    "nexus_website": "Project NEXUS Website",
+    "nexus_website": "Projekt NEXUS Website",
     "contact_tenant": "{{tenant}} kontaktieren"
   },
   "platform_disclaimer": {
@@ -435,5 +439,35 @@
     "cta_title": "Haben Sie Fragen?",
     "cta_body": "Wenn Sie Fragen zu diesem Dokument haben, kontaktieren Sie uns bitte.",
     "contact_us": "Kontaktieren Sie uns"
+  },
+  "page_meta": {
+    "platform_terms": {
+      "title": "Nutzungsbedingungen der Plattform",
+      "description": "Nutzungsbedingungen für die Nutzung der NEXUS Community-Zeitbanking-Plattform."
+    },
+    "platform_privacy": {
+      "title": "Datenschutzrichtlinie der Plattform",
+      "description": "Wie die NEXUS-Plattform Ihre persönlichen Daten sammelt, verarbeitet und schützt."
+    },
+    "platform_disclaimer": {
+      "title": "Haftungsausschluss der Plattform",
+      "description": "Wichtige Haftungsausschlüsse zur Nutzung der NEXUS Community-Zeitbanking-Plattform."
+    },
+    "community_guidelines": {
+      "title": "Gemeinschaftsrichtlinien",
+      "description": "Gemeinschaftsrichtlinien für respektvolles und produktives Zeitbanking."
+    },
+    "acceptable_use": {
+      "title": "Richtlinie für akzeptable Nutzung",
+      "description": "Richtlinie für akzeptable Nutzung unserer Community-Zeitbanking-Plattform."
+    },
+    "legal_hub": {
+      "title": "Rechtliche Informationen",
+      "description": "Rechtliche Dokumente, Richtlinien und Informationen zur Einhaltung."
+    },
+    "legal_version_history": {
+      "title": "Rechtliche Versionshistorie",
+      "description": "Versionshistorie unserer rechtlichen Dokumente und Richtlinien."
+    }
   }
 }

@@ -1,0 +1,114 @@
+{
+  "checking_permissions": "Controllo dei permessi...",
+  "sidebar": {
+    "title": "Pannello Broker",
+    "expand": "Espandi barra laterale",
+    "collapse": "Riduci barra laterale",
+    "full_admin": "Pannello Amministratore Completo"
+  },
+  "header": {
+    "toggle_sidebar": "Attiva/disattiva barra laterale",
+    "back_to_site": "Torna al Sito",
+    "user_menu": "Menu utente",
+    "my_profile": "Il mio profilo",
+    "sign_out": "Disconnetti"
+  },
+  "nav": {
+    "vetting": "Verifica & DBS"
+  },
+  "breadcrumbs": {
+    "aria_label": "Navigazione a briciole",
+    "dashboard": "Pannello Broker",
+    "vetting": "Verifica & DBS"
+  },
+  "dashboard": {
+    "title": "Cruscotto Broker",
+    "description": "La tua panoramica quotidiana delle attività di gestione della comunità.",
+    "pending_members": "Membri in attesa",
+    "safeguarding_alerts": "Avvisi di protezione",
+    "unreviewed_messages": "Messaggi non esaminati",
+    "pending_exchanges": "Scambi in attesa",
+    "vetting_expiring": "Verifica in scadenza",
+    "monitored_users": "Utenti monitorati",
+    "high_risk_listings": "Elenco ad alto rischio",
+    "new_signups_today": "Nuove iscrizioni oggi",
+    "safeguarding_flags": "Flag di protezione",
+    "quick_actions": "Azioni rapide",
+    "recent_activity": "Attività recente",
+    "no_activity": "Nessuna attività recente.",
+    "view_all": "Visualizza tutto"
+  },
+  "members": {
+    "description": "Visualizza e gestisci i membri della comunità.",
+    "search_placeholder": "Cerca membri...",
+    "col_last_active": "Ultima attività",
+    "view_profile": "Visualizza profilo",
+    "send_message": "Invia messaggio",
+    "notes_for": "Note — {{name}}",
+    "note_placeholder": "Aggiungi una nota su questo membro...",
+    "note_added": "Nota aggiunta.",
+    "no_notes": "Nessuna nota ancora per questo membro.",
+    "check_vetting": "Controlla verifica",
+    "onboarding_incomplete": "Onboarding incompleto",
+    "confirm_approve_title": "Approva membro",
+    "confirm_approve_message": "Sei sicuro di voler approvare questo membro? Avrà accesso completo alla piattaforma.",
+    "confirm_suspend_title": "Sospendi membro",
+    "confirm_suspend_message": "Sei sicuro di voler sospendere questo membro? Perderà l'accesso alla piattaforma.",
+    "approved_success": "Membro approvato con successo.",
+    "suspended_success": "Membro sospeso con successo.",
+    "reactivated_success": "Membro riattivato con successo.",
+    "action_failed": "Azione non riuscita. Per favore riprova."
+  },
+  "onboarding": {
+    "description": "Monitora i progressi dei nuovi membri e approva le registrazioni in attesa.",
+    "funnel_title": "Funnel di onboarding",
+    "stage_email_verified": "Email verificata",
+    "stage_profile_complete": "Profilo completo",
+    "stage_first_exchange": "Primo scambio",
+    "pending_approvals": "Approvazioni in sospeso",
+    "no_pending": "Nessun membro in sospeso da approvare."
+  },
+  "safeguarding": {
+    "description": "Monitora avvisi di protezione, assegnazioni di guardian e preferenze dei membri.",
+    "tab_flagged": "Messaggi segnalati",
+    "tab_guardians": "Assegnazioni di guardian",
+    "tab_preferences": "Preferenze dei membri",
+    "col_reason": "Motivo della segnalazione",
+    "mark_reviewed": "Segna come Revisionato",
+    "review_notes_placeholder": "Aggiungi note di revisione...",
+    "reviewed_success": "Messaggio revisionato con successo.",
+    "no_flagged": "Nessun messaggio contrassegnato da revisionare.",
+    "no_assignments": "Nessun incarico di custode.",
+    "no_preferences": "Nessuna preferenza di protezione dei membri registrata."
+  },
+  "vetting": {
+    "title": "Verifica & DBS",
+    "description": "Gestisci i registri di verifica, i controlli DBS e il monitoraggio delle scadenze.",
+    "tab_expiring": "In scadenza presto",
+    "col_expiry": "Data di scadenza",
+    "reject_reason_placeholder": "Motivo del rifiuto...",
+    "verified_success": "Registro di verifica verificato.",
+    "rejected_success": "Registro di verifica rifiutato.",
+    "no_records": "Nessun registro di verifica trovato."
+  },
+  "exchanges": {
+    "description": "Supervisiona le richieste di scambio e le controversie in sospeso.",
+    "notes_placeholder": "Aggiungi note...",
+    "reason_placeholder": "Motivo del rifiuto...",
+    "approved_success": "Scambio approvato.",
+    "rejected_success": "Scambio rifiutato.",
+    "no_exchanges": "Nessun scambio trovato."
+  },
+  "messages": {
+    "title": "Revisione Messaggi",
+    "description": "Revisiona le conversazioni contrassegnate che richiedono supervisione del broker.",
+    "mark_reviewed": "Segna come Revisionato",
+    "reviewed_success": "Messaggio contrassegnato come revisionato.",
+    "no_messages": "Nessun messaggio da revisionare."
+  },
+  "common": {
+    "loading": "Caricamento...",
+    "error": "Qualcosa è andato storto. Per favore riprova.",
+    "no_data": "Nessun dato disponibile."
+  }
+}

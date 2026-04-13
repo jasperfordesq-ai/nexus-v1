@@ -60,5 +60,11 @@
     "retry": "Erneut versuchen",
     "no_activity": "Noch keine Aktivität aufgezeichnet.",
     "progress_aria": "Fortschritt: {{percent}}%"
+  },
+  "template_picker": {
+    "load_error": "Vorlagen konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+    "try_again": "Erneut versuchen",
+    "none_available": "Noch keine Vorlagen verfügbar.",
+    "none_in_category": "Keine Vorlagen in dieser Kategorie."
   }
 }

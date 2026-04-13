@@ -89,6 +89,14 @@
       "load_failed_desc": "Der XP-Shop konnte nicht geladen werden."
     },
     "loading": "Errungenschaften werden geladen",
+    "badge_detail": {
+      "title": "Abzeichen Details",
+      "earned_on": "Verdient am {{date}}",
+      "not_earned": "Noch nicht verdient",
+      "not_earned_desc": "Mach weiter — du wirst dieses Abzeichen bald freischalten!",
+      "xp_reward": "XP Belohnung",
+      "load_failed": "Konnte die Abzeichendetails nicht laden."
+    },
     "showcase": {
       "manage_title": "Abzeichen-Vitrine verwalten",
       "select_badges": "Wählen Sie bis zu 5 Abzeichen für Ihr Profil aus. ({{count}}/5 ausgewählt)",
@@ -274,5 +282,10 @@
     "member_since": "Mitglied seit",
     "empty_title": "Noch kein Spotlight",
     "empty_description": "Aktive Mitglieder werden hier vorgestellt, sobald die Gemeinschaft mit dem Tauschen beginnt."
+  },
+  "page_meta": {
+    "leaderboard": {
+      "description": "Community-Rangliste — sieh dir die besten Mitwirkenden und aktivsten Mitglieder an."
+    }
   }
 }

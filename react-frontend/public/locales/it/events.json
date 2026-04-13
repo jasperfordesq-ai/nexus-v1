@@ -1,4 +1,7 @@
 {
+  "page_description": "Scopri eventi comunitari, workshop e incontri vicino a te.",
+  "near_me": "Vicino a me",
+  "near_me_no_location": "Imposta la tua posizione nel tuo profilo per utilizzare Vicino a me",
   "title": "Eventi",
   "subtitle": "Scopri e partecipa agli eventi della comunità",
   "create_event": "Crea Evento",
@@ -55,7 +58,7 @@
     "event_location": "Luogo dell'evento",
     "tab_details": "Dettagli",
     "tab_attendees": "Partecipanti",
-    "tab_checkin": "Check-in",
+    "tab_checkin": "Registrati",
     "rsvp_going": "Partecipi",
     "rsvp_interested": "Sei interessato/a",
     "rsvp_not_going": "Non partecipi",
@@ -111,6 +114,7 @@
   "form": {
     "create_title": "Crea nuovo evento",
     "edit_title": "Modifica evento",
+    "group_event_notice": "Questo evento sarà associato al tuo gruppo.",
     "loading": "Caricamento evento...",
     "unable_to_load": "Impossibile Caricare l'Evento",
     "back_to_events": "Torna agli eventi",
@@ -234,5 +238,10 @@
     "vote_success": "Voto registrato!",
     "vote_failed": "Impossibile registrare il voto",
     "view_full": "Visualizza sondaggio completo"
+  },
+  "page_meta": {
+    "create": {
+      "title": "Crea Evento"
+    }
   }
 }

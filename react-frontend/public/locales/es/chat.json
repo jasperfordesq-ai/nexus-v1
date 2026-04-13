@@ -25,5 +25,8 @@
   "starter_q2": "¿Qué habilidades están ofreciendo actualmente los miembros de la comunidad?",
   "starter_q3": "¿Cómo funciona el banco de tiempo?",
   "starter_q4": "¿Qué próximos eventos hay?",
-  "starter_q5": "¿Cómo creo un anuncio para ofrecer mis habilidades?"
+  "starter_q5": "¿Cómo creo un anuncio para ofrecer mis habilidades?",
+  "page_meta": {
+    "title": "Chat de IA"
+  }
 }

@@ -2,6 +2,7 @@
   "page_title": "Desafios de Ideação",
   "title": "Desafios de Ideação",
   "subtitle": "Partilhe ideias, vote e ajude a moldar a sua comunidade",
+  "page_description": "Explore os desafios da comunidade, envie ideias e vote em soluções. Ajude a moldar o futuro da sua comunidade.",
   "actions": {
     "retry": "Tentar Novamente"
   },
@@ -391,5 +392,13 @@
     "url_required": "O URL é obrigatório",
     "name_required": "O nome é obrigatório",
     "file_required": "O ficheiro é obrigatório"
+  },
+  "page_meta": {
+    "outcomes": {
+      "title": "Painel de Resultados"
+    },
+    "create_challenge": {
+      "title": "Criar Desafio"
+    }
   }
 }

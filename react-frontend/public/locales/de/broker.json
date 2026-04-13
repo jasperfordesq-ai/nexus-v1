@@ -1,0 +1,114 @@
+{
+  "checking_permissions": "Berechtigungen werden überprüft...",
+  "sidebar": {
+    "title": "Broker-Panel",
+    "expand": "Seitenleiste erweitern",
+    "collapse": "Seitenleiste einklappen",
+    "full_admin": "Vollständiges Admin-Panel"
+  },
+  "header": {
+    "toggle_sidebar": "Seitenleiste umschalten",
+    "back_to_site": "Zurück zur Seite",
+    "user_menu": "Benutzermenü",
+    "my_profile": "Mein Profil",
+    "sign_out": "Abmelden"
+  },
+  "nav": {
+    "vetting": "Überprüfung & DBS"
+  },
+  "breadcrumbs": {
+    "aria_label": "Breadcrumb-Navigation",
+    "dashboard": "Broker-Panel",
+    "vetting": "Überprüfung & DBS"
+  },
+  "dashboard": {
+    "title": "Broker-Dashboard",
+    "description": "Ihr täglicher Überblick über die Aufgaben des Community-Managements.",
+    "pending_members": "Ausstehende Mitglieder",
+    "safeguarding_alerts": "Schutzwarnungen",
+    "unreviewed_messages": "Nicht überprüfte Nachrichten",
+    "pending_exchanges": "Ausstehende Tauschgeschäfte",
+    "vetting_expiring": "Überprüfung läuft ab",
+    "monitored_users": "Überwachte Benutzer",
+    "high_risk_listings": "Hochrisiko-Listen",
+    "new_signups_today": "Neue Anmeldungen heute",
+    "safeguarding_flags": "Schutzflaggen",
+    "quick_actions": "Schnellaktionen",
+    "recent_activity": "Aktuelle Aktivitäten",
+    "no_activity": "Keine aktuellen Aktivitäten.",
+    "view_all": "Alle anzeigen"
+  },
+  "members": {
+    "description": "Community-Mitglieder anzeigen und verwalten.",
+    "search_placeholder": "Mitglieder suchen...",
+    "col_last_active": "Zuletzt aktiv",
+    "view_profile": "Profil anzeigen",
+    "send_message": "Nachricht senden",
+    "notes_for": "Notizen — {{name}}",
+    "note_placeholder": "Fügen Sie eine Notiz über dieses Mitglied hinzu...",
+    "note_added": "Notiz hinzugefügt.",
+    "no_notes": "Noch keine Notizen für dieses Mitglied.",
+    "check_vetting": "Überprüfung durchführen",
+    "onboarding_incomplete": "Einarbeitung unvollständig",
+    "confirm_approve_title": "Mitglied genehmigen",
+    "confirm_approve_message": "Sind Sie sicher, dass Sie dieses Mitglied genehmigen möchten? Es erhält vollen Zugang zur Plattform.",
+    "confirm_suspend_title": "Mitglied aussetzen",
+    "confirm_suspend_message": "Sind Sie sicher, dass Sie dieses Mitglied aussetzen möchten? Es verliert den Zugang zur Plattform.",
+    "approved_success": "Mitglied erfolgreich genehmigt.",
+    "suspended_success": "Mitglied erfolgreich ausgesetzt.",
+    "reactivated_success": "Mitglied erfolgreich reaktiviert.",
+    "action_failed": "Aktion fehlgeschlagen. Bitte versuchen Sie es erneut."
+  },
+  "onboarding": {
+    "description": "Verfolgen Sie den Fortschritt neuer Mitglieder und genehmigen Sie ausstehende Registrierungen.",
+    "funnel_title": "Einarbeitungsprozess",
+    "stage_email_verified": "E-Mail verifiziert",
+    "stage_profile_complete": "Profil vollständig",
+    "stage_first_exchange": "Erster Austausch",
+    "pending_approvals": "Ausstehende Genehmigungen",
+    "no_pending": "Keine ausstehenden Mitglieder zur Genehmigung."
+  },
+  "safeguarding": {
+    "description": "Überwachen Sie Sicherheitswarnungen, Betreuerzuweisungen und Mitgliederpräferenzen.",
+    "tab_flagged": "Markierte Nachrichten",
+    "tab_guardians": "Betreuerzuweisungen",
+    "tab_preferences": "Mitgliederpräferenzen",
+    "col_reason": "Grund für die Markierung",
+    "mark_reviewed": "Markiert als Überprüft",
+    "review_notes_placeholder": "Überprüfungsnotizen hinzufügen...",
+    "reviewed_success": "Nachricht erfolgreich überprüft.",
+    "no_flagged": "Keine markierten Nachrichten zur Überprüfung.",
+    "no_assignments": "Keine Aufträge für Wächter.",
+    "no_preferences": "Keine Präferenzen zum Schutz der Mitglieder aufgezeichnet."
+  },
+  "vetting": {
+    "title": "Überprüfung & DBS",
+    "description": "Verwalten Sie Überprüfungsunterlagen, DBS-Prüfungen und Ablaufverfolgung.",
+    "tab_expiring": "Bald ablaufend",
+    "col_expiry": "Ablaufdatum",
+    "reject_reason_placeholder": "Grund für die Ablehnung...",
+    "verified_success": "Überprüfungsunterlagen verifiziert.",
+    "rejected_success": "Überprüfungsunterlagen abgelehnt.",
+    "no_records": "Keine Überprüfungsunterlagen gefunden."
+  },
+  "exchanges": {
+    "description": "Überwachen Sie ausstehende Austauschanforderungen und Streitigkeiten.",
+    "notes_placeholder": "Notizen hinzufügen...",
+    "reason_placeholder": "Grund für die Ablehnung...",
+    "approved_success": "Austausch genehmigt.",
+    "rejected_success": "Austausch abgelehnt.",
+    "no_exchanges": "Keine Austausche gefunden."
+  },
+  "messages": {
+    "title": "Nachrichtenüberprüfung",
+    "description": "Überprüfen Sie markierte Gespräche, die eine Aufsicht des Brokers erfordern.",
+    "mark_reviewed": "Markiert als Überprüft",
+    "reviewed_success": "Nachricht als überprüft markiert.",
+    "no_messages": "Keine Nachrichten zur Überprüfung."
+  },
+  "common": {
+    "loading": "Lädt...",
+    "error": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+    "no_data": "Keine Daten verfügbar."
+  }
+}

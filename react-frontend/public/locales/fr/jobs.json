@@ -888,5 +888,42 @@
     "qualification_percentage": "Pourcentage de qualification"
   },
   "deadline_countdown_one": "Clôture dans {{count}} jour",
-  "deadline_countdown_other": "Clôture dans {{count}} jours"
+  "deadline_countdown_other": "Clôture dans {{count}} jours",
+  "ai_chat": {
+    "open": "Demandez à l'IA à propos de ce travail",
+    "close": "Fermer le chat de l'IA",
+    "send": "Envoyer un message",
+    "title": "Demandez à l'IA à propos de ce travail",
+    "hint": "Posez-moi toutes vos questions sur ce travail — qualifications, salaire, comment postuler, conseils d'entretien...",
+    "placeholder": "Tapez votre question..."
+  },
+  "page_meta": {
+    "bias_audit": {
+      "title": "Audit de biais"
+    },
+    "create": {
+      "title": "Publier un emploi"
+    },
+    "talent_search": {
+      "title": "Recherche de talents"
+    },
+    "my_applications": {
+      "title": "Mes candidatures"
+    },
+    "analytics": {
+      "title": "Analyse des emplois"
+    },
+    "kanban": {
+      "title": "Candidatures d'emploi"
+    },
+    "alerts": {
+      "title": "Alertes d'emploi"
+    },
+    "employer_onboarding": {
+      "title": "Intégration des employeurs"
+    },
+    "employer_brand": {
+      "title": "Marque employeur"
+    }
+  }
 }

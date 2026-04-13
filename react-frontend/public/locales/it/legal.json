@@ -1,5 +1,6 @@
 {
   "terms": {
+    "meta_description": "Termini e condizioni che regolano l'uso della nostra piattaforma di timebanking comunitario.",
     "page_title": "Termini di servizio",
     "heading": "Termini di servizio",
     "subtitle": "Le regole e le linee guida per l'utilizzo della nostra piattaforma",
@@ -96,6 +97,7 @@
     "privacy_policy_link": "Informativa sulla privacy"
   },
   "privacy": {
+    "meta_description": "Come raccogliamo, utilizziamo e proteggiamo i tuoi dati personali sulla nostra piattaforma comunitaria.",
     "page_title": "Informativa sulla privacy",
     "heading": "Informativa sulla privacy",
     "subtitle": "Come raccogliamo, utilizziamo e proteggiamo le Sue informazioni personali",
@@ -206,6 +208,7 @@
     "contact_privacy_team": "Contatti il nostro team per la privacy"
   },
   "cookies": {
+    "meta_description": "Informazioni su come utilizziamo i cookie per migliorare la tua esperienza sulla nostra piattaforma.",
     "page_title": "Politica dei cookie",
     "heading": "Politica dei cookie",
     "subtitle": "Come utilizziamo i cookie e tecnologie simili sulla nostra piattaforma",
@@ -287,6 +290,7 @@
     "privacy_policy_link": "Informativa sulla privacy"
   },
   "accessibility": {
+    "meta_description": "Il nostro impegno a rendere la piattaforma accessibile a tutti, seguendo gli standard WCAG 2.1 AA.",
     "page_title": "Accessibilita",
     "heading": "Dichiarazione di accessibilita",
     "subtitle": "{{name}} si impegna a garantire l'accessibilita digitale per le persone di tutte le capacita.",
@@ -435,5 +439,35 @@
     "cta_title": "Hai Domande?",
     "cta_body": "Se hai domande su questo documento, contattaci.",
     "contact_us": "Contattaci"
+  },
+  "page_meta": {
+    "platform_terms": {
+      "title": "Termini di Servizio della Piattaforma",
+      "description": "Termini di servizio che regolano l'uso della piattaforma di timebanking comunitario NEXUS."
+    },
+    "platform_privacy": {
+      "title": "Informativa sulla Privacy della Piattaforma",
+      "description": "Come la piattaforma NEXUS raccoglie, elabora e protegge i tuoi dati personali."
+    },
+    "platform_disclaimer": {
+      "title": "Dichiarazione di Non Responsabilità della Piattaforma",
+      "description": "Importanti dichiarazioni di non responsabilità sull'uso della piattaforma di timebanking comunitario NEXUS."
+    },
+    "community_guidelines": {
+      "title": "Linee Guida della Comunità",
+      "description": "Linee guida per un timebanking rispettoso e produttivo."
+    },
+    "acceptable_use": {
+      "title": "Politica di Uso Accettabile",
+      "description": "Politica di uso accettabile per la nostra piattaforma di timebanking comunitario."
+    },
+    "legal_hub": {
+      "title": "Informazioni Legali",
+      "description": "Documenti legali, politiche e informazioni sulla conformità."
+    },
+    "legal_version_history": {
+      "title": "Cronologia delle Versioni Legali",
+      "description": "Cronologia delle versioni dei nostri documenti e politiche legali."
+    }
   }
 }

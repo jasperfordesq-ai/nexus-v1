@@ -146,6 +146,7 @@
     "placeholder": "Eine Fähigkeit eingeben und Enter drücken...",
     "aria_add": "Fähigkeits-Tag hinzufügen"
   },
+  "more_filters": "Weitere Filter",
   "aria": {
     "view_mode": "Ansichtsmodus",
     "loading_listings": "Inserate werden geladen"
@@ -161,5 +162,25 @@
     "trend_7day": "7-Tage-Trend",
     "vs_previous_week": "ggü. Vorwoche",
     "views_last_days": "Aufrufe (letzte {{days}} Tage)"
+  },
+  "filter_any_duration": "Jede Dauer",
+  "filter_quick": "Schnell (unter 1h)",
+  "filter_short": "Kurz (1-3h)",
+  "filter_half_day": "Halber Tag (3-6h)",
+  "filter_full_day": "Ganzer Tag (6h+)",
+  "filter_service_mode": "Dienstmodus",
+  "filter_any_mode": "Jeder Modus",
+  "filter_remote": "Fernzugriff verfügbar",
+  "filter_in_person": "Nur persönlich",
+  "filter_posted_date": "Veröffentlichungsdatum",
+  "filter_any_time": "Jede Zeit",
+  "filter_this_week": "Diese Woche",
+  "filter_this_month": "Diesen Monat",
+  "clear_filters": "Filter zurücksetzen",
+  "results_count": "{{count}} Angebote gefunden",
+  "page_meta": {
+    "create": {
+      "title": "Angebot erstellen"
+    }
   }
 }

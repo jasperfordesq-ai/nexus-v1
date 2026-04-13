@@ -115,6 +115,11 @@
   "delete_for_everyone": "Supprimer pour tout le monde",
   "message_removed_self": "Message supprimé",
   "message_removed_self_subtitle": "Message supprimé de votre vue.",
+  "voice.show_transcript": "Afficher la transcription",
+  "voice.hide_transcript": "Masquer la transcription",
+  "voice.translate": "Traduire",
+  "voice.translating": "Traduction en cours...",
+  "voice.translation_failed": "Échec de la traduction. Veuillez réessayer.",
   "voice": {
     "show_transcript": "Afficher la transcription",
     "hide_transcript": "Masquer la transcription",
@@ -122,17 +127,48 @@
     "translating": "Traduction en cours...",
     "translation_failed": "Échec de la traduction"
   },
-  "voice.show_transcript": "Afficher la transcription",
-  "voice.hide_transcript": "Masquer la transcription",
-  "voice.translate": "Traduire",
-  "voice.translating": "Traduction en cours...",
-  "voice.translation_failed": "Échec de la traduction. Veuillez réessayer.",
   "translate": {
     "translate": "Traduire",
+    "translate_to": "Traduire en",
     "view_original": "Voir l'original",
     "show_translation": "Afficher la traduction",
     "translating": "Traduction en cours...",
     "translation_failed": "La traduction a échoué. Veuillez réessayer.",
     "translated_label": "Traduit"
-  }
+  },
+  "auto_translate": {
+    "enable": "Traduction automatique",
+    "enabled_toast": "Les messages seront traduits automatiquement",
+    "disabled_toast": "Traduction automatique désactivée",
+    "translating_all": "Traduction des messages...",
+    "tooltip_off": "Traduire tous les messages automatiquement",
+    "tooltip_on": "La traduction automatique est activée — cliquez pour désactiver",
+    "active_banner": "Les messages de cette conversation sont traduits automatiquement dans votre langue.",
+    "turn_off": "Désactiver"
+  },
+  "translate_hint": {
+    "title": "La traduction est disponible",
+    "body": "Vous et cette personne pouvez chacun écrire dans votre propre langue. Appuyez sur \"Traduire\" sur n'importe quel message pour le lire dans la vôtre, ou utilisez le bouton de traduction dans l'en-tête pour tout traduire automatiquement.",
+    "dismiss": "Ignorer l'astuce de traduction"
+  },
+  "new_group": "Nouveau groupe",
+  "create_group": "Créer un groupe",
+  "create_group_title": "Créer une conversation de groupe",
+  "group_name_label": "Nom du groupe",
+  "group_name_placeholder": "Entrez un nom pour ce groupe...",
+  "add_members": "Ajouter des membres",
+  "add_members_hint": "Recherchez des membres à ajouter (minimum 2)",
+  "selected_members": "Sélectionné ({{count}})",
+  "create_group_error": "Échec de la création de la conversation de groupe",
+  "group_created": "Groupe créé",
+  "group_created_desc": "Votre conversation de groupe a été créée.",
+  "group_members": "{{count}} membres",
+  "group_leave": "Quitter le groupe",
+  "group_leave_confirm": "Êtes-vous sûr de vouloir quitter ce groupe ? Vous ne recevrez plus de nouveaux messages.",
+  "group_add_member": "Ajouter un membre",
+  "group_edit_name": "Modifier le nom",
+  "group_name_updated": "Nom du groupe mis à jour",
+  "group_member_added": "Membre ajouté au groupe",
+  "group_member_removed": "Membre retiré du groupe",
+  "group_left": "Vous avez quitté le groupe"
 }

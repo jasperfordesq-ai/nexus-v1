@@ -888,5 +888,42 @@
     "qualification_percentage": "Porcentaje de calificación"
   },
   "deadline_countdown_one": "Cierra en {{count}} día",
-  "deadline_countdown_other": "Cierra en {{count}} días"
+  "deadline_countdown_other": "Cierra en {{count}} días",
+  "ai_chat": {
+    "open": "Pregunta a la IA sobre este trabajo",
+    "close": "Cerrar chat de IA",
+    "send": "Enviar mensaje",
+    "title": "Pregunta a la IA sobre este trabajo",
+    "hint": "Pregúntame cualquier cosa sobre este trabajo: requisitos, salario, cómo postular, consejos para la entrevista...",
+    "placeholder": "Escribe tu pregunta..."
+  },
+  "page_meta": {
+    "bias_audit": {
+      "title": "Auditoría de sesgos"
+    },
+    "create": {
+      "title": "Publicar un trabajo"
+    },
+    "talent_search": {
+      "title": "Búsqueda de talento"
+    },
+    "my_applications": {
+      "title": "Mis solicitudes"
+    },
+    "analytics": {
+      "title": "Análisis de trabajos"
+    },
+    "kanban": {
+      "title": "Solicitudes de empleo"
+    },
+    "alerts": {
+      "title": "Alertas de empleo"
+    },
+    "employer_onboarding": {
+      "title": "Integración de empleadores"
+    },
+    "employer_brand": {
+      "title": "Marca del empleador"
+    }
+  }
 }

@@ -68,7 +68,35 @@
     "aria_endorse": "Recomendar {{skillName}}",
     "endorsed": "Recomendado",
     "endorse": "Recomendar",
-    "endorse_failed": "Falha ao recomendar",
-    "remove_failed": "Falha ao remover recomendação"
+    "remove_failed": "Falha ao remover recomendação",
+    "endorse_failed": "Falha ao recomendar"
+  },
+  "bookmark": {
+    "remove": "Remover dos salvos",
+    "save_to": "Salvar na coleção",
+    "no_collection": "Geral (sem coleção)",
+    "new_collection": "Nova coleção",
+    "collection_name": "Nome da coleção"
+  },
+  "bookmarks": {
+    "title": "Itens Salvos",
+    "subtitle": "Seu conteúdo marcado, organizado do seu jeito.",
+    "new_collection": "Nova Coleção",
+    "count": "{{count}} itens salvos",
+    "removed": "Removido dos salvos",
+    "remove_failed": "Falha ao remover",
+    "empty_title": "Ainda não há itens salvos",
+    "empty_desc": "Toque no ícone de marcador em postagens, listagens, eventos e mais para salvá-los aqui.",
+    "load_more": "Carregar Mais",
+    "collection_updated": "Coleção atualizada",
+    "collection_created": "Coleção criada",
+    "collection_save_failed": "Falha ao salvar a coleção",
+    "collection_deleted": "Coleção excluída",
+    "collection_delete_failed": "Falha ao excluir a coleção",
+    "delete_collection_confirm": "Excluir esta coleção? Os marcadores serão mantidos.",
+    "collection_actions": "Ações da coleção",
+    "create_collection_title": "Criar Coleção",
+    "edit_collection_title": "Editar Coleção",
+    "collection_description": "Descrição (opcional)"
   }
 }

@@ -146,6 +146,7 @@
     "placeholder": "Digita una competenza e premi Invio...",
     "aria_add": "Aggiungi tag competenza"
   },
+  "more_filters": "Altri filtri",
   "aria": {
     "view_mode": "Modalità di visualizzazione",
     "loading_listings": "Caricamento annunci"
@@ -161,5 +162,25 @@
     "trend_7day": "Tendenza 7 Giorni",
     "vs_previous_week": "vs. settimana precedente",
     "views_last_days": "Visualizzazioni (Ultimi {{days}} Giorni)"
+  },
+  "filter_any_duration": "Qualsiasi durata",
+  "filter_quick": "Veloce (meno di 1h)",
+  "filter_short": "Breve (1-3h)",
+  "filter_half_day": "Mezza giornata (3-6h)",
+  "filter_full_day": "Giornata intera (6h+)",
+  "filter_service_mode": "Modalità servizio",
+  "filter_any_mode": "Qualsiasi modalità",
+  "filter_remote": "Disponibile da remoto",
+  "filter_in_person": "Solo di persona",
+  "filter_posted_date": "Data di pubblicazione",
+  "filter_any_time": "Qualsiasi momento",
+  "filter_this_week": "Questa settimana",
+  "filter_this_month": "Questo mese",
+  "clear_filters": "Cancella filtri",
+  "results_count": "{{count}} annunci trovati",
+  "page_meta": {
+    "create": {
+      "title": "Crea annuncio"
+    }
   }
 }

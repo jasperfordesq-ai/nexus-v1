@@ -2,6 +2,7 @@
   "page_title": "Freiwilligenarbeit",
   "heading": "Freiwilligenarbeit",
   "subtitle": "Finden Sie Einsätze und verfolgen Sie Ihre Wirkung",
+  "page_description": "Entdecke Freiwilligenmöglichkeiten in deiner Gemeinschaft. Melde dich an, verfolge deine Stunden und hinterlasse einen Eindruck.",
   "browse_organisations": "Organisationen durchsuchen",
   "tab_opportunities": "Einsätze",
   "tab_applications": "Meine Bewerbungen",
@@ -257,6 +258,7 @@
       "amount": "Betrag",
       "message": "Nachricht (optional)"
     },
+    "placeholder_amount": "0,00",
     "anonymous_toggle_on": "Anonyme Spende",
     "anonymous_toggle_off": "Anonym spenden",
     "cancel": "Abbrechen",
@@ -492,5 +494,10 @@
     "suggested_rest_days": "Empfohlene Ruhetage",
     "rest_days_desc": "Basierend auf Ihrer letzten Aktivität empfehlen wir, an diesen Tagen eine Pause einzulegen:",
     "recent_checkins": "Letzte Stimmungs-Check-ins"
+  },
+  "page_meta": {
+    "create_opportunity": {
+      "title": "Möglichkeit erstellen"
+    }
   }
 }

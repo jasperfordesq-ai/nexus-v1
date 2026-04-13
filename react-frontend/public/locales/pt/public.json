@@ -1,5 +1,6 @@
 {
   "home": {
+    "meta_title": "Plataforma Comunitária de Timebanking",
     "meta_description": "Troque competências e serviços usando créditos de tempo. Junte-se à nossa plataforma comunitária de timebanking.",
     "meta_keywords": "timebanking, troca de competências, comunidade, voluntariado, créditos de tempo",
     "badge": "O Futuro do Timebanking",
@@ -156,6 +157,7 @@
     }
   },
   "contact": {
+    "meta_description": "Entre em contato com nossa equipe de suporte comunitário. Estamos aqui para ajudar.",
     "title": "Contacte-nos",
     "subtitle": "Tem uma pergunta sobre {{name}}? Adoraríamos ouvir de si.",
     "success_title": "Mensagem Enviada!",
@@ -185,6 +187,8 @@
     }
   },
   "faq": {
+    "page_title": "Perguntas Frequentes",
+    "meta_description": "Encontre respostas para perguntas comuns sobre timebanking, trocas e recursos comunitários.",
     "title": "Perguntas Frequentes",
     "subtitle_before_link": "Não encontra o que procura? Visite o nosso",
     "help_center_link": "Centro de Ajuda",
@@ -426,6 +430,10 @@
       "member_item17": "Desafios de ideação — hub de inovação com campanhas, ideias, votação e resultados",
       "member_item18": "Conquistas e gamificação — XP, insígnias, desafios, sequências, tabela de classificação e Pontuação Nexus",
       "member_item19": "Insights pessoais — métricas de envolvimento individuais e recomendações personalizadas",
+      "member_item20": "Marketplace — módulo de classificados independente com pagamentos Stripe Connect, pedidos e perfis de vendedores",
+      "member_item21": "Doações — doações únicas e recorrentes via Stripe com painéis de organização e recibos",
+      "member_item22": "Verificação de identidade — fluxo opcional de Identidade Stripe (documento + selfie + correspondência de nome/data de nascimento) com um distintivo de membro verificado",
+      "member_item23": "Sugestões de resposta de IA — assistente no marketplace que elabora respostas para consultas de listagens",
       "content_title": "Conteúdo e comunicação",
       "content_item1": "Blog — gestão de conteúdo do tenant e notícias da comunidade",
       "content_item2": "Recursos e base de conhecimento — artigos estruturados e biblioteca de recursos partilhados",
@@ -442,7 +450,10 @@
       "platform_item5": "7 idiomas — inglês, irlandês, alemão, francês, italiano, português e espanhol",
       "platform_item6": "Painel de administração — configuração de tenant, gestão de utilizadores, análises e moderação",
       "platform_item7": "Controlos algorítmicos — dashboard de saúde em direto e ajuste de todos os sistemas de classificação",
-      "platform_item8": "Modo escuro e interface responsiva para dispositivos móveis"
+      "platform_item8": "Modo escuro e interface responsiva para dispositivos móveis",
+      "platform_item9": "SEO no momento da construção — 19+ páginas públicas pré-renderizadas com Playwright, dados estruturados, sitemaps e fallback Prerender.io para rotas dinâmicas",
+      "platform_item10": "Federação — quatro adaptadores de protocolo ativos: Nexus (nativo), Komunitin (todos os 15 endpoints), Credit Commons (11 endpoints, crédito mútuo compatível com CEN) e TimeOverflow; sincronização bidirecional entre 9 tipos de entidades, push orientado a eventos e portabilidade de reputação",
+      "platform_item11": "Camada de pagamentos — Stripe para assinaturas, doações, marketplace (Connect) e verificação de identidade, com manuseio de webhook idempotente"
     },
     "whats_rough": {
       "title": "O que ainda pode estar irregular",
@@ -485,5 +496,10 @@
     "title": "Base de conhecimento",
     "description": "Encontre respostas, guias e recursos úteis",
     "search_placeholder": "Pesquisar na base de conhecimento..."
+  },
+  "page_meta": {
+    "development_status": {
+      "title": "Status de Desenvolvimento"
+    }
   }
 }

@@ -154,5 +154,13 @@
     "broker_approval_description": "Esta troca terá de ser aprovada por um coordenador da comunidade antes de poder prosseguir.",
     "cancel": "Cancelar",
     "send_request": "Enviar Pedido"
+  },
+  "page_meta": {
+    "request": {
+      "title": "Solicitar Troca"
+    },
+    "detail": {
+      "title": "Detalhes da Troca"
+    }
   }
 }

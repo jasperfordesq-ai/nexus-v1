@@ -146,6 +146,7 @@
     "placeholder": "Escreva uma competência e prima Enter...",
     "aria_add": "Adicionar etiqueta de competência"
   },
+  "more_filters": "Mais filtros",
   "aria": {
     "view_mode": "Modo de visualização",
     "loading_listings": "A carregar anúncios"
@@ -161,5 +162,25 @@
     "trend_7day": "Tendência de 7 Dias",
     "vs_previous_week": "vs. semana anterior",
     "views_last_days": "Visualizações (Últimos {{days}} Dias)"
+  },
+  "filter_any_duration": "Qualquer duração",
+  "filter_quick": "Rápido (menos de 1h)",
+  "filter_short": "Curto (1-3h)",
+  "filter_half_day": "Meio dia (3-6h)",
+  "filter_full_day": "Dia inteiro (6h+)",
+  "filter_service_mode": "Modo de serviço",
+  "filter_any_mode": "Qualquer modo",
+  "filter_remote": "Remoto disponível",
+  "filter_in_person": "Apenas presencial",
+  "filter_posted_date": "Data de postagem",
+  "filter_any_time": "Qualquer hora",
+  "filter_this_week": "Esta semana",
+  "filter_this_month": "Este mês",
+  "clear_filters": "Limpar filtros",
+  "results_count": "{{count}} listagens encontradas",
+  "page_meta": {
+    "create": {
+      "title": "Criar Listagem"
+    }
   }
 }

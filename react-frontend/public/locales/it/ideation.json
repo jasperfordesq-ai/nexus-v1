@@ -2,6 +2,7 @@
   "page_title": "Sfide di Ideazione",
   "title": "Sfide di Ideazione",
   "subtitle": "Condividi idee, vota e contribuisci a plasmare la tua comunita",
+  "page_description": "Esplora le sfide della comunità, invia idee e vota le soluzioni. Aiuta a plasmare il futuro della tua comunità.",
   "actions": {
     "retry": "Riprova"
   },
@@ -391,5 +392,13 @@
     "url_required": "L'URL e obbligatorio",
     "name_required": "Il nome e obbligatorio",
     "file_required": "Il file e obbligatorio"
+  },
+  "page_meta": {
+    "outcomes": {
+      "title": "Dashboard dei Risultati"
+    },
+    "create_challenge": {
+      "title": "Crea Sfida"
+    }
   }
 }

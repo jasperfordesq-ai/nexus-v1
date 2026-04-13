@@ -25,5 +25,8 @@
   "starter_q2": "Welche Fähigkeiten bieten Gemeinschaftsmitglieder derzeit an?",
   "starter_q3": "Wie funktioniert Zeitbanking?",
   "starter_q4": "Welche bevorstehenden Veranstaltungen gibt es?",
-  "starter_q5": "Wie erstelle ich eine Anzeige, um meine Fähigkeiten anzubieten?"
+  "starter_q5": "Wie erstelle ich eine Anzeige, um meine Fähigkeiten anzubieten?",
+  "page_meta": {
+    "title": "KI-Chat"
+  }
 }

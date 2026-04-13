@@ -2,6 +2,7 @@
   "page_title": "Ideenwettbewerbe",
   "title": "Ideenwettbewerbe",
   "subtitle": "Teilen Sie Ideen, stimmen Sie ab und gestalten Sie Ihre Gemeinschaft mit",
+  "page_description": "Durchstöbere die Herausforderungen der Gemeinschaft, reiche Ideen ein und stimme über Lösungen ab. Hilf mit, die Zukunft deiner Gemeinschaft zu gestalten.",
   "actions": {
     "retry": "Erneut versuchen"
   },
@@ -391,5 +392,13 @@
     "url_required": "URL ist erforderlich",
     "name_required": "Name ist erforderlich",
     "file_required": "Datei ist erforderlich"
+  },
+  "page_meta": {
+    "outcomes": {
+      "title": "Ergebnisse-Dashboard"
+    },
+    "create_challenge": {
+      "title": "Herausforderung erstellen"
+    }
   }
 }

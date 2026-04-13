@@ -1,0 +1,114 @@
+{
+  "checking_permissions": "Vérification des autorisations...",
+  "sidebar": {
+    "title": "Panneau du courtier",
+    "expand": "Développer la barre latérale",
+    "collapse": "Réduire la barre latérale",
+    "full_admin": "Panneau d'administration complet"
+  },
+  "header": {
+    "toggle_sidebar": "Basculer la barre latérale",
+    "back_to_site": "Retour au site",
+    "user_menu": "Menu utilisateur",
+    "my_profile": "Mon profil",
+    "sign_out": "Se déconnecter"
+  },
+  "nav": {
+    "vetting": "Vérification et DBS"
+  },
+  "breadcrumbs": {
+    "aria_label": "Navigation par fil d'Ariane",
+    "dashboard": "Panneau du courtier",
+    "vetting": "Vérification et DBS"
+  },
+  "dashboard": {
+    "title": "Tableau de bord du courtier",
+    "description": "Votre aperçu quotidien des tâches de gestion communautaire.",
+    "pending_members": "Membres en attente",
+    "safeguarding_alerts": "Alertes de protection",
+    "unreviewed_messages": "Messages non examinés",
+    "pending_exchanges": "Échanges en attente",
+    "vetting_expiring": "Vérification expirante",
+    "monitored_users": "Utilisateurs surveillés",
+    "high_risk_listings": "Annonces à haut risque",
+    "new_signups_today": "Nouvelles inscriptions aujourd'hui",
+    "safeguarding_flags": "Drapeaux de protection",
+    "quick_actions": "Actions rapides",
+    "recent_activity": "Activité récente",
+    "no_activity": "Aucune activité récente.",
+    "view_all": "Voir tout"
+  },
+  "members": {
+    "description": "Voir et gérer les membres de la communauté.",
+    "search_placeholder": "Rechercher des membres...",
+    "col_last_active": "Dernière activité",
+    "view_profile": "Voir le profil",
+    "send_message": "Envoyer un message",
+    "notes_for": "Notes — {{name}}",
+    "note_placeholder": "Ajouter une note sur ce membre...",
+    "note_added": "Note ajoutée.",
+    "no_notes": "Aucune note pour ce membre pour le moment.",
+    "check_vetting": "Vérifier la vérification",
+    "onboarding_incomplete": "Intégration incomplète",
+    "confirm_approve_title": "Approuver le membre",
+    "confirm_approve_message": "Êtes-vous sûr de vouloir approuver ce membre ? Il aura un accès complet à la plateforme.",
+    "confirm_suspend_title": "Suspendre le membre",
+    "confirm_suspend_message": "Êtes-vous sûr de vouloir suspendre ce membre ? Il perdra l'accès à la plateforme.",
+    "approved_success": "Membre approuvé avec succès.",
+    "suspended_success": "Membre suspendu avec succès.",
+    "reactivated_success": "Membre réactivé avec succès.",
+    "action_failed": "Échec de l'action. Veuillez réessayer."
+  },
+  "onboarding": {
+    "description": "Suivez les progrès des nouveaux membres et approuvez les inscriptions en attente.",
+    "funnel_title": "Entonnoir d'intégration",
+    "stage_email_verified": "Email vérifié",
+    "stage_profile_complete": "Profil complet",
+    "stage_first_exchange": "Premier échange",
+    "pending_approvals": "Approbations en attente",
+    "no_pending": "Aucun membre en attente à approuver."
+  },
+  "safeguarding": {
+    "description": "Surveillez les alertes de protection, les attributions de gardiens et les préférences des membres.",
+    "tab_flagged": "Messages signalés",
+    "tab_guardians": "Attributions de gardiens",
+    "tab_preferences": "Préférences des membres",
+    "col_reason": "Raison du signalement",
+    "mark_reviewed": "Marquer comme examiné",
+    "review_notes_placeholder": "Ajouter des notes de révision...",
+    "reviewed_success": "Message examiné avec succès.",
+    "no_flagged": "Aucun message signalé à examiner.",
+    "no_assignments": "Aucune affectation de gardien.",
+    "no_preferences": "Aucune préférence de protection des membres enregistrée."
+  },
+  "vetting": {
+    "title": "Vérification et DBS",
+    "description": "Gérer les dossiers de vérification, les contrôles DBS et le suivi des dates d'expiration.",
+    "tab_expiring": "Expiration imminente",
+    "col_expiry": "Date d'expiration",
+    "reject_reason_placeholder": "Raison du rejet...",
+    "verified_success": "Dossier de vérification vérifié.",
+    "rejected_success": "Dossier de vérification rejeté.",
+    "no_records": "Aucun dossier de vérification trouvé."
+  },
+  "exchanges": {
+    "description": "Superviser les demandes d'échange et les litiges en attente.",
+    "notes_placeholder": "Ajouter des notes...",
+    "reason_placeholder": "Raison du rejet...",
+    "approved_success": "Échange approuvé.",
+    "rejected_success": "Échange rejeté.",
+    "no_exchanges": "Aucun échange trouvé."
+  },
+  "messages": {
+    "title": "Examen des messages",
+    "description": "Examiner les conversations signalées nécessitant la supervision d'un courtier.",
+    "mark_reviewed": "Marquer comme examiné",
+    "reviewed_success": "Message marqué comme examiné.",
+    "no_messages": "Aucun message à examiner."
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Quelque chose a mal tourné. Veuillez réessayer.",
+    "no_data": "Aucune donnée disponible."
+  }
+}

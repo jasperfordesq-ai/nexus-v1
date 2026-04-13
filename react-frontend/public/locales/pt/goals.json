@@ -60,5 +60,11 @@
     "retry": "Tentar Novamente",
     "no_activity": "Ainda não foi registada atividade.",
     "progress_aria": "Progresso: {{percent}}%"
+  },
+  "template_picker": {
+    "load_error": "Falha ao carregar os modelos. Por favor, tente novamente.",
+    "try_again": "Tente novamente",
+    "none_available": "Ainda não há modelos disponíveis.",
+    "none_in_category": "Não há modelos nesta categoria."
   }
 }

@@ -115,6 +115,11 @@
   "delete_for_everyone": "Für alle löschen",
   "message_removed_self": "Nachricht entfernt",
   "message_removed_self_subtitle": "Nachricht aus Ihrer Ansicht entfernt.",
+  "voice.show_transcript": "Transkript anzeigen",
+  "voice.hide_transcript": "Transkript ausblenden",
+  "voice.translate": "Übersetzen",
+  "voice.translating": "Wird übersetzt...",
+  "voice.translation_failed": "Übersetzung fehlgeschlagen. Bitte versuchen Sie es erneut.",
   "voice": {
     "show_transcript": "Transkript anzeigen",
     "hide_transcript": "Transkript ausblenden",
@@ -122,17 +127,48 @@
     "translating": "Wird übersetzt...",
     "translation_failed": "Übersetzung fehlgeschlagen"
   },
-  "voice.show_transcript": "Transkript anzeigen",
-  "voice.hide_transcript": "Transkript ausblenden",
-  "voice.translate": "Übersetzen",
-  "voice.translating": "Wird übersetzt...",
-  "voice.translation_failed": "Übersetzung fehlgeschlagen. Bitte versuchen Sie es erneut.",
   "translate": {
     "translate": "Übersetzen",
+    "translate_to": "Übersetzen in",
     "view_original": "Original anzeigen",
     "show_translation": "Übersetzung anzeigen",
     "translating": "Wird übersetzt...",
     "translation_failed": "Übersetzung fehlgeschlagen. Bitte versuchen Sie es erneut.",
     "translated_label": "Übersetzt"
-  }
+  },
+  "auto_translate": {
+    "enable": "Automatisch übersetzen",
+    "enabled_toast": "Nachrichten werden automatisch übersetzt",
+    "disabled_toast": "Automatische Übersetzung deaktiviert",
+    "translating_all": "Nachrichten werden übersetzt...",
+    "tooltip_off": "Alle Nachrichten automatisch übersetzen",
+    "tooltip_on": "Automatische Übersetzung ist aktiv — klicken Sie, um sie auszuschalten",
+    "active_banner": "Nachrichten in diesem Gespräch werden automatisch in Ihre Sprache übersetzt.",
+    "turn_off": "Ausschalten"
+  },
+  "translate_hint": {
+    "title": "Übersetzung ist verfügbar",
+    "body": "Sie und diese Person können jeweils in Ihrer eigenen Sprache schreiben. Tippen Sie auf \"Übersetzen\" bei einer Nachricht, um sie in Ihrer Sprache zu lesen, oder verwenden Sie die Übersetzen-Schaltfläche im Header, um alles automatisch zu übersetzen.",
+    "dismiss": "Übersetzungshinweis schließen"
+  },
+  "new_group": "Neue Gruppe",
+  "create_group": "Gruppe erstellen",
+  "create_group_title": "Gruppengespräch erstellen",
+  "group_name_label": "Gruppenname",
+  "group_name_placeholder": "Geben Sie einen Namen für diese Gruppe ein...",
+  "add_members": "Mitglieder hinzufügen",
+  "add_members_hint": "Suchen Sie nach Mitgliedern, die hinzugefügt werden sollen (mindestens 2)",
+  "selected_members": "Ausgewählt ({{count}})",
+  "create_group_error": "Gruppengespräch konnte nicht erstellt werden",
+  "group_created": "Gruppe erstellt",
+  "group_created_desc": "Ihr Gruppengespräch wurde erstellt.",
+  "group_members": "{{count}} Mitglieder",
+  "group_leave": "Gruppe verlassen",
+  "group_leave_confirm": "Sind Sie sicher, dass Sie diese Gruppe verlassen möchten? Sie erhalten keine neuen Nachrichten mehr.",
+  "group_add_member": "Mitglied hinzufügen",
+  "group_edit_name": "Name bearbeiten",
+  "group_name_updated": "Gruppenname aktualisiert",
+  "group_member_added": "Mitglied zur Gruppe hinzugefügt",
+  "group_member_removed": "Mitglied aus der Gruppe entfernt",
+  "group_left": "Du hast die Gruppe verlassen"
 }

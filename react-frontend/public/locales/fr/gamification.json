@@ -89,6 +89,14 @@
       "load_failed_desc": "Impossible de charger la boutique XP."
     },
     "loading": "Chargement des réalisations",
+    "badge_detail": {
+      "title": "Détails du badge",
+      "earned_on": "Gagné le {{date}}",
+      "not_earned": "Pas encore gagné",
+      "not_earned_desc": "Continuez — vous débloquerez bientôt ce badge !",
+      "xp_reward": "Récompense XP",
+      "load_failed": "Impossible de charger les détails du badge."
+    },
     "showcase": {
       "manage_title": "Gérer la vitrine de badges",
       "select_badges": "Sélectionnez jusqu'à 5 badges à afficher sur votre profil. ({{count}}/5 sélectionnés)",
@@ -274,5 +282,10 @@
     "member_since": "Membre depuis",
     "empty_title": "Pas encore de coup de projecteur",
     "empty_description": "Les membres actifs seront mis en avant ici dès que la communauté commencera à échanger."
+  },
+  "page_meta": {
+    "leaderboard": {
+      "description": "Classement de la communauté — voyez les meilleurs contributeurs et les membres les plus actifs."
+    }
   }
 }

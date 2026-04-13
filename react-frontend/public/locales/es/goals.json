@@ -60,5 +60,11 @@
     "retry": "Reintentar",
     "no_activity": "Aún no se ha registrado actividad.",
     "progress_aria": "Progreso: {{percent}}%"
+  },
+  "template_picker": {
+    "load_error": "Error al cargar las plantillas. Por favor, inténtalo de nuevo.",
+    "try_again": "Inténtalo de nuevo",
+    "none_available": "Aún no hay plantillas disponibles.",
+    "none_in_category": "No hay plantillas en esta categoría."
   }
 }

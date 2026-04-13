@@ -146,6 +146,7 @@
     "placeholder": "Saisissez une compétence et appuyez sur Entrée...",
     "aria_add": "Ajouter une étiquette de compétence"
   },
+  "more_filters": "Plus de filtres",
   "aria": {
     "view_mode": "Mode d’affichage",
     "loading_listings": "Chargement des annonces"
@@ -161,5 +162,25 @@
     "trend_7day": "Tendance sur 7 jours",
     "vs_previous_week": "vs. semaine précédente",
     "views_last_days": "Vues ({{days}} derniers jours)"
+  },
+  "filter_any_duration": "Toute durée",
+  "filter_quick": "Rapide (moins de 1h)",
+  "filter_short": "Court (1-3h)",
+  "filter_half_day": "Demi-journée (3-6h)",
+  "filter_full_day": "Journée complète (6h+)",
+  "filter_service_mode": "Mode de service",
+  "filter_any_mode": "Tout mode",
+  "filter_remote": "À distance disponible",
+  "filter_in_person": "Uniquement en personne",
+  "filter_posted_date": "Date de publication",
+  "filter_any_time": "Tout moment",
+  "filter_this_week": "Cette semaine",
+  "filter_this_month": "Ce mois-ci",
+  "clear_filters": "Effacer les filtres",
+  "results_count": "{{count}} annonces trouvées",
+  "page_meta": {
+    "create": {
+      "title": "Créer une annonce"
+    }
   }
 }

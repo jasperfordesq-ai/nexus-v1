@@ -197,7 +197,7 @@
   },
   "weekly_digest": {
     "title": "Community Pulse - Wöchentlicher Digest",
-    "heading": "Community Pulse",
+    "heading": "Gemeinschafts-Puls",
     "subheading": "Dein wöchentlicher Digest",
     "preview_text": "Deine wöchentlichen Community-Highlights - neue Angebote, Anfragen und bevorstehende Veranstaltungen",
     "greeting": "Hallo {{name}},",
