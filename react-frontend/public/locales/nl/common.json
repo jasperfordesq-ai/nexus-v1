@@ -74,6 +74,7 @@
     "matches": "Vaardigheidsmatching",
     "goals": "Persoonlijke & gemeenschapsdoelen",
     "skills": "Vaardigheidsgids & aanbevelingen",
+    "saved": "Je opgeslagen items",
     "activity": "Jouw recente activiteitenlog",
     "ai_chat": "AI-aangedreven gemeenschapsassistent",
     "federation_hub": "Cross-community netwerk",
@@ -92,7 +93,8 @@
     "impact_report": "Gedetailleerde impactgegevens",
     "strategic_plan": "Onze strategische richting",
     "timebanking_listings": "Aanbiedingen & verzoeken",
-    "messages": "Jouw berichten"
+    "messages": "Jouw berichten",
+    "marketplace": "Koop & verkoop in je gemeenschap"
   },
   "user_menu": {
     "my_profile": "Mijn profiel",
@@ -223,7 +225,7 @@
     "pages": "Pagina's",
     "cookie_settings": "Cookie-instellingen",
     "built_on_nexus": "Gebouwd op Project NEXUS — Open Source Gemeenschapsplatform",
-    "agpl_notice": "AGPL-3.0 — Copyright © 2024–{{year}} Jasper Ford",
+    "agpl_notice": "AGPL-3.0 — Auteursrecht © 2024–{{year}} Jasper Ford",
     "terms": "Voorwaarden",
     "privacy": "Privacy"
   },
@@ -287,7 +289,9 @@
     "trending": "Trending",
     "no_results": "Geen GIF's gevonden",
     "powered_by": "Mogelijk gemaakt door GIPHY",
-    "button_label": "GIF toevoegen"
+    "button_label": "GIF toevoegen",
+    "select": "Selecteer GIF",
+    "preview_alt": "GIF voorbeeld"
   },
   "loading": "Laden...",
   "feature_error": {
@@ -382,8 +386,23 @@
   },
   "hours_display_one": "{{count}} uur",
   "hours_display_other": "{{count}} uren",
+  "compose": {
+    "aria_insert_link": "Voeg link in",
+    "aria_remove_link": "Verwijder link"
+  },
   "toast": {
     "aria_notifications": "Meldingen",
     "aria_dismiss_notification": "Melding negeren"
+  },
+  "verification": {
+    "not_id_verified": "Niet ID Geverifieerd"
+  },
+  "page_meta": {
+    "skills_browse": {
+      "title": "Bekijk Vaardigheden"
+    },
+    "members": {
+      "description": "Bekijk gemeenschapsleden, verbind en wissel tijdcredits uit."
+    }
   }
 }

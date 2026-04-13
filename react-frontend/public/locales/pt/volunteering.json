@@ -2,6 +2,7 @@
   "page_title": "Voluntariado",
   "heading": "Voluntariado",
   "subtitle": "Encontre oportunidades e acompanhe o seu impacto",
+  "page_description": "Descubra oportunidades de voluntariado em sua comunidade. Inscreva-se, acompanhe suas horas e faça a diferença.",
   "browse_organisations": "Explorar Organizações",
   "tab_opportunities": "Oportunidades",
   "tab_applications": "As Minhas Candidaturas",
@@ -257,6 +258,7 @@
       "amount": "Montante",
       "message": "Mensagem (opcional)"
     },
+    "placeholder_amount": "0,00",
     "anonymous_toggle_on": "A doar anonimamente",
     "anonymous_toggle_off": "Doar anonimamente",
     "cancel": "Cancelar",
@@ -492,5 +494,10 @@
     "suggested_rest_days": "Dias de Descanso Sugeridos",
     "rest_days_desc": "Com base na sua atividade recente, recomendamos que descanse nestes dias:",
     "recent_checkins": "Check-ins de Humor Recentes"
+  },
+  "page_meta": {
+    "create_opportunity": {
+      "title": "Criar Oportunidade"
+    }
   }
 }

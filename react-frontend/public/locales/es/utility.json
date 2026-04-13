@@ -1,5 +1,6 @@
 {
   "help": {
+    "meta_description": "Explora artículos de ayuda, guías y preguntas frecuentes para aprovechar al máximo la plataforma.",
     "page_title": "Centro de Ayuda",
     "heading": "Centro de Ayuda",
     "subtitle": "Encuentra respuestas a preguntas frecuentes sobre {{name}}",
@@ -146,5 +147,10 @@
     "default_title": "Página",
     "not_found_description": "La página que buscas no existe o ya no está disponible.",
     "back_to_home": "Volver al Inicio"
+  },
+  "page_meta": {
+    "newsletter_unsubscribe": {
+      "title": "Cancelar suscripción al boletín"
+    }
   }
 }

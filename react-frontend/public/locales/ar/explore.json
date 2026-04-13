@@ -33,7 +33,7 @@
   "top_contributors": {
     "title": "أفضل المساهمين",
     "subtitle": "قادة المجتمع حسب الخبرة",
-    "level": "Lv.{{level}}"
+    "level": "مستوى.{{level}}"
   },
   "trending_hashtags": {
     "title": "الهاشتاجات الرائجة",

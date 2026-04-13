@@ -74,6 +74,7 @@
     "matches": "مطابقة المهارات",
     "goals": "الأهداف الشخصية والمجتمعية",
     "skills": "دليل المهارات والتوصيات",
+    "saved": "عناصرك المحفوظة",
     "activity": "سجل نشاطك الأخير",
     "ai_chat": "مساعد المجتمع المدعوم بالذكاء الاصطناعي",
     "federation_hub": "شبكة عبر المجتمعات",
@@ -92,7 +93,8 @@
     "impact_report": "بيانات التأثير التفصيلية",
     "strategic_plan": "اتجاهنا الاستراتيجي",
     "timebanking_listings": "العروض والطلبات",
-    "messages": "رسائلك"
+    "messages": "رسائلك",
+    "marketplace": "اشترِ وبيع في مجتمعك"
   },
   "user_menu": {
     "my_profile": "ملفي الشخصي",
@@ -287,7 +289,9 @@
     "trending": "رائج",
     "no_results": "لم يتم العثور على صور GIF",
     "powered_by": "مدعوم من GIPHY",
-    "button_label": "إضافة GIF"
+    "button_label": "إضافة GIF",
+    "select": "اختر GIF",
+    "preview_alt": "معاينة GIF"
   },
   "loading": "جارٍ التحميل...",
   "feature_error": {
@@ -382,8 +386,23 @@
   },
   "hours_display_one": "ساعة واحدة",
   "hours_display_other": "{{count}} ساعات",
+  "compose": {
+    "aria_insert_link": "أدخل الرابط",
+    "aria_remove_link": "إزالة الرابط"
+  },
   "toast": {
     "aria_notifications": "الإشعارات",
     "aria_dismiss_notification": "تجاهل الإشعار"
+  },
+  "verification": {
+    "not_id_verified": "غير موثق الهوية"
+  },
+  "page_meta": {
+    "skills_browse": {
+      "title": "تصفح المهارات"
+    },
+    "members": {
+      "description": "تصفح أعضاء المجتمع، تواصل وتبادل أرصدة الوقت."
+    }
   }
 }

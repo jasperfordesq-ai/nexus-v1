@@ -1,4 +1,7 @@
 {
+  "page_description": "Descubra eventos comunitários, oficinas e encontros perto de você.",
+  "near_me": "Perto de mim",
+  "near_me_no_location": "Defina sua localização em seu perfil para usar Perto de mim",
   "title": "Eventos",
   "subtitle": "Descubra e participe em eventos comunitários",
   "create_event": "Criar Evento",
@@ -111,6 +114,7 @@
   "form": {
     "create_title": "Criar Novo Evento",
     "edit_title": "Editar Evento",
+    "group_event_notice": "Este evento estará associado ao seu grupo.",
     "loading": "A carregar evento...",
     "unable_to_load": "Não Foi Possível Carregar o Evento",
     "back_to_events": "Voltar aos Eventos",
@@ -234,5 +238,10 @@
     "vote_success": "Voto registado!",
     "vote_failed": "Falha ao registar voto",
     "view_full": "Ver sondagem completa"
+  },
+  "page_meta": {
+    "create": {
+      "title": "Criar Evento"
+    }
   }
 }

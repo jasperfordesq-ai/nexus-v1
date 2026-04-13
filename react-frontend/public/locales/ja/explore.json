@@ -42,7 +42,7 @@
   "recommended": {
     "title": "あなたへのおすすめ",
     "subtitle": "あなたの興味と活動に基づいて",
-    "by_author": "by {{name}}"
+    "by_author": "{{name}}によって"
   },
   "new_members": {
     "title": "新しいメンバーを歓迎します",

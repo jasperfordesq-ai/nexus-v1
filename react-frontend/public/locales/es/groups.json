@@ -63,7 +63,7 @@
     "invite_members": "Invitar a miembros",
     "invite_link_desc": "Comparte un enlace que cualquiera pueda usar para unirse:",
     "invite_email_desc": "O invita por correo electrónico (separados por comas):",
-    "invite_email_placeholder": "email1@example.com, email2@example.com",
+    "invite_email_placeholder": "correo1@ejemplo.com, correo2@ejemplo.com",
     "invite_emails_aria": "Direcciones de correo electrónico para invitar",
     "invite_message_label": "Mensaje personal (opcional)",
     "invite_message_placeholder": "¡Únete a nuestro grupo!",

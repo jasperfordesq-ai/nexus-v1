@@ -74,6 +74,7 @@
     "matches": "Coincidencias basadas en habilidades",
     "goals": "Metas personales y comunitarias",
     "skills": "Directorio de habilidades y recomendaciones",
+    "saved": "Tus elementos guardados",
     "activity": "Su registro de actividad reciente",
     "ai_chat": "Asistente comunitario con IA",
     "federation_hub": "Red intercomunidades",
@@ -92,7 +93,8 @@
     "impact_report": "Datos de impacto detallados",
     "strategic_plan": "Nuestra dirección estratégica",
     "timebanking_listings": "Ofertas y solicitudes",
-    "messages": "Tus mensajes"
+    "messages": "Tus mensajes",
+    "marketplace": "Compra y vende en tu comunidad"
   },
   "user_menu": {
     "my_profile": "Mi Perfil",
@@ -287,7 +289,9 @@
     "trending": "Tendencias",
     "no_results": "No se encontraron GIFs",
     "powered_by": "Proporcionado por GIPHY",
-    "button_label": "Agregar GIF"
+    "button_label": "Agregar GIF",
+    "select": "Seleccionar GIF",
+    "preview_alt": "Vista previa del GIF"
   },
   "loading": "Cargando...",
   "feature_error": {
@@ -382,8 +386,23 @@
   },
   "hours_display_one": "{{count}} hora",
   "hours_display_other": "{{count}} horas",
+  "compose": {
+    "aria_insert_link": "Insertar enlace",
+    "aria_remove_link": "Eliminar enlace"
+  },
   "toast": {
     "aria_notifications": "Notificaciones",
     "aria_dismiss_notification": "Descartar notificación"
+  },
+  "verification": {
+    "not_id_verified": "No verificado por ID"
+  },
+  "page_meta": {
+    "skills_browse": {
+      "title": "Explorar habilidades"
+    },
+    "members": {
+      "description": "Explora miembros de la comunidad, conéctate e intercambia créditos de tiempo."
+    }
   }
 }

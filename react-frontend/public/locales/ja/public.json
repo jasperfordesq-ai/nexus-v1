@@ -1,489 +1,505 @@
 {
   "home": {
-    "meta_description": "Exchange skills and services using time credits. Join our community-driven time banking platform.",
-    "meta_keywords": "time banking, skill exchange, community, volunteer, time credits",
-    "badge": "The Future of Time Banking",
-    "headline_1": "Exchange Skills,",
-    "headline_2": "Build Community",
-    "subheadline": "{{name}} is a modern time banking platform where every hour of service is valued equally. Trade your skills, earn time credits, and connect with your community.",
-    "cta_dashboard": "Go to Dashboard",
+    "meta_title": "コミュニティタイムバンキングプラットフォーム",
+    "meta_description": "時間クレジットを使ってスキルやサービスを交換しましょう。私たちのコミュニティ主導のタイムバンキングプラットフォームに参加してください。",
+    "meta_keywords": "タイムバンキング、スキル交換、コミュニティ、ボランティア、時間クレジット",
+    "badge": "タイムバンキングの未来",
+    "headline_1": "スキルを交換する、",
+    "headline_2": "コミュニティを築く",
+    "subheadline": "{{name}}は、すべてのサービスの時間が平等に評価される現代のタイムバンキングプラットフォームです。あなたのスキルを交換し、時間クレジットを獲得し、コミュニティとつながりましょう。",
+    "cta_dashboard": "ダッシュボードに移動",
     "cta_feed": "フィードへ",
-    "cta_get_started": "Get Started Free",
-    "cta_learn_more": "Learn More",
+    "cta_get_started": "無料で始める",
+    "cta_learn_more": "詳細を学ぶ",
     "features": {
       "0": {
-        "title": "Time Credits",
-        "description": "Exchange skills using time as currency"
+        "title": "時間クレジット",
+        "description": "通貨として時間を使ってスキルを交換する"
       },
       "1": {
         "title": "Community",
-        "description": "Connect with local service providers"
+        "description": "地元のサービス提供者とつながる"
       },
       "2": {
         "title": "Instant",
-        "description": "Quick and seamless transactions"
+        "description": "迅速でシームレスな取引"
       }
     },
     "stats": {
-      "active_members": "Active Members",
-      "hours_exchanged": "Hours Exchanged",
-      "active_listings": "Active Listings",
+      "active_members": "アクティブメンバー",
+      "hours_exchanged": "交換された時間",
+      "active_listings": "アクティブリスティング",
       "communities": "Communities"
     },
-    "scroll_down": "Scroll down",
+    "scroll_down": "下にスクロール",
     "how_it_works": {
-      "title": "How It Works",
-      "subtitle": "Get started in four simple steps",
+      "title": "仕組み",
+      "subtitle": "4つの簡単なステップで始めましょう",
       "steps": {
         "0": {
-          "title": "Sign Up Free",
-          "description": "Create your profile in minutes and list the skills you can offer."
+          "title": "無料でサインアップ",
+          "description": "数分でプロフィールを作成し、提供できるスキルをリストアップしましょう。"
         },
         "1": {
-          "title": "Browse & Connect",
-          "description": "Find services you need and connect with local community members."
+          "title": "ブラウズ＆接続",
+          "description": "必要なサービスを見つけて、地元のコミュニティメンバーとつながりましょう。"
         },
         "2": {
-          "title": "Exchange Services",
-          "description": "Arrange skill exchanges and help each other out."
+          "title": "サービスを交換する",
+          "description": "スキル交換をアレンジして、お互いに助け合いましょう。"
         },
         "3": {
-          "title": "Earn Credits",
-          "description": "Get one time credit for every hour you give. Spend them freely."
+          "title": "クレジットを獲得する",
+          "description": "提供した1時間ごとに1つの時間クレジットを獲得します。自由に使ってください。"
         }
       }
     },
     "why_timebanking": {
-      "title": "Why Time Banking?",
-      "subtitle": "The core principles that make our community work",
+      "title": "なぜタイムバンキング？",
+      "subtitle": "私たちのコミュニティが機能するための基本原則",
       "values": {
         "0": {
-          "title": "Equal Value",
-          "description": "Every hour is worth the same. Whether you're teaching piano or mowing lawns, your time has equal value."
+          "title": "等しい価値",
+          "description": "すべての時間は同じ価値があります。ピアノを教えることでも芝生を刈ることでも、あなたの時間には等しい価値があります。"
         },
         "1": {
-          "title": "Build Trust",
-          "description": "Reviews and ratings help you find reliable service providers and build your reputation in the community."
+          "title": "信頼を築く",
+          "description": "レビューや評価は、信頼できるサービス提供者を見つけ、コミュニティ内での評判を築くのに役立ちます。"
         },
         "2": {
-          "title": "Stay Local",
-          "description": "Connect with neighbors and strengthen your local community through meaningful skill exchanges."
+          "title": "地域に留まる",
+          "description": "近隣の人々とつながり、意味のあるスキル交換を通じて地域コミュニティを強化しましょう。"
         }
       }
     },
     "cta_section": {
-      "title": "Ready to get started?",
-      "description": "Join thousands of community members who are already exchanging skills and building meaningful connections.",
-      "button": "Create Your Free Account"
+      "title": "始める準備はできましたか？",
+      "description": "すでにスキルを交換し、意味のあるつながりを築いている何千人ものコミュニティメンバーに参加しましょう。",
+      "button": "無料アカウントを作成する"
     }
   },
   "about": {
-    "meta_title": "About {{name}}",
-    "meta_description": "Learn about {{name}} — a time banking platform where communities exchange skills using time as currency.",
-    "hero_title": "About {{name}}",
-    "hero_description": "{{name}} is a modern time banking platform where every hour of service is valued equally. We help communities exchange skills, build trust, and create a fairer local economy — one hour at a time.",
+    "meta_title": "{{name}}について",
+    "meta_description": "{{name}}について学びましょう — コミュニティが時間を通貨としてスキルを交換するタイムバンキングプラットフォームです。",
+    "hero_title": "{{name}}について",
+    "hero_description": "{{name}}は、すべてのサービスの時間が等しく評価される現代のタイムバンキングプラットフォームです。私たちはコミュニティがスキルを交換し、信頼を築き、より公正な地域経済を創造する手助けをします — 一時間ずつ。",
     "how_it_works": {
-      "title": "How It Works",
-      "subtitle": "Getting started is simple. Four steps to join and begin exchanging skills in your community.",
+      "title": "仕組み",
+      "subtitle": "始めるのは簡単です。コミュニティでスキルを交換し始めるための4つのステップです。",
       "steps": {
         "0": {
-          "title": "Create Your Profile",
-          "description": "Sign up for free and list the skills you can offer to your community."
+          "title": "プロフィールを作成する",
+          "description": "無料でサインアップし、コミュニティに提供できるスキルをリストアップしましょう。"
         },
         "1": {
-          "title": "Find What You Need",
-          "description": "Browse listings to discover services offered by members near you."
+          "title": "必要なものを見つける",
+          "description": "近くのメンバーが提供するサービスを見つけるためにリストをブラウズしましょう。"
         },
         "2": {
-          "title": "Exchange Services",
-          "description": "Connect with members and arrange skill exchanges that work for both of you."
+          "title": "サービスを交換する",
+          "description": "メンバーとつながり、お互いに合ったスキル交換をアレンジしましょう。"
         },
         "3": {
-          "title": "Earn & Spend Credits",
-          "description": "Earn one time credit for every hour you give, and spend them on services you need."
+          "title": "クレジットを得て使う",
+          "description": "提供した1時間ごとに1つのタイムクレジットを得て、必要なサービスに使いましょう。"
         }
       }
     },
     "values": {
-      "title": "Our Values",
-      "subtitle": "The principles that guide everything we do at {{name}}.",
+      "title": "私たちの価値観",
+      "subtitle": "{{name}}で私たちが行うすべてのことを導く原則。",
       "items": {
         "0": {
           "title": "Equality",
-          "description": "Every person's time is valued equally. One hour of gardening is worth the same as one hour of tutoring."
+          "description": "すべての人の時間は等しく評価されます。1時間のガーデニングは、1時間の家庭教師と同じ価値があります。"
         },
         "1": {
           "title": "Community",
-          "description": "We believe in building strong local connections. Every exchange strengthens the fabric of your neighbourhood."
+          "description": "私たちは強い地域のつながりを築くことを信じています。すべての交換があなたの近所の絆を強化します。"
         },
         "2": {
-          "title": "Trust & Safety",
-          "description": "Reviews, ratings, and broker oversight ensure a safe environment for all members to participate."
+          "title": "信頼と安全",
+          "description": "レビュー、評価、ブローカーの監視により、すべてのメンバーが参加できる安全な環境が確保されます。"
         },
         "3": {
           "title": "Sustainability",
-          "description": "By sharing skills locally, we reduce waste, support circular economies, and strengthen local resilience."
+          "description": "地域でスキルを共有することで、廃棄物を減らし、循環経済を支援し、地域のレジリエンスを強化します。"
         }
       }
     },
     "stats": {
       "members": "Members",
-      "hours_exchanged": "Hours Exchanged",
-      "active_listings": "Active Listings",
+      "hours_exchanged": "交換した時間",
+      "active_listings": "アクティブなリスト",
       "communities": "Communities"
     },
     "credits": {
-      "title": "Powered by Project NEXUS",
-      "subtitle": "Open-source community platform created by Jasper Ford. Licensed under AGPL v3.",
+      "title": "Project NEXUSによって提供されています",
+      "subtitle": "Jasper Fordによって作成されたオープンソースのコミュニティプラットフォーム。AGPL v3の下でライセンスされています。",
       "creator": "Creator",
-      "founders_heading": "Founders of hOUR Timebank CLG",
+      "founders_heading": "hOUR Timebank CLGの創設者",
       "contributors": "Contributors",
-      "research_heading": "Research Foundation",
-      "research_description": "Informed by a social impact study commissioned by the {{name}}.",
+      "research_heading": "研究財団",
+      "research_description": "{{name}}によって委託された社会的影響調査に基づいています。",
       "acknowledgements": "Acknowledgements",
-      "open_source": "Open Source",
-      "license_text": "Licensed under the GNU Affero General Public License v3 (AGPL-3.0).",
-      "v1_source": "V1 Source Code (PHP + React)",
-      "v2_source": "V2 Source Code (ASP.NET Core)"
+      "open_source": "オープンソース",
+      "license_text": "GNU Affero General Public License v3 (AGPL-3.0)の下でライセンスされています。",
+      "v1_source": "V1 ソースコード (PHP + React)",
+      "v2_source": "V2 ソースコード (ASP.NET Core)"
     },
     "cta": {
-      "title": "Ready to Get Involved?",
-      "description": "Whether you want to share your skills or find help with something, our community is here for you.",
-      "dashboard": "Go to Dashboard",
-      "join": "Join for Free",
-      "help_center": "Help Center",
-      "contact_us": "Contact Us"
+      "title": "参加する準備はできましたか？",
+      "description": "スキルを共有したい方でも、何か助けが必要な方でも、私たちのコミュニティがあなたをサポートします。",
+      "dashboard": "ダッシュボードに移動",
+      "join": "無料で参加",
+      "help_center": "ヘルプセンター",
+      "contact_us": "お問い合わせ"
     }
   },
   "contact": {
-    "title": "Contact Us",
-    "subtitle": "Have a question about {{name}}? We'd love to hear from you.",
-    "success_title": "Message Sent!",
-    "success_message": "We'll get back to you as soon as possible.",
-    "back_to_help": "Back to Help Center",
-    "error_fallback": "Failed to send message. Please try again.",
+    "meta_description": "私たちのコミュニティサポートチームにご連絡ください。お手伝いします。",
+    "title": "お問い合わせ",
+    "subtitle": "{{name}}について質問がありますか？ぜひお聞かせください。",
+    "success_title": "メッセージが送信されました！",
+    "success_message": "できるだけ早くお返事いたします。",
+    "back_to_help": "ヘルプセンターに戻る",
+    "error_fallback": "メッセージの送信に失敗しました。もう一度お試しください。",
     "form": {
       "name_label": "Name",
-      "name_placeholder": "Your name",
+      "name_placeholder": "あなたの名前",
       "email_label": "Email",
       "email_placeholder": "you@example.com",
       "subject_label": "Subject",
-      "subject_placeholder": "What is this about?",
+      "subject_placeholder": "これは何についてですか？",
       "subjects": {
-        "general": "General Inquiry",
-        "account": "Account Help",
-        "technical": "Technical Issue",
-        "feedback": "Feedback / Suggestion",
+        "general": "一般的な問い合わせ",
+        "account": "アカウントのヘルプ",
+        "technical": "技術的な問題",
+        "feedback": "フィードバック / 提案",
         "other": "Other"
       },
       "message_label": "Message",
-      "message_placeholder": "How can we help?",
-      "submit": "Send Message",
-      "login_prompt_before": "Already have an account?",
-      "login_link": "Log in",
-      "login_prompt_after": "for faster support."
+      "message_placeholder": "どのようにお手伝いできますか？",
+      "submit": "メッセージを送信",
+      "login_prompt_before": "すでにアカウントをお持ちですか？",
+      "login_link": "ログイン",
+      "login_prompt_after": "より迅速なサポートのために。"
     }
   },
   "faq": {
-    "title": "Frequently Asked Questions",
-    "subtitle_before_link": "Can't find what you're looking for? Visit our",
-    "help_center_link": "Help Center",
-    "subtitle_after_link": "for detailed guides.",
-    "search_placeholder": "Search questions...",
-    "no_results": "No matching questions found. Try a different search term.",
-    "cta_title": "Still have questions?",
-    "cta_description": "Our support team is here to help.",
-    "cta_button": "Contact Support",
+    "page_title": "よくある質問",
+    "meta_description": "タイムバンキング、交換、コミュニティ機能に関する一般的な質問への回答を見つけてください。",
+    "title": "よくある質問",
+    "subtitle_before_link": "探しているものが見つかりませんか？私たちの",
+    "help_center_link": "ヘルプセンター",
+    "subtitle_after_link": "で詳細なガイドをご覧ください。",
+    "search_placeholder": "質問を検索...",
+    "no_results": "一致する質問が見つかりませんでした。別の検索用語を試してください。",
+    "cta_title": "まだ質問がありますか？",
+    "cta_description": "私たちのサポートチームがあなたをお手伝いします。",
+    "cta_button": "サポートに連絡",
     "categories": {
       "getting_started": {
-        "title": "Getting Started",
+        "title": "始めるには",
         "q1": {
-          "question": "What is time banking?",
-          "answer_p1": "Time banking is a community exchange system where one hour of help equals one time credit, regardless of the service provided. Whether you're teaching a language, helping with gardening, or providing tech support, your time is valued equally.",
-          "answer_p2": "It's a way to build community connections while exchanging skills and services without traditional money."
+          "question": "タイムバンキングとは何ですか？",
+          "answer_p1": "タイムバンキングは、1時間の助けが1つのタイムクレジットに等しいコミュニティ交換システムです。提供されるサービスに関係なく、言語を教えたり、庭仕事を手伝ったり、技術サポートを提供したりする場合でも、あなたの時間は平等に評価されます。",
+          "answer_p2": "これは、伝統的なお金を使わずにスキルやサービスを交換しながらコミュニティのつながりを築く方法です。"
         },
         "q2": {
-          "question": "Is it free to join?",
-          "answer_p1": "Yes! Membership is completely free. The only currency used is time credits, which you earn by helping others in the community.",
-          "answer_p2": "New members often receive a small number of starter credits to help them get started."
+          "question": "参加は無料ですか？",
+          "answer_p1": "はい！メンバーシップは完全に無料です。使用される唯一の通貨はタイムクレジットで、これはコミュニティの他の人を助けることで得られます。",
+          "answer_p2": "新しいメンバーは、スタートを助けるために少数のスタートクレジットを受け取ることがよくあります。"
         },
         "q3": {
-          "question": "How do I get started?",
-          "answer_intro": "Here's how to begin:",
-          "step1_bold": "Complete your profile",
-          "step1_text": "Add a photo, bio, and your skills",
-          "step2_bold": "Browse the marketplace",
-          "step2_text": "See what services are offered and needed",
-          "step3_bold": "Post an offer",
-          "step3_text": "Share what you can help others with",
-          "step4_bold": "Make a request",
-          "step4_text": "Ask for something you need",
-          "step5_bold": "Connect with members",
-          "step5_text": "Build your network"
+          "question": "どうやって始めればいいですか？",
+          "answer_intro": "始める方法は次のとおりです：",
+          "step1_bold": "プロフィールを完成させる",
+          "step1_text": "写真、自己紹介、スキルを追加する",
+          "step2_bold": "マーケットプレイスをブラウズする",
+          "step2_text": "提供されているサービスと必要なサービスを確認する",
+          "step3_bold": "オファーを投稿する",
+          "step3_text": "他の人を助けるためにできることを共有しましょう",
+          "step4_bold": "リクエストを作成する",
+          "step4_text": "必要なものをお願いしましょう",
+          "step5_bold": "メンバーとつながる",
+          "step5_text": "ネットワークを構築する"
         },
         "q4": {
-          "question": "What skills can I offer?",
-          "answer_intro": "Almost anything! Common offerings include:",
-          "skill1": "Home help (gardening, cleaning, minor repairs)",
-          "skill2": "Tech support (computer help, phone setup)",
-          "skill3": "Teaching (languages, music, academic subjects)",
-          "skill4": "Creative services (design, photography, writing)",
-          "skill5": "Transportation (rides, errands)",
-          "skill6": "Companionship (walks, visits, conversation)",
-          "skill7": "Professional skills (accounting, legal advice, etc.)",
-          "answer_outro": "Everyone has something valuable to offer!"
+          "question": "どんなスキルを提供できますか？",
+          "answer_intro": "ほとんど何でも！一般的な提供内容には以下が含まれます：",
+          "skill1": "ホームヘルプ（庭仕事、掃除、小さな修理）",
+          "skill2": "テクニカルサポート（コンピュータの手助け、電話の設定）",
+          "skill3": "教育（言語、音楽、学問）",
+          "skill4": "クリエイティブサービス（デザイン、写真、執筆）",
+          "skill5": "交通（送迎、用事）",
+          "skill6": "仲間（散歩、訪問、会話）",
+          "skill7": "専門スキル（会計、法律相談など）",
+          "answer_outro": "誰もが価値のあるものを提供できます！"
         }
       },
       "time_credits": {
-        "title": "Time Credits",
+        "title": "タイムクレジット",
         "q1": {
-          "question": "What is a time credit?",
-          "answer_p1": "One time credit equals one hour of service. It's the currency of our community.",
-          "answer_p2": "You can also exchange partial hours: 30 minutes = 0.5 credits, 15 minutes = 0.25 credits."
+          "question": "タイムクレジットとは何ですか？",
+          "answer_p1": "1タイムクレジットは1時間のサービスに相当します。これは私たちのコミュニティの通貨です。",
+          "answer_p2": "部分的な時間も交換できます：30分 = 0.5クレジット、15分 = 0.25クレジット。"
         },
         "q2": {
-          "question": "How do I earn time credits?",
-          "answer_intro": "You earn credits by:",
-          "way1_bold": "Providing services",
-          "way1_text": "to other members",
-          "way2_bold": "Logging volunteer hours",
-          "way2_text": "with approved organisations",
-          "way3_bold": "Receiving donations",
-          "way3_text": "from other members",
-          "way4_bold": "Starter credits",
-          "way4_text": "when you first join"
+          "question": "タイムクレジットはどうやって得るのですか？",
+          "answer_intro": "クレジットは以下の方法で得られます：",
+          "way1_bold": "サービスを提供する",
+          "way1_text": "他のメンバーに",
+          "way2_bold": "ボランティア時間を記録する",
+          "way2_text": "承認された団体で",
+          "way3_bold": "寄付を受け取る",
+          "way3_text": "他のメンバーから",
+          "way4_bold": "スタートクレジット",
+          "way4_text": "最初に参加したとき"
         },
         "q3": {
-          "question": "Can I donate my credits?",
-          "answer_intro": "Yes! You can:",
-          "option1": "Transfer credits to any other member",
-          "option2": "Donate to the community pot (helps members who need extra support)",
-          "answer_link_before": "Go to your ",
+          "question": "クレジットを寄付できますか？",
+          "answer_intro": "はい！あなたは:",
+          "option1": "他のメンバーにクレジットを転送できます",
+          "option2": "コミュニティポットに寄付できます（追加のサポートが必要なメンバーを助けます）",
+          "answer_link_before": "あなたの ",
           "wallet_link": "Wallet",
-          "answer_link_after": " to send credits."
+          "answer_link_after": " に行ってクレジットを送信してください。"
         },
         "q4": {
-          "question": "Can my balance go negative?",
-          "answer": "Some communities allow limited negative balances to help new members get started before they've had a chance to earn credits. Check with your community coordinator for the specific rules in your timebank."
+          "question": "残高はマイナスになることがありますか？",
+          "answer": "一部のコミュニティでは、新しいメンバーがクレジットを獲得する前に始められるように、限られたマイナス残高を許可しています。あなたのタイムバンクの具体的なルールについては、コミュニティコーディネーターに確認してください。"
         },
         "q5": {
-          "question": "What if I sent credits to the wrong person?",
-          "answer_intro": "Transactions cannot be automatically reversed. If you made a mistake:",
-          "step1": "Contact the recipient and ask them to send the credits back",
-          "step2": "If you can't resolve it, contact support for assistance",
-          "answer_outro": "Always double-check the recipient before confirming a transfer."
+          "question": "間違った人にクレジットを送った場合はどうなりますか？",
+          "answer_intro": "取引は自動的に取り消すことができません。もし間違えた場合は:",
+          "step1": "受取人に連絡して、クレジットを返送してもらうように頼んでください",
+          "step2": "解決できない場合は、サポートに連絡して支援を求めてください",
+          "answer_outro": "転送を確認する前に、受取人を必ず再確認してください。"
         }
       },
       "exchanges_safety": {
-        "title": "Exchanges & Safety",
+        "title": "交換と安全性",
         "q1": {
-          "question": "How do I arrange an exchange?",
-          "answer_intro": "The typical process is:",
-          "step1": "Find an offer or request that interests you",
-          "step2": "Message the member to discuss details",
-          "step3": "Agree on when, where, and estimated time",
-          "step4": "Meet and complete the exchange",
-          "step5": "The person who received help sends time credits",
-          "step6": "Leave a review for each other"
+          "question": "交換をどのように手配しますか？",
+          "answer_intro": "一般的なプロセスは:",
+          "step1": "興味のあるオファーやリクエストを見つける",
+          "step2": "メンバーにメッセージを送って詳細を話し合う",
+          "step3": "いつ、どこで、推定時間について合意する",
+          "step4": "会って交換を完了する",
+          "step5": "助けを受けた人が時間クレジットを送ります",
+          "step6": "お互いにレビューを残す"
         },
         "q2": {
-          "question": "Is it safe to meet strangers?",
-          "answer_intro": "We recommend these safety practices:",
-          "tip1": "Meet in public places for first exchanges",
-          "tip2": "Check the member's profile and reviews",
-          "tip3": "Tell someone where you're going",
-          "tip4": "Trust your instincts — if something feels wrong, leave",
-          "tip5": "Start with smaller, low-risk exchanges",
-          "answer_outro": "Report any concerning behaviour to our support team."
+          "question": "見知らぬ人と会うのは安全ですか？",
+          "answer_intro": "これらの安全対策をお勧めします:",
+          "tip1": "最初の交換は公共の場所で会う",
+          "tip2": "メンバーのプロフィールとレビューを確認する",
+          "tip3": "どこに行くかを誰かに伝える",
+          "tip4": "直感を信じてください — 何かが間違っていると感じたら、離れてください",
+          "tip5": "小さくてリスクの低い交換から始める",
+          "answer_outro": "懸念される行動はサポートチームに報告してください。"
         },
         "q3": {
-          "question": "What if someone doesn't show up or complete the service?",
-          "answer_intro": "Communication is key. If there's an issue:",
-          "step1": "Message the member to discuss what happened",
-          "step2": "Try to find a resolution together",
-          "step3": "If you can't resolve it, contact support",
-          "answer_outro": "Repeated no-shows or poor behaviour may result in account restrictions."
+          "question": "誰かが現れなかったり、サービスを完了しなかった場合はどうなりますか？",
+          "answer_intro": "コミュニケーションが重要です。問題がある場合は：",
+          "step1": "メンバーにメッセージを送って、何が起こったのか話し合いましょう",
+          "step2": "一緒に解決策を見つけるようにしましょう",
+          "step3": "解決できない場合は、サポートに連絡してください",
+          "answer_outro": "繰り返し現れないことや不適切な行動は、アカウントの制限につながる可能性があります。"
         },
         "q4": {
-          "question": "Are the services insured?",
-          "answer": "Exchanges are informal arrangements between community members. We don't provide insurance coverage for services. For higher-risk activities, discuss liability with the other member beforehand. Some members have their own professional insurance."
+          "question": "サービスは保険に加入していますか？",
+          "answer": "交換はコミュニティメンバー間の非公式な取り決めです。サービスに対する保険の提供はありません。リスクの高い活動については、事前に他のメンバーと責任について話し合ってください。一部のメンバーは独自の専門的な保険を持っています。"
         }
       },
       "badges_rewards": {
-        "title": "Badges & Rewards",
+        "title": "バッジと報酬",
         "q1": {
-          "question": "What are badges and XP?",
-          "answer_intro": "Our gamification system rewards community participation:",
-          "item1_bold": "XP (Experience Points)",
-          "item1_text": "Earned for various activities, helping you level up",
+          "question": "バッジとXPとは何ですか？",
+          "answer_intro": "私たちのゲーミフィケーションシステムは、コミュニティへの参加を報酬します：",
+          "item1_bold": "XP（経験値）",
+          "item1_text": "さまざまな活動で獲得し、レベルアップを助けます",
           "item2_bold": "Badges",
-          "item2_text": "Achievements for reaching milestones (60+ to collect!)",
+          "item2_text": "マイルストーンに到達することで得られる成果（60以上の収集可能！）",
           "item3_bold": "Levels",
-          "item3_text": "Progress from Newcomer to Timebank Legend",
+          "item3_text": "新参者からタイムバンクレジェンドへの進行",
           "item4_bold": "Streaks",
-          "item4_text": "Rewards for daily engagement"
+          "item4_text": "日々の参加に対する報酬"
         },
         "q2": {
-          "question": "How do I earn XP?",
-          "answer_intro": "You earn XP for many activities:",
-          "activity1": "Sending/receiving time credits",
-          "activity2": "Creating listings",
-          "activity3": "Logging volunteer hours",
-          "activity4": "Attending events",
-          "activity5": "Making connections",
-          "activity6": "Daily logins",
-          "activity7": "Earning badges"
+          "question": "XPはどうやって獲得しますか？",
+          "answer_intro": "さまざまな活動でXPを獲得します：",
+          "activity1": "時間クレジットの送受信",
+          "activity2": "リスティングの作成",
+          "activity3": "ボランティア時間の記録",
+          "activity4": "イベントへの参加",
+          "activity5": "つながりを作る",
+          "activity6": "毎日のログイン",
+          "activity7": "バッジの獲得"
         },
         "q3": {
-          "question": "Can I opt out of leaderboards?",
-          "answer_before_link": "Yes! If you prefer privacy, you can opt out of appearing on public leaderboards in your ",
+          "question": "リーダーボードからオプトアウトできますか？",
+          "answer_before_link": "はい！プライバシーを重視する場合は、あなたの ",
           "settings_link": "Settings",
-          "answer_after_link": ". You'll still earn XP and badges, they just won't be visible to others on the rankings."
+          "answer_after_link": "の公開リーダーボードに表示されないようにオプトアウトできます。XPやバッジは獲得できますが、ランキングで他の人には見えなくなります。"
         }
       },
       "account_privacy": {
-        "title": "Account & Privacy",
+        "title": "アカウントとプライバシー",
         "q1": {
-          "question": "How do I change my password?",
-          "answer_before_link": "Go to ",
+          "question": "パスワードを変更するにはどうすればいいですか？",
+          "answer_before_link": "に移動する",
           "settings_link": "Settings",
-          "answer_after_link": " > Security to change your password. You'll need to enter your current password first. If you've forgotten your password, use the \"Forgot Password\" link on the login page."
+          "answer_after_link": " > セキュリティでパスワードを変更します。まず現在のパスワードを入力する必要があります。パスワードを忘れた場合は、ログインページの「パスワードを忘れた」リンクを使用してください。"
         },
         "q2": {
-          "question": "Who can see my profile?",
-          "answer_intro": "By default, your profile is visible to other community members. You can control:",
-          "item1": "What contact information is displayed",
-          "item2": "Whether you appear on leaderboards",
-          "item3": "Your general location visibility",
-          "answer_link_before": "Adjust these in your ",
+          "question": "誰が私のプロフィールを見ることができますか？",
+          "answer_intro": "デフォルトでは、あなたのプロフィールは他のコミュニティメンバーに表示されます。あなたは以下を制御できます：",
+          "item1": "表示される連絡先情報",
+          "item2": "リーダーボードに表示されるかどうか",
+          "item3": "あなたの一般的な位置情報の可視性",
+          "answer_link_before": "これらをあなたの",
           "settings_link": "Settings",
-          "answer_link_after": "."
+          "answer_link_after": "で調整してください。"
         },
         "q3": {
-          "question": "How do I delete my account?",
-          "answer_intro": "If you wish to leave the community:",
-          "step1": "Go to Settings > Account",
-          "step2": "Click \"Delete Account\"",
-          "step3": "Confirm your decision",
-          "answer_outro": "Note: Your transaction history will be retained for record-keeping, but your personal information will be removed."
+          "question": "アカウントを削除するにはどうすればいいですか？",
+          "answer_intro": "コミュニティを離れたい場合は：",
+          "step1": "設定 > アカウントに移動します",
+          "step2": "「アカウントを削除」をクリックします",
+          "step3": "決定を確認します",
+          "answer_outro": "注意：取引履歴は記録のために保持されますが、あなたの個人情報は削除されます。"
         },
         "q4": {
-          "question": "How is my data protected?",
-          "answer_intro": "We take privacy seriously:",
-          "item1": "Your data is encrypted and securely stored",
-          "item2": "We never sell your information",
-          "item3": "You can request a copy of your data at any time",
-          "item4": "We comply with GDPR and data protection regulations"
+          "question": "私のデータはどのように保護されていますか？",
+          "answer_intro": "私たちはプライバシーを真剣に考えています：",
+          "item1": "あなたのデータは暗号化され、安全に保存されています",
+          "item2": "私たちはあなたの情報を販売することはありません",
+          "item3": "いつでもあなたのデータのコピーをリクエストできます",
+          "item4": "私たちはGDPRおよびデータ保護規則に準拠しています"
         }
       }
     }
   },
   "maintenance": {
-    "title": "We'll be back soon!",
-    "description": "is currently undergoing scheduled maintenance to improve your experience.",
-    "apology": "We apologize for any inconvenience. Please check back in a little while.",
-    "thanks": "Thank you for your patience!",
-    "admin_login": "Admin Login",
-    "deploy_notice": "This platform is still being actively built, so there may be phases of rapid deployments. During these times, the server automatically enters maintenance mode. This normally only lasts about five minutes while new changes are being applied."
+    "title": "すぐに戻ります！",
+    "description": "は現在、あなたの体験を向上させるための定期メンテナンスを行っています。",
+    "apology": "ご不便をおかけして申し訳ありません。少し後で再度ご確認ください。",
+    "thanks": "ご理解いただきありがとうございます！",
+    "admin_login": "管理者ログイン",
+    "deploy_notice": "このプラットフォームはまだ積極的に構築中であり、急速なデプロイメントのフェーズがあるかもしれません。この間、サーバーは自動的にメンテナンスモードに入ります。通常、新しい変更が適用される間、これは約5分間続きます。"
   },
   "dev_status": {
-    "title": "Development status: {{stage}}",
+    "title": "開発状況：{{stage}}",
     "where_we_are": {
-      "title": "Where we are now",
-      "paragraph1": "This platform was born in the middle of December 2025, with development beginning around 15/12/2025.",
-      "paragraph2": "It grew quickly in a short space of time. By around 15/02/2026, much of the earlier work on both the front end and the back end had been intentionally scrapped and rewritten so the platform could be rebuilt on stronger foundations.",
-      "paragraph3": "Around 24/02/2026, we decided to rewrite the front end in React. The front end is the part people see and interact with — a bit like the body of the platform. We made that change to create a cleaner and more flexible user experience built on reusable components, improve responsiveness across devices — especially on mobile — and make the interface easier to improve and maintain as the platform grows.",
-      "paragraph4": "Around 17/03/2026, we decided to rewrite the back end in Laravel. The back end is the part working behind the scenes — a bit like the brain of the platform. We made that change to give the platform a stronger and more maintainable foundation, with better structure for authentication, validation, background processing, caching, and long-term developer productivity.",
+      "title": "現在の状況",
+      "paragraph1": "このプラットフォームは2025年12月中旬に誕生し、開発は2025年12月15日頃に始まりました。",
+      "paragraph2": "短期間で急速に成長しました。2026年2月15日頃には、フロントエンドとバックエンドの初期の作業の多くが意図的に廃棄され、再構築され、プラットフォームがより強固な基盤の上に再構築されることになりました。",
+      "paragraph3": "2026年2月24日頃、フロントエンドをReactで書き直すことに決めました。フロントエンドは人々が見る部分であり、対話する部分です — プラットフォームの体のようなものです。この変更を行ったのは、再利用可能なコンポーネントに基づいたクリーンで柔軟なユーザー体験を作成し、デバイス間の応答性を改善するため — 特にモバイルで — そしてプラットフォームが成長するにつれてインターフェースを改善しやすく、維持しやすくするためです。",
+      "paragraph4": "2026年3月17日頃、バックエンドをLaravelで書き直すことに決めました。バックエンドは舞台裏で動いている部分です — プラットフォームの脳のようなものです。この変更を行ったのは、プラットフォームにより強固で維持しやすい基盤を提供し、認証、検証、バックグラウンド処理、キャッシング、長期的な開発者の生産性のためのより良い構造を持たせるためです。",
       "paragraph5": "As of 24/03/2026, this remains a very new platform that is evolving quickly. Most core functionality is already in place, but some parts are still being refined as the new front end and new back end are connected together and polished.",
-      "paragraph6": "We are also working on a dedicated mobile phone app in the background, which should be available soon."
+      "paragraph6": "私たちはまた、専用のモバイルアプリをバックグラウンドで開発しており、もうすぐ利用可能になる予定です。"
     },
     "whats_stable": {
-      "title": "What's stable and working",
-      "core_title": "Core platform",
-      "core_item1": "Member registration, login, two-factor auth (TOTP + WebAuthn), guided onboarding",
-      "core_item2": "Time credit wallet — earning, spending, transfers, broker controls, and full transaction history",
-      "core_item3": "Multi-tenant architecture — unlimited communities, each with isolated data and custom branding",
-      "core_item4": "Exchange workflow — structured service exchange lifecycle with broker approval",
-      "core_item5": "Federation — cross-community exchange, shared listings, events, and messaging across connected platforms",
-      "core_item6": "Progressive Web App — installable on any device, works offline",
-      "member_title": "Member experience",
+      "title": "安定して動作しているもの",
+      "core_title": "コアプラットフォーム",
+      "core_item1": "メンバー登録、ログイン、二要素認証（TOTP + WebAuthn）、ガイド付きオンボーディング",
+      "core_item2": "タイムクレジットウォレット — 獲得、支出、転送、ブローカーコントロール、完全な取引履歴",
+      "core_item3": "マルチテナントアーキテクチャ — 無制限のコミュニティ、それぞれが隔離されたデータとカスタムブランディングを持つ",
+      "core_item4": "交換ワークフロー — ブローカーの承認を伴う構造化されたサービス交換ライフサイクル",
+      "core_item5": "連合 — コミュニティ間の交換、共有リスト、イベント、接続されたプラットフォーム間のメッセージング",
+      "core_item6": "プログレッシブウェブアプリ — どのデバイスにもインストール可能で、オフラインでも動作",
+      "member_title": "メンバー体験",
       "member_item1": "Service marketplace — post offers and requests, browse and smart-match listings",
-      "member_item2": "Social feed — posts, comments, likes, polls, hashtags, and voice messages",
-      "member_item3": "Messaging — direct conversations with read receipts and real-time updates",
-      "member_item4": "Events — creating, discovering, RSVPs, and calendar export",
-      "member_item5": "Groups — community sub-groups with discussions, roles, and moderation",
-      "member_item6": "Group exchanges — bulk community service exchanges",
-      "member_item7": "Members directory — browse, filter, and discover people",
-      "member_item8": "Connections — follow and connect with community members",
-      "member_item9": "Reviews and ratings — build trust through member feedback",
-      "member_item10": "Endorsements — peer skill and experience endorsements",
-      "member_item11": "Polls — community voting and surveys",
-      "member_item12": "Skills browse — explore skill taxonomy and discover expertise",
+      "member_item2": "ソーシャルフィード — 投稿、コメント、いいね、投票、ハッシュタグ、音声メッセージ",
+      "member_item3": "メッセージング — 読了確認とリアルタイム更新を伴う直接の会話",
+      "member_item4": "イベント — 作成、発見、RSVP、カレンダーエクスポート",
+      "member_item5": "グループ — 討論、役割、モデレーションを持つコミュニティのサブグループ",
+      "member_item6": "グループ交換 — 大規模なコミュニティサービスの交換",
+      "member_item7": "メンバー名簿 — 人々をブラウズ、フィルタリング、発見",
+      "member_item8": "コネクション — コミュニティメンバーをフォローし、つながる",
+      "member_item9": "レビューと評価 — メンバーのフィードバックを通じて信頼を築く",
+      "member_item10": "推薦 — ピアスキルと経験の推薦",
+      "member_item11": "投票 — コミュニティの投票と調査",
+      "member_item12": "スキルブラウズ — スキルの分類を探求し、専門知識を発見",
       "member_item13": "Volunteering — opportunities, shifts, applications, and hours logging",
-      "member_item14": "Job vacancies — full recruitment module with alerts and analytics",
-      "member_item15": "Organisations — company and employer profiles with sub-accounts",
-      "member_item16": "Goals and impact — personal goals, mentoring, and community impact tracking",
-      "member_item17": "Ideation challenges — innovation hub with campaigns, ideas, voting, and outcomes",
+      "member_item14": "求人情報 — アラートと分析を伴う完全な採用モジュール",
+      "member_item15": "組織 — サブアカウントを持つ会社と雇用者のプロフィール",
+      "member_item16": "目標と影響 — 個人の目標、メンタリング、コミュニティの影響追跡",
+      "member_item17": "アイデアチャレンジ — キャンペーン、アイデア、投票、成果を持つイノベーションハブ",
       "member_item18": "Achievements and gamification — XP, badges, challenges, streaks, leaderboard, and Nexus Score",
-      "member_item19": "Personal insights — individual engagement metrics and personalised recommendations",
-      "content_title": "Content and communication",
-      "content_item1": "Blog — tenant content management and community news",
-      "content_item2": "Resources and knowledge base — structured articles and shared resource library",
-      "content_item3": "Help center — documentation hub and FAQ",
+      "member_item19": "個人の洞察 — 個々のエンゲージメントメトリクスとパーソナライズされた推奨",
+      "member_item20": "マーケットプレイス — Stripe Connectの支払い、注文、売り手プロフィールを持つ独立したクラシファイドモジュール",
+      "member_item21": "寄付 — Stripeを通じた一回限りおよび定期的な寄付、組織ダッシュボードと領収書付き",
+      "member_item22": "本人確認 — オプションのStripe Identityフロー（書類 + 自撮り + 名前/生年月日の照合）と認証済みメンバーバッジ",
+      "member_item23": "AI返信提案 — マーケットプレイス内のアシスタントがリスティングの問い合わせに対する返信をドラフトします",
+      "content_title": "コンテンツとコミュニケーション",
+      "content_item1": "ブログ — テナントコンテンツ管理とコミュニティニュース",
+      "content_item2": "リソースとナレッジベース — 構造化された記事と共有リソースライブラリ",
+      "content_item3": "ヘルプセンター — ドキュメントハブとFAQ",
       "content_item4": "Newsletter system — email campaigns with smart segments, templates, and send-time optimisation",
-      "content_item5": "AI Chat — AI-powered assistant for platform guidance",
-      "content_item6": "Custom pages — tenant-managed CMS pages",
-      "content_item7": "Legal hub — versioned legal documents with acceptance gates and audit trail",
-      "platform_title": "Platform and security",
+      "content_item5": "AIチャット — プラットフォームガイダンスのためのAI駆動アシスタント",
+      "content_item6": "カスタムページ — テナント管理のCMSページ",
+      "content_item7": "法的ハブ — バージョン管理された法的文書と受け入れゲート、監査トレイル",
+      "platform_title": "プラットフォームとセキュリティ",
       "platform_item1": "Enterprise security — CSRF, rate limiting, TOTP 2FA, and WebAuthn passwordless auth",
-      "platform_item2": "GDPR compliance — data requests, consent management, breach tracking, and audit log",
-      "platform_item3": "Fraud and abuse detection — automated suspicious activity alerts and content moderation",
-      "platform_item4": "WCAG 2.1 AA accessibility compliance",
+      "platform_item2": "GDPR準拠 — データリクエスト、同意管理、違反追跡、監査ログ",
+      "platform_item3": "詐欺と悪用の検出 — 自動化された疑わしい活動アラートとコンテンツモデレーション",
+      "platform_item4": "WCAG 2.1 AAアクセシビリティ準拠",
       "platform_item5": "7 languages — English, Irish, German, French, Italian, Portuguese, and Spanish",
-      "platform_item6": "Admin panel — tenant configuration, user management, analytics, and moderation",
-      "platform_item7": "Algorithm controls — live health dashboard and tuning for all ranking systems",
-      "platform_item8": "Dark mode and mobile-responsive UI"
+      "platform_item6": "管理パネル — テナント設定、ユーザー管理、分析、モデレーション",
+      "platform_item7": "アルゴリズムコントロール — ライブヘルスダッシュボードとすべてのランキングシステムの調整",
+      "platform_item8": "ダークモードとモバイルレスポンシブUI",
+      "platform_item9": "ビルド時のSEO — 19以上の公開ページがPlaywrightで事前レンダリングされ、構造化データ、サイトマップ、動的ルート用のPrerender.ioフォールバック付き",
+      "platform_item10": "フェデレーション — 4つのプロトコルアダプターが稼働中：Nexus（ネイティブ）、Komunitin（すべての15エンドポイント）、Credit Commons（11エンドポイント、CEN互換の相互クレジット）、TimeOverflow；9つのエンティティタイプ間での双方向同期、イベント駆動のプッシュ、評判のポータビリティ",
+      "platform_item11": "支払いレイヤー — サブスクリプション、寄付、マーケットプレイス（Connect）、本人確認のためのStripe、冪等性のあるWebhook処理付き"
     },
     "whats_rough": {
-      "title": "What may still be rough",
+      "title": "まだ粗いかもしれないこと",
       "item1": "Federation (cross-community) features — functional but still accumulating real-world edge cases",
-      "item2": "AI Chat assistant — depends on external AI providers; response quality varies by configuration",
-      "item3": "Nexus Score breakdown — newly launched; scoring weights may be adjusted as usage data grows",
-      "item4": "Smart feed ranking — EdgeRank algorithm is live but cold-start behaviour for new members is still being tuned",
-      "item5": "Push notifications (mobile) — may have delivery delays on some devices or browsers",
-      "item6": "Non-English translations — AI-generated and not yet reviewed by native speakers"
+      "item2": "AIチャットアシスタント — 外部AIプロバイダーに依存；応答の質は設定によって異なります",
+      "item3": "Nexusスコアの内訳 — 新たに立ち上げた；スコアリングの重みは使用データの増加に応じて調整される可能性があります",
+      "item4": "スマートフィードランキング — EdgeRankアルゴリズムが稼働中ですが、新しいメンバーのコールドスタート動作はまだ調整中です",
+      "item5": "プッシュ通知（モバイル） — 一部のデバイスやブラウザで配信遅延が発生する可能性があります",
+      "item6": "非英語翻訳 — AI生成であり、まだネイティブスピーカーによるレビューは行われていません"
     },
     "how_we_catch_bugs": {
-      "title": "How we catch bugs",
-      "intro": "We use a multi-layer approach to catch and fix issues quickly:",
-      "method1_bold": "Automated tests",
+      "title": "バグを捕まえる方法",
+      "intro": "私たちは、問題を迅速にキャッチして修正するためにマルチレイヤーアプローチを使用しています：",
+      "method1_bold": "自動テスト",
       "method1_text": "250+ PHP unit/integration tests and React component tests run on every commit",
-      "method2_bold": "Sentry error tracking",
-      "method2_text": "exceptions on both frontend and backend are captured in real time",
-      "method3_bold": "Cloudflare analytics",
-      "method3_text": "traffic anomalies and error spikes are monitored continuously",
-      "method4_bold": "Manual QA",
-      "method4_text": "core user journeys are tested across multiple tenant configurations before each deployment",
-      "method5_bold": "Community testing",
-      "method5_text": "real members across multiple active communities help us surface edge cases in production"
+      "method2_bold": "Sentryエラートラッキング",
+      "method2_text": "フロントエンドとバックエンドの例外はリアルタイムでキャッチされます",
+      "method3_bold": "Cloudflare アナリティクス",
+      "method3_text": "トラフィックの異常やエラーのスパイクは継続的に監視されています",
+      "method4_bold": "手動 QA",
+      "method4_text": "コアユーザージャーニーは、各デプロイメントの前に複数のテナント構成でテストされます",
+      "method5_bold": "コミュニティテスト",
+      "method5_text": "複数のアクティブなコミュニティにいる実際のメンバーが、プロダクションでのエッジケースを浮き彫りにするのを手伝ってくれます"
     },
     "how_to_help": {
-      "title": "How to help",
-      "report_bug_title": "Report a bug",
-      "report_bug_description": "Found something broken? Please open an issue on GitHub — it's the fastest way to get a fix in front of us. Include what you were doing, what you expected, and what actually happened.",
-      "github_link": "Open an issue on GitHub",
-      "become_tester_title": "Bring your community onto NEXUS",
-      "become_tester_description": "If you run a timebank or community network and want to join the platform, we'd love to work with you. Reach out via GitHub Discussions or the contact page — we support communities of all sizes."
+      "title": "助ける方法",
+      "report_bug_title": "バグを報告する",
+      "report_bug_description": "壊れているものを見つけましたか？ GitHub に問題をオープンしてください — それが私たちの前に修正を持ってくる最も早い方法です。あなたがしていたこと、期待していたこと、実際に起こったことを含めてください。",
+      "github_link": "GitHub に問題をオープンする",
+      "become_tester_title": "あなたのコミュニティを NEXUS に持ち込む",
+      "become_tester_description": "タイムバンクやコミュニティネットワークを運営していて、プラットフォームに参加したい場合は、ぜひご連絡ください。GitHub ディスカッションまたはお問い合わせページからご連絡ください — 私たちはあらゆる規模のコミュニティをサポートしています。"
     },
     "security": {
-      "title": "Security disclosure",
-      "description_before_email": "If you discover a security vulnerability, please do not open a public issue. Instead, contact us confidentially at",
-      "description_after_email": ". We will respond within 72 hours and work with you on responsible disclosure."
+      "title": "セキュリティ開示",
+      "description_before_email": "セキュリティの脆弱性を発見した場合は、公開の問題をオープンしないでください。代わりに、以下のアドレスで機密にご連絡ください",
+      "description_after_email": "。72時間以内に返信し、責任ある開示について一緒に作業します。"
     }
   },
   "kb": {
-    "title": "Knowledge Base",
-    "description": "Find answers, guides, and helpful resources",
-    "search_placeholder": "Search the knowledge base..."
+    "title": "ナレッジベース",
+    "description": "回答、ガイド、お役立ちリソースを見つける",
+    "search_placeholder": "ナレッジベースを検索..."
+  },
+  "page_meta": {
+    "development_status": {
+      "title": "開発状況"
+    }
   }
 }

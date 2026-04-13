@@ -142,7 +142,7 @@
       "research_heading": "Fondation de recherche",
       "research_description": "Basé sur une étude d'impact social commandée par {{name}}.",
       "acknowledgements": "Remerciements",
-      "open_source": "Open Source",
+      "open_source": "Source Ouverte",
       "license_text": "Sous licence GNU Affero General Public License v3 (AGPL-3.0).",
       "v1_source": "Code source V1 (PHP + React)",
       "v2_source": "Code source V2 (ASP.NET Core)"

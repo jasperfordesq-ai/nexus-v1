@@ -311,7 +311,7 @@
     "conformance_body_2_emphasis": "teilweise konform",
     "conformance_body_2_after": "mit WCAG 2.1 Level AA. Teilweise konform bedeutet, dass einige Teile des Inhalts nicht vollstaendig dem Barrierefreiheitsstandard entsprechen.",
     "standards_label": "Standards, die wir befolgen:",
-    "standard_wcag": "WCAG 2.1 Level AA",
+    "standard_wcag": "WCAG 2.1 Stufe AA",
     "standard_aria": "WAI-ARIA 1.2 fuer interaktive Komponenten",
     "standard_508": "Section 508 Konformitaet",
     "standard_en301549": "EN 301 549 (Europaeischer Barrierefreiheitsstandard)",

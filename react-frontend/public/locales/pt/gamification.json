@@ -89,6 +89,14 @@
       "load_failed_desc": "Não foi possível carregar a loja XP."
     },
     "loading": "A carregar conquistas",
+    "badge_detail": {
+      "title": "Detalhes do Distintivo",
+      "earned_on": "Conquistado em {{date}}",
+      "not_earned": "Ainda não conquistado",
+      "not_earned_desc": "Continue assim — você desbloqueará este distintivo em breve!",
+      "xp_reward": "Recompensa de XP",
+      "load_failed": "Não foi possível carregar os detalhes do distintivo."
+    },
     "showcase": {
       "manage_title": "Gerir Montra de Insígnias",
       "select_badges": "Selecione até 5 insígnias para mostrar no seu perfil. ({{count}}/5 selecionadas)",
@@ -274,5 +282,10 @@
     "member_since": "Membro desde",
     "empty_title": "Sem destaque ainda",
     "empty_description": "Os membros ativos serão apresentados aqui assim que a comunidade começar a trocar."
+  },
+  "page_meta": {
+    "leaderboard": {
+      "description": "Classificação da comunidade — veja os principais colaboradores e os membros mais ativos."
+    }
   }
 }

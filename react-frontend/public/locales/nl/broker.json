@@ -14,12 +14,12 @@
     "sign_out": "Uitloggen"
   },
   "nav": {
-    "vetting": "Vetting & DBS"
+    "vetting": "Screening & DBS"
   },
   "breadcrumbs": {
     "aria_label": "Broodkruimelnavigatie",
     "dashboard": "Broker Paneel",
-    "vetting": "Vetting & DBS"
+    "vetting": "Screening & DBS"
   },
   "dashboard": {
     "title": "Broker Dashboard",

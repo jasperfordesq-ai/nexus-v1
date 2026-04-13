@@ -1,12 +1,11 @@
 {
-  "page_title": "Ideation Challenges",
-  "title": "Ideation Challenges",
-  "subtitle": "Share ideas, vote, and help shape your community",
-
+  "page_title": "Idee-uitdagingen",
+  "title": "Idee-uitdagingen",
+  "subtitle": "Deel ideeën, stem en help je gemeenschap vorm te geven",
+  "page_description": "Blader door de gemeenschapsuitdagingen, dien ideeën in en stem op oplossingen. Help de toekomst van je gemeenschap vorm te geven.",
   "actions": {
     "retry": "Retry"
   },
-
   "tabs": {
     "all": "All",
     "open": "Open",
@@ -14,9 +13,8 @@
     "evaluating": "Evaluating",
     "closed": "Closed",
     "archived": "Archived",
-    "favorites": "My Favorites"
+    "favorites": "Mijn Favorieten"
   },
-
   "status": {
     "draft": "Draft",
     "open": "Open",
@@ -25,7 +23,6 @@
     "closed": "Closed",
     "archived": "Archived"
   },
-
   "idea_status": {
     "draft": "Draft",
     "submitted": "Submitted",
@@ -33,396 +30,375 @@
     "winner": "Winner",
     "withdrawn": "Withdrawn"
   },
-
   "challenge": {
-    "ideas_count": "{{count}} ideas",
-    "ideas_count_one": "{{count}} idea",
-    "submission_deadline": "Submissions due {{date}}",
-    "voting_deadline": "Voting ends {{date}}",
+    "ideas_count": "{{count}} ideeën",
+    "ideas_count_one": "{{count}} idee",
+    "submission_deadline": "Inzendingen moeten voor {{date}} binnen zijn",
+    "voting_deadline": "Stemmen eindigt op {{date}}",
     "prize": "Prize",
     "category": "Category",
-    "max_ideas": "Max {{count}} ideas per person",
-    "created_by": "Created by {{name}}",
-    "no_deadline": "No deadline",
-    "evaluation_criteria": "Evaluation Criteria",
+    "max_ideas": "Maximaal {{count}} ideeën per persoon",
+    "created_by": "Gemaakt door {{name}}",
+    "no_deadline": "Geen deadline",
+    "evaluation_criteria": "Evaluatiecriteria",
     "outcome": "Outcome",
-    "team_links": "Project Teams"
+    "team_links": "Projectteams"
   },
-
   "challenges": {
     "title": "Challenges",
-    "empty_title": "No Challenges Yet",
-    "empty_description": "There are no ideation challenges at the moment. Check back soon!",
-    "empty_filtered": "No challenges match the selected filter.",
-    "create": "Create Challenge",
-    "load_error": "Unable to load challenges",
-    "load_more": "Load More"
+    "empty_title": "Nog geen uitdagingen",
+    "empty_description": "Er zijn op dit moment geen idee-uitdagingen. Kom snel terug!",
+    "empty_filtered": "Geen uitdagingen passen bij de geselecteerde filter.",
+    "create": "Uitdaging maken",
+    "load_error": "Kan uitdagingen niet laden",
+    "load_more": "Meer laden"
   },
-
   "ideas": {
     "title": "Ideas",
-    "empty_title": "No Ideas Yet",
-    "empty_description": "Be the first to share your idea for this challenge!",
-    "submit": "Submit Idea",
-    "submit_title": "Submit Your Idea",
-    "sort_votes": "Top Voted",
+    "empty_title": "Nog geen ideeën",
+    "empty_description": "Wees de eerste om je idee voor deze uitdaging te delen!",
+    "submit": "Dien Idee In",
+    "submit_title": "Dien Je Idee In",
+    "sort_votes": "Meest Gestemd",
     "sort_newest": "Newest",
     "vote": "Vote",
     "unvote": "Unvote",
-    "votes": "{{count}} votes",
-    "votes_one": "{{count}} vote",
-    "comments": "{{count}} comments",
-    "comments_one": "{{count}} comment",
-    "load_more": "Load More Ideas",
-    "back_to_challenge": "Back to Challenge",
-    "your_ideas": "Your ideas: {{count}}/{{max}}",
-    "edit": "Edit Idea",
-    "delete": "Delete Idea",
-    "delete_confirm": "Are you sure you want to delete this idea? This action cannot be undone.",
-    "load_error": "Unable to load ideas",
-    "save_draft": "Save Draft",
-    "publish_draft": "Publish Idea",
-    "draft_saved": "Draft saved",
+    "votes": "{{count}} stemmen",
+    "votes_one": "{{count}} stem",
+    "comments": "{{count}} opmerkingen",
+    "comments_one": "{{count}} opmerking",
+    "load_more": "Meer Ideeën Laden",
+    "back_to_challenge": "Terug naar Uitdaging",
+    "your_ideas": "Jouw ideeën: {{count}}/{{max}}",
+    "edit": "Idee Bewerken",
+    "delete": "Idee Verwijderen",
+    "delete_confirm": "Weet je zeker dat je dit idee wilt verwijderen? Deze actie kan niet ongedaan gemaakt worden.",
+    "load_error": "Kan ideeën niet laden",
+    "save_draft": "Concept Opslaan",
+    "publish_draft": "Idee Publiceren",
+    "draft_saved": "Concept opgeslagen",
     "draft": "Draft",
-    "your_drafts": "Your Drafts",
-    "untitled_draft": "Untitled Draft",
-    "draft_updated": "Updated {{date}}",
-    "draft_created": "Created {{date}}",
-    "new_idea": "New Idea"
+    "your_drafts": "Jouw Concepten",
+    "untitled_draft": "Ongetiteld Concept",
+    "draft_updated": "Bijgewerkt {{date}}",
+    "draft_created": "Aangemaakt {{date}}",
+    "new_idea": "Nieuw Idee"
   },
-
   "idea_detail": {
-    "page_title": "Idea Details",
-    "back_to_challenge": "Back to Challenge",
-    "submitted_by": "Submitted by {{name}}",
-    "submitted_on": "Submitted on {{date}}"
+    "page_title": "Idee Details",
+    "back_to_challenge": "Terug naar Uitdaging",
+    "submitted_by": "Ingediend door {{name}}",
+    "submitted_on": "Ingediend op {{date}}"
   },
-
   "comments": {
     "title": "Comments",
-    "empty_title": "No Comments Yet",
-    "empty_description": "Be the first to share your thoughts on this idea.",
-    "add_placeholder": "Share your thoughts...",
-    "add_button": "Post Comment",
+    "empty_title": "Nog Geen Reacties",
+    "empty_description": "Wees de eerste om je gedachten over dit idee te delen.",
+    "add_placeholder": "Deel je gedachten...",
+    "add_button": "Plaats Reactie",
     "delete": "Delete",
-    "delete_confirm": "Are you sure you want to delete this comment?",
-    "load_more": "Load More Comments",
-    "load_error": "Unable to load comments"
+    "delete_confirm": "Weet je zeker dat je deze reactie wilt verwijderen?",
+    "load_more": "Laad Meer Reacties",
+    "load_error": "Kan reacties niet laden"
   },
-
   "form": {
     "title_label": "Title",
-    "title_placeholder": "Enter a clear, descriptive title",
+    "title_placeholder": "Voer een duidelijke, beschrijvende titel in",
     "description_label": "Description",
-    "description_placeholder": "Describe the challenge or your idea in detail",
-    "description_helper": "Describe the problem clearly, including who is affected, why it matters, and what a successful solution looks like",
+    "description_placeholder": "Beschrijf de uitdaging of je idee in detail",
+    "description_helper": "Beschrijf het probleem duidelijk, inclusief wie erdoor wordt getroffen, waarom het belangrijk is, en hoe een succesvolle oplossing eruitziet",
     "category_label": "Category",
-    "category_placeholder": "Select a category",
-    "category_free_label": "Category (free text)",
-    "category_free_placeholder": "e.g. Environment, Technology, Community",
-    "prize_label": "Prize Description",
-    "prize_placeholder": "Describe what the winner receives (optional)",
-    "prize_helper": "Incentives boost participation — consider time credits, recognition, or implementation support",
-    "submission_deadline_label": "Submission Deadline",
-    "voting_deadline_label": "Voting Deadline",
-    "max_ideas_label": "Max Ideas Per User",
-    "max_ideas_placeholder": "Leave empty for unlimited",
-    "max_ideas_helper": "Limiting ideas per person encourages higher quality submissions",
-    "status_label": "Initial Status",
-    "evaluation_criteria_label": "Evaluation Criteria",
-    "evaluation_criteria_placeholder": "Add a criterion (press Enter)",
-    "evaluation_criteria_helper": "Define how ideas will be judged",
-    "template_label": "Start from Template",
-    "template_placeholder": "Select a template (optional)",
+    "category_placeholder": "Selecteer een categorie",
+    "category_free_label": "Categorie (vrije tekst)",
+    "category_free_placeholder": "bijv. Milieu, Technologie, Gemeenschap",
+    "prize_label": "Prijsbeschrijving",
+    "prize_placeholder": "Beschrijf wat de winnaar ontvangt (optioneel)",
+    "prize_helper": "Incentives stimuleren deelname — denk aan tijdcredits, erkenning of implementatieondersteuning",
+    "submission_deadline_label": "Inzenddeadline",
+    "voting_deadline_label": "Stemdeadline",
+    "max_ideas_label": "Max. ideeën per gebruiker",
+    "max_ideas_placeholder": "Laat leeg voor onbeperkt",
+    "max_ideas_helper": "Het beperken van ideeën per persoon moedigt hogere kwaliteit inzendingen aan",
+    "status_label": "Initiële status",
+    "evaluation_criteria_label": "Evaluatiecriteria",
+    "evaluation_criteria_placeholder": "Voeg een criterium toe (druk op Enter)",
+    "evaluation_criteria_helper": "Definieer hoe ideeën beoordeeld zullen worden",
+    "template_label": "Begin vanaf sjabloon",
+    "template_placeholder": "Selecteer een sjabloon (optioneel)",
     "save": "Save",
-    "saving": "Saving...",
-    "create": "Create Challenge",
-    "creating": "Creating...",
-    "update": "Update Challenge",
-    "updating": "Updating...",
+    "saving": "Opslaan...",
+    "create": "Creëer uitdaging",
+    "creating": "Aan het creëren...",
+    "update": "Update uitdaging",
+    "updating": "Aan het bijwerken...",
     "cancel": "Cancel"
   },
-
   "create_page": {
-    "page_title": "Create Challenge",
-    "title": "Create Ideation Challenge",
-    "subtitle": "Post a problem statement for your community to solve"
+    "page_title": "Creëer uitdaging",
+    "title": "Creëer ideation-uitdaging",
+    "subtitle": "Plaats een probleemstelling voor jouw gemeenschap om op te lossen"
   },
-
   "edit_page": {
-    "page_title": "Edit Challenge",
-    "title": "Edit Ideation Challenge"
+    "page_title": "Bewerk uitdaging",
+    "title": "Bewerk ideation-uitdaging"
   },
-
   "admin": {
-    "change_status": "Change Status",
-    "set_open": "Open for Submissions",
-    "set_voting": "Move to Voting",
-    "set_evaluating": "Move to Evaluation",
-    "set_closed": "Close Challenge",
-    "set_archived": "Archive Challenge",
-    "reopen": "Reopen Challenge",
-    "unarchive": "Un-archive Challenge",
-    "set_shortlisted": "Mark as Shortlisted",
-    "set_winner": "Mark as Winner",
-    "remove_status": "Reset to Submitted",
-    "edit_challenge": "Edit Challenge",
-    "delete_challenge": "Delete Challenge",
-    "delete_confirm": "Are you sure you want to delete this challenge? All ideas, votes, and comments will be permanently removed.",
-    "status_updated": "Challenge status updated",
-    "idea_status_updated": "Idea status updated"
+    "change_status": "Verander status",
+    "set_open": "Open voor inzendingen",
+    "set_voting": "Ga naar stemmen",
+    "set_evaluating": "Ga naar evaluatie",
+    "set_closed": "Sluit uitdaging",
+    "set_archived": "Uitdaging archiveren",
+    "reopen": "Uitdaging heropenen",
+    "unarchive": "Uitdaging on-archiveren",
+    "set_shortlisted": "Markeren als shortlist",
+    "set_winner": "Markeren als winnaar",
+    "remove_status": "Resetten naar ingediend",
+    "edit_challenge": "Uitdaging bewerken",
+    "delete_challenge": "Uitdaging verwijderen",
+    "delete_confirm": "Weet je zeker dat je deze uitdaging wilt verwijderen? Alle ideeën, stemmen en opmerkingen worden permanent verwijderd.",
+    "status_updated": "Status van de uitdaging bijgewerkt",
+    "idea_status_updated": "Status van het idee bijgewerkt"
   },
-
   "toast": {
-    "challenge_created": "Challenge created successfully",
-    "challenge_updated": "Challenge updated successfully",
-    "challenge_deleted": "Challenge deleted successfully",
-    "idea_submitted": "Idea submitted successfully",
-    "idea_updated": "Idea updated successfully",
-    "idea_deleted": "Idea deleted successfully",
-    "vote_added": "Vote recorded",
-    "vote_removed": "Vote removed",
-    "comment_added": "Comment posted",
-    "comment_deleted": "Comment deleted",
-    "media_added": "Media added",
-    "media_deleted": "Media removed",
-    "category_created": "Category created",
-    "category_updated": "Category updated",
-    "category_deleted": "Category deleted",
-    "tag_created": "Tag created",
-    "tag_deleted": "Tag deleted",
-    "campaign_created": "Campaign created",
-    "campaign_updated": "Campaign updated",
-    "campaign_deleted": "Campaign deleted",
-    "template_created": "Template created",
-    "template_updated": "Template updated",
-    "template_deleted": "Template deleted",
-    "outcome_saved": "Outcome saved",
-    "task_created": "Task created",
-    "task_updated": "Task updated",
-    "task_deleted": "Task deleted",
-    "document_uploaded": "Document uploaded",
-    "document_deleted": "Document deleted",
-    "chatroom_created": "Channel created",
-    "chatroom_deleted": "Channel deleted",
-    "message_posted": "Message posted",
-    "template_applied": "Template applied successfully",
-    "error_generic": "Something went wrong. Please try again."
+    "challenge_created": "Uitdaging succesvol aangemaakt",
+    "challenge_updated": "Uitdaging succesvol bijgewerkt",
+    "challenge_deleted": "Uitdaging succesvol verwijderd",
+    "idea_submitted": "Idee succesvol ingediend",
+    "idea_updated": "Idee succesvol bijgewerkt",
+    "idea_deleted": "Idee succesvol verwijderd",
+    "vote_added": "Stem geregistreerd",
+    "vote_removed": "Stem verwijderd",
+    "comment_added": "Opmerking geplaatst",
+    "comment_deleted": "Opmerking verwijderd",
+    "media_added": "Media toegevoegd",
+    "media_deleted": "Media verwijderd",
+    "category_created": "Categorie aangemaakt",
+    "category_updated": "Categorie bijgewerkt",
+    "category_deleted": "Categorie verwijderd",
+    "tag_created": "Tag aangemaakt",
+    "tag_deleted": "Tag verwijderd",
+    "campaign_created": "Campagne aangemaakt",
+    "campaign_updated": "Campagne bijgewerkt",
+    "campaign_deleted": "Campagne verwijderd",
+    "template_created": "Sjabloon aangemaakt",
+    "template_updated": "Sjabloon bijgewerkt",
+    "template_deleted": "Sjabloon verwijderd",
+    "outcome_saved": "Resultaat opgeslagen",
+    "task_created": "Taak aangemaakt",
+    "task_updated": "Taak bijgewerkt",
+    "task_deleted": "Taak verwijderd",
+    "document_uploaded": "Document geüpload",
+    "document_deleted": "Document verwijderd",
+    "chatroom_created": "Kanaal aangemaakt",
+    "chatroom_deleted": "Kanaal verwijderd",
+    "message_posted": "Bericht geplaatst",
+    "template_applied": "Sjabloon succesvol toegepast",
+    "error_generic": "Er is iets misgegaan. Probeer het opnieuw."
   },
-
   "favorites": {
-    "add": "Add to favorites",
-    "remove": "Remove from favorites",
-    "my_favorites": "My Favorites",
-    "empty_title": "No Favorites Yet",
-    "empty_description": "Heart a challenge to add it to your favorites."
+    "add": "Toevoegen aan favorieten",
+    "remove": "Verwijderen uit favorieten",
+    "my_favorites": "Mijn Favorieten",
+    "empty_title": "Nog geen Favorieten",
+    "empty_description": "Geef een uitdaging een hart om deze aan je favorieten toe te voegen."
   },
-
   "views": "views",
-
   "featured": "Featured",
-
   "search": {
-    "label": "Search challenges",
-    "placeholder": "Search challenges by title or description...",
-    "clear_tags": "Clear tags",
-    "no_results": "No challenges match your search"
+    "label": "Zoek uitdagingen",
+    "placeholder": "Zoek uitdagingen op titel of beschrijving...",
+    "clear_tags": "Tags wissen",
+    "no_results": "Geen uitdagingen die overeenkomen met je zoekopdracht"
   },
-
   "tags": {
     "label": "Tags",
-    "placeholder": "Add tags (press Enter)",
-    "helper": "Add skills or topics relevant to this challenge",
-    "interests": "Areas of Interest",
-    "skills": "Skills Needed",
-    "general": "General Tags"
+    "placeholder": "Voeg tags toe (druk op Enter)",
+    "helper": "Voeg vaardigheden of onderwerpen toe die relevant zijn voor deze uitdaging",
+    "interests": "Interessegebieden",
+    "skills": "Vereiste vaardigheden",
+    "general": "Algemene tags"
   },
-
   "cover_image": {
-    "label": "Cover Image URL",
+    "label": "URL van de omslagafbeelding",
     "placeholder": "https://example.com/image.jpg",
-    "helper": "Banner image for the challenge (recommended 600x400)"
+    "helper": "Bannerafbeelding voor de uitdaging (aanbevolen 600x400)"
   },
-
   "guidance": {
-    "title": "Tips for Writing a Great Challenge",
-    "intro": "A well-framed challenge inspires better ideas. Here are some tips to help you create an effective problem statement.",
+    "title": "Tips voor het Schrijven van een Geweldige Uitdaging",
+    "intro": "Een goed geformuleerde uitdaging inspireert betere ideeën. Hier zijn enkele tips om je te helpen een effectieve probleemstelling te creëren.",
     "tips": {
       "clear_problem": {
-        "title": "\uD83C\uDFAF Define a Clear Problem",
-        "description": "State the specific issue you want the community to address. Avoid vague or overly broad statements."
+        "title": "🎯 Definieer een Duidelijk Probleem",
+        "description": "Geef het specifieke probleem aan dat je wilt dat de gemeenschap aanpakt. Vermijd vage of te brede uitspraken."
       },
       "scope": {
-        "title": "\uD83D\uDCCF Set Realistic Scope",
-        "description": "Define clear boundaries and constraints so ideas remain focused and actionable."
+        "title": "📏 Stel Realistische Omvang In",
+        "description": "Definieer duidelijke grenzen en beperkingen zodat ideeën gefocust en uitvoerbaar blijven."
       },
       "criteria": {
-        "title": "\u2696\uFE0F Explain Evaluation Criteria",
-        "description": "Tell participants how ideas will be judged \u2014 feasibility, creativity, impact, or cost-effectiveness."
+        "title": "⚖️ Verklaar Evaluatiecriteria",
+        "description": "Vertel deelnemers hoe ideeën beoordeeld zullen worden — haalbaarheid, creativiteit, impact of kosteneffectiviteit."
       },
       "engagement": {
-        "title": "\uD83D\uDCA1 Encourage Participation",
-        "description": "Use inviting language. Add a prize or recognition to motivate submissions."
+        "title": "💡 Moedig Deelname Aan",
+        "description": "Gebruik uitnodigende taal. Voeg een prijs of erkenning toe om inzendingen te motiveren."
       }
     },
-    "examples_toggle": "Show examples of good vs. weak challenges \u25B8",
+    "examples_toggle": "Toon voorbeelden van goede vs. zwakke uitdagingen ▸",
     "example_good": {
-      "label": "\u2705 Strong challenge:",
-      "text": "How might we reduce food waste in our community by 25% over the next year? We're looking for practical, low-cost ideas that local businesses and residents can implement together."
+      "label": "✅ Sterke uitdaging:",
+      "text": "Hoe kunnen we voedselverspilling in onze gemeenschap met 25% verminderen in het komende jaar? We zijn op zoek naar praktische, goedkope ideeën die lokale bedrijven en bewoners samen kunnen implementeren."
     },
     "example_weak": {
-      "label": "\u274C Weak challenge:",
-      "text": "We need ideas about the environment.",
-      "why": "Too vague \u2014 no specific problem, no constraints, no success criteria."
+      "label": "❌ Zwakke uitdaging:",
+      "text": "We hebben ideeën nodig over het milieu.",
+      "why": "Te vaag — geen specifiek probleem, geen beperkingen, geen succescriteria."
     }
   },
-
   "duplicate": {
-    "button": "Duplicate Challenge",
-    "success": "Challenge duplicated successfully",
-    "error": "Failed to duplicate challenge"
+    "button": "Dupliceer Uitdaging",
+    "success": "Uitdaging succesvol gedupliceerd",
+    "error": "Dupliceer uitdaging mislukt"
   },
-
-  "idea_image": "Idea image",
-
+  "idea_image": "Idee afbeelding",
   "media": {
     "title": "Attachments",
-    "add": "Add Attachment",
-    "add_image": "Add Image",
-    "add_link": "Add Link",
+    "add": "Voeg Bijlage Toe",
+    "add_image": "Voeg Afbeelding Toe",
+    "add_link": "Voeg Link Toe",
     "url_label": "URL",
     "url_placeholder": "https://...",
     "caption_label": "Caption",
-    "caption_placeholder": "Brief description (optional)",
+    "caption_placeholder": "Korte beschrijving (optioneel)",
     "type_label": "Type",
     "type_image": "Image",
     "type_video": "Video",
     "type_document": "Document",
     "type_link": "Link",
-    "delete_confirm": "Remove this attachment?",
-    "empty": "No attachments"
+    "delete_confirm": "Deze bijlage verwijderen?",
+    "empty": "Geen bijlagen"
   },
-
   "convert_to_group": {
-    "button": "Create Team",
-    "title": "Create Project Team from Idea",
-    "description": "Convert this winning idea into a project team where members can collaborate, manage tasks, share documents, and chat.",
-    "name_label": "Team Name",
-    "description_label": "Team Description",
+    "button": "Creëer Team",
+    "title": "Creëer Projectteam vanuit Idee",
+    "description": "Zet dit winnende idee om in een projectteam waar leden kunnen samenwerken, taken beheren, documenten delen en chatten.",
+    "name_label": "Teamnaam",
+    "description_label": "Teambeschrijving",
     "visibility_label": "Visibility",
     "visibility_public": "Public",
     "visibility_private": "Private",
-    "confirm": "Create Team",
-    "creating": "Creating...",
-    "success": "Project team created successfully! Redirecting...",
-    "error": "Failed to create team",
-    "already_converted": "This idea has already been converted to a team"
+    "confirm": "Team aanmaken",
+    "creating": "Aanmaken...",
+    "success": "Projectteam succesvol aangemaakt! Wordt omgeleid...",
+    "error": "Mislukt om team aan te maken",
+    "already_converted": "Dit idee is al omgezet naar een team"
   },
-
   "campaigns": {
     "title": "Campaigns",
     "page_title": "Campaigns",
-    "empty_title": "No Campaigns Yet",
-    "empty_description": "Create a campaign to group related challenges together.",
-    "create": "Create Campaign",
-    "challenges_count": "{{count}} challenges",
-    "challenges_count_one": "{{count}} challenge",
-    "link_challenge": "Link Challenge",
-    "unlink_challenge": "Unlink Challenge"
+    "empty_title": "Nog geen campagnes",
+    "empty_description": "Maak een campagne om gerelateerde uitdagingen te groeperen.",
+    "create": "Campagne aanmaken",
+    "challenges_count": "{{count}} uitdagingen",
+    "challenges_count_one": "{{count}} uitdaging",
+    "link_challenge": "Koppel Uitdaging",
+    "unlink_challenge": "Ontkoppel Uitdaging"
   },
-
   "templates": {
-    "title": "Challenge Templates",
-    "page_title": "Challenge Templates",
-    "empty_title": "No Templates Yet",
-    "empty_description": "Create reusable templates to streamline challenge creation.",
-    "create": "Create Template",
-    "use_template": "Use This Template",
-    "start_from_template": "Start from Template"
+    "title": "Uitdaging Sjablonen",
+    "page_title": "Uitdaging Sjablonen",
+    "empty_title": "Nog geen sjablonen",
+    "empty_description": "Maak herbruikbare sjablonen om het aanmaken van uitdagingen te stroomlijnen.",
+    "create": "Sjabloon aanmaken",
+    "use_template": "Gebruik dit sjabloon",
+    "start_from_template": "Begin vanaf sjabloon"
   },
-
   "outcomes": {
     "title": "Impact Tracking",
     "page_title": "Impact Dashboard",
-    "empty_title": "No outcomes yet",
+    "empty_title": "Nog geen resultaten",
     "status_label": "Status",
-    "implementation_status_label": "Implementation Status",
-    "status_not_started": "Not Started",
-    "status_in_progress": "In Progress",
+    "implementation_status_label": "Implementatiestatus",
+    "status_not_started": "Niet gestart",
+    "status_in_progress": "Bezig",
     "status_implemented": "Implemented",
     "status_abandoned": "Abandoned",
-    "winning_idea": "Winning Idea",
-    "impact_description": "Impact Description",
-    "impact_placeholder": "Describe the impact and results...",
-    "save": "Save Outcome",
-    "saving": "Saving...",
+    "winning_idea": "Winnend idee",
+    "impact_description": "Impactbeschrijving",
+    "impact_placeholder": "Beschrijf de impact en resultaten...",
+    "save": "Resultaat Opslaan",
+    "saving": "Opslaan...",
     "dashboard": "Impact Dashboard",
-    "total_challenges": "Total Tracked",
+    "total_challenges": "Totaal Gevolgd",
     "implemented_count": "Implemented",
-    "in_progress_count": "In Progress"
+    "in_progress_count": "In Behandeling"
   },
-
   "tasks": {
     "title": "Tasks",
     "status_label": "Status",
     "priority_label": "Priority",
-    "create": "Add Task",
-    "empty_title": "No Tasks Yet",
-    "empty_description": "Create tasks to organize your team's work.",
-    "status_todo": "To Do",
-    "status_in_progress": "In Progress",
+    "create": "Taak Toevoegen",
+    "empty_title": "Nog Geen Taken",
+    "empty_description": "Maak taken aan om het werk van je team te organiseren.",
+    "status_todo": "Te Doen",
+    "status_in_progress": "In Behandeling",
     "status_done": "Done",
     "priority_low": "Low",
     "priority_medium": "Medium",
     "priority_high": "High",
     "priority_urgent": "Urgent",
-    "assigned_to": "Assigned to",
+    "assigned_to": "Toegewezen aan",
     "unassigned": "Unassigned",
-    "due_date": "Due date",
+    "due_date": "Vervaldatum",
     "overdue": "Overdue",
-    "stats": "Task Stats"
+    "stats": "Taak Statistieken"
   },
-
   "documents": {
     "title": "Documents",
-    "upload": "Upload Document",
-    "empty_title": "No Documents Yet",
-    "empty_description": "Upload files to share with your team.",
-    "delete_confirm": "Delete this document?",
-    "max_size": "Max file size: 10 MB"
+    "upload": "Document Uploaden",
+    "empty_title": "Nog Geen Documenten",
+    "empty_description": "Upload bestanden om te delen met je team.",
+    "delete_confirm": "Dit document verwijderen?",
+    "max_size": "Maximale bestandsgrootte: 10 MB"
   },
-
   "chatrooms": {
     "title": "Channels",
-    "create": "Create Channel",
+    "create": "Kanaal Aanmaken",
     "general": "General",
-    "empty_title": "No Messages Yet",
-    "empty_description": "Start the conversation!",
-    "message_placeholder": "Type a message...",
+    "empty_title": "Nog Geen Berichten",
+    "empty_description": "Begin het gesprek!",
+    "message_placeholder": "Typ een bericht...",
     "send": "Send",
-    "delete_channel": "Delete Channel",
-    "delete_channel_confirm": "Delete this channel and all its messages?"
+    "delete_channel": "Kanaal Verwijderen",
+    "delete_channel_confirm": "Dit kanaal en al zijn berichten verwijderen?"
   },
-
   "categories": {
     "title": "Categories",
-    "manage": "Manage Categories",
-    "all": "All Categories",
-    "create": "Add Category",
-    "name_label": "Category Name",
-    "name_placeholder": "e.g. Environment",
+    "manage": "Categorieën Beheren",
+    "all": "Alle Categorieën",
+    "create": "Categorie Toevoegen",
+    "name_label": "Categorie Naam",
+    "name_placeholder": "bijv. Milieu",
     "icon_label": "Icon",
-    "icon_placeholder": "Lucide icon name (e.g. Leaf)",
+    "icon_placeholder": "Lucide icoon naam (bijv. Blad)",
     "color_label": "Color",
-    "delete_confirm": "Delete this category?"
+    "delete_confirm": "Deze categorie verwijderen?"
   },
-
   "validation": {
-    "title_required": "Title is required",
-    "description_required": "Description is required",
-    "comment_required": "Comment cannot be empty",
-    "url_required": "URL is required",
-    "name_required": "Name is required",
-    "file_required": "File is required"
+    "title_required": "Titel is verplicht",
+    "description_required": "Beschrijving is verplicht",
+    "comment_required": "Opmerking mag niet leeg zijn",
+    "url_required": "URL is verplicht",
+    "name_required": "Naam is verplicht",
+    "file_required": "Bestand is verplicht"
+  },
+  "page_meta": {
+    "outcomes": {
+      "title": "Resultaten Dashboard"
+    },
+    "create_challenge": {
+      "title": "Uitdaging Creëren"
+    }
   }
 }

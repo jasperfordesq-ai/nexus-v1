@@ -115,6 +115,11 @@
   "delete_for_everyone": "Excluir para todos",
   "message_removed_self": "Mensagem removida",
   "message_removed_self_subtitle": "Mensagem removida da sua visualização.",
+  "voice.show_transcript": "Mostrar transcrição",
+  "voice.hide_transcript": "Ocultar transcrição",
+  "voice.translate": "Traduzir",
+  "voice.translating": "A traduzir...",
+  "voice.translation_failed": "Falha na tradução. Tente novamente.",
   "voice": {
     "show_transcript": "Mostrar transcrição",
     "hide_transcript": "Ocultar transcrição",
@@ -122,17 +127,48 @@
     "translating": "A traduzir...",
     "translation_failed": "Falha na tradução"
   },
-  "voice.show_transcript": "Mostrar transcrição",
-  "voice.hide_transcript": "Ocultar transcrição",
-  "voice.translate": "Traduzir",
-  "voice.translating": "A traduzir...",
-  "voice.translation_failed": "Falha na tradução. Tente novamente.",
   "translate": {
     "translate": "Traduzir",
+    "translate_to": "Traduzir para",
     "view_original": "Ver original",
     "show_translation": "Mostrar tradução",
     "translating": "Traduzindo...",
     "translation_failed": "Falha na tradução. Tente novamente.",
     "translated_label": "Traduzido"
-  }
+  },
+  "auto_translate": {
+    "enable": "Tradução automática",
+    "enabled_toast": "As mensagens serão traduzidas automaticamente",
+    "disabled_toast": "Tradução automática desativada",
+    "translating_all": "Traduzindo mensagens...",
+    "tooltip_off": "Traduzir todas as mensagens automaticamente",
+    "tooltip_on": "A tradução automática está ativada — clique para desativar",
+    "active_banner": "As mensagens nesta conversa estão sendo traduzidas automaticamente para o seu idioma.",
+    "turn_off": "Desativar"
+  },
+  "translate_hint": {
+    "title": "A tradução está disponível",
+    "body": "Você e essa pessoa podem escrever em seu próprio idioma. Toque em \"Traduzir\" em qualquer mensagem para lê-la no seu, ou use o botão de tradução no cabeçalho para traduzir tudo automaticamente.",
+    "dismiss": "Dispensar dica de tradução"
+  },
+  "new_group": "Novo Grupo",
+  "create_group": "Criar Grupo",
+  "create_group_title": "Criar Conversa em Grupo",
+  "group_name_label": "Nome do Grupo",
+  "group_name_placeholder": "Digite um nome para este grupo...",
+  "add_members": "Adicionar Membros",
+  "add_members_hint": "Pesquise por membros para adicionar (mínimo 2)",
+  "selected_members": "Selecionados ({{count}})",
+  "create_group_error": "Falha ao criar conversa em grupo",
+  "group_created": "Grupo Criado",
+  "group_created_desc": "Sua conversa em grupo foi criada.",
+  "group_members": "{{count}} membros",
+  "group_leave": "Sair do Grupo",
+  "group_leave_confirm": "Você tem certeza de que deseja sair deste grupo? Você não receberá novas mensagens.",
+  "group_add_member": "Adicionar Membro",
+  "group_edit_name": "Editar Nome",
+  "group_name_updated": "Nome do grupo atualizado",
+  "group_member_added": "Membro adicionado ao grupo",
+  "group_member_removed": "Membro removido do grupo",
+  "group_left": "Você saiu do grupo"
 }

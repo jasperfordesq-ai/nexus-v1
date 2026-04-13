@@ -19,7 +19,7 @@
   "empty_description": "Matches verschijnen hier zodra het systeem verbindingen voor jou vindt op het platform.",
   "browse_listings": "Blader door Aanbiedingen",
   "score_label": "Matchscore: {{score}}%",
-  "score_percent": "{{score}}% match",
+  "score_percent": "{{score}}% overeenstemming",
   "reasons_more": "+{{count}} meer",
   "view_details": "Bekijk matchdetails",
   "not_interested": "Niet geïnteresseerd",

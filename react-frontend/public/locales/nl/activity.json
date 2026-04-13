@@ -1,43 +1,43 @@
 {
   "meta": {
-    "title": "Activity Dashboard",
-    "description": "Your activity overview — hours, skills, connections, and recent actions."
+    "title": "Activiteiten Dashboard",
+    "description": "Jouw activiteitenoverzicht — uren, vaardigheden, connecties en recente acties."
   },
-  "page_title": "Activity Dashboard",
-  "page_subtitle": "Your community participation at a glance.",
-  "error_load_failed": "Failed to load activity dashboard",
-  "error_load_failed_detail": "Failed to load your activity data. Please try again.",
-  "unable_to_load": "Unable to load",
-  "try_again": "Try Again",
-  "loading": "Loading activity data...",
+  "page_title": "Activiteiten Dashboard",
+  "page_subtitle": "Jouw deelname aan de gemeenschap in één oogopslag.",
+  "error_load_failed": "Kon het activiteiten dashboard niet laden",
+  "error_load_failed_detail": "Kon je activiteitsgegevens niet laden. Probeer het opnieuw.",
+  "unable_to_load": "Niet in staat om te laden",
+  "try_again": "Probeer opnieuw",
+  "loading": "Activiteitsgegevens laden...",
   "refresh": "Refresh",
   "stats": {
-    "hours_given": "Hours Given",
-    "hours_received": "Hours Received",
+    "hours_given": "Uren Gegeven",
+    "hours_received": "Uren Ontvangen",
     "connections": "Connections",
     "exchanges": "Exchanges",
-    "pending_requests": "Pending Requests",
-    "transactions_given": "Transactions Given",
-    "transactions_received": "Transactions Received"
+    "pending_requests": "In behandeling zijnde verzoeken",
+    "transactions_given": "Transacties Gegeven",
+    "transactions_received": "Transacties Ontvangen"
   },
   "chart": {
     "given": "Given",
     "received": "Received",
-    "monthly_activity": "Monthly Activity",
-    "no_data": "No chart data available"
+    "monthly_activity": "Maandelijkse Activiteit",
+    "no_data": "Geen grafiekgegevens beschikbaar"
   },
-  "recent_activity": "Recent Activity",
-  "empty_title": "No recent activity",
-  "empty_description": "Start participating in your community to see your activity here.",
-  "quick_stats": "Quick Stats",
-  "groups_joined": "Groups Joined",
-  "posts_30d": "Posts (30d)",
-  "comments_30d": "Comments (30d)",
-  "likes_given_30d": "Likes Given (30d)",
-  "likes_received_30d": "Likes Received (30d)",
-  "net_balance": "Net Balance",
+  "recent_activity": "Recente Activiteit",
+  "empty_title": "Geen recente activiteit",
+  "empty_description": "Begin met deelnemen aan je gemeenschap om hier je activiteit te zien.",
+  "quick_stats": "Snelle Statistieken",
+  "groups_joined": "Groepen Gejoind",
+  "posts_30d": "Berichten (30d)",
+  "comments_30d": "Reacties (30d)",
+  "likes_given_30d": "Vind-ik-leuks Gegeven (30d)",
+  "likes_received_30d": "Vind-ik-leuks Ontvangen (30d)",
+  "net_balance": "Netto Saldo",
   "hours_suffix": "h",
-  "my_skills": "My Skills",
+  "my_skills": "Mijn Vaardigheden",
   "skill_offer": "Offer",
   "skill_request": "Request",
   "activity_types": {
@@ -50,6 +50,9 @@
     "post": "Post",
     "default": "Activity"
   },
-  "endorsements_count_one": "{{count}} endorsement",
-  "endorsements_count_other": "{{count}} endorsements"
+  "endorsements_count_one": "{{count}} goedkeuring",
+  "endorsements_count_other": "{{count}} goedkeuringen",
+  "page_meta": {
+    "title": "Activiteiten Dashboard"
+  }
 }

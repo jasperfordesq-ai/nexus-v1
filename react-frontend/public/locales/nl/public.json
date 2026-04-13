@@ -1,489 +1,505 @@
 {
   "home": {
-    "meta_description": "Exchange skills and services using time credits. Join our community-driven time banking platform.",
-    "meta_keywords": "time banking, skill exchange, community, volunteer, time credits",
-    "badge": "The Future of Time Banking",
-    "headline_1": "Exchange Skills,",
-    "headline_2": "Build Community",
-    "subheadline": "{{name}} is a modern time banking platform where every hour of service is valued equally. Trade your skills, earn time credits, and connect with your community.",
-    "cta_dashboard": "Go to Dashboard",
+    "meta_title": "Gemeenschaps Timebanking Platform",
+    "meta_description": "Ruil vaardigheden en diensten met tijdcredits. Sluit je aan bij ons door de gemeenschap aangedreven time banking platform.",
+    "meta_keywords": "time banking, vaardigheidsuitwisseling, gemeenschap, vrijwilligerswerk, tijdcredits",
+    "badge": "De Toekomst van Time Banking",
+    "headline_1": "Ruil Vaardigheden,",
+    "headline_2": "Bouw Gemeenschap",
+    "subheadline": "{{name}} is een modern time banking platform waar elk uur van dienstverlening gelijkwaardig wordt gewaardeerd. Ruil je vaardigheden, verdien tijdcredits en verbind met je gemeenschap.",
+    "cta_dashboard": "Ga naar Dashboard",
     "cta_feed": "Ga naar Feed",
-    "cta_get_started": "Get Started Free",
-    "cta_learn_more": "Learn More",
+    "cta_get_started": "Begin Gratis",
+    "cta_learn_more": "Leer Meer",
     "features": {
       "0": {
-        "title": "Time Credits",
-        "description": "Exchange skills using time as currency"
+        "title": "Tijdcredits",
+        "description": "Ruil vaardigheden met tijd als valuta"
       },
       "1": {
         "title": "Community",
-        "description": "Connect with local service providers"
+        "description": "Verbind met lokale dienstverleners"
       },
       "2": {
         "title": "Instant",
-        "description": "Quick and seamless transactions"
+        "description": "Snelle en naadloze transacties"
       }
     },
     "stats": {
-      "active_members": "Active Members",
-      "hours_exchanged": "Hours Exchanged",
-      "active_listings": "Active Listings",
+      "active_members": "Actieve Leden",
+      "hours_exchanged": "Uren Gewisseld",
+      "active_listings": "Actieve Lijsten",
       "communities": "Communities"
     },
-    "scroll_down": "Scroll down",
+    "scroll_down": "Scroll naar beneden",
     "how_it_works": {
-      "title": "How It Works",
-      "subtitle": "Get started in four simple steps",
+      "title": "Hoe Het Werkt",
+      "subtitle": "Begin in vier eenvoudige stappen",
       "steps": {
         "0": {
-          "title": "Sign Up Free",
-          "description": "Create your profile in minutes and list the skills you can offer."
+          "title": "Meld je Gratis Aan",
+          "description": "Maak je profiel in enkele minuten aan en vermeld de vaardigheden die je kunt aanbieden."
         },
         "1": {
-          "title": "Browse & Connect",
-          "description": "Find services you need and connect with local community members."
+          "title": "Blader & Verbind",
+          "description": "Vind de diensten die je nodig hebt en verbind met lokale gemeenschapsleden."
         },
         "2": {
-          "title": "Exchange Services",
-          "description": "Arrange skill exchanges and help each other out."
+          "title": "Ruil Diensten",
+          "description": "Regel vaardigheidsuitwisselingen en help elkaar."
         },
         "3": {
-          "title": "Earn Credits",
-          "description": "Get one time credit for every hour you give. Spend them freely."
+          "title": "Verdien Credits",
+          "description": "Krijg één tijdcredit voor elk uur dat je geeft. Besteed ze vrijelijk."
         }
       }
     },
     "why_timebanking": {
-      "title": "Why Time Banking?",
-      "subtitle": "The core principles that make our community work",
+      "title": "Waarom Time Banking?",
+      "subtitle": "De kernprincipes die onze gemeenschap laten werken",
       "values": {
         "0": {
-          "title": "Equal Value",
-          "description": "Every hour is worth the same. Whether you're teaching piano or mowing lawns, your time has equal value."
+          "title": "Gelijke Waarde",
+          "description": "Elke uur is evenveel waard. Of je nu piano lesgeeft of gras maait, jouw tijd heeft gelijke waarde."
         },
         "1": {
-          "title": "Build Trust",
-          "description": "Reviews and ratings help you find reliable service providers and build your reputation in the community."
+          "title": "Bouw Vertrouwen",
+          "description": "Beoordelingen en waarderingen helpen je betrouwbare dienstverleners te vinden en je reputatie in de gemeenschap op te bouwen."
         },
         "2": {
-          "title": "Stay Local",
-          "description": "Connect with neighbors and strengthen your local community through meaningful skill exchanges."
+          "title": "Blijf Lokaal",
+          "description": "Verbind met buren en versterk je lokale gemeenschap door middel van betekenisvolle vaardigheidsuitwisselingen."
         }
       }
     },
     "cta_section": {
-      "title": "Ready to get started?",
-      "description": "Join thousands of community members who are already exchanging skills and building meaningful connections.",
-      "button": "Create Your Free Account"
+      "title": "Klaar om te beginnen?",
+      "description": "Sluit je aan bij duizenden gemeenschapsleden die al vaardigheden uitwisselen en betekenisvolle verbindingen opbouwen.",
+      "button": "Maak Je Gratis Account Aan"
     }
   },
   "about": {
-    "meta_title": "About {{name}}",
-    "meta_description": "Learn about {{name}} — a time banking platform where communities exchange skills using time as currency.",
-    "hero_title": "About {{name}}",
-    "hero_description": "{{name}} is a modern time banking platform where every hour of service is valued equally. We help communities exchange skills, build trust, and create a fairer local economy — one hour at a time.",
+    "meta_title": "Over {{name}}",
+    "meta_description": "Leer over {{name}} — een tijdbankplatform waar gemeenschappen vaardigheden uitwisselen met tijd als valuta.",
+    "hero_title": "Over {{name}}",
+    "hero_description": "{{name}} is een modern tijdbankplatform waar elk uur van dienstverlening gelijk wordt gewaardeerd. We helpen gemeenschappen vaardigheden uit te wisselen, vertrouwen op te bouwen en een eerlijkere lokale economie te creëren — uur voor uur.",
     "how_it_works": {
-      "title": "How It Works",
-      "subtitle": "Getting started is simple. Four steps to join and begin exchanging skills in your community.",
+      "title": "Hoe Het Werkt",
+      "subtitle": "Aan de slag gaan is eenvoudig. Vier stappen om je aan te sluiten en vaardigheden in jouw gemeenschap uit te wisselen.",
       "steps": {
         "0": {
-          "title": "Create Your Profile",
-          "description": "Sign up for free and list the skills you can offer to your community."
+          "title": "Maak Je Profiel Aan",
+          "description": "Meld je gratis aan en vermeld de vaardigheden die je kunt aanbieden aan je gemeenschap."
         },
         "1": {
-          "title": "Find What You Need",
-          "description": "Browse listings to discover services offered by members near you."
+          "title": "Vind Wat Je Nodig Hebt",
+          "description": "Blader door aanbiedingen om diensten te ontdekken die door leden bij jou in de buurt worden aangeboden."
         },
         "2": {
-          "title": "Exchange Services",
-          "description": "Connect with members and arrange skill exchanges that work for both of you."
+          "title": "Diensten Uitwisselen",
+          "description": "Verbind met leden en regel vaardigheidsuitwisselingen die voor jullie beiden werken."
         },
         "3": {
-          "title": "Earn & Spend Credits",
-          "description": "Earn one time credit for every hour you give, and spend them on services you need."
+          "title": "Verdien & Besteed Credits",
+          "description": "Verdien één tijdcredit voor elk uur dat je geeft, en besteed ze aan de diensten die je nodig hebt."
         }
       }
     },
     "values": {
-      "title": "Our Values",
-      "subtitle": "The principles that guide everything we do at {{name}}.",
+      "title": "Onze Waarden",
+      "subtitle": "De principes die alles wat we doen bij {{name}} begeleiden.",
       "items": {
         "0": {
           "title": "Equality",
-          "description": "Every person's time is valued equally. One hour of gardening is worth the same as one hour of tutoring."
+          "description": "De tijd van elke persoon wordt gelijk gewaardeerd. Eén uur tuinieren is evenveel waard als één uur bijles geven."
         },
         "1": {
           "title": "Community",
-          "description": "We believe in building strong local connections. Every exchange strengthens the fabric of your neighbourhood."
+          "description": "We geloven in het opbouwen van sterke lokale verbindingen. Elke uitwisseling versterkt de basis van jouw buurt."
         },
         "2": {
-          "title": "Trust & Safety",
-          "description": "Reviews, ratings, and broker oversight ensure a safe environment for all members to participate."
+          "title": "Vertrouwen & Veiligheid",
+          "description": "Beoordelingen, waarderingen en toezicht van een broker zorgen voor een veilige omgeving voor alle leden om deel te nemen."
         },
         "3": {
           "title": "Sustainability",
-          "description": "By sharing skills locally, we reduce waste, support circular economies, and strengthen local resilience."
+          "description": "Door lokaal vaardigheden te delen, verminderen we afval, ondersteunen we circulaire economieën en versterken we de lokale veerkracht."
         }
       }
     },
     "stats": {
       "members": "Members",
-      "hours_exchanged": "Hours Exchanged",
-      "active_listings": "Active Listings",
+      "hours_exchanged": "Uren Uitgewisseld",
+      "active_listings": "Actieve Lijsten",
       "communities": "Communities"
     },
     "credits": {
-      "title": "Powered by Project NEXUS",
-      "subtitle": "Open-source community platform created by Jasper Ford. Licensed under AGPL v3.",
+      "title": "Aangedreven door Project NEXUS",
+      "subtitle": "Open-source communityplatform gemaakt door Jasper Ford. Gelicentieerd onder AGPL v3.",
       "creator": "Creator",
-      "founders_heading": "Founders of hOUR Timebank CLG",
+      "founders_heading": "Oprichters van hOUR Timebank CLG",
       "contributors": "Contributors",
-      "research_heading": "Research Foundation",
-      "research_description": "Informed by a social impact study commissioned by the {{name}}.",
+      "research_heading": "Onderzoeksstichting",
+      "research_description": "Geïnformeerd door een sociale impactstudie in opdracht van de {{name}}.",
       "acknowledgements": "Acknowledgements",
       "open_source": "Open Source",
-      "license_text": "Licensed under the GNU Affero General Public License v3 (AGPL-3.0).",
-      "v1_source": "V1 Source Code (PHP + React)",
-      "v2_source": "V2 Source Code (ASP.NET Core)"
+      "license_text": "Gelicentieerd onder de GNU Affero General Public License v3 (AGPL-3.0).",
+      "v1_source": "V1 Bronnencode (PHP + React)",
+      "v2_source": "V2 Bronnencode (ASP.NET Core)"
     },
     "cta": {
-      "title": "Ready to Get Involved?",
-      "description": "Whether you want to share your skills or find help with something, our community is here for you.",
-      "dashboard": "Go to Dashboard",
-      "join": "Join for Free",
-      "help_center": "Help Center",
-      "contact_us": "Contact Us"
+      "title": "Klaar om Betrokken te Raken?",
+      "description": "Of je nu je vaardigheden wilt delen of hulp zoekt met iets, onze community staat voor je klaar.",
+      "dashboard": "Ga naar Dashboard",
+      "join": "Word Gratis Lid",
+      "help_center": "Helpcentrum",
+      "contact_us": "Neem Contact met Ons Op"
     }
   },
   "contact": {
-    "title": "Contact Us",
-    "subtitle": "Have a question about {{name}}? We'd love to hear from you.",
-    "success_title": "Message Sent!",
-    "success_message": "We'll get back to you as soon as possible.",
-    "back_to_help": "Back to Help Center",
-    "error_fallback": "Failed to send message. Please try again.",
+    "meta_description": "Neem contact op met ons community-ondersteuningsteam. We zijn hier om te helpen.",
+    "title": "Neem Contact met Ons Op",
+    "subtitle": "Heb je een vraag over {{name}}? We horen graag van je.",
+    "success_title": "Bericht Verzonden!",
+    "success_message": "We nemen zo snel mogelijk contact met je op.",
+    "back_to_help": "Terug naar Helpcentrum",
+    "error_fallback": "Bericht verzenden mislukt. Probeer het opnieuw.",
     "form": {
       "name_label": "Name",
-      "name_placeholder": "Your name",
+      "name_placeholder": "Je naam",
       "email_label": "Email",
-      "email_placeholder": "you@example.com",
+      "email_placeholder": "je@example.com",
       "subject_label": "Subject",
-      "subject_placeholder": "What is this about?",
+      "subject_placeholder": "Waar gaat dit over?",
       "subjects": {
-        "general": "General Inquiry",
-        "account": "Account Help",
-        "technical": "Technical Issue",
-        "feedback": "Feedback / Suggestion",
+        "general": "Algemene Vraag",
+        "account": "Account Hulp",
+        "technical": "Technisch Probleem",
+        "feedback": "Feedback / Suggestie",
         "other": "Other"
       },
       "message_label": "Message",
-      "message_placeholder": "How can we help?",
-      "submit": "Send Message",
-      "login_prompt_before": "Already have an account?",
+      "message_placeholder": "Hoe kunnen we helpen?",
+      "submit": "Stuur Bericht",
+      "login_prompt_before": "Heb je al een account?",
       "login_link": "Log in",
-      "login_prompt_after": "for faster support."
+      "login_prompt_after": "voor snellere ondersteuning."
     }
   },
   "faq": {
-    "title": "Frequently Asked Questions",
-    "subtitle_before_link": "Can't find what you're looking for? Visit our",
-    "help_center_link": "Help Center",
-    "subtitle_after_link": "for detailed guides.",
-    "search_placeholder": "Search questions...",
-    "no_results": "No matching questions found. Try a different search term.",
-    "cta_title": "Still have questions?",
-    "cta_description": "Our support team is here to help.",
-    "cta_button": "Contact Support",
+    "page_title": "Veelgestelde Vragen",
+    "meta_description": "Vind antwoorden op veelvoorkomende vragen over timebanking, uitwisselingen en gemeenschapsfuncties.",
+    "title": "Veelgestelde Vragen",
+    "subtitle_before_link": "Kun je niet vinden wat je zoekt? Bezoek ons",
+    "help_center_link": "Helpcentrum",
+    "subtitle_after_link": "voor gedetailleerde handleidingen.",
+    "search_placeholder": "Zoek vragen...",
+    "no_results": "Geen overeenkomende vragen gevonden. Probeer een andere zoekterm.",
+    "cta_title": "Heb je nog vragen?",
+    "cta_description": "Ons ondersteuningsteam staat klaar om te helpen.",
+    "cta_button": "Neem contact op met Ondersteuning",
     "categories": {
       "getting_started": {
-        "title": "Getting Started",
+        "title": "Aan de Slag",
         "q1": {
-          "question": "What is time banking?",
-          "answer_p1": "Time banking is a community exchange system where one hour of help equals one time credit, regardless of the service provided. Whether you're teaching a language, helping with gardening, or providing tech support, your time is valued equally.",
-          "answer_p2": "It's a way to build community connections while exchanging skills and services without traditional money."
+          "question": "Wat is time banking?",
+          "answer_p1": "Time banking is een gemeenschapsuitwisselingssysteem waarbij één uur hulp gelijkstaat aan één tijdskrediet, ongeacht de geleverde dienst. Of je nu een taal leert, helpt met tuinieren of technische ondersteuning biedt, jouw tijd wordt gelijk gewaardeerd.",
+          "answer_p2": "Het is een manier om gemeenschapsverbindingen op te bouwen terwijl je vaardigheden en diensten uitwisselt zonder traditioneel geld."
         },
         "q2": {
-          "question": "Is it free to join?",
-          "answer_p1": "Yes! Membership is completely free. The only currency used is time credits, which you earn by helping others in the community.",
-          "answer_p2": "New members often receive a small number of starter credits to help them get started."
+          "question": "Is het gratis om lid te worden?",
+          "answer_p1": "Ja! Lidmaatschap is volledig gratis. De enige valuta die wordt gebruikt zijn tijdskredieten, die je verdient door anderen in de gemeenschap te helpen.",
+          "answer_p2": "Nieuwe leden ontvangen vaak een klein aantal startkredieten om hen op weg te helpen."
         },
         "q3": {
-          "question": "How do I get started?",
-          "answer_intro": "Here's how to begin:",
-          "step1_bold": "Complete your profile",
-          "step1_text": "Add a photo, bio, and your skills",
-          "step2_bold": "Browse the marketplace",
-          "step2_text": "See what services are offered and needed",
-          "step3_bold": "Post an offer",
-          "step3_text": "Share what you can help others with",
-          "step4_bold": "Make a request",
-          "step4_text": "Ask for something you need",
-          "step5_bold": "Connect with members",
-          "step5_text": "Build your network"
+          "question": "Hoe begin ik?",
+          "answer_intro": "Zo begin je:",
+          "step1_bold": "Voltooi je profiel",
+          "step1_text": "Voeg een foto, bio en je vaardigheden toe",
+          "step2_bold": "Blader door de marktplaats",
+          "step2_text": "Bekijk welke diensten worden aangeboden en nodig zijn",
+          "step3_bold": "Plaats een aanbod",
+          "step3_text": "Deel waarmee je anderen kunt helpen",
+          "step4_bold": "Doe een verzoek",
+          "step4_text": "Vraag om iets wat je nodig hebt",
+          "step5_bold": "Verbind met leden",
+          "step5_text": "Bouw je netwerk op"
         },
         "q4": {
-          "question": "What skills can I offer?",
-          "answer_intro": "Almost anything! Common offerings include:",
-          "skill1": "Home help (gardening, cleaning, minor repairs)",
-          "skill2": "Tech support (computer help, phone setup)",
-          "skill3": "Teaching (languages, music, academic subjects)",
-          "skill4": "Creative services (design, photography, writing)",
-          "skill5": "Transportation (rides, errands)",
-          "skill6": "Companionship (walks, visits, conversation)",
-          "skill7": "Professional skills (accounting, legal advice, etc.)",
-          "answer_outro": "Everyone has something valuable to offer!"
+          "question": "Welke vaardigheden kan ik aanbieden?",
+          "answer_intro": "Bijna alles! Veelvoorkomende aanbiedingen zijn:",
+          "skill1": "Hulp thuis (tuinieren, schoonmaken, kleine reparaties)",
+          "skill2": "Technische ondersteuning (computerhulp, telefooninstellingen)",
+          "skill3": "Onderwijs (talen, muziek, academische vakken)",
+          "skill4": "Creatieve diensten (ontwerp, fotografie, schrijven)",
+          "skill5": "Vervoer (ritten, boodschappen)",
+          "skill6": "Gezelschap (wandelen, bezoeken, gesprekken)",
+          "skill7": "Professionele vaardigheden (boekhouding, juridisch advies, enz.)",
+          "answer_outro": "Iedereen heeft iets waardevols te bieden!"
         }
       },
       "time_credits": {
-        "title": "Time Credits",
+        "title": "Tijdcredits",
         "q1": {
-          "question": "What is a time credit?",
-          "answer_p1": "One time credit equals one hour of service. It's the currency of our community.",
-          "answer_p2": "You can also exchange partial hours: 30 minutes = 0.5 credits, 15 minutes = 0.25 credits."
+          "question": "Wat is een tijdcredit?",
+          "answer_p1": "Één tijdcredit staat gelijk aan één uur dienstverlening. Het is de valuta van onze gemeenschap.",
+          "answer_p2": "Je kunt ook gedeeltelijke uren uitwisselen: 30 minuten = 0,5 credits, 15 minuten = 0,25 credits."
         },
         "q2": {
-          "question": "How do I earn time credits?",
-          "answer_intro": "You earn credits by:",
-          "way1_bold": "Providing services",
-          "way1_text": "to other members",
-          "way2_bold": "Logging volunteer hours",
-          "way2_text": "with approved organisations",
-          "way3_bold": "Receiving donations",
-          "way3_text": "from other members",
-          "way4_bold": "Starter credits",
-          "way4_text": "when you first join"
+          "question": "Hoe verdien ik tijdcredits?",
+          "answer_intro": "Je verdient credits door:",
+          "way1_bold": "Diensten te verlenen",
+          "way1_text": "aan andere leden",
+          "way2_bold": "Vrijwilligersuren te registreren",
+          "way2_text": "bij goedgekeurde organisaties",
+          "way3_bold": "Donaties te ontvangen",
+          "way3_text": "van andere leden",
+          "way4_bold": "Startcredits",
+          "way4_text": "wanneer je je voor het eerst aanmeldt"
         },
         "q3": {
-          "question": "Can I donate my credits?",
-          "answer_intro": "Yes! You can:",
-          "option1": "Transfer credits to any other member",
-          "option2": "Donate to the community pot (helps members who need extra support)",
-          "answer_link_before": "Go to your ",
+          "question": "Kan ik mijn credits doneren?",
+          "answer_intro": "Ja! Je kunt:",
+          "option1": "Credits overdragen naar een andere lid",
+          "option2": "Doneren aan de gemeenschapspot (helpt leden die extra ondersteuning nodig hebben)",
+          "answer_link_before": "Ga naar je ",
           "wallet_link": "Wallet",
-          "answer_link_after": " to send credits."
+          "answer_link_after": " om credits te versturen."
         },
         "q4": {
-          "question": "Can my balance go negative?",
-          "answer": "Some communities allow limited negative balances to help new members get started before they've had a chance to earn credits. Check with your community coordinator for the specific rules in your timebank."
+          "question": "Kan mijn saldo negatief worden?",
+          "answer": "Sommige gemeenschappen staan beperkte negatieve saldi toe om nieuwe leden te helpen beginnen voordat ze de kans hebben gehad om credits te verdienen. Controleer bij je gemeenschapscoördinator voor de specifieke regels in jouw tijdbank."
         },
         "q5": {
-          "question": "What if I sent credits to the wrong person?",
-          "answer_intro": "Transactions cannot be automatically reversed. If you made a mistake:",
-          "step1": "Contact the recipient and ask them to send the credits back",
-          "step2": "If you can't resolve it, contact support for assistance",
-          "answer_outro": "Always double-check the recipient before confirming a transfer."
+          "question": "Wat als ik credits naar de verkeerde persoon heb gestuurd?",
+          "answer_intro": "Transacties kunnen niet automatisch worden teruggedraaid. Als je een fout hebt gemaakt:",
+          "step1": "Neem contact op met de ontvanger en vraag hen om de credits terug te sturen",
+          "step2": "Als je het niet kunt oplossen, neem dan contact op met de ondersteuning voor hulp",
+          "answer_outro": "Controleer altijd de ontvanger voordat je een overdracht bevestigt."
         }
       },
       "exchanges_safety": {
-        "title": "Exchanges & Safety",
+        "title": "Wisselingen & Veiligheid",
         "q1": {
-          "question": "How do I arrange an exchange?",
-          "answer_intro": "The typical process is:",
-          "step1": "Find an offer or request that interests you",
-          "step2": "Message the member to discuss details",
-          "step3": "Agree on when, where, and estimated time",
-          "step4": "Meet and complete the exchange",
-          "step5": "The person who received help sends time credits",
-          "step6": "Leave a review for each other"
+          "question": "Hoe regel ik een wisseling?",
+          "answer_intro": "Het typische proces is:",
+          "step1": "Vind een aanbod of verzoek dat je interesseert",
+          "step2": "Stuur een bericht naar het lid om details te bespreken",
+          "step3": "Stem af wanneer, waar en de geschatte tijd",
+          "step4": "Ontmoet elkaar en voltooi de wisseling",
+          "step5": "De persoon die hulp heeft ontvangen, stuurt tijdcredits",
+          "step6": "Laat een beoordeling voor elkaar achter"
         },
         "q2": {
-          "question": "Is it safe to meet strangers?",
-          "answer_intro": "We recommend these safety practices:",
-          "tip1": "Meet in public places for first exchanges",
-          "tip2": "Check the member's profile and reviews",
-          "tip3": "Tell someone where you're going",
-          "tip4": "Trust your instincts — if something feels wrong, leave",
-          "tip5": "Start with smaller, low-risk exchanges",
-          "answer_outro": "Report any concerning behaviour to our support team."
+          "question": "Is het veilig om vreemden te ontmoeten?",
+          "answer_intro": "We raden deze veiligheidspraktijken aan:",
+          "tip1": "Ontmoet elkaar op openbare plaatsen voor de eerste wisselingen",
+          "tip2": "Controleer het profiel en de beoordelingen van het lid",
+          "tip3": "Vertel iemand waar je naartoe gaat",
+          "tip4": "Vertrouw op je instinct — als iets verkeerd aanvoelt, ga dan weg",
+          "tip5": "Begin met kleinere, laag-risico wisselingen",
+          "answer_outro": "Rapporteer verontrustend gedrag aan ons ondersteuningsteam."
         },
         "q3": {
-          "question": "What if someone doesn't show up or complete the service?",
-          "answer_intro": "Communication is key. If there's an issue:",
-          "step1": "Message the member to discuss what happened",
-          "step2": "Try to find a resolution together",
-          "step3": "If you can't resolve it, contact support",
-          "answer_outro": "Repeated no-shows or poor behaviour may result in account restrictions."
+          "question": "Wat als iemand niet op komt dagen of de service niet voltooit?",
+          "answer_intro": "Communicatie is de sleutel. Als er een probleem is:",
+          "step1": "Stuur een bericht naar het lid om te bespreken wat er is gebeurd",
+          "step2": "Probeer samen een oplossing te vinden",
+          "step3": "Als je het niet kunt oplossen, neem dan contact op met de ondersteuning",
+          "answer_outro": "Herhaalde no-shows of slecht gedrag kunnen leiden tot beperkingen op je account."
         },
         "q4": {
-          "question": "Are the services insured?",
-          "answer": "Exchanges are informal arrangements between community members. We don't provide insurance coverage for services. For higher-risk activities, discuss liability with the other member beforehand. Some members have their own professional insurance."
+          "question": "Zijn de diensten verzekerd?",
+          "answer": "Uitwisselingen zijn informele afspraken tussen leden van de gemeenschap. We bieden geen verzekeringsdekking voor diensten. Voor activiteiten met een hoger risico, bespreek aansprakelijkheid van tevoren met het andere lid. Sommige leden hebben hun eigen professionele verzekering."
         }
       },
       "badges_rewards": {
-        "title": "Badges & Rewards",
+        "title": "Badges & Beloningen",
         "q1": {
-          "question": "What are badges and XP?",
-          "answer_intro": "Our gamification system rewards community participation:",
-          "item1_bold": "XP (Experience Points)",
-          "item1_text": "Earned for various activities, helping you level up",
+          "question": "Wat zijn badges en XP?",
+          "answer_intro": "Ons gamificatiesysteem beloont deelname aan de gemeenschap:",
+          "item1_bold": "XP (Ervaringspunten)",
+          "item1_text": "Verdiend voor verschillende activiteiten, helpt je om te levelen",
           "item2_bold": "Badges",
-          "item2_text": "Achievements for reaching milestones (60+ to collect!)",
+          "item2_text": "Prestaties voor het bereiken van mijlpalen (60+ om te verzamelen!)",
           "item3_bold": "Levels",
-          "item3_text": "Progress from Newcomer to Timebank Legend",
+          "item3_text": "Vooruitgang van Nieuwkomer naar Tijdbank Legende",
           "item4_bold": "Streaks",
-          "item4_text": "Rewards for daily engagement"
+          "item4_text": "Beloningen voor dagelijkse betrokkenheid"
         },
         "q2": {
-          "question": "How do I earn XP?",
-          "answer_intro": "You earn XP for many activities:",
-          "activity1": "Sending/receiving time credits",
-          "activity2": "Creating listings",
-          "activity3": "Logging volunteer hours",
-          "activity4": "Attending events",
-          "activity5": "Making connections",
-          "activity6": "Daily logins",
-          "activity7": "Earning badges"
+          "question": "Hoe verdien ik XP?",
+          "answer_intro": "Je verdient XP voor veel activiteiten:",
+          "activity1": "Tijdcredits verzenden/ontvangen",
+          "activity2": "Lijsten maken",
+          "activity3": "Vrijwilligersuren registreren",
+          "activity4": "Evenementen bijwonen",
+          "activity5": "Verbindingen maken",
+          "activity6": "Dagelijkse inlog",
+          "activity7": "Badges verdienen"
         },
         "q3": {
-          "question": "Can I opt out of leaderboards?",
-          "answer_before_link": "Yes! If you prefer privacy, you can opt out of appearing on public leaderboards in your ",
+          "question": "Kan ik me afmelden voor ranglijsten?",
+          "answer_before_link": "Ja! Als je privacy verkiest, kun je je afmelden om op openbare ranglijsten te verschijnen in je ",
           "settings_link": "Settings",
-          "answer_after_link": ". You'll still earn XP and badges, they just won't be visible to others on the rankings."
+          "answer_after_link": ". Je verdient nog steeds XP en badges, ze zijn alleen niet zichtbaar voor anderen in de ranglijsten."
         }
       },
       "account_privacy": {
         "title": "Account & Privacy",
         "q1": {
-          "question": "How do I change my password?",
-          "answer_before_link": "Go to ",
+          "question": "Hoe wijzig ik mijn wachtwoord?",
+          "answer_before_link": "Ga naar ",
           "settings_link": "Settings",
-          "answer_after_link": " > Security to change your password. You'll need to enter your current password first. If you've forgotten your password, use the \"Forgot Password\" link on the login page."
+          "answer_after_link": " > Beveiliging om je wachtwoord te wijzigen. Je moet eerst je huidige wachtwoord invoeren. Als je je wachtwoord bent vergeten, gebruik dan de link \"Wachtwoord Vergeten\" op de inlogpagina."
         },
         "q2": {
-          "question": "Who can see my profile?",
-          "answer_intro": "By default, your profile is visible to other community members. You can control:",
-          "item1": "What contact information is displayed",
-          "item2": "Whether you appear on leaderboards",
-          "item3": "Your general location visibility",
-          "answer_link_before": "Adjust these in your ",
+          "question": "Wie kan mijn profiel zien?",
+          "answer_intro": "Standaard is je profiel zichtbaar voor andere leden van de gemeenschap. Je kunt het volgende beheren:",
+          "item1": "Welke contactinformatie wordt weergegeven",
+          "item2": "Of je op ranglijsten verschijnt",
+          "item3": "De zichtbaarheid van je algemene locatie",
+          "answer_link_before": "Pas deze aan in je ",
           "settings_link": "Settings",
           "answer_link_after": "."
         },
         "q3": {
-          "question": "How do I delete my account?",
-          "answer_intro": "If you wish to leave the community:",
-          "step1": "Go to Settings > Account",
-          "step2": "Click \"Delete Account\"",
-          "step3": "Confirm your decision",
-          "answer_outro": "Note: Your transaction history will be retained for record-keeping, but your personal information will be removed."
+          "question": "Hoe verwijder ik mijn account?",
+          "answer_intro": "Als je de gemeenschap wilt verlaten:",
+          "step1": "Ga naar Instellingen > Account",
+          "step2": "Klik op \"Account Verwijderen\"",
+          "step3": "Bevestig je beslissing",
+          "answer_outro": "Opmerking: Je transactiegeschiedenis wordt bewaard voor administratieve doeleinden, maar je persoonlijke informatie wordt verwijderd."
         },
         "q4": {
-          "question": "How is my data protected?",
-          "answer_intro": "We take privacy seriously:",
-          "item1": "Your data is encrypted and securely stored",
-          "item2": "We never sell your information",
-          "item3": "You can request a copy of your data at any time",
-          "item4": "We comply with GDPR and data protection regulations"
+          "question": "Hoe wordt mijn data beschermd?",
+          "answer_intro": "We nemen privacy serieus:",
+          "item1": "Je gegevens zijn versleuteld en veilig opgeslagen",
+          "item2": "We verkopen je informatie nooit",
+          "item3": "Je kunt op elk moment een kopie van je gegevens aanvragen",
+          "item4": "We voldoen aan de AVG en gegevensbeschermingsregels"
         }
       }
     }
   },
   "maintenance": {
-    "title": "We'll be back soon!",
-    "description": "is currently undergoing scheduled maintenance to improve your experience.",
-    "apology": "We apologize for any inconvenience. Please check back in a little while.",
-    "thanks": "Thank you for your patience!",
-    "admin_login": "Admin Login",
-    "deploy_notice": "This platform is still being actively built, so there may be phases of rapid deployments. During these times, the server automatically enters maintenance mode. This normally only lasts about five minutes while new changes are being applied."
+    "title": "We zijn snel terug!",
+    "description": "ondergaat momenteel geplande onderhoudswerkzaamheden om je ervaring te verbeteren.",
+    "apology": "Onze excuses voor het ongemak. Kijk over een tijdje weer terug.",
+    "thanks": "Bedankt voor je geduld!",
+    "admin_login": "Admin Inloggen",
+    "deploy_notice": "Dit platform wordt nog actief gebouwd, dus er kunnen fasen van snelle implementaties zijn. Tijdens deze tijden gaat de server automatisch in onderhoudsmodus. Dit duurt normaal gesproken slechts ongeveer vijf minuten terwijl nieuwe wijzigingen worden toegepast."
   },
   "dev_status": {
-    "title": "Development status: {{stage}}",
+    "title": "Ontwikkelingsstatus: {{stage}}",
     "where_we_are": {
-      "title": "Where we are now",
-      "paragraph1": "This platform was born in the middle of December 2025, with development beginning around 15/12/2025.",
-      "paragraph2": "It grew quickly in a short space of time. By around 15/02/2026, much of the earlier work on both the front end and the back end had been intentionally scrapped and rewritten so the platform could be rebuilt on stronger foundations.",
-      "paragraph3": "Around 24/02/2026, we decided to rewrite the front end in React. The front end is the part people see and interact with — a bit like the body of the platform. We made that change to create a cleaner and more flexible user experience built on reusable components, improve responsiveness across devices — especially on mobile — and make the interface easier to improve and maintain as the platform grows.",
-      "paragraph4": "Around 17/03/2026, we decided to rewrite the back end in Laravel. The back end is the part working behind the scenes — a bit like the brain of the platform. We made that change to give the platform a stronger and more maintainable foundation, with better structure for authentication, validation, background processing, caching, and long-term developer productivity.",
+      "title": "Waar we nu zijn",
+      "paragraph1": "Dit platform is ontstaan in het midden van december 2025, met de ontwikkeling die begon rond 15/12/2025.",
+      "paragraph2": "Het groeide snel in een korte tijd. Rond 15/02/2026 was veel van het eerdere werk aan zowel de voorkant als de achterkant opzettelijk geschrapt en herschreven, zodat het platform op sterkere fundamenten kon worden herbouwd.",
+      "paragraph3": "Rond 24/02/2026 besloten we de voorkant in React te herschrijven. De voorkant is het deel dat mensen zien en mee omgaan — een beetje zoals het lichaam van het platform. We maakten die wijziging om een schonere en flexibelere gebruikerservaring te creëren, gebouwd op herbruikbare componenten, de responsiviteit op verschillende apparaten te verbeteren — vooral op mobiel — en de interface gemakkelijker te maken om te verbeteren en onderhouden naarmate het platform groeit.",
+      "paragraph4": "Rond 17/03/2026 besloten we de achterkant in Laravel te herschrijven. De achterkant is het deel dat achter de schermen werkt — een beetje zoals de hersenen van het platform. We maakten die wijziging om het platform een sterker en beter onderhoudbaar fundament te geven, met een betere structuur voor authenticatie, validatie, achtergrondverwerking, caching en langdurige ontwikkelaarsproductiviteit.",
       "paragraph5": "As of 24/03/2026, this remains a very new platform that is evolving quickly. Most core functionality is already in place, but some parts are still being refined as the new front end and new back end are connected together and polished.",
-      "paragraph6": "We are also working on a dedicated mobile phone app in the background, which should be available soon."
+      "paragraph6": "We werken ook aan een speciale mobiele app op de achtergrond, die binnenkort beschikbaar zou moeten zijn."
     },
     "whats_stable": {
-      "title": "What's stable and working",
-      "core_title": "Core platform",
-      "core_item1": "Member registration, login, two-factor auth (TOTP + WebAuthn), guided onboarding",
-      "core_item2": "Time credit wallet — earning, spending, transfers, broker controls, and full transaction history",
-      "core_item3": "Multi-tenant architecture — unlimited communities, each with isolated data and custom branding",
-      "core_item4": "Exchange workflow — structured service exchange lifecycle with broker approval",
-      "core_item5": "Federation — cross-community exchange, shared listings, events, and messaging across connected platforms",
-      "core_item6": "Progressive Web App — installable on any device, works offline",
-      "member_title": "Member experience",
+      "title": "Wat stabiel en werkend is",
+      "core_title": "Kernplatform",
+      "core_item1": "Lidregistratie, inloggen, twee-factor authenticatie (TOTP + WebAuthn), begeleide onboarding",
+      "core_item2": "Tijd krediet portemonnee — verdienen, uitgeven, overboekingen, brokercontroles en volledige transactiegeschiedenis",
+      "core_item3": "Multi-tenant architectuur — onbeperkte gemeenschappen, elk met geïsoleerde gegevens en aangepaste branding",
+      "core_item4": "Wisselwerkstroom — gestructureerde servicewisselcyclus met goedkeuring van de broker",
+      "core_item5": "Federatie — uitwisseling tussen gemeenschappen, gedeelde lijsten, evenementen en berichten over verbonden platforms",
+      "core_item6": "Progressieve Web App — installeerbaar op elk apparaat, werkt offline",
+      "member_title": "Ledenervaring",
       "member_item1": "Service marketplace — post offers and requests, browse and smart-match listings",
-      "member_item2": "Social feed — posts, comments, likes, polls, hashtags, and voice messages",
-      "member_item3": "Messaging — direct conversations with read receipts and real-time updates",
-      "member_item4": "Events — creating, discovering, RSVPs, and calendar export",
-      "member_item5": "Groups — community sub-groups with discussions, roles, and moderation",
-      "member_item6": "Group exchanges — bulk community service exchanges",
-      "member_item7": "Members directory — browse, filter, and discover people",
-      "member_item8": "Connections — follow and connect with community members",
-      "member_item9": "Reviews and ratings — build trust through member feedback",
-      "member_item10": "Endorsements — peer skill and experience endorsements",
-      "member_item11": "Polls — community voting and surveys",
-      "member_item12": "Skills browse — explore skill taxonomy and discover expertise",
+      "member_item2": "Sociale feed — berichten, opmerkingen, likes, peilingen, hashtags en spraakberichten",
+      "member_item3": "Berichten — directe gesprekken met leesbevestigingen en realtime updates",
+      "member_item4": "Evenementen — creëren, ontdekken, RSVPs en kalenderexport",
+      "member_item5": "Groepen — subgroepen binnen de gemeenschap met discussies, rollen en moderatie",
+      "member_item6": "Groepswisselingen — bulk gemeenschapsdienstwisselingen",
+      "member_item7": "Ledenregister — bladeren, filteren en mensen ontdekken",
+      "member_item8": "Verbondenheid — volg en verbind met leden van de gemeenschap",
+      "member_item9": "Beoordelingen en waarderingen — bouw vertrouwen op door feedback van leden",
+      "member_item10": "Aanbevelingen — peer vaardigheden en ervaring aanbevelingen",
+      "member_item11": "Peilingen — gemeenschapsstemmen en enquêtes",
+      "member_item12": "Vaardigheden bladeren — verken vaardigheidstaxonomie en ontdek expertise",
       "member_item13": "Volunteering — opportunities, shifts, applications, and hours logging",
-      "member_item14": "Job vacancies — full recruitment module with alerts and analytics",
-      "member_item15": "Organisations — company and employer profiles with sub-accounts",
-      "member_item16": "Goals and impact — personal goals, mentoring, and community impact tracking",
-      "member_item17": "Ideation challenges — innovation hub with campaigns, ideas, voting, and outcomes",
+      "member_item14": "Vacatures — volledig wervingsmodule met meldingen en analyses",
+      "member_item15": "Organisaties — bedrijfs- en werkgeversprofielen met sub-accounts",
+      "member_item16": "Doelen en impact — persoonlijke doelen, mentoring en tracking van gemeenschapsimpact",
+      "member_item17": "Ideeënuitdagingen — innovatiehub met campagnes, ideeën, stemmen en resultaten",
       "member_item18": "Achievements and gamification — XP, badges, challenges, streaks, leaderboard, and Nexus Score",
-      "member_item19": "Personal insights — individual engagement metrics and personalised recommendations",
-      "content_title": "Content and communication",
-      "content_item1": "Blog — tenant content management and community news",
-      "content_item2": "Resources and knowledge base — structured articles and shared resource library",
-      "content_item3": "Help center — documentation hub and FAQ",
+      "member_item19": "Persoonlijke inzichten — individuele betrokkenheidsstatistieken en gepersonaliseerde aanbevelingen",
+      "member_item20": "Marktplaats — zelfstandige advertentiesmodule met Stripe Connect uitbetalingen, bestellingen en verkopersprofielen",
+      "member_item21": "Donaties — eenmalige en terugkerende donaties via Stripe met organisatie dashboards en ontvangstbewijzen",
+      "member_item22": "Identiteitsverificatie — optionele Stripe Identiteitsflow (document + selfie + naam/geboortedatum matching) met een geverifieerd-lid badge",
+      "member_item23": "AI antwoordsuggesties — in-marktplaats assistent die antwoorden op vragen over aanbiedingen opstelt",
+      "content_title": "Inhoud en communicatie",
+      "content_item1": "Blog — contentbeheer voor huurders en community nieuws",
+      "content_item2": "Hulpmiddelen en kennisbank — gestructureerde artikelen en gedeelde bronnenbibliotheek",
+      "content_item3": "Helpcentrum — documentatiehub en FAQ",
       "content_item4": "Newsletter system — email campaigns with smart segments, templates, and send-time optimisation",
-      "content_item5": "AI Chat — AI-powered assistant for platform guidance",
-      "content_item6": "Custom pages — tenant-managed CMS pages",
-      "content_item7": "Legal hub — versioned legal documents with acceptance gates and audit trail",
-      "platform_title": "Platform and security",
+      "content_item5": "AI Chat — AI-gestuurde assistent voor platform begeleiding",
+      "content_item6": "Aangepaste pagina's — door huurders beheerde CMS-pagina's",
+      "content_item7": "Juridische hub — versiebeheer van juridische documenten met acceptatiepoorten en audittrail",
+      "platform_title": "Platform en beveiliging",
       "platform_item1": "Enterprise security — CSRF, rate limiting, TOTP 2FA, and WebAuthn passwordless auth",
-      "platform_item2": "GDPR compliance — data requests, consent management, breach tracking, and audit log",
-      "platform_item3": "Fraud and abuse detection — automated suspicious activity alerts and content moderation",
-      "platform_item4": "WCAG 2.1 AA accessibility compliance",
+      "platform_item2": "GDPR-naleving — gegevensverzoeken, toestemmingsbeheer, inbreuktracking en auditlog",
+      "platform_item3": "Fraude- en misbruikdetectie — geautomatiseerde waarschuwingen voor verdachte activiteiten en inhoudsmoderatie",
+      "platform_item4": "WCAG 2.1 AA toegankelijkheidsnaleving",
       "platform_item5": "7 languages — English, Irish, German, French, Italian, Portuguese, and Spanish",
-      "platform_item6": "Admin panel — tenant configuration, user management, analytics, and moderation",
-      "platform_item7": "Algorithm controls — live health dashboard and tuning for all ranking systems",
-      "platform_item8": "Dark mode and mobile-responsive UI"
+      "platform_item6": "Beheerderspaneel — configuratie voor huurders, gebruikersbeheer, analytics en moderatie",
+      "platform_item7": "Algoritmecontroles — live gezondheidsdashboard en afstemming voor alle rangschikkingssystemen",
+      "platform_item8": "Donkere modus en mobiel-responsieve UI",
+      "platform_item9": "SEO tijdens de bouw — 19+ openbare pagina's vooraf gerenderd met Playwright, gestructureerde gegevens, sitemaps en Prerender.io fallback voor dynamische routes",
+      "platform_item10": "Federatie — vier protocoladapters live: Nexus (native), Komunitin (alle 15 eindpunten), Credit Commons (11 eindpunten, CEN-compatibele wederzijdse krediet) en TimeOverflow; tweerichtingssync over 9 entiteitstypen, gebeurtenisgestuurde push en reputatieportabiliteit",
+      "platform_item11": "Betalingslaag — Stripe voor abonnementen, donaties, marktplaats (Connect) en identiteitsverificatie, met idempotente webhookverwerking"
     },
     "whats_rough": {
-      "title": "What may still be rough",
+      "title": "Wat nog ruw kan zijn",
       "item1": "Federation (cross-community) features — functional but still accumulating real-world edge cases",
-      "item2": "AI Chat assistant — depends on external AI providers; response quality varies by configuration",
-      "item3": "Nexus Score breakdown — newly launched; scoring weights may be adjusted as usage data grows",
-      "item4": "Smart feed ranking — EdgeRank algorithm is live but cold-start behaviour for new members is still being tuned",
-      "item5": "Push notifications (mobile) — may have delivery delays on some devices or browsers",
-      "item6": "Non-English translations — AI-generated and not yet reviewed by native speakers"
+      "item2": "AI Chat-assistent — afhankelijk van externe AI-leveranciers; de kwaliteit van de reacties varieert per configuratie",
+      "item3": "Nexus Score uitsplitsing — nieuw gelanceerd; scoringsgewichten kunnen worden aangepast naarmate het gebruiksdata groeit",
+      "item4": "Slimme feedrangschikking — EdgeRank-algoritme is live, maar het koude-startgedrag voor nieuwe leden wordt nog afgestemd",
+      "item5": "Pushmeldingen (mobiel) — kunnen vertragingen in de levering hebben op sommige apparaten of browsers",
+      "item6": "Niet-Engelse vertalingen — AI-gegenereerd en nog niet beoordeeld door moedertaalsprekers"
     },
     "how_we_catch_bugs": {
-      "title": "How we catch bugs",
-      "intro": "We use a multi-layer approach to catch and fix issues quickly:",
-      "method1_bold": "Automated tests",
+      "title": "Hoe we bugs vangen",
+      "intro": "We gebruiken een gelaagde aanpak om problemen snel te vangen en op te lossen:",
+      "method1_bold": "Geautomatiseerde tests",
       "method1_text": "250+ PHP unit/integration tests and React component tests run on every commit",
-      "method2_bold": "Sentry error tracking",
-      "method2_text": "exceptions on both frontend and backend are captured in real time",
-      "method3_bold": "Cloudflare analytics",
-      "method3_text": "traffic anomalies and error spikes are monitored continuously",
-      "method4_bold": "Manual QA",
-      "method4_text": "core user journeys are tested across multiple tenant configurations before each deployment",
-      "method5_bold": "Community testing",
-      "method5_text": "real members across multiple active communities help us surface edge cases in production"
+      "method2_bold": "Sentry fouttracking",
+      "method2_text": "uitzonderingen op zowel de frontend als de backend worden in realtime vastgelegd",
+      "method3_bold": "Cloudflare-analyse",
+      "method3_text": "verkeersanomalieën en foutpieken worden continu gemonitord",
+      "method4_bold": "Handmatige QA",
+      "method4_text": "kerngebruikersreizen worden getest op meerdere huurderconfiguraties vóór elke implementatie",
+      "method5_bold": "Gemeenschapstests",
+      "method5_text": "echte leden uit meerdere actieve gemeenschappen helpen ons om randgevallen in productie aan het licht te brengen"
     },
     "how_to_help": {
-      "title": "How to help",
-      "report_bug_title": "Report a bug",
-      "report_bug_description": "Found something broken? Please open an issue on GitHub — it's the fastest way to get a fix in front of us. Include what you were doing, what you expected, and what actually happened.",
-      "github_link": "Open an issue on GitHub",
-      "become_tester_title": "Bring your community onto NEXUS",
-      "become_tester_description": "If you run a timebank or community network and want to join the platform, we'd love to work with you. Reach out via GitHub Discussions or the contact page — we support communities of all sizes."
+      "title": "Hoe te helpen",
+      "report_bug_title": "Rapporteer een bug",
+      "report_bug_description": "Iets kapot gevonden? Open alsjeblieft een probleem op GitHub — het is de snelste manier om een oplossing voor ons te krijgen. Vermeld wat je aan het doen was, wat je verwachtte en wat er daadwerkelijk gebeurde.",
+      "github_link": "Open een probleem op GitHub",
+      "become_tester_title": "Breng je gemeenschap naar NEXUS",
+      "become_tester_description": "Als je een tijdbank of gemeenschapsnetwerk runt en je wilt je bij het platform aansluiten, werken we graag met je samen. Neem contact met ons op via GitHub Discussions of de contactpagina — we ondersteunen gemeenschappen van alle groottes."
     },
     "security": {
-      "title": "Security disclosure",
-      "description_before_email": "If you discover a security vulnerability, please do not open a public issue. Instead, contact us confidentially at",
-      "description_after_email": ". We will respond within 72 hours and work with you on responsible disclosure."
+      "title": "Beveiligingsmelding",
+      "description_before_email": "Als je een beveiligingskwetsbaarheid ontdekt, open dan alsjeblieft geen openbaar probleem. Neem in plaats daarvan vertrouwelijk contact met ons op via",
+      "description_after_email": ". We zullen binnen 72 uur reageren en met je samenwerken aan een verantwoordelijke openbaarmaking."
     }
   },
   "kb": {
-    "title": "Knowledge Base",
-    "description": "Find answers, guides, and helpful resources",
-    "search_placeholder": "Search the knowledge base..."
+    "title": "Kennisbank",
+    "description": "Vind antwoorden, handleidingen en nuttige bronnen",
+    "search_placeholder": "Zoek in de kennisbank..."
+  },
+  "page_meta": {
+    "development_status": {
+      "title": "Ontwikkelingsstatus"
+    }
   }
 }

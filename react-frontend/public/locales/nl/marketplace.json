@@ -395,7 +395,7 @@
     "breadcrumb": "Kaart Zoekopdracht",
     "search_placeholder": "Zoek naar vermeldingen in de buurt...",
     "radius_label": "Zoekradius",
-    "radius_chip": "{{km}} km radius",
+    "radius_chip": "{{km}} km straal",
     "results_count": "{{count}} vermeldingen gevonden in de buurt",
     "map_view": "Kaartweergave",
     "list_view": "Lijstweergave",
@@ -443,7 +443,7 @@
   "orders": {
     "load_error": "Kon bestellingen niet laden",
     "action_error": "Actie mislukt",
-    "tracking_number": "Tracking:",
+    "tracking_number": "Volgen:",
     "tab_cancelled": "Geannuleerd / Terugbetaald",
     "status": {
       "pending_payment": "In afwachting van betaling"

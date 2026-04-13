@@ -1,43 +1,43 @@
 {
   "meta": {
-    "title": "Activity Dashboard",
-    "description": "Your activity overview — hours, skills, connections, and recent actions."
+    "title": "لوحة نشاط",
+    "description": "نظرة عامة على نشاطك — الساعات، المهارات، الروابط، والإجراءات الأخيرة."
   },
-  "page_title": "Activity Dashboard",
-  "page_subtitle": "Your community participation at a glance.",
-  "error_load_failed": "Failed to load activity dashboard",
-  "error_load_failed_detail": "Failed to load your activity data. Please try again.",
-  "unable_to_load": "Unable to load",
-  "try_again": "Try Again",
-  "loading": "Loading activity data...",
+  "page_title": "لوحة نشاط",
+  "page_subtitle": "مشاركتك في المجتمع في لمحة.",
+  "error_load_failed": "فشل في تحميل لوحة النشاط",
+  "error_load_failed_detail": "فشل في تحميل بيانات نشاطك. يرجى المحاولة مرة أخرى.",
+  "unable_to_load": "غير قادر على التحميل",
+  "try_again": "حاول مرة أخرى",
+  "loading": "جارٍ تحميل بيانات النشاط...",
   "refresh": "Refresh",
   "stats": {
-    "hours_given": "Hours Given",
-    "hours_received": "Hours Received",
+    "hours_given": "الساعات المقدمة",
+    "hours_received": "الساعات المستلمة",
     "connections": "Connections",
     "exchanges": "Exchanges",
-    "pending_requests": "Pending Requests",
-    "transactions_given": "Transactions Given",
-    "transactions_received": "Transactions Received"
+    "pending_requests": "طلبات معلقة",
+    "transactions_given": "المعاملات المقدمة",
+    "transactions_received": "المعاملات المستلمة"
   },
   "chart": {
     "given": "Given",
     "received": "Received",
-    "monthly_activity": "Monthly Activity",
-    "no_data": "No chart data available"
+    "monthly_activity": "النشاط الشهري",
+    "no_data": "لا توجد بيانات رسم بياني متاحة"
   },
-  "recent_activity": "Recent Activity",
-  "empty_title": "No recent activity",
-  "empty_description": "Start participating in your community to see your activity here.",
-  "quick_stats": "Quick Stats",
-  "groups_joined": "Groups Joined",
-  "posts_30d": "Posts (30d)",
-  "comments_30d": "Comments (30d)",
-  "likes_given_30d": "Likes Given (30d)",
-  "likes_received_30d": "Likes Received (30d)",
-  "net_balance": "Net Balance",
+  "recent_activity": "النشاط الأخير",
+  "empty_title": "لا توجد نشاطات حديثة",
+  "empty_description": "ابدأ بالمشاركة في مجتمعك لرؤية نشاطك هنا.",
+  "quick_stats": "إحصائيات سريعة",
+  "groups_joined": "المجموعات المنضمة",
+  "posts_30d": "المنشورات (30 يوم)",
+  "comments_30d": "التعليقات (30 يوم)",
+  "likes_given_30d": "الإعجابات المقدمة (30 يوم)",
+  "likes_received_30d": "الإعجابات المستلمة (30 يوم)",
+  "net_balance": "الرصيد الصافي",
   "hours_suffix": "h",
-  "my_skills": "My Skills",
+  "my_skills": "مهاراتي",
   "skill_offer": "Offer",
   "skill_request": "Request",
   "activity_types": {
@@ -50,6 +50,9 @@
     "post": "Post",
     "default": "Activity"
   },
-  "endorsements_count_one": "{{count}} endorsement",
-  "endorsements_count_other": "{{count}} endorsements"
+  "endorsements_count_one": "{{count}} تأييد",
+  "endorsements_count_other": "{{count}} تأييدات",
+  "page_meta": {
+    "title": "لوحة نشاط"
+  }
 }

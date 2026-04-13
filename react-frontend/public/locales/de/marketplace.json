@@ -152,7 +152,7 @@
     "listings_count_other": "{{count}} Angebote",
     "search_placeholder": "Suche in {{name}}...",
     "price_range": "Preisspanne",
-    "category_details": "{{name}} Details",
+    "category_details": "{{name}} Einzelheiten",
     "reset_filters": "Filter zurücksetzen ({{count}})",
     "no_listings_title": "Keine Angebote gefunden",
     "no_listings_filtered": "Versuche, deine Suche oder Filter anzupassen.",

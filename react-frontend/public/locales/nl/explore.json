@@ -36,7 +36,7 @@
     "level": "Lv.{{level}}"
   },
   "trending_hashtags": {
-    "title": "Trending Hashtags",
+    "title": "Populaire hashtags",
     "subtitle": "Populaire onderwerpen in jouw gemeenschap"
   },
   "recommended": {
@@ -134,7 +134,7 @@
     "subtitle": "Items die je recent hebt bekeken",
     "clear": "Clear"
   },
-  "match_score": "{{score}}% match",
+  "match_score": "{{score}}% overeenkomst",
   "dismiss": "Niet geïnteresseerd",
   "dismiss_reasons": {
     "not_relevant": "Niet relevant",

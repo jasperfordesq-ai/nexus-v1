@@ -44,7 +44,7 @@
     "col_last_active": "Dernière activité",
     "view_profile": "Voir le profil",
     "send_message": "Envoyer un message",
-    "notes_for": "Notes — {{name}}",
+    "notes_for": "Remarques — {{name}}",
     "note_placeholder": "Ajouter une note sur ce membre...",
     "note_added": "Note ajoutée.",
     "no_notes": "Aucune note pour ce membre pour le moment.",

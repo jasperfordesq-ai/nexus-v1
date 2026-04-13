@@ -453,12 +453,12 @@
     "online": "Online"
   },
   "partners": {
-    "level_prefix": "Level {{level}}",
+    "level_prefix": "Stufe {{level}}",
     "permission_groups": "Gruppenmitgliedschaft"
   },
   "partner_detail": {
     "federation_partner_badge": "Föderationspartner",
-    "level_prefix": "Level {{level}}",
+    "level_prefix": "Stufe {{level}}",
     "permission_groups": "Gruppenmitgliedschaft"
   },
   "member_profile": {

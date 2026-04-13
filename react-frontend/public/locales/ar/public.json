@@ -1,489 +1,505 @@
 {
   "home": {
-    "meta_description": "Exchange skills and services using time credits. Join our community-driven time banking platform.",
-    "meta_keywords": "time banking, skill exchange, community, volunteer, time credits",
-    "badge": "The Future of Time Banking",
-    "headline_1": "Exchange Skills,",
-    "headline_2": "Build Community",
-    "subheadline": "{{name}} is a modern time banking platform where every hour of service is valued equally. Trade your skills, earn time credits, and connect with your community.",
-    "cta_dashboard": "Go to Dashboard",
+    "meta_title": "منصة تبادل الوقت المجتمعية",
+    "meta_description": "تبادل المهارات والخدمات باستخدام أرصدة الوقت. انضم إلى منصتنا المجتمعية المدفوعة بالوقت.",
+    "meta_keywords": "تبادل الوقت، تبادل المهارات، المجتمع، التطوع، أرصدة الوقت",
+    "badge": "مستقبل تبادل الوقت",
+    "headline_1": "تبادل المهارات،",
+    "headline_2": "بناء المجتمع",
+    "subheadline": "{{name}} هي منصة حديثة لتبادل الوقت حيث يتم تقييم كل ساعة خدمة بالتساوي. تبادل مهاراتك، احصل على أرصدة الوقت، وتواصل مع مجتمعك.",
+    "cta_dashboard": "اذهب إلى لوحة التحكم",
     "cta_feed": "انتقل إلى الخلاصة",
-    "cta_get_started": "Get Started Free",
-    "cta_learn_more": "Learn More",
+    "cta_get_started": "ابدأ مجانًا",
+    "cta_learn_more": "تعلم المزيد",
     "features": {
       "0": {
-        "title": "Time Credits",
-        "description": "Exchange skills using time as currency"
+        "title": "أرصدة الوقت",
+        "description": "تبادل المهارات باستخدام الوقت كعملة"
       },
       "1": {
         "title": "Community",
-        "description": "Connect with local service providers"
+        "description": "تواصل مع مقدمي الخدمات المحليين"
       },
       "2": {
         "title": "Instant",
-        "description": "Quick and seamless transactions"
+        "description": "معاملات سريعة وسلسة"
       }
     },
     "stats": {
-      "active_members": "Active Members",
-      "hours_exchanged": "Hours Exchanged",
-      "active_listings": "Active Listings",
+      "active_members": "أعضاء نشطون",
+      "hours_exchanged": "الساعات المتبادلة",
+      "active_listings": "قوائم نشطة",
       "communities": "Communities"
     },
-    "scroll_down": "Scroll down",
+    "scroll_down": "قم بالتمرير لأسفل",
     "how_it_works": {
-      "title": "How It Works",
-      "subtitle": "Get started in four simple steps",
+      "title": "كيف يعمل",
+      "subtitle": "ابدأ في أربع خطوات بسيطة",
       "steps": {
         "0": {
-          "title": "Sign Up Free",
-          "description": "Create your profile in minutes and list the skills you can offer."
+          "title": "سجل مجانًا",
+          "description": "أنشئ ملفك الشخصي في دقائق وقم بإدراج المهارات التي يمكنك تقديمها."
         },
         "1": {
-          "title": "Browse & Connect",
-          "description": "Find services you need and connect with local community members."
+          "title": "تصفح وتواصل",
+          "description": "ابحث عن الخدمات التي تحتاجها وتواصل مع أعضاء المجتمع المحلي."
         },
         "2": {
-          "title": "Exchange Services",
-          "description": "Arrange skill exchanges and help each other out."
+          "title": "تبادل الخدمات",
+          "description": "نظم تبادل المهارات وساعدوا بعضكم البعض."
         },
         "3": {
-          "title": "Earn Credits",
-          "description": "Get one time credit for every hour you give. Spend them freely."
+          "title": "احصل على أرصدة",
+          "description": "احصل على رصيد وقت واحد مقابل كل ساعة تقدمها. أنفقها بحرية."
         }
       }
     },
     "why_timebanking": {
-      "title": "Why Time Banking?",
-      "subtitle": "The core principles that make our community work",
+      "title": "لماذا تبادل الوقت؟",
+      "subtitle": "المبادئ الأساسية التي تجعل مجتمعنا يعمل",
       "values": {
         "0": {
-          "title": "Equal Value",
-          "description": "Every hour is worth the same. Whether you're teaching piano or mowing lawns, your time has equal value."
+          "title": "قيمة متساوية",
+          "description": "كل ساعة لها نفس القيمة. سواء كنت تعلم العزف على البيانو أو تقص العشب، وقتك له قيمة متساوية."
         },
         "1": {
-          "title": "Build Trust",
-          "description": "Reviews and ratings help you find reliable service providers and build your reputation in the community."
+          "title": "بناء الثقة",
+          "description": "المراجعات والتقييمات تساعدك في العثور على مقدمي خدمات موثوقين وبناء سمعتك في المجتمع."
         },
         "2": {
-          "title": "Stay Local",
-          "description": "Connect with neighbors and strengthen your local community through meaningful skill exchanges."
+          "title": "ابق محليًا",
+          "description": "تواصل مع الجيران وحقق مجتمعك المحلي من خلال تبادل المهارات المعنوية."
         }
       }
     },
     "cta_section": {
-      "title": "Ready to get started?",
-      "description": "Join thousands of community members who are already exchanging skills and building meaningful connections.",
-      "button": "Create Your Free Account"
+      "title": "هل أنت مستعد للبدء؟",
+      "description": "انضم إلى آلاف الأعضاء في المجتمع الذين يتبادلون المهارات ويبنون علاقات ذات مغزى.",
+      "button": "أنشئ حسابك المجاني"
     }
   },
   "about": {
-    "meta_title": "About {{name}}",
-    "meta_description": "Learn about {{name}} — a time banking platform where communities exchange skills using time as currency.",
-    "hero_title": "About {{name}}",
-    "hero_description": "{{name}} is a modern time banking platform where every hour of service is valued equally. We help communities exchange skills, build trust, and create a fairer local economy — one hour at a time.",
+    "meta_title": "حول {{name}}",
+    "meta_description": "تعرف على {{name}} — منصة مصرفية زمنية حيث تتبادل المجتمعات المهارات باستخدام الوقت كعملة.",
+    "hero_title": "حول {{name}}",
+    "hero_description": "{{name}} هي منصة مصرفية زمنية حديثة حيث يتم تقييم كل ساعة من الخدمة بشكل متساوٍ. نحن نساعد المجتمعات على تبادل المهارات، وبناء الثقة، وخلق اقتصاد محلي أكثر عدلاً — ساعة واحدة في كل مرة.",
     "how_it_works": {
-      "title": "How It Works",
-      "subtitle": "Getting started is simple. Four steps to join and begin exchanging skills in your community.",
+      "title": "كيف يعمل",
+      "subtitle": "البدء سهل. أربع خطوات للانضمام وبدء تبادل المهارات في مجتمعك.",
       "steps": {
         "0": {
-          "title": "Create Your Profile",
-          "description": "Sign up for free and list the skills you can offer to your community."
+          "title": "أنشئ ملفك الشخصي",
+          "description": "سجل مجانًا وأدرج المهارات التي يمكنك تقديمها لمجتمعك."
         },
         "1": {
-          "title": "Find What You Need",
-          "description": "Browse listings to discover services offered by members near you."
+          "title": "ابحث عما تحتاجه",
+          "description": "تصفح القوائم لاكتشاف الخدمات المقدمة من الأعضاء بالقرب منك."
         },
         "2": {
-          "title": "Exchange Services",
-          "description": "Connect with members and arrange skill exchanges that work for both of you."
+          "title": "تبادل الخدمات",
+          "description": "تواصل مع الأعضاء ورتب تبادل المهارات الذي يناسب كلاكما."
         },
         "3": {
-          "title": "Earn & Spend Credits",
-          "description": "Earn one time credit for every hour you give, and spend them on services you need."
+          "title": "كسب وإنفاق الاعتمادات",
+          "description": "احصل على اعتماد زمني واحد مقابل كل ساعة تقدمها، وأنفقها على الخدمات التي تحتاجها."
         }
       }
     },
     "values": {
-      "title": "Our Values",
-      "subtitle": "The principles that guide everything we do at {{name}}.",
+      "title": "قيمنا",
+      "subtitle": "المبادئ التي توجه كل ما نقوم به في {{name}}.",
       "items": {
         "0": {
           "title": "Equality",
-          "description": "Every person's time is valued equally. One hour of gardening is worth the same as one hour of tutoring."
+          "description": "وقت كل شخص له قيمة متساوية. ساعة واحدة من البستنة تساوي نفس قيمة ساعة واحدة من التدريس."
         },
         "1": {
           "title": "Community",
-          "description": "We believe in building strong local connections. Every exchange strengthens the fabric of your neighbourhood."
+          "description": "نؤمن ببناء روابط محلية قوية. كل تبادل يقوي نسيج حيّك."
         },
         "2": {
-          "title": "Trust & Safety",
-          "description": "Reviews, ratings, and broker oversight ensure a safe environment for all members to participate."
+          "title": "الثقة والسلامة",
+          "description": "المراجعات والتقييمات وإشراف الوسطاء تضمن بيئة آمنة لجميع الأعضاء للمشاركة."
         },
         "3": {
           "title": "Sustainability",
-          "description": "By sharing skills locally, we reduce waste, support circular economies, and strengthen local resilience."
+          "description": "من خلال مشاركة المهارات محليًا، نقلل من الهدر، وندعم الاقتصاد الدائري، ونعزز المرونة المحلية."
         }
       }
     },
     "stats": {
       "members": "Members",
-      "hours_exchanged": "Hours Exchanged",
-      "active_listings": "Active Listings",
+      "hours_exchanged": "الساعات المتبادلة",
+      "active_listings": "القوائم النشطة",
       "communities": "Communities"
     },
     "credits": {
-      "title": "Powered by Project NEXUS",
-      "subtitle": "Open-source community platform created by Jasper Ford. Licensed under AGPL v3.",
+      "title": "مدعوم من مشروع NEXUS",
+      "subtitle": "منصة مجتمعية مفتوحة المصدر أنشأها جاسبر فورد. مرخصة بموجب AGPL v3.",
       "creator": "Creator",
-      "founders_heading": "Founders of hOUR Timebank CLG",
+      "founders_heading": "مؤسسو hOUR Timebank CLG",
       "contributors": "Contributors",
-      "research_heading": "Research Foundation",
-      "research_description": "Informed by a social impact study commissioned by the {{name}}.",
+      "research_heading": "مؤسسة البحث",
+      "research_description": "مستند إلى دراسة تأثير اجتماعي تم تكليفها من قبل {{name}}.",
       "acknowledgements": "Acknowledgements",
-      "open_source": "Open Source",
-      "license_text": "Licensed under the GNU Affero General Public License v3 (AGPL-3.0).",
-      "v1_source": "V1 Source Code (PHP + React)",
-      "v2_source": "V2 Source Code (ASP.NET Core)"
+      "open_source": "مفتوح المصدر",
+      "license_text": "مرخص بموجب رخصة جنو العامة التشاركية v3 (AGPL-3.0).",
+      "v1_source": "شفرة المصدر V1 (PHP + React)",
+      "v2_source": "شفرة المصدر V2 (ASP.NET Core)"
     },
     "cta": {
-      "title": "Ready to Get Involved?",
-      "description": "Whether you want to share your skills or find help with something, our community is here for you.",
-      "dashboard": "Go to Dashboard",
-      "join": "Join for Free",
-      "help_center": "Help Center",
-      "contact_us": "Contact Us"
+      "title": "هل أنت مستعد للمشاركة؟",
+      "description": "سواء كنت ترغب في مشاركة مهاراتك أو العثور على مساعدة في شيء ما، فإن مجتمعنا هنا من أجلك.",
+      "dashboard": "اذهب إلى لوحة التحكم",
+      "join": "انضم مجانًا",
+      "help_center": "مركز المساعدة",
+      "contact_us": "اتصل بنا"
     }
   },
   "contact": {
-    "title": "Contact Us",
-    "subtitle": "Have a question about {{name}}? We'd love to hear from you.",
-    "success_title": "Message Sent!",
-    "success_message": "We'll get back to you as soon as possible.",
-    "back_to_help": "Back to Help Center",
-    "error_fallback": "Failed to send message. Please try again.",
+    "meta_description": "تواصل مع فريق دعم المجتمع لدينا. نحن هنا للمساعدة.",
+    "title": "اتصل بنا",
+    "subtitle": "هل لديك سؤال حول {{name}}؟ نود أن نسمع منك.",
+    "success_title": "تم إرسال الرسالة!",
+    "success_message": "سنتواصل معك في أقرب وقت ممكن.",
+    "back_to_help": "العودة إلى مركز المساعدة",
+    "error_fallback": "فشل في إرسال الرسالة. يرجى المحاولة مرة أخرى.",
     "form": {
       "name_label": "Name",
-      "name_placeholder": "Your name",
+      "name_placeholder": "اسمك",
       "email_label": "Email",
       "email_placeholder": "you@example.com",
       "subject_label": "Subject",
-      "subject_placeholder": "What is this about?",
+      "subject_placeholder": "ما هو هذا الموضوع؟",
       "subjects": {
-        "general": "General Inquiry",
-        "account": "Account Help",
-        "technical": "Technical Issue",
-        "feedback": "Feedback / Suggestion",
+        "general": "استفسار عام",
+        "account": "مساعدة الحساب",
+        "technical": "مشكلة تقنية",
+        "feedback": "ملاحظات / اقتراحات",
         "other": "Other"
       },
       "message_label": "Message",
-      "message_placeholder": "How can we help?",
-      "submit": "Send Message",
-      "login_prompt_before": "Already have an account?",
-      "login_link": "Log in",
-      "login_prompt_after": "for faster support."
+      "message_placeholder": "كيف يمكننا مساعدتك؟",
+      "submit": "إرسال رسالة",
+      "login_prompt_before": "هل لديك حساب بالفعل؟",
+      "login_link": "تسجيل الدخول",
+      "login_prompt_after": "للحصول على دعم أسرع."
     }
   },
   "faq": {
-    "title": "Frequently Asked Questions",
-    "subtitle_before_link": "Can't find what you're looking for? Visit our",
-    "help_center_link": "Help Center",
-    "subtitle_after_link": "for detailed guides.",
-    "search_placeholder": "Search questions...",
-    "no_results": "No matching questions found. Try a different search term.",
-    "cta_title": "Still have questions?",
-    "cta_description": "Our support team is here to help.",
-    "cta_button": "Contact Support",
+    "page_title": "الأسئلة الشائعة",
+    "meta_description": "ابحث عن إجابات للأسئلة الشائعة حول تبادل الوقت، والتبادلات، وميزات المجتمع.",
+    "title": "الأسئلة الشائعة",
+    "subtitle_before_link": "لا تستطيع العثور على ما تبحث عنه؟ قم بزيارة",
+    "help_center_link": "مركز المساعدة",
+    "subtitle_after_link": "للحصول على أدلة مفصلة.",
+    "search_placeholder": "ابحث عن الأسئلة...",
+    "no_results": "لم يتم العثور على أسئلة مطابقة. جرب مصطلح بحث مختلف.",
+    "cta_title": "لا تزال لديك أسئلة؟",
+    "cta_description": "فريق الدعم لدينا هنا لمساعدتك.",
+    "cta_button": "اتصل بالدعم",
     "categories": {
       "getting_started": {
-        "title": "Getting Started",
+        "title": "البدء",
         "q1": {
-          "question": "What is time banking?",
-          "answer_p1": "Time banking is a community exchange system where one hour of help equals one time credit, regardless of the service provided. Whether you're teaching a language, helping with gardening, or providing tech support, your time is valued equally.",
-          "answer_p2": "It's a way to build community connections while exchanging skills and services without traditional money."
+          "question": "ما هو تبادل الوقت؟",
+          "answer_p1": "تبادل الوقت هو نظام تبادل مجتمعي حيث تعادل ساعة واحدة من المساعدة رصيدًا واحدًا من الوقت، بغض النظر عن الخدمة المقدمة. سواء كنت تعلم لغة، أو تساعد في البستنة، أو تقدم دعمًا تقنيًا، فإن وقتك يُقدَّر بالتساوي.",
+          "answer_p2": "إنه وسيلة لبناء روابط مجتمعية أثناء تبادل المهارات والخدمات دون استخدام المال التقليدي."
         },
         "q2": {
-          "question": "Is it free to join?",
-          "answer_p1": "Yes! Membership is completely free. The only currency used is time credits, which you earn by helping others in the community.",
-          "answer_p2": "New members often receive a small number of starter credits to help them get started."
+          "question": "هل الانضمام مجاني؟",
+          "answer_p1": "نعم! العضوية مجانية تمامًا. العملة الوحيدة المستخدمة هي أرصدة الوقت، التي تكسبها من خلال مساعدة الآخرين في المجتمع.",
+          "answer_p2": "غالبًا ما يحصل الأعضاء الجدد على عدد قليل من أرصدة البداية لمساعدتهم على البدء."
         },
         "q3": {
-          "question": "How do I get started?",
-          "answer_intro": "Here's how to begin:",
-          "step1_bold": "Complete your profile",
-          "step1_text": "Add a photo, bio, and your skills",
-          "step2_bold": "Browse the marketplace",
-          "step2_text": "See what services are offered and needed",
-          "step3_bold": "Post an offer",
-          "step3_text": "Share what you can help others with",
-          "step4_bold": "Make a request",
-          "step4_text": "Ask for something you need",
-          "step5_bold": "Connect with members",
-          "step5_text": "Build your network"
+          "question": "كيف أبدأ؟",
+          "answer_intro": "إليك كيفية البدء:",
+          "step1_bold": "أكمل ملفك الشخصي",
+          "step1_text": "أضف صورة، وسيرة ذاتية، ومهاراتك",
+          "step2_bold": "تصفح السوق",
+          "step2_text": "انظر ما هي الخدمات المعروضة والمطلوبة",
+          "step3_bold": "نشر عرض",
+          "step3_text": "شارك ما يمكنك مساعدته الآخرين به",
+          "step4_bold": "قم بعمل طلب",
+          "step4_text": "اطلب شيئًا تحتاجه",
+          "step5_bold": "تواصل مع الأعضاء",
+          "step5_text": "قم ببناء شبكتك"
         },
         "q4": {
-          "question": "What skills can I offer?",
-          "answer_intro": "Almost anything! Common offerings include:",
-          "skill1": "Home help (gardening, cleaning, minor repairs)",
-          "skill2": "Tech support (computer help, phone setup)",
-          "skill3": "Teaching (languages, music, academic subjects)",
-          "skill4": "Creative services (design, photography, writing)",
-          "skill5": "Transportation (rides, errands)",
-          "skill6": "Companionship (walks, visits, conversation)",
-          "skill7": "Professional skills (accounting, legal advice, etc.)",
-          "answer_outro": "Everyone has something valuable to offer!"
+          "question": "ما المهارات التي يمكنني تقديمها؟",
+          "answer_intro": "تقريبًا أي شيء! تشمل العروض الشائعة:",
+          "skill1": "مساعدة في المنزل (البستنة، التنظيف، الإصلاحات البسيطة)",
+          "skill2": "دعم تقني (مساعدة في الكمبيوتر، إعداد الهاتف)",
+          "skill3": "تعليم (لغات، موسيقى، مواد أكاديمية)",
+          "skill4": "خدمات إبداعية (تصميم، تصوير، كتابة)",
+          "skill5": "نقل (رحلات، مهام)",
+          "skill6": "رفقة (نزهات، زيارات، محادثة)",
+          "skill7": "مهارات احترافية (محاسبة، نصائح قانونية، إلخ.)",
+          "answer_outro": "لدى الجميع شيء قيم ليقدمه!"
         }
       },
       "time_credits": {
-        "title": "Time Credits",
+        "title": "رصيد الوقت",
         "q1": {
-          "question": "What is a time credit?",
-          "answer_p1": "One time credit equals one hour of service. It's the currency of our community.",
-          "answer_p2": "You can also exchange partial hours: 30 minutes = 0.5 credits, 15 minutes = 0.25 credits."
+          "question": "ما هو رصيد الوقت؟",
+          "answer_p1": "رصيد الوقت الواحد يساوي ساعة واحدة من الخدمة. إنها عملتنا في مجتمعنا.",
+          "answer_p2": "يمكنك أيضًا تبادل الساعات الجزئية: 30 دقيقة = 0.5 رصيد، 15 دقيقة = 0.25 رصيد."
         },
         "q2": {
-          "question": "How do I earn time credits?",
-          "answer_intro": "You earn credits by:",
-          "way1_bold": "Providing services",
-          "way1_text": "to other members",
-          "way2_bold": "Logging volunteer hours",
-          "way2_text": "with approved organisations",
-          "way3_bold": "Receiving donations",
-          "way3_text": "from other members",
-          "way4_bold": "Starter credits",
-          "way4_text": "when you first join"
+          "question": "كيف أكسب رصيد الوقت؟",
+          "answer_intro": "تكسب الرصيد من خلال:",
+          "way1_bold": "تقديم الخدمات",
+          "way1_text": "لأعضاء آخرين",
+          "way2_bold": "تسجيل ساعات التطوع",
+          "way2_text": "مع منظمات معتمدة",
+          "way3_bold": "استلام التبرعات",
+          "way3_text": "من أعضاء آخرين",
+          "way4_bold": "رصيد البداية",
+          "way4_text": "عندما تنضم لأول مرة"
         },
         "q3": {
-          "question": "Can I donate my credits?",
-          "answer_intro": "Yes! You can:",
-          "option1": "Transfer credits to any other member",
-          "option2": "Donate to the community pot (helps members who need extra support)",
-          "answer_link_before": "Go to your ",
+          "question": "هل يمكنني التبرع برصيدي؟",
+          "answer_intro": "نعم! يمكنك:",
+          "option1": "نقل الرصيد إلى أي عضو آخر",
+          "option2": "التبرع لصندوق المجتمع (يساعد الأعضاء الذين يحتاجون إلى دعم إضافي)",
+          "answer_link_before": "اذهب إلى ",
           "wallet_link": "Wallet",
-          "answer_link_after": " to send credits."
+          "answer_link_after": " لإرسال الرصيد."
         },
         "q4": {
-          "question": "Can my balance go negative?",
-          "answer": "Some communities allow limited negative balances to help new members get started before they've had a chance to earn credits. Check with your community coordinator for the specific rules in your timebank."
+          "question": "هل يمكن أن يصبح رصيدي سالبًا؟",
+          "answer": "بعض المجتمعات تسمح برصيد سالب محدود لمساعدة الأعضاء الجدد على البدء قبل أن تتاح لهم الفرصة لكسب الرصيد. تحقق مع منسق مجتمعك لمعرفة القواعد المحددة في بنك الوقت الخاص بك."
         },
         "q5": {
-          "question": "What if I sent credits to the wrong person?",
-          "answer_intro": "Transactions cannot be automatically reversed. If you made a mistake:",
-          "step1": "Contact the recipient and ask them to send the credits back",
-          "step2": "If you can't resolve it, contact support for assistance",
-          "answer_outro": "Always double-check the recipient before confirming a transfer."
+          "question": "ماذا لو أرسلت رصيدًا إلى الشخص الخطأ؟",
+          "answer_intro": "لا يمكن عكس المعاملات تلقائيًا. إذا ارتكبت خطأ:",
+          "step1": "اتصل بالمستلم واطلب منه إعادة الرصيد",
+          "step2": "إذا لم تتمكن من حلها، اتصل بالدعم للحصول على المساعدة",
+          "answer_outro": "تحقق دائمًا من المستلم قبل تأكيد النقل."
         }
       },
       "exchanges_safety": {
-        "title": "Exchanges & Safety",
+        "title": "التبادلات والسلامة",
         "q1": {
-          "question": "How do I arrange an exchange?",
-          "answer_intro": "The typical process is:",
-          "step1": "Find an offer or request that interests you",
-          "step2": "Message the member to discuss details",
-          "step3": "Agree on when, where, and estimated time",
-          "step4": "Meet and complete the exchange",
-          "step5": "The person who received help sends time credits",
-          "step6": "Leave a review for each other"
+          "question": "كيف أرتب تبادلًا؟",
+          "answer_intro": "العملية النموذجية هي:",
+          "step1": "ابحث عن عرض أو طلب يثير اهتمامك",
+          "step2": "راسل العضو لمناقشة التفاصيل",
+          "step3": "اتفقوا على متى وأين والوقت المقدر",
+          "step4": "التقوا وأكملوا التبادل",
+          "step5": "الشخص الذي تلقى المساعدة يرسل رصيد الوقت",
+          "step6": "اترك تقييمًا لبعضكما البعض"
         },
         "q2": {
-          "question": "Is it safe to meet strangers?",
-          "answer_intro": "We recommend these safety practices:",
-          "tip1": "Meet in public places for first exchanges",
-          "tip2": "Check the member's profile and reviews",
-          "tip3": "Tell someone where you're going",
-          "tip4": "Trust your instincts — if something feels wrong, leave",
-          "tip5": "Start with smaller, low-risk exchanges",
-          "answer_outro": "Report any concerning behaviour to our support team."
+          "question": "هل من الآمن مقابلة غرباء؟",
+          "answer_intro": "نوصي بهذه الممارسات الأمنية:",
+          "tip1": "التقوا في أماكن عامة للتبادلات الأولى",
+          "tip2": "تحقق من ملف العضو والتقييمات",
+          "tip3": "أخبر شخصًا ما إلى أين تذهب",
+          "tip4": "ثق بغرائزك - إذا شعرت أن هناك شيئًا خاطئًا، اترك",
+          "tip5": "ابدأ بتبادلات صغيرة ومنخفضة المخاطر",
+          "answer_outro": "أبلغ عن أي سلوك مقلق لفريق الدعم لدينا."
         },
         "q3": {
-          "question": "What if someone doesn't show up or complete the service?",
-          "answer_intro": "Communication is key. If there's an issue:",
-          "step1": "Message the member to discuss what happened",
-          "step2": "Try to find a resolution together",
-          "step3": "If you can't resolve it, contact support",
-          "answer_outro": "Repeated no-shows or poor behaviour may result in account restrictions."
+          "question": "ماذا لو لم يظهر شخص ما أو لم يكمل الخدمة؟",
+          "answer_intro": "التواصل هو المفتاح. إذا كانت هناك مشكلة:",
+          "step1": "راسل العضو لمناقشة ما حدث",
+          "step2": "حاول إيجاد حل معًا",
+          "step3": "إذا لم تتمكن من حلها، اتصل بالدعم",
+          "answer_outro": "التكرار في عدم الحضور أو السلوك السيء قد يؤدي إلى قيود على الحساب."
         },
         "q4": {
-          "question": "Are the services insured?",
-          "answer": "Exchanges are informal arrangements between community members. We don't provide insurance coverage for services. For higher-risk activities, discuss liability with the other member beforehand. Some members have their own professional insurance."
+          "question": "هل الخدمات مؤمنة؟",
+          "answer": "التبادلات هي ترتيبات غير رسمية بين أعضاء المجتمع. نحن لا نقدم تغطية تأمينية للخدمات. بالنسبة للأنشطة ذات المخاطر العالية، ناقش المسؤولية مع العضو الآخر مسبقًا. بعض الأعضاء لديهم تأمين مهني خاص بهم."
         }
       },
       "badges_rewards": {
-        "title": "Badges & Rewards",
+        "title": "الشارات والمكافآت",
         "q1": {
-          "question": "What are badges and XP?",
-          "answer_intro": "Our gamification system rewards community participation:",
-          "item1_bold": "XP (Experience Points)",
-          "item1_text": "Earned for various activities, helping you level up",
+          "question": "ما هي الشارات ونقاط الخبرة؟",
+          "answer_intro": "نظام الألعاب لدينا يكافئ المشاركة المجتمعية:",
+          "item1_bold": "نقاط الخبرة (XP)",
+          "item1_text": "تُكتسب من أنشطة متنوعة، مما يساعدك على الارتقاء",
           "item2_bold": "Badges",
-          "item2_text": "Achievements for reaching milestones (60+ to collect!)",
+          "item2_text": "إنجازات للوصول إلى معالم (60+ لجمعها!)",
           "item3_bold": "Levels",
-          "item3_text": "Progress from Newcomer to Timebank Legend",
+          "item3_text": "التقدم من مبتدئ إلى أسطورة الوقت",
           "item4_bold": "Streaks",
-          "item4_text": "Rewards for daily engagement"
+          "item4_text": "مكافآت للمشاركة اليومية"
         },
         "q2": {
-          "question": "How do I earn XP?",
-          "answer_intro": "You earn XP for many activities:",
-          "activity1": "Sending/receiving time credits",
-          "activity2": "Creating listings",
-          "activity3": "Logging volunteer hours",
-          "activity4": "Attending events",
-          "activity5": "Making connections",
-          "activity6": "Daily logins",
-          "activity7": "Earning badges"
+          "question": "كيف أكسب نقاط الخبرة؟",
+          "answer_intro": "تكتسب نقاط الخبرة من العديد من الأنشطة:",
+          "activity1": "إرسال/استلام اعتمادات الوقت",
+          "activity2": "إنشاء القوائم",
+          "activity3": "تسجيل ساعات التطوع",
+          "activity4": "حضور الفعاليات",
+          "activity5": "إقامة الاتصالات",
+          "activity6": "تسجيل الدخول اليومي",
+          "activity7": "كسب الشارات"
         },
         "q3": {
-          "question": "Can I opt out of leaderboards?",
-          "answer_before_link": "Yes! If you prefer privacy, you can opt out of appearing on public leaderboards in your ",
+          "question": "هل يمكنني الانسحاب من لوحات المتصدرين؟",
+          "answer_before_link": "نعم! إذا كنت تفضل الخصوصية، يمكنك الانسحاب من الظهور على لوحات المتصدرين العامة في ",
           "settings_link": "Settings",
-          "answer_after_link": ". You'll still earn XP and badges, they just won't be visible to others on the rankings."
+          "answer_after_link": ". ستظل تكسب نقاط الخبرة والشارات، لكنها لن تكون مرئية للآخرين في الترتيب."
         }
       },
       "account_privacy": {
-        "title": "Account & Privacy",
+        "title": "الحساب والخصوصية",
         "q1": {
-          "question": "How do I change my password?",
-          "answer_before_link": "Go to ",
+          "question": "كيف أغير كلمة المرور الخاصة بي؟",
+          "answer_before_link": "اذهب إلى ",
           "settings_link": "Settings",
-          "answer_after_link": " > Security to change your password. You'll need to enter your current password first. If you've forgotten your password, use the \"Forgot Password\" link on the login page."
+          "answer_after_link": " > الأمان لتغيير كلمة المرور الخاصة بك. ستحتاج إلى إدخال كلمة المرور الحالية أولاً. إذا كنت قد نسيت كلمة المرور الخاصة بك، استخدم رابط \"نسيت كلمة المرور\" في صفحة تسجيل الدخول."
         },
         "q2": {
-          "question": "Who can see my profile?",
-          "answer_intro": "By default, your profile is visible to other community members. You can control:",
-          "item1": "What contact information is displayed",
-          "item2": "Whether you appear on leaderboards",
-          "item3": "Your general location visibility",
-          "answer_link_before": "Adjust these in your ",
+          "question": "من يمكنه رؤية ملفي الشخصي؟",
+          "answer_intro": "بشكل افتراضي، ملفك الشخصي مرئي لأعضاء المجتمع الآخرين. يمكنك التحكم في:",
+          "item1": "معلومات الاتصال المعروضة",
+          "item2": "ما إذا كنت تظهر في لوحات المتصدرين",
+          "item3": "رؤية موقعك العام",
+          "answer_link_before": "قم بتعديل هذه في ",
           "settings_link": "Settings",
           "answer_link_after": "."
         },
         "q3": {
-          "question": "How do I delete my account?",
-          "answer_intro": "If you wish to leave the community:",
-          "step1": "Go to Settings > Account",
-          "step2": "Click \"Delete Account\"",
-          "step3": "Confirm your decision",
-          "answer_outro": "Note: Your transaction history will be retained for record-keeping, but your personal information will be removed."
+          "question": "كيف يمكنني حذف حسابي؟",
+          "answer_intro": "إذا كنت ترغب في مغادرة المجتمع:",
+          "step1": "اذهب إلى الإعدادات > الحساب",
+          "step2": "انقر على \"حذف الحساب\"",
+          "step3": "أكد قرارك",
+          "answer_outro": "ملاحظة: سيتم الاحتفاظ بسجل معاملاتك لأغراض التوثيق، ولكن سيتم إزالة معلوماتك الشخصية."
         },
         "q4": {
-          "question": "How is my data protected?",
-          "answer_intro": "We take privacy seriously:",
-          "item1": "Your data is encrypted and securely stored",
-          "item2": "We never sell your information",
-          "item3": "You can request a copy of your data at any time",
-          "item4": "We comply with GDPR and data protection regulations"
+          "question": "كيف يتم حماية بياناتي؟",
+          "answer_intro": "نحن نأخذ الخصوصية على محمل الجد:",
+          "item1": "بياناتك مشفرة ومخزنة بأمان",
+          "item2": "نحن لا نبيع معلوماتك أبداً",
+          "item3": "يمكنك طلب نسخة من بياناتك في أي وقت",
+          "item4": "نحن نلتزم باللائحة العامة لحماية البيانات ولوائح حماية البيانات"
         }
       }
     }
   },
   "maintenance": {
-    "title": "We'll be back soon!",
-    "description": "is currently undergoing scheduled maintenance to improve your experience.",
-    "apology": "We apologize for any inconvenience. Please check back in a little while.",
-    "thanks": "Thank you for your patience!",
-    "admin_login": "Admin Login",
-    "deploy_notice": "This platform is still being actively built, so there may be phases of rapid deployments. During these times, the server automatically enters maintenance mode. This normally only lasts about five minutes while new changes are being applied."
+    "title": "سنعود قريباً!",
+    "description": "يخضع حالياً للصيانة المجدولة لتحسين تجربتك.",
+    "apology": "نعتذر عن أي إزعاج. يرجى التحقق مرة أخرى بعد قليل.",
+    "thanks": "شكراً لصبرك!",
+    "admin_login": "تسجيل دخول المسؤول",
+    "deploy_notice": "هذه المنصة لا تزال قيد الإنشاء النشط، لذا قد تكون هناك مراحل من النشر السريع. خلال هذه الأوقات، يدخل الخادم تلقائياً وضع الصيانة. عادةً ما يستمر هذا لمدة خمس دقائق تقريباً أثناء تطبيق التغييرات الجديدة."
   },
   "dev_status": {
-    "title": "Development status: {{stage}}",
+    "title": "حالة التطوير: {{stage}}",
     "where_we_are": {
-      "title": "Where we are now",
-      "paragraph1": "This platform was born in the middle of December 2025, with development beginning around 15/12/2025.",
-      "paragraph2": "It grew quickly in a short space of time. By around 15/02/2026, much of the earlier work on both the front end and the back end had been intentionally scrapped and rewritten so the platform could be rebuilt on stronger foundations.",
-      "paragraph3": "Around 24/02/2026, we decided to rewrite the front end in React. The front end is the part people see and interact with — a bit like the body of the platform. We made that change to create a cleaner and more flexible user experience built on reusable components, improve responsiveness across devices — especially on mobile — and make the interface easier to improve and maintain as the platform grows.",
-      "paragraph4": "Around 17/03/2026, we decided to rewrite the back end in Laravel. The back end is the part working behind the scenes — a bit like the brain of the platform. We made that change to give the platform a stronger and more maintainable foundation, with better structure for authentication, validation, background processing, caching, and long-term developer productivity.",
+      "title": "أين نحن الآن",
+      "paragraph1": "ولدت هذه المنصة في منتصف ديسمبر 2025، مع بدء التطوير حوالي 15/12/2025.",
+      "paragraph2": "لقد نمت بسرعة في فترة زمنية قصيرة. بحلول حوالي 15/02/2026، تم إلغاء وإعادة كتابة الكثير من العمل السابق على كل من الواجهة الأمامية والخلفية عمدًا حتى يمكن إعادة بناء المنصة على أسس أقوى.",
+      "paragraph3": "حوالي 24/02/2026، قررنا إعادة كتابة الواجهة الأمامية باستخدام React. الواجهة الأمامية هي الجزء الذي يراه الناس ويتفاعلون معه - مثل جسم المنصة. قمنا بهذا التغيير لإنشاء تجربة مستخدم أنظف وأكثر مرونة مبنية على مكونات قابلة لإعادة الاستخدام، وتحسين الاستجابة عبر الأجهزة - خاصة على الهواتف المحمولة - وجعل الواجهة أسهل في التحسين والصيانة مع نمو المنصة.",
+      "paragraph4": "حوالي 17/03/2026، قررنا إعادة كتابة الخلفية باستخدام Laravel. الخلفية هي الجزء الذي يعمل خلف الكواليس - مثل دماغ المنصة. قمنا بهذا التغيير لمنح المنصة أساسًا أقوى وأكثر قابلية للصيانة، مع هيكل أفضل للمصادقة، والتحقق، والمعالجة الخلفية، والتخزين المؤقت، وإنتاجية المطورين على المدى الطويل.",
       "paragraph5": "As of 24/03/2026, this remains a very new platform that is evolving quickly. Most core functionality is already in place, but some parts are still being refined as the new front end and new back end are connected together and polished.",
-      "paragraph6": "We are also working on a dedicated mobile phone app in the background, which should be available soon."
+      "paragraph6": "نحن نعمل أيضًا على تطبيق مخصص للهواتف المحمولة في الخلفية، والذي يجب أن يكون متاحًا قريبًا."
     },
     "whats_stable": {
-      "title": "What's stable and working",
-      "core_title": "Core platform",
-      "core_item1": "Member registration, login, two-factor auth (TOTP + WebAuthn), guided onboarding",
-      "core_item2": "Time credit wallet — earning, spending, transfers, broker controls, and full transaction history",
-      "core_item3": "Multi-tenant architecture — unlimited communities, each with isolated data and custom branding",
-      "core_item4": "Exchange workflow — structured service exchange lifecycle with broker approval",
-      "core_item5": "Federation — cross-community exchange, shared listings, events, and messaging across connected platforms",
-      "core_item6": "Progressive Web App — installable on any device, works offline",
-      "member_title": "Member experience",
+      "title": "ما هو مستقر ويعمل",
+      "core_title": "المنصة الأساسية",
+      "core_item1": "تسجيل الأعضاء، تسجيل الدخول، المصادقة الثنائية (TOTP + WebAuthn)، التوجيه خلال عملية الانضمام",
+      "core_item2": "محفظة رصيد الوقت - الكسب، الإنفاق، التحويلات، تحكمات الوسيط، وسجل المعاملات الكامل",
+      "core_item3": "بنية متعددة المستأجرين - مجتمعات غير محدودة، كل منها ببيانات معزولة وعلامة تجارية مخصصة",
+      "core_item4": "سير عمل التبادل - دورة حياة تبادل الخدمة المنظمة مع موافقة الوسيط",
+      "core_item5": "الاتحاد - تبادل عبر المجتمعات، قوائم مشتركة، أحداث، ورسائل عبر المنصات المتصلة",
+      "core_item6": "تطبيق ويب تقدمي - قابل للتثبيت على أي جهاز، يعمل بدون اتصال",
+      "member_title": "تجربة الأعضاء",
       "member_item1": "Service marketplace — post offers and requests, browse and smart-match listings",
-      "member_item2": "Social feed — posts, comments, likes, polls, hashtags, and voice messages",
-      "member_item3": "Messaging — direct conversations with read receipts and real-time updates",
-      "member_item4": "Events — creating, discovering, RSVPs, and calendar export",
-      "member_item5": "Groups — community sub-groups with discussions, roles, and moderation",
-      "member_item6": "Group exchanges — bulk community service exchanges",
-      "member_item7": "Members directory — browse, filter, and discover people",
-      "member_item8": "Connections — follow and connect with community members",
-      "member_item9": "Reviews and ratings — build trust through member feedback",
-      "member_item10": "Endorsements — peer skill and experience endorsements",
-      "member_item11": "Polls — community voting and surveys",
-      "member_item12": "Skills browse — explore skill taxonomy and discover expertise",
+      "member_item2": "التغذية الاجتماعية - منشورات، تعليقات، إعجابات، استطلاعات، علامات تصنيف، ورسائل صوتية",
+      "member_item3": "المراسلة - محادثات مباشرة مع إيصالات قراءة وتحديثات في الوقت الحقيقي",
+      "member_item4": "الأحداث - إنشاء، اكتشاف، تأكيد الحضور، وتصدير التقويم",
+      "member_item5": "المجموعات - مجموعات فرعية مجتمعية مع مناقشات، أدوار، وإشراف",
+      "member_item6": "تبادلات المجموعات - تبادلات خدمات المجتمع بالجملة",
+      "member_item7": "دليل الأعضاء - تصفح، تصفية، واكتشاف الأشخاص",
+      "member_item8": "الاتصالات - متابعة والتواصل مع أعضاء المجتمع",
+      "member_item9": "المراجعات والتقييمات - بناء الثقة من خلال ملاحظات الأعضاء",
+      "member_item10": "التوصيات - توصيات المهارات والخبرات من الأقران",
+      "member_item11": "الاستطلاعات - تصويت المجتمع واستطلاعات الرأي",
+      "member_item12": "تصفح المهارات - استكشاف تصنيف المهارات واكتشاف الخبرات",
       "member_item13": "Volunteering — opportunities, shifts, applications, and hours logging",
-      "member_item14": "Job vacancies — full recruitment module with alerts and analytics",
-      "member_item15": "Organisations — company and employer profiles with sub-accounts",
-      "member_item16": "Goals and impact — personal goals, mentoring, and community impact tracking",
-      "member_item17": "Ideation challenges — innovation hub with campaigns, ideas, voting, and outcomes",
+      "member_item14": "وظائف شاغرة - وحدة توظيف كاملة مع تنبيهات وتحليلات",
+      "member_item15": "المنظمات - ملفات تعريف الشركات وأرباب العمل مع حسابات فرعية",
+      "member_item16": "الأهداف والأثر - الأهداف الشخصية، والتوجيه، وتتبع تأثير المجتمع",
+      "member_item17": "تحديات الأفكار - مركز الابتكار مع حملات، أفكار، تصويت، ونتائج",
       "member_item18": "Achievements and gamification — XP, badges, challenges, streaks, leaderboard, and Nexus Score",
-      "member_item19": "Personal insights — individual engagement metrics and personalised recommendations",
-      "content_title": "Content and communication",
-      "content_item1": "Blog — tenant content management and community news",
-      "content_item2": "Resources and knowledge base — structured articles and shared resource library",
-      "content_item3": "Help center — documentation hub and FAQ",
+      "member_item19": "رؤى شخصية - مقاييس مشاركة فردية وتوصيات مخصصة",
+      "member_item20": "السوق - وحدة إعلانات مستقلة مع مدفوعات Stripe Connect، الطلبات، وملفات تعريف البائعين",
+      "member_item21": "التبرعات - تبرعات لمرة واحدة وتبرعات متكررة عبر Stripe مع لوحات معلومات للمنظمات وإيصالات",
+      "member_item22": "التحقق من الهوية - تدفق هوية Stripe الاختياري (وثيقة + صورة شخصية + مطابقة الاسم/تاريخ الميلاد) مع شارة عضو موثق",
+      "member_item23": "اقتراحات الردود الذكية - مساعد داخل السوق يقوم بصياغة ردود على استفسارات القوائم",
+      "content_title": "المحتوى والتواصل",
+      "content_item1": "المدونة - إدارة محتوى المستأجر وأخبار المجتمع",
+      "content_item2": "الموارد وقاعدة المعرفة - مقالات منظمة ومكتبة موارد مشتركة",
+      "content_item3": "مركز المساعدة - مركز الوثائق والأسئلة الشائعة",
       "content_item4": "Newsletter system — email campaigns with smart segments, templates, and send-time optimisation",
-      "content_item5": "AI Chat — AI-powered assistant for platform guidance",
-      "content_item6": "Custom pages — tenant-managed CMS pages",
-      "content_item7": "Legal hub — versioned legal documents with acceptance gates and audit trail",
-      "platform_title": "Platform and security",
+      "content_item5": "دردشة الذكاء الاصطناعي - مساعد مدعوم بالذكاء الاصطناعي لإرشادات المنصة",
+      "content_item6": "صفحات مخصصة - صفحات إدارة المحتوى التي يديرها المستأجر",
+      "content_item7": "مركز قانوني - مستندات قانونية مُصدرة مع بوابات قبول وسجل تدقيق",
+      "platform_title": "المنصة والأمان",
       "platform_item1": "Enterprise security — CSRF, rate limiting, TOTP 2FA, and WebAuthn passwordless auth",
-      "platform_item2": "GDPR compliance — data requests, consent management, breach tracking, and audit log",
-      "platform_item3": "Fraud and abuse detection — automated suspicious activity alerts and content moderation",
-      "platform_item4": "WCAG 2.1 AA accessibility compliance",
+      "platform_item2": "امتثال GDPR - طلبات البيانات، إدارة الموافقة، تتبع الانتهاكات، وسجل التدقيق",
+      "platform_item3": "كشف الاحتيال وسوء الاستخدام - تنبيهات تلقائية للنشاط المشبوه وإدارة المحتوى",
+      "platform_item4": "امتثال WCAG 2.1 AA للوصول",
       "platform_item5": "7 languages — English, Irish, German, French, Italian, Portuguese, and Spanish",
-      "platform_item6": "Admin panel — tenant configuration, user management, analytics, and moderation",
-      "platform_item7": "Algorithm controls — live health dashboard and tuning for all ranking systems",
-      "platform_item8": "Dark mode and mobile-responsive UI"
+      "platform_item6": "لوحة الإدارة - تكوين المستأجر، إدارة المستخدمين، التحليلات، والإشراف",
+      "platform_item7": "تحكمات الخوارزمية - لوحة معلومات صحية حية وضبط لجميع أنظمة الترتيب",
+      "platform_item8": "الوضع الداكن وواجهة مستخدم متجاوبة مع الهواتف المحمولة",
+      "platform_item9": "تحسين محركات البحث في وقت البناء - 19+ صفحة عامة تم إعدادها مسبقًا باستخدام Playwright، بيانات منظمة، خرائط مواقع، وPrerender.io كنسخة احتياطية للمسارات الديناميكية",
+      "platform_item10": "الاتحاد - أربعة محولات بروتوكول حية: Nexus (محلي)، Komunitin (جميع 15 نقطة نهاية)، Credit Commons (11 نقطة نهاية، ائتمان متبادل متوافق مع CEN)، وTimeOverflow؛ مزامنة ثنائية الاتجاه عبر 9 نوع من الكيانات، دفع مدفوع بالأحداث، وقابلية نقل السمعة",
+      "platform_item11": "طبقة المدفوعات - Stripe للاشتراكات، التبرعات، السوق (Connect)، والتحقق من الهوية، مع معالجة webhook غير القابلة للتكرار"
     },
     "whats_rough": {
-      "title": "What may still be rough",
+      "title": "ما قد يكون لا يزال غير مكتمل",
       "item1": "Federation (cross-community) features — functional but still accumulating real-world edge cases",
-      "item2": "AI Chat assistant — depends on external AI providers; response quality varies by configuration",
-      "item3": "Nexus Score breakdown — newly launched; scoring weights may be adjusted as usage data grows",
-      "item4": "Smart feed ranking — EdgeRank algorithm is live but cold-start behaviour for new members is still being tuned",
-      "item5": "Push notifications (mobile) — may have delivery delays on some devices or browsers",
-      "item6": "Non-English translations — AI-generated and not yet reviewed by native speakers"
+      "item2": "مساعد دردشة الذكاء الاصطناعي - يعتمد على مزودي الذكاء الاصطناعي الخارجيين؛ جودة الردود تختلف حسب التكوين",
+      "item3": "تفصيل درجة Nexus - تم إطلاقها حديثًا؛ قد يتم تعديل أوزان الدرجات مع زيادة بيانات الاستخدام",
+      "item4": "تصنيف الخلاصة الذكية - خوارزمية EdgeRank حية ولكن سلوك البداية الباردة للأعضاء الجدد لا يزال يتم ضبطه",
+      "item5": "إشعارات الدفع (المحمول) - قد تكون هناك تأخيرات في التسليم على بعض الأجهزة أو المتصفحات",
+      "item6": "ترجمات غير الإنجليزية - تم إنشاؤها بواسطة الذكاء الاصطناعي ولم يتم مراجعتها بعد من قبل الناطقين الأصليين"
     },
     "how_we_catch_bugs": {
-      "title": "How we catch bugs",
-      "intro": "We use a multi-layer approach to catch and fix issues quickly:",
-      "method1_bold": "Automated tests",
+      "title": "كيف نكتشف الأخطاء",
+      "intro": "نستخدم نهج متعدد الطبقات لاكتشاف وإصلاح المشكلات بسرعة:",
+      "method1_bold": "اختبارات تلقائية",
       "method1_text": "250+ PHP unit/integration tests and React component tests run on every commit",
-      "method2_bold": "Sentry error tracking",
-      "method2_text": "exceptions on both frontend and backend are captured in real time",
-      "method3_bold": "Cloudflare analytics",
-      "method3_text": "traffic anomalies and error spikes are monitored continuously",
-      "method4_bold": "Manual QA",
-      "method4_text": "core user journeys are tested across multiple tenant configurations before each deployment",
-      "method5_bold": "Community testing",
-      "method5_text": "real members across multiple active communities help us surface edge cases in production"
+      "method2_bold": "تتبع أخطاء Sentry",
+      "method2_text": "يتم التقاط الاستثناءات على كل من الواجهة الأمامية والخلفية في الوقت الحقيقي",
+      "method3_bold": "تحليلات Cloudflare",
+      "method3_text": "يتم مراقبة الشذوذ في حركة المرور وارتفاع الأخطاء بشكل مستمر",
+      "method4_bold": "اختبار الجودة اليدوي",
+      "method4_text": "يتم اختبار رحلات المستخدم الأساسية عبر تكوينات متعددة للمستأجرين قبل كل نشر",
+      "method5_bold": "اختبار المجتمع",
+      "method5_text": "يساعدنا أعضاء حقيقيون من مجتمعات نشطة متعددة في اكتشاف الحالات النادرة في الإنتاج"
     },
     "how_to_help": {
-      "title": "How to help",
-      "report_bug_title": "Report a bug",
-      "report_bug_description": "Found something broken? Please open an issue on GitHub — it's the fastest way to get a fix in front of us. Include what you were doing, what you expected, and what actually happened.",
-      "github_link": "Open an issue on GitHub",
-      "become_tester_title": "Bring your community onto NEXUS",
-      "become_tester_description": "If you run a timebank or community network and want to join the platform, we'd love to work with you. Reach out via GitHub Discussions or the contact page — we support communities of all sizes."
+      "title": "كيف يمكنك المساعدة",
+      "report_bug_title": "الإبلاغ عن خطأ",
+      "report_bug_description": "هل وجدت شيئًا معطلاً؟ يرجى فتح قضية على GitHub - إنها أسرع طريقة للحصول على إصلاح أمامنا. أدرج ما كنت تفعله، وما كنت تتوقعه، وما حدث بالفعل.",
+      "github_link": "فتح قضية على GitHub",
+      "become_tester_title": "اجلب مجتمعك إلى NEXUS",
+      "become_tester_description": "إذا كنت تدير بنك وقت أو شبكة مجتمع وترغب في الانضمام إلى المنصة، سنكون سعداء للعمل معك. تواصل معنا عبر مناقشات GitHub أو صفحة الاتصال - نحن ندعم المجتمعات بجميع الأحجام."
     },
     "security": {
-      "title": "Security disclosure",
-      "description_before_email": "If you discover a security vulnerability, please do not open a public issue. Instead, contact us confidentially at",
-      "description_after_email": ". We will respond within 72 hours and work with you on responsible disclosure."
+      "title": "إفصاح الأمان",
+      "description_before_email": "إذا اكتشفت ثغرة أمنية، يرجى عدم فتح قضية عامة. بدلاً من ذلك، اتصل بنا بشكل سري على",
+      "description_after_email": ". سنرد في غضون 72 ساعة وسنعمل معك على الإفصاح المسؤول."
     }
   },
   "kb": {
-    "title": "Knowledge Base",
-    "description": "Find answers, guides, and helpful resources",
-    "search_placeholder": "Search the knowledge base..."
+    "title": "قاعدة المعرفة",
+    "description": "ابحث عن إجابات، وأدلة، وموارد مفيدة",
+    "search_placeholder": "ابحث في قاعدة المعرفة..."
+  },
+  "page_meta": {
+    "development_status": {
+      "title": "حالة التطوير"
+    }
   }
 }
