@@ -496,5 +496,13 @@
     "title": "Knowledge Base",
     "description": "Find answers, guides, and helpful resources",
     "search_placeholder": "Search the knowledge base..."
+  },
+  "page_meta": {
+    "development_status": {
+      "title": "Development Status"
+    },
+    "maintenance": {
+      "title": "Maintenance"
+    }
   }
 }

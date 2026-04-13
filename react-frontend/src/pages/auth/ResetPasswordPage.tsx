@@ -41,7 +41,7 @@ export function ResetPasswordPage() {
   if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <PageMeta title="Reset Password" noIndex />
+        <PageMeta title={t('page_meta.reset_password.title')} noIndex />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -100,7 +100,7 @@ export function ResetPasswordPage() {
   if (isSuccess) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <PageMeta title="Reset Password" noIndex />
+        <PageMeta title={t('page_meta.reset_password.title')} noIndex />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -127,7 +127,7 @@ export function ResetPasswordPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <PageMeta title="Reset Password" noIndex />
+      <PageMeta title={t('page_meta.reset_password.title')} noIndex />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

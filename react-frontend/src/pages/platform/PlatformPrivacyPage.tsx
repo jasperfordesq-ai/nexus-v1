@@ -491,7 +491,7 @@ export function PlatformPrivacyPage() {
   usePageTitle(t('platform_privacy.page_title'));
   return (
     <>
-      <PageMeta title="Platform Privacy Policy" description="How the NEXUS platform collects, processes, and protects your personal data." />
+      <PageMeta title={t('page_meta.platform_privacy.title')} description={t('page_meta.platform_privacy.description')} />
       <PlatformLegalPage
         title={t('platform_privacy.title')}
         subtitle={t('platform_privacy.subtitle')}

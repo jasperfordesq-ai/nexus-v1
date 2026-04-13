@@ -3,11 +3,9 @@
   "title": "Ideation Challenges",
   "subtitle": "Share ideas, vote, and help shape your community",
   "page_description": "Browse community challenges, submit ideas, and vote on solutions. Help shape the future of your community.",
-
   "actions": {
     "retry": "Retry"
   },
-
   "tabs": {
     "all": "All",
     "open": "Open",
@@ -17,7 +15,6 @@
     "archived": "Archived",
     "favorites": "My Favorites"
   },
-
   "status": {
     "draft": "Draft",
     "open": "Open",
@@ -26,7 +23,6 @@
     "closed": "Closed",
     "archived": "Archived"
   },
-
   "idea_status": {
     "draft": "Draft",
     "submitted": "Submitted",
@@ -34,7 +30,6 @@
     "winner": "Winner",
     "withdrawn": "Withdrawn"
   },
-
   "challenge": {
     "ideas_count": "{{count}} ideas",
     "ideas_count_one": "{{count}} idea",
@@ -49,7 +44,6 @@
     "outcome": "Outcome",
     "team_links": "Project Teams"
   },
-
   "challenges": {
     "title": "Challenges",
     "empty_title": "No Challenges Yet",
@@ -59,7 +53,6 @@
     "load_error": "Unable to load challenges",
     "load_more": "Load More"
   },
-
   "ideas": {
     "title": "Ideas",
     "empty_title": "No Ideas Yet",
@@ -91,14 +84,12 @@
     "draft_created": "Created {{date}}",
     "new_idea": "New Idea"
   },
-
   "idea_detail": {
     "page_title": "Idea Details",
     "back_to_challenge": "Back to Challenge",
     "submitted_by": "Submitted by {{name}}",
     "submitted_on": "Submitted on {{date}}"
   },
-
   "comments": {
     "title": "Comments",
     "empty_title": "No Comments Yet",
@@ -110,7 +101,6 @@
     "load_more": "Load More Comments",
     "load_error": "Unable to load comments"
   },
-
   "form": {
     "title_label": "Title",
     "title_placeholder": "Enter a clear, descriptive title",
@@ -143,18 +133,15 @@
     "updating": "Updating...",
     "cancel": "Cancel"
   },
-
   "create_page": {
     "page_title": "Create Challenge",
     "title": "Create Ideation Challenge",
     "subtitle": "Post a problem statement for your community to solve"
   },
-
   "edit_page": {
     "page_title": "Edit Challenge",
     "title": "Edit Ideation Challenge"
   },
-
   "admin": {
     "change_status": "Change Status",
     "set_open": "Open for Submissions",
@@ -173,7 +160,6 @@
     "status_updated": "Challenge status updated",
     "idea_status_updated": "Idea status updated"
   },
-
   "toast": {
     "challenge_created": "Challenge created successfully",
     "challenge_updated": "Challenge updated successfully",
@@ -210,7 +196,6 @@
     "template_applied": "Template applied successfully",
     "error_generic": "Something went wrong. Please try again."
   },
-
   "favorites": {
     "add": "Add to favorites",
     "remove": "Remove from favorites",
@@ -218,18 +203,14 @@
     "empty_title": "No Favorites Yet",
     "empty_description": "Heart a challenge to add it to your favorites."
   },
-
   "views": "views",
-
   "featured": "Featured",
-
   "search": {
     "label": "Search challenges",
     "placeholder": "Search challenges by title or description...",
     "clear_tags": "Clear tags",
     "no_results": "No challenges match your search"
   },
-
   "tags": {
     "label": "Tags",
     "placeholder": "Add tags (press Enter)",
@@ -238,54 +219,49 @@
     "skills": "Skills Needed",
     "general": "General Tags"
   },
-
   "cover_image": {
     "label": "Cover Image URL",
     "placeholder": "https://example.com/image.jpg",
     "helper": "Banner image for the challenge (recommended 600x400)"
   },
-
   "guidance": {
     "title": "Tips for Writing a Great Challenge",
     "intro": "A well-framed challenge inspires better ideas. Here are some tips to help you create an effective problem statement.",
     "tips": {
       "clear_problem": {
-        "title": "\uD83C\uDFAF Define a Clear Problem",
+        "title": "🎯 Define a Clear Problem",
         "description": "State the specific issue you want the community to address. Avoid vague or overly broad statements."
       },
       "scope": {
-        "title": "\uD83D\uDCCF Set Realistic Scope",
+        "title": "📏 Set Realistic Scope",
         "description": "Define clear boundaries and constraints so ideas remain focused and actionable."
       },
       "criteria": {
-        "title": "\u2696\uFE0F Explain Evaluation Criteria",
-        "description": "Tell participants how ideas will be judged \u2014 feasibility, creativity, impact, or cost-effectiveness."
+        "title": "⚖️ Explain Evaluation Criteria",
+        "description": "Tell participants how ideas will be judged — feasibility, creativity, impact, or cost-effectiveness."
       },
       "engagement": {
-        "title": "\uD83D\uDCA1 Encourage Participation",
+        "title": "💡 Encourage Participation",
         "description": "Use inviting language. Add a prize or recognition to motivate submissions."
       }
     },
-    "examples_toggle": "Show examples of good vs. weak challenges \u25B8",
+    "examples_toggle": "Show examples of good vs. weak challenges ▸",
     "example_good": {
-      "label": "\u2705 Strong challenge:",
+      "label": "✅ Strong challenge:",
       "text": "How might we reduce food waste in our community by 25% over the next year? We're looking for practical, low-cost ideas that local businesses and residents can implement together."
     },
     "example_weak": {
-      "label": "\u274C Weak challenge:",
+      "label": "❌ Weak challenge:",
       "text": "We need ideas about the environment.",
-      "why": "Too vague \u2014 no specific problem, no constraints, no success criteria."
+      "why": "Too vague — no specific problem, no constraints, no success criteria."
     }
   },
-
   "duplicate": {
     "button": "Duplicate Challenge",
     "success": "Challenge duplicated successfully",
     "error": "Failed to duplicate challenge"
   },
-
   "idea_image": "Idea image",
-
   "media": {
     "title": "Attachments",
     "add": "Add Attachment",
@@ -303,7 +279,6 @@
     "delete_confirm": "Remove this attachment?",
     "empty": "No attachments"
   },
-
   "convert_to_group": {
     "button": "Create Team",
     "title": "Create Project Team from Idea",
@@ -319,7 +294,6 @@
     "error": "Failed to create team",
     "already_converted": "This idea has already been converted to a team"
   },
-
   "campaigns": {
     "title": "Campaigns",
     "page_title": "Campaigns",
@@ -331,7 +305,6 @@
     "link_challenge": "Link Challenge",
     "unlink_challenge": "Unlink Challenge"
   },
-
   "templates": {
     "title": "Challenge Templates",
     "page_title": "Challenge Templates",
@@ -341,7 +314,6 @@
     "use_template": "Use This Template",
     "start_from_template": "Start from Template"
   },
-
   "outcomes": {
     "title": "Impact Tracking",
     "page_title": "Impact Dashboard",
@@ -362,7 +334,6 @@
     "implemented_count": "Implemented",
     "in_progress_count": "In Progress"
   },
-
   "tasks": {
     "title": "Tasks",
     "status_label": "Status",
@@ -383,7 +354,6 @@
     "overdue": "Overdue",
     "stats": "Task Stats"
   },
-
   "documents": {
     "title": "Documents",
     "upload": "Upload Document",
@@ -392,7 +362,6 @@
     "delete_confirm": "Delete this document?",
     "max_size": "Max file size: 10 MB"
   },
-
   "chatrooms": {
     "title": "Channels",
     "create": "Create Channel",
@@ -404,7 +373,6 @@
     "delete_channel": "Delete Channel",
     "delete_channel_confirm": "Delete this channel and all its messages?"
   },
-
   "categories": {
     "title": "Categories",
     "manage": "Manage Categories",
@@ -417,7 +385,6 @@
     "color_label": "Color",
     "delete_confirm": "Delete this category?"
   },
-
   "validation": {
     "title_required": "Title is required",
     "description_required": "Description is required",
@@ -425,5 +392,16 @@
     "url_required": "URL is required",
     "name_required": "Name is required",
     "file_required": "File is required"
+  },
+  "page_meta": {
+    "outcomes": {
+      "title": "Outcomes Dashboard"
+    },
+    "create_challenge": {
+      "title": "Create Challenge"
+    },
+    "campaigns": {
+      "title": "Campaigns"
+    }
   }
 }

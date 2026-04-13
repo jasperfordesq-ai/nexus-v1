@@ -261,7 +261,7 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "load_failed": "Failed to load files",
-    "upload_success": "{{count}} file(s) uploaded",
+    "upload_success": "File uploaded successfully",
     "upload_failed": "Failed to upload file(s)",
     "download_failed": "Failed to download file",
     "file_deleted": "File deleted",
@@ -278,7 +278,6 @@
     "no_results": "No files match your search",
     "upload_title": "Upload File",
     "upload_btn": "Upload",
-    "upload_success": "File uploaded successfully",
     "upload_error": "Failed to upload file",
     "download_aria": "Download {{name}}",
     "download_error": "Failed to download file",
@@ -382,5 +381,10 @@
     "answer_posted_error": "Failed to post answer",
     "vote_error": "Failed to vote",
     "accept_error": "Failed to accept answer"
+  },
+  "page_meta": {
+    "create": {
+      "title": "Create Group"
+    }
   }
 }

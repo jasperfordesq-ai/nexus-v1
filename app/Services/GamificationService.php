@@ -577,6 +577,16 @@ class GamificationService
                 User::query()->where('id', $userId)->increment('xp', $amount);
             });
 
+            // Invalidate cached leaderboard slices for this tenant — XP just changed.
+            try {
+                $tenantId = (int) (User::query()->where('id', $userId)->value('tenant_id') ?? 0);
+                if ($tenantId > 0) {
+                    \App\Services\LeaderboardService::invalidate($tenantId);
+                }
+            } catch (\Throwable $e) {
+                // Non-fatal — TTL will eventually evict stale entries.
+            }
+
             // Broadcast XP gained event
             try {
                 app(GamificationRealtimeService::class)->broadcastXPGained($userId, $amount, $action);

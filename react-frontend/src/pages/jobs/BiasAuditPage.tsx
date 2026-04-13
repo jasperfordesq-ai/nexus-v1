@@ -216,7 +216,7 @@ export function BiasAuditPage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title="Bias Audit" noIndex />
+      <PageMeta title={t('page_meta.bias_audit.title')} noIndex />
       {/* Back navigation */}
       <Link
         to={tenantPath('/jobs')}

@@ -31,5 +31,5 @@ export default function MatchesRedirectPage() {
     navigate(tenantPath('/listings'), { replace: true });
   }, [navigate, tenantPath]);
 
-  return <PageMeta title="Matches" noIndex />;
+  return <PageMeta title={t('page_meta.title')} noIndex />;
 }

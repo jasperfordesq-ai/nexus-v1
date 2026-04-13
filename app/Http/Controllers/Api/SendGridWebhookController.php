@@ -41,52 +41,39 @@ class SendGridWebhookController extends BaseApiController
      */
     public function events(): JsonResponse
     {
-        // ECDSA signature verification (SendGrid official method)
+        // ECDSA signature verification (SendGrid official method).
+        // SECURITY: Query-parameter / shared-secret fallbacks have been
+        // removed — secrets must NEVER travel in URLs (logged by proxies,
+        // browser history, referer headers). The only accepted auth is the
+        // SendGrid ECDSA signature verified against the public key in
+        // SENDGRID_WEBHOOK_VERIFICATION_KEY.
         $verificationKey = env('SENDGRID_WEBHOOK_VERIFICATION_KEY');
-        $ecdsaVerified = false;
 
-        if (!empty($verificationKey)) {
-            $signature = request()->header('X-Twilio-Email-Event-Webhook-Signature');
-            $timestamp = request()->header('X-Twilio-Email-Event-Webhook-Timestamp');
-
-            if (empty($signature) || empty($timestamp)) {
-                return $this->respondWithError('UNAUTHORIZED', __('api.missing_signature_headers'), null, 401);
-            }
-
-            $payload = request()->getContent();
-            $timestampedPayload = $timestamp . $payload;
-            $decodedSignature = base64_decode($signature);
-
-            $publicKey = openssl_pkey_get_public($verificationKey);
-            if (!$publicKey) {
-                Log::error('SendGrid webhook: Invalid verification key');
-                // Fall through to shared secret check
-            } else {
-                $valid = openssl_verify($timestampedPayload, $decodedSignature, $publicKey, OPENSSL_ALGO_SHA256);
-                if ($valid !== 1) {
-                    return $this->respondWithError('UNAUTHORIZED', __('api.invalid_webhook_signature'), null, 401);
-                }
-                // Signature verified — skip shared secret check
-                $ecdsaVerified = true;
-            }
+        if (empty($verificationKey)) {
+            Log::error('SendGrid webhook: SENDGRID_WEBHOOK_VERIFICATION_KEY is not configured — refusing to accept unauthenticated webhook traffic.');
+            return $this->respondWithError('CONFIGURATION_ERROR', __('api.webhook_auth_not_configured'), null, 500);
         }
 
-        // Shared secret check (fallback) — if SENDGRID_WEBHOOK_SECRET is configured
-        // and ECDSA verification was not performed, require it as a query parameter or header.
-        if (!$ecdsaVerified) {
-            $expectedSecret = env('SENDGRID_WEBHOOK_SECRET');
-            if (!empty($expectedSecret)) {
-                $providedSecret = request()->header('X-Webhook-Secret')
-                    ?? request()->query('secret');
-                if (!hash_equals($expectedSecret, (string) $providedSecret)) {
-                    return $this->respondWithError('UNAUTHORIZED', __('api.invalid_webhook_secret'), null, 401);
-                }
-            } else {
-                // SECURITY: If neither ECDSA key nor shared secret is configured,
-                // reject all requests. Never accept unauthenticated webhooks.
-                Log::error('SendGrid webhook: No authentication configured (set SENDGRID_WEBHOOK_VERIFICATION_KEY or SENDGRID_WEBHOOK_SECRET)');
-                return $this->respondWithError('UNAUTHORIZED', __('api.webhook_auth_not_configured'), null, 401);
-            }
+        $signature = request()->header('X-Twilio-Email-Event-Webhook-Signature');
+        $timestamp = request()->header('X-Twilio-Email-Event-Webhook-Timestamp');
+
+        if (empty($signature) || empty($timestamp)) {
+            return $this->respondWithError('UNAUTHORIZED', __('api.missing_signature_headers'), null, 401);
+        }
+
+        $payload = request()->getContent();
+        $timestampedPayload = $timestamp . $payload;
+        $decodedSignature = base64_decode($signature);
+
+        $publicKey = openssl_pkey_get_public($verificationKey);
+        if (!$publicKey) {
+            Log::error('SendGrid webhook: SENDGRID_WEBHOOK_VERIFICATION_KEY is set but is not a valid public key.');
+            return $this->respondWithError('CONFIGURATION_ERROR', __('api.webhook_auth_not_configured'), null, 500);
+        }
+
+        $valid = openssl_verify($timestampedPayload, $decodedSignature, $publicKey, OPENSSL_ALGO_SHA256);
+        if ($valid !== 1) {
+            return $this->respondWithError('UNAUTHORIZED', __('api.invalid_webhook_signature'), null, 401);
         }
 
         $payload = request()->getContent();

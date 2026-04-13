@@ -18,7 +18,7 @@ The React frontend uses V2 API endpoints at `/api/v2/*`. All endpoints defined i
 
 ### Registration — `POST /api/v2/auth/register`
 
-Controller: `RegistrationApiController`
+Controller: `RegistrationController`
 
 **Request body:**
 ```json
@@ -159,9 +159,9 @@ The Relying Party ID defaults to the registrable domain extracted from the reque
 | `/api/v2/events` | EventsApiController |
 | `/api/v2/groups` | GroupsApiController |
 | `/api/v2/feed` | SocialApiController |
-| `/api/v2/blog` | BlogPublicApiController |
-| `/api/v2/resources` | ResourcesPublicApiController |
-| `/api/v2/comments` | CommentsV2ApiController |
+| `/api/v2/blog` | BlogPublicController |
+| `/api/v2/resources` | ResourcePublicController |
+| `/api/v2/comments` | CommentsController |
 | `/api/v2/polls` | PollsApiController |
 | `/api/v2/search` | SearchApiController |
 | `/api/v2/notifications` | NotificationsApiController |

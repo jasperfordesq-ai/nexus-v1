@@ -361,7 +361,7 @@
     "categories": "Categories",
     "sub_categories": "Sub-categories",
     "total_skills": "Skills Listed",
-    "search_placeholder": "Search skill categories...",
+    "search_placeholder": "Search for a skill...",
     "no_categories": "No categories found",
     "no_match": "No categories match \"{{query}}\"",
     "no_categories_yet": "No skill categories available yet.",
@@ -383,7 +383,6 @@
     },
     "aria_clear_search": "Clear search",
     "aria_close_members_list": "Close members list",
-    "search_placeholder": "Search for a skill...",
     "category_optional": "Category (optional)",
     "proficiency_level": "Proficiency Level"
   },
@@ -401,5 +400,14 @@
   },
   "verification": {
     "not_id_verified": "Not ID Verified"
+  },
+  "page_meta": {
+    "skills_browse": {
+      "title": "Browse Skills"
+    },
+    "members": {
+      "title": "Members",
+      "description": "Browse community members, connect and exchange time credits."
+    }
   }
 }

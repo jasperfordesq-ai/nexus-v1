@@ -41,7 +41,7 @@ import {
   Users,
   Info,
 } from 'lucide-react';
-import DOMPurify from 'dompurify';
+import { sanitizeRichText } from '@/lib/sanitize';
 import { GlassCard } from '@/components/ui';
 import { AvailabilityGrid } from '@/components/availability/AvailabilityGrid';
 import { AppearanceSettings } from '@/components/settings/AppearanceSettings';
@@ -348,10 +348,8 @@ export function SettingsPage() {
   const saveProfile = useCallback(async () => {
     try {
       setIsSaving(true);
-      // Sanitize bio to prevent XSS - allow only safe HTML tags
-      const sanitizedBio = DOMPurify.sanitize(profileData.bio, {
-        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'a', 'ul', 'ol', 'li'],
-      });
+      // Sanitize bio with the unified rich-text profile (XSS guard).
+      const sanitizedBio = sanitizeRichText(profileData.bio);
       const payload: Record<string, any> = {
         first_name: profileData.first_name,
         last_name: profileData.last_name,
@@ -783,7 +781,7 @@ export function SettingsPage() {
       animate="visible"
       className="max-w-3xl mx-auto space-y-6"
     >
-      <PageMeta title="Settings" noIndex />
+      <PageMeta title={t('page_meta.title')} noIndex />
       {/* Header */}
       <motion.div variants={itemVariants}>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">

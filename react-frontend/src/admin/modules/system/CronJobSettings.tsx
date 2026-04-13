@@ -118,7 +118,7 @@ export function CronJobSettingsPage() {
       if (res.success) {
         toast.success(t('system.job_settings_saved_successfully'));
       } else {
-        toast.error(res.error || 'Failed to save job settings');
+        toast.error(res.error || t('system.failed_to_save_job_settings'));
       }
     } catch {
       toast.error(t('system.failed_to_save_job_settings'));
@@ -134,7 +134,7 @@ export function CronJobSettingsPage() {
       if (res.success) {
         toast.success(t('system.global_settings_saved_successfully'));
       } else {
-        toast.error(res.error || 'Failed to save global settings');
+        toast.error(res.error || t('system.failed_to_save_global_settings'));
       }
     } catch {
       toast.error(t('system.failed_to_save_global_settings'));

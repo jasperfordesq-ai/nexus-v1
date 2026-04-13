@@ -23,6 +23,7 @@ import type { SuperAdminUserDetail, SuperAdminTenant } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
+import { sanitizeInline } from '@/lib/sanitize';
 type ConfirmActionType =
   | 'grant-sa'
   | 'revoke-sa'
@@ -580,7 +581,7 @@ export function UserShow() {
         <ModalContent>
           <ModalHeader>{t('super.move_user_to_tenant')}</ModalHeader>
           <ModalBody>
-            <p className="text-sm text-default-600 mb-3" dangerouslySetInnerHTML={{ __html: t('super.move_user_desc', { name: user.name }) }} />
+            <p className="text-sm text-default-600 mb-3" dangerouslySetInnerHTML={{ __html: sanitizeInline(t('super.move_user_desc', { name: user.name })) }} />
 
             <Select
               label={t('super.label_target_tenant')}
@@ -665,7 +666,7 @@ export function UserShow() {
             {t('super.move_and_promote')}
           </ModalHeader>
           <ModalBody>
-            <p className="text-sm text-default-600 mb-3" dangerouslySetInnerHTML={{ __html: t('super.move_and_promote_desc', { name: user.name }) }} />
+            <p className="text-sm text-default-600 mb-3" dangerouslySetInnerHTML={{ __html: sanitizeInline(t('super.move_and_promote_desc', { name: user.name })) }} />
             <div className="bg-warning-50 dark:bg-warning-50/10 border border-warning-200 dark:border-warning-200/20 rounded-lg p-3 mb-3">
               <p className="text-xs text-warning-700 dark:text-warning-400">
                 {t('super.move_and_promote_warning')}

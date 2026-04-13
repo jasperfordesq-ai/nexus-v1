@@ -1363,7 +1363,7 @@ export function ConversationPage() {
 
   return (
     <div className="-my-6 sm:-my-8 h-[calc(100dvh-4rem-4rem)] md:h-[calc(100dvh-4rem)] flex flex-col max-w-3xl mx-auto">
-      <PageMeta title="Conversation" noIndex />
+      <PageMeta title={t('page_meta.conversation.title')} noIndex />
       {/* Header */}
       <GlassCard className="p-4 mb-4">
         <div className="flex items-center justify-between">

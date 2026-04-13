@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -32,6 +33,46 @@ class LeaderboardService
 
     public const PERIODS = ['all_time', 'monthly', 'weekly'];
 
+    /** Cache TTL for leaderboard queries (5 minutes). */
+    public const CACHE_TTL_SECONDS = 300;
+
+    /**
+     * Build cache key for a leaderboard slice.
+     */
+    private static function cacheKey(int $tenantId, string $type, string $period, int $limit, ?int $currentUserId = null): string
+    {
+        // currentUserId only affects the is_current_user flag, NOT the underlying
+        // ranked dataset — keep it out of the cache key and apply per-call below.
+        return "leaderboard:{$tenantId}:{$type}:{$period}:{$limit}";
+    }
+
+    /**
+     * Invalidate ALL cached leaderboard slices for a tenant.
+     * Call from XP award / transaction commit handlers.
+     */
+    public static function invalidate(int $tenantId): void
+    {
+        try {
+            // Bump a per-tenant version counter — cheap and avoids needing
+            // Cache::tags() (not supported on file/database stores).
+            $versionKey = "leaderboard:{$tenantId}:version";
+            Cache::increment($versionKey);
+        } catch (\Throwable $e) {
+            // Best-effort — never let cache invalidation break a write path.
+            Log::warning('Leaderboard invalidate failed: ' . $e->getMessage());
+        }
+    }
+
+    private static function versionedKey(int $tenantId, string $base): string
+    {
+        try {
+            $version = (int) Cache::get("leaderboard:{$tenantId}:version", 0);
+        } catch (\Throwable $e) {
+            $version = 0;
+        }
+        return "{$base}:v{$version}";
+    }
+
     /**
      * Get leaderboard data.
      */
@@ -51,18 +92,29 @@ class LeaderboardService
         }
 
         try {
-            $query = $this->buildLeaderboardQuery($type, $period, $tenantId, $limit);
-            if (!$query) {
-                return [];
-            }
+            $cacheKey = self::versionedKey(
+                $tenantId,
+                self::cacheKey($tenantId, $type, $period, $limit)
+            );
 
-            $results = DB::select($query['sql'], $query['params']);
-            $results = array_map(fn ($r) => (array) $r, $results);
+            $results = Cache::remember($cacheKey, self::CACHE_TTL_SECONDS, function () use ($type, $period, $tenantId, $limit) {
+                $query = $this->buildLeaderboardQuery($type, $period, $tenantId, $limit);
+                if (!$query) {
+                    return [];
+                }
+                $rows = DB::select($query['sql'], $query['params']);
+                $rows = array_map(fn ($r) => (array) $r, $rows);
+                $rank = 1;
+                foreach ($rows as &$row) {
+                    $row['rank'] = $rank++;
+                }
+                return $rows;
+            });
 
-            $rank = 1;
+            // Apply per-request is_current_user flag AFTER cache fetch
+            // so the cached payload is shareable across users.
             foreach ($results as &$row) {
-                $row['rank'] = $rank++;
-                $row['is_current_user'] = ($currentUserId && $row['user_id'] == $currentUserId);
+                $row['is_current_user'] = ($currentUserId && (int) $row['user_id'] === (int) $currentUserId);
             }
 
             return $results;
@@ -78,26 +130,30 @@ class LeaderboardService
     public function getUserRank(int $tenantId, int $userId): ?array
     {
         try {
-            $user = DB::table('users')
-                ->where('id', $userId)
-                ->where('tenant_id', $tenantId)
-                ->select('id as user_id', 'name', 'first_name', 'last_name', 'avatar_url', DB::raw('COALESCE(xp, 0) as score'))
-                ->first();
+            $cacheKey = self::versionedKey($tenantId, "leaderboard:{$tenantId}:userrank:{$userId}");
 
-            if (!$user) {
-                return null;
-            }
+            return Cache::remember($cacheKey, self::CACHE_TTL_SECONDS, function () use ($tenantId, $userId) {
+                $user = DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->select('id as user_id', 'name', 'first_name', 'last_name', 'avatar_url', DB::raw('COALESCE(xp, 0) as score'))
+                    ->first();
 
-            $user = (array) $user;
+                if (!$user) {
+                    return null;
+                }
 
-            $rank = (int) DB::table('users')
-                ->where('tenant_id', $tenantId)
-                ->where('is_approved', 1)
-                ->where(DB::raw('COALESCE(xp, 0)'), '>', $user['score'])
-                ->count() + 1;
+                $user = (array) $user;
 
-            $user['rank'] = $rank;
-            return $user;
+                $rank = (int) DB::table('users')
+                    ->where('tenant_id', $tenantId)
+                    ->where('is_approved', 1)
+                    ->where(DB::raw('COALESCE(xp, 0)'), '>', $user['score'])
+                    ->count() + 1;
+
+                $user['rank'] = $rank;
+                return $user;
+            });
         } catch (\Throwable $e) {
             Log::warning('User Rank Error: ' . $e->getMessage());
             return null;

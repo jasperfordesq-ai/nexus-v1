@@ -24,7 +24,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Chip, Spinner } from '@heroui/react';
-import DOMPurify from 'dompurify';
+import { sanitizeRichText } from '@/lib/sanitize';
 import {
   History,
   CalendarDays,
@@ -233,7 +233,7 @@ export function LegalVersionHistoryPage() {
       animate="visible"
       className="max-w-4xl mx-auto space-y-6"
     >
-      <PageMeta title="Legal Version History" description="Version history of our legal documents and policies." />
+      <PageMeta title={t('page_meta.legal_version_history.title')} description={t('page_meta.legal_version_history.description')} />
       {/* Back link */}
       <motion.div variants={itemVariants}>
         <Link
@@ -457,7 +457,7 @@ export function LegalVersionHistoryPage() {
                                     {/* Diff content */}
                                     <div
                                       className="version-diff-content max-h-[500px] overflow-y-auto p-4 text-sm font-mono leading-relaxed"
-                                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(diffData.diff_html) }}
+                                      dangerouslySetInnerHTML={{ __html: sanitizeRichText(diffData.diff_html) }}
                                     />
                                   </div>
                                 )}
@@ -468,7 +468,7 @@ export function LegalVersionHistoryPage() {
                           {/* Full document content */}
                           <div
                             className="legal-content"
-                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(expandedContent.content) }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeRichText(expandedContent.content) }}
                           />
                         </div>
                       )}

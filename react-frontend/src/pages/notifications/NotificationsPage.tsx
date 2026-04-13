@@ -172,7 +172,7 @@ export function NotificationsPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <PageMeta title="Notifications" noIndex />
+      <PageMeta title={t('page_meta.title')} noIndex />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

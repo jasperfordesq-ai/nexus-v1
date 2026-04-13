@@ -203,7 +203,7 @@ export function EmployerOnboardingPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <PageMeta title="Employer Onboarding" noIndex />
+      <PageMeta title={t('page_meta.employer_onboarding.title')} noIndex />
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link

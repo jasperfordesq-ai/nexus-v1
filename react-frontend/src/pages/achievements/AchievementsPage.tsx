@@ -1556,7 +1556,7 @@ export function AchievementsPage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title="Achievements" noIndex />
+      <PageMeta title={t('page_meta.achievements.title')} noIndex />
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">

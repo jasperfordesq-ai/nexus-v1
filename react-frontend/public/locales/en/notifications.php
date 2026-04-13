@@ -6,6 +6,13 @@
 
 return [
     // =========================================================================
+    // FederationController — cross-tenant notifications
+    // =========================================================================
+    'federation' => [
+        'new_message' => 'New federated message from :sender (:tenant): :subject',
+    ],
+
+    // =========================================================================
     // GroupNotificationService
     // =========================================================================
     'group_join_request'        => ':name has requested to join ":group"',

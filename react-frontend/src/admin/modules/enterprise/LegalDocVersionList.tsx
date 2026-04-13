@@ -42,7 +42,7 @@ import { adminLegalDocs } from '@/admin/api/adminApi';
 import type { LegalDocumentVersion } from '@/admin/api/types';
 import LegalDocVersionForm from './LegalDocVersionForm';
 import LegalDocVersionComparison from './LegalDocVersionComparison';
-import DOMPurify from 'dompurify';
+import { sanitizeRichText } from '@/lib/sanitize';
 
 import { useTranslation } from 'react-i18next';
 export default function LegalDocVersionList() {
@@ -537,7 +537,7 @@ export default function LegalDocVersionList() {
                 )}
                 <div
                   className="prose prose-sm max-w-none dark:prose-invert border rounded-lg p-4 overflow-auto"
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(viewingVersion?.content ?? '') }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichText(viewingVersion?.content ?? '') }}
                 />
               </ModalBody>
               <ModalFooter>

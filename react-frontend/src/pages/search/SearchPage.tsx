@@ -230,7 +230,7 @@ export function SearchPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <PageMeta title="Search" noIndex />
+      <PageMeta title={t('page_meta.title')} noIndex />
       {/* Search Header */}
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">

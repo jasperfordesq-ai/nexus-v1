@@ -84,10 +84,19 @@ class EmbeddingService
                 return [];
             }
 
+            // PERF: Cap candidate set to most-recent N embeddings to bound latency.
+            // Cosine similarity is computed in PHP (O(N*dim)) — for tenants with thousands
+            // of embeddings, scanning the entire table per call is too slow.
+            // Trade-off: reduced recall for bounded latency.
+            // TODO: Migrate to a true vector DB (pgvector / Meilisearch hybrid / Qdrant)
+            //       to push similarity scoring into the storage engine.
+            $candidateLimit = 500;
             $rows = DB::table('content_embeddings')
                 ->where('tenant_id', $tenantId)
                 ->where('content_type', $contentType)
                 ->where('content_id', '!=', $contentId)
+                ->orderByDesc('updated_at')
+                ->limit($candidateLimit)
                 ->get();
 
             $similarities = [];

@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Spinner } from '@heroui/react';
 import { ArrowLeft, AlertTriangle, FileText } from 'lucide-react';
-import DOMPurify from 'dompurify';
+import { sanitizeRichText } from '@/lib/sanitize';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo';
@@ -146,7 +146,7 @@ export function CustomPage() {
                   [&_code]:bg-theme-elevated [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-sm
                   [&_pre]:bg-theme-elevated [&_pre]:p-4 [&_pre]:rounded-xl [&_pre]:overflow-x-auto
                 "
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(page.content) }}
+                dangerouslySetInnerHTML={{ __html: sanitizeRichText(page.content) }}
               />
             )}
           </GlassCard>

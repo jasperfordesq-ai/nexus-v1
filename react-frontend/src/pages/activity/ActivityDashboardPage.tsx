@@ -293,7 +293,7 @@ export function ActivityDashboardPage() {
       animate="visible"
       className="max-w-5xl mx-auto space-y-6"
     >
-      <PageMeta title="Activity Dashboard" noIndex />
+      <PageMeta title={t('page_meta.title')} noIndex />
       {/* Header */}
       <motion.div variants={itemVariants}>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">

@@ -43,7 +43,7 @@ import {
   MoreVertical,
   ShieldOff,
 } from 'lucide-react';
-import DOMPurify from 'dompurify';
+import { sanitizeRichText } from '@/lib/sanitize';
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
@@ -474,7 +474,7 @@ export function ProfilePage() {
       animate="visible"
       className="max-w-4xl mx-auto space-y-6"
     >
-      <PageMeta title="Profile" noIndex />
+      <PageMeta title={t('page_meta.title')} noIndex />
       {/* Profile Header */}
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
@@ -800,9 +800,7 @@ export function ProfilePage() {
                 <div
                   className="text-theme-muted whitespace-pre-wrap prose prose-sm max-w-none dark:prose-invert"
                   dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(profile.bio, {
-                      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'a', 'ul', 'ol', 'li'],
-                    }),
+                    __html: sanitizeRichText(profile.bio),
                   }}
                 />
               ) : (

@@ -66,11 +66,11 @@ class AdminEventsController extends BaseApiController
         )->cnt;
 
         $items = DB::select(
-            "SELECT e.id, e.title, e.description, e.start_date, e.end_date, e.location, e.status,
-                    e.created_by, e.created_at, e.max_attendees, e.category_id,
+            "SELECT e.id, e.title, e.description, e.start_time AS start_date, e.end_time AS end_date, e.location, e.status,
+                    e.user_id AS created_by, e.created_at, e.max_attendees, e.category_id,
                     u.name as creator_name
              FROM events e
-             LEFT JOIN users u ON e.created_by = u.id
+             LEFT JOIN users u ON e.user_id = u.id
              WHERE {$where} ORDER BY e.created_at DESC LIMIT ? OFFSET ?",
             array_merge($params, [$limit, $offset])
         );
@@ -87,11 +87,11 @@ class AdminEventsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $event = DB::selectOne(
-            "SELECT e.id, e.title, e.description, e.start_date, e.end_date, e.location, e.status,
-                    e.created_by, e.created_at, e.max_attendees, e.category_id,
+            "SELECT e.id, e.title, e.description, e.start_time AS start_date, e.end_time AS end_date, e.location, e.status,
+                    e.user_id AS created_by, e.created_at, e.max_attendees, e.category_id,
                     u.name as creator_name
              FROM events e
-             LEFT JOIN users u ON e.created_by = u.id
+             LEFT JOIN users u ON e.user_id = u.id
              WHERE e.id = ? AND e.tenant_id = ?",
             [$id, $tenantId]
         );

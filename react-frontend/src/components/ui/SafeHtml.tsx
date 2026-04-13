@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import DOMPurify from 'dompurify';
+import { sanitizeRichText } from '@/lib/sanitize';
 
 interface SafeHtmlProps {
   content: string;
@@ -30,7 +30,7 @@ export function SafeHtml({ content, className, as: Tag = 'div' }: SafeHtmlProps)
     return (
       <Tag
         className={className}
-        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
+        dangerouslySetInnerHTML={{ __html: sanitizeRichText(content) }}
       />
     );
   }

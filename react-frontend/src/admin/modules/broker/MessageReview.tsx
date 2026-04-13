@@ -84,7 +84,7 @@ export function MessageReview() {
         toast.success(t('broker.message_marked_as_reviewed'));
         loadItems();
       } else {
-        toast.error(res?.error || 'Failed to mark message as reviewed');
+        toast.error(res?.error || t('broker.failed_to_mark_message_as_reviewed'));
       }
     } catch {
       toast.error(t('broker.failed_to_mark_message_as_reviewed'));
@@ -114,7 +114,7 @@ export function MessageReview() {
         setFlagModalOpen(false);
         loadItems();
       } else {
-        toast.error(res?.error || 'Failed to flag message');
+        toast.error(res?.error || t('broker.failed_to_flag_message'));
       }
     } catch {
       toast.error(t('broker.failed_to_flag_message'));

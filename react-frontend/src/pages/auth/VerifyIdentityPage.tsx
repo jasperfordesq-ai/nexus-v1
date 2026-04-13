@@ -194,7 +194,7 @@ export function VerifyIdentityPage() {
   if (pageState === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <PageMeta title="Verify Identity" noIndex />
+        <PageMeta title={t('page_meta.verify_identity.title')} noIndex />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <GlassCard className="p-8 text-center">
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-indigo-500/20 flex items-center justify-center">

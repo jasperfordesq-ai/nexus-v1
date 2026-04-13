@@ -91,10 +91,10 @@ export function MatchDetail() {
         setItem(data as MatchApprovalDetail);
       }
     } else {
-      setError(res.error || 'Failed to load match approval');
+      setError(res.error || t('matching.failed_to_load_match_approval'));
     }
     setLoading(false);
-  }, [id]);
+  }, [id, t]);
 
   useEffect(() => {
     loadItem();

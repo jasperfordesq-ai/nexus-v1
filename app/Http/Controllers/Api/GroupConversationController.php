@@ -41,7 +41,7 @@ class GroupConversationController extends BaseApiController
         $memberIds = $this->input('member_ids', []);
 
         if (!is_array($memberIds)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'member_ids must be an array', 'member_ids', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('errors.validation.member_ids_must_be_array'), 'member_ids', 422);
         }
 
         $result = GroupConversationService::createGroup($userId, $memberIds, $name);

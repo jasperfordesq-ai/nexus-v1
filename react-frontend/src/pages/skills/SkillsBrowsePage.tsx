@@ -250,7 +250,7 @@ export function SkillsBrowsePage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
-      <PageMeta title="Browse Skills" noIndex />
+      <PageMeta title={t('page_meta.skills_browse.title')} noIndex />
       {/* ── Hero / Explainer ──────────────────────────────────────────── */}
       <GlassCard className="p-6 sm:p-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-indigo-500/5 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />

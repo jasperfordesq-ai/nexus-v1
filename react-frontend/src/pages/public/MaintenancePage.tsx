@@ -26,7 +26,7 @@ export function MaintenancePage() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-primary-500 to-secondary-600 flex items-center justify-center p-4">
-      <PageMeta title="Maintenance" noIndex />
+      <PageMeta title={t('page_meta.maintenance.title')} noIndex />
       {/* Tell prerender services (Prerender.io, Google) this is temporary.
           503 = "come back later, don't cache or de-index this page." */}
       <Helmet>

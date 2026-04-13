@@ -555,7 +555,7 @@ export function PlatformDisclaimerPage() {
   usePageTitle(t('platform_disclaimer.page_title'));
   return (
     <>
-      <PageMeta title="Platform Disclaimer" description="Important disclaimers about the use of the NEXUS community timebanking platform." />
+      <PageMeta title={t('page_meta.platform_disclaimer.title')} description={t('page_meta.platform_disclaimer.description')} />
       <PlatformLegalPage
         title={t('platform_disclaimer.title')}
         subtitle={t('platform_disclaimer.subtitle')}

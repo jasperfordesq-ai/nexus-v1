@@ -52,7 +52,7 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import DOMPurify from 'dompurify';
+import { sanitizeInline } from '@/lib/sanitize';
 import { adminUsers, type BulkActionResult } from '../../api/adminApi';
 import { DataTable, StatusBadge, PageHeader, ConfirmModal, BulkActionToolbar, type BulkAction, type Column } from '../../components';
 import type { AdminUser, UserListParams } from '../../api/types';
@@ -535,7 +535,7 @@ export function UserList() {
           <ModalBody>
             {!importResults ? (
               <div className="flex flex-col gap-4">
-                <p className="text-sm text-default-500" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('users.import_csv_description')) }} />
+                <p className="text-sm text-default-500" dangerouslySetInnerHTML={{ __html: sanitizeInline(t('users.import_csv_description')) }} />
 
                 <div className="flex items-center gap-2">
                   <Button

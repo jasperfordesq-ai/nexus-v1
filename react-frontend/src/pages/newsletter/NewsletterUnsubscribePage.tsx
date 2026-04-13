@@ -63,7 +63,7 @@ export default function NewsletterUnsubscribePage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-content2 px-4">
-      <PageMeta title="Newsletter Unsubscribe" noIndex />
+      <PageMeta title={t('page_meta.newsletter_unsubscribe.title')} noIndex />
       <div className="w-full max-w-md bg-content1 rounded-2xl shadow-lg p-8 text-center">
         <div className="mb-6">
           <Mail className="mx-auto text-default-400" size={40} />

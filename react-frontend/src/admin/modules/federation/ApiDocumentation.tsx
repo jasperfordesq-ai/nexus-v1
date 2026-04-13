@@ -32,6 +32,7 @@ import {
   Code,
   AlertTriangle,
   Webhook,
+  HelpCircle,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { PageHeader } from '../../components';
@@ -59,6 +60,205 @@ function MethodChip({ method }: { method: 'GET' | 'POST' }) {
     >
       {method}
     </Chip>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tab 0: Overview (plain-English)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function OverviewTab() {
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader className="flex items-center gap-2">
+          <HelpCircle size={20} className="text-primary" />
+          <div>
+            <h3 className="text-lg font-semibold">Start here — federation in plain English</h3>
+            <p className="text-sm text-default-500">For non-technical admins. No jargon.</p>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-5 text-sm leading-relaxed">
+          <div>
+            <h4 className="font-semibold text-base mb-1">What is federation?</h4>
+            <p>
+              Federation lets your timebank talk to another timebank. Think of two separate
+              timebanking websites as two islands — on their own, members can only trade with
+              their own neighbours. <strong>Federation is the bridge between the islands.</strong>
+              {' '}Once the bridge is open, members can send time credits, message each other,
+              see each other's listings, and leave reviews across the bridge.
+            </p>
+            <p className="mt-2">
+              Both sides must agree before the bridge opens, and either side can close it at any
+              time.
+            </p>
+          </div>
+
+          <Divider />
+
+          <div>
+            <h4 className="font-semibold text-base mb-1">What is an API key?</h4>
+            <p>
+              A <strong>very long password</strong>. When you federate with another timebank, you
+              give them an API key and they give you one. Whenever their platform needs to ask
+              yours a question ("show me your public listings"), it sends the key along so yours
+              knows the request is genuine.
+            </p>
+            <p className="mt-2">
+              Keys are revocable (click "revoke" and it's dead) and scoped (you can limit a key
+              to read-only, for example).
+            </p>
+          </div>
+
+          <Divider />
+
+          <div>
+            <h4 className="font-semibold text-base mb-1">What is a webhook?</h4>
+            <p>
+              A <strong>doorbell</strong>. API keys are for when you want to <em>ask</em> the
+              other side something. Webhooks are for when something happens on your side that
+              the other side needs to know about <em>right now</em> — like a cancelled transfer
+              or a new message. Instead of them checking every 30 seconds, you ring their
+              doorbell.
+            </p>
+            <p className="mt-2">
+              Every webhook is signed like a wax seal. Forgeries get rejected automatically.
+            </p>
+          </div>
+
+          <Divider />
+
+          <div>
+            <h4 className="font-semibold text-base mb-2">When do I need what?</h4>
+            <Table aria-label="Federation scenarios" removeWrapper>
+              <TableHeader>
+                <TableColumn>Scenario</TableColumn>
+                <TableColumn>API key</TableColumn>
+                <TableColumn>Webhook</TableColumn>
+              </TableHeader>
+              <TableBody>
+                <TableRow key="nexus-nexus">
+                  <TableCell>Nexus ↔ another Nexus</TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="flat">Required</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="default" variant="flat">Optional</Chip></TableCell>
+                </TableRow>
+                <TableRow key="timeoverflow">
+                  <TableCell>Nexus ↔ TimeOverflow</TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="flat">Required</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="flat">Required</Chip></TableCell>
+                </TableRow>
+                <TableRow key="komunitin">
+                  <TableCell>Nexus ↔ Komunitin / Credit Commons</TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="flat">Required</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="flat">Required</Chip></TableCell>
+                </TableRow>
+                <TableRow key="listings">
+                  <TableCell>Reading another timebank's listings</TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="flat">Required</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="default" variant="flat">Not needed</Chip></TableCell>
+                </TableRow>
+                <TableRow key="transfer-send">
+                  <TableCell>Sending a time-credit transfer</TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="flat">Required</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="default" variant="flat">Not needed</Chip></TableCell>
+                </TableRow>
+                <TableRow key="transfer-cancel">
+                  <TableCell>Being told a transfer you sent was cancelled</TableCell>
+                  <TableCell><Chip size="sm" color="default" variant="flat">Not needed</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="flat">Required</Chip></TableCell>
+                </TableRow>
+                <TableRow key="messages">
+                  <TableCell>Receiving messages from the other side</TableCell>
+                  <TableCell><Chip size="sm" color="default" variant="flat">Not needed</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="flat">Required</Chip></TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+            <p className="mt-3 text-default-600">
+              <strong>Rule of thumb:</strong> API keys handle requests you make on purpose.
+              Webhooks handle surprises you need to know about without asking.
+            </p>
+          </div>
+
+          <Divider />
+
+          <div>
+            <h4 className="font-semibold text-base mb-2">How do I set up a connection? (6 steps)</h4>
+            <ol className="list-decimal pl-6 space-y-1">
+              <li><strong>Find a partner.</strong> Another timebank running compatible federation software.</li>
+              <li><strong>Both admins agree</strong> to federate. Nothing starts without both sides saying yes.</li>
+              <li><strong>Exchange API keys.</strong> Paste theirs into <em>External Partners</em>. Keep yours safe.</li>
+              <li><strong>Exchange webhook URLs</strong> (if you want real-time events).</li>
+              <li><strong>Test the handshake.</strong> One click sends a test request. Green means it's working.</li>
+              <li><strong>Turn on features</strong> you want to share: listings, messages, transactions, reviews. Start with the safest and only enable transactions once you trust the partner.</li>
+            </ol>
+          </div>
+
+          <Divider />
+
+          <div>
+            <h4 className="font-semibold text-base mb-2">What could go wrong? (and what we do about it)</h4>
+            <Table aria-label="Federation safeguards" removeWrapper>
+              <TableHeader>
+                <TableColumn>Worry</TableColumn>
+                <TableColumn>What's in place</TableColumn>
+              </TableHeader>
+              <TableBody>
+                <TableRow key="stolen-key">
+                  <TableCell>Someone steals our API key</TableCell>
+                  <TableCell>Revoke in one click. New key in seconds.</TableCell>
+                </TableRow>
+                <TableRow key="fake-webhook">
+                  <TableCell>A partner sends a fake webhook</TableCell>
+                  <TableCell>Every webhook is signed. Fakes rejected automatically.</TableCell>
+                </TableRow>
+                <TableRow key="dup-webhook">
+                  <TableCell>A webhook arrives twice</TableCell>
+                  <TableCell>Unique IDs and nonces. Duplicates ignored.</TableCell>
+                </TableRow>
+                <TableRow key="partner-down">
+                  <TableCell>A partner's server is offline</TableCell>
+                  <TableCell>Queued delivery with retries. Circuit breaker stops hammering a dead partner.</TableCell>
+                </TableRow>
+                <TableRow key="misbehaves">
+                  <TableCell>A partner misbehaves (spam, fraud)</TableCell>
+                  <TableCell>Per-partner rate limits. Per-feature kill switches. One-click suspension.</TableCell>
+                </TableRow>
+                <TableRow key="global">
+                  <TableCell>We lose trust in federation entirely</TableCell>
+                  <TableCell>Platform-wide kill switch in super-admin. Disables all federation everywhere, instantly.</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+
+          <Divider />
+
+          <div>
+            <h4 className="font-semibold text-base mb-1">One-sentence summary</h4>
+            <blockquote className="border-l-4 border-primary pl-4 italic text-default-700">
+              Federation is two timebanks agreeing to act as one network. API keys let them ask
+              each other questions. Webhooks let them tap each other on the shoulder when
+              something urgent happens. Everything is signed, revocable, and off by default until
+              both sides say yes.
+            </blockquote>
+          </div>
+
+          <Divider />
+
+          <div className="text-default-500">
+            <p>
+              Ready for the technical detail? Use the other tabs above: <strong>Authentication</strong>,
+              {' '}<strong>Endpoints</strong>, <strong>Examples</strong>, <strong>Error Codes</strong>,
+              {' '}<strong>Webhooks</strong>.
+            </p>
+            <p className="mt-2">
+              Full manual (MD + PDF): <code>docs/FEDERATION_API_MANUAL.md</code>.
+            </p>
+          </div>
+        </CardBody>
+      </Card>
+    </div>
   );
 }
 
@@ -1126,6 +1326,20 @@ export function ApiDocumentation() {
           tab: 'h-12',
         }}
       >
+        <Tab
+          key="overview"
+          title={
+            <div className="flex items-center gap-2">
+              <HelpCircle size={16} />
+              <span>{t('federation.api_docs_overview', 'Overview')}</span>
+            </div>
+          }
+        >
+          <div className="pt-4">
+            <OverviewTab />
+          </div>
+        </Tab>
+
         <Tab
           key="auth"
           title={

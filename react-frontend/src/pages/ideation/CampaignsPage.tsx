@@ -161,7 +161,7 @@ export function CampaignsPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
-      <PageMeta title="Campaigns" noIndex />
+      <PageMeta title={t('page_meta.campaigns.title')} noIndex />
       {/* Back link */}
       <Button
         variant="light"

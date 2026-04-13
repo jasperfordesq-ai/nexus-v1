@@ -44,7 +44,7 @@ class SendWelcomeNotification implements ShouldQueue
                 'tenant_id'  => $event->tenantId,
                 'user_id'    => $event->user->id,
                 'type'       => 'welcome',
-                'message'    => 'Welcome to the community! Start by exploring your feed and connecting with other members.',
+                'message'    => __('emails.welcome.in_app_message'),
                 'link'       => '/feed',
                 'is_read'    => false,
                 'created_at' => now(),
@@ -71,44 +71,44 @@ class SendWelcomeNotification implements ShouldQueue
 
                 $html = EmailTemplateBuilder::make()
                     ->theme('success')
-                    ->title("Welcome to {$safeTenantName}!")
-                    ->previewText("Verify your email to get started on {$safeTenantName}.")
+                    ->title(__('emails.welcome.title', ['community' => $safeTenantName]))
+                    ->previewText(__('emails.welcome.pending_preview', ['community' => $safeTenantName]))
                     ->greeting($safeUserName)
-                    ->paragraph("Welcome to <strong>{$safeTenantName}</strong>! We're excited to have you join our community.")
-                    ->paragraph("Please verify your email address by clicking the button below to activate your account. This link expires in 24 hours.")
-                    ->button('Verify Email & Get Started', $verifyUrl)
-                    ->paragraph("Once verified, you can:")
+                    ->paragraph(__('emails.welcome.pending_intro', ['community' => $safeTenantName]))
+                    ->paragraph(__('emails.welcome.pending_verify_instruction'))
+                    ->button(__('emails.welcome.pending_button'), $verifyUrl)
+                    ->paragraph(__('emails.welcome.pending_once_verified'))
                     ->bulletList([
-                        '<strong>Complete your profile</strong> — let others know who you are',
-                        '<strong>Browse listings</strong> — discover skills and services offered by members',
-                        '<strong>Make connections</strong> — reach out to people in your community',
+                        __('emails.welcome.pending_bullet_profile'),
+                        __('emails.welcome.pending_bullet_listings'),
+                        __('emails.welcome.pending_bullet_connections'),
                     ])
-                    ->paragraph("If you did not create this account, you can safely ignore this email.")
+                    ->paragraph(__('emails.welcome.pending_ignore'))
                     ->render();
 
                 $mailer = \App\Core\Mailer::forCurrentTenant();
-                $mailer->send($userEmail, "Verify Your Email - {$tenantName}", $html);
+                $mailer->send($userEmail, __('emails.welcome.pending_subject', ['community' => $tenantName]), $html);
             } else {
                 // Already active user (admin-created) — generic welcome only
                 $html = EmailTemplateBuilder::make()
                     ->theme('success')
-                    ->title("Welcome to {$safeTenantName}!")
-                    ->previewText("Welcome aboard, {$safeUserName}! Here's how to get started.")
+                    ->title(__('emails.welcome.title', ['community' => $safeTenantName]))
+                    ->previewText(__('emails.welcome.active_preview', ['name' => $safeUserName]))
                     ->greeting($safeUserName)
-                    ->paragraph("Welcome to <strong>{$safeTenantName}</strong>! We're excited to have you join our community.")
-                    ->highlight("Here are some things to get started:", '✨')
+                    ->paragraph(__('emails.welcome.active_intro', ['community' => $safeTenantName]))
+                    ->highlight(__('emails.welcome.active_get_started'), '✨')
                     ->bulletList([
-                        '<strong>Complete your profile</strong> — let others know who you are and what you can offer',
-                        '<strong>Browse listings</strong> — discover skills and services offered by other members',
-                        '<strong>Make connections</strong> — reach out to people in your community',
-                        '<strong>Explore events</strong> — find upcoming activities and gatherings',
+                        __('emails.welcome.active_bullet_profile'),
+                        __('emails.welcome.active_bullet_listings'),
+                        __('emails.welcome.active_bullet_connections'),
+                        __('emails.welcome.active_bullet_events'),
                     ])
-                    ->paragraph("If you have any questions, don't hesitate to reach out. We're here to help!")
-                    ->button('Explore Your Community', EmailTemplateBuilder::tenantUrl('/feed'))
+                    ->paragraph(__('emails.welcome.active_help'))
+                    ->button(__('emails.welcome.active_button'), EmailTemplateBuilder::tenantUrl('/feed'))
                     ->render();
 
                 $mailer = \App\Core\Mailer::forCurrentTenant();
-                $mailer->send($userEmail, "Welcome to {$tenantName}!", $html);
+                $mailer->send($userEmail, __('emails.welcome.subject', ['community' => $tenantName]), $html);
             }
         } catch (\Throwable $e) {
             Log::error('SendWelcomeNotification listener failed', [

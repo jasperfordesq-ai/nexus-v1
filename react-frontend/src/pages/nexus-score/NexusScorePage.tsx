@@ -247,7 +247,7 @@ export default function NexusScorePage() {
       initial="hidden"
       animate="show"
     >
-      <PageMeta title="NexusScore" noIndex />
+      <PageMeta title={t('page_meta.nexus_score.title')} noIndex />
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <motion.div variants={itemVariants} className="flex items-center justify-between gap-4">
         <div>

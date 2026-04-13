@@ -46,7 +46,7 @@ export function ForgotPasswordPage() {
   if (isSubmitted) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <PageMeta title="Forgot Password" noIndex />
+        <PageMeta title={t('page_meta.forgot_password.title')} noIndex />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -89,7 +89,7 @@ export function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <PageMeta title="Forgot Password" noIndex />
+      <PageMeta title={t('page_meta.forgot_password.title')} noIndex />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

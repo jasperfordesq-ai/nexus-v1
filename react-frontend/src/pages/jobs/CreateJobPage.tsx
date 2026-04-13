@@ -669,7 +669,7 @@ export function CreateJobPage() {
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
-      <PageMeta title="Post a Job" noIndex />
+      <PageMeta title={t('page_meta.create.title')} noIndex />
       {/* Back nav */}
       <Link
         to={isEditing ? tenantPath(`/jobs/${id}`) : tenantPath('/jobs')}

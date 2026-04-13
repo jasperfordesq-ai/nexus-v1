@@ -392,7 +392,7 @@ export function ExchangeDetailPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-3xl mx-auto space-y-6"
     >
-      <PageMeta title="Exchange Details" noIndex />
+      <PageMeta title={t('page_meta.detail.title')} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('breadcrumb.exchanges'), href: '/exchanges' },

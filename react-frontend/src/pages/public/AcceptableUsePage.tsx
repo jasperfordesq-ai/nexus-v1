@@ -52,7 +52,7 @@ export function AcceptableUsePage() {
   if (customDoc) {
     return (
       <>
-        <PageMeta title="Acceptable Use Policy" description="Acceptable use policy for our community timebanking platform." />
+        <PageMeta title={t('page_meta.acceptable_use.title')} description={t('page_meta.acceptable_use.description')} />
         <CustomLegalDocument document={customDoc} />
       </>
     );
@@ -66,7 +66,7 @@ export function AcceptableUsePage() {
       animate="visible"
       className="max-w-4xl mx-auto space-y-6"
     >
-      <PageMeta title="Acceptable Use Policy" description="Acceptable use policy for our community timebanking platform." />
+      <PageMeta title={t('page_meta.acceptable_use.title')} description={t('page_meta.acceptable_use.description')} />
       <motion.div variants={itemVariants} className="text-center">
         <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 mb-4">
           <ShieldCheck className="w-10 h-10 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />

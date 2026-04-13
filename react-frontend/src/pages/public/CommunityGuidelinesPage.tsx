@@ -52,7 +52,7 @@ export function CommunityGuidelinesPage() {
   if (customDoc) {
     return (
       <>
-        <PageMeta title="Community Guidelines" description="Community guidelines for respectful and productive timebanking." />
+        <PageMeta title={t('page_meta.community_guidelines.title')} description={t('page_meta.community_guidelines.description')} />
         <CustomLegalDocument document={customDoc} />
       </>
     );
@@ -66,7 +66,7 @@ export function CommunityGuidelinesPage() {
       animate="visible"
       className="max-w-4xl mx-auto space-y-6"
     >
-      <PageMeta title="Community Guidelines" description="Community guidelines for respectful and productive timebanking." />
+      <PageMeta title={t('page_meta.community_guidelines.title')} description={t('page_meta.community_guidelines.description')} />
       <motion.div variants={itemVariants} className="text-center">
         <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 mb-4">
           <Users className="w-10 h-10 text-blue-500 dark:text-blue-400" aria-hidden="true" />

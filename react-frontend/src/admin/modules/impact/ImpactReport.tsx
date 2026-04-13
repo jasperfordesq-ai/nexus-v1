@@ -989,9 +989,9 @@ export function ImpactReport() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={closeConfig}>Cancel</Button>
+            <Button variant="flat" onPress={closeConfig}>{t('common.cancel')}</Button>
             <Button color="primary" onPress={handleSaveConfig} isLoading={saving} isDisabled={saving}>
-              Save Configuration
+              {t('impact.save_configuration')}
             </Button>
           </ModalFooter>
         </ModalContent>

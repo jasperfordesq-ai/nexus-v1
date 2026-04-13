@@ -373,7 +373,7 @@ class GamificationController extends BaseApiController
         $badgeKeys = $this->input('badge_keys', []);
 
         if (!is_array($badgeKeys)) {
-            return $this->error('badge_keys must be an array', 422, 'VALIDATION_ERROR');
+            return $this->error(__('errors.validation.badge_keys_must_be_array'), 422, 'VALIDATION_ERROR');
         }
         if (count($badgeKeys) > 5) {
             return $this->error('Maximum 5 badges allowed', 422, 'VALIDATION_ERROR');

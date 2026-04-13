@@ -471,7 +471,7 @@ class FederationV2Controller extends BaseApiController
             ]);
         } catch (\Exception $e) {
             error_log("FederationV2Api::partnerDetail error: " . $e->getMessage());
-            return response()->json(['success' => false, 'error' => 'Failed to load partner'], 500);
+            return response()->json(['success' => false, 'error' => __('errors.admin.federation.failed_to_load_partner')], 500);
         }
     }
 

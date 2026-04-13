@@ -137,24 +137,37 @@ class GroupRecommendationEngine
 
         $placeholders = implode(',', array_fill(0, count($userGroupIds), '?'));
 
+        // PERF: Replace per-row correlated subquery (which re-scanned group_members for
+        // every candidate user) with aggregation-only Jaccard. The previous query was
+        // O(candidates * group_members rows). Now we compute:
+        //   - U = |user's groups| (constant, count of $userGroupIds)
+        //   - V = |other user's groups| via a single grouped subquery
+        //   - X = overlap (COUNT in main aggregation)
+        //   - jaccard = X / (U + V - X)
+        $userGroupCount = count($userGroupIds);
+
         $similarUsers = DB::select("
             SELECT
                 gm.user_id,
                 COUNT(*) as overlap_count,
-                (COUNT(*) * 1.0 / (
-                    SELECT COUNT(DISTINCT group_id) FROM group_members
-                    WHERE user_id IN (?, gm.user_id) AND status = 'active'
-                )) as jaccard_similarity
+                user_totals.total_groups as other_total,
+                (COUNT(*) * 1.0 / (? + user_totals.total_groups - COUNT(*))) as jaccard_similarity
             FROM group_members gm
+            JOIN (
+                SELECT user_id, COUNT(DISTINCT group_id) as total_groups
+                FROM group_members
+                WHERE status = 'active'
+                GROUP BY user_id
+            ) user_totals ON user_totals.user_id = gm.user_id
             WHERE gm.group_id IN ($placeholders)
             AND gm.user_id != ?
             AND gm.status = 'active'
             AND gm.group_id IN (SELECT g.id FROM `groups` g WHERE g.tenant_id = ?)
-            GROUP BY gm.user_id
+            GROUP BY gm.user_id, user_totals.total_groups
             HAVING overlap_count >= 2
             ORDER BY jaccard_similarity DESC, overlap_count DESC
             LIMIT 100
-        ", array_merge([$userId], $userGroupIds, [$userId, $tenantId]));
+        ", array_merge([$userGroupCount], $userGroupIds, [$userId, $tenantId]));
 
         if (empty($similarUsers)) {
             return [];

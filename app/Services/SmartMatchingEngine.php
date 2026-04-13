@@ -152,13 +152,44 @@ class SmartMatchingEngine
         $matches = [];
         $seenIds = [];
 
+        // PERF: Batch candidate lookup. Previous code fired one query per user listing
+        // (N+1 over $userListings). Now we group by targetType and issue at most 2 queries
+        // (one for 'offer' candidates, one for 'request' candidates), filtered by the
+        // union of all relevant category_ids. We then dispatch candidates back to each
+        // source listing by matching category_id in PHP.
+        $byTargetType = ['offer' => [], 'request' => []]; // targetType => list of category_ids
+        $myListingsByTarget = ['offer' => [], 'request' => []]; // targetType => list of myListings
         foreach ($userListings as $myListing) {
             $targetType = ($myListing['type'] === 'offer') ? 'request' : 'offer';
+            if (!empty($myListing['category_id'])) {
+                $byTargetType[$targetType][] = (int) $myListing['category_id'];
+            }
+            $myListingsByTarget[$targetType][] = $myListing;
+        }
 
-            $candidates = $this->getCandidateListings(
-                $tenantId, $userId, $targetType, $myListing['category_id'],
+        $candidatesByTargetType = ['offer' => [], 'request' => []];
+        foreach ($byTargetType as $targetType => $categoryIds) {
+            if (empty($myListingsByTarget[$targetType])) {
+                continue;
+            }
+            $uniqueCatIds = array_values(array_unique($categoryIds));
+            $candidatesByTargetType[$targetType] = $this->getCandidateListingsBatch(
+                $tenantId, $userId, $targetType, $uniqueCatIds,
                 $categoryFilter, $userData['latitude'], $userData['longitude'], $maxDistance
             );
+        }
+
+        foreach ($userListings as $myListing) {
+            $targetType = ($myListing['type'] === 'offer') ? 'request' : 'offer';
+            $myCatId = $myListing['category_id'] ?? null;
+
+            // Dispatch: candidates whose category_id matches this listing, OR all if myCatId null.
+            $candidates = [];
+            foreach ($candidatesByTargetType[$targetType] as $cand) {
+                if ($myCatId === null || (int) ($cand['category_id'] ?? 0) === (int) $myCatId) {
+                    $candidates[] = $cand;
+                }
+            }
 
             foreach ($candidates as $candidate) {
                 if (in_array($candidate['id'], $seenIds)) {
@@ -736,6 +767,73 @@ class SmartMatchingEngine
         }
 
         $sql .= " LIMIT 50";
+
+        return array_map(fn ($row) => (array) $row, DB::select($sql, $params));
+    }
+
+    /**
+     * Batch variant of getCandidateListings — accepts an array of category_ids and
+     * returns candidates matching ANY of them. Caller groups by category in PHP.
+     * Mirrors getCandidateListings logic but uses IN clause instead of single-id match.
+     */
+    private function getCandidateListingsBatch(
+        int $tenantId, int $excludeUserId, string $targetType, array $categoryIds,
+        ?array $categoryFilter, ?float $userLat, ?float $userLon, float $maxDistance
+    ): array {
+        $params = [$tenantId, $targetType, $excludeUserId];
+
+        $sql = "SELECT l.*,
+                       u.first_name, u.last_name, u.avatar_url, u.location as author_location,
+                       u.latitude as author_latitude, u.longitude as author_longitude,
+                       u.is_verified as author_verified,
+                       TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))) as user_name,
+                       (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id AND tenant_id = u.tenant_id) as author_rating,
+                       c.name as category_name, c.color as category_color";
+
+        if ($userLat && $userLon) {
+            $sql .= ",
+                (6371 * acos(
+                    cos(radians(?)) * cos(radians(COALESCE(l.latitude, u.latitude, 0))) *
+                    cos(radians(COALESCE(l.longitude, u.longitude, 0)) - radians(?)) +
+                    sin(radians(?)) * sin(radians(COALESCE(l.latitude, u.latitude, 0)))
+                )) as distance_km";
+            $params = array_merge([$userLat, $userLon, $userLat], $params);
+        }
+
+        $sql .= " FROM listings l
+                  JOIN users u ON l.user_id = u.id
+                  LEFT JOIN categories c ON l.category_id = c.id
+                  WHERE l.tenant_id = ? AND l.type = ? AND l.status = 'active' AND l.user_id != ?
+                  AND u.status NOT IN ('banned', 'suspended')";
+
+        if ($this->userBlocksTableExists()) {
+            $sql .= "
+                  AND l.user_id NOT IN (SELECT blocked_user_id FROM user_blocks WHERE user_id = ?)
+                  AND l.user_id NOT IN (SELECT user_id FROM user_blocks WHERE blocked_user_id = ?)";
+            $params[] = $excludeUserId;
+            $params[] = $excludeUserId;
+        }
+
+        if (!empty($categoryIds)) {
+            $placeholders = implode(',', array_fill(0, count($categoryIds), '?'));
+            $sql .= " AND l.category_id IN ($placeholders)";
+            $params = array_merge($params, $categoryIds);
+        } elseif ($categoryFilter && !empty($categoryFilter)) {
+            $placeholders = implode(',', array_fill(0, count($categoryFilter), '?'));
+            $sql .= " AND l.category_id IN ($placeholders)";
+            $params = array_merge($params, $categoryFilter);
+        }
+
+        if ($userLat && $userLon) {
+            $sql .= " HAVING distance_km <= ?";
+            $params[] = $maxDistance;
+            $sql .= " ORDER BY distance_km ASC";
+        } else {
+            $sql .= " ORDER BY l.created_at DESC";
+        }
+
+        // Slightly larger cap since we're servicing multiple source listings.
+        $sql .= " LIMIT 200";
 
         return array_map(fn ($row) => (array) $row, DB::select($sql, $params));
     }

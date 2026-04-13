@@ -234,11 +234,14 @@ class PasswordResetController extends BaseApiController
             return;
         }
 
-        // Generate a secure random token
+        // Generate a secure random token (256-bit entropy, hex-encoded)
         $token = bin2hex(random_bytes(32));
 
-        // Hash the token before storing (we send unhashed token via email)
-        $hashedToken = password_hash($token, PASSWORD_DEFAULT);
+        // Hash the token with SHA-256 for storage. SHA-256 is appropriate here
+        // (NOT for passwords) because the token is high-entropy random data.
+        // This enables an indexed exact-match lookup instead of scanning
+        // every non-expired record with bcrypt's password_verify().
+        $hashedToken = hash('sha256', $token);
 
         // Delete any existing tokens for this email
         DB::delete(
@@ -298,21 +301,29 @@ class PasswordResetController extends BaseApiController
             [self::TOKEN_EXPIRY_SECONDS]
         );
 
-        // Fetch all non-expired tokens
-        $records = DB::select(
-            "SELECT * FROM password_resets WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? SECOND) ORDER BY created_at DESC LIMIT 500",
-            [self::TOKEN_EXPIRY_SECONDS]
+        // Hash the supplied token with SHA-256 and look it up directly by
+        // the indexed token column. This eliminates the linear-scan timing
+        // signal from the previous bcrypt-per-row approach.
+        $hashedToken = hash('sha256', $token);
+
+        $record = DB::selectOne(
+            "SELECT * FROM password_resets WHERE token = ? AND created_at >= DATE_SUB(NOW(), INTERVAL ? SECOND) LIMIT 1",
+            [$hashedToken, self::TOKEN_EXPIRY_SECONDS]
         );
 
-        // Check each record with password_verify (constant-time comparison)
-        foreach ($records as $record) {
-            $recordArr = (array)$record;
-            if (password_verify($token, $recordArr['token'])) {
-                return $recordArr;
-            }
+        if (!$record) {
+            return null;
         }
 
-        return null;
+        $recordArr = (array)$record;
+
+        // Constant-time confirmation (defence in depth — DB equality already
+        // matched, but hash_equals avoids any future-proofing surprises).
+        if (!hash_equals($recordArr['token'], $hashedToken)) {
+            return null;
+        }
+
+        return $recordArr;
     }
 
     /**

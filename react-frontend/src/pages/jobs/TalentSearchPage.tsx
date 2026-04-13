@@ -196,7 +196,7 @@ export function TalentSearchPage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title="Talent Search" noIndex />
+      <PageMeta title={t('page_meta.talent_search.title')} noIndex />
       {/* Back navigation */}
       <Link
         to={tenantPath('/jobs')}

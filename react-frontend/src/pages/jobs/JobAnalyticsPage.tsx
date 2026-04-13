@@ -184,7 +184,7 @@ export function JobAnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title="Job Analytics" noIndex />
+      <PageMeta title={t('page_meta.analytics.title')} noIndex />
       {/* Back nav */}
       <Link
         to={tenantPath(`/jobs/${id}`)}

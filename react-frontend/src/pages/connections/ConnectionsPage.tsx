@@ -572,7 +572,7 @@ export default function ConnectionsPage() {
 
   return (
     <div className="min-h-screen py-6 px-4">
-      <PageMeta title="Connections" noIndex />
+      <PageMeta title={t('page_meta.title')} noIndex />
       <div className="max-w-3xl mx-auto">
         {/* Page header */}
         <div className="mb-6">

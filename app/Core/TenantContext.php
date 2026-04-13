@@ -28,6 +28,16 @@ class TenantContext
     private static $tenant = null;
     private static $basePath = '';
 
+    /**
+     * Per-request memoized tenant ID. Avoids repeated array dereference of
+     * self::$tenant['id'] on every getId() call (called thousands of times
+     * per request from tenant-scoped queries). Cleared by setById/reset.
+     *
+     * Static is request-scoped under PHP-FPM/mod_php, but Octane-style
+     * persistent workers MUST call reset() between requests.
+     */
+    private static ?int $cachedId = null;
+
     /** @var int|null Tenant ID extracted from Bearer token (for mismatch detection) */
     private static $tokenTenantId = null;
 
@@ -353,7 +363,27 @@ class TenantContext
 
     public static function getId()
     {
-        return self::get()['id'];
+        if (self::$cachedId !== null) {
+            return self::$cachedId;
+        }
+        $id = self::get()['id'] ?? null;
+        if ($id !== null) {
+            self::$cachedId = (int) $id;
+        }
+        return $id;
+    }
+
+    /**
+     * Reset all per-request tenant state. Required for Octane/Swoole-style
+     * persistent workers; safe no-op under PHP-FPM/mod_php.
+     */
+    public static function reset(): void
+    {
+        self::$tenant = null;
+        self::$basePath = '';
+        self::$cachedId = null;
+        self::$tokenTenantId = null;
+        self::$headerTenantId = null;
     }
 
     /**
@@ -368,6 +398,7 @@ class TenantContext
 
         if ($tenant) {
             self::$tenant = $tenant;
+            self::$cachedId = (int) $tenant['id'];
             // Keep basePath as-is (empty for admin routes)
             return true;
         }

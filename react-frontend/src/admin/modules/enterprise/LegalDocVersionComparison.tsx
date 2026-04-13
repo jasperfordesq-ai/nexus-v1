@@ -12,7 +12,7 @@ import {
   Spinner,
   Chip,
 } from '@heroui/react';
-import DOMPurify from 'dompurify';
+import { sanitizeRichText } from '@/lib/sanitize';
 import { GitCompare, FileText, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts/ToastContext';
@@ -131,7 +131,7 @@ export default function LegalDocVersionComparison({
               <h3 className="font-semibold mb-3">{t('enterprise.comparison.content_comparison')}</h3>
               <div
                 className="version-diff-content prose dark:prose-invert max-w-none p-4 border rounded-lg bg-[var(--color-surface)]"
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(comparison.diff_html) }}
+                dangerouslySetInnerHTML={{ __html: sanitizeRichText(comparison.diff_html) }}
               />
             </div>
 

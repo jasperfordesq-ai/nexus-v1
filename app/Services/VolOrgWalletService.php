@@ -55,7 +55,9 @@ class VolOrgWalletService
     public static function getTransactions(int $volOrgId, array $filters = []): array
     {
         $tenantId = TenantContext::getId();
-        $limit = min((int) ($filters['limit'] ?? 20), 50);
+        // Hard cap at 50 rows to bound the LEFT JOIN users payload per request.
+        $requested = (int) ($filters['limit'] ?? 20);
+        $limit = max(1, min($requested, 50));
         $cursor = $filters['cursor'] ?? null;
 
         $params = [$volOrgId, $tenantId];

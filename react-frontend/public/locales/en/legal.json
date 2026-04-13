@@ -429,7 +429,7 @@
     "read": "Read",
     "consent_text": "By clicking Accept, you confirm you have read and agree to the documents listed above.",
     "accept_aria": "Accept all updated legal documents and continue",
-    "accepting": "Accepting\u2026",
+    "accepting": "Accepting…",
     "accept_continue": "Accept & Continue"
   },
   "custom": {
@@ -439,5 +439,35 @@
     "cta_title": "Have Questions?",
     "cta_body": "If you have any questions about this document, please contact us.",
     "contact_us": "Contact Us"
+  },
+  "page_meta": {
+    "platform_terms": {
+      "title": "Platform Terms of Service",
+      "description": "Terms of service governing use of the NEXUS community timebanking platform."
+    },
+    "platform_privacy": {
+      "title": "Platform Privacy Policy",
+      "description": "How the NEXUS platform collects, processes, and protects your personal data."
+    },
+    "platform_disclaimer": {
+      "title": "Platform Disclaimer",
+      "description": "Important disclaimers about the use of the NEXUS community timebanking platform."
+    },
+    "community_guidelines": {
+      "title": "Community Guidelines",
+      "description": "Community guidelines for respectful and productive timebanking."
+    },
+    "acceptable_use": {
+      "title": "Acceptable Use Policy",
+      "description": "Acceptable use policy for our community timebanking platform."
+    },
+    "legal_hub": {
+      "title": "Legal Information",
+      "description": "Legal documents, policies, and compliance information."
+    },
+    "legal_version_history": {
+      "title": "Legal Version History",
+      "description": "Version history of our legal documents and policies."
+    }
   }
 }

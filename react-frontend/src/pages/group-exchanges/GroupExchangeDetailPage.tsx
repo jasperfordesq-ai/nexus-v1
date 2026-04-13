@@ -441,7 +441,7 @@ export function GroupExchangeDetailPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-3xl mx-auto space-y-6"
     >
-      <PageMeta title="Group Exchange" noIndex />
+      <PageMeta title={t('page_meta.detail.title')} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('title'), href: '/group-exchanges' },

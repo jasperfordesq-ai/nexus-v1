@@ -133,7 +133,7 @@ export default function RegisterOrganisationPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-2xl mx-auto space-y-6"
     >
-      <PageMeta title="Register Organisation" noIndex />
+      <PageMeta title={t('page_meta.register_organisation.title')} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('organisations.heading'), href: '/organisations' },

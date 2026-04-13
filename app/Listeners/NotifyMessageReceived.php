@@ -59,9 +59,9 @@ class NotifyMessageReceived implements ShouldQueue
                 return;
             }
 
-            $senderName = $event->sender->first_name ?? $event->sender->name ?? 'Someone';
+            $senderName = $event->sender->first_name ?? $event->sender->name ?? __('emails.message.fallback_sender_name');
             $link = '/messages/' . $senderId;
-            $content = "{$senderName} sent you a message";
+            $content = __('emails.message.in_app_content', ['sender' => $senderName]);
 
             // Build a rich HTML email body using EmailTemplateBuilder
             $htmlContent = $this->buildMessageEmailHtml($event, $senderName, $link);
@@ -118,33 +118,35 @@ class NotifyMessageReceived implements ShouldQueue
         $preview = mb_strlen($preview) > 200 ? mb_substr($preview, 0, 200) . '…' : $preview;
 
         // Get recipient name for greeting
-        $recipientName = 'there';
+        $recipientName = __('emails.message.fallback_recipient_name');
         try {
             $recipient = User::withoutGlobalScopes()->find((int) $event->message->receiver_id);
             if ($recipient) {
-                $recipientName = $recipient->first_name ?? $recipient->name ?? 'there';
+                $recipientName = $recipient->first_name ?? $recipient->name ?? __('emails.message.fallback_recipient_name');
             }
         } catch (\Throwable $e) {
             // Fallback to generic greeting
         }
 
+        $safeSenderName = htmlspecialchars($senderName, ENT_QUOTES, 'UTF-8');
+
         $builder = EmailTemplateBuilder::make()
             ->theme('brand')
-            ->title('New Message')
-            ->previewText("{$senderName} sent you a message")
+            ->title(__('emails.message.title'))
+            ->previewText(__('emails.message.preview', ['sender' => $senderName]))
             ->greeting($recipientName)
-            ->paragraph("You have a new message from <strong>" . htmlspecialchars($senderName, ENT_QUOTES, 'UTF-8') . "</strong>.");
+            ->paragraph(__('emails.message.body_intro', ['sender' => $safeSenderName]));
 
         // Include message preview if available (not voice messages)
         if (!empty($preview) && !$event->message->is_voice) {
             $builder->blockquote($preview, $senderName);
         } elseif ($event->message->is_voice) {
-            $builder->highlight('This is a voice message — listen to it on the platform.', '🎙️');
+            $builder->highlight(__('emails.message.voice_notice'), '🎙️');
         }
 
-        $builder->button('View Conversation', $messageUrl)
+        $builder->button(__('emails.message.view_button'), $messageUrl)
             ->divider()
-            ->paragraph('<span style="font-size: 13px; color: #6b7280;">You can reply directly from the platform. To stop receiving message emails, update your <a href="' . EmailTemplateBuilder::tenantUrl('/notifications') . '">notification preferences</a>.</span>');
+            ->paragraph('<span style="font-size: 13px; color: #6b7280;">' . __('emails.message.footer_note', ['url' => EmailTemplateBuilder::tenantUrl('/notifications')]) . '</span>');
 
         return $builder->render();
     }

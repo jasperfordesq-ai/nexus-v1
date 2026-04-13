@@ -494,5 +494,10 @@
     "suggested_rest_days": "Suggested Rest Days",
     "rest_days_desc": "Based on your recent activity, we recommend taking a break on these days:",
     "recent_checkins": "Recent Mood Check-ins"
+  },
+  "page_meta": {
+    "create_opportunity": {
+      "title": "Create Opportunity"
+    }
   }
 }

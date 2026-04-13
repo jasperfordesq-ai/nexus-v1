@@ -10,7 +10,7 @@
  */
 
 import { Fragment } from 'react';
-import DOMPurify from 'dompurify';
+import { sanitizeRichText } from '@/lib/sanitize';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
@@ -29,36 +29,18 @@ interface FeedContentRendererProps {
 
 /* ───────────────────────── Constants ───────────────────────── */
 
-const ALLOWED_TAGS = ['p', 'br', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'a'];
-const ALLOWED_ATTR = ['href', 'target', 'rel'];
-
 /** Regex to detect if a string contains HTML tags */
 const HTML_TAG_REGEX = /<[a-z][\s\S]*>/i;
 
 /* ───────────────────────── DOMPurify Configuration ───────────────────────── */
 
 /**
- * Configure DOMPurify to force safe link attributes on all anchor tags.
- * This hook runs after DOMPurify sanitizes but before final output.
+ * Sanitize feed HTML using the unified rich-text profile. The shared
+ * helper already forces target=_blank + rel=noopener noreferrer nofollow
+ * on every anchor and blocks unsafe URI schemes.
  */
 function sanitizeHtml(html: string): string {
-  // Create a new DOMPurify instance hook for this call
-  const clean = DOMPurify.sanitize(html, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
-  });
-
-  // Post-process: ensure all <a> tags have target and rel attributes
-  // DOMPurify strips unknown attributes, so we add them after sanitization
-  const div = document.createElement('div');
-  div.innerHTML = clean;
-  const links = div.querySelectorAll('a');
-  links.forEach((link) => {
-    link.setAttribute('target', '_blank');
-    link.setAttribute('rel', 'noopener noreferrer');
-  });
-
-  return div.innerHTML;
+  return sanitizeRichText(html);
 }
 
 /* ───────────────────────── Hashtag & Mention Helper ───────────────────────── */

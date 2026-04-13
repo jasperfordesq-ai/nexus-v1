@@ -191,7 +191,7 @@ export function RequestExchangePage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-2xl mx-auto space-y-6"
     >
-      <PageMeta title="Request Exchange" noIndex />
+      <PageMeta title={t('page_meta.request.title')} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('request.breadcrumb_listings'), href: '/listings' },

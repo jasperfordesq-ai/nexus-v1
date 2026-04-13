@@ -23,13 +23,16 @@ class AdminEventsControllerTest extends TestCase
 
     private function createEvent(int $tenantId): int
     {
+        $organizer = User::factory()->forTenant($tenantId)->create();
+
         return DB::table('events')->insertGetId([
             'tenant_id' => $tenantId,
+            'user_id' => $organizer->id,
             'title' => 'Test Event',
             'description' => 'A test event description',
-            'status' => 'pending',
-            'start_date' => now()->addDays(7),
-            'end_date' => now()->addDays(7)->addHours(2),
+            'status' => 'active',
+            'start_time' => now()->addDays(7),
+            'end_time' => now()->addDays(7)->addHours(2),
             'created_at' => now(),
             'updated_at' => now(),
         ]);

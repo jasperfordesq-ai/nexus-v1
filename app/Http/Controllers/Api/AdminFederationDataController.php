@@ -491,7 +491,7 @@ class AdminFederationDataController extends BaseApiController
             if (!in_array((string) $key, $allowedKeys, true)) {
                 $errors[] = [
                     'code' => 'UNKNOWN_KEY',
-                    'message' => "Unknown key: {$key}",
+                    'message' => __('errors.admin.federation.unknown_key', ['key' => $key]),
                     'field' => (string) $key,
                 ];
             }
@@ -500,7 +500,7 @@ class AdminFederationDataController extends BaseApiController
             if (isset($data[$k]) && !is_array($data[$k])) {
                 $errors[] = [
                     'code' => 'INVALID_SHAPE',
-                    'message' => "{$k} must be an array",
+                    'message' => __('errors.admin.federation.must_be_array', ['field' => $k]),
                     'field' => $k,
                 ];
             }

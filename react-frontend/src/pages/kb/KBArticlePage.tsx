@@ -41,7 +41,7 @@ import {
   Download,
   File,
 } from 'lucide-react';
-import DOMPurify from 'dompurify';
+import { sanitizeRichText } from '@/lib/sanitize';
 import { Helmet } from 'react-helmet-async';
 import { lazy, Suspense } from 'react';
 
@@ -354,7 +354,7 @@ export function KBArticlePage() {
                 prose-pre:bg-theme-elevated prose-pre:border prose-pre:border-theme-default
                 prose-img:rounded-lg prose-blockquote:border-blue-400
                 prose-li:text-theme-secondary"
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content || '') }}
+              dangerouslySetInnerHTML={{ __html: sanitizeRichText(article.content || '') }}
             />
           )}
 

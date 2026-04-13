@@ -280,6 +280,7 @@ return [
     'rows_array_required'                  => 'An array of subscriber rows is required',
     'newsletter_already_sent'              => 'Newsletter has already been sent',
     'newsletter_currently_sending'         => 'Newsletter is currently being sent',
+    'newsletter_send_failed'               => 'Failed to send newsletter. Please try again or check logs.',
     'newsletter_duplicated'                => 'Newsletter duplicated successfully',
     'ab_winner_must_be_a_or_b'             => 'Winner must be "a" or "b"',
     'no_ab_testing'                        => 'Newsletter does not have A/B testing enabled',
@@ -1514,4 +1515,17 @@ return [
 
     // Group exchanges
     'total_hours_gt_zero'                  => 'Total hours must be greater than 0',
+
+    // Federation API errors (hardcoded-string audit — 2026-04-13)
+    'federation' => [
+        'partner_not_found'          => 'Partner not found',
+        'feature_disabled'           => 'Federation feature disabled for this tenant',
+        'webhook_rate_limited'       => 'Too many requests',
+        'webhook_empty_body'         => 'Empty request body',
+        'webhook_auth_failed'        => 'Invalid API key or webhook signature',
+        'webhook_invalid_nonce'      => 'Nonce must be 8-128 chars',
+        'webhook_invalid_json'       => 'Invalid JSON',
+        'webhook_missing_event'      => 'Missing event type',
+        'webhook_partner_inactive'   => 'Partner is not active',
+    ],
 ];

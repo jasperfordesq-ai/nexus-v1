@@ -509,7 +509,7 @@ export function LeaderboardPage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title="Leaderboard" description="Community leaderboard — see top contributors and most active members." />
+      <PageMeta title={t('page_meta.leaderboard.title')} description={t('page_meta.leaderboard.description')} />
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">

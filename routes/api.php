@@ -1803,13 +1803,17 @@ Route::post('/app/log', [\App\Http\Controllers\Api\AppController::class, 'log'])
 Route::post('/pusher/auth', [\App\Http\Controllers\Api\PusherController::class, 'auth']);
 Route::get('/pusher/auth', [\App\Http\Controllers\Api\PusherController::class, 'auth']);
 Route::get('/pusher/config', [\App\Http\Controllers\Api\PusherController::class, 'config']);
-Route::post('/webauthn/register-challenge', [\App\Http\Controllers\Api\WebAuthnController::class, 'registerChallenge']);
-Route::post('/webauthn/register-verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'registerVerify']);
+// WebAuthn state-changing endpoints — rate-limited (10 req/min per IP) to prevent abuse of
+// challenge generation and credential mutation. Public pre-login WebAuthn endpoints
+// (/webauthn/auth-challenge, /webauthn/auth-verify) are throttled separately at throttle:30,1
+// in the public auth group above.
+Route::post('/webauthn/register-challenge', [\App\Http\Controllers\Api\WebAuthnController::class, 'registerChallenge'])->middleware('throttle:10,1');
+Route::post('/webauthn/register-verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'registerVerify'])->middleware('throttle:10,1');
 // NOTE: POST /webauthn/auth-challenge, /webauthn/auth-verify, /webauthn/login/options, /webauthn/login/verify
 // are public routes (registered above auth group) — they're pre-login flows
-Route::post('/webauthn/remove', [\App\Http\Controllers\Api\WebAuthnController::class, 'remove']);
-Route::post('/webauthn/rename', [\App\Http\Controllers\Api\WebAuthnController::class, 'rename']);
-Route::post('/webauthn/remove-all', [\App\Http\Controllers\Api\WebAuthnController::class, 'removeAll']);
+Route::post('/webauthn/remove', [\App\Http\Controllers\Api\WebAuthnController::class, 'remove'])->middleware('throttle:10,1');
+Route::post('/webauthn/rename', [\App\Http\Controllers\Api\WebAuthnController::class, 'rename'])->middleware('throttle:10,1');
+Route::post('/webauthn/remove-all', [\App\Http\Controllers\Api\WebAuthnController::class, 'removeAll'])->middleware('throttle:10,1');
 Route::get('/webauthn/credentials', [\App\Http\Controllers\Api\WebAuthnController::class, 'credentials']);
 Route::get('/webauthn/status', [\App\Http\Controllers\Api\WebAuthnController::class, 'status']);
 Route::post('/ai/chat', [\App\Http\Controllers\Api\AiChatController::class, 'chat']);

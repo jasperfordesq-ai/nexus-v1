@@ -407,7 +407,7 @@ export default function AiChatPage() {
       className="flex flex-col h-[calc(100dvh-4rem)]"
       aria-label={t('aria_chat')}
     >
-      <PageMeta title="AI Chat" noIndex />
+      <PageMeta title={t('page_meta.title')} noIndex />
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)] bg-[var(--color-surface)] flex-shrink-0">
         <div className="flex items-center gap-3">

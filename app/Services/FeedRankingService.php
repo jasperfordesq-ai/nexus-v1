@@ -115,6 +115,15 @@ class FeedRankingService
     /** @var array<int, int> */
     private array $mutedUserSet = [];
 
+    /**
+     * Per-request, per-tenant config cache. getConfig() is called from inside
+     * tight scoring loops — without this, every post scored re-queries the
+     * tenants table.
+     *
+     * @var array<int, array>
+     */
+    private static array $configCacheByTenant = [];
+
     public function __construct()
     {
     }
@@ -125,6 +134,17 @@ class FeedRankingService
 
     public static function getConfig(): array
     {
+        // Per-request memoization keyed by tenant — avoids repeated DB hits
+        // from inside scoring loops (called once per post).
+        try {
+            $tenantIdForCache = TenantContext::getId();
+            if ($tenantIdForCache !== null && isset(self::$configCacheByTenant[$tenantIdForCache])) {
+                return self::$configCacheByTenant[$tenantIdForCache];
+            }
+        } catch (\Throwable $e) {
+            $tenantIdForCache = null;
+        }
+
         $defaults = [
             'enabled' => true,
             'like_weight' => self::LIKE_WEIGHT, 'comment_weight' => self::COMMENT_WEIGHT, 'share_weight' => self::SHARE_WEIGHT,
@@ -164,6 +184,9 @@ class FeedRankingService
                 if (is_array($configArr) && isset($configArr['feed_algorithm'])) {
                     $config = array_merge($defaults, $configArr['feed_algorithm']);
                     self::validateConfigArray($config);
+                    if ($tenantIdForCache !== null) {
+                        self::$configCacheByTenant[$tenantIdForCache] = $config;
+                    }
                     return $config;
                 }
             }
@@ -172,7 +195,19 @@ class FeedRankingService
         }
 
         self::validateConfigArray($defaults);
+        if ($tenantIdForCache !== null) {
+            self::$configCacheByTenant[$tenantIdForCache] = $defaults;
+        }
         return $defaults;
+    }
+
+    /**
+     * Clear the per-request static config cache. Required for tests and for
+     * Octane-style persistent workers between requests.
+     */
+    public static function clearStaticCache(): void
+    {
+        self::$configCacheByTenant = [];
     }
 
     private static function validateConfigArray(array &$c): void

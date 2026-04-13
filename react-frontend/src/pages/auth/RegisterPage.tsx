@@ -1100,7 +1100,7 @@ export function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 py-12">
-      <PageMeta title="Create Account" noIndex />
+      <PageMeta title={t('page_meta.register.title')} noIndex />
       {/* Background blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="blob blob-indigo" />

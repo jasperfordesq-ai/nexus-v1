@@ -721,6 +721,7 @@ class CronJobRunner
         }
 
         // 1b. Clean expired password_resets table entries (Laravel password resets older than 1 hour)
+        // Global table — `password_resets` has no tenant_id column (keyed by email + token only).
         try {
             $sql = "DELETE FROM password_resets WHERE created_at < DATE_SUB(NOW(), INTERVAL 1 HOUR)";
             DB::delete($sql);
@@ -730,6 +731,7 @@ class CronJobRunner
         }
 
         // 2. Clean old notification queue items (older than 30 days, already sent)
+        // Global cleanup — `notification_queue` has no tenant_id column (user-scoped only); housekeeping of stale queue rows.
         try {
             $sql = "DELETE FROM notification_queue WHERE status = 'sent' AND sent_at < DATE_SUB(NOW(), INTERVAL 30 DAY)";
             DB::delete($sql);
@@ -739,6 +741,7 @@ class CronJobRunner
         }
 
         // 3. Clean expired newsletter suppression entries
+        // Global cleanup across all tenants — expired suppression rows (tenant_id present, but expiry is row-level not tenant-scoped); not user-facing.
         try {
             $sql = "DELETE FROM newsletter_suppression_list WHERE expires_at IS NOT NULL AND expires_at < NOW()";
             DB::delete($sql);
@@ -750,6 +753,7 @@ class CronJobRunner
 
         // 4. Clean old newsletter tracking data (older than 90 days)
         // DISABLED: newsletter_link_clicks table missing
+        // Global cleanup across all tenants — expired click tracking (tenant_id present), not user-facing.
         /*
         try {
             $sql = "DELETE FROM newsletter_link_clicks WHERE clicked_at < DATE_SUB(NOW(), INTERVAL 90 DAY)";
@@ -762,6 +766,7 @@ class CronJobRunner
 
         // 5. Clean old API logs if they exist
         // DISABLED: api_logs table missing
+        // Global cleanup across all tenants — expired request logs (tenant_id present), not user-facing.
         /*
         try {
             $sql = "DELETE FROM api_logs WHERE created_at < DATE_SUB(NOW(), INTERVAL 30 DAY)";
@@ -773,6 +778,7 @@ class CronJobRunner
         */
 
         // 6. Clean expired API tokens
+        // Global cleanup across all tenants — expired auth tokens (table not present in current schema; user-keyed if added), not user-facing.
         try {
             DB::delete("DELETE FROM api_tokens WHERE expires_at IS NOT NULL AND expires_at < NOW()");
             $tasks[] = "Cleaned expired API tokens";
@@ -781,6 +787,7 @@ class CronJobRunner
         }
 
         // 7. Clean expired password_resets entries (older than 1 hour)
+        // Global table — `password_resets` has no tenant_id column (keyed by email + token); duplicate of step 1b, kept for safety.
         try {
             DB::delete("DELETE FROM password_resets WHERE created_at < DATE_SUB(NOW(), INTERVAL 1 HOUR)");
             $tasks[] = "Cleaned expired password_resets entries";
@@ -1350,6 +1357,7 @@ class CronJobRunner
         }
 
         // Clean old match cache entries (older than 24 hours)
+        // Global cleanup across all tenants — expired/stale data (tenant_id present, but expiry is row-level), not user-facing.
         try {
             DB::delete("DELETE FROM match_cache WHERE expires_at < NOW()");
             echo "   Cleaned expired match cache.\n";

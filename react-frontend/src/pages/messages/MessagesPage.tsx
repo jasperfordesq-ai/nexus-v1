@@ -378,7 +378,7 @@ export function MessagesPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <PageMeta title="Messages" noIndex />
+      <PageMeta title={t('page_meta.list.title')} noIndex />
       {/* Messaging Disabled Notice (feature flag) */}
       {!isDirectMessagingEnabled && (
         <GlassCard className="p-4 border-l-4 border-amber-500 bg-amber-500/10">

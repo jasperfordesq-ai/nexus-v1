@@ -47,30 +47,40 @@ class FederationNeighborhoodService
                  ORDER BY fn.name ASC"
             );
 
-            return array_map(function ($row) {
-                // Get member tenants
-                $tenants = DB::select(
-                    "SELECT fnt.tenant_id, t.name, t.slug
+            // PERF: Avoid N+1 by fetching ALL neighborhood->tenant rows in a single query,
+            // then grouping in PHP. Previous implementation issued one query per neighborhood.
+            $neighborhoodIds = array_map(fn($r) => (int) $r->id, $rows);
+            $tenantsByNeighborhood = [];
+            if (!empty($neighborhoodIds)) {
+                $placeholders = implode(',', array_fill(0, count($neighborhoodIds), '?'));
+                $allTenants = DB::select(
+                    "SELECT fnt.neighborhood_id, fnt.tenant_id, t.name, t.slug
                      FROM federation_neighborhood_tenants fnt
                      JOIN tenants t ON t.id = fnt.tenant_id
-                     WHERE fnt.neighborhood_id = ?
+                     WHERE fnt.neighborhood_id IN ($placeholders)
                      ORDER BY t.name ASC",
-                    [$row->id]
+                    $neighborhoodIds
                 );
+                foreach ($allTenants as $t) {
+                    $tenantsByNeighborhood[(int) $t->neighborhood_id][] = [
+                        'tenant_id' => (int) $t->tenant_id,
+                        'name' => $t->name,
+                        'slug' => $t->slug,
+                    ];
+                }
+            }
 
+            return array_map(function ($row) use ($tenantsByNeighborhood) {
+                $nid = (int) $row->id;
                 return [
-                    'id' => (int) $row->id,
+                    'id' => $nid,
                     'name' => $row->name,
                     'description' => $row->description,
                     'region' => $row->region,
                     'tenant_count' => (int) $row->tenant_count,
                     'created_by' => $row->created_by ? (int) $row->created_by : null,
                     'created_by_name' => $row->created_by_name ? trim($row->created_by_name) : null,
-                    'tenants' => array_map(fn($t) => [
-                        'tenant_id' => (int) $t->tenant_id,
-                        'name' => $t->name,
-                        'slug' => $t->slug,
-                    ], $tenants),
+                    'tenants' => $tenantsByNeighborhood[$nid] ?? [],
                     'created_at' => $row->created_at,
                     'updated_at' => $row->updated_at,
                 ];

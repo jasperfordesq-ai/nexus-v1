@@ -1,5 +1,9 @@
 # Federation
 
+> **New to federation? Start with [FEDERATION_API_MANUAL.md](FEDERATION_API_MANUAL.md)** —
+> a plain-English manual (also available as PDF) aimed at non-technical admins.
+> This file is the technical/architectural companion.
+
 Project NEXUS's federation layer lets tenants exchange members, listings,
 messages, transactions, and reviews with other timebanks — both NEXUS-to-NEXUS
 and across protocol-native partners (Komunitin, TimeOverflow, Credit Commons).

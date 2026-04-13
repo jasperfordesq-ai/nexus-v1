@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import { motion } from 'framer-motion';
 import { Button, Chip } from '@heroui/react';
-import DOMPurify from 'dompurify';
+import { sanitizeRichText } from '@/lib/sanitize';
 import {
   FileText,
   CalendarDays,
@@ -316,7 +316,7 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
               </h2>
               <div
                 className="legal-content"
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(section.html) }}
+                dangerouslySetInnerHTML={{ __html: sanitizeRichText(section.html) }}
               />
             </GlassCard>
           </motion.div>

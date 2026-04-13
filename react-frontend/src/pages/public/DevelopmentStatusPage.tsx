@@ -23,7 +23,7 @@ export function DevelopmentStatusPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 py-4">
-      <PageMeta title="Development Status" noIndex />
+      <PageMeta title={t('page_meta.development_status.title')} noIndex />
       {/* Header */}
       <div className="flex items-start gap-3">
         <FlaskConical className="w-8 h-8 text-amber-500 shrink-0 mt-1" aria-hidden="true" />

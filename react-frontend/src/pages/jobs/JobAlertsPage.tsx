@@ -195,7 +195,7 @@ export function JobAlertsPage() {
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
-      <PageMeta title="Job Alerts" noIndex />
+      <PageMeta title={t('page_meta.alerts.title')} noIndex />
       {/* Back nav */}
       <Link
         to={tenantPath('/jobs')}

@@ -277,7 +277,7 @@ export function CronJobLogs() {
       {/* Loading state */}
       {loading && logs.length === 0 && (
         <div className="flex items-center justify-center py-20">
-          <Spinner size="lg" label="Loading logs..." />
+          <Spinner size="lg" label={t('system.loading_logs')} />
         </div>
       )}
 
@@ -448,11 +448,10 @@ export function CronJobLogs() {
       {/* Clear Logs Modal */}
       <Modal isOpen={isClearOpen} onClose={onClearClose}>
         <ModalContent>
-          <ModalHeader>Clear Old Logs</ModalHeader>
+          <ModalHeader>{t('system.clear_old_logs')}</ModalHeader>
           <ModalBody>
             <p className="text-sm text-default-600 mb-4">
-              Delete all logs executed before the selected date. This action cannot be
-              undone.
+              {t('system.clear_old_logs_warning')}
             </p>
             <Input
               label={t('system.label_delete_logs_before')}
@@ -464,7 +463,7 @@ export function CronJobLogs() {
           </ModalBody>
           <ModalFooter>
             <Button size="sm" variant="flat" onPress={onClearClose}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               size="sm"
@@ -472,7 +471,7 @@ export function CronJobLogs() {
               onPress={handleClearLogs}
               isDisabled={!clearBeforeDate}
             >
-              Clear Logs
+              {t('system.clear_logs')}
             </Button>
           </ModalFooter>
         </ModalContent>

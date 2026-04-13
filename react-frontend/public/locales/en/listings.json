@@ -180,5 +180,10 @@
   "filter_this_week": "This week",
   "filter_this_month": "This month",
   "clear_filters": "Clear filters",
-  "results_count": "{{count}} listings found"
+  "results_count": "{{count}} listings found",
+  "page_meta": {
+    "create": {
+      "title": "Create Listing"
+    }
+  }
 }

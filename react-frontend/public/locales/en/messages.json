@@ -162,7 +162,7 @@
   "translate_hint.body": "You and this person can each write in your own language. Tap \"Translate\" on any message to read it in yours, or use the translate button in the header to translate everything automatically.",
   "translate_hint.dismiss": "Dismiss translation hint",
   "auto_translate.tooltip_off": "Translate all messages automatically",
-  "auto_translate.tooltip_on": "Auto-translate is on \u2014 click to turn off",
+  "auto_translate.tooltip_on": "Auto-translate is on — click to turn off",
   "auto_translate.active_banner": "Messages in this conversation are being automatically translated into your language.",
   "auto_translate.turn_off": "Turn off",
   "new_group": "New Group",
@@ -189,5 +189,13 @@
   "group_member_added": "Member added to group",
   "group_member_removed": "Member removed from group",
   "group_left": "You left the group",
-  "group_tab": "Groups"
+  "group_tab": "Groups",
+  "page_meta": {
+    "list": {
+      "title": "Messages"
+    },
+    "conversation": {
+      "title": "Conversation"
+    }
+  }
 }

@@ -390,7 +390,7 @@ export function CreateChallengePage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
-      <PageMeta title="Create Challenge" noIndex />
+      <PageMeta title={t('page_meta.create_challenge.title')} noIndex />
       {/* Back link */}
       <Button
         variant="light"

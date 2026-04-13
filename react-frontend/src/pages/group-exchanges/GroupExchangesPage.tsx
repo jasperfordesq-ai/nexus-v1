@@ -207,7 +207,7 @@ export function GroupExchangesPage() {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      <PageMeta title="Group Exchanges" noIndex />
+      <PageMeta title={t('page_meta.list.title')} noIndex />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

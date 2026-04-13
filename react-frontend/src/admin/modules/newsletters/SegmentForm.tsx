@@ -264,10 +264,10 @@ export function SegmentForm() {
       }
       navigate(tenantPath('/admin/newsletters/segments'));
     } catch {
-      setErrors({ form: 'Failed to save segment. Please try again.' });
+      setErrors({ form: t('newsletters.failed_to_save_segment') });
     }
     setSaving(false);
-  }, [name, description, isActive, matchType, rules, isEdit, id, navigate]);
+  }, [name, description, isActive, matchType, rules, isEdit, id, navigate, t]);
 
   // ── Apply Suggestion ──
 

@@ -542,7 +542,7 @@ export function CreateEventPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-2xl mx-auto space-y-6"
     >
-      <PageMeta title="Create Event" noIndex />
+      <PageMeta title={t('page_meta.create.title')} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('title'), href: '/events' },

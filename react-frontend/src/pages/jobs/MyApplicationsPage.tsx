@@ -925,7 +925,7 @@ export function MyApplicationsPage() {
 
   return (
     <div className='max-w-3xl mx-auto px-4 py-8'>
-      <PageMeta title="My Applications" noIndex />
+      <PageMeta title={t('page_meta.my_applications.title')} noIndex />
       {/* Page header */}
       <div className='mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3'>
         <div>

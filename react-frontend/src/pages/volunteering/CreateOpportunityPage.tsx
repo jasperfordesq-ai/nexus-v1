@@ -206,7 +206,7 @@ export default function CreateOpportunityPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-2xl mx-auto space-y-6"
     >
-      <PageMeta title="Create Opportunity" noIndex />
+      <PageMeta title={t('page_meta.create_opportunity.title')} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('volunteering.heading'), href: '/volunteering' },

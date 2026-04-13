@@ -540,7 +540,7 @@ export function OnboardingPage() {
 
   return (
     <div className="max-w-2xl mx-auto py-6 px-4 space-y-6">
-      <PageMeta title="Onboarding" noIndex />
+      <PageMeta title={t('page_meta.title')} noIndex />
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}

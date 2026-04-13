@@ -296,5 +296,20 @@
     "member_since": "Member since",
     "empty_title": "No Spotlight Yet",
     "empty_description": "Active members will be featured here once the community starts exchanging."
+  },
+  "page_meta": {
+    "achievements": {
+      "title": "Achievements"
+    },
+    "leaderboard": {
+      "title": "Leaderboard",
+      "description": "Community leaderboard — see top contributors and most active members."
+    },
+    "goals": {
+      "title": "Goals"
+    },
+    "nexus_score": {
+      "title": "NexusScore"
+    }
   }
 }

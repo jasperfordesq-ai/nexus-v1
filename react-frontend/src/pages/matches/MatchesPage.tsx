@@ -159,7 +159,7 @@ export function MatchesPage() {
   // ─── Render ───
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-      <PageMeta title="Matches" noIndex />
+      <PageMeta title={t('page_meta.title')} noIndex />
       <Breadcrumbs items={[{ label: t('breadcrumb_dashboard'), href: '/dashboard' }, { label: t('breadcrumb_matches') }]} />
 
       {/* Header */}

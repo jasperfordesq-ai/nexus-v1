@@ -451,5 +451,8 @@
     "blocked": "User blocked",
     "blocked_desc": "{{name}} has been blocked.",
     "error": "Failed to block user"
+  },
+  "page_meta": {
+    "title": "Settings"
   }
 }
