@@ -96,27 +96,62 @@ class LegalAcceptanceController extends BaseApiController
         $accepted = [];
         $errors   = [];
 
-        foreach ($pending as $doc) {
-            if (empty($doc->current_version_id)) {
-                continue;
+        // Wrap the bulk-accept in a transaction with SELECT ... FOR UPDATE on
+        // the affected documents. This prevents races where an admin mutates
+        // requires_acceptance / current_version_id between our status check
+        // and our insert — we'd otherwise record acceptance of a version the
+        // admin just deactivated.
+        DB::transaction(function () use ($pending, $userId, $tenantId, &$accepted, &$errors) {
+            $docIds = collect($pending)
+                ->filter(fn ($d) => !empty($d->current_version_id))
+                ->pluck('document_id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+
+            if (empty($docIds)) {
+                return;
             }
 
-            try {
-                DB::table('user_legal_acceptances')->insert([
-                    'user_id'           => $userId,
-                    'document_id'       => (int) $doc->document_id,
-                    'version_id'        => (int) $doc->current_version_id,
-                    'version_number'    => $doc->current_version,
-                    'acceptance_method' => 'login_prompt',
-                    'ip_address'        => request()->ip(),
-                    'user_agent'        => request()->userAgent(),
-                    'accepted_at'       => now(),
-                ]);
-                $accepted[] = $doc->document_type;
-            } catch (\Throwable $e) {
-                $errors[] = $doc->document_type;
+            // Lock the document rows for the duration of the transaction.
+            $locked = DB::table('legal_documents')
+                ->whereIn('id', $docIds)
+                ->where('tenant_id', $tenantId)
+                ->where('is_active', 1)
+                ->where('requires_acceptance', 1)
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
+
+            foreach ($pending as $doc) {
+                if (empty($doc->current_version_id)) {
+                    continue;
+                }
+
+                // Re-verify inside the lock: the doc must still be active,
+                // still require acceptance, and the version we're recording
+                // must still be the current_version_id.
+                $fresh = $locked->get((int) $doc->document_id);
+                if (!$fresh || (int) $fresh->current_version_id !== (int) $doc->current_version_id) {
+                    continue; // document changed — skip silently
+                }
+
+                try {
+                    DB::table('user_legal_acceptances')->insert([
+                        'user_id'           => $userId,
+                        'document_id'       => (int) $doc->document_id,
+                        'version_id'        => (int) $doc->current_version_id,
+                        'version_number'    => $doc->current_version,
+                        'acceptance_method' => 'login_prompt',
+                        'ip_address'        => request()->ip(),
+                        'user_agent'        => request()->userAgent(),
+                        'accepted_at'       => now(),
+                    ]);
+                    $accepted[] = $doc->document_type;
+                } catch (\Throwable $e) {
+                    $errors[] = $doc->document_type;
+                }
             }
-        }
+        });
 
         if (! empty($errors)) {
             return $this->respondWithError(

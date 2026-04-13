@@ -5,6 +5,13 @@
 # This is an ISOLATED stack - does not share networks/volumes with other projects.
 #
 # IMPORTANT: Uses .env.docker for configuration (not .env which is for XAMPP)
+#
+# Volume / container naming convention:
+#   Local dev (this file):   `nexus-*` prefix (e.g. nexus-mysql-data)
+#   Production (compose.prod.yml): `nexus-php-*` prefix (e.g. nexus-php-uploads)
+# DO NOT rename existing volumes — renaming detaches Docker from the on-disk
+# data and causes silent data loss. The prefixes are intentionally distinct
+# so that dev and prod stacks can coexist on the same host without collision.
 # =============================================================================
 
 services:

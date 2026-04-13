@@ -270,6 +270,40 @@ export function BlogAdmin() {
             },
           },
           {
+            key: 'archive',
+            label: t('bulk.blog.archive', 'Archive (Unpublish)'),
+            icon: <ToggleLeft size={14} />,
+            color: 'warning',
+            confirmTitle: t('bulk.blog.archive_confirm_title', 'Archive selected posts?'),
+            confirmMessage: t('bulk.blog.archive_confirm_message', {
+              count: selectedIdList.length,
+              defaultValue: 'This will unpublish {{count}} post(s). They can be republished later.',
+            }),
+            onConfirm: async () => {
+              setBulkLoading(true);
+              try {
+                // No bulk-archive endpoint — loop single-row toggleStatus for posts
+                // that are currently published. Partial failures surface as a toast.
+                const targetPosts = items.filter(
+                  (p) => selectedIdList.includes(p.id) && p.status === 'published',
+                );
+                let success = 0;
+                let failed = 0;
+                for (const post of targetPosts) {
+                  try {
+                    const r = await adminBlog.toggleStatus(post.id);
+                    if (r?.success) success += 1; else failed += 1;
+                  } catch {
+                    failed += 1;
+                  }
+                }
+                handleBulkResult({ success: true, data: { success, failed } as BulkActionResult });
+              } finally {
+                setBulkLoading(false);
+              }
+            },
+          },
+          {
             key: 'delete',
             label: t('bulk.blog.delete'),
             icon: <Trash2 size={14} />,

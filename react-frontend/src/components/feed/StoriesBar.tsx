@@ -88,7 +88,6 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
       el.removeEventListener('scroll', updateArrows);
       window.removeEventListener('resize', updateArrows);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- scroll listener setup; updateArrows is stable via useCallback
   }, [updateArrows]);
 
   const scroll = (direction: 'left' | 'right') => {

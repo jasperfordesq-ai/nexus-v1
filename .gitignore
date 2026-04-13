@@ -226,3 +226,18 @@ Ctemp*
 
 # ─── Data exports (PII) ───────────────────────────────────────────────────────
 *.csv
+
+# ─── Legacy analysis / scratch artifacts (cleanup 2026-04-13) ────────────────
+# Prevent recurrence of the stray root-level junk (summary dumps, ad-hoc scripts,
+# and one-off legacy archaeology). If any of these patterns is legitimately
+# needed in tree, add a negated exception.
+legacy_*
+legacy_files/
+*_temp.php
+*_temp.sh
+analyze_*.sh
+create_*_summary.sh
+
+# ─── Confidential legal documents (never commit) ─────────────────────────────
+DPO_Confidentiality_Agreement_*.docx
+*.docx

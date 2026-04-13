@@ -10,6 +10,13 @@
 #
 # Usage:
 #   docker compose -f compose.prod.yml up -d
+#
+# Volume / container naming convention:
+#   Production (this file):  `nexus-php-*` prefix (e.g. nexus-php-uploads)
+#   Local dev (compose.yml): `nexus-*` prefix (e.g. nexus-mysql-data)
+# DO NOT rename existing volumes — renaming detaches Docker from the on-disk
+# data and causes silent data loss. The prefixes are intentionally distinct
+# so that dev and prod stacks can coexist on the same host without collision.
 # =============================================================================
 
 name: nexus-php
@@ -77,7 +84,8 @@ services:
     deploy:
       resources:
         limits:
-          # PHP memory_limit is 384M (see Dockerfile.prod); 768M allows Apache mpm_prefork
+          # PHP memory_limit is 512M (aligned across Dockerfile and Dockerfile.prod
+          # per CLAUDE.md rule); 768M container limit allows Apache mpm_prefork
           # workers + OPcache + request overhead without OOM-kills.
           memory: 768M
         reservations:

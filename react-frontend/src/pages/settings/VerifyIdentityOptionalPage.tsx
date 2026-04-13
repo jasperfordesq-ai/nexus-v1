@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Spinner, Input } from '@heroui/react';
 import {
@@ -62,7 +63,8 @@ interface StartVerificationResponse {
 type PageState = 'loading' | 'dob_collection' | 'payment_required' | 'start' | 'in_progress' | 'verified' | 'failed' | 'error';
 
 export function VerifyIdentityOptionalPage() {
-  usePageTitle('Verify Identity');
+  const { t } = useTranslation('settings');
+  usePageTitle(t('identity.page_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const { isAuthenticated } = useAuth();
@@ -248,7 +250,7 @@ export function VerifyIdentityOptionalPage() {
   if (pageState === 'loading') {
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-4">
-        <PageMeta title="Verify Identity" noIndex />
+        <PageMeta title={t('identity.page_title')} noIndex />
         <GlassCard className="p-8 text-center max-w-md">
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
             <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
@@ -262,7 +264,7 @@ export function VerifyIdentityOptionalPage() {
   if (pageState === 'verified') {
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-4">
-        <PageMeta title="Identity Verified" noIndex />
+        <PageMeta title={t('identity.page_title_verified')} noIndex />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <GlassCard className="p-8 text-center">
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
@@ -289,7 +291,7 @@ export function VerifyIdentityOptionalPage() {
   if (pageState === 'failed') {
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-4">
-        <PageMeta title="Verification Failed" noIndex />
+        <PageMeta title={t('identity.page_title_failed')} noIndex />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <GlassCard className="p-8 text-center">
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/20 flex items-center justify-center">
@@ -314,7 +316,7 @@ export function VerifyIdentityOptionalPage() {
   if (pageState === 'error') {
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-4">
-        <PageMeta title="Verify Identity" noIndex />
+        <PageMeta title={t('identity.page_title')} noIndex />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <GlassCard className="p-8 text-center">
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/20 flex items-center justify-center">
@@ -334,7 +336,7 @@ export function VerifyIdentityOptionalPage() {
   if (pageState === 'dob_collection') {
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-4">
-        <PageMeta title="Verify Identity — Date of Birth" noIndex />
+        <PageMeta title={t('identity.page_title_dob')} noIndex />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <GlassCard className="p-5 sm:p-8">
             <div className="text-center mb-6">
@@ -355,7 +357,7 @@ export function VerifyIdentityOptionalPage() {
             <div className="space-y-4">
               <Input
                 type="date"
-                label="Date of Birth"
+                label={t('identity.dob_label')}
                 value={dob}
                 onChange={(e) => setDob(e.target.value)}
                 variant="bordered"
@@ -388,7 +390,7 @@ export function VerifyIdentityOptionalPage() {
 
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-4">
-        <PageMeta title="Verify Identity — Payment" noIndex />
+        <PageMeta title={t('identity.page_title_payment')} noIndex />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <GlassCard className="p-5 sm:p-8">
             <div className="text-center mb-6">
@@ -444,7 +446,7 @@ export function VerifyIdentityOptionalPage() {
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center p-4">
-      <PageMeta title="Verify Identity" noIndex />
+      <PageMeta title={t('identity.page_title')} noIndex />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
         <GlassCard className="p-5 sm:p-8">
           <div className="text-center mb-8">

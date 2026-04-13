@@ -72,6 +72,18 @@ class StripeWebhookController extends BaseApiController
         // Atomic idempotency claim — INSERT IGNORE relies on the UNIQUE index
         // on stripe_webhook_events.event_id. Exactly one concurrent caller
         // wins the insert; losers get 0 affected rows and bail out.
+        //
+        // NOTE (tenant scope): The UNIQUE index is on event_id ALONE (no tenant_id).
+        // This is correct: Stripe event IDs (evt_...) are globally unique across
+        // Stripe's entire platform. A single Stripe event has exactly one intended
+        // recipient (account) — it is never legitimately delivered to multiple tenants.
+        // Our platform uses ONE shared Stripe account (connected accounts for
+        // marketplace sellers, but the top-level `account` on the event still maps
+        // deterministically to one tenant). Global dedup is therefore the safest
+        // posture: if the same event_id arrives twice (Stripe retry, misconfigured
+        // duplicate endpoint, or replay attack), we always suppress the second.
+        // Composite key (event_id, tenant_id) would weaken this guarantee by letting
+        // a replay-forged event be processed against a different tenant.
         $eventId = $event->id;
         $nowTs = now();
 

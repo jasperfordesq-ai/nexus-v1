@@ -222,7 +222,7 @@ export function CreateEventPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
   useEffect(() => {
     if (isEditing) {

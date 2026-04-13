@@ -91,7 +91,14 @@ abstract class BaseApiController extends Controller
      * @param string $code Error code for programmatic handling
      * @param string $message Human-readable error message
      * @param string|null $field Optional field name for validation errors
-     * @param int $status HTTP status code (default 400)
+     * @param int $status HTTP status code (default 400 — kept for backward
+     *                    compatibility with ~1,900 existing callers). ALWAYS
+     *                    pass an explicit status; for new code, prefer the
+     *                    dedicated helpers where applicable:
+     *                      - respondUnauthorized()   → 401
+     *                      - respondForbidden()      → 403
+     *                      - respondNotFound()       → 404
+     *                      - respondServerError()    → 500
      * @return JsonResponse
      */
     protected function respondWithError(string $code, string $message, ?string $field = null, int $status = 400): JsonResponse
@@ -106,6 +113,31 @@ abstract class BaseApiController extends Controller
         }
 
         return $this->buildJsonResponse(['errors' => [$error]], $status);
+    }
+
+    /**
+     * Semantic error helpers — prefer these over respondWithError() with magic
+     * status numbers. Each helper sets a consistent default error code for the
+     * failure class while still allowing caller customization.
+     */
+    protected function respondUnauthorized(string $message = 'Authentication required', string $code = 'AUTH_REQUIRED'): JsonResponse
+    {
+        return $this->respondWithError($code, $message, null, 401);
+    }
+
+    protected function respondForbidden(string $message = 'Access denied', string $code = 'FORBIDDEN'): JsonResponse
+    {
+        return $this->respondWithError($code, $message, null, 403);
+    }
+
+    protected function respondNotFound(string $message = 'Resource not found', string $code = 'NOT_FOUND'): JsonResponse
+    {
+        return $this->respondWithError($code, $message, null, 404);
+    }
+
+    protected function respondServerError(string $message = 'Internal server error', string $code = 'SERVER_ERROR'): JsonResponse
+    {
+        return $this->respondWithError($code, $message, null, 500);
     }
 
     /**

@@ -3,6 +3,9 @@
    Reusable glassmorphism classes
    Matches nexus-modern-frontend styling
    ============================================= */
+/* TODO: migrate to Tailwind per CLAUDE.md — 311+ files consume GlassCard/GlassButton
+   which depend on these classes. Migration must replace the .glass-* classes
+   with Tailwind utilities or tokens.css variables in one coordinated pass. */
 
 /* ─────────────────────────────────────────────
    OPAQUE SURFACES — Modals, popovers, dropdowns

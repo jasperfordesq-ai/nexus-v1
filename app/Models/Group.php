@@ -80,7 +80,19 @@ class Group extends Model
      */
     public function attachMember(int $userId, array $attributes = []): void
     {
-        $attributes['tenant_id'] = $this->tenant_id ?? \App\Core\TenantContext::getId();
+        // SECURITY: Always scope to the GROUP's tenant, not the ambient
+        // TenantContext. A super-admin or cross-tenant actor operating on a
+        // Group loaded from another tenant must still produce pivot rows
+        // tagged with the group's real tenant_id — otherwise group_members
+        // rows would leak across tenants.
+        $groupTenantId = $this->tenant_id;
+        if (!$groupTenantId) {
+            // Fall back only if model somehow lacks tenant_id (shouldn't happen
+            // for persisted groups); this keeps behaviour safe instead of
+            // producing a silently broken row.
+            $groupTenantId = \App\Core\TenantContext::getId();
+        }
+        $attributes['tenant_id'] = $groupTenantId;
         $this->members()->attach($userId, $attributes);
     }
 

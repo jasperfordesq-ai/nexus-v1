@@ -12,11 +12,12 @@ import {
 import {
   ArrowLeft, Edit, Shield, ShieldOff, ShieldAlert, Crown, CrownIcon,
   MapPin, Phone, Clock, CalendarDays, Wallet, User, Building2, ArrowRightLeft,
+  UserCog,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useTenant, useToast } from '@/contexts';
+import { useAuth, useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { adminSuper } from '../../api/adminApi';
+import { adminSuper, adminUsers } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
 import type { SuperAdminUserDetail, SuperAdminTenant } from '../../api/types';
 
@@ -49,6 +50,15 @@ export function UserShow() {
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
+  const { user: currentUser } = useAuth();
+  const currentUserRecord = currentUser as Record<string, unknown> | null;
+  const isCurrentSuperAdmin =
+    (currentUser?.role as string) === 'super_admin' ||
+    currentUserRecord?.is_super_admin === true;
+
+  // Impersonation modal state
+  const [impersonateModalOpen, setImpersonateModalOpen] = useState(false);
+  const [impersonateLoading, setImpersonateLoading] = useState(false);
 
   const [user, setUser] = useState<SuperAdminUserDetail | null>(null);
   const [tenants, setTenants] = useState<SuperAdminTenant[]>([]);
@@ -136,6 +146,30 @@ export function UserShow() {
       toast.error(res?.error || t('super.failed_to_move_and_promote'));
     }
     setPromoteLoading(false);
+  };
+
+  const handleImpersonate = async () => {
+    if (!user) return;
+    setImpersonateLoading(true);
+    try {
+      const res = await adminUsers.impersonate(user.id);
+      if (res?.success && res.data?.token) {
+        toast.success(t('super.impersonation_started', 'Impersonation started'));
+        // Store token & navigate to member dashboard. The backend returns a
+        // short-lived token scoped to the target user.
+        localStorage.setItem('impersonation_token', res.data.token);
+        setImpersonateModalOpen(false);
+        navigate(tenantPath('/dashboard'));
+      } else {
+        toast.error(
+          (res as { error?: string })?.error ||
+          t('super.impersonation_failed', 'Failed to start impersonation'),
+        );
+      }
+    } catch {
+      toast.error(t('super.impersonation_failed', 'Failed to start impersonation'));
+    }
+    setImpersonateLoading(false);
   };
 
   const confirmMessages: Record<ConfirmActionType, { title: string; message: string; label: string; color: 'danger' | 'warning' | 'primary' }> = {
@@ -502,6 +536,17 @@ export function UserShow() {
                 >
                   {t('super.edit_user')}
                 </Button>
+                {isCurrentSuperAdmin && (
+                  <Button
+                    color="warning"
+                    variant="flat"
+                    startContent={<UserCog size={16} />}
+                    fullWidth
+                    onPress={() => setImpersonateModalOpen(true)}
+                  >
+                    {t('super.impersonate_user', 'Impersonate user')}
+                  </Button>
+                )}
                 <Button
                   variant="light"
                   startContent={<ArrowLeft size={16} />}
@@ -559,6 +604,54 @@ export function UserShow() {
               isDisabled={!moveTargetTenant}
             >
               {t('super.move_user')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Impersonation Modal */}
+      <Modal
+        isOpen={impersonateModalOpen}
+        onClose={() => setImpersonateModalOpen(false)}
+        size="md"
+      >
+        <ModalContent>
+          <ModalHeader className="flex items-center gap-2">
+            <UserCog size={20} className="text-warning" />
+            {t('super.impersonate_user_title', 'Impersonate user')}
+          </ModalHeader>
+          <ModalBody>
+            <p className="text-sm text-default-600">
+              {t('super.impersonate_user_desc', {
+                name: user.name,
+                defaultValue:
+                  'You are about to impersonate {{name}}. You will see the platform exactly as they do. This action is logged in the super-admin audit trail.',
+              })}
+            </p>
+            <div className="bg-warning-50 dark:bg-warning-50/10 border border-warning-200 dark:border-warning-200/20 rounded-lg p-3 mt-3">
+              <p className="text-xs text-warning-700 dark:text-warning-400">
+                {t(
+                  'super.impersonate_user_warning',
+                  'Only use this feature for support and debugging. Your actions will appear as if performed by the target user.',
+                )}
+              </p>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              onPress={() => setImpersonateModalOpen(false)}
+              isDisabled={impersonateLoading}
+            >
+              {t('super.cancel')}
+            </Button>
+            <Button
+              color="warning"
+              onPress={handleImpersonate}
+              isLoading={impersonateLoading}
+              startContent={<UserCog size={16} />}
+            >
+              {t('super.impersonate_confirm', 'Start impersonation')}
             </Button>
           </ModalFooter>
         </ModalContent>

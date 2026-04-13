@@ -75,6 +75,7 @@ const GroupTypes = lazy(() => import('./modules/groups/GroupTypes'));
 const GroupDetail = lazy(() => import('./modules/groups/GroupDetail'));
 const GroupRecommendations = lazy(() => import('./modules/groups/GroupRecommendations'));
 const GroupRanking = lazy(() => import('./modules/groups/GroupRanking'));
+const GroupGeocode = lazy(() => import('./modules/groups/GroupGeocode'));
 
 // Enterprise module
 const EnterpriseDashboard = lazy(() => import('./modules/enterprise/EnterpriseDashboard'));
@@ -504,8 +505,8 @@ export function AdminRoutes() {
       <Route path="groups/ranking" element={<Lazy><GroupRanking /></Lazy>} />
       <Route path="group-types" element={<Lazy><GroupList /></Lazy>} />
       <Route path="group-ranking" element={<Lazy><GroupList /></Lazy>} />
-      <Route path="group-locations" element={<Lazy><GroupList /></Lazy>} />
-      <Route path="geocode-groups" element={<Lazy><GroupList /></Lazy>} />
+      <Route path="group-locations" element={<Lazy><GroupGeocode /></Lazy>} />
+      <Route path="geocode-groups" element={<Lazy><GroupGeocode /></Lazy>} />
       <Route path="smart-match-users" element={<Lazy><SmartMatchUsers /></Lazy>} />
       <Route path="smart-match-monitoring" element={<Lazy><SmartMatchMonitoring /></Lazy>} />
       <Route path="volunteering" element={<Lazy><VolunteeringOverview /></Lazy>} />

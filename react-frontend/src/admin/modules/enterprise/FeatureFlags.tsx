@@ -127,6 +127,9 @@ export function FeatureFlags() {
     });
 
     try {
+      // NOTE: tenant scope is enforced server-side via TenantContext (auth middleware).
+      // We intentionally do NOT send a tenant_id from the client — any value here
+      // could be spoofed; the backend always derives scope from the authenticated user.
       const res = await adminEnterprise.updateFeatureFlag({ key, value, type });
       if (res.success) {
         toast.success(t('enterprise.feature_flag_toggled', { name: formatKey(key), status: value ? t('enterprise.enabled') : t('enterprise.disabled') }));

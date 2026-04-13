@@ -56,10 +56,22 @@ class TenantContext
         // If specific tenant domain (not master), enforce it.
         $host = $_SERVER['HTTP_HOST'] ?? '';
         if ($host) {
+            // Strip optional port (e.g. "example.com:8080" → "example.com")
+            if (strpos($host, ':') !== false) {
+                $host = explode(':', $host, 2)[0];
+            }
             // Strip www. prefix for consistent matching
-            $host = preg_replace('/^www\./', '', $host);
+            $host = preg_replace('/^www\./', '', (string) $host);
 
-            $domainTenant = self::fetchTenant('domain', $host);
+            // SECURITY: Validate the Host header is a real hostname before hitting
+            // the DB. An attacker-controlled Host header (or header injection via
+            // a broken reverse proxy) could otherwise feed garbage into our
+            // tenants.domain lookup or trigger log-injection downstream.
+            $hostIsValid = is_string($host)
+                && $host !== ''
+                && filter_var($host, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) !== false;
+
+            $domainTenant = $hostIsValid ? self::fetchTenant('domain', $host) : null;
 
             if ($domainTenant && $domainTenant['id'] != 1) {
                 // Check if tenant is active

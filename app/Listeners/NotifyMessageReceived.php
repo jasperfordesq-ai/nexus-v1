@@ -34,8 +34,17 @@ class NotifyMessageReceived implements ShouldQueue
     public function handle(MessageSent $event): void
     {
         try {
-            // Ensure tenant context is set (required when running via async queue)
-            TenantContext::setById($event->tenantId);
+            // Ensure tenant context is set (required when running via async queue).
+            // setById returns false if the tenant no longer exists (e.g. deleted
+            // between event dispatch and listener execution). Bail out so we
+            // don't process the message against the wrong / missing tenant.
+            if (!TenantContext::setById($event->tenantId)) {
+                Log::warning('NotifyMessageReceived: tenant not found, skipping', [
+                    'tenant_id' => $event->tenantId,
+                    'message_id' => $event->message->id ?? null,
+                ]);
+                return;
+            }
             $message = $event->message;
             $senderId = $event->sender->id;
             $recipientId = (int) $message->receiver_id;

@@ -597,17 +597,33 @@ class MarketplacePaymentService
             return;
         }
 
-        $orderId = (int) ($paymentIntent->metadata->nexus_order_id ?? 0);
-        $tenantId = (int) ($paymentIntent->metadata->nexus_tenant_id ?? 0);
+        // SECURITY: Do NOT trust tenant_id from webhook metadata — an attacker
+        // controlling a PaymentIntent could manipulate metadata to pivot into other
+        // tenants. Resolve tenant_id from our own DB record keyed on the Stripe
+        // payment_intent_id (which Stripe controls and we cannot forge).
+        $paymentRecord = MarketplacePayment::withoutGlobalScopes()
+            ->where('stripe_payment_intent_id', $piId)
+            ->first();
 
-        if (!$orderId || !$tenantId) {
-            Log::warning('MarketplacePayment webhook: missing metadata', [
+        if (!$paymentRecord) {
+            Log::warning('MarketplacePayment webhook: no local payment record for PI — rejecting event', [
                 'payment_intent_id' => $piId,
             ]);
             return;
         }
 
-        // Set tenant context for the webhook handler
+        $orderId = (int) $paymentRecord->order_id;
+        $tenantId = (int) $paymentRecord->tenant_id;
+
+        if (!$orderId || !$tenantId) {
+            Log::warning('MarketplacePayment webhook: local record missing order/tenant — rejecting event', [
+                'payment_intent_id' => $piId,
+                'payment_id' => $paymentRecord->id ?? null,
+            ]);
+            return;
+        }
+
+        // Set tenant context from our trusted DB record (never from Stripe metadata)
         TenantContext::setId($tenantId);
 
         try {

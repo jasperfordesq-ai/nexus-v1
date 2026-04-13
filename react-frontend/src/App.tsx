@@ -55,7 +55,6 @@ function lazyWithRetry(
         if (isUserTyping) {
           // Skip the reload — the error boundary will show a "try again" UI
           // instead of destroying the user's in-progress work
-          console.warn('[NEXUS] Chunk load error detected but user is typing — deferring reload');
           throw error;
         }
 

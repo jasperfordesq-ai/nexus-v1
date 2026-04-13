@@ -353,11 +353,16 @@ class CronJobRunner
                 echo " - Email Sent.\n";
 
                 // Mark as Sent
+                // SECURITY: also scope by tenant_id to prevent a bad row (somehow
+                // matching an ID range) from crossing tenants. The user's tenant
+                // is the authoritative source here.
                 $ids = array_column($items, 'id');
-                if (!empty($ids)) {
+                $userTenantId = $user['tenant_id'] ?? null;
+                if (!empty($ids) && $userTenantId) {
                     $inQuery = implode(',', array_fill(0, count($ids), '?'));
-                    $updateSql = "UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id IN ($inQuery)";
-                    DB::update($updateSql, $ids);
+                    $updateSql = "UPDATE notification_queue SET status = 'sent', sent_at = NOW()
+                                  WHERE id IN ($inQuery) AND tenant_id = ?";
+                    DB::update($updateSql, array_merge($ids, [$userTenantId]));
                     echo " - Queue updated (Marked as sent).\n";
                 }
             } else {
@@ -365,10 +370,12 @@ class CronJobRunner
 
                 // Revert processing items back to pending so they can be retried
                 $ids = array_column($items, 'id');
-                if (!empty($ids)) {
+                $userTenantId = $user['tenant_id'] ?? null;
+                if (!empty($ids) && $userTenantId) {
                     $inQuery = implode(',', array_fill(0, count($ids), '?'));
-                    $revertSql = "UPDATE notification_queue SET status = 'failed' WHERE id IN ($inQuery)";
-                    DB::update($revertSql, $ids);
+                    $revertSql = "UPDATE notification_queue SET status = 'failed'
+                                  WHERE id IN ($inQuery) AND tenant_id = ?";
+                    DB::update($revertSql, array_merge($ids, [$userTenantId]));
                 }
             }
         }

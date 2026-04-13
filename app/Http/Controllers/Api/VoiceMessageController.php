@@ -14,6 +14,7 @@ use App\Core\TenantContext;
 use App\Models\Message;
 use App\Services\TranscriptionService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -94,12 +95,10 @@ class VoiceMessageController extends BaseApiController
                 // Resolve the audio file path for transcription
                 $audioPath = $audioResult['local_path'] ?? null;
                 if (!$audioPath && isset($audioResult['url'])) {
-                    // If only URL available, download to temp file for transcription
-                    $audioPath = sys_get_temp_dir() . '/' . uniqid('voice_') . '.webm';
-                    $audioContent = @file_get_contents($audioResult['url']);
-                    if ($audioContent !== false) {
-                        file_put_contents($audioPath, $audioContent);
-                    }
+                    // If only URL available, download to temp file for transcription.
+                    // SSRF HARDENING: the URL comes from AudioUploader (our own storage),
+                    // but we still defensively validate before fetching.
+                    $audioPath = $this->safeDownloadAudio((string) $audioResult['url']);
                 }
 
                 if ($audioPath && file_exists($audioPath)) {
@@ -161,5 +160,109 @@ class VoiceMessageController extends BaseApiController
             Log::error('Voice message store failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return $this->respondWithError('UPLOAD_FAILED', __('api.audio_upload_failed'), 'audio', 400);
         }
+    }
+
+    /**
+     * Safely download an audio file from a URL with SSRF + size + type guards.
+     *
+     * Returns the local temp path on success, or null on any failure.
+     *
+     * Guards:
+     *  - https:// only (reject http/file/ftp/data/gopher/etc.)
+     *  - reject private/loopback/link-local IPv4 ranges (basic SSRF protection)
+     *  - reject if Content-Length exceeds 25 MB (or if streamed body exceeds it)
+     *  - reject if Content-Type is not audio/*
+     *  - 10s connect+read timeout
+     */
+    private function safeDownloadAudio(string $url): ?string
+    {
+        $maxBytes = 25 * 1024 * 1024; // 25 MB
+
+        // 1. Scheme check — https only
+        $parts = parse_url($url);
+        if (!is_array($parts) || ($parts['scheme'] ?? '') !== 'https') {
+            Log::warning('safeDownloadAudio: rejecting non-https scheme', ['scheme' => $parts['scheme'] ?? null]);
+            return null;
+        }
+        $host = $parts['host'] ?? '';
+        if ($host === '') {
+            return null;
+        }
+
+        // 2. SSRF — resolve host and reject internal/reserved IP ranges
+        $ip = null;
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            $ip = $host;
+        } else {
+            $records = @gethostbynamel($host);
+            if (!$records) {
+                Log::warning('safeDownloadAudio: DNS lookup failed', ['host' => $host]);
+                return null;
+            }
+            $ip = $records[0];
+        }
+        if ($this->isPrivateOrReservedIp($ip)) {
+            Log::warning('safeDownloadAudio: rejecting private/reserved IP', ['host' => $host, 'ip' => $ip]);
+            return null;
+        }
+
+        // 3. Fetch with Laravel HTTP client (10s timeout)
+        try {
+            $response = Http::timeout(10)
+                ->withOptions(['max_redirects' => 0]) // avoid redirect-based SSRF
+                ->get($url);
+        } catch (\Throwable $e) {
+            Log::warning('safeDownloadAudio: HTTP request failed', ['error' => $e->getMessage()]);
+            return null;
+        }
+
+        if (!$response->successful()) {
+            return null;
+        }
+
+        // 4. Content-Type check
+        $contentType = strtolower((string) $response->header('Content-Type'));
+        if (!str_starts_with($contentType, 'audio/')) {
+            Log::warning('safeDownloadAudio: rejecting non-audio content type', ['content_type' => $contentType]);
+            return null;
+        }
+
+        // 5. Size check (header + actual)
+        $contentLengthHeader = $response->header('Content-Length');
+        if ($contentLengthHeader !== null && $contentLengthHeader !== '' && (int) $contentLengthHeader > $maxBytes) {
+            Log::warning('safeDownloadAudio: Content-Length exceeds limit', ['length' => $contentLengthHeader]);
+            return null;
+        }
+        $body = $response->body();
+        if (strlen($body) > $maxBytes) {
+            Log::warning('safeDownloadAudio: body exceeds limit', ['bytes' => strlen($body)]);
+            return null;
+        }
+
+        // 6. Write temp file
+        $ext = str_contains($contentType, 'webm') ? 'webm'
+             : (str_contains($contentType, 'mpeg') ? 'mp3'
+             : (str_contains($contentType, 'ogg') ? 'ogg' : 'audio'));
+        $path = sys_get_temp_dir() . '/' . uniqid('voice_') . '.' . $ext;
+        if (@file_put_contents($path, $body) === false) {
+            return null;
+        }
+        return $path;
+    }
+
+    /**
+     * Reject private/loopback/link-local/reserved ranges (basic SSRF protection).
+     */
+    private function isPrivateOrReservedIp(string $ip): bool
+    {
+        if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+            return true;
+        }
+        // PHP's FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE covers:
+        // 10/8, 172.16/12, 192.168/16, 127/8, 169.254/16, and IPv6 equivalents
+        if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+            return true;
+        }
+        return false;
     }
 }

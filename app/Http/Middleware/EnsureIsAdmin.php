@@ -33,15 +33,36 @@ class EnsureIsAdmin
             ]);
         }
 
-        // NB: 'broker' (community moderator) is intentionally NOT admin-equivalent.
-        // Brokers have their own routes; allowing them here would let a moderator
-        // hit every admin endpoint (user suspend, tenant config, etc.) just by
-        // guessing the URL.
-        $isAdmin = $user->is_admin
+        // Admin precedence (evaluated in order):
+        //   1. EXPLICIT REJECT: role === 'broker' → never admin. Brokers are
+        //      community moderators with their own scoped routes. Even if some
+        //      legacy flag is set on their row, we deny admin here to avoid
+        //      privilege-escalation via flag drift.
+        //   2. Boolean flags (backward compat): is_admin, is_super_admin,
+        //      is_tenant_super_admin, is_god. Any one grants admin.
+        //   3. Role string: 'admin', 'tenant_admin', 'super_admin'. Any one
+        //      grants admin.
+        $role = (string) ($user->role ?? '');
+
+        if ($role === 'broker') {
+            return response()->json([
+                'errors' => [
+                    ['code' => 'forbidden', 'message' => 'Admin access required'],
+                ],
+                'success' => false,
+            ], 403, [
+                'API-Version' => '2.0',
+            ]);
+        }
+
+        $hasAdminFlag = $user->is_admin
             || $user->is_super_admin
             || $user->is_tenant_super_admin
-            || $user->is_god
-            || in_array($user->role ?? '', ['admin', 'tenant_admin', 'super_admin'], true);
+            || $user->is_god;
+
+        $hasAdminRole = in_array($role, ['admin', 'tenant_admin', 'super_admin'], true);
+
+        $isAdmin = $hasAdminFlag || $hasAdminRole;
 
         if (!$isAdmin) {
             return response()->json([

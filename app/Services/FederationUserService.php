@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -40,11 +41,34 @@ class FederationUserService
     }
 
     /**
+     * Verify that the given user belongs to the current tenant context.
+     * SECURITY: federation_user_settings has no tenant_id column (PK = user_id),
+     * so we enforce tenant scope by confirming the user is owned by the current
+     * tenant before returning/mutating settings. Returns false if no tenant
+     * context is set or user is not in that tenant.
+     */
+    private static function userBelongsToCurrentTenant(int $userId): bool
+    {
+        $tenantId = TenantContext::getId();
+        if (!$tenantId) {
+            return false;
+        }
+        return DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+    }
+
+    /**
      * Get federation settings for a user (returns defaults if none saved).
      */
     public static function getUserSettings(int $userId): array
     {
         try {
+            if (!self::userBelongsToCurrentTenant($userId)) {
+                return array_merge(self::DEFAULT_SETTINGS, ['user_id' => $userId]);
+            }
+
             $row = DB::table('federation_user_settings')
                 ->where('user_id', $userId)
                 ->first();
@@ -78,6 +102,14 @@ class FederationUserService
     public static function updateSettings(int $userId, array $settings): bool
     {
         try {
+            if (!self::userBelongsToCurrentTenant($userId)) {
+                Log::warning('FederationUserService::updateSettings rejected — user not in current tenant', [
+                    'user_id' => $userId,
+                    'tenant_id' => TenantContext::getId(),
+                ]);
+                return false;
+            }
+
             $data = ['user_id' => $userId, 'updated_at' => now()];
 
             if (isset($settings['federation_optin'])) {
@@ -134,6 +166,19 @@ class FederationUserService
     public static function hasOptedIn(int $userId, ?int $tenantId = null): bool
     {
         try {
+            // Enforce tenant scope: user must belong to the tenant being asked about.
+            $tenantId = $tenantId ?? TenantContext::getId();
+            if (!$tenantId) {
+                return false;
+            }
+            $userInTenant = DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->exists();
+            if (!$userInTenant) {
+                return false;
+            }
+
             $row = DB::table('federation_user_settings')
                 ->where('user_id', $userId)
                 ->first();
@@ -150,6 +195,14 @@ class FederationUserService
     public static function optOut(int $userId): bool
     {
         try {
+            if (!self::userBelongsToCurrentTenant($userId)) {
+                Log::warning('FederationUserService::optOut rejected — user not in current tenant', [
+                    'user_id' => $userId,
+                    'tenant_id' => TenantContext::getId(),
+                ]);
+                return false;
+            }
+
             DB::table('federation_user_settings')->updateOrInsert(
                 ['user_id' => $userId],
                 [
@@ -201,7 +254,14 @@ class FederationUserService
     public static function isFederationAvailableForUser(int $userId): bool
     {
         try {
-            $user = DB::table('users')->where('id', $userId)->first();
+            // Tenant-scoped lookup — a user from another tenant should not
+            // be considered "available for federation" in this tenant.
+            $tenantId = TenantContext::getId();
+            $userQuery = DB::table('users')->where('id', $userId);
+            if ($tenantId) {
+                $userQuery->where('tenant_id', $tenantId);
+            }
+            $user = $userQuery->first();
             if (!$user) {
                 return false;
             }

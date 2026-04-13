@@ -98,6 +98,37 @@ class FederationExternalWebhookController extends BaseApiController
             return $this->respondWithError('PARTNER_INACTIVE', 'Partner is not active', null, 403);
         }
 
+        // ---- Replay protection via X-Federation-Nonce ----
+        // HMAC alone is not enough: a captured-but-still-fresh (<5 min) signed
+        // request could be replayed. Require a nonce and reject duplicates
+        // scoped by (partner_id, nonce). Header is optional for API-key auth
+        // (Bearer) to stay backward-compatible with existing partner clients,
+        // but strongly recommended — when present it is always enforced.
+        $nonce = $request->header('X-Federation-Nonce');
+        if (!empty($nonce)) {
+            if (!is_string($nonce) || strlen($nonce) < 8 || strlen($nonce) > 128) {
+                return $this->respondWithError('INVALID_NONCE', 'Nonce must be 8-128 chars', null, 400);
+            }
+            try {
+                // INSERT IGNORE — atomic "first-seen" claim.
+                $inserted = DB::affectingStatement(
+                    "INSERT IGNORE INTO federation_webhook_nonces (partner_id, nonce, seen_at) VALUES (?, ?, NOW())",
+                    [$partner->id, $nonce]
+                );
+                if ($inserted === 0) {
+                    Log::warning('[FederationExternalWebhook] Rejecting replayed nonce', [
+                        'partner_id' => $partner->id,
+                        'nonce_prefix' => substr($nonce, 0, 8),
+                    ]);
+                    return $this->respondWithError('REPLAY_DETECTED', 'Nonce already used', null, 409);
+                }
+            } catch (\Throwable $e) {
+                // If the nonce table isn't available (e.g., mid-migration), don't
+                // fail closed on a signed+fresh request — but log loudly.
+                Log::error('[FederationExternalWebhook] Nonce store error', ['error' => $e->getMessage()]);
+            }
+        }
+
         // ---- Parse body (post-auth) ----
         $payload = json_decode($rawBody, true, 10);
         if (!is_array($payload)) {

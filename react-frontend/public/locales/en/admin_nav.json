@@ -102,6 +102,8 @@
   "monitoring": "Monitoring",
   "system_config": "System Configuration",
   "tenant_features": "Tenant Features",
+  "module_configuration": "Module Configuration",
+  "translation_config": "Translation Config",
   "cron_jobs": "Cron Jobs",
   "cron_logs": "Cron Logs",
   "cron_settings": "Cron Settings",

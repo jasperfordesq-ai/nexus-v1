@@ -51,6 +51,16 @@ class RouteServiceProvider extends ServiceProvider
             );
         });
 
+        // Bulk data export / import — 1 per minute keyed by authenticated user
+        // (falls back to IP for unauthenticated, but all current callers are
+        // behind auth:sanctum). This replaces the per-IP `throttle:1,1` that
+        // allowed multiple admins behind a shared NAT to starve each other.
+        RateLimiter::for('bulk-export', function (Request $request) {
+            return Limit::perMinute(1)->by(
+                $request->user()?->id ? 'user:' . $request->user()->id : 'ip:' . $request->ip()
+            );
+        });
+
         $this->routes(function () {
             // API routes — prefixed with /api (Apache rewrites /api/* → index.php,
             // so REQUEST_URI keeps the /api prefix that Laravel must match)

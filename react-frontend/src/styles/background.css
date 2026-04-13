@@ -3,6 +3,9 @@
    Theme-aware backgrounds with animated gradient blobs
    Supports both dark and light themes
    ============================================= */
+/* TODO: migrate to Tailwind per CLAUDE.md — gradient blob animations and custom
+   scrollbar rules don't have direct Tailwind equivalents; fold essentials into
+   tokens.css as CSS variables during the next design-system refactor. */
 
 /* ─────────────────────────────────────────────
    BASE DOCUMENT STYLES

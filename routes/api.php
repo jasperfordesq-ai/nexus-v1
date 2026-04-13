@@ -1490,10 +1490,13 @@ Route::get('/v2/admin/federation/export/{type}', [\App\Http\Controllers\Api\Admi
 // Enhanced federation analytics overview (KPIs + chart data)
 Route::get('/v2/admin/federation/analytics/overview', [\App\Http\Controllers\Api\AdminFederationAnalyticsController::class, 'overview']);
 // Federation data management: full export / import / purge
+// Bulk data export/import — keyed per authenticated admin (not per IP) so
+// multiple admins behind a shared NAT don't starve each other. See
+// RouteServiceProvider::boot() `bulk-export` limiter.
 Route::post('/v2/admin/federation/data/export', [\App\Http\Controllers\Api\AdminFederationDataController::class, 'export'])
-    ->middleware('throttle:1,1');
+    ->middleware('throttle:bulk-export');
 Route::post('/v2/admin/federation/data/import', [\App\Http\Controllers\Api\AdminFederationDataController::class, 'import'])
-    ->middleware('throttle:1,1');
+    ->middleware('throttle:bulk-export');
 Route::post('/v2/admin/federation/data/purge', [\App\Http\Controllers\Api\AdminFederationDataController::class, 'purge']);
 Route::get('/v2/admin/federation/neighborhoods', [\App\Http\Controllers\Api\AdminFederationNeighborhoodsController::class, 'index']);
 Route::post('/v2/admin/federation/neighborhoods', [\App\Http\Controllers\Api\AdminFederationNeighborhoodsController::class, 'store']);

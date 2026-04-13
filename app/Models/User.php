@@ -27,7 +27,10 @@ class User extends Authenticatable
         'phone', 'is_verified', 'is_approved',
         'onboarding_completed', 'date_of_birth',
         'profile_type', 'organization_name', 'totp_enabled',
-        'notification_preferences',
+        // notification_preferences intentionally excluded from $fillable —
+        // it is a sensitive JSON blob mass-assignable only via the explicit
+        // updateNotificationPreferences(int $userId, array $prefs) static method
+        // below (with tenant scoping + structural validation).
         'email_verified_at', 'last_active_at',
     ];
 
@@ -157,42 +160,63 @@ class User extends Authenticatable
     }
 
     /**
+     * Standard user lookup columns. Kept private to avoid duplicating the select list.
+     */
+    private static function findByIdSelectColumns(): array
+    {
+        return [
+            'id', 'first_name', 'last_name',
+            DB::raw("CASE
+                WHEN profile_type = 'organisation' AND organization_name IS NOT NULL AND organization_name != '' THEN organization_name
+                ELSE CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, ''))
+            END as name"),
+            'organization_name', 'email', 'role', 'profile_type', 'balance', 'bio', 'tagline',
+            'location', 'latitude', 'longitude', 'skills', 'phone', 'avatar_url',
+            'created_at', 'tenant_id', 'is_approved',
+            'privacy_profile', 'privacy_search', 'privacy_contact',
+            'is_super_admin', 'is_god', 'is_tenant_super_admin', 'onboarding_completed',
+            DB::raw('COALESCE(xp, 0) as xp'),
+            DB::raw('COALESCE(level, 1) as level'),
+            'last_active_at', 'last_login_at',
+        ];
+    }
+
+    /**
      * Find user by ID, returning as array for legacy compatibility.
+     *
+     * SECURITY: Always enforces tenant_id scoping when $withTenant=true and a tenant
+     * context is set. Super-admin cross-tenant lookups must use findByIdGlobal() with
+     * an explicit Sanctum-authenticated super-admin caller — NEVER via session flags.
      */
     public static function findById(int $id, bool $withTenant = true): ?array
     {
         $tenantId = TenantContext::getId();
 
         $query = DB::table('users')
-            ->select([
-                'id', 'first_name', 'last_name',
-                DB::raw("CASE
-                    WHEN profile_type = 'organisation' AND organization_name IS NOT NULL AND organization_name != '' THEN organization_name
-                    ELSE CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, ''))
-                END as name"),
-                'organization_name', 'email', 'role', 'profile_type', 'balance', 'bio', 'tagline',
-                'location', 'latitude', 'longitude', 'skills', 'phone', 'avatar_url',
-                'created_at', 'tenant_id', 'is_approved',
-                'privacy_profile', 'privacy_search', 'privacy_contact',
-                'is_super_admin', 'is_god', 'is_tenant_super_admin', 'onboarding_completed',
-                DB::raw('COALESCE(xp, 0) as xp'),
-                DB::raw('COALESCE(level, 1) as level'),
-                'last_active_at', 'last_login_at',
-            ])
+            ->select(self::findByIdSelectColumns())
             ->where('id', $id);
 
         if ($withTenant && $tenantId) {
-            $isSuperAdmin = !empty($_SESSION['is_super_admin']) || !empty($_SESSION['is_tenant_super_admin']);
-            if (!$isSuperAdmin) {
-                $query->where(function ($q) use ($tenantId) {
-                    $q->where('tenant_id', $tenantId)
-                      ->orWhere('is_super_admin', 1)
-                      ->orWhere('is_tenant_super_admin', 1);
-                });
-            }
+            $query->where('tenant_id', $tenantId);
         }
 
         $row = $query->first();
+        return $row ? (array) $row : null;
+    }
+
+    /**
+     * Find user by ID WITHOUT tenant scoping. Intended only for legitimate
+     * super-admin / platform-level flows. Callers MUST verify the current request
+     * is authenticated as a super admin via Sanctum (Auth::user()->is_super_admin)
+     * BEFORE invoking this method. Do not gate on $_SESSION.
+     */
+    public static function findByIdGlobal(int $id): ?array
+    {
+        $row = DB::table('users')
+            ->select(self::findByIdSelectColumns())
+            ->where('id', $id)
+            ->first();
+
         return $row ? (array) $row : null;
     }
 
@@ -332,12 +356,31 @@ class User extends Authenticatable
      */
     public static function updateNotificationPreferences(int $userId, array $prefs): bool
     {
+        // Allowlist of permitted notification preference keys. Any unknown keys
+        // are silently dropped. This prevents callers from stuffing arbitrary
+        // JSON (and potentially sensitive fields) into the column via the API.
+        $allowed = [
+            'email_messages', 'email_connections', 'email_transactions',
+            'email_reviews', 'push_enabled',
+            'email_org_payments', 'email_org_transfers', 'email_org_membership',
+            'email_org_admin', 'email_gamification_digest',
+            'email_gamification_milestones',
+        ];
+
+        $sanitized = [];
+        foreach ($allowed as $key) {
+            if (array_key_exists($key, $prefs)) {
+                // Coerce to 0/1 — all current keys are boolean toggles.
+                $sanitized[$key] = filter_var($prefs[$key], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+            }
+        }
+
         try {
             $tenantId = TenantContext::getId();
             DB::table('users')
                 ->where('id', $userId)
                 ->where('tenant_id', $tenantId)
-                ->update(['notification_preferences' => json_encode($prefs)]);
+                ->update(['notification_preferences' => json_encode($sanitized)]);
             return true;
         } catch (\Exception $e) {
             error_log('[User::updateNotificationPreferences] Error: ' . $e->getMessage());

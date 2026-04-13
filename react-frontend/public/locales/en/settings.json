@@ -1,4 +1,12 @@
 {
+  "identity": {
+    "page_title": "Verify Identity",
+    "page_title_dob": "Verify Identity — Date of Birth",
+    "page_title_payment": "Verify Identity — Payment",
+    "page_title_verified": "Identity Verified",
+    "page_title_failed": "Verification Failed",
+    "dob_label": "Date of Birth"
+  },
   "title": "Settings",
   "account": "Account",
   "notifications": "Notifications",
