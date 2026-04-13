@@ -108,16 +108,16 @@
     FALSE POSITIVE: joomla/string matched to Joomla CMS CPE
     joomla/string is a standalone PHP string utility library.
     OWASP incorrectly matches it to the full Joomla CMS CPE, triggering
-    dozens of ancient Joomla CMS CVEs (2007-2008) that have nothing to do
-    with this package. The CPE cpe:2.3:a:joomla:joomla:* is wrong.
+    dozens of ancient Joomla CMS CVEs (2007-2008). The CVE element does not
+    support regex — suppress by packageUrl + each vulnerabilityName pattern.
   -->
   <suppress>
     <notes><![CDATA[
       FP: joomla/string is a PHP string utility, not the Joomla CMS.
-      All CVE-2008-* and CVE-2007-* matches are against the Joomla CMS CPE.
+      All old CVE matches are against the Joomla CMS CPE — wrong package.
     ]]></notes>
     <packageUrl regex="true">^pkg:composer/joomla/string@.*$</packageUrl>
-    <cve regex="true">CVE-200[78]-.*</cve>
+    <vulnerabilityName regex="true">CVE-200[678]-.*</vulnerabilityName>
   </suppress>
 
   <!--
@@ -136,12 +136,16 @@
     <vulnerabilityName>GHSA-vrm6-8vpv-qv8q</vulnerabilityName>
   </suppress>
   <suppress>
-    <notes><![CDATA[MOBILE-ONLY: undici WebSocket DoS — mobile APK only.</notes>]]></notes>
+    <notes><![CDATA[
+      MOBILE-ONLY: undici WebSocket DoS — mobile APK only, not web server.
+    ]]></notes>
     <packageUrl regex="true">^pkg:npm/undici@6\.2[0-3]\..*$</packageUrl>
     <vulnerabilityName>GHSA-f269-vfmq-vjvj</vulnerabilityName>
   </suppress>
   <suppress>
-    <notes><![CDATA[MOBILE-ONLY: undici WebSocket DoS — mobile APK only.</notes>]]></notes>
+    <notes><![CDATA[
+      MOBILE-ONLY: undici WebSocket DoS — mobile APK only, not web server.
+    ]]></notes>
     <packageUrl regex="true">^pkg:npm/undici@6\.2[0-3]\..*$</packageUrl>
     <vulnerabilityName>GHSA-v9p9-hfj2-hcw8</vulnerabilityName>
   </suppress>
