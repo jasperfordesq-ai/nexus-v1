@@ -572,6 +572,11 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Install E2E Dependencies
+        # e2e/package.json has its own deps (@axe-core/playwright etc.)
+        # that are NOT in the root package.json — must install separately.
+        run: cd e2e && npm ci
+
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
 

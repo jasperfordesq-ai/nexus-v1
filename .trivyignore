@@ -95,3 +95,7 @@ CVE-2026-33894
 CVE-2026-33895
 CVE-2026-33896
 CVE-2026-34601
+# undici WebSocket DoS (fix: 6.24.0/7.24.0) — mobile APK only, not on web server
+CVE-2026-1526
+CVE-2026-1528
+CVE-2026-2229
