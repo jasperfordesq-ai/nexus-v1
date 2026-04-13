@@ -151,6 +151,109 @@
   </suppress>
 
   <!--
+    MOBILE-ONLY: lodash@4.17.23 in mobile/package-lock.json (Capacitor APK).
+    The mobile app compiles to APK/IPA and is NOT deployed to the web server.
+    GHSA-r5fr-rjxr-66jc — prototype pollution in lodash. Not reachable from web.
+    Tracked for update with mobile deps separately.
+  -->
+  <suppress>
+    <notes><![CDATA[
+      MOBILE-ONLY: lodash@4.17.23 is in mobile/package-lock.json (Capacitor APK).
+      Not deployed to the web server. Will update mobile deps separately.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:npm/lodash@4\.17\.23$</packageUrl>
+    <vulnerabilityName>GHSA-r5fr-rjxr-66jc</vulnerabilityName>
+  </suppress>
+
+  <!--
+    MOBILE-ONLY: node-forge@1.3.3 in mobile/package-lock.json (Capacitor APK).
+    Not deployed to the web server.
+  -->
+  <suppress>
+    <notes><![CDATA[
+      MOBILE-ONLY: node-forge@1.3.3 is in mobile/package-lock.json (Capacitor APK).
+      Not deployed to the web server. Will update mobile deps separately.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:npm/node-forge@1\.3\.3$</packageUrl>
+    <vulnerabilityName>GHSA-ppp5-5v6c-4jwp</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      MOBILE-ONLY: node-forge@1.3.3 in mobile/package-lock.json (Capacitor APK).
+    ]]></notes>
+    <packageUrl regex="true">^pkg:npm/node-forge@1\.3\.3$</packageUrl>
+    <vulnerabilityName>GHSA-5m6q-g25r-mvwx</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      MOBILE-ONLY: node-forge@1.3.3 in mobile/package-lock.json (Capacitor APK).
+    ]]></notes>
+    <packageUrl regex="true">^pkg:npm/node-forge@1\.3\.3$</packageUrl>
+    <vulnerabilityName>GHSA-2328-f5f3-gj25</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      MOBILE-ONLY: node-forge@1.3.3 in mobile/package-lock.json (Capacitor APK).
+    ]]></notes>
+    <packageUrl regex="true">^pkg:npm/node-forge@1\.3\.3$</packageUrl>
+    <vulnerabilityName>GHSA-q67f-28xg-22rw</vulnerabilityName>
+  </suppress>
+
+  <!--
+    MOBILE-ONLY: picomatch@4.0.3 in mobile/package-lock.json (Capacitor APK).
+    GHSA-c2c7-rcm5-vvqj. Not deployed to the web server.
+  -->
+  <suppress>
+    <notes><![CDATA[
+      MOBILE-ONLY: picomatch@4.0.3 is in mobile/package-lock.json (Capacitor APK).
+      Not deployed to the web server. Will update mobile deps separately.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:npm/picomatch@4\.0\.3$</packageUrl>
+    <vulnerabilityName>GHSA-c2c7-rcm5-vvqj</vulnerabilityName>
+  </suppress>
+
+  <!--
+    MOBILE-ONLY: @xmldom/xmldom@0.8.11 in mobile/package-lock.json (Capacitor APK).
+    GHSA-wh4c-j3r5-mjhp. Not deployed to the web server.
+    Note: react-frontend uses 0.8.12+ which is patched.
+  -->
+  <suppress>
+    <notes><![CDATA[
+      MOBILE-ONLY: @xmldom/xmldom@0.8.11 is in mobile/package-lock.json (Capacitor APK).
+      Not deployed to the web server. react-frontend already uses the patched version.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:npm/%40xmldom%2Fxmldom@0\.8\.11$</packageUrl>
+    <vulnerabilityName>GHSA-wh4c-j3r5-mjhp</vulnerabilityName>
+  </suppress>
+
+  <!--
+    VENDOR/DEBUG-ONLY: vite@7.1.11 in vendor/laravel/framework exception renderer.
+    The Laravel exception renderer (Ignition) bundles its own frontend assets with
+    Vite — this is a PHP vendor sub-package used ONLY when APP_DEBUG=true (local
+    dev). In production APP_DEBUG=false, this renderer is never invoked and its
+    Vite bundle is never served. GHSA-v2wj-q39q-566r and GHSA-p9ff-h696-f583
+    (arbitrary file read / SSRF via Vite dev server) require running the Vite dev
+    server, which is never done in production.
+  -->
+  <suppress>
+    <notes><![CDATA[
+      VENDOR DEBUG-ONLY: vite@7.1.11 is in vendor/laravel/framework exception
+      renderer. APP_DEBUG=false in production — renderer never invoked. Vite dev
+      server is not started. GHSA-v2wj-q39q-566r does not apply.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:npm/vite@7\.1\.11$</packageUrl>
+    <vulnerabilityName>GHSA-v2wj-q39q-566r</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      VENDOR DEBUG-ONLY: vite@7.1.11 in vendor/laravel/framework exception renderer.
+      APP_DEBUG=false in production. GHSA-p9ff-h696-f583 does not apply.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:npm/vite@7\.1\.11$</packageUrl>
+    <vulnerabilityName>GHSA-p9ff-h696-f583</vulnerabilityName>
+  </suppress>
+
+  <!--
     FALSE POSITIVE: certifi in vendor/mockery/mockery/docs/requirements.txt
     This is a Python requirements.txt inside the DOCUMENTATION folder of the
     Mockery PHP testing library (require-dev). We never install Python in this
