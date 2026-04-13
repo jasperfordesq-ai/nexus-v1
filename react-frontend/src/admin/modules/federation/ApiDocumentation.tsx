@@ -280,7 +280,7 @@ const ENDPOINTS: EndpointDef[] = [
       "id": 3,
       "name": "Greenville Community Exchange",
       "tagline": "Sharing time, building community",
-      "location": { "city": "Dublin", "country": "IE" },
+      "location": { "city": "Springfield", "country": "US" },
       "member_count": 142,
       "partnership_status": "active",
       "partnership_since": "2025-06-15 10:30:00"

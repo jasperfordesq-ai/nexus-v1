@@ -739,6 +739,14 @@ Route::get('/v2/volunteering/organisations', [\App\Http\Controllers\Api\Voluntee
 Route::post('/v2/volunteering/organisations', [\App\Http\Controllers\Api\VolunteerController::class, 'createOrganisation']);
 Route::get('/v2/volunteering/organisations/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'showOrganisation'])->withoutMiddleware('auth:sanctum');
 // Organisation dashboard & wallet endpoints (org owner/admin only)
+//
+// Authorization enforced via VolunteerController::ensureOrgAccess() per-org
+// ownership check (tenant scope + org.user_id creator OR org_members.role IN
+// ('owner','admin') OR platform super_admin/god). This is NOT the platform
+// `admin` middleware — that would gate by platform role, which is a different
+// scope. Per-org gating must live in the controller so non-admin org owners
+// retain access to their own org dashboards. Returns 403 when access denied.
+// See app/Http/Controllers/Api/VolunteerController.php :: ensureOrgAccess().
 Route::get('/v2/volunteering/organisations/{id}/stats', [\App\Http\Controllers\Api\VolunteerController::class, 'orgStats']);
 Route::get('/v2/volunteering/organisations/{id}/wallet', [\App\Http\Controllers\Api\VolunteerController::class, 'orgWalletBalance']);
 Route::get('/v2/volunteering/organisations/{id}/wallet/transactions', [\App\Http\Controllers\Api\VolunteerController::class, 'orgWalletTransactions']);

@@ -1230,7 +1230,7 @@ class FederationV2Controller extends BaseApiController
     {
         // Feature gate — federation feature must be enabled for tenant.
         if (!\App\Core\TenantContext::hasFeature('federation')) {
-            return response()->json(['error' => 'Federation feature disabled for this tenant'], 403);
+            return response()->json(['error' => __('api.federation.feature_disabled')], 403);
         }
 
         $this->getUserId();
@@ -1514,7 +1514,7 @@ class FederationV2Controller extends BaseApiController
         // Feature gate: tenant must have federation enabled at the tenant-feature
         // level. Mirrors the idiom used by optIn()/setup().
         if (!\App\Core\TenantContext::hasFeature('federation')) {
-            return response()->json(['error' => 'Federation feature disabled for this tenant'], 403);
+            return response()->json(['error' => __('api.federation.feature_disabled')], 403);
         }
 
         $input = request()->all();
@@ -2220,7 +2220,7 @@ class FederationV2Controller extends BaseApiController
         // Feature gate: tenant must have federation enabled at the tenant-feature
         // level. Mirrors the idiom used by optIn()/setup().
         if (!\App\Core\TenantContext::hasFeature('federation')) {
-            return response()->json(['error' => 'Federation feature disabled for this tenant'], 403);
+            return response()->json(['error' => __('api.federation.feature_disabled')], 403);
         }
 
         $input = request()->all();

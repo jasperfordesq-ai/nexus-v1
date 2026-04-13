@@ -306,6 +306,7 @@ export function TranslationConfig() {
                 <p className="text-sm text-default-500">{meta('translation.context_messages').description}</p>
               </div>
               <Input
+                aria-label={meta('translation.context_messages').label}
                 type="number"
                 min={1}
                 max={20}
@@ -341,6 +342,7 @@ export function TranslationConfig() {
                 <p className="text-sm text-default-500">{meta('translation.max_per_user_per_hour').description}</p>
               </div>
               <Input
+                aria-label={meta('translation.max_per_user_per_hour').label}
                 type="number"
                 min={10}
                 max={1000}

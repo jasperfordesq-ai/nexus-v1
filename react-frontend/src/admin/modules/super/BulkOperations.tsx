@@ -359,4 +359,4 @@ export function BulkOperations() {
     </div>
   );
 }
-export defau
+export default BulkOperations;

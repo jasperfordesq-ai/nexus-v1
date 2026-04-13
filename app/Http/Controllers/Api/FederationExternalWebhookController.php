@@ -69,7 +69,7 @@ class FederationExternalWebhookController extends BaseApiController
         $rateLimitKey = "federation_ext_webhook:{$ip}";
         if (RateLimiter::tooManyAttempts($rateLimitKey, self::RATE_LIMIT_PER_MINUTE)) {
             return response()->json([
-                'errors' => [['code' => 'RATE_LIMITED', 'message' => 'Too many requests']],
+                'errors' => [['code' => 'RATE_LIMITED', 'message' => __('api.federation.webhook_rate_limited')]],
             ], 429);
         }
         RateLimiter::hit($rateLimitKey, 60);
@@ -77,7 +77,7 @@ class FederationExternalWebhookController extends BaseApiController
         // ---- Read raw body (needed for HMAC verification) ----
         $rawBody = $request->getContent();
         if (empty($rawBody)) {
-            return $this->respondWithError('INVALID_REQUEST', 'Empty request body', null, 400);
+            return $this->respondWithError('INVALID_REQUEST', __('api.federation.webhook_empty_body'), null, 400);
         }
 
         // ---- Authenticate BEFORE parsing or interpreting the body ----
@@ -91,11 +91,11 @@ class FederationExternalWebhookController extends BaseApiController
         $partner = $this->identifyPartnerByApiKey($request)
             ?? $this->identifyAndVerifyPartner($request, $rawBody);
         if (!$partner) {
-            return $this->respondWithError('AUTH_FAILED', 'Invalid API key or webhook signature', null, 401);
+            return $this->respondWithError('AUTH_FAILED', __('api.federation.webhook_auth_failed'), null, 401);
         }
 
         if ($partner->status !== 'active') {
-            return $this->respondWithError('PARTNER_INACTIVE', 'Partner is not active', null, 403);
+            return $this->respondWithError('PARTNER_INACTIVE', __('api.federation.webhook_partner_inactive'), null, 403);
         }
 
         // ---- Replay protection via X-Federation-Nonce ----
@@ -107,7 +107,7 @@ class FederationExternalWebhookController extends BaseApiController
         $nonce = $request->header('X-Federation-Nonce');
         if (!empty($nonce)) {
             if (!is_string($nonce) || strlen($nonce) < 8 || strlen($nonce) > 128) {
-                return $this->respondWithError('INVALID_NONCE', 'Nonce must be 8-128 chars', null, 400);
+                return $this->respondWithError('INVALID_NONCE', __('api.federation.webhook_invalid_nonce'), null, 400);
             }
             try {
                 // INSERT IGNORE — atomic "first-seen" claim.
@@ -132,14 +132,14 @@ class FederationExternalWebhookController extends BaseApiController
         // ---- Parse body (post-auth) ----
         $payload = json_decode($rawBody, true, 10);
         if (!is_array($payload)) {
-            return $this->respondWithError('INVALID_REQUEST', 'Invalid JSON', null, 400);
+            return $this->respondWithError('INVALID_REQUEST', __('api.federation.webhook_invalid_json'), null, 400);
         }
 
         $event = $payload['event'] ?? null;
         $data = $payload['data'] ?? [];
 
         if (empty($event)) {
-            return $this->respondWithError('INVALID_REQUEST', 'Missing event type', null, 400);
+            return $this->respondWithError('INVALID_REQUEST', __('api.federation.webhook_missing_event'), null, 400);
         }
 
         // ---- Normalize payload through protocol adapter ----

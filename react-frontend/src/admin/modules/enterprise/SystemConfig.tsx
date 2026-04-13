@@ -77,6 +77,21 @@ interface ConfigGroup {
 // Config schema definition
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Supported platform languages — generated programmatically to avoid Irish-first bias
+const SUPPORTED_LOCALES: { code: string; name: string }[] = [
+  { code: 'en', name: 'English' },
+  { code: 'ga', name: 'Irish' },
+  { code: 'de', name: 'German' },
+  { code: 'fr', name: 'French' },
+  { code: 'it', name: 'Italian' },
+  { code: 'pt', name: 'Portuguese' },
+  { code: 'es', name: 'Spanish' },
+  { code: 'nl', name: 'Dutch' },
+  { code: 'pl', name: 'Polish' },
+  { code: 'ja', name: 'Japanese' },
+  { code: 'ar', name: 'Arabic' },
+];
+
 const CONFIG_SCHEMA: ConfigGroup[] = [
   {
     key: 'general',
@@ -92,12 +107,7 @@ const CONFIG_SCHEMA: ConfigGroup[] = [
       { key: 'footer_text', label: 'Footer / Legal Text', description: 'Displayed in the site footer (e.g., charity number, company registration)', type: 'textarea', default: '' },
       {
         key: 'locale', label: 'Default Locale', description: 'Default language for the platform', type: 'select', default: 'en',
-        options: [
-          { label: 'English', value: 'en' }, { label: 'Irish', value: 'ga' }, { label: 'German', value: 'de' },
-          { label: 'French', value: 'fr' }, { label: 'Italian', value: 'it' }, { label: 'Portuguese', value: 'pt' },
-          { label: 'Spanish', value: 'es' }, { label: 'Dutch', value: 'nl' }, { label: 'Polish', value: 'pl' },
-          { label: 'Japanese', value: 'ja' }, { label: 'Arabic', value: 'ar' },
-        ],
+        options: SUPPORTED_LOCALES.map(({ code, name }) => ({ label: name, value: code })),
       },
     ],
   },
