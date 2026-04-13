@@ -63,7 +63,8 @@
         "federation_partnerships_not_found": "Federation partnerships table not found",
         "federation_transactions_not_found": "Federation transactions table not found",
         "federation_audit_log_not_found": "Federation audit log table not found",
-        "export_failed": "Failed to export data"
+        "export_failed": "Failed to export data",
+        "api_key_shown_once_warning": "This key is shown ONCE. Store it securely — it cannot be retrieved again."
     },
     "admin_feed": {
         "item_hidden": "Item hidden",

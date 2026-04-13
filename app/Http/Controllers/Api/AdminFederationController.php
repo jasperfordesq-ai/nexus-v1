@@ -641,7 +641,7 @@ class AdminFederationController extends BaseApiController
         $primaryIds = array_map('intval', $input['primary_ids'] ?? []);
 
         if (count($topicIds) > 10) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Maximum 10 topics allowed.', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_federation.max_topics_exceeded'), null, 422);
         }
 
         $ok = $this->federationDirectoryService->setTenantTopics($tenantId, $topicIds, $primaryIds);
@@ -852,7 +852,7 @@ class AdminFederationController extends BaseApiController
                 [$tenantId, $name, hash('sha256', $keyValue), $prefix, json_encode($scopes), $expiresAt ?: null, $this->getUserId()]
             );
             \Illuminate\Support\Facades\Log::info('[Federation] API key created', ['tenant_id' => $tenantId, 'key_prefix' => $prefix, 'created_by' => $this->getUserId()]);
-            return $this->respondWithData(['id' => DB::getPdo()->lastInsertId(), 'name' => $name, 'api_key' => $keyValue, 'key_prefix' => $prefix, 'warning' => 'This key is shown ONCE. Store it securely — it cannot be retrieved again.'], null, 201);
+            return $this->respondWithData(['id' => DB::getPdo()->lastInsertId(), 'name' => $name, 'api_key' => $keyValue, 'key_prefix' => $prefix, 'warning' => __('api_controllers_1.admin_federation.api_key_shown_once_warning')], null, 201);
         } catch (\Exception $e) { return $this->respondWithError('CREATE_FAILED', __('api_controllers_1.admin_federation.api_key_create_failed')); }
     }
 
@@ -903,7 +903,7 @@ class AdminFederationController extends BaseApiController
 
         $allowedTypes = ['users', 'partnerships', 'transactions', 'audit'];
         if (!in_array($type, $allowedTypes, true)) {
-            return $this->respondWithError('INVALID_TYPE', 'Invalid export type. Allowed: ' . implode(', ', $allowedTypes), null, 400);
+            return $this->respondWithError('INVALID_TYPE', __('api_controllers_1.admin_federation.invalid_export_type', ['types' => implode(', ', $allowedTypes)]), null, 400);
         }
 
         try {
@@ -913,7 +913,7 @@ class AdminFederationController extends BaseApiController
             switch ($type) {
                 case 'users':
                     if (!$this->tableExists('federation_user_settings')) {
-                        return $this->respondWithError('NO_DATA', 'Federation user settings table not found', null, 404);
+                        return $this->respondWithError('NO_DATA', __('api_controllers_1.admin_federation.federation_user_settings_not_found'), null, 404);
                     }
                     $rows = array_map(fn($r) => (array)$r, DB::select("
                         SELECT u.id, u.first_name, u.last_name, u.email, u.username,
@@ -929,7 +929,7 @@ class AdminFederationController extends BaseApiController
 
                 case 'partnerships':
                     if (!$this->tableExists('federation_partnerships')) {
-                        return $this->respondWithError('NO_DATA', 'Federation partnerships table not found', null, 404);
+                        return $this->respondWithError('NO_DATA', __('api_controllers_1.admin_federation.federation_partnerships_not_found'), null, 404);
                     }
                     $rows = array_map(fn($r) => (array)$r, DB::select("
                         SELECT fp.id, t1.name AS tenant_name, t2.name AS partner_name,
@@ -945,7 +945,7 @@ class AdminFederationController extends BaseApiController
 
                 case 'transactions':
                     if (!$this->tableExists('federation_transactions')) {
-                        return $this->respondWithError('NO_DATA', 'Federation transactions table not found', null, 404);
+                        return $this->respondWithError('NO_DATA', __('api_controllers_1.admin_federation.federation_transactions_not_found'), null, 404);
                     }
                     $rows = array_map(fn($r) => (array)$r, DB::select("
                         SELECT ft.id, ft.sender_user_id, ft.receiver_user_id,
@@ -960,7 +960,7 @@ class AdminFederationController extends BaseApiController
 
                 case 'audit':
                     if (!$this->tableExists('federation_audit_log')) {
-                        return $this->respondWithError('NO_DATA', 'Federation audit log table not found', null, 404);
+                        return $this->respondWithError('NO_DATA', __('api_controllers_1.admin_federation.federation_audit_log_not_found'), null, 404);
                     }
                     $rows = array_map(fn($r) => (array)$r, DB::select("
                         SELECT id, action_type, category, level, actor_user_id,
@@ -990,7 +990,7 @@ class AdminFederationController extends BaseApiController
             ]);
 
         } catch (\Throwable $e) {
-            return $this->respondWithError('EXPORT_FAILED', 'Failed to export data', null, 500);
+            return $this->respondWithError('EXPORT_FAILED', __('api_controllers_1.admin_federation.export_failed'), null, 500);
         }
     }
 }
