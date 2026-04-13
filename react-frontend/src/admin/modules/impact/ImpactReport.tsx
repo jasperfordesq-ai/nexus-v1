@@ -276,7 +276,35 @@ export function ImpactReport() {
       }
 
       if (svRes.data) {
-        const sv = svRes.data as SocialValueExtras;
+        // The API returns config keys as hour_value_currency/hour_value_amount,
+        // and summary as a stats object (not a string). Normalise to SocialValueExtras shape.
+        const raw = svRes.data as Record<string, unknown>;
+        const rawConfig = (raw.config ?? {}) as Record<string, unknown>;
+        const rawSummary = (raw.summary ?? {}) as Record<string, unknown>;
+
+        const sv: SocialValueExtras = {
+          config: {
+            currency: (rawConfig.hour_value_currency as string) ?? 'GBP',
+            hour_value: (rawConfig.hour_value_amount as number) ?? 15,
+            social_multiplier: (rawConfig.social_multiplier as number) ?? 3.5,
+            reporting_period: (rawConfig.reporting_period as string) ?? 'annually',
+          },
+          members: rawSummary.active_members != null ? {
+            total_registered: 0,
+            active_traders: rawSummary.active_members as number,
+            participation_rate: 0,
+            new_members: 0,
+            logged_in: 0,
+          } : undefined,
+          events: rawSummary.total_events != null ? {
+            total_events: rawSummary.total_events as number,
+            unique_organizers: 0,
+            total_attendees: 0,
+          } : undefined,
+          // summary string (AI-generated) is not provided by this endpoint
+          summary: undefined,
+        };
+
         setExtras(sv);
         setConfigCurrency(sv.config.currency);
         setConfigHourValue(String(sv.config.hour_value));
