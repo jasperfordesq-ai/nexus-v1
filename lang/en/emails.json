@@ -178,7 +178,18 @@
     "subject": "{{heading}} - {{tenant}}"
   },
   "group_digest": {
-    "subject": "Weekly Digest: {{group}}"
+    "subject": "Weekly Digest: {{group}}",
+    "title": "Group Weekly Summary",
+    "preview": "This week in \"{{group}}\" on {{community}}",
+    "intro": "Here's your weekly summary for <strong>&ldquo;{{group}}&rdquo;</strong> on <strong>{{community}}</strong>.",
+    "stat_new_members": "New Members",
+    "stat_new_discussions": "New Discussions",
+    "stat_new_posts": "New Posts",
+    "stat_new_events": "New Events",
+    "quiet_week": "It was a quiet week in this group — check back next week!",
+    "total_members_label": "Total Members",
+    "thanks": "Thank you for keeping your community active!",
+    "visit_button": "Visit Group"
   },
   "newsletter": {
     "subscriber_notice": "You received this email because you're subscribed to the {{community}} newsletter.",

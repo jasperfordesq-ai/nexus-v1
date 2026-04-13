@@ -50,7 +50,7 @@ class JobTeamService
             try {
                 Notification::createNotification(
                     $targetUserId,
-                    "You've been added as a {$role} for '{$vacancy->title}'",
+                    __('svc_notifications.job_team.added_as_role', ['role' => $role, 'title' => $vacancy->title]),
                     "/jobs/{$vacancyId}",
                     'job_application'
                 );

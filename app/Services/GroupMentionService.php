@@ -98,7 +98,7 @@ class GroupMentionService
             try {
                 Notification::createNotification(
                     $mention['user_id'],
-                    "You were mentioned in {$groupName}",
+                    __('svc_notifications.group_mention.mentioned_in_group', ['group' => $groupName]),
                     $link,
                     'group_mention'
                 );

@@ -116,7 +116,7 @@ class JobPipelineRuleService
                             // Notify candidate
                             Notification::createNotification(
                                 (int) $app->user_id,
-                                'Your application status has been updated',
+                                __('svc_notifications.job_application.status_updated_generic'),
                                 "/jobs/{$vacancyId}",
                                 'job_application_status'
                             );
@@ -127,7 +127,7 @@ class JobPipelineRuleService
                             if ($vacancy) {
                                 Notification::createNotification(
                                     (int) $vacancy->user_id,
-                                    "Application #{$app->id} has been in '{$rule->trigger_stage}' for {$rule->condition_days}+ days",
+                                    __('svc_notifications.job_application.stuck_in_stage', ['id' => $app->id, 'stage' => $rule->trigger_stage, 'days' => $rule->condition_days]),
                                     "/jobs/{$vacancyId}/kanban",
                                     'job_application'
                                 );

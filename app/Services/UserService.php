@@ -414,7 +414,7 @@ class UserService
             try {
                 Notification::createNotification(
                     $userId,
-                    'Your email address has been changed. If you did not do this, contact support immediately.',
+                    __('svc_notifications.user_security.email_changed'),
                     null,
                     'email_changed'
                 );

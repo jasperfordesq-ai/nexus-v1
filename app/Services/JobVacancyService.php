@@ -819,10 +819,10 @@ class JobVacancyService
                 $applicantId = (int) $application->user_id;
 
                 $message = match ($status) {
-                    'shortlisted' => "Your application for {$jobTitle} has been shortlisted!",
-                    'rejected'    => "Your application for {$jobTitle} was not successful",
-                    'hired', 'accepted' => "Congratulations! You've been hired for {$jobTitle}",
-                    default       => "Your application for {$jobTitle} status updated to {$status}",
+                    'shortlisted' => __('svc_notifications.job_application.shortlisted', ['title' => $jobTitle]),
+                    'rejected'    => __('svc_notifications.job_application.rejected', ['title' => $jobTitle]),
+                    'hired', 'accepted' => __('svc_notifications.job_application.hired', ['title' => $jobTitle]),
+                    default       => __('svc_notifications.job_application.status_updated', ['title' => $jobTitle, 'status' => $status]),
                 };
 
                 Notification::createNotification(

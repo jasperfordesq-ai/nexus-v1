@@ -161,7 +161,7 @@ class IdeaTeamConversionService
                     try {
                         Notification::createNotification(
                             (int) $idea->user_id,
-                            "You've been added to {$groupName}",
+                            __('svc_notifications.idea_team.added_to_group', ['group' => $groupName]),
                             "/groups/{$groupId}",
                             'group_added'
                         );

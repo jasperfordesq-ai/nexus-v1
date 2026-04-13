@@ -335,35 +335,35 @@ class GroupReportingService
 
         $builder = EmailTemplateBuilder::make()
             ->theme('brand')
-            ->title('Group Weekly Summary')
-            ->previewText("This week in \"{$safeGroupName}\" on {$safeCommunityName}")
+            ->title(__('emails.group_digest.title'))
+            ->previewText(__('emails.group_digest.preview', ['group' => $safeGroupName, 'community' => $safeCommunityName]))
             ->greeting($safeName ?: 'there')
-            ->paragraph("Here's your weekly summary for <strong>&ldquo;{$safeGroupName}&rdquo;</strong> on <strong>{$safeCommunityName}</strong>.");
+            ->paragraph(__('emails.group_digest.intro', ['group' => $safeGroupName, 'community' => $safeCommunityName]));
 
         // Build stat cards for non-zero activity metrics
         $statCards = [];
         if ($stats['new_members'] > 0) {
-            $statCards[] = ['value' => (string) $stats['new_members'], 'label' => 'New Members', 'icon' => '👥'];
+            $statCards[] = ['value' => (string) $stats['new_members'], 'label' => __('emails.group_digest.stat_new_members'), 'icon' => '👥'];
         }
         if ($stats['new_discussions'] > 0) {
-            $statCards[] = ['value' => (string) $stats['new_discussions'], 'label' => 'New Discussions', 'icon' => '💬'];
+            $statCards[] = ['value' => (string) $stats['new_discussions'], 'label' => __('emails.group_digest.stat_new_discussions'), 'icon' => '💬'];
         }
         if ($stats['new_posts'] > 0) {
-            $statCards[] = ['value' => (string) $stats['new_posts'], 'label' => 'New Posts', 'icon' => '📝'];
+            $statCards[] = ['value' => (string) $stats['new_posts'], 'label' => __('emails.group_digest.stat_new_posts'), 'icon' => '📝'];
         }
         if ($stats['new_events'] > 0) {
-            $statCards[] = ['value' => (string) $stats['new_events'], 'label' => 'New Events', 'icon' => '📅'];
+            $statCards[] = ['value' => (string) $stats['new_events'], 'label' => __('emails.group_digest.stat_new_events'), 'icon' => '📅'];
         }
 
         if (!empty($statCards)) {
             $builder->statCards($statCards);
         } else {
-            $builder->paragraph('It was a quiet week in this group — check back next week!');
+            $builder->paragraph(__('emails.group_digest.quiet_week'));
         }
 
-        $builder->infoCard(['Total Members' => (string) $stats['total_members']])
-            ->paragraph('Thank you for keeping your community active!')
-            ->button('Visit Group', EmailTemplateBuilder::tenantUrl('/groups'));
+        $builder->infoCard([__('emails.group_digest.total_members_label') => (string) $stats['total_members']])
+            ->paragraph(__('emails.group_digest.thanks'))
+            ->button(__('emails.group_digest.visit_button'), EmailTemplateBuilder::tenantUrl('/groups'));
 
         return $builder->render();
     }

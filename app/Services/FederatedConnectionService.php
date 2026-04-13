@@ -93,7 +93,7 @@ class FederatedConnectionService
 
                 Notification::createNotification(
                     $receiverId,
-                    "{$senderName} from {$communityName} wants to connect with you",
+                    __('svc_notifications.federation.connection_request', ['sender' => $senderName, 'community' => $communityName]),
                     '/connections',
                     'federation_connection',
                     true,
@@ -148,7 +148,7 @@ class FederatedConnectionService
 
                 Notification::createNotification(
                     (int) $connection->requester_user_id,
-                    "{$accepterName} accepted your connection request",
+                    __('svc_notifications.federation.connection_accepted', ['name' => $accepterName]),
                     '/connections',
                     'federation_connection',
                     false,
@@ -197,7 +197,7 @@ class FederatedConnectionService
             try {
                 Notification::createNotification(
                     (int) $connection->requester_user_id,
-                    'Your connection request was declined',
+                    __('svc_notifications.federation.connection_declined'),
                     '/connections',
                     'federation_connection',
                     false,

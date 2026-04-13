@@ -130,7 +130,7 @@ class ShiftSwapService
             ]);
 
             // Notify the target user about the incoming swap request
-            self::notifySwap($toUserId, 'vol_swap_requested', 'You have a new shift swap request', '/volunteering?tab=swaps');
+            self::notifySwap($toUserId, 'vol_swap_requested', __('svc_notifications.shift_swap.requested'), '/volunteering?tab=swaps');
 
             return (int) $swapId;
         } catch (\Exception $e) {
@@ -177,7 +177,7 @@ class ShiftSwapService
                     ->update(['status' => 'rejected']);
 
                 // Notify requester their swap was declined
-                self::notifySwap((int) $swap->from_user_id, 'vol_swap_declined', 'Your shift swap request was declined', '/volunteering?tab=swaps');
+                self::notifySwap((int) $swap->from_user_id, 'vol_swap_declined', __('svc_notifications.shift_swap.declined'), '/volunteering?tab=swaps');
 
                 return true;
             }
@@ -196,7 +196,7 @@ class ShiftSwapService
 
             if ($result) {
                 // Notify requester their swap was approved
-                self::notifySwap((int) $swap->from_user_id, 'vol_swap_approved', 'Your shift swap request was accepted', '/volunteering?tab=swaps');
+                self::notifySwap((int) $swap->from_user_id, 'vol_swap_approved', __('svc_notifications.shift_swap.accepted'), '/volunteering?tab=swaps');
             }
 
             return $result;
@@ -239,8 +239,8 @@ class ShiftSwapService
                     ->update(['status' => 'admin_rejected', 'admin_id' => $adminId]);
 
                 // Notify both parties
-                self::notifySwap((int) $swap->from_user_id, 'vol_swap_declined', 'Your shift swap request was declined by an admin', '/volunteering?tab=swaps');
-                self::notifySwap((int) $swap->to_user_id, 'vol_swap_declined', 'A shift swap you accepted was declined by an admin', '/volunteering?tab=swaps');
+                self::notifySwap((int) $swap->from_user_id, 'vol_swap_declined', __('svc_notifications.shift_swap.declined_by_admin'), '/volunteering?tab=swaps');
+                self::notifySwap((int) $swap->to_user_id, 'vol_swap_declined', __('svc_notifications.shift_swap.accepted_swap_declined_by_admin'), '/volunteering?tab=swaps');
 
                 return true;
             }
@@ -255,8 +255,8 @@ class ShiftSwapService
                     ->update(['admin_id' => $adminId]);
 
                 // Notify both parties
-                self::notifySwap((int) $swap->from_user_id, 'vol_swap_approved', 'Your shift swap was approved by an admin', '/volunteering?tab=swaps');
-                self::notifySwap((int) $swap->to_user_id, 'vol_swap_approved', 'A shift swap you accepted was approved by an admin', '/volunteering?tab=swaps');
+                self::notifySwap((int) $swap->from_user_id, 'vol_swap_approved', __('svc_notifications.shift_swap.approved_by_admin'), '/volunteering?tab=swaps');
+                self::notifySwap((int) $swap->to_user_id, 'vol_swap_approved', __('svc_notifications.shift_swap.accepted_swap_approved_by_admin'), '/volunteering?tab=swaps');
             }
 
             return $result;
