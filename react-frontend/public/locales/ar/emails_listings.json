@@ -1,42 +1,42 @@
 {
   "listings": {
     "expired": {
-      "notification": "Your listing \"{{title}}\" has expired. You can renew it to make it active again.",
-      "subject": "Your listing has expired",
-      "heading": "Your listing has expired",
-      "subheading": "Renew your listing to keep it active.",
-      "body_expired": "Your listing <strong>\"{{title}}\"</strong> has expired.",
-      "body_renew": "You can renew it to make it visible to the community again.",
-      "cta": "Renew Listing"
+      "notification": "قائمة \"{{title}}\" الخاصة بك قد انتهت صلاحيتها. يمكنك تجديدها لجعلها نشطة مرة أخرى.",
+      "subject": "قائمةك قد انتهت صلاحيتها",
+      "heading": "قائمةك قد انتهت صلاحيتها",
+      "subheading": "قم بتجديد قائمتك للحفاظ عليها نشطة.",
+      "body_expired": "قائمةك <strong>\"{{title}}\"</strong> قد انتهت صلاحيتها.",
+      "body_renew": "يمكنك تجديدها لجعلها مرئية للمجتمع مرة أخرى.",
+      "cta": "تجديد القائمة"
     },
     "expiry_reminder": {
-      "notification": "Your listing \"{{title}}\" expires in {{days_text}} (on {{expiry_date}}) — renew it to keep it active.",
-      "subject": "Your listing expires in {{days_text}}",
-      "heading": "Your listing expires in {{days_text}}",
-      "subheading": "Don't miss out — renew your listing to keep it active.",
-      "body_expires": "Your listing <strong>\"{{title}}\"</strong> expires in {{days_text}} (on {{expiry_date}}).",
-      "body_renew": "Renew it now to keep it visible to the community.",
-      "cta": "View Listing",
-      "days_one": "1 day",
-      "days_other": "{{count}} days"
+      "notification": "قائمة \"{{title}}\" الخاصة بك ستنتهي صلاحيتها في {{days_text}} (في {{expiry_date}}) — قم بتجديدها للحفاظ عليها نشطة.",
+      "subject": "قائمةك ستنتهي صلاحيتها في {{days_text}}",
+      "heading": "قائمةك ستنتهي صلاحيتها في {{days_text}}",
+      "subheading": "لا تفوت الفرصة — قم بتجديد قائمتك للحفاظ عليها نشطة.",
+      "body_expires": "قائمةك <strong>\"{{title}}\"</strong> ستنتهي صلاحيتها في {{days_text}} (في {{expiry_date}}).",
+      "body_renew": "قم بتجديدها الآن للحفاظ عليها مرئية للمجتمع.",
+      "cta": "عرض القائمة",
+      "days_one": "يوم واحد",
+      "days_other": "{{count}} أيام"
     },
     "approved": {
-      "notification": "Your listing \"{{title}}\" has been approved and is now active.",
-      "notification_short": "Your listing \"{{title}}\" has been approved!"
+      "notification": "قائمة \"{{title}}\" الخاصة بك قد تم الموافقة عليها وهي الآن نشطة.",
+      "notification_short": "قائمة \"{{title}}\" الخاصة بك قد تم الموافقة عليها!"
     },
     "rejected": {
-      "notification": "Your listing \"{{title}}\" was not approved. Reason: {{reason}}",
-      "notification_no_reason": "Your listing \"{{title}}\" was not approved.",
-      "subject": "Your listing needs changes",
-      "heading": "Your listing needs changes",
-      "subheading": "Your listing was not approved — here's what to do next.",
-      "body_not_approved": "Your listing <strong>\"{{title}}\"</strong> was not approved.",
-      "body_reason": "<strong>Reason:</strong> {{reason}}",
-      "body_resubmit": "Please review and update your listing, then resubmit for approval.",
-      "cta": "Edit Listing"
+      "notification": "قائمة \"{{title}}\" الخاصة بك لم يتم الموافقة عليها. السبب: {{reason}}",
+      "notification_no_reason": "قائمة \"{{title}}\" الخاصة بك لم يتم الموافقة عليها.",
+      "subject": "قائمتك تحتاج إلى تغييرات",
+      "heading": "قائمتك تحتاج إلى تغييرات",
+      "subheading": "لم يتم الموافقة على قائمتك — إليك ما يجب القيام به بعد ذلك.",
+      "body_not_approved": "قائمة <strong>\"{{title}}\"</strong> الخاصة بك لم يتم الموافقة عليها.",
+      "body_reason": "<strong>السبب:</strong> {{reason}}",
+      "body_resubmit": "يرجى مراجعة وتحديث قائمتك، ثم إعادة تقديمها للموافقة.",
+      "cta": "تعديل القائمة"
     },
     "removed": {
-      "notification": "Your listing \"{{title}}\" has been removed by a moderator."
+      "notification": "قائمة \"{{title}}\" الخاصة بك قد تمت إزالتها بواسطة مشرف."
     }
   }
 }

@@ -1,0 +1,69 @@
+{
+  "registration": {
+    "verify_subject": "Bestätigen Sie Ihre E-Mail - {{tenant}}",
+    "verify_title": "Bestätigen Sie Ihre E-Mail-Adresse",
+    "verify_greeting": "Hallo {{name}}, willkommen bei {{tenant}}!",
+    "verify_body": "Bitte bestätigen Sie Ihre E-Mail-Adresse, indem Sie auf die Schaltfläche unten klicken.<br><br>Wenn Sie kein Konto erstellt haben, ignorieren Sie bitte diese E-Mail.",
+    "verify_cta": "E-Mail-Adresse bestätigen",
+    "success_message": "Registrierung erfolgreich. Bitte überprüfen Sie Ihre E-Mail, um Ihr Konto zu bestätigen.",
+    "error_generic": "Die Registrierung konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support."
+  },
+  "stories": {
+    "new_story_notification": "{{name}} hat eine neue Geschichte geteilt"
+  },
+  "jobs": {
+    "posting_approved": "Ihre Stellenanzeige wurde genehmigt!",
+    "posting_not_approved": "Ihre Stellenanzeige wurde nicht genehmigt",
+    "interview_requested": "Interview angefordert für {{title}}",
+    "interview_accepted": "Interview akzeptiert für {{title}}",
+    "interview_declined": "Interview abgelehnt für {{title}}",
+    "interview_cancelled": "Interview abgesagt für {{title}}",
+    "interview_reminder": "Interview-Erinnerung: {{title}} — {{time_label}} ({{scheduled_at}})",
+    "interview_reminder_push_title": "Interview-Erinnerung",
+    "interview_in_1_hour": "in 1 Stunde",
+    "interview_in_hours": "in {{hours}} Stunden",
+    "expiry_greeting": "Hallo {{name}},"
+  },
+  "guardian": {
+    "consent_title": "Anfrage zur Zustimmung des Erziehungsberechtigten",
+    "consent_preview": "Ein Minderjähriger in Ihrer Obhut benötigt Ihre Zustimmung, um an Freiwilligenarbeit teilzunehmen",
+    "consent_body": "Ein Minderjähriger in Ihrer Obhut hat um Ihre Zustimmung gebeten, um an Freiwilligenaktivitäten bei <strong>Project NEXUS</strong> teilzunehmen.",
+    "consent_highlight": "Ihre Zustimmung ist erforderlich, bevor sie teilnehmen können. Bitte überprüfen Sie dies und antworten Sie mit der Schaltfläche unten.",
+    "consent_expires_label": "in {{days}} Tagen",
+    "consent_cta": "Zustimmung erteilen",
+    "consent_ignore": "Wenn Sie diese Anfrage nicht erwartet haben, können Sie diese E-Mail sicher ignorieren. Es werden keine Maßnahmen ohne Ihre ausdrückliche Zustimmung ergriffen.",
+    "consent_subject": "Anfrage zur Zustimmung des Erziehungsberechtigten — Project NEXUS"
+  },
+  "safeguarding": {
+    "training_verified": "Ihr {{training_name}}-Datensatz wurde verifiziert!",
+    "training_not_approved": "Ihr {{training_name}}-Datensatz wurde nicht genehmigt. Bitte kontaktieren Sie den Support für weitere Informationen.",
+    "dlp_assigned_bell": "Sie wurden als die benannte Kontaktperson für den Schutzvorfall #{{incident_id}} zugewiesen.",
+    "dlp_assigned_title": "DLP-Zuweisung — Vorfall #{{incident_id}}",
+    "dlp_assigned_preview": "[{{severity}}] Sie wurden als DLP für den Vorfall #{{incident_id}} zugewiesen.",
+    "dlp_assigned_highlight": "Sie wurden als <strong>Designated Liaison Person (DLP)</strong> für einen Schutzvorfall zugewiesen.",
+    "dlp_assigned_body": "Als DLP sind Sie verantwortlich für die Koordination der Schutzreaktion für diesen Vorfall. Bitte überprüfen Sie dies umgehend.",
+    "dlp_assigned_audit_note": "Alle Zugriffe auf Schutzdaten werden protokolliert.",
+    "dlp_assigned_cta": "Vorfall überprüfen",
+    "dlp_assigned_subject": "[NEXUS] [{{severity}}] DLP-Zuweisung — Schutzvorfall #{{incident_id}}",
+    "incident_reported_title": "Schutzvorfall gemeldet",
+    "incident_reported_preview": "[{{severity}}] Neuer {{type}} Vorfall gemeldet von {{reporter}}",
+    "incident_reported_highlight": "Ein <strong>{{severity}}</strong> Schutzvorfall wurde gemeldet.",
+    "incident_reported_review": "Bitte überprüfen Sie dies im Admin-Panel und ergreifen Sie die entsprechenden Maßnahmen.",
+    "incident_reported_auto_note": "Dies ist eine automatisierte Benachrichtigung vom Schutzsystem der Plattform.",
+    "incident_reported_cta": "Im Admin-Panel überprüfen",
+    "incident_reported_subject": "[NEXUS] [{{severity}}] Schutzvorfall — {{title}}",
+    "incident_reported_bell": "[{{severity}}] Schutzvorfall gemeldet von {{reporter}}: {{title}}",
+    "incident_status_changed": "Ihr Schutzvorfall #{{incident_id}} wurde als {{status}} markiert.",
+    "incident_status_dlp_bell": "Der Status des Schutzvorfalls #{{incident_id}} wurde auf {{status}} geändert.",
+    "incident_updated_title": "Schutzvorfall aktualisiert",
+    "incident_updated_preview": "[{{severity}}] Vorfall #{{incident_id}} Status geändert auf {{status}}",
+    "incident_updated_review": "Bitte überprüfen Sie dies im Admin-Panel.",
+    "incident_updated_subject": "[NEXUS] [{{severity}}] Schutzvorfall #{{incident_id}} — {{status}}"
+  },
+  "social": {
+    "connection_request": "{{name}} hat Ihnen eine Verbindungsanfrage gesendet."
+  },
+  "marketplace": {
+    "listing_pending_notice": "Ihr Eintrag wurde zur Überprüfung eingereicht und wird veröffentlicht, sobald er genehmigt ist."
+  }
+}

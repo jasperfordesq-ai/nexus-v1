@@ -1,0 +1,42 @@
+{
+  "listings": {
+    "expired": {
+      "notification": "Votre annonce \"{{title}}\" a expiré. Vous pouvez la renouveler pour la rendre à nouveau active.",
+      "subject": "Votre annonce a expiré",
+      "heading": "Votre annonce a expiré",
+      "subheading": "Renouvelez votre annonce pour la garder active.",
+      "body_expired": "Votre annonce <strong>\"{{title}}\"</strong> a expiré.",
+      "body_renew": "Vous pouvez la renouveler pour la rendre à nouveau visible pour la communauté.",
+      "cta": "Renouveler l'annonce"
+    },
+    "expiry_reminder": {
+      "notification": "Votre annonce \"{{title}}\" expire dans {{days_text}} (le {{expiry_date}}) — renouvelez-la pour la garder active.",
+      "subject": "Votre annonce expire dans {{days_text}}",
+      "heading": "Votre annonce expire dans {{days_text}}",
+      "subheading": "Ne manquez pas cette occasion — renouvelez votre annonce pour la garder active.",
+      "body_expires": "Votre annonce <strong>\"{{title}}\"</strong> expire dans {{days_text}} (le {{expiry_date}}).",
+      "body_renew": "Renouvelez-la maintenant pour la garder visible pour la communauté.",
+      "cta": "Voir l'annonce",
+      "days_one": "1 jour",
+      "days_other": "{{count}} jours"
+    },
+    "approved": {
+      "notification": "Votre annonce \"{{title}}\" a été approuvée et est maintenant active.",
+      "notification_short": "Votre annonce \"{{title}}\" a été approuvée !"
+    },
+    "rejected": {
+      "notification": "Votre annonce \"{{title}}\" n'a pas été approuvée. Raison : {{reason}}",
+      "notification_no_reason": "Votre annonce \"{{title}}\" n'a pas été approuvée.",
+      "subject": "Votre annonce nécessite des modifications",
+      "heading": "Votre annonce nécessite des modifications",
+      "subheading": "Votre annonce n'a pas été approuvée — voici ce que vous devez faire ensuite.",
+      "body_not_approved": "Votre annonce <strong>\"{{title}}\"</strong> n'a pas été approuvée.",
+      "body_reason": "<strong>Raison :</strong> {{reason}}",
+      "body_resubmit": "Veuillez examiner et mettre à jour votre annonce, puis la soumettre à nouveau pour approbation.",
+      "cta": "Modifier l'annonce"
+    },
+    "removed": {
+      "notification": "Votre annonce \"{{title}}\" a été supprimée par un modérateur."
+    }
+  }
+}

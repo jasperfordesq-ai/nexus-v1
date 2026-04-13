@@ -1,0 +1,120 @@
+{
+  "hot_match": {
+    "heading": "Correspondance chaude trouvée !",
+    "subheading": "Une annonce compatible à {{score}}% vient d'apparaître",
+    "posted_by": "Publié par {{name}}",
+    "km_away": "{{distance}} km de distance"
+  },
+  "mutual_match": {
+    "heading": "Correspondance mutuelle !",
+    "subheading": "Une opportunité d'échange parfaite",
+    "exchange_with": "Échange avec {{name}}",
+    "they_help_you": "Ils peuvent vous aider avec :",
+    "you_help_them": "Vous pouvez les aider avec :"
+  },
+  "match_digest": {
+    "heading": "Votre digest de correspondance {{period}}",
+    "matches_waiting": "{{count}} nouvelles correspondances vous attendent",
+    "top_matches": "Meilleures correspondances",
+    "by_poster": "par {{name}}",
+    "hot_badge": "{{count}} Chaud",
+    "mutual_badge": "{{count}} Mutuel"
+  },
+  "match_approval": {
+    "heading": "La correspondance nécessite une approbation",
+    "body": "Une nouvelle correspondance attend votre approbation :",
+    "label_member": "Membre :",
+    "label_matched_listing": "Correspond avec l'annonce :",
+    "review_note": "Veuillez examiner cette correspondance pour vous assurer que le membre est approprié (mobilité, considérations de santé) et que l'activité est couverte par l'assurance.",
+    "btn_review": "Examiner la correspondance"
+  },
+  "match_approved": {
+    "heading": "Vous avez été mis en correspondance !",
+    "body": "Excellente nouvelle ! Un coordinateur a approuvé une correspondance pour vous :",
+    "view_note": "Cliquez ci-dessous pour voir l'annonce et entrer en contact avec le membre.",
+    "btn_view": "Voir la correspondance",
+    "score_text": "({{score}}% de correspondance)"
+  },
+  "match_rejected": {
+    "heading": "Mise à jour de la correspondance",
+    "body": "Malheureusement, un coordinateur a déterminé que la correspondance suivante n'était pas appropriée pour le moment :",
+    "label_reason": "Raison :",
+    "encouragement": "Ne vous inquiétez pas - il y a plein d'autres opportunités dans votre communauté ! Parcourez plus de correspondances pour trouver un bon ajustement.",
+    "btn_browse": "Parcourir les correspondances"
+  },
+  "credit_received": {
+    "footer_tagline": "{{community}} — Crédits de temps qui renforcent les communautés"
+  },
+  "review": {
+    "review_body": "{{reviewer}} vous a laissé un avis sur :community.",
+    "rating_text": "{{rating}} sur 5 étoiles",
+    "what_they_said": "Ce qu'ils ont dit"
+  },
+  "exchange": {
+    "label_proposed_hours": "Heures proposées",
+    "label_approved_hours": "Heures approuvées",
+    "label_hours_transferred": "Heures transférées",
+    "label_agreed_hours": "Heures convenues",
+    "label_expected_hours": "Heures attendues",
+    "label_requester_confirmed": "Demandeur confirmé",
+    "label_provider_confirmed": "Fournisseur confirmé",
+    "label_reason_provided": "Raison fournie :",
+    "label_coordinators_note": "Note du coordinateur :",
+    "request_received_msg": "{{name}} aimerait échanger des services avec vous ! Ils ont proposé {{hours}} heure(s) pour cet échange.",
+    "request_declined_msg": "Malheureusement, {{name}} a refusé votre demande d'échange.",
+    "request_declined_reason": " Ils ont fourni cette raison : \"{{reason}}\"",
+    "approved_msg": "Excellente nouvelle ! Votre échange a été approuvé par un coordinateur. Vous pouvez maintenant commencer l'échange de services.",
+    "approved_next_step": "Contactez l'autre partie pour organiser quand et où le service aura lieu.",
+    "rejected_msg": "Un coordinateur a examiné cet échange et n'a pas pu l'approuver pour le moment.",
+    "rejected_reason": " Raison : \"{{reason}}\"",
+    "completed_msg": "Félicitations ! Votre échange a été complété avec succès. {{hours}} heure(s) ont été transférées.",
+    "completed_well_done": "Votre solde de crédits de temps a été mis à jour. Pensez à laisser un avis pour l'autre membre !",
+    "cancelled_msg": "Cet échange a été annulé.",
+    "cancelled_reason": " Raison : \"{{reason}}\"",
+    "disputed_msg": "Il y a une divergence dans les heures confirmées par les deux parties. Un coordinateur examinera cet échange et aidera à résoudre la différence.",
+    "disputed_under_review": "Un coordinateur examinera les heures confirmées et prendra une décision équitable.",
+    "accepted_msg": "Excellente nouvelle ! {{name}} a accepté votre demande d'échange. Vous pouvez maintenant coordonner quand et où le service aura lieu.",
+    "accepted_next_step": "Envoyez un message à {{name}} pour organiser quand et où le service aura lieu.",
+    "pending_broker_msg": "Le fournisseur a accepté votre demande ! Avant de commencer, un coordinateur de la communauté doit examiner et approuver cet échange.",
+    "pending_broker_why": "Certain échanges nécessitent une révision par le coordinateur pour garantir la sécurité et l'adéquation pour tous les membres.",
+    "started_msg": "L'échange est maintenant en cours ! Le service est en train d'être fourni.",
+    "started_remember": "Lorsque le service est terminé, marquez-le comme fait et confirmez le nombre d'heures réellement travaillées.",
+    "ready_confirmation_msg": "L'échange a été marqué comme complet ! Veuillez confirmer le nombre d'heures travaillées afin que les crédits de temps puissent être transférés.",
+    "ready_confirmation_action": "Veuillez confirmer les heures dès que possible afin que l'autre partie reçoive ses crédits de temps.",
+    "label_next_step": "Prochaine étape :",
+    "label_well_done": "Bien joué !",
+    "label_under_review": "En cours d'examen :",
+    "label_remember": "Rappelez-vous :",
+    "label_action_needed": "Action requise :",
+    "label_why_approval": "Pourquoi une approbation ?"
+  },
+  "volunteering": {
+    "heading_accepted": "Demande acceptée !",
+    "tenant_volunteering": "{{community}} Bénévolat",
+    "approved_body": "Excellente nouvelle ! Votre demande de bénévolat a été <strong style=\"color: #16a34a;\">approuvée</strong>.",
+    "approved_next": "Vous pouvez maintenant vous inscrire pour des créneaux et commencer à enregistrer vos heures de bénévolat. Merci de faire une différence dans votre communauté !",
+    "btn_view_opportunity": "Voir l'opportunité",
+    "heading_declined": "Mise à jour de la demande",
+    "declined_body": "Malheureusement, votre demande n'a pas été acceptée cette fois-ci.",
+    "declined_encouragement": "Ne soyez pas découragé — il y a de nombreuses autres opportunités de bénévolat disponibles. Parcourez les dernières offres et trouvez le parfait ajustement pour vos compétences.",
+    "btn_browse_opportunities": "Parcourir les opportunités",
+    "heading_hours_paid": "Heures approuvées et crédits payés !",
+    "hours_paid_body": "Vos heures de bénévolat ont été approuvées et des crédits de temps ont été ajoutés à votre portefeuille !",
+    "label_hours_approved": "Heures approuvées",
+    "label_credits_earned": "Crédits gagnés",
+    "hours_paid_detail": "{{org}} vous a payé {{hours}} crédits de temps pour votre bénévolat. Vous pouvez dépenser ces crédits pour des services d'autres membres de la communauté.",
+    "btn_view_wallet": "Voir mon portefeuille",
+    "heading_hours_approved": "Heures approuvées !",
+    "hours_approved_body": "Vos heures de bénévolat avec {{org}} ont été vérifiées et approuvées.",
+    "hours_approved_thanks": "Merci pour votre précieuse contribution à la communauté !",
+    "btn_view_hours": "Voir mes heures",
+    "heading_hours_declined": "Mise à jour des heures",
+    "hours_declined_body": "Votre journal de bénévolat {{hours}} avec {{org}} n'a pas été approuvé.",
+    "hours_declined_note": "Cela peut être dû à une divergence dans les heures enregistrées. Si vous pensez qu'il s'agit d'une erreur, veuillez contacter directement l'organisation pour en discuter.",
+    "heading_application_received": "Nouvelle demande de bénévolat",
+    "application_received_body": "{{name}} a postulé pour faire du bénévolat avec votre organisation.",
+    "application_received_note": "Examinez leur demande et approuvez ou refusez depuis le tableau de bord de votre organisation.",
+    "btn_review_application": "Examiner la demande"
+  },
+  "default_notification": "Notification : {{type}}"
+}

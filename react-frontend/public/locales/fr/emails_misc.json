@@ -1,0 +1,69 @@
+{
+  "registration": {
+    "verify_subject": "Vérifiez votre e-mail - {{tenant}}",
+    "verify_title": "Vérifiez votre adresse e-mail",
+    "verify_greeting": "Bonjour {{name}}, bienvenue sur {{tenant}} !",
+    "verify_body": "Veuillez vérifier votre adresse e-mail en cliquant sur le bouton ci-dessous.<br><br>Si vous n'avez pas créé de compte, veuillez ignorer cet e-mail.",
+    "verify_cta": "Vérifier l'adresse e-mail",
+    "success_message": "Inscription réussie. Veuillez vérifier votre e-mail pour confirmer votre compte.",
+    "error_generic": "L'inscription n'a pas pu être complétée. Veuillez réessayer ou contacter le support."
+  },
+  "stories": {
+    "new_story_notification": "{{name}} a partagé une nouvelle histoire"
+  },
+  "jobs": {
+    "posting_approved": "Votre annonce de travail a été approuvée !",
+    "posting_not_approved": "Votre annonce de travail n'a pas été approuvée",
+    "interview_requested": "Entretien demandé pour {{title}}",
+    "interview_accepted": "Entretien accepté pour {{title}}",
+    "interview_declined": "Entretien refusé pour {{title}}",
+    "interview_cancelled": "Entretien annulé pour {{title}}",
+    "interview_reminder": "Rappel d'entretien : {{title}} — {{time_label}} ({{scheduled_at}})",
+    "interview_reminder_push_title": "Rappel d'entretien",
+    "interview_in_1_hour": "dans 1 heure",
+    "interview_in_hours": "dans {{hours}} heures",
+    "expiry_greeting": "Bonjour {{name}},"
+  },
+  "guardian": {
+    "consent_title": "Demande de consentement du tuteur",
+    "consent_preview": "Un mineur sous votre garde a besoin de votre consentement pour participer au bénévolat",
+    "consent_body": "Un mineur sous votre garde a demandé votre consentement pour participer aux activités de bénévolat sur <strong>Project NEXUS</strong>.",
+    "consent_highlight": "Votre consentement est requis avant qu'il puisse participer. Veuillez examiner et répondre en utilisant le bouton ci-dessous.",
+    "consent_expires_label": "dans {{days}} jours",
+    "consent_cta": "Accorder le consentement",
+    "consent_ignore": "Si vous ne vous attendiez pas à cette demande, vous pouvez ignorer cet e-mail en toute sécurité. Aucune action ne sera entreprise sans votre consentement explicite.",
+    "consent_subject": "Demande de consentement du tuteur — Project NEXUS"
+  },
+  "safeguarding": {
+    "training_verified": "Votre dossier {{training_name}} a été vérifié !",
+    "training_not_approved": "Votre dossier {{training_name}} n'a pas été approuvé. Veuillez contacter le support pour plus de détails.",
+    "dlp_assigned_bell": "Vous avez été désigné comme la personne de liaison désignée pour l'incident de protection #{{incident_id}}",
+    "dlp_assigned_title": "Affectation DLP — Incident #{{incident_id}}",
+    "dlp_assigned_preview": "[{{severity}}] Vous avez été désigné comme DLP pour l'incident #{{incident_id}}",
+    "dlp_assigned_highlight": "Vous avez été désigné comme <strong>Personne de Liaison Désignée (DLP)</strong> pour un incident de protection.",
+    "dlp_assigned_body": "En tant que DLP, vous êtes responsable de la coordination de la réponse de protection pour cet incident. Veuillez le revoir immédiatement.",
+    "dlp_assigned_audit_note": "Tous les accès aux données de protection sont enregistrés dans un audit.",
+    "dlp_assigned_cta": "Revoir l'Incident",
+    "dlp_assigned_subject": "[NEXUS] [{{severity}}] Affectation DLP — Incident de Protection #{{incident_id}}",
+    "incident_reported_title": "Incident de Protection Signalé",
+    "incident_reported_preview": "[{{severity}}] Nouvel incident {{type}} signalé par {{reporter}}",
+    "incident_reported_highlight": "Un incident de protection <strong>{{severity}}</strong> a été signalé.",
+    "incident_reported_review": "Veuillez le revoir dans le panneau d'administration et prendre les mesures appropriées.",
+    "incident_reported_auto_note": "Ceci est une notification automatisée du système de protection de la plateforme.",
+    "incident_reported_cta": "Revoir dans le Panneau d'Administration",
+    "incident_reported_subject": "[NEXUS] [{{severity}}] Incident de Protection — {{title}}",
+    "incident_reported_bell": "[{{severity}}] Incident de protection signalé par {{reporter}} : {{title}}",
+    "incident_status_changed": "Votre incident de protection #{{incident_id}} a été marqué comme {{status}}",
+    "incident_status_dlp_bell": "L'état de l'incident de protection #{{incident_id}} a été changé en {{status}}",
+    "incident_updated_title": "Incident de Protection Mis à Jour",
+    "incident_updated_preview": "[{{severity}}] L'état de l'incident #{{incident_id}} a été changé en {{status}}",
+    "incident_updated_review": "Veuillez le revoir dans le panneau d'administration.",
+    "incident_updated_subject": "[NEXUS] [{{severity}}] Incident de Protection #{{incident_id}} — {{status}}"
+  },
+  "social": {
+    "connection_request": "{{name}} vous a envoyé une demande de connexion"
+  },
+  "marketplace": {
+    "listing_pending_notice": "Votre annonce a été soumise pour révision et sera publiée une fois approuvée."
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "hot_match": {
+    "heading": "¡Coincidencia caliente encontrada!",
+    "subheading": "Apareció un listado compatible al {{score}}%",
+    "posted_by": "Publicado por {{name}}",
+    "km_away": "A {{distance}} km de distancia"
+  },
+  "mutual_match": {
+    "heading": "¡Coincidencia mutua!",
+    "subheading": "Una oportunidad de intercambio perfecta",
+    "exchange_with": "Intercambia con {{name}}",
+    "they_help_you": "Ellos pueden ayudarte con:",
+    "you_help_them": "Tú puedes ayudarles con:"
+  },
+  "match_digest": {
+    "heading": "Tu resumen de coincidencias {{period}}",
+    "matches_waiting": "{{count}} nuevas coincidencias te están esperando",
+    "top_matches": "Mejores coincidencias",
+    "by_poster": "por {{name}}",
+    "hot_badge": "{{count}} Caliente",
+    "mutual_badge": "{{count}} Mutua"
+  },
+  "match_approval": {
+    "heading": "La coincidencia necesita aprobación",
+    "body": "Una nueva coincidencia está esperando tu aprobación:",
+    "label_member": "Miembro:",
+    "label_matched_listing": "Coincidente con el listado:",
+    "review_note": "Por favor, revisa esta coincidencia para asegurarte de que el miembro es adecuado (consideraciones de movilidad, salud) y que la actividad está dentro de la cobertura del seguro.",
+    "btn_review": "Revisar coincidencia"
+  },
+  "match_approved": {
+    "heading": "¡Has sido emparejado!",
+    "body": "¡Grandes noticias! Un coordinador ha aprobado una coincidencia para ti:",
+    "view_note": "Haz clic abajo para ver el listado y ponerte en contacto con el miembro.",
+    "btn_view": "Ver coincidencia",
+    "score_text": "({{score}}% de coincidencia)"
+  },
+  "match_rejected": {
+    "heading": "Actualización de coincidencia",
+    "body": "Desafortunadamente, un coordinador ha determinado que la siguiente coincidencia no era adecuada en este momento:",
+    "label_reason": "Razón:",
+    "encouragement": "No te preocupes, ¡hay muchas otras oportunidades en tu comunidad! Explora más coincidencias para encontrar una buena opción.",
+    "btn_browse": "Explorar Coincidencias"
+  },
+  "credit_received": {
+    "footer_tagline": "{{community}} — Créditos de tiempo que fortalecen comunidades"
+  },
+  "review": {
+    "review_body": "{{reviewer}} te ha dejado una reseña en :community.",
+    "rating_text": "{{rating}} de 5 estrellas",
+    "what_they_said": "Lo que dijeron"
+  },
+  "exchange": {
+    "label_proposed_hours": "Horas Propuestas",
+    "label_approved_hours": "Horas Aprobadas",
+    "label_hours_transferred": "Horas Transferidas",
+    "label_agreed_hours": "Horas Acordadas",
+    "label_expected_hours": "Horas Esperadas",
+    "label_requester_confirmed": "Solicitante confirmado",
+    "label_provider_confirmed": "Proveedor confirmado",
+    "label_reason_provided": "Razón proporcionada:",
+    "label_coordinators_note": "Nota del coordinador:",
+    "request_received_msg": "{{name}} le gustaría intercambiar servicios contigo. Han propuesto {{hours}} hora(s) para este intercambio.",
+    "request_declined_msg": "Desafortunadamente, {{name}} ha rechazado tu solicitud de intercambio.",
+    "request_declined_reason": " Proporcionaron esta razón: \"{{reason}}\"",
+    "approved_msg": "¡Grandes noticias! Tu intercambio ha sido aprobado por un coordinador. Ahora puedes comenzar el intercambio de servicios.",
+    "approved_next_step": "Contacta a la otra parte para organizar cuándo y dónde se llevará a cabo el servicio.",
+    "rejected_msg": "Un coordinador ha revisado este intercambio y no pudo aprobarlo en este momento.",
+    "rejected_reason": " Razón: \"{{reason}}\"",
+    "completed_msg": "¡Felicidades! Tu intercambio se ha completado con éxito. Se han transferido {{hours}} hora(s).",
+    "completed_well_done": "Tu saldo de créditos de tiempo ha sido actualizado. ¡Considera dejar una reseña para el otro miembro!",
+    "cancelled_msg": "Este intercambio ha sido cancelado.",
+    "cancelled_reason": " Razón: \"{{reason}}\"",
+    "disputed_msg": "Hay una discrepancia en las horas confirmadas por ambas partes. Un coordinador revisará este intercambio y ayudará a resolver la diferencia.",
+    "disputed_under_review": "Un coordinador revisará las horas confirmadas y tomará una decisión justa.",
+    "accepted_msg": "¡Grandes noticias! {{name}} ha aceptado tu solicitud de intercambio. Ahora puedes coordinar cuándo y dónde se llevará a cabo el servicio.",
+    "accepted_next_step": "Envía un mensaje a {{name}} para organizar cuándo y dónde sucederá el servicio.",
+    "pending_broker_msg": "¡El proveedor ha aceptado tu solicitud! Antes de que puedas comenzar, un coordinador de la comunidad necesita revisar y aprobar este intercambio.",
+    "pending_broker_why": "Algunos intercambios requieren revisión del coordinador para garantizar la seguridad y adecuación para todos los miembros.",
+    "started_msg": "¡El intercambio está en progreso! Se está proporcionando el servicio.",
+    "started_remember": "Cuando el servicio esté completo, márcalo como hecho y confirma las horas reales trabajadas.",
+    "ready_confirmation_msg": "¡El intercambio ha sido marcado como completo! Por favor, confirma el número de horas trabajadas para que los créditos de tiempo puedan ser transferidos.",
+    "ready_confirmation_action": "Por favor, confirma las horas lo antes posible para que la otra parte reciba sus créditos de tiempo.",
+    "label_next_step": "Próximo paso:",
+    "label_well_done": "¡Bien hecho!",
+    "label_under_review": "En revisión:",
+    "label_remember": "Recuerda:",
+    "label_action_needed": "Acción necesaria:",
+    "label_why_approval": "¿Por qué aprobación?"
+  },
+  "volunteering": {
+    "heading_accepted": "¡Solicitud aceptada!",
+    "tenant_volunteering": "{{community}} Voluntariado",
+    "approved_body": "¡Grandes noticias! Tu solicitud de voluntariado ha sido <strong style=\"color: #16a34a;\">aprobada</strong>.",
+    "approved_next": "Ahora puedes inscribirte para turnos y comenzar a registrar tus horas de voluntariado. ¡Gracias por hacer la diferencia en tu comunidad!",
+    "btn_view_opportunity": "Ver Oportunidad",
+    "heading_declined": "Actualización de Solicitud",
+    "declined_body": "Desafortunadamente, tu solicitud no fue aceptada esta vez.",
+    "declined_encouragement": "No te desanimes: hay muchas otras oportunidades de voluntariado disponibles. Explora las últimas ofertas y encuentra la opción perfecta para tus habilidades.",
+    "btn_browse_opportunities": "Explorar Oportunidades",
+    "heading_hours_paid": "¡Horas aprobadas y créditos pagados!",
+    "hours_paid_body": "¡Tus horas de voluntariado han sido aprobadas y los créditos de tiempo han sido añadidos a tu billetera!",
+    "label_hours_approved": "Horas Aprobadas",
+    "label_credits_earned": "Créditos Ganados",
+    "hours_paid_detail": "{{org}} te ha pagado {{hours}} créditos de tiempo por tu voluntariado. Puedes gastar estos créditos en servicios de otros miembros de la comunidad.",
+    "btn_view_wallet": "Ver Mi Billetera",
+    "heading_hours_approved": "¡Horas Aprobadas!",
+    "hours_approved_body": "Tus horas de voluntariado con {{org}} han sido verificadas y aprobadas.",
+    "hours_approved_thanks": "¡Gracias por tu valiosa contribución a la comunidad!",
+    "btn_view_hours": "Ver Mis Horas",
+    "heading_hours_declined": "Actualización de Horas",
+    "hours_declined_body": "Tu registro de voluntariado {{hours}} con {{org}} no fue aprobado.",
+    "hours_declined_note": "Esto puede deberse a una discrepancia en las horas registradas. Si crees que esto es un error, por favor contacta directamente a la organización para discutirlo.",
+    "heading_application_received": "Nueva Solicitud de Voluntariado",
+    "application_received_body": "{{name}} ha solicitado ser voluntario con tu organización.",
+    "application_received_note": "Revisa su solicitud y aprueba o rechaza desde el panel de control de tu organización.",
+    "btn_review_application": "Revisar Solicitud"
+  },
+  "default_notification": "Notificación: {{type}}"
+}

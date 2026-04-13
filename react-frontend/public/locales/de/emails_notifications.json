@@ -1,0 +1,120 @@
+{
+  "hot_match": {
+    "heading": "Heißes Match gefunden!",
+    "subheading": "Ein {{score}}% kompatibles Angebot ist gerade erschienen",
+    "posted_by": "Veröffentlicht von {{name}}",
+    "km_away": "{{distance}} km entfernt"
+  },
+  "mutual_match": {
+    "heading": "Gegenseitiges Match!",
+    "subheading": "Eine perfekte Austauschmöglichkeit",
+    "exchange_with": "Tausche mit {{name}}",
+    "they_help_you": "Sie können Ihnen helfen mit:",
+    "you_help_them": "Sie können ihnen helfen mit:"
+  },
+  "match_digest": {
+    "heading": "Ihr {{period}} Match-Digest",
+    "matches_waiting": "{{count}} neue Matches warten auf Sie",
+    "top_matches": "Top-Matches",
+    "by_poster": "von {{name}}",
+    "hot_badge": "{{count}} Heiß",
+    "mutual_badge": "{{count}} Gegenseitig"
+  },
+  "match_approval": {
+    "heading": "Match benötigt Genehmigung",
+    "body": "Ein neues Match wartet auf Ihre Genehmigung:",
+    "label_member": "Mitglied:",
+    "label_matched_listing": "Gematcht mit Angebot:",
+    "review_note": "Bitte überprüfen Sie dieses Match, um sicherzustellen, dass das Mitglied geeignet ist (Mobilität, gesundheitliche Überlegungen) und die Aktivität innerhalb des Versicherungsschutzes liegt.",
+    "btn_review": "Match überprüfen"
+  },
+  "match_approved": {
+    "heading": "Sie wurden gematcht!",
+    "body": "Tolle Neuigkeiten! Ein Koordinator hat ein Match für Sie genehmigt:",
+    "view_note": "Klicken Sie unten, um das Angebot anzusehen und mit dem Mitglied in Kontakt zu treten.",
+    "btn_view": "Match ansehen",
+    "score_text": "({{score}}% Übereinstimmung)"
+  },
+  "match_rejected": {
+    "heading": "Match-Update",
+    "body": "Leider hat ein Koordinator festgestellt, dass das folgende Match zu diesem Zeitpunkt nicht geeignet war:",
+    "label_reason": "Grund:",
+    "encouragement": "Keine Sorge - es gibt viele andere Möglichkeiten in Ihrer Gemeinschaft! Durchsuchen Sie weitere Matches, um eine gute Übereinstimmung zu finden.",
+    "btn_browse": "Durchsuche Übereinstimmungen"
+  },
+  "credit_received": {
+    "footer_tagline": "{{community}} — Zeitguthaben, die Gemeinschaften stärken"
+  },
+  "review": {
+    "review_body": "{{reviewer}} hat dir eine Bewertung in :community hinterlassen.",
+    "rating_text": "{{rating}} von 5 Sternen",
+    "what_they_said": "Was sie gesagt haben"
+  },
+  "exchange": {
+    "label_proposed_hours": "Vorgeschlagene Stunden",
+    "label_approved_hours": "Genehmigte Stunden",
+    "label_hours_transferred": "Übertragene Stunden",
+    "label_agreed_hours": "Vereinbarte Stunden",
+    "label_expected_hours": "Erwartete Stunden",
+    "label_requester_confirmed": "Antragsteller bestätigt",
+    "label_provider_confirmed": "Anbieter bestätigt",
+    "label_reason_provided": "Grund angegeben:",
+    "label_coordinators_note": "Hinweis des Koordinators:",
+    "request_received_msg": "{{name}} möchte Dienstleistungen mit dir austauschen! Sie haben {{hours}} Stunde(n) für diesen Austausch vorgeschlagen.",
+    "request_declined_msg": "Leider hat {{name}} deine Austausch-Anfrage abgelehnt.",
+    "request_declined_reason": " Sie haben diesen Grund angegeben: \"{{reason}}\"",
+    "approved_msg": "Tolle Neuigkeiten! Dein Austausch wurde von einem Koordinator genehmigt. Du kannst jetzt mit dem Dienstleistungsaustausch beginnen.",
+    "approved_next_step": "Kontaktiere die andere Partei, um zu vereinbaren, wann und wo der Dienst stattfinden wird.",
+    "rejected_msg": "Ein Koordinator hat diesen Austausch überprüft und konnte ihn zu diesem Zeitpunkt nicht genehmigen.",
+    "rejected_reason": " Grund: \"{{reason}}\"",
+    "completed_msg": "Herzlichen Glückwunsch! Dein Austausch wurde erfolgreich abgeschlossen. {{hours}} Stunde(n) wurden übertragen.",
+    "completed_well_done": "Dein Zeitguthaben wurde aktualisiert. Überlege, eine Bewertung für das andere Mitglied zu hinterlassen!",
+    "cancelled_msg": "Dieser Austausch wurde storniert.",
+    "cancelled_reason": " Grund: \"{{reason}}\"",
+    "disputed_msg": "Es gibt eine Diskrepanz in den von beiden Parteien bestätigten Stunden. Ein Koordinator wird diesen Austausch überprüfen und helfen, die Differenz zu klären.",
+    "disputed_under_review": "Ein Koordinator wird die bestätigten Stunden überprüfen und eine faire Entscheidung treffen.",
+    "accepted_msg": "Tolle Neuigkeiten! {{name}} hat deine Austausch-Anfrage angenommen. Du kannst jetzt koordinieren, wann und wo der Dienst stattfinden wird.",
+    "accepted_next_step": "Nachricht an {{name}} senden, um zu vereinbaren, wann und wo der Dienst stattfinden wird.",
+    "pending_broker_msg": "Der Anbieter hat deine Anfrage angenommen! Bevor du beginnen kannst, muss ein Gemeinschaftskoordinator diesen Austausch überprüfen und genehmigen.",
+    "pending_broker_why": "Einige Tauschgeschäfte erfordern eine Überprüfung durch den Koordinator, um die Sicherheit und Eignung für alle Mitglieder zu gewährleisten.",
+    "started_msg": "Der Tausch ist jetzt im Gange! Die Dienstleistung wird bereitgestellt.",
+    "started_remember": "Wenn der Dienst abgeschlossen ist, markieren Sie ihn als erledigt und bestätigen Sie die tatsächlich geleisteten Stunden.",
+    "ready_confirmation_msg": "Der Tausch wurde als abgeschlossen markiert! Bitte bestätigen Sie die Anzahl der geleisteten Stunden, damit die Zeitgutschriften übertragen werden können.",
+    "ready_confirmation_action": "Bitte bestätigen Sie die Stunden so schnell wie möglich, damit die andere Partei ihre Zeitgutschriften erhält.",
+    "label_next_step": "Nächster Schritt:",
+    "label_well_done": "Gut gemacht!",
+    "label_under_review": "In Überprüfung:",
+    "label_remember": "Denken Sie daran:",
+    "label_action_needed": "Handlung erforderlich:",
+    "label_why_approval": "Warum Genehmigung?"
+  },
+  "volunteering": {
+    "heading_accepted": "Antrag angenommen!",
+    "tenant_volunteering": "{{community}} Freiwilligenarbeit",
+    "approved_body": "Tolle Neuigkeiten! Ihr Freiwilligenantrag wurde <strong style=\"color: #16a34a;\">genehmigt</strong>.",
+    "approved_next": "Sie können sich jetzt für Schichten anmelden und beginnen, Ihre Freiwilligenstunden zu erfassen. Vielen Dank, dass Sie einen Unterschied in Ihrer Gemeinschaft machen!",
+    "btn_view_opportunity": "Möglichkeit ansehen",
+    "heading_declined": "Antragsaktualisierung",
+    "declined_body": "Leider wurde Ihr Antrag diesmal nicht angenommen.",
+    "declined_encouragement": "Lassen Sie sich nicht entmutigen – es gibt viele andere Freiwilligenmöglichkeiten. Durchsuchen Sie die neuesten Angebote und finden Sie die perfekte Übereinstimmung für Ihre Fähigkeiten.",
+    "btn_browse_opportunities": "Möglichkeiten durchsuchen",
+    "heading_hours_paid": "Stunden genehmigt & Gutschriften bezahlt!",
+    "hours_paid_body": "Ihre Freiwilligenstunden wurden genehmigt und Zeitgutschriften wurden Ihrem Wallet hinzugefügt!",
+    "label_hours_approved": "Stunden genehmigt",
+    "label_credits_earned": "Gutschriften verdient",
+    "hours_paid_detail": "{{org}} hat Ihnen {{hours}} Zeitgutschriften für Ihre Freiwilligenarbeit bezahlt. Sie können diese Gutschriften für Dienstleistungen von anderen Mitgliedern der Gemeinschaft ausgeben.",
+    "btn_view_wallet": "Mein Wallet ansehen",
+    "heading_hours_approved": "Stunden genehmigt!",
+    "hours_approved_body": "Ihre Freiwilligenstunden mit {{org}} wurden überprüft und genehmigt.",
+    "hours_approved_thanks": "Vielen Dank für Ihren wertvollen Beitrag zur Gemeinschaft!",
+    "btn_view_hours": "Meine Stunden ansehen",
+    "heading_hours_declined": "Stundenaktualisierung",
+    "hours_declined_body": "Ihr {{hours}} Freiwilligenprotokoll mit {{org}} wurde nicht genehmigt.",
+    "hours_declined_note": "Dies kann auf eine Diskrepanz in den erfassten Stunden zurückzuführen sein. Wenn Sie glauben, dass dies ein Fehler ist, kontaktieren Sie bitte direkt die Organisation, um darüber zu sprechen.",
+    "heading_application_received": "Neue Freiwilligenanmeldung",
+    "application_received_body": "{{name}} hat sich beworben, um bei Ihrer Organisation freiwillig zu arbeiten.",
+    "application_received_note": "Überprüfen Sie ihre Bewerbung und genehmigen oder lehnen Sie sie von Ihrem Organisations-Dashboard aus ab.",
+    "btn_review_application": "Bewerbung überprüfen"
+  },
+  "default_notification": "Benachrichtigung: {{type}}"
+}

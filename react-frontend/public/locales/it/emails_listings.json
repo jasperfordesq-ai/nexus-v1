@@ -1,0 +1,42 @@
+{
+  "listings": {
+    "expired": {
+      "notification": "Il tuo annuncio \"{{title}}\" è scaduto. Puoi rinnovarlo per renderlo attivo di nuovo.",
+      "subject": "Il tuo annuncio è scaduto",
+      "heading": "Il tuo annuncio è scaduto",
+      "subheading": "Rinnova il tuo annuncio per mantenerlo attivo.",
+      "body_expired": "Il tuo annuncio <strong>\"{{title}}\"</strong> è scaduto.",
+      "body_renew": "Puoi rinnovarlo per renderlo visibile di nuovo alla comunità.",
+      "cta": "Rinnova Annuncio"
+    },
+    "expiry_reminder": {
+      "notification": "Il tuo annuncio \"{{title}}\" scade tra {{days_text}} (il {{expiry_date}}) — rinnovalo per mantenerlo attivo.",
+      "subject": "Il tuo annuncio scade tra {{days_text}}",
+      "heading": "Il tuo annuncio scade tra {{days_text}}",
+      "subheading": "Non perdere l'occasione — rinnova il tuo annuncio per mantenerlo attivo.",
+      "body_expires": "Il tuo annuncio <strong>\"{{title}}\"</strong> scade tra {{days_text}} (il {{expiry_date}}).",
+      "body_renew": "Rinnova ora per mantenerlo visibile alla comunità.",
+      "cta": "Visualizza Annuncio",
+      "days_one": "1 giorno",
+      "days_other": "{{count}} giorni"
+    },
+    "approved": {
+      "notification": "Il tuo annuncio \"{{title}}\" è stato approvato ed è ora attivo.",
+      "notification_short": "Il tuo annuncio \"{{title}}\" è stato approvato!"
+    },
+    "rejected": {
+      "notification": "Il tuo annuncio \"{{title}}\" non è stato approvato. Motivo: {{reason}}",
+      "notification_no_reason": "Il tuo annuncio \"{{title}}\" non è stato approvato.",
+      "subject": "Il tuo annuncio necessita di modifiche",
+      "heading": "Il tuo annuncio necessita di modifiche",
+      "subheading": "Il tuo annuncio non è stato approvato — ecco cosa fare dopo.",
+      "body_not_approved": "Il tuo annuncio <strong>\"{{title}}\"</strong> non è stato approvato.",
+      "body_reason": "<strong>Motivo:</strong> {{reason}}",
+      "body_resubmit": "Si prega di rivedere e aggiornare il proprio annuncio, quindi reinviare per approvazione.",
+      "cta": "Modifica Annuncio"
+    },
+    "removed": {
+      "notification": "Il tuo annuncio \"{{title}}\" è stato rimosso da un moderatore."
+    }
+  }
+}

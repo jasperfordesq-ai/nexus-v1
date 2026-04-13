@@ -1,0 +1,42 @@
+{
+  "listings": {
+    "expired": {
+      "notification": "Seu anúncio \"{{title}}\" expirou. Você pode renová-lo para torná-lo ativo novamente.",
+      "subject": "Seu anúncio expirou",
+      "heading": "Seu anúncio expirou",
+      "subheading": "Renove seu anúncio para mantê-lo ativo.",
+      "body_expired": "Seu anúncio <strong>\"{{title}}\"</strong> expirou.",
+      "body_renew": "Você pode renová-lo para torná-lo visível para a comunidade novamente.",
+      "cta": "Renovar Anúncio"
+    },
+    "expiry_reminder": {
+      "notification": "Seu anúncio \"{{title}}\" expira em {{days_text}} (em {{expiry_date}}) — renove-o para mantê-lo ativo.",
+      "subject": "Seu anúncio expira em {{days_text}}",
+      "heading": "Seu anúncio expira em {{days_text}}",
+      "subheading": "Não perca — renove seu anúncio para mantê-lo ativo.",
+      "body_expires": "Seu anúncio <strong>\"{{title}}\"</strong> expira em {{days_text}} (em {{expiry_date}}).",
+      "body_renew": "Renove agora para mantê-lo visível para a comunidade.",
+      "cta": "Ver Anúncio",
+      "days_one": "1 dia",
+      "days_other": "{{count}} dias"
+    },
+    "approved": {
+      "notification": "Seu anúncio \"{{title}}\" foi aprovado e agora está ativo.",
+      "notification_short": "Seu anúncio \"{{title}}\" foi aprovado!"
+    },
+    "rejected": {
+      "notification": "Seu anúncio \"{{title}}\" não foi aprovado. Motivo: {{reason}}",
+      "notification_no_reason": "Seu anúncio \"{{title}}\" não foi aprovado.",
+      "subject": "Seu anúncio precisa de alterações",
+      "heading": "Seu anúncio precisa de alterações",
+      "subheading": "Seu anúncio não foi aprovado — aqui está o que fazer a seguir.",
+      "body_not_approved": "Seu anúncio <strong>\"{{title}}\"</strong> não foi aprovado.",
+      "body_reason": "<strong>Motivo:</strong> {{reason}}",
+      "body_resubmit": "Por favor, revise e atualize seu anúncio, depois reenvie para aprovação.",
+      "cta": "Editar Anúncio"
+    },
+    "removed": {
+      "notification": "Seu anúncio \"{{title}}\" foi removido por um moderador."
+    }
+  }
+}
