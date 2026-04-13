@@ -17,7 +17,7 @@ import {
 } from '@heroui/react';
 import {
   Globe, Shield, Lock, Unlock, AlertTriangle, Network, Trash2, Plus,
-  Activity, ArrowRight, Settings, ListChecks, Users, Handshake, KeyRound,
+  Activity, ArrowRight, ListChecks, Users, Handshake, KeyRound,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
@@ -178,7 +178,6 @@ export function FederationControls() {
   };
 
   const quickLinks = [
-    { label: t('super.link_system_controls', 'System Controls'), description: t('super.link_system_controls_desc', 'Emergency lockdown & kill switches'), href: '/admin/super/federation/system-controls', icon: Settings, color: 'primary' as const },
     { label: t('super.link_whitelist', 'Whitelist'), description: t('super.link_whitelist_desc', { count: whitelist.length }), href: '/admin/super/federation/whitelist', icon: ListChecks, color: 'success' as const },
     { label: t('super.link_partnerships', 'Partnerships'), description: t('super.link_partnerships_desc', { active: activePartnerships, pending: pendingPartnerships }), href: '/admin/super/federation/partnerships', icon: Handshake, color: 'secondary' as const },
     { label: t('super.link_audit_log', 'Audit Log'), description: t('super.link_audit_log_desc', 'Federation action history'), href: '/admin/super/federation/audit', icon: Activity, color: 'warning' as const },

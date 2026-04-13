@@ -213,17 +213,6 @@ describe('ModerationQueuePage', () => {
   });
 });
 
-// ─── SocialValuePage ──────────────────────────────────────────────────────────
-
-import SocialValuePage from '../reports/SocialValuePage';
-
-describe('SocialValuePage', () => {
-  it('renders without crashing', () => {
-    const { container } = render(<W><SocialValuePage /></W>);
-    expect(container.querySelector('div')).toBeTruthy();
-  });
-});
-
 // ─── ResourcesAdmin ──────────────────────────────────────────────────────────
 
 import ResourcesAdmin from '../resources/ResourcesAdmin';

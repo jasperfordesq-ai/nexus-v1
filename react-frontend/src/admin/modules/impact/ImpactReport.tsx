@@ -6,8 +6,15 @@
 /**
  * Impact Report - Admin Module
  *
- * SROI calculations, community health metrics, impact timelines,
- * and branded PDF export. Data source: GET /api/v2/admin/impact-report
+ * Unified SROI + community health + skills/events + impact summary view.
+ * Merges the former "Social Value" page into a single Impact Report.
+ *
+ * Data sources (loaded in parallel):
+ *  - GET /api/v2/admin/impact-report        → SROI, health, timeline (primary)
+ *  - GET /api/v2/admin/reports/social-value → skills, events, impact summary, currency
+ *
+ * Config is currently stored in two backends (tenant JSON + social_value_config
+ * table). The config modal writes to both endpoints to keep them in sync.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -21,6 +28,12 @@ import {
   Divider,
   Select,
   SelectItem,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
 } from '@heroui/react';
 import {
   AreaChart,
@@ -44,17 +57,21 @@ import {
   Activity,
   ArrowLeftRight,
   Settings,
-  PoundSterling,
   Sparkles,
+  Lightbulb,
+  Calendar,
+  Award,
 } from 'lucide-react';
 
 import { usePageTitle } from '@/hooks';
-import { api } from '@/lib/api';
+import { useToast } from '@/contexts';
+import { api, tokenManager } from '@/lib/api';
 import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
 
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -107,19 +124,38 @@ interface ImpactReportData {
   config: ReportConfig;
 }
 
-// ---------------------------------------------------------------------------
-// Chart tooltip style (theme-aware, matches CommunityAnalytics)
-// ---------------------------------------------------------------------------
+interface SocialValueExtras {
+  period?: { from: string; to: string };
+  config: {
+    currency: string;
+    hour_value: number;
+    social_multiplier: number;
+    reporting_period: string;
+  };
+  members?: {
+    total_registered: number;
+    active_traders: number;
+    participation_rate: number;
+    new_members: number;
+    logged_in: number;
+  };
+  skills?: {
+    unique_categories: number;
+    total_listings: number;
+    unique_skills: number;
+    skills_offered: number;
+    skills_requested: number;
+  };
+  events?: {
+    total_events: number;
+    unique_organizers: number;
+    total_attendees: number;
+  };
+  summary?: string;
+}
 
-const tooltipStyle = {
-  borderRadius: '8px',
-  border: '1px solid hsl(var(--heroui-default-200))',
-  backgroundColor: 'hsl(var(--heroui-content1))',
-  color: 'hsl(var(--heroui-foreground))',
-};
-
 // ---------------------------------------------------------------------------
-// Period options
+// Constants
 // ---------------------------------------------------------------------------
 
 const PERIOD_OPTIONS = [
@@ -130,12 +166,38 @@ const PERIOD_OPTIONS = [
   { key: '36', label: '36 months' },
 ];
 
+const CURRENCY_OPTIONS = [
+  { key: 'GBP', label: 'GBP (£)' },
+  { key: 'EUR', label: 'EUR (€)' },
+  { key: 'USD', label: 'USD ($)' },
+];
+
+const REPORTING_PERIOD_OPTIONS = [
+  { key: 'monthly', label: 'Monthly' },
+  { key: 'quarterly', label: 'Quarterly' },
+  { key: 'annually', label: 'Annually' },
+];
+
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  GBP: '£',
+  EUR: '€',
+  USD: '$',
+};
+
+const tooltipStyle = {
+  borderRadius: '8px',
+  border: '1px solid hsl(var(--heroui-default-200))',
+  backgroundColor: 'hsl(var(--heroui-content1))',
+  color: 'hsl(var(--heroui-foreground))',
+};
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'GBP', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+function formatCurrency(value: number, currency: string): string {
+  const symbol = CURRENCY_SYMBOLS[currency] || currency;
+  return `${symbol}${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 function formatPercent(rate: number): string {
@@ -148,6 +210,28 @@ function formatMonth(monthStr: string): string {
   return date.toLocaleDateString(undefined, { month: 'short', year: '2-digit' });
 }
 
+async function exportCsv(dateFrom?: string, dateTo?: string) {
+  const token = tokenManager.getAccessToken();
+  const tenantId = tokenManager.getTenantId();
+  const headers: Record<string, string> = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (tenantId) headers['X-Tenant-ID'] = tenantId;
+
+  const params = new URLSearchParams({ format: 'csv' });
+  if (dateFrom) params.append('date_from', dateFrom);
+  if (dateTo) params.append('date_to', dateTo);
+
+  const apiBase = import.meta.env.VITE_API_BASE || '/api';
+  const res = await fetch(`${apiBase}/v2/admin/reports/social_value/export?${params}`, { headers, credentials: 'include' });
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'impact-report.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -155,60 +239,89 @@ function formatMonth(monthStr: string): string {
 export function ImpactReport() {
   const { t } = useTranslation('admin');
   usePageTitle(t('impact.page_title'));
+  const toast = useToast();
 
   const [data, setData] = useState<ImpactReportData | null>(null);
+  const [extras, setExtras] = useState<SocialValueExtras | null>(null);
   const [loading, setLoading] = useState(true);
   const [months, setMonths] = useState(12);
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [saving, setSaving] = useState(false);
+  const { isOpen: configOpen, onOpen: openConfig, onClose: closeConfig } = useDisclosure();
 
   // Config form state
-  const [hourlyValue, setHourlyValue] = useState('15');
-  const [socialMultiplier, setSocialMultiplier] = useState('3.5');
-  const [configSaved, setConfigSaved] = useState(false);
+  const [configCurrency, setConfigCurrency] = useState('GBP');
+  const [configHourValue, setConfigHourValue] = useState('15.00');
+  const [configMultiplier, setConfigMultiplier] = useState('3.5');
+  const [configPeriod, setConfigPeriod] = useState('annually');
 
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/v2/admin/impact-report?months=${months}`);
-      if (res.data) {
-        const reportData = res.data as ImpactReportData;
+      const svParams = new URLSearchParams();
+      if (dateFrom) svParams.append('date_from', dateFrom);
+      if (dateTo) svParams.append('date_to', dateTo);
+      const svQs = svParams.toString();
+
+      const [impactRes, svRes] = await Promise.all([
+        api.get(`/v2/admin/impact-report?months=${months}`),
+        api.get(`/v2/admin/reports/social-value${svQs ? `?${svQs}` : ''}`),
+      ]);
+
+      if (impactRes.data) {
+        const reportData = impactRes.data as ImpactReportData;
         setData(reportData);
-        setHourlyValue(String(reportData.config.hourly_value));
-        setSocialMultiplier(String(reportData.config.social_multiplier));
+      }
+
+      if (svRes.data) {
+        const sv = svRes.data as SocialValueExtras;
+        setExtras(sv);
+        setConfigCurrency(sv.config.currency);
+        setConfigHourValue(String(sv.config.hour_value));
+        setConfigMultiplier(String(sv.config.social_multiplier));
+        setConfigPeriod(sv.config.reporting_period);
       }
     } catch {
-      // Silently handle — cards will show loading/empty state
+      // Silently handle — cards will show empty state
     } finally {
       setLoading(false);
     }
-  }, [months]);
+  }, [months, dateFrom, dateTo]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
-  // -------------------------------------------------------------------------
-  // Save config
-  // -------------------------------------------------------------------------
-
   const handleSaveConfig = async () => {
     setSaving(true);
-    setConfigSaved(false);
     try {
-      await api.put('/v2/admin/impact-report/config', {
-        hourly_value: parseFloat(hourlyValue) || 15,
-        social_multiplier: parseFloat(socialMultiplier) || 3.5,
-      });
-      setConfigSaved(true);
-      // Reload data with new config
+      const hourValue = parseFloat(configHourValue) || 15;
+      const multiplier = parseFloat(configMultiplier) || 3.5;
+
+      // Write to both backends so Impact Report and Social Value stay in sync.
+      await Promise.all([
+        api.put('/v2/admin/impact-report/config', {
+          hourly_value: hourValue,
+          social_multiplier: multiplier,
+        }),
+        api.put('/v2/admin/reports/social-value/config', {
+          hour_value_currency: configCurrency,
+          hour_value_amount: hourValue,
+          social_multiplier: multiplier,
+          reporting_period: configPeriod,
+        }),
+      ]);
+      closeConfig();
       await loadData();
-      setTimeout(() => setConfigSaved(false), 3000);
     } catch {
-      // Config save failed silently
+      toast.error(t('reports.failed_to_save_configuration'));
     } finally {
       setSaving(false);
     }
   };
+
+  const currency = extras?.config.currency || 'GBP';
 
   // -------------------------------------------------------------------------
   // PDF export
@@ -224,9 +337,8 @@ export function ImpactReport() {
 
     const doc = new jsPDF();
 
-    // Title
     doc.setFontSize(22);
-    doc.setTextColor(99, 102, 241); // indigo
+    doc.setTextColor(99, 102, 241);
     doc.text(`${data.config.tenant_name} Impact Report`, 20, 25);
 
     doc.setFontSize(11);
@@ -237,7 +349,6 @@ export function ImpactReport() {
       33,
     );
 
-    // SROI Table
     doc.setFontSize(14);
     doc.setTextColor(30, 30, 30);
     doc.text('Social Return on Investment', 20, 48);
@@ -250,42 +361,27 @@ export function ImpactReport() {
         ['Total Transactions', String(data.sroi.total_transactions)],
         ['Unique Givers', String(data.sroi.unique_givers)],
         ['Unique Receivers', String(data.sroi.unique_receivers)],
-        [
-          'Monetary Value',
-          `${new Intl.NumberFormat(i18n.language, { style: 'currency', currency: 'GBP', minimumFractionDigits: 2 }).format(data.sroi.monetary_value)}`,
-        ],
-        [
-          'Social Value',
-          `${new Intl.NumberFormat(i18n.language, { style: 'currency', currency: 'GBP', minimumFractionDigits: 2 }).format(data.sroi.social_value)}`,
-        ],
+        ['Monetary Value', formatCurrency(data.sroi.monetary_value, currency)],
+        ['Social Value', formatCurrency(data.sroi.social_value, currency)],
         ['SROI Ratio', `${data.sroi.sroi_ratio}:1`],
       ],
       theme: 'striped',
       headStyles: { fillColor: [99, 102, 241] },
     });
 
-    // Health Metrics Table
     const sroiTableEnd =
-      (doc as unknown as Record<string, { finalY?: number }>).lastAutoTable
-        ?.finalY ?? 120;
+      (doc as unknown as Record<string, { finalY?: number }>).lastAutoTable?.finalY ?? 120;
     doc.setFontSize(14);
-    doc.setTextColor(30, 30, 30);
     doc.text('Community Health Metrics', 20, sroiTableEnd + 15);
 
     autoTable(doc, {
       startY: sroiTableEnd + 19,
       head: [['Metric', 'Value']],
       body: [
-        ['Engagement Rate', `${(data.health.engagement_rate * 100).toFixed(1)}%`],
+        ['Engagement Rate', formatPercent(data.health.engagement_rate)],
         ['Reciprocity Score', data.health.reciprocity_score.toFixed(2)],
-        [
-          'Retention Rate (90d)',
-          `${(data.health.retention_rate * 100).toFixed(1)}%`,
-        ],
-        [
-          'New Member Activation',
-          `${(data.health.activation_rate * 100).toFixed(1)}%`,
-        ],
+        ['Retention Rate (90d)', formatPercent(data.health.retention_rate)],
+        ['New Member Activation', formatPercent(data.health.activation_rate)],
         ['Network Density', data.health.network_density.toFixed(4)],
         ['Total Connections', String(data.health.total_connections)],
       ],
@@ -293,61 +389,36 @@ export function ImpactReport() {
       headStyles: { fillColor: [16, 185, 129] },
     });
 
-    // Timeline Table (if data available)
     if (data.timeline.length > 0) {
       const healthTableEnd =
-        (doc as unknown as Record<string, { finalY?: number }>).lastAutoTable
-          ?.finalY ?? 200;
+        (doc as unknown as Record<string, { finalY?: number }>).lastAutoTable?.finalY ?? 200;
+      const needNewPage = healthTableEnd > 240;
+      if (needNewPage) doc.addPage();
+      const timelineY = needNewPage ? 20 : healthTableEnd + 15;
 
-      // Check if we need a new page
-      if (healthTableEnd > 240) {
-        doc.addPage();
-        doc.setFontSize(14);
-        doc.setTextColor(30, 30, 30);
-        doc.text('Monthly Impact Timeline', 20, 20);
+      doc.setFontSize(14);
+      doc.text('Monthly Impact Timeline', 20, timelineY);
 
-        autoTable(doc, {
-          startY: 24,
-          head: [['Month', 'Hours Exchanged', 'Transactions', 'New Users']],
-          body: data.timeline.map((t) => [
-            t.month,
-            t.hours_exchanged.toFixed(1),
-            String(t.transactions),
-            String(t.new_users),
-          ]),
-          theme: 'striped',
-          headStyles: { fillColor: [245, 158, 11] },
-        });
-      } else {
-        doc.setFontSize(14);
-        doc.text('Monthly Impact Timeline', 20, healthTableEnd + 15);
-
-        autoTable(doc, {
-          startY: healthTableEnd + 19,
-          head: [['Month', 'Hours Exchanged', 'Transactions', 'New Users']],
-          body: data.timeline.map((t) => [
-            t.month,
-            t.hours_exchanged.toFixed(1),
-            String(t.transactions),
-            String(t.new_users),
-          ]),
-          theme: 'striped',
-          headStyles: { fillColor: [245, 158, 11] },
-        });
-      }
+      autoTable(doc, {
+        startY: timelineY + 4,
+        head: [['Month', 'Hours Exchanged', 'Transactions', 'New Users']],
+        body: data.timeline.map((r) => [
+          r.month,
+          r.hours_exchanged.toFixed(1),
+          String(r.transactions),
+          String(r.new_users),
+        ]),
+        theme: 'striped',
+        headStyles: { fillColor: [245, 158, 11] },
+      });
     }
 
-    // Footer on every page
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(9);
       doc.setTextColor(150, 150, 150);
-      doc.text(
-        'Generated by Project NEXUS | project-nexus.ie',
-        20,
-        285,
-      );
+      doc.text('Generated by Project NEXUS | project-nexus.ie', 20, 285);
       doc.text(`Page ${i} of ${pageCount}`, 170, 285);
     }
 
@@ -355,7 +426,7 @@ export function ImpactReport() {
   };
 
   // -------------------------------------------------------------------------
-  // Formatted timeline data for charts
+  // Chart data
   // -------------------------------------------------------------------------
 
   const chartData = (data?.timeline ?? []).map((entry) => ({
@@ -373,7 +444,7 @@ export function ImpactReport() {
         title={t('impact.impact_report_title')}
         description={t('impact.impact_report_desc')}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Select
               size="sm"
               selectedKeys={[String(months)]}
@@ -388,6 +459,32 @@ export function ImpactReport() {
                 <SelectItem key={opt.key}>{opt.label}</SelectItem>
               ))}
             </Select>
+            <Input
+              type="date"
+              size="sm"
+              value={dateFrom}
+              onValueChange={setDateFrom}
+              aria-label={t('reports.label_from_date')}
+              className="w-36"
+              variant="bordered"
+            />
+            <Input
+              type="date"
+              size="sm"
+              value={dateTo}
+              onValueChange={setDateTo}
+              aria-label={t('reports.label_to_date')}
+              className="w-36"
+              variant="bordered"
+            />
+            <Button
+              variant="flat"
+              startContent={<Settings size={16} />}
+              onPress={openConfig}
+              size="sm"
+            >
+              Configure
+            </Button>
             <Button
               variant="flat"
               startContent={<Download size={16} />}
@@ -396,6 +493,16 @@ export function ImpactReport() {
               size="sm"
             >
               Export PDF
+            </Button>
+            <Button
+              variant="flat"
+              startContent={<Download size={16} />}
+              onPress={async () => {
+                try { await exportCsv(dateFrom, dateTo); } catch { toast.error(t('reports.failed_to_export_c_s_v')); }
+              }}
+              size="sm"
+            >
+              Export CSV
             </Button>
             <Button
               variant="flat"
@@ -410,13 +517,11 @@ export function ImpactReport() {
         }
       />
 
-      {/* ----------------------------------------------------------------- */}
-      {/* SROI Section                                                      */}
-      {/* ----------------------------------------------------------------- */}
+      {/* SROI Section --------------------------------------------------- */}
 
       <div className="mb-2">
         <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-          <PoundSterling size={20} className="text-primary" />
+          <Sparkles size={20} className="text-primary" />
           Social Return on Investment
         </h2>
         <p className="text-sm text-default-500 mt-0.5">
@@ -434,14 +539,14 @@ export function ImpactReport() {
         />
         <StatCard
           label={t('impact.label_monetary_value')}
-          value={data ? formatCurrency(data.sroi.monetary_value) : '\u2014'}
-          icon={PoundSterling}
+          value={data ? formatCurrency(data.sroi.monetary_value, currency) : '\u2014'}
+          icon={TrendingUp}
           color="primary"
           loading={loading}
         />
         <StatCard
           label={t('impact.label_social_value')}
-          value={data ? formatCurrency(data.sroi.social_value) : '\u2014'}
+          value={data ? formatCurrency(data.sroi.social_value, currency) : '\u2014'}
           icon={Sparkles}
           color="success"
           loading={loading}
@@ -455,7 +560,6 @@ export function ImpactReport() {
         />
       </div>
 
-      {/* Secondary SROI stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-8">
         <Card shadow="sm">
           <CardBody className="flex flex-row items-center gap-4 p-4">
@@ -510,9 +614,91 @@ export function ImpactReport() {
         </Card>
       </div>
 
-      {/* ----------------------------------------------------------------- */}
-      {/* Community Health Section                                          */}
-      {/* ----------------------------------------------------------------- */}
+      {/* Skills & Events Section --------------------------------------- */}
+
+      {(extras?.skills || extras?.events || extras?.members) && (
+        <>
+          <Divider className="mb-6" />
+          <div className="mb-2">
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <Lightbulb size={20} className="text-warning" />
+              Skills & Events
+            </h2>
+            <p className="text-sm text-default-500 mt-0.5">
+              Service categories, listings, and community events
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
+            <StatCard
+              label={t('reports.label_active_members')}
+              value={extras.members?.active_traders ?? '\u2014'}
+              icon={Users}
+              color="primary"
+              loading={loading}
+            />
+            <StatCard
+              label={t('reports.label_skills_shared')}
+              value={extras.skills?.unique_skills ?? '\u2014'}
+              icon={Lightbulb}
+              color="secondary"
+              loading={loading}
+            />
+            <StatCard
+              label={t('reports.label_events_held')}
+              value={extras.events?.total_events ?? '\u2014'}
+              icon={Calendar}
+              color="success"
+              loading={loading}
+            />
+            <StatCard
+              label={t('reports.label_unique_categories')}
+              value={extras.skills?.unique_categories ?? '\u2014'}
+              icon={Award}
+              color="danger"
+              loading={loading}
+            />
+            <StatCard
+              label="Active Listings"
+              value={extras.skills?.total_listings ?? '\u2014'}
+              icon={Sparkles}
+              color="warning"
+              loading={loading}
+            />
+          </div>
+
+          {extras.skills && (
+            <Card shadow="sm" className="mb-8">
+              <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
+                <Lightbulb size={18} className="text-warning" />
+                <h3 className="font-semibold">Skills Overview</h3>
+              </CardHeader>
+              <CardBody className="px-4 pb-4">
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                  <div className="p-4 rounded-lg bg-default-50">
+                    <p className="text-xs text-default-500 mb-1">Skills Offered</p>
+                    <p className="text-2xl font-bold text-primary">{extras.skills.skills_offered ?? 0}</p>
+                  </div>
+                  <div className="p-4 rounded-lg bg-default-50">
+                    <p className="text-xs text-default-500 mb-1">Skills Requested</p>
+                    <p className="text-2xl font-bold text-secondary">{extras.skills.skills_requested ?? 0}</p>
+                  </div>
+                  <div className="p-4 rounded-lg bg-default-50">
+                    <p className="text-xs text-default-500 mb-1">Unique Skills</p>
+                    <p className="text-2xl font-bold text-success">{extras.skills.unique_skills ?? 0}</p>
+                  </div>
+                  <div className="p-4 rounded-lg bg-default-50">
+                    <p className="text-xs text-default-500 mb-1">Active Listings</p>
+                    <p className="text-2xl font-bold text-warning">{extras.skills.total_listings ?? 0}</p>
+                  </div>
+                </div>
+              </CardBody>
+            </Card>
+          )}
+        </>
+      )}
+
+      {/* Community Health Section -------------------------------------- */}
 
       <Divider className="mb-6" />
 
@@ -557,7 +743,6 @@ export function ImpactReport() {
         />
       </div>
 
-      {/* Additional health stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         <Card shadow="sm">
           <CardBody className="p-4">
@@ -612,14 +797,11 @@ export function ImpactReport() {
         </Card>
       </div>
 
-      {/* ----------------------------------------------------------------- */}
-      {/* Impact Timeline                                                   */}
-      {/* ----------------------------------------------------------------- */}
+      {/* Impact Timeline ----------------------------------------------- */}
 
       <Divider className="mb-6" />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-8">
-        {/* Hours exchanged area chart */}
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Clock size={18} className="text-primary" />
@@ -640,16 +822,9 @@ export function ImpactReport() {
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                  <XAxis
-                    dataKey="label"
-                    tick={{ fontSize: 12 }}
-                    tickLine={false}
-                  />
+                  <XAxis dataKey="label" tick={{ fontSize: 12 }} tickLine={false} />
                   <YAxis tick={{ fontSize: 12 }} tickLine={false} />
-                  <Tooltip
-                    contentStyle={tooltipStyle}
-                    labelStyle={{ fontWeight: 600 }}
-                  />
+                  <Tooltip contentStyle={tooltipStyle} labelStyle={{ fontWeight: 600 }} />
                   <Area
                     type="monotone"
                     dataKey="hours_exchanged"
@@ -668,7 +843,6 @@ export function ImpactReport() {
           </CardBody>
         </Card>
 
-        {/* Transactions + new users bar chart */}
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Activity size={18} className="text-success" />
@@ -683,29 +857,12 @@ export function ImpactReport() {
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                  <XAxis
-                    dataKey="label"
-                    tick={{ fontSize: 12 }}
-                    tickLine={false}
-                  />
+                  <XAxis dataKey="label" tick={{ fontSize: 12 }} tickLine={false} />
                   <YAxis tick={{ fontSize: 12 }} tickLine={false} />
-                  <Tooltip
-                    contentStyle={tooltipStyle}
-                    labelStyle={{ fontWeight: 600 }}
-                  />
+                  <Tooltip contentStyle={tooltipStyle} labelStyle={{ fontWeight: 600 }} />
                   <Legend />
-                  <Bar
-                    dataKey="transactions"
-                    name="Transactions"
-                    fill={CHART_COLOR_MAP.primary}
-                    radius={[4, 4, 0, 0]}
-                  />
-                  <Bar
-                    dataKey="new_users"
-                    name="New Users"
-                    fill={CHART_COLOR_MAP.success}
-                    radius={[4, 4, 0, 0]}
-                  />
+                  <Bar dataKey="transactions" name="Transactions" fill={CHART_COLOR_MAP.primary} radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="new_users" name="New Users" fill={CHART_COLOR_MAP.success} radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -717,93 +874,128 @@ export function ImpactReport() {
         </Card>
       </div>
 
-      {/* ----------------------------------------------------------------- */}
-      {/* Configuration Panel                                               */}
-      {/* ----------------------------------------------------------------- */}
+      {/* Impact Summary ------------------------------------------------ */}
 
-      <Divider className="mb-6" />
+      {extras?.summary && (
+        <Card shadow="sm" className="mb-8">
+          <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
+            <Sparkles size={18} className="text-success" />
+            <h3 className="font-semibold">Impact Summary</h3>
+          </CardHeader>
+          <CardBody className="px-4 pb-4">
+            <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">
+              {extras.summary}
+            </p>
+            <Divider className="my-4" />
+            <div className="text-xs text-default-400 space-y-1">
+              <p>
+                <strong>Hour Value:</strong> {formatCurrency(extras.config.hour_value, currency)}/hr
+              </p>
+              <p>
+                <strong>Social Multiplier:</strong> {extras.config.social_multiplier}x
+              </p>
+              <p>
+                <strong>Formula:</strong> Social Value = Hours × Hour Value × Multiplier
+              </p>
+            </div>
+          </CardBody>
+        </Card>
+      )}
 
-      <Card shadow="sm" className="mb-8">
-        <CardHeader className="flex items-center gap-2 px-6 pt-5 pb-0">
-          <Settings size={18} className="text-default-500" />
-          <h3 className="font-semibold">SROI Configuration</h3>
-        </CardHeader>
-        <CardBody className="px-6 pb-6">
-          <p className="text-sm text-default-500 mb-4">
-            Configure the hourly value and social multiplier used for SROI calculations.
-            The formula is: Social Value = Total Hours x Hourly Value x Social Multiplier.
-          </p>
+      {/* Configuration Modal ------------------------------------------- */}
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 max-w-xl">
-            <Input
-              label={t('impact.label_hourly_value')}
-              type="number"
-              min={0.01}
-              max={1000}
-              step={0.5}
-              value={hourlyValue}
-              onValueChange={setHourlyValue}
-              variant="bordered"
-              startContent={
-                <span className="text-default-400 text-sm">\u00A3</span>
-              }
-              description="Value per hour of service (Timebanking UK default: 15.00)"
-            />
-            <Input
-              label={t('impact.label_social_multiplier')}
-              type="number"
-              min={0.1}
-              max={100}
-              step={0.1}
-              value={socialMultiplier}
-              onValueChange={setSocialMultiplier}
-              variant="bordered"
-              startContent={
-                <span className="text-default-400 text-sm">x</span>
-              }
-              description="Multiplier for secondary social benefits (default: 3.5)"
-            />
-          </div>
-
-          <div className="flex items-center gap-3 mt-4">
-            <Button
-              color="primary"
-              onPress={handleSaveConfig}
-              isLoading={saving}
-              size="sm"
-            >
-              Update Configuration
+      <Modal isOpen={configOpen} onClose={closeConfig} size="lg">
+        <ModalContent>
+          <ModalHeader>SROI Configuration</ModalHeader>
+          <ModalBody>
+            <p className="text-sm text-default-500 mb-4">
+              Configure how social value is calculated. Changes recalculate all metrics
+              across both Impact and Social Value backends.
+            </p>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Select
+                label={t('reports.label_currency')}
+                selectedKeys={[configCurrency]}
+                onSelectionChange={(keys) => {
+                  const v = Array.from(keys)[0];
+                  if (v) setConfigCurrency(String(v));
+                }}
+                variant="bordered"
+              >
+                {CURRENCY_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.key}>{opt.label}</SelectItem>
+                ))}
+              </Select>
+              <Input
+                label={t('reports.label_hour_value')}
+                type="number"
+                min={0.01}
+                max={10000}
+                step={0.5}
+                value={configHourValue}
+                onValueChange={setConfigHourValue}
+                variant="bordered"
+                startContent={
+                  <span className="text-default-400 text-sm">
+                    {CURRENCY_SYMBOLS[configCurrency] || configCurrency}
+                  </span>
+                }
+                description="Value per hour of service (Timebanking UK default: 15.00)"
+              />
+              <Input
+                label={t('reports.label_social_multiplier')}
+                type="number"
+                min={0.1}
+                max={100}
+                step={0.1}
+                value={configMultiplier}
+                onValueChange={setConfigMultiplier}
+                variant="bordered"
+                startContent={<span className="text-default-400 text-sm">×</span>}
+              />
+              <Select
+                label={t('reports.label_reporting_period')}
+                selectedKeys={[configPeriod]}
+                onSelectionChange={(keys) => {
+                  const v = Array.from(keys)[0];
+                  if (v) setConfigPeriod(String(v));
+                }}
+                variant="bordered"
+              >
+                {REPORTING_PERIOD_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.key}>{opt.label}</SelectItem>
+                ))}
+              </Select>
+            </div>
+            <Divider className="my-4" />
+            <div className="text-xs text-default-400 space-y-1">
+              <p>
+                <strong>SROI Formula:</strong> Social Value = Total Hours × Hourly Value (
+                {CURRENCY_SYMBOLS[configCurrency] || configCurrency}{configHourValue}/hr) × Social Multiplier ({configMultiplier}×)
+              </p>
+              <p>
+                <strong>SROI Ratio:</strong> Social Value / Monetary Value (a ratio of {configMultiplier}:1 means every
+                {' '}{CURRENCY_SYMBOLS[configCurrency] || configCurrency}1 of direct value generates
+                {' '}{CURRENCY_SYMBOLS[configCurrency] || configCurrency}{configMultiplier} in social value)
+              </p>
+              <p>
+                <strong>Reciprocity Score:</strong> 1.0 = perfectly balanced giving/receiving across all members;
+                0.0 = completely one-directional
+              </p>
+              <p>
+                <strong>Network Density:</strong> Ratio of actual connections to possible connections
+                (higher = more interconnected community)
+              </p>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={closeConfig}>Cancel</Button>
+            <Button color="primary" onPress={handleSaveConfig} isLoading={saving} isDisabled={saving}>
+              Save Configuration
             </Button>
-            {configSaved && (
-              <span className="text-sm text-success font-medium">
-                Configuration saved. Report data refreshed.
-              </span>
-            )}
-          </div>
-
-          <Divider className="my-4" />
-
-          <div className="text-xs text-default-400 space-y-1">
-            <p>
-              <strong>SROI Formula:</strong> Social Value = Total Hours x Hourly Value (
-              {'\u00A3'}{hourlyValue}/hr) x Social Multiplier ({socialMultiplier}x)
-            </p>
-            <p>
-              <strong>SROI Ratio:</strong> Social Value / Monetary Value
-              (a ratio of {socialMultiplier}:1 means every {'\u00A3'}1 of direct value generates{' '}
-              {'\u00A3'}{socialMultiplier} in social value)
-            </p>
-            <p>
-              <strong>Reciprocity Score:</strong> 1.0 = perfectly balanced giving/receiving across all members;
-              0.0 = completely one-directional
-            </p>
-            <p>
-              <strong>Network Density:</strong> Ratio of actual connections to possible connections
-              (higher = more interconnected community)
-            </p>
-          </div>
-        </CardBody>
-      </Card>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

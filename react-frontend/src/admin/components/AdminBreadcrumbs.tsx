@@ -195,7 +195,6 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
   analytics: 'breadcrumbs.analytics',
   'community-analytics': 'breadcrumbs.community_analytics',
   'impact-report': 'breadcrumbs.impact_report',
-  'social-value': 'breadcrumbs.social_value',
   members: 'breadcrumbs.members',
   hours: 'breadcrumbs.hours',
   'inactive-members': 'breadcrumbs.inactive_members',

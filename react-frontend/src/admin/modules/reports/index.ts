@@ -3,7 +3,6 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-export { SocialValuePage } from './SocialValuePage';
 export { MemberReportsPage } from './MemberReportsPage';
 export { HoursReportsPage } from './HoursReportsPage';
 export { InactiveMembersPage } from './InactiveMembersPage';

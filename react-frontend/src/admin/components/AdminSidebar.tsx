@@ -75,7 +75,6 @@ import {
   Archive,
   FileCheck,
   UserX,
-  DollarSign,
   Calendar,
   BarChart2,
   Lightbulb,
@@ -275,7 +274,6 @@ function useAdminNav(): NavSection[] {
         items: [
           { label: t('community_analytics'), href: '/admin/community-analytics', icon: BarChart3 },
           { label: t('impact_report'), href: '/admin/impact-report', icon: FileText },
-          { label: t('social_value'), href: '/admin/reports/social-value', icon: DollarSign },
           { label: t('member_reports'), href: '/admin/reports/members', icon: Users },
           { label: t('hours_reports'), href: '/admin/reports/hours', icon: Clock },
           { label: t('inactive_members'), href: '/admin/reports/inactive-members', icon: UserX },
@@ -382,7 +380,6 @@ function useAdminNav(): NavSection[] {
           { label: t('super_bulk_operations'), href: '/admin/super/bulk', icon: ListChecks },
           { label: t('super_audit_log'), href: '/admin/super/audit', icon: ScrollText },
           { label: t('super_federation_controls'), href: '/admin/super/federation', icon: Globe },
-          { label: t('super_federation_system_controls'), href: '/admin/super/federation/system-controls', icon: Settings },
           { label: t('super_federation_whitelist'), href: '/admin/super/federation/whitelist', icon: Shield },
           { label: t('super_federation_partnerships'), href: '/admin/super/federation/partnerships', icon: Handshake },
           { label: t('super_federation_audit'), href: '/admin/super/federation/audit', icon: FileSearch },

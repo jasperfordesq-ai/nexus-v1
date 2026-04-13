@@ -240,7 +240,6 @@ const CommunityAnalytics = lazy(() => import('./modules/analytics/CommunityAnaly
 const ImpactReport = lazy(() => import('./modules/impact/ImpactReport'));
 
 // Admin Reports & Moderation Queue (A1-A5, A7)
-const SocialValuePage = lazy(() => import('./modules/reports/SocialValuePage'));
 const MemberReportsPage = lazy(() => import('./modules/reports/MemberReportsPage'));
 const HoursReportsPage = lazy(() => import('./modules/reports/HoursReportsPage'));
 const InactiveMembersPage = lazy(() => import('./modules/reports/InactiveMembersPage'));
@@ -267,7 +266,6 @@ const UserShow = lazy(() => import('./modules/super/UserShow'));
 const BulkOperations = lazy(() => import('./modules/super/BulkOperations'));
 const SuperAuditLog = lazy(() => import('./modules/super/SuperAuditLog'));
 const FederationControls = lazy(() => import('./modules/super/FederationControls'));
-const FederationSystemControls = lazy(() => import('./modules/super/FederationSystemControls'));
 const FederationWhitelist = lazy(() => import('./modules/super/FederationWhitelist'));
 const SuperPartnerships = lazy(() => import('./modules/super/SuperPartnerships'));
 const FederationAuditLog = lazy(() => import('./modules/super/FederationAuditLog'));
@@ -579,7 +577,6 @@ export function AdminRoutes() {
         <Route path="bulk" element={<Lazy><BulkOperations /></Lazy>} />
         <Route path="audit" element={<Lazy><SuperAuditLog /></Lazy>} />
         <Route path="federation" element={<Lazy><FederationControls /></Lazy>} />
-        <Route path="federation/system-controls" element={<Lazy><FederationSystemControls /></Lazy>} />
         <Route path="federation/whitelist" element={<Lazy><FederationWhitelist /></Lazy>} />
         <Route path="federation/partnerships" element={<Lazy><SuperPartnerships /></Lazy>} />
         <Route path="federation/audit" element={<Lazy><FederationAuditLog /></Lazy>} />
@@ -589,7 +586,7 @@ export function AdminRoutes() {
       {/* ─── ANALYTICS & REPORTING ─── */}
       <Route path="community-analytics" element={<Lazy><CommunityAnalytics /></Lazy>} />
       <Route path="impact-report" element={<Lazy><ImpactReport /></Lazy>} />
-      <Route path="reports/social-value" element={<Lazy><SocialValuePage /></Lazy>} />
+      <Route path="reports/social-value" element={<TenantRedirect to="/admin/impact-report" />} />
       <Route path="reports/members" element={<Lazy><MemberReportsPage /></Lazy>} />
       <Route path="reports/hours" element={<Lazy><HoursReportsPage /></Lazy>} />
       <Route path="reports/inactive-members" element={<Lazy><InactiveMembersPage /></Lazy>} />
