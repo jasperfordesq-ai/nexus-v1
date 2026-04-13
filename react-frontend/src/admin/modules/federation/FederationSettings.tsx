@@ -11,7 +11,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Switch, Button, Input, Divider, Skeleton } from '@heroui/react';
-import { Network, RefreshCw, Save } from 'lucide-react';
+import { Network, RefreshCw, Save, KeyRound } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
@@ -188,6 +188,27 @@ export function FederationSettings() {
       />
 
       <div className="space-y-4">
+        {/* Platform-level JWT auth is configured in Super Admin → Federation
+            Controls. Tenant admins see this pointer so they know where to
+            look (and can ask the platform operator) when a partner using
+            JWT-based auth has trouble. */}
+        <Card shadow="sm" className="border border-default-200">
+          <CardBody className="flex flex-row items-start gap-3 text-sm">
+            <KeyRound size={18} className="text-default-500 mt-0.5 shrink-0" />
+            <div>
+              <p className="font-medium">JWT-based federation auth is configured at platform level</p>
+              <p className="text-default-500 mt-1">
+                Most partners authenticate via API key, HMAC, or OAuth2 — those are configured
+                per-partner in <strong>External Partners</strong> and need no platform setup.
+                If a partner specifically requires JWT auth, the platform super-admin must set{' '}
+                <code className="text-xs bg-default-100 px-1 rounded">FEDERATION_JWT_SECRET</code>{' '}
+                in the server environment. Status and setup instructions live under{' '}
+                <strong>Super Admin → Federation Controls</strong>.
+              </p>
+            </div>
+          </CardBody>
+        </Card>
+
         <Card shadow="sm">
           <CardHeader><h3 className="text-lg font-semibold">{t('federation.federation_status')}</h3></CardHeader>
           <CardBody>

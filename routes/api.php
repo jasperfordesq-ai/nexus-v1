@@ -1614,6 +1614,7 @@ Route::post('/v2/admin/super/bulk/update-tenants', [\App\Http\Controllers\Api\Ad
 Route::get('/v2/admin/super/audit', [\App\Http\Controllers\Api\AdminSuperController::class, 'audit']);
 Route::get('/v2/admin/super/federation', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationOverview']);
 Route::get('/v2/admin/super/federation/system-controls', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationGetSystemControls']);
+Route::get('/v2/admin/super/federation/jwt-status', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationGetJwtStatus']);
 Route::put('/v2/admin/super/federation/system-controls', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationUpdateSystemControls']);
 Route::post('/v2/admin/super/federation/emergency-lockdown', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationEmergencyLockdown']);
 Route::post('/v2/admin/super/federation/lift-lockdown', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationLiftLockdown']);

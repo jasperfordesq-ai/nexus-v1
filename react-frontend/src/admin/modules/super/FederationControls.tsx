@@ -13,10 +13,11 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Card, CardBody, CardHeader, Button, Switch, Chip, Divider, Input, Spinner,
+  Code, Snippet, Accordion, AccordionItem,
 } from '@heroui/react';
 import {
   Globe, Shield, Lock, Unlock, AlertTriangle, Network, Trash2, Plus,
-  Activity, ArrowRight, Settings, ListChecks, Users, Handshake,
+  Activity, ArrowRight, Settings, ListChecks, Users, Handshake, KeyRound,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
@@ -36,6 +37,7 @@ export function FederationControls() {
   const [controls, setControls] = useState<FederationSystemControlsType | null>(null);
   const [whitelist, setWhitelist] = useState<FederationWhitelistEntry[]>([]);
   const [partnerships, setPartnerships] = useState<FederationPartnership[]>([]);
+  const [jwtStatus, setJwtStatus] = useState<{ configured: boolean; issuer: string; key_bits: number; recommended_bits: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [lockdownConfirm, setLockdownConfirm] = useState(false);
@@ -46,14 +48,16 @@ export function FederationControls() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [ctrlRes, wlRes, pRes] = await Promise.all([
+      const [ctrlRes, wlRes, pRes, jwtRes] = await Promise.all([
         adminSuper.getSystemControls(),
         adminSuper.getWhitelist(),
         adminSuper.getFederationPartnerships(),
+        adminSuper.getFederationJwtStatus(),
       ]);
       if (ctrlRes.success && ctrlRes.data) setControls(ctrlRes.data);
       if (wlRes.success && wlRes.data) setWhitelist(Array.isArray(wlRes.data) ? wlRes.data : []);
       if (pRes.success && pRes.data) setPartnerships(Array.isArray(pRes.data) ? pRes.data : []);
+      if (jwtRes.success && jwtRes.data) setJwtStatus(jwtRes.data);
     } catch (err) {
       toastRef.current.error(t('super.federation_error', { message: err instanceof Error ? err.message : 'Unknown error' }));
     }
@@ -221,6 +225,168 @@ export function FederationControls() {
           color={controls.emergency_lockdown_active ? 'danger' : 'success'}
         />
       </div>
+
+      {/* JWT Auth Configuration — platform-level setup that is easy to forget.
+          Displayed prominently so operators notice when it is missing. */}
+      <Card className={jwtStatus && !jwtStatus.configured ? 'border-2 border-warning' : ''}>
+        <CardHeader className="flex items-center gap-3">
+          <KeyRound size={20} className={jwtStatus?.configured ? 'text-success' : 'text-warning'} />
+          <div className="flex-1">
+            <p className="font-semibold">Federation JWT authentication</p>
+            <p className="text-xs text-default-500">
+              Shared secret used to sign and verify cross-platform federation tokens
+            </p>
+          </div>
+          {jwtStatus ? (
+            jwtStatus.configured ? (
+              <Chip color="success" variant="flat" size="sm">Configured · {jwtStatus.key_bits}-bit</Chip>
+            ) : (
+              <Chip color="warning" variant="flat" size="sm" startContent={<AlertTriangle size={14} />}>Not configured</Chip>
+            )
+          ) : (
+            <Chip variant="flat" size="sm">…</Chip>
+          )}
+        </CardHeader>
+        <CardBody className="gap-3 text-sm">
+          {jwtStatus?.configured && jwtStatus.key_bits < jwtStatus.recommended_bits && (
+            <div className="rounded-md border border-warning bg-warning-50 dark:bg-warning-950 p-3 text-warning-700 dark:text-warning-300">
+              <strong>Key is weaker than recommended.</strong> Current: {jwtStatus.key_bits}-bit.
+              Recommended: at least {jwtStatus.recommended_bits}-bit. Regenerate with the openssl
+              command below and replace the env var.
+            </div>
+          )}
+
+          {!jwtStatus?.configured && (
+            <div className="rounded-md border border-warning bg-warning-50 dark:bg-warning-950 p-3 text-warning-700 dark:text-warning-300">
+              <strong>FEDERATION_JWT_SECRET is not set on this server.</strong> JWT-authenticated
+              federation requests will fail. Partnerships using <Code size="sm">api_key</Code>,
+              <Code size="sm">hmac</Code>, or <Code size="sm">oauth2</Code> still work — only the
+              JWT auth method is affected.
+            </div>
+          )}
+
+          <div className="text-default-600">
+            <span className="font-medium">Issuer (iss claim):</span>{' '}
+            <Code size="sm">{jwtStatus?.issuer || '(falls back to APP_URL)'}</Code>
+          </div>
+
+          <Divider />
+
+          <Accordion variant="light" isCompact>
+            <AccordionItem
+              key="what"
+              aria-label="What is this for"
+              title={<span className="font-medium">What is this for?</span>}
+            >
+              <div className="space-y-2 text-default-600">
+                <p>
+                  NEXUS can authenticate incoming and outgoing federation requests with four
+                  different methods: <strong>api_key</strong>, <strong>hmac</strong>,{' '}
+                  <strong>oauth2</strong>, and <strong>jwt</strong>. The first three store
+                  credentials per partner in the database — no server-wide config needed.
+                </p>
+                <p>
+                  The JWT method signs tokens with a single server-wide HMAC-SHA256 secret
+                  (this one). It is used by the V2 and native-ingest cross-tenant bridges, and
+                  by some newer partner protocols that prefer signed tokens to API keys.
+                </p>
+                <p>
+                  If you are <strong>not using JWT-based federation partnerships</strong>, you
+                  can leave this unset — federation will work via api_key / hmac / oauth2. You
+                  will get a clear log entry the first time JWT is actually needed.
+                </p>
+              </div>
+            </AccordionItem>
+
+            <AccordionItem
+              key="setup"
+              aria-label="How to configure"
+              title={<span className="font-medium">How to configure (first-time setup)</span>}
+            >
+              <div className="space-y-3 text-default-600">
+                <div>
+                  <p className="mb-1"><strong>Step 1.</strong> Generate a 256-bit random secret on any machine:</p>
+                  <Snippet size="sm" symbol="$" hideCopyButton={false}>openssl rand -hex 32</Snippet>
+                  <p className="text-xs text-default-500 mt-1">(Copy the 64-character hex string it prints.)</p>
+                </div>
+
+                <div>
+                  <p className="mb-1"><strong>Step 2.</strong> Set it as an environment variable on the server. Use exactly ONE of the options below — whichever matches your hosting stack:</p>
+                  <ul className="list-disc pl-5 space-y-1 text-xs">
+                    <li><strong>Docker Compose / plain Linux server with .env file:</strong> append to <Code size="sm">/opt/nexus-php/.env</Code>:<br/>
+                      <Code size="sm">FEDERATION_JWT_SECRET=&lt;paste 64-char hex&gt;</Code><br/>
+                      <Code size="sm">FEDERATION_JWT_ISSUER=https://api.your-domain.com</Code>
+                    </li>
+                    <li><strong>Docker Compose without .env file:</strong> add under the app service&apos;s <Code size="sm">environment:</Code> key in the compose file.</li>
+                    <li><strong>Kubernetes:</strong> create a <Code size="sm">Secret</Code> and reference it via <Code size="sm">envFrom</Code> or <Code size="sm">env.valueFrom.secretKeyRef</Code>.</li>
+                    <li><strong>AWS ECS / Fargate:</strong> add to the task-definition <Code size="sm">secrets</Code> (AWS Secrets Manager) or <Code size="sm">environment</Code> block.</li>
+                    <li><strong>Heroku / Render / Fly.io:</strong> <Code size="sm">heroku config:set FEDERATION_JWT_SECRET=&lt;hex&gt;</Code> (or the equivalent dashboard field).</li>
+                    <li><strong>systemd service:</strong> add <Code size="sm">Environment=&quot;FEDERATION_JWT_SECRET=&lt;hex&gt;&quot;</Code> to the service unit file.</li>
+                    <li><strong>Plesk / cPanel / IIS:</strong> use the hosting panel&apos;s environment-variable editor (Plesk: PHP Settings → Env Vars; IIS: web.config <Code size="sm">&lt;environmentVariables&gt;</Code>).</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <p className="mb-1"><strong>Step 3.</strong> Restart the PHP container (or reload PHP-FPM) so the new env var is picked up. If you use <Code size="sm">php artisan config:cache</Code>, re-run it before the restart.</p>
+                </div>
+
+                <div>
+                  <p className="mb-1"><strong>Step 4.</strong> Refresh this page. The status pill should flip to green &quot;Configured · 256-bit&quot;.</p>
+                </div>
+              </div>
+            </AccordionItem>
+
+            <AccordionItem
+              key="rotate"
+              aria-label="How to rotate"
+              title={<span className="font-medium">Rotation policy</span>}
+            >
+              <div className="space-y-2 text-default-600">
+                <p>Rotate this secret when:</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>You suspect the secret was exposed (committed to git, leaked in logs, a developer who had access has left).</li>
+                  <li>A federation partner using JWT auth has reported token abuse.</li>
+                  <li>Routine schedule — annually is reasonable.</li>
+                </ul>
+                <p><strong>Rotation procedure:</strong></p>
+                <ol className="list-decimal pl-5 space-y-1">
+                  <li>Generate a new 256-bit secret: <Code size="sm">openssl rand -hex 32</Code>.</li>
+                  <li>Replace <Code size="sm">FEDERATION_JWT_SECRET</Code> in server env (same method as initial setup).</li>
+                  <li>Restart the PHP container.</li>
+                  <li>Notify any federation partners that rely on verifying tokens issued by us — they may need to update their trusted-issuer cache (usually no action needed because we publish the secret out-of-band to them, not the public).</li>
+                </ol>
+                <p className="text-xs text-default-500">
+                  Rotation invalidates all outstanding tokens. Tokens already in flight at the
+                  moment of rotation will fail verification; the requesting partner will re-mint.
+                </p>
+              </div>
+            </AccordionItem>
+
+            <AccordionItem
+              key="troubleshoot"
+              aria-label="Troubleshooting"
+              title={<span className="font-medium">Troubleshooting</span>}
+            >
+              <div className="space-y-2 text-default-600 text-xs">
+                <p><strong>Status shows &quot;Not configured&quot; but I set the env var:</strong></p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Restart the PHP container. PHP reads env vars at process start.</li>
+                  <li>If you use <Code size="sm">php artisan config:cache</Code>, re-run it after setting the var, then restart.</li>
+                  <li>Check the var actually reaches PHP: <Code size="sm">docker exec nexus-php-app printenv FEDERATION_JWT_SECRET</Code>.</li>
+                </ul>
+                <p className="pt-2"><strong>Key bits shows a low number:</strong></p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Someone used a short / human-memorable string. Regenerate with <Code size="sm">openssl rand -hex 32</Code> (gives 256 bits).</li>
+                </ul>
+                <p className="pt-2"><strong>Federation was working with api_key/hmac and still works — do I need this at all?</strong></p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>No. JWT is only for the JWT auth method. Existing partners with api_key / hmac / oauth2 are unaffected.</li>
+                </ul>
+              </div>
+            </AccordionItem>
+          </Accordion>
+        </CardBody>
+      </Card>
 
       {/* Quick Navigation */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

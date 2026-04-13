@@ -1192,6 +1192,34 @@ class AdminSuperController extends BaseApiController
         return $this->respondWithData($controls);
     }
 
+    /**
+     * GET /api/v2/admin/super/federation/jwt-status
+     *
+     * Returns whether FEDERATION_JWT_SECRET is configured on this server.
+     * NEVER returns the secret itself — only a boolean status plus the
+     * configured issuer string. Used by the admin UI to surface a clear
+     * "configured / not configured" indicator plus setup instructions.
+     */
+    public function federationGetJwtStatus(): JsonResponse
+    {
+        $this->requireSuperAdmin();
+
+        $secret = (string) config('federation.jwt_secret', '');
+        $issuer = (string) config('federation.jwt_issuer', config('app.url', ''));
+
+        // Key length in bits (hex chars × 4). "base64:..." prefix is common,
+        // so strip that when measuring.
+        $raw = str_starts_with($secret, 'base64:') ? base64_decode(substr($secret, 7)) : $secret;
+        $bits = $secret === '' ? 0 : (ctype_xdigit($raw) ? strlen($raw) * 4 : strlen($raw) * 8);
+
+        return $this->respondWithData([
+            'configured' => $secret !== '',
+            'issuer' => $issuer,
+            'key_bits' => $bits,
+            'recommended_bits' => 256,
+        ]);
+    }
+
     /** PUT /api/v2/super-admin/federation/system-controls */
     public function federationUpdateSystemControls(): JsonResponse
     {

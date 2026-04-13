@@ -1727,6 +1727,11 @@ export const adminSuper = {
   getSystemControls: () =>
     api.get<FederationSystemControls>('/v2/admin/super/federation/system-controls'),
 
+  getFederationJwtStatus: () =>
+    api.get<{ configured: boolean; issuer: string; key_bits: number; recommended_bits: number }>(
+      '/v2/admin/super/federation/jwt-status',
+    ),
+
   updateSystemControls: (data: Partial<FederationSystemControls>) =>
     api.put<{ success: boolean }>('/v2/admin/super/federation/system-controls', data),
 
