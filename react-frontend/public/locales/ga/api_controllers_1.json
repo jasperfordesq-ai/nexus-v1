@@ -1,182 +1,182 @@
 {
-    "admin_analytics_reports": {
-        "members_marked_notified": "Marcáladh :count ball mar chur in iúl"
-    },
-    "admin_cron": {
-        "log_not_found": "Loga gan aimsiú",
-        "deleted_log_entries": "Scriosadh :count iontráil loga"
-    },
-    "admin_enterprise": {
-        "breach_reported": "D'éirigh le tuairisciú an tsáraithe",
-        "gdpr_request_created": "D'éirigh le cruthú iarratais GDPR",
-        "gdpr_request_create_failed": "Theip ar chruthú an iarratais GDPR",
-        "data_export_generated": "D'éirigh le giniúint easpórtála sonraí",
-        "data_export_failed": "Theip ar ghiniúint easpórtála sonraí",
-        "dpa_notification_recorded": "D'éirigh le taifeadadh an fhógra DPA",
-        "dpa_notification_failed": "Theip ar thaifeadadh an fhógra DPA",
-        "log_file_cleared": "D'éirigh le glanadh an chomhaid loga",
-        "log_file_only_allowed": "Ní cheadaítear ach comhaid .log",
-        "log_file_not_found": "Comhad loga gan aimsiú",
-        "log_file_clear_failed": "Theip ar ghlanadh an chomhaid loga",
-        "secret_rotation_requires_ssh": "Teastaíonn rochtain freastalaí chun rúin a uainchur. Úsáid SSH chun rúin sa chomhad .env a uainchur.",
-        "secret_deletion_requires_ssh": "Teastaíonn rochtain freastalaí chun rúin a scriosadh. Úsáid SSH chun rúin a bhaint den chomhad .env."
-    },
-    "admin_feed": {
-        "item_hidden": "Mír i bhfolach",
-        "item_deleted": "Mír scriosta"
-    },
-    "admin_gamification": {
-        "badge_recheck_completed": "Athsheiceáil suaitheantas críochnaithe do :count úsáideoir"
-    },
-    "admin_groups": {
-        "group_archived": "Grúpa curtha i gcartlann",
-        "group_unarchived": "Grúpa bainte as cartlann",
-        "ownership_transferred": "Úinéireacht aistrithe",
-        "groups_merged": "D'éirigh le cumasc na ngrúpaí",
-        "group_cloned": "Grúpa clónáilte",
-        "tag_deleted": "Clib scriosta",
-        "collection_updated": "Nuashonraithe",
-        "collection_deleted": "Scriosta",
-        "collection_groups_set": "Grúpaí socraithe",
-        "rule_deleted": "Riail scriosta"
-    },
-    "admin_impact_report": {
-        "config_updated": "Cumraíocht nuashonraithe"
-    },
-    "admin_marketplace": {
-        "feature_not_enabled": "Níl gné an mhargaidh cumasaithe don tionónta seo.",
-        "listing_approved": "Liosta ceadaithe.",
-        "listing_rejected": "Liosta diúltaithe.",
-        "listing_removed": "Liosta bainte.",
-        "only_business_sellers_verified": "Ní féidir ach díoltóirí gnó a dheimhniú.",
-        "seller_verified": "Díoltóir deimhnithe.",
-        "seller_suspended": "Díoltóir ar fionraí agus gach liosta díghníomhachtaithe.",
-        "report_acknowledged": "Tuairisc admhaithe.",
-        "report_resolved": "Tuairisc réitithe."
-    },
-    "admin_newsletter": {
-        "newsletter_queued": "Nuachtlitir sa scuaine do :count faighteoir",
-        "test_email_sent": "Ríomhphost tástála seolta chuig :email"
-    },
-    "admin_onboarding": {
-        "settings_updated": "Socruithe inbhordála nuashonraithe",
-        "preset_applied": "Réamhshocrú :preset curtha i bhfeidhm"
-    },
-    "admin_reports": {
-        "report_resolved": "Tuairisc réitithe",
-        "report_dismissed": "Tuairisc díbhe"
-    },
-    "admin_reviews": {
-        "review_flagged": "Athbhreithniú bratach le haghaidh airde",
-        "review_hidden": "Athbhreithniú i bhfolach",
-        "review_deleted": "Athbhreithniú scriosta"
-    },
-    "admin_safeguarding": {
-        "guardian_assigned_notification": "Sannadh tú mar chaomhnóir cosanta do :name",
-        "ward_assigned_notification": "Sannadh :guardian mar do theagmhálaí tacaíochta cosanta. Is féidir leat toiliú a thabhairt nó a chúlghairm i do shocruithe.",
-        "a_member": "ball",
-        "a_coordinator": "Comhordaitheoir pobail"
-    },
-    "admin_safeguarding_options": {
-        "option_updated": "Rogha nuashonraithe",
-        "option_deactivated": "Rogha díghníomhachtaithe",
-        "options_reordered": "Roghanna athordaithe"
-    },
-    "admin_super": {
-        "tenant_created": "D'éirigh le cruthú an tionónta ':name'",
-        "lockdown_activated": "Dianghlasáil éigeandála gníomhachtaithe",
-        "lockdown_lifted": "Dianghlasáil éigeandála ardaithe"
-    },
-    "admin_tools": {
-        "connection_failed": "Theip ar an nasc",
-        "conversion_queued": "Tiontú sa scuaine",
-        "seed_generation_queued": "Giniúint síl sa scuaine",
-        "blog_backup_restore_queued": "Athchóiriú cúltaca bhlag sa scuaine"
-    },
-    "admin_volunteer": {
-        "application_approved": "Iarratas ceadaithe",
-        "application_declined": "Iarratas diúltaithe",
-        "org_status_updated": "Stádas eagraíochta nuashonraithe go :status",
-        "amount_cannot_be_zero": "Ní féidir an méid a bheith nialas",
-        "reason_required": "Tá cúis riachtanach",
-        "status_must_be_active_or_suspended": "Ní mór don stádas a bheith gníomhach nó ar fionraí",
-        "organization_not_found": "Eagraíocht gan aimsiú",
-        "org_status_update_failed": "Theip ar nuashonrú stádas na heagraíochta"
-    },
-    "admin_wallet_grant": {
-        "credits_granted": "D'éirigh le deonú creidmheasanna"
-    },
-    "ai_chat": {
-        "not_available": "Níl comhrá AI ar fáil faoi láthair. Bain triail eile as ar ball.",
-        "connection_test_failed": "Theip ar thástáil an naisc"
-    },
-    "app": {
-        "log_recorded": "Loga taifeadta"
-    },
-    "auth": {
-        "two_factor_required": "Teastaíonn fíordheimhniú dhá-fhachtóir",
-        "logged_out": "D'éirigh leat logáil amach",
-        "session_refreshed": "Seisiún athnuaite",
-        "session_restored": "Seisiún athchóirithe ón gcomhartha",
-        "session_deprecated": "Tá an críochphointe seo imithe i léig. Ba cheart d'aipeanna soghluaiste comharthaí Bearer a úsáid go díreach gan sioncrónú seisiúin.",
-        "tokens_revoked": "Cúlghaireadh gach comhartha athnuachana. Beidh ort logáil isteach arís ar gach gléas."
-    },
-    "block_user": {
-        "user_blocked": "Úsáideoir blocáilte",
-        "user_unblocked": "Úsáideoir díbhlocáilte",
-        "user_not_blocked": "Ní raibh an t-úsáideoir blocáilte"
-    },
-    "cookie_consent": {
-        "preferences_updated": "D'éirigh le nuashonrú na sainroghanna toilithe",
-        "consent_withdrawn": "D'éirigh le cúlghairm an toilithe"
-    },
-    "email_verification": {
-        "already_verified": "Tá an seoladh ríomhphoist deimhnithe cheana féin",
-        "verified_successfully": "D'éirigh le deimhniú an tseolta ríomhphoist",
-        "verification_sent": "Ríomhphost deimhnithe seolta",
-        "generic_resend": "Má tá cuntas ann leis an ríomhphost sin agus é gan deimhniú, tá ríomhphost deimhnithe nua seolta."
-    },
-    "endorsement": {
-        "endorsement_added": "Formhuiniú curtha leis",
-        "endorsement_removed": "Formhuiniú bainte"
-    },
-    "federation": {
-        "already_opted_in": "Rogha déanta cheana féin don chónaidhm.",
-        "enabled_successfully": "D'éirigh le cumasú na cónaidhme.",
-        "disabled_successfully": "D'éirigh le díchumasú na cónaidhme.",
-        "signature_verified": "D'éirigh le deimhniú an tsínithe",
-        "settings_updated": "D'éirigh le nuashonrú na socruithe."
-    },
-    "federation_v2": {
-        "receiver_id_required": "Tá receiver_id riachtanach.",
-        "receiver_tenant_id_required": "Tá receiver_tenant_id riachtanach.",
-        "message_body_required": "Tá corp na teachtaireachta riachtanach.",
-        "subject_max_length": "Ní féidir leis an ábhar dul thar 255 carachtar.",
-        "body_max_length": "Ní féidir le corp na teachtaireachta dul thar 10,000 carachtar."
-    },
-    "feed_social": {
-        "post_unshared": "Postáil díroinnte"
-    },
-    "gamification": {
-        "invalid_leaderboard_type": "Cineál clár ceannairí neamhbhailí",
-        "showcase_updated": "Taispeántas nuashonraithe",
-        "score_recalculation_initiated": "Cuireadh tús le hathríomh an scóir"
-    },
-    "gdpr": {
-        "request_submitted": "Cuireadh isteach d'iarratas agus déanfar é a phróiseáil laistigh de 30 lá.",
-        "account_deletion_submitted": "Cuireadh isteach d'iarratas scriosta cuntais. Gheobhaidh tú deimhniú trí ríomhphost."
-    },
-    "group_challenge": {
-        "challenge_deleted": "Dúshlán scriosta"
-    },
-    "group_exchange": {
-        "exchange_cancelled": "Malartú curtha ar ceal",
-        "exchange_completed": "D'éirigh le críochnú an mhalartaithe"
-    },
-    "group_files": {
-        "file_deleted": "Comhad scriosta"
-    },
-    "group_invite": {
-        "invite_revoked": "Cuireadh cúlghairthe"
-    }
+  "admin_analytics_reports": {
+    "members_marked_notified": "Marcáladh :count ball mar chur in iúl"
+  },
+  "admin_cron": {
+    "log_not_found": "Loga gan aimsiú",
+    "deleted_log_entries": "Scriosadh :count iontráil loga"
+  },
+  "admin_enterprise": {
+    "breach_reported": "D'éirigh le tuairisciú an tsáraithe",
+    "gdpr_request_created": "D'éirigh le cruthú iarratais GDPR",
+    "gdpr_request_create_failed": "Theip ar chruthú an iarratais GDPR",
+    "data_export_generated": "D'éirigh le giniúint easpórtála sonraí",
+    "data_export_failed": "Theip ar ghiniúint easpórtála sonraí",
+    "dpa_notification_recorded": "D'éirigh le taifeadadh an fhógra DPA",
+    "dpa_notification_failed": "Theip ar thaifeadadh an fhógra DPA",
+    "log_file_cleared": "D'éirigh le glanadh an chomhaid loga",
+    "log_file_only_allowed": "Ní cheadaítear ach comhaid .log",
+    "log_file_not_found": "Comhad loga gan aimsiú",
+    "log_file_clear_failed": "Theip ar ghlanadh an chomhaid loga",
+    "secret_rotation_requires_ssh": "Teastaíonn rochtain freastalaí chun rúin a uainchur. Úsáid SSH chun rúin sa chomhad .env a uainchur.",
+    "secret_deletion_requires_ssh": "Teastaíonn rochtain freastalaí chun rúin a scriosadh. Úsáid SSH chun rúin a bhaint den chomhad .env."
+  },
+  "admin_feed": {
+    "item_hidden": "Mír i bhfolach",
+    "item_deleted": "Mír scriosta"
+  },
+  "admin_gamification": {
+    "badge_recheck_completed": "Athsheiceáil suaitheantas críochnaithe do :count úsáideoir"
+  },
+  "admin_groups": {
+    "group_archived": "Grúpa curtha i gcartlann",
+    "group_unarchived": "Grúpa bainte as cartlann",
+    "ownership_transferred": "Úinéireacht aistrithe",
+    "groups_merged": "D'éirigh le cumasc na ngrúpaí",
+    "group_cloned": "Grúpa clónáilte",
+    "tag_deleted": "Clib scriosta",
+    "collection_updated": "Nuashonraithe",
+    "collection_deleted": "Scriosta",
+    "collection_groups_set": "Grúpaí socraithe",
+    "rule_deleted": "Riail scriosta"
+  },
+  "admin_impact_report": {
+    "config_updated": "Cumraíocht nuashonraithe"
+  },
+  "admin_marketplace": {
+    "feature_not_enabled": "Níl gné an mhargaidh cumasaithe don tionónta seo.",
+    "listing_approved": "Liosta ceadaithe.",
+    "listing_rejected": "Liosta diúltaithe.",
+    "listing_removed": "Liosta bainte.",
+    "only_business_sellers_verified": "Ní féidir ach díoltóirí gnó a dheimhniú.",
+    "seller_verified": "Díoltóir deimhnithe.",
+    "seller_suspended": "Díoltóir ar fionraí agus gach liosta díghníomhachtaithe.",
+    "report_acknowledged": "Tuairisc admhaithe.",
+    "report_resolved": "Tuairisc réitithe."
+  },
+  "admin_newsletter": {
+    "newsletter_queued": "Nuachtlitir sa scuaine do :count faighteoir",
+    "test_email_sent": "Ríomhphost tástála seolta chuig :email"
+  },
+  "admin_onboarding": {
+    "settings_updated": "Socruithe inbhordála nuashonraithe",
+    "preset_applied": "Réamhshocrú :preset curtha i bhfeidhm"
+  },
+  "admin_reports": {
+    "report_resolved": "Tuairisc réitithe",
+    "report_dismissed": "Tuairisc díbhe"
+  },
+  "admin_reviews": {
+    "review_flagged": "Athbhreithniú bratach le haghaidh airde",
+    "review_hidden": "Athbhreithniú i bhfolach",
+    "review_deleted": "Athbhreithniú scriosta"
+  },
+  "admin_safeguarding": {
+    "guardian_assigned_notification": "Sannadh tú mar chaomhnóir cosanta do :name",
+    "ward_assigned_notification": "Sannadh :guardian mar do theagmhálaí tacaíochta cosanta. Is féidir leat toiliú a thabhairt nó a chúlghairm i do shocruithe.",
+    "a_member": "ball",
+    "a_coordinator": "Comhordaitheoir pobail"
+  },
+  "admin_safeguarding_options": {
+    "option_updated": "Rogha nuashonraithe",
+    "option_deactivated": "Rogha díghníomhachtaithe",
+    "options_reordered": "Roghanna athordaithe"
+  },
+  "admin_super": {
+    "tenant_created": "D'éirigh le cruthú an tionónta ':name'",
+    "lockdown_activated": "Dianghlasáil éigeandála gníomhachtaithe",
+    "lockdown_lifted": "Dianghlasáil éigeandála ardaithe"
+  },
+  "admin_tools": {
+    "connection_failed": "Theip ar an nasc",
+    "conversion_queued": "Tiontú sa scuaine",
+    "seed_generation_queued": "Giniúint síl sa scuaine",
+    "blog_backup_restore_queued": "Athchóiriú cúltaca bhlag sa scuaine"
+  },
+  "admin_volunteer": {
+    "application_approved": "Iarratas ceadaithe",
+    "application_declined": "Iarratas diúltaithe",
+    "org_status_updated": "Stádas eagraíochta nuashonraithe go :status",
+    "amount_cannot_be_zero": "Ní féidir an méid a bheith nialas",
+    "reason_required": "Tá cúis riachtanach",
+    "status_must_be_active_or_suspended": "Ní mór don stádas a bheith gníomhach nó ar fionraí",
+    "organization_not_found": "Eagraíocht gan aimsiú",
+    "org_status_update_failed": "Theip ar nuashonrú stádas na heagraíochta"
+  },
+  "admin_wallet_grant": {
+    "credits_granted": "D'éirigh le deonú creidmheasanna"
+  },
+  "ai_chat": {
+    "not_available": "Níl comhrá AI ar fáil faoi láthair. Bain triail eile as ar ball.",
+    "connection_test_failed": "Theip ar thástáil an naisc"
+  },
+  "app": {
+    "log_recorded": "Loga taifeadta"
+  },
+  "auth": {
+    "two_factor_required": "Teastaíonn fíordheimhniú dhá-fhachtóir",
+    "logged_out": "D'éirigh leat logáil amach",
+    "session_refreshed": "Seisiún athnuaite",
+    "session_restored": "Seisiún athchóirithe ón gcomhartha",
+    "session_deprecated": "Tá an críochphointe seo imithe i léig. Ba cheart d'aipeanna soghluaiste comharthaí Bearer a úsáid go díreach gan sioncrónú seisiúin.",
+    "tokens_revoked": "Cúlghaireadh gach comhartha athnuachana. Beidh ort logáil isteach arís ar gach gléas."
+  },
+  "block_user": {
+    "user_blocked": "Úsáideoir blocáilte",
+    "user_unblocked": "Úsáideoir díbhlocáilte",
+    "user_not_blocked": "Ní raibh an t-úsáideoir blocáilte"
+  },
+  "cookie_consent": {
+    "preferences_updated": "D'éirigh le nuashonrú na sainroghanna toilithe",
+    "consent_withdrawn": "D'éirigh le cúlghairm an toilithe"
+  },
+  "email_verification": {
+    "already_verified": "Tá an seoladh ríomhphoist deimhnithe cheana féin",
+    "verified_successfully": "D'éirigh le deimhniú an tseolta ríomhphoist",
+    "verification_sent": "Ríomhphost deimhnithe seolta",
+    "generic_resend": "Má tá cuntas ann leis an ríomhphost sin agus é gan deimhniú, tá ríomhphost deimhnithe nua seolta."
+  },
+  "endorsement": {
+    "endorsement_added": "Formhuiniú curtha leis",
+    "endorsement_removed": "Formhuiniú bainte"
+  },
+  "federation": {
+    "already_opted_in": "Rogha déanta cheana féin don chónaidhm.",
+    "enabled_successfully": "D'éirigh le cumasú na cónaidhme.",
+    "disabled_successfully": "D'éirigh le díchumasú na cónaidhme.",
+    "signature_verified": "D'éirigh le deimhniú an tsínithe",
+    "settings_updated": "D'éirigh le nuashonrú na socruithe."
+  },
+  "federation_v2": {
+    "receiver_id_required": "Tá receiver_id riachtanach.",
+    "receiver_tenant_id_required": "Tá receiver_tenant_id riachtanach.",
+    "message_body_required": "Tá corp na teachtaireachta riachtanach.",
+    "subject_max_length": "Ní féidir leis an ábhar dul thar 255 carachtar.",
+    "body_max_length": "Ní féidir le corp na teachtaireachta dul thar 10,000 carachtar."
+  },
+  "feed_social": {
+    "post_unshared": "Postáil díroinnte"
+  },
+  "gamification": {
+    "invalid_leaderboard_type": "Cineál clár ceannairí neamhbhailí",
+    "showcase_updated": "Taispeántas nuashonraithe",
+    "score_recalculation_initiated": "Cuireadh tús le hathríomh an scóir"
+  },
+  "gdpr": {
+    "request_submitted": "Cuireadh isteach d'iarratas agus déanfar é a phróiseáil laistigh de 30 lá.",
+    "account_deletion_submitted": "Cuireadh isteach d'iarratas scriosta cuntais. Gheobhaidh tú deimhniú trí ríomhphost."
+  },
+  "group_challenge": {
+    "challenge_deleted": "Dúshlán scriosta"
+  },
+  "group_exchange": {
+    "exchange_cancelled": "Malartú curtha ar ceal",
+    "exchange_completed": "D'éirigh le críochnú an mhalartaithe"
+  },
+  "group_files": {
+    "file_deleted": "Comhad scriosta"
+  },
+  "group_invite": {
+    "invite_revoked": "Cuireadh cúlghairthe"
+  }
 }

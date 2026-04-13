@@ -871,7 +871,7 @@ class AdminEnterpriseController extends BaseApiController
             try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Throwable $e) {}
             return $this->respondWithData(['reset' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('RESET_FAILED', 'Failed to reset configuration', null, 500);
+            return $this->respondWithError('RESET_FAILED', __('api_controllers_1.admin_enterprise.config_reset_failed'), null, 500);
         }
     }
 
@@ -930,7 +930,7 @@ class AdminEnterpriseController extends BaseApiController
             );
 
             if (!$request) {
-                return $this->respondWithError('NOT_FOUND', 'GDPR request not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api_controllers_1.admin_enterprise.gdpr_request_not_found'), null, 404);
             }
 
             $result = (array) $request;
@@ -961,7 +961,7 @@ class AdminEnterpriseController extends BaseApiController
 
             return $this->respondWithData($result);
         } catch (\Exception $e) {
-            return $this->respondWithError('FETCH_FAILED', 'Failed to fetch GDPR request', null, 500);
+            return $this->respondWithError('FETCH_FAILED', __('api_controllers_1.admin_enterprise.gdpr_request_fetch_failed'), null, 500);
         }
     }
 
@@ -978,12 +978,12 @@ class AdminEnterpriseController extends BaseApiController
         $notes = $input['notes'] ?? null;
 
         if (!$userId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'User ID is required', 'user_id', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.user_id_required'), 'user_id', 422);
         }
 
         $validTypes = ['access', 'erasure', 'portability', 'rectification', 'restriction', 'objection'];
         if (!in_array($type, $validTypes, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid request type. Must be one of: ' . implode(', ', $validTypes), 'type', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.invalid_request_type', ['types' => implode(', ', $validTypes)]), 'type', 422);
         }
 
         try {
@@ -1019,7 +1019,7 @@ class AdminEnterpriseController extends BaseApiController
         $assignedTo = (int) ($this->input('assigned_to') ?? 0);
 
         if (!$assignedTo) {
-            return $this->respondWithError('VALIDATION_ERROR', 'assigned_to (user ID) is required', 'assigned_to', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.assigned_to_required'), 'assigned_to', 422);
         }
 
         try {
@@ -1029,7 +1029,7 @@ class AdminEnterpriseController extends BaseApiController
             );
 
             if ($affected === 0) {
-                return $this->respondWithError('NOT_FOUND', 'GDPR request not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api_controllers_1.admin_enterprise.gdpr_request_not_found'), null, 404);
             }
 
             try {
@@ -1042,7 +1042,7 @@ class AdminEnterpriseController extends BaseApiController
 
             return $this->respondWithData(['id' => $id, 'assigned_to' => $assignedTo, 'updated' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to assign GDPR request', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api_controllers_1.admin_enterprise.gdpr_request_assign_failed'), null, 500);
         }
     }
 
@@ -1054,13 +1054,13 @@ class AdminEnterpriseController extends BaseApiController
         $note = trim($this->input('note') ?? '');
 
         if ($note === '') {
-            return $this->respondWithError('VALIDATION_ERROR', 'Note text is required', 'note', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.note_text_required'), 'note', 422);
         }
 
         try {
             $request = DB::selectOne("SELECT notes FROM gdpr_requests WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             if (!$request) {
-                return $this->respondWithError('NOT_FOUND', 'GDPR request not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api_controllers_1.admin_enterprise.gdpr_request_not_found'), null, 404);
             }
 
             // Get admin name
@@ -1091,7 +1091,7 @@ class AdminEnterpriseController extends BaseApiController
 
             return $this->respondWithData(['id' => $id, 'notes' => $newNotes, 'updated' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to add note to GDPR request', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api_controllers_1.admin_enterprise.gdpr_request_note_failed'), null, 500);
         }
     }
 
@@ -1107,7 +1107,7 @@ class AdminEnterpriseController extends BaseApiController
         try {
             $request = DB::selectOne("SELECT * FROM gdpr_requests WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             if (!$request) {
-                return $this->respondWithError('NOT_FOUND', 'GDPR request not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api_controllers_1.admin_enterprise.gdpr_request_not_found'), null, 404);
             }
 
             $gdprService = new \App\Services\Enterprise\GdprService($tenantId);
@@ -1174,7 +1174,7 @@ class AdminEnterpriseController extends BaseApiController
         $slug = trim($input['slug'] ?? '');
         $name = trim($input['name'] ?? '');
         if (!$slug || !$name) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Slug and name are required', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.slug_and_name_required'), null, 422);
         }
 
         try {
@@ -1198,7 +1198,7 @@ class AdminEnterpriseController extends BaseApiController
             return $this->respondWithData($created ? (array) $created : ['id' => $newId], null, 201);
         } catch (\Exception $e) {
             Log::error('Create consent type failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('CREATE_FAILED', 'Failed to create consent type', null, 500);
+            return $this->respondWithError('CREATE_FAILED', __('api_controllers_1.admin_enterprise.consent_type_create_failed'), null, 500);
         }
     }
 
@@ -1223,7 +1223,7 @@ class AdminEnterpriseController extends BaseApiController
         }
 
         if (empty($setParts)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.no_fields_to_update'), null, 422);
         }
 
         $setParts[] = 'updated_at = NOW()';
@@ -1233,12 +1233,12 @@ class AdminEnterpriseController extends BaseApiController
         try {
             $affected = DB::update("UPDATE consent_types SET " . implode(', ', $setParts) . " WHERE id = ? AND tenant_id = ?", $params);
             if ($affected === 0) {
-                return $this->respondWithError('NOT_FOUND', 'Consent type not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api_controllers_1.admin_enterprise.consent_type_not_found'), null, 404);
             }
             $updated = DB::selectOne("SELECT * FROM consent_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             return $this->respondWithData($updated ? (array) $updated : ['id' => $id, 'updated' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update consent type', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api_controllers_1.admin_enterprise.consent_type_update_failed'), null, 500);
         }
     }
 
@@ -1252,7 +1252,7 @@ class AdminEnterpriseController extends BaseApiController
             DB::delete("DELETE FROM consent_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             return $this->respondWithData(['deleted' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('DELETE_FAILED', 'Failed to delete consent type', null, 500);
+            return $this->respondWithError('DELETE_FAILED', __('api_controllers_1.admin_enterprise.consent_type_delete_failed'), null, 500);
         }
     }
 
@@ -1344,12 +1344,12 @@ class AdminEnterpriseController extends BaseApiController
             );
 
             if (!$breach) {
-                return $this->respondWithError('NOT_FOUND', 'Breach record not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api_controllers_1.admin_enterprise.breach_record_not_found'), null, 404);
             }
 
             return $this->respondWithData((array) $breach);
         } catch (\Exception $e) {
-            return $this->respondWithError('FETCH_FAILED', 'Failed to fetch breach record', null, 500);
+            return $this->respondWithError('FETCH_FAILED', __('api_controllers_1.admin_enterprise.breach_record_fetch_failed'), null, 500);
         }
     }
 
@@ -1376,7 +1376,7 @@ class AdminEnterpriseController extends BaseApiController
         }
 
         if (empty($setParts)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.no_fields_to_update'), null, 422);
         }
 
         $setParts[] = 'updated_at = NOW()';
@@ -1386,7 +1386,7 @@ class AdminEnterpriseController extends BaseApiController
         try {
             $affected = DB::update("UPDATE data_breach_log SET " . implode(', ', $setParts) . " WHERE id = ? AND tenant_id = ?", $params);
             if ($affected === 0) {
-                return $this->respondWithError('NOT_FOUND', 'Breach record not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api_controllers_1.admin_enterprise.breach_record_not_found'), null, 404);
             }
 
             try {
@@ -1399,7 +1399,7 @@ class AdminEnterpriseController extends BaseApiController
 
             return $this->respondWithData(['id' => $id, 'updated' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update breach record', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api_controllers_1.admin_enterprise.breach_record_update_failed'), null, 500);
         }
     }
 
@@ -1416,7 +1416,7 @@ class AdminEnterpriseController extends BaseApiController
             );
 
             if ($affected === 0) {
-                return $this->respondWithError('NOT_FOUND', 'Breach record not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api_controllers_1.admin_enterprise.breach_record_not_found'), null, 404);
             }
 
             try {
@@ -1690,7 +1690,7 @@ class AdminEnterpriseController extends BaseApiController
 
         // Security: no path traversal
         if (str_contains($filename, '/') || str_contains($filename, '\\') || str_contains($filename, '..')) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid filename', 'filename', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.invalid_log_filename'), 'filename', 400);
         }
         if (!str_ends_with($filename, '.log')) {
             return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.log_file_only_allowed'), 'filename', 400);
@@ -1734,7 +1734,7 @@ class AdminEnterpriseController extends BaseApiController
                 'filtered_count' => count($filtered),
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('READ_FAILED', 'Failed to read log file', null, 500);
+            return $this->respondWithError('READ_FAILED', __('api_controllers_1.admin_enterprise.log_file_read_failed'), null, 500);
         }
     }
 
@@ -1744,7 +1744,7 @@ class AdminEnterpriseController extends BaseApiController
         $this->requireAdmin();
 
         if (str_contains($filename, '/') || str_contains($filename, '\\') || str_contains($filename, '..')) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid filename', 'filename', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.invalid_log_filename'), 'filename', 400);
         }
         if (!str_ends_with($filename, '.log')) {
             return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.log_file_only_allowed'), 'filename', 400);
@@ -1887,11 +1887,11 @@ class AdminEnterpriseController extends BaseApiController
         $type = trim($input['type'] ?? 'feature');
 
         if (!$key) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Key is required', 'key', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.feature_key_required'), 'key', 422);
         }
 
         if (!in_array($type, ['feature', 'module'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Type must be "feature" or "module"', 'type', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.feature_type_invalid'), 'type', 422);
         }
 
         try {
@@ -1916,7 +1916,7 @@ class AdminEnterpriseController extends BaseApiController
 
             return $this->respondWithData(['key' => $key, 'value' => $value, 'type' => $type, 'updated' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update feature flag', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api_controllers_1.admin_enterprise.feature_flag_update_failed'), null, 500);
         }
     }
 

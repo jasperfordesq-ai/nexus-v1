@@ -203,7 +203,8 @@
     },
     "attach_polls_label": "Adjuntar encuestas (opcional)",
     "attach_polls_placeholder": "Seleccionar encuestas para adjuntar...",
-    "attach_polls_hint": "Adjunte encuestas comunitarias existentes a este evento."
+    "attach_polls_hint": "Adjunte encuestas comunitarias existentes a este evento.",
+    "group_event_notice": "This event will be associated with your group."
   },
   "toast": {
     "rsvp_removed": "Confirmación eliminada",

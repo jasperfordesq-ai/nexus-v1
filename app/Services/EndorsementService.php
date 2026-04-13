@@ -37,7 +37,7 @@ class EndorsementService
 
         // Cannot endorse yourself
         if ($endorserId === $endorsedId) {
-            self::$errors[] = ['code' => 'SELF_ENDORSEMENT', 'message' => 'You cannot endorse yourself'];
+            self::$errors[] = ['code' => 'SELF_ENDORSEMENT', 'message' => __('api_controllers_2.endorsement.cannot_endorse_self')];
             return null;
         }
 
@@ -51,7 +51,7 @@ class EndorsementService
         // Check endorsed user exists in same tenant
         $endorsed = User::where('id', $endorsedId)->first(['id', 'first_name', 'last_name']);
         if (!$endorsed) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Member not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api_controllers_2.endorsement.member_not_found')];
             return null;
         }
 
@@ -63,7 +63,7 @@ class EndorsementService
             ->exists();
 
         if ($existing) {
-            self::$errors[] = ['code' => 'ALREADY_ENDORSED', 'message' => 'You have already endorsed this skill'];
+            self::$errors[] = ['code' => 'ALREADY_ENDORSED', 'message' => __('api_controllers_2.endorsement.already_endorsed')];
             return null;
         }
 

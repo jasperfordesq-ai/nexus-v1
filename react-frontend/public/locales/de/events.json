@@ -203,7 +203,8 @@
     },
     "attach_polls_label": "Umfragen anhängen (optional)",
     "attach_polls_placeholder": "Umfragen zum Anhängen auswählen...",
-    "attach_polls_hint": "Hängen Sie bestehende Gemeinschaftsumfragen an diese Veranstaltung an."
+    "attach_polls_hint": "Hängen Sie bestehende Gemeinschaftsumfragen an diese Veranstaltung an.",
+    "group_event_notice": "This event will be associated with your group."
   },
   "toast": {
     "rsvp_removed": "RSVP entfernt",

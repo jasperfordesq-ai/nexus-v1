@@ -242,13 +242,13 @@ class AdminVettingController extends BaseApiController
             // Notify the user: bell + email
             $this->sendVettingNotification(
                 (int) $existing['user_id'],
-                'Your verification has been approved!',
+                __('svc_notifications.vetting_approved_title'),
                 '/dashboard',
-                'Verification Approved',
-                'Your background check verification has been approved. Your verified status is now active on your profile.',
+                __('svc_notifications.vetting_approved_heading'),
+                __('svc_notifications.vetting_approved_body'),
                 '#22c55e',
                 '#16a34a',
-                'Go to Dashboard',
+                __('svc_notifications.vetting_go_to_dashboard'),
                 '/dashboard'
             );
 
@@ -281,13 +281,13 @@ class AdminVettingController extends BaseApiController
             // Notify the user: bell + email
             $this->sendVettingNotification(
                 (int) $existing['user_id'],
-                'Your verification could not be completed. Please contact support.',
+                __('svc_notifications.vetting_rejected_title'),
                 '/help',
-                'Verification Not Completed',
-                'Your background check verification could not be completed at this time. Please contact your community coordinator for more information or to resubmit.',
+                __('svc_notifications.vetting_rejected_heading'),
+                __('svc_notifications.vetting_rejected_body'),
                 '#ef4444',
                 '#dc2626',
-                'Contact Support',
+                __('svc_notifications.vetting_contact_support'),
                 '/help'
             );
 

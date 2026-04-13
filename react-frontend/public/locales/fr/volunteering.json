@@ -319,7 +319,8 @@
     "receipt_method": "Moyen de paiement",
     "receipt_message": "Message",
     "receipt_error": "Impossible de charger le reçu.",
-    "receipt_not_found": "Reçu introuvable."
+    "receipt_not_found": "Reçu introuvable.",
+    "placeholder_amount": "0.00"
   },
   "safeguarding": {
     "heading": "Protection",

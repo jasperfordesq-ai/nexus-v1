@@ -151,5 +151,6 @@
   "empty_groups": "Nessun gruppo attivo. Avvia un gruppo sui tuoi interessi!",
   "create_listing": "Crea Annuncio",
   "create_event": "Crea Evento",
-  "create_group": "Crea Gruppo"
+  "create_group": "Crea Gruppo",
+  "page_description": "Explore listings, events, groups, and opportunities across the community."
 }

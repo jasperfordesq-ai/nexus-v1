@@ -151,5 +151,6 @@
   "empty_groups": "Noch keine aktiven Gruppen. Gründen Sie eine Gruppe zu Ihren Interessen!",
   "create_listing": "Inserat erstellen",
   "create_event": "Veranstaltung erstellen",
-  "create_group": "Gruppe erstellen"
+  "create_group": "Gruppe erstellen",
+  "page_description": "Explore listings, events, groups, and opportunities across the community."
 }

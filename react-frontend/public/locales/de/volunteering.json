@@ -319,7 +319,8 @@
     "receipt_method": "Zahlungsmethode",
     "receipt_message": "Nachricht",
     "receipt_error": "Beleg konnte nicht geladen werden.",
-    "receipt_not_found": "Beleg nicht gefunden."
+    "receipt_not_found": "Beleg nicht gefunden.",
+    "placeholder_amount": "0.00"
   },
   "safeguarding": {
     "heading": "Kinderschutz",

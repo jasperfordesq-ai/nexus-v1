@@ -182,6 +182,8 @@ jobs:
         run: |
           # Seed .env from example so env() calls resolve
           [ -f .env ] || cp .env.example .env
+          # Ensure bootstrap/cache exists (gitignored — absent in fresh CI clone)
+          mkdir -p bootstrap/cache
           # Ensure APP_KEY is set (required by config:cache)
           php artisan key:generate --force --ansi
           php artisan config:cache
@@ -288,6 +290,13 @@ jobs:
         run: npm run build
         env:
           VITE_API_BASE: /api
+
+      - name: Upload React Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: react-frontend-build
+          path: react-frontend/dist
+          retention-days: 1
 
   # ─────────────────────────────────────────────────────────────────
   # Stage 2b: API Contract Validation
@@ -562,6 +571,11 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
+
+      - name: Install E2E Dependencies
+        # e2e/package.json has its own deps (@axe-core/playwright etc.)
+        # that are NOT in the root package.json — must install separately.
+        run: cd e2e && npm ci
 
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps

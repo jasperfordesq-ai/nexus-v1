@@ -54,7 +54,10 @@
     "update_failed": "Aggiornamento del post non riuscito",
     "post_shared": "Post condiviso nel tuo feed",
     "share_removed": "Condivisione rimossa",
-    "share_failed": "Impossibile condividere il post"
+    "share_failed": "Impossibile condividere il post",
+    "not_interested": "We'll show you less like this",
+    "post_updated": "Post updated",
+    "update_failed": "Failed to update post"
   },
   "realtime": {
     "new_posts_one": "1 nuovo post",

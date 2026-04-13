@@ -125,7 +125,29 @@
       "save_failed_desc": "Impossibile aggiornare la vetrina.",
       "save_error": "Si è verificato un errore."
     },
-    "load_error": "Impossibile caricare i risultati. Riprova."
+    "load_error": "Impossibile caricare i risultati. Riprova.",
+    "badge_detail": {
+      "title": "Badge Details",
+      "earned_on": "Earned on {{date}}",
+      "not_earned": "Not yet earned",
+      "not_earned_desc": "Keep going — you'll unlock this badge soon!",
+      "type": "Category",
+      "threshold": "Requirement",
+      "threshold_value": "{{threshold}} {{type}}",
+      "rarity": "Rarity",
+      "xp_reward": "XP Reward",
+      "tier": "Tier",
+      "close": "Close",
+      "rarity_common": "Common",
+      "rarity_uncommon": "Uncommon",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "rarity_legendary": "Legendary",
+      "tier_core": "Core",
+      "tier_template": "Standard",
+      "tier_custom": "Custom",
+      "load_failed": "Could not load badge details."
+    }
   },
   "goals": {
     "page_title": "Obiettivi",

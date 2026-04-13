@@ -30,7 +30,10 @@ jobs:
         run: composer install --no-interaction --prefer-dist
 
       # ── Trivy filesystem scan ─────────────────────────────────────
-      # Blocks on CRITICAL and HIGH severity vulnerabilities.
+      # The TABLE step is the blocking gate (exit-code 1) because Trivy
+      # correctly handles .trivyignore suppressions in table format.
+      # The SARIF step is non-blocking (exit-code 0) and uploads results
+      # to the GitHub Security tab for visibility.
       - name: Run Trivy Vulnerability Scanner (Table)
         uses: aquasecurity/trivy-action@master
         with:
@@ -38,7 +41,8 @@ jobs:
           scan-ref: '.'
           severity: 'CRITICAL,HIGH'
           format: 'table'
-          exit-code: '0'
+          trivyignores: '.trivyignore'
+          exit-code: '1'
 
       - name: Run Trivy Vulnerability Scanner (SARIF)
         uses: aquasecurity/trivy-action@master
@@ -48,7 +52,8 @@ jobs:
           severity: 'CRITICAL,HIGH'
           format: 'sarif'
           output: 'trivy-results.sarif'
-          exit-code: '1'
+          trivyignores: '.trivyignore'
+          exit-code: '0'
 
       - name: Upload Trivy Scan Results
         uses: github/codeql-action/upload-sarif@v3
@@ -71,6 +76,12 @@ jobs:
             --config p/secrets \
             --sarif --output semgrep-results.sarif \
             || true
+          # Semgrep may fail to produce the SARIF file (auth error, network issue,
+          # install problem). Create a valid empty SARIF so the upload step
+          # never crashes regardless of why Semgrep didn't write the file.
+          if [ ! -f semgrep-results.sarif ]; then
+            echo '{"version":"2.1.0","$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json","runs":[]}' > semgrep-results.sarif
+          fi
         env:
           SEMGREP_RULES: p/php p/security-audit p/secrets
 

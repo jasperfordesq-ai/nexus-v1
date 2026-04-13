@@ -1,13 +1,11 @@
 {
   "checking_permissions": "Sprawdzanie uprawnień...",
-
   "sidebar": {
     "title": "Panel brokera",
     "expand": "Rozwiń pasek boczny",
     "collapse": "Zwiń pasek boczny",
     "full_admin": "Pełny panel administratora"
   },
-
   "header": {
     "toggle_sidebar": "Przełącz pasek boczny",
     "back_to_site": "Powrót do witryny",
@@ -16,7 +14,6 @@
     "my_profile": "Mój profil",
     "sign_out": "Wyloguj"
   },
-
   "nav": {
     "dashboard": "Panel",
     "members": "Członkowie",
@@ -26,7 +23,6 @@
     "exchanges": "Wymiany",
     "messages": "Wiadomości"
   },
-
   "breadcrumbs": {
     "aria_label": "Nawigacja okruszkowa",
     "dashboard": "Panel brokera",
@@ -37,7 +33,6 @@
     "exchanges": "Wymiany",
     "messages": "Wiadomości"
   },
-
   "dashboard": {
     "title": "Panel brokera",
     "description": "Twój codzienny przegląd zadań zarządzania społecznością.",
@@ -55,7 +50,6 @@
     "no_activity": "Brak ostatniej aktywności.",
     "view_all": "Zobacz wszystkie"
   },
-
   "members": {
     "title": "Członkowie",
     "description": "Przeglądaj członków społeczności i zarządzaj nimi.",
@@ -92,7 +86,6 @@
     "reactivated_success": "Członek reaktywowany pomyślnie.",
     "action_failed": "Działanie nie powiodło się. Spróbuj ponownie."
   },
-
   "onboarding": {
     "title": "Onboarding",
     "description": "Śledź postępy nowych członków i zatwierdzaj oczekujące rejestracje.",
@@ -104,7 +97,6 @@
     "pending_approvals": "Oczekujące zatwierdzenia",
     "no_pending": "Brak oczekujących członków do zatwierdzenia."
   },
-
   "safeguarding": {
     "title": "Ochrona",
     "description": "Monitoruj alerty ochrony, przypisania opiekunów i preferencje członków.",
@@ -130,7 +122,6 @@
     "no_assignments": "Brak przypisań opiekunów.",
     "no_preferences": "Brak zarejestrowanych preferencji ochrony członków."
   },
-
   "vetting": {
     "title": "Weryfikacja i DBS",
     "description": "Zarządzaj rekordami weryfikacji, sprawdzeniami DBS i terminami wygaśnięcia.",
@@ -151,7 +142,6 @@
     "rejected_success": "Rekord weryfikacji odrzucony.",
     "no_records": "Nie znaleziono rekordów weryfikacji."
   },
-
   "exchanges": {
     "title": "Wymiany",
     "description": "Nadzoruj oczekujące wnioski o wymianę i spory.",
@@ -174,7 +164,6 @@
     "rejected_success": "Wymiana odrzucona.",
     "no_exchanges": "Nie znaleziono wymian."
   },
-
   "messages": {
     "title": "Przegląd wiadomości",
     "description": "Przeglądaj oznaczone konwersacje wymagające nadzoru brokera.",
@@ -192,7 +181,6 @@
     "reviewed_success": "Wiadomość oznaczona jako przejrzana.",
     "no_messages": "Brak wiadomości do przejrzenia."
   },
-
   "status": {
     "active": "Aktywny",
     "pending": "Oczekujący",
@@ -210,7 +198,6 @@
     "high": "Wysoki",
     "critical": "Krytyczny"
   },
-
   "common": {
     "loading": "Ładowanie...",
     "error": "Coś poszło nie tak. Spróbuj ponownie.",

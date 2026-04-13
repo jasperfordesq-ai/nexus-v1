@@ -212,11 +212,11 @@ class GroupConversationController extends BaseApiController
         $body = trim($this->input('body', ''));
 
         if (empty($body)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Message body is required', 'body', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.group_conversation.body_required'), 'body', 422);
         }
 
         if (mb_strlen($body) > 10000) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Message is too long', 'body', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.group_conversation.message_too_long'), 'body', 400);
         }
 
         $result = GroupConversationService::sendGroupMessage($id, $userId, $body);

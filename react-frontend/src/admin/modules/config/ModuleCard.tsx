@@ -43,17 +43,17 @@ export default function ModuleCard({ module, enabled, onToggle, onConfigure, tog
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
-              <h3 className="text-sm font-semibold truncate">{module.name}</h3>
+              <h3 className="text-sm font-semibold truncate">{t(`config.module_name_${module.id}`, module.name)}</h3>
               <Switch
                 size="sm"
                 isSelected={enabled}
                 isDisabled={toggling}
                 onValueChange={(val) => onToggle(module.id, val)}
-                aria-label={t('config.toggle_module', { name: module.name })}
+                aria-label={t('config.toggle_module', { name: t(`config.module_name_${module.id}`, module.name) })}
                 className="flex-shrink-0"
               />
             </div>
-            <p className="text-xs text-default-500 line-clamp-2 mt-0.5">{module.description}</p>
+            <p className="text-xs text-default-500 line-clamp-2 mt-0.5">{t(`config.module_desc_${module.id}`, module.description)}</p>
           </div>
         </div>
 

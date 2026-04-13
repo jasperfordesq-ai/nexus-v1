@@ -203,7 +203,8 @@
     },
     "attach_polls_label": "Allega sondaggi (opzionale)",
     "attach_polls_placeholder": "Seleziona sondaggi da allegare...",
-    "attach_polls_hint": "Allega sondaggi della comunità esistenti a questo evento."
+    "attach_polls_hint": "Allega sondaggi della comunità esistenti a questo evento.",
+    "group_event_notice": "This event will be associated with your group."
   },
   "toast": {
     "rsvp_removed": "RSVP rimosso",

@@ -380,7 +380,9 @@
           "item4": "Przestrzegamy przepisów RODO i regulacji dotyczących ochrony danych"
         }
       }
-    }
+    },
+    "page_title": "Frequently Asked Questions",
+    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features."
   },
   "maintenance": {
     "title": "Wkrótce wrócimy!",

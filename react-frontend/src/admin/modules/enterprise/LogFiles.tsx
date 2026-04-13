@@ -106,8 +106,8 @@ export function LogFiles() {
   return (
     <div>
       <PageHeader
-        title="Log Files"
-        description="Browse and view server log files"
+        title={t('system.log_files_title')}
+        description={t('system.log_files_desc')}
         actions={
           <Button
             variant="flat"
@@ -176,7 +176,7 @@ export function LogFiles() {
       ) : filtered.length === 0 ? (
         <Card shadow="sm">
           <CardBody className="py-16 text-center">
-            <p className="text-default-500">No log files found</p>
+            <p className="text-default-500">{t('system.no_log_files')}</p>
           </CardBody>
         </Card>
       ) : (

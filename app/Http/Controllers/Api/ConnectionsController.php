@@ -163,9 +163,9 @@ class ConnectionsController extends BaseApiController
 
         // Award XP to both users for making a connection
         try {
-            \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['make_connection'], 'make_connection', 'Accepted a connection');
+            \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['make_connection'], 'make_connection', __('api_controllers_2.connections.accepted_connection'));
             $otherUserId = ($connection->requester_id === $userId) ? $connection->receiver_id : $connection->requester_id;
-            \App\Services\GamificationService::awardXP($otherUserId, \App\Services\GamificationService::XP_VALUES['make_connection'], 'make_connection', 'Connection accepted');
+            \App\Services\GamificationService::awardXP($otherUserId, \App\Services\GamificationService::XP_VALUES['make_connection'], 'make_connection', __('api_controllers_2.connections.connection_accepted'));
             \App\Services\GamificationService::runAllBadgeChecks($userId);
             \App\Services\GamificationService::runAllBadgeChecks($otherUserId);
         } catch (\Throwable $e) {

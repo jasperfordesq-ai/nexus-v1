@@ -94,7 +94,8 @@
     "cta_title": "Des questions ?",
     "cta_body": "Si vous avez des questions sur ces conditions d'utilisation ou besoin de precisions, notre equipe est la pour vous aider.",
     "contact_us": "Contactez-nous",
-    "privacy_policy_link": "Politique de confidentialite"
+    "privacy_policy_link": "Politique de confidentialite",
+    "meta_description": "Terms and conditions governing the use of our community timebanking platform."
   },
   "privacy": {
     "meta_description": "Comment nous collectons, utilisons et protégeons vos données personnelles sur notre plateforme communautaire.",
@@ -205,7 +206,8 @@
     "retention_logs_desc": "Les adresses IP et journaux d'acces sont conserves pendant 12 mois",
     "cta_title": "Questions sur votre vie privee ?",
     "cta_body": "Nous sommes la pour vous aider. Si vous avez des questions sur cette politique ou souhaitez exercer vos droits sur vos donnees, n'hesitez pas a nous contacter.",
-    "contact_privacy_team": "Contacter notre equipe vie privee"
+    "contact_privacy_team": "Contacter notre equipe vie privee",
+    "meta_description": "How we collect, use, and protect your personal data on our community platform."
   },
   "cookies": {
     "meta_description": "Informations sur la façon dont nous utilisons des cookies pour améliorer votre expérience sur notre plateforme.",
@@ -287,7 +289,8 @@
     "cta_title": "Questions sur les cookies ?",
     "cta_body": "Si vous avez des questions sur notre utilisation des cookies ou cette politique, n'hesitez pas a nous contacter.",
     "contact_us": "Contactez-nous",
-    "privacy_policy_link": "Politique de confidentialite"
+    "privacy_policy_link": "Politique de confidentialite",
+    "meta_description": "Information about how we use cookies to improve your experience on our platform."
   },
   "accessibility": {
     "meta_description": "Notre engagement à rendre la plateforme accessible à tous, conformément aux normes WCAG 2.1 AA.",
@@ -334,7 +337,8 @@
     "tech_svg": "SVG avec alternatives appropriees",
     "tech_react": "React avec bibliotheque de composants accessible",
     "tech_recommendation": "Ces technologies sont necessaires pour la conformite avec les normes d'accessibilite utilisees. Nous recommandons d'utiliser la derniere version de votre navigateur avec une technologie d'assistance a jour pour la meilleure experience.",
-    "last_updated": "Cette declaration a ete mise a jour pour la derniere fois en fevrier 2026."
+    "last_updated": "Cette declaration a ete mise a jour pour la derniere fois en fevrier 2026.",
+    "meta_description": "Our commitment to making the platform accessible to everyone, following WCAG 2.1 AA standards."
   },
   "hub": {
     "page_title": "Juridique",

@@ -94,7 +94,8 @@
     "cta_title": "¿Tienes Preguntas?",
     "cta_body": "Si tienes alguna pregunta sobre estos Términos de Servicio o necesitas aclaración sobre algún punto, nuestro equipo está aquí para ayudar.",
     "contact_us": "Contáctanos",
-    "privacy_policy_link": "Política de Privacidad"
+    "privacy_policy_link": "Política de Privacidad",
+    "meta_description": "Terms and conditions governing the use of our community timebanking platform."
   },
   "privacy": {
     "meta_description": "Cómo recopilamos, usamos y protegemos tus datos personales en nuestra plataforma comunitaria.",
@@ -205,7 +206,8 @@
     "retention_logs_desc": "Direcciones IP y registros de acceso retenidos por 12 meses",
     "cta_title": "¿Preguntas Sobre Tu Privacidad?",
     "cta_body": "Estamos aquí para ayudar. Si tienes alguna pregunta sobre esta política o quieres ejercer tus derechos sobre los datos, no dudes en contactarnos.",
-    "contact_privacy_team": "Contactar a Nuestro Equipo de Privacidad"
+    "contact_privacy_team": "Contactar a Nuestro Equipo de Privacidad",
+    "meta_description": "How we collect, use, and protect your personal data on our community platform."
   },
   "cookies": {
     "meta_description": "Información sobre cómo usamos cookies para mejorar tu experiencia en nuestra plataforma.",
@@ -287,7 +289,8 @@
     "cta_title": "¿Preguntas Sobre las Cookies?",
     "cta_body": "Si tienes alguna pregunta sobre nuestro uso de cookies o esta política, no dudes en contactarnos.",
     "contact_us": "Contáctanos",
-    "privacy_policy_link": "Política de Privacidad"
+    "privacy_policy_link": "Política de Privacidad",
+    "meta_description": "Information about how we use cookies to improve your experience on our platform."
   },
   "accessibility": {
     "meta_description": "Nuestro compromiso de hacer la plataforma accesible para todos, siguiendo los estándares WCAG 2.1 AA.",
@@ -334,7 +337,8 @@
     "tech_svg": "SVG con alternativas apropiadas",
     "tech_react": "React con biblioteca de componentes accesibles",
     "tech_recommendation": "Estas tecnologías se utilizan para la conformidad con los estándares de accesibilidad usados. Recomendamos usar la última versión de tu navegador con tecnología de asistencia actualizada para la mejor experiencia.",
-    "last_updated": "Esta declaración fue actualizada por última vez en febrero de 2026."
+    "last_updated": "Esta declaración fue actualizada por última vez en febrero de 2026.",
+    "meta_description": "Our commitment to making the platform accessible to everyone, following WCAG 2.1 AA standards."
   },
   "hub": {
     "page_title": "Legal",

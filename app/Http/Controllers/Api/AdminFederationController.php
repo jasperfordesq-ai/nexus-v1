@@ -371,8 +371,8 @@ class AdminFederationController extends BaseApiController
         try {
             $result = $this->federationPartnershipService->requestPartnership($tenantId, $targetTenantId, $userId, FederationPartnershipService::LEVEL_DISCOVERY, $notes);
             if ($result['success']) { return $this->respondWithData($result, null, 201); }
-            return $this->respondWithError('REQUEST_FAILED', $result['error'] ?? 'Failed to send partnership request');
-        } catch (\Exception $e) { return $this->respondWithError('REQUEST_FAILED', 'Failed to send partnership request'); }
+            return $this->respondWithError('REQUEST_FAILED', $result['error'] ?? __('api_controllers_1.admin_federation.partnership_request_failed'));
+        } catch (\Exception $e) { return $this->respondWithError('REQUEST_FAILED', __('api_controllers_1.admin_federation.partnership_request_failed')); }
     }
 
     /** GET /api/v2/admin/federation/partnerships/{id} — Full partnership detail */
@@ -402,7 +402,7 @@ class AdminFederationController extends BaseApiController
 
             return $this->respondWithData($partnership);
         } catch (\Exception $e) {
-            return $this->respondWithError('FETCH_FAILED', 'Failed to load partnership detail', null, 500);
+            return $this->respondWithError('FETCH_FAILED', __('api_controllers_1.admin_federation.partnership_detail_failed'), null, 500);
         }
     }
 
@@ -426,9 +426,9 @@ class AdminFederationController extends BaseApiController
             if ($result['success']) {
                 return $this->respondWithData($result);
             }
-            return $this->respondWithError('COUNTER_PROPOSE_FAILED', $result['error'] ?? 'Failed to counter-propose');
+            return $this->respondWithError('COUNTER_PROPOSE_FAILED', $result['error'] ?? __('api_controllers_1.admin_federation.counter_propose_failed'));
         } catch (\Exception $e) {
-            return $this->respondWithError('COUNTER_PROPOSE_FAILED', 'Failed to send counter-proposal');
+            return $this->respondWithError('COUNTER_PROPOSE_FAILED', __('api_controllers_1.admin_federation.counter_proposal_send_failed'));
         }
     }
 
@@ -445,9 +445,9 @@ class AdminFederationController extends BaseApiController
             if ($result['success']) {
                 return $this->respondWithData($result);
             }
-            return $this->respondWithError('UPDATE_FAILED', $result['error'] ?? 'Failed to update permissions');
+            return $this->respondWithError('UPDATE_FAILED', $result['error'] ?? __('api_controllers_1.admin_federation.permissions_update_failed'));
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update partnership permissions');
+            return $this->respondWithError('UPDATE_FAILED', __('api_controllers_1.admin_federation.partnership_permissions_update_failed'));
         }
     }
 
@@ -641,7 +641,7 @@ class AdminFederationController extends BaseApiController
         $primaryIds = array_map('intval', $input['primary_ids'] ?? []);
 
         if (count($topicIds) > 10) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Maximum 10 topics allowed.', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_federation.max_topics_exceeded'), null, 422);
         }
 
         $ok = $this->federationDirectoryService->setTenantTopics($tenantId, $topicIds, $primaryIds);
@@ -839,8 +839,8 @@ class AdminFederationController extends BaseApiController
         $tenantId = TenantContext::getId();
         $name = $this->input('name');
         $scopes = $this->input('scopes', []);
-        if (!$name) { return $this->respondWithError('VALIDATION_ERROR', 'Name is required', 'name'); }
-        if (!$this->tableExists('federation_api_keys')) { return $this->respondWithError('TABLE_MISSING', 'Federation API keys table not configured', null, 503); }
+        if (!$name) { return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_federation.api_key_name_required'), 'name'); }
+        if (!$this->tableExists('federation_api_keys')) { return $this->respondWithError('TABLE_MISSING', __('api_controllers_1.admin_federation.api_keys_table_not_configured'), null, 503); }
 
         $expiresAt = $this->input('expires_at');
 
@@ -852,8 +852,8 @@ class AdminFederationController extends BaseApiController
                 [$tenantId, $name, hash('sha256', $keyValue), $prefix, json_encode($scopes), $expiresAt ?: null, $this->getUserId()]
             );
             \Illuminate\Support\Facades\Log::info('[Federation] API key created', ['tenant_id' => $tenantId, 'key_prefix' => $prefix, 'created_by' => $this->getUserId()]);
-            return $this->respondWithData(['id' => DB::getPdo()->lastInsertId(), 'name' => $name, 'api_key' => $keyValue, 'key_prefix' => $prefix, 'warning' => 'This key is shown ONCE. Store it securely — it cannot be retrieved again.'], null, 201);
-        } catch (\Exception $e) { return $this->respondWithError('CREATE_FAILED', 'Failed to create API key'); }
+            return $this->respondWithData(['id' => DB::getPdo()->lastInsertId(), 'name' => $name, 'api_key' => $keyValue, 'key_prefix' => $prefix, 'warning' => __('api_controllers_1.admin_federation.api_key_shown_once_warning')], null, 201);
+        } catch (\Exception $e) { return $this->respondWithError('CREATE_FAILED', __('api_controllers_1.admin_federation.api_key_create_failed')); }
     }
 
     /** POST /api/v2/admin/federation/api-keys/{id}/revoke */
@@ -864,23 +864,23 @@ class AdminFederationController extends BaseApiController
         $id = (int) $id;
 
         if (!$this->tableExists('federation_api_keys')) {
-            return $this->respondWithError('TABLE_MISSING', 'Federation API keys table not configured', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api_controllers_1.admin_federation.api_keys_table_not_configured'), null, 503);
         }
 
         try {
             $key = DB::selectOne("SELECT id, status FROM federation_api_keys WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             if (!$key) {
-                return $this->respondWithError('NOT_FOUND', 'API key not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api_controllers_1.admin_federation.api_key_not_found'), null, 404);
             }
             if ($key->status === 'revoked') {
-                return $this->respondWithError('ALREADY_REVOKED', 'API key is already revoked', null, 409);
+                return $this->respondWithError('ALREADY_REVOKED', __('api_controllers_1.admin_federation.api_key_already_revoked'), null, 409);
             }
 
             DB::update("UPDATE federation_api_keys SET status = 'revoked', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             \Illuminate\Support\Facades\Log::info('[Federation] API key revoked', ['tenant_id' => $tenantId, 'key_id' => $id, 'revoked_by' => $this->getUserId()]);
             return $this->respondWithData(['id' => $id, 'status' => 'revoked']);
         } catch (\Exception $e) {
-            return $this->respondWithError('REVOKE_FAILED', 'Failed to revoke API key');
+            return $this->respondWithError('REVOKE_FAILED', __('api_controllers_1.admin_federation.api_key_revoke_failed'));
         }
     }
 
@@ -903,7 +903,7 @@ class AdminFederationController extends BaseApiController
 
         $allowedTypes = ['users', 'partnerships', 'transactions', 'audit'];
         if (!in_array($type, $allowedTypes, true)) {
-            return $this->respondWithError('INVALID_TYPE', 'Invalid export type. Allowed: ' . implode(', ', $allowedTypes), null, 400);
+            return $this->respondWithError('INVALID_TYPE', __('api_controllers_1.admin_federation.invalid_export_type', ['types' => implode(', ', $allowedTypes)]), null, 400);
         }
 
         try {
@@ -913,7 +913,7 @@ class AdminFederationController extends BaseApiController
             switch ($type) {
                 case 'users':
                     if (!$this->tableExists('federation_user_settings')) {
-                        return $this->respondWithError('NO_DATA', 'Federation user settings table not found', null, 404);
+                        return $this->respondWithError('NO_DATA', __('api_controllers_1.admin_federation.federation_user_settings_not_found'), null, 404);
                     }
                     $rows = array_map(fn($r) => (array)$r, DB::select("
                         SELECT u.id, u.first_name, u.last_name, u.email, u.username,
@@ -929,7 +929,7 @@ class AdminFederationController extends BaseApiController
 
                 case 'partnerships':
                     if (!$this->tableExists('federation_partnerships')) {
-                        return $this->respondWithError('NO_DATA', 'Federation partnerships table not found', null, 404);
+                        return $this->respondWithError('NO_DATA', __('api_controllers_1.admin_federation.federation_partnerships_not_found'), null, 404);
                     }
                     $rows = array_map(fn($r) => (array)$r, DB::select("
                         SELECT fp.id, t1.name AS tenant_name, t2.name AS partner_name,
@@ -945,7 +945,7 @@ class AdminFederationController extends BaseApiController
 
                 case 'transactions':
                     if (!$this->tableExists('federation_transactions')) {
-                        return $this->respondWithError('NO_DATA', 'Federation transactions table not found', null, 404);
+                        return $this->respondWithError('NO_DATA', __('api_controllers_1.admin_federation.federation_transactions_not_found'), null, 404);
                     }
                     $rows = array_map(fn($r) => (array)$r, DB::select("
                         SELECT ft.id, ft.sender_user_id, ft.receiver_user_id,
@@ -960,7 +960,7 @@ class AdminFederationController extends BaseApiController
 
                 case 'audit':
                     if (!$this->tableExists('federation_audit_log')) {
-                        return $this->respondWithError('NO_DATA', 'Federation audit log table not found', null, 404);
+                        return $this->respondWithError('NO_DATA', __('api_controllers_1.admin_federation.federation_audit_log_not_found'), null, 404);
                     }
                     $rows = array_map(fn($r) => (array)$r, DB::select("
                         SELECT id, action_type, category, level, actor_user_id,
@@ -990,7 +990,7 @@ class AdminFederationController extends BaseApiController
             ]);
 
         } catch (\Throwable $e) {
-            return $this->respondWithError('EXPORT_FAILED', 'Failed to export data', null, 500);
+            return $this->respondWithError('EXPORT_FAILED', __('api_controllers_1.admin_federation.export_failed'), null, 500);
         }
     }
 }

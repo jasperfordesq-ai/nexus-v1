@@ -203,7 +203,8 @@
     },
     "attach_polls_label": "Joindre des sondages (optionnel)",
     "attach_polls_placeholder": "Sélectionner des sondages à joindre...",
-    "attach_polls_hint": "Joignez des sondages communautaires existants à cet événement."
+    "attach_polls_hint": "Joignez des sondages communautaires existants à cet événement.",
+    "group_event_notice": "This event will be associated with your group."
   },
   "toast": {
     "rsvp_removed": "RSVP annulé",

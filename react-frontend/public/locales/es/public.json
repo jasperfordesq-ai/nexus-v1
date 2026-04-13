@@ -76,7 +76,8 @@
       "title": "¿Listo para empezar?",
       "description": "Únete a miles de miembros de la comunidad que ya están intercambiando habilidades y construyendo conexiones significativas.",
       "button": "Crea Tu Cuenta Gratis"
-    }
+    },
+    "meta_title": "Community Timebanking Platform"
   },
   "about": {
     "meta_title": "Acerca de {{name}}",
@@ -184,7 +185,8 @@
       "login_prompt_before": "¿Ya tienes una cuenta?",
       "login_link": "Inicia sesión",
       "login_prompt_after": "para soporte más rápido."
-    }
+    },
+    "meta_description": "Get in touch with our community support team. We're here to help."
   },
   "faq": {
     "page_title": "Preguntas Frecuentes",
@@ -380,7 +382,9 @@
           "item4": "Cumplimos con el RGPD y las regulaciones de protección de datos"
         }
       }
-    }
+    },
+    "page_title": "Frequently Asked Questions",
+    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features."
   },
   "maintenance": {
     "title": "¡Volveremos pronto!",

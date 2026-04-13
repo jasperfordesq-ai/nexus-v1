@@ -380,7 +380,9 @@
           "item4": "نحن نلتزم باللائحة العامة لحماية البيانات ولوائح حماية البيانات"
         }
       }
-    }
+    },
+    "page_title": "Frequently Asked Questions",
+    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features."
   },
   "maintenance": {
     "title": "سنعود قريباً!",

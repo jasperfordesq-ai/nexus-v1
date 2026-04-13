@@ -57,3 +57,45 @@ CVE-2026-23191
 CVE-2026-23193
 CVE-2026-23204
 CVE-2026-23209
+
+# ── vendor/mockery/mockery/docs/requirements.txt ────────────────────────────
+# These CVEs are in a Python requirements.txt file inside the docs/ directory
+# of the Mockery PHP test-only library (vendor/mockery/mockery). This file:
+#   - Is documentation for the Mockery project itself, not our code
+#   - Contains Python dependencies we never install or run (our stack has no Python)
+#   - Lives in vendor/ which is NEVER deployed to production (gitignored)
+#   - Has zero exploitability in our context (wrong language, wrong environment)
+# These are false positives for our threat model. The mockery/mockery package
+# is a dev-only dependency used only in PHPUnit tests.
+CVE-2024-6345
+CVE-2024-37891
+CVE-2025-47273
+CVE-2025-50181
+CVE-2025-50182
+CVE-2025-66418
+CVE-2025-66471
+CVE-2026-4539
+CVE-2026-21441
+CVE-2026-24049
+CVE-2026-25645
+
+# ── mobile/package-lock.json ────────────────────────────────────────────────
+# These CVEs are in the Capacitor mobile app's npm dependencies (mobile/).
+# The mobile app is a SEPARATE build artifact compiled into APK/IPA binaries —
+# it is NOT deployed to our web server or PHP/React production containers.
+# These are tracked for remediation but do not affect production web security.
+# Tracked: update mobile/ deps via `npm update` in the mobile/ directory.
+# Dependabot PR #55 addresses @xmldom/xmldom in the web frontend separately.
+CVE-2026-33532
+CVE-2026-33671
+CVE-2026-33672
+CVE-2026-33750
+CVE-2026-33891
+CVE-2026-33894
+CVE-2026-33895
+CVE-2026-33896
+CVE-2026-34601
+# undici WebSocket DoS (fix: 6.24.0/7.24.0) — mobile APK only, not on web server
+CVE-2026-1526
+CVE-2026-1528
+CVE-2026-2229
