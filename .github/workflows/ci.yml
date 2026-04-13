@@ -291,6 +291,13 @@ jobs:
         env:
           VITE_API_BASE: /api
 
+      - name: Upload React Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: react-frontend-build
+          path: react-frontend/dist
+          retention-days: 1
+
   # ─────────────────────────────────────────────────────────────────
   # Stage 2b: API Contract Validation
   # Runs Zod schema contract tests to detect frontend/backend schema drift.
