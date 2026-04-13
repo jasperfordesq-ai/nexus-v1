@@ -91,7 +91,7 @@ services:
     # to leave headroom for Apache workers, opcache, and OS overhead. Matches the
     # pattern in compose.prod.yml. For heavy artisan tasks that need more, override
     # at invocation time: `docker exec -e PHP_MEMORY_LIMIT=-1 ...` (see docs/DOCKER.md).
-    mem_limit: 1536m
+    mem_limit: 768m
     mem_reservation: 512m
 
   # ---------------------------------------------------------------------------

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 use App\Models\ActivityLog;
+use App\Models\Page;
 use App\Services\RedisCache;
 use App\Services\StripeSubscriptionService;
 
@@ -210,10 +211,14 @@ class AdminContentController extends BaseApiController
         }
 
         $input = $this->getAllInput();
-        $updates = [];
-        $params = [];
+        // NOTE: Dynamic-SQL → Eloquent migration started here (2026-04-13).
+        // This one updatePage() call has been refactored below as the pilot; the
+        // remaining ~30 dynamic DB::update/DB::insert sites in this controller
+        // should be converted to Eloquent Model::where(...)->update([...]) in a
+        // follow-up pass. See CLAUDE.md / audit notes.
+        $data = [];
 
-        if (isset($input['title'])) { $updates[] = 'title = ?'; $params[] = trim($input['title']); }
+        if (isset($input['title'])) { $data['title'] = trim($input['title']); }
         if (isset($input['slug'])) {
             $slug = $this->generateSlug($input['slug']);
             if ($this->isReservedPageSlug($slug)) {
@@ -223,30 +228,29 @@ class AdminContentController extends BaseApiController
             if ($conflict) {
                 return $this->respondWithError('VALIDATION_ERROR', __('api.slug_already_in_use'), 'slug', 422);
             }
-            $updates[] = 'slug = ?'; $params[] = $slug;
+            $data['slug'] = $slug;
         }
-        if (array_key_exists('content', $input)) { $updates[] = 'content = ?'; $params[] = $input['content']; }
+        if (array_key_exists('content', $input)) { $data['content'] = $input['content']; }
         if (isset($input['status'])) {
             if (!in_array($input['status'], ['draft', 'published'], true)) {
                 return $this->respondWithError('VALIDATION_ERROR', __('api.status_must_be_draft_or_published'), 'status', 422);
             }
-            $updates[] = 'is_published = ?'; $params[] = ($input['status'] === 'published') ? 1 : 0;
+            $data['is_published'] = ($input['status'] === 'published') ? 1 : 0;
         }
-        if (isset($input['sort_order'])) { $updates[] = 'sort_order = ?'; $params[] = (int)$input['sort_order']; }
-        if (isset($input['show_in_menu'])) { $updates[] = 'show_in_menu = ?'; $params[] = (int)$input['show_in_menu']; }
-        if (isset($input['menu_location'])) { $updates[] = 'menu_location = ?'; $params[] = $input['menu_location']; }
-        if (array_key_exists('meta_description', $input)) { $updates[] = 'meta_description = ?'; $params[] = $input['meta_description']; }
-        if (isset($input['menu_order'])) { $updates[] = 'menu_order = ?'; $params[] = (int)$input['menu_order']; }
+        if (isset($input['sort_order'])) { $data['sort_order'] = (int)$input['sort_order']; }
+        if (isset($input['show_in_menu'])) { $data['show_in_menu'] = (int)$input['show_in_menu']; }
+        if (isset($input['menu_location'])) { $data['menu_location'] = $input['menu_location']; }
+        if (array_key_exists('meta_description', $input)) { $data['meta_description'] = $input['meta_description']; }
+        if (isset($input['menu_order'])) { $data['menu_order'] = (int)$input['menu_order']; }
 
-        if (empty($updates)) {
+        if (empty($data)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.no_fields_to_update'), null, 422);
         }
 
-        $updates[] = 'updated_at = NOW()';
-        $params[] = $id;
-        $params[] = $tenantId;
-
-        DB::update("UPDATE pages SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
+        // Eloquent update — HasTenantScope on Page model auto-applies tenant_id.
+        // Explicit where(tenant_id) kept as defense-in-depth per CLAUDE.md rule
+        // "every DELETE/UPDATE must include AND tenant_id = ?".
+        Page::where('id', $id)->where('tenant_id', $tenantId)->update($data);
 
         $result = DB::selectOne(
             "SELECT id, tenant_id, title, slug, content, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at

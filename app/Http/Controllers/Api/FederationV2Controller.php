@@ -382,7 +382,7 @@ class FederationV2Controller extends BaseApiController
                 $extId = (int) substr($id, 4);
                 $ep = \App\Services\FederationExternalPartnerService::getById($extId, $tenantId);
                 if (!$ep || ($ep['status'] ?? '') !== 'active') {
-                    return response()->json(['success' => false, 'error' => 'Partner not found'], 404);
+                    return response()->json(['success' => false, 'error' => __('api.federation.partner_not_found')], 404);
                 }
                 $permissions = [];
                 if ($ep['allow_member_search'] ?? false) $permissions[] = 'profiles';
@@ -442,7 +442,7 @@ class FederationV2Controller extends BaseApiController
             ", [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $partnerId]);
 
             if (!$row) {
-                return response()->json(['success' => false, 'error' => 'Partner not found'], 404);
+                return response()->json(['success' => false, 'error' => __('api.federation.partner_not_found')], 404);
             }
 
             $p = (array) $row;

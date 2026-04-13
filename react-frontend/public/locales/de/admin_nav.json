@@ -144,5 +144,8 @@
     "admin": "Admin",
     "expand_sidebar": "Seitenleiste erweitern",
     "collapse_sidebar": "Seitenleiste einklappen"
-  }
+  },
+  "admin": "Admin",
+  "expand_sidebar": "Seitenleiste erweitern",
+  "collapse_sidebar": "Seitenleiste einklappen"
 }

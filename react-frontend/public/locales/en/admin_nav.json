@@ -139,6 +139,9 @@
   "federation_webhooks": "Webhooks",
   "onboarding_settings": "Onboarding Settings",
   "safeguarding_options": "Safeguarding Options",
+  "admin": "Admin",
+  "expand_sidebar": "Expand sidebar",
+  "collapse_sidebar": "Collapse sidebar",
   "sections": {
     "content": "Content",
     "community": "Community",

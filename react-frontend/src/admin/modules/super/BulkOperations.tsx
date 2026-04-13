@@ -63,7 +63,6 @@ export function BulkOperations() {
     // Final hard confirmation — destructive cross-tenant move
     const message = t('bulk_operations.final_confirm_move', {
       count: selectedUserIds.size,
-      defaultValue: `You are about to move ${selectedUserIds.size} user(s) to another tenant. This action cannot be undone automatically. Continue?`,
     });
     if (typeof window !== 'undefined' && !window.confirm(message)) {
       setMoveConfirm(false);
@@ -92,7 +91,6 @@ export function BulkOperations() {
     const message = t('bulk_operations.final_confirm_update', {
       action: bulkAction.replace('_', ' '),
       count: selectedTenantIds.size,
-      defaultValue: `You are about to ${bulkAction.replace('_', ' ')} ${selectedTenantIds.size} tenant(s). This affects all users on those tenants. Continue?`,
     });
     if (typeof window !== 'undefined' && !window.confirm(message)) {
       setTenantConfirm(false);
@@ -183,7 +181,7 @@ export function BulkOperations() {
                 ))}
               </div>
             )}
-            {loading && <p className="text-center text-default-400 text-sm">Loading users...</p>}
+            {loading && <p className="text-center text-default-400 text-sm">{t('bulk_operations.loading_users')}</p>}
 
             <Divider />
             <Select label={t('super.label_target_tenant')} selectedKeys={targetTenant ? [targetTenant] : []}
@@ -192,7 +190,7 @@ export function BulkOperations() {
                 <SelectItem key={String(t.id)}>{t.name}</SelectItem>)}
             </Select>
 
-            <div className="bg-purple-50 dark:bg-purple-50/10 border border-purple-200 dark:border-purple-200/20 rounded-lg p-3">
+            <div className="bg-secondary-50 border border-secondary-200 text-secondary-700 rounded-medium p-3">
               <Switch
                 isSelected={grantSA}
                 onValueChange={setGrantSA}
@@ -361,4 +359,4 @@ export function BulkOperations() {
     </div>
   );
 }
-export default BulkOperations;
+export defau

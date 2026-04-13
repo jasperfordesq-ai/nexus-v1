@@ -1515,4 +1515,17 @@ return [
 
     // Group exchanges
     'total_hours_gt_zero'                  => 'Total hours must be greater than 0',
+
+    // Federation API errors (hardcoded-string audit — 2026-04-13)
+    'federation' => [
+        'partner_not_found'          => 'Partner not found',
+        'feature_disabled'           => 'Federation feature disabled for this tenant',
+        'webhook_rate_limited'       => 'Too many requests',
+        'webhook_empty_body'         => 'Empty request body',
+        'webhook_auth_failed'        => 'Invalid API key or webhook signature',
+        'webhook_invalid_nonce'      => 'Nonce must be 8-128 chars',
+        'webhook_invalid_json'       => 'Invalid JSON',
+        'webhook_missing_event'      => 'Missing event type',
+        'webhook_partner_inactive'   => 'Partner is not active',
+    ],
 ];

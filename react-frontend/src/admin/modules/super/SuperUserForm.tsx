@@ -252,9 +252,9 @@ export function SuperUserForm() {
               </CardHeader>
               <Divider />
               <CardBody className="flex flex-col gap-4">
-                <div className="bg-blue-50 dark:bg-blue-50/10 border border-blue-200 dark:border-blue-200/20 rounded-lg p-3">
-                  <p className="text-sm text-blue-700 dark:text-blue-400 font-medium mb-2">{t('super_user_form.how_it_works')}</p>
-                  <ol className="text-xs text-blue-600 dark:text-blue-300 space-y-1 list-decimal list-inside">
+                <div className="bg-primary-50 border border-primary-200 text-primary-700 rounded-medium p-3">
+                  <p className="text-sm font-medium mb-2">{t('super_user_form.how_it_works')}</p>
+                  <ol className="text-xs opacity-90 space-y-1 list-decimal list-inside">
                     <li>{t('super_user_form.move_step_1')}</li>
                     <li>{t('super_user_form.move_step_2')}</li>
                     <li>{t('super_user_form.move_step_3')}</li>

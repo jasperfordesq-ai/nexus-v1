@@ -144,5 +144,8 @@
     "admin": "Admin",
     "expand_sidebar": "Espandi barra laterale",
     "collapse_sidebar": "Comprimi barra laterale"
-  }
+  },
+  "admin": "Admin",
+  "expand_sidebar": "Espandi barra laterale",
+  "collapse_sidebar": "Comprimi barra laterale"
 }

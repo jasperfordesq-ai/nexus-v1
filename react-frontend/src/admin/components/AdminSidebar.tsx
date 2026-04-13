@@ -115,9 +115,8 @@ interface NavSection {
 }
 
 // ⚠️ TRANSLATION KEY CONVENTION — READ BEFORE EDITING
-// Section labels use TOP-LEVEL keys from admin_nav.json: t('users'), t('crm'), etc.
-// Do NOT add a "sidebar." prefix — the "sidebar" namespace is only for
-// sidebar.admin, sidebar.expand_sidebar, sidebar.collapse_sidebar, sidebar.broker_panel.
+// ALL labels use TOP-LEVEL keys from admin_nav.json: t('users'), t('admin'), etc.
+// Do NOT add a "sidebar." prefix — per CLAUDE.md, admin sidebar keys are top-level only.
 // Sub-item labels also use top-level keys: t('all_users'), t('blog_posts'), etc.
 function useAdminNav(): NavSection[] {
   const { t } = useTranslation('admin_nav');
@@ -483,7 +482,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
       <div className="flex h-16 items-center justify-between border-b border-divider px-4">
         {!collapsed && (
           <Link to={tenantPath('/admin')} className="text-lg font-bold text-foreground">
-            {t('sidebar.admin')}
+            {t('admin')}
           </Link>
         )}
         <Button
@@ -491,7 +490,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
           isIconOnly
           onPress={onToggle}
           className="rounded-lg p-2 text-default-500 hover:bg-default-100 hover:text-foreground min-w-0 h-auto"
-          aria-label={collapsed ? t('sidebar.expand_sidebar') : t('sidebar.collapse_sidebar')}
+          aria-label={collapsed ? t('expand_sidebar') : t('collapse_sidebar')}
         >
           {collapsed ? <PanelLeft size={20} /> : <PanelLeftClose size={20} />}
         </Button>

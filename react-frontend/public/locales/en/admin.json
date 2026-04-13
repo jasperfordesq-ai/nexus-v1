@@ -1,4 +1,13 @@
 {
+  "bulk_operations": {
+    "final_confirm_move": "You are about to move {{count}} user(s) to another tenant. This action cannot be undone automatically. Continue?",
+    "final_confirm_update": "You are about to {{action}} {{count}} tenant(s). This affects all users on those tenants. Continue?",
+    "loading_users": "Loading users...",
+    "grant_sa_on_arrival": "Grant Super Admin on arrival",
+    "grant_sa_on_arrival_desc": "Newly moved users will be granted super admin access on the target tenant.",
+    "move_n_users": "Move {{count}} user(s)",
+    "bulk_update_tenants": "Bulk update tenants"
+  },
   "checking_permissions": "Checking permissions...",
   "active": "Active",
   "activity": {

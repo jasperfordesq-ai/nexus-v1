@@ -254,11 +254,11 @@ export function MenusAdmin() {
 
       {/* Info notice when no custom menus exist */}
       {data.length === 0 && (
-        <div className="flex items-start gap-3 p-4 mb-4 rounded-lg bg-blue-500/5 border border-blue-500/20">
-          <Info size={18} className="text-blue-500 shrink-0 mt-0.5" />
+        <div className="flex items-start gap-3 p-4 mb-4 rounded-medium bg-primary-50 border border-primary-200 text-primary-700">
+          <Info size={18} className="shrink-0 mt-0.5" />
           <div className="text-sm">
-            <p className="font-medium text-theme-primary">Default menus are active</p>
-            <p className="text-theme-muted mt-0.5">
+            <p className="font-medium">Default menus are active</p>
+            <p className="mt-0.5 opacity-90">
               The navigation is currently using hardcoded defaults. Create custom menus below to
               override the default navigation for your community.
             </p>

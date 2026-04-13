@@ -150,5 +150,8 @@
   "marketplace_dashboard": "Marketplace Dashboard",
   "marketplace_moderation": "Marketplace Moderation",
   "marketplace_sellers": "Marketplace Sellers",
-  "translation_config": "Translation Config"
+  "translation_config": "Translation Config",
+  "admin": "Admin",
+  "expand_sidebar": "Expand sidebar",
+  "collapse_sidebar": "Collapse sidebar"
 }
