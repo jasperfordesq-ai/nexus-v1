@@ -563,7 +563,7 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.cannot_suspend_super_admin'), null, 403);
         }
 
-        $reason = $this->input('reason', 'Suspended by admin');
+        $reason = $this->input('reason', __('svc_notifications.suspended_by_admin'));
 
         DB::update("UPDATE users SET status = 'suspended' WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
@@ -589,7 +589,7 @@ class AdminUsersController extends BaseApiController
             $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
 
             $html = \App\Core\EmailTemplate::render(
-                'Account Suspended',
+                __('svc_notifications.account_suspended_title'),
                 "Important notice, {$firstName}",
                 '<p>Your account on <strong>' . $tenantNameSafe . '</strong> has been suspended.</p>
                  <p>If you believe this is an error, please contact your community administrator for assistance.</p>',
@@ -630,7 +630,7 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.cannot_ban_super_admin'), null, 403);
         }
 
-        $reason = $this->input('reason', 'Banned by admin');
+        $reason = $this->input('reason', __('svc_notifications.banned_by_admin'));
 
         DB::update("UPDATE users SET status = 'banned' WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
@@ -644,7 +644,7 @@ class AdminUsersController extends BaseApiController
             $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
 
             $html = \App\Core\EmailTemplate::render(
-                'Account Banned',
+                __('svc_notifications.account_banned_title'),
                 "Important notice, {$firstName}",
                 '<p>Your account on <strong>' . $tenantNameSafe . '</strong> has been permanently banned.</p>
                  <p>If you believe this is an error, please contact your community administrator.</p>',
@@ -720,7 +720,7 @@ class AdminUsersController extends BaseApiController
             $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
 
             $html = \App\Core\EmailTemplate::render(
-                'Account Deleted',
+                __('svc_notifications.account_deleted_title'),
                 "Important notice, {$firstName}",
                 '<p>Your account on <strong>' . $tenantNameSafe . '</strong> has been scheduled for deletion.</p>
                  <p>If you believe this is an error, please contact your community administrator as soon as possible.</p>',
@@ -762,7 +762,7 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
-        $reason = $this->input('reason', 'Reset by admin');
+        $reason = $this->input('reason', __('svc_notifications.reset_by_admin'));
 
         try {
             DB::delete("DELETE FROM user_totp_settings WHERE user_id = ? AND tenant_id = ?", [$id, $tenantId]);
@@ -1000,7 +1000,7 @@ class AdminUsersController extends BaseApiController
             $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
 
             $html = \App\Core\EmailTemplate::render(
-                'Password Changed',
+                __('svc_notifications.password_changed_title'),
                 "Security notice, {$firstName}",
                 '<p>Your password on <strong>' . $tenantNameSafe . '</strong> has been reset by an administrator.</p>
                  <p>Your previous password will no longer work. Please use the new password provided to you by your administrator to log in.</p>
@@ -1697,7 +1697,7 @@ class AdminUsersController extends BaseApiController
                 'Welcome to the Community!',
                 "You're all set, {$firstName}!",
                 $body,
-                'Get Started',
+                __('svc_notifications.get_started'),
                 $loginUrl,
                 $tenant['name']
             );
@@ -1765,7 +1765,7 @@ class AdminUsersController extends BaseApiController
             $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
 
             $html = \App\Core\EmailTemplate::render(
-                'Account Reactivated',
+                __('svc_notifications.account_reactivated_title'),
                 "Welcome back, {$firstName}!",
                 '<p>Your account on ' . $tenantNameSafe . ' has been reactivated by an administrator.</p>
                  <p>You can now log in and access the platform again.</p>',

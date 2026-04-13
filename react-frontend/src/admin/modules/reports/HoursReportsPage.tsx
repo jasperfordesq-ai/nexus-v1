@@ -383,7 +383,7 @@ export function HoursReportsPage() {
             <TableColumn>Balance</TableColumn>
           </TableHeader>
           <TableBody
-            emptyContent="No member hours data found"
+            emptyContent={t('reports.no_member_hours_data')}
             isLoading={loading}
             loadingContent={<Spinner />}
           >

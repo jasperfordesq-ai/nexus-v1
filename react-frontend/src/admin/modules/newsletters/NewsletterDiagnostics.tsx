@@ -104,7 +104,7 @@ export function NewsletterDiagnostics() {
           <CardBody className="flex-row items-center gap-4">
             {data && getHealthIcon(data.health_status)}
             <div className="flex-1">
-              <p className="text-lg font-semibold">System Health</p>
+              <p className="text-lg font-semibold">{t('newsletters.system_health')}</p>
               <p className="text-sm text-default-500">
                 {data?.health_status === 'healthy' && 'All systems operational'}
                 {data?.health_status === 'warning' && 'Minor issues detected'}

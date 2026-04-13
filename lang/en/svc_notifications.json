@@ -109,5 +109,22 @@
     "suggestion_connect_message": "Exchange credits with new people to increase your network diversity.",
     "suggestion_exchanges_title": "Complete more exchanges",
     "suggestion_exchanges_message": "Build your reputation by completing transactions and earning reviews."
-  }
+  },
+  "vetting_approved_title": "Your verification has been approved!",
+  "vetting_approved_heading": "Verification Approved",
+  "vetting_approved_body": "Your background check verification has been approved. Your verified status is now active on your profile.",
+  "vetting_go_to_dashboard": "Go to Dashboard",
+  "vetting_rejected_title": "Your verification could not be completed. Please contact support.",
+  "vetting_rejected_heading": "Verification Not Completed",
+  "vetting_rejected_body": "Your background check verification could not be completed at this time. Please contact your community coordinator for more information or to resubmit.",
+  "vetting_contact_support": "Contact Support",
+  "suspended_by_admin": "Suspended by admin",
+  "account_suspended_title": "Account Suspended",
+  "account_banned_title": "Account Banned",
+  "banned_by_admin": "Banned by admin",
+  "account_deleted_title": "Account Deleted",
+  "reset_by_admin": "Reset by admin",
+  "password_changed_title": "Password Changed",
+  "get_started": "Get Started",
+  "account_reactivated_title": "Account Reactivated"
 }
