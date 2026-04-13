@@ -70,7 +70,7 @@ class MemberVerificationBadgeService
         $tenantId = TenantContext::getId();
 
         if (!in_array($badgeType, self::BADGE_TYPES, true)) {
-            $this->errors[] = ['code' => 'INVALID_TYPE', 'message' => 'Invalid badge type: ' . $badgeType, 'field' => 'badge_type'];
+            $this->errors[] = ['code' => 'INVALID_TYPE', 'message' => __('api_controllers_2.verification_badge.invalid_badge_type', ['type' => $badgeType]), 'field' => 'badge_type'];
             return null;
         }
 
@@ -82,7 +82,7 @@ class MemberVerificationBadgeService
             ->first();
 
         if (!$user) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'User not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api_controllers_2.verification_badge.user_not_found')];
             return null;
         }
 
@@ -96,7 +96,7 @@ class MemberVerificationBadgeService
 
         if ($existing) {
             if ($existing->revoked_at === null) {
-                $this->errors[] = ['code' => 'ALREADY_GRANTED', 'message' => 'Badge already active'];
+                $this->errors[] = ['code' => 'ALREADY_GRANTED', 'message' => __('api_controllers_2.verification_badge.badge_already_active')];
                 return (int) $existing->id;
             }
 

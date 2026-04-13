@@ -647,7 +647,7 @@ class FeedService
         $groupId = !empty($data['group_id']) ? (int) $data['group_id'] : null;
 
         if (empty($content) && empty($image)) {
-            return ['error' => 'Post must have content or an image'];
+            return ['error' => __('api_controllers_2.feed.content_or_image_required')];
         }
 
         // Determine publish status: scheduled, draft, or published
@@ -675,7 +675,7 @@ class FeedService
                 ->where('tenant_id', $tenantId)
                 ->exists();
             if (!$quotedExists) {
-                return ['error' => 'Quoted post not found'];
+                return ['error' => __('api_controllers_2.feed.quoted_post_not_found')];
             }
         }
 
@@ -768,7 +768,7 @@ class FeedService
             ->first();
 
         if (!$post) {
-            return ['success' => false, 'error' => 'Post not found or not owned by you'];
+            return ['success' => false, 'error' => __('api_controllers_2.feed.post_not_found_or_not_owned')];
         }
 
         $content = isset($data['content'])
@@ -776,7 +776,7 @@ class FeedService
             : $post->content;
 
         if (empty($content) && empty($post->image_url)) {
-            return ['success' => false, 'error' => 'Post must have content or an image'];
+            return ['success' => false, 'error' => __('api_controllers_2.feed.content_or_image_required')];
         }
 
         $post->content = $content;
@@ -822,7 +822,7 @@ class FeedService
         }
 
         if (empty($content) && empty($imageUrl)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Content or image is required', 'field' => 'content'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api_controllers_2.feed.content_or_image_required'), 'field' => 'content'];
             return null;
         }
 
@@ -834,7 +834,7 @@ class FeedService
                 [$groupId, $userId, $tenantId]
             );
             if (!$isMember) {
-                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a group member to post'];
+                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api_controllers_2.feed.must_be_group_member')];
                 return null;
             }
         }
@@ -873,7 +873,7 @@ class FeedService
             return $postId;
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("FeedService::createPostLegacy error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create post'];
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api_controllers_2.feed.create_post_failed')];
             return null;
         }
     }

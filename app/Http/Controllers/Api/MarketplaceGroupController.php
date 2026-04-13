@@ -72,7 +72,7 @@ class MarketplaceGroupController extends BaseApiController
 
         $userId = $request->user()?->id;
         if (!$userId) {
-            return $this->respondWithError('UNAUTHORIZED', 'Authentication required.', null, 401);
+            return $this->respondWithError('UNAUTHORIZED', __('api_controllers_2.marketplace_group.auth_required'), null, 401);
         }
 
         // Verify group membership
@@ -115,7 +115,7 @@ class MarketplaceGroupController extends BaseApiController
 
         $userId = $request->user()?->id;
         if (!$userId) {
-            return $this->respondWithError('UNAUTHORIZED', 'Authentication required.', null, 401);
+            return $this->respondWithError('UNAUTHORIZED', __('api_controllers_2.marketplace_group.auth_required'), null, 401);
         }
 
         if (!MarketplaceGroupService::isGroupMember($groupId, $userId)) {

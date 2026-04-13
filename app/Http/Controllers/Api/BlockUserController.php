@@ -33,7 +33,7 @@ class BlockUserController extends BaseApiController
         $this->rateLimit('block_user', 20, 60);
 
         if ($userId === $id) {
-            return $this->respondWithError('VALIDATION_ERROR', 'You cannot block yourself', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.block_user.cannot_block_self'), null, 400);
         }
 
         $reason = $this->input('reason');
