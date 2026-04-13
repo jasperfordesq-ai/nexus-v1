@@ -224,7 +224,7 @@ export default function LegalDocVersionList() {
           <Card>
             <CardBody className="text-center py-12">
               <FileText size={48} className="mx-auto text-[var(--color-text-tertiary)] mb-4" />
-              <p className="text-lg text-[var(--color-text-secondary)]">No versions found</p>
+              <p className="text-lg text-[var(--color-text-secondary)]">{t('enterprise.no_versions_found')}</p>
               <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
                 Create a new version to get started
               </p>
@@ -260,7 +260,7 @@ export default function LegalDocVersionList() {
                     <div className="flex flex-wrap gap-4 text-sm text-[var(--color-text-secondary)]">
                       <div className="flex items-center gap-1">
                         <User size={14} />
-                        <span>Created by {version.created_by_name || 'Unknown'}</span>
+                        <span>{t('enterprise.created_by', { name: version.created_by_name || t('enterprise.unknown') })}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Calendar size={14} />
@@ -269,20 +269,20 @@ export default function LegalDocVersionList() {
                       {version.effective_date && (
                         <div className="flex items-center gap-1">
                           <Clock size={14} />
-                          <span>Effective: {new Date(version.effective_date).toLocaleDateString()}</span>
+                          <span>{t('enterprise.effective_date_label')} {new Date(version.effective_date).toLocaleDateString()}</span>
                         </div>
                       )}
                       {version.published_at && (
                         <div className="flex items-center gap-1">
                           <CheckCircle2 size={14} />
-                          <span>Published: {new Date(version.published_at).toLocaleDateString()}</span>
+                          <span>{t('enterprise.published_date_label')} {new Date(version.published_at).toLocaleDateString()}</span>
                         </div>
                       )}
                     </div>
 
                     {version.summary_of_changes && (
                       <div className="mt-3 p-3 bg-[var(--color-surface)] rounded-lg">
-                        <p className="text-sm font-medium mb-1">Summary of Changes:</p>
+                        <p className="text-sm font-medium mb-1">{t('enterprise.summary_of_changes')}</p>
                         <p className="text-sm text-[var(--color-text-secondary)]">
                           {version.summary_of_changes}
                         </p>
@@ -517,19 +517,19 @@ export default function LegalDocVersionList() {
                   {viewingVersion?.effective_date && (
                     <div className="flex items-center gap-1">
                       <Clock size={14} />
-                      <span>Effective: {new Date(viewingVersion.effective_date).toLocaleDateString()}</span>
+                      <span>{t('enterprise.effective_date_label')} {new Date(viewingVersion.effective_date).toLocaleDateString()}</span>
                     </div>
                   )}
                   {viewingVersion?.published_at && (
                     <div className="flex items-center gap-1">
                       <CheckCircle2 size={14} />
-                      <span>Published: {new Date(viewingVersion.published_at).toLocaleDateString()}</span>
+                      <span>{t('enterprise.published_date_label')} {new Date(viewingVersion.published_at).toLocaleDateString()}</span>
                     </div>
                   )}
                 </div>
                 {viewingVersion?.summary_of_changes && (
                   <div className="p-3 bg-(--color-surface) rounded-lg">
-                    <p className="text-sm font-medium mb-1">Summary of Changes:</p>
+                    <p className="text-sm font-medium mb-1">{t('enterprise.summary_of_changes')}</p>
                     <p className="text-sm text-(--color-text-secondary)">
                       {viewingVersion.summary_of_changes}
                     </p>
@@ -576,7 +576,7 @@ export default function LegalDocVersionList() {
                       }}
                       description={pendingCount > 0 ? `${pendingCount} users` : 'Loading...'}
                     >
-                      <span className="font-medium">Non-accepted users only</span>
+                      <span className="font-medium">{t('enterprise.notify_non_accepted')}</span>
                     </Radio>
 
                     <Radio
@@ -587,7 +587,7 @@ export default function LegalDocVersionList() {
                       }}
                       description={t('enterprise.desc_send_to_everyone_may_be_redundant')}
                     >
-                      <span className="font-medium">All active users</span>
+                      <span className="font-medium">{t('enterprise.notify_all_active')}</span>
                     </Radio>
                   </RadioGroup>
                 </div>
