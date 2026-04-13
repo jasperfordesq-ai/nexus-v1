@@ -1,42 +1,42 @@
 {
   "listings": {
     "expired": {
-      "notification": "Your listing \"{{title}}\" has expired. You can renew it to make it active again.",
-      "subject": "Your listing has expired",
-      "heading": "Your listing has expired",
-      "subheading": "Renew your listing to keep it active.",
-      "body_expired": "Your listing <strong>\"{{title}}\"</strong> has expired.",
-      "body_renew": "You can renew it to make it visible to the community again.",
-      "cta": "Renew Listing"
+      "notification": "Tu anuncio \"{{title}}\" ha expirado. Puedes renovarlo para hacerlo activo nuevamente.",
+      "subject": "Tu anuncio ha expirado",
+      "heading": "Tu anuncio ha expirado",
+      "subheading": "Renueva tu anuncio para mantenerlo activo.",
+      "body_expired": "Tu anuncio <strong>\"{{title}}\"</strong> ha expirado.",
+      "body_renew": "Puedes renovarlo para hacerlo visible a la comunidad nuevamente.",
+      "cta": "Renovar Anuncio"
     },
     "expiry_reminder": {
-      "notification": "Your listing \"{{title}}\" expires in {{days_text}} (on {{expiry_date}}) — renew it to keep it active.",
-      "subject": "Your listing expires in {{days_text}}",
-      "heading": "Your listing expires in {{days_text}}",
-      "subheading": "Don't miss out — renew your listing to keep it active.",
-      "body_expires": "Your listing <strong>\"{{title}}\"</strong> expires in {{days_text}} (on {{expiry_date}}).",
-      "body_renew": "Renew it now to keep it visible to the community.",
-      "cta": "View Listing",
-      "days_one": "1 day",
-      "days_other": "{{count}} days"
+      "notification": "Tu anuncio \"{{title}}\" expira en {{days_text}} (el {{expiry_date}}) — renueva para mantenerlo activo.",
+      "subject": "Tu anuncio expira en {{days_text}}",
+      "heading": "Tu anuncio expira en {{days_text}}",
+      "subheading": "No te lo pierdas — renueva tu anuncio para mantenerlo activo.",
+      "body_expires": "Tu anuncio <strong>\"{{title}}\"</strong> expira en {{days_text}} (el {{expiry_date}}).",
+      "body_renew": "Renueva ahora para mantenerlo visible a la comunidad.",
+      "cta": "Ver Anuncio",
+      "days_one": "1 día",
+      "days_other": "{{count}} días"
     },
     "approved": {
-      "notification": "Your listing \"{{title}}\" has been approved and is now active.",
-      "notification_short": "Your listing \"{{title}}\" has been approved!"
+      "notification": "Tu anuncio \"{{title}}\" ha sido aprobado y ahora está activo.",
+      "notification_short": "¡Tu anuncio \"{{title}}\" ha sido aprobado!"
     },
     "rejected": {
-      "notification": "Your listing \"{{title}}\" was not approved. Reason: {{reason}}",
-      "notification_no_reason": "Your listing \"{{title}}\" was not approved.",
-      "subject": "Your listing needs changes",
-      "heading": "Your listing needs changes",
-      "subheading": "Your listing was not approved — here's what to do next.",
-      "body_not_approved": "Your listing <strong>\"{{title}}\"</strong> was not approved.",
-      "body_reason": "<strong>Reason:</strong> {{reason}}",
-      "body_resubmit": "Please review and update your listing, then resubmit for approval.",
-      "cta": "Edit Listing"
+      "notification": "Tu anuncio \"{{title}}\" no fue aprobado. Razón: {{reason}}",
+      "notification_no_reason": "Tu anuncio \"{{title}}\" no fue aprobado.",
+      "subject": "Tu anuncio necesita cambios",
+      "heading": "Tu anuncio necesita cambios",
+      "subheading": "Tu anuncio no fue aprobado — aquí tienes qué hacer a continuación.",
+      "body_not_approved": "Tu anuncio <strong>\"{{title}}\"</strong> no fue aprobado.",
+      "body_reason": "<strong>Razón:</strong> {{reason}}",
+      "body_resubmit": "Por favor, revisa y actualiza tu anuncio, luego vuelve a enviarlo para aprobación.",
+      "cta": "Editar Anuncio"
     },
     "removed": {
-      "notification": "Your listing \"{{title}}\" has been removed by a moderator."
+      "notification": "Tu anuncio \"{{title}}\" ha sido eliminado por un moderador."
     }
   }
 }

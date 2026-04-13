@@ -1,42 +1,42 @@
 {
   "listings": {
     "expired": {
-      "notification": "Your listing \"{{title}}\" has expired. You can renew it to make it active again.",
-      "subject": "Your listing has expired",
-      "heading": "Your listing has expired",
-      "subheading": "Renew your listing to keep it active.",
-      "body_expired": "Your listing <strong>\"{{title}}\"</strong> has expired.",
-      "body_renew": "You can renew it to make it visible to the community again.",
-      "cta": "Renew Listing"
+      "notification": "Je aanbieding \"{{title}}\" is verlopen. Je kunt het vernieuwen om het weer actief te maken.",
+      "subject": "Je aanbieding is verlopen",
+      "heading": "Je aanbieding is verlopen",
+      "subheading": "Vernieuw je aanbieding om het actief te houden.",
+      "body_expired": "Je aanbieding <strong>\"{{title}}\"</strong> is verlopen.",
+      "body_renew": "Je kunt het vernieuwen om het weer zichtbaar te maken voor de gemeenschap.",
+      "cta": "Vernieuw Aanbieding"
     },
     "expiry_reminder": {
-      "notification": "Your listing \"{{title}}\" expires in {{days_text}} (on {{expiry_date}}) — renew it to keep it active.",
-      "subject": "Your listing expires in {{days_text}}",
-      "heading": "Your listing expires in {{days_text}}",
-      "subheading": "Don't miss out — renew your listing to keep it active.",
-      "body_expires": "Your listing <strong>\"{{title}}\"</strong> expires in {{days_text}} (on {{expiry_date}}).",
-      "body_renew": "Renew it now to keep it visible to the community.",
-      "cta": "View Listing",
-      "days_one": "1 day",
-      "days_other": "{{count}} days"
+      "notification": "Je aanbieding \"{{title}}\" verloopt over {{days_text}} (op {{expiry_date}}) — vernieuw het om het actief te houden.",
+      "subject": "Je aanbieding verloopt over {{days_text}}",
+      "heading": "Je aanbieding verloopt over {{days_text}}",
+      "subheading": "Mis het niet — vernieuw je aanbieding om het actief te houden.",
+      "body_expires": "Je aanbieding <strong>\"{{title}}\"</strong> verloopt over {{days_text}} (op {{expiry_date}}).",
+      "body_renew": "Vernieuw het nu om het zichtbaar te houden voor de gemeenschap.",
+      "cta": "Bekijk Aanbieding",
+      "days_one": "1 dag",
+      "days_other": "{{count}} dagen"
     },
     "approved": {
-      "notification": "Your listing \"{{title}}\" has been approved and is now active.",
-      "notification_short": "Your listing \"{{title}}\" has been approved!"
+      "notification": "Je aanbieding \"{{title}}\" is goedgekeurd en is nu actief.",
+      "notification_short": "Je aanbieding \"{{title}}\" is goedgekeurd!"
     },
     "rejected": {
-      "notification": "Your listing \"{{title}}\" was not approved. Reason: {{reason}}",
-      "notification_no_reason": "Your listing \"{{title}}\" was not approved.",
-      "subject": "Your listing needs changes",
-      "heading": "Your listing needs changes",
-      "subheading": "Your listing was not approved — here's what to do next.",
-      "body_not_approved": "Your listing <strong>\"{{title}}\"</strong> was not approved.",
-      "body_reason": "<strong>Reason:</strong> {{reason}}",
-      "body_resubmit": "Please review and update your listing, then resubmit for approval.",
-      "cta": "Edit Listing"
+      "notification": "Je aanbieding \"{{title}}\" is niet goedgekeurd. Reden: {{reason}}",
+      "notification_no_reason": "Je aanbieding \"{{title}}\" is niet goedgekeurd.",
+      "subject": "Je aanbieding heeft wijzigingen nodig",
+      "heading": "Je aanbieding heeft wijzigingen nodig",
+      "subheading": "Je aanbieding is niet goedgekeurd — hier is wat je nu moet doen.",
+      "body_not_approved": "Je aanbieding <strong>\"{{title}}\"</strong> is niet goedgekeurd.",
+      "body_reason": "<strong>Reden:</strong> {{reason}}",
+      "body_resubmit": "Controleer en werk je aanbieding bij, en dien deze opnieuw in voor goedkeuring.",
+      "cta": "Bewerk Aanbieding"
     },
     "removed": {
-      "notification": "Your listing \"{{title}}\" has been removed by a moderator."
+      "notification": "Je aanbieding \"{{title}}\" is verwijderd door een moderator."
     }
   }
 }

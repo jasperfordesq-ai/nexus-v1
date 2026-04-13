@@ -1,42 +1,42 @@
 {
   "listings": {
     "expired": {
-      "notification": "Your listing \"{{title}}\" has expired. You can renew it to make it active again.",
-      "subject": "Your listing has expired",
-      "heading": "Your listing has expired",
-      "subheading": "Renew your listing to keep it active.",
-      "body_expired": "Your listing <strong>\"{{title}}\"</strong> has expired.",
-      "body_renew": "You can renew it to make it visible to the community again.",
-      "cta": "Renew Listing"
+      "notification": "Votre annonce \"{{title}}\" a expiré. Vous pouvez la renouveler pour la rendre à nouveau active.",
+      "subject": "Votre annonce a expiré",
+      "heading": "Votre annonce a expiré",
+      "subheading": "Renouvelez votre annonce pour la garder active.",
+      "body_expired": "Votre annonce <strong>\"{{title}}\"</strong> a expiré.",
+      "body_renew": "Vous pouvez la renouveler pour la rendre à nouveau visible pour la communauté.",
+      "cta": "Renouveler l'annonce"
     },
     "expiry_reminder": {
-      "notification": "Your listing \"{{title}}\" expires in {{days_text}} (on {{expiry_date}}) — renew it to keep it active.",
-      "subject": "Your listing expires in {{days_text}}",
-      "heading": "Your listing expires in {{days_text}}",
-      "subheading": "Don't miss out — renew your listing to keep it active.",
-      "body_expires": "Your listing <strong>\"{{title}}\"</strong> expires in {{days_text}} (on {{expiry_date}}).",
-      "body_renew": "Renew it now to keep it visible to the community.",
-      "cta": "View Listing",
-      "days_one": "1 day",
-      "days_other": "{{count}} days"
+      "notification": "Votre annonce \"{{title}}\" expire dans {{days_text}} (le {{expiry_date}}) — renouvelez-la pour la garder active.",
+      "subject": "Votre annonce expire dans {{days_text}}",
+      "heading": "Votre annonce expire dans {{days_text}}",
+      "subheading": "Ne manquez pas cette occasion — renouvelez votre annonce pour la garder active.",
+      "body_expires": "Votre annonce <strong>\"{{title}}\"</strong> expire dans {{days_text}} (le {{expiry_date}}).",
+      "body_renew": "Renouvelez-la maintenant pour la garder visible pour la communauté.",
+      "cta": "Voir l'annonce",
+      "days_one": "1 jour",
+      "days_other": "{{count}} jours"
     },
     "approved": {
-      "notification": "Your listing \"{{title}}\" has been approved and is now active.",
-      "notification_short": "Your listing \"{{title}}\" has been approved!"
+      "notification": "Votre annonce \"{{title}}\" a été approuvée et est maintenant active.",
+      "notification_short": "Votre annonce \"{{title}}\" a été approuvée !"
     },
     "rejected": {
-      "notification": "Your listing \"{{title}}\" was not approved. Reason: {{reason}}",
-      "notification_no_reason": "Your listing \"{{title}}\" was not approved.",
-      "subject": "Your listing needs changes",
-      "heading": "Your listing needs changes",
-      "subheading": "Your listing was not approved — here's what to do next.",
-      "body_not_approved": "Your listing <strong>\"{{title}}\"</strong> was not approved.",
-      "body_reason": "<strong>Reason:</strong> {{reason}}",
-      "body_resubmit": "Please review and update your listing, then resubmit for approval.",
-      "cta": "Edit Listing"
+      "notification": "Votre annonce \"{{title}}\" n'a pas été approuvée. Raison : {{reason}}",
+      "notification_no_reason": "Votre annonce \"{{title}}\" n'a pas été approuvée.",
+      "subject": "Votre annonce nécessite des modifications",
+      "heading": "Votre annonce nécessite des modifications",
+      "subheading": "Votre annonce n'a pas été approuvée — voici ce que vous devez faire ensuite.",
+      "body_not_approved": "Votre annonce <strong>\"{{title}}\"</strong> n'a pas été approuvée.",
+      "body_reason": "<strong>Raison :</strong> {{reason}}",
+      "body_resubmit": "Veuillez examiner et mettre à jour votre annonce, puis la soumettre à nouveau pour approbation.",
+      "cta": "Modifier l'annonce"
     },
     "removed": {
-      "notification": "Your listing \"{{title}}\" has been removed by a moderator."
+      "notification": "Votre annonce \"{{title}}\" a été supprimée par un modérateur."
     }
   }
 }
