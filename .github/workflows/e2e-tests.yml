@@ -63,6 +63,14 @@ jobs:
           if [ "${{ github.event.inputs.project }}" != "" ] && [ "${{ github.event.inputs.project }}" != "all" ]; then
             PROJECT="${{ github.event.inputs.project }}"
           fi
+          # Skip credential-dependent projects when secrets are not configured.
+          # Without credentials, 200+ tests each time out on login, exhausting
+          # the 30-minute job timeout and making the job fail. When secrets ARE
+          # configured (e.g. in a private fork or workflow_dispatch), tests run normally.
+          if [ "$PROJECT" = "admin" ] && [ -z "$E2E_ADMIN_EMAIL" ]; then
+            echo "::notice::Skipping admin E2E tests — E2E_ADMIN_EMAIL secret not configured in this repo."
+            exit 0
+          fi
           npx playwright test --project=$PROJECT
         continue-on-error: true
 
