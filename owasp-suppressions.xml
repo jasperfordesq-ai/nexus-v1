@@ -79,4 +79,87 @@
     <vulnerabilityName>GHSA-3ppc-4f35-3m26</vulnerabilityName>
   </suppress>
 
+  <!--
+    DEV-ONLY: PHPUnit CVE-2026-24765 — phpunit and sub-packages
+    PHPUnit, php-code-coverage, and php-timer are TEST-ONLY dependencies.
+    They are never installed on the production server (require-dev in
+    composer.json). This CVE cannot be exploited in our environment.
+    CVE-2017-9841 is an old remote code execution in PHPUnit's test
+    result handler — again, never exposed on production.
+  -->
+  <suppress>
+    <notes><![CDATA[
+      DEV-ONLY: All phpunit/* packages are in require-dev and never deployed.
+      CVE-2026-24765 and CVE-2017-9841 cannot be exploited in production.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:composer/phpunit/.*$</packageUrl>
+    <vulnerabilityName>CVE-2026-24765</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      DEV-ONLY: phpunit/php-timer matched to generic phpunit CPE.
+      CVE-2017-9841 (PHPUnit remote code via HTTP) — dev-only, never deployed.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:composer/phpunit/.*$</packageUrl>
+    <vulnerabilityName>CVE-2017-9841</vulnerabilityName>
+  </suppress>
+
+  <!--
+    FALSE POSITIVE: joomla/string matched to Joomla CMS CPE
+    joomla/string is a standalone PHP string utility library.
+    OWASP incorrectly matches it to the full Joomla CMS CPE, triggering
+    dozens of ancient Joomla CMS CVEs (2007-2008) that have nothing to do
+    with this package. The CPE cpe:2.3:a:joomla:joomla:* is wrong.
+  -->
+  <suppress>
+    <notes><![CDATA[
+      FP: joomla/string is a PHP string utility, not the Joomla CMS.
+      All CVE-2008-* and CVE-2007-* matches are against the Joomla CMS CPE.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:composer/joomla/string@.*$</packageUrl>
+    <cve regex="true">CVE-200[78]-.*</cve>
+  </suppress>
+
+  <!--
+    MOBILE-ONLY: undici WebSocket DoS CVEs in mobile/package-lock.json
+    undici is used by the Capacitor mobile app (mobile/ directory).
+    The mobile app compiles to APK/IPA — it is NOT deployed to the web server.
+    Fixed in undici 6.24.0 / 7.24.0. Mobile deps tracked for update separately.
+    These GHSAs correspond to CVE-2026-1526, CVE-2026-1528, CVE-2026-2229.
+  -->
+  <suppress>
+    <notes><![CDATA[
+      MOBILE-ONLY: undici in mobile/package-lock.json (Capacitor APK).
+      Not deployed to the web server. Will update mobile deps separately.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:npm/undici@6\.2[0-3]\..*$</packageUrl>
+    <vulnerabilityName>GHSA-vrm6-8vpv-qv8q</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[MOBILE-ONLY: undici WebSocket DoS — mobile APK only.</notes>]]></notes>
+    <packageUrl regex="true">^pkg:npm/undici@6\.2[0-3]\..*$</packageUrl>
+    <vulnerabilityName>GHSA-f269-vfmq-vjvj</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[MOBILE-ONLY: undici WebSocket DoS — mobile APK only.</notes>]]></notes>
+    <packageUrl regex="true">^pkg:npm/undici@6\.2[0-3]\..*$</packageUrl>
+    <vulnerabilityName>GHSA-v9p9-hfj2-hcw8</vulnerabilityName>
+  </suppress>
+
+  <!--
+    FALSE POSITIVE: certifi in vendor/mockery/mockery/docs/requirements.txt
+    This is a Python requirements.txt inside the DOCUMENTATION folder of the
+    Mockery PHP testing library (require-dev). We never install Python in this
+    project and this file is never executed. certifi CVE-2024-39689 relates to
+    a compromised root CA — entirely irrelevant to a PHP/Node project.
+  -->
+  <suppress>
+    <notes><![CDATA[
+      FP: certifi is in mockery docs/requirements.txt — a Python file inside
+      a PHP dev-only test library. Never installed or run. Not a web risk.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:pypi/certifi@.*$</packageUrl>
+    <vulnerabilityName>CVE-2024-39689</vulnerabilityName>
+  </suppress>
+
 </suppressions>

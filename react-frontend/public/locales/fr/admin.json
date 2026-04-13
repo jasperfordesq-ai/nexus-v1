@@ -2872,7 +2872,8 @@
     "subscribers_title": "Subscribers",
     "templates_desc": "Manage and configure templates settings",
     "templates_title": "Templates",
-    "failed_to_save_segment": "Failed to save segment. Please try again."
+    "failed_to_save_segment": "Failed to save segment. Please try again.",
+    "system_health": "System Health"
   },
   "no_data": "Aucune donnée disponible",
   "not_found": {
@@ -3791,7 +3792,30 @@
     "clear_logs": "Clear Logs",
     "clear_old_logs": "Clear Old Logs",
     "clear_old_logs_warning": "Delete all logs executed before the selected date. This action cannot be undone.",
-    "loading_logs": "Loading logs..."
+    "loading_logs": "Loading logs...",
+    "advanced_custom_settings": "Advanced / Custom Settings",
+    "ini_settings": "INI Settings",
+    "lang_ar": "Arabic",
+    "lang_de": "German",
+    "lang_en": "English",
+    "lang_es": "Spanish",
+    "lang_fr": "French",
+    "lang_ga": "Irish",
+    "lang_it": "Italian",
+    "lang_ja": "Japanese",
+    "lang_nl": "Dutch",
+    "lang_pl": "Polish",
+    "lang_pt": "Portuguese",
+    "log_files_desc": "Browse and view server log files",
+    "log_files_title": "Log Files",
+    "no_log_files": "No log files found",
+    "overall_status": "Overall Status",
+    "php_extensions": "PHP Extensions",
+    "php_version": "PHP Version",
+    "services": "Services",
+    "system_requirements_desc": "Check server configuration and dependencies",
+    "system_requirements_title": "System Requirements",
+    "writable_directories": "Writable Directories"
   },
   "timebanking": {
     "a_reason_is_required_for_balance_adjustm": "A Reason is Required for Balance Adjustm",
