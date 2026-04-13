@@ -983,7 +983,7 @@ class AdminEnterpriseController extends BaseApiController
 
         $validTypes = ['access', 'erasure', 'portability', 'rectification', 'restriction', 'objection'];
         if (!in_array($type, $validTypes, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid request type. Must be one of: ' . implode(', ', $validTypes), 'type', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.invalid_request_type', ['types' => implode(', ', $validTypes)]), 'type', 422);
         }
 
         try {
@@ -1690,7 +1690,7 @@ class AdminEnterpriseController extends BaseApiController
 
         // Security: no path traversal
         if (str_contains($filename, '/') || str_contains($filename, '\\') || str_contains($filename, '..')) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid filename', 'filename', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.invalid_log_filename'), 'filename', 400);
         }
         if (!str_ends_with($filename, '.log')) {
             return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.log_file_only_allowed'), 'filename', 400);
@@ -1734,7 +1734,7 @@ class AdminEnterpriseController extends BaseApiController
                 'filtered_count' => count($filtered),
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('READ_FAILED', 'Failed to read log file', null, 500);
+            return $this->respondWithError('READ_FAILED', __('api_controllers_1.admin_enterprise.log_file_read_failed'), null, 500);
         }
     }
 
@@ -1744,7 +1744,7 @@ class AdminEnterpriseController extends BaseApiController
         $this->requireAdmin();
 
         if (str_contains($filename, '/') || str_contains($filename, '\\') || str_contains($filename, '..')) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid filename', 'filename', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.invalid_log_filename'), 'filename', 400);
         }
         if (!str_ends_with($filename, '.log')) {
             return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.log_file_only_allowed'), 'filename', 400);
@@ -1887,11 +1887,11 @@ class AdminEnterpriseController extends BaseApiController
         $type = trim($input['type'] ?? 'feature');
 
         if (!$key) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Key is required', 'key', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.feature_key_required'), 'key', 422);
         }
 
         if (!in_array($type, ['feature', 'module'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Type must be "feature" or "module"', 'type', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.feature_type_invalid'), 'type', 422);
         }
 
         try {
@@ -1916,7 +1916,7 @@ class AdminEnterpriseController extends BaseApiController
 
             return $this->respondWithData(['key' => $key, 'value' => $value, 'type' => $type, 'updated' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update feature flag', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api_controllers_1.admin_enterprise.feature_flag_update_failed'), null, 500);
         }
     }
 

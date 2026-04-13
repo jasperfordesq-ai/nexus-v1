@@ -36,7 +36,13 @@
         "consent_type_delete_failed": "Failed to delete consent type",
         "breach_record_not_found": "Breach record not found",
         "breach_record_fetch_failed": "Failed to fetch breach record",
-        "breach_record_update_failed": "Failed to update breach record"
+        "breach_record_update_failed": "Failed to update breach record",
+        "invalid_request_type": "Invalid request type. Must be one of: :types",
+        "invalid_log_filename": "Invalid filename",
+        "log_file_read_failed": "Failed to read log file",
+        "feature_key_required": "Key is required",
+        "feature_type_invalid": "Type must be \"feature\" or \"module\"",
+        "feature_flag_update_failed": "Failed to update feature flag"
     },
     "admin_federation": {
         "partnership_request_failed": "Failed to send partnership request",
@@ -50,7 +56,14 @@
         "api_key_create_failed": "Failed to create API key",
         "api_key_not_found": "API key not found",
         "api_key_already_revoked": "API key is already revoked",
-        "api_key_revoke_failed": "Failed to revoke API key"
+        "api_key_revoke_failed": "Failed to revoke API key",
+        "max_topics_exceeded": "Maximum 10 topics allowed.",
+        "invalid_export_type": "Invalid export type. Allowed: :types",
+        "federation_user_settings_not_found": "Federation user settings table not found",
+        "federation_partnerships_not_found": "Federation partnerships table not found",
+        "federation_transactions_not_found": "Federation transactions table not found",
+        "federation_audit_log_not_found": "Federation audit log table not found",
+        "export_failed": "Failed to export data"
     },
     "admin_feed": {
         "item_hidden": "Item hidden",
