@@ -89,7 +89,7 @@ class LegalAcceptanceController extends BaseApiController
         if ($pending->isEmpty()) {
             return $this->respondWithData([
                 'accepted' => [],
-                'message'  => 'No documents require acceptance',
+                'message'  => __('api.legal.no_documents_require_acceptance'),
             ]);
         }
 
@@ -164,7 +164,7 @@ class LegalAcceptanceController extends BaseApiController
 
         return $this->respondWithData([
             'accepted' => $accepted,
-            'message'  => 'All documents accepted',
+            'message'  => __('api.legal.all_documents_accepted'),
         ]);
     }
 

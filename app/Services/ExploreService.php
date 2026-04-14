@@ -1635,7 +1635,9 @@ class ExploreService
                     'score' => 40 + min(20, (int) $listing['view_count'] / 5), 'created_at' => $listing['created_at'],
                 ];
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            \Log::warning('ExploreService: failed to fetch popular listings for mixed feed', ['tenant_id' => $tenantId, 'error' => $e->getMessage()]);
+        }
 
         try {
             foreach ($this->getUpcomingEvents($tenantId) as $event) {
@@ -1646,7 +1648,9 @@ class ExploreService
                     'score' => 45, 'created_at' => $event['start_at'],
                 ];
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            \Log::warning('ExploreService: failed to fetch upcoming events for mixed feed', ['tenant_id' => $tenantId, 'error' => $e->getMessage()]);
+        }
 
         usort($candidates, fn($a, $b) => $b['score'] <=> $a['score']);
         $diversified = $this->applyContentDiversity($candidates, 3);

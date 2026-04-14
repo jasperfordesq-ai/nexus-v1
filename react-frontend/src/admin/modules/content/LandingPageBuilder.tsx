@@ -751,7 +751,7 @@ function SectionCard({
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+        <div role="presentation" className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
           <Switch
             size="sm"
             isSelected={section.enabled}

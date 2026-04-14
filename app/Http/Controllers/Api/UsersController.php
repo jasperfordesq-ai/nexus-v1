@@ -367,7 +367,7 @@ class UsersController extends BaseApiController
         }
 
         return $this->respondWithData([
-            'message'           => 'Theme preferences updated',
+            'message'           => __('api.users.theme_updated'),
             'theme_preferences' => $preferences,
         ]);
     }
@@ -408,7 +408,7 @@ class UsersController extends BaseApiController
         }
 
         return $this->respondWithData([
-            'message'  => 'Language preference updated',
+            'message'  => __('api.users.language_updated'),
             'language' => $language,
         ]);
     }
@@ -636,7 +636,7 @@ class UsersController extends BaseApiController
                 'request_id' => $result['id'],
                 'type'       => $type,
                 'status'     => 'pending',
-                'message'    => 'Your request has been submitted and will be processed within 30 days.',
+                'message'    => __('api.users.gdpr_request_submitted'),
             ], null, 201);
         } catch (\RuntimeException $e) {
             return $this->respondWithError('DUPLICATE_REQUEST', __('api.user_duplicate_request'), null, 409);

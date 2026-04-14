@@ -82,13 +82,17 @@ export function CommunityDeliveryCard({
   const [estimatedMinutes, setEstimatedMinutes] = useState('');
   const [notes, setNotes] = useState('');
 
+  interface DeliveryOffersResponse {
+    data?: DeliveryOffer[];
+  }
   const loadOffers = useCallback(async () => {
     if (!orderId) return;
     setLoading(true);
     try {
-      const response = await api.get(`/v2/marketplace/orders/${orderId}/delivery-offers`);
-      const raw = response.data as any;
-      setOffers(raw.data ?? raw ?? []);
+      const response = await api.get<DeliveryOffersResponse | DeliveryOffer[]>(`/v2/marketplace/orders/${orderId}/delivery-offers`);
+      const raw = response.data;
+      const list = raw && !Array.isArray(raw) && 'data' in raw ? raw.data : raw;
+      setOffers(Array.isArray(list) ? list : []);
     } catch (err) {
       logError('Failed to load delivery offers', err);
     } finally {

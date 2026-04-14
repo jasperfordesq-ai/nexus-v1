@@ -330,8 +330,7 @@ export default function OnboardingFunnel() {
                       backgroundColor: 'hsl(var(--heroui-content1))',
                       color: 'hsl(var(--heroui-foreground))',
                     }}
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    formatter={(value: any) => [
+                    formatter={(value: number) => [
                       Number(value).toLocaleString(),
                       t('crm.registrations_label'),
                     ]}

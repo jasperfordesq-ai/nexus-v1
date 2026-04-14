@@ -584,7 +584,7 @@ class GamificationService
                     \App\Services\LeaderboardService::invalidate($tenantId);
                 }
             } catch (\Throwable $e) {
-                // Non-fatal — TTL will eventually evict stale entries.
+                \Log::warning('GamificationService: leaderboard cache invalidation failed', ['error' => $e->getMessage()]);
             }
 
             // Broadcast XP gained event
@@ -959,7 +959,7 @@ class GamificationService
                 }
             }
         } catch (\Throwable $e) {
-            // post_likes table may not exist
+            \Log::warning('GamificationService: checkLikesBadges failed', ['error' => $e->getMessage()]);
         }
     }
 
@@ -1013,7 +1013,7 @@ class GamificationService
                 }
             }
         } catch (\Throwable $e) {
-            // vol_organisations table may not exist
+            \Log::warning('GamificationService: checkVolOrgBadges failed', ['error' => $e->getMessage()]);
         }
     }
 
@@ -1301,26 +1301,26 @@ class GamificationService
             'reciprocity' => 0, 'community_champion' => 0,
         ];
 
-        try { $stats['vol'] = (int) VolLog::where('user_id', $userId)->where('status', 'verified')->sum('hours'); } catch (\Throwable $e) {}
-        try { $stats['offer'] = (int) Listing::where('user_id', $userId)->where('type', 'offer')->count(); } catch (\Throwable $e) {}
-        try { $stats['request'] = (int) Listing::where('user_id', $userId)->where('type', 'request')->count(); } catch (\Throwable $e) {}
-        try { $stats['earn'] = (int) Transaction::where('receiver_id', $userId)->where('status', 'completed')->sum('amount'); } catch (\Throwable $e) {}
-        try { $stats['spend'] = (int) Transaction::where('sender_id', $userId)->where('deleted_for_sender', false)->sum('amount'); } catch (\Throwable $e) {}
-        try { $stats['transaction'] = (int) Transaction::where(fn ($q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))->count(); } catch (\Throwable $e) {}
-        try { $stats['diversity'] = (int) Transaction::where('sender_id', $userId)->distinct('receiver_id')->count('receiver_id'); } catch (\Throwable $e) {}
-        try { $stats['connection'] = (int) Connection::where('status', 'accepted')->where(fn ($q) => $q->where('requester_id', $userId)->orWhere('receiver_id', $userId))->count(); } catch (\Throwable $e) {}
-        try { $stats['message'] = (int) Message::where('sender_id', $userId)->count(); } catch (\Throwable $e) {}
-        try { $stats['review_given'] = (int) Review::where('reviewer_id', $userId)->count(); } catch (\Throwable $e) {}
-        try { $stats['5star'] = (int) Review::where('receiver_id', $userId)->where('rating', 5)->count(); } catch (\Throwable $e) {}
-        try { $stats['event_attend'] = (int) EventRsvp::where('user_id', $userId)->where('status', 'going')->count(); } catch (\Throwable $e) {}
-        try { $stats['event_host'] = (int) Event::where('user_id', $userId)->count(); } catch (\Throwable $e) {}
-        try { $stats['group_join'] = (int) GroupMember::where('user_id', $userId)->where('status', 'active')->count(); } catch (\Throwable $e) {}
-        try { $stats['post'] = (int) FeedPost::where('user_id', $userId)->count(); } catch (\Throwable $e) {}
-        try { $stats['likes_received'] = (int) DB::table('post_likes')->join('feed_posts', 'post_likes.post_id', '=', 'feed_posts.id')->where('feed_posts.user_id', $userId)->count(); } catch (\Throwable $e) {}
-        try { $stats['profile'] = self::getProfileCompletion($userId); } catch (\Throwable $e) {}
-        try { $stats['membership'] = self::getDaysSinceJoined($userId); } catch (\Throwable $e) {}
-        try { $stats['streak'] = (int) (UserStreak::where('user_id', $userId)->where('streak_type', 'login')->value('current_streak') ?? 0); } catch (\Throwable $e) {}
-        try { $stats['level'] = (int) (User::query()->where('id', $userId)->value('level') ?? 1); } catch (\Throwable $e) {}
+        try { $stats['vol'] = (int) VolLog::where('user_id', $userId)->where('status', 'verified')->sum('hours'); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[vol] failed', ['error' => $e->getMessage()]); }
+        try { $stats['offer'] = (int) Listing::where('user_id', $userId)->where('type', 'offer')->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[offer] failed', ['error' => $e->getMessage()]); }
+        try { $stats['request'] = (int) Listing::where('user_id', $userId)->where('type', 'request')->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[request] failed', ['error' => $e->getMessage()]); }
+        try { $stats['earn'] = (int) Transaction::where('receiver_id', $userId)->where('status', 'completed')->sum('amount'); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[earn] failed', ['error' => $e->getMessage()]); }
+        try { $stats['spend'] = (int) Transaction::where('sender_id', $userId)->where('deleted_for_sender', false)->sum('amount'); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[spend] failed', ['error' => $e->getMessage()]); }
+        try { $stats['transaction'] = (int) Transaction::where(fn ($q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[transaction] failed', ['error' => $e->getMessage()]); }
+        try { $stats['diversity'] = (int) Transaction::where('sender_id', $userId)->distinct('receiver_id')->count('receiver_id'); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[diversity] failed', ['error' => $e->getMessage()]); }
+        try { $stats['connection'] = (int) Connection::where('status', 'accepted')->where(fn ($q) => $q->where('requester_id', $userId)->orWhere('receiver_id', $userId))->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[connection] failed', ['error' => $e->getMessage()]); }
+        try { $stats['message'] = (int) Message::where('sender_id', $userId)->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[message] failed', ['error' => $e->getMessage()]); }
+        try { $stats['review_given'] = (int) Review::where('reviewer_id', $userId)->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[review_given] failed', ['error' => $e->getMessage()]); }
+        try { $stats['5star'] = (int) Review::where('receiver_id', $userId)->where('rating', 5)->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[5star] failed', ['error' => $e->getMessage()]); }
+        try { $stats['event_attend'] = (int) EventRsvp::where('user_id', $userId)->where('status', 'going')->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[event_attend] failed', ['error' => $e->getMessage()]); }
+        try { $stats['event_host'] = (int) Event::where('user_id', $userId)->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[event_host] failed', ['error' => $e->getMessage()]); }
+        try { $stats['group_join'] = (int) GroupMember::where('user_id', $userId)->where('status', 'active')->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[group_join] failed', ['error' => $e->getMessage()]); }
+        try { $stats['post'] = (int) FeedPost::where('user_id', $userId)->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[post] failed', ['error' => $e->getMessage()]); }
+        try { $stats['likes_received'] = (int) DB::table('post_likes')->join('feed_posts', 'post_likes.post_id', '=', 'feed_posts.id')->where('feed_posts.user_id', $userId)->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[likes_received] failed', ['error' => $e->getMessage()]); }
+        try { $stats['profile'] = self::getProfileCompletion($userId); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[profile] failed', ['error' => $e->getMessage()]); }
+        try { $stats['membership'] = self::getDaysSinceJoined($userId); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[membership] failed', ['error' => $e->getMessage()]); }
+        try { $stats['streak'] = (int) (UserStreak::where('user_id', $userId)->where('streak_type', 'login')->value('current_streak') ?? 0); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[streak] failed', ['error' => $e->getMessage()]); }
+        try { $stats['level'] = (int) (User::query()->where('id', $userId)->value('level') ?? 1); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[level] failed', ['error' => $e->getMessage()]); }
 
         // Quality badge stats
         try {
@@ -1328,7 +1328,9 @@ class GamificationService
                 $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
             })->where('status', 'completed')->count();
             $stats['reliability'] = $completed; // Simplified — actual check uses cancellation rate
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            \Log::warning('GamificationService: stats[reliability] failed', ['error' => $e->getMessage()]);
+        }
         try {
             $stats['bridge_builder'] = (int) DB::table('transactions')
                 ->join('listings', 'transactions.listing_id', '=', 'listings.id')
@@ -1336,8 +1338,10 @@ class GamificationService
                     $q->where('transactions.sender_id', $userId)->orWhere('transactions.receiver_id', $userId);
                 })->where('transactions.status', 'completed')
                 ->distinct()->count('listings.category_id');
-        } catch (\Throwable $e) {}
-        try { $stats['reciprocity'] = $stats['transaction']; } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            \Log::warning('GamificationService: stats[bridge_builder] failed', ['error' => $e->getMessage()]);
+        }
+        try { $stats['reciprocity'] = $stats['transaction']; } catch (\Throwable $e) { \Log::warning('GamificationService: stats[reciprocity] failed', ['error' => $e->getMessage()]); }
 
         return $stats;
     }

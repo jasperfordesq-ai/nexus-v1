@@ -249,7 +249,7 @@ class GroupService
             $group->save();
 
             // Log group creation
-            try { GroupAuditService::log(GroupAuditService::ACTION_GROUP_CREATED, $group->id, $userId, ['name' => $group->name]); } catch (\Throwable $e) {}
+            try { GroupAuditService::log(GroupAuditService::ACTION_GROUP_CREATED, $group->id, $userId, ['name' => $group->name]); } catch (\Throwable $e) { \Log::warning('GroupService: failed to log group creation audit', ['group_id' => $group->id, 'error' => $e->getMessage()]); }
 
             $fresh = $group->fresh(['creator']);
 
@@ -274,7 +274,7 @@ class GroupService
         /** @var Group|null $group */
         $group = Group::query()->find($groupId);
         if (!$group) {
-            return ['success' => false, 'error' => 'Group not found'];
+            return ['success' => false, 'error' => __('api.group_not_found')];
         }
 
         $existing = DB::table('group_members')
@@ -285,9 +285,9 @@ class GroupService
         if ($existing) {
             // Prevent banned users from rejoining
             if (($existing->status ?? '') === 'banned') {
-                return ['success' => false, 'error' => 'You have been banned from this group'];
+                return ['success' => false, 'error' => __('api.group_banned')];
             }
-            return ['success' => false, 'error' => 'Already a member or request pending'];
+            return ['success' => false, 'error' => __('api.group_already_member')];
         }
 
         $status = $group->visibility === 'private' ? 'pending' : 'active';
@@ -301,10 +301,10 @@ class GroupService
             $group->increment('cached_member_count');
 
             // Send welcome message + fire webhook + log audit
-            try { GroupWelcomeService::sendWelcome($groupId, $userId); } catch (\Throwable $e) {}
-            try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_MEMBER_JOINED, ['user_id' => $userId]); } catch (\Throwable $e) {}
-            try { GroupAuditService::log(GroupAuditService::ACTION_MEMBER_JOINED, $groupId, $userId); } catch (\Throwable $e) {}
-            try { GroupChallengeService::incrementProgress($groupId, 'members'); } catch (\Throwable $e) {}
+            try { GroupWelcomeService::sendWelcome($groupId, $userId); } catch (\Throwable $e) { \Log::warning('GroupService: failed to send welcome message on join', ['group_id' => $groupId, 'user_id' => $userId, 'error' => $e->getMessage()]); }
+            try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_MEMBER_JOINED, ['user_id' => $userId]); } catch (\Throwable $e) { \Log::warning('GroupService: failed to fire member_joined webhook', ['group_id' => $groupId, 'user_id' => $userId, 'error' => $e->getMessage()]); }
+            try { GroupAuditService::log(GroupAuditService::ACTION_MEMBER_JOINED, $groupId, $userId); } catch (\Throwable $e) { \Log::warning('GroupService: failed to log member_joined audit', ['group_id' => $groupId, 'user_id' => $userId, 'error' => $e->getMessage()]); }
+            try { GroupChallengeService::incrementProgress($groupId, 'members'); } catch (\Throwable $e) { \Log::warning('GroupService: failed to increment challenge progress for members', ['group_id' => $groupId, 'error' => $e->getMessage()]); }
 
             try {
                 GroupMemberJoined::dispatch($groupId, $userId, (int) TenantContext::getId());
@@ -328,7 +328,7 @@ class GroupService
         /** @var Group|null $group */
         $group = Group::query()->find($groupId);
         if (!$group) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_not_found')];
             return false;
         }
 
@@ -336,8 +336,8 @@ class GroupService
 
         if ($detached > 0) {
             $group->decrement('cached_member_count');
-            try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_MEMBER_LEFT, ['user_id' => $userId]); } catch (\Throwable $e) {}
-            try { GroupAuditService::log(GroupAuditService::ACTION_MEMBER_LEFT, $groupId, $userId); } catch (\Throwable $e) {}
+            try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_MEMBER_LEFT, ['user_id' => $userId]); } catch (\Throwable $e) { \Log::warning('GroupService: failed to fire member_left webhook', ['group_id' => $groupId, 'user_id' => $userId, 'error' => $e->getMessage()]); }
+            try { GroupAuditService::log(GroupAuditService::ACTION_MEMBER_LEFT, $groupId, $userId); } catch (\Throwable $e) { \Log::warning('GroupService: failed to log member_left audit', ['group_id' => $groupId, 'user_id' => $userId, 'error' => $e->getMessage()]); }
         }
 
         return $detached > 0;
@@ -372,14 +372,14 @@ class GroupService
 
         // name is required and max 255
         if ($name === null || $name === '') {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Name is required', 'field' => 'name'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.name_required'), 'field' => 'name'];
         } elseif (mb_strlen($name) > 255) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Name must not exceed 255 characters', 'field' => 'name'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_name_max_255'), 'field' => 'name'];
         }
 
         // visibility must be public or private (if provided)
         if ($visibility !== null && !in_array($visibility, ['public', 'private'], true)) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Visibility must be public or private', 'field' => 'visibility'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_visibility_invalid'), 'field' => 'visibility'];
         }
 
         return empty(self::$errors);
@@ -400,12 +400,12 @@ class GroupService
         $group = Group::query()->find($id);
 
         if (! $group) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_not_found')];
             return false;
         }
 
         if (! self::canModify($id, $userId)) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to edit this group'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_edit_forbidden')];
             return false;
         }
 
@@ -435,13 +435,13 @@ class GroupService
         $group = Group::query()->find($id);
 
         if (! $group) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_not_found')];
             return false;
         }
 
         // Only owner or platform admin can delete
         if ((int) $group->owner_id !== $userId && ! self::isPlatformAdmin($userId)) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only the group owner can delete this group'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_delete_forbidden')];
             return false;
         }
 
@@ -574,12 +574,12 @@ class GroupService
         self::$errors = [];
 
         if (! in_array($role, ['admin', 'member'])) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Invalid role', 'field' => 'role'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.invalid_role'), 'field' => 'role'];
             return false;
         }
 
         if (! self::canModify($groupId, $actingUserId)) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage members'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_manage_members_forbidden')];
             return false;
         }
 
@@ -590,7 +590,7 @@ class GroupService
             ->first();
 
         if (! $membership || $membership->status !== 'active') {
-            self::$errors[] = ['code' => 'NOT_MEMBER', 'message' => 'User is not a member of this group'];
+            self::$errors[] = ['code' => 'NOT_MEMBER', 'message' => __('api.group_user_not_member')];
             return false;
         }
 
@@ -598,11 +598,11 @@ class GroupService
         /** @var Group|null $group */
         $group = Group::query()->find($groupId);
         if (!$group) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_not_found')];
             return false;
         }
         if ((int) $group->owner_id === $targetUserId) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Cannot change the owner\'s role'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_cannot_change_owner_role')];
             return false;
         }
 
@@ -622,7 +622,7 @@ class GroupService
         self::$errors = [];
 
         if (! self::canModify($groupId, $actingUserId)) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to remove members'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_remove_members_forbidden')];
             return false;
         }
 
@@ -630,17 +630,17 @@ class GroupService
         /** @var Group|null $group */
         $group = Group::query()->find($groupId);
         if (!$group) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_not_found')];
             return false;
         }
         if ((int) $group->owner_id === $targetUserId) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Cannot remove the group owner'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_cannot_remove_owner')];
             return false;
         }
 
         // Can't remove yourself this way (use leave instead)
         if ($targetUserId === $actingUserId) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Use leave endpoint to remove yourself'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_use_leave_endpoint')];
             return false;
         }
 
@@ -665,7 +665,7 @@ class GroupService
         self::$errors = [];
 
         if (! self::canModify($groupId, $adminUserId)) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to view join requests'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_view_join_requests_forbidden')];
             return null;
         }
 
@@ -691,12 +691,12 @@ class GroupService
         self::$errors = [];
 
         if (! in_array($action, ['accept', 'reject'])) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be accept or reject', 'field' => 'action'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_action_accept_or_reject'), 'field' => 'action'];
             return false;
         }
 
         if (! self::canModify($groupId, $adminUserId)) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to handle join requests'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_handle_join_requests_forbidden')];
             return false;
         }
 
@@ -707,7 +707,7 @@ class GroupService
             ->first();
 
         if (! $membership || $membership->status !== 'pending') {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'No pending request found for this user'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.pending_request_not_found')];
             return false;
         }
 
@@ -724,10 +724,10 @@ class GroupService
             }
 
             // Send welcome message + fire webhook + log audit
-            try { GroupWelcomeService::sendWelcome($groupId, $requesterId); } catch (\Throwable $e) {}
-            try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_MEMBER_JOINED, ['user_id' => $requesterId]); } catch (\Throwable $e) {}
-            try { GroupAuditService::log(GroupAuditService::ACTION_MEMBER_JOINED, $groupId, $requesterId, ['approved_by' => $adminUserId]); } catch (\Throwable $e) {}
-            try { GroupChallengeService::incrementProgress($groupId, 'members'); } catch (\Throwable $e) {}
+            try { GroupWelcomeService::sendWelcome($groupId, $requesterId); } catch (\Throwable $e) { \Log::warning('GroupService: failed to send welcome message after join request approval', ['group_id' => $groupId, 'requester_id' => $requesterId, 'error' => $e->getMessage()]); }
+            try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_MEMBER_JOINED, ['user_id' => $requesterId]); } catch (\Throwable $e) { \Log::warning('GroupService: failed to fire member_joined webhook after join request approval', ['group_id' => $groupId, 'requester_id' => $requesterId, 'error' => $e->getMessage()]); }
+            try { GroupAuditService::log(GroupAuditService::ACTION_MEMBER_JOINED, $groupId, $requesterId, ['approved_by' => $adminUserId]); } catch (\Throwable $e) { \Log::warning('GroupService: failed to log member_joined audit after join request approval', ['group_id' => $groupId, 'requester_id' => $requesterId, 'error' => $e->getMessage()]); }
+            try { GroupChallengeService::incrementProgress($groupId, 'members'); } catch (\Throwable $e) { \Log::warning('GroupService: failed to increment challenge progress for members after join request approval', ['group_id' => $groupId, 'error' => $e->getMessage()]); }
         } else {
             // Reject — remove the pending row
             DB::table('group_members')
@@ -760,7 +760,7 @@ class GroupService
             ->exists();
 
         if (! $isMember) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to view discussions'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_member_required_view_discussions')];
             return null;
         }
 
@@ -828,7 +828,7 @@ class GroupService
             ->exists();
 
         if (! $isMember) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to create discussions'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_member_required_create_discussions')];
             return null;
         }
 
@@ -836,12 +836,12 @@ class GroupService
         $content = trim($data['content'] ?? '');
 
         if (empty($title)) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title is required', 'field' => 'title'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.title_required'), 'field' => 'title'];
             return null;
         }
 
         if (empty($content)) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Content is required', 'field' => 'content'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_content_required'), 'field' => 'content'];
             return null;
         }
 
@@ -866,10 +866,10 @@ class GroupService
             $user = $discussion->user;
 
             // Fire integrations
-            try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_DISCUSSION_CREATED, ['discussion_id' => $discussion->id, 'title' => $title]); } catch (\Throwable $e) {}
-            try { GroupAuditService::log(GroupAuditService::ACTION_DISCUSSION_CREATED, $groupId, $userId, ['discussion_id' => $discussion->id]); } catch (\Throwable $e) {}
-            try { GroupChallengeService::incrementProgress($groupId, 'discussions'); } catch (\Throwable $e) {}
-            try { GroupMentionService::notifyMentioned($groupId, $userId, $content, 'discussion', $discussion->id); } catch (\Throwable $e) {}
+            try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_DISCUSSION_CREATED, ['discussion_id' => $discussion->id, 'title' => $title]); } catch (\Throwable $e) { \Log::warning('GroupService: failed to fire discussion_created webhook', ['group_id' => $groupId, 'discussion_id' => $discussion->id, 'error' => $e->getMessage()]); }
+            try { GroupAuditService::log(GroupAuditService::ACTION_DISCUSSION_CREATED, $groupId, $userId, ['discussion_id' => $discussion->id]); } catch (\Throwable $e) { \Log::warning('GroupService: failed to log discussion_created audit', ['group_id' => $groupId, 'discussion_id' => $discussion->id, 'error' => $e->getMessage()]); }
+            try { GroupChallengeService::incrementProgress($groupId, 'discussions'); } catch (\Throwable $e) { \Log::warning('GroupService: failed to increment challenge progress for discussions', ['group_id' => $groupId, 'error' => $e->getMessage()]); }
+            try { GroupMentionService::notifyMentioned($groupId, $userId, $content, 'discussion', $discussion->id); } catch (\Throwable $e) { \Log::warning('GroupService: failed to notify mentioned users in discussion', ['group_id' => $groupId, 'discussion_id' => $discussion->id, 'error' => $e->getMessage()]); }
 
             return [
                 'id'            => $discussion->id,
@@ -903,7 +903,7 @@ class GroupService
             ->exists();
 
         if (! $isMember) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to view discussions'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_member_required_view_discussions')];
             return null;
         }
 
@@ -914,7 +914,7 @@ class GroupService
             ->find($discussionId);
 
         if (! $discussion) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Discussion not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_discussion_not_found')];
             return null;
         }
 
@@ -1007,7 +1007,7 @@ class GroupService
             ->exists();
 
         if (! $isMember) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to post'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_member_required_post')];
             return null;
         }
 
@@ -1017,13 +1017,13 @@ class GroupService
             ->find($discussionId);
 
         if (! $discussion) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Discussion not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_discussion_not_found')];
             return null;
         }
 
         $content = trim($data['content'] ?? '');
         if (empty($content)) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Content is required', 'field' => 'content'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_content_required'), 'field' => 'content'];
             return null;
         }
 
@@ -1037,10 +1037,10 @@ class GroupService
         ]);
 
         // Fire integrations
-        try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_POST_CREATED, ['post_id' => $post->id, 'discussion_id' => $discussionId]); } catch (\Throwable $e) {}
-        try { GroupAuditService::log(GroupAuditService::ACTION_POST_CREATED, $groupId, $userId, ['post_id' => $post->id]); } catch (\Throwable $e) {}
-        try { GroupChallengeService::incrementProgress($groupId, 'posts'); } catch (\Throwable $e) {}
-        try { GroupMentionService::notifyMentioned($groupId, $userId, $content, 'post', $post->id); } catch (\Throwable $e) {}
+        try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_POST_CREATED, ['post_id' => $post->id, 'discussion_id' => $discussionId]); } catch (\Throwable $e) { \Log::warning('GroupService: failed to fire post_created webhook', ['group_id' => $groupId, 'post_id' => $post->id, 'error' => $e->getMessage()]); }
+        try { GroupAuditService::log(GroupAuditService::ACTION_POST_CREATED, $groupId, $userId, ['post_id' => $post->id]); } catch (\Throwable $e) { \Log::warning('GroupService: failed to log post_created audit', ['group_id' => $groupId, 'post_id' => $post->id, 'error' => $e->getMessage()]); }
+        try { GroupChallengeService::incrementProgress($groupId, 'posts'); } catch (\Throwable $e) { \Log::warning('GroupService: failed to increment challenge progress for posts', ['group_id' => $groupId, 'error' => $e->getMessage()]); }
+        try { GroupMentionService::notifyMentioned($groupId, $userId, $content, 'post', $post->id); } catch (\Throwable $e) { \Log::warning('GroupService: failed to notify mentioned users in post', ['group_id' => $groupId, 'post_id' => $post->id, 'error' => $e->getMessage()]); }
 
         $post->load('user:id,first_name,last_name,avatar_url');
         $user = $post->user;
@@ -1070,7 +1070,7 @@ class GroupService
         self::$errors = [];
 
         if (! self::canModify($groupId, $userId)) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to modify this group'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_modify_forbidden')];
             return false;
         }
 

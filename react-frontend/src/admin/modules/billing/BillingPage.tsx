@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Button, Chip, Spinner, Divider } from '@heroui/react';
 import { CreditCard, ArrowRight, Receipt, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { billingApi, type SubscriptionDetails } from '../../api/billingApi';
@@ -35,8 +36,7 @@ function statusColor(status: string): 'success' | 'warning' | 'danger' | 'defaul
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function statusLabel(status: string, t: any): string {
+function statusLabel(status: string, t: TFunction): string {
   switch (status) {
     case 'active':
       return t('billing.status_active', 'Active');

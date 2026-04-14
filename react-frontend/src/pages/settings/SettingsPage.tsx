@@ -109,11 +109,14 @@ export function SettingsPage() {
   const [notificationError, setNotificationError] = useState<string | null>(null);
 
   // Identity verification status — lock name fields if verified
+  interface IdentityStatusResponse {
+    has_id_verified_badge: boolean;
+  }
   const [isIdVerified, setIsIdVerified] = useState(false);
   useEffect(() => {
     if (!user?.id) return;
     let cancelled = false;
-    api.get('/v2/identity/status').then((res: any) => {
+    api.get<IdentityStatusResponse>('/v2/identity/status').then((res) => {
       if (!cancelled && res?.data?.has_id_verified_badge) setIsIdVerified(true);
     }).catch(() => {});
     return () => { cancelled = true; };
@@ -300,7 +303,7 @@ export function SettingsPage() {
         first_name: user.first_name || '',
         last_name: user.last_name || '',
         name: user.name || '',
-        date_of_birth: (user as any).date_of_birth || '',
+        date_of_birth: user.date_of_birth || '',
         phone: user.phone || '',
         tagline: user.tagline || '',
         bio: user.bio || '',

@@ -1151,7 +1151,9 @@ class FeedRankingService
                     }
                 }
             }
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            \Log::warning('FeedRankingService: failed to fetch batch report penalties', ['error' => $e->getMessage()]);
+        }
         return $result;
     }
 
@@ -1305,7 +1307,9 @@ class FeedRankingService
             if ($row && $row->latitude !== null && $row->longitude !== null) {
                 return [(float) $row->latitude, (float) $row->longitude];
             }
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            \Log::warning('FeedRankingService: failed to fetch user coordinates', ['user_id' => $userId, 'error' => $e->getMessage()]);
+        }
         return [null, null];
     }
 

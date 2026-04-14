@@ -188,7 +188,7 @@ class IdeationChallengeService
         $tenantId = TenantContext::getId();
 
         if (! $this->isAdmin($userId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only admins can update challenges'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.challenge_admin_only_update')];
             return false;
         }
 
@@ -198,7 +198,7 @@ class IdeationChallengeService
             ->first();
 
         if (! $challenge) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Challenge not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.challenge_not_found')];
             return false;
         }
 
@@ -214,11 +214,11 @@ class IdeationChallengeService
             $value = $data[$field];
 
             if ($field === 'title' && empty(trim((string) $value))) {
-                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title cannot be empty', 'field' => 'title'];
+                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.title_cannot_be_empty'), 'field' => 'title'];
                 return false;
             }
             if ($field === 'description' && empty(trim((string) $value))) {
-                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description cannot be empty', 'field' => 'description'];
+                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.description_cannot_be_empty'), 'field' => 'description'];
                 return false;
             }
 
@@ -258,7 +258,7 @@ class IdeationChallengeService
         $tenantId = TenantContext::getId();
 
         if (! $this->isAdmin($userId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only admins can delete challenges'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.challenge_admin_only_delete')];
             return false;
         }
 
@@ -268,7 +268,7 @@ class IdeationChallengeService
             ->exists();
 
         if (! $exists) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Challenge not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.challenge_not_found')];
             return false;
         }
 
@@ -289,13 +289,13 @@ class IdeationChallengeService
         $tenantId = TenantContext::getId();
 
         if (! $this->isAdmin($userId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only admins can change challenge status'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.challenge_admin_only_status')];
             return false;
         }
 
         $validStatuses = ['draft', 'open', 'voting', 'evaluating', 'closed', 'archived'];
         if (! in_array($status, $validStatuses)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Invalid status value', 'field' => 'status'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.invalid_status_value'), 'field' => 'status'];
             return false;
         }
 
@@ -305,7 +305,7 @@ class IdeationChallengeService
             ->first();
 
         if (! $challenge) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Challenge not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.challenge_not_found')];
             return false;
         }
 
@@ -320,7 +320,7 @@ class IdeationChallengeService
         ];
 
         if (! in_array($status, $validTransitions[$challenge->status] ?? [])) {
-            $this->errors[] = ['code' => 'CONFLICT', 'message' => "Cannot transition from '{$challenge->status}' to '{$status}'"];
+            $this->errors[] = ['code' => 'CONFLICT', 'message' => __('api.challenge_invalid_transition', ['from' => $challenge->status, 'to' => $status])];
             return false;
         }
 
@@ -465,12 +465,12 @@ class IdeationChallengeService
 
         $idea = $this->getIdeaById($id);
         if (! $idea) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Idea not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.idea_not_found')];
             return false;
         }
 
         if ((int) $idea['user_id'] !== $userId) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You can only edit your own ideas'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.idea_edit_own_only')];
             return false;
         }
 
@@ -480,7 +480,7 @@ class IdeationChallengeService
             ->first();
 
         if (! $challenge || $challenge->status !== 'open') {
-            $this->errors[] = ['code' => 'CONFLICT', 'message' => 'Challenge is no longer open for edits'];
+            $this->errors[] = ['code' => 'CONFLICT', 'message' => __('api.challenge_closed_for_edits')];
             return false;
         }
 
@@ -489,7 +489,7 @@ class IdeationChallengeService
         if (isset($data['title'])) {
             $title = trim($data['title']);
             if (empty($title)) {
-                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title cannot be empty', 'field' => 'title'];
+                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.title_cannot_be_empty'), 'field' => 'title'];
                 return false;
             }
             $updates['title'] = $title;
@@ -498,7 +498,7 @@ class IdeationChallengeService
         if (isset($data['description'])) {
             $desc = trim($data['description']);
             if (empty($desc)) {
-                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description cannot be empty', 'field' => 'description'];
+                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.description_cannot_be_empty'), 'field' => 'description'];
                 return false;
             }
             $updates['description'] = $desc;
@@ -535,12 +535,12 @@ class IdeationChallengeService
             ->first();
 
         if (! $idea) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Idea not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.idea_not_found')];
             return false;
         }
 
         if ($idea->status !== 'draft') {
-            $this->errors[] = ['code' => 'CONFLICT', 'message' => 'Only draft ideas can be edited'];
+            $this->errors[] = ['code' => 'CONFLICT', 'message' => __('api.idea_only_draft_editable')];
             return false;
         }
 
@@ -549,12 +549,12 @@ class IdeationChallengeService
         $publish     = ! empty($data['publish']);
 
         if (empty($title)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title is required', 'field' => 'title'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.title_required'), 'field' => 'title'];
             return false;
         }
 
         if ($publish && empty($description)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description is required', 'field' => 'description'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.description_required'), 'field' => 'description'];
             return false;
         }
 
@@ -582,7 +582,7 @@ class IdeationChallengeService
             });
         } catch (\Exception $e) {
             Log::error('IdeationChallengeService::updateDraftIdea error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update draft'];
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.idea_draft_update_failed')];
             return false;
         }
     }
@@ -597,7 +597,7 @@ class IdeationChallengeService
 
         $idea = $this->getIdeaById($id);
         if (! $idea) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Idea not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.idea_not_found')];
             return false;
         }
 
@@ -605,7 +605,7 @@ class IdeationChallengeService
         $isAdmin = $this->isAdmin($userId, $tenantId);
 
         if (! $isOwner && ! $isAdmin) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You can only delete your own ideas'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.idea_delete_own_only')];
             return false;
         }
 
@@ -627,7 +627,7 @@ class IdeationChallengeService
             });
         } catch (\Exception $e) {
             Log::error('IdeationChallengeService::deleteIdea error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to delete idea'];
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.idea_delete_failed')];
             return false;
         }
     }
@@ -671,13 +671,13 @@ class IdeationChallengeService
 
         $idea = $this->getIdeaById($ideaId, $userId);
         if (! $idea) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Idea not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.idea_not_found')];
             return null;
         }
 
         // Cannot vote on withdrawn or draft ideas
         if (in_array($idea['status'] ?? '', ['withdrawn', 'draft'])) {
-            $this->errors[] = ['code' => 'CONFLICT', 'message' => 'Cannot vote on a withdrawn or draft idea'];
+            $this->errors[] = ['code' => 'CONFLICT', 'message' => __('api.idea_vote_withdrawn_or_draft')];
             return null;
         }
 
@@ -688,13 +688,13 @@ class IdeationChallengeService
             ->first();
 
         if (! $challenge || ! in_array($challenge->status, ['open', 'voting'])) {
-            $this->errors[] = ['code' => 'CONFLICT', 'message' => 'Voting is not currently allowed for this challenge'];
+            $this->errors[] = ['code' => 'CONFLICT', 'message' => __('api.challenge_voting_not_allowed')];
             return null;
         }
 
         // Can't vote on your own idea
         if ((int) $idea['user_id'] === $userId) {
-            $this->errors[] = ['code' => 'CONFLICT', 'message' => 'You cannot vote on your own idea'];
+            $this->errors[] = ['code' => 'CONFLICT', 'message' => __('api.idea_cannot_vote_own')];
             return null;
         }
 
@@ -740,7 +740,7 @@ class IdeationChallengeService
             });
         } catch (\Exception $e) {
             Log::error('IdeationChallengeService::voteIdea error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to toggle vote'];
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.idea_vote_toggle_failed')];
             return null;
         }
     }
@@ -754,19 +754,19 @@ class IdeationChallengeService
         $tenantId = TenantContext::getId();
 
         if (! $this->isAdmin($userId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only admins can change idea status'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.idea_admin_only_status')];
             return false;
         }
 
         $validStatuses = ['submitted', 'shortlisted', 'winner', 'withdrawn'];
         if (! in_array($status, $validStatuses)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Invalid status value', 'field' => 'status'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.invalid_status_value'), 'field' => 'status'];
             return false;
         }
 
         $idea = $this->getIdeaById($ideaId);
         if (! $idea) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Idea not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.idea_not_found')];
             return false;
         }
 
@@ -876,18 +876,18 @@ class IdeationChallengeService
         $body = trim($body);
 
         if (empty($body)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Comment body is required', 'field' => 'body'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.comment_body_required'), 'field' => 'body'];
             return null;
         }
 
         $idea = $this->getIdeaById($ideaId);
         if (! $idea) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Idea not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.idea_not_found')];
             return null;
         }
 
         if (in_array($idea['status'] ?? '', ['withdrawn', 'draft'])) {
-            $this->errors[] = ['code' => 'CONFLICT', 'message' => 'Cannot comment on a withdrawn or draft idea'];
+            $this->errors[] = ['code' => 'CONFLICT', 'message' => __('api.idea_comment_withdrawn_or_draft')];
             return null;
         }
 
@@ -913,7 +913,7 @@ class IdeationChallengeService
             return $commentId;
         } catch (\Exception $e) {
             Log::error('IdeationChallengeService::addComment error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to add comment'];
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.comment_add_failed')];
             return null;
         }
     }
@@ -934,7 +934,7 @@ class IdeationChallengeService
             ->first();
 
         if (! $comment || (int) ($comment->tenant_id ?? 0) !== $tenantId) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Comment not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.comment_not_found')];
             return false;
         }
 
@@ -942,7 +942,7 @@ class IdeationChallengeService
         $isAdmin = $this->isAdmin($userId, $tenantId);
 
         if (! $isOwner && ! $isAdmin) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You can only delete your own comments'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.comment_delete_own_only')];
             return false;
         }
 
@@ -958,7 +958,7 @@ class IdeationChallengeService
             });
         } catch (\Exception $e) {
             Log::error('IdeationChallengeService::deleteComment error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to delete comment'];
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.comment_delete_failed')];
             return false;
         }
     }
@@ -983,7 +983,7 @@ class IdeationChallengeService
             ->exists();
 
         if (! $exists) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Challenge not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.challenge_not_found')];
             return ['favorited' => false];
         }
 
@@ -1042,7 +1042,7 @@ class IdeationChallengeService
         $tenantId = TenantContext::getId();
 
         if (! $this->isAdmin($userId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only admins can duplicate challenges'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.challenge_admin_only_duplicate')];
             return null;
         }
 
@@ -1052,7 +1052,7 @@ class IdeationChallengeService
             ->first();
 
         if (! $original) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Challenge not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.challenge_not_found')];
             return null;
         }
 
@@ -1080,7 +1080,7 @@ class IdeationChallengeService
             ]);
         } catch (\Exception $e) {
             Log::error('IdeationChallengeService::duplicateChallenge error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to duplicate challenge'];
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.challenge_duplicate_failed')];
             return null;
         }
     }

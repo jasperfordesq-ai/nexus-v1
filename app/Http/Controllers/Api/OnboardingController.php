@@ -161,7 +161,7 @@ class OnboardingController extends BaseApiController
         }
 
         return $this->respondWithData([
-            'message'          => 'Onboarding complete!',
+            'message'          => __('api.onboarding.complete'),
             'listings_created' => count($listingIds),
             'listing_ids'      => $listingIds,
         ]);

@@ -110,16 +110,37 @@ class AchievementAnalyticsService
             ->map(fn ($r) => (array) $r)
             ->all();
 
-        // Enrich with custom badge definitions from DB
+        // Batch-fetch custom badge definitions to avoid N+1 queries
+        $customIds = array_values(array_filter(array_map(
+            fn ($b) => str_starts_with($b['badge_key'] ?? '', 'custom_')
+                ? str_replace('custom_', '', $b['badge_key'])
+                : null,
+            $badges
+        )));
+
+        $customBadgeMap = [];
+        if (!empty($customIds)) {
+            $rows = DB::table('custom_badges')
+                ->whereIn('id', $customIds)
+                ->get(['id', 'name', 'icon', 'xp']);
+            foreach ($rows as $row) {
+                $customBadgeMap[$row->id] = (array) $row;
+            }
+        }
+
+        // Enrich with custom badge definitions from map
         foreach ($badges as &$badge) {
-            $custom = DB::table('custom_badges')
-                ->where('id', str_replace('custom_', '', $badge['badge_key']))
-                ->first(['name', 'icon', 'xp']);
+            if (str_starts_with($badge['badge_key'] ?? '', 'custom_')) {
+                $id = str_replace('custom_', '', $badge['badge_key']);
+                $custom = $customBadgeMap[$id] ?? null;
+            } else {
+                $custom = null;
+            }
 
             if ($custom) {
-                $badge['name'] = $custom->name ?? $badge['badge_key'];
-                $badge['icon'] = $custom->icon ?? '🏆';
-                $badge['xp'] = $custom->xp ?? 0;
+                $badge['name'] = $custom['name'] ?? $badge['badge_key'];
+                $badge['icon'] = $custom['icon'] ?? '🏆';
+                $badge['xp'] = $custom['xp'] ?? 0;
             } else {
                 $badge['name'] = $badge['badge_key'];
                 $badge['icon'] = '🏆';

@@ -49,6 +49,7 @@ export interface User {
   phone?: string;
   profile_type?: 'individual' | 'organisation';
   organization_name?: string;
+  date_of_birth?: string;
   has_2fa_enabled?: boolean;
   preferred_layout?: 'modern';
   preferred_language?: string;

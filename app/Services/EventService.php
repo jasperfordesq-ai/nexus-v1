@@ -250,7 +250,7 @@ class EventService
         $event = Event::query()->find($id);
 
         if (! $event) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.event_not_found')];
             return false;
         }
 
@@ -262,7 +262,7 @@ class EventService
                 !empty($user->is_super_admin) ||
                 !empty($user->is_tenant_super_admin)
             )) {
-                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to edit this event'];
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.event_edit_forbidden')];
                 return false;
             }
         }
@@ -329,7 +329,7 @@ class EventService
         $event = Event::query()->find($id);
 
         if (! $event) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.event_not_found')];
             return false;
         }
 
@@ -341,7 +341,7 @@ class EventService
                 !empty($user->is_super_admin) ||
                 !empty($user->is_tenant_super_admin)
             )) {
-                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only the event organizer can delete this event'];
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.event_delete_forbidden')];
                 return false;
             }
         }
@@ -369,16 +369,16 @@ class EventService
 
         // title is required and max 255
         if ($title === null || $title === '') {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title is required', 'field' => 'title'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.title_required'), 'field' => 'title'];
         } elseif (mb_strlen($title) > 255) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title must not exceed 255 characters', 'field' => 'title'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.event_title_max_255'), 'field' => 'title'];
         }
 
         // start_time: validate format if provided
         if ($startTime !== null) {
             $parsed = strtotime($startTime);
             if ($parsed === false) {
-                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Invalid start_time format', 'field' => 'start_time'];
+                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.event_invalid_start_time'), 'field' => 'start_time'];
             }
         }
 
@@ -387,7 +387,7 @@ class EventService
             $startParsed = strtotime($startTime);
             $endParsed = strtotime($endTime);
             if ($startParsed !== false && $endParsed !== false && $endParsed <= $startParsed) {
-                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'End time must be after start time', 'field' => 'end_time'];
+                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.event_end_after_start'), 'field' => 'end_time'];
             }
         }
 
@@ -453,14 +453,14 @@ class EventService
 
         $validStatuses = ['going', 'interested', 'not_going', 'declined'];
         if (!in_array($status, $validStatuses)) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Invalid RSVP status', 'field' => 'status'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.event_invalid_rsvp_status'), 'field' => 'status'];
             return false;
         }
 
         $tenantId = \App\Core\TenantContext::getId();
         $event = DB::selectOne("SELECT * FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
         if (!$event) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.event_not_found')];
             return false;
         }
 
@@ -528,7 +528,7 @@ class EventService
             return true;
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("EventService::rsvp error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update RSVP'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.event_rsvp_update_failed')];
             return false;
         }
     }
@@ -543,7 +543,7 @@ class EventService
 
         $event = DB::selectOne("SELECT id FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
         if (!$event) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.event_not_found')];
             return false;
         }
 
@@ -561,7 +561,7 @@ class EventService
             return true;
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("EventService::removeRsvp error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to remove RSVP'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.event_rsvp_remove_failed')];
             return false;
         }
     }
@@ -779,7 +779,7 @@ class EventService
 
         $event = DB::selectOne("SELECT id, user_id FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
         if (!$event) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.event_not_found')];
             return false;
         }
 
@@ -787,7 +787,7 @@ class EventService
             // Check admin
             $user = DB::selectOne("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
             if (!$user || !in_array($user->role ?? '', ['admin', 'super_admin', 'god'])) {
-                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to modify this event'];
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.event_modify_forbidden')];
                 return false;
             }
         }
@@ -797,7 +797,7 @@ class EventService
             return true;
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("EventService::updateImage error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update image'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.event_image_update_failed')];
             return false;
         }
     }
@@ -812,7 +812,7 @@ class EventService
 
         $event = DB::selectOne("SELECT * FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
         if (!$event) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.event_not_found')];
             return false;
         }
 
@@ -820,13 +820,13 @@ class EventService
         if ((int) $event->user_id !== $userId) {
             $user = DB::selectOne("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
             if (!$user || !in_array($user->role ?? '', ['admin', 'super_admin', 'god'])) {
-                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to cancel this event'];
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.event_cancel_forbidden')];
                 return false;
             }
         }
 
         if (($event->status ?? 'active') === 'cancelled') {
-            self::$errors[] = ['code' => 'ALREADY_CANCELLED', 'message' => 'This event is already cancelled'];
+            self::$errors[] = ['code' => 'ALREADY_CANCELLED', 'message' => __('api.event_already_cancelled')];
             return false;
         }
 
@@ -891,7 +891,7 @@ class EventService
             return true;
         } catch (\Exception $e) {
             Log::error("EventService::cancelEvent error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel event'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.event_cancel_failed')];
             return false;
         }
     }
@@ -1125,7 +1125,7 @@ class EventService
 
         $event = DB::selectOne("SELECT * FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
         if (!$event) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.event_not_found')];
             return false;
         }
 
@@ -1133,7 +1133,7 @@ class EventService
         if ((int) $event->user_id !== $markedById) {
             $user = DB::selectOne("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$markedById, $tenantId]);
             if (!$user || !in_array($user->role ?? '', ['admin', 'super_admin', 'god'])) {
-                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only the organizer or admin can mark attendance'];
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.event_attendance_forbidden')];
                 return false;
             }
         }
@@ -1171,7 +1171,7 @@ class EventService
             return true;
         } catch (\Exception $e) {
             Log::error("EventService::markAttended error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to mark attendance'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.event_mark_attendance_failed')];
             return false;
         }
     }
@@ -1255,7 +1255,7 @@ class EventService
         $tenantId = \App\Core\TenantContext::getId();
 
         if (empty(trim($title))) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Series title is required', 'field' => 'title'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.event_series_title_required'), 'field' => 'title'];
             return null;
         }
 
@@ -1267,7 +1267,7 @@ class EventService
             return (int) DB::getPdo()->lastInsertId();
         } catch (\Exception $e) {
             Log::error("EventService::createSeries error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create series'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.event_series_create_failed')];
             return null;
         }
     }
@@ -1352,7 +1352,7 @@ class EventService
 
         $event = DB::selectOne("SELECT id, user_id FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
         if (!$event) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.event_not_found')];
             return false;
         }
 
@@ -1360,7 +1360,7 @@ class EventService
         if ((int) $event->user_id !== $userId) {
             $user = DB::selectOne("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
             if (!$user || !in_array($user->role ?? '', ['admin', 'super_admin', 'god'])) {
-                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to modify this event'];
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.event_modify_forbidden')];
                 return false;
             }
         }
@@ -1370,7 +1370,7 @@ class EventService
             return true;
         } catch (\Exception $e) {
             Log::error("EventService::linkToSeries error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to link event to series'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.event_series_link_failed')];
             return false;
         }
     }
@@ -1388,7 +1388,7 @@ class EventService
         $frequency = $data['recurrence_frequency'] ?? null;
         $validFrequencies = ['daily', 'weekly', 'monthly', 'yearly', 'custom'];
         if (!$frequency || !in_array($frequency, $validFrequencies)) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Valid recurrence frequency is required', 'field' => 'recurrence_frequency'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.event_recurrence_frequency_required'), 'field' => 'recurrence_frequency'];
             return null;
         }
 
@@ -1430,7 +1430,7 @@ class EventService
             ];
         } catch (\Exception $e) {
             Log::error("EventService::createRecurring error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create recurring event'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.event_recurring_create_failed')];
             return null;
         }
     }
@@ -1543,7 +1543,7 @@ class EventService
         // scope === 'all': update all future occurrences
         $event = DB::selectOne("SELECT * FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
         if (!$event) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.event_not_found')];
             return false;
         }
 
