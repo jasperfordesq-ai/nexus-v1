@@ -219,11 +219,11 @@ export default function ExchangesPage() {
         render: (item) => (
           <Dropdown>
             <DropdownTrigger>
-              <Button isIconOnly size="sm" variant="light" aria-label="Actions">
+              <Button isIconOnly size="sm" variant="light" aria-label={t('exchanges.actions_aria')}>
                 <MoreVertical size={16} />
               </Button>
             </DropdownTrigger>
-            <DropdownMenu aria-label="Exchange actions">
+            <DropdownMenu aria-label={t('exchanges.exchange_actions_aria')}>
               <DropdownItem
                 key="approve"
                 onPress={() => setApproveTarget(item)}
@@ -267,7 +267,7 @@ export default function ExchangesPage() {
 
       {/* Status tabs */}
       <Tabs
-        aria-label="Exchange status filter"
+        aria-label={t('exchanges.status_filter_aria')}
         selectedKey={status || 'all'}
         onSelectionChange={handleTabChange}
         className="mb-4"

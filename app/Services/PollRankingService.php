@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Models\Poll;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -20,6 +21,9 @@ class PollRankingService
      */
     public function submitRanking(int $pollId, int $userId, array $rankings): bool
     {
+        // Validates tenant ownership via HasTenantScope global scope
+        Poll::findOrFail($pollId);
+
         $exists = DB::table('poll_rankings')
             ->where('poll_id', $pollId)
             ->where('user_id', $userId)
@@ -49,6 +53,9 @@ class PollRankingService
      */
     public function calculateResults(int $pollId): array
     {
+        // Validates tenant ownership via HasTenantScope global scope
+        Poll::findOrFail($pollId);
+
         $rankings = DB::table('poll_rankings')
             ->where('poll_id', $pollId)
             ->orderBy('user_id')
@@ -87,6 +94,9 @@ class PollRankingService
      */
     public function getUserRankings(int $pollId, int $userId): ?array
     {
+        // Validates tenant ownership via HasTenantScope global scope
+        Poll::findOrFail($pollId);
+
         $rankings = DB::table('poll_rankings')
             ->where('poll_id', $pollId)
             ->where('user_id', $userId)

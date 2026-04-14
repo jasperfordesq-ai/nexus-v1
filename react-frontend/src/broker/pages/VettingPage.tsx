@@ -269,28 +269,28 @@ export default function VettingPage() {
       {/* Stat cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Total"
+          label={t('vetting.stat_total')}
           value={stats?.total ?? 0}
           icon={FileCheck}
           color="default"
           loading={statsLoading}
         />
         <StatCard
-          label="Pending"
+          label={t('vetting.stat_pending')}
           value={stats?.pending ?? 0}
           icon={Clock}
           color="warning"
           loading={statsLoading}
         />
         <StatCard
-          label="Verified"
+          label={t('vetting.stat_verified')}
           value={stats?.verified ?? 0}
           icon={ShieldCheck}
           color="success"
           loading={statsLoading}
         />
         <StatCard
-          label="Expiring Soon"
+          label={t('vetting.stat_expiring')}
           value={stats?.expiring_soon ?? 0}
           icon={AlertTriangle}
           color="danger"
@@ -302,7 +302,7 @@ export default function VettingPage() {
       <Tabs
         selectedKey={activeTab}
         onSelectionChange={(key) => setActiveTab(String(key) as TabKey)}
-        aria-label="Vetting status tabs"
+        aria-label={t('vetting.tabs_aria')}
         color="primary"
         variant="underlined"
       >
@@ -369,7 +369,7 @@ export default function VettingPage() {
         isLoading={rejectLoading}
       >
         <Textarea
-          label="Reason"
+          label={t('vetting.reject_reason_label')}
           placeholder={t('vetting.reject_reason_placeholder')}
           value={rejectReason}
           onValueChange={setRejectReason}

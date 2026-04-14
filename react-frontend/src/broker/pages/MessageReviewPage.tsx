@@ -246,7 +246,7 @@ export default function MessageReviewPage() {
 
       {/* Filter tabs */}
       <Tabs
-        aria-label="Message filter"
+        aria-label={t('messages.filter_aria')}
         selectedKey={filter}
         onSelectionChange={handleTabChange}
         className="mb-4"
