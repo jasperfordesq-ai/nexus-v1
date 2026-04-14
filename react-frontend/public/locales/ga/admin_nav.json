@@ -154,5 +154,8 @@
   "marketplace_sellers": "Sellers",
   "feature_flags": "Feature Flags",
   "secrets_vault": "Secrets Vault",
-  "federation_cc_config": "CC Config"
+  "federation_cc_config": "CC Config",
+  "module_configuration": "Module Configuration",
+  "translation_config": "Translation Config",
+  "broker_panel": "Broker Panel"
 }
