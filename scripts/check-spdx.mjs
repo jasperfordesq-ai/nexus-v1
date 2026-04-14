@@ -17,7 +17,15 @@ const dirs = [
   { path: 'src', ext: ['.php'] },
   { path: 'httpdocs', ext: ['.php'] },
   { path: 'tests', ext: ['.php'] },
+  { path: 'app', ext: ['.php'] },
+  { path: 'config', ext: ['.php'] },
+  { path: 'routes', ext: ['.php'] },
+  { path: 'views', ext: ['.php'] },
+  { path: 'migrations', ext: ['.php'] },
+  { path: join('database', 'migrations'), ext: ['.php'] },
   { path: join('react-frontend', 'src'), ext: ['.ts', '.tsx'] },
+  { path: 'e2e', ext: ['.ts', '.tsx'] },
+  { path: 'mobile', ext: ['.ts', '.tsx'] },
 ];
 
 let totalFiles = 0;
