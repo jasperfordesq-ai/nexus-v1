@@ -144,5 +144,15 @@
     "admin": "Admin",
     "expand_sidebar": "Développer la barre latérale",
     "collapse_sidebar": "Réduire la barre latérale"
-  }
+  },
+  "job_vacancies": "Job Vacancies",
+  "job_pipeline": "Job Pipeline",
+  "job_bias_audit": "Bias Audit",
+  "job_templates": "Job Templates",
+  "marketplace_dashboard": "Marketplace",
+  "marketplace_moderation": "Moderation",
+  "marketplace_sellers": "Sellers",
+  "feature_flags": "Feature Flags",
+  "secrets_vault": "Secrets Vault",
+  "federation_cc_config": "CC Config"
 }
