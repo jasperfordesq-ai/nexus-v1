@@ -121,6 +121,7 @@ class AchievementAnalyticsService
         $customBadgeMap = [];
         if (!empty($customIds)) {
             $rows = DB::table('custom_badges')
+                ->where('tenant_id', \App\Core\TenantContext::getId())
                 ->whereIn('id', $customIds)
                 ->get(['id', 'name', 'icon', 'xp']);
             foreach ($rows as $row) {
