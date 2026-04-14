@@ -58,9 +58,7 @@ export function YouTubeEmbed({ embedUrl, thumbnailUrl, title = 'Video' }: YouTub
   // Determine thumbnail: use provided, or derive from video ID
   const thumbnail = thumbnailUrl || (videoId ? getYouTubeThumbnail(videoId) : null);
 
-  const handlePlay = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
+  const handlePlay = useCallback(() => {
     setIsPlaying(true);
   }, []);
 

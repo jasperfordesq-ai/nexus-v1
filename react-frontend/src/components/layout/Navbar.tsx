@@ -257,7 +257,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   ].filter(item => hasFeature(item.feature)), [t, tenantPath, hasFeature]);
 
   // Helper to filter items by feature/module gates
-  const gateFilter = useCallback((item: { feature?: string; module?: string }) => {
+  const gateFilter = useCallback((item: Record<string, unknown> & { feature?: string; module?: string }) => {
     if ('feature' in item && item.feature && !hasFeature(item.feature as Parameters<typeof hasFeature>[0])) return false;
     if ('module' in item && item.module && !hasModule(item.module as Parameters<typeof hasModule>[0])) return false;
     return true;

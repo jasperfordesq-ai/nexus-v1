@@ -33,9 +33,7 @@ export function MarketplaceListingCard({ listing, onSave, onUnsave }: Marketplac
   const [isSaved, setIsSaved] = useState(listing.is_saved);
 
   const handleToggleSave = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
+    () => {
       if (isSaved) {
         onUnsave?.(listing.id);
       } else {

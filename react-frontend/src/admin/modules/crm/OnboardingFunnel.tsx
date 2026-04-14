@@ -330,7 +330,7 @@ export default function OnboardingFunnel() {
                       backgroundColor: 'hsl(var(--heroui-content1))',
                       color: 'hsl(var(--heroui-foreground))',
                     }}
-                    formatter={(value: number) => [
+                    formatter={(value: number | undefined) => [
                       Number(value).toLocaleString(),
                       t('crm.registrations_label'),
                     ]}
