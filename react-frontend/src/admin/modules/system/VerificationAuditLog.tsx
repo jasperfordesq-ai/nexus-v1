@@ -130,12 +130,12 @@ export function VerificationAuditLog() {
           <>
             <Table aria-label={t('verification.audit_log_aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>TIME</TableColumn>
-                <TableColumn>USER</TableColumn>
-                <TableColumn>EVENT</TableColumn>
-                <TableColumn>ACTOR</TableColumn>
-                <TableColumn>IP</TableColumn>
-                <TableColumn>DETAILS</TableColumn>
+                <TableColumn>{t('system.col_time')}</TableColumn>
+                <TableColumn>{t('system.col_user')}</TableColumn>
+                <TableColumn>{t('system.col_event')}</TableColumn>
+                <TableColumn>{t('system.col_actor')}</TableColumn>
+                <TableColumn>{t('system.col_ip')}</TableColumn>
+                <TableColumn>{t('system.col_details')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {events.map((event) => {

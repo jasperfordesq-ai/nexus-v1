@@ -960,7 +960,7 @@ class GdprService
                 // Fallback: group_members may not have tenant_id
                 try {
                     $this->query("DELETE FROM group_members WHERE user_id = ?", [$userId]);
-                } catch (\Throwable $e2) { /* ignore */ }
+                } catch (\Throwable $e2) { $this->logger->warning('GDPR deletion step skipped', ['user_id' => $userId, 'error' => $e2->getMessage()]); }
             }
 
             // 3g. Remove event RSVPs
@@ -969,7 +969,7 @@ class GdprService
                     "DELETE FROM event_rsvps WHERE user_id = ?",
                     [$userId]
                 );
-            } catch (\Throwable $e) { /* ignore */ }
+            } catch (\Throwable $e) { $this->logger->warning('GDPR deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
             // 3h. Anonymize reviews (preserve review content but remove personal link)
             try {
@@ -977,7 +977,7 @@ class GdprService
                     "UPDATE reviews SET reviewer_id = NULL WHERE reviewer_id = ? AND tenant_id = ?",
                     [$userId, $this->tenantId]
                 );
-            } catch (\Throwable $e) { /* ignore */ }
+            } catch (\Throwable $e) { $this->logger->warning('GDPR deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
             // 3i. Delete TOTP/2FA secrets
             try {
@@ -986,7 +986,7 @@ class GdprService
                      WHERE id = ? AND tenant_id = ?",
                     [$userId, $this->tenantId]
                 );
-            } catch (\Throwable $e) { /* ignore */ }
+            } catch (\Throwable $e) { $this->logger->warning('GDPR deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
             // 3j. Delete user notification preferences
             try {
@@ -994,7 +994,7 @@ class GdprService
                     "DELETE FROM user_notification_preferences WHERE user_id = ?",
                     [$userId]
                 );
-            } catch (\Throwable $e) { /* ignore */ }
+            } catch (\Throwable $e) { $this->logger->warning('GDPR deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
             // 3k. Anonymize exchange requests (preserve transaction history, remove personal notes)
             try {
@@ -1003,7 +1003,7 @@ class GdprService
                      WHERE (requester_id = ? OR provider_id = ?) AND tenant_id = ?",
                     [$userId, $userId, $this->tenantId]
                 );
-            } catch (\Throwable $e) { /* ignore */ }
+            } catch (\Throwable $e) { $this->logger->warning('GDPR deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
             // 3l. Delete feed activity entries (user's posts/shares in the feed)
             try {
@@ -1011,7 +1011,7 @@ class GdprService
                     "DELETE FROM feed_activity WHERE user_id = ? AND tenant_id = ?",
                     [$userId, $this->tenantId]
                 );
-            } catch (\Throwable $e) { /* ignore */ }
+            } catch (\Throwable $e) { $this->logger->warning('GDPR deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
             // 3m. Delete user blocks (in both directions)
             try {
@@ -1019,7 +1019,7 @@ class GdprService
                     "DELETE FROM user_blocks WHERE user_id = ? OR blocked_user_id = ?",
                     [$userId, $userId]
                 );
-            } catch (\Throwable $e) { /* ignore */ }
+            } catch (\Throwable $e) { $this->logger->warning('GDPR deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
             // 3n. Anonymize transactions (preserve amounts for audit, remove personal link text)
             // Note: transactions are financial records — we keep them but with anonymized sender/receiver names
@@ -1032,7 +1032,7 @@ class GdprService
                     "UPDATE transactions SET deleted_for_receiver = 1 WHERE receiver_id = ? AND tenant_id = ?",
                     [$userId, $this->tenantId]
                 );
-            } catch (\Throwable $e) { /* ignore */ }
+            } catch (\Throwable $e) { $this->logger->warning('GDPR deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
             // 4. Soft delete listings
             $this->query(
@@ -1083,7 +1083,7 @@ class GdprService
                 foreach ($listingIds as $listingId) {
                     try {
                         $meiliClient->index('listings')->deleteDocument($listingId);
-                    } catch (\Throwable $e) { /* ignore individual listing failures */ }
+                    } catch (\Throwable $e) { $this->logger->warning('GDPR Meilisearch listing deletion skipped', ['listing_id' => $listingId, 'error' => $e->getMessage()]); }
                 }
             } catch (\Throwable $e) {
                 $this->logger->warning("Meilisearch cleanup failed during account deletion", [

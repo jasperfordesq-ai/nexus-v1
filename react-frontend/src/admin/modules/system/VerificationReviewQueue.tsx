@@ -165,12 +165,12 @@ export function VerificationReviewQueue() {
           ) : (
             <Table aria-label={t('verification.pending_reviews_aria')} removeWrapper>
               <TableHeader>
-                <TableColumn>USER</TableColumn>
-                <TableColumn>PROVIDER</TableColumn>
-                <TableColumn>LEVEL</TableColumn>
-                <TableColumn>STATUS</TableColumn>
-                <TableColumn>CREATED</TableColumn>
-                <TableColumn>ACTIONS</TableColumn>
+                <TableColumn>{t('system.col_user')}</TableColumn>
+                <TableColumn>{t('system.col_provider')}</TableColumn>
+                <TableColumn>{t('system.col_level')}</TableColumn>
+                <TableColumn>{t('system.col_status')}</TableColumn>
+                <TableColumn>{t('system.col_created')}</TableColumn>
+                <TableColumn>{t('system.col_actions')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {sessions.map((session) => (

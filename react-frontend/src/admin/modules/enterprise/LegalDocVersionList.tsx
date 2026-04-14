@@ -294,7 +294,7 @@ export default function LegalDocVersionList() {
                 <div className="flex gap-2">
                   {version.is_draft && (
                     <>
-                      <Tooltip content="Publish this version">
+                      <Tooltip content={t('enterprise.tooltip_publish')}>
                         <Button
                           size="sm"
                           color="success"
@@ -305,10 +305,10 @@ export default function LegalDocVersionList() {
                             setShowPublishModal(true);
                           }}
                         >
-                          Publish
+                          {t('enterprise.btn_publish')}
                         </Button>
                       </Tooltip>
-                      <Tooltip content="Edit this draft">
+                      <Tooltip content={t('enterprise.tooltip_edit_draft')}>
                         <Button
                           size="sm"
                           variant="flat"
@@ -318,10 +318,10 @@ export default function LegalDocVersionList() {
                             setShowEditModal(true);
                           }}
                         >
-                          Edit
+                          {t('enterprise.btn_edit')}
                         </Button>
                       </Tooltip>
-                      <Tooltip content="Delete this draft">
+                      <Tooltip content={t('enterprise.tooltip_delete_draft')}>
                         <Button
                           size="sm"
                           color="danger"
@@ -332,14 +332,14 @@ export default function LegalDocVersionList() {
                             setShowDeleteModal(true);
                           }}
                         >
-                          Delete
+                          {t('enterprise.btn_delete')}
                         </Button>
                       </Tooltip>
                     </>
                   )}
 
                   {!version.is_draft && (
-                    <Tooltip content="Notify users about this version">
+                    <Tooltip content={t('enterprise.tooltip_notify')}>
                       <Button
                         size="sm"
                         color="primary"
@@ -347,25 +347,25 @@ export default function LegalDocVersionList() {
                         startContent={<Send size={16} />}
                         onPress={() => openNotifyModal(version)}
                       >
-                        Notify
+                        {t('enterprise.btn_notify')}
                       </Button>
                     </Tooltip>
                   )}
 
                   {index < versions.length - 1 && (
-                    <Tooltip content="Compare with previous version">
+                    <Tooltip content={t('enterprise.tooltip_compare')}>
                       <Button
                         size="sm"
                         variant="bordered"
                         startContent={<GitCompare size={16} />}
                         onPress={() => { const prev = versions[index + 1]; if (prev) openCompareModal(version, prev); }}
                       >
-                        Compare
+                        {t('enterprise.btn_compare')}
                       </Button>
                     </Tooltip>
                   )}
 
-                  <Tooltip content="View full content">
+                  <Tooltip content={t('enterprise.tooltip_view_content')}>
                     <Button
                       size="sm"
                       variant="bordered"

@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Core\TenantContext;
 
@@ -167,10 +168,10 @@ class GroupFileService
             'created_at' => now(),
         ]);
 
-        // Fire integrations
-        try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_FILE_UPLOADED, ['file_id' => $id, 'file_name' => $originalName]); } catch (\Throwable $e) {}
-        try { GroupAuditService::log('file_uploaded', $groupId, $userId, ['file_id' => $id, 'file_name' => $originalName]); } catch (\Throwable $e) {}
-        try { GroupChallengeService::incrementProgress($groupId, 'files'); } catch (\Throwable $e) {}
+        // Fire integrations — non-critical; log but don't fail the upload
+        try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_FILE_UPLOADED, ['file_id' => $id, 'file_name' => $originalName]); } catch (\Throwable $e) { Log::warning('GroupFileService: webhook fire failed', ['group_id' => $groupId, 'error' => $e->getMessage()]); }
+        try { GroupAuditService::log('file_uploaded', $groupId, $userId, ['file_id' => $id, 'file_name' => $originalName]); } catch (\Throwable $e) { Log::warning('GroupFileService: audit log failed', ['group_id' => $groupId, 'error' => $e->getMessage()]); }
+        try { GroupChallengeService::incrementProgress($groupId, 'files'); } catch (\Throwable $e) { Log::warning('GroupFileService: challenge progress failed', ['group_id' => $groupId, 'error' => $e->getMessage()]); }
 
         return [
             'id' => $id,

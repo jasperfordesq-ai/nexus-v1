@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Models\UserBadge;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * BadgeService — Laravel DI-based service for badge/achievement management.
@@ -51,6 +52,7 @@ class BadgeService
 
             return $affected > 0;
         } catch (\Throwable $e) {
+            Log::error('BadgeService: award failed', ['user_id' => $userId, 'badge_key' => $badgeKey, 'error' => $e->getMessage()]);
             return false;
         }
     }
