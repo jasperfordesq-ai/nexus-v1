@@ -144,9 +144,9 @@ class EventReminderService
                     $when = date('l, M j \\a\\t g:i A', strtotime($event->start_time));
 
                     if ($reminderType === '24h') {
-                        $message = "Reminder: \"{$title}\" is tomorrow — {$when}";
+                        $message = __('svc_notifications_2.event.reminder_tomorrow', ['title' => $title, 'when' => $when]);
                     } else {
-                        $message = "Starting soon: \"{$title}\" begins in 1 hour — {$when}";
+                        $message = __('svc_notifications_2.event.reminder_1h', ['title' => $title, 'when' => $when]);
                     }
 
                     $link = "/events/{$eventId}";

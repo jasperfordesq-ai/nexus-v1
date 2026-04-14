@@ -400,7 +400,7 @@ class GroupExchangeService
         }
 
         if ($exchange->status === 'cancelled') {
-            return ['success' => false, 'error' => 'Exchange has been cancelled'];
+            return ['success' => false, 'error' => __('api_controllers_1.group_exchange.exchange_cancelled')];
         }
 
         // Check all participants have confirmed
