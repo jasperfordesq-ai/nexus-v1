@@ -465,7 +465,7 @@ class EventService
         }
 
         if (($event->status ?? 'active') === 'cancelled') {
-            self::$errors[] = ['code' => 'EVENT_CANCELLED', 'message' => 'This event has been cancelled'];
+            self::$errors[] = ['code' => 'EVENT_CANCELLED', 'message' => __('svc_notifications_2.event.rsvp_cancelled')];
             return false;
         }
 
@@ -473,7 +473,7 @@ class EventService
         if ($status === 'going' || $status === 'interested') {
             $eventEnd = $event->end_time ?? $event->start_time ?? null;
             if ($eventEnd && strtotime($eventEnd) < time()) {
-                self::$errors[] = ['code' => 'EVENT_ENDED', 'message' => 'This event has already ended'];
+                self::$errors[] = ['code' => 'EVENT_ENDED', 'message' => __('svc_notifications_2.event.rsvp_ended')];
                 return false;
             }
         }
@@ -871,9 +871,9 @@ class EventService
                 ->merge(collect($waitlistUserIds)->pluck('user_id'))
                 ->unique();
 
-            $message = "The event \"{$event->title}\" has been cancelled.";
+            $message = __('svc_notifications_2.event.cancelled_notification', ['title' => $event->title]);
             if (!empty($reason)) {
-                $message .= " Reason: {$reason}";
+                $message .= __('svc_notifications_2.event.cancelled_reason_suffix', ['reason' => $reason]);
             }
 
             foreach ($allUserIds as $uid) {

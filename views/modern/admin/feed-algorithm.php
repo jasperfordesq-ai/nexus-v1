@@ -1,4 +1,9 @@
 <?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 /**
  * Feed Algorithm - Gold Standard Mission Control
  * STANDALONE admin interface - does NOT use main site header/footer

@@ -13,9 +13,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('newsletter_queue', function (Blueprint $table) {
-            $table->string('name', 255)->default('')->after('email');
-            $table->string('first_name', 100)->default('')->after('name');
-            $table->string('last_name', 100)->default('')->after('first_name');
+            if (!Schema::hasColumn('newsletter_queue', 'name')) {
+                $table->string('name', 255)->default('')->after('email');
+            }
+            if (!Schema::hasColumn('newsletter_queue', 'first_name')) {
+                $table->string('first_name', 100)->default('')->after('name');
+            }
+            if (!Schema::hasColumn('newsletter_queue', 'last_name')) {
+                $table->string('last_name', 100)->default('')->after('first_name');
+            }
         });
     }
 

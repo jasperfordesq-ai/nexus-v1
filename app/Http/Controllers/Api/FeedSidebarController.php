@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 
@@ -289,7 +290,7 @@ class FeedSidebarController extends BaseApiController
                         ->pluck('cid')
                         ->all();
                     $connectedIds = array_merge($connectedIds, array_map('intval', $cids));
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
                 $data['suggested_members'] = DB::table('users')
                     ->where('tenant_id', $tenantId)

@@ -221,7 +221,7 @@ class AdminUsersController extends BaseApiController
                 'icon' => $b->badge_icon ?? null,
                 'awarded_at' => $b->awarded_at ?? '',
             ], $badgeRows);
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
         return $this->respondWithData([
             'id' => (int) $user->id,

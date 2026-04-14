@@ -29,7 +29,15 @@ const DIRS = [
   { path: 'src', extensions: ['.php'] },
   { path: 'httpdocs', extensions: ['.php'] },
   { path: 'tests', extensions: ['.php'] },
+  { path: 'app', extensions: ['.php'] },
+  { path: 'config', extensions: ['.php'] },
+  { path: 'routes', extensions: ['.php'] },
+  { path: 'views', extensions: ['.php'] },
+  { path: 'migrations', extensions: ['.php'] },
+  { path: join('database', 'migrations'), extensions: ['.php'] },
   { path: join('react-frontend', 'src'), extensions: ['.ts', '.tsx'] },
+  { path: 'e2e', extensions: ['.ts', '.tsx'] },
+  { path: 'mobile', extensions: ['.ts', '.tsx'] },
 ];
 
 // Directories to skip
@@ -61,15 +69,18 @@ function addHeaderToPhp(content) {
   // Already has SPDX header
   if (content.includes(SPDX_MARKER)) return null;
 
-  // Find the <?php tag
-  const phpTagMatch = content.match(/^<\?php\s*/);
-  if (!phpTagMatch) return null; // Not a PHP file with opening tag
-
-  const afterTag = content.slice(phpTagMatch[0].length);
   const header = makePhpHeader();
 
-  // Insert header right after <?php with a blank line before and after
-  return `<?php\n${header}\n${afterTag}`;
+  // PHP file with opening <?php tag — insert header right after it
+  const phpTagMatch = content.match(/^<\?php\s*/);
+  if (phpTagMatch) {
+    const afterTag = content.slice(phpTagMatch[0].length);
+    return `<?php\n${header}\n${afterTag}`;
+  }
+
+  // HTML-first template (no <?php opener, e.g. error pages, partials)
+  // Wrap header in a silent PHP block prepended before the HTML
+  return `<?php\n${header}?>\n${content}`;
 }
 
 function addHeaderToTs(content) {

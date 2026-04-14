@@ -93,6 +93,12 @@
     "review.submitted_successfully": "Review submitted successfully",
 
     "event.added_to_waitlist": "This event is full. You have been added to the waitlist.",
+    "event.reminder_tomorrow": "Reminder: \"{{title}}\" is tomorrow — {{when}}",
+    "event.reminder_1h": "Starting soon: \"{{title}}\" begins in 1 hour — {{when}}",
+    "event.cancelled_notification": "The event \"{{title}}\" has been cancelled.",
+    "event.cancelled_reason_suffix": " Reason: {{reason}}",
+    "event.rsvp_cancelled": "This event has been cancelled",
+    "event.rsvp_ended": "This event has already ended",
 
     "comment.deleted": "Comment deleted",
 
