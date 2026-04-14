@@ -23,8 +23,11 @@ use App\Events\UserRegistered;
 use App\Events\VolunteerOpportunityCreated;
 use App\Events\VolunteerOpportunityUpdated;
 use App\Listeners\CopyMessageForBrokerReview;
+use App\Listeners\NotifyAdminOfNewCommunityEvent;
+use App\Listeners\NotifyAdminOfNewGroup;
 use App\Listeners\NotifyAdminOfNewListing;
 use App\Listeners\NotifyAdminOfNewRegistration;
+use App\Listeners\NotifyAdminOfNewVolunteerOpportunity;
 use App\Listeners\NotifyConnectionAccepted;
 use App\Listeners\NotifyConnectionRequest;
 use App\Listeners\NotifyJobAlertSubscribers;
@@ -107,6 +110,7 @@ class EventServiceProvider extends ServiceProvider
 
         CommunityEventCreated::class => [
             PushCommunityEventToFederatedPartners::class,
+            NotifyAdminOfNewCommunityEvent::class,
         ],
 
         CommunityEventUpdated::class => [
@@ -115,6 +119,7 @@ class EventServiceProvider extends ServiceProvider
 
         GroupCreated::class => [
             PushGroupToFederatedPartners::class,
+            NotifyAdminOfNewGroup::class,
         ],
 
         GroupMemberJoined::class => [
@@ -123,6 +128,7 @@ class EventServiceProvider extends ServiceProvider
 
         VolunteerOpportunityCreated::class => [
             PushVolunteerOpportunityToFederatedPartners::class,
+            NotifyAdminOfNewVolunteerOpportunity::class,
         ],
 
         VolunteerOpportunityUpdated::class => [

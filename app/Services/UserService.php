@@ -6,7 +6,7 @@
 
 namespace App\Services;
 
-use App\Core\EmailTemplate;
+use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Events\MemberProfileUpdated;
 use App\Models\Notification;
@@ -426,16 +426,16 @@ class UserService
                 $mailer = Mailer::forCurrentTenant();
                 $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
 
-                $html = EmailTemplate::render(
-                    "Email Address Changed",
-                    "Your email address has been changed.",
-                    "The email address on your account has been changed to a new address. If you did not make this change, please contact support immediately to secure your account.",
-                    null,
-                    null,
-                    $tenantName
-                );
+                $html = EmailTemplateBuilder::make()
+                    ->theme('warning')
+                    ->title(__('emails.security.email_changed_title'))
+                    ->previewText(__('emails.security.email_changed_preview'))
+                    ->paragraph(__('emails.security.email_changed_body', ['community' => htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8')]))
+                    ->highlight(__('emails.security.email_changed_warning'))
+                    ->render();
 
-                $mailer->send($oldEmail, "Security Alert: Email Address Changed - " . $tenantName, $html);
+                $subject = __('emails.security.email_changed_subject', ['community' => $tenantName]);
+                $mailer->send($oldEmail, $subject, $html);
             } catch (\Throwable $e) {
                 Log::warning('Failed to send email change notification to old address', ['user_id' => $userId, 'error' => $e->getMessage()]);
             }

@@ -62,12 +62,26 @@
     "expiry": "This link expires in {{hours}} hours."
   },
   "password_reset": {
-    "subject": "Reset your password",
+    "subject": "Reset your password — {{community}}",
+    "title": "Reset Your Password",
+    "preview": "You requested a password reset link",
     "greeting": "Hi {{name}},",
     "body": "You requested a password reset. Click the button below to set a new password.",
     "cta": "Reset Password",
-    "expiry": "This link expires in {{hours}} hours.",
+    "expiry": "This link expires in 1 hour.",
     "ignore": "If you did not request this, you can safely ignore this email."
+  },
+  "security": {
+    "password_changed_subject": "Security Alert: Your password was changed — {{community}}",
+    "password_changed_title": "Password Changed",
+    "password_changed_preview": "Your account password was recently changed",
+    "password_changed_body": "Your account password was recently changed. If you made this change, no action is needed.",
+    "password_changed_warning": "If you did not make this change, please contact support immediately to secure your account.",
+    "email_changed_subject": "Security Alert: Your email address was changed — {{community}}",
+    "email_changed_title": "Email Address Changed",
+    "email_changed_preview": "The email address on your account has been changed",
+    "email_changed_body": "The email address on your <strong>{{community}}</strong> account has been updated to a new address.",
+    "email_changed_warning": "If you did not make this change, please contact support immediately to secure your account."
   },
   "transaction": {
     "subject": "Time credit transaction — {{amount}}h",

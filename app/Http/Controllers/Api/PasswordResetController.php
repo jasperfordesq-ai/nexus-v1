@@ -13,8 +13,8 @@ use App\Core\ApiErrorCodes;
 use App\Core\Env;
 use App\Core\TenantContext;
 use App\Core\RateLimiter;
+use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
-use App\Core\EmailTemplate;
 use App\Models\Notification;
 use App\Models\User;
 
@@ -202,16 +202,16 @@ class PasswordResetController extends BaseApiController
             $mailer = Mailer::forCurrentTenant();
             $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
 
-            $html = EmailTemplate::render(
-                "Password Changed",
-                "Your password was recently changed.",
-                "Your account password was changed. If you did not make this change, please contact support immediately to secure your account.",
-                null,
-                null,
-                $tenantName
-            );
+            $html = EmailTemplateBuilder::make()
+                ->theme('warning')
+                ->title(__('emails.security.password_changed_title'))
+                ->previewText(__('emails.security.password_changed_preview'))
+                ->paragraph(__('emails.security.password_changed_body'))
+                ->highlight(__('emails.security.password_changed_warning'))
+                ->render();
 
-            $mailer->send($email, "Security Alert: Password Changed - " . $tenantName, $html);
+            $subject = __('emails.security.password_changed_subject', ['community' => $tenantName]);
+            $mailer->send($email, $subject, $html);
         } catch (\Throwable $e) {
             error_log("Failed to send password change email: " . $e->getMessage());
         }
@@ -273,17 +273,24 @@ class PasswordResetController extends BaseApiController
         try {
             $mailer = Mailer::forCurrentTenant();
             $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+            $firstName = $user['first_name'] ?? ($user['name'] ?? null);
+            $greeting = $firstName
+                ? __('emails.password_reset.greeting', ['name' => htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8')])
+                : null;
 
-            $html = EmailTemplate::render(
-                "Reset Your Password",
-                "We received a request to reset your password.",
-                "Click the button below to set a new password. This link will expire in 1 hour.<br><br>If you did not request this change, please ignore this email or contact support if you have concerns.",
-                "Reset Password",
-                $resetUrl,
-                $tenantName
-            );
+            $html = EmailTemplateBuilder::make()
+                ->theme('warning')
+                ->title(__('emails.password_reset.title'))
+                ->previewText(__('emails.password_reset.preview'))
+                ->greeting($greeting ?? __('emails.password_reset.greeting', ['name' => 'there']))
+                ->paragraph(__('emails.password_reset.body'))
+                ->paragraph(__('emails.password_reset.expiry'))
+                ->button(__('emails.password_reset.cta'), $resetUrl)
+                ->paragraph(__('emails.password_reset.ignore'))
+                ->render();
 
-            $mailer->send($email, "Password Reset Request - " . $tenantName, $html);
+            $subject = __('emails.password_reset.subject', ['community' => $tenantName]);
+            $mailer->send($email, $subject, $html);
         } catch (\Throwable $e) {
             $maskedEmail = substr($email, 0, 2) . '***@' . (explode('@', $email)[1] ?? '***');
             error_log("Password reset email failed for {$maskedEmail}: " . $e->getMessage());
