@@ -299,7 +299,9 @@ class AdminMatchingController extends BaseApiController
                 $pendingApprovals = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM match_approvals WHERE tenant_id = ? AND status = 'pending'", [$tenantId])->cnt;
                 $approvedCount = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM match_approvals WHERE tenant_id = ? AND status = 'approved'", [$tenantId])->cnt;
                 $rejectedCount = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM match_approvals WHERE tenant_id = ? AND status = 'rejected'", [$tenantId])->cnt;
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) {
+                \Log::warning('Matching stats approval query failed', ['error' => $e->getMessage()]);
+            }
 
             $totalReviewed = $approvedCount + $rejectedCount;
             $approvalRate = $totalReviewed > 0 ? round(($approvedCount / $totalReviewed) * 100, 1) : 0;

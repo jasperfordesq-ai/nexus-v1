@@ -131,7 +131,6 @@ class StripeWebhookController extends BaseApiController
             Log::error("Stripe webhook handler error for {$event->type}", [
                 'event_id' => $eventId,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
             return $this->respondWithError(
                 'HANDLER_ERROR',

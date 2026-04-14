@@ -5020,6 +5020,22 @@
     "pending_reviews_aria": "Pending verification reviews"
   },
   "rte": {
-    "enter_url": "Enter URL:"
+    "enter_url": "Enter URL:",
+    "undo": "Undo",
+    "redo": "Redo",
+    "heading_2": "Heading 2",
+    "heading_3": "Heading 3",
+    "bold": "Bold",
+    "italic": "Italic",
+    "underline": "Underline",
+    "strikethrough": "Strikethrough",
+    "inline_code": "Inline Code",
+    "bullet_list": "Bullet List",
+    "numbered_list": "Numbered List",
+    "block_quote": "Block Quote",
+    "remove_link": "Remove Link",
+    "insert_link": "Insert Link",
+    "import_markdown": "Import Markdown",
+    "import_md": "Import .md"
   }
 }

@@ -140,11 +140,6 @@
     "engagement": "Participación",
     "system": "Sistema"
   },
-  "sidebar": {
-    "admin": "Admin",
-    "expand_sidebar": "Expandir barra lateral",
-    "collapse_sidebar": "Contraer barra lateral"
-  },
   "job_vacancies": "Job Vacancies",
   "job_pipeline": "Job Pipeline",
   "job_bias_audit": "Bias Audit",
@@ -157,5 +152,8 @@
   "federation_cc_config": "CC Config",
   "module_configuration": "Module Configuration",
   "translation_config": "Translation Config",
-  "broker_panel": "Broker Panel"
+  "broker_panel": "Broker Panel",
+  "admin": "Admin",
+  "expand_sidebar": "Expandir barra lateral",
+  "collapse_sidebar": "Contraer barra lateral"
 }

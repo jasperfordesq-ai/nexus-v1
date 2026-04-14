@@ -140,11 +140,6 @@
     "engagement": "Rannpháirtíocht",
     "system": "Córas"
   },
-  "sidebar": {
-    "admin": "Riarachán",
-    "expand_sidebar": "Leathnaigh an barra taoibh",
-    "collapse_sidebar": "Crap an barra taoibh"
-  },
   "job_vacancies": "Job Vacancies",
   "job_pipeline": "Job Pipeline",
   "job_bias_audit": "Bias Audit",
@@ -157,5 +152,8 @@
   "federation_cc_config": "CC Config",
   "module_configuration": "Module Configuration",
   "translation_config": "Translation Config",
-  "broker_panel": "Broker Panel"
+  "broker_panel": "Broker Panel",
+  "admin": "Riarachán",
+  "expand_sidebar": "Leathnaigh an barra taoibh",
+  "collapse_sidebar": "Crap an barra taoibh"
 }
