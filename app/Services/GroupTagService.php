@@ -111,6 +111,18 @@ class GroupTagService
     {
         $tenantId = TenantContext::getId();
 
+        // Verify the tag belongs to this tenant BEFORE deleting assignments.
+        // group_tag_assignments has no tenant_id column, so without this guard
+        // a caller with a foreign tagId could wipe assignments across tenants.
+        $tag = DB::table('group_tags')
+            ->where('id', $tagId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$tag) {
+            return false;
+        }
+
         DB::table('group_tag_assignments')->where('tag_id', $tagId)->delete();
         return DB::table('group_tags')
             ->where('id', $tagId)
@@ -141,6 +153,17 @@ class GroupTagService
     public static function setForGroup(int $groupId, array $tagIds): void
     {
         $tenantId = TenantContext::getId();
+
+        // Verify the group belongs to the current tenant to prevent cross-tenant
+        // modification of group_tag_assignments via an attacker-supplied groupId.
+        $group = DB::table('groups')
+            ->where('id', $groupId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$group) {
+            return;
+        }
 
         // Validate tags belong to tenant
         $validIds = DB::table('group_tags')

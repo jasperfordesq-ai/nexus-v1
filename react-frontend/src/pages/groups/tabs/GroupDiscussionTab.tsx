@@ -173,6 +173,7 @@ export function GroupDiscussionTab({
                   role="button"
                   tabIndex={0}
                   aria-expanded={expandedDiscussionId === discussion.id}
+                  aria-label={discussion.title}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onExpandDiscussion(discussion.id); } }}
                 >
                   <div className="p-4">

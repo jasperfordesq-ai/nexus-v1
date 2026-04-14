@@ -327,7 +327,9 @@ class NexusScoreService
         $eventCount = 0;
         try {
             $eventCount = EventRsvp::where('user_id', $userId)->count();
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            Log::warning('NexusScore: EventRsvp query failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
+        }
 
         $groupCount = GroupMember::where('user_id', $userId)->where('status', 'active')->count();
 
@@ -404,7 +406,11 @@ class NexusScoreService
     private function calculateImpactScore(int $userId): array
     {
         $postCount = 0;
-        try { $postCount = FeedPost::where('user_id', $userId)->count(); } catch (\Throwable $e) {}
+        try {
+            $postCount = FeedPost::where('user_id', $userId)->count();
+        } catch (\Throwable $e) {
+            Log::warning('NexusScore: FeedPost query failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
+        }
 
         $likesReceived = 0;
         try {
@@ -412,7 +418,9 @@ class NexusScoreService
                 ->join('feed_posts', 'post_likes.post_id', '=', 'feed_posts.id')
                 ->where('feed_posts.user_id', $userId)
                 ->count();
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            Log::warning('NexusScore: post_likes query failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
+        }
 
         $contentScore = min(50, ($postCount / 50) * 50);
         $engagementScore = min(50, ($likesReceived / 100) * 50);
