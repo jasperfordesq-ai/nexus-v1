@@ -1642,7 +1642,19 @@
     "btn_clear": "Clear",
     "btn_view": "View",
     "btn_export": "Export",
-    "btn_close": "Close"
+    "btn_close": "Close",
+    "btn_publish": "Publish",
+    "btn_edit": "Edit",
+    "btn_delete": "Delete",
+    "btn_notify": "Notify",
+    "btn_compare": "Compare",
+    "btn_view": "View",
+    "btn_export": "Export",
+    "btn_clear": "Clear",
+    "failed_to_load_compliance_stats": "Failed to load compliance stats",
+    "failed_to_load_acceptances": "Failed to load acceptances",
+    "failed_to_export_acceptances": "Failed to export acceptances",
+    "export_downloaded_successfully": "Export downloaded successfully"
   },
   "events": {
     "an_unexpected_error_occurred": "An Unexpected Error Occurred",
@@ -4218,6 +4230,9 @@
     "system_requirements_desc": "Check server configuration and dependencies",
     "system_requirements_title": "System Requirements",
     "writable_directories": "Writable Directories",
+    "col_actor": "Actor",
+    "col_created": "Created",
+    "col_details": "Details",
     "no_logs_found": "No logs found",
     "try_filters_or_run_cron": "Try adjusting your filters or run a cron job",
     "col_job_name": "Job Name",
@@ -4249,7 +4264,11 @@
     "last_success_label": "Last success",
     "last_failure_label": "Last failure",
     "last_webhook_label": "Last webhook",
-    "failed_to_load_provider_health": "Failed to load provider health"
+    "failed_to_load_provider_health": "Failed to load provider health",
+    "no_identity_providers": "No identity verification providers registered.",
+    "no_sessions_yet": "No sessions yet",
+    "no_successful_sessions": "No successful sessions",
+    "no_failed_sessions": "No failed sessions"
   },
   "timebanking": {
     "a_reason_is_required_for_balance_adjustm": "A Reason is Required for Balance Adjustm",

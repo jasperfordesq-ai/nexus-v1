@@ -115,7 +115,7 @@ export function SegmentForm() {
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
-  usePageTitle(isEdit ? 'Admin - Edit Segment' : 'Admin - Create Segment');
+  usePageTitle(isEdit ? t('segment_form.title_edit') : t('segment_form.title_create'));
 
   // Form state
   const [name, setName] = useState('');
@@ -369,15 +369,15 @@ export function SegmentForm() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={isEdit ? 'Edit Segment' : 'Create Segment'}
-        description={isEdit ? 'Update this audience segment and its targeting rules' : 'Define a new audience segment with targeting rules'}
+        title={isEdit ? t('segment_form.title_edit') : t('segment_form.title_create')}
+        description={isEdit ? t('segment_form.desc_edit') : t('segment_form.desc_create')}
         actions={
           <Button
             variant="flat"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/newsletters/segments'))}
           >
-            Back to Segments
+            {t('segment_form.btn_back_to_segments')}
           </Button>
         }
       />
@@ -393,12 +393,12 @@ export function SegmentForm() {
       {/* Segment Details */}
       <Card shadow="sm">
         <CardHeader className="pb-0">
-          <h3 className="text-lg font-semibold">Segment Details</h3>
+          <h3 className="text-lg font-semibold">{t('segment_form.section_segment_details')}</h3>
         </CardHeader>
         <CardBody className="space-y-4">
           <Input
             label={t('segment_form.label_segment_name')}
-            placeholder="e.g., Active Members, New Joiners"
+            placeholder={t('segment_form.placeholder_segment_name')}
             value={name}
             onValueChange={setName}
             isRequired
@@ -418,7 +418,7 @@ export function SegmentForm() {
               size="sm"
             />
             <span className="text-sm text-foreground">
-              {isActive ? 'Active' : 'Inactive'} -- {isActive ? 'This segment is available for targeting' : 'This segment will not appear in targeting options'}
+              {isActive ? t('segment_form.status_active') : t('segment_form.status_inactive')} -- {isActive ? t('segment_form.status_active_hint') : t('segment_form.status_inactive_hint')}
             </span>
           </div>
         </CardBody>
@@ -427,7 +427,7 @@ export function SegmentForm() {
       {/* Rule Builder */}
       <Card shadow="sm">
         <CardHeader className="flex justify-between items-center pb-0">
-          <h3 className="text-lg font-semibold">Targeting Rules</h3>
+          <h3 className="text-lg font-semibold">{t('segment_form.section_targeting_rules')}</h3>
           <Select
             size="sm"
             label={t('segment_form.label_match_logic')}
@@ -445,8 +445,8 @@ export function SegmentForm() {
         <CardBody className="space-y-3">
           <p className="text-sm text-default-500">
             {matchType === 'all'
-              ? 'Members must match ALL of the following rules to be included.'
-              : 'Members matching ANY of the following rules will be included.'}
+              ? t('segment_form.match_all_description')
+              : t('segment_form.match_any_description')}
           </p>
 
           <Divider />
@@ -493,7 +493,7 @@ export function SegmentForm() {
 
               {rule.field && rule.operator && renderValueInput(rule)}
 
-              <Tooltip content="Remove rule">
+              <Tooltip content={t('segment_form.remove_rule_tooltip')}>
                 <Button
                   isIconOnly
                   size="sm"
@@ -516,7 +516,7 @@ export function SegmentForm() {
               startContent={<Plus size={14} />}
               onPress={addRule}
             >
-              Add Rule
+              {t('segment_form.btn_add_rule')}
             </Button>
           </div>
         </CardBody>
@@ -525,7 +525,7 @@ export function SegmentForm() {
       {/* Preview */}
       <Card shadow="sm">
         <CardHeader className="pb-0">
-          <h3 className="text-lg font-semibold">Preview</h3>
+          <h3 className="text-lg font-semibold">{t('segment_form.section_preview')}</h3>
         </CardHeader>
         <CardBody>
           <div className="flex items-center gap-4">
@@ -536,7 +536,7 @@ export function SegmentForm() {
               onPress={handlePreview}
               isLoading={previewing}
             >
-              Preview Matching Members
+              {t('segment_form.btn_preview_members')}
             </Button>
 
             {previewCount !== null && (
@@ -559,17 +559,17 @@ export function SegmentForm() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 pb-0">
             <Sparkles size={18} className="text-warning" />
-            <h3 className="text-lg font-semibold">Smart Suggestions</h3>
+            <h3 className="text-lg font-semibold">{t('segment_form.section_smart_suggestions')}</h3>
           </CardHeader>
           <CardBody>
             {loadingSuggestions ? (
               <div className="flex items-center gap-2 py-4">
                 <Spinner size="sm" />
-                <span className="text-sm text-default-500">Analyzing your member data...</span>
+                <span className="text-sm text-default-500">{t('segment_form.analyzing_member_data')}</span>
               </div>
             ) : suggestions.length === 0 ? (
               <p className="text-sm text-default-400 py-2">
-                No suggestions available. Add more members to get AI-powered segment suggestions.
+                {t('segment_form.no_suggestions')}
               </p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -604,7 +604,7 @@ export function SegmentForm() {
           variant="flat"
           onPress={() => navigate(tenantPath('/admin/newsletters/segments'))}
         >
-          Cancel
+          {t('segment_form.btn_cancel')}
         </Button>
         <Button
           color="primary"
@@ -612,7 +612,7 @@ export function SegmentForm() {
           onPress={handleSave}
           isLoading={saving}
         >
-          {isEdit ? 'Update Segment' : 'Create Segment'}
+          {isEdit ? t('segment_form.btn_update_segment') : t('segment_form.btn_create_segment')}
         </Button>
       </div>
     </div>

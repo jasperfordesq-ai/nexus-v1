@@ -286,8 +286,8 @@ export function CronJobLogs() {
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center gap-3 py-16 text-default-400">
             <FileText size={48} />
-            <p className="text-lg font-medium">No logs found</p>
-            <p className="text-sm">Try adjusting your filters or run a cron job</p>
+            <p className="text-lg font-medium">{t('system.no_logs_found')}</p>
+            <p className="text-sm">{t('system.try_filters_or_run_cron')}</p>
           </CardBody>
         </Card>
       )}
@@ -298,12 +298,12 @@ export function CronJobLogs() {
           <CardBody className="p-0">
             <Table aria-label={t('system.label_cron_job_logs')} removeWrapper>
               <TableHeader>
-                <TableColumn>JOB NAME</TableColumn>
-                <TableColumn>STATUS</TableColumn>
-                <TableColumn>DURATION</TableColumn>
-                <TableColumn>OUTPUT</TableColumn>
-                <TableColumn>EXECUTED AT</TableColumn>
-                <TableColumn>EXECUTED BY</TableColumn>
+                <TableColumn>{t('system.col_job_name')}</TableColumn>
+                <TableColumn>{t('system.col_status')}</TableColumn>
+                <TableColumn>{t('system.col_duration')}</TableColumn>
+                <TableColumn>{t('system.col_output')}</TableColumn>
+                <TableColumn>{t('system.col_executed_at')}</TableColumn>
+                <TableColumn>{t('system.col_executed_by')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {logs.map((log) => (

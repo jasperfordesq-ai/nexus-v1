@@ -376,11 +376,11 @@ export function HoursReportsPage() {
 
         <Table aria-label={t('reports.label_hours_by_member')} shadow="sm">
           <TableHeader>
-            <TableColumn>Member</TableColumn>
-            <TableColumn>Hours Given</TableColumn>
-            <TableColumn>Hours Received</TableColumn>
-            <TableColumn>Total</TableColumn>
-            <TableColumn>Balance</TableColumn>
+            <TableColumn>{t('reports.col_member')}</TableColumn>
+            <TableColumn>{t('reports.col_hours_given')}</TableColumn>
+            <TableColumn>{t('reports.col_hours_received')}</TableColumn>
+            <TableColumn>{t('reports.col_total')}</TableColumn>
+            <TableColumn>{t('reports.col_balance')}</TableColumn>
           </TableHeader>
           <TableBody
             emptyContent={t('reports.no_member_hours_data')}
