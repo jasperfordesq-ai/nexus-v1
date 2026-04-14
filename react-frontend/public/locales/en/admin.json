@@ -789,6 +789,7 @@
     "medium": "Medium",
     "planned": "Planned",
     "clear": "Clear",
+    "no": "No",
     "refresh": "Refresh",
     "unexpected_error": "Unexpected error",
     "unfeature": "Unfeature"
@@ -901,6 +902,7 @@
     "module_desc_identity_verification": "Stripe Identity verification with ID Verified badge, document + selfie matching, and configurable fee"
   },
   "content": {
+    "about": "About",
     "about_section": "About Section",
     "advanced_options": "Advanced Options",
     "allowed_layouts": "Allowed Layouts",
@@ -4808,5 +4810,44 @@
     "total_actions_30d": "Total Actions (Last 30 Days)",
     "export_csv": "Export CSV",
     "clear": "Clear Filters"
+  },
+  "bulk": {
+    "result_failed": "Bulk action failed",
+    "result_partial": "Partial success: {{success}} succeeded, {{failed}} failed",
+    "result_success": "{{count}} item(s) updated successfully",
+    "confirm_title": "{{action}} selected items?",
+    "confirm_message": "This will {{action}} {{count}} item(s).",
+    "destructive_warning": "This action cannot be undone.",
+    "reason_label": "Reason",
+    "reason_placeholder": "Enter a reason...",
+    "clear_selection": "Clear selection",
+    "blog": {
+      "publish": "Publish",
+      "publish_confirm_title": "Publish selected posts?",
+      "publish_confirm_message": "This will publish {{count}} post(s).",
+      "archive": "Archive (Unpublish)",
+      "archive_confirm_title": "Archive selected posts?",
+      "archive_confirm_message": "This will unpublish {{count}} post(s). They can be republished later.",
+      "delete": "Delete",
+      "delete_confirm_title": "Delete selected posts?",
+      "delete_confirm_message": "This will permanently delete {{count}} post(s). This cannot be undone."
+    },
+    "marketplace": {
+      "reject": "Reject",
+      "reject_confirm_title": "Reject selected items?",
+      "reject_confirm_message": "This will reject {{count}} item(s).",
+      "reason_label": "Rejection reason",
+      "reason_placeholder": "Enter rejection reason..."
+    },
+    "users": {
+      "approve": "Approve",
+      "approve_confirm_title": "Approve selected users?",
+      "approve_confirm_message": "This will approve {{count}} user(s).",
+      "suspend": "Suspend",
+      "suspend_confirm_title": "Suspend selected users?",
+      "suspend_confirm_message": "This will suspend {{count}} user(s).",
+      "reason_label": "Suspension reason",
+      "reason_placeholder": "Enter suspension reason..."
+    }
   }
 }
