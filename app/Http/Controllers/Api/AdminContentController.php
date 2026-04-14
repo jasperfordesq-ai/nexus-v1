@@ -190,7 +190,9 @@ class AdminContentController extends BaseApiController
         $row['status'] = $row['is_published'] ? 'published' : 'draft';
         unset($row['is_published']);
 
-        try { $this->redisCache->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
+        try { $this->redisCache->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {
+            \Log::warning('Failed to invalidate tenant_bootstrap cache on page create', ['tenant_id' => $tenantId, 'error' => $e->getMessage()]);
+        }
 
         return $this->respondWithData($row, null, 201);
     }
@@ -261,7 +263,9 @@ class AdminContentController extends BaseApiController
         $row['status'] = $row['is_published'] ? 'published' : 'draft';
         unset($row['is_published']);
 
-        try { $this->redisCache->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
+        try { $this->redisCache->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {
+            \Log::warning('Failed to invalidate tenant_bootstrap cache on page update', ['tenant_id' => $tenantId, 'error' => $e->getMessage()]);
+        }
 
         return $this->respondWithData($row);
     }
@@ -286,7 +290,9 @@ class AdminContentController extends BaseApiController
 
         ActivityLog::log($adminId, 'admin_delete_page', "Deleted page #{$id}: " . ($existing->title ?? ''));
 
-        try { $this->redisCache->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
+        try { $this->redisCache->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {
+            \Log::warning('Failed to invalidate tenant_bootstrap cache on page delete', ['tenant_id' => $tenantId, 'error' => $e->getMessage()]);
+        }
 
         return $this->respondWithData(['deleted' => true]);
     }

@@ -1622,7 +1622,9 @@ class ExploreService
                     'score' => 40 + min(30, (int) $post['engagement']), 'created_at' => $post['created_at'],
                 ];
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            \Log::warning('ExploreService: failed to fetch trending posts for mixed feed', ['tenant_id' => $tenantId, 'error' => $e->getMessage()]);
+        }
 
         try {
             foreach ($this->getPopularListings($tenantId) as $listing) {
