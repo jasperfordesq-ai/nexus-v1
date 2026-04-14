@@ -700,24 +700,24 @@ export function ImpactReport() {
             <Card shadow="sm" className="mb-8">
               <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
                 <Lightbulb size={18} className="text-warning" />
-                <h3 className="font-semibold">Skills Overview</h3>
+                <h3 className="font-semibold">{t('impact.section_skills_overview')}</h3>
               </CardHeader>
               <CardBody className="px-4 pb-4">
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                   <div className="p-4 rounded-lg bg-default-50">
-                    <p className="text-xs text-default-500 mb-1">Skills Offered</p>
+                    <p className="text-xs text-default-500 mb-1">{t('impact.label_skills_offered')}</p>
                     <p className="text-2xl font-bold text-primary">{extras.skills.skills_offered ?? 0}</p>
                   </div>
                   <div className="p-4 rounded-lg bg-default-50">
-                    <p className="text-xs text-default-500 mb-1">Skills Requested</p>
+                    <p className="text-xs text-default-500 mb-1">{t('impact.label_skills_requested')}</p>
                     <p className="text-2xl font-bold text-secondary">{extras.skills.skills_requested ?? 0}</p>
                   </div>
                   <div className="p-4 rounded-lg bg-default-50">
-                    <p className="text-xs text-default-500 mb-1">Unique Skills</p>
+                    <p className="text-xs text-default-500 mb-1">{t('impact.label_unique_skills')}</p>
                     <p className="text-2xl font-bold text-success">{extras.skills.unique_skills ?? 0}</p>
                   </div>
                   <div className="p-4 rounded-lg bg-default-50">
-                    <p className="text-xs text-default-500 mb-1">Active Listings</p>
+                    <p className="text-xs text-default-500 mb-1">{t('impact.label_active_listings')}</p>
                     <p className="text-2xl font-bold text-warning">{extras.skills.total_listings ?? 0}</p>
                   </div>
                 </div>
@@ -734,10 +734,10 @@ export function ImpactReport() {
       <div className="mb-2">
         <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
           <Activity size={20} className="text-success" />
-          Community Health
+          {t('impact.section_community_health')}
         </h2>
         <p className="text-sm text-default-500 mt-0.5">
-          Current community engagement and network metrics
+          {t('impact.section_community_health_desc')}
         </p>
       </div>
 
@@ -775,7 +775,7 @@ export function ImpactReport() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         <Card shadow="sm">
           <CardBody className="p-4">
-            <p className="text-sm text-default-500">Total Members</p>
+            <p className="text-sm text-default-500">{t('impact.label_total_members')}</p>
             {loading ? (
               <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
             ) : (
@@ -787,7 +787,7 @@ export function ImpactReport() {
         </Card>
         <Card shadow="sm">
           <CardBody className="p-4">
-            <p className="text-sm text-default-500">Active (90 days)</p>
+            <p className="text-sm text-default-500">{t('impact.label_active_90d')}</p>
             {loading ? (
               <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
             ) : (
@@ -799,7 +799,7 @@ export function ImpactReport() {
         </Card>
         <Card shadow="sm">
           <CardBody className="p-4">
-            <p className="text-sm text-default-500">New (30 days)</p>
+            <p className="text-sm text-default-500">{t('impact.label_new_30d')}</p>
             {loading ? (
               <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
             ) : (
@@ -811,7 +811,7 @@ export function ImpactReport() {
         </Card>
         <Card shadow="sm">
           <CardBody className="p-4">
-            <p className="text-sm text-default-500">Network Density</p>
+            <p className="text-sm text-default-500">{t('impact.label_network_density')}</p>
             {loading ? (
               <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
             ) : (
@@ -820,7 +820,7 @@ export function ImpactReport() {
               </p>
             )}
             <p className="text-xs text-default-400 mt-1">
-              {data?.health.total_connections.toLocaleString() ?? 0} connections
+              {data?.health.total_connections.toLocaleString() ?? 0} {t('impact.unit_connections')}
             </p>
           </CardBody>
         </Card>
@@ -834,7 +834,7 @@ export function ImpactReport() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Clock size={18} className="text-primary" />
-            <h3 className="font-semibold">Hours Exchanged Over Time</h3>
+            <h3 className="font-semibold">{t('impact.chart_hours_exchanged_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
@@ -857,7 +857,7 @@ export function ImpactReport() {
                   <Area
                     type="monotone"
                     dataKey="hours_exchanged"
-                    name="Hours Exchanged"
+                    name={t('impact.chart_hours_name')}
                     stroke={CHART_COLOR_MAP.primary}
                     fill="url(#hoursGradient)"
                     strokeWidth={2}
@@ -866,7 +866,7 @@ export function ImpactReport() {
               </ResponsiveContainer>
             ) : (
               <p className="flex h-[300px] items-center justify-center text-sm text-default-400">
-                No timeline data available yet
+                {t('impact.empty_timeline')}
               </p>
             )}
           </CardBody>
@@ -875,7 +875,7 @@ export function ImpactReport() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Activity size={18} className="text-success" />
-            <h3 className="font-semibold">Activity Breakdown</h3>
+            <h3 className="font-semibold">{t('impact.chart_activity_breakdown_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
@@ -890,13 +890,13 @@ export function ImpactReport() {
                   <YAxis tick={{ fontSize: 12 }} tickLine={false} />
                   <Tooltip contentStyle={tooltipStyle} labelStyle={{ fontWeight: 600 }} />
                   <Legend />
-                  <Bar dataKey="transactions" name="Transactions" fill={CHART_COLOR_MAP.primary} radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="new_users" name="New Users" fill={CHART_COLOR_MAP.success} radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="transactions" name={t('impact.chart_transactions_name')} fill={CHART_COLOR_MAP.primary} radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="new_users" name={t('impact.chart_new_users_name')} fill={CHART_COLOR_MAP.success} radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
               <p className="flex h-[300px] items-center justify-center text-sm text-default-400">
-                No activity data available yet
+                {t('impact.empty_activity')}
               </p>
             )}
           </CardBody>
@@ -909,7 +909,7 @@ export function ImpactReport() {
         <Card shadow="sm" className="mb-8">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Sparkles size={18} className="text-success" />
-            <h3 className="font-semibold">Impact Summary</h3>
+            <h3 className="font-semibold">{t('impact.section_impact_summary')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">
@@ -918,13 +918,13 @@ export function ImpactReport() {
             <Divider className="my-4" />
             <div className="text-xs text-default-400 space-y-1">
               <p>
-                <strong>Hour Value:</strong> {formatCurrency(extras.config.hour_value, currency)}/hr
+                <strong>{t('impact.label_hour_value')}:</strong> {formatCurrency(extras.config.hour_value, currency)}/hr
               </p>
               <p>
-                <strong>Social Multiplier:</strong> {extras.config.social_multiplier}x
+                <strong>{t('impact.label_social_multiplier')}:</strong> {extras.config.social_multiplier}x
               </p>
               <p>
-                <strong>Formula:</strong> Social Value = Hours × Hour Value × Multiplier
+                <strong>{t('impact.label_formula')}:</strong> {t('impact.formula_simple')}
               </p>
             </div>
           </CardBody>
@@ -935,11 +935,10 @@ export function ImpactReport() {
 
       <Modal isOpen={configOpen} onClose={closeConfig} size="lg">
         <ModalContent>
-          <ModalHeader>SROI Configuration</ModalHeader>
+          <ModalHeader>{t('impact.modal_sroi_config_title')}</ModalHeader>
           <ModalBody>
             <p className="text-sm text-default-500 mb-4">
-              Configure how social value is calculated. Changes recalculate all metrics
-              across both Impact and Social Value backends.
+              {t('impact.desc_sroi_config')}
             </p>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Select
@@ -969,7 +968,7 @@ export function ImpactReport() {
                     {CURRENCY_SYMBOLS[configCurrency] || configCurrency}
                   </span>
                 }
-                description="Value per hour of service (Timebanking UK default: 15.00)"
+                description={t('impact.desc_hour_value')}
               />
               <Input
                 label={t('reports.label_social_multiplier')}
@@ -999,21 +998,19 @@ export function ImpactReport() {
             <Divider className="my-4" />
             <div className="text-xs text-default-400 space-y-1">
               <p>
-                <strong>SROI Formula:</strong> Social Value = Total Hours × Hourly Value (
+                <strong>{t('impact.label_sroi_formula')}:</strong> Social Value = Total Hours × Hourly Value (
                 {CURRENCY_SYMBOLS[configCurrency] || configCurrency}{configHourValue}/hr) × Social Multiplier ({configMultiplier}×)
               </p>
               <p>
-                <strong>SROI Ratio:</strong> Social Value / Monetary Value (a ratio of {configMultiplier}:1 means every
+                <strong>{t('impact.label_sroi_ratio')}:</strong> Social Value / Monetary Value (a ratio of {configMultiplier}:1 means every
                 {' '}{CURRENCY_SYMBOLS[configCurrency] || configCurrency}1 of direct value generates
                 {' '}{CURRENCY_SYMBOLS[configCurrency] || configCurrency}{configMultiplier} in social value)
               </p>
               <p>
-                <strong>Reciprocity Score:</strong> 1.0 = perfectly balanced giving/receiving across all members;
-                0.0 = completely one-directional
+                <strong>{t('impact.label_reciprocity_score')}:</strong> {t('impact.formula_reciprocity')}
               </p>
               <p>
-                <strong>Network Density:</strong> Ratio of actual connections to possible connections
-                (higher = more interconnected community)
+                <strong>{t('impact.label_network_density')}:</strong> {t('impact.formula_density')}
               </p>
             </div>
           </ModalBody>

@@ -223,5 +223,9 @@
     },
     "group_invite": {
         "invite_revoked": "Invite revoked"
+    },
+    "contact_form": {
+        "sent_successfully": "Message sent successfully.",
+        "received_fallback": "Message received. We'll get back to you soon."
     }
 }

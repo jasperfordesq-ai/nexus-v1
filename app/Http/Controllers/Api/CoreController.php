@@ -73,7 +73,7 @@ class CoreController extends BaseApiController
             // Table may not exist — non-critical
         }
 
-        return $this->respondWithData(['message' => $sent ? 'Message sent successfully.' : "Message received. We'll get back to you soon."]);
+        return $this->respondWithData(['message' => $sent ? __('api_controllers_1.contact_form.sent_successfully') : __('api_controllers_1.contact_form.received_fallback')]);
     }
 
     // ──────────────────────────────────────────────
