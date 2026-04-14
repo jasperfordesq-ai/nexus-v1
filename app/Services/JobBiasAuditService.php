@@ -75,11 +75,11 @@ class JobBiasAuditService
     {
         $total = $this->getTotalApplications($tenantId, $jobId, $dateFrom, $dateTo);
         if ($total === 0) {
-            return array_map(fn($stage) => [
-                'stage' => $stage,
-                'count' => 0,
-                'percentage' => 0,
-            ], self::STAGES);
+            $empty = [];
+            foreach (self::STAGES as $stage) {
+                $empty[$stage] = 0;
+            }
+            return $empty;
         }
 
         $funnel = [];
@@ -116,11 +116,7 @@ class JobBiasAuditService
                 })->count();
             }
 
-            $funnel[] = [
-                'stage' => $stage,
-                'count' => $count,
-                'percentage' => round(($count / $total) * 100, 1),
-            ];
+            $funnel[$stage] = $count;
         }
 
         return $funnel;
@@ -173,8 +169,8 @@ class JobBiasAuditService
             }
 
             $rates[$stage] = [
-                'rejections' => $rejections,
-                'total_at_stage' => $entered,
+                'rejected' => $rejections,
+                'total' => $entered,
                 'rate' => $entered > 0 ? round(($rejections / $entered) * 100, 1) : 0,
             ];
         }
@@ -242,10 +238,10 @@ class JobBiasAuditService
         $total = $accepted + $rejected;
 
         return [
+            'accepted_avg' => $total > 0 ? round($accepted / $total, 2) : 0,
+            'rejected_avg' => $total > 0 ? round($rejected / $total, 2) : 0,
             'accepted_count' => $accepted,
             'rejected_count' => $rejected,
-            'acceptance_rate' => $total > 0 ? round(($accepted / $total) * 100, 1) : 0,
-            'note' => 'Skills match correlation requires detailed skills data tracking. This shows overall acceptance vs rejection rates.',
         ];
     }
 
@@ -273,8 +269,23 @@ class JobBiasAuditService
 
         $sources = [];
 
+        // Direct applications
+        $directApps = (clone $query)
+            ->select(
+                DB::raw('COUNT(*) as total'),
+                DB::raw('SUM(CASE WHEN a.status = "accepted" THEN 1 ELSE 0 END) as accepted')
+            )
+            ->first();
+
+        $directTotal = (int) ($directApps->total ?? 0);
+        $directAccepted = (int) ($directApps->accepted ?? 0);
+        $sources['direct'] = [
+            'applications' => $directTotal,
+            'accepted' => $directAccepted,
+            'rate' => $directTotal > 0 ? round(($directAccepted / $directTotal) * 100, 1) : 0,
+        ];
+
         if ($hasReferrals) {
-            // Get referral applications
             $referralApps = (clone $query)
                 ->whereExists(function ($sub) {
                     $sub->select(DB::raw(1))
@@ -288,30 +299,16 @@ class JobBiasAuditService
                 )
                 ->first();
 
+            $refTotal = (int) ($referralApps->total ?? 0);
+            $refAccepted = (int) ($referralApps->accepted ?? 0);
             $sources['referral'] = [
-                'total_applications' => (int) ($referralApps->total ?? 0),
-                'accepted' => (int) ($referralApps->accepted ?? 0),
-                'acceptance_rate' => ($referralApps->total ?? 0) > 0
-                    ? round((($referralApps->accepted ?? 0) / $referralApps->total) * 100, 1)
-                    : 0,
+                'applications' => $refTotal,
+                'accepted' => $refAccepted,
+                'rate' => $refTotal > 0 ? round(($refAccepted / $refTotal) * 100, 1) : 0,
             ];
+        } else {
+            $sources['referral'] = ['applications' => 0, 'accepted' => 0, 'rate' => 0];
         }
-
-        // Direct applications (all that aren't referrals)
-        $directApps = (clone $query)
-            ->select(
-                DB::raw('COUNT(*) as total'),
-                DB::raw('SUM(CASE WHEN a.status = "accepted" THEN 1 ELSE 0 END) as accepted')
-            )
-            ->first();
-
-        $sources['direct'] = [
-            'total_applications' => (int) ($directApps->total ?? 0),
-            'accepted' => (int) ($directApps->accepted ?? 0),
-            'acceptance_rate' => ($directApps->total ?? 0) > 0
-                ? round((($directApps->accepted ?? 0) / $directApps->total) * 100, 1)
-                : 0,
-        ];
 
         return $sources;
     }
