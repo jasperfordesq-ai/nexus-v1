@@ -1,5 +1,0 @@
-#!/usr/bin/env sh
-
-# Mobile pre-push hook disabled — mobile development on hold
-# CI pipeline handles all test validation
-exit 0

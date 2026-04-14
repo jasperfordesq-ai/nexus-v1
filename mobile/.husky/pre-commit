@@ -1,5 +1,0 @@
-#!/usr/bin/env sh
-
-# Mobile pre-commit hook disabled — mobile development on hold
-# CI pipeline handles type-check and lint validation
-exit 0
