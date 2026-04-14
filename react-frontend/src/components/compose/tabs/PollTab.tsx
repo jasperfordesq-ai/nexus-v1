@@ -173,7 +173,7 @@ export function PollTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
 
       <div className="space-y-2 pl-0 sm:pl-11">
         {draft.options.map((opt, index) => (
-          <div key={index} className="flex items-center gap-2">
+          <div key={opt || `option-${index}`} className="flex items-center gap-2">
             <div className="w-5 h-5 rounded-full border-2 border-[var(--border-default)] flex-shrink-0 flex items-center justify-center text-[10px] text-[var(--text-subtle)] font-medium">
               {index + 1}
             </div>

@@ -322,7 +322,7 @@ export function VolunteeringOverview() {
                   type="monotone"
                   dataKey="hours"
                   name={t('volunteering.chart_hours', 'Hours')}
-                  stroke="#22c55e"
+                  stroke="var(--chart-color-success, #22c55e)"
                   fill="url(#gradHours)"
                   strokeWidth={2}
                 />
@@ -330,7 +330,7 @@ export function VolunteeringOverview() {
                   type="monotone"
                   dataKey="applications"
                   name={t('volunteering.chart_applications', 'Applications')}
-                  stroke="#3b82f6"
+                  stroke="var(--chart-color-info, #3b82f6)"
                   fill="url(#gradApplications)"
                   strokeWidth={2}
                 />
@@ -338,7 +338,7 @@ export function VolunteeringOverview() {
                   type="monotone"
                   dataKey="volunteers"
                   name={t('volunteering.chart_volunteers', 'Volunteers')}
-                  stroke="#a855f7"
+                  stroke="var(--chart-color-accent, #a855f7)"
                   fill="url(#gradVolunteers)"
                   strokeWidth={2}
                 />

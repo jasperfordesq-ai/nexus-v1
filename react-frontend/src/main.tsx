@@ -109,8 +109,8 @@ function ErrorFallback() {
       minHeight: '100vh',
       padding: '2rem',
       textAlign: 'center',
-      backgroundColor: '#0f172a',
-      color: '#e2e8f0',
+      backgroundColor: 'var(--color-background, #0f172a)',
+      color: 'var(--color-text, #e2e8f0)',
     }}>
       <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Something went wrong</h1>
       <p style={{ marginBottom: '2rem', opacity: 0.8 }}>
@@ -120,7 +120,7 @@ function ErrorFallback() {
         onClick={() => window.location.reload()}
         style={{
           padding: '0.75rem 1.5rem',
-          backgroundColor: '#6366f1',
+          backgroundColor: 'var(--color-primary, #6366f1)',
           color: 'white',
           border: 'none',
           borderRadius: '0.5rem',

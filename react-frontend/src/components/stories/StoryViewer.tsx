@@ -685,7 +685,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                     className="w-full h-full flex items-center justify-center p-8"
                     style={{
                       background: resolveGradient(currentStory.background_gradient),
-                      backgroundColor: currentStory.background_color || '#1f2937',
+                      backgroundColor: currentStory.background_color || 'var(--color-neutral-700, #1f2937)',
                     }}
                   >
                     <p
@@ -743,7 +743,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                     className="w-full h-full flex flex-col items-center justify-center p-8 gap-6"
                     style={{
                       background: resolveGradient(currentStory.background_gradient),
-                      backgroundColor: currentStory.background_color || '#1f2937',
+                      backgroundColor: currentStory.background_color || 'var(--color-neutral-700, #1f2937)',
                     }}
                   >
                     <h3 className="text-white text-xl font-bold text-center drop-shadow-lg max-w-sm">
