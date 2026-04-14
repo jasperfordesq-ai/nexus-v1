@@ -120,7 +120,16 @@
     "reviewed_success": "D'éirigh le hathbhreithniú na teachtaireachta.",
     "no_flagged": "Níl aon teachtaireachtaí le bratach le hathbhreithniú.",
     "no_assignments": "Níl aon sannadh caomhnóirí.",
-    "no_preferences": "Níl aon sainroghanna cosanta ball taifeadta."
+    "no_preferences": "Níl aon sainroghanna cosanta ball taifeadta.",
+    "col_has_triggers": "Has Triggers",
+    "yes": "Yes",
+    "no": "No",
+    "stat_flags_month": "Flags This Month",
+    "stat_critical": "Critical Flags",
+    "stat_unreviewed": "Unreviewed",
+    "tabs_aria": "Safeguarding tabs",
+    "severity_label": "Severity:",
+    "review_notes_label": "Review Notes"
   },
   "vetting": {
     "title": "Scagadh & DBS",
@@ -140,7 +149,13 @@
     "reject_reason_placeholder": "Cúis le diúltú...",
     "verified_success": "Taifead scagtha deimhnithe.",
     "rejected_success": "Taifead scagtha diúltaithe.",
-    "no_records": "Níor aimsíodh aon taifid scagtha."
+    "no_records": "Níor aimsíodh aon taifid scagtha.",
+    "reject_reason_label": "Reason",
+    "stat_total": "Total",
+    "stat_pending": "Pending",
+    "stat_verified": "Verified",
+    "stat_expiring": "Expiring Soon",
+    "tabs_aria": "Vetting status tabs"
   },
   "exchanges": {
     "title": "Malartuithe",
@@ -162,7 +177,10 @@
     "reason_placeholder": "Cúis le diúltú...",
     "approved_success": "Malartú ceadaithe.",
     "rejected_success": "Malartú diúltaithe.",
-    "no_exchanges": "Níor aimsíodh aon mhalartuithe."
+    "no_exchanges": "Níor aimsíodh aon mhalartuithe.",
+    "actions_aria": "Actions",
+    "exchange_actions_aria": "Exchange actions",
+    "status_filter_aria": "Exchange status filter"
   },
   "messages": {
     "title": "Athbhreithniú Teachtaireachtaí",
@@ -179,7 +197,8 @@
     "col_actions": "Gníomhartha",
     "mark_reviewed": "Marcáil Athbhreithnithe",
     "reviewed_success": "Teachtaireacht marcáilte mar athbhreithnithe.",
-    "no_messages": "Níl aon teachtaireachtaí le hathbhreithniú."
+    "no_messages": "Níl aon teachtaireachtaí le hathbhreithniú.",
+    "filter_aria": "Message filter"
   },
   "status": {
     "active": "Gníomhach",

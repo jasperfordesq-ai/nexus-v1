@@ -393,7 +393,10 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $existing = \App\Models\NewsletterSubscriber::where('email', strtolower(trim($email)))->first();
+            $tenantId = TenantContext::getId();
+            $existing = \App\Models\NewsletterSubscriber::where('email', strtolower(trim($email)))
+                ->where('tenant_id', $tenantId)
+                ->first();
             if ($existing) {
                 return $this->respondWithError('DUPLICATE', __('api.subscriber_already_exists'), 'email', 409);
             }
@@ -420,7 +423,10 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $subscriber = \App\Models\NewsletterSubscriber::find($id);
+            $tenantId = TenantContext::getId();
+            $subscriber = \App\Models\NewsletterSubscriber::where('id', $id)
+                ->where('tenant_id', $tenantId)
+                ->first();
             if (!$subscriber) {
                 return $this->respondWithError('NOT_FOUND', __('api.subscriber_not_found'), null, 404);
             }
@@ -588,6 +594,7 @@ class AdminNewsletterController extends BaseApiController
 
             // Full analytics from sent newsletters (mirrors legacy PHP admin)
             $newsletters = \App\Models\Newsletter::where('status', 'sent')
+                ->where('tenant_id', $tenantId)
                 ->orderByDesc('sent_at')
                 ->get()
                 ->map(fn($n) => $n->toArray())

@@ -93,8 +93,8 @@ export function VerificationAuditLog() {
       <CardHeader className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center px-6 pt-5 pb-0">
         <div className="flex items-center gap-2">
           <ScrollText className="w-5 h-5 text-indigo-500" />
-          <h3 className="text-lg font-semibold">Verification Audit Log</h3>
-          <Chip size="sm" variant="flat">{total} events</Chip>
+          <h3 className="text-lg font-semibold">{t('verification.audit_log_title')}</h3>
+          <Chip size="sm" variant="flat">{t('verification.total_events', { count: total })}</Chip>
         </div>
         <div className="flex items-center gap-2">
           <Select
@@ -109,8 +109,8 @@ export function VerificationAuditLog() {
             }}
           >
             {EVENT_TYPES.map((type) => (
-              <SelectItem key={type} textValue={EVENT_TYPE_LABELS[type]?.label ?? type}>
-                {EVENT_TYPE_LABELS[type]?.label ?? type}
+              <SelectItem key={type} textValue={t(`verification.event_type_${type}`, EVENT_TYPE_LABELS[type]?.label ?? type)}>
+                {t(`verification.event_type_${type}`, EVENT_TYPE_LABELS[type]?.label ?? type)}
               </SelectItem>
             ))}
           </Select>
@@ -125,7 +125,7 @@ export function VerificationAuditLog() {
             <Spinner size="lg" />
           </div>
         ) : events.length === 0 ? (
-          <p className="text-center py-8 text-theme-muted">No verification events yet.</p>
+          <p className="text-center py-8 text-theme-muted">{t('verification.no_events')}</p>
         ) : (
           <>
             <Table aria-label={t('verification.audit_log_aria')} removeWrapper>
@@ -140,6 +140,7 @@ export function VerificationAuditLog() {
               <TableBody>
                 {events.map((event) => {
                   const typeInfo = EVENT_TYPE_LABELS[event.event_type] || { label: event.event_type, color: 'default' as const };
+                  const typeLabel = t(`verification.event_type_${event.event_type}`, typeInfo.label);
                   const userName = [event.first_name, event.last_name].filter(Boolean).join(' ') || `User #${event.user_id}`;
                   let details = '';
                   if (event.details) {
@@ -164,7 +165,7 @@ export function VerificationAuditLog() {
                       </TableCell>
                       <TableCell>
                         <Chip size="sm" color={typeInfo.color} variant="flat">
-                          {typeInfo.label}
+                          {typeLabel}
                         </Chip>
                       </TableCell>
                       <TableCell className="text-xs text-theme-muted capitalize">
@@ -186,7 +187,7 @@ export function VerificationAuditLog() {
             {totalPages > 1 && (
               <div className="flex justify-between items-center mt-4">
                 <span className="text-sm text-theme-muted">
-                  Page {page + 1} of {totalPages}
+                  {t('verification.page_of', { page: page + 1, total: totalPages })}
                 </span>
                 <div className="flex gap-2">
                   <Button
@@ -196,7 +197,7 @@ export function VerificationAuditLog() {
                     onPress={() => setPage((p) => p - 1)}
                     startContent={<ChevronLeft className="w-4 h-4" />}
                   >
-                    Previous
+                    {t('common.previous')}
                   </Button>
                   <Button
                     size="sm"
@@ -205,7 +206,7 @@ export function VerificationAuditLog() {
                     onPress={() => setPage((p) => p + 1)}
                     endContent={<ChevronRight className="w-4 h-4" />}
                   >
-                    Next
+                    {t('common.next')}
                   </Button>
                 </div>
               </div>

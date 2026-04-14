@@ -19,5 +19,10 @@
     "phone": "Veuillez saisir un numéro de téléphone valide",
     "min_length": "Doit comporter au moins {{min}} caractères",
     "max_length": "Ne doit pas dépasser {{max}} caractères"
-  }
+  },
+  "community_not_found": "Community Not Found",
+  "community_not_found_message": "We couldn't find a community called \"{{slug}}\".",
+  "community_not_found_detail": "The community may have been renamed, deactivated, or the URL may be incorrect.",
+  "go_home": "Go Home",
+  "find_community": "Find Community"
 }

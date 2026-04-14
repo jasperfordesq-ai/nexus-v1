@@ -403,5 +403,6 @@
     "cta_subtitle": "Quer seja parceiro, financiador, voluntário ou membro — há um papel para si na construção de uma Irlanda mais conectada.",
     "cta_download": "Transferir Plano Completo",
     "cta_contact": "Contacte-nos"
-  }
+  },
+  "age_band": "Age {{band}}"
 }

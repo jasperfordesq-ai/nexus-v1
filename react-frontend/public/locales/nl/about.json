@@ -403,5 +403,6 @@
     "cta_subtitle": "Of je nu wilt samenwerken, financieren, vrijwilligerswerk wilt doen of lid wilt worden — er is een rol voor jou in het bouwen aan een meer verbonden Ierland.",
     "cta_download": "Download het volledige plan",
     "cta_contact": "Neem contact op"
-  }
+  },
+  "age_band": "Age {{band}}"
 }

@@ -341,6 +341,15 @@ class IdeationChallengeService
      */
     public function submitIdea(int $challengeId, int $userId, array $data): int
     {
+        $tenantId = TenantContext::getId();
+        $challenge = DB::table('ideation_challenges')
+            ->where('id', $challengeId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+        if (!$challenge) {
+            throw new \RuntimeException('Challenge not found');
+        }
+
         $ideaId = DB::table('challenge_ideas')->insertGetId([
             'challenge_id' => $challengeId,
             'user_id'      => $userId,
@@ -630,35 +639,6 @@ class IdeationChallengeService
             $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.idea_delete_failed')];
             return false;
         }
-    }
-
-    /**
-     * Toggle a vote on an idea.
-     *
-     * @return array{voted: bool, vote_count: int}|null
-     */
-    public function vote(int $ideaId, int $userId): array
-    {
-        $existing = DB::table('challenge_idea_votes')
-            ->where('idea_id', $ideaId)
-            ->where('user_id', $userId)
-            ->first();
-
-        if ($existing) {
-            DB::table('challenge_idea_votes')->where('id', $existing->id)->delete();
-            $voted = false;
-        } else {
-            DB::table('challenge_idea_votes')->insert([
-                'idea_id'    => $ideaId,
-                'user_id'    => $userId,
-                'created_at' => now(),
-            ]);
-            $voted = true;
-        }
-
-        $count = (int) DB::table('challenge_idea_votes')->where('idea_id', $ideaId)->count();
-
-        return ['voted' => $voted, 'vote_count' => $count];
     }
 
     /**

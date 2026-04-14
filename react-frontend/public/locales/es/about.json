@@ -403,5 +403,6 @@
     "cta_subtitle": "Ya sea que quieras colaborar, financiar, ser voluntario o unirte como miembro — hay un rol para ti en la construcción de una Irlanda más conectada.",
     "cta_download": "Descargar Plan Completo",
     "cta_contact": "Contáctanos"
-  }
+  },
+  "age_band": "Age {{band}}"
 }

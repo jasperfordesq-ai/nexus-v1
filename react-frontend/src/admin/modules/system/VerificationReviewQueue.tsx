@@ -136,10 +136,10 @@ export function VerificationReviewQueue() {
         <CardHeader className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center px-6 pt-5 pb-0">
           <div className="flex items-center gap-2">
             <ClipboardCheck className="w-5 h-5 text-amber-500" />
-            <h3 className="text-lg font-semibold">Pending Verification Reviews</h3>
+            <h3 className="text-lg font-semibold">{t('verification.pending_reviews_title')}</h3>
             {sessions.length > 0 && (
               <Chip size="sm" color="warning" variant="flat">
-                {sessions.length} pending
+                {t('verification.n_pending', { count: sessions.length })}
               </Chip>
             )}
           </div>
@@ -160,7 +160,7 @@ export function VerificationReviewQueue() {
             </div>
           ) : sessions.length === 0 ? (
             <p className="text-center py-8 text-theme-muted">
-              No pending verification reviews. All users are up to date.
+              {t('verification.no_pending_reviews')}
             </p>
           ) : (
             <Table aria-label={t('verification.pending_reviews_aria')} removeWrapper>
@@ -208,7 +208,7 @@ export function VerificationReviewQueue() {
                           startContent={<CheckCircle className="w-3.5 h-3.5" />}
                           onPress={() => openConfirmation(session, 'approve')}
                         >
-                          Approve
+                          {t('verification.approve')}
                         </Button>
                         <Button
                           size="sm"
@@ -217,7 +217,7 @@ export function VerificationReviewQueue() {
                           startContent={<XCircle className="w-3.5 h-3.5" />}
                           onPress={() => openConfirmation(session, 'reject')}
                         >
-                          Reject
+                          {t('verification.reject')}
                         </Button>
                       </div>
                     </TableCell>
@@ -261,7 +261,7 @@ export function VerificationReviewQueue() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={confirmModal.onClose} isDisabled={actionLoading}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               color={selectedAction === 'approve' ? 'success' : 'danger'}
@@ -275,7 +275,7 @@ export function VerificationReviewQueue() {
                   : undefined
               }
             >
-              {selectedAction === 'approve' ? 'Approve' : 'Reject'}
+              {selectedAction === 'approve' ? t('verification.approve') : t('verification.reject')}
             </Button>
           </ModalFooter>
         </ModalContent>

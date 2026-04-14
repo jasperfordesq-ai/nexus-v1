@@ -184,8 +184,8 @@ class GdprService
 
         $this->query(
             "UPDATE gdpr_requests SET status = 'processing', acknowledged_at = NOW()
-             WHERE id = ?",
-            [$requestId]
+             WHERE id = ? AND tenant_id = ?",
+            [$requestId, $this->tenantId]
         );
 
         $this->logAction($request['user_id'], 'request_processing_started', 'gdpr_request', $requestId, $adminId);

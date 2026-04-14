@@ -11,9 +11,18 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Ensure the authenticated user has super-admin or god-level privileges.
+ * Ensure the authenticated user has PLATFORM-LEVEL super-admin or god-level privileges.
  *
- * Returns 403 JSON response for non-super-admin users.
+ * This middleware gates cross-tenant platform routes (/v2/admin/super/...) such as
+ * tenant CRUD, federation management, and cross-tenant user moves. It intentionally
+ * rejects tenant super-admins (is_tenant_super_admin) because those accounts are
+ * scoped to a single tenant — admitting them here would allow a compromised tenant
+ * admin account to become a full platform compromise.
+ *
+ * For within-tenant admin operations use the 'admin' middleware instead, which
+ * accepts both regular admins and tenant super-admins.
+ *
+ * Returns 403 JSON response for non-platform-super-admin users.
  */
 class EnsureIsSuperAdmin
 {
@@ -32,9 +41,11 @@ class EnsureIsSuperAdmin
             ]);
         }
 
-        $isSuperAdmin = $user->is_super_admin || $user->is_tenant_super_admin || $user->is_god;
+        // Explicitly NOT accepting is_tenant_super_admin — these are platform-level routes.
+        $isPlatformSuperAdmin = ($user->is_super_admin ?? false) || ($user->is_god ?? false)
+            || in_array($user->role ?? '', ['super_admin', 'god'], true);
 
-        if (!$isSuperAdmin) {
+        if (!$isPlatformSuperAdmin) {
             return response()->json([
                 'errors' => [
                     ['code' => 'forbidden', 'message' => 'Super admin access required'],

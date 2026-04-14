@@ -310,6 +310,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
               variant="light"
               size="sm"
               onPress={() => setActiveIndex(idx)}
+              aria-label={t('listing.thumbnail_label', 'View image {{n}}', { n: idx + 1 })}
               className={`shrink-0 w-16 h-16 min-w-0 rounded-lg overflow-hidden border-2 transition-colors p-0 ${
                 idx === activeIndex ? 'border-primary' : 'border-transparent'
               }`}
@@ -352,6 +353,8 @@ export function MarketplaceListingPage() {
   const [offerAmount, setOfferAmount] = useState('');
   const [offerMessage, setOfferMessage] = useState('');
   const [isSubmittingOffer, setIsSubmittingOffer] = useState(false);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [reportReason, setReportReason] = useState('');
 
   // Load listing
   useEffect(() => {
@@ -458,13 +461,32 @@ export function MarketplaceListingPage() {
     }
   }, [listing?.title, toast]);
 
+  // Submit report
+  const handleSubmitReport = useCallback(async () => {
+    if (!listing || !reportReason.trim()) return;
+    try {
+      await api.post(`/v2/marketplace/listings/${listing.id}/report`, { reason: 'other', description: reportReason.trim() });
+      toast.success(t('listing.report_submitted', 'Report submitted. Thank you.'));
+    } catch {
+      toast.error(t('listing.report_error', 'Failed to submit report'));
+    } finally {
+      setReportModalOpen(false);
+      setReportReason('');
+    }
+  }, [listing, reportReason, toast]);
+
   // Make offer
   const handleMakeOffer = useCallback(async () => {
     if (!listing || !offerAmount) return;
+    const parsedOffer = parseFloat(offerAmount);
+    if (parsedOffer <= 0 || parsedOffer > 999999) {
+      toast.error(t('offer.amount_invalid', 'Please enter a valid offer amount'));
+      return;
+    }
     setIsSubmittingOffer(true);
     try {
       await api.post(`/v2/marketplace/listings/${listing.id}/offers`, {
-        amount: parseFloat(offerAmount),
+        amount: parsedOffer,
         message: offerMessage || undefined,
       });
       toast.success(t('offer.sent_success', 'Offer sent successfully!'));
@@ -817,20 +839,49 @@ export function MarketplaceListingPage() {
             size="sm"
             color="danger"
             startContent={<Flag className="w-3.5 h-3.5" />}
-            onPress={async () => {
+            onPress={() => {
               if (!isAuthenticated) { toast.error(t('listing.sign_in_to_report', 'Sign in to report')); return; }
-              const reason = window.prompt(t('listing.report_reason_prompt', 'Why are you reporting this listing?'));
-              if (!reason) return;
-              try {
-                await api.post(`/v2/marketplace/listings/${listing.id}/report`, { reason: 'other', description: reason });
-                toast.success(t('listing.report_submitted', 'Report submitted. Thank you.'));
-              } catch { toast.error(t('listing.report_error', 'Failed to submit report')); }
+              setReportModalOpen(true);
             }}
           >
             {t('listing.report_listing', 'Report this listing')}
           </Button>
         </div>
       </div>
+
+      {/* Report Listing Modal */}
+      <Modal isOpen={reportModalOpen} onOpenChange={(open) => { setReportModalOpen(open); if (!open) setReportReason(''); }} placement="center">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>{t('listing.report_modal_title', 'Report Listing')}</ModalHeader>
+              <ModalBody>
+                <Textarea
+                  label={t('listing.report_reason_label', 'Reason')}
+                  placeholder={t('listing.report_reason_placeholder', 'Please describe why you are reporting this listing...')}
+                  value={reportReason}
+                  onValueChange={setReportReason}
+                  minRows={3}
+                  maxRows={6}
+                  isRequired
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" onPress={onClose}>
+                  {t('offer.cancel', 'Cancel')}
+                </Button>
+                <Button
+                  color="danger"
+                  onPress={handleSubmitReport}
+                  isDisabled={!reportReason.trim()}
+                >
+                  {t('listing.report_submit', 'Submit Report')}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
 
       {/* Make Offer Modal */}
       <Modal isOpen={offerModal.isOpen} onOpenChange={offerModal.onOpenChange} placement="center">
@@ -849,6 +900,7 @@ export function MarketplaceListingPage() {
                     placeholder="0.00"
                     type="number"
                     min={0}
+                    max={999999}
                     step={0.01}
                     value={offerAmount}
                     onValueChange={setOfferAmount}

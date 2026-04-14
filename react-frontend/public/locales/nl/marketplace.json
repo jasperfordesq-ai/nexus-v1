@@ -59,7 +59,12 @@
     "details": "Details",
     "share_aria": "Share",
     "unsave_aria": "Unsave",
-    "save_aria": "Save"
+    "save_aria": "Save",
+    "thumbnail_label": "View image {{n}}",
+    "report_modal_title": "Report Listing",
+    "report_reason_label": "Reason",
+    "report_reason_placeholder": "Please describe why you are reporting this listing...",
+    "report_submit": "Submit Report"
   },
   "offer": {
     "modal_title": "Doe een bod",
@@ -87,7 +92,8 @@
     "accept": "Accept",
     "decline": "Decline",
     "counter": "Counter",
-    "withdraw": "Withdraw"
+    "withdraw": "Withdraw",
+    "amount_invalid": "Please enter a valid offer amount"
   },
   "create": {
     "page_title": "Verkoop iets - Marktplaats",
@@ -597,7 +603,9 @@
       "rate_order": "Beoordeel bestelling",
       "leave_rating": "Beoordeling Verlaten",
       "dispute_open": "Geschil Open",
-      "rated": "Rated"
+      "rated": "Rated",
+      "confirm_delivery_modal_title": "Confirm Delivery",
+      "confirm_delivery_modal_body": "Mark this order as delivered? This cannot be undone."
     },
     "seller": {
       "page_title": "Mijn Verkopen - Marketplace",

@@ -129,9 +129,9 @@ const tooltipStyle = {
 const PIE_COLORS = CHART_COLORS;
 
 const SORT_OPTIONS = [
-  { key: 'total', label: 'Total Hours' },
-  { key: 'given', label: 'Hours Given' },
-  { key: 'received', label: 'Hours Received' },
+  { key: 'total' },
+  { key: 'given' },
+  { key: 'received' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -273,7 +273,7 @@ export function HoursReportsPage() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <BarChart3 size={18} className="text-primary" />
-            <h3 className="font-semibold">Hours by Category</h3>
+            <h3 className="font-semibold">{t('reports.chart_hours_by_category')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
@@ -290,7 +290,7 @@ export function HoursReportsPage() {
               </ResponsiveContainer>
             ) : (
               <p className="flex h-[350px] items-center justify-center text-sm text-default-400">
-                No category data available
+                {t('reports.no_category_data')}
               </p>
             )}
           </CardBody>
@@ -300,7 +300,7 @@ export function HoursReportsPage() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <PieChartIcon size={18} className="text-secondary" />
-            <h3 className="font-semibold">Category Distribution</h3>
+            <h3 className="font-semibold">{t('reports.chart_category_distribution')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
@@ -338,7 +338,7 @@ export function HoursReportsPage() {
               </ResponsiveContainer>
             ) : (
               <p className="flex h-[350px] items-center justify-center text-sm text-default-400">
-                No category data available
+                {t('reports.no_category_data')}
               </p>
             )}
           </CardBody>
@@ -369,7 +369,9 @@ export function HoursReportsPage() {
             label={t('reports.label_sort_by')}
           >
             {SORT_OPTIONS.map((opt) => (
-              <SelectItem key={opt.key}>{opt.label}</SelectItem>
+              <SelectItem key={opt.key}>
+                {opt.key === 'total' ? t('reports.sort_total_hours') : opt.key === 'given' ? t('reports.sort_hours_given') : t('reports.sort_hours_received')}
+              </SelectItem>
             ))}
           </Select>
         </div>
@@ -426,7 +428,7 @@ export function HoursReportsPage() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <TrendingUp size={18} className="text-primary" />
-          <h3 className="font-semibold">Monthly Hours Trend</h3>
+          <h3 className="font-semibold">{t('reports.chart_monthly_hours_trend')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
           {loading ? (
@@ -452,7 +454,7 @@ export function HoursReportsPage() {
                 <Area
                   type="monotone"
                   dataKey="total_hours"
-                  name="Total Hours"
+                  name={t('reports.sort_total_hours') as string}
                   stroke={CHART_COLOR_MAP.primary}
                   fill="url(#hrTotalGrad)"
                   strokeWidth={2}
@@ -460,7 +462,7 @@ export function HoursReportsPage() {
                 <Area
                   type="monotone"
                   dataKey="transaction_count"
-                  name="Transactions"
+                  name={t('reports.label_transactions') as string}
                   stroke={CHART_COLOR_MAP.success}
                   fill="url(#hrTxGrad)"
                   strokeWidth={2}
@@ -469,7 +471,7 @@ export function HoursReportsPage() {
             </ResponsiveContainer>
           ) : (
             <p className="flex h-[350px] items-center justify-center text-sm text-default-400">
-              No period data available
+              {t('reports.no_period_data')}
             </p>
           )}
         </CardBody>
@@ -514,7 +516,7 @@ export function HoursReportsPage() {
               }}
               size="sm"
             >
-              Export CSV
+              {t('reports.btn_export_csv')}
             </Button>
             <Button
               variant="flat"
@@ -524,7 +526,7 @@ export function HoursReportsPage() {
               isDisabled={loading}
               size="sm"
             >
-              Refresh
+              {t('reports.btn_refresh')}
             </Button>
           </div>
         }
@@ -539,9 +541,9 @@ export function HoursReportsPage() {
         color="primary"
         classNames={{ tabList: 'mb-4' }}
       >
-        <Tab key="category" title={<span className="flex items-center gap-1.5"><PieChartIcon size={14} /> By Category</span>} />
-        <Tab key="member" title={<span className="flex items-center gap-1.5"><Users size={14} /> By Member</span>} />
-        <Tab key="period" title={<span className="flex items-center gap-1.5"><TrendingUp size={14} /> Monthly Trend</span>} />
+        <Tab key="category" title={<span className="flex items-center gap-1.5"><PieChartIcon size={14} /> {t('reports.tab_by_category')}</span>} />
+        <Tab key="member" title={<span className="flex items-center gap-1.5"><Users size={14} /> {t('reports.tab_by_member')}</span>} />
+        <Tab key="period" title={<span className="flex items-center gap-1.5"><TrendingUp size={14} /> {t('reports.tab_monthly_trend')}</span>} />
       </Tabs>
 
       {groupBy === 'category' && renderCategory()}

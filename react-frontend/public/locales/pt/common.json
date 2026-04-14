@@ -409,5 +409,11 @@
       "description": "Explore os membros da comunidade, conecte-se e troque créditos de tempo.",
       "title": "Members"
     }
-  }
+  },
+  "radius_5": "5 km",
+  "radius_10": "10 km",
+  "radius_25": "25 km",
+  "radius_50": "50 km",
+  "radius_100": "100 km",
+  "go_back": "Go back"
 }

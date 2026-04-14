@@ -63,7 +63,12 @@
     "view_image": "View image {{number}}",
     "image_alt": "Image {{number}}",
     "thumbnail_alt": "Thumbnail {{number}}",
-    "link_copied": "Link copied to clipboard"
+    "link_copied": "Link copied to clipboard",
+    "thumbnail_label": "View image {{n}}",
+    "report_modal_title": "Report Listing",
+    "report_reason_label": "Reason",
+    "report_reason_placeholder": "Please describe why you are reporting this listing...",
+    "report_submit": "Submit Report"
   },
 
   "offer": {
@@ -76,6 +81,7 @@
     "send": "Send Offer",
     "sent_success": "Offer sent successfully!",
     "sent_error": "Failed to send offer",
+    "amount_invalid": "Please enter a valid offer amount",
     "matches_price": "Matches the listing price",
     "above_price": "{{percent}}% above the listing price",
     "below_price": "{{percent}}% below the listing price",
@@ -633,6 +639,8 @@
       "browse_marketplace": "Browse Marketplace",
       "waiting_shipment": "Waiting for Shipment",
       "confirm_delivery": "Confirm Delivery",
+      "confirm_delivery_modal_title": "Confirm Delivery",
+      "confirm_delivery_modal_body": "Mark this order as delivered? This cannot be undone.",
       "delivery_confirmed": "Delivery confirmed!",
       "rate_order": "Rate Order",
       "leave_rating": "Leave Rating",

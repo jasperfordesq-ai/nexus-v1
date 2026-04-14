@@ -236,7 +236,7 @@ export function SegmentForm() {
   const handleSave = useCallback(async () => {
     // Validate
     const newErrors: Record<string, string> = {};
-    if (!name.trim()) newErrors.name = 'Name is required';
+    if (!name.trim()) newErrors.name = t('segment_form.name_required');
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -350,7 +350,7 @@ export function SegmentForm() {
         size="sm"
         type={fieldConfig.type === 'number' ? 'number' : 'text'}
         label={t('segment_form.label_value')}
-        placeholder={fieldConfig.type === 'number' ? '0' : 'Enter value...'}
+        placeholder={fieldConfig.type === 'number' ? '0' : t('segment_form.placeholder_enter_value')}
         value={rule.value}
         onValueChange={(val) => updateRule(rule.id, 'value', val)}
         className="min-w-[160px]"
@@ -455,7 +455,7 @@ export function SegmentForm() {
             <div key={rule.id} className="flex flex-wrap items-end gap-2">
               {index > 0 && (
                 <Chip size="sm" variant="flat" color="primary" className="mb-1">
-                  {matchType === 'all' ? 'AND' : 'OR'}
+                  {matchType === 'all' ? t('segment_form.chip_and') : t('segment_form.chip_or')}
                 </Chip>
               )}
 
@@ -470,7 +470,7 @@ export function SegmentForm() {
                 className="min-w-[180px] flex-1"
               >
                 {RULE_FIELDS.map(f => (
-                  <SelectItem key={f.key}>{f.label}</SelectItem>
+                  <SelectItem key={f.key}>{t(`segment_form.field_${f.key}`, f.label)}</SelectItem>
                 ))}
               </Select>
 
@@ -486,7 +486,7 @@ export function SegmentForm() {
                   className="min-w-[150px]"
                 >
                   {(getFieldConfig(rule.field)?.operators || []).map(op => (
-                    <SelectItem key={op}>{OPERATOR_LABELS[op] || op}</SelectItem>
+                    <SelectItem key={op}>{t(`segment_form.operator_${op}`, OPERATOR_LABELS[op] || op)}</SelectItem>
                   ))}
                 </Select>
               )}
@@ -546,7 +546,7 @@ export function SegmentForm() {
                   {previewCount.toLocaleString()}
                 </span>
                 <span className="text-sm text-default-500">
-                  {previewCount === 1 ? 'member matches' : 'members match'}
+                  {t('segment_form.members_match', { count: previewCount })}
                 </span>
               </div>
             )}
@@ -586,7 +586,7 @@ export function SegmentForm() {
                         <p className="font-medium text-foreground text-sm">{suggestion.name}</p>
                         <p className="text-xs text-default-500 mt-1 line-clamp-2">{suggestion.description}</p>
                         <Chip size="sm" variant="flat" color="primary" className="mt-2">
-                          ~{suggestion.estimated_count.toLocaleString()} members
+                          {t('segment_form.approx_members', { count: suggestion.estimated_count })}
                         </Chip>
                       </div>
                     </div>

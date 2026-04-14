@@ -60,7 +60,12 @@
     "view_image": "Zobacz obraz {{number}}",
     "image_alt": "Obraz {{number}}",
     "thumbnail_alt": "Miniatura {{number}}",
-    "link_copied": "Link skopiowany do schowka"
+    "link_copied": "Link skopiowany do schowka",
+    "thumbnail_label": "View image {{n}}",
+    "report_modal_title": "Report Listing",
+    "report_reason_label": "Reason",
+    "report_reason_placeholder": "Please describe why you are reporting this listing...",
+    "report_submit": "Submit Report"
   },
   "offer": {
     "modal_title": "Złóż ofertę",
@@ -88,7 +93,8 @@
     "decline": "Odrzuć",
     "counter": "Kontroferta",
     "withdraw": "Wycofaj",
-    "accept_counter": "Zaakceptuj kontrofertę"
+    "accept_counter": "Zaakceptuj kontrofertę",
+    "amount_invalid": "Please enter a valid offer amount"
   },
   "create": {
     "page_title": "Sprzedaj coś - Marketplace",
@@ -602,7 +608,9 @@
       "rate_order": "Oceń zamówienie",
       "leave_rating": "Wystaw ocenę",
       "rated": "Oceniono",
-      "dispute_open": "Otwarty spór"
+      "dispute_open": "Otwarty spór",
+      "confirm_delivery_modal_title": "Confirm Delivery",
+      "confirm_delivery_modal_body": "Mark this order as delivered? This cannot be undone."
     },
     "seller": {
       "page_title": "Moja sprzedaż - Marketplace",

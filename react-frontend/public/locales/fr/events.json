@@ -245,5 +245,10 @@
     }
   },
   "page_title": "Events",
-  "radius_label": "Radius"
+  "radius_label": "Radius",
+  "radius_5": "5 km",
+  "radius_10": "10 km",
+  "radius_25": "25 km",
+  "radius_50": "50 km",
+  "radius_100": "100 km"
 }

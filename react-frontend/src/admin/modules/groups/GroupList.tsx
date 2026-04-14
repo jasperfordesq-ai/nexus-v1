@@ -182,7 +182,7 @@ export function GroupList() {
               setSelectedIds(new Set());
             }
           }}
-          aria-label="Select all"
+          aria-label={t('common.select_all')}
         />
       ),
       render: (item) => (
@@ -194,7 +194,7 @@ export function GroupList() {
             else next.delete(item.id);
             setSelectedIds(next);
           }}
-          aria-label={`Select ${item.name}`}
+          aria-label={t('common.select_item', { name: item.name })}
         />
       ),
     },
@@ -314,13 +314,13 @@ export function GroupList() {
               key="archive"
               startContent={<EyeOff size={14} />}
             >
-              {item.status === 'archived' ? 'Unarchive' : 'Archive'}
+              {item.status === 'archived' ? t('groups.unarchive') : t('groups.archive')}
             </DropdownItem>
             <DropdownItem key="clone" startContent={<Users size={14} />}>
-              Clone Group
+              {t('groups.clone_group')}
             </DropdownItem>
             <DropdownItem key="audit" startContent={<Eye size={14} />}>
-              Audit Log
+              {t('groups.audit_log')}
             </DropdownItem>
             <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
               {t('common.delete')}
@@ -373,7 +373,7 @@ export function GroupList() {
 
       {selectedIds.size > 0 && (
         <div className="flex items-center gap-3 p-3 mb-4 bg-primary/10 rounded-lg">
-          <span className="text-sm font-medium">{selectedIds.size} selected</span>
+          <span className="text-sm font-medium">{t('groups.n_selected', { count: selectedIds.size })}</span>
           <Button size="sm" variant="flat" onPress={handleBulkArchive}>{t('groups.archive')}</Button>
           <Button size="sm" variant="flat" color="danger" onPress={handleBulkDelete}>{t('common.delete')}</Button>
           <Button size="sm" variant="flat" onPress={() => setSelectedIds(new Set())}>{t('common.clear')}</Button>

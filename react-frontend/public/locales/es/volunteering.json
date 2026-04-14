@@ -499,5 +499,42 @@
     "create_opportunity": {
       "title": "Crear Oportunidad"
     }
+  },
+  "org_wallet": {
+    "heading": "Organisation Wallet",
+    "refresh": "Refresh",
+    "hours_label": "hours",
+    "deposit": "Deposit Credits",
+    "auto_pay_title": "Auto-pay Volunteers",
+    "auto_pay_description": "Automatically pay volunteers from this wallet when their hours are approved.",
+    "auto_pay_toggle": "Toggle auto-pay",
+    "auto_pay_enabled": "Auto-pay enabled.",
+    "auto_pay_disabled": "Auto-pay disabled.",
+    "auto_pay_error": "Failed to update auto-pay.",
+    "transaction_history": "Transaction History",
+    "load_error": "Unable to load transactions.",
+    "try_again": "Try Again",
+    "empty_title": "No transactions yet",
+    "empty_description": "Transactions will appear here when credits are deposited, withdrawn, or paid to volunteers.",
+    "loading_more": "Loading...",
+    "load_more": "Load More",
+    "balance_after": "Balance: {{balance}}",
+    "deposit_modal_title": "Deposit Credits",
+    "form": {
+      "amount": "Amount (hours)",
+      "note": "Note (optional)"
+    },
+    "cancel": "Cancel",
+    "deposit_button": "Deposit",
+    "invalid_amount": "Please enter a valid amount.",
+    "deposit_amount_too_large": "Deposit amount cannot exceed 9,999 hours.",
+    "deposit_success": "Credits deposited successfully.",
+    "deposit_error": "Failed to deposit credits.",
+    "types": {
+      "deposit": "Deposit",
+      "volunteer_payment": "Volunteer Payment",
+      "withdrawal": "Withdrawal",
+      "admin_adjustment": "Admin Adjustment"
+    }
   }
 }

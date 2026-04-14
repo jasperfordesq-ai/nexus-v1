@@ -226,6 +226,10 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
       toastRef.current.error(tRef.current('org_wallet.invalid_amount', 'Please enter a valid amount.'));
       return;
     }
+    if (amount > 9999) {
+      toastRef.current.error(tRef.current('org_wallet.deposit_amount_too_large', 'Deposit amount cannot exceed 9,999 hours.'));
+      return;
+    }
 
     try {
       setIsDepositing(true);
@@ -498,6 +502,7 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
                   label={t('org_wallet.form.amount', 'Amount (hours)')}
                   type="number"
                   min="0.25"
+                  max="9999"
                   step="0.25"
                   value={depositAmount}
                   onValueChange={setDepositAmount}

@@ -25,6 +25,11 @@ import {
   Tabs,
   Avatar,
   useDisclosure,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from '@heroui/react';
 import {
   ShoppingBag,
@@ -83,11 +88,11 @@ function formatPrice(price: number, currency: string): string {
 
 function OrderCard({
   order,
-  onConfirmDelivery,
+  onRequestConfirmDelivery,
   onRate,
 }: {
   order: MarketplaceOrderItem;
-  onConfirmDelivery: (orderId: number) => void;
+  onRequestConfirmDelivery: (orderId: number) => void;
   onRate: (orderId: number) => void;
 }) {
   const { t } = useTranslation('marketplace');
@@ -186,7 +191,7 @@ function OrderCard({
               <Button
                 size="sm"
                 color="primary"
-                onPress={() => onConfirmDelivery(order.id)}
+                onPress={() => onRequestConfirmDelivery(order.id)}
                 startContent={<CheckCircle2 className="w-3.5 h-3.5" />}
               >
                 {t('orders.buyer.confirm_delivery', 'Confirm Delivery')}
@@ -255,6 +260,9 @@ export function BuyerOrdersPage() {
   // Rating modal
   const ratingModal = useDisclosure();
   const [ratingOrderId, setRatingOrderId] = useState<number | null>(null);
+
+  // Confirm delivery modal
+  const [confirmDeliveryId, setConfirmDeliveryId] = useState<number | null>(null);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -398,7 +406,7 @@ export function BuyerOrdersPage() {
               <OrderCard
                 key={order.id}
                 order={order}
-                onConfirmDelivery={handleConfirmDelivery}
+                onRequestConfirmDelivery={(id) => setConfirmDeliveryId(id)}
                 onRate={handleOpenRating}
               />
             ))}
@@ -419,6 +427,42 @@ export function BuyerOrdersPage() {
           </div>
         )}
       </div>
+
+      {/* Confirm Delivery Modal */}
+      <Modal
+        isOpen={confirmDeliveryId !== null}
+        onOpenChange={(open) => { if (!open) setConfirmDeliveryId(null); }}
+        placement="center"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>{t('orders.buyer.confirm_delivery_modal_title', 'Confirm Delivery')}</ModalHeader>
+              <ModalBody>
+                <p className="text-sm text-default-600">
+                  {t('orders.buyer.confirm_delivery_modal_body', 'Mark this order as delivered? This cannot be undone.')}
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" onPress={onClose}>
+                  {t('common.cancel', 'Cancel')}
+                </Button>
+                <Button
+                  color="primary"
+                  onPress={() => {
+                    if (confirmDeliveryId !== null) {
+                      handleConfirmDelivery(confirmDeliveryId);
+                    }
+                    setConfirmDeliveryId(null);
+                  }}
+                >
+                  {t('orders.buyer.confirm_delivery', 'Confirm Delivery')}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
 
       {/* Rating modal */}
       {ratingOrderId !== null && (

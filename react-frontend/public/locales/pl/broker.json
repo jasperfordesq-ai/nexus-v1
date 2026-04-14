@@ -120,7 +120,16 @@
     "reviewed_success": "Wiadomość przejrzana pomyślnie.",
     "no_flagged": "Brak oznaczonych wiadomości do przejrzenia.",
     "no_assignments": "Brak przypisań opiekunów.",
-    "no_preferences": "Brak zarejestrowanych preferencji ochrony członków."
+    "no_preferences": "Brak zarejestrowanych preferencji ochrony członków.",
+    "col_has_triggers": "Has Triggers",
+    "yes": "Yes",
+    "no": "No",
+    "stat_flags_month": "Flags This Month",
+    "stat_critical": "Critical Flags",
+    "stat_unreviewed": "Unreviewed",
+    "tabs_aria": "Safeguarding tabs",
+    "severity_label": "Severity:",
+    "review_notes_label": "Review Notes"
   },
   "vetting": {
     "title": "Weryfikacja i DBS",
@@ -140,7 +149,13 @@
     "reject_reason_placeholder": "Powód odrzucenia...",
     "verified_success": "Rekord weryfikacji potwierdzony.",
     "rejected_success": "Rekord weryfikacji odrzucony.",
-    "no_records": "Nie znaleziono rekordów weryfikacji."
+    "no_records": "Nie znaleziono rekordów weryfikacji.",
+    "reject_reason_label": "Reason",
+    "stat_total": "Total",
+    "stat_pending": "Pending",
+    "stat_verified": "Verified",
+    "stat_expiring": "Expiring Soon",
+    "tabs_aria": "Vetting status tabs"
   },
   "exchanges": {
     "title": "Wymiany",
@@ -162,7 +177,10 @@
     "reason_placeholder": "Powód odrzucenia...",
     "approved_success": "Wymiana zatwierdzona.",
     "rejected_success": "Wymiana odrzucona.",
-    "no_exchanges": "Nie znaleziono wymian."
+    "no_exchanges": "Nie znaleziono wymian.",
+    "actions_aria": "Actions",
+    "exchange_actions_aria": "Exchange actions",
+    "status_filter_aria": "Exchange status filter"
   },
   "messages": {
     "title": "Przegląd wiadomości",
@@ -179,7 +197,8 @@
     "col_actions": "Akcje",
     "mark_reviewed": "Oznacz jako przejrzane",
     "reviewed_success": "Wiadomość oznaczona jako przejrzana.",
-    "no_messages": "Brak wiadomości do przejrzenia."
+    "no_messages": "Brak wiadomości do przejrzenia.",
+    "filter_aria": "Message filter"
   },
   "status": {
     "active": "Aktywny",

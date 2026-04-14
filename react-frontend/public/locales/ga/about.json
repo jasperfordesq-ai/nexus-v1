@@ -403,5 +403,6 @@
     "cta_subtitle": "Cibé comhpháirtíocht, maoiniú, obair dheonach, nó ballraíocht atá uait — tá ról duit in Éirinn níos nasctha a thógáil.",
     "cta_download": "Íoslódáil an Plean Iomlán",
     "cta_contact": "Déan Teagmháil"
-  }
+  },
+  "age_band": "Age {{band}}"
 }

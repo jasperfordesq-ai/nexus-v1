@@ -60,7 +60,12 @@
     "view_image": "画像 {{number}} を表示",
     "image_alt": "画像 {{number}}",
     "thumbnail_alt": "サムネイル {{number}}",
-    "link_copied": "リンクをクリップボードにコピーしました"
+    "link_copied": "リンクをクリップボードにコピーしました",
+    "thumbnail_label": "View image {{n}}",
+    "report_modal_title": "Report Listing",
+    "report_reason_label": "Reason",
+    "report_reason_placeholder": "Please describe why you are reporting this listing...",
+    "report_submit": "Submit Report"
   },
   "offer": {
     "modal_title": "オファーを出す",
@@ -88,7 +93,8 @@
     "decline": "辞退",
     "counter": "カウンター",
     "withdraw": "取り下げ",
-    "accept_counter": "カウンターを承諾"
+    "accept_counter": "カウンターを承諾",
+    "amount_invalid": "Please enter a valid offer amount"
   },
   "create": {
     "page_title": "出品する - マーケットプレイス",
@@ -602,7 +608,9 @@
       "rate_order": "注文を評価",
       "leave_rating": "評価を残す",
       "rated": "評価済み",
-      "dispute_open": "異議申立中"
+      "dispute_open": "異議申立中",
+      "confirm_delivery_modal_title": "Confirm Delivery",
+      "confirm_delivery_modal_body": "Mark this order as delivered? This cannot be undone."
     },
     "seller": {
       "page_title": "マイセールス - マーケットプレイス",

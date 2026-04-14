@@ -120,7 +120,16 @@
     "reviewed_success": "メッセージをレビューしました。",
     "no_flagged": "レビューするフラグ付きメッセージはありません。",
     "no_assignments": "保護者の割り当てはありません。",
-    "no_preferences": "メンバーのセーフガーディング設定は記録されていません。"
+    "no_preferences": "メンバーのセーフガーディング設定は記録されていません。",
+    "col_has_triggers": "Has Triggers",
+    "yes": "Yes",
+    "no": "No",
+    "stat_flags_month": "Flags This Month",
+    "stat_critical": "Critical Flags",
+    "stat_unreviewed": "Unreviewed",
+    "tabs_aria": "Safeguarding tabs",
+    "severity_label": "Severity:",
+    "review_notes_label": "Review Notes"
   },
   "vetting": {
     "title": "審査・DBS",
@@ -140,7 +149,13 @@
     "reject_reason_placeholder": "却下理由…",
     "verified_success": "審査記録を確認しました。",
     "rejected_success": "審査記録を却下しました。",
-    "no_records": "審査記録が見つかりません。"
+    "no_records": "審査記録が見つかりません。",
+    "reject_reason_label": "Reason",
+    "stat_total": "Total",
+    "stat_pending": "Pending",
+    "stat_verified": "Verified",
+    "stat_expiring": "Expiring Soon",
+    "tabs_aria": "Vetting status tabs"
   },
   "exchanges": {
     "title": "交換",
@@ -162,7 +177,10 @@
     "reason_placeholder": "却下理由…",
     "approved_success": "交換を承認しました。",
     "rejected_success": "交換を却下しました。",
-    "no_exchanges": "交換が見つかりません。"
+    "no_exchanges": "交換が見つかりません。",
+    "actions_aria": "Actions",
+    "exchange_actions_aria": "Exchange actions",
+    "status_filter_aria": "Exchange status filter"
   },
   "messages": {
     "title": "メッセージレビュー",
@@ -179,7 +197,8 @@
     "col_actions": "操作",
     "mark_reviewed": "レビュー済みとしてマーク",
     "reviewed_success": "メッセージをレビュー済みとしてマークしました。",
-    "no_messages": "レビューするメッセージはありません。"
+    "no_messages": "レビューするメッセージはありません。",
+    "filter_aria": "Message filter"
   },
   "status": {
     "active": "有効",

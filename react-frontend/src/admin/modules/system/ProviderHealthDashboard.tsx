@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/contexts';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { api } from '@/lib/api';
 
 interface ProviderHealthStats {
@@ -57,26 +58,26 @@ interface ProviderHealth {
 /**
  * Format a date string as relative time (e.g., "2 hours ago").
  */
-function formatRelativeTime(dateStr: string | null): string {
-  if (!dateStr) return 'Never';
+function formatRelativeTime(dateStr: string | null, t: TFunction): string {
+  if (!dateStr) return t('system.never');
 
   const date = new Date(dateStr);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffSec = Math.floor(diffMs / 1000);
 
-  if (diffSec < 60) return 'Just now';
+  if (diffSec < 60) return t('system.just_now');
   if (diffSec < 3600) {
     const mins = Math.floor(diffSec / 60);
-    return `${mins} minute${mins === 1 ? '' : 's'} ago`;
+    return t('system.n_minutes_ago', { count: mins });
   }
   if (diffSec < 86400) {
     const hours = Math.floor(diffSec / 3600);
-    return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+    return t('system.n_hours_ago', { count: hours });
   }
   if (diffSec < 604800) {
     const days = Math.floor(diffSec / 86400);
-    return `${days} day${days === 1 ? '' : 's'} ago`;
+    return t('system.n_days_ago', { count: days });
   }
 
   return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
@@ -216,15 +217,15 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
         <div className="flex items-center gap-3 text-sm">
           <Tooltip content={t('system.tooltip_api_latency')}>
             <Chip size="sm" variant="flat" color={provider.latency_ms !== null && provider.latency_ms < 500 ? 'success' : provider.latency_ms !== null && provider.latency_ms < 2000 ? 'warning' : 'default'} className="text-xs">
-              {provider.latency_ms !== null ? `${provider.latency_ms}ms` : 'N/A'} latency
+              {provider.latency_ms !== null ? t('system.latency_ms', { ms: provider.latency_ms }) : t('system.n_a')}
             </Chip>
           </Tooltip>
           {provider.avg_completion_seconds !== null && (
             <Tooltip content={t('system.tooltip_avg_completion')}>
               <Chip size="sm" variant="flat" color="default" className="text-xs">
                 {provider.avg_completion_seconds < 60
-                  ? `${provider.avg_completion_seconds}s avg`
-                  : `${Math.round(provider.avg_completion_seconds / 60)}m avg`}
+                  ? t('system.avg_completion_seconds', { s: provider.avg_completion_seconds })
+                  : t('system.avg_completion_minutes', { m: Math.round(provider.avg_completion_seconds / 60) })}
               </Chip>
             </Tooltip>
           )}
@@ -235,7 +236,7 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
           <div className="flex items-center justify-between text-sm">
             <span className="text-default-500">{t('system.success_rate_label')}</span>
             <span className="font-medium">
-              {stats.success_rate !== null ? `${stats.success_rate}%` : 'N/A'}
+              {stats.success_rate !== null ? `${stats.success_rate}%` : t('system.n_a')}
             </span>
           </div>
           <Progress
@@ -281,7 +282,7 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
           <div className="rounded-lg bg-default-100 dark:bg-default-50 p-2">
             <p className="text-xs font-medium text-default-500 mb-1">{t('system.last_24h_label')}</p>
             <div className="flex items-center gap-3 text-sm">
-              <span>{recent_24h.total} session{recent_24h.total !== 1 ? 's' : ''}</span>
+              <span>{t('system.n_sessions', { count: recent_24h.total })}</span>
               <span className="text-success">{recent_24h.passed} {t('system.stat_passed').toLowerCase()}</span>
               <span className="text-danger">{recent_24h.failed} {t('system.stat_failed').toLowerCase()}</span>
             </div>
@@ -293,26 +294,26 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
           <Tooltip content={stats.last_session_at || t('system.no_sessions_yet')}>
             <div className="flex items-center justify-between">
               <span>{t('system.last_session_label')}</span>
-              <span>{formatRelativeTime(stats.last_session_at)}</span>
+              <span>{formatRelativeTime(stats.last_session_at, t)}</span>
             </div>
           </Tooltip>
           <Tooltip content={stats.last_success_at || t('system.no_successful_sessions')}>
             <div className="flex items-center justify-between">
               <span>{t('system.last_success_label')}</span>
-              <span>{formatRelativeTime(stats.last_success_at)}</span>
+              <span>{formatRelativeTime(stats.last_success_at, t)}</span>
             </div>
           </Tooltip>
           <Tooltip content={stats.last_failure_at || t('system.no_failed_sessions')}>
             <div className="flex items-center justify-between">
               <span>{t('system.last_failure_label')}</span>
-              <span>{formatRelativeTime(stats.last_failure_at)}</span>
+              <span>{formatRelativeTime(stats.last_failure_at, t)}</span>
             </div>
           </Tooltip>
           {last_webhook && (
-            <Tooltip content={`Event: ${last_webhook.type} at ${last_webhook.at}`}>
+            <Tooltip content={t('system.tooltip_last_webhook_event', { type: last_webhook.type, at: last_webhook.at })}>
               <div className="flex items-center justify-between">
                 <span>{t('system.last_webhook_label')}</span>
-                <span>{formatRelativeTime(last_webhook.at)}</span>
+                <span>{formatRelativeTime(last_webhook.at, t)}</span>
               </div>
             </Tooltip>
           )}

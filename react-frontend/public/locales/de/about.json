@@ -403,5 +403,6 @@
     "cta_subtitle": "Ob Sie partnern, fördern, ehrenamtlich arbeiten oder als Mitglied beitreten möchten — es gibt eine Rolle für Sie beim Aufbau eines besser vernetzten Irlands.",
     "cta_download": "Vollständigen Plan herunterladen",
     "cta_contact": "Kontakt aufnehmen"
-  }
+  },
+  "age_band": "Age {{band}}"
 }

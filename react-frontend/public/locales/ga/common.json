@@ -409,5 +409,11 @@
       "title": "Members",
       "description": "Browse community members, connect and exchange time credits."
     }
-  }
+  },
+  "radius_5": "5 km",
+  "radius_10": "10 km",
+  "radius_25": "25 km",
+  "radius_50": "50 km",
+  "radius_100": "100 km",
+  "go_back": "Go back"
 }

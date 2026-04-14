@@ -88,6 +88,7 @@ class NexusScoreService
     public function recalculateAll(int $tenantId): int
     {
         $users = $this->user->newQuery()
+            ->where('tenant_id', $tenantId)
             ->where('is_approved', true)
             ->pluck('id');
 
@@ -109,12 +110,12 @@ class NexusScoreService
      */
     public function calculateNexusScore(int $userId, int $tenantId): array
     {
-        $engagement = $this->calculateEngagementScore($userId);
-        $quality = $this->calculateQualityScore($userId);
-        $volunteer = $this->calculateVolunteerScore($userId);
-        $activity = $this->calculateActivityScore($userId);
-        $badges = $this->calculateBadgeScore($userId);
-        $impact = $this->calculateImpactScore($userId);
+        $engagement = $this->calculateEngagementScore($userId, $tenantId);
+        $quality = $this->calculateQualityScore($userId, $tenantId);
+        $volunteer = $this->calculateVolunteerScore($userId, $tenantId);
+        $activity = $this->calculateActivityScore($userId, $tenantId);
+        $badges = $this->calculateBadgeScore($userId, $tenantId);
+        $impact = $this->calculateImpactScore($userId, $tenantId);
 
         $totalScore = $engagement['score'] + $quality['score'] + $volunteer['score']
                     + $activity['score'] + $badges['score'] + $impact['score'];
@@ -163,6 +164,7 @@ class NexusScoreService
     public function getCommunityStats(int $tenantId): array
     {
         $userIds = $this->user->newQuery()
+            ->where('tenant_id', $tenantId)
             ->where('is_approved', true)
             ->pluck('id')
             ->all();
@@ -205,17 +207,21 @@ class NexusScoreService
     /**
      * Community Engagement Score (250 points max).
      */
-    private function calculateEngagementScore(int $userId): array
+    private function calculateEngagementScore(int $userId, int $tenantId): array
     {
         $creditsSent = (float) Transaction::where('sender_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'completed')->sum('amount');
         $creditsReceived = (float) Transaction::where('receiver_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'completed')->sum('amount');
         $uniqueConnections = (int) Transaction::where('status', 'completed')
+            ->where('tenant_id', $tenantId)
             ->where(fn ($q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))
             ->selectRaw('COUNT(DISTINCT CASE WHEN sender_id = ? THEN receiver_id WHEN receiver_id = ? THEN sender_id END) as cnt', [$userId, $userId])
             ->value('cnt');
         $activeDays = (int) Transaction::where('status', 'completed')
+            ->where('tenant_id', $tenantId)
             ->where(fn ($q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))
             ->selectRaw('COUNT(DISTINCT DATE(created_at)) as cnt')
             ->value('cnt');
@@ -247,14 +253,16 @@ class NexusScoreService
     /**
      * Contribution Quality Score (200 points max).
      */
-    private function calculateQualityScore(int $userId): array
+    private function calculateQualityScore(int $userId, int $tenantId): array
     {
-        $avgRating = (float) Review::where('receiver_id', $userId)->avg('rating');
-        $reviewCount = (int) Review::where('receiver_id', $userId)->count();
-        $positiveReviews = (int) Review::where('receiver_id', $userId)->where('rating', '>=', 4)->count();
+        $avgRating = (float) Review::where('receiver_id', $userId)->where('tenant_id', $tenantId)->avg('rating');
+        $reviewCount = (int) Review::where('receiver_id', $userId)->where('tenant_id', $tenantId)->count();
+        $positiveReviews = (int) Review::where('receiver_id', $userId)->where('tenant_id', $tenantId)->where('rating', '>=', 4)->count();
 
-        $totalTxns = Transaction::where(fn ($q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))->count();
+        $totalTxns = Transaction::where('tenant_id', $tenantId)
+            ->where(fn ($q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))->count();
         $completedTxns = Transaction::where('status', 'completed')
+            ->where('tenant_id', $tenantId)
             ->where(fn ($q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))->count();
 
         $successRate = $totalTxns > 0 ? ($completedTxns / $totalTxns) : 0;
@@ -284,15 +292,18 @@ class NexusScoreService
     /**
      * Volunteer Hours Score (200 points max).
      */
-    private function calculateVolunteerScore(int $userId): array
+    private function calculateVolunteerScore(int $userId, int $tenantId): array
     {
         $totalHours = (float) Transaction::where('sender_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'completed')->sum('amount');
         $volunteerDays = (int) Transaction::where('sender_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'completed')
             ->selectRaw('COUNT(DISTINCT DATE(created_at)) as cnt')
             ->value('cnt');
         $daysSpan = (int) Transaction::where('sender_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'completed')
             ->selectRaw('DATEDIFF(MAX(created_at), MIN(created_at)) + 1 as span')
             ->value('span');
@@ -320,20 +331,21 @@ class NexusScoreService
     /**
      * Platform Activity Score (150 points max).
      */
-    private function calculateActivityScore(int $userId): array
+    private function calculateActivityScore(int $userId, int $tenantId): array
     {
-        $listingCount = Listing::where('user_id', $userId)->where('status', 'active')->count();
+        $listingCount = Listing::where('user_id', $userId)->where('tenant_id', $tenantId)->where('status', 'active')->count();
 
         $eventCount = 0;
         try {
-            $eventCount = EventRsvp::where('user_id', $userId)->count();
+            $eventCount = EventRsvp::where('user_id', $userId)->where('tenant_id', $tenantId)->count();
         } catch (\Throwable $e) {
             Log::warning('NexusScore: EventRsvp query failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
         }
 
-        $groupCount = GroupMember::where('user_id', $userId)->where('status', 'active')->count();
+        $groupCount = GroupMember::where('user_id', $userId)->where('tenant_id', $tenantId)->where('status', 'active')->count();
 
         $loginStreak = (int) (UserStreak::where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->where('streak_type', 'login')
             ->value('current_streak') ?? 0);
 
@@ -364,9 +376,9 @@ class NexusScoreService
     /**
      * Badge & Achievement Score (100 points max).
      */
-    private function calculateBadgeScore(int $userId): array
+    private function calculateBadgeScore(int $userId, int $tenantId): array
     {
-        $badges = UserBadge::where('user_id', $userId)->get();
+        $badges = UserBadge::where('user_id', $userId)->where('tenant_id', $tenantId)->get();
 
         $rarityWeights = [
             'vol_500h' => 10, 'vol_250h' => 8, 'transaction_50' => 7,
@@ -403,11 +415,11 @@ class NexusScoreService
     /**
      * Social Impact Score (100 points max).
      */
-    private function calculateImpactScore(int $userId): array
+    private function calculateImpactScore(int $userId, int $tenantId): array
     {
         $postCount = 0;
         try {
-            $postCount = FeedPost::where('user_id', $userId)->count();
+            $postCount = FeedPost::where('user_id', $userId)->where('tenant_id', $tenantId)->count();
         } catch (\Throwable $e) {
             Log::warning('NexusScore: FeedPost query failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
         }
@@ -417,6 +429,7 @@ class NexusScoreService
             $likesReceived = (int) DB::table('post_likes')
                 ->join('feed_posts', 'post_likes.post_id', '=', 'feed_posts.id')
                 ->where('feed_posts.user_id', $userId)
+                ->where('feed_posts.tenant_id', $tenantId)
                 ->count();
         } catch (\Throwable $e) {
             Log::warning('NexusScore: post_likes query failed', ['user_id' => $userId, 'error' => $e->getMessage()]);

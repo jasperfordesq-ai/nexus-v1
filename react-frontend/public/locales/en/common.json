@@ -296,6 +296,7 @@
     "preview_alt": "GIF preview"
   },
   "loading": "Loading...",
+  "go_back": "Go back",
   "feature_error": {
     "load_failed": "We couldn't load {{feature}}. This section may be temporarily unavailable."
   },

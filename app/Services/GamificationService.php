@@ -144,7 +144,9 @@ class GamificationService
      */
     public static function getProfile(int $userId, ?int $tenantId = null): array
     {
+        $tenantId = $tenantId ?? TenantContext::getId();
         $user = User::query()
+            ->where('tenant_id', $tenantId)
             ->find($userId, ['id', 'first_name', 'last_name', 'avatar_url', 'xp', 'level', 'points']);
 
         if (! $user) {
@@ -210,8 +212,10 @@ class GamificationService
      */
     public static function getBadges(int $userId, ?int $tenantId = null): array
     {
+        $tenantId = $tenantId ?? TenantContext::getId();
         $badges = UserBadge::query()
             ->where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->orderByDesc('awarded_at')
             ->get()
             ->toArray();

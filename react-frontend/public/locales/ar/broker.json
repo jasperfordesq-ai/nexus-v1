@@ -120,7 +120,16 @@
     "col_assigned": "Assigned",
     "col_consent": "Consent",
     "col_member": "Member",
-    "col_options": "Preferences"
+    "col_options": "Preferences",
+    "col_has_triggers": "Has Triggers",
+    "yes": "Yes",
+    "no": "No",
+    "stat_flags_month": "Flags This Month",
+    "stat_critical": "Critical Flags",
+    "stat_unreviewed": "Unreviewed",
+    "tabs_aria": "Safeguarding tabs",
+    "severity_label": "Severity:",
+    "review_notes_label": "Review Notes"
   },
   "vetting": {
     "title": "التدقيق و DBS",
@@ -140,7 +149,13 @@
     "col_status": "Status",
     "col_actions": "Actions",
     "verify": "Verify",
-    "reject": "Reject"
+    "reject": "Reject",
+    "reject_reason_label": "Reason",
+    "stat_total": "Total",
+    "stat_pending": "Pending",
+    "stat_verified": "Verified",
+    "stat_expiring": "Expiring Soon",
+    "tabs_aria": "Vetting status tabs"
   },
   "exchanges": {
     "description": "الإشراف على طلبات التبادل والنزاعات المعلقة.",
@@ -162,7 +177,10 @@
     "col_date": "Date",
     "col_actions": "Actions",
     "approve": "Approve",
-    "reject": "Reject"
+    "reject": "Reject",
+    "actions_aria": "Actions",
+    "exchange_actions_aria": "Exchange actions",
+    "status_filter_aria": "Exchange status filter"
   },
   "messages": {
     "title": "مراجعة الرسالة",
@@ -179,7 +197,8 @@
     "col_reason": "Reason",
     "col_severity": "Severity",
     "col_date": "Date",
-    "col_actions": "Actions"
+    "col_actions": "Actions",
+    "filter_aria": "Message filter"
   },
   "common": {
     "loading": "جارٍ التحميل...",

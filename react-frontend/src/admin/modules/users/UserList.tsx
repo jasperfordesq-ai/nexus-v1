@@ -549,8 +549,9 @@ export function UserList() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">{t('users.import_csv_file')}</label>
+                  <label htmlFor="import-csv-file" className="block text-sm font-medium mb-1">{t('users.import_csv_file')}</label>
                   <input
+                    id="import-csv-file"
                     type="file"
                     accept=".csv"
                     onChange={(e) => setImportFile(e.target.files?.[0] || null)}

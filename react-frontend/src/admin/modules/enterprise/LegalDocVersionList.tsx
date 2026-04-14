@@ -84,10 +84,10 @@ export default function LegalDocVersionList() {
       if (response.success && response.data) {
         setVersions(response.data);
       } else {
-        error(response.error || 'Failed to load versions');
+        error(response.error || t('enterprise.failed_to_load_versions'));
       }
     } catch {
-      error('Failed to load versions');
+      error(t('enterprise.failed_to_load_versions'));
     } finally {
       setLoading(false);
     }
@@ -105,15 +105,15 @@ export default function LegalDocVersionList() {
       const response = await adminLegalDocs.publishVersion(selectedVersion.id);
 
       if (response.success) {
-        success('Version published successfully');
+        success(t('enterprise.version_published'));
         setShowPublishModal(false);
         setSelectedVersion(null);
         loadVersions();
       } else {
-        error(response.error || 'Failed to publish version');
+        error(response.error || t('enterprise.failed_to_publish_version'));
       }
     } catch {
-      error('Failed to publish version');
+      error(t('enterprise.failed_to_publish_version'));
     } finally {
       setSubmitting(false);
     }
@@ -127,15 +127,15 @@ export default function LegalDocVersionList() {
       const response = await adminLegalDocs.deleteVersion(documentId, deleteTarget.id);
 
       if (response.success) {
-        success('Draft version deleted');
+        success(t('enterprise.draft_version_deleted'));
         setShowDeleteModal(false);
         setDeleteTarget(null);
         loadVersions();
       } else {
-        error(response.error || 'Failed to delete version');
+        error(response.error || t('enterprise.failed_to_delete_version'));
       }
     } catch {
-      error('Failed to delete version');
+      error(t('enterprise.failed_to_delete_version'));
     } finally {
       setSubmitting(false);
     }
@@ -149,14 +149,14 @@ export default function LegalDocVersionList() {
       const response = await adminLegalDocs.notifyUsers(documentId, selectedVersion.id, { target: notifyTarget });
 
       if (response.success) {
-        success(`Notification sent to ${notifyTarget === 'all' ? 'all users' : 'non-accepted users'}`);
+        success(notifyTarget === 'all' ? t('enterprise.notification_sent_all') : t('enterprise.notification_sent_non_accepted'));
         setShowNotifyModal(false);
         setSelectedVersion(null);
       } else {
-        error(response.error || 'Failed to send notifications');
+        error(response.error || t('enterprise.failed_to_send_notifications'));
       }
     } catch {
-      error('Failed to send notifications');
+      error(t('enterprise.failed_to_send_notifications'));
     } finally {
       setSubmitting(false);
     }
@@ -226,7 +226,7 @@ export default function LegalDocVersionList() {
               <FileText size={48} className="mx-auto text-[var(--color-text-tertiary)] mb-4" />
               <p className="text-lg text-[var(--color-text-secondary)]">{t('enterprise.no_versions_found')}</p>
               <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
-                Create a new version to get started
+                {t('enterprise.create_new_version_hint')}
               </p>
             </CardBody>
           </Card>
@@ -238,7 +238,7 @@ export default function LegalDocVersionList() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="text-xl font-semibold">
-                        Version {version.version_number}
+                        {t('enterprise.version_prefix', { number: version.version_number })}
                       </h3>
                       {version.version_label && (
                         <Chip size="sm" color="default">
@@ -247,12 +247,12 @@ export default function LegalDocVersionList() {
                       )}
                       {version.is_current && (
                         <Chip size="sm" color="success" startContent={<CheckCircle2 size={14} />}>
-                          Current
+                          {t('enterprise.version_list.current')}
                         </Chip>
                       )}
                       {version.is_draft && (
                         <Chip size="sm" color="warning">
-                          Draft
+                          {t('enterprise.chip_draft')}
                         </Chip>
                       )}
                     </div>
@@ -478,7 +478,7 @@ export default function LegalDocVersionList() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   color="success"
@@ -507,7 +507,7 @@ export default function LegalDocVersionList() {
                 <div className="flex items-center gap-2">
                   <FileText size={20} />
                   <span>
-                    Version {viewingVersion?.version_number}
+                    {t('enterprise.version_prefix', { number: viewingVersion?.version_number })}
                     {viewingVersion?.version_label ? ` — ${viewingVersion.version_label}` : ''}
                   </span>
                 </div>
@@ -542,7 +542,7 @@ export default function LegalDocVersionList() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  Close
+                  {t('common.close')}
                 </Button>
               </ModalFooter>
             </>
@@ -559,7 +559,7 @@ export default function LegalDocVersionList() {
               <ModalBody>
                 <div className="space-y-4">
                   <p className="text-sm text-[var(--color-text-secondary)]">
-                    Choose who should receive email notifications about version {selectedVersion?.version_number}:
+                    {t('enterprise.notify_modal_intro', { version: selectedVersion?.version_number })}
                   </p>
 
                   <RadioGroup
@@ -574,7 +574,7 @@ export default function LegalDocVersionList() {
                         base: 'flex items-start gap-3 p-3 border border-[var(--color-border)] rounded-lg cursor-pointer hover:bg-[var(--color-surface)] max-w-full',
                         label: 'flex-1',
                       }}
-                      description={pendingCount > 0 ? `${pendingCount} users` : 'Loading...'}
+                      description={pendingCount > 0 ? t('enterprise.pending_users_count', { count: pendingCount }) : t('enterprise.loading_pending_users')}
                     >
                       <span className="font-medium">{t('enterprise.notify_non_accepted')}</span>
                     </Radio>
@@ -594,7 +594,7 @@ export default function LegalDocVersionList() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   color="primary"
@@ -631,7 +631,7 @@ export default function LegalDocVersionList() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   color="danger"

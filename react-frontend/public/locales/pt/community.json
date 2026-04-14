@@ -281,5 +281,7 @@
     "register_organisation": {
       "title": "Registrar Organização"
     }
-  }
+  },
+  "remote": "Remote",
+  "closes_date": "Closes {{date}}"
 }

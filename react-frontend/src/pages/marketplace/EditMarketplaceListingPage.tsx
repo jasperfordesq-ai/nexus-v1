@@ -376,7 +376,7 @@ export function EditMarketplaceListingPage() {
   const handleSubmit = useCallback(async () => {
     if (!title.trim()) { toast.error(t('create.title_required', 'Title is required')); return; }
     if (!description.trim()) { toast.error(t('create.description_required', 'Description is required')); return; }
-    if (priceType !== 'free' && (!price || parseFloat(price) < 0)) {
+    if (priceType !== 'free' && (!price || parseFloat(price) <= 0)) {
       toast.error(t('create.price_invalid', 'Please enter a valid price'));
       return;
     }
@@ -493,6 +493,7 @@ export function EditMarketplaceListingPage() {
             variant="light"
             isIconOnly
             size="sm"
+            aria-label={t('common.go_back', 'Go back')}
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
@@ -514,9 +515,12 @@ export function EditMarketplaceListingPage() {
 
           {/* Drop zone */}
           <div
+            role="button"
+            tabIndex={0}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onClick={() => fileInputRef.current?.click()}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInputRef.current?.click(); } }}
             className="border-2 border-dashed border-default-300 rounded-xl p-8 text-center cursor-pointer
               hover:border-primary hover:bg-primary/5 transition-colors"
           >

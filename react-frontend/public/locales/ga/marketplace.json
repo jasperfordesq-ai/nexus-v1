@@ -60,7 +60,12 @@
     "view_image": "Féach ar íomhá {{number}}",
     "image_alt": "Íomhá {{number}}",
     "thumbnail_alt": "Mionsamhail {{number}}",
-    "link_copied": "Nasc cóipeáilte chuig an ngearrthaisce"
+    "link_copied": "Nasc cóipeáilte chuig an ngearrthaisce",
+    "thumbnail_label": "View image {{n}}",
+    "report_modal_title": "Report Listing",
+    "report_reason_label": "Reason",
+    "report_reason_placeholder": "Please describe why you are reporting this listing...",
+    "report_submit": "Submit Report"
   },
   "offer": {
     "modal_title": "Déan Tairiscint",
@@ -88,7 +93,8 @@
     "decline": "Diúltaigh",
     "counter": "Frith-thairg",
     "withdraw": "Tarraing Siar",
-    "accept_counter": "Glac leis an bhFrith-thairiscint"
+    "accept_counter": "Glac leis an bhFrith-thairiscint",
+    "amount_invalid": "Please enter a valid offer amount"
   },
   "create": {
     "page_title": "Díol Rud Éigin - Margadh",
@@ -602,7 +608,9 @@
       "rate_order": "Rátáil an tOrdú",
       "leave_rating": "Fág Rátáil",
       "rated": "Rátáilte",
-      "dispute_open": "Aighneas Oscailte"
+      "dispute_open": "Aighneas Oscailte",
+      "confirm_delivery_modal_title": "Confirm Delivery",
+      "confirm_delivery_modal_body": "Mark this order as delivered? This cannot be undone."
     },
     "seller": {
       "page_title": "Mo Dhíolacháin - Margadh",

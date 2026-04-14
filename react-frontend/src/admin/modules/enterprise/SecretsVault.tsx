@@ -126,7 +126,7 @@ export function SecretsVault() {
     try {
       const res = await adminEnterprise.rotateSecret(key);
       if (res.success) {
-        setRotateMessage(res.data?.message || 'Secret rotation requires manual update.');
+        setRotateMessage(res.data?.message || t('enterprise.secret_rotation_manual_update'));
         setRotateModalOpen(true);
       } else {
         toast.error(t('enterprise.failed_to_rotate_secret'));
@@ -183,7 +183,7 @@ export function SecretsVault() {
               isLoading={testingConnection}
               size="sm"
             >
-              Test Connection
+              {t('enterprise.btn_test_connection')}
             </Button>
             <Button
               variant="flat"
@@ -224,9 +224,9 @@ export function SecretsVault() {
                       <ChevronDown size={16} className="text-default-400" />
                     )}
                     <CategoryIcon size={18} className={catConfig.color} />
-                    <h3 className="text-base font-semibold">{catConfig.label}</h3>
+                    <h3 className="text-base font-semibold">{t(`enterprise.category_${cat}`, catConfig.label)}</h3>
                     <Chip size="sm" variant="flat" color={catSetCount === catSecrets.length ? 'success' : 'warning'}>
-                      {catSetCount}/{catSecrets.length} set
+                      {t('enterprise.secrets_n_of_m_set', { n: catSetCount, m: catSecrets.length })}
                     </Chip>
                   </div>
                 </CardHeader>
@@ -262,7 +262,7 @@ export function SecretsVault() {
                             isLoading={rotatingKey === secret.key}
                             isDisabled={!secret.is_set}
                           >
-                            Rotate
+                            {t('enterprise.btn_rotate')}
                           </Button>
                         </div>
                       ))}
@@ -284,7 +284,7 @@ export function SecretsVault() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setRotateModalOpen(false)}>
-              OK
+              {t('common.ok')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -306,7 +306,7 @@ export function SecretsVault() {
                     )}
                     <span className="text-sm font-medium text-foreground">{service}</span>
                     <Chip size="sm" variant="flat" color={ok ? 'success' : 'danger'}>
-                      {ok ? 'Connected' : 'Failed'}
+                      {ok ? t('enterprise.connected') : t('enterprise.failed')}
                     </Chip>
                   </div>
                 ))}
@@ -315,7 +315,7 @@ export function SecretsVault() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setTestModalOpen(false)}>
-              Close
+              {t('common.close')}
             </Button>
           </ModalFooter>
         </ModalContent>

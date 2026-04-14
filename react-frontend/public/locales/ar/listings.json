@@ -185,5 +185,10 @@
   },
   "filters_label": "Filters",
   "filter_hours": "Duration",
-  "filter_today": "Today"
+  "filter_today": "Today",
+  "radius_5": "5 km",
+  "radius_10": "10 km",
+  "radius_25": "25 km",
+  "radius_50": "50 km",
+  "radius_100": "100 km"
 }

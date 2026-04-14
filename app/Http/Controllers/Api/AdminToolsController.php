@@ -117,6 +117,7 @@ class AdminToolsController extends BaseApiController
     /** GET /api/v2/admin/tools/404-errors */
     public function get404Errors(): JsonResponse
     {
+        // Global log — intentionally cross-tenant (super-admin only). error_404_log has no tenant_id column.
         $this->requireSuperAdmin();
 
         $page = $this->queryInt('page', 1, 1);
@@ -152,6 +153,7 @@ class AdminToolsController extends BaseApiController
     /** DELETE /api/v2/admin/tools/404-errors/{id} */
     public function delete404Error(int $id): JsonResponse
     {
+        // Global log — intentionally cross-tenant (super-admin only). error_404_log has no tenant_id column.
         $this->requireSuperAdmin();
 
         try {
@@ -282,7 +284,7 @@ class AdminToolsController extends BaseApiController
     /** POST /api/v2/admin/tools/seed-generator */
     public function runSeedGenerator(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
 
         $input = $this->getAllInput();
         $types = $input['types'] ?? [];
