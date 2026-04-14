@@ -1,0 +1,37 @@
+{
+  "page_title": "Reviews",
+  "tabs": {
+    "received": "Reviews Received",
+    "given": "Reviews Given",
+    "pending": "Pending Reviews"
+  },
+  "stats": {
+    "average": "Average Rating",
+    "total": "Total Reviews",
+    "no_reviews": "No reviews yet"
+  },
+  "review_card": {
+    "anonymous": "Anonymous",
+    "delete": "Delete Review",
+    "delete_confirm": "Are you sure you want to delete this review?",
+    "delete_success": "Review deleted",
+    "delete_error": "Failed to delete review"
+  },
+  "pending": {
+    "empty": "No pending reviews",
+    "empty_subtitle": "You're all caught up! Reviews for your completed exchanges will appear here.",
+    "write_review": "Write Review"
+  },
+  "received": {
+    "empty": "No reviews received yet",
+    "empty_subtitle": "Complete exchanges with community members to start earning reviews."
+  },
+  "given": {
+    "empty": "You haven't written any reviews yet",
+    "empty_subtitle": "After completing exchanges, you can leave reviews for other members."
+  },
+  "load_error": "Failed to load reviews. Please try again.",
+  "load_more": "Load more",
+  "stars": "{{count}} star",
+  "stars_plural": "{{count}} stars"
+}

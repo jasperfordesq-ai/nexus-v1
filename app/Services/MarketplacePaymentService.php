@@ -782,10 +782,15 @@ class MarketplacePaymentService
 
         $totalEarned = (clone $baseQuery)->sum('seller_payout');
 
+        // Derive currency from the seller's most recent payment record; fall back to tenant default.
+        $currency = strtoupper(
+            (clone $baseQuery)->latest()->value('currency') ?? TenantContext::getCurrency() ?? 'EUR'
+        );
+
         return [
             'pending' => round((float) $pending, 2),
             'available' => round((float) $available, 2),
-            'currency' => 'EUR', // TODO: derive from seller's actual payment currency — global platform
+            'currency' => $currency,
             'total_earned' => round((float) $totalEarned, 2),
         ];
     }

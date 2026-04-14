@@ -142,6 +142,9 @@ class FeedRankingService
                 return self::$configCacheByTenant[$tenantIdForCache];
             }
         } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('FeedRankingService: TenantContext unavailable, skipping per-request cache', [
+                'error' => $e->getMessage(),
+            ]);
             $tenantIdForCache = null;
         }
 

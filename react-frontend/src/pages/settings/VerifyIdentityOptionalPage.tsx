@@ -261,7 +261,7 @@ export function VerifyIdentityOptionalPage() {
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
             <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
           </div>
-          <h1 className="text-2xl font-bold text-theme-primary">Checking verification status...</h1>
+          <h1 className="text-2xl font-bold text-theme-primary">{t('identity.loading_title')}</h1>
         </GlassCard>
       </div>
     );
@@ -276,17 +276,15 @@ export function VerifyIdentityOptionalPage() {
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
               <BadgeCheck className="w-8 h-8 text-emerald-400" />
             </div>
-            <h1 className="text-2xl font-bold text-theme-primary mb-2">Identity Verified</h1>
-            <p className="text-theme-muted mb-2">
-              Your identity has been verified. The <strong className="text-emerald-600 dark:text-emerald-400">ID Verified</strong> badge is now visible on your profile.
-            </p>
+            <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('identity.verified_title')}</h1>
+            <p className="text-theme-muted mb-2">{t('identity.verified_body')}</p>
             <div className="flex items-center justify-center gap-2 mt-4 mb-6 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
               <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-              <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">ID Verified</span>
+              <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{t('identity.verified_badge_label')}</span>
             </div>
             <div className="flex flex-col gap-3">
-              <Button color="primary" className="w-full" onPress={() => navigate(tenantPath('/settings'))}>Go to Settings</Button>
-              <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>Back to Dashboard</Button>
+              <Button color="primary" className="w-full" onPress={() => navigate(tenantPath('/settings'))}>{t('identity.go_to_settings')}</Button>
+              <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.back_to_dashboard')}</Button>
             </div>
           </GlassCard>
         </motion.div>
@@ -303,15 +301,13 @@ export function VerifyIdentityOptionalPage() {
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/20 flex items-center justify-center">
               <ShieldX className="w-8 h-8 text-red-400" />
             </div>
-            <h1 className="text-2xl font-bold text-theme-primary mb-2">Verification Unsuccessful</h1>
-            <p className="text-theme-muted mb-2">We were unable to verify your identity.</p>
+            <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('identity.failed_title')}</h1>
+            <p className="text-theme-muted mb-2">{t('identity.failed_body')}</p>
             {failureReason && <p className="text-red-600 dark:text-red-400 text-sm mb-4">{failureReason}</p>}
-            <p className="text-theme-subtle text-sm mb-6">
-              Please ensure your photo ID is clear, well-lit, and that your name and date of birth match your profile.
-            </p>
+            <p className="text-theme-subtle text-sm mb-6">{t('identity.failed_hint')}</p>
             <div className="flex flex-col gap-3">
-              <Button onPress={handleStartVerification} isLoading={isStarting} className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={!isStarting ? <RefreshCw className="w-4 h-4" /> : undefined}>Try Again</Button>
-              <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>Back to Dashboard</Button>
+              <Button onPress={handleStartVerification} isLoading={isStarting} className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={!isStarting ? <RefreshCw className="w-4 h-4" /> : undefined}>{t('identity.try_again')}</Button>
+              <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.back_to_dashboard')}</Button>
             </div>
           </GlassCard>
         </motion.div>
@@ -328,9 +324,9 @@ export function VerifyIdentityOptionalPage() {
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/20 flex items-center justify-center">
               <ShieldX className="w-8 h-8 text-red-400" />
             </div>
-            <h1 className="text-2xl font-bold text-theme-primary mb-2">Something went wrong</h1>
+            <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('identity.error_title')}</h1>
             <p className="text-theme-muted mb-6">{errorMessage}</p>
-            <Button onPress={() => { setPageState('loading'); fetchStatus(); }} className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={<RefreshCw className="w-4 h-4" />}>Try Again</Button>
+            <Button onPress={() => { setPageState('loading'); fetchStatus(); }} className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={<RefreshCw className="w-4 h-4" />}>{t('identity.try_again')}</Button>
           </GlassCard>
         </motion.div>
       </div>
@@ -349,11 +345,9 @@ export function VerifyIdentityOptionalPage() {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 mb-4">
                 <CalendarDays className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">Date of Birth</h1>
-              <p className="text-theme-muted mt-2">
-                We need your date of birth to verify it matches your government-issued ID.
-              </p>
-              <p className="text-xs text-theme-subtle mt-1">Step 1 of {feeCents > 0 ? '3' : '2'}</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">{t('identity.dob_title')}</h1>
+              <p className="text-theme-muted mt-2">{t('identity.dob_body')}</p>
+              <p className="text-xs text-theme-subtle mt-1">{t('identity.step_indicator', { current: 1, total: feeCents > 0 ? 3 : 2 })}</p>
             </div>
 
             {errorMessage && (
@@ -378,10 +372,10 @@ export function VerifyIdentityOptionalPage() {
                 size="lg"
                 isDisabled={!dob}
               >
-                Continue
+                {t('identity.continue')}
               </Button>
 
-              <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>Maybe Later</Button>
+              <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.maybe_later')}</Button>
             </div>
           </GlassCard>
         </motion.div>
@@ -403,11 +397,9 @@ export function VerifyIdentityOptionalPage() {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 mb-4">
                 <CreditCard className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">Verification Fee</h1>
-              <p className="text-theme-muted mt-2">
-                Identity verification costs <strong className="text-theme-primary">{feeDisplay}</strong>. This is a one-time fee — you won't be charged again if you need to retry.
-              </p>
-              <p className="text-xs text-theme-subtle mt-1">Step 2 of 3</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">{t('identity.fee_title')}</h1>
+              <p className="text-theme-muted mt-2">{t('identity.fee_body', { fee: feeDisplay })}</p>
+              <p className="text-xs text-theme-subtle mt-1">{t('identity.step_indicator', { current: 2, total: 3 })}</p>
             </div>
 
             {errorMessage && (
@@ -418,7 +410,7 @@ export function VerifyIdentityOptionalPage() {
               <div className="space-y-4">
                 <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-center">
                   <p className="text-3xl font-bold text-theme-primary">{feeDisplay}</p>
-                  <p className="text-xs text-theme-muted mt-1">One-time identity verification fee</p>
+                  <p className="text-xs text-theme-muted mt-1">{t('identity.fee_one_time_label')}</p>
                 </div>
 
                 <Button
@@ -428,10 +420,10 @@ export function VerifyIdentityOptionalPage() {
                   size="lg"
                   startContent={!isCreatingPayment ? <CreditCard className="w-5 h-5" /> : undefined}
                 >
-                  Pay {feeDisplay}
+                  {t('identity.pay_button', { fee: feeDisplay })}
                 </Button>
 
-                <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>Maybe Later</Button>
+                <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.maybe_later')}</Button>
               </div>
             ) : (
               <div className="space-y-4">
@@ -468,15 +460,13 @@ export function VerifyIdentityOptionalPage() {
               )}
             </motion.div>
             <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">
-              {pageState === 'in_progress' ? 'Verification in progress' : 'Verify your identity'}
+              {pageState === 'in_progress' ? t('identity.in_progress_title') : t('identity.start_title')}
             </h1>
             <p className="text-theme-muted mt-2">
-              {pageState === 'in_progress'
-                ? 'Please complete the verification in the opened window. This page will update automatically.'
-                : 'Submit your government-issued ID and a selfie to earn the ID Verified badge.'}
+              {pageState === 'in_progress' ? t('identity.in_progress_body') : t('identity.start_body')}
             </p>
             {pageState === 'start' && (
-              <p className="text-xs text-theme-subtle mt-1">Step {feeCents > 0 ? '3 of 3' : '2 of 2'}</p>
+              <p className="text-xs text-theme-subtle mt-1">{t('identity.step_indicator', { current: feeCents > 0 ? 3 : 2, total: feeCents > 0 ? 3 : 2 })}</p>
             )}
           </div>
 
@@ -487,11 +477,11 @@ export function VerifyIdentityOptionalPage() {
           {pageState === 'start' && (
             <div className="space-y-4">
               <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
-                <h3 className="font-medium text-theme-primary text-sm mb-2">What you'll need</h3>
+                <h3 className="font-medium text-theme-primary text-sm mb-2">{t('identity.what_needed_title')}</h3>
                 <ul className="text-sm text-theme-muted space-y-1">
-                  <li>• A valid government-issued photo ID</li>
-                  <li>• A device with a camera</li>
-                  <li>• About 2–5 minutes</li>
+                  <li>• {t('identity.need_document')}</li>
+                  <li>• {t('identity.need_camera')}</li>
+                  <li>• {t('identity.need_minutes')}</li>
                 </ul>
               </div>
 
@@ -503,10 +493,10 @@ export function VerifyIdentityOptionalPage() {
                 startContent={!isStarting ? <ShieldCheck className="w-5 h-5" /> : undefined}
                 spinner={<Loader2 className="w-4 h-4 animate-spin" />}
               >
-                Start Verification
+                {t('identity.start_button')}
               </Button>
 
-              <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>Maybe Later</Button>
+              <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.maybe_later')}</Button>
             </div>
           )}
 
@@ -514,18 +504,18 @@ export function VerifyIdentityOptionalPage() {
             <div className="space-y-4">
               {redirectUrl && (
                 <Button as="a" href={redirectUrl} target="_blank" rel="noopener noreferrer" variant="bordered" className="w-full border-indigo-500/30 text-theme-primary hover:bg-indigo-500/10" size="lg" startContent={<ExternalLink className="w-4 h-4" />}>
-                  Open Verification Window
+                  {t('identity.open_window')}
                 </Button>
               )}
 
               <div className="flex items-center justify-center gap-2 text-sm text-theme-muted">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Waiting for verification result...
+                {t('identity.waiting')}
               </div>
 
               <div className="flex flex-col gap-2 pt-2">
-                <Button variant="flat" size="sm" className="w-full text-theme-muted" onPress={() => { stopPolling(); setPageState('start'); setRedirectUrl(null); userStartedRef.current = false; }}>Cancel & Start Over</Button>
-                <Button variant="light" size="sm" className="w-full text-theme-subtle" startContent={<ArrowLeft className="w-3.5 h-3.5" />} onPress={() => navigate(tenantPath('/dashboard'))}>Back to Dashboard</Button>
+                <Button variant="flat" size="sm" className="w-full text-theme-muted" onPress={() => { stopPolling(); setPageState('start'); setRedirectUrl(null); userStartedRef.current = false; }}>{t('identity.cancel_start_over')}</Button>
+                <Button variant="light" size="sm" className="w-full text-theme-subtle" startContent={<ArrowLeft className="w-3.5 h-3.5" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.back_to_dashboard')}</Button>
               </div>
             </div>
           )}

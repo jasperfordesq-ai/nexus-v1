@@ -151,7 +151,7 @@ Route::post('/v2/events/{id}/attendees/{attendeeId}/check-in', [\App\Http\Contro
 Route::post('/v2/events/{id}/cancel', [\App\Http\Controllers\Api\EventsController::class, 'cancel']);
 Route::post('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'waitlist']);
 Route::delete('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'leaveWaitlist']);
-Route::post('/v2/events/{id}/image', [\App\Http\Controllers\Api\EventsController::class, 'uploadImage']);
+Route::post('/v2/events/{id}/image', [\App\Http\Controllers\Api\EventsController::class, 'uploadImage'])->middleware('throttle:20,1');
 
 // ============================================
 // MIGRATED ROUTES — Listings (controller routes only)
@@ -180,9 +180,9 @@ Route::put('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::c
 Route::delete('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'destroy']);
 Route::post('/v2/listings/{id}/save', [\App\Http\Controllers\Api\ListingsController::class, 'saveListing']);
 Route::delete('/v2/listings/{id}/save', [\App\Http\Controllers\Api\ListingsController::class, 'unsaveListing']);
-Route::post('/v2/listings/{id}/image', [\App\Http\Controllers\Api\ListingsController::class, 'uploadImage']);
+Route::post('/v2/listings/{id}/image', [\App\Http\Controllers\Api\ListingsController::class, 'uploadImage'])->middleware('throttle:20,1');
 Route::delete('/v2/listings/{id}/image', [\App\Http\Controllers\Api\ListingsController::class, 'deleteImage']);
-Route::post('/v2/listings/{id}/images', [\App\Http\Controllers\Api\ListingsController::class, 'uploadImages']);
+Route::post('/v2/listings/{id}/images', [\App\Http\Controllers\Api\ListingsController::class, 'uploadImages'])->middleware('throttle:20,1');
 Route::delete('/v2/listings/{id}/images/{imageId}', [\App\Http\Controllers\Api\ListingsController::class, 'deleteListingImage']);
 Route::put('/v2/listings/{id}/images/reorder', [\App\Http\Controllers\Api\ListingsController::class, 'reorderImages']);
 Route::post('/v2/listings/{id}/renew', [\App\Http\Controllers\Api\ListingsController::class, 'renew']);
@@ -250,7 +250,7 @@ Route::get('/v2/groups/{id}/discussions', [\App\Http\Controllers\Api\GroupsContr
 Route::post('/v2/groups/{id}/discussions', [\App\Http\Controllers\Api\GroupsController::class, 'createDiscussion']);
 Route::get('/v2/groups/{id}/discussions/{discussionId}', [\App\Http\Controllers\Api\GroupsController::class, 'discussionMessages']);
 Route::post('/v2/groups/{id}/discussions/{discussionId}/messages', [\App\Http\Controllers\Api\GroupsController::class, 'postToDiscussion']);
-Route::post('/v2/groups/{id}/image', [\App\Http\Controllers\Api\GroupsController::class, 'uploadImage']);
+Route::post('/v2/groups/{id}/image', [\App\Http\Controllers\Api\GroupsController::class, 'uploadImage'])->middleware('throttle:20,1');
 Route::get('/v2/groups/{id}/announcements', [\App\Http\Controllers\Api\GroupsController::class, 'announcements']);
 Route::post('/v2/groups/{id}/announcements', [\App\Http\Controllers\Api\GroupsController::class, 'createAnnouncement']);
 Route::put('/v2/groups/{id}/announcements/{announcementId}', [\App\Http\Controllers\Api\GroupsController::class, 'updateAnnouncement']);
@@ -292,7 +292,7 @@ Route::put('/v2/groups/{id}/wiki/{pageId}', [\App\Http\Controllers\Api\GroupWiki
 Route::delete('/v2/groups/{id}/wiki/{pageId}', [\App\Http\Controllers\Api\GroupWikiController::class, 'destroy']);
 Route::get('/v2/groups/{id}/wiki/{pageId}/revisions', [\App\Http\Controllers\Api\GroupWikiController::class, 'revisions']);
 Route::get('/v2/groups/{id}/media', [\App\Http\Controllers\Api\GroupMediaController::class, 'index']);
-Route::post('/v2/groups/{id}/media', [\App\Http\Controllers\Api\GroupMediaController::class, 'upload']);
+Route::post('/v2/groups/{id}/media', [\App\Http\Controllers\Api\GroupMediaController::class, 'upload'])->middleware('throttle:20,1');
 Route::delete('/v2/groups/{id}/media/{mediaId}', [\App\Http\Controllers\Api\GroupMediaController::class, 'destroy']);
 Route::get('/v2/groups/{id}/webhooks', [\App\Http\Controllers\Api\GroupWebhookController::class, 'index']);
 Route::post('/v2/groups/{id}/webhooks', [\App\Http\Controllers\Api\GroupWebhookController::class, 'store']);
@@ -487,7 +487,7 @@ Route::get('/v2/comments/{id}/reactions', [\App\Http\Controllers\Api\ReactionCon
 Route::get('/v2/link-preview', [\App\Http\Controllers\Api\LinkPreviewController::class, 'show']);
 Route::post('/v2/link-preview', [\App\Http\Controllers\Api\LinkPreviewController::class, 'fetch']);
 // Post Media (carousel / multi-image)
-Route::post('/v2/posts/{id}/media', [\App\Http\Controllers\Api\PostMediaController::class, 'uploadMedia']);
+Route::post('/v2/posts/{id}/media', [\App\Http\Controllers\Api\PostMediaController::class, 'uploadMedia'])->middleware('throttle:20,1');
 Route::put('/v2/posts/{id}/media/reorder', [\App\Http\Controllers\Api\PostMediaController::class, 'reorderMedia']);
 Route::delete('/v2/posts/media/{mediaId}', [\App\Http\Controllers\Api\PostMediaController::class, 'removeMedia']);
 Route::put('/v2/posts/media/{mediaId}/alt', [\App\Http\Controllers\Api\PostMediaController::class, 'updateAltText']);
@@ -835,10 +835,10 @@ Route::get('/v2/donations/{id}/receipt', [\App\Http\Controllers\Api\DonationPaym
 Route::post('/v2/marketplace/listings', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'store']);
 Route::put('/v2/marketplace/listings/{id}', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'update']);
 Route::delete('/v2/marketplace/listings/{id}', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'destroy']);
-Route::post('/v2/marketplace/listings/{id}/images', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'uploadImages']);
+Route::post('/v2/marketplace/listings/{id}/images', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'uploadImages'])->middleware('throttle:20,1');
 Route::put('/v2/marketplace/listings/{id}/images/reorder', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'reorderImages']);
 Route::delete('/v2/marketplace/listings/{id}/images/{imageId}', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'deleteImage']);
-Route::post('/v2/marketplace/listings/{id}/video', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'uploadVideo']);
+Route::post('/v2/marketplace/listings/{id}/video', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'uploadVideo'])->middleware('throttle:10,1');
 Route::delete('/v2/marketplace/listings/{id}/video', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'deleteVideo']);
 Route::post('/v2/marketplace/listings/{id}/renew', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'renew']);
 Route::get('/v2/marketplace/listings/{id}/analytics', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'analytics']);
@@ -1693,10 +1693,11 @@ Route::middleware('throttle:30,1')->group(function () {
 Route::middleware('throttle:30,1')->group(function () {
     Route::post('/auth/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
     Route::post('/v2/auth/register', [\App\Http\Controllers\Api\RegistrationController::class, 'register']);
-    Route::post('/totp/verify', [\App\Http\Controllers\Api\TotpController::class, 'verify']);
     Route::post('/webauthn/auth-challenge', [\App\Http\Controllers\Api\WebAuthnController::class, 'authChallenge']);
     Route::post('/webauthn/auth-verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'authVerify']);
 });
+// TOTP verify — strict throttle (5/min) to prevent 6-digit code brute-force during 2FA login
+Route::post('/totp/verify', [\App\Http\Controllers\Api\TotpController::class, 'verify'])->middleware('throttle:5,1');
 // Password reset endpoints — stricter throttle to mitigate email enumeration/spam (5/min per IP)
 Route::middleware('throttle:5,1')->group(function () {
     Route::post('/auth/forgot-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'forgotPassword']);
@@ -1940,7 +1941,7 @@ Route::post('/v2/volunteering/certificates', [\App\Http\Controllers\Api\Voluntee
 Route::get('/v2/volunteering/certificates/verify/{code}', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'verifyCertificate'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/volunteering/certificates/{code}/html', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'certificateHtml'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/volunteering/credentials', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'myCredentials']);
-Route::post('/v2/volunteering/credentials', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'uploadCredential']);
+Route::post('/v2/volunteering/credentials', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'uploadCredential'])->middleware('throttle:20,1');
 Route::delete('/v2/volunteering/credentials/{id}', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'deleteCredential']);
 Route::get('/v2/volunteering/emergency-alerts', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'myEmergencyAlerts']);
 Route::post('/v2/volunteering/emergency-alerts', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'createEmergencyAlert']);
