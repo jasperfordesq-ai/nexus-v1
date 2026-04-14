@@ -874,7 +874,7 @@ export function RegisterPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Honeypot - hidden from users, visible to bots */}
         <div className="hidden" aria-hidden="true">
-          <label htmlFor="website">Website</label>
+          <label htmlFor="website">{t('register.honeypot_label')}</label>
           <input
             ref={honeypotRef}
             type="text"

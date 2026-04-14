@@ -358,12 +358,12 @@ export default function SafeguardingPage() {
     },
     {
       key: 'has_triggers',
-      label: 'Has Triggers',
+      label: t('safeguarding.col_has_triggers'),
       render: (item) =>
         item.has_triggers ? (
-          <Chip size="sm" color="danger" variant="flat">Yes</Chip>
+          <Chip size="sm" color="danger" variant="flat">{t('safeguarding.yes')}</Chip>
         ) : (
-          <Chip size="sm" color="success" variant="flat">No</Chip>
+          <Chip size="sm" color="success" variant="flat">{t('safeguarding.no')}</Chip>
         ),
     },
     {
@@ -385,21 +385,21 @@ export default function SafeguardingPage() {
       {/* Stat cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard
-          label="Flags This Month"
+          label={t('safeguarding.stat_flags_month')}
           value={stats?.total_flags_this_month ?? 0}
           icon={Flag}
           color="warning"
           loading={statsLoading}
         />
         <StatCard
-          label="Critical Flags"
+          label={t('safeguarding.stat_critical')}
           value={stats?.critical_flags ?? 0}
           icon={AlertTriangle}
           color="danger"
           loading={statsLoading}
         />
         <StatCard
-          label="Unreviewed"
+          label={t('safeguarding.stat_unreviewed')}
           value={stats?.unreviewed_flags ?? 0}
           icon={Eye}
           color="primary"
@@ -411,7 +411,7 @@ export default function SafeguardingPage() {
       <Tabs
         selectedKey={activeTab}
         onSelectionChange={(key) => setActiveTab(String(key))}
-        aria-label="Safeguarding tabs"
+        aria-label={t('safeguarding.tabs_aria')}
         color="primary"
         variant="underlined"
       >
@@ -521,11 +521,11 @@ export default function SafeguardingPage() {
                   <p className="text-default-500">{reviewTarget.message_content || reviewTarget.message_body || ''}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-default-500">Severity:</span>
+                  <span className="text-sm text-default-500">{t('safeguarding.severity_label')}</span>
                   <SeverityChip severity={reviewTarget.severity || reviewTarget.flag_severity || 'low'} />
                 </div>
                 <Textarea
-                  label="Review Notes"
+                  label={t('safeguarding.review_notes_label')}
                   placeholder={t('safeguarding.review_notes_placeholder')}
                   value={reviewNotes}
                   onValueChange={setReviewNotes}
