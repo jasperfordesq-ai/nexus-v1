@@ -12,6 +12,7 @@
  */
 
 import { useState, useRef, useCallback } from 'react';
+import { Button } from '@heroui/react';
 import { Image } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -118,10 +119,13 @@ export function MarketplaceImageGallery({ images }: MarketplaceImageGalleryProps
       {images.length > 1 && (
         <div className="hidden sm:flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
           {images.map((image, index) => (
-            <button
+            <Button
               key={image.id}
-              onClick={() => handleThumbnailClick(index)}
-              className={`shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-colors ${
+              isIconOnly
+              variant="light"
+              size="sm"
+              onPress={() => handleThumbnailClick(index)}
+              className={`shrink-0 w-16 h-16 min-w-0 rounded-md overflow-hidden border-2 transition-colors p-0 ${
                 index === activeIndex
                   ? 'border-primary'
                   : 'border-transparent hover:border-default-300'
@@ -135,7 +139,7 @@ export function MarketplaceImageGallery({ images }: MarketplaceImageGalleryProps
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
-            </button>
+            </Button>
           ))}
         </div>
       )}

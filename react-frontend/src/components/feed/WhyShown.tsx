@@ -11,7 +11,7 @@
  * Only renders in "For You" (ranking) mode, not chronological.
  */
 
-import { Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
+import { Popover, PopoverTrigger, PopoverContent, Button } from '@heroui/react';
 import { Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { FeedItem } from './types';
@@ -71,12 +71,15 @@ export function WhyShown({ item, feedMode }: WhyShownProps) {
   return (
     <Popover placement="bottom" offset={4}>
       <PopoverTrigger>
-        <button
-          className="text-[var(--text-subtle)] hover:text-[var(--text-muted)] transition-colors opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-primary)] rounded-sm p-0.5"
+        <Button
+          isIconOnly
+          variant="light"
+          size="sm"
+          className="text-[var(--text-subtle)] hover:text-[var(--text-muted)] transition-colors opacity-0 group-hover:opacity-100 focus-visible:opacity-100 min-w-0 min-h-0 w-auto h-auto p-0.5"
           aria-label={t('why_shown.label', 'Why am I seeing this?')}
         >
           <Info className="w-3.5 h-3.5" />
-        </button>
+        </Button>
       </PopoverTrigger>
       <PopoverContent className="p-3 max-w-[240px]">
         <p className="text-xs font-semibold text-[var(--text-primary)] mb-2">

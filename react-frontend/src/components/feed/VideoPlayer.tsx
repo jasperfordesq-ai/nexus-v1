@@ -13,6 +13,7 @@
  */
 
 import { useRef, useState, useEffect, useCallback } from 'react';
+import { Button } from '@heroui/react';
 import { Play, Volume2, VolumeX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { resolveAssetUrl } from '@/lib/helpers';
@@ -119,9 +120,11 @@ export function VideoPlayer({ media, className = '' }: VideoPlayerProps) {
       )}
 
       {/* Mute toggle — bottom right */}
-      <button
-        type="button"
-        className="absolute bottom-3 right-3 bg-black/40 backdrop-blur-sm text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/60 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-white/50"
+      <Button
+        isIconOnly
+        variant="flat"
+        size="sm"
+        className="absolute bottom-3 right-3 bg-black/40 backdrop-blur-sm text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100"
         onClick={handleToggleMute}
         aria-label={isMuted ? t('video.unmute', 'Unmute') : t('video.mute', 'Mute')}
       >
@@ -130,7 +133,7 @@ export function VideoPlayer({ media, className = '' }: VideoPlayerProps) {
         ) : (
           <Volume2 className="w-4 h-4" />
         )}
-      </button>
+      </Button>
     </div>
   );
 }

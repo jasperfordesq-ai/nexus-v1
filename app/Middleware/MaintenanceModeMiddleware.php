@@ -154,14 +154,14 @@ class MaintenanceModeMiddleware
             if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
                 throw new \Symfony\Component\HttpKernel\Exception\HttpException(
                     503,
-                    json_encode(['success' => false, 'error' => 'Platform is currently under maintenance. Please check back soon.', 'code' => 'MAINTENANCE_MODE'])
+                    json_encode(['success' => false, 'error' => __('api.maintenance_mode'), 'code' => 'MAINTENANCE_MODE'])
                 );
             }
             header('Content-Type: application/json');
             http_response_code(503);
             echo json_encode([
                 'success' => false,
-                'error' => 'Platform is currently under maintenance. Please check back soon.',
+                'error' => __('api.maintenance_mode'),
                 'code' => 'MAINTENANCE_MODE',
             ]);
             exit;

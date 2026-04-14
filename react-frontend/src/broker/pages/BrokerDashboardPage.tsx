@@ -11,7 +11,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardBody, CardHeader, Spinner } from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Spinner } from '@heroui/react';
 import {
   Users,
   ShieldAlert,
@@ -232,10 +232,11 @@ export default function BrokerDashboardPage() {
               {quickActions.map((action) => {
                 const Icon = action.icon;
                 return (
-                  <button
+                  <Button
                     key={action.path}
-                    onClick={() => navigate(tenantPath(action.path))}
-                    className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-default-100 transition-colors text-left"
+                    variant="light"
+                    onPress={() => navigate(tenantPath(action.path))}
+                    className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-default-100 transition-colors text-left h-auto min-w-0 justify-start"
                   >
                     <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${action.color}`}>
                       <Icon size={20} />
@@ -245,7 +246,7 @@ export default function BrokerDashboardPage() {
                       <p className="text-xs text-default-400 truncate">{action.description}</p>
                     </div>
                     <ChevronRight size={16} className="text-default-400 shrink-0" />
-                  </button>
+                  </Button>
                 );
               })}
             </CardBody>

@@ -12,7 +12,7 @@
 
 import { forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Avatar, Skeleton } from '@heroui/react';
+import { Avatar, Skeleton, Button } from '@heroui/react';
 import { UserCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -115,13 +115,13 @@ export const MentionAutocomplete = forwardRef<HTMLDivElement, MentionAutocomplet
             /* Results list */
             <div className="py-1">
               {suggestions.map((user, idx) => (
-                <button
+                <Button
                   key={user.id}
-                  type="button"
+                  variant="light"
                   role="option"
                   id={`mention-option-${user.id}`}
                   aria-selected={idx === selectedIndex}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors cursor-pointer ${
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors h-auto justify-start rounded-none ${
                     idx === selectedIndex
                       ? 'bg-primary-50 dark:bg-primary-900/20 text-[var(--color-primary)]'
                       : 'text-[var(--text-primary)] hover:bg-[var(--surface-hover)]'
@@ -151,7 +151,7 @@ export const MentionAutocomplete = forwardRef<HTMLDivElement, MentionAutocomplet
                   {user.is_connection && (
                     <UserCheck className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" aria-label={t('mention.connected', 'Connected')} />
                   )}
-                </button>
+                </Button>
               ))}
             </div>
           )}

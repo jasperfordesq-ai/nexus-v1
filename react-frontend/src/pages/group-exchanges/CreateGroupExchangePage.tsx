@@ -522,12 +522,12 @@ export function CreateGroupExchangePage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {SPLIT_TYPE_CARDS.map((card) => (
-                    <button
+                    <Button
                       key={card.value}
-                      type="button"
-                      onClick={() => setSplitType(card.value)}
+                      variant="flat"
+                      onPress={() => setSplitType(card.value)}
                       className={`
-                        p-4 rounded-xl border-2 text-center transition-all cursor-pointer
+                        p-4 rounded-xl border-2 text-center transition-all cursor-pointer h-auto min-w-0 flex-col
                         ${splitType === card.value
                           ? 'border-indigo-500 bg-indigo-500/10'
                           : 'border-theme-default bg-theme-elevated hover:border-indigo-500/30 hover:bg-theme-hover'}
@@ -543,7 +543,7 @@ export function CreateGroupExchangePage() {
                       <p className="text-xs text-theme-subtle leading-relaxed">
                         {t('create.split_' + card.value + '_desc')}
                       </p>
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </GlassCard>

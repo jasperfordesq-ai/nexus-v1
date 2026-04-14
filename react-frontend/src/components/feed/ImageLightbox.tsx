@@ -16,6 +16,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
+import { Button } from '@heroui/react';
 import { X, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
@@ -140,17 +141,17 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
       tabIndex={-1}
     >
       {/* Close button — large, high contrast, always visible */}
-      <button
-        type="button"
-        className="absolute top-4 right-4 z-10 bg-white/90 text-black rounded-full p-2.5 hover:bg-white transition-colors shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50"
-        onClick={(e) => {
-          e.stopPropagation();
-          onClose();
-        }}
+      <Button
+        isIconOnly
+        variant="flat"
+        size="sm"
+        className="absolute top-4 right-4 z-10 bg-white/90 text-black rounded-full shadow-lg"
+        onPress={onClose}
+        onClick={(e) => e.stopPropagation()}
         aria-label={t('lightbox.close', 'Close image viewer')}
       >
         <X className="w-6 h-6 stroke-[2.5]" />
-      </button>
+      </Button>
 
       {/* Download button — top-left */}
       <a
@@ -228,32 +229,32 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
 
       {/* Left arrow */}
       {currentIndex > 0 && (
-        <button
-          type="button"
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm text-white rounded-full p-3 hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
-          onClick={(e) => {
-            e.stopPropagation();
-            goPrev();
-          }}
+        <Button
+          isIconOnly
+          variant="flat"
+          size="sm"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm text-white rounded-full"
+          onPress={goPrev}
+          onClick={(e) => e.stopPropagation()}
           aria-label={t('carousel.previous', 'Previous image')}
         >
           <ChevronLeft className="w-6 h-6" />
-        </button>
+        </Button>
       )}
 
       {/* Right arrow */}
       {currentIndex < total - 1 && (
-        <button
-          type="button"
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm text-white rounded-full p-3 hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
-          onClick={(e) => {
-            e.stopPropagation();
-            goNext();
-          }}
+        <Button
+          isIconOnly
+          variant="flat"
+          size="sm"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm text-white rounded-full"
+          onPress={goNext}
+          onClick={(e) => e.stopPropagation()}
           aria-label={t('carousel.next', 'Next image')}
         >
           <ChevronRight className="w-6 h-6" />
-        </button>
+        </Button>
       )}
 
       {/* Dot indicators — collapses to max 7 visible dots for 8+ images */}
@@ -266,38 +267,36 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
               if (distance > 3) return null;
               const scale = distance <= 1 ? '' : distance === 2 ? 'scale-75' : 'scale-50 opacity-50';
               return (
-                <button
+                <Button
                   key={idx}
-                  type="button"
-                  className={`w-2.5 h-2.5 rounded-full transition-all ${scale} ${
+                  isIconOnly
+                  variant="light"
+                  size="sm"
+                  className={`w-2.5 h-2.5 min-w-0 min-h-0 rounded-full p-0 transition-all ${scale} ${
                     idx === currentIndex
                       ? 'bg-white scale-110'
                       : 'bg-white/40 hover:bg-white/60'
                   }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDirection(idx > currentIndex ? 1 : -1);
-                    setCurrentIndex(idx);
-                  }}
+                  onPress={() => { setDirection(idx > currentIndex ? 1 : -1); setCurrentIndex(idx); }}
+                  onClick={(e) => e.stopPropagation()}
                   aria-label={t('carousel.go_to_image', 'Go to image {{number}}', { number: idx + 1 })}
                   aria-current={idx === currentIndex ? 'true' : undefined}
                 />
               );
             }
             return (
-              <button
+              <Button
                 key={idx}
-                type="button"
-                className={`w-2.5 h-2.5 rounded-full transition-all ${
+                isIconOnly
+                variant="light"
+                size="sm"
+                className={`w-2.5 h-2.5 min-w-0 min-h-0 rounded-full p-0 transition-all ${
                   idx === currentIndex
                     ? 'bg-white scale-110'
                     : 'bg-white/40 hover:bg-white/60'
                 }`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDirection(idx > currentIndex ? 1 : -1);
-                  setCurrentIndex(idx);
-                }}
+                onPress={() => { setDirection(idx > currentIndex ? 1 : -1); setCurrentIndex(idx); }}
+                onClick={(e) => e.stopPropagation()}
                 aria-label={t('carousel.go_to_image', 'Go to image {{number}}', { number: idx + 1 })}
                 aria-current={idx === currentIndex ? 'true' : undefined}
               />

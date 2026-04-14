@@ -203,17 +203,17 @@ export function GdprRequestCreate() {
                 {showDropdown && userResults.length > 0 && (
                   <div className="absolute z-50 w-full mt-1 bg-content1 border border-divider rounded-xl shadow-lg max-h-60 overflow-y-auto">
                     {userResults.map((user) => (
-                      <button
+                      <Button
                         key={user.id}
-                        type="button"
+                        variant="light"
+                        className="w-full text-left px-4 py-2.5 hover:bg-default-100 transition-colors first:rounded-t-xl last:rounded-b-xl h-auto min-w-0 justify-start"
                         onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => handleSelectUser(user)}
-                        className="w-full text-left px-4 py-2.5 hover:bg-default-100 transition-colors first:rounded-t-xl last:rounded-b-xl"
+                        onPress={() => handleSelectUser(user)}
                       >
                         <span className="font-medium text-sm">{user.name}</span>
                         <span className="text-default-500 text-sm"> ({user.email})</span>
                         <span className="text-default-400 text-xs ml-1">— ID #{user.id}</span>
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 )}
@@ -234,13 +234,13 @@ export function GdprRequestCreate() {
                 const isSelected = selectedType === type.key;
                 const Icon = type.icon;
                 return (
-                  <button
+                  <Button
                     key={type.key}
-                    type="button"
-                    onClick={() => setSelectedType(type.key)}
+                    variant="flat"
+                    onPress={() => setSelectedType(type.key)}
                     className={`
                       flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all
-                      cursor-pointer text-center
+                      cursor-pointer text-center h-auto min-w-0
                       ${isSelected
                         ? 'border-primary bg-primary-50 shadow-sm'
                         : 'border-default-200 bg-default-50 hover:border-default-300'
@@ -259,7 +259,7 @@ export function GdprRequestCreate() {
                       </p>
                       <p className="text-xs text-default-500 mt-0.5">{t(type.descriptionKey)}</p>
                     </div>
-                  </button>
+                  </Button>
                 );
               })}
             </div>

@@ -134,11 +134,12 @@ export function GifPicker({ onSelect }: GifPickerProps) {
           ) : (
             <div className="grid grid-cols-3 gap-1">
               {gifs.map((gif) => (
-                <button
+                <Button
                   key={gif.id}
-                  type="button"
-                  onClick={() => handleGifClick(gif)}
-                  className="relative overflow-hidden rounded-lg cursor-pointer hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary"
+                  isIconOnly
+                  variant="flat"
+                  onPress={() => handleGifClick(gif)}
+                  className="relative overflow-hidden rounded-lg cursor-pointer hover:opacity-80 transition-opacity p-0 min-w-0 h-auto"
                   aria-label={t('gif.select', 'Select GIF')}
                 >
                   <img
@@ -147,7 +148,7 @@ export function GifPicker({ onSelect }: GifPickerProps) {
                     loading="lazy"
                     className="w-full aspect-square object-cover"
                   />
-                </button>
+                </Button>
               ))}
             </div>
           )}

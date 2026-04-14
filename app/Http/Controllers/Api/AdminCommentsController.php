@@ -96,6 +96,9 @@ class AdminCommentsController extends BaseApiController
             $params[] = $searchPattern;
         }
 
+        // Safety: $where is assembled from hardcoded SQL fragments only.
+        // All user-supplied values (search, targetType, effectiveTenantId) are bound
+        // via parameterised ? placeholders — never interpolated into the SQL string.
         $where = !empty($conditions) ? implode(' AND ', $conditions) : '1=1';
 
         $total = (int) DB::selectOne(
@@ -144,6 +147,8 @@ class AdminCommentsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $effectiveTenantId = $this->resolveEffectiveTenantId($superAdmin, $tenantId);
+        // Safety: $tenantWhere is a hardcoded literal string ('AND c.tenant_id = ?' or '').
+        // The tenant ID value is bound via parameterised placeholder, not interpolated.
         $tenantWhere = $effectiveTenantId !== null ? 'AND c.tenant_id = ?' : '';
         $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
@@ -188,6 +193,8 @@ class AdminCommentsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $effectiveTenantId = $this->resolveEffectiveTenantId($superAdmin, $tenantId);
+        // Safety: $tenantWhere is a hardcoded literal string ('AND tenant_id = ?' or '').
+        // The tenant ID value is bound via parameterised placeholder, not interpolated.
         $tenantWhere = $effectiveTenantId !== null ? 'AND tenant_id = ?' : '';
         $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
@@ -248,6 +255,8 @@ class AdminCommentsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $effectiveTenantId = $this->resolveEffectiveTenantId($superAdmin, $tenantId);
+        // Safety: $tenantWhere is a hardcoded literal string ('AND tenant_id = ?' or '').
+        // The tenant ID value is bound via parameterised placeholder, not interpolated.
         $tenantWhere = $effectiveTenantId !== null ? 'AND tenant_id = ?' : '';
         $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 

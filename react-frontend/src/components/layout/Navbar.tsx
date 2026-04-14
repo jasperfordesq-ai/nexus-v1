@@ -80,6 +80,10 @@ import { TenantLogo } from '@/components/branding';
 import { PresenceIndicator, StatusSelector } from '@/components/social';
 import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 
+interface IdentityStatusResponse {
+  has_id_verified_badge: boolean;
+}
+
 interface NavbarProps {
   /** Opens mobile drawer — only used for unauthenticated users (authenticated users use MobileTabBar) */
   onMobileMenuOpen?: () => void;
@@ -177,7 +181,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     if (!isAuthenticated || !user?.id) return;
     let cancelled = false;
     import('@/lib/api').then(({ api }) => {
-      api.get('/v2/identity/status').then((res: any) => {
+      api.get<IdentityStatusResponse>('/v2/identity/status').then((res) => {
         if (cancelled) return;
         const data = res?.data;
         setIsIdVerified(data?.has_id_verified_badge === true);
@@ -253,8 +257,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   ].filter(item => hasFeature(item.feature)), [t, tenantPath, hasFeature]);
 
   // Helper to filter items by feature/module gates
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const gateFilter = useCallback((item: any) => {
+  const gateFilter = useCallback((item: { feature?: string; module?: string }) => {
     if ('feature' in item && item.feature && !hasFeature(item.feature as Parameters<typeof hasFeature>[0])) return false;
     if ('module' in item && item.module && !hasModule(item.module as Parameters<typeof hasModule>[0])) return false;
     return true;

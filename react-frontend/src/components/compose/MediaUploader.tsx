@@ -405,22 +405,22 @@ export function MediaUploader({
 
                 {/* Add more button (inline in grid) */}
                 {canAddMore && (
-                  <button
-                    type="button"
-                    className={`aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer transition-all ${
+                  <Button
+                    variant="flat"
+                    onPress={() => inputRef.current?.click()}
+                    isDisabled={compressing}
+                    aria-label={tc('aria.add_more_photos')}
+                    className={`aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer transition-all h-auto min-w-0 ${
                       isDragOver
                         ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5'
                         : 'border-gray-300 dark:border-gray-600 hover:border-[var(--color-primary)]/50'
                     }`}
-                    onClick={() => inputRef.current?.click()}
-                    disabled={compressing}
-                    aria-label={tc('aria.add_more_photos')}
                   >
                     <ImagePlus className="w-6 h-6 text-[var(--text-subtle)]" aria-hidden="true" />
                     <span className="text-[10px] text-[var(--text-subtle)]">
                       {compressing ? t('compose.image_compressing', 'Processing...') : '+'}
                     </span>
-                  </button>
+                  </Button>
                 )}
               </div>
             </SortableContext>

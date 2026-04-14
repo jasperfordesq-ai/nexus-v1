@@ -324,8 +324,8 @@ function useAdminNav(): NavSection[] {
           { label: t('compliance_dashboard'), href: '/admin/legal-documents/compliance', icon: ShieldCheck },
           { label: t('monitoring'), href: '/admin/enterprise/monitoring', icon: Heart },
           { label: t('system_config'), href: '/admin/enterprise/config', icon: Cog },
-          { label: t('feature_flags') || 'Feature Flags', href: '/admin/enterprise/config/features', icon: Settings },
-          { label: t('secrets_vault') || 'Secrets Vault', href: '/admin/enterprise/config/secrets', icon: Key },
+          { label: t('feature_flags'), href: '/admin/enterprise/config/features', icon: Settings },
+          { label: t('secrets_vault'), href: '/admin/enterprise/config/secrets', icon: Key },
         ],
       },
       {

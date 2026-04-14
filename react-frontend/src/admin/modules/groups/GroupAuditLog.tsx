@@ -10,6 +10,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
+  Button,
   Chip,
   Select,
   SelectItem,
@@ -78,14 +79,15 @@ function ExpandableDetails({ details }: { details: Record<string, unknown> | str
 
   return (
     <div>
-      <button
-        type="button"
-        className="flex items-center gap-1 text-xs text-primary hover:text-primary-600 transition-colors"
-        onClick={() => setExpanded((prev) => !prev)}
+      <Button
+        variant="light"
+        size="sm"
+        className="flex items-center gap-1 text-xs text-primary hover:text-primary-600 transition-colors h-auto min-w-0 p-0"
+        onPress={() => setExpanded((prev) => !prev)}
       >
         {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
         {expanded ? 'Collapse' : 'Expand'}
-      </button>
+      </Button>
       {expanded && (
         <pre className="mt-1 text-xs text-default-500 font-mono bg-default-100 p-2 rounded-md overflow-x-auto max-h-48 whitespace-pre-wrap break-all">
           {text}

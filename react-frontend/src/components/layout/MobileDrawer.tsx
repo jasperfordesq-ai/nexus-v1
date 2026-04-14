@@ -79,6 +79,10 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useMenuContext } from '@/contexts';
 import { MobileMenuItems } from '@/components/navigation';
 
+interface IdentityStatusResponse {
+  has_id_verified_badge: boolean;
+}
+
 // Identity verification CTA for mobile menu — shows "Verify Identity" if not verified
 function IdentityVerificationCTA({ userId, tenantPath, onClose }: { userId: number; tenantPath: (p: string) => string; onClose: () => void }) {
   const [isVerified, setIsVerified] = useState<boolean | null>(null);
@@ -88,7 +92,7 @@ function IdentityVerificationCTA({ userId, tenantPath, onClose }: { userId: numb
     if (!userId) return;
     let cancelled = false;
     import('@/lib/api').then(({ api }) => {
-      api.get('/v2/identity/status').then((res: any) => {
+      api.get<IdentityStatusResponse>('/v2/identity/status').then((res) => {
         if (!cancelled) setIsVerified(res?.data?.has_id_verified_badge === true);
       }).catch(() => { if (!cancelled) setIsVerified(false); });
     }).catch(() => { if (!cancelled) setIsVerified(false); });
@@ -99,14 +103,14 @@ function IdentityVerificationCTA({ userId, tenantPath, onClose }: { userId: numb
   if (isVerified) return null; // Already verified — VerificationBadgeRow handles display
 
   return (
-    <button
-      type="button"
-      onClick={() => { onClose(); setTimeout(() => navigate(tenantPath('/verify-identity-optional')), 150); }}
-      className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-sm font-semibold transition-colors hover:bg-emerald-500/20"
+    <Button
+      variant="flat"
+      onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/verify-identity-optional')), 150); }}
+      className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-sm font-semibold hover:bg-emerald-500/20 h-auto"
     >
       <Fingerprint className="w-4 h-4" />
       Verify Your Identity
-    </button>
+    </Button>
   );
 }
 
@@ -245,11 +249,11 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     const isActive = location.pathname === resolvedHref || location.pathname.startsWith(resolvedHref + '/');
 
     return (
-      <button
+      <Button
         key={item.href}
-        type="button"
-        onClick={() => { onClose(); setTimeout(() => navigate(resolvedHref), 150); }}
-        className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-start ${
+        variant="light"
+        onPress={() => { onClose(); setTimeout(() => navigate(resolvedHref), 150); }}
+        className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-start h-auto justify-start ${
           isActive
             ? 'bg-theme-active text-theme-primary'
             : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
@@ -257,7 +261,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
       >
         <Icon className="w-4 h-4" aria-hidden="true" />
         <span>{item.label}</span>
-      </button>
+      </Button>
     );
   };
 
@@ -323,10 +327,10 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
           {/* User Section */}
           {isAuthenticated && user && (
             <div className="p-4 border-b border-[var(--border-default)]">
-              <button
-                type="button"
-                onClick={() => { onClose(); setTimeout(() => navigate(tenantPath('/profile')), 150); }}
-                className="flex items-center gap-3 w-full text-start"
+              <Button
+                variant="light"
+                onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/profile')), 150); }}
+                className="flex items-center gap-3 w-full text-start h-auto p-0 justify-start"
               >
                 <Avatar
                   name={`${user.first_name} ${user.last_name}`}
@@ -340,7 +344,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   </p>
                   <p className="text-sm text-theme-subtle">{user.email}</p>
                 </div>
-              </button>
+              </Button>
 
               {/* Identity Verification Status */}
               <VerificationBadgeRow userId={user.id} size="sm" />
@@ -348,20 +352,20 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
               {/* Quick Stats */}
               <div className="grid grid-cols-3 gap-2 mt-3">
-                <button
-                  type="button"
-                  onClick={() => { onClose(); setTimeout(() => navigate(tenantPath('/wallet')), 150); }}
-                  className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors"
+                <Button
+                  variant="flat"
+                  onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/wallet')), 150); }}
+                  className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors h-auto flex-col"
                 >
                   <p className="text-lg font-bold text-theme-primary">
                     {user.balance ?? 0}
                   </p>
                   <p className="text-xs text-theme-subtle">{t('stats.credits')}</p>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { onClose(); setTimeout(() => navigate(tenantPath('/messages')), 150); }}
-                  className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative"
+                </Button>
+                <Button
+                  variant="flat"
+                  onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/messages')), 150); }}
+                  className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative h-auto flex-col"
                 >
                   <p className="text-lg font-bold text-theme-primary">
                     {counts.messages > 0 ? counts.messages : 0}
@@ -370,11 +374,11 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   {counts.messages > 0 && (
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
                   )}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { onClose(); setTimeout(() => navigate(tenantPath('/notifications')), 150); }}
-                  className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative"
+                </Button>
+                <Button
+                  variant="flat"
+                  onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/notifications')), 150); }}
+                  className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative h-auto flex-col"
                 >
                   <p className="text-lg font-bold text-theme-primary">
                     {unreadCount > 0 ? unreadCount : 0}
@@ -383,7 +387,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   {unreadCount > 0 && (
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
                   )}
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -626,21 +630,23 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 Built on Project NEXUS by Jasper Ford
               </a>
               <div className="flex justify-center gap-2 mt-2">
-                <button
-                  type="button"
-                  onClick={() => { onClose(); setTimeout(() => navigate(tenantPath('/platform/terms')), 150); }}
-                  className="text-[10px] text-theme-subtle hover:text-theme-primary transition-colors"
+                <Button
+                  variant="light"
+                  size="sm"
+                  onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/platform/terms')), 150); }}
+                  className="text-[10px] text-theme-subtle hover:text-theme-primary transition-colors h-auto p-0 min-w-0"
                 >
                   Platform Terms
-                </button>
+                </Button>
                 <span className="text-theme-subtle/30">&middot;</span>
-                <button
-                  type="button"
-                  onClick={() => { onClose(); setTimeout(() => navigate(tenantPath('/platform/privacy')), 150); }}
-                  className="text-[10px] text-theme-subtle hover:text-theme-primary transition-colors"
+                <Button
+                  variant="light"
+                  size="sm"
+                  onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/platform/privacy')), 150); }}
+                  className="text-[10px] text-theme-subtle hover:text-theme-primary transition-colors h-auto p-0 min-w-0"
                 >
                   Privacy
-                </button>
+                </Button>
               </div>
             </div>
           </nav>

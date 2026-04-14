@@ -307,7 +307,7 @@ class CommentService
         // Server-side XSS prevention: sanitize HTML content before storage
         $content = \App\Helpers\HtmlSanitizer::sanitize(trim($content));
         if (empty($content)) {
-            return ['success' => false, 'error' => 'Comment cannot be empty'];
+            return ['success' => false, 'error' => __('api.comment_cannot_be_empty')];
         }
 
         // If replying, verify parent exists
@@ -318,7 +318,7 @@ class CommentService
                 ->exists();
 
             if (!$parentExists) {
-                return ['success' => false, 'error' => 'Parent comment not found'];
+                return ['success' => false, 'error' => __('api.parent_comment_not_found')];
             }
         }
 
@@ -373,11 +373,11 @@ class CommentService
             ->first();
 
         if (!$comment) {
-            return ['success' => false, 'error' => 'Comment not found'];
+            return ['success' => false, 'error' => __('api.comment_not_found')];
         }
 
         if ((int) $comment->user_id !== $userId && !$isSuperAdmin) {
-            return ['success' => false, 'error' => 'Unauthorized'];
+            return ['success' => false, 'error' => __('api.comment_unauthorized')];
         }
 
         DB::table('comments')
@@ -398,7 +398,7 @@ class CommentService
         $newContent = \App\Helpers\HtmlSanitizer::sanitize(trim($newContent));
 
         if (empty($newContent)) {
-            return ['success' => false, 'error' => 'Comment cannot be empty'];
+            return ['success' => false, 'error' => __('api.comment_cannot_be_empty')];
         }
 
         $comment = DB::table('comments')
@@ -408,11 +408,11 @@ class CommentService
             ->first();
 
         if (!$comment) {
-            return ['success' => false, 'error' => 'Comment not found'];
+            return ['success' => false, 'error' => __('api.comment_not_found')];
         }
 
         if ((int) $comment->user_id !== $userId) {
-            return ['success' => false, 'error' => 'Unauthorized'];
+            return ['success' => false, 'error' => __('api.comment_unauthorized')];
         }
 
         DB::table('comments')

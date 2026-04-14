@@ -469,26 +469,28 @@ export function CreateMarketplaceListingPage() {
                       </Chip>
                     </div>
                   )}
-                  <button
-                    onClick={() => removeImage(img.id)}
-                    className="absolute top-1 right-1 p-1 rounded-full bg-danger/90 text-white
-                      opacity-0 group-hover:opacity-100 transition-opacity"
+                  <Button
+                    isIconOnly
+                    variant="flat"
+                    size="sm"
+                    onPress={() => removeImage(img.id)}
+                    className="absolute top-1 right-1 p-1 rounded-full bg-danger/90 text-white opacity-0 group-hover:opacity-100 transition-opacity min-w-0 w-auto h-auto"
                     aria-label={t('create.remove_image', 'Remove image')}
                   >
                     <X className="w-3 h-3" />
-                  </button>
+                  </Button>
                 </div>
               ))}
 
               {images.length < MAX_IMAGES && (
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="aspect-square rounded-lg border-2 border-dashed border-default-300 flex flex-col items-center justify-center
-                    hover:border-primary hover:bg-primary/5 transition-colors"
+                <Button
+                  variant="flat"
+                  onPress={() => fileInputRef.current?.click()}
+                  className="aspect-square rounded-lg border-2 border-dashed border-default-300 flex flex-col items-center justify-center hover:border-primary hover:bg-primary/5 transition-colors h-auto min-w-0"
                 >
                   <Plus className="w-5 h-5 text-default-400" />
                   <span className="text-xs text-default-400 mt-1">{t('create.add', 'Add')}</span>
-                </button>
+                </Button>
               )}
             </div>
           )}
@@ -512,14 +514,15 @@ export function CreateMarketplaceListingPage() {
                 preload="metadata"
                 className="w-full h-full object-contain"
               />
-              <button
-                onClick={removeVideo}
-                className="absolute top-2 right-2 p-1.5 rounded-full bg-danger/90 text-white
-                  hover:bg-danger transition-colors"
+              <Button
+                isIconOnly
+                variant="flat"
+                onPress={removeVideo}
+                className="absolute top-2 right-2 p-1.5 rounded-full bg-danger/90 text-white hover:bg-danger transition-colors min-w-0 w-auto h-auto"
                 aria-label={t('create.remove_video', 'Remove video')}
               >
                 <X className="w-4 h-4" />
-              </button>
+              </Button>
             </div>
           ) : (
             <div

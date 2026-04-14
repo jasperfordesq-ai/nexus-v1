@@ -715,7 +715,18 @@ class TenantContext
     }
 
     /**
-     * Extract tenant_id from Bearer token payload
+     * Extract tenant_id from Bearer token payload.
+     *
+     * SECURITY: When TokenService is available the JWT signature is validated
+     * before any claim is trusted. A forged or tampered token returns null,
+     * preventing tenant-ID spoofing via crafted Bearer tokens.
+     *
+     * During very early bootstrap (before the service container is ready)
+     * TokenService may not be resolvable; in that case we fall back to an
+     * unvalidated decode. This is safe because auth:sanctum middleware
+     * performs full signature validation later in the request lifecycle and
+     * will reject any request whose token does not verify — this method only
+     * provides an early-routing hint.
      *
      * @return int|null
      */
@@ -728,7 +739,23 @@ class TenantContext
 
         $token = $matches[1];
 
-        // Decode token payload without full validation (just to extract tenant_id)
+        // Preferred path: validate signature before trusting claims
+        if (class_exists(\App\Services\TokenService::class)) {
+            try {
+                $tokenService = new \App\Services\TokenService();
+                $payload = $tokenService->validateToken($token);
+                if (!$payload || !isset($payload['tenant_id'])) {
+                    return null;
+                }
+                return (int) $payload['tenant_id'];
+            } catch (\Throwable $e) {
+                // Invalid/malformed token — auth middleware will handle the 401
+                return null;
+            }
+        }
+
+        // Fallback (early bootstrap only): decode without signature validation.
+        // The auth:sanctum middleware enforces full validation on every request.
         $parts = explode('.', $token);
         if (count($parts) !== 3) {
             return null;

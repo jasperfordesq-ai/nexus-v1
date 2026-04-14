@@ -12,7 +12,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Avatar, Skeleton } from '@heroui/react';
+import { Avatar, Skeleton, Button } from '@heroui/react';
 import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts';
@@ -146,24 +146,30 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
       <div className="relative w-full group">
         {/* Left scroll arrow */}
         {showLeftArrow && (
-          <button
-            onClick={() => scroll('left')}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[var(--surface-elevated)] shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-[var(--border-default)]"
+          <Button
+            isIconOnly
+            variant="flat"
+            size="sm"
+            onPress={() => scroll('left')}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[var(--surface-elevated)] shadow-md opacity-0 group-hover:opacity-100 transition-opacity border border-[var(--border-default)]"
             aria-label={t('stories.scroll_left', 'Scroll stories left')}
           >
             <ChevronLeft className="w-4 h-4 text-[var(--text-primary)]" />
-          </button>
+          </Button>
         )}
 
         {/* Right scroll arrow */}
         {showRightArrow && (
-          <button
-            onClick={() => scroll('right')}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[var(--surface-elevated)] shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-[var(--border-default)]"
+          <Button
+            isIconOnly
+            variant="flat"
+            size="sm"
+            onPress={() => scroll('right')}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[var(--surface-elevated)] shadow-md opacity-0 group-hover:opacity-100 transition-opacity border border-[var(--border-default)]"
             aria-label={t('stories.scroll_right', 'Scroll stories right')}
           >
             <ChevronRight className="w-4 h-4 text-[var(--text-primary)]" />
-          </button>
+          </Button>
         )}
 
         <div
@@ -172,9 +178,10 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
         >
           <div className="flex items-start gap-3 px-1 py-2 min-w-min">
             {/* Your Story — create button */}
-            <button
-              onClick={handleCreateClick}
-              className="flex flex-col items-center gap-1.5 flex-shrink-0 w-16 group/create"
+            <Button
+              variant="light"
+              onPress={handleCreateClick}
+              className="flex flex-col items-center gap-1.5 flex-shrink-0 w-16 h-auto group/create p-0 min-w-0"
               aria-label={t('stories.create_your_story', 'Create your story')}
             >
               <div className="relative">
@@ -200,7 +207,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
               <span className="text-xs truncate w-full text-center text-[var(--text-primary)]">
                 {t('stories.your_story', 'Your Story')}
               </span>
-            </button>
+            </Button>
 
             {/* Other users' stories */}
             {storyUsers.filter((su) => !su.is_own).map((storyUser) => {
@@ -211,10 +218,11 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
               );
 
               return (
-                <button
+                <Button
                   key={storyUser.user_id}
-                  onClick={() => handleStoryClick(actualIndex)}
-                  className="flex flex-col items-center gap-1.5 flex-shrink-0 w-16"
+                  variant="light"
+                  onPress={() => handleStoryClick(actualIndex)}
+                  className="flex flex-col items-center gap-1.5 flex-shrink-0 w-16 h-auto p-0 min-w-0"
                   aria-label={t('stories.view_story_from', 'View story from {{name}}', { name: storyUser.name })}
                 >
                   <div className="relative">
@@ -237,7 +245,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
                   <span className="text-xs truncate w-full text-center text-[var(--text-primary)]">
                     {truncateName((storyUser.first_name || storyUser.name || '').split(' ')[0] ?? '')}
                   </span>
-                </button>
+                </Button>
               );
             })}
           </div>

@@ -1144,10 +1144,10 @@ export function CreateJobPage() {
 
           {/* Employer Branding section */}
           <div className="border border-theme-default rounded-xl overflow-hidden">
-            <button
-              type="button"
-              className="w-full flex items-center justify-between p-4 text-left bg-theme-elevated hover:bg-theme-hover transition-colors"
-              onClick={() => setBrandingOpen((o) => !o)}
+            <Button
+              variant="light"
+              className="w-full flex items-center justify-between p-4 text-left bg-theme-elevated hover:bg-theme-hover transition-colors h-auto min-w-0 justify-between"
+              onPress={() => setBrandingOpen((o) => !o)}
               aria-expanded={brandingOpen}
             >
               <span className="font-semibold text-theme-primary text-sm">{t('branding.section')}</span>
@@ -1155,7 +1155,7 @@ export function CreateJobPage() {
                 ? <ChevronUp size={16} className="text-theme-subtle" aria-hidden="true" />
                 : <ChevronDown size={16} className="text-theme-subtle" aria-hidden="true" />
               }
-            </button>
+            </Button>
             {brandingOpen && (
               <div className="p-4 space-y-4 border-t border-theme-default">
                 {/* Tagline */}
@@ -1245,10 +1245,10 @@ export function CreateJobPage() {
           {/* Hiring Team section (only shown when editing or after creation) */}
           {(isEditing || createdJobId) ? (
             <div className="border border-theme-default rounded-xl overflow-hidden">
-              <button
-                type="button"
-                className="w-full flex items-center justify-between p-4 text-left bg-theme-elevated hover:bg-theme-hover transition-colors"
-                onClick={() => setTeamOpen((o) => !o)}
+              <Button
+                variant="light"
+                className="w-full flex items-center justify-between p-4 text-left bg-theme-elevated hover:bg-theme-hover transition-colors h-auto min-w-0 justify-between"
+                onPress={() => setTeamOpen((o) => !o)}
                 aria-expanded={teamOpen}
               >
                 <span className="font-semibold text-theme-primary text-sm flex items-center gap-2">
@@ -1262,7 +1262,7 @@ export function CreateJobPage() {
                   ? <ChevronUp size={16} className="text-theme-subtle" aria-hidden="true" />
                   : <ChevronDown size={16} className="text-theme-subtle" aria-hidden="true" />
                 }
-              </button>
+              </Button>
               {teamOpen && (
                 <div className="p-4 space-y-4 border-t border-theme-default">
                   {/* Current team members as avatar + name chips */}

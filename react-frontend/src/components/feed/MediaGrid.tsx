@@ -16,6 +16,7 @@
  */
 
 import { useState } from 'react';
+import { Button } from '@heroui/react';
 import { Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { resolveAssetUrl } from '@/lib/helpers';
@@ -40,11 +41,11 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
   };
 
   const renderMedia = (item: PostMedia, index: number, extraOverlay = false) => (
-    <button
+    <Button
       key={item.id}
-      type="button"
-      className="relative w-full h-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-inset"
-      onClick={() => openLightbox(index)}
+      variant="light"
+      className="relative w-full h-full overflow-hidden p-0 min-w-0 rounded-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-inset"
+      onPress={() => openLightbox(index)}
       aria-label={item.alt_text || t(item.media_type === 'video' ? 'carousel.view_video' : 'carousel.view_image', 'View {{type}} {{current}} of {{total}}', { type: item.media_type, current: index + 1, total })}
     >
       {item.media_type === 'video' ? (
@@ -84,7 +85,7 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
           <span className="text-white text-2xl font-bold" aria-hidden="true">+{extraCount}</span>
         </div>
       )}
-    </button>
+    </Button>
   );
 
   const gridContent = () => {

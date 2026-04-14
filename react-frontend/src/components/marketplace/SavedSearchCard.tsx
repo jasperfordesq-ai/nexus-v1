@@ -51,14 +51,14 @@ export function SavedSearchCard({ search, onToggle, onDelete, onRun }: SavedSear
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             {/* Name + run */}
-            <button
-              type="button"
-              className="flex items-center gap-2 text-left hover:text-primary transition-colors"
-              onClick={() => onRun?.(search)}
+            <Button
+              variant="light"
+              onPress={() => onRun?.(search)}
+              className="flex items-center gap-2 text-left hover:text-primary transition-colors h-auto p-0 min-w-0 justify-start"
             >
               <Search className="w-4 h-4 text-primary shrink-0" />
               <span className="font-semibold text-foreground truncate">{search.name}</span>
-            </button>
+            </Button>
 
             {/* Filter chips */}
             {filterSummary.length > 0 && (

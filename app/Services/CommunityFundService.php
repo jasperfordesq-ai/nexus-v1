@@ -73,7 +73,7 @@ class CommunityFundService
     public static function adminDeposit(int $adminId, float $amount, string $description = ''): array
     {
         if ($amount <= 0) {
-            return ['success' => false, 'error' => 'Amount must be greater than 0'];
+            return ['success' => false, 'error' => __('api.amount_must_be_greater_than_0')];
         }
 
         $tenantId = TenantContext::getId();
@@ -90,7 +90,7 @@ class CommunityFundService
 
             if (!$lockedFund) {
                 DB::rollBack();
-                return ['success' => false, 'error' => 'Community fund not found'];
+                return ['success' => false, 'error' => __('api.community_fund_not_found')];
             }
 
             $newBalance = (float) $lockedFund->balance + $amount;
@@ -119,7 +119,7 @@ class CommunityFundService
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('CommunityFundService::adminDeposit error: ' . $e->getMessage());
-            return ['success' => false, 'error' => 'Deposit failed'];
+            return ['success' => false, 'error' => __('api.deposit_failed')];
         }
     }
 
@@ -129,14 +129,14 @@ class CommunityFundService
     public static function adminWithdraw(int $adminId, int $recipientId, float $amount, string $description = ''): array
     {
         if ($amount <= 0) {
-            return ['success' => false, 'error' => 'Amount must be greater than 0'];
+            return ['success' => false, 'error' => __('api.amount_must_be_greater_than_0')];
         }
 
         $tenantId = TenantContext::getId();
         $fund = self::getOrCreateFund();
 
         if ((float) $fund['balance'] < $amount) {
-            return ['success' => false, 'error' => 'Insufficient community fund balance'];
+            return ['success' => false, 'error' => __('api.insufficient_community_fund_balance')];
         }
 
         DB::beginTransaction();
@@ -150,7 +150,7 @@ class CommunityFundService
 
             if (!$lockedFund || (float) $lockedFund->balance < $amount) {
                 DB::rollBack();
-                return ['success' => false, 'error' => 'Insufficient community fund balance'];
+                return ['success' => false, 'error' => __('api.insufficient_community_fund_balance')];
             }
 
             $newBalance = (float) $lockedFund->balance - $amount;
@@ -200,7 +200,7 @@ class CommunityFundService
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('CommunityFundService::adminWithdraw error: ' . $e->getMessage());
-            return ['success' => false, 'error' => 'Withdrawal failed'];
+            return ['success' => false, 'error' => __('api.withdrawal_failed')];
         }
     }
 
@@ -269,7 +269,7 @@ class CommunityFundService
     public static function receiveDonation(int $donorId, float $amount, string $message = ''): array
     {
         if ($amount <= 0) {
-            return ['success' => false, 'error' => 'Amount must be greater than 0'];
+            return ['success' => false, 'error' => __('api.amount_must_be_greater_than_0')];
         }
 
         $tenantId = TenantContext::getId();
@@ -286,7 +286,7 @@ class CommunityFundService
 
             if (!$lockedFund) {
                 DB::rollBack();
-                return ['success' => false, 'error' => 'Community fund not found'];
+                return ['success' => false, 'error' => __('api.community_fund_not_found')];
             }
 
             $newBalance = (float) $lockedFund->balance + $amount;
@@ -299,7 +299,7 @@ class CommunityFundService
 
             if ($affected === 0) {
                 DB::rollBack();
-                return ['success' => false, 'error' => 'Insufficient balance'];
+                return ['success' => false, 'error' => __('api.insufficient_balance')];
             }
 
             // Credit community fund
@@ -351,7 +351,7 @@ class CommunityFundService
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('CommunityFundService::receiveDonation error: ' . $e->getMessage());
-            return ['success' => false, 'error' => 'Donation failed'];
+            return ['success' => false, 'error' => __('api.donation_failed')];
         }
     }
 }

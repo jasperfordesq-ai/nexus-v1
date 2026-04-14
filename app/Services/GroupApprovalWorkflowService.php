@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Core\Database;
 use App\Core\TenantContext;
+use Illuminate\Support\Facades\DB;
 
 /**
  * GroupApprovalWorkflowService — manages group creation approval workflow.
@@ -42,25 +42,24 @@ class GroupApprovalWorkflowService
         $tenantId = TenantContext::getId();
 
         // Check for existing pending request to prevent duplicates
-        $stmt = Database::query(
+        $existing = DB::selectOne(
             "SELECT id FROM group_approval_requests
              WHERE tenant_id = ? AND group_id = ? AND status = ?",
             [$tenantId, $groupId, self::STATUS_PENDING]
         );
-        $existing = $stmt->fetch();
 
         if ($existing) {
-            return (int) $existing['id'];
+            return (int) $existing->id;
         }
 
         // Insert new approval request
-        Database::query(
+        DB::insert(
             "INSERT INTO group_approval_requests (tenant_id, group_id, submitted_by, status, notes, created_at, updated_at)
              VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
             [$tenantId, $groupId, $userId, self::STATUS_PENDING, $notes]
         );
 
-        return (int) Database::getInstance()->lastInsertId();
+        return (int) DB::getPdo()->lastInsertId();
     }
 
     /**
@@ -73,14 +72,13 @@ class GroupApprovalWorkflowService
     {
         $tenantId = TenantContext::getId();
 
-        $stmt = Database::query(
+        $result = DB::selectOne(
             "SELECT * FROM group_approval_requests
              WHERE id = ? AND tenant_id = ?",
             [$requestId, $tenantId]
         );
-        $result = $stmt->fetch();
 
-        return $result ?: [];
+        return $result ? (array) $result : [];
     }
 
     /**
@@ -95,14 +93,14 @@ class GroupApprovalWorkflowService
     {
         $tenantId = TenantContext::getId();
 
-        $stmt = Database::query(
+        $affected = DB::update(
             "UPDATE group_approval_requests
              SET status = ?, reviewed_by = ?, reviewer_notes = ?, updated_at = NOW()
              WHERE id = ? AND tenant_id = ? AND status = ?",
             [self::STATUS_APPROVED, $approverId, $notes, $requestId, $tenantId, self::STATUS_PENDING]
         );
 
-        return $stmt->rowCount() > 0;
+        return $affected > 0;
     }
 
     /**
@@ -117,14 +115,14 @@ class GroupApprovalWorkflowService
     {
         $tenantId = TenantContext::getId();
 
-        $stmt = Database::query(
+        $affected = DB::update(
             "UPDATE group_approval_requests
              SET status = ?, reviewed_by = ?, reviewer_notes = ?, updated_at = NOW()
              WHERE id = ? AND tenant_id = ? AND status = ?",
             [self::STATUS_REJECTED, $rejecterId, $notes, $requestId, $tenantId, self::STATUS_PENDING]
         );
 
-        return $stmt->rowCount() > 0;
+        return $affected > 0;
     }
 
     /**
@@ -138,7 +136,7 @@ class GroupApprovalWorkflowService
     {
         $tenantId = TenantContext::getId();
 
-        $stmt = Database::query(
+        $rows = DB::select(
             "SELECT gar.*, g.name AS group_name
              FROM group_approval_requests gar
              LEFT JOIN `groups` g ON g.id = gar.group_id
@@ -147,6 +145,6 @@ class GroupApprovalWorkflowService
             [$tenantId, self::STATUS_PENDING]
         );
 
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+        return array_map(fn($r) => (array) $r, $rows);
     }
 }

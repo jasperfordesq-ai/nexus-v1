@@ -203,36 +203,36 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
                 if (distance > 3) return null;
                 const scale = distance <= 1 ? '' : distance === 2 ? 'scale-75' : 'scale-50 opacity-50';
                 return (
-                  <button
+                  <Button
                     key={idx}
-                    type="button"
-                    className={`w-2 h-2 rounded-full transition-all ${scale} ${
+                    isIconOnly
+                    variant="light"
+                    size="sm"
+                    className={`w-2 h-2 min-w-0 min-h-0 rounded-full p-0 transition-all ${scale} ${
                       idx === currentIndex
                         ? 'bg-white scale-110'
                         : 'bg-white/60 hover:bg-white/80'
                     }`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      goTo(idx, idx > currentIndex ? 1 : -1);
-                    }}
+                    onPress={() => goTo(idx, idx > currentIndex ? 1 : -1)}
+                    onClick={(e) => e.stopPropagation()}
                     aria-label={t('carousel.go_to_image', 'Go to image {{number}}', { number: idx + 1 })}
                     aria-current={idx === currentIndex ? 'true' : undefined}
                   />
                 );
               }
               return (
-                <button
+                <Button
                   key={idx}
-                  type="button"
-                  className={`w-2 h-2 rounded-full transition-all ${
+                  isIconOnly
+                  variant="light"
+                  size="sm"
+                  className={`w-2 h-2 min-w-0 min-h-0 rounded-full p-0 transition-all ${
                     idx === currentIndex
                       ? 'bg-white scale-110'
                       : 'bg-white/60 hover:bg-white/80'
                   }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    goTo(idx, idx > currentIndex ? 1 : -1);
-                  }}
+                  onPress={() => goTo(idx, idx > currentIndex ? 1 : -1)}
+                  onClick={(e) => e.stopPropagation()}
                   aria-label={t('carousel.go_to_image', 'Go to image {{number}}', { number: idx + 1 })}
                   aria-current={idx === currentIndex ? 'true' : undefined}
                 />

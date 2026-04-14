@@ -8,14 +8,14 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Core\Database;
 use App\Core\TenantContext;
+use Illuminate\Support\Facades\DB;
 
 /**
  * GroupAssignmentService — Automatically assigns users to geographic hub groups
  * based on fuzzy location matching.
  *
- * Uses the legacy Database class for raw PDO queries (not Eloquent).
+ * Uses the Laravel DB facade for raw queries (not Eloquent).
  */
 class GroupAssignmentService
 {
@@ -65,7 +65,7 @@ class GroupAssignmentService
         }
 
         // Insert the user into the group (INSERT IGNORE to avoid duplicates)
-        Database::query(
+        DB::insert(
             "INSERT IGNORE INTO group_members (group_id, user_id, status, created_at)
              VALUES (?, ?, 'active', NOW())",
             [(int) $bestGroup['id'], (int) $user['id']]
@@ -109,7 +109,7 @@ class GroupAssignmentService
     {
         $tenantId = TenantContext::getId();
 
-        $stmt = Database::query(
+        $rows = DB::select(
             "SELECT g.id, g.name, g.location
              FROM `groups` g
              LEFT JOIN group_types gt ON g.type_id = gt.id
@@ -122,7 +122,7 @@ class GroupAssignmentService
             [$tenantId]
         );
 
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+        return array_map(fn($r) => (array) $r, $rows);
     }
 
     /**

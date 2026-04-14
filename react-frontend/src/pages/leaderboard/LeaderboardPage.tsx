@@ -608,11 +608,31 @@ export function LeaderboardPage() {
   );
 }
 
+interface CompetitiveLeaderboardProps {
+  entries: LeaderboardEntry[];
+  meta: LeaderboardMeta | null;
+  isLoading: boolean;
+  error: string | null;
+  period: LeaderboardPeriod;
+  type: LeaderboardType;
+  setPeriod: (period: LeaderboardPeriod) => void;
+  setType: (type: LeaderboardType) => void;
+  tenantPath: (path: string) => string;
+  t: (key: string, fallback?: string) => string;
+  getRankIcon: (position: number) => React.ReactNode;
+  formatScore: (entry: LeaderboardEntry) => string;
+  typeLabels: Record<LeaderboardType, string>;
+  typeIcons: Record<LeaderboardType, React.ReactNode>;
+  periodLabels: Record<LeaderboardPeriod, string>;
+  containerVariants: { hidden: object; visible: object };
+  itemVariants: { hidden: object; visible: object };
+  loadLeaderboard: () => void;
+}
+
 /**
  * CompetitiveLeaderboard — the original ranking view, now wrapped as a tab.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function CompetitiveLeaderboard(props: any) {
+function CompetitiveLeaderboard(props: CompetitiveLeaderboardProps) {
   const {
     entries,
     meta,

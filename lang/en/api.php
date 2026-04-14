@@ -1516,6 +1516,29 @@ return [
     // Group exchanges
     'total_hours_gt_zero'                  => 'Total hours must be greater than 0',
 
+    // Server errors (hardcoded-string audit — 2026-04-14)
+    'unexpected_error'                     => 'An unexpected error occurred.',
+    'access_denied'                        => 'Access denied',
+
+    // Comment errors (hardcoded-string audit — 2026-04-14)
+    'comment_cannot_be_empty'              => 'Comment cannot be empty',
+    'parent_comment_not_found'             => 'Parent comment not found',
+    'comment_unauthorized'                 => 'Unauthorized',
+
+    // Community fund errors (hardcoded-string audit — 2026-04-14)
+    'amount_must_be_greater_than_0'        => 'Amount must be greater than 0',
+    'community_fund_not_found'             => 'Community fund not found',
+    'insufficient_community_fund_balance'  => 'Insufficient community fund balance',
+    'deposit_failed'                       => 'Deposit failed',
+    'withdrawal_failed'                    => 'Withdrawal failed',
+    'donation_failed'                      => 'Donation failed',
+
+    // Maintenance mode (hardcoded-string audit — 2026-04-14)
+    'maintenance_mode'                     => 'Platform is currently under maintenance. Please check back soon.',
+
+    // Auth rate limit with seconds (hardcoded-string audit — 2026-04-14)
+    'too_many_login_attempts_seconds'      => 'Too many login attempts. Try again in :seconds seconds.',
+
     // Federation API errors (hardcoded-string audit — 2026-04-13)
     'federation' => [
         'partner_not_found'          => 'Partner not found',

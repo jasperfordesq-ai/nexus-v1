@@ -354,14 +354,15 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
               <ul className="space-y-1">
                 {treePages.map((page) => (
                   <li key={page.id}>
-                    <button
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 ${
+                    <Button
+                      variant="light"
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 h-auto min-w-0 justify-start ${
                         selectedPage?.id === page.id
                           ? 'bg-primary/10 text-primary font-medium'
                           : 'text-theme-secondary hover:bg-theme-hover'
                       }`}
                       style={{ paddingLeft: `${page.depth * 16 + 12}px` }}
-                      onClick={() => loadPage(page.slug)}
+                      onPress={() => loadPage(page.slug)}
                       aria-current={selectedPage?.id === page.id ? 'page' : undefined}
                     >
                       <FileText className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
@@ -371,7 +372,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                           {t('wiki.draft', 'Draft')}
                         </Chip>
                       )}
-                    </button>
+                    </Button>
                   </li>
                 ))}
               </ul>
@@ -401,12 +402,13 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                         <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
                       )}
                       {idx < breadcrumbs.length - 1 ? (
-                        <button
-                          className="hover:text-primary transition-colors underline-offset-2 hover:underline"
-                          onClick={() => loadPage(crumb.slug)}
+                        <Button
+                          variant="light"
+                          className="hover:text-primary transition-colors underline-offset-2 hover:underline h-auto min-w-0 p-0"
+                          onPress={() => loadPage(crumb.slug)}
                         >
                           {crumb.title}
-                        </button>
+                        </Button>
                       ) : (
                         <span className="text-theme-primary font-medium">{crumb.title}</span>
                       )}

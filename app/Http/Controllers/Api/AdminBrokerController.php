@@ -37,6 +37,14 @@ class AdminBrokerController extends BaseApiController
     // ============================================
     // HELPERS
     // ============================================
+    //
+    // NOTE — SQL injection safety:
+    // All dynamic WHERE / ORDER BY clauses in this controller are built from
+    // hardcoded, whitelisted SQL fragments stored in $conditions arrays.
+    // User input is NEVER interpolated into SQL strings; it is always bound
+    // via parameterised placeholders (?).  The $where variable only ever
+    // contains literal strings assembled by this controller, not raw request data.
+    // ORDER BY columns are validated against explicit whitelists before use.
 
     private function isSuperAdmin(): bool
     {
@@ -72,9 +80,20 @@ class AdminBrokerController extends BaseApiController
         $filterRaw = request()->query('tenant_id');
         if ($isSuperAdmin) {
             if ($filterRaw === 'all') {
+                \Illuminate\Support\Facades\Log::warning('Super admin accessed all-tenant data', [
+                    'admin_user_id' => \Illuminate\Support\Facades\Auth::id() ?? request()->header('X-User-Id'),
+                    'endpoint'      => request()->path(),
+                    'ip'            => request()->ip(),
+                ]);
                 return null;
             }
             if ($filterRaw !== null && is_numeric($filterRaw)) {
+                \Illuminate\Support\Facades\Log::info('Super admin filtered to specific tenant', [
+                    'admin_user_id'    => \Illuminate\Support\Facades\Auth::id() ?? request()->header('X-User-Id'),
+                    'target_tenant_id' => (int) $filterRaw,
+                    'endpoint'         => request()->path(),
+                    'ip'               => request()->ip(),
+                ]);
                 return (int) $filterRaw;
             }
             return $tenantId;

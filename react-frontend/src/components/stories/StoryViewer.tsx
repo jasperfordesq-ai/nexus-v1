@@ -17,7 +17,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Avatar } from '@heroui/react';
+import { Avatar, Button } from '@heroui/react';
 import {
   X,
   Eye,
@@ -520,24 +520,28 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
     >
       {/* Desktop: previous user arrow */}
       {currentUserIdx > 0 && (
-        <button
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-50 w-10 h-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-white/20 transition-colors hidden md:flex"
-          onClick={() => setCurrentUserIdx((prev) => prev - 1)}
+        <Button
+          isIconOnly
+          variant="flat"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-50 w-10 h-10 rounded-full bg-white/10 backdrop-blur hover:bg-white/20 transition-colors hidden md:flex min-w-0"
+          onPress={() => setCurrentUserIdx((prev) => prev - 1)}
           aria-label={t('viewer.previous_user')}
         >
           <ChevronLeft className="w-5 h-5 text-white" />
-        </button>
+        </Button>
       )}
 
       {/* Desktop: next user arrow */}
       {currentUserIdx < storyUsers.length - 1 && (
-        <button
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-50 w-10 h-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-white/20 transition-colors hidden md:flex"
-          onClick={() => setCurrentUserIdx((prev) => prev + 1)}
+        <Button
+          isIconOnly
+          variant="flat"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-50 w-10 h-10 rounded-full bg-white/10 backdrop-blur hover:bg-white/20 transition-colors hidden md:flex min-w-0"
+          onPress={() => setCurrentUserIdx((prev) => prev + 1)}
           aria-label={t('viewer.next_user')}
         >
           <ChevronRight className="w-5 h-5 text-white" />
-        </button>
+        </Button>
       )}
 
       {/* Story container — 9:16 aspect on desktop, full on mobile */}
@@ -753,11 +757,12 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                         const pct = totalVotes > 0 ? Math.round((thisVotes / totalVotes) * 100) : 0;
 
                         return (
-                          <button
+                          <Button
                             key={idx}
-                            onClick={() => !hasVoted && handlePollVote(idx)}
-                            disabled={hasVoted}
-                            className={`relative w-full px-4 py-3 rounded-xl text-left transition-all overflow-hidden ${
+                            variant="flat"
+                            onPress={() => !hasVoted && handlePollVote(idx)}
+                            isDisabled={hasVoted}
+                            className={`relative w-full px-4 py-3 rounded-xl text-left transition-all overflow-hidden h-auto min-w-0 justify-start ${
                               hasVoted
                                 ? 'bg-white/20 cursor-default'
                                 : 'bg-white/30 hover:bg-white/40 cursor-pointer active:scale-[0.98]'
@@ -781,7 +786,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                                 {pct}%
                               </span>
                             )}
-                          </button>
+                          </Button>
                         );
                       })}
                       {hasVoted && (
@@ -820,8 +825,9 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
             >
-              <button
-                className="w-1/3 h-full cursor-pointer"
+              <Button
+                variant="light"
+                className="w-1/3 h-full cursor-pointer rounded-none min-w-0 p-0"
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={() => handlePointerUp('left')}
@@ -831,9 +837,10 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                 }}
                 aria-label={t('viewer.previous_story')}
               />
-              <button
-                className="w-1/3 h-full cursor-pointer"
-                onClick={() => {
+              <Button
+                variant="light"
+                className="w-1/3 h-full cursor-pointer rounded-none min-w-0 p-0"
+                onPress={() => {
                   const now = Date.now();
                   if (now - lastTapRef.current < 300) {
                     handleDoubleTap();
@@ -844,8 +851,9 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                 }}
                 aria-label={t('viewer.double_tap_react')}
               />
-              <button
-                className="w-1/3 h-full cursor-pointer"
+              <Button
+                variant="light"
+                className="w-1/3 h-full cursor-pointer rounded-none min-w-0 p-0"
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={() => handlePointerUp('right')}
@@ -907,61 +915,69 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
 
               {/* Pause indicator */}
               {isPaused && (
-                <button
-                  onClick={() => setIsPaused(false)}
-                  className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                <Button
+                  isIconOnly
+                  variant="flat"
+                  className="p-1.5 rounded-full hover:bg-white/10 transition-colors min-w-0 w-auto h-auto"
+                  onPress={() => setIsPaused(false)}
                   aria-label={t('viewer.resume_story')}
                 >
                   <Play className="w-4 h-4 text-white" />
-                </button>
+                </Button>
               )}
 
               {/* More menu */}
               {isOwner && (
                 <div className="relative">
-                  <button
-                    onClick={() => { setShowMenu(!showMenu); setIsPaused(true); }}
-                    className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                  <Button
+                    isIconOnly
+                    variant="flat"
+                    className="p-1.5 rounded-full hover:bg-white/10 transition-colors min-w-0 w-auto h-auto"
+                    onPress={() => { setShowMenu(!showMenu); setIsPaused(true); }}
                     aria-label={t('viewer.story_options')}
                   >
                     <MoreHorizontal className="w-4 h-4 text-white" />
-                  </button>
+                  </Button>
                   {showMenu && (
                     <div className="absolute right-0 top-8 bg-gray-800 rounded-lg shadow-xl border border-white/10 overflow-hidden min-w-[140px]">
-                      <button
-                        onClick={handleDeleteStory}
-                        className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-400 hover:bg-white/5 transition-colors"
+                      <Button
+                        variant="light"
+                        className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-400 hover:bg-white/5 transition-colors h-auto min-w-0 justify-start"
+                        onPress={handleDeleteStory}
                       >
                         <Trash2 className="w-4 h-4" />
                         Delete Story
-                      </button>
+                      </Button>
                     </div>
                   )}
                 </div>
               )}
 
               {/* Close button */}
-              <button
-                onClick={onClose}
-                className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
+              <Button
+                isIconOnly
+                variant="flat"
+                className="p-1.5 rounded-full hover:bg-white/10 transition-colors min-w-0 w-auto h-auto"
+                onPress={onClose}
                 aria-label={t('viewer.close')}
               >
                 <X className="w-5 h-5 text-white" />
-              </button>
+              </Button>
             </div>
 
             {/* Bottom bar: reactions + view count */}
             <div className="absolute bottom-0 left-0 right-0 z-30 px-4 pb-6 pt-16 bg-gradient-to-t from-black/60 to-transparent">
               {/* View count (owner only) */}
               {isOwner && currentStory && (
-                <button
-                  onClick={handleViewViewers}
-                  className="flex items-center gap-1.5 mb-3 text-white/70 hover:text-white transition-colors"
+                <Button
+                  variant="light"
+                  className="flex items-center gap-1.5 mb-3 text-white/70 hover:text-white transition-colors h-auto min-w-0 p-0"
+                  onPress={handleViewViewers}
                   aria-label={`${currentStory.view_count} views`}
                 >
                   <Eye className="w-4 h-4" />
                   <span className="text-sm">{currentStory.view_count}</span>
-                </button>
+                </Button>
               )}
 
               {/* Reply input */}
@@ -979,14 +995,16 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                     maxLength={500}
                   />
                   {replyText.trim() && (
-                    <button
-                      onClick={handleReply}
-                      disabled={isSendingReply}
-                      className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                    <Button
+                      isIconOnly
+                      variant="flat"
+                      className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors min-w-0 w-auto h-auto"
+                      onPress={handleReply}
+                      isDisabled={isSendingReply}
                       aria-label={t('viewer.send_reply')}
                     >
                       <Send className="w-4 h-4 text-white" />
-                    </button>
+                    </Button>
                   )}
                 </div>
               )}
@@ -995,19 +1013,21 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
               {!isOwner && currentStory && currentStory.media_type !== 'poll' && (
                 <div className="flex items-center gap-2">
                   {REACTIONS.map(({ emoji, type }) => (
-                    <button
+                    <Button
                       key={type}
-                      onClick={() => handleReaction(type)}
-                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                      isIconOnly
+                      variant="flat"
+                      onPress={() => handleReaction(type)}
+                      className={`w-10 h-10 rounded-full transition-all min-w-0 ${
                         reactedWith === type
                           ? 'bg-white/30 scale-125'
                           : 'bg-white/10 hover:bg-white/20 hover:scale-110 active:scale-95'
                       }`}
-                      disabled={!!reactedWith}
+                      isDisabled={!!reactedWith}
                       aria-label={`React with ${type}`}
                     >
                       <span className="text-lg">{emoji}</span>
-                    </button>
+                    </Button>
                   ))}
                 </div>
               )}
@@ -1031,13 +1051,15 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
           >
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
               <h3 className="text-white font-semibold">Viewers ({viewers.length})</h3>
-              <button
-                onClick={() => { setShowViewers(false); setIsPaused(false); }}
-                className="p-1 rounded-full hover:bg-white/10 transition-colors"
+              <Button
+                isIconOnly
+                variant="flat"
+                className="p-1 rounded-full hover:bg-white/10 transition-colors min-w-0 w-auto h-auto"
+                onPress={() => { setShowViewers(false); setIsPaused(false); }}
                 aria-label={t('viewer.viewers_close')}
               >
                 <X className="w-4 h-4 text-white" />
-              </button>
+              </Button>
             </div>
             <div className="overflow-y-auto max-h-[calc(60vh-50px)]">
               {viewers.length === 0 ? (

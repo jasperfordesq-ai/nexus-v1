@@ -297,24 +297,26 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
         <div className="flex items-start gap-4 px-1 py-2 min-w-min">
           {/* Create new highlight button (owner only) */}
           {isOwner && (
-            <button
-              onClick={onCreateOpen}
-              className="flex flex-col items-center gap-1.5 flex-shrink-0 w-18 group"
+            <Button
+              variant="light"
+              onPress={onCreateOpen}
+              className="flex flex-col items-center gap-1.5 flex-shrink-0 w-18 group h-auto min-w-0 p-0"
               aria-label={t('highlights.aria_create', 'Create new highlight')}
             >
               <div className="w-16 h-16 rounded-full border-2 border-dashed border-[var(--border-default)] flex items-center justify-center group-hover:border-[var(--color-primary)] transition-colors">
                 <Plus className="w-6 h-6 text-[var(--text-muted)] group-hover:text-[var(--color-primary)] transition-colors" />
               </div>
               <span className="text-xs text-[var(--text-muted)] text-center">{t('highlights.new', 'New')}</span>
-            </button>
+            </Button>
           )}
 
           {/* Highlight circles */}
           {highlights.map((highlight) => (
-            <button
+            <Button
               key={highlight.id}
-              onClick={() => handleHighlightClick(highlight)}
-              className="flex flex-col items-center gap-1.5 flex-shrink-0 w-18 group relative"
+              variant="light"
+              onPress={() => handleHighlightClick(highlight)}
+              className="flex flex-col items-center gap-1.5 flex-shrink-0 w-18 group relative h-auto min-w-0 p-0"
               aria-label={`View highlight: ${highlight.title}`}
             >
               <div className="w-16 h-16 rounded-full p-[2px] bg-[var(--border-default)] group-hover:bg-gradient-to-tr group-hover:from-yellow-400 group-hover:via-red-500 group-hover:to-purple-600 transition-all">
@@ -343,24 +345,28 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
               {isOwner && (
                 <>
                   {/* Edit button */}
-                  <button
-                    onClick={(e) => handleEditClick(highlight, e)}
-                    className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  <Button
+                    isIconOnly
+                    variant="flat"
+                    className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-[var(--color-primary)] text-white opacity-0 group-hover:opacity-100 transition-opacity min-w-0 p-0"
+                    onClick={(e) => { e.stopPropagation(); handleEditClick(highlight, e); }}
                     aria-label={`Edit highlight: ${highlight.title}`}
                   >
                     <Pencil className="w-3 h-3" />
-                  </button>
+                  </Button>
                   {/* Delete button */}
-                  <button
-                    onClick={(e) => handleDeleteHighlight(highlight.id, e)}
-                    className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  <Button
+                    isIconOnly
+                    variant="flat"
+                    className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity min-w-0 p-0"
+                    onClick={(e) => { e.stopPropagation(); handleDeleteHighlight(highlight.id, e); }}
                     aria-label={`Delete highlight: ${highlight.title}`}
                   >
                     <X className="w-3 h-3" />
-                  </button>
+                  </Button>
                 </>
               )}
-            </button>
+            </Button>
           ))}
         </div>
       </div>

@@ -50,17 +50,18 @@ export function JobDescriptionCard({
       {/* Match Explanation Card — "Why You Match" */}
       {qualificationData && !isOwner && (
         <GlassCard className="p-4 mt-4">
-          <button
-            className="w-full flex items-center justify-between text-left"
-            onClick={() => setQualOpen(v => !v)}
+          <Button
+            variant="light"
+            onPress={() => setQualOpen(v => !v)}
             aria-expanded={qualOpen}
+            className="w-full flex items-center justify-between text-left h-auto p-0 justify-between"
           >
             <span className="font-semibold flex items-center gap-2">
               <Sparkles size={16} className={qualificationData.percentage >= 70 ? 'text-success' : 'text-warning'} aria-hidden="true" />
               {t('match.why_you_match', 'Why you match')} — {qualificationData.percentage}%
             </span>
             {qualOpen ? <ChevronUp size={16} aria-hidden="true" /> : <ChevronDown size={16} aria-hidden="true" />}
-          </button>
+          </Button>
           {qualOpen && (
             <div className="mt-3 space-y-3">
               <p className="text-sm text-theme-secondary italic">{qualificationData.ai_summary}</p>

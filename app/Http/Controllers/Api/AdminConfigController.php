@@ -1807,7 +1807,8 @@ class AdminConfigController extends BaseApiController
         $key = $this->input('key');
         $value = $this->input('value');
 
-        if (!$key || !is_string($key)) {
+        // Type-check key before truth-testing so arrays/objects don't slip through
+        if (!is_string($key) || $key === '') {
             return $this->respondWithError('VALIDATION_ERROR', 'Configuration key is required', 'key', 422);
         }
 
@@ -1824,6 +1825,8 @@ class AdminConfigController extends BaseApiController
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         } elseif (is_int($defaultValue)) {
             $value = (int) $value;
+        } else {
+            $value = (string) $value;
         }
 
         ListingConfigurationService::set($key, $value);

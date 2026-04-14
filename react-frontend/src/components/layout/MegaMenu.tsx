@@ -171,18 +171,18 @@ export function MegaMenu({
           <div className="mx-3 mb-1.5 border-t border-[var(--border-default)] opacity-40" />
         )}
         {section.collapsible ? (
-          <button
-            type="button"
-            onClick={() => toggleSection(section.key)}
+          <Button
+            variant="light"
+            onPress={() => toggleSection(section.key)}
             aria-expanded={isExpanded}
-            className="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-theme-subtle hover:text-theme-primary transition-colors motion-reduce:transition-none rounded-md hover:bg-theme-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50"
+            className="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-theme-subtle hover:text-theme-primary transition-colors motion-reduce:transition-none rounded-md hover:bg-theme-hover h-auto justify-between"
           >
             <span>{section.title}</span>
             <ChevronDown
               className={`w-3 h-3 transition-transform duration-200 motion-reduce:transition-none ${isExpanded ? 'rotate-180' : ''}`}
               aria-hidden="true"
             />
-          </button>
+          </Button>
         ) : (
           <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-theme-subtle">
             {section.title}

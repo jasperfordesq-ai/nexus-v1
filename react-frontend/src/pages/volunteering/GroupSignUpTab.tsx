@@ -493,18 +493,18 @@ export function GroupSignUpTab() {
             {!isSearching && searchResults.length > 0 && (
               <div className="space-y-1">
                 {searchResults.map((user) => (
-                  <button
+                  <Button
                     key={user.id}
-                    type="button"
-                    className="w-full text-left px-3 py-2 rounded-lg bg-theme-elevated hover:bg-theme-hover text-sm text-theme-primary transition-colors"
-                    onClick={() => {
+                    variant="light"
+                    className="w-full text-left px-3 py-2 rounded-lg bg-theme-elevated hover:bg-theme-hover text-sm text-theme-primary transition-colors h-auto min-w-0 justify-start"
+                    onPress={() => {
                       setNewMemberEmail(user.email);
                       setSearchResults([]);
                     }}
                   >
                     <span className="font-medium">{user.name}</span>
                     <span className="text-theme-subtle ml-2">{user.email}</span>
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}

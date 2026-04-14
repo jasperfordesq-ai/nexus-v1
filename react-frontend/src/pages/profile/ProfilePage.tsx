@@ -771,13 +771,13 @@ export function ProfilePage() {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.key;
                 return (
-                  <button
-                    type="button"
+                  <Button
+                    variant="light"
                     key={tab.key}
                     role="tab"
                     aria-selected={isActive ? 'true' : 'false'}
-                    onClick={() => setActiveTab(tab.key)}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+                    onPress={() => setActiveTab(tab.key)}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap h-auto min-w-0 ${
                       isActive
                         ? 'bg-theme-hover text-theme-primary shadow-sm'
                         : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover/50'
@@ -785,7 +785,7 @@ export function ProfilePage() {
                   >
                     <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                     {tab.label}
-                  </button>
+                  </Button>
                 );
               })}
             </div>

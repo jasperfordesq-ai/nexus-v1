@@ -61,13 +61,15 @@ function StarRating({
       {[1, 2, 3, 4, 5].map((star) => {
         const filled = star <= (hovered || value);
         return (
-          <button
+          <Button
             key={star}
-            type="button"
-            onClick={() => onChange(star)}
+            isIconOnly
+            variant="light"
+            size="sm"
+            onPress={() => onChange(star)}
             onMouseEnter={() => setHovered(star)}
             onMouseLeave={() => setHovered(0)}
-            className="p-0.5 transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+            className="p-0.5 transition-transform hover:scale-110"
             aria-label={t('orders.rating.star_n', '{{n}} stars', { n: star })}
             role="radio"
             aria-checked={star === value}
@@ -79,7 +81,7 @@ function StarRating({
                   : 'text-default-300'
               }`}
             />
-          </button>
+          </Button>
         );
       })}
     </div>

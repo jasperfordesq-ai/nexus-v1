@@ -37,7 +37,7 @@ class AuthService
         $key = 'login:' . request()->ip() . ':' . $email;
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $seconds = RateLimiter::availableIn($key);
-            return ['success' => false, 'error' => "Too many login attempts. Try again in {$seconds} seconds."];
+            return ['success' => false, 'error' => __('api.too_many_login_attempts_seconds', ['seconds' => $seconds])];
         }
         RateLimiter::hit($key, 300); // 5 minute decay
 

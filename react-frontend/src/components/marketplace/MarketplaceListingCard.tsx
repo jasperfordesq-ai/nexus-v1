@@ -11,7 +11,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Card, CardBody, Chip } from '@heroui/react';
+import { Button, Card, CardBody, Chip } from '@heroui/react';
 import { Heart, MapPin, Megaphone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -86,9 +86,12 @@ export function MarketplaceListingCard({ listing, onSave, onUnsave }: Marketplac
         )}
 
         {/* Save/Heart button - top-right */}
-        <button
-          onClick={handleToggleSave}
-          className="absolute top-2 right-2 p-1.5 rounded-full bg-black/40 hover:bg-black/60 transition-colors"
+        <Button
+          isIconOnly
+          variant="flat"
+          size="sm"
+          onPress={handleToggleSave}
+          className="absolute top-2 right-2 bg-black/40 hover:bg-black/60 transition-colors"
           aria-label={
             isSaved
               ? t('listing.unsave', 'Remove from saved')
@@ -99,7 +102,7 @@ export function MarketplaceListingCard({ listing, onSave, onUnsave }: Marketplac
             className={`w-4 h-4 ${isSaved ? 'fill-rose-500 text-rose-500' : 'text-white'}`}
             aria-hidden="true"
           />
-        </button>
+        </Button>
 
         {/* Promoted badge */}
         {listing.is_promoted && (

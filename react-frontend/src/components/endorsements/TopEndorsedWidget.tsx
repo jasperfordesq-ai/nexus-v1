@@ -14,6 +14,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Avatar, Chip, Spinner } from '@heroui/react';
 import { Trophy, ThumbsUp, Medal } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -30,6 +31,7 @@ interface TopEndorsedMember {
 
 export function TopEndorsedWidget({ limit = 5 }: { limit?: number }) {
   const { tenantPath } = useTenant();
+  const { t } = useTranslation('endorsements');
   const [members, setMembers] = useState<TopEndorsedMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -72,7 +74,7 @@ export function TopEndorsedWidget({ limit = 5 }: { limit?: number }) {
     <GlassCard className="p-4">
       <div className="flex items-center gap-2 mb-4">
         <Trophy className="w-5 h-5 text-amber-500" aria-hidden="true" />
-        <h3 className="font-semibold text-theme-primary text-sm">Most Endorsed</h3>
+        <h3 className="font-semibold text-theme-primary text-sm">{t('most_endorsed')}</h3>
       </div>
 
       <div className="space-y-3">

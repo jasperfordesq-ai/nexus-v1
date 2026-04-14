@@ -93,10 +93,10 @@ const badgeConfig: Record<string, {
 // Helpers — normalize API response
 // ─────────────────────────────────────────────────────────────────────────────
 
-function normalizeBadges(data: any[]): VerificationBadgeData[] {
-  return data.map((b: any) => ({
+function normalizeBadges(data: VerificationBadgeData[]): VerificationBadgeData[] {
+  return data.map((b) => ({
     ...b,
-    type: b.type || b.badge_type,
+    type: b.type || b.badge_type || '',
     verified_at: b.verified_at || b.granted_at,
   }));
 }

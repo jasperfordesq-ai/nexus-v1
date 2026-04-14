@@ -261,26 +261,35 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
 
         {images.length > 1 && (
           <>
-            <button
-              onClick={() => setActiveIndex((i) => (i - 1 + images.length) % images.length)}
-              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background transition-colors"
+            <Button
+              isIconOnly
+              variant="flat"
+              size="sm"
+              onPress={() => setActiveIndex((i) => (i - 1 + images.length) % images.length)}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm"
               aria-label={t('listing.previous_image', 'Previous image')}
             >
               <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setActiveIndex((i) => (i + 1) % images.length)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background transition-colors"
+            </Button>
+            <Button
+              isIconOnly
+              variant="flat"
+              size="sm"
+              onPress={() => setActiveIndex((i) => (i + 1) % images.length)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm"
               aria-label={t('listing.next_image', 'Next image')}
             >
               <ChevronRight className="w-5 h-5" />
-            </button>
+            </Button>
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
               {images.map((_, idx) => (
-                <button
+                <Button
                   key={idx}
-                  onClick={() => setActiveIndex(idx)}
-                  className={`w-2 h-2 rounded-full transition-colors ${
+                  isIconOnly
+                  variant="light"
+                  size="sm"
+                  onPress={() => setActiveIndex(idx)}
+                  className={`w-2 h-2 min-w-0 min-h-0 rounded-full p-0 ${
                     idx === activeIndex ? 'bg-primary' : 'bg-white/50'
                   }`}
                   aria-label={t('listing.view_image', 'View image {{number}}', { number: idx + 1 })}
@@ -295,10 +304,13 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
       {images.length > 1 && (
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
           {images.map((img, idx) => (
-            <button
+            <Button
               key={img.id || idx}
-              onClick={() => setActiveIndex(idx)}
-              className={`shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${
+              isIconOnly
+              variant="light"
+              size="sm"
+              onPress={() => setActiveIndex(idx)}
+              className={`shrink-0 w-16 h-16 min-w-0 rounded-lg overflow-hidden border-2 transition-colors p-0 ${
                 idx === activeIndex ? 'border-primary' : 'border-transparent'
               }`}
             >
@@ -308,7 +320,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
-            </button>
+            </Button>
           ))}
         </div>
       )}

@@ -14,6 +14,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@heroui/react';
 import {
   Search,
   X,
@@ -290,24 +291,27 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               className="flex-1 bg-transparent text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 text-base outline-none"
             />
             {query && (
-              <button
-                type="button"
-                onClick={() => setQuery('')}
-                className="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+              <Button
+                isIconOnly
+                variant="light"
+                size="sm"
+                onPress={() => setQuery('')}
+                className="p-1 h-auto min-w-0 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
                 aria-label={t('aria.clear')}
               >
                 <X className="w-4 h-4" />
-              </button>
+              </Button>
             )}
-            <button
-              type="button"
-              onClick={handleClose}
-              className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 text-xs border border-zinc-200 dark:border-zinc-600"
+            <Button
+              variant="flat"
+              size="sm"
+              onPress={handleClose}
+              className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 text-xs border border-zinc-200 dark:border-zinc-600 h-auto"
               aria-label={t('accessibility.close')}
             >
               <X className="w-3.5 h-3.5" />
               <kbd className="text-[10px]">ESC</kbd>
-            </button>
+            </Button>
           </div>
 
           {/* Results area */}
@@ -321,13 +325,13 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                     {filteredActions.map((action, i) => {
                       const Icon = action.icon;
                       return (
-                        <button
+                        <Button
                           key={action.label}
-                          type="button"
-                          onClick={() => { action.action(); handleClose(); }}
+                          variant="light"
+                          onPress={() => { action.action(); handleClose(); }}
                           onMouseEnter={() => setSelectedIndex(i)}
                           onFocus={() => setSelectedIndex(i)}
-                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-start ${
+                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-start h-auto justify-start ${
                             i === selectedIndex
                               ? 'bg-indigo-50 dark:bg-indigo-500/10'
                               : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
@@ -335,7 +339,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                         >
                           <Icon className="w-4 h-4 text-zinc-500" />
                           <span className="text-sm text-zinc-800 dark:text-zinc-200">{action.label}</span>
-                        </button>
+                        </Button>
                       );
                     })}
                   </div>
@@ -351,12 +355,12 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   {suggestions.map((s, i) => {
                     const type = typeLabels[s.type] || { label: s.type, color: 'bg-zinc-200 text-zinc-600' };
                     return (
-                      <button
+                      <Button
                         key={`${s.type}-${s.id}`}
-                        type="button"
-                        onClick={() => goToSuggestion(s)}
+                        variant="light"
+                        onPress={() => goToSuggestion(s)}
                         onMouseEnter={() => setSelectedIndex(i)}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-start ${
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-start h-auto ${
                           i === selectedIndex
                             ? 'bg-indigo-50 dark:bg-indigo-500/10'
                             : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
@@ -364,19 +368,19 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                       >
                         <span className="text-sm text-zinc-800 dark:text-zinc-200 truncate">{s.title || s.name}</span>
                         <span className={`text-[10px] px-2 py-0.5 rounded-full ${type.color} ms-2 flex-shrink-0`}>{type.label}</span>
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
-                <button
-                  type="button"
-                  onClick={goToSearch}
-                  className="w-full flex items-center justify-center gap-2 mt-3 pt-3 border-t border-zinc-200 dark:border-zinc-700 text-indigo-600 dark:text-indigo-400 hover:underline text-sm"
+                <Button
+                  variant="light"
+                  onPress={goToSearch}
+                  className="w-full flex items-center justify-center gap-2 mt-3 pt-3 border-t border-zinc-200 dark:border-zinc-700 text-indigo-600 dark:text-indigo-400 hover:underline text-sm h-auto rounded-none"
                 >
                   <Search className="w-4 h-4" />
                   {t('search.view_all', 'View all results')}
                   <ArrowRight className="w-3 h-3" />
-                </button>
+                </Button>
               </div>
             ) : isLoading ? (
               /* Loading */
@@ -388,14 +392,14 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               /* No results */
               <div className="py-4 text-center">
                 <p className="text-sm text-zinc-500 mb-2">{t('search.no_suggestions', 'No quick matches')}</p>
-                <button
-                  type="button"
-                  onClick={goToSearch}
-                  className="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline text-sm"
+                <Button
+                  variant="light"
+                  onPress={goToSearch}
+                  className="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline text-sm h-auto"
                 >
                   <Search className="w-4 h-4" />
                   {t('search.search_for', 'Search for')} "{query.trim()}"
-                </button>
+                </Button>
               </div>
             ) : (
               /* Default state: recent + quick links */
@@ -404,29 +408,30 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-xs text-zinc-500">{t('search.recent', 'Recent')}</p>
-                      <button
-                        type="button"
-                        onClick={clearRecent}
-                        className="text-[10px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                      <Button
+                        variant="light"
+                        size="sm"
+                        onPress={clearRecent}
+                        className="text-[10px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 h-auto p-0 min-w-0"
                       >
                         {t('search.clear', 'Clear')}
-                      </button>
+                      </Button>
                     </div>
                     <div className="space-y-1">
                       {recentSearches.map(q => (
-                        <button
+                        <Button
                           key={q}
-                          type="button"
-                          onClick={() => {
+                          variant="light"
+                          onPress={() => {
                             saveRecent(q);
                             navigate(tenantPath(`/search?q=${encodeURIComponent(q)}`));
                             handleClose();
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-start hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                          className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-start hover:bg-zinc-50 dark:hover:bg-zinc-800 h-auto justify-start"
                         >
                           <Clock className="w-3.5 h-3.5 text-zinc-400" />
                           <span className="text-sm text-zinc-600 dark:text-zinc-400">{q}</span>
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   </div>
@@ -440,14 +445,15 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                     { label: t('nav.events', 'Events'), path: tenantPath('/events') },
                     { label: t('support.help_center', 'Help'), path: tenantPath('/help') },
                   ].map(link => (
-                    <button
+                    <Button
                       key={link.path}
-                      type="button"
-                      onClick={() => { navigate(link.path); handleClose(); }}
-                      className="px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                      variant="flat"
+                      size="sm"
+                      onPress={() => { navigate(link.path); handleClose(); }}
+                      className="px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 h-auto"
                     >
                       {link.label}
-                    </button>
+                    </Button>
                   ))}
                 </div>
 

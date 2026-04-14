@@ -147,12 +147,14 @@ export function PusherProvider({ children }: PusherProviderProps) {
           // should NOT log the user out of the entire application.
           const token = tokenManager.getAccessToken();
           const tenantId = tokenManager.getTenantId?.() ?? '';
+          const csrfToken = tokenManager.getCsrfToken?.() ?? '';
           fetch(`${import.meta.env.VITE_API_BASE || '/api'}/pusher/auth`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               ...(token ? { Authorization: `Bearer ${token}` } : {}),
               ...(tenantId ? { 'X-Tenant-ID': String(tenantId) } : {}),
+              ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
             },
             body: JSON.stringify({ socket_id: socketId, channel_name: channel.name }),
           })

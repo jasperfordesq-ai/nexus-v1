@@ -502,17 +502,17 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
           {questions.map((question) => (
             <GlassCard key={question.id} className="p-0 overflow-hidden">
               {/* Question row */}
-              <button
-                type="button"
-                className="w-full text-left p-3 hover:bg-default-100/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                onClick={() => toggleExpand(question.id)}
+              <Button
+                variant="light"
+                className="w-full text-left p-3 hover:bg-default-100/50 transition-colors h-auto min-w-0 justify-start rounded-none"
+                onPress={() => toggleExpand(question.id)}
                 aria-expanded={expandedId === question.id}
                 aria-label={t('qa.expand_aria', {
                   title: question.title,
                   defaultValue: `Toggle question: ${question.title}`,
                 })}
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-3 w-full">
                   {/* Vote controls */}
                   <div
                     className="flex-shrink-0"
@@ -568,7 +568,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                     </Chip>
                   </div>
                 </div>
-              </button>
+              </Button>
 
               {/* Expanded detail */}
               {expandedId === question.id && (

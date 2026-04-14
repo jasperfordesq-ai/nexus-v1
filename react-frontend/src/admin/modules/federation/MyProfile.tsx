@@ -453,14 +453,16 @@ export function MyProfile() {
                               variant="solid"
                               color={isPrimary ? 'warning' : 'primary'}
                               startContent={
-                                <button
-                                  type="button"
+                                <Button
+                                  isIconOnly
+                                  variant="light"
+                                  size="sm"
+                                  className="flex items-center min-w-0 w-auto h-auto p-0"
                                   onClick={(e) => { e.stopPropagation(); togglePrimary(topic.id); }}
-                                  className="flex items-center"
                                   aria-label={isPrimary ? t('federation.remove_primary', 'Remove primary') : t('federation.set_as_primary', 'Set as primary')}
                                 >
                                   <Star size={12} className={isPrimary ? 'fill-current' : 'opacity-40'} />
-                                </button>
+                                </Button>
                               }
                               onClose={() => toggleTopic(topic.id)}
                             >

@@ -5,6 +5,7 @@
 
 import { useTranslation } from 'react-i18next';
 import {
+  Button,
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
@@ -78,12 +79,13 @@ export function GroupTabNav({
         const Icon = tab.icon;
         const isActive = activeTab === tab.key;
         return (
-          <button
+          <Button
             key={tab.key}
+            variant="light"
             role="tab"
             aria-selected={isActive}
-            onClick={() => onTabChange(tab.key)}
-            className={`flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
+            onPress={() => onTabChange(tab.key)}
+            className={`flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap h-auto min-w-0 ${
               isActive
                 ? 'bg-theme-hover text-theme-primary shadow-sm'
                 : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover/50'
@@ -91,7 +93,7 @@ export function GroupTabNav({
           >
             <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
             <span className="hidden md:inline">{tab.label}</span>
-          </button>
+          </Button>
         );
       })}
 
@@ -101,14 +103,14 @@ export function GroupTabNav({
       {/* "More" dropdown for secondary tabs */}
       <Dropdown>
         <DropdownTrigger>
-          <button
-            className={`flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
+          <Button
+            variant="light"
+            className={`flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap h-auto min-w-0 ${
               isSecondaryActive
                 ? 'bg-theme-hover text-theme-primary shadow-sm'
                 : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover/50'
             }`}
             aria-label={t('detail.tab_more', 'More sections')}
-            aria-haspopup="true"
           >
             {isSecondaryActive && activeSecondaryTab ? (
               <>
@@ -122,7 +124,7 @@ export function GroupTabNav({
               </>
             )}
             <ChevronDown className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
-          </button>
+          </Button>
         </DropdownTrigger>
         <DropdownMenu
           aria-label={t('detail.tab_more_menu', 'More group sections')}

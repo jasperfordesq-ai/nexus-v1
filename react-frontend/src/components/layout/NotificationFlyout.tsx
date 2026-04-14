@@ -189,11 +189,11 @@ export function NotificationFlyout() {
             const isUnread = !notification.read_at;
             const isGrouped = notification.is_grouped && (notification.group_count ?? 0) > 1;
             return (
-              <button
+              <Button
                 key={notification.id}
-                type="button"
-                onClick={() => handleNotificationClick(notification)}
-                className={`w-full flex items-start gap-3 px-4 py-3 text-start transition-colors hover:bg-theme-hover ${
+                variant="light"
+                onPress={() => handleNotificationClick(notification)}
+                className={`w-full flex items-start gap-3 px-4 py-3 text-start transition-colors hover:bg-theme-hover h-auto justify-start rounded-none ${
                   isUnread ? 'bg-indigo-50/50 dark:bg-indigo-500/5' : ''
                 }`}
               >
@@ -238,7 +238,7 @@ export function NotificationFlyout() {
                 {isUnread && (
                   <span className="w-2 h-2 mt-2 rounded-full bg-indigo-500 shrink-0" aria-label={t('flyout.unread_dot_aria')} />
                 )}
-              </button>
+              </Button>
             );
           })}
         </div>

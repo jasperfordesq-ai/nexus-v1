@@ -76,11 +76,11 @@ class Auth
         if (!self::check()) {
             if ($testing || $jsonResponse) {
                 if ($testing) {
-                    throw new \Symfony\Component\HttpKernel\Exception\HttpException(401, json_encode(['success' => false, 'error' => 'Not authenticated']));
+                    throw new \Symfony\Component\HttpKernel\Exception\HttpException(401, json_encode(['success' => false, 'error' => __('api.not_authenticated')]));
                 }
                 header('Content-Type: application/json');
                 http_response_code(401);
-                echo json_encode(['success' => false, 'error' => 'Not authenticated']);
+                echo json_encode(['success' => false, 'error' => __('api.not_authenticated')]);
                 exit;
             }
             header('Location: ' . TenantContext::getBasePath() . '/login');
@@ -93,11 +93,11 @@ class Auth
             self::logout();
             if ($testing || $jsonResponse) {
                 if ($testing) {
-                    throw new \Symfony\Component\HttpKernel\Exception\HttpException(401, json_encode(['success' => false, 'error' => 'Session expired']));
+                    throw new \Symfony\Component\HttpKernel\Exception\HttpException(401, json_encode(['success' => false, 'error' => __('api.session_expired')]));
                 }
                 header('Content-Type: application/json');
                 http_response_code(401);
-                echo json_encode(['success' => false, 'error' => 'Session expired']);
+                echo json_encode(['success' => false, 'error' => __('api.session_expired')]);
                 exit;
             }
             header('Location: ' . TenantContext::getBasePath() . '/login');
@@ -120,12 +120,12 @@ class Auth
 
         if (!self::isAdmin($user)) {
             if ($testing) {
-                throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, json_encode(['success' => false, 'error' => 'Access denied']));
+                throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, json_encode(['success' => false, 'error' => __('api.access_denied')]));
             }
             if ($jsonResponse) {
                 header('Content-Type: application/json');
                 http_response_code(403);
-                echo json_encode(['success' => false, 'error' => 'Access denied']);
+                echo json_encode(['success' => false, 'error' => __('api.access_denied')]);
                 exit;
             }
             http_response_code(403);

@@ -62,6 +62,7 @@ export function AvailabilityGrid({
 }) {
   const toast = useToast();
   const { t } = useTranslation('settings');
+  const { t: tAvail } = useTranslation('availability');
   const [slots, setSlots] = useState<Map<string, boolean>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -254,7 +255,7 @@ export function AvailabilityGrid({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-            <h3 className="font-semibold text-theme-primary">Set Your Availability</h3>
+            <h3 className="font-semibold text-theme-primary">{tAvail('set_your_availability')}</h3>
           </div>
           {isDirty && (
             <Button
@@ -306,7 +307,7 @@ export function AvailabilityGrid({
                   return (
                     <Tooltip
                       key={key}
-                      content={`${FULL_DAYS[dayIdx] ?? ''} ${time} - ${isAvail ? 'Available' : 'Unavailable'}`}
+                      content={`${FULL_DAYS[dayIdx] ?? ''} ${time} - ${isAvail ? tAvail('available') : tAvail('unavailable')}`}
                       delay={300}
                       closeDelay={0}
                       size="sm"
@@ -323,7 +324,7 @@ export function AvailabilityGrid({
                           ${editable ? 'cursor-pointer' : 'cursor-default'}
                         `}
                         variant="flat"
-                        aria-label={`${FULL_DAYS[dayIdx] ?? ''} ${time}: ${isAvail ? 'Available' : 'Unavailable'}`}
+                        aria-label={`${FULL_DAYS[dayIdx] ?? ''} ${time}: ${isAvail ? tAvail('available') : tAvail('unavailable')}`}
                       />
                     </Tooltip>
                   );
@@ -338,11 +339,11 @@ export function AvailabilityGrid({
       <div className="flex items-center gap-4 text-xs text-theme-subtle">
         <div className="flex items-center gap-1.5">
           <div className="w-4 h-4 rounded-sm bg-emerald-500/60 border border-emerald-500/30" />
-          <span>Available</span>
+          <span>{tAvail('available')}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-4 h-4 rounded-sm bg-theme-elevated border border-theme-default" />
-          <span>Unavailable</span>
+          <span>{tAvail('unavailable')}</span>
         </div>
       </div>
     </div>

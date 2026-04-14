@@ -123,11 +123,11 @@ class Csrf
             error_log("CSRF API FAIL | SessionID: $sessionId | SessionPrefix: $sessionToken | HeaderPrefix: $headerToken | PostPrefix: $postToken");
 
             if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
-                throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, json_encode(['error' => 'Invalid CSRF token', 'code' => 'csrf_invalid']));
+                throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, json_encode(['error' => __('api.invalid_csrf_token'), 'code' => 'csrf_invalid']));
             }
             header('Content-Type: application/json');
             http_response_code(403);
-            echo json_encode(['error' => 'Invalid CSRF token', 'code' => 'csrf_invalid']);
+            echo json_encode(['error' => __('api.invalid_csrf_token'), 'code' => 'csrf_invalid']);
             exit;
         }
         return true;

@@ -269,14 +269,16 @@ export function PostTab({ onSuccess, onClose, groupId, templateData, editItem, o
             alt="Selected GIF"
             className="max-w-[240px] max-h-[200px] rounded-lg border border-[var(--border-default)]"
           />
-          <button
-            type="button"
-            onClick={() => setSelectedGifUrl(null)}
-            className="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors"
+          <Button
+            isIconOnly
+            variant="flat"
+            size="sm"
+            onPress={() => setSelectedGifUrl(null)}
+            className="absolute -top-1.5 -right-1.5 w-5 h-5 min-w-0 min-h-0 bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors"
             aria-label={t('compose.cancel')}
           >
             <X className="w-3 h-3" />
-          </button>
+          </Button>
         </div>
       )}
 
@@ -285,14 +287,16 @@ export function PostTab({ onSuccess, onClose, groupId, templateData, editItem, o
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 text-sm">
           <Calendar className="w-4 h-4 flex-shrink-0" />
           <span>{t('compose.schedule_set', { date: toScheduleIso(scheduleDate, scheduleTime) })}</span>
-          <button
-            type="button"
-            onClick={() => { setScheduleDate(null); setScheduleTime(null); }}
-            className="ml-auto p-0.5 rounded hover:bg-primary-100 dark:hover:bg-primary-800/30"
+          <Button
+            isIconOnly
+            variant="light"
+            size="sm"
+            onPress={() => { setScheduleDate(null); setScheduleTime(null); }}
+            className="ml-auto p-0.5 min-w-0 min-h-0 h-auto hover:bg-primary-100 dark:hover:bg-primary-800/30"
             aria-label={t('compose.schedule_clear')}
           >
             <X className="w-3.5 h-3.5" />
-          </button>
+          </Button>
         </div>
       )}
 

@@ -64,27 +64,29 @@ export function BookmarkCollectionPicker({ selectedId, onSelect, onClose }: Book
       </p>
 
       {/* "No collection" option */}
-      <button
-        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-primary)]"
-        onClick={() => handleSelect(null)}
+      <Button
+        variant="light"
+        onPress={() => handleSelect(null)}
+        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors h-auto justify-start"
       >
         <FolderOpen className="w-4 h-4 text-[var(--text-muted)]" />
         <span className="flex-1 text-left">{t('bookmark.no_collection', 'General (no collection)')}</span>
         {selectedId === null && <Check className="w-4 h-4 text-[var(--color-primary)]" />}
-      </button>
+      </Button>
 
       {/* Existing collections */}
       {collections.map((col) => (
-        <button
+        <Button
           key={col.id}
-          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-primary)]"
-          onClick={() => handleSelect(col.id)}
+          variant="light"
+          onPress={() => handleSelect(col.id)}
+          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors h-auto justify-start"
         >
           <FolderOpen className="w-4 h-4 text-amber-500" />
           <span className="flex-1 text-left truncate">{col.name}</span>
           <span className="text-xs text-[var(--text-subtle)]">{col.bookmarks_count}</span>
           {selectedId === col.id && <Check className="w-4 h-4 text-[var(--color-primary)]" />}
-        </button>
+        </Button>
       ))}
 
       <Divider className="my-1" />
@@ -107,13 +109,14 @@ export function BookmarkCollectionPicker({ selectedId, onSelect, onClose }: Book
           </Button>
         </div>
       ) : (
-        <button
-          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-primary)]"
-          onClick={() => setIsCreating(true)}
+        <Button
+          variant="light"
+          onPress={() => setIsCreating(true)}
+          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors h-auto justify-start"
         >
           <Plus className="w-4 h-4" />
           <span>{t('bookmark.new_collection', 'New collection')}</span>
-        </button>
+        </Button>
       )}
     </div>
   );

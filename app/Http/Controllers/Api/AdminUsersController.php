@@ -102,8 +102,13 @@ class AdminUsersController extends BaseApiController
             $params[] = $searchTerm;
         }
 
+        // Safety: $where is built exclusively from hardcoded SQL fragments above.
+        // All user values are bound via parameterised ? placeholders in $params.
+        // No user input is ever interpolated directly into the SQL string.
         $where = implode(' AND ', $conditions);
 
+        // Safety: $sortColumn is resolved from a whitelist map — never raw user input.
+        // $order is sanitised to 'ASC'|'DESC' via the ternary on line above (strtoupper check).
         $sortColumnMap = [
             'name' => 'name',
             'email' => 'u.email',

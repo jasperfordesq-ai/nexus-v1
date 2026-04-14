@@ -188,10 +188,11 @@ export function ReactionSummary({
   return (
     <>
       {/* Inline summary row */}
-      <button
-        type="button"
-        className="flex items-center gap-1.5 text-xs text-[var(--text-subtle)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
-        onClick={handleOpenModal}
+      <Button
+        variant="light"
+        size="sm"
+        onPress={handleOpenModal}
+        className="flex items-center gap-1.5 text-xs text-[var(--text-subtle)] hover:text-[var(--text-primary)] transition-colors h-auto p-0 min-w-0"
         aria-label={`View reactions: ${summaryText}`}
       >
         {/* Emoji badges */}
@@ -206,7 +207,7 @@ export function ReactionSummary({
           ))}
         </span>
         <span>{summaryText}</span>
-      </button>
+      </Button>
 
       {/* Reactors Modal */}
       <Modal

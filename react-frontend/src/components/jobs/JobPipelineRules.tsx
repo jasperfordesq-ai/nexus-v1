@@ -40,20 +40,21 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
 
   return (
     <GlassCard className="p-4">
-      <button
-        className="w-full flex items-center justify-between"
-        onClick={() => {
+      <Button
+        variant="light"
+        onPress={() => {
           setPipelineOpen((v) => !v);
           if (!pipelineOpen) loadPipelineRules();
         }}
         aria-expanded={pipelineOpen}
+        className="w-full flex items-center justify-between h-auto p-0 justify-between"
       >
         <span className="font-semibold flex items-center gap-2">
           <Zap size={16} aria-hidden="true" />
           {t('pipeline.title', 'Automation Rules')}
         </span>
         {pipelineOpen ? <ChevronUp size={16} aria-hidden="true" /> : <ChevronDown size={16} aria-hidden="true" />}
-      </button>
+      </Button>
       {pipelineOpen && (
         <div className="mt-3 space-y-3">
           {pipelineRules.length === 0 && (

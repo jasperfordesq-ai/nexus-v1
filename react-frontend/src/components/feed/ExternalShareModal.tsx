@@ -163,14 +163,15 @@ export function ExternalShareModal({ isOpen, onClose, url, title, text }: Extern
           <div className="grid grid-cols-5 gap-3 mt-3">
             {SHARE_TARGETS.map((target) => (
               <Tooltip key={target.key} content={target.label} delay={300} closeDelay={0} size="sm">
-                <button
-                  type="button"
-                  className={`flex flex-col items-center gap-1.5 p-3 rounded-xl ${target.color} text-white hover:opacity-80 transition-opacity`}
-                  onClick={() => handleShareTarget(target)}
+                <Button
+                  isIconOnly
+                  size="sm"
+                  className={`flex flex-col items-center gap-1.5 p-3 rounded-xl ${target.color} text-white hover:opacity-80 transition-opacity w-full h-auto`}
+                  onPress={() => handleShareTarget(target)}
                   aria-label={t('share.share_via', 'Share via {{platform}}', { platform: target.label })}
                 >
                   {target.icon}
-                </button>
+                </Button>
               </Tooltip>
             ))}
           </div>

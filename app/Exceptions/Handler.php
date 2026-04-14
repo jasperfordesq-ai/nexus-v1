@@ -169,7 +169,7 @@ class Handler extends ExceptionHandler
             $response = response()->json([
                 'errors' => [[
                     'code' => 'RATE_LIMIT_EXCEEDED',
-                    'message' => 'Rate limit exceeded. Please try again later.',
+                    'message' => __('api.rate_limit_exceeded'),
                 ]],
             ], 429);
 
@@ -195,7 +195,7 @@ class Handler extends ExceptionHandler
         $response = [
             'errors' => [[
                 'code' => 'SERVER_ERROR',
-                'message' => 'An unexpected error occurred.',
+                'message' => __('api.unexpected_error'),
             ]],
         ];
 

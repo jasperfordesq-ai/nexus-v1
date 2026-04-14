@@ -15,7 +15,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Card } from '@heroui/react';
+import { Card, Button } from '@heroui/react';
 import { Play } from 'lucide-react';
 
 /* ───────────────────────── Types ───────────────────────── */
@@ -85,10 +85,10 @@ export function YouTubeEmbed({ embedUrl, thumbnailUrl, title = 'Video' }: YouTub
             loading="lazy"
           />
         ) : (
-          <button
-            type="button"
-            onClick={handlePlay}
-            className="absolute inset-0 w-full h-full group/play cursor-pointer bg-black focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-inset"
+          <Button
+            variant="flat"
+            onPress={handlePlay}
+            className="absolute inset-0 w-full h-full group/play cursor-pointer bg-black rounded-none p-0 min-w-0 focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-inset"
             aria-label={`Play video: ${title}`}
           >
             {/* Thumbnail */}
@@ -115,7 +115,7 @@ export function YouTubeEmbed({ embedUrl, thumbnailUrl, title = 'Video' }: YouTub
             <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/60 text-white text-[10px] font-medium">
               {embedUrl.includes('vimeo') ? 'Vimeo' : 'YouTube'}
             </div>
-          </button>
+          </Button>
         )}
       </div>
     </Card>

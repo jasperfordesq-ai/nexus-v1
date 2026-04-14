@@ -528,13 +528,15 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 z-10">
-        <button
-          onClick={onClose}
-          className="p-2 rounded-full hover:bg-white/10 transition-colors"
+        <Button
+          isIconOnly
+          variant="flat"
+          className="p-2 rounded-full hover:bg-white/10 transition-colors min-w-0 w-auto h-auto"
+          onPress={onClose}
           aria-label={t('creator.close')}
         >
           <X className="w-5 h-5 text-white" />
-        </button>
+        </Button>
 
         <h2 className="text-white font-semibold text-lg">{t('creator.title')}</h2>
 
@@ -549,10 +551,11 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
           { key: 'text' as StoryMode, icon: Type, label: t('creator.mode_text') },
           { key: 'poll' as StoryMode, icon: BarChart3, label: t('creator.mode_poll') },
         ]).map(({ key, icon: Icon, label }) => (
-          <button
+          <Button
             key={key}
-            onClick={() => setMode(key)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+            variant="flat"
+            onPress={() => setMode(key)}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all h-auto min-w-0 ${
               mode === key
                 ? 'bg-white text-black'
                 : 'bg-white/10 text-white/70 hover:bg-white/20'
@@ -562,7 +565,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
           >
             <Icon className="w-4 h-4" />
             {label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -593,30 +596,36 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                   />
                   {/* Drawing toolbar */}
                   <div className="absolute top-3 right-3 flex flex-col gap-2 z-30">
-                    <button
-                      onClick={() => setDrawingActive(!drawingActive)}
-                      className={`p-2 rounded-full backdrop-blur transition-colors ${
+                    <Button
+                      isIconOnly
+                      variant="flat"
+                      className={`p-2 rounded-full backdrop-blur transition-colors min-w-0 w-auto h-auto ${
                         drawingActive ? 'bg-white text-black' : 'bg-black/40 text-white hover:bg-black/60'
                       }`}
+                      onPress={() => setDrawingActive(!drawingActive)}
                       aria-label={t('creator.draw_toggle')}
                     >
                       <Pencil className="w-4 h-4" />
-                    </button>
+                    </Button>
                     {drawingActive && (
                       <>
-                        <button
-                          onClick={clearDrawing}
-                          className="p-2 rounded-full bg-black/40 backdrop-blur text-white hover:bg-black/60 transition-colors"
+                        <Button
+                          isIconOnly
+                          variant="flat"
+                          className="p-2 rounded-full bg-black/40 backdrop-blur text-white hover:bg-black/60 transition-colors min-w-0 w-auto h-auto"
+                          onPress={clearDrawing}
                           aria-label={t('creator.draw_clear')}
                         >
                           <Eraser className="w-4 h-4" />
-                        </button>
+                        </Button>
                         <div className="flex flex-col gap-1 bg-black/40 backdrop-blur rounded-full p-1.5">
                           {DRAW_COLORS.map((c) => (
-                            <button
+                            <Button
                               key={c}
-                              onClick={() => setDrawColor(c)}
-                              className={`w-5 h-5 rounded-full transition-all ${
+                              isIconOnly
+                              variant="flat"
+                              onPress={() => setDrawColor(c)}
+                              className={`w-5 h-5 rounded-full transition-all min-w-0 p-0 ${
                                 drawColor === c ? 'ring-2 ring-white scale-110' : ''
                               }`}
                               style={{ backgroundColor: c }}
@@ -626,16 +635,18 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                         </div>
                         <div className="flex flex-col gap-1 bg-black/40 backdrop-blur rounded-full p-1.5">
                           {[2, 4, 8].map((s) => (
-                            <button
+                            <Button
                               key={s}
-                              onClick={() => setDrawSize(s)}
-                              className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
+                              isIconOnly
+                              variant="flat"
+                              onPress={() => setDrawSize(s)}
+                              className={`w-5 h-5 rounded-full transition-all min-w-0 p-0 ${
                                 drawSize === s ? 'bg-white/30' : ''
                               }`}
                               aria-label={`Brush size ${s}`}
                             >
                               <div className="rounded-full bg-white" style={{ width: s + 2, height: s + 2 }} />
-                            </button>
+                            </Button>
                           ))}
                         </div>
                       </>
@@ -662,10 +673,11 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                   <p className="text-white/50 text-xs mb-2 uppercase tracking-wider">Filter</p>
                   <div className="flex gap-2 overflow-x-auto pb-1">
                     {IMAGE_FILTERS.map((f) => (
-                      <button
+                      <Button
                         key={f.value}
-                        onClick={() => setImageFilter(f.value)}
-                        className={`flex-shrink-0 flex flex-col items-center gap-1 ${
+                        variant="light"
+                        onPress={() => setImageFilter(f.value)}
+                        className={`flex-shrink-0 flex flex-col items-center gap-1 h-auto min-w-0 p-0 ${
                           imageFilter === f.value ? 'opacity-100' : 'opacity-60 hover:opacity-80'
                         }`}
                         aria-label={`${f.label} filter`}
@@ -677,14 +689,14 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                           }`}
                         >
                           <img
-                            src={imagePreview}
+                            src={imagePreview ?? ''}
                             alt={`${f.label} filter preview`}
                             className="w-full h-full object-cover"
                             style={{ filter: f.css }}
                           />
                         </div>
                         <span className="text-white text-[10px]">{f.label}</span>
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -703,32 +715,39 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
 
                 {/* Camera controls */}
                 <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-8">
-                  <button
-                    onClick={flipCamera}
-                    className="p-3 rounded-full bg-white/20 backdrop-blur hover:bg-white/30 transition-colors"
+                  <Button
+                    isIconOnly
+                    variant="flat"
+                    className="p-3 rounded-full bg-white/20 backdrop-blur hover:bg-white/30 transition-colors min-w-0 w-auto h-auto"
+                    onPress={flipCamera}
                     aria-label={t('creator.flip_camera')}
                   >
                     <SwitchCamera className="w-5 h-5 text-white" />
-                  </button>
-                  <button
-                    onClick={capturePhoto}
-                    className="w-16 h-16 rounded-full border-4 border-white bg-white/20 hover:bg-white/40 transition-colors active:scale-90"
+                  </Button>
+                  <Button
+                    isIconOnly
+                    variant="flat"
+                    className="w-16 h-16 rounded-full border-4 border-white bg-white/20 hover:bg-white/40 transition-colors active:scale-90 min-w-0"
+                    onPress={capturePhoto}
                     aria-label={t('creator.capture')}
                   />
-                  <button
-                    onClick={stopCamera}
-                    className="p-3 rounded-full bg-white/20 backdrop-blur hover:bg-white/30 transition-colors"
+                  <Button
+                    isIconOnly
+                    variant="flat"
+                    className="p-3 rounded-full bg-white/20 backdrop-blur hover:bg-white/30 transition-colors min-w-0 w-auto h-auto"
+                    onPress={stopCamera}
                     aria-label={t('creator.close_camera')}
                   >
                     <X className="w-5 h-5 text-white" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-4 w-full max-w-sm">
-                <button
-                  onClick={startCamera}
-                  className="flex flex-col items-center gap-4 p-10 w-full rounded-2xl border-2 border-dashed border-white/20 hover:border-white/40 transition-colors cursor-pointer"
+                <Button
+                  variant="flat"
+                  onPress={startCamera}
+                  className="flex flex-col items-center gap-4 p-10 w-full rounded-2xl border-2 border-dashed border-white/20 hover:border-white/40 transition-colors cursor-pointer h-auto min-w-0"
                   aria-label={t('creator.open_camera')}
                 >
                   <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center">
@@ -738,18 +757,19 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                     <p className="text-white font-medium">Take Photo</p>
                     <p className="text-white/50 text-sm mt-1">Use your camera</p>
                   </div>
-                </button>
+                </Button>
                 <div className="text-white/30 text-xs uppercase tracking-wider">or</div>
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex flex-col items-center gap-3 p-8 w-full rounded-2xl border-2 border-dashed border-white/20 hover:border-white/40 transition-colors cursor-pointer"
+                <Button
+                  variant="flat"
+                  onPress={() => fileInputRef.current?.click()}
+                  className="flex flex-col items-center gap-3 p-8 w-full rounded-2xl border-2 border-dashed border-white/20 hover:border-white/40 transition-colors cursor-pointer h-auto min-w-0"
                   aria-label={t('creator.select_image')}
                 >
                   <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
                     <ImagePlus className="w-6 h-6 text-white/70" />
                   </div>
                   <p className="text-white/70 text-sm">Choose from gallery</p>
-                </button>
+                </Button>
               </div>
             )}
             <input
@@ -804,44 +824,53 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                   </div>
                 )}
                 <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-8">
-                  <button
-                    onClick={flipCamera}
-                    className="p-3 rounded-full bg-white/20 backdrop-blur hover:bg-white/30 transition-colors"
+                  <Button
+                    isIconOnly
+                    variant="flat"
+                    className="p-3 rounded-full bg-white/20 backdrop-blur hover:bg-white/30 transition-colors min-w-0 w-auto h-auto"
+                    onPress={flipCamera}
                     aria-label={t('creator.flip_camera')}
                   >
                     <SwitchCamera className="w-5 h-5 text-white" />
-                  </button>
+                  </Button>
                   {isRecording ? (
-                    <button
-                      onClick={stopRecording}
-                      className="w-16 h-16 rounded-full border-4 border-red-500 bg-red-500/30 flex items-center justify-center hover:bg-red-500/50 transition-colors"
+                    <Button
+                      isIconOnly
+                      variant="flat"
+                      className="w-16 h-16 rounded-full border-4 border-red-500 bg-red-500/30 hover:bg-red-500/50 transition-colors min-w-0"
+                      onPress={stopRecording}
                       aria-label={t('creator.stop_recording')}
                     >
                       <Square className="w-6 h-6 text-white fill-white" />
-                    </button>
+                    </Button>
                   ) : (
-                    <button
-                      onClick={startRecording}
-                      className="w-16 h-16 rounded-full border-4 border-red-500 bg-red-500/20 flex items-center justify-center hover:bg-red-500/40 transition-colors"
+                    <Button
+                      isIconOnly
+                      variant="flat"
+                      className="w-16 h-16 rounded-full border-4 border-red-500 bg-red-500/20 hover:bg-red-500/40 transition-colors min-w-0"
+                      onPress={startRecording}
                       aria-label={t('creator.start_recording')}
                     >
                       <Circle className="w-6 h-6 text-red-500 fill-red-500" />
-                    </button>
+                    </Button>
                   )}
-                  <button
-                    onClick={stopCamera}
-                    className="p-3 rounded-full bg-white/20 backdrop-blur hover:bg-white/30 transition-colors"
+                  <Button
+                    isIconOnly
+                    variant="flat"
+                    className="p-3 rounded-full bg-white/20 backdrop-blur hover:bg-white/30 transition-colors min-w-0 w-auto h-auto"
+                    onPress={stopCamera}
                     aria-label={t('creator.close_camera')}
                   >
                     <X className="w-5 h-5 text-white" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-4 w-full max-w-sm">
-                <button
-                  onClick={startCamera}
-                  className="flex flex-col items-center gap-4 p-10 w-full rounded-2xl border-2 border-dashed border-white/20 hover:border-white/40 transition-colors cursor-pointer"
+                <Button
+                  variant="flat"
+                  onPress={startCamera}
+                  className="flex flex-col items-center gap-4 p-10 w-full rounded-2xl border-2 border-dashed border-white/20 hover:border-white/40 transition-colors cursor-pointer h-auto min-w-0"
                   aria-label={t('creator.record_video')}
                 >
                   <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center">
@@ -851,18 +880,19 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                     <p className="text-white font-medium">Record Video</p>
                     <p className="text-white/50 text-sm mt-1">Use your camera</p>
                   </div>
-                </button>
+                </Button>
                 <div className="text-white/30 text-xs uppercase tracking-wider">or</div>
-                <button
-                  onClick={() => videoInputRef.current?.click()}
-                  className="flex flex-col items-center gap-3 p-8 w-full rounded-2xl border-2 border-dashed border-white/20 hover:border-white/40 transition-colors cursor-pointer"
+                <Button
+                  variant="flat"
+                  onPress={() => videoInputRef.current?.click()}
+                  className="flex flex-col items-center gap-3 p-8 w-full rounded-2xl border-2 border-dashed border-white/20 hover:border-white/40 transition-colors cursor-pointer h-auto min-w-0"
                   aria-label={t('creator.select_video')}
                 >
                   <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
                     <ImagePlus className="w-6 h-6 text-white/70" />
                   </div>
                   <p className="text-white/70 text-sm">Choose from gallery</p>
-                </button>
+                </Button>
               </div>
             )}
             <input
@@ -908,17 +938,18 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                   <p className="text-white/50 text-xs mb-2 uppercase tracking-wider">Templates</p>
                   <div className="flex gap-2 overflow-x-auto pb-1">
                     {STORY_TEMPLATES.map((t, idx) => (
-                      <button
+                      <Button
                         key={idx}
-                        onClick={() => {
+                        variant="flat"
+                        onPress={() => {
                           setTextContent(t.text);
                           setSelectedGradient(t.gradient);
                           setSelectedFont(t.font);
                         }}
-                        className="flex-shrink-0 px-3 py-1.5 rounded-full bg-white/10 text-white/70 text-xs hover:bg-white/20 transition-colors whitespace-nowrap"
+                        className="flex-shrink-0 px-3 py-1.5 rounded-full bg-white/10 text-white/70 text-xs hover:bg-white/20 transition-colors whitespace-nowrap h-auto min-w-0"
                       >
                         {t.label}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -945,10 +976,12 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 <p className="text-white/50 text-xs mb-2 uppercase tracking-wider">Background</p>
                 <div className="flex gap-2 flex-wrap">
                   {GRADIENT_PRESETS.map((g, idx) => (
-                    <button
+                    <Button
                       key={idx}
-                      onClick={() => setSelectedGradient(idx)}
-                      className={`w-8 h-8 rounded-full transition-all ${
+                      isIconOnly
+                      variant="flat"
+                      onPress={() => setSelectedGradient(idx)}
+                      className={`w-8 h-8 rounded-full transition-all min-w-0 p-0 ${
                         selectedGradient === idx ? 'ring-2 ring-white ring-offset-2 ring-offset-black scale-110' : 'hover:scale-105'
                       }`}
                       style={{ background: g.css }}
@@ -964,10 +997,11 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 <p className="text-white/50 text-xs mb-2 uppercase tracking-wider">Font</p>
                 <div className="flex gap-2">
                   {FONT_STYLES.map((f, idx) => (
-                    <button
+                    <Button
                       key={idx}
-                      onClick={() => setSelectedFont(idx)}
-                      className={`px-4 py-1.5 rounded-full text-sm transition-all ${
+                      variant="flat"
+                      onPress={() => setSelectedFont(idx)}
+                      className={`px-4 py-1.5 rounded-full text-sm transition-all h-auto min-w-0 ${
                         selectedFont === idx
                           ? 'bg-white text-black font-medium'
                           : 'bg-white/10 text-white/70 hover:bg-white/20'
@@ -977,7 +1011,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                       aria-pressed={selectedFont === idx}
                     >
                       {f.label}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -1073,10 +1107,12 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 <p className="text-white/50 text-xs mb-2 uppercase tracking-wider">Background</p>
                 <div className="flex gap-2 flex-wrap">
                   {GRADIENT_PRESETS.map((g, idx) => (
-                    <button
+                    <Button
                       key={idx}
-                      onClick={() => setPollGradient(idx)}
-                      className={`w-8 h-8 rounded-full transition-all ${
+                      isIconOnly
+                      variant="flat"
+                      onPress={() => setPollGradient(idx)}
+                      className={`w-8 h-8 rounded-full transition-all min-w-0 p-0 ${
                         pollGradient === idx ? 'ring-2 ring-white ring-offset-2 ring-offset-black scale-110' : 'hover:scale-105'
                       }`}
                       style={{ background: g.css }}
@@ -1100,10 +1136,11 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
             { key: 'connections' as const, icon: Users, label: 'Connections' },
             { key: 'close_friends' as const, icon: Heart, label: 'Close Friends' },
           ]).map(({ key, icon: Icon, label }) => (
-            <button
+            <Button
               key={key}
-              onClick={() => setAudience(key)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+              variant="flat"
+              onPress={() => setAudience(key)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all h-auto min-w-0 ${
                 audience === key
                   ? 'bg-white text-black'
                   : 'bg-white/10 text-white/60 hover:bg-white/20'
@@ -1113,7 +1150,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
             >
               <Icon className="w-3.5 h-3.5" />
               {label}
-            </button>
+            </Button>
           ))}
         </div>
 
