@@ -282,7 +282,9 @@ class LeaderboardSeasonService
                     $ranking = (array) $row;
                 }
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            Log::warning('LeaderboardSeasonService: ranking lookup failed', ['user_id' => $userId, 'season_id' => $seasonId, 'error' => $e->getMessage()]);
+        }
 
         if ($ranking) {
             $position = (int) DB::table('season_rankings')

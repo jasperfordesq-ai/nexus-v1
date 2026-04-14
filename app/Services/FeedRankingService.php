@@ -1037,7 +1037,7 @@ class FeedRankingService
             $r = [];
             foreach ($rows as $row) { $r[(int) $row->author_id] = (float) $row->weighted_interactions; }
             return $r;
-        } catch (\Exception $e) { return []; }
+        } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
     }
 
     private function getBatchVitalityScores(array $userIds): array
@@ -1063,7 +1063,7 @@ class FeedRankingService
                 if (!isset($r[$uid])) { $r[$uid] = (float) $config['vitality_minimum']; }
             }
             return $r;
-        } catch (\Exception $e) { return []; }
+        } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
     }
 
     private function getBatchEngagementVelocity(array $postIds): array
@@ -1083,7 +1083,7 @@ class FeedRankingService
             $r = [];
             foreach ($rows as $row) { $r[(int) $row->post_id] = (int) $row->velocity; }
             return $r;
-        } catch (\Exception $e) { return []; }
+        } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
     }
 
     private function getBatchConversationDepth(array $postIds): array
@@ -1099,7 +1099,7 @@ class FeedRankingService
             $r = [];
             foreach ($rows as $row) { $r[(int) $row->post_id] = (int) $row->depth; }
             return $r;
-        } catch (\Exception $e) { return []; }
+        } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
     }
 
     private function getBatchReactionScores(array $postIds): array
@@ -1120,7 +1120,7 @@ class FeedRankingService
                 $r[$pid] = ($r[$pid] ?? 0) + ($weight * (int) $row->cnt);
             }
             return $r;
-        } catch (\Exception $e) { return []; }
+        } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
     }
 
     private function getBatchNegativeSignals(int $viewerId, array $postIds, array $authorIds): array
@@ -1176,7 +1176,7 @@ class FeedRankingService
                 $r['_impressions'][$pid] = (int) $row->impressions;
             }
             return $r;
-        } catch (\Exception $e) { return []; }
+        } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
     }
 
     /**
@@ -1224,7 +1224,7 @@ class FeedRankingService
                 $result[$type] = 1.0 + ($normalized * ($maxBoost - 1.0));
             }
             return $result;
-        } catch (\Exception $e) { return []; }
+        } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
     }
 
     private function getBatchSaveScores(array $postIds): array
@@ -1246,7 +1246,7 @@ class FeedRankingService
             $r = [];
             foreach ($rows as $row) { $r[(int) $row->post_id] = (int) $row->save_count; }
             return $r;
-        } catch (\Exception $e) { return []; }
+        } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
     }
 
     // =========================================================================
@@ -1327,7 +1327,7 @@ class FeedRankingService
                 $result[(int) $row->id] = [(float) $row->latitude, (float) $row->longitude];
             }
             return $result;
-        } catch (\Exception $e) { return []; }
+        } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
     }
 
     private function getViewerConnectedUserIds(int $viewerId): array
@@ -1341,7 +1341,7 @@ class FeedRankingService
                 [$viewerId, $viewerId, $viewerId, $tenantId]
             );
             return array_map(fn ($row) => (int) $row->connected_id, $rows);
-        } catch (\Exception $e) { return []; }
+        } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
     }
 
     private function isAuthorMuted(int $authorId): bool

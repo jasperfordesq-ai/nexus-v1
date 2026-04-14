@@ -1302,16 +1302,41 @@ class GamificationService
         ];
 
         try { $stats['vol'] = (int) VolLog::where('user_id', $userId)->where('status', 'verified')->sum('hours'); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[vol] failed', ['error' => $e->getMessage()]); }
-        try { $stats['offer'] = (int) Listing::where('user_id', $userId)->where('type', 'offer')->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[offer] failed', ['error' => $e->getMessage()]); }
-        try { $stats['request'] = (int) Listing::where('user_id', $userId)->where('type', 'request')->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[request] failed', ['error' => $e->getMessage()]); }
-        try { $stats['earn'] = (int) Transaction::where('receiver_id', $userId)->where('status', 'completed')->sum('amount'); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[earn] failed', ['error' => $e->getMessage()]); }
-        try { $stats['spend'] = (int) Transaction::where('sender_id', $userId)->where('deleted_for_sender', false)->sum('amount'); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[spend] failed', ['error' => $e->getMessage()]); }
-        try { $stats['transaction'] = (int) Transaction::where(fn ($q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[transaction] failed', ['error' => $e->getMessage()]); }
+        // Batch: listings table (2 → 1 query)
+        try {
+            $listingCounts = Listing::where('user_id', $userId)
+                ->whereIn('type', ['offer', 'request'])
+                ->selectRaw('type, COUNT(*) as cnt')
+                ->groupBy('type')
+                ->pluck('cnt', 'type');
+            $stats['offer']   = (int) ($listingCounts['offer'] ?? 0);
+            $stats['request'] = (int) ($listingCounts['request'] ?? 0);
+        } catch (\Throwable $e) { \Log::warning('GamificationService: stats[listings] failed', ['error' => $e->getMessage()]); }
+
+        // Batch: transactions table (4 → 2 queries)
+        try {
+            $txRow = DB::table('transactions')
+                ->where(fn ($q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))
+                ->selectRaw('COUNT(*) as total, SUM(CASE WHEN receiver_id = ? AND status = ? THEN amount ELSE 0 END) as earned, SUM(CASE WHEN sender_id = ? AND deleted_for_sender = 0 THEN amount ELSE 0 END) as spent', [$userId, 'completed', $userId])
+                ->first();
+            $stats['transaction'] = (int) ($txRow->total ?? 0);
+            $stats['earn']        = (int) ($txRow->earned ?? 0);
+            $stats['spend']       = (int) ($txRow->spent ?? 0);
+        } catch (\Throwable $e) { \Log::warning('GamificationService: stats[transactions] failed', ['error' => $e->getMessage()]); }
         try { $stats['diversity'] = (int) Transaction::where('sender_id', $userId)->distinct('receiver_id')->count('receiver_id'); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[diversity] failed', ['error' => $e->getMessage()]); }
+
+        // Batch: reviews table (2 → 1 query)
+        try {
+            $reviewRow = DB::table('reviews')
+                ->where(fn ($q) => $q->where('reviewer_id', $userId)->orWhere('receiver_id', $userId))
+                ->selectRaw('SUM(CASE WHEN reviewer_id = ? THEN 1 ELSE 0 END) as given, SUM(CASE WHEN receiver_id = ? AND rating = 5 THEN 1 ELSE 0 END) as fivestar', [$userId, $userId])
+                ->first();
+            $stats['review_given'] = (int) ($reviewRow->given ?? 0);
+            $stats['5star']        = (int) ($reviewRow->fivestar ?? 0);
+        } catch (\Throwable $e) { \Log::warning('GamificationService: stats[reviews] failed', ['error' => $e->getMessage()]); }
+
         try { $stats['connection'] = (int) Connection::where('status', 'accepted')->where(fn ($q) => $q->where('requester_id', $userId)->orWhere('receiver_id', $userId))->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[connection] failed', ['error' => $e->getMessage()]); }
         try { $stats['message'] = (int) Message::where('sender_id', $userId)->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[message] failed', ['error' => $e->getMessage()]); }
-        try { $stats['review_given'] = (int) Review::where('reviewer_id', $userId)->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[review_given] failed', ['error' => $e->getMessage()]); }
-        try { $stats['5star'] = (int) Review::where('receiver_id', $userId)->where('rating', 5)->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[5star] failed', ['error' => $e->getMessage()]); }
         try { $stats['event_attend'] = (int) EventRsvp::where('user_id', $userId)->where('status', 'going')->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[event_attend] failed', ['error' => $e->getMessage()]); }
         try { $stats['event_host'] = (int) Event::where('user_id', $userId)->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[event_host] failed', ['error' => $e->getMessage()]); }
         try { $stats['group_join'] = (int) GroupMember::where('user_id', $userId)->where('status', 'active')->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[group_join] failed', ['error' => $e->getMessage()]); }

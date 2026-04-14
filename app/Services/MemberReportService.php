@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * MemberReportService — Comprehensive member reporting for admin dashboards.
@@ -201,7 +202,7 @@ class MemberReportService
                 ->where('tenant_id', $tenantId)
                 ->where('created_at', '>=', $cutoff)
                 ->count();
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) { Log::warning('MemberReportService metric query failed', ['error' => $e->getMessage()]); }
 
         $comments = 0;
         try {
@@ -209,7 +210,7 @@ class MemberReportService
                 ->where('tenant_id', $tenantId)
                 ->where('created_at', '>=', $cutoff)
                 ->count();
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) { Log::warning('MemberReportService metric query failed', ['error' => $e->getMessage()]); }
 
         $rsvps = 0;
         try {
@@ -218,7 +219,7 @@ class MemberReportService
                 ->where('created_at', '>=', $cutoff)
                 ->where('status', 'going')
                 ->count();
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) { Log::warning('MemberReportService metric query failed', ['error' => $e->getMessage()]); }
 
         $connections = 0;
         try {
@@ -227,7 +228,7 @@ class MemberReportService
                 ->where('created_at', '>=', $cutoff)
                 ->where('status', 'accepted')
                 ->count();
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) { Log::warning('MemberReportService metric query failed', ['error' => $e->getMessage()]); }
 
         return [
             'period_days' => $days,
