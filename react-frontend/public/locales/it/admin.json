@@ -758,7 +758,8 @@
     "try_changing_filter": "Try changing the filter or search term",
     "unreviewed": "Unreviewed",
     "user_added_to_monitoring": "{{name}} has been added to monitoring",
-    "visible_to_members": "Visible to Members"
+    "visible_to_members": "Visible to Members",
+    "confirm_delete_label": "Delete"
   },
   "categories": {
     "categories_admin_desc": "Manage and configure categories admin settings",
@@ -1692,7 +1693,11 @@
     "category_email": "Email",
     "category_ai": "AI / ML",
     "category_auth": "Authentication",
-    "category_other": "Other"
+    "category_other": "Other",
+    "feature_flags_page_desc": "Enable or disable features and modules for this tenant",
+    "feature_flags_page_title": "Feature Flags",
+    "label_level": "Level",
+    "label_lines": "Lines"
   },
   "events": {
     "an_unexpected_error_occurred": "An Unexpected Error Occurred",
@@ -3159,7 +3164,11 @@
     "failed_to_save_segment": "Failed to save segment. Please try again.",
     "system_health": "System Health",
     "placeholder_describe_what_this_segment_targets": "Describe what this segment targets...",
-    "loading_segment": "Loading segment..."
+    "loading_segment": "Loading segment...",
+    "confirm_delete_label": "Delete",
+    "confirm_delete_segment_label": "Delete Segment",
+    "desc_preview_text": "The preview text appears after the subject line in most email clients.",
+    "desc_subject_override": "Override the original subject line for this resend"
   },
   "no_data": "Nessun dato disponibile",
   "not_found": {
@@ -4321,7 +4330,9 @@
     "avg_completion_minutes": "{{m}}m avg",
     "n_sessions_one": "{{count}} session",
     "n_sessions_other": "{{count}} sessions",
-    "tooltip_last_webhook_event": "Event: {{type}} at {{at}}"
+    "tooltip_last_webhook_event": "Event: {{type}} at {{at}}",
+    "desc_default_currency": "Currency used for Stripe subscriptions, donations, marketplace orders, and identity verification fees.",
+    "label_default_currency": "Default Currency"
   },
   "timebanking": {
     "a_reason_is_required_for_balance_adjustm": "A Reason is Required for Balance Adjustm",

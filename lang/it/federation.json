@@ -1,0 +1,5 @@
+{
+  "relay_no_remote_node": "Cannot determine remote node for account: :account",
+  "relay_no_route_to_node": "No route to node: :node",
+  "relay_url_blocked": "Relay target URL blocked by security filter"
+}

@@ -241,7 +241,7 @@ export function Segments() {
         onConfirm={handleDelete}
         title={t('newsletters.delete_segment')}
         message={t('newsletters.delete_segment_confirm', { name: deleteTarget?.name })}
-        confirmLabel="Delete Segment"
+        confirmLabel={t('newsletters.confirm_delete_segment_label')}
         confirmColor="danger"
         isLoading={deleting}
       />

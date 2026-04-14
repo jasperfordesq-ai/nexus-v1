@@ -278,12 +278,12 @@ class CreditCommonsNodeService
         $remoteNodeSlug = CreditCommonsAdapter::extractNodeSlug($remoteAccountPath);
 
         if (!$remoteNodeSlug) {
-            return ['success' => false, 'error' => "Cannot determine remote node for account: {$remoteAccountPath}"];
+            return ['success' => false, 'error' => __('federation.relay_no_remote_node', ['account' => $remoteAccountPath])];
         }
 
         $partner = self::findPartnerForNode($remoteNodeSlug, $tenantId);
         if (!$partner) {
-            return ['success' => false, 'error' => "No route to node: {$remoteNodeSlug}"];
+            return ['success' => false, 'error' => __('federation.relay_no_route_to_node', ['node' => $remoteNodeSlug])];
         }
 
         // Apply exchange rate if crossing node boundaries
@@ -295,7 +295,7 @@ class CreditCommonsNodeService
 
         // SSRF protection on relay target
         if (!self::isUrlSafe($partner->base_url)) {
-            return ['success' => false, 'error' => 'Relay target URL blocked by security filter'];
+            return ['success' => false, 'error' => __('federation.relay_url_blocked')];
         }
 
         // Forward to the remote node's /transaction/relay endpoint

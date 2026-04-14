@@ -162,7 +162,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                     placeholder={t('newsletters.placeholder_leave_blank_to_use_original_subject')}
                     value={subjectOverride}
                     onValueChange={setSubjectOverride}
-                    description="Override the original subject line for this resend"
+                    description={t('newsletters.desc_subject_override')}
                   />
 
                   <Card className="bg-default-100">

@@ -172,7 +172,7 @@ export function LogFileViewer() {
       <Card shadow="sm" className="mb-4">
         <CardBody className="flex flex-wrap items-center gap-4 p-4">
           <Select
-            label="Lines"
+            label={t('enterprise.label_lines')}
             selectedKeys={[String(lines)]}
             onSelectionChange={(keys) => {
               const val = Array.from(keys)[0];
@@ -188,7 +188,7 @@ export function LogFileViewer() {
           </Select>
 
           <Select
-            label="Level"
+            label={t('enterprise.label_level')}
             selectedKeys={[level]}
             onSelectionChange={(keys) => {
               const val = Array.from(keys)[0];

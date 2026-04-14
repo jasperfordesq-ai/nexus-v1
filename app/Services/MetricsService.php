@@ -9,68 +9,83 @@ namespace App\Services;
 use Illuminate\Support\Facades\DB;
 
 /**
- * MetricsService — Laravel DI-based service for platform metrics.
+ * MetricsService — Platform metrics collection and reporting.
  *
- * Stores and retrieves aggregate metrics for analytics dashboards.
- * Designed for lightweight metric ingestion and summary queries.
+ * Stores and retrieves aggregate event metrics for analytics dashboards.
+ * All queries are scoped by tenant_id for data isolation.
  */
 class MetricsService
 {
     /**
-     * Store a metric data point.
+     * Record a metric event (primary API used by MetricsController).
      */
-    public function store(string $name, float $value, array $tags = []): void
+    public function record(int $tenantId, string $event, array $data = []): void
     {
         DB::table('metrics')->insert([
-            'name'        => $name,
-            'value'       => $value,
-            'tags'        => ! empty($tags) ? json_encode($tags) : null,
-            'recorded_at' => now(),
-            'created_at'  => now(),
+            'tenant_id'  => $tenantId,
+            'event'      => $event,
+            'data'       => !empty($data) ? json_encode($data) : null,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
     }
 
     /**
-     * Get a summary of a metric over a time range.
+     * Get aggregated metrics summary for a tenant over a time period.
      *
-     * @return array{count: int, sum: float, avg: float, min: float, max: float}
+     * @return array{period: string, total_events: int, events_by_type: array, start: string, end: string}
      */
-    public function getSummary(string $name, ?string $from = null, ?string $to = null): array
+    public function getSummary(int $tenantId, string $period = 'week', ?string $startDate = null, ?string $endDate = null): array
     {
-        $query = DB::table('metrics')->where('name', $name);
+        $start = $startDate ? \Carbon\Carbon::parse($startDate) : match ($period) {
+            'day'   => now()->subDay(),
+            'month' => now()->subMonth(),
+            default => now()->subWeek(),
+        };
+        $end = $endDate ? \Carbon\Carbon::parse($endDate) : now();
 
-        if ($from) {
-            $query->where('recorded_at', '>=', $from);
-        }
-        if ($to) {
-            $query->where('recorded_at', '<=', $to);
-        }
+        $query = DB::table('metrics')
+            ->where('tenant_id', $tenantId)
+            ->whereBetween('created_at', [$start, $end]);
 
-        $result = $query->selectRaw('
-            COUNT(*) as count,
-            COALESCE(SUM(value), 0) as sum,
-            COALESCE(AVG(value), 0) as avg,
-            COALESCE(MIN(value), 0) as min,
-            COALESCE(MAX(value), 0) as max
-        ')->first();
+        $totalEvents = (int) $query->count();
+
+        $eventsByType = DB::table('metrics')
+            ->where('tenant_id', $tenantId)
+            ->whereBetween('created_at', [$start, $end])
+            ->select('event', DB::raw('COUNT(*) as count'))
+            ->groupBy('event')
+            ->orderByDesc('count')
+            ->limit(20)
+            ->pluck('count', 'event')
+            ->toArray();
 
         return [
-            'count' => (int) $result->count,
-            'sum'   => (float) $result->sum,
-            'avg'   => (float) $result->avg,
-            'min'   => (float) $result->min,
-            'max'   => (float) $result->max,
+            'period'         => $period,
+            'total_events'   => $totalEvents,
+            'events_by_type' => $eventsByType,
+            'start'          => $start->toISOString(),
+            'end'            => $end->toISOString(),
         ];
     }
 
     /**
-     * Get recent metric values (time series).
+     * Store a raw metric data point (legacy API — use record() for new code).
      */
-    public function getTimeSeries(string $name, int $limit = 100): array
+    public function store(int $tenantId, string $name, float $value, array $tags = []): void
+    {
+        $this->record($tenantId, $name, ['value' => $value, 'tags' => $tags]);
+    }
+
+    /**
+     * Get recent metric events as time series (tenant-scoped).
+     */
+    public function getTimeSeries(int $tenantId, string $event, int $limit = 100): array
     {
         return DB::table('metrics')
-            ->where('name', $name)
-            ->orderByDesc('recorded_at')
+            ->where('tenant_id', $tenantId)
+            ->where('event', $event)
+            ->orderByDesc('created_at')
             ->limit($limit)
             ->get()
             ->map(fn ($r) => (array) $r)

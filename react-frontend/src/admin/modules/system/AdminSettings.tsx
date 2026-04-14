@@ -194,8 +194,8 @@ export function AdminSettings() {
               onValueChange={(val) => setForm(prev => ({ ...prev, contact_phone: val }))}
             />
             <Select
-              label="Default Currency"
-              description="Currency used for Stripe subscriptions, donations, marketplace orders, and identity verification fees."
+              label={t('system.label_default_currency')}
+              description={t('system.desc_default_currency')}
               variant="bordered"
               selectedKeys={[form.default_currency]}
               onSelectionChange={(keys) => {

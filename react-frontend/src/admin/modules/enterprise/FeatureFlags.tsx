@@ -244,8 +244,8 @@ export function FeatureFlags() {
   return (
     <div>
       <PageHeader
-        title="Feature Flags"
-        description="Enable or disable features and modules for this tenant"
+        title={t('enterprise.feature_flags_page_title')}
+        description={t('enterprise.feature_flags_page_desc')}
         actions={
           <Button
             variant="flat"

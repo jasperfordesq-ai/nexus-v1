@@ -1301,7 +1301,7 @@ export function VettingRecords() {
         message={deleteItem
           ? t('broker.delete_vetting_record_confirm', { name: `${deleteItem.first_name} ${deleteItem.last_name}` })
           : ''}
-        confirmLabel="Delete"
+        confirmLabel={t('broker.confirm_delete_label')}
         confirmColor="danger"
         isLoading={deleteLoading}
       />

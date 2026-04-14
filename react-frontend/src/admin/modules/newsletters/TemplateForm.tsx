@@ -352,7 +352,7 @@ export function TemplateForm() {
                   value={previewText}
                   onValueChange={setPreviewText}
                   isDisabled={submitting}
-                  description="The preview text appears after the subject line in most email clients."
+                  description={t('newsletters.desc_preview_text')}
                 />
               </CardBody>
             </Card>

@@ -354,7 +354,7 @@ export function Templates() {
         onConfirm={handleDelete}
         title={t('newsletters.delete_template')}
         message={t('newsletters.delete_template_confirm', { name: deleteTarget?.name })}
-        confirmLabel="Delete"
+        confirmLabel={t('newsletters.confirm_delete_label')}
         confirmColor="danger"
         isLoading={deleting}
       />
