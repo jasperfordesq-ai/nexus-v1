@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 use App\Services\RedisCache;
 use App\Services\TokenService;
@@ -260,7 +261,7 @@ class AdminToolsController extends BaseApiController
                 }
 
                 $pendingConversion = $nonWebpImages;
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
 
         return $this->respondWithData([
@@ -334,7 +335,7 @@ class AdminToolsController extends BaseApiController
                 }
 
                 usort($backups, fn($a, $b) => strcmp($b['created_at'], $a['created_at']));
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
 
         return $this->respondWithData($backups);

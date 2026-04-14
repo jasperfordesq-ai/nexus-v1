@@ -378,7 +378,7 @@ class AdminVolunteerController extends BaseApiController
             );
             $data['stats']['total_opportunities'] = (int) ($row->total ?? 0);
             $data['stats']['active_opportunities'] = (int) ($row->active_count ?? 0);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
         if ($this->tableExists('vol_applications')) {
             try {
@@ -389,7 +389,7 @@ class AdminVolunteerController extends BaseApiController
                 );
                 $data['stats']['total_applications'] = (int) ($row->total ?? 0);
                 $data['stats']['pending_applications'] = (int) ($row->pending ?? 0);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
 
         if ($this->tableExists('vol_logs')) {
@@ -401,7 +401,7 @@ class AdminVolunteerController extends BaseApiController
                 );
                 $data['stats']['total_hours_logged'] = round((float) ($row->total_hours ?? 0), 1);
                 $data['stats']['active_volunteers'] = (int) ($row->volunteers ?? 0);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
 
         try {
@@ -430,7 +430,7 @@ class AdminVolunteerController extends BaseApiController
                 unset($row['ui_status']);
                 return $row;
             }, $rows);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
         return $this->respondWithData($data);
     }
@@ -507,7 +507,7 @@ class AdminVolunteerController extends BaseApiController
                     [$tenantId, $tenantId, $tenantId, $tenantId]
                 );
                 return $this->respondWithData(array_map(fn($r) => (array)$r, $results));
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
 
         try {

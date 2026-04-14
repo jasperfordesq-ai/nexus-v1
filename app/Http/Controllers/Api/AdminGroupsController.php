@@ -533,7 +533,7 @@ class AdminGroupsController extends BaseApiController
                 $policyCount = 0;
                 try {
                     $policyCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM group_policies WHERE tenant_id = ?", [$tenantId])->cnt ?? 0);
-                } catch (\Throwable $e) {}
+                } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
                 return [
                     'id' => (int) $row->id,
@@ -1046,9 +1046,9 @@ class AdminGroupsController extends BaseApiController
 
             $memberCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM group_members WHERE group_id = ? AND tenant_id = ?", [$id, $tenantId])->cnt ?? 0);
             $postsCount = 0;
-            try { $postsCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM group_posts gp JOIN group_discussions gd ON gp.discussion_id = gd.id WHERE gd.group_id = ? AND gd.tenant_id = ?", [$id, $tenantId])->cnt ?? 0); } catch (\Throwable $e) {}
+            try { $postsCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM group_posts gp JOIN group_discussions gd ON gp.discussion_id = gd.id WHERE gd.group_id = ? AND gd.tenant_id = ?", [$id, $tenantId])->cnt ?? 0); } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
             $eventsCount = 0;
-            try { $eventsCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM events WHERE group_id = ? AND tenant_id = ?", [$id, $tenantId])->cnt ?? 0); } catch (\Throwable $e) {}
+            try { $eventsCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM events WHERE group_id = ? AND tenant_id = ?", [$id, $tenantId])->cnt ?? 0); } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
             return $this->respondWithData([
                 'group_id' => $id,

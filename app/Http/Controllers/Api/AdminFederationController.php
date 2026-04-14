@@ -179,7 +179,7 @@ class AdminFederationController extends BaseApiController
                     $data['settings'] = array_merge($data['settings'], array_diff_key($fc, ['federation_enabled' => '']));
                 }
             }
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
         return $this->respondWithData($data);
     }
@@ -204,7 +204,7 @@ class AdminFederationController extends BaseApiController
             $config['federation'] = $federationSettings;
 
             DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
-            try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
+            try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
             return $this->respondWithData([
                 'federation_enabled' => $federationSettings['federation_enabled'] ?? false,
@@ -520,7 +520,7 @@ class AdminFederationController extends BaseApiController
                         [$t1, $t2, $t2, $t1]
                     );
                     $stats['messages_exchanged'] = (int) ($row->total ?? 0);
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
             }
 
             if ($this->tableExists('federation_transactions')) {
@@ -530,7 +530,7 @@ class AdminFederationController extends BaseApiController
                         [$t1, $t2, $t2, $t1]
                     );
                     $stats['transactions_completed'] = (int) ($row->total ?? 0);
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
             }
 
             return $this->respondWithData($stats);
@@ -602,7 +602,7 @@ class AdminFederationController extends BaseApiController
             $config = json_decode($row->configuration ?? '{}', true) ?: [];
             $config['federation_profile'] = array_merge($config['federation_profile'] ?? [], $input);
             DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
-            try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
+            try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
             return $this->respondWithData($config['federation_profile']);
         } catch (\Exception $e) {
             return $this->respondWithError('UPDATE_FAILED', __('api.update_failed', ['resource' => 'federation profile']), null, 500);
@@ -662,13 +662,13 @@ class AdminFederationController extends BaseApiController
         $data = ['total_partnerships' => 0, 'active_partnerships' => 0, 'pending_requests' => 0, 'cross_community_transactions' => 0, 'cross_community_messages' => 0];
 
         if ($this->tableExists('federation_partnerships')) {
-            try { $row = DB::selectOne("SELECT COUNT(*) as total, SUM(CASE WHEN status='active' THEN 1 ELSE 0 END) as active_count, SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END) as pending FROM federation_partnerships WHERE tenant_id = ? OR partner_tenant_id = ?", [$tenantId, $tenantId]); $data['total_partnerships'] = (int)($row->total ?? 0); $data['active_partnerships'] = (int)($row->active_count ?? 0); $data['pending_requests'] = (int)($row->pending ?? 0); } catch (\Exception $e) {}
+            try { $row = DB::selectOne("SELECT COUNT(*) as total, SUM(CASE WHEN status='active' THEN 1 ELSE 0 END) as active_count, SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END) as pending FROM federation_partnerships WHERE tenant_id = ? OR partner_tenant_id = ?", [$tenantId, $tenantId]); $data['total_partnerships'] = (int)($row->total ?? 0); $data['active_partnerships'] = (int)($row->active_count ?? 0); $data['pending_requests'] = (int)($row->pending ?? 0); } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
         if ($this->tableExists('federation_transactions')) {
-            try { $row = DB::selectOne("SELECT COUNT(*) as total FROM federation_transactions WHERE sender_tenant_id = ? OR receiver_tenant_id = ?", [$tenantId, $tenantId]); $data['cross_community_transactions'] = (int)($row->total ?? 0); } catch (\Exception $e) {}
+            try { $row = DB::selectOne("SELECT COUNT(*) as total FROM federation_transactions WHERE sender_tenant_id = ? OR receiver_tenant_id = ?", [$tenantId, $tenantId]); $data['cross_community_transactions'] = (int)($row->total ?? 0); } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
         if ($this->tableExists('federation_messages')) {
-            try { $row = DB::selectOne("SELECT COUNT(*) as total FROM federation_messages WHERE sender_tenant_id = ? OR receiver_tenant_id = ?", [$tenantId, $tenantId]); $data['cross_community_messages'] = (int)($row->total ?? 0); } catch (\Exception $e) {}
+            try { $row = DB::selectOne("SELECT COUNT(*) as total FROM federation_messages WHERE sender_tenant_id = ? OR receiver_tenant_id = ?", [$tenantId, $tenantId]); $data['cross_community_messages'] = (int)($row->total ?? 0); } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
         return $this->respondWithData($data);
     }

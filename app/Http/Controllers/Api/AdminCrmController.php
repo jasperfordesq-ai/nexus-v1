@@ -109,10 +109,10 @@ class AdminCrmController extends BaseApiController
         try {
             $openTasks = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM coordinator_tasks WHERE tenant_id = ? AND status IN ('pending','in_progress')", [$tenantId])->cnt;
             $overdueTasks = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM coordinator_tasks WHERE tenant_id = ? AND status IN ('pending','in_progress') AND due_date < CURDATE()", [$tenantId])->cnt;
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
         $totalNotes = 0;
-        try { $totalNotes = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM member_notes WHERE tenant_id = ?", [$tenantId])->cnt; } catch (\Throwable $e) {}
+        try { $totalNotes = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM member_notes WHERE tenant_id = ?", [$tenantId])->cnt; } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
         $neverLoggedIn = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND last_login_at IS NULL AND is_approved = 1", [$tenantId])->cnt;
         $approvedMembers = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 1", [$tenantId])->cnt;
@@ -141,7 +141,7 @@ class AdminCrmController extends BaseApiController
         $profileCompleted = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND (bio IS NOT NULL AND bio != '') AND (location IS NOT NULL AND location != '')", [$tenantId])->cnt;
 
         $firstListing = 0;
-        try { $firstListing = (int) DB::selectOne("SELECT COUNT(DISTINCT user_id) as cnt FROM listings WHERE tenant_id = ?", [$tenantId])->cnt; } catch (\Throwable $e) {}
+        try { $firstListing = (int) DB::selectOne("SELECT COUNT(DISTINCT user_id) as cnt FROM listings WHERE tenant_id = ?", [$tenantId])->cnt; } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
         $firstExchange = 0;
         try {
@@ -149,7 +149,7 @@ class AdminCrmController extends BaseApiController
                 "SELECT COUNT(DISTINCT u) as cnt FROM (SELECT sender_id as u FROM transactions WHERE tenant_id = ? AND status = 'completed' UNION SELECT receiver_id as u FROM transactions WHERE tenant_id = ? AND status = 'completed') AS combined",
                 [$tenantId, $tenantId]
             )->cnt;
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
         $repeatUser = 0;
         try {
@@ -157,7 +157,7 @@ class AdminCrmController extends BaseApiController
                 "SELECT COUNT(*) as cnt FROM (SELECT u, COUNT(*) as tx_count FROM (SELECT sender_id as u FROM transactions WHERE tenant_id = ? AND status = 'completed' UNION ALL SELECT receiver_id as u FROM transactions WHERE tenant_id = ? AND status = 'completed') AS all_tx GROUP BY u HAVING tx_count >= 2) AS repeat_users",
                 [$tenantId, $tenantId]
             )->cnt;
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
         $monthlyRegistrations = DB::select(
             "SELECT DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as count FROM users WHERE tenant_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) GROUP BY DATE_FORMAT(created_at, '%Y-%m') ORDER BY month ASC",
@@ -764,7 +764,7 @@ class AdminCrmController extends BaseApiController
                 if ($userId) { $sql .= " AND l.user_id = ?"; $p[] = $userId; $cp[] = $userId; }
                 if ($useDayFilter) { $sql .= " AND l.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
                 $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
 
         // 4. Exchanges completed
@@ -779,7 +779,7 @@ class AdminCrmController extends BaseApiController
                 if ($userId) { $sql .= " AND t.sender_id = ?"; $p[] = $userId; $cp[] = $userId; }
                 if ($useDayFilter) { $sql .= " AND t.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
                 $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
 
         // 5. Notes added
@@ -794,7 +794,7 @@ class AdminCrmController extends BaseApiController
                 if ($userId) { $sql .= " AND mn.user_id = ?"; $p[] = $userId; $cp[] = $userId; }
                 if ($useDayFilter) { $sql .= " AND mn.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
                 $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
 
         // 6. Tasks created
@@ -808,7 +808,7 @@ class AdminCrmController extends BaseApiController
                 if ($userId) { $sql .= " AND ct.created_by = ?"; $p[] = $userId; $cp[] = $userId; }
                 if ($useDayFilter) { $sql .= " AND ct.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
                 $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
 
         // 7. Group joins
@@ -823,7 +823,7 @@ class AdminCrmController extends BaseApiController
                 if ($userId) { $sql .= " AND gm.user_id = ?"; $p[] = $userId; $cp[] = $userId; }
                 if ($useDayFilter) { $sql .= " AND gm.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
                 $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
 
         // 8. Profile updates

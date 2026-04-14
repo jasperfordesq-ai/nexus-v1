@@ -13,7 +13,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('saved_searches', function (Blueprint $table) {
-            $table->timestamp('last_notified_at')->nullable()->after('last_run_at');
+            if (!Schema::hasColumn('saved_searches', 'last_notified_at')) {
+                $table->timestamp('last_notified_at')->nullable()->after('last_run_at');
+            }
         });
     }
 

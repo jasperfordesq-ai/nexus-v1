@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 use App\Services\AbuseDetectionService;
 
@@ -57,7 +58,7 @@ class AdminTimebankingController extends BaseApiController
                 "SELECT COUNT(*) as cnt FROM abuse_alerts WHERE tenant_id = ? AND status IN ('new', 'reviewing')",
                 [$tenantId]
             )->cnt;
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
         return $this->respondWithData([
             'total_transactions' => (int) ($txRow->total_transactions ?? 0),
@@ -105,7 +106,7 @@ class AdminTimebankingController extends BaseApiController
             $params[] = $offset;
 
             $items = DB::select($sql, $params);
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
         $formatted = array_map(fn($r) => [
             'id' => (int) $r->id,
@@ -301,7 +302,7 @@ class AdminTimebankingController extends BaseApiController
                     'created_at' => $row->created_at ?? '',
                 ];
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
         return $this->respondWithData($wallets);
     }
