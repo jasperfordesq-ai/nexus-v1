@@ -275,7 +275,7 @@ export function VerificationBadgeSummary({
       {badges.length === 0 ? (
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-elevated">
           <ShieldOff className="w-4 h-4 text-theme-muted shrink-0" aria-hidden="true" />
-          <span className="text-xs text-theme-muted">Identity not verified</span>
+          <span className="text-xs text-theme-muted">{t('identity_not_verified')}</span>
         </div>
       ) : (
         <div className="flex flex-wrap gap-2">

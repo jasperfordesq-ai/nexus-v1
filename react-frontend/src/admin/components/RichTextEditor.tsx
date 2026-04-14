@@ -552,8 +552,8 @@ export function RichTextEditor({
             <RichTextPlugin
               contentEditable={
                 <ContentEditable
-                  className="min-h-[400px] px-4 py-3 outline-none text-foreground"
-                  aria-label={label || 'Rich text editor'}
+                  className="min-h-[400px] px-4 py-3 outline-none focus-visible:ring-2 focus-visible:ring-primary/50 text-foreground"
+                  aria-label={label || undefined}
                 />
               }
               placeholder={

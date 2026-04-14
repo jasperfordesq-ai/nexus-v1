@@ -1264,7 +1264,7 @@ export function PollsPage() {
                         })}
                         {/* Total ballots */}
                         {rankedResults.total_ballots ? (
-                          <p className="text-xs text-theme-subtle">{t('total_ballots', { count: String(rankedResults.total_ballots) })}</p>
+                          <p className="text-xs text-theme-subtle">{t('total_ballots', { count: Number(rankedResults.total_ballots) })}</p>
                         ) : null}
                       </div>
                     )}

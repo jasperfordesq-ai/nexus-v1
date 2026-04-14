@@ -15,7 +15,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { Button, Avatar, Select, SelectItem, Chip, Skeleton, Tabs, Tab } from '@heroui/react';
 import {
   Trophy,
@@ -36,7 +36,7 @@ import {
   Sparkles,
   BarChart3,
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, type TFunction } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
@@ -618,14 +618,14 @@ interface CompetitiveLeaderboardProps {
   setPeriod: (period: LeaderboardPeriod) => void;
   setType: (type: LeaderboardType) => void;
   tenantPath: (path: string) => string;
-  t: (key: string, fallback?: string) => string;
+  t: TFunction;
   getRankIcon: (position: number) => React.ReactNode;
-  formatScore: (entry: LeaderboardEntry) => string;
+  formatScore: (entry: LeaderboardEntry) => React.ReactNode;
   typeLabels: Record<LeaderboardType, string>;
   typeIcons: Record<LeaderboardType, React.ReactNode>;
   periodLabels: Record<LeaderboardPeriod, string>;
-  containerVariants: { hidden: object; visible: object };
-  itemVariants: { hidden: object; visible: object };
+  containerVariants: Variants;
+  itemVariants: Variants;
   loadLeaderboard: () => void;
 }
 

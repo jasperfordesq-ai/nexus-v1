@@ -398,6 +398,9 @@
     "aria_notifications": "通知",
     "aria_dismiss_notification": "通知を閉じる"
   },
+  "verified": "Verified",
+  "map_unavailable": "Map view is not available",
+  "identity_not_verified": "Identity not verified",
   "verification": {
     "not_id_verified": "ID確認されていません"
   },

@@ -109,6 +109,21 @@
     "next_story": "Volgende verhaal",
     "resume_story": "Verhaal hervatten",
     "story_options": "Verhaalopties",
-    "reply_placeholder_generic": "Beantwoord verhaal..."
+    "reply_placeholder_generic": "Beantwoord verhaal...",
+    "react_with": "React with {{type}}"
+  },
+  "empty": {
+    "no_stories": "No stories available"
+  },
+  "highlights": {
+    "no_stories": "This highlight has no stories",
+    "load_error": "Failed to load highlight",
+    "create_error": "Failed to create highlight",
+    "create_success": "Highlight created!",
+    "delete_success": "Highlight deleted",
+    "title_updated": "Highlight title updated",
+    "title_update_error": "Failed to update title",
+    "story_removed": "Story removed from highlight",
+    "story_remove_error": "Failed to remove story"
   }
 }

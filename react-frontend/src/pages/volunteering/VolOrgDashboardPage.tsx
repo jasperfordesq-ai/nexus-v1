@@ -81,7 +81,7 @@ export default function VolOrgDashboardPage() {
   const [accessDenied, setAccessDenied] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
-  usePageTitle(org ? `${org.name} Dashboard` : 'Organization Dashboard');
+  usePageTitle(org ? `${org.name} ${t('dashboard')}` : t('org_dashboard'));
 
   const setTab = useCallback((newTab: OrgDashTab) => {
     setTabState(newTab);

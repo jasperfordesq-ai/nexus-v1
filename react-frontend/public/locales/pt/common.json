@@ -398,6 +398,9 @@
     "aria_notifications": "Notificações",
     "aria_dismiss_notification": "Ignorar notificação"
   },
+  "verified": "Verified",
+  "map_unavailable": "Map view is not available",
+  "identity_not_verified": "Identity not verified",
   "verification": {
     "not_id_verified": "Não verificado por ID"
   },

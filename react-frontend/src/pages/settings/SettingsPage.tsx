@@ -69,12 +69,12 @@ import { LinkedAccountsTab } from './tabs/LinkedAccountsTab';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function SettingsPage() {
+  const { t } = useTranslation('settings');
   usePageTitle(t('page_meta.title'));
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user, logout, refreshUser } = useAuth();
   const { tenantPath, tenant, hasFeature } = useTenant();
-  const { t } = useTranslation('settings');
   const toast = useToast();
   const validTabs = ['profile', 'notifications', 'privacy', 'security', 'skills', 'availability', 'linked-accounts'];
   const initialTab = validTabs.includes(searchParams.get('tab') || '') ? searchParams.get('tab')! : 'profile';

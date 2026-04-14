@@ -800,7 +800,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
               </>
             ) : (
               <div className="w-full h-full bg-gray-900 flex items-center justify-center">
-                <p className="text-white/50 text-sm">No stories available</p>
+                <p className="text-white/50 text-sm">{t('empty.no_stories')}</p>
               </div>
             )}
 
@@ -946,7 +946,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                         onPress={handleDeleteStory}
                       >
                         <Trash2 className="w-4 h-4" />
-                        Delete Story
+                        {t('viewer.delete_story')}
                       </Button>
                     </div>
                   )}
@@ -988,7 +988,8 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                     placeholder={t('viewer.reply_placeholder_generic')}
-                    className="flex-1 bg-white/10 border border-white/20 rounded-full px-4 py-2 text-white text-sm placeholder:text-white/40 outline-none focus:border-white/40"
+                    aria-label={t('viewer.reply_placeholder_generic')}
+                    className="flex-1 bg-white/10 border border-white/20 rounded-full px-4 py-2 text-white text-sm placeholder:text-white/40 outline-none focus:border-white/40 focus-visible:ring-2 focus-visible:ring-white/60"
                     onKeyDown={(e) => { if (e.key === 'Enter' && replyText.trim()) handleReply(); }}
                     onFocus={() => setIsPaused(true)}
                     onBlur={() => { if (!replyText.trim()) setIsPaused(false); }}
@@ -1024,7 +1025,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                           : 'bg-white/10 hover:bg-white/20 hover:scale-110 active:scale-95'
                       }`}
                       isDisabled={!!reactedWith}
-                      aria-label={`React with ${type}`}
+                      aria-label={t('viewer.react_with', { type })}
                     >
                       <span className="text-lg">{emoji}</span>
                     </Button>
@@ -1063,7 +1064,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
             </div>
             <div className="overflow-y-auto max-h-[calc(60vh-50px)]">
               {viewers.length === 0 ? (
-                <p className="text-white/50 text-sm text-center py-6">No viewers yet</p>
+                <p className="text-white/50 text-sm text-center py-6">{t('viewer.viewers_empty')}</p>
               ) : (
                 viewers.map((v) => (
                   <div key={v.id} className="flex items-center gap-3 px-4 py-3 hover:bg-white/5">

@@ -438,7 +438,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   {isIdVerified ? (
                     <div className="flex items-center gap-1 px-2 h-7 text-xs text-emerald-600 dark:text-emerald-400 shrink-0">
                       <ShieldCheck className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                      <span className="hidden md:inline">Verified</span>
+                      <span className="hidden md:inline">{t('verified')}</span>
                     </div>
                   ) : (
                     <Button
@@ -495,7 +495,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 className="flex items-center gap-1 px-2 h-7 min-w-0 text-theme-muted hover:text-theme-primary text-xs shrink-0"
               >
                 <Search className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                <span className="hidden md:inline">Search</span>
+                <span className="hidden md:inline">{t('accessibility.search')}</span>
                 <kbd className="hidden lg:inline-flex items-center gap-0.5 ms-0.5 px-1 py-0 rounded bg-theme-hover/60 text-[10px] font-medium text-theme-subtle">
                   <span className="text-xs">⌘</span>K
                 </kbd>

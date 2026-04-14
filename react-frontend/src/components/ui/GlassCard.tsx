@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { forwardRef, type ReactNode, type HTMLAttributes } from 'react';
+import { Card } from '@heroui/react';
 import { motion, type Variants } from 'framer-motion';
 
 /** Exclude HTML event props that conflict with Framer Motion's signatures */
@@ -25,7 +26,7 @@ const cardVariants: Variants = {
 };
 
 /**
- * GlassCard - Glassmorphism card component
+ * GlassCard - Glassmorphism card component built on HeroUI Card
  *
  * Uses centralized CSS utilities from styles/glass.css
  */
@@ -49,23 +50,34 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
       return (
         <motion.div
           ref={ref}
-          className={combinedClassName}
-          {...rest}
           variants={cardVariants}
           initial="hidden"
           animate="visible"
           transition={{ duration: 0.3, ease: 'easeOut' }}
           whileHover={hoverable ? { y: -4, transition: { duration: 0.2 } } : undefined}
+          {...(rest as object)}
         >
-          {children}
+          <Card
+            classNames={{ base: combinedClassName }}
+            shadow="none"
+            radius="none"
+          >
+            {children}
+          </Card>
         </motion.div>
       );
     }
 
     return (
-      <div ref={ref} className={combinedClassName} {...rest}>
+      <Card
+        ref={ref}
+        classNames={{ base: combinedClassName }}
+        shadow="none"
+        radius="none"
+        {...(rest as object)}
+      >
         {children}
-      </div>
+      </Card>
     );
   }
 );

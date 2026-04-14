@@ -398,6 +398,9 @@
     "aria_notifications": "الإشعارات",
     "aria_dismiss_notification": "تجاهل الإشعار"
   },
+  "verified": "Verified",
+  "map_unavailable": "Map view is not available",
+  "identity_not_verified": "Identity not verified",
   "verification": {
     "not_id_verified": "غير موثق الهوية"
   },

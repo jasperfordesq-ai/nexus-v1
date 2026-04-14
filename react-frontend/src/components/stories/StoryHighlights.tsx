@@ -142,11 +142,11 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
         setViewerStories([syntheticUser]);
         setViewerOpen(true);
       } else {
-        toast.info('This highlight has no stories');
+        toast.info(t('highlights.no_stories'));
       }
     } catch (err) {
       logError('Failed to load highlight stories', err);
-      toast.error('Failed to load highlight');
+      toast.error(t('highlights.load_error'));
     }
   };
 
@@ -159,16 +159,16 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
         story_ids: [],
       });
       if (response.success) {
-        toast.success('Highlight created!');
+        toast.success(t('highlights.create_success'));
         setNewTitle('');
         onCreateClose();
         loadHighlights();
       } else {
-        toast.error('Failed to create highlight');
+        toast.error(t('highlights.create_error'));
       }
     } catch (err) {
       logError('Failed to create highlight', err);
-      toast.error('Failed to create highlight');
+      toast.error(t('highlights.create_error'));
     } finally {
       setIsCreating(false);
     }
@@ -180,7 +180,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
       const response = await api.delete(`/v2/stories/highlights/${highlightId}`);
       if (response.success) {
         setHighlights((prev) => prev.filter((h) => h.id !== highlightId));
-        toast.success('Highlight deleted');
+        toast.success(t('highlights.delete_success'));
       }
     } catch (err) {
       logError('Failed to delete highlight', err);
@@ -222,18 +222,18 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
         title: editTitle.trim(),
       });
       if (response.success) {
-        toast.success('Highlight title updated');
+        toast.success(t('highlights.title_updated'));
         // Update local state
         setHighlights((prev) =>
           prev.map((h) => (h.id === editingHighlight.id ? { ...h, title: editTitle.trim() } : h))
         );
         setEditingHighlight((prev) => (prev ? { ...prev, title: editTitle.trim() } : prev));
       } else {
-        toast.error('Failed to update title');
+        toast.error(t('highlights.title_update_error'));
       }
     } catch (err) {
       logError('Failed to update highlight title', err);
-      toast.error('Failed to update title');
+      toast.error(t('highlights.title_update_error'));
     } finally {
       setIsSavingTitle(false);
     }
@@ -255,13 +255,13 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
             h.id === editingHighlight.id ? { ...h, story_count: Math.max(0, h.story_count - 1) } : h
           )
         );
-        toast.success('Story removed from highlight');
+        toast.success(t('highlights.story_removed'));
       } else {
-        toast.error('Failed to remove story');
+        toast.error(t('highlights.story_remove_error'));
       }
     } catch (err) {
       logError('Failed to remove story from highlight', err);
-      toast.error('Failed to remove story');
+      toast.error(t('highlights.story_remove_error'));
     } finally {
       setRemovingStoryId(null);
     }

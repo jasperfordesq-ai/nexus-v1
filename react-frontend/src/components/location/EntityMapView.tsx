@@ -10,6 +10,7 @@
 
 import { type ReactNode, useMemo } from 'react';
 import { MapPin, MapPinOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { LocationMap, type MapMarker } from './LocationMap';
 import { MAPS_ENABLED } from '@/lib/map-config';
 
@@ -36,6 +37,7 @@ export function EntityMapView<T>({
   isLoading = false,
   emptyMessage = 'No items with location data',
 }: EntityMapViewProps<T>) {
+  const { t } = useTranslation('common');
   const markers: MapMarker[] = useMemo(() => {
     const result: MapMarker[] = [];
     for (const item of items) {
@@ -59,7 +61,7 @@ export function EntityMapView<T>({
     return (
       <div className={`flex flex-col items-center justify-center gap-3 py-16 ${className}`}>
         <MapPinOff className="w-12 h-12 text-theme-subtle" />
-        <p className="text-theme-muted text-sm">Map view is not available</p>
+        <p className="text-theme-muted text-sm">{t('map_unavailable')}</p>
       </div>
     );
   }
