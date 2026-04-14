@@ -208,7 +208,7 @@ export function JobsAdmin() {
             <Button isIconOnly size='sm' variant='flat' color='primary' as='a' href={tenantPath(`/jobs/${item.id}`)} target='_blank' rel='noopener noreferrer' aria-label={t('jobs.view_job')}><Eye size={14} /></Button>
           </Tooltip>
           <Tooltip content={item.is_featured ? t('common.unfeature') : t('common.feature')}>
-            <Button isIconOnly size='sm' variant='flat' color='warning' onPress={() => handleFeatureToggle(item)} aria-label={item.is_featured ? 'Unfeature job' : 'Feature job'}>
+            <Button isIconOnly size='sm' variant='flat' color='warning' onPress={() => handleFeatureToggle(item)} aria-label={item.is_featured ? t('jobs.unfeature_job') : t('jobs.feature_job')}>
               {item.is_featured ? <StarOff size={14} /> : <Star size={14} />}
             </Button>
           </Tooltip>
@@ -272,7 +272,7 @@ export function JobsAdmin() {
                 </div>
                 <Button size='sm' variant='flat' startContent={<RefreshCw size={13} />} onPress={() => loadApplications(selectedJob)} isDisabled={appsLoading}>{t('common.refresh')}</Button>
               </div>
-              {appsLoading && <div className='flex justify-center py-12'><Spinner label='Loading applications…' /></div>}
+              {appsLoading && <div className='flex justify-center py-12'><Spinner label={t('jobs.loading_applications')} /></div>}
               {!appsLoading && appsError && (
                 <div className='flex flex-col items-center gap-3 py-12 text-center'>
                   <p className='text-sm text-danger'>{appsError}</p>
