@@ -30,7 +30,7 @@
 # DO NOT improvise alternative approaches. Use this script.
 # =============================================================================
 
-set -e
+set -eo pipefail
 
 # --- Configuration ---
 DEPLOY_DIR="/opt/nexus-php"
