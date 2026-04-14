@@ -181,6 +181,11 @@
   "filter_this_month": "This month",
   "clear_filters": "Clear filters",
   "results_count": "{{count}} listings found",
+  "radius_5": "5 km",
+  "radius_10": "10 km",
+  "radius_25": "25 km",
+  "radius_50": "50 km",
+  "radius_100": "100 km",
   "page_meta": {
     "create": {
       "title": "Create Listing"

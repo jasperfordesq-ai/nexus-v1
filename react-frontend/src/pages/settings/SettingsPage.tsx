@@ -69,7 +69,7 @@ import { LinkedAccountsTab } from './tabs/LinkedAccountsTab';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function SettingsPage() {
-  usePageTitle('Settings');
+  usePageTitle(t('page_meta.title'));
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user, logout, refreshUser } = useAuth();

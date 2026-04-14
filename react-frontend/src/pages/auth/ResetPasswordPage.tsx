@@ -22,7 +22,7 @@ import { validatePassword, PASSWORD_REQUIREMENTS } from '@/lib/validation';
 
 export function ResetPasswordPage() {
   const { t } = useTranslation('auth');
-  usePageTitle('Set New Password');
+  usePageTitle(t('reset_password.page_title'));
   const { branding, tenantPath } = useTenant();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');

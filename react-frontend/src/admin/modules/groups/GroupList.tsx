@@ -376,7 +376,7 @@ export function GroupList() {
           <span className="text-sm font-medium">{selectedIds.size} selected</span>
           <Button size="sm" variant="flat" onPress={handleBulkArchive}>{t('groups.archive')}</Button>
           <Button size="sm" variant="flat" color="danger" onPress={handleBulkDelete}>{t('common.delete')}</Button>
-          <Button size="sm" variant="flat" onPress={() => setSelectedIds(new Set())}>Clear</Button>
+          <Button size="sm" variant="flat" onPress={() => setSelectedIds(new Set())}>{t('common.clear')}</Button>
         </div>
       )}
 

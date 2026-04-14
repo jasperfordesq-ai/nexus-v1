@@ -277,6 +277,8 @@
     "load_failed": "Failed to load certificates. Please try again.",
     "load_error": "Unable to load certificates. Please try again."
   },
+  "remote": "Remote",
+  "closes_date": "Closes {{date}}",
   "page_meta": {
     "register_organisation": {
       "title": "Register Organisation"

@@ -472,12 +472,12 @@ export function OrganisationDetailPage() {
                           {job.type}
                         </Chip>
                         {job.is_remote ? (
-                          <span>Remote</span>
+                          <span>{t('remote')}</span>
                         ) : job.location ? (
                           <span>{job.location}</span>
                         ) : null}
                         {job.deadline && (
-                          <span>Closes {new Date(job.deadline).toLocaleDateString()}</span>
+                          <span>{t('closes_date', { date: new Date(job.deadline).toLocaleDateString() })}</span>
                         )}
                       </div>
                     </div>

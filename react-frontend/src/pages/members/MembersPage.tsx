@@ -395,11 +395,11 @@ export function MembersPage() {
                   value: 'text-theme-primary',
                 }}
               >
-                <SelectItem key="5">5 km</SelectItem>
-                <SelectItem key="10">10 km</SelectItem>
-                <SelectItem key="25">25 km</SelectItem>
-                <SelectItem key="50">50 km</SelectItem>
-                <SelectItem key="100">100 km</SelectItem>
+                <SelectItem key="5">{t('radius_5')}</SelectItem>
+                <SelectItem key="10">{t('radius_10')}</SelectItem>
+                <SelectItem key="25">{t('radius_25')}</SelectItem>
+                <SelectItem key="50">{t('radius_50')}</SelectItem>
+                <SelectItem key="100">{t('radius_100')}</SelectItem>
               </Select>
             )}
 

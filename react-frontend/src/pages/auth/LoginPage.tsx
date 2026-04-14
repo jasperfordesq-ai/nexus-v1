@@ -42,7 +42,7 @@ interface Tenant {
 
 export function LoginPage() {
   const { t } = useTranslation('auth');
-  usePageTitle('Sign In');
+  usePageTitle(t('page_meta.login.title'));
   const navigate = useNavigate();
   const location = useLocation();
   const {

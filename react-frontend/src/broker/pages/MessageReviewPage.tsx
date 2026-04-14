@@ -54,7 +54,7 @@ function filterParam(tab: string): string | undefined {
 
 export default function MessageReviewPage() {
   const { t } = useTranslation('broker');
-  usePageTitle('Messages - Broker');
+  usePageTitle(t('messages.title'));
   const toast = useToast();
 
   // Data state

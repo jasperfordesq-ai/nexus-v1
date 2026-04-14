@@ -27,7 +27,7 @@ type VerifyState = 'loading' | 'success' | 'error';
 
 export function VerifyEmailPage() {
   const { t } = useTranslation('auth');
-  usePageTitle('Verify Email');
+  usePageTitle(t('page_meta.verify_email.title'));
   const { branding, tenantPath, tenant } = useTenant();
   const { isAuthenticated } = useAuth();
 

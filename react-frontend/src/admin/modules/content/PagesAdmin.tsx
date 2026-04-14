@@ -120,10 +120,10 @@ export function PagesAdmin() {
       sortable: true,
       render: (item) => item.show_in_menu ? (
         <Chip size="sm" variant="flat" color="primary">
-          {item.menu_location === 'footer' ? 'Footer' : 'About'}
+          {item.menu_location === 'footer' ? t('content.footer') : t('content.about')}
         </Chip>
       ) : (
-        <span className="text-sm text-default-400">No</span>
+        <span className="text-sm text-default-400">{t('common.no')}</span>
       ),
     },
     {

@@ -253,10 +253,11 @@ import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 
 function CommunityNotFound({ slug }: { slug: string }) {
-  usePageTitle('Community Not Found');
+  const { t } = useTranslation('errors');
+  usePageTitle(t('community_not_found'));
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
-      <PageMeta title="Community Not Found" noIndex />
+      <PageMeta title={t('community_not_found')} noIndex />
       <Helmet>
         <meta name="prerender-status-code" content="404" />
       </Helmet>
@@ -270,12 +271,12 @@ function CommunityNotFound({ slug }: { slug: string }) {
             <Globe className="w-10 h-10 text-amber-500" aria-hidden="true" />
           </div>
 
-          <h1 className="text-2xl font-bold text-theme-primary mb-2">Community Not Found</h1>
+          <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('community_not_found')}</h1>
           <p className="text-theme-muted mb-2">
-            We couldn&apos;t find a community called &ldquo;<strong>{slug}</strong>&rdquo;.
+            {t('community_not_found_message', { slug })}
           </p>
           <p className="text-sm text-theme-subtle mb-8">
-            The community may have been renamed, deactivated, or the URL may be incorrect.
+            {t('community_not_found_detail')}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3">
@@ -284,7 +285,7 @@ function CommunityNotFound({ slug }: { slug: string }) {
                 className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                 startContent={<Home className="w-4 h-4" aria-hidden="true" />}
               >
-                Go Home
+                {t('go_home')}
               </Button>
             </Link>
             <Link to="/login" className="flex-1">
@@ -293,7 +294,7 @@ function CommunityNotFound({ slug }: { slug: string }) {
                 className="w-full bg-theme-elevated text-theme-muted"
                 startContent={<Search className="w-4 h-4" aria-hidden="true" />}
               >
-                Find Community
+                {t('find_community')}
               </Button>
             </Link>
           </div>

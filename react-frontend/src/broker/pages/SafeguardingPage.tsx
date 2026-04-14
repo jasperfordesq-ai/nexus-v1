@@ -112,7 +112,7 @@ function SeverityChip({ severity }: { severity: string }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function SafeguardingPage() {
-  usePageTitle('Safeguarding - Broker');
+  usePageTitle(t('safeguarding.title'));
   const { t } = useTranslation('broker');
   const toast = useToast();
 
