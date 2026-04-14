@@ -788,6 +788,7 @@
     "low": "Low",
     "medium": "Medium",
     "planned": "Planned",
+    "clear": "Clear",
     "refresh": "Refresh",
     "unexpected_error": "Unexpected error",
     "unfeature": "Unfeature"
@@ -1382,6 +1383,8 @@
     "back_to_roles": "Back to Roles",
     "basic_information": "Basic Information",
     "breach_reported_successfully": "Breach Reported Successfully",
+    "secret_rotation_title": "Secret Rotation",
+    "connection_test_title": "Connection Test Results",
     "col_action": "Action",
     "col_actions": "Actions",
     "col_consented": "Consented",
@@ -4513,6 +4516,7 @@
     "withdrawn_on": "Withdrawn on"
   },
   "users": {
+    "page_title": "Admin - Users",
     "action_approve": "Approve",
     "action_ban": "Ban",
     "action_delete": "Delete",

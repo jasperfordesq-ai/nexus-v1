@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Services\NewsletterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\Log;
 
@@ -45,12 +46,7 @@ class AdminNewsletterController extends BaseApiController
         if (!in_array($table, self::ALLOWED_TABLES, true)) {
             return false;
         }
-        try {
-            DB::select("SELECT 1 FROM `{$table}` LIMIT 1");
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
+        return Schema::hasTable($table);
     }
 
     public function index(): JsonResponse

@@ -1219,7 +1219,7 @@ export function PollsPage() {
                     </Button>
                     {rankedResults && (
                       <div className="mt-3 p-3 rounded-xl bg-theme-elevated space-y-3">
-                        <h4 className="text-sm font-semibold text-theme-primary">Round-by-Round Results</h4>
+                        <h4 className="text-sm font-semibold text-theme-primary">{t('ranked_results_title')}</h4>
                         {/* Winner */}
                         {rankedResults.winner ? (
                           <div className="flex items-center gap-2 p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
@@ -1235,7 +1235,7 @@ export function PollsPage() {
                           const eliminated = round.eliminated as string | undefined;
                           return (
                             <div key={idx} className="p-2 rounded-lg border border-[var(--border-default)]">
-                              <p className="text-xs font-semibold text-theme-muted mb-1.5">Round {idx + 1}</p>
+                              <p className="text-xs font-semibold text-theme-muted mb-1.5">{t('round_number', { number: idx + 1 })}</p>
                               {votes && Object.entries(votes)
                                 .sort(([, a], [, b]) => b - a)
                                 .map(([option, count]) => {
@@ -1257,14 +1257,14 @@ export function PollsPage() {
                                   );
                                 })}
                               {eliminated && (
-                                <p className="text-[10px] text-red-400 mt-1">Eliminated: {eliminated}</p>
+                                <p className="text-[10px] text-red-400 mt-1">{t('eliminated_candidate', { name: eliminated })}</p>
                               )}
                             </div>
                           );
                         })}
                         {/* Total ballots */}
                         {rankedResults.total_ballots ? (
-                          <p className="text-xs text-theme-subtle">Total ballots: {String(rankedResults.total_ballots)}</p>
+                          <p className="text-xs text-theme-subtle">{t('total_ballots', { count: String(rankedResults.total_ballots) })}</p>
                         ) : null}
                       </div>
                     )}

@@ -21,7 +21,7 @@ import { api } from '@/lib/api';
 
 export function ForgotPasswordPage() {
   const { t } = useTranslation('auth');
-  usePageTitle('Reset Password');
+  usePageTitle(t('page_meta.forgot_password.title'));
   const { branding, tenantPath } = useTenant();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);

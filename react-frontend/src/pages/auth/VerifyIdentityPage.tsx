@@ -66,7 +66,7 @@ type PageState = 'loading' | 'start' | 'in_progress' | 'passed' | 'failed' | 'ac
 
 export function VerifyIdentityPage() {
   const { t } = useTranslation('auth');
-  usePageTitle('Verify Identity');
+  usePageTitle(t('page_meta.verify_identity.title'));
   const navigate = useNavigate();
   const { branding, tenantPath } = useTenant();
   const { isAuthenticated } = useAuth();

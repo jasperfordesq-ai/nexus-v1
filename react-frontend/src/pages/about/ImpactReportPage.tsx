@@ -392,7 +392,7 @@ export function ImpactReportPage() {
                     { band: '65+', pct: '28%', color: 'from-amber-500/20 to-orange-500/20' },
                   ].map((age) => (
                     <div key={age.band} className={`p-3 rounded-xl bg-gradient-to-br ${age.color} text-center`}>
-                      <p className="text-xs text-theme-subtle mb-1">Age {age.band}</p>
+                      <p className="text-xs text-theme-subtle mb-1">{t('age_band', { band: age.band })}</p>
                       <p className="text-lg font-bold text-theme-primary">{age.pct}</p>
                     </div>
                   ))}

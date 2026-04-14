@@ -70,7 +70,7 @@ const STEPS = [
 
 export function RegisterPage() {
   const { t } = useTranslation('auth');
-  usePageTitle('Create Account');
+  usePageTitle(t('page_meta.register.title'));
   const navigate = useNavigate();
   const { register, isAuthenticated, isLoading, error, clearError } = useAuth();
   const { tenant, tenantSlug, tenantPath } = useTenant();

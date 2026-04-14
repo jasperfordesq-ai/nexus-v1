@@ -278,7 +278,7 @@ export function SecretsVault() {
       {/* Rotate Result Modal */}
       <Modal isOpen={rotateModalOpen} onClose={() => setRotateModalOpen(false)}>
         <ModalContent>
-          <ModalHeader>Secret Rotation</ModalHeader>
+          <ModalHeader>{t('enterprise.secret_rotation_title')}</ModalHeader>
           <ModalBody>
             <p className="text-default-600">{rotateMessage}</p>
           </ModalBody>
@@ -293,7 +293,7 @@ export function SecretsVault() {
       {/* Test Connection Results Modal */}
       <Modal isOpen={testModalOpen} onClose={() => setTestModalOpen(false)}>
         <ModalContent>
-          <ModalHeader>Connection Test Results</ModalHeader>
+          <ModalHeader>{t('enterprise.connection_test_title')}</ModalHeader>
           <ModalBody>
             {testResults && (
               <div className="space-y-3">

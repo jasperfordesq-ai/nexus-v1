@@ -409,5 +409,6 @@
     "cta_subtitle": "Whether you want to partner, fund, volunteer, or join as a member \u2014 there\u0027s a role for you in building a more connected Ireland.",
     "cta_download": "Download Full Plan",
     "cta_contact": "Get in Touch"
-  }
+  },
+  "age_band": "Age {{band}}"
 }

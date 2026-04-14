@@ -59,7 +59,7 @@ import type { AdminUser, UserListParams } from '../../api/types';
 
 export function UserList() {
   const { t } = useTranslation('admin');
-  usePageTitle('Admin - Users');
+  usePageTitle(t('users.page_title'));
   const { tenantPath, tenant } = useTenant();
   const toast = useToast();
   const { user: currentUser } = useAuth();

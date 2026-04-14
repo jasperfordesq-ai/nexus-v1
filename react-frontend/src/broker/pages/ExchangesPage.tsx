@@ -45,7 +45,7 @@ const statusColorMap: Record<string, 'warning' | 'success' | 'danger' | 'default
 
 export default function ExchangesPage() {
   const { t } = useTranslation('broker');
-  usePageTitle('Exchanges - Broker');
+  usePageTitle(t('exchanges.title'));
   const toast = useToast();
 
   // Data state

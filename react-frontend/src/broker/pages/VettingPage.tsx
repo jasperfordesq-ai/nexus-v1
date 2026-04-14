@@ -85,7 +85,7 @@ function tabToParams(tab: TabKey): { status?: string; expiring_soon?: boolean } 
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function VettingPage() {
-  usePageTitle('Vetting & DBS - Broker');
+  usePageTitle(t('vetting.title'));
   const { t } = useTranslation('broker');
   const toast = useToast();
 
