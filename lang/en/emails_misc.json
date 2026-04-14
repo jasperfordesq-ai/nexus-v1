@@ -61,9 +61,28 @@
     "incident_updated_subject": "[NEXUS] [{{severity}}] Safeguarding Incident #{{incident_id}} — {{status}}"
   },
   "social": {
-    "connection_request": "{{name}} sent you a connection request"
+    "connection_request": "{{name}} sent you a connection request",
+    "connection_accepted": "{{name}} accepted your connection request"
   },
   "marketplace": {
     "listing_pending_notice": "Your listing has been submitted for review and will be published once approved."
+  },
+  "admin_notify": {
+    "new_user_subject": "New member registered — {{community}}",
+    "new_user_title": "New Member Registration",
+    "new_user_preview": "A new member has just registered on {{community}}",
+    "new_user_bell": "New member registered: {{name}}",
+    "new_user_body": "A new member has just registered on <strong>{{community}}</strong>.",
+    "new_user_email_label": "Email",
+    "new_user_status_label": "Status",
+    "new_user_cta": "View Member",
+    "new_listing_subject": "New listing posted — {{community}}",
+    "new_listing_title": "New Listing Posted",
+    "new_listing_preview": "A new listing has been posted on {{community}}",
+    "new_listing_bell": "New listing posted: {{title}} by {{poster}}",
+    "new_listing_body": "A new listing has been posted on <strong>{{community}}</strong>.",
+    "new_listing_type_label": "Type",
+    "new_listing_by_label": "Posted by",
+    "new_listing_cta": "View Listing"
   }
 }

@@ -23,6 +23,9 @@ use App\Events\UserRegistered;
 use App\Events\VolunteerOpportunityCreated;
 use App\Events\VolunteerOpportunityUpdated;
 use App\Listeners\CopyMessageForBrokerReview;
+use App\Listeners\NotifyAdminOfNewListing;
+use App\Listeners\NotifyAdminOfNewRegistration;
+use App\Listeners\NotifyConnectionAccepted;
 use App\Listeners\NotifyConnectionRequest;
 use App\Listeners\NotifyJobAlertSubscribers;
 use App\Listeners\NotifyMessageReceived;
@@ -60,11 +63,13 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         UserRegistered::class => [
             SendWelcomeNotification::class,
+            NotifyAdminOfNewRegistration::class,
         ],
 
         ListingCreated::class => [
             UpdateFeedOnListingCreated::class,
             PushListingToFederatedPartners::class,
+            NotifyAdminOfNewListing::class,
         ],
 
         TransactionCompleted::class => [
@@ -79,6 +84,7 @@ class EventServiceProvider extends ServiceProvider
 
         ConnectionAccepted::class => [
             PushConnectionAcceptedToFederatedPartner::class,
+            NotifyConnectionAccepted::class,
         ],
 
         MessageSent::class => [
