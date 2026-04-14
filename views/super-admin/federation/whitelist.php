@@ -20,16 +20,16 @@ require __DIR__ . '/../partials/header.php';
     <div>
         <h1 class="super-page-title">
             <i class="fa-solid fa-building-shield"></i>
-            Federation Whitelist
+            <?= __('super_admin.federation.whitelist.title') ?>
         </h1>
         <p class="super-page-subtitle">
-            Manage which tenants are approved for federation participation
+            <?= __('super_admin.federation.whitelist.subtitle') ?>
         </p>
     </div>
     <div class="super-page-actions">
         <a href="/super-admin/federation" class="super-btn super-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
-            Back to Overview
+            <?= __('super_admin.federation.whitelist.back_btn') ?>
         </a>
     </div>
 </div>
@@ -40,15 +40,15 @@ require __DIR__ . '/../partials/header.php';
     <div class="super-card-header">
         <h3 class="super-card-title">
             <i class="fa-solid fa-plus"></i>
-            Add Tenant to Whitelist
+            <?= __('super_admin.federation.whitelist.add_card_title') ?>
         </h3>
     </div>
     <div class="super-card-body">
         <form id="addWhitelistForm" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
             <div style="flex: 1; min-width: 200px;">
-                <label class="super-label">Tenant</label>
+                <label class="super-label"><?= __('super_admin.federation.whitelist.tenant_label') ?></label>
                 <select id="addTenantId" class="super-input" required>
-                    <option value="">Select a tenant...</option>
+                    <option value=""><?= __('super_admin.federation.whitelist.tenant_placeholder') ?></option>
                     <?php foreach ($availableTenants as $tenant): ?>
                     <option value="<?= $tenant['id'] ?>">
                         <?= htmlspecialchars($tenant['name']) ?>
@@ -60,12 +60,12 @@ require __DIR__ . '/../partials/header.php';
                 </select>
             </div>
             <div style="flex: 2; min-width: 300px;">
-                <label class="super-label">Notes (optional)</label>
-                <input type="text" id="addNotes" class="super-input" placeholder="Reason for approval...">
+                <label class="super-label"><?= __('super_admin.federation.whitelist.notes_label') ?></label>
+                <input type="text" id="addNotes" class="super-input" placeholder="<?= __('super_admin.federation.whitelist.notes_placeholder') ?>">
             </div>
             <button type="submit" class="super-btn super-btn-primary">
                 <i class="fa-solid fa-plus"></i>
-                Add to Whitelist
+                <?= __('super_admin.federation.whitelist.add_btn') ?>
             </button>
         </form>
     </div>
@@ -77,18 +77,18 @@ require __DIR__ . '/../partials/header.php';
     <div class="super-card-header">
         <h3 class="super-card-title">
             <i class="fa-solid fa-list"></i>
-            Whitelisted Tenants (<?= count($whitelistedTenants) ?>)
+            <?= __('super_admin.federation.whitelist.table_card_title', ['count' => count($whitelistedTenants)]) ?>
         </h3>
     </div>
     <table class="super-table">
         <thead>
             <tr>
-                <th>Tenant</th>
-                <th>Domain</th>
-                <th>Approved By</th>
-                <th>Approved Date</th>
-                <th>Notes</th>
-                <th>Actions</th>
+                <th><?= __('super_admin.federation.whitelist.col_tenant') ?></th>
+                <th><?= __('super_admin.federation.whitelist.col_domain') ?></th>
+                <th><?= __('super_admin.federation.whitelist.col_approved_by') ?></th>
+                <th><?= __('super_admin.federation.whitelist.col_approved_date') ?></th>
+                <th><?= __('super_admin.federation.whitelist.col_notes') ?></th>
+                <th><?= __('super_admin.federation.whitelist.col_actions') ?></th>
             </tr>
         </thead>
         <tbody>
@@ -96,7 +96,7 @@ require __DIR__ . '/../partials/header.php';
             <tr>
                 <td colspan="6" style="text-align: center; padding: 3rem; color: var(--super-text-muted);">
                     <i class="fa-solid fa-building-shield" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                    No tenants whitelisted yet
+                    <?= __('super_admin.federation.whitelist.no_whitelisted') ?>
                 </td>
             </tr>
             <?php else: ?>
@@ -170,7 +170,7 @@ document.getElementById('addWhitelistForm')?.addEventListener('submit', function
 });
 
 function removeFromWhitelist(tenantId, tenantName) {
-    if (!confirm(`Remove "${tenantName}" from the federation whitelist?\n\nThis will disable all federation features for this tenant.`)) {
+    if (!confirm('<?= __('super_admin.federation.whitelist.remove_confirm') ?>')) {
         return;
     }
 

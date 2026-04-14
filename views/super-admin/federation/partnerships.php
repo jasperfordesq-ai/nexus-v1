@@ -20,16 +20,16 @@ require __DIR__ . '/../partials/header.php';
     <div>
         <h1 class="super-page-title">
             <i class="fa-solid fa-handshake"></i>
-            Federation Partnerships
+            <?= __('super_admin.federation.partnerships.title') ?>
         </h1>
         <p class="super-page-subtitle">
-            Overview of all tenant partnerships across the platform
+            <?= __('super_admin.federation.partnerships.subtitle') ?>
         </p>
     </div>
     <div class="super-page-actions">
         <a href="/super-admin/federation" class="super-btn super-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
-            Back to Overview
+            <?= __('super_admin.federation.partnerships.back_btn') ?>
         </a>
     </div>
 </div>
@@ -42,7 +42,7 @@ require __DIR__ . '/../partials/header.php';
         </div>
         <div>
             <div class="super-stat-value"><?= $stats['active'] ?? 0 ?></div>
-            <div class="super-stat-label">Active</div>
+            <div class="super-stat-label"><?= __('super_admin.federation.partnerships.stat_active') ?></div>
         </div>
     </div>
     <div class="super-stat-card">
@@ -51,7 +51,7 @@ require __DIR__ . '/../partials/header.php';
         </div>
         <div>
             <div class="super-stat-value"><?= $stats['pending'] ?? 0 ?></div>
-            <div class="super-stat-label">Pending</div>
+            <div class="super-stat-label"><?= __('super_admin.federation.partnerships.stat_pending') ?></div>
         </div>
     </div>
     <div class="super-stat-card">
@@ -60,7 +60,7 @@ require __DIR__ . '/../partials/header.php';
         </div>
         <div>
             <div class="super-stat-value"><?= $stats['suspended'] ?? 0 ?></div>
-            <div class="super-stat-label">Suspended</div>
+            <div class="super-stat-label"><?= __('super_admin.federation.partnerships.stat_suspended') ?></div>
         </div>
     </div>
     <div class="super-stat-card">
@@ -69,7 +69,7 @@ require __DIR__ . '/../partials/header.php';
         </div>
         <div>
             <div class="super-stat-value"><?= $stats['terminated'] ?? 0 ?></div>
-            <div class="super-stat-label">Terminated</div>
+            <div class="super-stat-label"><?= __('super_admin.federation.partnerships.stat_terminated') ?></div>
         </div>
     </div>
 </div>
@@ -78,24 +78,24 @@ require __DIR__ . '/../partials/header.php';
 <div class="super-card" style="margin-top: 1.5rem;">
     <div class="super-card-header">
         <div style="display: flex; gap: 0.5rem;">
-            <button class="super-btn super-btn-sm filter-btn active" data-filter="all">All</button>
-            <button class="super-btn super-btn-sm super-btn-secondary filter-btn" data-filter="active">Active</button>
-            <button class="super-btn super-btn-sm super-btn-secondary filter-btn" data-filter="pending">Pending</button>
-            <button class="super-btn super-btn-sm super-btn-secondary filter-btn" data-filter="suspended">Suspended</button>
-            <button class="super-btn super-btn-sm super-btn-secondary filter-btn" data-filter="terminated">Terminated</button>
+            <button class="super-btn super-btn-sm filter-btn active" data-filter="all"><?= __('super_admin.federation.partnerships.filter_all') ?></button>
+            <button class="super-btn super-btn-sm super-btn-secondary filter-btn" data-filter="active"><?= __('super_admin.federation.partnerships.filter_active') ?></button>
+            <button class="super-btn super-btn-sm super-btn-secondary filter-btn" data-filter="pending"><?= __('super_admin.federation.partnerships.filter_pending') ?></button>
+            <button class="super-btn super-btn-sm super-btn-secondary filter-btn" data-filter="suspended"><?= __('super_admin.federation.partnerships.filter_suspended') ?></button>
+            <button class="super-btn super-btn-sm super-btn-secondary filter-btn" data-filter="terminated"><?= __('super_admin.federation.partnerships.filter_terminated') ?></button>
         </div>
     </div>
     <table class="super-table">
         <thead>
             <tr>
-                <th>Tenant A</th>
+                <th><?= __('super_admin.federation.partnerships.col_tenant_a') ?></th>
                 <th></th>
-                <th>Tenant B</th>
-                <th>Level</th>
-                <th>Features</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th>Actions</th>
+                <th><?= __('super_admin.federation.partnerships.col_tenant_b') ?></th>
+                <th><?= __('super_admin.federation.partnerships.col_level') ?></th>
+                <th><?= __('super_admin.federation.partnerships.col_features') ?></th>
+                <th><?= __('super_admin.federation.partnerships.col_status') ?></th>
+                <th><?= __('super_admin.federation.partnerships.col_created') ?></th>
+                <th><?= __('super_admin.federation.partnerships.col_actions') ?></th>
             </tr>
         </thead>
         <tbody id="partnershipsTable">
@@ -103,7 +103,7 @@ require __DIR__ . '/../partials/header.php';
             <tr class="no-data-row">
                 <td colspan="8" style="text-align: center; padding: 3rem; color: var(--super-text-muted);">
                     <i class="fa-solid fa-handshake" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                    No partnerships found
+                    <?= __('super_admin.federation.partnerships.no_partnerships') ?>
                 </td>
             </tr>
             <?php else: ?>
@@ -217,7 +217,7 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 });
 
 function suspendPartnership(id) {
-    const reason = prompt('Enter reason for suspension:');
+    const reason = prompt('<?= __('super_admin.federation.partnerships.suspend_prompt') ?>');
     if (!reason) return;
 
     fetch('/super-admin/federation/suspend-partnership', {
@@ -239,10 +239,10 @@ function suspendPartnership(id) {
 }
 
 function terminatePartnership(id) {
-    const reason = prompt('Enter reason for termination (this action cannot be undone):');
+    const reason = prompt('<?= __('super_admin.federation.partnerships.terminate_prompt') ?>');
     if (!reason) return;
 
-    if (!confirm('Are you sure you want to terminate this partnership?')) return;
+    if (!confirm('<?= __('super_admin.federation.partnerships.terminate_confirm') ?>')) return;
 
     fetch('/super-admin/federation/terminate-partnership', {
         method: 'POST',

@@ -20,7 +20,7 @@ require __DIR__ . '/../partials/header.php';
 <div class="super-breadcrumb">
     <a href="/super-admin"><i class="fa-solid fa-gauge-high"></i></a>
     <span class="super-breadcrumb-sep">/</span>
-    <span>Audit Log</span>
+    <span><?= __('super_admin.audit.breadcrumb') ?></span>
 </div>
 
 <!-- Page Header -->
@@ -28,10 +28,10 @@ require __DIR__ . '/../partials/header.php';
     <div>
         <h1 class="super-page-title">
             <i class="fa-solid fa-history"></i>
-            Audit Log
+            <?= __('super_admin.audit.title') ?>
         </h1>
         <p class="super-page-subtitle">
-            Track all hierarchy changes across <?= $access['scope'] === 'global' ? 'all tenants' : 'your tenant hierarchy' ?>
+            <?= $access['scope'] === 'global' ? __('super_admin.audit.subtitle_global') : __('super_admin.audit.subtitle_scoped') ?>
         </p>
     </div>
 </div>
@@ -44,7 +44,7 @@ require __DIR__ . '/../partials/header.php';
         </div>
         <div class="super-stat-content">
             <div class="super-stat-value"><?= number_format($stats['total_actions'] ?? 0) ?></div>
-            <div class="super-stat-label">Actions (30 days)</div>
+            <div class="super-stat-label"><?= __('super_admin.audit.stat_actions_30d') ?></div>
         </div>
     </div>
 
@@ -66,7 +66,7 @@ require __DIR__ . '/../partials/header.php';
         </div>
         <div class="super-stat-content">
             <div class="super-stat-value"><?= number_format($tenantActions) ?></div>
-            <div class="super-stat-label">Tenant Changes</div>
+            <div class="super-stat-label"><?= __('super_admin.audit.stat_tenant_changes') ?></div>
         </div>
     </div>
 
@@ -76,7 +76,7 @@ require __DIR__ . '/../partials/header.php';
         </div>
         <div class="super-stat-content">
             <div class="super-stat-value"><?= number_format($userActions) ?></div>
-            <div class="super-stat-label">User Changes</div>
+            <div class="super-stat-label"><?= __('super_admin.audit.stat_user_changes') ?></div>
         </div>
     </div>
 
@@ -86,7 +86,7 @@ require __DIR__ . '/../partials/header.php';
         </div>
         <div class="super-stat-content">
             <div class="super-stat-value"><?= count($stats['top_actors'] ?? []) ?></div>
-            <div class="super-stat-label">Active Admins</div>
+            <div class="super-stat-label"><?= __('super_admin.audit.stat_active_admins') ?></div>
         </div>
     </div>
 </div>
@@ -96,66 +96,66 @@ require __DIR__ . '/../partials/header.php';
     <div class="super-card-body">
         <form method="GET" action="/super-admin/audit" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
             <div class="super-form-group" style="min-width: 150px; margin-bottom: 0;">
-                <label class="super-form-label">Action Type</label>
+                <label class="super-form-label"><?= __('super_admin.audit.filter_action_type') ?></label>
                 <select name="action_type" class="super-form-select">
-                    <option value="">All Actions</option>
-                    <optgroup label="Tenant Actions">
-                        <option value="tenant_created" <?= ($filters['action_type'] ?? '') === 'tenant_created' ? 'selected' : '' ?>>Created</option>
-                        <option value="tenant_updated" <?= ($filters['action_type'] ?? '') === 'tenant_updated' ? 'selected' : '' ?>>Updated</option>
-                        <option value="tenant_moved" <?= ($filters['action_type'] ?? '') === 'tenant_moved' ? 'selected' : '' ?>>Moved</option>
-                        <option value="tenant_hub_enabled" <?= ($filters['action_type'] ?? '') === 'tenant_hub_enabled' ? 'selected' : '' ?>>Hub Enabled</option>
-                        <option value="tenant_hub_disabled" <?= ($filters['action_type'] ?? '') === 'tenant_hub_disabled' ? 'selected' : '' ?>>Hub Disabled</option>
+                    <option value=""><?= __('super_admin.audit.filter_all_actions') ?></option>
+                    <optgroup label="<?= __('super_admin.audit.filter_group_tenant') ?>">
+                        <option value="tenant_created" <?= ($filters['action_type'] ?? '') === 'tenant_created' ? 'selected' : '' ?>><?= __('super_admin.audit.filter_tenant_created') ?></option>
+                        <option value="tenant_updated" <?= ($filters['action_type'] ?? '') === 'tenant_updated' ? 'selected' : '' ?>><?= __('super_admin.audit.filter_tenant_updated') ?></option>
+                        <option value="tenant_moved" <?= ($filters['action_type'] ?? '') === 'tenant_moved' ? 'selected' : '' ?>><?= __('super_admin.audit.filter_tenant_moved') ?></option>
+                        <option value="tenant_hub_enabled" <?= ($filters['action_type'] ?? '') === 'tenant_hub_enabled' ? 'selected' : '' ?>><?= __('super_admin.audit.filter_tenant_hub_enabled') ?></option>
+                        <option value="tenant_hub_disabled" <?= ($filters['action_type'] ?? '') === 'tenant_hub_disabled' ? 'selected' : '' ?>><?= __('super_admin.audit.filter_tenant_hub_disabled') ?></option>
                     </optgroup>
-                    <optgroup label="User Actions">
-                        <option value="user_created" <?= ($filters['action_type'] ?? '') === 'user_created' ? 'selected' : '' ?>>Created</option>
-                        <option value="user_moved" <?= ($filters['action_type'] ?? '') === 'user_moved' ? 'selected' : '' ?>>Moved</option>
-                        <option value="user_super_admin_granted" <?= ($filters['action_type'] ?? '') === 'user_super_admin_granted' ? 'selected' : '' ?>>Super Admin Granted</option>
-                        <option value="user_super_admin_revoked" <?= ($filters['action_type'] ?? '') === 'user_super_admin_revoked' ? 'selected' : '' ?>>Super Admin Revoked</option>
+                    <optgroup label="<?= __('super_admin.audit.filter_group_user') ?>">
+                        <option value="user_created" <?= ($filters['action_type'] ?? '') === 'user_created' ? 'selected' : '' ?>><?= __('super_admin.audit.filter_user_created') ?></option>
+                        <option value="user_moved" <?= ($filters['action_type'] ?? '') === 'user_moved' ? 'selected' : '' ?>><?= __('super_admin.audit.filter_user_moved') ?></option>
+                        <option value="user_super_admin_granted" <?= ($filters['action_type'] ?? '') === 'user_super_admin_granted' ? 'selected' : '' ?>><?= __('super_admin.audit.filter_super_admin_granted') ?></option>
+                        <option value="user_super_admin_revoked" <?= ($filters['action_type'] ?? '') === 'user_super_admin_revoked' ? 'selected' : '' ?>><?= __('super_admin.audit.filter_super_admin_revoked') ?></option>
                     </optgroup>
-                    <optgroup label="Bulk Actions">
-                        <option value="bulk_users_moved" <?= ($filters['action_type'] ?? '') === 'bulk_users_moved' ? 'selected' : '' ?>>Bulk Users Moved</option>
-                        <option value="bulk_tenants_updated" <?= ($filters['action_type'] ?? '') === 'bulk_tenants_updated' ? 'selected' : '' ?>>Bulk Tenants Updated</option>
+                    <optgroup label="<?= __('super_admin.audit.filter_group_bulk') ?>">
+                        <option value="bulk_users_moved" <?= ($filters['action_type'] ?? '') === 'bulk_users_moved' ? 'selected' : '' ?>><?= __('super_admin.audit.filter_bulk_users_moved') ?></option>
+                        <option value="bulk_tenants_updated" <?= ($filters['action_type'] ?? '') === 'bulk_tenants_updated' ? 'selected' : '' ?>><?= __('super_admin.audit.filter_bulk_tenants_updated') ?></option>
                     </optgroup>
                 </select>
             </div>
 
             <div class="super-form-group" style="min-width: 120px; margin-bottom: 0;">
-                <label class="super-form-label">Target Type</label>
+                <label class="super-form-label"><?= __('super_admin.audit.filter_target_type') ?></label>
                 <select name="target_type" class="super-form-select">
-                    <option value="">All Types</option>
-                    <option value="tenant" <?= ($filters['target_type'] ?? '') === 'tenant' ? 'selected' : '' ?>>Tenants</option>
-                    <option value="user" <?= ($filters['target_type'] ?? '') === 'user' ? 'selected' : '' ?>>Users</option>
-                    <option value="bulk" <?= ($filters['target_type'] ?? '') === 'bulk' ? 'selected' : '' ?>>Bulk</option>
+                    <option value=""><?= __('super_admin.audit.filter_all_types') ?></option>
+                    <option value="tenant" <?= ($filters['target_type'] ?? '') === 'tenant' ? 'selected' : '' ?>><?= __('super_admin.audit.filter_type_tenant') ?></option>
+                    <option value="user" <?= ($filters['target_type'] ?? '') === 'user' ? 'selected' : '' ?>><?= __('super_admin.audit.filter_type_user') ?></option>
+                    <option value="bulk" <?= ($filters['target_type'] ?? '') === 'bulk' ? 'selected' : '' ?>><?= __('super_admin.audit.filter_type_bulk') ?></option>
                 </select>
             </div>
 
             <div class="super-form-group" style="min-width: 140px; margin-bottom: 0;">
-                <label class="super-form-label">From Date</label>
+                <label class="super-form-label"><?= __('super_admin.audit.filter_date_from') ?></label>
                 <input type="date" name="date_from" class="super-form-input"
                        value="<?= htmlspecialchars($filters['date_from'] ?? '') ?>">
             </div>
 
             <div class="super-form-group" style="min-width: 140px; margin-bottom: 0;">
-                <label class="super-form-label">To Date</label>
+                <label class="super-form-label"><?= __('super_admin.audit.filter_date_to') ?></label>
                 <input type="date" name="date_to" class="super-form-input"
                        value="<?= htmlspecialchars($filters['date_to'] ?? '') ?>">
             </div>
 
             <div class="super-form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
-                <label class="super-form-label">Search</label>
+                <label class="super-form-label"><?= __('super_admin.audit.filter_search_label') ?></label>
                 <input type="text" name="search" class="super-form-input"
-                       placeholder="Description, name..."
+                       placeholder="<?= __('super_admin.audit.filter_search_placeholder') ?>"
                        value="<?= htmlspecialchars($filters['search'] ?? '') ?>">
             </div>
 
             <div style="display: flex; gap: 0.5rem;">
                 <button type="submit" class="super-btn super-btn-primary">
                     <i class="fa-solid fa-search"></i>
-                    Filter
+                    <?= __('super_admin.common.filter_btn') ?>
                 </button>
                 <a href="/super-admin/audit" class="super-btn super-btn-secondary">
                     <i class="fa-solid fa-times"></i>
-                    Clear
+                    <?= __('super_admin.common.clear_btn') ?>
                 </a>
             </div>
         </form>
@@ -167,17 +167,17 @@ require __DIR__ . '/../partials/header.php';
     <div class="super-card-header">
         <h3 class="super-card-title">
             <i class="fa-solid fa-list-alt"></i>
-            Recent Activity
+            <?= __('super_admin.audit.table_title') ?>
         </h3>
     </div>
     <table class="super-table">
         <thead>
             <tr>
-                <th style="width: 160px;">Time</th>
-                <th style="width: 180px;">Actor</th>
-                <th style="width: 160px;">Action</th>
-                <th>Target</th>
-                <th>Description</th>
+                <th style="width: 160px;"><?= __('super_admin.audit.col_time') ?></th>
+                <th style="width: 180px;"><?= __('super_admin.audit.col_actor') ?></th>
+                <th style="width: 160px;"><?= __('super_admin.audit.col_action') ?></th>
+                <th><?= __('super_admin.audit.col_target') ?></th>
+                <th><?= __('super_admin.audit.col_description') ?></th>
             </tr>
         </thead>
         <tbody>
@@ -185,8 +185,8 @@ require __DIR__ . '/../partials/header.php';
                 <tr>
                     <td colspan="5" style="text-align: center; padding: 3rem; color: var(--super-text-muted);">
                         <i class="fa-solid fa-history" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                        No audit log entries found
-                        <br><small>Changes will appear here as they are made</small>
+                        <?= __('super_admin.audit.no_entries') ?>
+                        <br><small><?= __('super_admin.audit.no_entries_hint') ?></small>
                     </td>
                 </tr>
             <?php else: ?>

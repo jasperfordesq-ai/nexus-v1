@@ -20,20 +20,20 @@ require __DIR__ . '/partials/header.php';
     <div>
         <h1 class="super-page-title">
             <i class="fa-solid fa-gauge-high"></i>
-            Infrastructure Dashboard
+            <?= __('super_admin.dashboard.title') ?>
         </h1>
         <p class="super-page-subtitle">
             <?php if ($access['level'] === 'master'): ?>
-                Global overview of all tenants and infrastructure
+                <?= __('super_admin.dashboard.subtitle_global') ?>
             <?php else: ?>
-                Overview of <?= htmlspecialchars($access['tenant_name']) ?> and sub-tenants
+                <?= __('super_admin.dashboard.subtitle_scoped', ['tenant_name' => htmlspecialchars($access['tenant_name'])]) ?>
             <?php endif; ?>
         </p>
     </div>
     <div class="super-page-actions">
         <a href="/super-admin/tenants/create" class="super-btn super-btn-primary">
             <i class="fa-solid fa-plus"></i>
-            Create Tenant
+            <?= __('super_admin.dashboard.create_tenant_btn') ?>
         </a>
     </div>
 </div>
@@ -46,7 +46,7 @@ require __DIR__ . '/partials/header.php';
         </div>
         <div>
             <div class="super-stat-value"><?= number_format($stats['total_tenants'] ?? 0) ?></div>
-            <div class="super-stat-label">Total Tenants</div>
+            <div class="super-stat-label"><?= __('super_admin.dashboard.stat_total_tenants') ?></div>
         </div>
     </div>
 
@@ -56,7 +56,7 @@ require __DIR__ . '/partials/header.php';
         </div>
         <div>
             <div class="super-stat-value"><?= number_format($stats['active_tenants'] ?? 0) ?></div>
-            <div class="super-stat-label">Active Tenants</div>
+            <div class="super-stat-label"><?= __('super_admin.dashboard.stat_active_tenants') ?></div>
         </div>
     </div>
 
@@ -66,7 +66,7 @@ require __DIR__ . '/partials/header.php';
         </div>
         <div>
             <div class="super-stat-value"><?= number_format($stats['total_users'] ?? 0) ?></div>
-            <div class="super-stat-label">Total Users</div>
+            <div class="super-stat-label"><?= __('super_admin.dashboard.stat_total_users') ?></div>
         </div>
     </div>
 
@@ -76,7 +76,7 @@ require __DIR__ . '/partials/header.php';
         </div>
         <div>
             <div class="super-stat-value"><?= number_format($stats['super_admins'] ?? 0) ?></div>
-            <div class="super-stat-label">Super Admins</div>
+            <div class="super-stat-label"><?= __('super_admin.dashboard.stat_super_admins') ?></div>
         </div>
     </div>
 
@@ -86,7 +86,7 @@ require __DIR__ . '/partials/header.php';
         </div>
         <div>
             <div class="super-stat-value"><?= number_format($stats['hub_tenants'] ?? 0) ?></div>
-            <div class="super-stat-label">Hub Tenants</div>
+            <div class="super-stat-label"><?= __('super_admin.dashboard.stat_hub_tenants') ?></div>
         </div>
     </div>
 </div>
@@ -96,30 +96,30 @@ require __DIR__ . '/partials/header.php';
     <div class="super-card-header">
         <h3 class="super-card-title">
             <i class="fa-solid fa-sitemap"></i>
-            Tenant Hierarchy
+            <?= __('super_admin.dashboard.table_title') ?>
         </h3>
         <a href="/super-admin/tenants" class="super-btn super-btn-sm super-btn-secondary">
-            View All <i class="fa-solid fa-arrow-right"></i>
+            <?= __('super_admin.dashboard.view_all') ?> <i class="fa-solid fa-arrow-right"></i>
         </a>
     </div>
 
     <table class="super-table">
         <thead>
             <tr>
-                <th>Tenant</th>
-                <th>Domain</th>
-                <th>Users</th>
-                <th>Children</th>
-                <th>Hub</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th><?= __('super_admin.dashboard.col_tenant') ?></th>
+                <th><?= __('super_admin.dashboard.col_domain') ?></th>
+                <th><?= __('super_admin.dashboard.col_users') ?></th>
+                <th><?= __('super_admin.dashboard.col_children') ?></th>
+                <th><?= __('super_admin.dashboard.col_hub') ?></th>
+                <th><?= __('super_admin.dashboard.col_status') ?></th>
+                <th><?= __('super_admin.dashboard.col_actions') ?></th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($tenants)): ?>
                 <tr>
                     <td colspan="7" style="text-align: center; padding: 2rem; color: var(--super-text-muted);">
-                        No tenants found in your scope
+                        <?= __('super_admin.dashboard.no_tenants') ?>
                     </td>
                 </tr>
             <?php else: ?>
@@ -130,7 +130,7 @@ require __DIR__ . '/partials/header.php';
                                 <?= htmlspecialchars($tenant['indented_name'] ?? $tenant['name']) ?>
                             </a>
                             <?php if ($tenant['relationship'] === 'self'): ?>
-                                <span class="super-badge super-badge-purple" style="margin-left: 0.5rem;">You</span>
+                                <span class="super-badge super-badge-purple" style="margin-left: 0.5rem;"><?= __('super_admin.dashboard.you_badge') ?></span>
                             <?php endif; ?>
                         </td>
                         <td>
@@ -147,7 +147,7 @@ require __DIR__ . '/partials/header.php';
                         <td>
                             <?php if ($tenant['allows_subtenants']): ?>
                                 <span class="super-badge super-badge-success">
-                                    <i class="fa-solid fa-check"></i> Hub
+                                    <i class="fa-solid fa-check"></i> <?= __('super_admin.common.hub') ?>
                                 </span>
                             <?php else: ?>
                                 <span style="color: var(--super-border);">-</span>
@@ -155,9 +155,9 @@ require __DIR__ . '/partials/header.php';
                         </td>
                         <td>
                             <?php if ($tenant['is_active']): ?>
-                                <span class="super-badge super-badge-success">Active</span>
+                                <span class="super-badge super-badge-success"><?= __('super_admin.common.active') ?></span>
                             <?php else: ?>
-                                <span class="super-badge super-badge-danger">Inactive</span>
+                                <span class="super-badge super-badge-danger"><?= __('super_admin.common.inactive') ?></span>
                             <?php endif; ?>
                         </td>
                         <td>
@@ -184,35 +184,35 @@ require __DIR__ . '/partials/header.php';
         <div class="super-card-header">
             <h3 class="super-card-title">
                 <i class="fa-solid fa-eye"></i>
-                Your Access Scope
+                <?= __('super_admin.dashboard.scope_title') ?>
             </h3>
         </div>
         <div class="super-card-body">
             <div style="margin-bottom: 1rem;">
-                <strong>Level:</strong>
+                <strong><?= __('super_admin.dashboard.scope_level') ?></strong>
                 <span class="super-badge <?= $access['level'] === 'master' ? 'super-badge-danger' : 'super-badge-info' ?>" style="margin-left: 0.5rem;">
                     <?= strtoupper($access['level']) ?>
                 </span>
             </div>
             <div style="margin-bottom: 1rem;">
-                <strong>Home Tenant:</strong>
+                <strong><?= __('super_admin.dashboard.scope_home_tenant') ?></strong>
                 <span style="color: var(--super-text-muted); margin-left: 0.5rem;">
-                    <?= htmlspecialchars($access['tenant_name'] ?? 'Unknown') ?>
+                    <?= htmlspecialchars($access['tenant_name'] ?? __('super_admin.common.unknown')) ?>
                 </span>
             </div>
             <div style="margin-bottom: 1rem;">
-                <strong>Path:</strong>
+                <strong><?= __('super_admin.dashboard.scope_path') ?></strong>
                 <code style="background: var(--super-bg); padding: 0.25rem 0.5rem; border-radius: 4px; margin-left: 0.5rem;">
                     <?= htmlspecialchars($access['tenant_path'] ?? '/') ?>
                 </code>
             </div>
             <div>
-                <strong>Scope:</strong>
+                <strong><?= __('super_admin.dashboard.scope_scope') ?></strong>
                 <span style="color: var(--super-text-muted); margin-left: 0.5rem;">
                     <?php if ($access['scope'] === 'global'): ?>
-                        All tenants globally
+                        <?= __('super_admin.dashboard.scope_global') ?>
                     <?php else: ?>
-                        Your tenant + all descendants
+                        <?= __('super_admin.dashboard.scope_hierarchy') ?>
                     <?php endif; ?>
                 </span>
             </div>
@@ -224,22 +224,22 @@ require __DIR__ . '/partials/header.php';
         <div class="super-card-header">
             <h3 class="super-card-title">
                 <i class="fa-solid fa-bolt"></i>
-                Quick Actions
+                <?= __('super_admin.dashboard.quick_actions_title') ?>
             </h3>
         </div>
         <div class="super-card-body">
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 <a href="/super-admin/tenants/create" class="super-btn super-btn-primary" style="justify-content: center;">
                     <i class="fa-solid fa-plus"></i>
-                    Create New Tenant
+                    <?= __('super_admin.dashboard.create_new_tenant') ?>
                 </a>
                 <a href="/super-admin/users?super_admins=1" class="super-btn super-btn-secondary" style="justify-content: center;">
                     <i class="fa-solid fa-crown"></i>
-                    View Super Admins
+                    <?= __('super_admin.dashboard.view_super_admins') ?>
                 </a>
                 <a href="/admin-legacy" class="super-btn super-btn-secondary" style="justify-content: center;">
                     <i class="fa-solid fa-arrow-left"></i>
-                    Back to Platform Admin
+                    <?= __('super_admin.dashboard.back_to_platform_admin') ?>
                 </a>
             </div>
         </div>

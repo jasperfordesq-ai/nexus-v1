@@ -20,7 +20,7 @@ require __DIR__ . '/../partials/header.php';
 <div class="super-breadcrumb">
     <a href="/super-admin"><i class="fa-solid fa-gauge-high"></i></a>
     <span class="super-breadcrumb-sep">/</span>
-    <span>Bulk Operations</span>
+    <span><?= __('super_admin.bulk.breadcrumb') ?></span>
 </div>
 
 <!-- Page Header -->
@@ -28,10 +28,10 @@ require __DIR__ . '/../partials/header.php';
     <div>
         <h1 class="super-page-title">
             <i class="fa-solid fa-layer-group"></i>
-            Bulk Operations
+            <?= __('super_admin.bulk.title') ?>
         </h1>
         <p class="super-page-subtitle">
-            Perform mass updates on users and tenants
+            <?= __('super_admin.bulk.subtitle') ?>
         </p>
     </div>
 </div>
@@ -58,12 +58,12 @@ require __DIR__ . '/../partials/header.php';
         <div class="super-card-header">
             <h3 class="super-card-title">
                 <i class="fa-solid fa-users"></i>
-                Bulk Move Users
+                <?= __('super_admin.bulk.move_users_card_title') ?>
             </h3>
         </div>
         <div class="super-card-body">
             <p style="color: var(--super-text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
-                Move multiple users to a different tenant at once. Optionally grant Super Admin privileges.
+                <?= __('super_admin.bulk.move_users_desc') ?>
             </p>
 
             <form method="POST" action="/super-admin/bulk/move-users" id="bulkMoveUsersForm">
@@ -71,9 +71,9 @@ require __DIR__ . '/../partials/header.php';
 
                 <!-- Source Tenant Filter -->
                 <div class="super-form-group">
-                    <label class="super-form-label">Filter by Source Tenant</label>
+                    <label class="super-form-label"><?= __('super_admin.bulk.source_tenant_label') ?></label>
                     <select id="sourceTenantFilter" class="super-form-select">
-                        <option value="">All Tenants</option>
+                        <option value=""><?= __('super_admin.bulk.source_tenant_all') ?></option>
                         <?php foreach ($tenants as $t): ?>
                             <option value="<?= $t['id'] ?>"><?= htmlspecialchars($t['indented_name']) ?></option>
                         <?php endforeach; ?>
@@ -82,23 +82,23 @@ require __DIR__ . '/../partials/header.php';
 
                 <!-- User Selection -->
                 <div class="super-form-group">
-                    <label class="super-form-label">Select Users</label>
+                    <label class="super-form-label"><?= __('super_admin.bulk.user_selection_label') ?></label>
                     <div id="userSelectionContainer" style="max-height: 250px; overflow-y: auto; border: 1px solid var(--super-border); border-radius: 6px; padding: 0.5rem;">
                         <div style="text-align: center; padding: 2rem; color: var(--super-text-muted);">
                             <i class="fa-solid fa-mouse-pointer"></i>
-                            Select a source tenant to load users
+                            <?= __('super_admin.bulk.user_select_hint') ?>
                         </div>
                     </div>
                     <p class="super-form-help">
-                        <span id="selectedUserCount">0</span> user(s) selected
+                        <span id="selectedUserCount">0</span> <?= __('super_admin.bulk.users_selected', ['count' => '']) ?>
                     </p>
                 </div>
 
                 <!-- Target Tenant -->
                 <div class="super-form-group">
-                    <label class="super-form-label">Target Tenant</label>
+                    <label class="super-form-label"><?= __('super_admin.bulk.target_tenant_label') ?></label>
                     <select name="target_tenant_id" class="super-form-select" required>
-                        <option value="">-- Select Target --</option>
+                        <option value=""><?= __('super_admin.bulk.target_tenant_placeholder') ?></option>
                         <?php foreach ($tenants as $t): ?>
                             <option value="<?= $t['id'] ?>">
                                 <?= htmlspecialchars($t['indented_name']) ?>
@@ -112,16 +112,16 @@ require __DIR__ . '/../partials/header.php';
                 <div class="super-form-group" style="padding: 0.75rem; background: rgba(139, 92, 246, 0.1); border-radius: 6px;">
                     <label class="super-form-checkbox">
                         <input type="checkbox" name="grant_super_admin" value="1">
-                        <span>Grant Super Admin to all moved users</span>
+                        <span><?= __('super_admin.bulk.grant_super_admin_label') ?></span>
                     </label>
                     <p class="super-form-help" style="margin-left: 1.75rem; margin-bottom: 0;">
-                        Only works if target is a Hub tenant
+                        <?= __('super_admin.bulk.grant_super_admin_help') ?>
                     </p>
                 </div>
 
                 <button type="submit" class="super-btn super-btn-primary" style="width: 100%; justify-content: center;">
                     <i class="fa-solid fa-exchange-alt"></i>
-                    Move Selected Users
+                    <?= __('super_admin.bulk.move_users_btn') ?>
                 </button>
             </form>
         </div>
@@ -132,12 +132,12 @@ require __DIR__ . '/../partials/header.php';
         <div class="super-card-header">
             <h3 class="super-card-title">
                 <i class="fa-solid fa-building"></i>
-                Bulk Tenant Operations
+                <?= __('super_admin.bulk.bulk_tenants_card_title') ?>
             </h3>
         </div>
         <div class="super-card-body">
             <p style="color: var(--super-text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
-                Enable/disable multiple tenants or toggle Hub capability in bulk.
+                <?= __('super_admin.bulk.bulk_tenants_desc') ?>
             </p>
 
             <form method="POST" action="/super-admin/bulk/update-tenants" id="bulkTenantsForm">
@@ -145,7 +145,7 @@ require __DIR__ . '/../partials/header.php';
 
                 <!-- Tenant Selection -->
                 <div class="super-form-group">
-                    <label class="super-form-label">Select Tenants</label>
+                    <label class="super-form-label"><?= __('super_admin.bulk.select_tenants_label') ?></label>
                     <div style="max-height: 250px; overflow-y: auto; border: 1px solid var(--super-border); border-radius: 6px; padding: 0.5rem;">
                         <?php foreach ($tenants as $t): ?>
                             <?php if ($t['id'] !== 1): // Cannot modify Master ?>
@@ -163,51 +163,51 @@ require __DIR__ . '/../partials/header.php';
                         <?php endforeach; ?>
                     </div>
                     <p class="super-form-help">
-                        <span id="selectedTenantCount">0</span> tenant(s) selected
-                        <a href="#" onclick="selectAllTenants(); return false;" style="margin-left: 0.5rem;">Select All</a>
-                        <a href="#" onclick="deselectAllTenants(); return false;" style="margin-left: 0.5rem;">Deselect All</a>
+                        <span id="selectedTenantCount">0</span> <?= __('super_admin.bulk.tenants_selected', ['count' => '']) ?>
+                        <a href="#" onclick="selectAllTenants(); return false;" style="margin-left: 0.5rem;"><?= __('super_admin.bulk.select_all') ?></a>
+                        <a href="#" onclick="deselectAllTenants(); return false;" style="margin-left: 0.5rem;"><?= __('super_admin.bulk.deselect_all') ?></a>
                     </p>
                 </div>
 
                 <!-- Action Selection -->
                 <div class="super-form-group">
-                    <label class="super-form-label">Action</label>
+                    <label class="super-form-label"><?= __('super_admin.bulk.action_label') ?></label>
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
                         <label class="super-radio-card">
                             <input type="radio" name="action" value="activate" required>
                             <span class="super-radio-card-content">
                                 <i class="fa-solid fa-check-circle text-success"></i>
-                                <strong>Activate</strong>
+                                <strong><?= __('super_admin.bulk.action_activate') ?></strong>
                             </span>
                         </label>
                         <label class="super-radio-card">
                             <input type="radio" name="action" value="deactivate">
                             <span class="super-radio-card-content">
                                 <i class="fa-solid fa-times-circle text-danger"></i>
-                                <strong>Deactivate</strong>
+                                <strong><?= __('super_admin.bulk.action_deactivate') ?></strong>
                             </span>
                         </label>
                         <label class="super-radio-card">
                             <input type="radio" name="action" value="enable_hub">
                             <span class="super-radio-card-content">
                                 <i class="fa-solid fa-toggle-on text-purple"></i>
-                                <strong>Enable Hub</strong>
+                                <strong><?= __('super_admin.bulk.action_enable_hub') ?></strong>
                             </span>
                         </label>
                         <label class="super-radio-card">
                             <input type="radio" name="action" value="disable_hub">
                             <span class="super-radio-card-content">
                                 <i class="fa-solid fa-toggle-off text-secondary"></i>
-                                <strong>Disable Hub</strong>
+                                <strong><?= __('super_admin.bulk.action_disable_hub') ?></strong>
                             </span>
                         </label>
                     </div>
                 </div>
 
                 <button type="submit" class="super-btn super-btn-warning" style="width: 100%; justify-content: center;"
-                        onclick="return confirm('Apply this action to all selected tenants?');">
+                        onclick="return confirm('<?= __('super_admin.bulk.apply_confirm') ?>');">
                     <i class="fa-solid fa-bolt"></i>
-                    Apply to Selected
+                    <?= __('super_admin.bulk.apply_btn') ?>
                 </button>
             </form>
         </div>

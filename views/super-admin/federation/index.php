@@ -20,17 +20,17 @@ require __DIR__ . '/../partials/header.php';
     <div>
         <h1 class="super-page-title">
             <i class="fa-solid fa-network-wired"></i>
-            Federation Control Center
+            <?= __('super_admin.federation.index.title') ?>
         </h1>
         <p class="super-page-subtitle">
-            Platform-wide federation management and oversight
+            <?= __('super_admin.federation.index.subtitle') ?>
         </p>
     </div>
     <?php if ($access['level'] === 'master'): ?>
     <div class="super-page-actions">
         <a href="/super-admin/federation/system-controls" class="super-btn super-btn-primary">
             <i class="fa-solid fa-sliders"></i>
-            System Controls
+            <?= __('super_admin.federation.index.system_controls_btn') ?>
         </a>
     </div>
     <?php endif; ?>
@@ -42,7 +42,7 @@ require __DIR__ . '/../partials/header.php';
     <div style="display: flex; align-items: center; gap: 1rem;">
         <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.5rem;"></i>
         <div>
-            <strong style="font-size: 1.1rem;">EMERGENCY LOCKDOWN ACTIVE</strong>
+            <strong style="font-size: 1.1rem;"><?= __('super_admin.federation.index.lockdown_title') ?></strong>
             <p style="margin: 0.25rem 0 0 0; opacity: 0.9;">
                 <?= htmlspecialchars($systemStatus['emergency_lockdown_reason'] ?? 'No reason provided') ?>
             </p>
@@ -51,7 +51,7 @@ require __DIR__ . '/../partials/header.php';
     <?php if ($access['level'] === 'master'): ?>
     <button onclick="liftLockdown()" class="super-btn" style="background: white; color: #dc2626;">
         <i class="fa-solid fa-unlock"></i>
-        Lift Lockdown
+        <?= __('super_admin.federation.index.lockdown_lift_btn') ?>
     </button>
     <?php endif; ?>
 </div>
@@ -65,7 +65,7 @@ require __DIR__ . '/../partials/header.php';
         </div>
         <div>
             <div class="super-stat-value"><?= $systemStatus['federation_enabled'] ? 'ON' : 'OFF' ?></div>
-            <div class="super-stat-label">Federation System</div>
+            <div class="super-stat-label"><?= __('super_admin.federation.index.stat_federation_system') ?></div>
         </div>
     </div>
 
@@ -75,7 +75,7 @@ require __DIR__ . '/../partials/header.php';
         </div>
         <div>
             <div class="super-stat-value"><?= count($whitelistedTenants ?? []) ?></div>
-            <div class="super-stat-label">Whitelisted Tenants</div>
+            <div class="super-stat-label"><?= __('super_admin.federation.index.stat_whitelisted_tenants') ?></div>
         </div>
     </div>
 
@@ -85,7 +85,7 @@ require __DIR__ . '/../partials/header.php';
         </div>
         <div>
             <div class="super-stat-value"><?= $partnershipStats['active'] ?? 0 ?></div>
-            <div class="super-stat-label">Active Partnerships</div>
+            <div class="super-stat-label"><?= __('super_admin.federation.index.stat_active_partnerships') ?></div>
         </div>
     </div>
 
@@ -95,7 +95,7 @@ require __DIR__ . '/../partials/header.php';
         </div>
         <div>
             <div class="super-stat-value"><?= $partnershipStats['pending'] ?? 0 ?></div>
-            <div class="super-stat-label">Pending Requests</div>
+            <div class="super-stat-label"><?= __('super_admin.federation.index.stat_pending_requests') ?></div>
         </div>
     </div>
 </div>
@@ -105,11 +105,11 @@ require __DIR__ . '/../partials/header.php';
     <div class="super-card-header">
         <h3 class="super-card-title">
             <i class="fa-solid fa-toggle-on"></i>
-            Global Feature Status
+            <?= __('super_admin.federation.index.features_card_title') ?>
         </h3>
         <?php if ($access['level'] === 'master'): ?>
         <a href="/super-admin/federation/system-controls" class="super-btn super-btn-sm super-btn-secondary">
-            Configure <i class="fa-solid fa-arrow-right"></i>
+            <?= __('super_admin.federation.index.configure_btn') ?> <i class="fa-solid fa-arrow-right"></i>
         </a>
         <?php endif; ?>
     </div>
@@ -117,12 +117,12 @@ require __DIR__ . '/../partials/header.php';
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
             <?php
             $features = [
-                'cross_tenant_profiles_enabled' => ['Profiles', 'fa-user'],
-                'cross_tenant_messaging_enabled' => ['Messaging', 'fa-envelope'],
-                'cross_tenant_transactions_enabled' => ['Transactions', 'fa-exchange-alt'],
-                'cross_tenant_listings_enabled' => ['Listings', 'fa-list'],
-                'cross_tenant_events_enabled' => ['Events', 'fa-calendar'],
-                'cross_tenant_groups_enabled' => ['Groups', 'fa-users'],
+                'cross_tenant_profiles_enabled' => [__('super_admin.federation.index.feature_profiles'), 'fa-user'],
+                'cross_tenant_messaging_enabled' => [__('super_admin.federation.index.feature_messaging'), 'fa-envelope'],
+                'cross_tenant_transactions_enabled' => [__('super_admin.federation.index.feature_transactions'), 'fa-exchange-alt'],
+                'cross_tenant_listings_enabled' => [__('super_admin.federation.index.feature_listings'), 'fa-list'],
+                'cross_tenant_events_enabled' => [__('super_admin.federation.index.feature_events'), 'fa-calendar'],
+                'cross_tenant_groups_enabled' => [__('super_admin.federation.index.feature_groups'), 'fa-users'],
             ];
             foreach ($features as $key => $info):
                 $enabled = !empty($systemStatus[$key]);
@@ -146,25 +146,25 @@ require __DIR__ . '/../partials/header.php';
         <div class="super-card-header">
             <h3 class="super-card-title">
                 <i class="fa-solid fa-building-shield"></i>
-                Whitelisted Tenants
+                <?= __('super_admin.federation.index.whitelisted_card_title') ?>
             </h3>
             <a href="/super-admin/federation/whitelist" class="super-btn super-btn-sm super-btn-secondary">
-                Manage <i class="fa-solid fa-arrow-right"></i>
+                <?= __('super_admin.federation.index.manage_btn') ?> <i class="fa-solid fa-arrow-right"></i>
             </a>
         </div>
         <table class="super-table">
             <thead>
                 <tr>
-                    <th>Tenant</th>
-                    <th>Approved</th>
-                    <th>Status</th>
+                    <th><?= __('super_admin.federation.index.col_tenant') ?></th>
+                    <th><?= __('super_admin.federation.index.col_approved') ?></th>
+                    <th><?= __('super_admin.federation.index.col_status') ?></th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($whitelistedTenants)): ?>
                 <tr>
                     <td colspan="3" style="text-align: center; padding: 2rem; color: var(--super-text-muted);">
-                        No tenants whitelisted yet
+                        <?= __('super_admin.federation.index.no_whitelisted') ?>
                     </td>
                 </tr>
                 <?php else: ?>
@@ -193,25 +193,25 @@ require __DIR__ . '/../partials/header.php';
         <div class="super-card-header">
             <h3 class="super-card-title">
                 <i class="fa-solid fa-handshake"></i>
-                Recent Partnerships
+                <?= __('super_admin.federation.index.partnerships_card_title') ?>
             </h3>
             <a href="/super-admin/federation/partnerships" class="super-btn super-btn-sm super-btn-secondary">
-                View All <i class="fa-solid fa-arrow-right"></i>
+                <?= __('super_admin.federation.index.view_all_btn') ?> <i class="fa-solid fa-arrow-right"></i>
             </a>
         </div>
         <table class="super-table">
             <thead>
                 <tr>
-                    <th>Partnership</th>
-                    <th>Level</th>
-                    <th>Status</th>
+                    <th><?= __('super_admin.federation.index.col_partnership') ?></th>
+                    <th><?= __('super_admin.federation.index.col_level') ?></th>
+                    <th><?= __('super_admin.federation.index.col_status') ?></th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($partnershipStats['recent'])): ?>
                 <tr>
                     <td colspan="3" style="text-align: center; padding: 2rem; color: var(--super-text-muted);">
-                        No partnerships yet
+                        <?= __('super_admin.federation.index.no_partnerships') ?>
                     </td>
                 </tr>
                 <?php else: ?>
@@ -255,7 +255,7 @@ require __DIR__ . '/../partials/header.php';
         <div class="super-card-header">
             <h3 class="super-card-title" style="color: #dc2626;">
                 <i class="fa-solid fa-triangle-exclamation"></i>
-                Critical Events
+                <?= __('super_admin.federation.index.critical_events_title') ?>
             </h3>
         </div>
         <div class="super-card-body">
@@ -278,16 +278,16 @@ require __DIR__ . '/../partials/header.php';
         <div class="super-card-header">
             <h3 class="super-card-title">
                 <i class="fa-solid fa-clipboard-list"></i>
-                Recent Activity
+                <?= __('super_admin.federation.index.recent_activity_title') ?>
             </h3>
             <a href="/super-admin/federation/audit" class="super-btn super-btn-sm super-btn-secondary">
-                Full Log <i class="fa-solid fa-arrow-right"></i>
+                <?= __('super_admin.federation.index.full_log_btn') ?> <i class="fa-solid fa-arrow-right"></i>
             </a>
         </div>
         <div class="super-card-body" style="max-height: 300px; overflow-y: auto;">
             <?php if (empty($recentAudit)): ?>
             <p style="text-align: center; color: var(--super-text-muted); padding: 2rem;">
-                No federation activity yet
+                <?= __('super_admin.federation.index.no_federation_activity') ?>
             </p>
             <?php else: ?>
             <?php foreach (array_slice($recentAudit, 0, 10) as $log): ?>
@@ -296,7 +296,7 @@ require __DIR__ . '/../partials/header.php';
                     <span style="font-size: 0.9rem;"><?= htmlspecialchars($log['action_type']) ?></span>
                     <?php if (!empty($log['actor_name'])): ?>
                     <span style="color: var(--super-text-muted); font-size: 0.85rem;">
-                        by <?= htmlspecialchars($log['actor_name']) ?>
+                        <?= __('super_admin.federation.index.by_label') ?> <?= htmlspecialchars($log['actor_name']) ?>
                     </span>
                     <?php endif; ?>
                 </div>
@@ -318,7 +318,7 @@ $auditStats = $auditStats ?? \App\Services\FederationAuditService::getStats(30);
     <div class="super-card-header">
         <h3 class="super-card-title">
             <i class="fa-solid fa-chart-line"></i>
-            Federation Activity (30 days)
+            <?= __('super_admin.federation.index.activity_title') ?>
         </h3>
     </div>
     <div class="super-card-body">
@@ -327,36 +327,36 @@ $auditStats = $auditStats ?? \App\Services\FederationAuditService::getStats(30);
                 <div style="font-size: 1.75rem; font-weight: 700; color: var(--super-primary);">
                     <?= number_format($auditStats['total_actions'] ?? 0) ?>
                 </div>
-                <div style="font-size: 0.85rem; color: var(--super-text-muted);">Total Actions</div>
+                <div style="font-size: 0.85rem; color: var(--super-text-muted);"><?= __('super_admin.federation.index.stat_total_actions') ?></div>
             </div>
             <div style="text-align: center; padding: 1rem; background: var(--super-bg); border-radius: 8px;">
                 <div style="font-size: 1.75rem; font-weight: 700; color: #22c55e;">
                     <?= number_format($auditStats['by_category']['messaging'] ?? 0) ?>
                 </div>
-                <div style="font-size: 0.85rem; color: var(--super-text-muted);">Messages</div>
+                <div style="font-size: 0.85rem; color: var(--super-text-muted);"><?= __('super_admin.federation.index.stat_messages') ?></div>
             </div>
             <div style="text-align: center; padding: 1rem; background: var(--super-bg); border-radius: 8px;">
                 <div style="font-size: 1.75rem; font-weight: 700; color: #f59e0b;">
                     <?= number_format($auditStats['by_category']['transaction'] ?? 0) ?>
                 </div>
-                <div style="font-size: 0.85rem; color: var(--super-text-muted);">Transactions</div>
+                <div style="font-size: 0.85rem; color: var(--super-text-muted);"><?= __('super_admin.federation.index.stat_transactions') ?></div>
             </div>
             <div style="text-align: center; padding: 1rem; background: var(--super-bg); border-radius: 8px;">
                 <div style="font-size: 1.75rem; font-weight: 700; color: #a855f7;">
                     <?= number_format($auditStats['by_category']['profile'] ?? 0) ?>
                 </div>
-                <div style="font-size: 0.85rem; color: var(--super-text-muted);">Profile Views</div>
+                <div style="font-size: 0.85rem; color: var(--super-text-muted);"><?= __('super_admin.federation.index.stat_profile_views') ?></div>
             </div>
             <div style="text-align: center; padding: 1rem; background: var(--super-bg); border-radius: 8px;">
                 <div style="font-size: 1.75rem; font-weight: 700; color: #dc2626;">
                     <?= number_format($auditStats['critical_count'] ?? 0) ?>
                 </div>
-                <div style="font-size: 0.85rem; color: var(--super-text-muted);">Critical Events</div>
+                <div style="font-size: 0.85rem; color: var(--super-text-muted);"><?= __('super_admin.federation.index.stat_critical_events') ?></div>
             </div>
         </div>
 
         <?php if (!empty($auditStats['most_active_pairs'])): ?>
-        <h4 style="margin: 0 0 0.75rem 0; font-size: 0.9rem; color: var(--super-text-muted);">Most Active Partnerships</h4>
+        <h4 style="margin: 0 0 0.75rem 0; font-size: 0.9rem; color: var(--super-text-muted);"><?= __('super_admin.federation.index.most_active_partnerships') ?></h4>
         <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
             <?php foreach (array_slice($auditStats['most_active_pairs'], 0, 5) as $pair): ?>
             <span style="padding: 0.5rem 0.75rem; background: var(--super-bg); border-radius: 6px; font-size: 0.85rem;">
@@ -374,7 +374,7 @@ $auditStats = $auditStats ?? \App\Services\FederationAuditService::getStats(30);
     <div class="super-card-header">
         <h3 class="super-card-title">
             <i class="fa-solid fa-compass"></i>
-            Quick Navigation
+            <?= __('super_admin.federation.index.quick_nav_title') ?>
         </h3>
     </div>
     <div class="super-card-body">
@@ -382,20 +382,20 @@ $auditStats = $auditStats ?? \App\Services\FederationAuditService::getStats(30);
             <?php if ($access['level'] === 'master'): ?>
             <a href="/super-admin/federation/system-controls" class="super-btn super-btn-secondary" style="justify-content: center;">
                 <i class="fa-solid fa-sliders"></i>
-                System Controls
+                <?= __('super_admin.federation.index.system_controls_btn') ?>
             </a>
             <?php endif; ?>
             <a href="/super-admin/federation/whitelist" class="super-btn super-btn-secondary" style="justify-content: center;">
                 <i class="fa-solid fa-building-shield"></i>
-                Tenant Whitelist
+                <?= __('super_admin.federation.index.tenant_whitelist_btn') ?>
             </a>
             <a href="/super-admin/federation/partnerships" class="super-btn super-btn-secondary" style="justify-content: center;">
                 <i class="fa-solid fa-handshake"></i>
-                Partnerships
+                <?= __('super_admin.federation.partnerships.title') ?>
             </a>
             <a href="/super-admin/federation/audit" class="super-btn super-btn-secondary" style="justify-content: center;">
                 <i class="fa-solid fa-clipboard-list"></i>
-                Audit Log
+                <?= __('super_admin.federation.audit_log.title') ?>
             </a>
         </div>
     </div>

@@ -28,9 +28,9 @@ $totalUsers = array_sum(array_column($tenants, 'user_count'));
 <div class="super-breadcrumb">
     <a href="/super-admin"><i class="fa-solid fa-gauge-high"></i></a>
     <span class="super-breadcrumb-sep">/</span>
-    <a href="/super-admin/tenants">Tenants</a>
+    <a href="/super-admin/tenants"><?= __('super_admin.tenants.hierarchy.breadcrumb_tenants') ?></a>
     <span class="super-breadcrumb-sep">/</span>
-    <span>Hierarchy View</span>
+    <span><?= __('super_admin.tenants.hierarchy.breadcrumb_hierarchy') ?></span>
 </div>
 
 <!-- Page Header -->
@@ -38,28 +38,28 @@ $totalUsers = array_sum(array_column($tenants, 'user_count'));
     <div>
         <h1 class="super-page-title">
             <i class="fa-solid fa-sitemap"></i>
-            Tenant Hierarchy
+            <?= __('super_admin.tenants.hierarchy.title') ?>
         </h1>
         <p class="super-page-subtitle">
-            Visual organization structure with drag-and-drop management
+            <?= __('super_admin.tenants.hierarchy.subtitle') ?>
         </p>
     </div>
     <div class="super-page-actions">
         <button type="button" class="super-btn super-btn-secondary" onclick="expandAll()">
             <i class="fa-solid fa-expand"></i>
-            Expand All
+            <?= __('super_admin.tenants.hierarchy.expand_all_btn') ?>
         </button>
         <button type="button" class="super-btn super-btn-secondary" onclick="collapseAll()">
             <i class="fa-solid fa-compress"></i>
-            Collapse All
+            <?= __('super_admin.tenants.hierarchy.collapse_all_btn') ?>
         </button>
         <a href="/super-admin/tenants" class="super-btn super-btn-secondary">
             <i class="fa-solid fa-table-list"></i>
-            List View
+            <?= __('super_admin.tenants.hierarchy.list_view_btn') ?>
         </a>
         <a href="/super-admin/tenants/create" class="super-btn super-btn-primary">
             <i class="fa-solid fa-plus"></i>
-            Add Tenant
+            <?= __('super_admin.tenants.hierarchy.add_tenant_btn') ?>
         </a>
     </div>
 </div>
@@ -72,7 +72,7 @@ $totalUsers = array_sum(array_column($tenants, 'user_count'));
         </div>
         <div class="hierarchy-stat-info">
             <div class="hierarchy-stat-value"><?= $totalTenants ?></div>
-            <div class="hierarchy-stat-label">Total Tenants</div>
+            <div class="hierarchy-stat-label"><?= __('super_admin.tenants.hierarchy.stat_total_tenants') ?></div>
         </div>
     </div>
     <div class="hierarchy-stat-card">
@@ -81,7 +81,7 @@ $totalUsers = array_sum(array_column($tenants, 'user_count'));
         </div>
         <div class="hierarchy-stat-info">
             <div class="hierarchy-stat-value"><?= $activeTenants ?></div>
-            <div class="hierarchy-stat-label">Active</div>
+            <div class="hierarchy-stat-label"><?= __('super_admin.tenants.hierarchy.stat_active') ?></div>
         </div>
     </div>
     <div class="hierarchy-stat-card">
@@ -90,7 +90,7 @@ $totalUsers = array_sum(array_column($tenants, 'user_count'));
         </div>
         <div class="hierarchy-stat-info">
             <div class="hierarchy-stat-value"><?= $hubTenants ?></div>
-            <div class="hierarchy-stat-label">Hub Tenants</div>
+            <div class="hierarchy-stat-label"><?= __('super_admin.tenants.hierarchy.stat_hub_tenants') ?></div>
         </div>
     </div>
     <div class="hierarchy-stat-card">
@@ -99,7 +99,7 @@ $totalUsers = array_sum(array_column($tenants, 'user_count'));
         </div>
         <div class="hierarchy-stat-info">
             <div class="hierarchy-stat-value"><?= $maxDepth ?></div>
-            <div class="hierarchy-stat-label">Max Depth</div>
+            <div class="hierarchy-stat-label"><?= __('super_admin.tenants.hierarchy.stat_max_depth') ?></div>
         </div>
     </div>
     <div class="hierarchy-stat-card">
@@ -108,7 +108,7 @@ $totalUsers = array_sum(array_column($tenants, 'user_count'));
         </div>
         <div class="hierarchy-stat-info">
             <div class="hierarchy-stat-value"><?= number_format($totalUsers) ?></div>
-            <div class="hierarchy-stat-label">Total Users</div>
+            <div class="hierarchy-stat-label"><?= __('super_admin.tenants.hierarchy.stat_total_users') ?></div>
         </div>
     </div>
 </div>
@@ -117,37 +117,37 @@ $totalUsers = array_sum(array_column($tenants, 'user_count'));
 <div class="hierarchy-toolbar">
     <div class="hierarchy-search">
         <i class="fa-solid fa-search"></i>
-        <input type="text" id="treeSearch" placeholder="Search tenants..." onkeyup="filterTree(this.value)">
+        <input type="text" id="treeSearch" placeholder="<?= __('super_admin.tenants.hierarchy.search_placeholder') ?>" onkeyup="filterTree(this.value)">
         <button type="button" class="hierarchy-search-clear" onclick="clearSearch()" style="display: none;">
             <i class="fa-solid fa-times"></i>
         </button>
     </div>
     <div class="hierarchy-filters">
         <button type="button" class="hierarchy-filter-btn active" data-filter="all" onclick="setFilter('all')">
-            <i class="fa-solid fa-globe"></i> All
+            <i class="fa-solid fa-globe"></i> <?= __('super_admin.tenants.hierarchy.filter_all') ?>
         </button>
         <button type="button" class="hierarchy-filter-btn" data-filter="hub" onclick="setFilter('hub')">
-            <i class="fa-solid fa-network-wired"></i> Hubs Only
+            <i class="fa-solid fa-network-wired"></i> <?= __('super_admin.tenants.hierarchy.filter_hubs') ?>
         </button>
         <button type="button" class="hierarchy-filter-btn" data-filter="active" onclick="setFilter('active')">
-            <i class="fa-solid fa-circle-check"></i> Active
+            <i class="fa-solid fa-circle-check"></i> <?= __('super_admin.tenants.hierarchy.filter_active') ?>
         </button>
         <button type="button" class="hierarchy-filter-btn" data-filter="inactive" onclick="setFilter('inactive')">
-            <i class="fa-solid fa-circle-xmark"></i> Inactive
+            <i class="fa-solid fa-circle-xmark"></i> <?= __('super_admin.tenants.hierarchy.filter_inactive') ?>
         </button>
     </div>
     <div class="hierarchy-legend">
         <span class="legend-item">
             <i class="fa-solid fa-crown" style="color: #fbbf24;"></i>
-            <span>Master</span>
+            <span><?= __('super_admin.tenants.hierarchy.legend_master') ?></span>
         </span>
         <span class="legend-item">
-            <span class="legend-badge hub">Hub</span>
-            <span>Can create sub-tenants</span>
+            <span class="legend-badge hub"><?= __('super_admin.tenants.hierarchy.legend_hub') ?></span>
+            <span><?= __('super_admin.tenants.hierarchy.legend_hub_desc') ?></span>
         </span>
         <span class="legend-item">
             <i class="fa-solid fa-grip-vertical" style="color: var(--super-text-muted);"></i>
-            <span>Drag to move</span>
+            <span><?= __('super_admin.tenants.hierarchy.legend_drag') ?></span>
         </span>
     </div>
 </div>
@@ -161,11 +161,11 @@ $totalUsers = array_sum(array_column($tenants, 'user_count'));
                     <div class="hierarchy-empty-icon">
                         <i class="fa-solid fa-sitemap"></i>
                     </div>
-                    <h3>No Tenants Found</h3>
-                    <p>Create your first tenant to get started.</p>
+                    <h3><?= __('super_admin.tenants.hierarchy.no_tenants_title') ?></h3>
+                    <p><?= __('super_admin.tenants.hierarchy.no_tenants_desc') ?></p>
                     <a href="/super-admin/tenants/create" class="super-btn super-btn-primary">
                         <i class="fa-solid fa-plus"></i>
-                        Create Tenant
+                        <?= __('super_admin.tenants.hierarchy.create_btn') ?>
                     </a>
                 </div>
             <?php else: ?>
@@ -209,7 +209,7 @@ $totalUsers = array_sum(array_column($tenants, 'user_count'));
                                     <span class="tree-toggle-placeholder"></span>
                                 <?php endif; ?>
 
-                                <div class="tree-node-drag <?= $isMaster ? 'disabled' : '' ?>" title="<?= $isMaster ? 'Cannot move master tenant' : 'Drag to move' ?>">
+                                <div class="tree-node-drag <?= $isMaster ? 'disabled' : '' ?>" title="<?= $isMaster ? __('super_admin.tenants.hierarchy.drag_cannot_move_master') : __('super_admin.tenants.hierarchy.drag_to_move') ?>">
                                     <i class="fa-solid fa-grip-vertical"></i>
                                 </div>
 
@@ -338,7 +338,7 @@ $totalUsers = array_sum(array_column($tenants, 'user_count'));
             <div class="modal-icon">
                 <i class="fa-solid fa-sitemap"></i>
             </div>
-            <h3>Move Tenant</h3>
+            <h3><?= __('super_admin.tenants.hierarchy.modal_move_title') ?></h3>
         </div>
         <div class="modal-body">
             <div class="move-preview">
@@ -347,7 +347,7 @@ $totalUsers = array_sum(array_column($tenants, 'user_count'));
                         <i class="fa-solid fa-building"></i>
                     </div>
                     <div class="move-item-info">
-                        <span class="move-item-label">Moving</span>
+                        <span class="move-item-label"><?= __('super_admin.tenants.hierarchy.modal_moving_label') ?></span>
                         <span class="move-item-name" id="dropSourceName"></span>
                     </div>
                 </div>
@@ -359,14 +359,14 @@ $totalUsers = array_sum(array_column($tenants, 'user_count'));
                         <i class="fa-solid fa-network-wired"></i>
                     </div>
                     <div class="move-item-info">
-                        <span class="move-item-label">Under</span>
+                        <span class="move-item-label"><?= __('super_admin.tenants.hierarchy.modal_under_label') ?></span>
                         <span class="move-item-name" id="dropTargetName"></span>
                     </div>
                 </div>
             </div>
             <div class="modal-warning">
                 <i class="fa-solid fa-info-circle"></i>
-                <span>All sub-tenants will move with their parent.</span>
+                <span><?= __('super_admin.tenants.hierarchy.modal_sub_tenants_note') ?></span>
             </div>
         </div>
         <div class="modal-footer">
@@ -375,11 +375,11 @@ $totalUsers = array_sum(array_column($tenants, 'user_count'));
                 <input type="hidden" name="new_parent_id" id="moveNewParentId">
                 <button type="button" class="super-btn super-btn-secondary" onclick="closeDropModal()">
                     <i class="fa-solid fa-times"></i>
-                    Cancel
+                    <?= __('super_admin.tenants.hierarchy.modal_cancel_btn') ?>
                 </button>
                 <button type="submit" class="super-btn super-btn-primary">
                     <i class="fa-solid fa-check"></i>
-                    Confirm Move
+                    <?= __('super_admin.tenants.hierarchy.modal_confirm_btn') ?>
                 </button>
             </form>
         </div>
@@ -389,11 +389,11 @@ $totalUsers = array_sum(array_column($tenants, 'user_count'));
 <!-- No Results Message -->
 <div id="noResults" class="no-results" style="display: none;">
     <i class="fa-solid fa-search"></i>
-    <h4>No tenants found</h4>
-    <p>Try adjusting your search or filter criteria.</p>
+    <h4><?= __('super_admin.tenants.hierarchy.no_results_title') ?></h4>
+    <p><?= __('super_admin.tenants.hierarchy.no_results_desc') ?></p>
     <button type="button" class="super-btn super-btn-secondary" onclick="clearSearch(); setFilter('all');">
         <i class="fa-solid fa-refresh"></i>
-        Reset Filters
+        <?= __('super_admin.tenants.hierarchy.reset_filters_btn') ?>
     </button>
 </div>
 

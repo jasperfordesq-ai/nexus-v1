@@ -20,9 +20,9 @@ require __DIR__ . '/../partials/header.php';
 <div class="super-breadcrumb">
     <a href="/super-admin"><i class="fa-solid fa-gauge-high"></i></a>
     <span class="super-breadcrumb-sep">/</span>
-    <a href="/super-admin/tenants">Tenants</a>
+    <a href="/super-admin/tenants"><?= __('super_admin.tenants.show.breadcrumb_tenants') ?></a>
     <span class="super-breadcrumb-sep">/</span>
-    <span>Create</span>
+    <span><?= __('super_admin.tenants.create.breadcrumb_create') ?></span>
 </div>
 
 <!-- Page Header -->
@@ -30,13 +30,13 @@ require __DIR__ . '/../partials/header.php';
     <div>
         <h1 class="super-page-title">
             <i class="fa-solid fa-plus-circle"></i>
-            Create New Tenant
+            <?= __('super_admin.tenants.create.title') ?>
         </h1>
         <p class="super-page-subtitle">
             <?php if ($parentTenant): ?>
-                Creating sub-tenant under <strong><?= htmlspecialchars($parentTenant['name']) ?></strong>
+                <?= __('super_admin.tenants.create.subtitle_selected', ['parent_name' => '<strong>' . htmlspecialchars($parentTenant['name']) . '</strong>']) ?>
             <?php else: ?>
-                Select a parent tenant to create a new sub-tenant
+                <?= __('super_admin.tenants.create.subtitle_default') ?>
             <?php endif; ?>
         </p>
     </div>
@@ -54,7 +54,7 @@ require __DIR__ . '/../partials/header.php';
     <div class="super-card-header">
         <h3 class="super-card-title">
             <i class="fa-solid fa-building"></i>
-            Tenant Details
+            <?= __('super_admin.tenants.create.card_title') ?>
         </h3>
     </div>
     <div class="super-card-body">
@@ -64,15 +64,15 @@ require __DIR__ . '/../partials/header.php';
             <!-- Parent Tenant Selection -->
             <div class="super-form-group">
                 <label class="super-form-label">
-                    Parent Tenant <span style="color: var(--super-danger);">*</span>
+                    <?= __('super_admin.tenants.create.parent_label') ?> <span style="color: var(--super-danger);">*</span>
                 </label>
                 <select name="parent_id" class="super-form-select" required <?= $parentTenant ? 'disabled' : '' ?>>
-                    <option value="">-- Select Parent Tenant --</option>
+                    <option value=""><?= __('super_admin.tenants.create.parent_placeholder') ?></option>
                     <?php foreach ($availableParents as $parent): ?>
                         <option value="<?= $parent['id'] ?>"
                             <?= ($parentTenant && $parentTenant['id'] == $parent['id']) ? 'selected' : '' ?>>
                             <?= htmlspecialchars($parent['display_name']) ?>
-                            (Depth: <?= $parent['depth'] ?>)
+                            <?= __('super_admin.tenants.create.depth_label', ['depth' => $parent['depth']]) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -80,7 +80,7 @@ require __DIR__ . '/../partials/header.php';
                     <input type="hidden" name="parent_id" value="<?= $parentTenant['id'] ?>">
                 <?php endif; ?>
                 <p class="super-form-help">
-                    Only tenants with sub-tenant capability are shown. The new tenant will be created as a child of the selected parent.
+                    <?= __('super_admin.tenants.create.parent_help') ?>
                 </p>
             </div>
 
@@ -88,7 +88,7 @@ require __DIR__ . '/../partials/header.php';
                 <!-- Name -->
                 <div class="super-form-group">
                     <label class="super-form-label">
-                        Tenant Name <span style="color: var(--super-danger);">*</span>
+                        <?= __('super_admin.tenants.create.name_label') ?> <span style="color: var(--super-danger);">*</span>
                     </label>
                     <input type="text" name="name" class="super-form-input" required
                            placeholder="e.g., Acme Corporation"
@@ -98,19 +98,19 @@ require __DIR__ . '/../partials/header.php';
                 <!-- Slug -->
                 <div class="super-form-group">
                     <label class="super-form-label">
-                        Slug <span style="color: var(--super-danger);">*</span>
+                        <?= __('super_admin.tenants.create.slug_label') ?> <span style="color: var(--super-danger);">*</span>
                     </label>
                     <input type="text" name="slug" class="super-form-input" required
                            placeholder="e.g., acme-corp"
                            pattern="[a-z0-9-]+"
                            value="<?= htmlspecialchars($_POST['slug'] ?? '') ?>">
-                    <p class="super-form-help">Lowercase letters, numbers, and hyphens only</p>
+                    <p class="super-form-help"><?= __('super_admin.tenants.create.slug_help') ?></p>
                 </div>
             </div>
 
             <!-- Tagline -->
             <div class="super-form-group">
-                <label class="super-form-label">Tagline</label>
+                <label class="super-form-label"><?= __('super_admin.tenants.create.tagline_label') ?></label>
                 <input type="text" name="tagline" class="super-form-input"
                        placeholder="e.g., Building the future together"
                        value="<?= htmlspecialchars($_POST['tagline'] ?? '') ?>">
@@ -118,18 +118,18 @@ require __DIR__ . '/../partials/header.php';
 
             <!-- Domain -->
             <div class="super-form-group">
-                <label class="super-form-label">Custom Domain</label>
+                <label class="super-form-label"><?= __('super_admin.tenants.create.domain_label') ?></label>
                 <input type="text" name="domain" class="super-form-input"
                        placeholder="e.g., acme.example.com"
                        value="<?= htmlspecialchars($_POST['domain'] ?? '') ?>">
-                <p class="super-form-help">Optional custom domain for this tenant. DNS must be configured separately.</p>
+                <p class="super-form-help"><?= __('super_admin.tenants.create.domain_help') ?></p>
             </div>
 
             <!-- Description -->
             <div class="super-form-group">
-                <label class="super-form-label">Description</label>
+                <label class="super-form-label"><?= __('super_admin.tenants.create.description_label') ?></label>
                 <textarea name="description" class="super-form-textarea" rows="3"
-                          placeholder="Brief description of this tenant..."><?= htmlspecialchars($_POST['description'] ?? '') ?></textarea>
+                          placeholder="<?= __('super_admin.tenants.create.description_placeholder') ?>"><?= htmlspecialchars($_POST['description'] ?? '') ?></textarea>
             </div>
 
             <!-- Settings -->
@@ -137,42 +137,42 @@ require __DIR__ . '/../partials/header.php';
                 <div class="super-form-group">
                     <label class="super-form-checkbox">
                         <input type="checkbox" name="is_active" value="1" checked>
-                        <span>Active</span>
+                        <span><?= __('super_admin.tenants.create.is_active_label') ?></span>
                     </label>
-                    <p class="super-form-help">Inactive tenants cannot be accessed by users</p>
+                    <p class="super-form-help"><?= __('super_admin.tenants.create.is_active_help') ?></p>
                 </div>
 
                 <div class="super-form-group">
                     <label class="super-form-checkbox">
                         <input type="checkbox" name="allows_subtenants" value="1">
-                        <span>Allow Sub-Tenants (Hub)</span>
+                        <span><?= __('super_admin.tenants.create.allows_subtenants_label') ?></span>
                     </label>
-                    <p class="super-form-help">Enable this tenant to create their own sub-tenants</p>
+                    <p class="super-form-help"><?= __('super_admin.tenants.create.allows_subtenants_help') ?></p>
                 </div>
             </div>
 
             <!-- Max Depth -->
             <div class="super-form-group">
-                <label class="super-form-label">Maximum Sub-Tenant Depth</label>
+                <label class="super-form-label"><?= __('super_admin.tenants.create.max_depth_label') ?></label>
                 <select name="max_depth" class="super-form-select">
-                    <option value="0">Unlimited</option>
+                    <option value="0"><?= __('super_admin.tenants.create.max_depth_unlimited') ?></option>
                     <option value="1">1 level deep</option>
                     <option value="2">2 levels deep</option>
                     <option value="3">3 levels deep</option>
                     <option value="5">5 levels deep</option>
                 </select>
-                <p class="super-form-help">Limit how many levels of sub-tenants can be created below this tenant (only applies if Hub is enabled)</p>
+                <p class="super-form-help"><?= __('super_admin.tenants.create.max_depth_help') ?></p>
             </div>
 
             <!-- Submit -->
             <div style="display: flex; gap: 1rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--super-border);">
                 <button type="submit" class="super-btn super-btn-primary">
                     <i class="fa-solid fa-plus"></i>
-                    Create Tenant
+                    <?= __('super_admin.tenants.create.submit_btn') ?>
                 </button>
                 <a href="/super-admin/tenants" class="super-btn super-btn-secondary">
                     <i class="fa-solid fa-times"></i>
-                    Cancel
+                    <?= __('super_admin.tenants.create.cancel_btn') ?>
                 </a>
             </div>
         </form>

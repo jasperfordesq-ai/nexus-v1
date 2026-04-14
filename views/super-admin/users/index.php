@@ -16,7 +16,7 @@ require __DIR__ . '/../partials/header.php';
 <div class="super-breadcrumb">
     <a href="/super-admin"><i class="fa-solid fa-gauge-high"></i></a>
     <span class="super-breadcrumb-sep">/</span>
-    <span>Users</span>
+    <span><?= __('super_admin.users.index.breadcrumb') ?></span>
 </div>
 
 <!-- Page Header -->
@@ -24,16 +24,16 @@ require __DIR__ . '/../partials/header.php';
     <div>
         <h1 class="super-page-title">
             <i class="fa-solid fa-users"></i>
-            User Management
+            <?= __('super_admin.users.index.title') ?>
         </h1>
         <p class="super-page-subtitle">
-            Manage users across <?= $access['scope'] === 'global' ? 'all tenants' : 'your tenant hierarchy' ?>
+            <?= $access['scope'] === 'global' ? __('super_admin.users.index.subtitle_global') : __('super_admin.users.index.subtitle_scoped') ?>
         </p>
     </div>
     <div class="super-page-actions">
         <a href="/super-admin/users/create" class="super-btn super-btn-primary">
             <i class="fa-solid fa-user-plus"></i>
-            Add User
+            <?= __('super_admin.users.index.add_user_btn') ?>
         </a>
     </div>
 </div>
@@ -59,16 +59,16 @@ require __DIR__ . '/../partials/header.php';
     <div class="super-card-body">
         <form method="GET" action="/super-admin/users" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
             <div class="super-form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
-                <label class="super-form-label">Search</label>
+                <label class="super-form-label"><?= __('super_admin.users.index.filter_search_label') ?></label>
                 <input type="text" name="search" class="super-form-input"
-                       placeholder="Name or email..."
+                       placeholder="<?= __('super_admin.users.index.filter_search_placeholder') ?>"
                        value="<?= htmlspecialchars($filters['search'] ?? '') ?>">
             </div>
 
             <div class="super-form-group" style="min-width: 180px; margin-bottom: 0;">
-                <label class="super-form-label">Tenant</label>
+                <label class="super-form-label"><?= __('super_admin.users.index.filter_tenant_label') ?></label>
                 <select name="tenant_id" class="super-form-select">
-                    <option value="">All Tenants</option>
+                    <option value=""><?= __('super_admin.users.index.filter_tenant_all') ?></option>
                     <?php foreach ($tenants as $tenant): ?>
                         <option value="<?= $tenant['id'] ?>"
                             <?= ($filters['tenant_id'] ?? '') == $tenant['id'] ? 'selected' : '' ?>>
@@ -79,13 +79,13 @@ require __DIR__ . '/../partials/header.php';
             </div>
 
             <div class="super-form-group" style="min-width: 140px; margin-bottom: 0;">
-                <label class="super-form-label">Role</label>
+                <label class="super-form-label"><?= __('super_admin.users.index.filter_role_label') ?></label>
                 <select name="role" class="super-form-select">
-                    <option value="">All Roles</option>
-                    <option value="admin" <?= ($filters['role'] ?? '') === 'admin' ? 'selected' : '' ?>>Admin</option>
-                    <option value="tenant_admin" <?= ($filters['role'] ?? '') === 'tenant_admin' ? 'selected' : '' ?>>Tenant Admin</option>
-                    <option value="moderator" <?= ($filters['role'] ?? '') === 'moderator' ? 'selected' : '' ?>>Moderator</option>
-                    <option value="member" <?= ($filters['role'] ?? '') === 'member' ? 'selected' : '' ?>>Member</option>
+                    <option value=""><?= __('super_admin.users.index.filter_role_all') ?></option>
+                    <option value="admin" <?= ($filters['role'] ?? '') === 'admin' ? 'selected' : '' ?>><?= __('super_admin.users.index.filter_role_admin') ?></option>
+                    <option value="tenant_admin" <?= ($filters['role'] ?? '') === 'tenant_admin' ? 'selected' : '' ?>><?= __('super_admin.users.index.filter_role_tenant_admin') ?></option>
+                    <option value="moderator" <?= ($filters['role'] ?? '') === 'moderator' ? 'selected' : '' ?>><?= __('super_admin.users.index.filter_role_moderator') ?></option>
+                    <option value="member" <?= ($filters['role'] ?? '') === 'member' ? 'selected' : '' ?>><?= __('super_admin.users.index.filter_role_member') ?></option>
                 </select>
             </div>
 
@@ -93,18 +93,18 @@ require __DIR__ . '/../partials/header.php';
                 <label class="super-form-checkbox">
                     <input type="checkbox" name="super_admins" value="1"
                         <?= isset($_GET['super_admins']) ? 'checked' : '' ?>>
-                    <span>Super Admins Only</span>
+                    <span><?= __('super_admin.users.index.filter_super_admins') ?></span>
                 </label>
             </div>
 
             <div style="display: flex; gap: 0.5rem;">
                 <button type="submit" class="super-btn super-btn-primary">
                     <i class="fa-solid fa-search"></i>
-                    Filter
+                    <?= __('super_admin.common.filter_btn') ?>
                 </button>
                 <a href="/super-admin/users" class="super-btn super-btn-secondary">
                     <i class="fa-solid fa-times"></i>
-                    Clear
+                    <?= __('super_admin.common.clear_btn') ?>
                 </a>
             </div>
         </form>
@@ -116,13 +116,13 @@ require __DIR__ . '/../partials/header.php';
     <table class="super-table">
         <thead>
             <tr>
-                <th>User</th>
-                <th>Tenant</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Super Admin</th>
-                <th>Last Login</th>
-                <th>Actions</th>
+                <th><?= __('super_admin.users.index.col_user') ?></th>
+                <th><?= __('super_admin.users.index.col_tenant') ?></th>
+                <th><?= __('super_admin.users.index.col_role') ?></th>
+                <th><?= __('super_admin.users.index.col_status') ?></th>
+                <th><?= __('super_admin.users.index.col_super_admin') ?></th>
+                <th><?= __('super_admin.users.index.col_last_login') ?></th>
+                <th><?= __('super_admin.users.index.col_actions') ?></th>
             </tr>
         </thead>
         <tbody>
@@ -130,7 +130,7 @@ require __DIR__ . '/../partials/header.php';
                 <tr>
                     <td colspan="7" style="text-align: center; padding: 3rem; color: var(--super-text-muted);">
                         <i class="fa-solid fa-users" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                        No users found matching your criteria
+                        <?= __('super_admin.users.index.no_users') ?>
                     </td>
                 </tr>
             <?php else: ?>
@@ -163,29 +163,29 @@ require __DIR__ . '/../partials/header.php';
                         </td>
                         <td>
                             <?php if ($user['is_approved']): ?>
-                                <span class="super-badge super-badge-success">Active</span>
+                                <span class="super-badge super-badge-success"><?= __('super_admin.users.index.status_active') ?></span>
                             <?php else: ?>
-                                <span class="super-badge super-badge-warning">Pending</span>
+                                <span class="super-badge super-badge-warning"><?= __('super_admin.users.index.status_pending') ?></span>
                             <?php endif; ?>
                         </td>
                         <td>
                             <?php if ($user['is_tenant_super_admin']): ?>
                                 <span class="super-badge super-badge-purple">
-                                    <i class="fa-solid fa-crown"></i> Yes
+                                    <i class="fa-solid fa-crown"></i> <?= __('super_admin.users.index.super_admin_yes') ?>
                                 </span>
                             <?php elseif ($user['is_super_admin']): ?>
                                 <span class="super-badge super-badge-warning">
-                                    <i class="fa-solid fa-star"></i> Legacy
+                                    <i class="fa-solid fa-star"></i> <?= __('super_admin.users.index.super_admin_legacy') ?>
                                 </span>
                             <?php else: ?>
-                                <span style="color: var(--super-text-muted);">No</span>
+                                <span style="color: var(--super-text-muted);"><?= __('super_admin.common.no') ?></span>
                             <?php endif; ?>
                         </td>
                         <td style="color: var(--super-text-muted); font-size: 0.875rem;">
                             <?php if ($user['last_login_at']): ?>
                                 <?= date('M j, Y', strtotime($user['last_login_at'])) ?>
                             <?php else: ?>
-                                Never
+                                <?= __('super_admin.common.never') ?>
                             <?php endif; ?>
                         </td>
                         <td>
@@ -205,7 +205,7 @@ require __DIR__ . '/../partials/header.php';
 <?php if (count($users) >= 100): ?>
     <p style="text-align: center; color: var(--super-text-muted); margin-top: 1rem;">
         <i class="fa-solid fa-info-circle"></i>
-        Showing first 100 results. Use filters to narrow down your search.
+        <?= __('super_admin.users.index.showing_first_100') ?>
     </p>
 <?php endif; ?>
 

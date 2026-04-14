@@ -22,11 +22,11 @@ require __DIR__ . '/../partials/header.php';
 <div class="super-breadcrumb">
     <a href="/super-admin"><i class="fa-solid fa-gauge-high"></i></a>
     <span class="super-breadcrumb-sep">/</span>
-    <a href="/super-admin/tenants">Tenants</a>
+    <a href="/super-admin/tenants"><?= __('super_admin.tenants.show.breadcrumb_tenants') ?></a>
     <span class="super-breadcrumb-sep">/</span>
     <a href="/super-admin/tenants/<?= $tenant['id'] ?>"><?= htmlspecialchars($tenant['name']) ?></a>
     <span class="super-breadcrumb-sep">/</span>
-    <span>Edit</span>
+    <span><?= __('super_admin.tenants.edit.breadcrumb_edit') ?></span>
 </div>
 
 <!-- Page Header -->
@@ -34,17 +34,16 @@ require __DIR__ . '/../partials/header.php';
     <div>
         <h1 class="super-page-title">
             <i class="fa-solid fa-pen"></i>
-            Edit Tenant
+            <?= __('super_admin.tenants.edit.title') ?>
         </h1>
         <p class="super-page-subtitle">
-            Modifying: <?= htmlspecialchars($tenant['name']) ?>
-            (Level <?= $tenant['depth'] ?>)
+            <?= __('super_admin.tenants.edit.subtitle', ['name' => htmlspecialchars($tenant['name']), 'depth' => $tenant['depth']]) ?>
         </p>
     </div>
     <div class="super-page-actions">
         <a href="/super-admin/tenants/<?= $tenant['id'] ?>" class="super-btn super-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
-            Back to Details
+            <?= __('super_admin.tenants.edit.back_btn') ?>
         </a>
     </div>
 </div>
@@ -72,7 +71,7 @@ require __DIR__ . '/../partials/header.php';
             <div class="super-card-header">
                 <h3 class="super-card-title">
                     <i class="fa-solid fa-building"></i>
-                    Tenant Details
+                    <?= __('super_admin.tenants.edit.details_card_title') ?>
                 </h3>
             </div>
             <div class="super-card-body">
@@ -83,7 +82,7 @@ require __DIR__ . '/../partials/header.php';
                         <!-- Name -->
                         <div class="super-form-group">
                             <label class="super-form-label">
-                                Tenant Name <span style="color: var(--super-danger);">*</span>
+                                <?= __('super_admin.tenants.edit.name_label') ?> <span style="color: var(--super-danger);">*</span>
                             </label>
                             <input type="text" name="name" class="super-form-input" required
                                    value="<?= htmlspecialchars($tenant['name']) ?>">
@@ -92,33 +91,33 @@ require __DIR__ . '/../partials/header.php';
                         <!-- Slug -->
                         <div class="super-form-group">
                             <label class="super-form-label">
-                                Slug <span style="color: var(--super-danger);">*</span>
+                                <?= __('super_admin.tenants.edit.slug_label') ?> <span style="color: var(--super-danger);">*</span>
                             </label>
                             <input type="text" name="slug" class="super-form-input" required
                                    pattern="[a-z0-9-]+"
                                    value="<?= htmlspecialchars($tenant['slug']) ?>">
-                            <p class="super-form-help">Lowercase letters, numbers, and hyphens only</p>
+                            <p class="super-form-help"><?= __('super_admin.tenants.edit.slug_help') ?></p>
                         </div>
                     </div>
 
                     <!-- Tagline -->
                     <div class="super-form-group">
-                        <label class="super-form-label">Tagline</label>
+                        <label class="super-form-label"><?= __('super_admin.tenants.edit.tagline_label') ?></label>
                         <input type="text" name="tagline" class="super-form-input"
                                value="<?= htmlspecialchars($tenant['tagline'] ?? '') ?>">
                     </div>
 
                     <!-- Domain -->
                     <div class="super-form-group">
-                        <label class="super-form-label">Custom Domain</label>
+                        <label class="super-form-label"><?= __('super_admin.tenants.edit.domain_label') ?></label>
                         <input type="text" name="domain" class="super-form-input"
                                value="<?= htmlspecialchars($tenant['domain'] ?? '') ?>">
-                        <p class="super-form-help">Optional custom domain. DNS must be configured separately.</p>
+                        <p class="super-form-help"><?= __('super_admin.tenants.edit.domain_help') ?></p>
                     </div>
 
                     <!-- Description -->
                     <div class="super-form-group">
-                        <label class="super-form-label">Description</label>
+                        <label class="super-form-label"><?= __('super_admin.tenants.edit.description_label') ?></label>
                         <textarea name="description" class="super-form-textarea" rows="3"><?= htmlspecialchars($tenant['description'] ?? '') ?></textarea>
                     </div>
 
@@ -127,20 +126,20 @@ require __DIR__ . '/../partials/header.php';
                         <label class="super-form-checkbox">
                             <input type="checkbox" name="is_active" value="1"
                                 <?= $tenant['is_active'] ? 'checked' : '' ?>>
-                            <span>Active</span>
+                            <span><?= __('super_admin.tenants.edit.is_active_label') ?></span>
                         </label>
-                        <p class="super-form-help">Inactive tenants cannot be accessed by users</p>
+                        <p class="super-form-help"><?= __('super_admin.tenants.edit.is_active_help') ?></p>
                     </div>
 
                     <!-- Submit -->
                     <div style="display: flex; gap: 1rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--super-border);">
                         <button type="submit" class="super-btn super-btn-primary">
                             <i class="fa-solid fa-save"></i>
-                            Save Changes
+                            <?= __('super_admin.tenants.edit.save_btn') ?>
                         </button>
                         <a href="/super-admin/tenants/<?= $tenant['id'] ?>" class="super-btn super-btn-secondary">
                             <i class="fa-solid fa-times"></i>
-                            Cancel
+                            <?= __('super_admin.tenants.edit.cancel_btn') ?>
                         </a>
                     </div>
                 </form>
@@ -152,7 +151,7 @@ require __DIR__ . '/../partials/header.php';
             <div class="super-card-header">
                 <h3 class="super-card-title">
                     <i class="fa-solid fa-magnifying-glass-chart"></i>
-                    SEO Settings
+                    <?= __('super_admin.tenants.edit.seo_card_title') ?>
                 </h3>
             </div>
             <div class="super-card-body">
@@ -161,7 +160,7 @@ require __DIR__ . '/../partials/header.php';
 
                     <!-- SERP Preview -->
                     <div style="background: var(--super-bg); border: 1px solid var(--super-border); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
-                        <div style="font-size: 0.7rem; color: var(--super-text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">Google Search Preview</div>
+                        <div style="font-size: 0.7rem; color: var(--super-text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;"><?= __('super_admin.tenants.edit.seo_preview_label') ?></div>
                         <div id="serpTitle" style="font-size: 1.1rem; color: #1a0dab; margin-bottom: 0.25rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                             <?= htmlspecialchars($tenant['meta_title'] ?: $tenant['name']) ?>
                         </div>
@@ -176,68 +175,68 @@ require __DIR__ . '/../partials/header.php';
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
                         <!-- Meta Title -->
                         <div class="super-form-group">
-                            <label class="super-form-label">Meta Title</label>
+                            <label class="super-form-label"><?= __('super_admin.tenants.edit.meta_title_label') ?></label>
                             <input type="text" name="meta_title" class="super-form-input" maxlength="70"
                                    value="<?= htmlspecialchars($tenant['meta_title'] ?? '') ?>"
-                                   placeholder="50-60 characters recommended"
+                                   placeholder="<?= __('super_admin.tenants.edit.meta_title_placeholder') ?>"
                                    oninput="document.getElementById('serpTitle').textContent = this.value || '<?= addslashes($tenant['name']) ?>'">
-                            <p class="super-form-help">Title shown in search results (50-60 chars)</p>
+                            <p class="super-form-help"><?= __('super_admin.tenants.edit.meta_title_help') ?></p>
                         </div>
 
                         <!-- H1 Headline -->
                         <div class="super-form-group">
-                            <label class="super-form-label">H1 Headline</label>
+                            <label class="super-form-label"><?= __('super_admin.tenants.edit.h1_headline_label') ?></label>
                             <input type="text" name="h1_headline" class="super-form-input" maxlength="100"
                                    value="<?= htmlspecialchars($tenant['h1_headline'] ?? '') ?>"
-                                   placeholder="Main page heading">
-                            <p class="super-form-help">Main heading displayed on homepage</p>
+                                   placeholder="<?= __('super_admin.tenants.edit.h1_headline_placeholder') ?>">
+                            <p class="super-form-help"><?= __('super_admin.tenants.edit.h1_headline_help') ?></p>
                         </div>
                     </div>
 
                     <!-- Meta Description -->
                     <div class="super-form-group">
-                        <label class="super-form-label">Meta Description</label>
+                        <label class="super-form-label"><?= __('super_admin.tenants.edit.meta_description_label') ?></label>
                         <textarea name="meta_description" class="super-form-textarea" rows="2" maxlength="180"
-                                  placeholder="150-160 characters recommended"
+                                  placeholder="<?= __('super_admin.tenants.edit.meta_description_placeholder') ?>"
                                   oninput="document.getElementById('serpDesc').textContent = this.value || 'Add a meta description...'"><?= htmlspecialchars($tenant['meta_description'] ?? '') ?></textarea>
-                        <p class="super-form-help">Description shown in search results (150-160 chars)</p>
+                        <p class="super-form-help"><?= __('super_admin.tenants.edit.meta_description_help') ?></p>
                     </div>
 
                     <!-- Hero Intro -->
                     <div class="super-form-group">
-                        <label class="super-form-label">Hero Intro Text</label>
+                        <label class="super-form-label"><?= __('super_admin.tenants.edit.hero_intro_label') ?></label>
                         <textarea name="hero_intro" class="super-form-textarea" rows="2"
-                                  placeholder="Short intro text for hero section"><?= htmlspecialchars($tenant['hero_intro'] ?? '') ?></textarea>
-                        <p class="super-form-help">Displayed below the headline on the homepage</p>
+                                  placeholder="<?= __('super_admin.tenants.edit.hero_intro_placeholder') ?>"><?= htmlspecialchars($tenant['hero_intro'] ?? '') ?></textarea>
+                        <p class="super-form-help"><?= __('super_admin.tenants.edit.hero_intro_help') ?></p>
                     </div>
 
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
                         <!-- OG Image -->
                         <div class="super-form-group">
-                            <label class="super-form-label">Social Share Image URL</label>
+                            <label class="super-form-label"><?= __('super_admin.tenants.edit.og_image_label') ?></label>
                             <input type="url" name="og_image_url" class="super-form-input"
                                    value="<?= htmlspecialchars($tenant['og_image_url'] ?? '') ?>"
                                    placeholder="https://example.com/image.jpg">
-                            <p class="super-form-help">Image for Facebook/Twitter shares (1200x630)</p>
+                            <p class="super-form-help"><?= __('super_admin.tenants.edit.og_image_help') ?></p>
                         </div>
 
                         <!-- Robots Directive -->
                         <div class="super-form-group">
-                            <label class="super-form-label">Robots Directive</label>
+                            <label class="super-form-label"><?= __('super_admin.tenants.edit.robots_label') ?></label>
                             <select name="robots_directive" class="super-form-select">
                                 <option value="index, follow" <?= ($tenant['robots_directive'] ?? '') === 'index, follow' ? 'selected' : '' ?>>index, follow (Default)</option>
                                 <option value="noindex, follow" <?= ($tenant['robots_directive'] ?? '') === 'noindex, follow' ? 'selected' : '' ?>>noindex, follow</option>
                                 <option value="index, nofollow" <?= ($tenant['robots_directive'] ?? '') === 'index, nofollow' ? 'selected' : '' ?>>index, nofollow</option>
                                 <option value="noindex, nofollow" <?= ($tenant['robots_directive'] ?? '') === 'noindex, nofollow' ? 'selected' : '' ?>>noindex, nofollow</option>
                             </select>
-                            <p class="super-form-help">Search engine indexing instructions</p>
+                            <p class="super-form-help"><?= __('super_admin.tenants.edit.robots_help') ?></p>
                         </div>
                     </div>
 
                     <div style="display: flex; gap: 1rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--super-border);">
                         <button type="submit" class="super-btn super-btn-primary">
                             <i class="fa-solid fa-save"></i>
-                            Save SEO Settings
+                            <?= __('super_admin.tenants.edit.save_seo_btn') ?>
                         </button>
                     </div>
                 </form>
@@ -249,7 +248,7 @@ require __DIR__ . '/../partials/header.php';
             <div class="super-card-header">
                 <h3 class="super-card-title">
                     <i class="fa-solid fa-location-dot"></i>
-                    Contact & Location
+                    <?= __('super_admin.tenants.edit.contact_card_title') ?>
                 </h3>
             </div>
             <div class="super-card-body">
@@ -259,7 +258,7 @@ require __DIR__ . '/../partials/header.php';
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
                         <!-- Contact Email -->
                         <div class="super-form-group">
-                            <label class="super-form-label">Contact Email</label>
+                            <label class="super-form-label"><?= __('super_admin.tenants.edit.contact_email_label') ?></label>
                             <input type="email" name="contact_email" class="super-form-input"
                                    value="<?= htmlspecialchars($tenant['contact_email'] ?? '') ?>"
                                    placeholder="contact@example.com">
@@ -267,7 +266,7 @@ require __DIR__ . '/../partials/header.php';
 
                         <!-- Contact Phone -->
                         <div class="super-form-group">
-                            <label class="super-form-label">Contact Phone</label>
+                            <label class="super-form-label"><?= __('super_admin.tenants.edit.contact_phone_label') ?></label>
                             <input type="text" name="contact_phone" class="super-form-input"
                                    value="<?= htmlspecialchars($tenant['contact_phone'] ?? '') ?>"
                                    placeholder="+1 234 567 8900">
@@ -276,34 +275,34 @@ require __DIR__ . '/../partials/header.php';
 
                     <!-- Address -->
                     <div class="super-form-group">
-                        <label class="super-form-label">Address</label>
+                        <label class="super-form-label"><?= __('super_admin.tenants.edit.address_label') ?></label>
                         <textarea name="address" class="super-form-textarea" rows="2"
-                                  placeholder="Full postal address"><?= htmlspecialchars($tenant['address'] ?? '') ?></textarea>
+                                  placeholder="<?= __('super_admin.tenants.edit.address_placeholder') ?>"><?= htmlspecialchars($tenant['address'] ?? '') ?></textarea>
                     </div>
 
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
                         <!-- Location Name -->
                         <div class="super-form-group">
-                            <label class="super-form-label">Location Name</label>
+                            <label class="super-form-label"><?= __('super_admin.tenants.edit.location_name_label') ?></label>
                             <input type="text" name="location_name" class="super-form-input"
                                    value="<?= htmlspecialchars($tenant['location_name'] ?? '') ?>"
-                                   placeholder="City, Region">
+                                   placeholder="<?= __('super_admin.tenants.edit.location_name_placeholder') ?>">
                         </div>
 
                         <!-- Country Code -->
                         <div class="super-form-group">
-                            <label class="super-form-label">Country Code</label>
+                            <label class="super-form-label"><?= __('super_admin.tenants.edit.country_code_label') ?></label>
                             <input type="text" name="country_code" class="super-form-input" maxlength="2"
                                    value="<?= htmlspecialchars($tenant['country_code'] ?? '') ?>"
                                    placeholder="IE, US, GB..." style="text-transform: uppercase;">
-                            <p class="super-form-help">2-letter ISO country code</p>
+                            <p class="super-form-help"><?= __('super_admin.tenants.edit.country_code_help') ?></p>
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
                         <!-- Latitude -->
                         <div class="super-form-group">
-                            <label class="super-form-label">Latitude</label>
+                            <label class="super-form-label"><?= __('super_admin.tenants.edit.latitude_label') ?></label>
                             <input type="number" name="latitude" class="super-form-input" step="0.00000001"
                                    value="<?= htmlspecialchars($tenant['latitude'] ?? '') ?>"
                                    placeholder="53.3498">
@@ -311,7 +310,7 @@ require __DIR__ . '/../partials/header.php';
 
                         <!-- Longitude -->
                         <div class="super-form-group">
-                            <label class="super-form-label">Longitude</label>
+                            <label class="super-form-label"><?= __('super_admin.tenants.edit.longitude_label') ?></label>
                             <input type="number" name="longitude" class="super-form-input" step="0.00000001"
                                    value="<?= htmlspecialchars($tenant['longitude'] ?? '') ?>"
                                    placeholder="-6.2603">
@@ -319,7 +318,7 @@ require __DIR__ . '/../partials/header.php';
 
                         <!-- Service Area -->
                         <div class="super-form-group">
-                            <label class="super-form-label">Service Area</label>
+                            <label class="super-form-label"><?= __('super_admin.tenants.edit.service_area_label') ?></label>
                             <select name="service_area" class="super-form-select">
                                 <option value="local" <?= ($tenant['service_area'] ?? '') === 'local' ? 'selected' : '' ?>>Local</option>
                                 <option value="regional" <?= ($tenant['service_area'] ?? '') === 'regional' ? 'selected' : '' ?>>Regional</option>
@@ -332,7 +331,7 @@ require __DIR__ . '/../partials/header.php';
                     <div style="display: flex; gap: 1rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--super-border);">
                         <button type="submit" class="super-btn super-btn-primary">
                             <i class="fa-solid fa-save"></i>
-                            Save Contact & Location
+                            <?= __('super_admin.tenants.edit.save_contact_btn') ?>
                         </button>
                     </div>
                 </form>
@@ -344,7 +343,7 @@ require __DIR__ . '/../partials/header.php';
             <div class="super-card-header">
                 <h3 class="super-card-title">
                     <i class="fa-solid fa-share-nodes"></i>
-                    Social Media Links
+                    <?= __('super_admin.tenants.edit.social_card_title') ?>
                 </h3>
             </div>
             <div class="super-card-body">
@@ -411,7 +410,7 @@ require __DIR__ . '/../partials/header.php';
                     <div style="display: flex; gap: 1rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--super-border);">
                         <button type="submit" class="super-btn super-btn-primary">
                             <i class="fa-solid fa-save"></i>
-                            Save Social Links
+                            <?= __('super_admin.tenants.edit.save_social_btn') ?>
                         </button>
                     </div>
                 </form>
@@ -423,7 +422,7 @@ require __DIR__ . '/../partials/header.php';
             <div class="super-card-header">
                 <h3 class="super-card-title">
                     <i class="fa-solid fa-puzzle-piece"></i>
-                    Platform Modules
+                    <?= __('super_admin.tenants.edit.modules_card_title') ?>
                 </h3>
             </div>
             <div class="super-card-body">
@@ -450,7 +449,7 @@ require __DIR__ . '/../partials/header.php';
                     <input type="hidden" name="update_modules" value="1">
 
                     <p style="color: var(--super-text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
-                        Enable or disable platform modules for this tenant. Disabled modules will be hidden from navigation.
+                        <?= __('super_admin.tenants.edit.modules_desc') ?>
                     </p>
 
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
@@ -474,7 +473,7 @@ require __DIR__ . '/../partials/header.php';
                     <div style="display: flex; gap: 1rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--super-border);">
                         <button type="submit" class="super-btn super-btn-primary">
                             <i class="fa-solid fa-save"></i>
-                            Save Module Settings
+                            <?= __('super_admin.tenants.edit.save_modules_btn') ?>
                         </button>
                     </div>
                 </form>
@@ -486,7 +485,7 @@ require __DIR__ . '/../partials/header.php';
             <div class="super-card-header">
                 <h3 class="super-card-title">
                     <i class="fa-solid fa-file-contract"></i>
-                    Legal Documents
+                    <?= __('super_admin.tenants.edit.legal_card_title') ?>
                 </h3>
             </div>
             <div class="super-card-body">
@@ -496,9 +495,7 @@ require __DIR__ . '/../partials/header.php';
                     <div style="background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
                         <p style="color: var(--super-text-muted); font-size: 0.875rem; margin: 0;">
                             <i class="fa-solid fa-info-circle" style="color: #22d3ee; margin-right: 0.5rem;"></i>
-                            <strong>Note:</strong> Leave these fields empty to use the default tenant view files
-                            (<code>views/tenants/<?= htmlspecialchars($tenant['slug']) ?>/modern/pages/terms.php</code> and
-                            <code>privacy.php</code>). Only add text here if you want to override the view files with simple text content.
+                            <?= __('super_admin.tenants.edit.legal_note') ?>
                         </p>
                     </div>
 
@@ -506,34 +503,34 @@ require __DIR__ . '/../partials/header.php';
                     <div class="super-form-group">
                         <label class="super-form-label">
                             <i class="fa-solid fa-shield-halved" style="color: #6366f1; margin-right: 0.5rem;"></i>
-                            Privacy Policy Text Override
+                            <?= __('super_admin.tenants.edit.privacy_policy_label') ?>
                         </label>
                         <textarea name="privacy_text" class="super-form-textarea" rows="4"
-                                  placeholder="Leave empty to use view file..."><?= htmlspecialchars($config['privacy_text'] ?? '') ?></textarea>
-                        <p class="super-form-help">HTML allowed. Leave empty to use tenant-specific view file.</p>
+                                  placeholder="<?= __('super_admin.tenants.edit.privacy_policy_placeholder') ?>"><?= htmlspecialchars($config['privacy_text'] ?? '') ?></textarea>
+                        <p class="super-form-help"><?= __('super_admin.tenants.edit.privacy_policy_help') ?></p>
                     </div>
 
                     <!-- Terms of Service -->
                     <div class="super-form-group">
                         <label class="super-form-label">
                             <i class="fa-solid fa-gavel" style="color: #3b82f6; margin-right: 0.5rem;"></i>
-                            Terms of Service Text Override
+                            <?= __('super_admin.tenants.edit.terms_label') ?>
                         </label>
                         <textarea name="terms_text" class="super-form-textarea" rows="4"
-                                  placeholder="Leave empty to use view file..."><?= htmlspecialchars($config['terms_text'] ?? '') ?></textarea>
-                        <p class="super-form-help">HTML allowed. Leave empty to use tenant-specific view file.</p>
+                                  placeholder="<?= __('super_admin.tenants.edit.terms_placeholder') ?>"><?= htmlspecialchars($config['terms_text'] ?? '') ?></textarea>
+                        <p class="super-form-help"><?= __('super_admin.tenants.edit.terms_help') ?></p>
                     </div>
 
                     <div style="display: flex; gap: 1rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--super-border);">
                         <button type="submit" class="super-btn super-btn-primary">
                             <i class="fa-solid fa-save"></i>
-                            Save Legal Documents
+                            <?= __('super_admin.tenants.edit.save_legal_btn') ?>
                         </button>
                         <?php if (!empty($config['privacy_text']) || !empty($config['terms_text'])): ?>
                             <button type="submit" name="clear_legal" value="1" class="super-btn super-btn-secondary"
                                     onclick="document.querySelector('textarea[name=privacy_text]').value=''; document.querySelector('textarea[name=terms_text]').value='';">
                                 <i class="fa-solid fa-eraser"></i>
-                                Clear & Use View Files
+                                <?= __('super_admin.tenants.edit.clear_legal_btn') ?>
                             </button>
                         <?php endif; ?>
                     </div>
@@ -549,31 +546,31 @@ require __DIR__ . '/../partials/header.php';
             <div class="super-card-header">
                 <h3 class="super-card-title">
                     <i class="fa-solid fa-sitemap"></i>
-                    Hierarchy Position
+                    <?= __('super_admin.tenants.edit.hierarchy_position_card_title') ?>
                 </h3>
             </div>
             <div class="super-card-body">
                 <div style="margin-bottom: 1rem;">
-                    <strong style="display: block; color: var(--super-text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">Path</strong>
+                    <strong style="display: block; color: var(--super-text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;"><?= __('super_admin.tenants.edit.field_path') ?></strong>
                     <code style="background: var(--super-bg); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem;">
                         <?= htmlspecialchars($tenant['path']) ?>
                     </code>
                 </div>
                 <div style="margin-bottom: 1rem;">
-                    <strong style="display: block; color: var(--super-text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">Depth Level</strong>
+                    <strong style="display: block; color: var(--super-text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;"><?= __('super_admin.tenants.edit.field_depth_level') ?></strong>
                     <span><?= $tenant['depth'] ?></span>
                 </div>
                 <?php if ($tenant['parent_id']): ?>
                     <div>
-                        <strong style="display: block; color: var(--super-text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">Parent Tenant</strong>
+                        <strong style="display: block; color: var(--super-text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;"><?= __('super_admin.tenants.edit.field_parent_tenant') ?></strong>
                         <a href="/super-admin/tenants/<?= $tenant['parent_id'] ?>" class="super-table-link">
                             <?= htmlspecialchars($tenant['parent_name'] ?? 'ID: ' . $tenant['parent_id']) ?>
                         </a>
                     </div>
                 <?php else: ?>
                     <div>
-                        <strong style="display: block; color: var(--super-text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">Parent Tenant</strong>
-                        <span style="color: var(--super-text-muted);">Root tenant (no parent)</span>
+                        <strong style="display: block; color: var(--super-text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;"><?= __('super_admin.tenants.edit.field_parent_tenant') ?></strong>
+                        <span style="color: var(--super-text-muted);"><?= __('super_admin.tenants.edit.root_tenant_no_parent') ?></span>
                     </div>
                 <?php endif; ?>
             </div>
@@ -584,27 +581,27 @@ require __DIR__ . '/../partials/header.php';
             <div class="super-card-header">
                 <h3 class="super-card-title">
                     <i class="fa-solid fa-network-wired"></i>
-                    Hub Settings
+                    <?= __('super_admin.tenants.edit.hub_settings_card_title') ?>
                 </h3>
             </div>
             <div class="super-card-body">
                 <p style="color: var(--super-text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
-                    Hub tenants can create sub-tenants and have regional super admins.
+                    <?= __('super_admin.tenants.edit.hub_settings_desc') ?>
                 </p>
 
                 <div style="margin-bottom: 1rem;">
-                    <strong style="display: block; color: var(--super-text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">Current Status</strong>
+                    <strong style="display: block; color: var(--super-text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;"><?= __('super_admin.tenants.edit.hub_current_status_label') ?></strong>
                     <?php if ($tenant['allows_subtenants']): ?>
-                        <span class="super-badge super-badge-purple">Hub Enabled</span>
+                        <span class="super-badge super-badge-purple"><?= __('super_admin.tenants.edit.hub_enabled_badge') ?></span>
                     <?php else: ?>
-                        <span class="super-badge super-badge-secondary">Standard Tenant</span>
+                        <span class="super-badge super-badge-secondary"><?= __('super_admin.tenants.edit.standard_tenant_badge') ?></span>
                     <?php endif; ?>
                 </div>
 
                 <?php if ($tenant['allows_subtenants']): ?>
                     <div style="margin-bottom: 1rem;">
-                        <strong style="display: block; color: var(--super-text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">Max Sub-Tenant Depth</strong>
-                        <span><?= $tenant['max_depth'] > 0 ? $tenant['max_depth'] . ' levels' : 'Unlimited' ?></span>
+                        <strong style="display: block; color: var(--super-text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;"><?= __('super_admin.tenants.edit.max_depth_label') ?></strong>
+                        <span><?= $tenant['max_depth'] > 0 ? __('super_admin.tenants.edit.max_depth_levels', ['count' => $tenant['max_depth']]) : __('super_admin.tenants.edit.max_depth_unlimited') ?></span>
                     </div>
                 <?php endif; ?>
 
@@ -613,15 +610,15 @@ require __DIR__ . '/../partials/header.php';
                     <?php if ($tenant['allows_subtenants']): ?>
                         <input type="hidden" name="enable" value="0">
                         <button type="submit" class="super-btn super-btn-danger" style="width: 100%; justify-content: center;"
-                                onclick="return confirm('This will prevent new sub-tenants from being created. Existing sub-tenants will remain.');">
+                                onclick="return confirm('<?= __('super_admin.tenants.edit.disable_hub_confirm') ?>');">
                             <i class="fa-solid fa-toggle-off"></i>
-                            Disable Hub
+                            <?= __('super_admin.tenants.edit.disable_hub_btn') ?>
                         </button>
                     <?php else: ?>
                         <input type="hidden" name="enable" value="1">
                         <button type="submit" class="super-btn super-btn-success" style="width: 100%; justify-content: center;">
                             <i class="fa-solid fa-toggle-on"></i>
-                            Enable Hub
+                            <?= __('super_admin.tenants.edit.enable_hub_btn') ?>
                         </button>
                     <?php endif; ?>
                 </form>
@@ -634,41 +631,41 @@ require __DIR__ . '/../partials/header.php';
                 <div class="super-card-header">
                     <h3 class="super-card-title">
                         <i class="fa-solid fa-sitemap"></i>
-                        <?= $tenant['parent_id'] ? 'Move Tenant' : 'Assign to Parent' ?>
+                        <?= $tenant['parent_id'] ? __('super_admin.tenants.edit.move_tenant_card_title') : __('super_admin.tenants.edit.assign_to_parent_card_title') ?>
                     </h3>
                 </div>
                 <div class="super-card-body">
                     <?php if ($tenant['parent_id']): ?>
                         <p style="color: var(--super-text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
-                            Move this tenant under a different parent. All sub-tenants will move with it.
+                            <?= __('super_admin.tenants.edit.move_tenant_desc') ?>
                         </p>
                     <?php else: ?>
                         <p style="color: var(--super-text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
-                            <strong>This is a root-level tenant.</strong> You can assign it as a sub-tenant under a Hub tenant.
+                            <?= __('super_admin.tenants.edit.root_tenant_desc') ?>
                         </p>
                     <?php endif; ?>
                     <form method="POST" action="/super-admin/tenants/<?= $tenant['id'] ?>/move">
                         <?= Csrf::field() ?>
                         <div class="super-form-group">
-                            <label class="super-form-label">New Parent Tenant</label>
+                            <label class="super-form-label"><?= __('super_admin.tenants.edit.new_parent_label') ?></label>
                             <select name="new_parent_id" class="super-form-select" required>
-                                <option value="">-- Select Parent Hub --</option>
+                                <option value=""><?= __('super_admin.tenants.edit.new_parent_placeholder') ?></option>
                                 <?php foreach ($availableParents as $parent): ?>
                                     <?php if ($parent['id'] != $tenant['id']): ?>
                                         <?php $isCurrent = ($parent['id'] == $tenant['parent_id']); ?>
                                         <option value="<?= $parent['id'] ?>" <?= $isCurrent ? 'disabled' : '' ?>>
                                             <?= htmlspecialchars($parent['display_name']) ?>
-                                            <?= $isCurrent ? ' (current parent)' : '' ?>
+                                            <?= $isCurrent ? ' ' . __('super_admin.tenants.edit.current_parent_suffix') : '' ?>
                                         </option>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
                             </select>
-                            <p class="super-form-help">Only Hub tenants (with sub-tenant capability) are shown</p>
+                            <p class="super-form-help"><?= __('super_admin.tenants.edit.new_parent_help') ?></p>
                         </div>
                         <button type="submit" class="super-btn super-btn-warning" style="width: 100%; justify-content: center;"
-                                onclick="return confirm('Are you sure? This will <?= $tenant['parent_id'] ? 'move' : 'assign' ?> this tenant and all its sub-tenants.');">
+                                onclick="return confirm('<?= $tenant['parent_id'] ? __('super_admin.tenants.edit.move_tenant_confirm_move') : __('super_admin.tenants.edit.move_tenant_confirm_assign') ?>');">
                             <i class="fa-solid fa-exchange-alt"></i>
-                            <?= $tenant['parent_id'] ? 'Move Tenant' : 'Assign as Sub-Tenant' ?>
+                            <?= $tenant['parent_id'] ? __('super_admin.tenants.edit.move_tenant_btn') : __('super_admin.tenants.edit.assign_subtenant_btn') ?>
                         </button>
                     </form>
                 </div>
@@ -683,19 +680,19 @@ require __DIR__ . '/../partials/header.php';
                     <div class="super-card-header" style="background: rgba(239, 68, 68, 0.1);">
                         <h3 class="super-card-title" style="color: var(--super-danger);">
                             <i class="fa-solid fa-exclamation-triangle"></i>
-                            Danger Zone
+                            <?= __('super_admin.tenants.edit.danger_zone_card_title') ?>
                         </h3>
                     </div>
                     <div class="super-card-body">
                         <p style="color: var(--super-text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
-                            Deactivating will prevent all users from accessing this tenant.
+                            <?= __('super_admin.tenants.edit.deactivate_desc') ?>
                         </p>
                         <form method="POST" action="/super-admin/tenants/<?= $tenant['id'] ?>/delete">
                             <?= Csrf::field() ?>
                             <button type="submit" class="super-btn super-btn-danger" style="width: 100%; justify-content: center;"
-                                    onclick="return confirm('Are you sure you want to deactivate this tenant? Users will lose access.');">
+                                    onclick="return confirm('<?= __('super_admin.tenants.edit.deactivate_confirm') ?>');">
                                 <i class="fa-solid fa-power-off"></i>
-                                Deactivate Tenant
+                                <?= __('super_admin.tenants.edit.deactivate_btn') ?>
                             </button>
                         </form>
                     </div>
@@ -706,18 +703,18 @@ require __DIR__ . '/../partials/header.php';
                     <div class="super-card-header" style="background: rgba(34, 197, 94, 0.1);">
                         <h3 class="super-card-title" style="color: var(--super-success);">
                             <i class="fa-solid fa-heart-pulse"></i>
-                            Reactivate Tenant
+                            <?= __('super_admin.tenants.edit.reactivate_card_title') ?>
                         </h3>
                     </div>
                     <div class="super-card-body">
                         <p style="color: var(--super-text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
-                            This tenant is currently inactive. Reactivating will restore user access.
+                            <?= __('super_admin.tenants.edit.reactivate_desc') ?>
                         </p>
                         <form method="POST" action="/super-admin/tenants/<?= $tenant['id'] ?>/reactivate">
                             <?= Csrf::field() ?>
                             <button type="submit" class="super-btn super-btn-success" style="width: 100%; justify-content: center;">
                                 <i class="fa-solid fa-power-off"></i>
-                                Reactivate Tenant
+                                <?= __('super_admin.tenants.edit.reactivate_btn') ?>
                             </button>
                         </form>
                     </div>

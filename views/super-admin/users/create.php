@@ -18,9 +18,9 @@ require __DIR__ . '/../partials/header.php';
 <div class="super-breadcrumb">
     <a href="/super-admin"><i class="fa-solid fa-gauge-high"></i></a>
     <span class="super-breadcrumb-sep">/</span>
-    <a href="/super-admin/users">Users</a>
+    <a href="/super-admin/users"><?= __('super_admin.users.show.breadcrumb_users') ?></a>
     <span class="super-breadcrumb-sep">/</span>
-    <span>Create</span>
+    <span><?= __('super_admin.users.create.breadcrumb_create') ?></span>
 </div>
 
 <!-- Page Header -->
@@ -28,13 +28,13 @@ require __DIR__ . '/../partials/header.php';
     <div>
         <h1 class="super-page-title">
             <i class="fa-solid fa-user-plus"></i>
-            Create New User
+            <?= __('super_admin.users.create.title') ?>
         </h1>
         <p class="super-page-subtitle">
             <?php if ($selectedTenant): ?>
-                Creating user for <strong><?= htmlspecialchars($selectedTenant['name']) ?></strong>
+                <?= __('super_admin.users.create.subtitle_selected', ['tenant_name' => '<strong>' . htmlspecialchars($selectedTenant['name']) . '</strong>']) ?>
             <?php else: ?>
-                Select a tenant to create a new user
+                <?= __('super_admin.users.create.subtitle_default') ?>
             <?php endif; ?>
         </p>
     </div>
@@ -52,7 +52,7 @@ require __DIR__ . '/../partials/header.php';
     <div class="super-card-header">
         <h3 class="super-card-title">
             <i class="fa-solid fa-user"></i>
-            User Details
+            <?= __('super_admin.users.create.card_title') ?>
         </h3>
     </div>
     <div class="super-card-body">
@@ -62,10 +62,10 @@ require __DIR__ . '/../partials/header.php';
             <!-- Tenant Selection -->
             <div class="super-form-group">
                 <label class="super-form-label">
-                    Tenant <span style="color: var(--super-danger);">*</span>
+                    <?= __('super_admin.users.create.tenant_label') ?> <span style="color: var(--super-danger);">*</span>
                 </label>
                 <select name="tenant_id" class="super-form-select" required <?= $selectedTenant ? 'disabled' : '' ?>>
-                    <option value="">-- Select Tenant --</option>
+                    <option value=""><?= __('super_admin.users.create.tenant_placeholder') ?></option>
                     <?php foreach ($tenants as $tenant): ?>
                         <option value="<?= $tenant['id'] ?>"
                             <?= ($selectedTenant && $selectedTenant['id'] == $tenant['id']) ? 'selected' : '' ?>
@@ -83,7 +83,7 @@ require __DIR__ . '/../partials/header.php';
                 <!-- First Name -->
                 <div class="super-form-group">
                     <label class="super-form-label">
-                        First Name <span style="color: var(--super-danger);">*</span>
+                        <?= __('super_admin.users.create.first_name_label') ?> <span style="color: var(--super-danger);">*</span>
                     </label>
                     <input type="text" name="first_name" class="super-form-input" required
                            placeholder="John"
@@ -92,7 +92,7 @@ require __DIR__ . '/../partials/header.php';
 
                 <!-- Last Name -->
                 <div class="super-form-group">
-                    <label class="super-form-label">Last Name</label>
+                    <label class="super-form-label"><?= __('super_admin.users.create.last_name_label') ?></label>
                     <input type="text" name="last_name" class="super-form-input"
                            placeholder="Doe"
                            value="<?= htmlspecialchars($_POST['last_name'] ?? '') ?>">
@@ -102,7 +102,7 @@ require __DIR__ . '/../partials/header.php';
             <!-- Email -->
             <div class="super-form-group">
                 <label class="super-form-label">
-                    Email <span style="color: var(--super-danger);">*</span>
+                    <?= __('super_admin.users.create.email_label') ?> <span style="color: var(--super-danger);">*</span>
                 </label>
                 <input type="email" name="email" class="super-form-input" required
                        placeholder="john.doe@example.com"
@@ -112,38 +112,38 @@ require __DIR__ . '/../partials/header.php';
             <!-- Password -->
             <div class="super-form-group">
                 <label class="super-form-label">
-                    Password <span style="color: var(--super-danger);">*</span>
+                    <?= __('super_admin.users.create.password_label') ?> <span style="color: var(--super-danger);">*</span>
                 </label>
                 <input type="password" name="password" class="super-form-input" required
-                       placeholder="Minimum 8 characters"
+                       placeholder="<?= __('super_admin.users.create.password_placeholder') ?>"
                        minlength="8">
-                <p class="super-form-help">Password must be at least 8 characters</p>
+                <p class="super-form-help"><?= __('super_admin.users.create.password_help') ?></p>
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
                 <!-- Role -->
                 <div class="super-form-group">
-                    <label class="super-form-label">Role</label>
+                    <label class="super-form-label"><?= __('super_admin.users.create.role_label') ?></label>
                     <select name="role" class="super-form-select">
-                        <option value="member">Member</option>
-                        <option value="moderator">Moderator</option>
-                        <option value="tenant_admin">Tenant Admin</option>
-                        <option value="admin">Admin</option>
+                        <option value="member"><?= __('super_admin.users.index.filter_role_member') ?></option>
+                        <option value="moderator"><?= __('super_admin.users.index.filter_role_moderator') ?></option>
+                        <option value="tenant_admin"><?= __('super_admin.users.index.filter_role_tenant_admin') ?></option>
+                        <option value="admin"><?= __('super_admin.users.index.filter_role_admin') ?></option>
                     </select>
                 </div>
 
                 <!-- Location -->
                 <div class="super-form-group">
-                    <label class="super-form-label">Location</label>
+                    <label class="super-form-label"><?= __('super_admin.users.create.location_label') ?></label>
                     <input type="text" name="location" class="super-form-input"
-                           placeholder="City, Country"
+                           placeholder="<?= __('super_admin.users.create.location_placeholder') ?>"
                            value="<?= htmlspecialchars($_POST['location'] ?? '') ?>">
                 </div>
             </div>
 
             <!-- Phone -->
             <div class="super-form-group">
-                <label class="super-form-label">Phone</label>
+                <label class="super-form-label"><?= __('super_admin.users.create.phone_label') ?></label>
                 <input type="text" name="phone" class="super-form-input"
                        placeholder="+1 234 567 8900"
                        value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>">
@@ -153,11 +153,10 @@ require __DIR__ . '/../partials/header.php';
             <div class="super-form-group" style="margin-top: 1rem; padding: 1rem; background: var(--super-bg); border-radius: 8px;">
                 <label class="super-form-checkbox">
                     <input type="checkbox" name="is_tenant_super_admin" value="1">
-                    <span>Grant Super Admin Privileges</span>
+                    <span><?= __('super_admin.users.create.super_admin_label') ?></span>
                 </label>
                 <p class="super-form-help" style="margin-left: 1.75rem;">
-                    Super Admins can access the Super Admin Panel and manage their tenant's sub-tenants.
-                    Only available for Hub tenants (tenants with sub-tenant capability).
+                    <?= __('super_admin.users.create.super_admin_help') ?>
                 </p>
             </div>
 
@@ -165,11 +164,11 @@ require __DIR__ . '/../partials/header.php';
             <div style="display: flex; gap: 1rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--super-border);">
                 <button type="submit" class="super-btn super-btn-primary">
                     <i class="fa-solid fa-user-plus"></i>
-                    Create User
+                    <?= __('super_admin.users.create.submit_btn') ?>
                 </button>
                 <a href="/super-admin/users" class="super-btn super-btn-secondary">
                     <i class="fa-solid fa-times"></i>
-                    Cancel
+                    <?= __('super_admin.users.create.cancel_btn') ?>
                 </a>
             </div>
         </form>

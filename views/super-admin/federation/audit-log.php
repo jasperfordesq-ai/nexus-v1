@@ -20,16 +20,16 @@ require __DIR__ . '/../partials/header.php';
     <div>
         <h1 class="super-page-title">
             <i class="fa-solid fa-clipboard-list"></i>
-            Federation Audit Log
+            <?= __('super_admin.federation.audit_log.title') ?>
         </h1>
         <p class="super-page-subtitle">
-            Complete audit trail of all federation activity
+            <?= __('super_admin.federation.audit_log.subtitle') ?>
         </p>
     </div>
     <div class="super-page-actions">
         <a href="/super-admin/federation" class="super-btn super-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
-            Back to Overview
+            <?= __('super_admin.federation.audit_log.back_btn') ?>
         </a>
     </div>
 </div>
@@ -43,7 +43,7 @@ require __DIR__ . '/../partials/header.php';
         </div>
         <div>
             <div class="super-stat-value"><?= number_format($stats['total'] ?? 0) ?></div>
-            <div class="super-stat-label">Total Events (30 days)</div>
+            <div class="super-stat-label"><?= __('super_admin.federation.audit_log.stat_total_30d') ?></div>
         </div>
     </div>
     <div class="super-stat-card">
@@ -52,7 +52,7 @@ require __DIR__ . '/../partials/header.php';
         </div>
         <div>
             <div class="super-stat-value"><?= number_format($stats['critical'] ?? 0) ?></div>
-            <div class="super-stat-label">Critical</div>
+            <div class="super-stat-label"><?= __('super_admin.federation.audit_log.stat_critical') ?></div>
         </div>
     </div>
     <div class="super-stat-card">
@@ -61,7 +61,7 @@ require __DIR__ . '/../partials/header.php';
         </div>
         <div>
             <div class="super-stat-value"><?= number_format($stats['warning'] ?? 0) ?></div>
-            <div class="super-stat-label">Warnings</div>
+            <div class="super-stat-label"><?= __('super_admin.federation.audit_log.stat_warnings') ?></div>
         </div>
     </div>
     <div class="super-stat-card">
@@ -70,7 +70,7 @@ require __DIR__ . '/../partials/header.php';
         </div>
         <div>
             <div class="super-stat-value"><?= number_format($stats['info'] ?? 0) ?></div>
-            <div class="super-stat-label">Info</div>
+            <div class="super-stat-label"><?= __('super_admin.federation.audit_log.stat_info') ?></div>
         </div>
     </div>
 </div>
@@ -81,52 +81,52 @@ require __DIR__ . '/../partials/header.php';
     <div class="super-card-header">
         <h3 class="super-card-title">
             <i class="fa-solid fa-filter"></i>
-            Filters
+            <?= __('super_admin.federation.audit_log.filters_card_title') ?>
         </h3>
     </div>
     <div class="super-card-body">
         <form method="GET" action="/super-admin/federation/audit" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
             <div style="min-width: 150px;">
-                <label class="super-label">Level</label>
+                <label class="super-label"><?= __('super_admin.federation.audit_log.level_label') ?></label>
                 <select name="level" class="super-input">
-                    <option value="">All Levels</option>
-                    <option value="critical" <?= ($filters['level'] ?? '') === 'critical' ? 'selected' : '' ?>>Critical</option>
-                    <option value="warning" <?= ($filters['level'] ?? '') === 'warning' ? 'selected' : '' ?>>Warning</option>
-                    <option value="info" <?= ($filters['level'] ?? '') === 'info' ? 'selected' : '' ?>>Info</option>
-                    <option value="debug" <?= ($filters['level'] ?? '') === 'debug' ? 'selected' : '' ?>>Debug</option>
+                    <option value=""><?= __('super_admin.federation.audit_log.level_all') ?></option>
+                    <option value="critical" <?= ($filters['level'] ?? '') === 'critical' ? 'selected' : '' ?>><?= __('super_admin.federation.audit_log.level_critical') ?></option>
+                    <option value="warning" <?= ($filters['level'] ?? '') === 'warning' ? 'selected' : '' ?>><?= __('super_admin.federation.audit_log.level_warning') ?></option>
+                    <option value="info" <?= ($filters['level'] ?? '') === 'info' ? 'selected' : '' ?>><?= __('super_admin.federation.audit_log.level_info') ?></option>
+                    <option value="debug" <?= ($filters['level'] ?? '') === 'debug' ? 'selected' : '' ?>><?= __('super_admin.federation.audit_log.level_debug') ?></option>
                 </select>
             </div>
             <div style="min-width: 150px;">
-                <label class="super-label">Category</label>
+                <label class="super-label"><?= __('super_admin.federation.audit_log.category_label') ?></label>
                 <select name="category" class="super-input">
-                    <option value="">All Categories</option>
-                    <option value="system" <?= ($filters['category'] ?? '') === 'system' ? 'selected' : '' ?>>System</option>
-                    <option value="tenant" <?= ($filters['category'] ?? '') === 'tenant' ? 'selected' : '' ?>>Tenant</option>
-                    <option value="partnership" <?= ($filters['category'] ?? '') === 'partnership' ? 'selected' : '' ?>>Partnership</option>
-                    <option value="profile" <?= ($filters['category'] ?? '') === 'profile' ? 'selected' : '' ?>>Profile</option>
-                    <option value="messaging" <?= ($filters['category'] ?? '') === 'messaging' ? 'selected' : '' ?>>Messaging</option>
-                    <option value="transaction" <?= ($filters['category'] ?? '') === 'transaction' ? 'selected' : '' ?>>Transaction</option>
+                    <option value=""><?= __('super_admin.federation.audit_log.category_all') ?></option>
+                    <option value="system" <?= ($filters['category'] ?? '') === 'system' ? 'selected' : '' ?>><?= __('super_admin.federation.audit_log.category_system') ?></option>
+                    <option value="tenant" <?= ($filters['category'] ?? '') === 'tenant' ? 'selected' : '' ?>><?= __('super_admin.federation.audit_log.category_tenant') ?></option>
+                    <option value="partnership" <?= ($filters['category'] ?? '') === 'partnership' ? 'selected' : '' ?>><?= __('super_admin.federation.audit_log.category_partnership') ?></option>
+                    <option value="profile" <?= ($filters['category'] ?? '') === 'profile' ? 'selected' : '' ?>><?= __('super_admin.federation.audit_log.category_profile') ?></option>
+                    <option value="messaging" <?= ($filters['category'] ?? '') === 'messaging' ? 'selected' : '' ?>><?= __('super_admin.federation.audit_log.category_messaging') ?></option>
+                    <option value="transaction" <?= ($filters['category'] ?? '') === 'transaction' ? 'selected' : '' ?>><?= __('super_admin.federation.audit_log.category_transaction') ?></option>
                 </select>
             </div>
             <div style="min-width: 150px;">
-                <label class="super-label">From Date</label>
+                <label class="super-label"><?= __('super_admin.federation.audit_log.date_from_label') ?></label>
                 <input type="date" name="date_from" class="super-input" value="<?= htmlspecialchars($filters['date_from'] ?? '') ?>">
             </div>
             <div style="min-width: 150px;">
-                <label class="super-label">To Date</label>
+                <label class="super-label"><?= __('super_admin.federation.audit_log.date_to_label') ?></label>
                 <input type="date" name="date_to" class="super-input" value="<?= htmlspecialchars($filters['date_to'] ?? '') ?>">
             </div>
             <div style="flex: 1; min-width: 200px;">
-                <label class="super-label">Search</label>
-                <input type="text" name="search" class="super-input" placeholder="Search actions, actors..." value="<?= htmlspecialchars($filters['search'] ?? '') ?>">
+                <label class="super-label"><?= __('super_admin.federation.audit_log.search_label') ?></label>
+                <input type="text" name="search" class="super-input" placeholder="<?= __('super_admin.federation.audit_log.search_placeholder') ?>" value="<?= htmlspecialchars($filters['search'] ?? '') ?>">
             </div>
             <button type="submit" class="super-btn super-btn-primary">
                 <i class="fa-solid fa-search"></i>
-                Filter
+                <?= __('super_admin.common.filter_btn') ?>
             </button>
             <a href="/super-admin/federation/audit" class="super-btn super-btn-secondary">
                 <i class="fa-solid fa-times"></i>
-                Clear
+                <?= __('super_admin.common.clear_btn') ?>
             </a>
         </form>
     </div>
@@ -137,19 +137,19 @@ require __DIR__ . '/../partials/header.php';
     <div class="super-card-header">
         <h3 class="super-card-title">
             <i class="fa-solid fa-list"></i>
-            Audit Events (<?= count($logs) ?>)
+            <?= __('super_admin.federation.audit_log.table_card_title', ['count' => count($logs)]) ?>
         </h3>
     </div>
     <table class="super-table">
         <thead>
             <tr>
-                <th style="width: 50px;">Level</th>
-                <th>Action</th>
-                <th>Category</th>
-                <th>Actor</th>
-                <th>Tenants</th>
-                <th>IP Address</th>
-                <th>Time</th>
+                <th style="width: 50px;"><?= __('super_admin.federation.audit_log.col_level') ?></th>
+                <th><?= __('super_admin.federation.audit_log.col_action') ?></th>
+                <th><?= __('super_admin.federation.audit_log.col_category') ?></th>
+                <th><?= __('super_admin.federation.audit_log.col_actor') ?></th>
+                <th><?= __('super_admin.federation.audit_log.col_tenants') ?></th>
+                <th><?= __('super_admin.federation.audit_log.col_ip') ?></th>
+                <th><?= __('super_admin.federation.audit_log.col_time') ?></th>
                 <th style="width: 50px;"></th>
             </tr>
         </thead>
@@ -158,7 +158,7 @@ require __DIR__ . '/../partials/header.php';
             <tr>
                 <td colspan="8" style="text-align: center; padding: 3rem; color: var(--super-text-muted);">
                     <i class="fa-solid fa-clipboard-list" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                    No audit events found
+                    <?= __('super_admin.federation.audit_log.no_events') ?>
                 </td>
             </tr>
             <?php else: ?>
@@ -191,15 +191,15 @@ require __DIR__ . '/../partials/header.php';
                     </div>
                     <?php endif; ?>
                     <?php else: ?>
-                    <span style="color: var(--super-text-muted);">System</span>
+                    <span style="color: var(--super-text-muted);"><?= __('super_admin.federation.audit_log.system_actor') ?></span>
                     <?php endif; ?>
                 </td>
                 <td style="font-size: 0.85rem;">
                     <?php if (!empty($log['source_tenant_id'])): ?>
-                    <div>From: <?= $log['source_tenant_id'] ?></div>
+                    <div><?= __('super_admin.federation.audit_log.from_label') ?> <?= $log['source_tenant_id'] ?></div>
                     <?php endif; ?>
                     <?php if (!empty($log['target_tenant_id'])): ?>
-                    <div>To: <?= $log['target_tenant_id'] ?></div>
+                    <div><?= __('super_admin.federation.audit_log.to_label') ?> <?= $log['target_tenant_id'] ?></div>
                     <?php endif; ?>
                     <?php if (empty($log['source_tenant_id']) && empty($log['target_tenant_id'])): ?>
                     <span style="color: var(--super-text-muted);">-</span>
@@ -229,7 +229,7 @@ require __DIR__ . '/../partials/header.php';
 <div id="detailsModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
     <div style="background: var(--super-card-bg); border-radius: 12px; max-width: 600px; width: 90%; max-height: 80vh; overflow: auto;">
         <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--super-border); display: flex; justify-content: space-between; align-items: center;">
-            <h3 style="margin: 0;">Event Details</h3>
+            <h3 style="margin: 0;"><?= __('super_admin.federation.audit_log.modal_title') ?></h3>
             <button onclick="closeModal()" class="super-btn super-btn-sm super-btn-secondary">
                 <i class="fa-solid fa-times"></i>
             </button>
@@ -242,31 +242,41 @@ require __DIR__ . '/../partials/header.php';
 <script>
 function showDetails(log) {
     const content = document.getElementById('detailsContent');
+    const labels = {
+        action: '<?= __('super_admin.federation.audit_log.modal_action') ?>',
+        category: '<?= __('super_admin.federation.audit_log.modal_category') ?>',
+        level: '<?= __('super_admin.federation.audit_log.modal_level') ?>',
+        time: '<?= __('super_admin.federation.audit_log.modal_time') ?>',
+        actor: '<?= __('super_admin.federation.audit_log.modal_actor') ?>',
+        ip: '<?= __('super_admin.federation.audit_log.modal_ip') ?>',
+        userAgent: '<?= __('super_admin.federation.audit_log.modal_user_agent') ?>',
+        data: '<?= __('super_admin.federation.audit_log.modal_data') ?>'
+    };
     let html = `
         <div style="margin-bottom: 1rem;">
-            <strong>Action:</strong> ${escapeHtml(log.action_type)}
+            <strong>${labels.action}</strong> ${escapeHtml(log.action_type)}
         </div>
         <div style="margin-bottom: 1rem;">
-            <strong>Category:</strong> ${escapeHtml(log.category)}
+            <strong>${labels.category}</strong> ${escapeHtml(log.category)}
         </div>
         <div style="margin-bottom: 1rem;">
-            <strong>Level:</strong> ${escapeHtml(log.level)}
+            <strong>${labels.level}</strong> ${escapeHtml(log.level)}
         </div>
         <div style="margin-bottom: 1rem;">
-            <strong>Time:</strong> ${new Date(log.created_at).toLocaleString()}
+            <strong>${labels.time}</strong> ${new Date(log.created_at).toLocaleString()}
         </div>
     `;
 
     if (log.actor_name) {
-        html += `<div style="margin-bottom: 1rem;"><strong>Actor:</strong> ${escapeHtml(log.actor_name)} (${escapeHtml(log.actor_email || '')})</div>`;
+        html += `<div style="margin-bottom: 1rem;"><strong>${labels.actor}</strong> ${escapeHtml(log.actor_name)} (${escapeHtml(log.actor_email || '')})</div>`;
     }
 
     if (log.ip_address) {
-        html += `<div style="margin-bottom: 1rem;"><strong>IP Address:</strong> ${escapeHtml(log.ip_address)}</div>`;
+        html += `<div style="margin-bottom: 1rem;"><strong>${labels.ip}</strong> ${escapeHtml(log.ip_address)}</div>`;
     }
 
     if (log.user_agent) {
-        html += `<div style="margin-bottom: 1rem;"><strong>User Agent:</strong> <span style="font-size: 0.85rem; word-break: break-all;">${escapeHtml(log.user_agent)}</span></div>`;
+        html += `<div style="margin-bottom: 1rem;"><strong>${labels.userAgent}</strong> <span style="font-size: 0.85rem; word-break: break-all;">${escapeHtml(log.user_agent)}</span></div>`;
     }
 
     if (log.data) {
@@ -275,7 +285,7 @@ function showDetails(log) {
             try { dataObj = JSON.parse(dataObj); } catch(e) {}
         }
         html += `
-            <div style="margin-bottom: 0.5rem;"><strong>Data:</strong></div>
+            <div style="margin-bottom: 0.5rem;"><strong>${labels.data}</strong></div>
             <pre style="background: var(--super-bg); padding: 1rem; border-radius: 6px; overflow: auto; font-size: 0.85rem;">${JSON.stringify(dataObj, null, 2)}</pre>
         `;
     }

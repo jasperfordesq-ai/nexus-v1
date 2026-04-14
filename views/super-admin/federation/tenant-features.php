@@ -23,17 +23,17 @@ require __DIR__ . '/../partials/header.php';
             <?= htmlspecialchars($tenant['name'] ?? 'Unknown Tenant') ?>
         </h1>
         <p class="super-page-subtitle">
-            Federation settings for this tenant
+            <?= __('super_admin.federation.tenant_features.subtitle') ?>
         </p>
     </div>
     <div class="super-page-actions">
         <a href="/super-admin/tenants/<?= $tenant['id'] ?>" class="super-btn super-btn-secondary">
             <i class="fa-solid fa-building"></i>
-            View Tenant
+            <?= __('super_admin.federation.tenant_features.view_tenant_btn') ?>
         </a>
         <a href="/super-admin/federation/whitelist" class="super-btn super-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
-            Back to Whitelist
+            <?= __('super_admin.federation.tenant_features.back_btn') ?>
         </a>
     </div>
 </div>
@@ -43,21 +43,21 @@ require __DIR__ . '/../partials/header.php';
     <div class="super-card-body">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
             <div>
-                <div style="color: var(--super-text-muted); font-size: 0.85rem;">Domain</div>
+                <div style="color: var(--super-text-muted); font-size: 0.85rem;"><?= __('super_admin.federation.tenant_features.field_domain') ?></div>
                 <div style="font-weight: 500;"><?= htmlspecialchars($tenant['domain'] ?? '-') ?></div>
             </div>
             <div>
-                <div style="color: var(--super-text-muted); font-size: 0.85rem;">Whitelist Status</div>
+                <div style="color: var(--super-text-muted); font-size: 0.85rem;"><?= __('super_admin.federation.tenant_features.field_whitelist_status') ?></div>
                 <div>
                     <?php if ($isWhitelisted): ?>
-                    <span class="super-badge super-badge-success">Whitelisted</span>
+                    <span class="super-badge super-badge-success"><?= __('super_admin.federation.tenant_features.whitelisted_badge') ?></span>
                     <?php else: ?>
-                    <span class="super-badge super-badge-danger">Not Whitelisted</span>
+                    <span class="super-badge super-badge-danger"><?= __('super_admin.federation.tenant_features.not_whitelisted_badge') ?></span>
                     <?php endif; ?>
                 </div>
             </div>
             <div>
-                <div style="color: var(--super-text-muted); font-size: 0.85rem;">Active Partnerships</div>
+                <div style="color: var(--super-text-muted); font-size: 0.85rem;"><?= __('super_admin.federation.tenant_features.field_active_partnerships') ?></div>
                 <div style="font-weight: 500;"><?= count(array_filter($partnerships ?? [], fn($p) => $p['status'] === 'active')) ?></div>
             </div>
         </div>
@@ -68,7 +68,7 @@ require __DIR__ . '/../partials/header.php';
 <div style="background: #fef3c7; border: 1px solid #f59e0b; padding: 1rem 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
     <div style="display: flex; align-items: center; gap: 0.75rem; color: #92400e;">
         <i class="fa-solid fa-triangle-exclamation"></i>
-        <span>This tenant is not whitelisted for federation. Features cannot be enabled until they are added to the whitelist.</span>
+        <span><?= __('super_admin.federation.tenant_features.not_whitelisted_warning') ?></span>
     </div>
 </div>
 <?php endif; ?>
@@ -78,25 +78,25 @@ require __DIR__ . '/../partials/header.php';
     <div class="super-card-header">
         <h3 class="super-card-title">
             <i class="fa-solid fa-toggle-on"></i>
-            Tenant Feature Flags
+            <?= __('super_admin.federation.tenant_features.features_card_title') ?>
         </h3>
     </div>
     <div class="super-card-body">
         <p style="color: var(--super-text-muted); margin-bottom: 1.5rem;">
-            Control which federation features this tenant can use. These are tenant-level caps on top of system-level settings.
+            <?= __('super_admin.federation.tenant_features.features_card_desc') ?>
         </p>
 
         <div style="display: grid; gap: 1rem;">
             <?php
             $featureList = [
-                'tenant_federation_enabled' => ['Federation Enabled', 'Master switch for this tenant', 'fa-power-off'],
-                'tenant_appear_in_directory' => ['Appear in Directory', 'Show in federation tenant directory', 'fa-eye'],
-                'tenant_profiles_enabled' => ['Profiles', 'Allow cross-tenant profile viewing', 'fa-user'],
-                'tenant_messaging_enabled' => ['Messaging', 'Allow cross-tenant messaging', 'fa-envelope'],
-                'tenant_transactions_enabled' => ['Transactions', 'Allow cross-tenant transactions', 'fa-exchange-alt'],
-                'tenant_listings_enabled' => ['Listings', 'Allow cross-tenant listing visibility', 'fa-list'],
-                'tenant_events_enabled' => ['Events', 'Allow cross-tenant event participation', 'fa-calendar'],
-                'tenant_groups_enabled' => ['Groups', 'Allow cross-tenant group membership', 'fa-users'],
+                'tenant_federation_enabled' => [__('super_admin.federation.tenant_features.feat_federation_enabled_title'), __('super_admin.federation.tenant_features.feat_federation_enabled_desc'), 'fa-power-off'],
+                'tenant_appear_in_directory' => [__('super_admin.federation.tenant_features.feat_appear_in_directory_title'), __('super_admin.federation.tenant_features.feat_appear_in_directory_desc'), 'fa-eye'],
+                'tenant_profiles_enabled' => [__('super_admin.federation.tenant_features.feat_profiles_title'), __('super_admin.federation.tenant_features.feat_profiles_desc'), 'fa-user'],
+                'tenant_messaging_enabled' => [__('super_admin.federation.tenant_features.feat_messaging_title'), __('super_admin.federation.tenant_features.feat_messaging_desc'), 'fa-envelope'],
+                'tenant_transactions_enabled' => [__('super_admin.federation.tenant_features.feat_transactions_title'), __('super_admin.federation.tenant_features.feat_transactions_desc'), 'fa-exchange-alt'],
+                'tenant_listings_enabled' => [__('super_admin.federation.tenant_features.feat_listings_title'), __('super_admin.federation.tenant_features.feat_listings_desc'), 'fa-list'],
+                'tenant_events_enabled' => [__('super_admin.federation.tenant_features.feat_events_title'), __('super_admin.federation.tenant_features.feat_events_desc'), 'fa-calendar'],
+                'tenant_groups_enabled' => [__('super_admin.federation.tenant_features.feat_groups_title'), __('super_admin.federation.tenant_features.feat_groups_desc'), 'fa-users'],
             ];
             foreach ($featureList as $key => $info):
                 $enabled = !empty($features[$key]);
@@ -129,23 +129,23 @@ require __DIR__ . '/../partials/header.php';
     <div class="super-card-header">
         <h3 class="super-card-title">
             <i class="fa-solid fa-handshake"></i>
-            Partnerships (<?= count($partnerships ?? []) ?>)
+            <?= __('super_admin.federation.tenant_features.partnerships_card_title', ['count' => count($partnerships ?? [])]) ?>
         </h3>
     </div>
     <table class="super-table">
         <thead>
             <tr>
-                <th>Partner Tenant</th>
-                <th>Level</th>
-                <th>Status</th>
-                <th>Created</th>
+                <th><?= __('super_admin.federation.tenant_features.col_partner_tenant') ?></th>
+                <th><?= __('super_admin.federation.tenant_features.col_level') ?></th>
+                <th><?= __('super_admin.federation.tenant_features.col_status') ?></th>
+                <th><?= __('super_admin.federation.tenant_features.col_created') ?></th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($partnerships)): ?>
             <tr>
                 <td colspan="4" style="text-align: center; padding: 2rem; color: var(--super-text-muted);">
-                    No partnerships for this tenant
+                    <?= __('super_admin.federation.tenant_features.no_partnerships') ?>
                 </td>
             </tr>
             <?php else: ?>

@@ -35,7 +35,7 @@ $scopeColor = $access['level'] === 'master' ? '#dc2626' : '#2563eb';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title><?= htmlspecialchars($pageTitle) ?> - Super Admin Panel</title>
+    <title><?= htmlspecialchars($pageTitle) ?> - <?= __('super_admin.nav.brand') ?></title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -728,60 +728,60 @@ $scopeColor = $access['level'] === 'master' ? '#dc2626' : '#2563eb';
             <div class="super-brand-icon">
                 <i class="fa-solid fa-crown"></i>
             </div>
-            <span class="super-brand-text">Super Admin</span>
+            <span class="super-brand-text"><?= __('super_admin.nav.brand') ?></span>
         </a>
 
         <div class="super-nav">
             <a href="<?= $basePath ?>/super-admin" class="super-nav-link <?= $currentPathClean === $basePath . '/super-admin' || $currentPathClean === $basePath . '/super-admin/dashboard' ? 'active' : '' ?>">
                 <i class="fa-solid fa-gauge-high"></i>
-                Dashboard
+                <?= __('super_admin.nav.dashboard') ?>
             </a>
             <a href="<?= $basePath ?>/super-admin/tenants" class="super-nav-link <?= str_starts_with($currentPathClean, $basePath . '/super-admin/tenants') && $currentPathClean !== $basePath . '/super-admin/tenants/hierarchy' ? 'active' : '' ?>">
                 <i class="fa-solid fa-building"></i>
-                Tenants
+                <?= __('super_admin.nav.tenants') ?>
             </a>
             <a href="<?= $basePath ?>/super-admin/tenants/hierarchy" class="super-nav-link <?= $currentPathClean === $basePath . '/super-admin/tenants/hierarchy' ? 'active' : '' ?>">
                 <i class="fa-solid fa-sitemap"></i>
-                Hierarchy
+                <?= __('super_admin.nav.hierarchy') ?>
             </a>
             <a href="<?= $basePath ?>/super-admin/users" class="super-nav-link <?= str_starts_with($currentPathClean, $basePath . '/super-admin/users') ? 'active' : '' ?>">
                 <i class="fa-solid fa-users-gear"></i>
-                Users
+                <?= __('super_admin.nav.users') ?>
             </a>
             <a href="<?= $basePath ?>/super-admin/bulk" class="super-nav-link <?= str_starts_with($currentPathClean, $basePath . '/super-admin/bulk') ? 'active' : '' ?>">
                 <i class="fa-solid fa-layer-group"></i>
-                Bulk Ops
+                <?= __('super_admin.nav.bulk_ops') ?>
             </a>
             <a href="<?= $basePath ?>/super-admin/audit" class="super-nav-link <?= str_starts_with($currentPathClean, $basePath . '/super-admin/audit') ? 'active' : '' ?>">
                 <i class="fa-solid fa-clipboard-list"></i>
-                Audit Log
+                <?= __('super_admin.nav.audit_log') ?>
             </a>
             <div class="super-nav-dropdown">
                 <button class="super-nav-dropdown-toggle <?= str_starts_with($currentPathClean, $basePath . '/super-admin/federation') ? 'active' : '' ?>">
                     <i class="fa-solid fa-globe"></i>
-                    Partner Timebanks
+                    <?= __('super_admin.nav.partner_timebanks') ?>
                     <i class="fa-solid fa-chevron-down chevron"></i>
                 </button>
                 <div class="super-nav-dropdown-menu">
                     <a href="<?= $basePath ?>/super-admin/federation" class="<?= $currentPathClean === $basePath . '/super-admin/federation' ? 'active' : '' ?>">
                         <i class="fa-solid fa-gauge-high"></i>
-                        Dashboard
+                        <?= __('super_admin.nav.federation_dashboard') ?>
                     </a>
                     <a href="<?= $basePath ?>/super-admin/federation/system-controls" class="<?= $currentPathClean === $basePath . '/super-admin/federation/system-controls' ? 'active' : '' ?>">
                         <i class="fa-solid fa-sliders"></i>
-                        System Controls
+                        <?= __('super_admin.nav.system_controls') ?>
                     </a>
                     <a href="<?= $basePath ?>/super-admin/federation/whitelist" class="<?= $currentPathClean === $basePath . '/super-admin/federation/whitelist' ? 'active' : '' ?>">
                         <i class="fa-solid fa-shield-check"></i>
-                        Whitelist
+                        <?= __('super_admin.nav.whitelist') ?>
                     </a>
                     <a href="<?= $basePath ?>/super-admin/federation/partnerships" class="<?= $currentPathClean === $basePath . '/super-admin/federation/partnerships' ? 'active' : '' ?>">
                         <i class="fa-solid fa-handshake"></i>
-                        Partnerships
+                        <?= __('super_admin.nav.partnerships') ?>
                     </a>
                     <a href="<?= $basePath ?>/super-admin/federation/audit" class="<?= $currentPathClean === $basePath . '/super-admin/federation/audit' ? 'active' : '' ?>">
                         <i class="fa-solid fa-clipboard-list"></i>
-                        Federation Audit
+                        <?= __('super_admin.nav.federation_audit') ?>
                     </a>
                 </div>
             </div>
@@ -789,9 +789,9 @@ $scopeColor = $access['level'] === 'master' ? '#dc2626' : '#2563eb';
 
         <div class="super-user">
             <span class="super-scope-badge"><?= $scopeBadge ?></span>
-            <a href="<?= $basePath ?>/admin-legacy" class="super-user-menu" title="Back to Platform Admin">
+            <a href="<?= $basePath ?>/admin-legacy" class="super-user-menu" title="<?= __('super_admin.nav.back_to_platform_admin') ?>">
                 <i class="fa-solid fa-arrow-left"></i>
-                Platform Admin
+                <?= __('super_admin.nav.platform_admin') ?>
             </a>
             <div class="super-user-avatar"><?= htmlspecialchars($userInitials) ?></div>
         </div>

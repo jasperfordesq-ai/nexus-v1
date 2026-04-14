@@ -19,16 +19,16 @@ require __DIR__ . '/../partials/header.php';
     <div>
         <h1 class="super-page-title">
             <i class="fa-solid fa-building"></i>
-            Manage Tenants
+            <?= __('super_admin.tenants.index.title') ?>
         </h1>
         <p class="super-page-subtitle">
-            <?= $stats['total_tenants'] ?? 0 ?> tenant(s) in your scope
+            <?= __('super_admin.tenants.index.subtitle', ['count' => $stats['total_tenants'] ?? 0]) ?>
         </p>
     </div>
     <div class="super-page-actions">
         <a href="/super-admin/tenants/create" class="super-btn super-btn-primary">
             <i class="fa-solid fa-plus"></i>
-            Create Tenant
+            <?= __('super_admin.tenants.index.create_btn') ?>
         </a>
     </div>
 </div>
@@ -38,26 +38,27 @@ require __DIR__ . '/../partials/header.php';
     <div class="super-card-body" style="padding: 0.75rem 1rem;">
         <form method="GET" action="/super-admin/tenants" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
             <div style="flex: 1; min-width: 200px;">
-                <input type="text" name="search" class="super-input" placeholder="Search tenants..."
+                <input type="text" name="search" class="super-input"
+                       placeholder="<?= __('super_admin.tenants.index.filter_search_placeholder') ?>"
                        value="<?= htmlspecialchars($filters['search'] ?? '') ?>">
             </div>
             <label class="super-checkbox-group">
                 <input type="checkbox" name="hub" class="super-checkbox" <?= isset($filters['allows_subtenants']) ? 'checked' : '' ?>>
-                <span>Hub tenants only</span>
+                <span><?= __('super_admin.tenants.index.filter_hub_label') ?></span>
             </label>
             <select name="is_active" class="super-select" style="width: auto;">
-                <option value="">All Status</option>
-                <option value="1" <?= ($filters['is_active'] ?? '') === 1 ? 'selected' : '' ?>>Active</option>
-                <option value="0" <?= ($filters['is_active'] ?? '') === '0' ? 'selected' : '' ?>>Inactive</option>
+                <option value=""><?= __('super_admin.tenants.index.filter_status_all') ?></option>
+                <option value="1" <?= ($filters['is_active'] ?? '') === 1 ? 'selected' : '' ?>><?= __('super_admin.tenants.index.filter_status_active') ?></option>
+                <option value="0" <?= ($filters['is_active'] ?? '') === '0' ? 'selected' : '' ?>><?= __('super_admin.tenants.index.filter_status_inactive') ?></option>
             </select>
             <button type="submit" class="super-btn super-btn-secondary">
                 <i class="fa-solid fa-search"></i>
-                Filter
+                <?= __('super_admin.common.filter_btn') ?>
             </button>
             <?php if (!empty($filters['search']) || isset($filters['allows_subtenants']) || isset($filters['is_active'])): ?>
                 <a href="/super-admin/tenants" class="super-btn super-btn-secondary">
                     <i class="fa-solid fa-times"></i>
-                    Clear
+                    <?= __('super_admin.common.clear_btn') ?>
                 </a>
             <?php endif; ?>
         </form>
@@ -69,14 +70,14 @@ require __DIR__ . '/../partials/header.php';
     <table class="super-table">
         <thead>
             <tr>
-                <th>Tenant</th>
-                <th>Slug</th>
-                <th>Domain</th>
-                <th>Parent</th>
-                <th>Users</th>
-                <th>Hub</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th><?= __('super_admin.tenants.index.col_tenant') ?></th>
+                <th><?= __('super_admin.tenants.index.col_slug') ?></th>
+                <th><?= __('super_admin.tenants.index.col_domain') ?></th>
+                <th><?= __('super_admin.tenants.index.col_parent') ?></th>
+                <th><?= __('super_admin.tenants.index.col_users') ?></th>
+                <th><?= __('super_admin.tenants.index.col_hub') ?></th>
+                <th><?= __('super_admin.tenants.index.col_status') ?></th>
+                <th><?= __('super_admin.tenants.index.col_actions') ?></th>
             </tr>
         </thead>
         <tbody>
@@ -84,7 +85,7 @@ require __DIR__ . '/../partials/header.php';
                 <tr>
                     <td colspan="8" style="text-align: center; padding: 3rem; color: var(--super-text-muted);">
                         <i class="fa-solid fa-building" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
-                        No tenants found
+                        <?= __('super_admin.tenants.index.no_tenants') ?>
                     </td>
                 </tr>
             <?php else: ?>
@@ -96,11 +97,11 @@ require __DIR__ . '/../partials/header.php';
                             </a>
                             <?php if ((int)$tenant['depth'] > 0): ?>
                                 <span style="color: var(--super-text-muted); font-size: 0.75rem; display: block;">
-                                    Level <?= $tenant['depth'] ?>
+                                    <?= __('super_admin.tenants.index.level_label', ['depth' => $tenant['depth']]) ?>
                                 </span>
                             <?php endif; ?>
                             <?php if ($tenant['relationship'] === 'self'): ?>
-                                <span class="super-badge super-badge-purple">You</span>
+                                <span class="super-badge super-badge-purple"><?= __('super_admin.tenants.index.you_badge') ?></span>
                             <?php endif; ?>
                         </td>
                         <td>
@@ -112,23 +113,23 @@ require __DIR__ . '/../partials/header.php';
                             <?= htmlspecialchars($tenant['domain'] ?? '-') ?>
                         </td>
                         <td style="color: var(--super-text-muted); font-size: 0.85rem;">
-                            <?= htmlspecialchars($tenant['parent_name'] ?? 'Root') ?>
+                            <?= htmlspecialchars($tenant['parent_name'] ?? __('super_admin.tenants.index.parent_root')) ?>
                         </td>
                         <td><?= number_format($tenant['user_count'] ?? 0) ?></td>
                         <td>
                             <?php if ($tenant['allows_subtenants']): ?>
                                 <span class="super-badge super-badge-success">
-                                    <i class="fa-solid fa-check"></i> Hub
+                                    <i class="fa-solid fa-check"></i> <?= __('super_admin.common.hub') ?>
                                 </span>
                             <?php else: ?>
-                                <span class="super-badge super-badge-warning">Leaf</span>
+                                <span class="super-badge super-badge-warning"><?= __('super_admin.common.leaf') ?></span>
                             <?php endif; ?>
                         </td>
                         <td>
                             <?php if ($tenant['is_active']): ?>
-                                <span class="super-badge super-badge-success">Active</span>
+                                <span class="super-badge super-badge-success"><?= __('super_admin.common.active') ?></span>
                             <?php else: ?>
-                                <span class="super-badge super-badge-danger">Inactive</span>
+                                <span class="super-badge super-badge-danger"><?= __('super_admin.common.inactive') ?></span>
                             <?php endif; ?>
                         </td>
                         <td>

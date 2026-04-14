@@ -20,16 +20,16 @@ require __DIR__ . '/../partials/header.php';
     <div>
         <h1 class="super-page-title">
             <i class="fa-solid fa-sliders"></i>
-            Federation System Controls
+            <?= __('super_admin.federation.system_controls.title') ?>
         </h1>
         <p class="super-page-subtitle">
-            Master controls for platform-wide federation settings
+            <?= __('super_admin.federation.system_controls.subtitle') ?>
         </p>
     </div>
     <div class="super-page-actions">
         <a href="/super-admin/federation" class="super-btn super-btn-secondary">
             <i class="fa-solid fa-arrow-left"></i>
-            Back to Overview
+            <?= __('super_admin.federation.system_controls.back_btn') ?>
         </a>
     </div>
 </div>
@@ -39,7 +39,7 @@ require __DIR__ . '/../partials/header.php';
     <div class="super-card-header" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);">
         <h3 class="super-card-title" style="color: #dc2626;">
             <i class="fa-solid fa-triangle-exclamation"></i>
-            Emergency Controls
+            <?= __('super_admin.federation.system_controls.emergency_card_title') ?>
         </h3>
     </div>
     <div class="super-card-body">
@@ -47,27 +47,26 @@ require __DIR__ . '/../partials/header.php';
         <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
             <div style="display: flex; align-items: center; gap: 0.75rem; color: #dc2626; font-weight: 600;">
                 <i class="fa-solid fa-lock"></i>
-                LOCKDOWN ACTIVE
+                <?= __('super_admin.federation.system_controls.lockdown_active_title') ?>
             </div>
             <p style="margin: 0.5rem 0 0 0; color: #991b1b;">
                 <?= htmlspecialchars($systemStatus['emergency_lockdown_reason'] ?? 'No reason provided') ?>
             </p>
             <p style="margin: 0.25rem 0 0 0; font-size: 0.85rem; color: #7f1d1d;">
-                Activated: <?= date('M j, Y g:i A', strtotime($systemStatus['emergency_lockdown_at'])) ?>
+                <?= __('super_admin.federation.system_controls.lockdown_activated') ?> <?= date('M j, Y g:i A', strtotime($systemStatus['emergency_lockdown_at'])) ?>
             </p>
         </div>
         <button onclick="liftLockdown()" class="super-btn super-btn-primary" style="background: #16a34a;">
             <i class="fa-solid fa-unlock"></i>
-            Lift Emergency Lockdown
+            <?= __('super_admin.federation.system_controls.lift_lockdown_btn') ?>
         </button>
         <?php else: ?>
         <p style="color: var(--super-text-muted); margin-bottom: 1rem;">
-            Emergency lockdown immediately disables ALL federation features across the entire platform.
-            Use only in case of security incidents or critical issues.
+            <?= __('super_admin.federation.system_controls.lockdown_desc') ?>
         </p>
         <button onclick="triggerLockdown()" class="super-btn" style="background: #dc2626; color: white;">
             <i class="fa-solid fa-lock"></i>
-            Trigger Emergency Lockdown
+            <?= __('super_admin.federation.system_controls.trigger_lockdown_btn') ?>
         </button>
         <?php endif; ?>
     </div>
