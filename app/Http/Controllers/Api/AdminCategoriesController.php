@@ -32,6 +32,9 @@ class AdminCategoriesController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $typeFilter = $this->query('type');
+        $page    = max(1, (int) ($this->query('page') ?? 1));
+        $perPage = min(200, max(1, (int) ($this->query('per_page') ?? 200)));
+        $offset  = ($page - 1) * $perPage;
 
         $conditions = ['c.tenant_id = ?'];
         $params = [$tenantId];
@@ -49,7 +52,7 @@ class AdminCategoriesController extends BaseApiController
              FROM categories c
              WHERE {$where}
              ORDER BY c.type ASC, c.name ASC
-             LIMIT 500",
+             LIMIT {$perPage} OFFSET {$offset}",
             $params
         );
 

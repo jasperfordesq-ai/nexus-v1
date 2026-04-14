@@ -131,7 +131,7 @@ export function AvailabilityGrid({
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load availability', err);
-      setError('Failed to load availability');
+      setError(tAvail('failed_to_load'));
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);

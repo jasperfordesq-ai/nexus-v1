@@ -290,7 +290,7 @@ const LandingPageBuilder = lazy(() => import('./modules/content/LandingPageBuild
 
 // Wrap lazy components in Suspense
 function Lazy({ children }: { children: React.ReactNode }) {
-  return <Suspense fallback={<LoadingScreen message="Loading..." />}>{children}</Suspense>;
+  return <Suspense fallback={<LoadingScreen />}>{children}</Suspense>;
 }
 
 /**

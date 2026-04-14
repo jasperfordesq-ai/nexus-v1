@@ -66,6 +66,7 @@ import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
 
 import { useTranslation } from 'react-i18next';
+import { useToast } from '@/contexts/ToastContext';
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -159,6 +160,7 @@ async function exportCsv(reportType: string) {
 
   const apiBase = import.meta.env.VITE_API_BASE || '/api';
   const res = await fetch(`${apiBase}/v2/admin/reports/members/export?format=csv`, { headers, credentials: 'include' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -175,6 +177,7 @@ async function exportCsv(reportType: string) {
 export function MemberReportsPage() {
   const { t } = useTranslation('admin');
   usePageTitle(t('reports.page_title'));
+  const toast = useToast();
 
   const GROUP_BY_OPTIONS = [
     { key: 'daily', label: t('reports.group_by_daily') },
@@ -599,7 +602,9 @@ export function MemberReportsPage() {
             <Button
               variant="flat"
               startContent={<Download size={16} />}
-              onPress={() => exportCsv(reportType)}
+              onPress={async () => {
+                try { await exportCsv(reportType); } catch { toast.error(t('reports.failed_to_export_c_s_v')); }
+              }}
               size="sm"
             >
               {t('reports.export_csv')}

@@ -1054,7 +1054,7 @@ class AppServiceProvider extends ServiceProvider
             if (in_array($command, $dangerous) && $db === 'nexus') {
                 fwrite(STDERR, "\n  ❌ BLOCKED: '$command' on the main 'nexus' database.\n");
                 fwrite(STDERR, "  Use DB_DATABASE=nexus_test or run against the test database.\n\n");
-                exit(1);
+                throw new \RuntimeException("Blocked: '$command' is not allowed on the production 'nexus' database.");
             }
         }
     }

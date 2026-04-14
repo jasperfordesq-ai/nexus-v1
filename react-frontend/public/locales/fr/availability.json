@@ -1,5 +1,6 @@
 {
   "set_your_availability": "Set Your Availability",
   "available": "Available",
-  "unavailable": "Unavailable"
+  "unavailable": "Unavailable",
+  "failed_to_load": "Failed to load availability"
 }

@@ -159,7 +159,7 @@ export default function CreateOpportunityPage() {
   }
 
   if (isLoadingOrgs) {
-    return <LoadingScreen message="Loading..." />;
+    return <LoadingScreen />;
   }
 
   // No approved organisations — show message

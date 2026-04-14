@@ -480,5 +480,6 @@
     "comments": "Comments",
     "shares": "Shares",
     "reach": "Reach"
-  }
+  },
+  "failed_to_load_analytics": "Failed to load analytics"
 }

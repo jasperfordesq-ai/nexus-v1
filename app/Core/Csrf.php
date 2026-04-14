@@ -96,8 +96,12 @@ class Csrf
             if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
                 throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Invalid CSRF Token');
             }
+            if (function_exists('abort')) {
+                abort(403, 'Invalid CSRF Token. Please refresh the page and try again.');
+            }
             http_response_code(403);
-            die("<h1>403 Forbidden</h1><p>Invalid CSRF Token. Please refresh the page and try again.</p>");
+            echo "<h1>403 Forbidden</h1><p>Invalid CSRF Token. Please refresh the page and try again.</p>";
+            exit;
         }
     }
 

@@ -10,6 +10,7 @@
  */
 
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
 import { LoadingScreen } from '@/components/feedback';
 import { useLegalGate } from '@/hooks/useLegalGate';
@@ -27,6 +28,7 @@ const LEGAL_GATE_BYPASS_SEGMENTS = new Set([
 ]);
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
+  const { t } = useTranslation('common');
   const { isAuthenticated, isLoading, status, user } = useAuth();
   const { tenantPath, tenant } = useTenant();
   const location = useLocation();
@@ -34,7 +36,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   // Show loading while checking auth status
   if (isLoading || status === 'loading') {
-    return <LoadingScreen message="Checking authentication..." />;
+    return <LoadingScreen message={t('checking_authentication')} />;
   }
 
   // Redirect to login if not authenticated, preserving tenant slug prefix

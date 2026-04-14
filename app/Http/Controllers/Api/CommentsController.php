@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Core\TenantContext;
 use App\Models\Comment;
 use App\Models\Notification;
 use App\Models\User;
@@ -177,6 +178,9 @@ class CommentsController extends BaseApiController
         if ($result['action'] === 'added') {
             try {
                 $comment = Comment::find($id);
+                if (!$comment || (int) $comment->tenant_id !== TenantContext::getId()) {
+                    return;
+                }
                 if ($comment && (int) $comment->user_id !== $userId) {
                     $reactor = User::find($userId);
                     $reactorName = $reactor ? trim(($reactor->first_name ?? '') . ' ' . ($reactor->last_name ?? '')) : 'Someone';

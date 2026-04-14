@@ -480,5 +480,6 @@
     "shares": "Shares",
     "reach": "Reach",
     "reactions_breakdown": "Reactions Breakdown"
-  }
+  },
+  "failed_to_load_analytics": "Failed to load analytics"
 }

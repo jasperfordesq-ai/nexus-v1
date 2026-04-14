@@ -966,7 +966,7 @@ class JobVacanciesController extends BaseApiController
 
         // Verify caller owns the vacancy or is admin
         $vacancy = \App\Models\JobVacancy::find($vacancyId);
-        if (!$vacancy) {
+        if (!$vacancy || (int) $vacancy->tenant_id !== TenantContext::getId()) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_vacancy_not_found'), null, 404);
         }
         if ((int) $vacancy->user_id !== $userId) {
@@ -1154,7 +1154,7 @@ class JobVacanciesController extends BaseApiController
 
         // Verify caller owns the vacancy or is admin
         $vacancy = \App\Models\JobVacancy::find($id);
-        if (!$vacancy) {
+        if (!$vacancy || (int) $vacancy->tenant_id !== TenantContext::getId()) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_vacancy_not_found'), null, 404);
         }
         if ((int) $vacancy->user_id !== $userId) {
@@ -1273,7 +1273,7 @@ class JobVacanciesController extends BaseApiController
 
         // Verify caller owns the vacancy or is admin
         $vacancy = \App\Models\JobVacancy::find($id);
-        if (!$vacancy) {
+        if (!$vacancy || (int) $vacancy->tenant_id !== TenantContext::getId()) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_vacancy_not_found'), null, 404);
         }
         if ((int) $vacancy->user_id !== $userId) {

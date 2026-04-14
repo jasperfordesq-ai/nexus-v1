@@ -181,6 +181,9 @@ class VolunteerController extends BaseApiController
         // Notify the opportunity organizer about the new application
         try {
             $opportunity = VolOpportunity::find($id);
+            if (!$opportunity || (int) $opportunity->tenant_id !== TenantContext::getId()) {
+                throw new \RuntimeException('Tenant mismatch — skip notification');
+            }
             if ($opportunity && $opportunity->created_by && $opportunity->created_by !== $userId) {
                 $volunteer = User::find($userId);
                 $volunteerName = $volunteer->name ?? 'Someone';
@@ -259,6 +262,9 @@ class VolunteerController extends BaseApiController
         // Notify the volunteer about the application decision (bell + email + push)
         try {
             $application = VolApplication::find($id);
+            if (!$application || (int) $application->tenant_id !== TenantContext::getId()) {
+                throw new \RuntimeException('Tenant mismatch — skip notification');
+            }
             if ($application && $application->user_id) {
                 $opportunityId = $application->opportunity_id;
                 $opportunity = VolOpportunity::find($opportunityId);
@@ -341,6 +347,9 @@ class VolunteerController extends BaseApiController
         // Notify the opportunity organizer about the shift sign-up
         try {
             $shift = VolShift::with('opportunity')->find($id);
+            if (!$shift || (int) $shift->tenant_id !== TenantContext::getId()) {
+                throw new \RuntimeException('Tenant mismatch — skip notification');
+            }
             if ($shift && $shift->opportunity && $shift->opportunity->created_by && $shift->opportunity->created_by !== $userId) {
                 $volunteer = User::find($userId);
                 $volunteerName = $volunteer->name ?? 'Someone';

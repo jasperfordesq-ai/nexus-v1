@@ -1145,7 +1145,7 @@ function App() {
                 <ScrollToTop />
                 <CookieConsentProvider>
                   <ToastProvider>
-                    <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                    <Suspense fallback={<LoadingScreen />}>
                       <Routes>
                         {/* Single catch-all route — TenantShell detects tenant slug from
                             the first path segment (if it's not reserved like "admin").

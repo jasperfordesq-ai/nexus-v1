@@ -65,12 +65,12 @@ export function PostAnalyticsModal({ isOpen, onClose, postId }: PostAnalyticsMod
         if (res.success && res.data) {
           setData(res.data);
         } else {
-          setError(res.error || 'Failed to load analytics');
+          setError(res.error || t('failed_to_load_analytics'));
         }
       })
       .catch((err) => {
         logError('Failed to load post analytics', err);
-        setError('Failed to load analytics');
+        setError(t('failed_to_load_analytics'));
       })
       .finally(() => setLoading(false));
   }, [isOpen, postId]);

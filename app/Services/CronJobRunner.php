@@ -1156,8 +1156,11 @@ class CronJobRunner
 
             echo "\n=== Cron Run Complete ({$taskNum} tasks checked) ===\n";
         } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('[CronJobRunner] Fatal error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             echo "\nFatal Error: " . $e->getMessage() . "\n";
-            echo "Stack: " . $e->getTraceAsString() . "\n";
             $status = 'error';
         }
 

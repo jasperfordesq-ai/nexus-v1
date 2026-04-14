@@ -418,5 +418,6 @@
       "title": "Members",
       "description": "Browse community members, connect and exchange time credits."
     }
-  }
+  },
+  "checking_authentication": "Checking authentication..."
 }

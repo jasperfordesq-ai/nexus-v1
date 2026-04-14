@@ -271,9 +271,12 @@ class OllamaProvider extends BaseProvider
             ];
 
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('[OllamaProvider] Request failed', [
+                'error' => $e->getMessage(),
+            ]);
             return [
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => __('svc_notifications_2.ai.provider_error'),
                 'latency_ms' => (int) ((microtime(true) - $start) * 1000)
             ];
         }

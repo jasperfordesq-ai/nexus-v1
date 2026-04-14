@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Core\TenantContext;
 use App\Models\Notification;
 use App\Models\Poll;
 use App\Models\User;
@@ -200,6 +201,9 @@ class PollsController extends BaseApiController
         // Notify poll creator of the vote
         try {
             $pollModel = Poll::find($id);
+            if (!$pollModel || (int) $pollModel->tenant_id !== TenantContext::getId()) {
+                throw new \RuntimeException('Tenant mismatch — skip notification');
+            }
             if ($pollModel && (int) $pollModel->user_id !== $userId) {
                 $voter = User::find($userId);
                 $voterName = $voter ? trim(($voter->first_name ?? '') . ' ' . ($voter->last_name ?? '')) : 'Someone';

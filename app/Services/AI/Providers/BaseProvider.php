@@ -191,9 +191,14 @@ abstract class BaseProvider implements AIProviderInterface
                 'response' => $response['content'] ?? ''
             ];
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('[AI Provider] Request failed', [
+                'provider' => $this->getName(),
+                'model' => $this->defaultModel,
+                'error' => $e->getMessage(),
+            ]);
             return [
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => __('svc_notifications_2.ai.provider_error'),
                 'latency_ms' => (int) ((microtime(true) - $start) * 1000),
                 'model' => $this->defaultModel,
                 'provider' => $this->getName()

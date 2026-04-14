@@ -151,6 +151,7 @@ async function exportCsv(exportType: string, dateFrom?: string, dateTo?: string)
 
   const apiBase = import.meta.env.VITE_API_BASE || '/api';
   const res = await fetch(`${apiBase}/v2/admin/reports/hours_by_category/export?${params}`, { headers, credentials: 'include' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
