@@ -187,8 +187,8 @@
     }
   },
   "faq": {
-    "page_title": "Najczęściej Zadawane Pytania",
-    "meta_description": "Znajdź odpowiedzi na najczęściej zadawane pytania dotyczące timebankingu, wymiany i funkcji społeczności.",
+    "page_title": "Frequently Asked Questions",
+    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features.",
     "title": "Najczęściej Zadawane Pytania",
     "subtitle_before_link": "Nie możesz znaleźć tego, czego szukasz? Odwiedź nasze",
     "help_center_link": "Centrum Pomocy",
@@ -380,9 +380,7 @@
           "item4": "Przestrzegamy przepisów RODO i regulacji dotyczących ochrony danych"
         }
       }
-    },
-    "page_title": "Frequently Asked Questions",
-    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features."
+    }
   },
   "maintenance": {
     "title": "Wkrótce wrócimy!",

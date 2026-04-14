@@ -49,15 +49,12 @@
     "deleted": "Post eliminato",
     "delete_failed": "Impossibile eliminare il post",
     "vote_failed": "Impossibile inviare il voto",
-    "not_interested": "Ti mostreremo meno come questo",
-    "post_updated": "Post aggiornato",
-    "update_failed": "Aggiornamento del post non riuscito",
-    "post_shared": "Post condiviso nel tuo feed",
-    "share_removed": "Condivisione rimossa",
-    "share_failed": "Impossibile condividere il post",
     "not_interested": "We'll show you less like this",
     "post_updated": "Post updated",
-    "update_failed": "Failed to update post"
+    "update_failed": "Failed to update post",
+    "post_shared": "Post condiviso nel tuo feed",
+    "share_removed": "Condivisione rimossa",
+    "share_failed": "Impossibile condividere il post"
   },
   "realtime": {
     "new_posts_one": "1 nuovo post",

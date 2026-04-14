@@ -1,6 +1,6 @@
 {
   "help": {
-    "meta_description": "Parcourez les articles d'aide, les guides et les FAQ pour tirer le meilleur parti de la plateforme.",
+    "meta_description": "Browse help articles, guides, and FAQs to get the most out of the platform.",
     "page_title": "Centre d'aide",
     "heading": "Centre d'aide",
     "subtitle": "Trouvez des réponses aux questions fréquentes sur {{name}}",
@@ -58,8 +58,7 @@
     "faq_cat_5_a_2": "Oui, vous pouvez supprimer votre compte depuis les Paramètres. Cette action est définitive et supprimera votre profil, vos annonces et votre historique de transactions. Contactez le coordinateur de votre communauté si vous avez besoin d'aide.",
     "still_need_help": "Besoin d'aide supplémentaire ?",
     "still_need_help_description": "Vous ne trouvez pas ce que vous cherchez ? Notre équipe est là pour vous aider.",
-    "contact_support": "Contacter le support",
-    "meta_description": "Browse help articles, guides, and FAQs to get the most out of the platform."
+    "contact_support": "Contacter le support"
   },
   "resources": {
     "page_title": "Ressources",

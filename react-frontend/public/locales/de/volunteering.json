@@ -258,7 +258,7 @@
       "amount": "Betrag",
       "message": "Nachricht (optional)"
     },
-    "placeholder_amount": "0,00",
+    "placeholder_amount": "0.00",
     "anonymous_toggle_on": "Anonyme Spende",
     "anonymous_toggle_off": "Anonym spenden",
     "cancel": "Abbrechen",
@@ -319,8 +319,7 @@
     "receipt_method": "Zahlungsmethode",
     "receipt_message": "Nachricht",
     "receipt_error": "Beleg konnte nicht geladen werden.",
-    "receipt_not_found": "Beleg nicht gefunden.",
-    "placeholder_amount": "0.00"
+    "receipt_not_found": "Beleg nicht gefunden."
   },
   "safeguarding": {
     "heading": "Kinderschutz",

@@ -258,7 +258,7 @@
       "amount": "Importo",
       "message": "Messaggio (opzionale)"
     },
-    "placeholder_amount": "0,00",
+    "placeholder_amount": "0.00",
     "anonymous_toggle_on": "Donazione anonima",
     "anonymous_toggle_off": "Dona in modo anonimo",
     "cancel": "Annulla",
@@ -319,8 +319,7 @@
     "receipt_method": "Metodo di pagamento",
     "receipt_message": "Messaggio",
     "receipt_error": "Impossibile caricare la ricevuta.",
-    "receipt_not_found": "Ricevuta non trovata.",
-    "placeholder_amount": "0.00"
+    "receipt_not_found": "Ricevuta non trovata."
   },
   "safeguarding": {
     "heading": "Tutela",

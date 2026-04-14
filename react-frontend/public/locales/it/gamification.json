@@ -90,43 +90,6 @@
     },
     "loading": "Caricamento traguardi",
     "badge_detail": {
-      "title": "Dettagli del badge",
-      "earned_on": "Guadagnato il {{date}}",
-      "not_earned": "Non ancora guadagnato",
-      "not_earned_desc": "Continua così — sbloccherai presto questo badge!",
-      "xp_reward": "Ricompensa XP",
-      "load_failed": "Impossibile caricare i dettagli del badge.",
-      "type": "Category",
-      "threshold": "Requirement",
-      "threshold_value": "{{threshold}} {{type}}",
-      "rarity": "Rarity",
-      "tier": "Tier",
-      "close": "Close",
-      "rarity_common": "Common",
-      "rarity_uncommon": "Uncommon",
-      "rarity_rare": "Rare",
-      "rarity_epic": "Epic",
-      "rarity_legendary": "Legendary",
-      "tier_core": "Core",
-      "tier_template": "Standard",
-      "tier_custom": "Custom"
-    },
-    "showcase": {
-      "manage_title": "Gestisca la vetrina badge",
-      "select_badges": "Selezioni fino a 5 badge da mostrare sul Suo profilo. ({{count}}/5 selezionati)",
-      "no_badges_earned": "Non ha ancora guadagnato nessun badge.",
-      "showcase_badge": "Mostra {{name}}",
-      "cancel": "Annulla",
-      "saving": "Salvataggio...",
-      "save": "Salva vetrina",
-      "updated": "Vetrina aggiornata",
-      "updated_desc": "La Sua vetrina badge è stata salvata.",
-      "save_failed": "Salvataggio fallito",
-      "save_failed_desc": "Impossibile aggiornare la vetrina.",
-      "save_error": "Si è verificato un errore."
-    },
-    "load_error": "Impossibile caricare i risultati. Riprova.",
-    "badge_detail": {
       "title": "Badge Details",
       "earned_on": "Earned on {{date}}",
       "not_earned": "Not yet earned",
@@ -147,7 +110,22 @@
       "tier_template": "Standard",
       "tier_custom": "Custom",
       "load_failed": "Could not load badge details."
-    }
+    },
+    "showcase": {
+      "manage_title": "Gestisca la vetrina badge",
+      "select_badges": "Selezioni fino a 5 badge da mostrare sul Suo profilo. ({{count}}/5 selezionati)",
+      "no_badges_earned": "Non ha ancora guadagnato nessun badge.",
+      "showcase_badge": "Mostra {{name}}",
+      "cancel": "Annulla",
+      "saving": "Salvataggio...",
+      "save": "Salva vetrina",
+      "updated": "Vetrina aggiornata",
+      "updated_desc": "La Sua vetrina badge è stata salvata.",
+      "save_failed": "Salvataggio fallito",
+      "save_failed_desc": "Impossibile aggiornare la vetrina.",
+      "save_error": "Si è verificato un errore."
+    },
+    "load_error": "Impossibile caricare i risultati. Riprova."
   },
   "goals": {
     "page_title": "Obiettivi",

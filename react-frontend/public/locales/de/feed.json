@@ -49,15 +49,12 @@
     "deleted": "Beitrag gelöscht",
     "delete_failed": "Beitrag konnte nicht gelöscht werden",
     "vote_failed": "Abstimmung konnte nicht abgegeben werden",
-    "not_interested": "Wir zeigen dir weniger davon",
-    "post_updated": "Beitrag aktualisiert",
-    "update_failed": "Fehler beim Aktualisieren des Beitrags",
-    "post_shared": "Beitrag in deinem Feed geteilt",
-    "share_removed": "Teilen entfernt",
-    "share_failed": "Beitrag konnte nicht geteilt werden",
     "not_interested": "We'll show you less like this",
     "post_updated": "Post updated",
-    "update_failed": "Failed to update post"
+    "update_failed": "Failed to update post",
+    "post_shared": "Beitrag in deinem Feed geteilt",
+    "share_removed": "Teilen entfernt",
+    "share_failed": "Beitrag konnte nicht geteilt werden"
   },
   "realtime": {
     "new_posts_one": "1 neuer Beitrag",

@@ -90,43 +90,6 @@
     },
     "loading": "A carregar conquistas",
     "badge_detail": {
-      "title": "Detalhes do Distintivo",
-      "earned_on": "Conquistado em {{date}}",
-      "not_earned": "Ainda não conquistado",
-      "not_earned_desc": "Continue assim — você desbloqueará este distintivo em breve!",
-      "xp_reward": "Recompensa de XP",
-      "load_failed": "Não foi possível carregar os detalhes do distintivo.",
-      "type": "Category",
-      "threshold": "Requirement",
-      "threshold_value": "{{threshold}} {{type}}",
-      "rarity": "Rarity",
-      "tier": "Tier",
-      "close": "Close",
-      "rarity_common": "Common",
-      "rarity_uncommon": "Uncommon",
-      "rarity_rare": "Rare",
-      "rarity_epic": "Epic",
-      "rarity_legendary": "Legendary",
-      "tier_core": "Core",
-      "tier_template": "Standard",
-      "tier_custom": "Custom"
-    },
-    "showcase": {
-      "manage_title": "Gerir Montra de Insígnias",
-      "select_badges": "Selecione até 5 insígnias para mostrar no seu perfil. ({{count}}/5 selecionadas)",
-      "no_badges_earned": "Ainda não ganhou nenhuma insígnia.",
-      "showcase_badge": "Mostrar {{name}}",
-      "cancel": "Cancelar",
-      "saving": "A guardar...",
-      "save": "Guardar Montra",
-      "updated": "Montra Atualizada",
-      "updated_desc": "A sua montra de insígnias foi guardada.",
-      "save_failed": "Falha ao Guardar",
-      "save_failed_desc": "Não foi possível atualizar a montra.",
-      "save_error": "Algo correu mal."
-    },
-    "load_error": "Falha ao carregar as conquistas. Tente novamente.",
-    "badge_detail": {
       "title": "Badge Details",
       "earned_on": "Earned on {{date}}",
       "not_earned": "Not yet earned",
@@ -147,7 +110,22 @@
       "tier_template": "Standard",
       "tier_custom": "Custom",
       "load_failed": "Could not load badge details."
-    }
+    },
+    "showcase": {
+      "manage_title": "Gerir Montra de Insígnias",
+      "select_badges": "Selecione até 5 insígnias para mostrar no seu perfil. ({{count}}/5 selecionadas)",
+      "no_badges_earned": "Ainda não ganhou nenhuma insígnia.",
+      "showcase_badge": "Mostrar {{name}}",
+      "cancel": "Cancelar",
+      "saving": "A guardar...",
+      "save": "Guardar Montra",
+      "updated": "Montra Atualizada",
+      "updated_desc": "A sua montra de insígnias foi guardada.",
+      "save_failed": "Falha ao Guardar",
+      "save_failed_desc": "Não foi possível atualizar a montra.",
+      "save_error": "Algo correu mal."
+    },
+    "load_error": "Falha ao carregar as conquistas. Tente novamente."
   },
   "goals": {
     "page_title": "Objetivos",

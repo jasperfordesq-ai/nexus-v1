@@ -114,7 +114,7 @@
   "form": {
     "create_title": "Neue Veranstaltung erstellen",
     "edit_title": "Veranstaltung bearbeiten",
-    "group_event_notice": "Diese Veranstaltung wird mit deiner Gruppe verbunden sein.",
+    "group_event_notice": "This event will be associated with your group.",
     "loading": "Veranstaltung wird geladen...",
     "unable_to_load": "Veranstaltung kann nicht geladen werden",
     "back_to_events": "Zurück zu Veranstaltungen",
@@ -203,8 +203,7 @@
     },
     "attach_polls_label": "Umfragen anhängen (optional)",
     "attach_polls_placeholder": "Umfragen zum Anhängen auswählen...",
-    "attach_polls_hint": "Hängen Sie bestehende Gemeinschaftsumfragen an diese Veranstaltung an.",
-    "group_event_notice": "This event will be associated with your group."
+    "attach_polls_hint": "Hängen Sie bestehende Gemeinschaftsumfragen an diese Veranstaltung an."
   },
   "toast": {
     "rsvp_removed": "RSVP entfernt",

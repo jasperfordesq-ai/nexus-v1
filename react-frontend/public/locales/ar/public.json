@@ -187,8 +187,8 @@
     }
   },
   "faq": {
-    "page_title": "الأسئلة الشائعة",
-    "meta_description": "ابحث عن إجابات للأسئلة الشائعة حول تبادل الوقت، والتبادلات، وميزات المجتمع.",
+    "page_title": "Frequently Asked Questions",
+    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features.",
     "title": "الأسئلة الشائعة",
     "subtitle_before_link": "لا تستطيع العثور على ما تبحث عنه؟ قم بزيارة",
     "help_center_link": "مركز المساعدة",
@@ -380,9 +380,7 @@
           "item4": "نحن نلتزم باللائحة العامة لحماية البيانات ولوائح حماية البيانات"
         }
       }
-    },
-    "page_title": "Frequently Asked Questions",
-    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features."
+    }
   },
   "maintenance": {
     "title": "سنعود قريباً!",

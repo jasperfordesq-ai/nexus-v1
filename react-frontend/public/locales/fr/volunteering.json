@@ -258,7 +258,7 @@
       "amount": "Montant",
       "message": "Message (optionnel)"
     },
-    "placeholder_amount": "0,00",
+    "placeholder_amount": "0.00",
     "anonymous_toggle_on": "Don anonyme",
     "anonymous_toggle_off": "Faire un don anonymement",
     "cancel": "Annuler",
@@ -319,8 +319,7 @@
     "receipt_method": "Moyen de paiement",
     "receipt_message": "Message",
     "receipt_error": "Impossible de charger le reçu.",
-    "receipt_not_found": "Reçu introuvable.",
-    "placeholder_amount": "0.00"
+    "receipt_not_found": "Reçu introuvable."
   },
   "safeguarding": {
     "heading": "Protection",

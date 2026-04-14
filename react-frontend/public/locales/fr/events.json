@@ -114,7 +114,7 @@
   "form": {
     "create_title": "Créer un nouvel événement",
     "edit_title": "Modifier l'événement",
-    "group_event_notice": "Cet événement sera associé à votre groupe.",
+    "group_event_notice": "This event will be associated with your group.",
     "loading": "Chargement de l'événement...",
     "unable_to_load": "Impossible de charger l'événement",
     "back_to_events": "Retour aux événements",
@@ -203,8 +203,7 @@
     },
     "attach_polls_label": "Joindre des sondages (optionnel)",
     "attach_polls_placeholder": "Sélectionner des sondages à joindre...",
-    "attach_polls_hint": "Joignez des sondages communautaires existants à cet événement.",
-    "group_event_notice": "This event will be associated with your group."
+    "attach_polls_hint": "Joignez des sondages communautaires existants à cet événement."
   },
   "toast": {
     "rsvp_removed": "RSVP annulé",

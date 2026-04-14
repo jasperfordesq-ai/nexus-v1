@@ -187,8 +187,8 @@
     }
   },
   "faq": {
-    "page_title": "よくある質問",
-    "meta_description": "タイムバンキング、交換、コミュニティ機能に関する一般的な質問への回答を見つけてください。",
+    "page_title": "Frequently Asked Questions",
+    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features.",
     "title": "よくある質問",
     "subtitle_before_link": "探しているものが見つかりませんか？私たちの",
     "help_center_link": "ヘルプセンター",
@@ -380,9 +380,7 @@
           "item4": "私たちはGDPRおよびデータ保護規則に準拠しています"
         }
       }
-    },
-    "page_title": "Frequently Asked Questions",
-    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features."
+    }
   },
   "maintenance": {
     "title": "すぐに戻ります！",

@@ -1,6 +1,6 @@
 {
   "home": {
-    "meta_title": "Plataforma Comunitária de Timebanking",
+    "meta_title": "Community Timebanking Platform",
     "meta_description": "Troque competências e serviços usando créditos de tempo. Junte-se à nossa plataforma comunitária de timebanking.",
     "meta_keywords": "timebanking, troca de competências, comunidade, voluntariado, créditos de tempo",
     "badge": "O Futuro do Timebanking",
@@ -76,8 +76,7 @@
       "title": "Pronto para começar?",
       "description": "Junte-se a milhares de membros da comunidade que já estão a trocar competências e a construir conexões significativas.",
       "button": "Criar a Sua Conta Gratuita"
-    },
-    "meta_title": "Community Timebanking Platform"
+    }
   },
   "about": {
     "meta_title": "Sobre {{name}}",
@@ -158,7 +157,7 @@
     }
   },
   "contact": {
-    "meta_description": "Entre em contato com nossa equipe de suporte comunitário. Estamos aqui para ajudar.",
+    "meta_description": "Get in touch with our community support team. We're here to help.",
     "title": "Contacte-nos",
     "subtitle": "Tem uma pergunta sobre {{name}}? Adoraríamos ouvir de si.",
     "success_title": "Mensagem Enviada!",
@@ -185,12 +184,11 @@
       "login_prompt_before": "Já tem uma conta?",
       "login_link": "Inicie sessão",
       "login_prompt_after": "para suporte mais rápido."
-    },
-    "meta_description": "Get in touch with our community support team. We're here to help."
+    }
   },
   "faq": {
-    "page_title": "Perguntas Frequentes",
-    "meta_description": "Encontre respostas para perguntas comuns sobre timebanking, trocas e recursos comunitários.",
+    "page_title": "Frequently Asked Questions",
+    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features.",
     "title": "Perguntas Frequentes",
     "subtitle_before_link": "Não encontra o que procura? Visite o nosso",
     "help_center_link": "Centro de Ajuda",
@@ -382,9 +380,7 @@
           "item4": "Cumprimos o RGPD e os regulamentos de proteção de dados"
         }
       }
-    },
-    "page_title": "Frequently Asked Questions",
-    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features."
+    }
   },
   "maintenance": {
     "title": "Voltamos em breve!",

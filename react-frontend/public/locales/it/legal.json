@@ -1,6 +1,6 @@
 {
   "terms": {
-    "meta_description": "Termini e condizioni che regolano l'uso della nostra piattaforma di timebanking comunitario.",
+    "meta_description": "Terms and conditions governing the use of our community timebanking platform.",
     "page_title": "Termini di servizio",
     "heading": "Termini di servizio",
     "subtitle": "Le regole e le linee guida per l'utilizzo della nostra piattaforma",
@@ -94,11 +94,10 @@
     "cta_title": "Ha domande?",
     "cta_body": "Se ha domande su questi Termini di servizio o necessita di chiarimenti su qualsiasi punto, il nostro team e a Sua disposizione.",
     "contact_us": "Contattaci",
-    "privacy_policy_link": "Informativa sulla privacy",
-    "meta_description": "Terms and conditions governing the use of our community timebanking platform."
+    "privacy_policy_link": "Informativa sulla privacy"
   },
   "privacy": {
-    "meta_description": "Come raccogliamo, utilizziamo e proteggiamo i tuoi dati personali sulla nostra piattaforma comunitaria.",
+    "meta_description": "How we collect, use, and protect your personal data on our community platform.",
     "page_title": "Informativa sulla privacy",
     "heading": "Informativa sulla privacy",
     "subtitle": "Come raccogliamo, utilizziamo e proteggiamo le Sue informazioni personali",
@@ -206,11 +205,10 @@
     "retention_logs_desc": "Indirizzi IP e log di accesso conservati per 12 mesi",
     "cta_title": "Domande sulla Sua privacy?",
     "cta_body": "Siamo a Sua disposizione. Se ha domande su questa informativa o desidera esercitare i Suoi diritti sui dati, non esiti a contattarci.",
-    "contact_privacy_team": "Contatti il nostro team per la privacy",
-    "meta_description": "How we collect, use, and protect your personal data on our community platform."
+    "contact_privacy_team": "Contatti il nostro team per la privacy"
   },
   "cookies": {
-    "meta_description": "Informazioni su come utilizziamo i cookie per migliorare la tua esperienza sulla nostra piattaforma.",
+    "meta_description": "Information about how we use cookies to improve your experience on our platform.",
     "page_title": "Politica dei cookie",
     "heading": "Politica dei cookie",
     "subtitle": "Come utilizziamo i cookie e tecnologie simili sulla nostra piattaforma",
@@ -289,11 +287,10 @@
     "cta_title": "Domande sui cookie?",
     "cta_body": "Se ha domande sull'uso dei cookie o su questa informativa, non esiti a contattarci.",
     "contact_us": "Contattaci",
-    "privacy_policy_link": "Informativa sulla privacy",
-    "meta_description": "Information about how we use cookies to improve your experience on our platform."
+    "privacy_policy_link": "Informativa sulla privacy"
   },
   "accessibility": {
-    "meta_description": "Il nostro impegno a rendere la piattaforma accessibile a tutti, seguendo gli standard WCAG 2.1 AA.",
+    "meta_description": "Our commitment to making the platform accessible to everyone, following WCAG 2.1 AA standards.",
     "page_title": "Accessibilita",
     "heading": "Dichiarazione di accessibilita",
     "subtitle": "{{name}} si impegna a garantire l'accessibilita digitale per le persone di tutte le capacita.",
@@ -337,8 +334,7 @@
     "tech_svg": "SVG con alternative appropriate",
     "tech_react": "React con libreria di componenti accessibili",
     "tech_recommendation": "Queste tecnologie sono utilizzate per la conformita agli standard di accessibilita. Consigliamo di utilizzare l'ultima versione del Suo browser con la tecnologia assistiva aggiornata per la migliore esperienza.",
-    "last_updated": "Questa dichiarazione e stata aggiornata l'ultima volta a febbraio 2026.",
-    "meta_description": "Our commitment to making the platform accessible to everyone, following WCAG 2.1 AA standards."
+    "last_updated": "Questa dichiarazione e stata aggiornata l'ultima volta a febbraio 2026."
   },
   "hub": {
     "page_title": "Legale",

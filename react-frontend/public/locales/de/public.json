@@ -1,6 +1,6 @@
 {
   "home": {
-    "meta_title": "Community Timebanking Plattform",
+    "meta_title": "Community Timebanking Platform",
     "meta_description": "Tauschen Sie Fähigkeiten und Dienstleistungen mit Zeitguthaben. Treten Sie unserer gemeinschaftsorientierten Zeitbank-Plattform bei.",
     "meta_keywords": "Zeitbank, Fähigkeitenaustausch, Gemeinschaft, Freiwilligenarbeit, Zeitguthaben",
     "badge": "Die Zukunft der Zeitbank",
@@ -76,8 +76,7 @@
       "title": "Bereit loszulegen?",
       "description": "Treten Sie Tausenden von Gemeinschaftsmitgliedern bei, die bereits Fähigkeiten austauschen und bedeutungsvolle Verbindungen aufbauen.",
       "button": "Erstellen Sie Ihr kostenloses Konto"
-    },
-    "meta_title": "Community Timebanking Platform"
+    }
   },
   "about": {
     "meta_title": "Über {{name}}",
@@ -158,7 +157,7 @@
     }
   },
   "contact": {
-    "meta_description": "Nehmen Sie Kontakt mit unserem Community-Support-Team auf. Wir sind hier, um zu helfen.",
+    "meta_description": "Get in touch with our community support team. We're here to help.",
     "title": "Kontaktieren Sie uns",
     "subtitle": "Haben Sie eine Frage zu {{name}}? Wir freuen uns, von Ihnen zu hören.",
     "success_title": "Nachricht gesendet!",
@@ -185,12 +184,11 @@
       "login_prompt_before": "Haben Sie bereits ein Konto?",
       "login_link": "Anmelden",
       "login_prompt_after": "für schnelleren Support."
-    },
-    "meta_description": "Get in touch with our community support team. We're here to help."
+    }
   },
   "faq": {
-    "page_title": "Häufig gestellte Fragen",
-    "meta_description": "Finden Sie Antworten auf häufige Fragen zu Timebanking, Austausch und Community-Funktionen.",
+    "page_title": "Frequently Asked Questions",
+    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features.",
     "title": "Häufig gestellte Fragen",
     "subtitle_before_link": "Finden Sie nicht, was Sie suchen? Besuchen Sie unser",
     "help_center_link": "Hilfezentrum",
@@ -382,9 +380,7 @@
           "item4": "Wir erfüllen die DSGVO und Datenschutzverordnungen"
         }
       }
-    },
-    "page_title": "Frequently Asked Questions",
-    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features."
+    }
   },
   "maintenance": {
     "title": "Wir sind bald zurück!",

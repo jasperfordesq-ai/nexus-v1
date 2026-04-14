@@ -1,6 +1,6 @@
 {
   "page_title": "Entdecken",
-  "page_description": "Entdecke Angebote, Veranstaltungen, Gruppen und Möglichkeiten in der Gemeinschaft.",
+  "page_description": "Explore listings, events, groups, and opportunities across the community.",
   "heading": "Entdecken",
   "subtitle": "Finden Sie Fähigkeiten, Veranstaltungen, Gruppen und mehr in Ihrer Gemeinschaft",
   "search_placeholder": "Fähigkeiten, Veranstaltungen, Gruppen entdecken...",
@@ -151,6 +151,5 @@
   "empty_groups": "Noch keine aktiven Gruppen. Gründen Sie eine Gruppe zu Ihren Interessen!",
   "create_listing": "Inserat erstellen",
   "create_event": "Veranstaltung erstellen",
-  "create_group": "Gruppe erstellen",
-  "page_description": "Explore listings, events, groups, and opportunities across the community."
+  "create_group": "Gruppe erstellen"
 }

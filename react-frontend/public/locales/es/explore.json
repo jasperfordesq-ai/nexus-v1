@@ -1,6 +1,6 @@
 {
   "page_title": "Descubrir",
-  "page_description": "Explora listados, eventos, grupos y oportunidades en toda la comunidad.",
+  "page_description": "Explore listings, events, groups, and opportunities across the community.",
   "heading": "Descubrir",
   "subtitle": "Encuentra habilidades, eventos, grupos y más en tu comunidad",
   "search_placeholder": "Descubre habilidades, eventos, grupos...",
@@ -151,6 +151,5 @@
   "empty_groups": "Aún no hay grupos activos. ¡Inicia un grupo sobre tus intereses!",
   "create_listing": "Crear Anuncio",
   "create_event": "Crear Evento",
-  "create_group": "Crear Grupo",
-  "page_description": "Explore listings, events, groups, and opportunities across the community."
+  "create_group": "Crear Grupo"
 }

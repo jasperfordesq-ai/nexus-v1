@@ -187,8 +187,8 @@
     }
   },
   "faq": {
-    "page_title": "Veelgestelde Vragen",
-    "meta_description": "Vind antwoorden op veelvoorkomende vragen over timebanking, uitwisselingen en gemeenschapsfuncties.",
+    "page_title": "Frequently Asked Questions",
+    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features.",
     "title": "Veelgestelde Vragen",
     "subtitle_before_link": "Kun je niet vinden wat je zoekt? Bezoek ons",
     "help_center_link": "Helpcentrum",
@@ -380,9 +380,7 @@
           "item4": "We voldoen aan de AVG en gegevensbeschermingsregels"
         }
       }
-    },
-    "page_title": "Frequently Asked Questions",
-    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features."
+    }
   },
   "maintenance": {
     "title": "We zijn snel terug!",

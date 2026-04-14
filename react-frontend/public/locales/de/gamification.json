@@ -90,43 +90,6 @@
     },
     "loading": "Errungenschaften werden geladen",
     "badge_detail": {
-      "title": "Abzeichen Details",
-      "earned_on": "Verdient am {{date}}",
-      "not_earned": "Noch nicht verdient",
-      "not_earned_desc": "Mach weiter — du wirst dieses Abzeichen bald freischalten!",
-      "xp_reward": "XP Belohnung",
-      "load_failed": "Konnte die Abzeichendetails nicht laden.",
-      "type": "Category",
-      "threshold": "Requirement",
-      "threshold_value": "{{threshold}} {{type}}",
-      "rarity": "Rarity",
-      "tier": "Tier",
-      "close": "Close",
-      "rarity_common": "Common",
-      "rarity_uncommon": "Uncommon",
-      "rarity_rare": "Rare",
-      "rarity_epic": "Epic",
-      "rarity_legendary": "Legendary",
-      "tier_core": "Core",
-      "tier_template": "Standard",
-      "tier_custom": "Custom"
-    },
-    "showcase": {
-      "manage_title": "Abzeichen-Vitrine verwalten",
-      "select_badges": "Wählen Sie bis zu 5 Abzeichen für Ihr Profil aus. ({{count}}/5 ausgewählt)",
-      "no_badges_earned": "Sie haben noch keine Abzeichen verdient.",
-      "showcase_badge": "{{name}} ausstellen",
-      "cancel": "Abbrechen",
-      "saving": "Wird gespeichert...",
-      "save": "Vitrine speichern",
-      "updated": "Vitrine aktualisiert",
-      "updated_desc": "Ihre Abzeichen-Vitrine wurde gespeichert.",
-      "save_failed": "Speichern fehlgeschlagen",
-      "save_failed_desc": "Die Vitrine konnte nicht aktualisiert werden.",
-      "save_error": "Etwas ist schiefgelaufen."
-    },
-    "load_error": "Erfolge konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
-    "badge_detail": {
       "title": "Badge Details",
       "earned_on": "Earned on {{date}}",
       "not_earned": "Not yet earned",
@@ -147,7 +110,22 @@
       "tier_template": "Standard",
       "tier_custom": "Custom",
       "load_failed": "Could not load badge details."
-    }
+    },
+    "showcase": {
+      "manage_title": "Abzeichen-Vitrine verwalten",
+      "select_badges": "Wählen Sie bis zu 5 Abzeichen für Ihr Profil aus. ({{count}}/5 ausgewählt)",
+      "no_badges_earned": "Sie haben noch keine Abzeichen verdient.",
+      "showcase_badge": "{{name}} ausstellen",
+      "cancel": "Abbrechen",
+      "saving": "Wird gespeichert...",
+      "save": "Vitrine speichern",
+      "updated": "Vitrine aktualisiert",
+      "updated_desc": "Ihre Abzeichen-Vitrine wurde gespeichert.",
+      "save_failed": "Speichern fehlgeschlagen",
+      "save_failed_desc": "Die Vitrine konnte nicht aktualisiert werden.",
+      "save_error": "Etwas ist schiefgelaufen."
+    },
+    "load_error": "Erfolge konnten nicht geladen werden. Bitte versuchen Sie es erneut."
   },
   "goals": {
     "page_title": "Ziele",

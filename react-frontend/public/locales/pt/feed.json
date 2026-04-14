@@ -49,15 +49,12 @@
     "deleted": "Publicação eliminada",
     "delete_failed": "Falha ao eliminar publicação",
     "vote_failed": "Falha ao submeter voto",
-    "not_interested": "Mostraremos menos como este",
-    "post_updated": "Post atualizado",
-    "update_failed": "Falha ao atualizar o post",
-    "post_shared": "Publicação partilhada no seu feed",
-    "share_removed": "Partilha removida",
-    "share_failed": "Falha ao partilhar publicação",
     "not_interested": "We'll show you less like this",
     "post_updated": "Post updated",
-    "update_failed": "Failed to update post"
+    "update_failed": "Failed to update post",
+    "post_shared": "Publicação partilhada no seu feed",
+    "share_removed": "Partilha removida",
+    "share_failed": "Falha ao partilhar publicação"
   },
   "realtime": {
     "new_posts_one": "1 nova publicação",

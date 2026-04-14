@@ -319,8 +319,7 @@
     "receipt_method": "Método de pago",
     "receipt_message": "Mensaje",
     "receipt_error": "No se pudo cargar el recibo.",
-    "receipt_not_found": "Recibo no encontrado.",
-    "placeholder_amount": "0.00"
+    "receipt_not_found": "Recibo no encontrado."
   },
   "safeguarding": {
     "heading": "Protección",

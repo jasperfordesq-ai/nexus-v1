@@ -1,6 +1,6 @@
 {
   "help": {
-    "meta_description": "Explore artigos de ajuda, guias e perguntas frequentes para aproveitar ao máximo a plataforma.",
+    "meta_description": "Browse help articles, guides, and FAQs to get the most out of the platform.",
     "page_title": "Centro de Ajuda",
     "heading": "Centro de Ajuda",
     "subtitle": "Encontre respostas a perguntas comuns sobre {{name}}",
@@ -58,8 +58,7 @@
     "faq_cat_5_a_2": "Sim, pode eliminar a sua conta nas Definições. Esta ação é permanente e removerá o seu perfil, anúncios e histórico de transações. Contacte o coordenador da sua comunidade se precisar de ajuda.",
     "still_need_help": "Ainda precisa de ajuda?",
     "still_need_help_description": "Não encontra o que procura? A nossa equipa está aqui para ajudar.",
-    "contact_support": "Contactar Suporte",
-    "meta_description": "Browse help articles, guides, and FAQs to get the most out of the platform."
+    "contact_support": "Contactar Suporte"
   },
   "resources": {
     "page_title": "Recursos",

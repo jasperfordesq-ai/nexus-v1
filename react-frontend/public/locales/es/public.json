@@ -1,6 +1,6 @@
 {
   "home": {
-    "meta_title": "Plataforma Comunitaria de Timebanking",
+    "meta_title": "Community Timebanking Platform",
     "meta_description": "Intercambia habilidades y servicios usando créditos de tiempo. Únete a nuestra plataforma comunitaria de banco de tiempo.",
     "meta_keywords": "banco de tiempo, intercambio de habilidades, comunidad, voluntariado, créditos de tiempo",
     "badge": "El Futuro del Banco de Tiempo",
@@ -76,8 +76,7 @@
       "title": "¿Listo para empezar?",
       "description": "Únete a miles de miembros de la comunidad que ya están intercambiando habilidades y construyendo conexiones significativas.",
       "button": "Crea Tu Cuenta Gratis"
-    },
-    "meta_title": "Community Timebanking Platform"
+    }
   },
   "about": {
     "meta_title": "Acerca de {{name}}",
@@ -158,7 +157,7 @@
     }
   },
   "contact": {
-    "meta_description": "Ponte en contacto con nuestro equipo de soporte comunitario. Estamos aquí para ayudar.",
+    "meta_description": "Get in touch with our community support team. We're here to help.",
     "title": "Contáctanos",
     "subtitle": "¿Tienes una pregunta sobre {{name}}? Nos encantaría saber de ti.",
     "success_title": "¡Mensaje Enviado!",
@@ -185,12 +184,11 @@
       "login_prompt_before": "¿Ya tienes una cuenta?",
       "login_link": "Inicia sesión",
       "login_prompt_after": "para soporte más rápido."
-    },
-    "meta_description": "Get in touch with our community support team. We're here to help."
+    }
   },
   "faq": {
-    "page_title": "Preguntas Frecuentes",
-    "meta_description": "Encuentra respuestas a preguntas comunes sobre el timebanking, intercambios y características comunitarias.",
+    "page_title": "Frequently Asked Questions",
+    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features.",
     "title": "Preguntas Frecuentes",
     "subtitle_before_link": "¿No encuentras lo que buscas? Visita nuestro",
     "help_center_link": "Centro de Ayuda",
@@ -382,9 +380,7 @@
           "item4": "Cumplimos con el RGPD y las regulaciones de protección de datos"
         }
       }
-    },
-    "page_title": "Frequently Asked Questions",
-    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features."
+    }
   },
   "maintenance": {
     "title": "¡Volveremos pronto!",
