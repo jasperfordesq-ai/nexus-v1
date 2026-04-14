@@ -164,13 +164,12 @@ export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
           variant="bordered"
           size="sm"
           className="max-w-[200px]"
+          items={[
+            { key: 'all', label: t('groups.audit_all_actions', 'All actions') },
+            ...uniqueActions.map((action) => ({ key: action, label: action })),
+          ]}
         >
-          <SelectItem key="all">
-            {t('groups.audit_all_actions', 'All actions')}
-          </SelectItem>
-          {uniqueActions.map((action) => (
-            <SelectItem key={action}>{action}</SelectItem>
-          ))}
+          {(item) => <SelectItem key={item.key}>{item.label}</SelectItem>}
         </Select>
       </div>
 

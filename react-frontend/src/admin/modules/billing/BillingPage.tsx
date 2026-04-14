@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Button, Chip, Spinner, Divider } from '@heroui/react';
 import { CreditCard, ArrowRight, Receipt, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { TFunction } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { billingApi, type SubscriptionDetails } from '../../api/billingApi';

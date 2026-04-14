@@ -245,6 +245,7 @@ export function VerificationBadgeSummary({
 }: {
   userId: number;
 }) {
+  const { t } = useTranslation('common');
   const [badges, setBadges] = useState<VerificationBadgeData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
