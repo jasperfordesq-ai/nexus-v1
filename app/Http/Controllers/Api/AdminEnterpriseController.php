@@ -501,6 +501,7 @@ class AdminEnterpriseController extends BaseApiController
                     ]);
                 }
             } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: GDPR audit export query failed: ' . $e->getMessage());
                 fputcsv($handle, ['Error exporting data', '', '', '', '', '', '', '', '']);
             }
 
@@ -563,6 +564,7 @@ class AdminEnterpriseController extends BaseApiController
             );
         } catch (\Exception $e) {
             // Table may not exist yet — don't break the health check
+            \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: health_check_history insert failed: ' . $e->getMessage());
         }
 
         return $this->respondWithData(['status' => $overallStatus, 'checks' => $checks]);
@@ -947,6 +949,7 @@ class AdminEnterpriseController extends BaseApiController
                     [$id, $tenantId]
                 ));
             } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: timeline fetch failed: ' . $e->getMessage());
                 $timeline = [];
             }
 
@@ -1003,6 +1006,7 @@ class AdminEnterpriseController extends BaseApiController
                 );
             } catch (\Exception $e) {
                 // Audit log failure should not break the main operation
+                \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: audit log insert failed: ' . $e->getMessage());
             }
 
             return $this->respondWithData(['id' => $requestId, 'message' => __('api_controllers_1.admin_enterprise.gdpr_request_created')], null, 201);
@@ -1160,6 +1164,7 @@ class AdminEnterpriseController extends BaseApiController
             return $this->respondWithData($types);
         } catch (\Exception $e) {
             // Table may not exist
+            \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: consent_types query failed: ' . $e->getMessage());
             return $this->respondWithData([]);
         }
     }
@@ -1319,6 +1324,7 @@ class AdminEnterpriseController extends BaseApiController
                 }
             } catch (\Exception $e) {
                 // Write error row
+                \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: consent export query failed: ' . $e->getMessage());
                 fputcsv($handle, ['Error exporting data', '', '', '', '']);
             }
 
@@ -1447,6 +1453,7 @@ class AdminEnterpriseController extends BaseApiController
             return $this->respondWithData($stats);
         } catch (\Exception $e) {
             // Fall back to manual computation
+            \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: GdprService::getStatistics failed, falling back to manual: ' . $e->getMessage());
         }
 
         try {
@@ -1848,6 +1855,7 @@ class AdminEnterpriseController extends BaseApiController
             return $this->respondWithData($history);
         } catch (\Exception $e) {
             // Table may not exist yet
+            \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: health_check_history query failed: ' . $e->getMessage());
             return $this->respondWithData([]);
         }
     }
@@ -1974,7 +1982,10 @@ class AdminEnterpriseController extends BaseApiController
         try {
             $docs = $this->legalDocumentService->getAllForTenant(TenantContext::getId());
             return $this->respondWithData($docs);
-        } catch (\Exception $e) { return $this->respondWithData([]); }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: legalDocs query failed: ' . $e->getMessage());
+            return $this->respondWithData([]);
+        }
     }
 
     /** POST /api/v2/admin/legal-documents */

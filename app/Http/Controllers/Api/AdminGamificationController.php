@@ -122,6 +122,7 @@ class AdminGamificationController extends BaseApiController
 
             return $this->respondWithData(['id' => $id, 'key' => $badgeKey, 'name' => $name, 'description' => $description, 'icon' => $icon, 'type' => 'custom'], null, 201);
         } catch (\Throwable $e) {
+            Log::warning('AdminGamificationController: createBadge failed: ' . $e->getMessage(), ['context' => __METHOD__]);
             return $this->respondWithError('SERVER_ERROR', __('api.create_failed', ['resource' => 'badge']), null, 500);
         }
     }
@@ -144,6 +145,7 @@ class AdminGamificationController extends BaseApiController
 
             return $this->respondWithData(['deleted' => true]);
         } catch (\Throwable $e) {
+            Log::warning('AdminGamificationController: deleteBadge failed: ' . $e->getMessage(), ['context' => __METHOD__]);
             return $this->respondWithError('SERVER_ERROR', __('api.delete_failed', ['resource' => 'badge']), null, 500);
         }
     }
@@ -161,6 +163,7 @@ class AdminGamificationController extends BaseApiController
             ], $campaigns);
             return $this->respondWithData($formatted);
         } catch (\Throwable $e) {
+            Log::warning('AdminGamificationController: campaigns fetch failed: ' . $e->getMessage(), ['context' => __METHOD__]);
             return $this->respondWithData([]);
         }
     }
@@ -222,7 +225,10 @@ class AdminGamificationController extends BaseApiController
         $campaign = $this->achievementCampaignService->getCampaign($id);
         if (!$campaign) return $this->respondWithError('NOT_FOUND', __('api.campaign_not_found'), null, 404);
         try { $this->achievementCampaignService->deleteCampaign($id); return $this->respondWithData(['deleted' => true]); }
-        catch (\Throwable $e) { return $this->respondWithError('SERVER_ERROR', __('api.delete_failed', ['resource' => 'campaign']), null, 500); }
+        catch (\Throwable $e) {
+            Log::warning('AdminGamificationController: deleteCampaign failed: ' . $e->getMessage(), ['context' => __METHOD__]);
+            return $this->respondWithError('SERVER_ERROR', __('api.delete_failed', ['resource' => 'campaign']), null, 500);
+        }
     }
 
     /** POST /api/v2/admin/gamification/recheck-all */
