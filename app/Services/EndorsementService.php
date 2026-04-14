@@ -48,8 +48,10 @@ class EndorsementService
             return null;
         }
 
-        // Check endorsed user exists in same tenant
-        $endorsed = User::where('id', $endorsedId)->first(['id', 'first_name', 'last_name']);
+        // Check endorsed user exists in the same tenant
+        $endorsed = User::where('id', $endorsedId)
+            ->where('tenant_id', TenantContext::getId())
+            ->first(['id', 'first_name', 'last_name']);
         if (!$endorsed) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api_controllers_2.endorsement.member_not_found')];
             return null;
@@ -175,10 +177,17 @@ class EndorsementService
      */
     public static function getEndorsementsForUser(int $userId): array
     {
+        $tenantId = TenantContext::getId();
+
+        // Verify the target user belongs to this tenant before exposing endorsement data
+        if (!User::where('id', $userId)->where('tenant_id', $tenantId)->exists()) {
+            return [];
+        }
+
         $rows = DB::table('skill_endorsements as se')
             ->join('users as u', 'se.endorser_id', '=', 'u.id')
             ->where('se.endorsed_id', $userId)
-            ->where('se.tenant_id', TenantContext::getId())
+            ->where('se.tenant_id', $tenantId)
             ->select(
                 'se.skill_name',
                 DB::raw('COUNT(*) as count'),
