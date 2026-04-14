@@ -100,7 +100,8 @@ compose.prod.yml
 playwright-report/
 test-results/
 
-# ─── Mobile App Build (Capacitor) ────────────────────────────────────────────
+# ─── Mobile App (on hold — not in active development) ───────────────────────
+/mobile/
 /capacitor/
 
 # ─── Old/Quarantined Directories ─────────────────────────────────────────────
