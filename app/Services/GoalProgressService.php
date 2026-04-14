@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Models\Goal;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -20,6 +21,9 @@ class GoalProgressService
      */
     public function getProgressHistory(int $goalId, array $filters = []): array
     {
+        // Validates tenant ownership via HasTenantScope global scope
+        Goal::findOrFail($goalId);
+
         $limit = min((int) ($filters['limit'] ?? 50), 100);
         $cursor = $filters['cursor'] ?? null;
 
@@ -55,6 +59,9 @@ class GoalProgressService
      */
     public function getSummary(int $goalId): array
     {
+        // Validates tenant ownership via HasTenantScope global scope
+        Goal::findOrFail($goalId);
+
         $total = DB::table('goal_progress_history')
             ->where('goal_id', $goalId)
             ->count();
