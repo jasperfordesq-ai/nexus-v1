@@ -201,7 +201,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
     if (isLink) {
       editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
     } else {
-      const url = prompt('Enter URL:');
+      const url = prompt(t('rte.enter_url'));
       if (url) {
         editor.dispatchCommand(TOGGLE_LINK_COMMAND, url);
       }

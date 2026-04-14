@@ -2533,7 +2533,8 @@
     "clone_group": "Clone Group",
     "audit_log": "Audit Log",
     "n_selected_one": "{{count}} selected",
-    "n_selected_other": "{{count}} selected"
+    "n_selected_other": "{{count}} selected",
+    "clone_group_name_prompt": "Name for cloned group:"
   },
   "header": {
     "admin_menu": "Menu di amministrazione",
@@ -5017,5 +5018,8 @@
     "refresh_pending_reviews_aria": "Refresh pending reviews",
     "audit_log_aria": "Verification audit log",
     "pending_reviews_aria": "Pending verification reviews"
+  },
+  "rte": {
+    "enter_url": "Enter URL:"
   }
 }

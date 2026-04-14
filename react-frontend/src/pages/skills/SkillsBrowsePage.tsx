@@ -128,9 +128,8 @@ export function SkillsBrowsePage() {
   const abortRef = useRef<AbortController | null>(null);
 
   // ── Load categories ──────────────────────────────────────────────────────
-  useEffect(() => {
-    loadCategories();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { loadCategories(); }, []);
 
   const loadCategories = async () => {
     abortRef.current?.abort();

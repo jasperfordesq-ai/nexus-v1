@@ -160,20 +160,23 @@ class PasswordResetController extends BaseApiController
             );
         }
 
-        // Update by user ID AND tenant_id — defense-in-depth against cross-tenant updates
-        DB::update(
-            "UPDATE users SET password_hash = ? WHERE id = ? AND tenant_id = ?",
-            [$hashedPassword, $user['id'], $user['tenant_id']]
-        );
+        // Atomically update password, delete reset tokens, and revoke session tokens
+        DB::transaction(function () use ($hashedPassword, $user, $email) {
+            // Update by user ID AND tenant_id — defense-in-depth against cross-tenant updates
+            DB::update(
+                "UPDATE users SET password_hash = ? WHERE id = ? AND tenant_id = ?",
+                [$hashedPassword, $user['id'], $user['tenant_id']]
+            );
 
-        // Delete all reset tokens for this email
-        DB::delete(
-            "DELETE FROM password_resets WHERE email = ?",
-            [$email]
-        );
+            // Delete all reset tokens for this email
+            DB::delete(
+                "DELETE FROM password_resets WHERE email = ?",
+                [$email]
+            );
 
-        // Invalidate all existing refresh tokens for security
-        $this->invalidateUserTokens((int)$user['id']);
+            // Invalidate all existing refresh tokens for security
+            $this->invalidateUserTokens((int)$user['id']);
+        });
 
         // Log the password change
         try {

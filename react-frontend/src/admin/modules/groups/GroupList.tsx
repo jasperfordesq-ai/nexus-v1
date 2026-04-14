@@ -136,7 +136,7 @@ export function GroupList() {
   };
 
   const handleClone = async (item: AdminGroup) => {
-    const name = prompt('Name for cloned group:', `${item.name} (Copy)`);
+    const name = prompt(t('groups.clone_group_name_prompt'), `${item.name} (Copy)`);
     if (!name) return;
     try {
       const res = await api.post(`/v2/admin/groups/${item.id}/clone`, { name, clone_members: false });
