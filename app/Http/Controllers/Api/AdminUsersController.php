@@ -1496,7 +1496,8 @@ class AdminUsersController extends BaseApiController
 
                 $results['imported']++;
             } catch (\Exception $e) {
-                $results['errors'][] = "Row {$row}: " . $e->getMessage();
+                \Illuminate\Support\Facades\Log::warning("CSV import row {$row} failed", ['error' => $e->getMessage()]);
+                $results['errors'][] = "Row {$row}: Failed to import user. Check data format.";
                 $results['skipped']++;
             }
         }

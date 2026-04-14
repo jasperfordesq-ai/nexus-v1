@@ -58,7 +58,7 @@ class AdminEnterpriseController extends BaseApiController
         try { DB::select("SELECT 1"); } catch (\Exception $e) { $dbConnected = false; }
 
         $redisConnected = false;
-        try { $stats = app(\App\Services\RedisCache::class)->getStats(); $redisConnected = !empty($stats['enabled']); } catch (\Throwable $e) {}
+        try { $stats = app(\App\Services\RedisCache::class)->getStats(); $redisConnected = !empty($stats['enabled']); } catch (\Throwable $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         $healthStatus = ($dbConnected && $redisConnected) ? 'healthy' : ($dbConnected ? 'degraded' : 'unhealthy');
 
@@ -71,14 +71,14 @@ class AdminEnterpriseController extends BaseApiController
             elseif (stripos($memLimitStr, 'M') !== false) $memLimit *= 1024 * 1024;
             elseif (stripos($memLimitStr, 'K') !== false) $memLimit *= 1024;
             if ($memLimit > 0) $memPercent = round(($memUsage / $memLimit) * 100, 1);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         $diskPercent = 0;
         try {
             $diskFree = disk_free_space('/');
             $diskTotal = disk_total_space('/');
             if ($diskTotal > 0 && $diskFree !== false) $diskPercent = round((1 - $diskFree / $diskTotal) * 100, 1);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         $recentActivity = [];
         try {
@@ -86,7 +86,7 @@ class AdminEnterpriseController extends BaseApiController
                 "SELECT gal.id, gal.action, gal.entity_type, gal.created_at, u.name as user_name FROM gdpr_audit_log gal LEFT JOIN users u ON u.id = gal.admin_id WHERE gal.tenant_id = ? ORDER BY gal.created_at DESC LIMIT 5",
                 [$tenantId]
             ));
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         return $this->respondWithData([
             'user_count' => $userCount, 'role_count' => $roleCount,
@@ -521,7 +521,7 @@ class AdminEnterpriseController extends BaseApiController
         try { $rows = DB::select("SHOW GLOBAL STATUS LIKE 'Uptime'"); $row = $rows[0] ?? null; if ($row) { $s = (int)($row->Value ?? 0); $uptime = floor($s/86400) . 'd ' . floor(($s%86400)/3600) . 'h'; } } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] Uptime query failed: ' . $e->getMessage()); }
 
         $redisConnected = false; $redisMemory = 'N/A';
-        try { $stats = app(\App\Services\RedisCache::class)->getStats(); $redisConnected = !empty($stats['enabled']); if ($redisConnected) { $redisMemory = $stats['memory_used'] ?? 'N/A'; } } catch (\Throwable $e) {}
+        try { $stats = app(\App\Services\RedisCache::class)->getStats(); $redisConnected = !empty($stats['enabled']); if ($redisConnected) { $redisMemory = $stats['memory_used'] ?? 'N/A'; } } catch (\Throwable $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         return $this->respondWithData([
             'php_version' => PHP_VERSION, 'memory_usage' => $this->formatBytes($memUsage),
@@ -535,11 +535,11 @@ class AdminEnterpriseController extends BaseApiController
     public function healthCheck(): JsonResponse
     {
         $this->requireAdmin();
-        $dbOk = false; try { DB::select("SELECT 1"); $dbOk = true; } catch (\Exception $e) {}
-        $redisOk = false; try { $stats = app(\App\Services\RedisCache::class)->getStats(); $redisOk = !empty($stats['enabled']); } catch (\Throwable $e) {}
+        $dbOk = false; try { DB::select("SELECT 1"); $dbOk = true; } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
+        $redisOk = false; try { $stats = app(\App\Services\RedisCache::class)->getStats(); $redisOk = !empty($stats['enabled']); } catch (\Throwable $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         $diskFree = 'N/A'; $diskTotal = 'N/A';
-        try { $f = disk_free_space('/'); $t = disk_total_space('/'); if ($f !== false && $t !== false) { $diskFree = $this->formatBytes($f); $diskTotal = $this->formatBytes($t); } } catch (\Exception $e) {}
+        try { $f = disk_free_space('/'); $t = disk_total_space('/'); if ($f !== false && $t !== false) { $diskFree = $this->formatBytes($f); $diskTotal = $this->formatBytes($t); } } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         $checks = [
             ['name' => 'Database', 'status' => $dbOk ? 'ok' : 'fail'],
@@ -868,7 +868,7 @@ class AdminEnterpriseController extends BaseApiController
                     );
                 }
             }
-            try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Throwable $e) {}
+            try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Throwable $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
             return $this->respondWithData(['reset' => true]);
         } catch (\Exception $e) {
             return $this->respondWithError('RESET_FAILED', __('api_controllers_1.admin_enterprise.config_reset_failed'), null, 500);
@@ -1038,7 +1038,7 @@ class AdminEnterpriseController extends BaseApiController
                      VALUES (?, ?, 'assign_request', 'gdpr_request', ?, ?, ?, NOW())",
                     [$tenantId, $this->getUserId(), $id, json_encode(['assigned_to' => $assignedTo]), request()->ip()]
                 );
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
             return $this->respondWithData(['id' => $id, 'assigned_to' => $assignedTo, 'updated' => true]);
         } catch (\Exception $e) {
@@ -1068,7 +1068,7 @@ class AdminEnterpriseController extends BaseApiController
             try {
                 $admin = DB::selectOne("SELECT name FROM users WHERE id = ?", [$this->getUserId()]);
                 if ($admin) { $adminName = $admin->name; }
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
             $timestamp = date('Y-m-d H:i:s');
             $existingNotes = $request->notes ?? '';
@@ -1087,7 +1087,7 @@ class AdminEnterpriseController extends BaseApiController
                      VALUES (?, ?, 'add_note', 'gdpr_request', ?, ?, ?, NOW())",
                     [$tenantId, $this->getUserId(), $id, json_encode(['note' => $note]), request()->ip()]
                 );
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
             return $this->respondWithData(['id' => $id, 'notes' => $newNotes, 'updated' => true]);
         } catch (\Exception $e) {
@@ -1125,7 +1125,7 @@ class AdminEnterpriseController extends BaseApiController
                      VALUES (?, ?, 'generate_export', 'gdpr_request', ?, ?, ?, NOW())",
                     [$tenantId, $this->getUserId(), $id, json_encode(['file_path' => $filePath]), request()->ip()]
                 );
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
             return $this->respondWithData([
                 'id' => $id,
@@ -1395,7 +1395,7 @@ class AdminEnterpriseController extends BaseApiController
                      VALUES (?, ?, 'update_breach', 'data_breach', ?, ?, ?, NOW())",
                     [$tenantId, $this->getUserId(), $id, json_encode(array_intersect_key($input, array_flip($allowedFields))), request()->ip()]
                 );
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
             return $this->respondWithData(['id' => $id, 'updated' => true]);
         } catch (\Exception $e) {
@@ -1425,7 +1425,7 @@ class AdminEnterpriseController extends BaseApiController
                      VALUES (?, ?, 'notify_dpa', 'data_breach', ?, ?, ?, NOW())",
                     [$tenantId, $this->getUserId(), $id, json_encode(['dpa_notified' => true]), request()->ip()]
                 );
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
             return $this->respondWithData(['id' => $id, 'dpa_notified' => true, 'message' => __('api_controllers_1.admin_enterprise.dpa_notification_recorded')]);
         } catch (\Exception $e) {
@@ -1514,7 +1514,7 @@ class AdminEnterpriseController extends BaseApiController
                      AND TIMESTAMPDIFF(DAY, created_at, completed_at) <= 30",
                     [$tenantId]
                 )->cnt ?? 0);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
             $complianceScore = 0;
             if ($totalRequests > 0) {
@@ -1580,7 +1580,7 @@ class AdminEnterpriseController extends BaseApiController
                         "SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND created_at >= ? AND created_at <= ?",
                         [$tenantId, $monthStart, $monthEnd . ' 23:59:59']
                     )->cnt ?? 0);
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
                 $requests[] = $reqCount;
 
                 $breachCount = 0;
@@ -1589,7 +1589,7 @@ class AdminEnterpriseController extends BaseApiController
                         "SELECT COUNT(*) as cnt FROM data_breach_log WHERE tenant_id = ? AND created_at >= ? AND created_at <= ?",
                         [$tenantId, $monthStart, $monthEnd . ' 23:59:59']
                     )->cnt ?? 0);
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
                 $breaches[] = $breachCount;
             }
 
@@ -1603,14 +1603,14 @@ class AdminEnterpriseController extends BaseApiController
             try {
                 $thisMonthRequests = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND created_at >= ?", [$tenantId, $thisMonthStart])->cnt ?? 0);
                 $lastMonthRequests = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND created_at >= ? AND created_at <= ?", [$tenantId, $lastMonthStart, $lastMonthEnd . ' 23:59:59'])->cnt ?? 0);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
             $thisMonthCompleted = 0;
             $lastMonthCompleted = 0;
             try {
                 $thisMonthCompleted = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND status = 'completed' AND completed_at >= ?", [$tenantId, $thisMonthStart])->cnt ?? 0);
                 $lastMonthCompleted = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND status = 'completed' AND completed_at >= ? AND completed_at <= ?", [$tenantId, $lastMonthStart, $lastMonthEnd . ' 23:59:59'])->cnt ?? 0);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
             return $this->respondWithData([
                 'months' => $months,
@@ -1804,10 +1804,10 @@ class AdminEnterpriseController extends BaseApiController
 
         // Services
         $dbOk = false;
-        try { DB::select("SELECT 1"); $dbOk = true; } catch (\Exception $e) {}
+        try { DB::select("SELECT 1"); $dbOk = true; } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         $redisOk = false;
-        try { $stats = app(\App\Services\RedisCache::class)->getStats(); $redisOk = !empty($stats['enabled']); } catch (\Throwable $e) {}
+        try { $stats = app(\App\Services\RedisCache::class)->getStats(); $redisOk = !empty($stats['enabled']); } catch (\Throwable $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         $services = [
             ['name' => 'database', 'connected' => $dbOk],
@@ -1912,7 +1912,7 @@ class AdminEnterpriseController extends BaseApiController
             // Invalidate tenant bootstrap cache
             try {
                 app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId);
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
             return $this->respondWithData(['key' => $key, 'value' => $value, 'type' => $type, 'updated' => true]);
         } catch (\Exception $e) {

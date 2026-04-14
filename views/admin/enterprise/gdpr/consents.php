@@ -340,6 +340,7 @@ $pageTitle = 'Consent Management';
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <form action="/admin-legacy/enterprise/gdpr/consents/types" method="POST">
+                <?= \App\Core\Csrf::input() ?>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">

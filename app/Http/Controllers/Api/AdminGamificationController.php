@@ -41,10 +41,10 @@ class AdminGamificationController extends BaseApiController
         $activeCampaigns = 0;
         $badgeDistribution = [];
 
-        try { $totalBadgesAwarded = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM user_badges ub JOIN users u ON ub.user_id = u.id WHERE u.tenant_id = ?", [$tenantId])->cnt; } catch (\Throwable $e) {}
-        try { $activeUsers = (int) DB::selectOne("SELECT COUNT(DISTINCT ub.user_id) as cnt FROM user_badges ub JOIN users u ON ub.user_id = u.id WHERE u.tenant_id = ?", [$tenantId])->cnt; } catch (\Throwable $e) {}
-        try { $totalXp = (int) DB::selectOne("SELECT COALESCE(SUM(xp), 0) as total FROM users WHERE tenant_id = ?", [$tenantId])->total; } catch (\Throwable $e) {}
-        try { $activeCampaigns = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM achievement_campaigns WHERE tenant_id = ? AND status = 'active'", [$tenantId])->cnt; } catch (\Throwable $e) {}
+        try { $totalBadgesAwarded = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM user_badges ub JOIN users u ON ub.user_id = u.id WHERE u.tenant_id = ?", [$tenantId])->cnt; } catch (\Throwable $e) { Log::warning('AdminGamificationController: ' . $e->getMessage(), ['context' => __METHOD__]); }
+        try { $activeUsers = (int) DB::selectOne("SELECT COUNT(DISTINCT ub.user_id) as cnt FROM user_badges ub JOIN users u ON ub.user_id = u.id WHERE u.tenant_id = ?", [$tenantId])->cnt; } catch (\Throwable $e) { Log::warning('AdminGamificationController: ' . $e->getMessage(), ['context' => __METHOD__]); }
+        try { $totalXp = (int) DB::selectOne("SELECT COALESCE(SUM(xp), 0) as total FROM users WHERE tenant_id = ?", [$tenantId])->total; } catch (\Throwable $e) { Log::warning('AdminGamificationController: ' . $e->getMessage(), ['context' => __METHOD__]); }
+        try { $activeCampaigns = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM achievement_campaigns WHERE tenant_id = ? AND status = 'active'", [$tenantId])->cnt; } catch (\Throwable $e) { Log::warning('AdminGamificationController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         try {
             $rows = DB::select(
@@ -53,7 +53,7 @@ class AdminGamificationController extends BaseApiController
                 [$tenantId]
             );
             $badgeDistribution = array_map(fn($r) => ['badge_name' => $r->badge_name, 'count' => (int) $r->count], $rows);
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) { Log::warning('AdminGamificationController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         return $this->respondWithData([
             'total_badges_awarded' => $totalBadgesAwarded,
@@ -78,14 +78,14 @@ class AdminGamificationController extends BaseApiController
                 $badgeKey = $def['key'] ?? '';
                 $badges[] = ['id' => null, 'key' => $badgeKey, 'name' => $def['name'] ?? $badgeKey, 'description' => $def['msg'] ?? $def['description'] ?? '', 'icon' => $def['icon'] ?? 'award', 'type' => 'built_in', 'awarded_count' => 0];
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) { Log::warning('AdminGamificationController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         try {
             $customBadges = DB::select("SELECT * FROM custom_badges WHERE tenant_id = ? ORDER BY created_at DESC", [$tenantId]);
             foreach ($customBadges as $cb) {
                 $badges[] = ['id' => (int) $cb->id, 'key' => 'custom_' . $cb->id, 'name' => $cb->name, 'description' => $cb->description ?? '', 'icon' => $cb->icon ?? 'award', 'type' => 'custom', 'awarded_count' => 0];
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) { Log::warning('AdminGamificationController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         try {
             $counts = DB::select("SELECT ub.badge_key, COUNT(*) as cnt FROM user_badges ub JOIN users u ON ub.user_id = u.id WHERE u.tenant_id = ? GROUP BY ub.badge_key", [$tenantId]);
@@ -93,7 +93,7 @@ class AdminGamificationController extends BaseApiController
             foreach ($counts as $row) { $countMap[$row->badge_key] = (int) $row->cnt; }
             foreach ($badges as &$badge) { $badge['awarded_count'] = $countMap[$badge['key']] ?? 0; }
             unset($badge);
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) { Log::warning('AdminGamificationController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         return $this->respondWithData($badges);
     }
@@ -139,7 +139,7 @@ class AdminGamificationController extends BaseApiController
             }
 
             $actualKey = $badge->badge_key ?? ('custom_' . $id);
-            try { DB::delete("DELETE FROM user_badges WHERE badge_key = ? AND user_id IN (SELECT id FROM users WHERE tenant_id = ?)", [$actualKey, $tenantId]); } catch (\Throwable $e) {}
+            try { DB::delete("DELETE FROM user_badges WHERE badge_key = ? AND user_id IN (SELECT id FROM users WHERE tenant_id = ?)", [$actualKey, $tenantId]); } catch (\Throwable $e) { Log::warning('AdminGamificationController: ' . $e->getMessage(), ['context' => __METHOD__]); }
             DB::delete("DELETE FROM custom_badges WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
             return $this->respondWithData(['deleted' => true]);

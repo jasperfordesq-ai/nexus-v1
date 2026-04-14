@@ -375,7 +375,8 @@ class AdminMarketplaceController extends BaseApiController
         try {
             $report = MarketplaceReportService::acknowledgeReport($id, $adminId);
         } catch (\InvalidArgumentException $e) {
-            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+            \Illuminate\Support\Facades\Log::warning('AdminMarketplaceController error: ' . $e->getMessage());
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid request parameters', 400);
         }
 
         return $this->respondWithData(['message' => __('api_controllers_1.admin_marketplace.report_acknowledged'), 'status' => $report->status]);
@@ -401,7 +402,8 @@ class AdminMarketplaceController extends BaseApiController
         try {
             $report = MarketplaceReportService::resolveReport($id, $adminId, $validated);
         } catch (\InvalidArgumentException $e) {
-            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+            \Illuminate\Support\Facades\Log::warning('AdminMarketplaceController error: ' . $e->getMessage());
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid request parameters', 400);
         }
 
         return $this->respondWithData(['message' => __('api_controllers_1.admin_marketplace.report_resolved'), 'status' => $report->status, 'action_taken' => $report->action_taken]);

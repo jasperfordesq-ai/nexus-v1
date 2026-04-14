@@ -411,6 +411,7 @@ $pageTitle = 'GDPR Request #' . $request['id'];
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <form action="/admin-legacy/enterprise/gdpr/requests/<?= $request['id'] ?>/assign" method="POST">
+                <?= \App\Core\Csrf::input() ?>
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Assign To</label>
@@ -442,6 +443,7 @@ $pageTitle = 'GDPR Request #' . $request['id'];
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <form action="/admin-legacy/enterprise/gdpr/requests/<?= $request['id'] ?>/notes" method="POST">
+                <?= \App\Core\Csrf::input() ?>
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Note</label>

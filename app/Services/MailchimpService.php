@@ -42,6 +42,7 @@ class MailchimpService
         $subscriberHash = md5(strtolower($email));
 
         Http::withBasicAuth('anystring', $this->apiKey)
+            ->timeout(10)
             ->put("{$this->baseUrl()}/lists/{$this->listId}/members/{$subscriberHash}", [
                 'email_address' => $email,
                 'status_if_new' => 'subscribed',
@@ -67,6 +68,7 @@ class MailchimpService
         $subscriberHash = md5(strtolower($email));
 
         Http::withBasicAuth('anystring', $this->apiKey)
+            ->timeout(10)
             ->patch("{$this->baseUrl()}/lists/{$this->listId}/members/{$subscriberHash}", [
                 'status' => 'unsubscribed',
             ])

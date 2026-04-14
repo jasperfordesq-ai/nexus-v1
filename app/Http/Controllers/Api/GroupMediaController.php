@@ -103,6 +103,14 @@ class GroupMediaController extends BaseApiController
             return $this->errorResponse('No valid file provided', 400);
         }
 
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm', 'video/quicktime'];
+        if (!in_array($file->getMimeType(), $allowedMimes, true)) {
+            return $this->respondWithError('File type not allowed', 422);
+        }
+        if ($file->getSize() > 50 * 1024 * 1024) {
+            return $this->respondWithError('File exceeds maximum allowed size of 50MB', 422);
+        }
+
         // Determine type from mime
         $mime = $file->getMimeType();
         if (str_starts_with($mime, 'image/')) {

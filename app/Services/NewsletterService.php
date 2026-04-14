@@ -394,6 +394,7 @@ class NewsletterService
             ->flip()
             ->all();
 
+        $rows = [];
         foreach ($recipients as $recipient) {
             $email = $recipient['email'] ?? '';
             if (empty($email) || isset($alreadySent[$email])) {
@@ -402,7 +403,7 @@ class NewsletterService
 
             $token = $recipient['unsubscribe_token'] ?? bin2hex(random_bytes(32));
 
-            DB::table('newsletter_queue')->insert([
+            $rows[] = [
                 'newsletter_id' => $newsletterId,
                 'email' => $email,
                 'user_id' => $recipient['user_id'] ?? null,
@@ -413,8 +414,12 @@ class NewsletterService
                 'tracking_token' => bin2hex(random_bytes(32)),
                 'status' => 'pending',
                 'created_at' => now(),
-            ]);
+            ];
             $queued++;
+        }
+
+        if (!empty($rows)) {
+            DB::table('newsletter_queue')->insert($rows);
         }
 
         return $queued;

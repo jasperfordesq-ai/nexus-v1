@@ -125,6 +125,7 @@ $isPending = ($currentStatus ?? '') === 'pending';
                                 <div style="display: flex; gap: 8px; justify-content: flex-end;">
                                     <?php if ($isPending && $row['content_type'] === 'listing'): ?>
                                         <form method="POST" action="/admin-legacy/listings/approve/<?= $row['id'] ?>" style="margin: 0;">
+                                            <?= \App\Core\Csrf::input() ?>
                                             <button type="submit" class="fds-btn-primary" style="background: #10b981; border-color: #10b981; padding: 4px 10px; font-size: 13px;">
                                                 <i class="fa-solid fa-check" style="margin-right: 4px;"></i> Approve
                                             </button>
@@ -132,6 +133,7 @@ $isPending = ($currentStatus ?? '') === 'pending';
                                     <?php endif; ?>
                                     <a href="<?= $editUrl ?>" class="fds-btn-secondary" style="padding: 4px 10px; font-size: 13px; text-decoration: none;">Edit</a>
                                     <form method="POST" action="/admin-legacy/listings/delete/<?= $row['id'] ?>?type=<?= $row['content_type'] ?>" onsubmit="return confirm('Are you sure you want to delete this item?');" style="margin: 0;">
+                                        <?= \App\Core\Csrf::input() ?>
                                         <button type="submit" class="fds-btn-primary" style="background: #ef4444; border-color: #ef4444; padding: 4px 10px; font-size: 13px;">Delete</button>
                                     </form>
                                 </div>
