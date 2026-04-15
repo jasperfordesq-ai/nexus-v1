@@ -107,6 +107,7 @@
 
     "password_reset.link_sent": "If an account exists with that email address, a password reset link has been sent.",
     "password_reset.updated": "Password updated successfully. Please log in with your new password.",
+    "password_reset.changed_bell": "Your password was changed. If you did not do this, contact support immediately.",
 
     "peer_endorsement.recorded": "Peer endorsement recorded",
 
@@ -126,6 +127,7 @@
     "sub_account.relationship_revoked": "Relationship revoked",
 
     "two_factor.disabled": "Two-factor authentication has been disabled",
+    "two_factor.enabled_notification": "Two-factor authentication has been enabled on your account.",
     "two_factor.disabled_notification": "Two-factor authentication has been disabled on your account. If you did not do this, secure your account immediately.",
     "two_factor.disabled_email_title": "Two-Factor Authentication Disabled",
     "two_factor.disabled_email_preview": "2FA has been disabled on your account.",
@@ -179,6 +181,8 @@
     "webauthn.auth_successful": "Authentication successful",
     "webauthn.credentials_removed": "Credential(s) removed",
     "webauthn.all_removed": "Removed :count passkey(s). You can now re-register on any device.",
+    "webauthn.passkey_removed_bell": "A passkey was removed from your account. If you did not do this, secure your account immediately.",
+    "webauthn.all_passkeys_removed_bell": "All passkeys ({{count}}) were removed from your account. If you did not do this, secure your account immediately.",
 
     "maintenance.under_maintenance": "Platform is currently under maintenance. Please check back soon.",
 

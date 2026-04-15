@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Services\TotpService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * TwoFactorController -- Two-factor authentication setup.
@@ -110,12 +111,12 @@ class TwoFactorController extends BaseApiController
         try {
             Notification::createNotification(
                 $userId,
-                __('api_controllers_2.two_factor.disabled_notification'),
+                __('api_controllers_2.two_factor.enabled_notification'),
                 null,
                 '2fa_enabled'
             );
         } catch (\Throwable $e) {
-            error_log("Failed to create 2FA enabled notification: " . $e->getMessage());
+            Log::warning('[2FA] Failed to create 2FA enabled notification: ' . $e->getMessage(), ['user_id' => $userId]);
         }
 
         // Security email: alert user that 2FA was enabled
@@ -137,11 +138,11 @@ class TwoFactorController extends BaseApiController
 
                 $subject = __('emails_security_alerts.2fa_enabled.subject', ['community' => $tenantName]);
                 if (!$mailer->send($user->email, $subject, $html)) {
-                    error_log("Failed to send 2FA enabled email to user {$userId}");
+                    Log::warning('[2FA] Failed to send 2FA enabled email', ['user_id' => $userId]);
                 }
             }
         } catch (\Throwable $e) {
-            error_log("Failed to send 2FA enabled email: " . $e->getMessage());
+            Log::warning('[2FA] Failed to send 2FA enabled email: ' . $e->getMessage(), ['user_id' => $userId]);
         }
 
         return $this->respondWithData([
@@ -187,7 +188,7 @@ class TwoFactorController extends BaseApiController
                 '2fa_disabled'
             );
         } catch (\Throwable $e) {
-            error_log("Failed to create 2FA disabled notification: " . $e->getMessage());
+            Log::warning('[2FA] Failed to create 2FA disabled notification: ' . $e->getMessage(), ['user_id' => $userId]);
         }
 
         try {
@@ -208,11 +209,11 @@ class TwoFactorController extends BaseApiController
 
                 $subject = __('emails_security_alerts.2fa_disabled.subject', ['community' => $tenantName]);
                 if (!$mailer->send($user->email, $subject, $html)) {
-                    error_log("Failed to send 2FA disabled email to user {$userId}");
+                    Log::warning('[2FA] Failed to send 2FA disabled email', ['user_id' => $userId]);
                 }
             }
         } catch (\Throwable $e) {
-            error_log("Failed to send 2FA disabled email: " . $e->getMessage());
+            Log::warning('[2FA] Failed to send 2FA disabled email: ' . $e->getMessage(), ['user_id' => $userId]);
         }
 
         return $this->respondWithData([

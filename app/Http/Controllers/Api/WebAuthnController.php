@@ -16,6 +16,7 @@ use App\Services\TokenService;
 use App\Services\WebAuthnChallengeStore;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Core\ApiErrorCodes;
 use App\Core\TenantContext;
 use lbuchs\WebAuthn\WebAuthn;
@@ -502,12 +503,12 @@ class WebAuthnController extends BaseApiController
         try {
             Notification::createNotification(
                 $userId,
-                'A passkey was removed from your account. If you did not do this, secure your account immediately.',
+                __('api_controllers_2.webauthn.passkey_removed_bell'),
                 null,
                 'passkey_removed'
             );
         } catch (\Throwable $e) {
-            error_log("Failed to create passkey removed notification: " . $e->getMessage());
+            Log::warning('[WebAuthn] Failed to create passkey removed notification: ' . $e->getMessage(), ['user_id' => $userId]);
         }
 
         try {
@@ -528,11 +529,11 @@ class WebAuthnController extends BaseApiController
 
                 $subject = __('emails_security_alerts.passkey_removed.subject', ['community' => $tenantName]);
                 if (!$mailer->send($user->email, $subject, $html)) {
-                    error_log("Failed to send passkey removed email to user {$userId}");
+                    Log::warning('[WebAuthn] Failed to send passkey removed email', ['user_id' => $userId]);
                 }
             }
         } catch (\Throwable $e) {
-            error_log("Failed to send passkey removed email: " . $e->getMessage());
+            Log::warning('[WebAuthn] Failed to send passkey removed email: ' . $e->getMessage(), ['user_id' => $userId]);
         }
 
         return $this->respondWithData(['message' => __('api_controllers_2.webauthn.credentials_removed')]);
@@ -590,12 +591,12 @@ class WebAuthnController extends BaseApiController
             try {
                 Notification::createNotification(
                     $userId,
-                    "All passkeys ({$count}) were removed from your account. If you did not do this, secure your account immediately.",
+                    __('api_controllers_2.webauthn.all_passkeys_removed_bell', ['count' => $count]),
                     null,
                     'passkey_removed'
                 );
             } catch (\Throwable $e) {
-                error_log("Failed to create passkeys removed notification: " . $e->getMessage());
+                Log::warning('[WebAuthn] Failed to create all-passkeys removed notification: ' . $e->getMessage(), ['user_id' => $userId]);
             }
 
             try {
@@ -616,11 +617,11 @@ class WebAuthnController extends BaseApiController
 
                     $subject = __('emails_security_alerts.passkey_removed.subject', ['community' => $tenantName]);
                     if (!$mailer->send($user->email, $subject, $html)) {
-                        error_log("Failed to send passkeys removed email to user {$userId}");
+                        Log::warning('[WebAuthn] Failed to send all-passkeys removed email', ['user_id' => $userId]);
                     }
                 }
             } catch (\Throwable $e) {
-                error_log("Failed to send passkeys removed email: " . $e->getMessage());
+                Log::warning('[WebAuthn] Failed to send all-passkeys removed email: ' . $e->getMessage(), ['user_id' => $userId]);
             }
         }
 

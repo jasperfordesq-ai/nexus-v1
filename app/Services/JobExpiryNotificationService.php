@@ -6,13 +6,13 @@
 
 namespace App\Services;
 
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\JobVacancy;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 /**
  * JobExpiryNotificationService — notifies job posters when their vacancy
@@ -110,9 +110,9 @@ class JobExpiryNotificationService
         HTML;
 
         $subject = __('notifications.job_expiry_email_subject', ['title' => $title]);
-        Mail::html($html, function ($message) use ($user, $subject) {
-            $message->to($user->email, $user->first_name . ' ' . ($user->last_name ?? ''))
-                    ->subject($subject);
-        });
+        $mailer = Mailer::forCurrentTenant();
+        if (!$mailer->send($user->email, $subject, $html)) {
+            Log::warning('JobExpiryNotificationService: failed to send expiry email', ['user_id' => $user->id, 'vacancy_id' => $vacancy->id]);
+        }
     }
 }

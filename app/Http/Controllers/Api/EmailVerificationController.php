@@ -13,7 +13,9 @@ use App\Core\TenantContext;
 use App\Core\RateLimiter;
 use App\Core\Mailer;
 use App\Core\EmailTemplate;
+use App\Core\EmailTemplateBuilder;
 use App\Services\RateLimitService;
+use Illuminate\Support\Facades\Log;
 
 /**
  * EmailVerificationController -- Email verification endpoints.
@@ -110,7 +112,7 @@ class EmailVerificationController extends BaseApiController
                 'Email address verified via API'
             );
         } catch (\Throwable $e) {
-            error_log("Failed to log email verification: " . $e->getMessage());
+            Log::warning('[EmailVerification] Failed to log email verification: ' . $e->getMessage());
         }
 
         // Award gamification points if available
@@ -270,20 +272,22 @@ class EmailVerificationController extends BaseApiController
                 }
             }
 
-            $firstName = $user['first_name'] ?? 'there';
+            $firstName = $user['first_name'] ?? '';
+            $greeting = $firstName !== ''
+                ? __('emails_misc.auth.verify_email_greeting', ['name' => htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8'), 'community' => $tenantName])
+                : __('emails_misc.auth.verify_email_greeting_fallback');
 
-            $html = EmailTemplate::render(
-                "Verify Your Email Address",
-                "Hi {$firstName}, welcome to {$tenantName}!",
-                "Please verify your email address by clicking the button below. This link will expire in 24 hours.<br><br>If you did not create an account, please ignore this email.",
-                "Verify Email Address",
-                $verifyUrl,
-                $tenantName
-            );
+            $html = EmailTemplateBuilder::make()
+                ->title(__('emails_misc.auth.verify_email_title'))
+                ->greeting($greeting)
+                ->paragraph(__('emails_misc.auth.verify_email_body'))
+                ->paragraph(__('emails_misc.auth.verify_email_ignore'))
+                ->button(__('emails_misc.auth.verify_email_cta'), $verifyUrl)
+                ->render();
 
-            return $mailer->send($user['email'], "Verify Your Email - " . $tenantName, $html);
+            return $mailer->send($user['email'], __('emails_misc.auth.verify_email_subject', ['community' => $tenantName]), $html);
         } catch (\Throwable $e) {
-            error_log("Verification email failed for user {$user['id']}: " . $e->getMessage());
+            Log::warning('[EmailVerification] Verification email failed for user: ' . $e->getMessage(), ['user_id' => $user['id']]);
             return false;
         }
     }
@@ -375,7 +379,7 @@ class EmailVerificationController extends BaseApiController
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             ");
         } catch (\Throwable $e) {
-            error_log("Failed to create email_verification_tokens table: " . $e->getMessage());
+            Log::warning('[EmailVerification] Failed to create email_verification_tokens table: ' . $e->getMessage());
         }
     }
 }

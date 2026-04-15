@@ -18,6 +18,7 @@ use App\Services\Enterprise\GdprService;
 use App\Services\GamificationService;
 use App\Services\TenantSettingsService;
 use App\Services\TokenService;
+use App\Core\EmailTemplateBuilder;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -459,7 +460,7 @@ class AdminUsersController extends BaseApiController
             $this->gdprService->recordConsent($newUserId, 'terms_of_service', true, $consentText, $consentVersion);
             $this->gdprService->recordConsent($newUserId, 'privacy_policy', true, $consentText, $consentVersion);
         } catch (\Throwable $e) {
-            error_log("GDPR Consent Recording Failed for admin-created user: " . $e->getMessage());
+            Log::warning('[AdminUsers] GDPR consent recording failed for admin-created user: ' . $e->getMessage());
         }
 
         // Send welcome email if requested
@@ -470,26 +471,24 @@ class AdminUsersController extends BaseApiController
                 $tenantName = $tenant['name'] ?? 'Project NEXUS';
                 $loginLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/login";
 
-                $html = \App\Core\EmailTemplate::render(
-                    "Your Account Has Been Created",
-                    "Welcome to {$tenantName}!",
-                    "<p>Hello <strong>" . htmlspecialchars($firstName) . "</strong>,</p>
-                    <p>An administrator has created an account for you on {$tenantName}.</p>
-                    <p>Your login credentials are:</p>
-                    <ul>
-                        <li><strong>Email:</strong> " . htmlspecialchars($email) . "</li>
-                        <li><strong>Password:</strong> " . htmlspecialchars($password) . "</li>
-                    </ul>
-                    <p>We recommend changing your password after your first login.</p>",
-                    "Login Now",
-                    $loginLink,
-                    "Project NEXUS"
-                );
+                $html = EmailTemplateBuilder::make()
+                    ->title(__('emails_misc.admin_actions.welcome_created_title'))
+                    ->previewText(__('emails_misc.admin_actions.welcome_created_preview'))
+                    ->greeting(__('emails_misc.admin_actions.welcome_created_greeting', ['community' => $tenantName]))
+                    ->paragraph(__('emails_misc.admin_actions.welcome_created_body_intro', ['community' => $tenantName]))
+                    ->paragraph(__('emails_misc.admin_actions.welcome_created_body_credentials'))
+                    ->infoCard([
+                        __('emails_misc.admin_actions.welcome_created_info_email')    => htmlspecialchars($email, ENT_QUOTES, 'UTF-8'),
+                        __('emails_misc.admin_actions.welcome_created_info_password') => htmlspecialchars($password, ENT_QUOTES, 'UTF-8'),
+                    ])
+                    ->paragraph(__('emails_misc.admin_actions.welcome_created_body_change_pass'))
+                    ->button(__('emails_misc.admin_actions.welcome_created_cta'), $loginLink)
+                    ->render();
 
                 $mailer = \App\Core\Mailer::forCurrentTenant();
-                $mailer->send($email, "Your account on {$tenantName}", $html);
+                $mailer->send($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html);
             } catch (\Throwable $e) {
-                error_log("Welcome email failed for admin-created user: " . $e->getMessage());
+                Log::warning('[AdminUsers] Welcome email failed for admin-created user: ' . $e->getMessage());
             }
         }
 
@@ -579,7 +578,7 @@ class AdminUsersController extends BaseApiController
         try {
             Notification::createNotification(
                 $id,
-                'Your account has been suspended. Contact support if you believe this is an error.',
+                __('emails_misc.admin_actions.suspension_bell'),
                 null,
                 'system',
                 true
@@ -591,21 +590,18 @@ class AdminUsersController extends BaseApiController
         try {
             $tenant = $this->resolveUserTenant($user);
             $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
-            $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
+            $tenantName = $tenant['name'];
 
-            $html = \App\Core\EmailTemplate::render(
-                __('svc_notifications.account_suspended_title'),
-                "Important notice, {$firstName}",
-                '<p>Your account on <strong>' . $tenantNameSafe . '</strong> has been suspended.</p>
-                 <p>If you believe this is an error, please contact your community administrator for assistance.</p>',
-                null,
-                null,
-                $tenant['name']
-            );
+            $html = EmailTemplateBuilder::make()
+                ->theme('warning')
+                ->greeting(__('emails_misc.admin_actions.suspension_greeting', ['name' => $firstName]))
+                ->paragraph(__('emails_misc.admin_actions.suspension_body', ['community' => $tenantName]))
+                ->paragraph(__('emails_misc.admin_actions.suspension_help'))
+                ->render();
 
             (\App\Core\Mailer::forCurrentTenant())->send(
                 $user['email'],
-                "Your account has been suspended - {$tenantNameSafe}",
+                __('emails_misc.admin_actions.suspension_subject', ['community' => $tenantName]),
                 $html
             );
         } catch (\Throwable $e) {
@@ -646,21 +642,18 @@ class AdminUsersController extends BaseApiController
         try {
             $tenant = $this->resolveUserTenant($user);
             $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
-            $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
+            $tenantName = $tenant['name'];
 
-            $html = \App\Core\EmailTemplate::render(
-                __('svc_notifications.account_banned_title'),
-                "Important notice, {$firstName}",
-                '<p>Your account on <strong>' . $tenantNameSafe . '</strong> has been permanently banned.</p>
-                 <p>If you believe this is an error, please contact your community administrator.</p>',
-                null,
-                null,
-                $tenant['name']
-            );
+            $html = EmailTemplateBuilder::make()
+                ->theme('danger')
+                ->greeting(__('emails_misc.admin_actions.ban_greeting', ['name' => $firstName]))
+                ->paragraph(__('emails_misc.admin_actions.ban_body', ['community' => $tenantName]))
+                ->paragraph(__('emails_misc.admin_actions.ban_help'))
+                ->render();
 
             (\App\Core\Mailer::forCurrentTenant())->send(
                 $user['email'],
-                "Your account has been banned - {$tenantNameSafe}",
+                __('emails_misc.admin_actions.ban_subject', ['community' => $tenantName]),
                 $html
             );
         } catch (\Throwable $e) {
@@ -722,21 +715,18 @@ class AdminUsersController extends BaseApiController
         try {
             $tenant = $this->resolveUserTenant($user);
             $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
-            $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
+            $tenantName = $tenant['name'];
 
-            $html = \App\Core\EmailTemplate::render(
-                __('svc_notifications.account_deleted_title'),
-                "Important notice, {$firstName}",
-                '<p>Your account on <strong>' . $tenantNameSafe . '</strong> has been scheduled for deletion.</p>
-                 <p>If you believe this is an error, please contact your community administrator as soon as possible.</p>',
-                null,
-                null,
-                $tenant['name']
-            );
+            $html = EmailTemplateBuilder::make()
+                ->theme('warning')
+                ->greeting(__('emails_misc.admin_actions.deletion_greeting', ['name' => $firstName]))
+                ->paragraph(__('emails_misc.admin_actions.deletion_body', ['community' => $tenantName]))
+                ->paragraph(__('emails_misc.admin_actions.deletion_help'))
+                ->render();
 
             (\App\Core\Mailer::forCurrentTenant())->send(
                 $user['email'],
-                "Your account has been scheduled for deletion - {$tenantNameSafe}",
+                __('emails_misc.admin_actions.deletion_subject', ['community' => $tenantName]),
                 $html
             );
         } catch (\Throwable $e) {
@@ -785,7 +775,7 @@ class AdminUsersController extends BaseApiController
         try {
             Notification::createNotification(
                 $id,
-                'Your two-factor authentication has been reset by an administrator. If you did not request this, please contact support immediately.',
+                __('emails_misc.admin_actions.reset_2fa_bell'),
                 '/settings/security',
                 'security',
                 true
@@ -797,23 +787,23 @@ class AdminUsersController extends BaseApiController
         try {
             $tenant = $this->resolveUserTenant($user);
             $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
-            $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
+            $tenantName = $tenant['name'];
             $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
 
-            $html = \App\Core\EmailTemplate::render(
-                'Two-Factor Authentication Reset',
-                "Security notice, {$firstName}",
-                '<p>Your two-factor authentication on <strong>' . $tenantNameSafe . '</strong> has been reset by an administrator.</p>
-                 <p>Your account is no longer protected by two-factor authentication. We strongly recommend re-enabling it in your security settings after logging in.</p>
-                 <p>If you did not request this change, please contact your community administrator immediately.</p>',
-                'Log In & Secure Your Account',
-                $loginUrl,
-                $tenant['name']
-            );
+            $html = EmailTemplateBuilder::make()
+                ->theme('warning')
+                ->title(__('emails_misc.admin_actions.reset_2fa_title'))
+                ->previewText(__('emails_misc.admin_actions.reset_2fa_preview'))
+                ->greeting(__('emails_misc.admin_actions.reset_2fa_greeting', ['name' => $firstName]))
+                ->paragraph(__('emails_misc.admin_actions.reset_2fa_body', ['community' => $tenantName]))
+                ->paragraph(__('emails_misc.admin_actions.reset_2fa_body_reenable'))
+                ->paragraph(__('emails_misc.admin_actions.reset_2fa_body_contact'))
+                ->button(__('emails_misc.admin_actions.reset_2fa_cta'), $loginUrl)
+                ->render();
 
             (\App\Core\Mailer::forCurrentTenant())->send(
                 $user['email'],
-                "Your two-factor authentication has been reset - {$tenantNameSafe}",
+                __('emails_misc.admin_actions.reset_2fa_subject', ['community' => $tenantName]),
                 $html
             );
         } catch (\Throwable $e) {
@@ -1001,23 +991,21 @@ class AdminUsersController extends BaseApiController
         try {
             $tenant = $this->resolveUserTenant($user);
             $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
-            $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
+            $tenantName = $tenant['name'];
             $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
 
-            $html = \App\Core\EmailTemplate::render(
-                __('svc_notifications.password_changed_title'),
-                "Security notice, {$firstName}",
-                '<p>Your password on <strong>' . $tenantNameSafe . '</strong> has been reset by an administrator.</p>
-                 <p>Your previous password will no longer work. Please use the new password provided to you by your administrator to log in.</p>
-                 <p>If you did not expect this change, please contact your community administrator immediately.</p>',
-                'Log In Now',
-                $loginUrl,
-                $tenant['name']
-            );
+            $html = EmailTemplateBuilder::make()
+                ->theme('warning')
+                ->greeting(__('emails_misc.admin_actions.set_password_greeting', ['name' => $firstName]))
+                ->paragraph(__('emails_misc.admin_actions.set_password_body', ['community' => $tenantName]))
+                ->paragraph(__('emails_misc.admin_actions.set_password_body_old_pass'))
+                ->paragraph(__('emails_misc.admin_actions.set_password_body_contact'))
+                ->button(__('emails_misc.admin_actions.set_password_cta'), $loginUrl)
+                ->render();
 
             (\App\Core\Mailer::forCurrentTenant())->send(
                 $user['email'],
-                "Your password has been reset - {$tenantNameSafe}",
+                __('emails_misc.admin_actions.set_password_subject', ['community' => $tenantName]),
                 $html
             );
         } catch (\Throwable $e) {

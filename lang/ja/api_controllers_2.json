@@ -166,5 +166,9 @@
   "two_factor.disabled_email_title": "Two-Factor Authentication Disabled",
   "two_factor.disabled_email_preview": "2FA has been disabled on your account.",
   "two_factor.disabled_email_body": "Two-factor authentication has been disabled on your account. If you did not make this change, please secure your account immediately by changing your password and re-enabling 2FA.",
-  "two_factor.disabled_email_subject": "Security Alert: 2FA Disabled — {{tenant}}"
+  "two_factor.disabled_email_subject": "Security Alert: 2FA Disabled — {{tenant}}",
+  "password_reset.changed_bell": "Your password was changed. If you did not do this, contact support immediately.",
+  "two_factor.enabled_notification": "Two-factor authentication has been enabled on your account.",
+  "webauthn.passkey_removed_bell": "A passkey was removed from your account. If you did not do this, secure your account immediately.",
+  "webauthn.all_passkeys_removed_bell": "All passkeys ({{count}}) were removed from your account. If you did not do this, secure your account immediately."
 }

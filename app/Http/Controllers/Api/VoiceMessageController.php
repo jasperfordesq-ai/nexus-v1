@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use App\Core\AudioUploader;
 use App\Core\EmailTemplate;
+use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\Message;
@@ -131,20 +132,22 @@ class VoiceMessageController extends BaseApiController
                 $replyLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/messages/" . $senderId;
 
                 $durationFormatted = gmdate("i:s", $audioResult['duration']);
-                $emailHtml = EmailTemplate::render(
-                    "New Voice Message",
-                    "You have received a voice message from " . htmlspecialchars($sender->name ?? 'Someone'),
-                    "Duration: {$durationFormatted}<br><br>Click the button below to listen to the message.",
-                    "Listen to Voice Message",
-                    $replyLink,
-                    $tenant['name']
-                );
+                $senderName = htmlspecialchars($sender->name ?? 'Someone', ENT_QUOTES, 'UTF-8');
+
+                $emailHtml = EmailTemplateBuilder::make()
+                    ->title(__('emails_misc.voice_message.email_title'))
+                    ->greeting(__('emails_misc.voice_message.email_greeting', ['sender' => $senderName]))
+                    ->paragraph(__('emails_misc.voice_message.email_body', ['duration' => $durationFormatted]))
+                    ->button(__('emails_misc.voice_message.email_cta'), $replyLink)
+                    ->render();
 
                 try {
                     $mailer = Mailer::forCurrentTenant();
-                    $mailer->send($receiver->email, "Voice Message from " . ($sender->name ?? 'Someone'), $emailHtml);
+                    if (!$mailer->send($receiver->email, __('emails_misc.voice_message.email_subject', ['sender' => $senderName]), $emailHtml)) {
+                        Log::warning('[VoiceMessage] Email notification failed to send', ['receiver_id' => $receiverId]);
+                    }
                 } catch (\Throwable $e) {
-                    error_log("Voice Message Email Notification Failed: " . $e->getMessage());
+                    Log::warning('[VoiceMessage] Email notification failed: ' . $e->getMessage(), ['receiver_id' => $receiverId]);
                 }
             }
 

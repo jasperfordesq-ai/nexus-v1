@@ -17,6 +17,7 @@ use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Models\Notification;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 /**
  * PasswordResetController -- Password reset flow.
@@ -186,19 +187,19 @@ class PasswordResetController extends BaseApiController
                 'Password was reset via API'
             );
         } catch (\Throwable $e) {
-            error_log("Failed to log password reset: " . $e->getMessage());
+            Log::warning('[PasswordReset] Failed to log password reset: ' . $e->getMessage());
         }
 
         // Security notification: bell + email for password change
         try {
             Notification::createNotification(
                 (int) $user['id'],
-                'Your password was changed. If you did not do this, contact support immediately.',
+                __('api_controllers_2.password_reset.changed_bell'),
                 null,
                 'password_changed'
             );
         } catch (\Throwable $e) {
-            error_log("Failed to create password change notification: " . $e->getMessage());
+            Log::warning('[PasswordReset] Failed to create password change notification: ' . $e->getMessage());
         }
 
         try {
@@ -216,7 +217,7 @@ class PasswordResetController extends BaseApiController
             $subject = __('emails.security.password_changed_subject', ['community' => $tenantName]);
             $mailer->send($email, $subject, $html);
         } catch (\Throwable $e) {
-            error_log("Failed to send password change email: " . $e->getMessage());
+            Log::warning('[PasswordReset] Failed to send password change email: ' . $e->getMessage());
         }
 
         return $this->respondWithData([
@@ -296,7 +297,7 @@ class PasswordResetController extends BaseApiController
             $mailer->send($email, $subject, $html);
         } catch (\Throwable $e) {
             $maskedEmail = substr($email, 0, 2) . '***@' . (explode('@', $email)[1] ?? '***');
-            error_log("Password reset email failed for {$maskedEmail}: " . $e->getMessage());
+            Log::warning('[PasswordReset] Password reset email failed for ' . $maskedEmail . ': ' . $e->getMessage());
         }
     }
 
@@ -394,7 +395,7 @@ class PasswordResetController extends BaseApiController
         try {
             $this->tokenService->revokeAllTokensForUser($userId);
         } catch (\Throwable $e) {
-            error_log("Could not revoke tokens for user {$userId}: " . $e->getMessage());
+            Log::warning('[PasswordReset] Could not revoke tokens for user: ' . $e->getMessage(), ['user_id' => $userId]);
         }
 
         try {
@@ -409,7 +410,7 @@ class PasswordResetController extends BaseApiController
                 );
             }
         } catch (\Throwable $e) {
-            error_log("Could not update password_changed_at: " . $e->getMessage());
+            Log::warning('[PasswordReset] Could not update password_changed_at: ' . $e->getMessage(), ['user_id' => $userId]);
         }
     }
 }

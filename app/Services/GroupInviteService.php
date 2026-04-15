@@ -164,7 +164,7 @@ class GroupInviteService
 
                 $builder = EmailTemplateBuilder::make()
                     ->title(__('emails_misc.group_invite.email_title'))
-                    ->greeting('there')
+                    ->greeting(__('emails_misc.group_invite.email_greeting'))
                     ->paragraph($body);
 
                 if (!empty($message)) {
