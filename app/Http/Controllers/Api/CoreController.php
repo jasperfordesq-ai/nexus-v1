@@ -174,6 +174,7 @@ class CoreController extends BaseApiController
 
         $notifs = DB::table('notifications')
             ->where('user_id', $userId)
+            ->where('tenant_id', $this->getTenantId())
             ->orderByDesc('created_at')
             ->limit(50)
             ->get()

@@ -973,7 +973,7 @@ class FederationExternalWebhookController extends BaseApiController
             // Credit the receiver's balance and record the transaction
             DB::beginTransaction();
             try {
-                DB::update("UPDATE users SET balance = balance + ? WHERE id = ?", [$amount, $receiverUserId]);
+                DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?", [$amount, $receiverUserId, TenantContext::getId()]);
 
                 DB::table('federation_transactions')->insert([
                     'sender_tenant_id'       => 0, // External origin
@@ -1050,9 +1050,9 @@ class FederationExternalWebhookController extends BaseApiController
             if ($tx && $tx->status === 'completed') {
                 DB::beginTransaction();
                 try {
-                    // Reverse the credit
-                    DB::update("UPDATE users SET balance = balance - ? WHERE id = ? AND balance >= ?",
-                        [$tx->amount, $tx->receiver_user_id, $tx->amount]);
+                    // Reverse the credit — include tenant_id from the original transaction record
+                    DB::update("UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
+                        [$tx->amount, $tx->receiver_user_id, $tx->receiver_tenant_id, $tx->amount]);
 
                     DB::table('federation_transactions')
                         ->where('id', $tx->id)

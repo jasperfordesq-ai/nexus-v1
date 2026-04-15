@@ -1332,6 +1332,7 @@ class GamificationService
         // Batch: reviews table (2 → 1 query)
         try {
             $reviewRow = DB::table('reviews')
+                ->where('tenant_id', \App\Core\TenantContext::getId())
                 ->where(fn ($q) => $q->where('reviewer_id', $userId)->orWhere('receiver_id', $userId))
                 ->selectRaw('SUM(CASE WHEN reviewer_id = ? THEN 1 ELSE 0 END) as given, SUM(CASE WHEN receiver_id = ? AND rating = 5 THEN 1 ELSE 0 END) as fivestar', [$userId, $userId])
                 ->first();

@@ -2290,13 +2290,13 @@ class FederationV2Controller extends BaseApiController
             }
 
             DB::beginTransaction();
-            $deducted = DB::update("UPDATE users SET balance = balance - ? WHERE id = ? AND balance >= ?", [$amount, $userId, $amount]);
+            $deducted = DB::update("UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?", [$amount, $userId, $tenantId, $amount]);
             if ($deducted === 0) {
                 DB::rollBack();
                 return $this->respondWithError('INSUFFICIENT_BALANCE', __('api.fed_insufficient_balance'), null, 400);
             }
 
-            DB::update("UPDATE users SET balance = balance + ? WHERE id = ?", [$amount, $receiverIdInt]);
+            DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?", [$amount, $receiverIdInt, $receiverTenantIdInt]);
 
             DB::insert(
                 "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at)
@@ -2371,7 +2371,7 @@ class FederationV2Controller extends BaseApiController
             }
 
             // External API succeeded — now deduct balance and record locally
-            DB::update("UPDATE users SET balance = balance - ? WHERE id = ?", [$amount, $userId]);
+            DB::update("UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ?", [$amount, $userId, $tenantId]);
 
             $externalTxId = $result['data']['transaction_id'] ?? null;
 
