@@ -74,6 +74,22 @@
         "shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
         "opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled"
     },
+    "marketplace_offer": {
+        "received": "{{buyer}} made an offer of {{amount}} on your listing \"{{title}}\"",
+        "accepted": "Your offer on \"{{title}}\" has been accepted!",
+        "declined": "Your offer on \"{{title}}\" was declined.",
+        "countered": "The seller countered your offer on \"{{title}}\" with {{amount}}",
+        "counter_accepted": "Your counter-offer on \"{{title}}\" was accepted!",
+        "withdrawn": "{{buyer}} withdrew their offer on your listing \"{{title}}\""
+    },
+    "marketplace_order": {
+        "confirmed_buyer": "Order #{{order_number}} confirmed — \"{{title}}\"",
+        "confirmed_seller": "You have a new order #{{order_number}} for \"{{title}}\"",
+        "shipped": "Your order #{{order_number}} has been shipped!",
+        "delivered": "Order #{{order_number}} — buyer confirmed delivery",
+        "cancelled": "Order #{{order_number}} has been cancelled",
+        "completed": "Order #{{order_number}} has been completed!"
+    },
     "admin_bells": {
         "comment_hidden": "Your comment has been hidden by a moderator.",
         "comment_removed": "Your comment has been removed by a moderator.",

@@ -170,5 +170,14 @@
   "password_reset.changed_bell": "Your password was changed. If you did not do this, contact support immediately.",
   "two_factor.enabled_notification": "Two-factor authentication has been enabled on your account.",
   "webauthn.passkey_removed_bell": "A passkey was removed from your account. If you did not do this, secure your account immediately.",
-  "webauthn.all_passkeys_removed_bell": "All passkeys ({{count}}) were removed from your account. If you did not do this, secure your account immediately."
+  "webauthn.all_passkeys_removed_bell": "All passkeys ({{count}}) were removed from your account. If you did not do this, secure your account immediately.",
+  "email_test": {
+    "subject": "Project NEXUS — Email Test",
+    "heading": "Email Test",
+    "body_provider": "This test email was sent via {{provider}} at {{time}}.",
+    "body_success": "If you received this email, your email configuration is working correctly.",
+    "provider_subject": "Project NEXUS — Email Provider Test",
+    "provider_heading": "Email Provider Test",
+    "body_tenant_ok": "Your tenant email provider is configured and working correctly."
+  }
 }

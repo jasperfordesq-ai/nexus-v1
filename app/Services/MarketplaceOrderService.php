@@ -12,6 +12,7 @@ use App\Core\TenantContext;
 use App\Models\MarketplaceListing;
 use App\Models\MarketplaceOffer;
 use App\Models\MarketplaceOrder;
+use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -176,6 +177,15 @@ class MarketplaceOrderService
             Log::warning('[MarketplaceOrderService] markShipped email failed: ' . $e->getMessage());
         }
 
+        // In-app bell to buyer
+        Notification::create([
+            'user_id'    => $order->buyer_id,
+            'message'    => __('api_controllers_3.marketplace_order.shipped', ['order_number' => $order->order_number]),
+            'link'       => '/marketplace/orders/' . $order->id,
+            'type'       => 'marketplace_order',
+            'created_at' => now(),
+        ]);
+
         return $order;
     }
 
@@ -205,6 +215,15 @@ class MarketplaceOrderService
         } catch (\Throwable $e) {
             Log::warning('[MarketplaceOrderService] confirmDelivery email failed: ' . $e->getMessage());
         }
+
+        // In-app bell to seller
+        Notification::create([
+            'user_id'    => $order->seller_id,
+            'message'    => __('api_controllers_3.marketplace_order.delivered', ['order_number' => $order->order_number]),
+            'link'       => '/marketplace/orders/' . $order->id,
+            'type'       => 'marketplace_order',
+            'created_at' => now(),
+        ]);
 
         return $order;
     }
@@ -244,6 +263,12 @@ class MarketplaceOrderService
         } catch (\Throwable $e) {
             Log::warning('[MarketplaceOrderService] cancel email failed: ' . $e->getMessage());
         }
+
+        // In-app bells to both parties
+        $cancelLink = '/marketplace/orders/' . $order->id;
+        $cancelBell = __('api_controllers_3.marketplace_order.cancelled', ['order_number' => $order->order_number]);
+        Notification::create(['user_id' => $order->buyer_id,  'message' => $cancelBell, 'link' => $cancelLink, 'type' => 'marketplace_order', 'created_at' => now()]);
+        Notification::create(['user_id' => $order->seller_id, 'message' => $cancelBell, 'link' => $cancelLink, 'type' => 'marketplace_order', 'created_at' => now()]);
 
         return $order;
     }
@@ -299,6 +324,12 @@ class MarketplaceOrderService
         } catch (\Throwable $e) {
             Log::warning('[MarketplaceOrderService] complete email failed: ' . $e->getMessage());
         }
+
+        // In-app bells to both parties
+        $completeLink = '/marketplace/orders/' . $order->id;
+        $completeBell = __('api_controllers_3.marketplace_order.completed', ['order_number' => $order->order_number]);
+        Notification::create(['user_id' => $order->buyer_id,  'message' => $completeBell, 'link' => $completeLink, 'type' => 'marketplace_order', 'created_at' => now()]);
+        Notification::create(['user_id' => $order->seller_id, 'message' => $completeBell, 'link' => $completeLink, 'type' => 'marketplace_order', 'created_at' => now()]);
 
         return $order;
     }
@@ -452,6 +483,22 @@ class MarketplaceOrderService
             __('emails_misc.marketplace_order.confirmed_seller_body', ['order_number' => $order->order_number, 'title' => $title]),
             $link
         );
+
+        // In-app bells
+        Notification::create([
+            'user_id'    => $order->buyer_id,
+            'message'    => __('api_controllers_3.marketplace_order.confirmed_buyer', ['order_number' => $order->order_number, 'title' => $title]),
+            'link'       => $link,
+            'type'       => 'marketplace_order',
+            'created_at' => now(),
+        ]);
+        Notification::create([
+            'user_id'    => $order->seller_id,
+            'message'    => __('api_controllers_3.marketplace_order.confirmed_seller', ['order_number' => $order->order_number, 'title' => $title]),
+            'link'       => $link,
+            'type'       => 'marketplace_order',
+            'created_at' => now(),
+        ]);
     }
 
     /**

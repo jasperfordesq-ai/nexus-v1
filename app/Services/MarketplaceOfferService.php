@@ -11,6 +11,7 @@ use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\MarketplaceListing;
 use App\Models\MarketplaceOffer;
+use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -76,6 +77,15 @@ class MarketplaceOfferService
             Log::warning('[MarketplaceOfferService] create email failed: ' . $e->getMessage());
         }
 
+        // In-app bell to seller
+        Notification::create([
+            'user_id'    => $listing->user_id,
+            'message'    => __('api_controllers_3.marketplace_offer.received', ['buyer' => self::userName($buyerId), 'amount' => number_format((float) $offer->amount, 2) . ' ' . $offer->currency, 'title' => $listing->title]),
+            'link'       => '/marketplace/listings/' . $listingId,
+            'type'       => 'marketplace_offer',
+            'created_at' => now(),
+        ]);
+
         return $offer;
     }
 
@@ -119,6 +129,16 @@ class MarketplaceOfferService
             Log::warning('[MarketplaceOfferService] accept email failed: ' . $e->getMessage());
         }
 
+        // In-app bell to buyer
+        $listing ??= MarketplaceListing::find($offer->marketplace_listing_id);
+        Notification::create([
+            'user_id'    => $offer->buyer_id,
+            'message'    => __('api_controllers_3.marketplace_offer.accepted', ['title' => $listing->title ?? '']),
+            'link'       => '/marketplace/orders',
+            'type'       => 'marketplace_offer',
+            'created_at' => now(),
+        ]);
+
         return $offer;
     }
 
@@ -149,6 +169,16 @@ class MarketplaceOfferService
         } catch (\Throwable $e) {
             Log::warning('[MarketplaceOfferService] decline email failed: ' . $e->getMessage());
         }
+
+        // In-app bell to buyer
+        $listing ??= MarketplaceListing::find($offer->marketplace_listing_id);
+        Notification::create([
+            'user_id'    => $offer->buyer_id,
+            'message'    => __('api_controllers_3.marketplace_offer.declined', ['title' => $listing->title ?? '']),
+            'link'       => '/marketplace/listings/' . $offer->marketplace_listing_id,
+            'type'       => 'marketplace_offer',
+            'created_at' => now(),
+        ]);
 
         return $offer;
     }
@@ -185,6 +215,17 @@ class MarketplaceOfferService
             Log::warning('[MarketplaceOfferService] counter email failed: ' . $e->getMessage());
         }
 
+        // In-app bell to buyer
+        $listing ??= MarketplaceListing::find($offer->marketplace_listing_id);
+        $counterAmount = number_format((float) $offer->counter_amount, 2) . ' ' . $offer->currency;
+        Notification::create([
+            'user_id'    => $offer->buyer_id,
+            'message'    => __('api_controllers_3.marketplace_offer.countered', ['title' => $listing->title ?? '', 'amount' => $counterAmount]),
+            'link'       => '/marketplace/offers',
+            'type'       => 'marketplace_offer',
+            'created_at' => now(),
+        ]);
+
         return $offer;
     }
 
@@ -200,6 +241,16 @@ class MarketplaceOfferService
 
         $offer->status = 'withdrawn';
         $offer->save();
+
+        // In-app bell to seller
+        $listing = MarketplaceListing::find($offer->marketplace_listing_id);
+        Notification::create([
+            'user_id'    => $offer->seller_id,
+            'message'    => __('api_controllers_3.marketplace_offer.withdrawn', ['buyer' => self::userName($buyerId), 'title' => $listing->title ?? '']),
+            'link'       => '/marketplace/listings/' . $offer->marketplace_listing_id,
+            'type'       => 'marketplace_offer',
+            'created_at' => now(),
+        ]);
 
         return $offer;
     }
@@ -248,6 +299,16 @@ class MarketplaceOfferService
         } catch (\Throwable $e) {
             Log::warning('[MarketplaceOfferService] acceptCounter email failed: ' . $e->getMessage());
         }
+
+        // In-app bell to seller
+        $listing ??= MarketplaceListing::find($offer->marketplace_listing_id);
+        Notification::create([
+            'user_id'    => $offer->seller_id,
+            'message'    => __('api_controllers_3.marketplace_offer.counter_accepted', ['title' => $listing->title ?? '']),
+            'link'       => '/marketplace/orders',
+            'type'       => 'marketplace_offer',
+            'created_at' => now(),
+        ]);
 
         return $offer;
     }

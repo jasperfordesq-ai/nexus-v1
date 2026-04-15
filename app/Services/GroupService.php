@@ -14,6 +14,7 @@ use App\Events\GroupMemberJoined;
 use App\Models\Group;
 use App\Models\GroupDiscussion;
 use App\Models\GroupPost;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -752,6 +753,15 @@ class GroupService
         } catch (\Throwable $e) {
             Log::warning('[GroupService] group_removed email failed: ' . $e->getMessage());
         }
+
+        // In-app bell to removed member
+        Notification::create([
+            'user_id'    => $targetUserId,
+            'message'    => __('api_controllers_3.admin_bells.group_member_removed', ['group' => $group->name]),
+            'link'       => '/groups',
+            'type'       => 'group_member_removed',
+            'created_at' => now(),
+        ]);
 
         return true;
     }

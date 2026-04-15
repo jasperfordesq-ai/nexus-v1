@@ -210,5 +210,15 @@
 
     "verification_badge.user_not_found": "User not found",
     "verification_badge.badge_already_active": "Badge already active",
-    "verification_badge.invalid_badge_type": "Invalid badge type: :type"
+    "verification_badge.invalid_badge_type": "Invalid badge type: :type",
+
+    "email_test": {
+        "subject": "Project NEXUS — Email Test",
+        "heading": "Email Test",
+        "body_provider": "This test email was sent via {{provider}} at {{time}}.",
+        "body_success": "If you received this email, your email configuration is working correctly.",
+        "provider_subject": "Project NEXUS — Email Provider Test",
+        "provider_heading": "Email Provider Test",
+        "body_tenant_ok": "Your tenant email provider is configured and working correctly."
+    }
 }
