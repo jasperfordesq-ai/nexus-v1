@@ -262,7 +262,7 @@ class AdminGroupsController extends BaseApiController
                 if ((int) $membership->user_id !== $adminId) {
                     Notification::createNotification(
                         (int) $membership->user_id,
-                        "You've been approved to join {$membership->group_name}",
+                        __('api_controllers_3.admin_bells.group_member_approved', ['group' => $membership->group_name]),
                         "/groups/{$membership->group_id}",
                         'info',
                         false,
@@ -312,7 +312,7 @@ class AdminGroupsController extends BaseApiController
                 if ((int) $membership->user_id !== $adminId) {
                     Notification::createNotification(
                         (int) $membership->user_id,
-                        "Your request to join {$membership->group_name} was declined",
+                        __('api_controllers_3.admin_bells.group_member_rejected', ['group' => $membership->group_name]),
                         null,
                         'info',
                         false,
@@ -355,7 +355,7 @@ class AdminGroupsController extends BaseApiController
             if ($group->owner_id && (int) $group->owner_id !== $adminId) {
                 Notification::createNotification(
                     (int) $group->owner_id,
-                    'Your group has been approved!',
+                    __('api_controllers_3.admin_bells.group_approved'),
                     "/groups/{$id}",
                     'info',
                     false,
@@ -829,7 +829,7 @@ class AdminGroupsController extends BaseApiController
                 if ((int) $userId !== $adminId) {
                     Notification::createNotification(
                         (int) $userId,
-                        "You have been removed from {$member->group_name}",
+                        __('api_controllers_3.admin_bells.group_member_removed', ['group' => $member->group_name]),
                         null,
                         'info',
                         false,

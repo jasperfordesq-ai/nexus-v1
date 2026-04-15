@@ -6,12 +6,12 @@
 
 namespace App\Services;
 
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\JobAlert;
 use App\Models\JobVacancy;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 /**
  * JobAlertEmailService — sends email digests to job alert subscribers.
@@ -36,12 +36,8 @@ class JobAlertEmailService
             $subject = __('emails.job_alert.subject_single', ['title' => $vacancy->title]);
             $bodyHtml = self::buildAlertEmailHtml($recipient, [$vacancy]);
 
-            Mail::html($bodyHtml, function ($message) use ($recipient, $subject) {
-                $message->to($recipient->email, $recipient->first_name . ' ' . ($recipient->last_name ?? ''))
-                        ->subject($subject);
-            });
-
-            return true;
+            $mailer = Mailer::forCurrentTenant();
+            return $mailer->send($recipient->email, $subject, $bodyHtml);
         } catch (\Throwable $e) {
             Log::warning('JobAlertEmailService::sendImmediateAlert failed', [
                 'user_id'    => $recipient->id,

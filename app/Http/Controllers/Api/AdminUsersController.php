@@ -351,7 +351,7 @@ class AdminUsersController extends BaseApiController
                 if ($input['status'] === 'suspended') {
                     Notification::createNotification(
                         $id,
-                        'Your account has been suspended. Contact support if you believe this is an error.',
+                        __('api_controllers_3.admin_bells.account_suspended'),
                         null,
                         'system',
                         true
@@ -359,7 +359,7 @@ class AdminUsersController extends BaseApiController
                 } elseif ($input['status'] === 'banned') {
                     Notification::createNotification(
                         $id,
-                        'Your account has been banned. Contact support if you believe this is an error.',
+                        __('api_controllers_3.admin_bells.account_banned'),
                         null,
                         'system',
                         true
@@ -1118,8 +1118,8 @@ class AdminUsersController extends BaseApiController
             // Notify the user of role change (bell notification)
             try {
                 $message = $grant
-                    ? 'You have been granted Tenant Super Admin privileges.'
-                    : 'Your Tenant Super Admin privileges have been removed.';
+                    ? __('api_controllers_3.admin_bells.super_admin_granted')
+                    : __('api_controllers_3.admin_bells.super_admin_revoked');
                 Notification::createNotification(
                     $id,
                     $message,

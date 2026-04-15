@@ -284,7 +284,7 @@ class AdminFeedController extends BaseApiController
             if ($feedItem && $feedItem->user_id) {
                 Notification::createNotification(
                     (int) $feedItem->user_id,
-                    'Your post has been hidden by a moderator.',
+                    __('api_controllers_3.admin_bells.post_hidden'),
                     null,
                     'moderation',
                     false,
@@ -361,7 +361,7 @@ class AdminFeedController extends BaseApiController
             try {
                 Notification::createNotification(
                     $creatorUserId,
-                    'Your post has been removed by a moderator.',
+                    __('api_controllers_3.admin_bells.post_removed'),
                     null,
                     'moderation',
                     false,

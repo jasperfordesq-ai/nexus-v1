@@ -282,7 +282,7 @@ class AdminReviewsController extends BaseApiController
             if ($reviewerId && $reviewerId !== $adminId) {
                 Notification::createNotification(
                     $reviewerId,
-                    'Your review has been hidden by a moderator.',
+                    __('api_controllers_3.admin_bells.review_hidden'),
                     null,
                     'moderation',
                     true,
@@ -331,7 +331,7 @@ class AdminReviewsController extends BaseApiController
             if ($reviewerId && $reviewerId !== $adminId) {
                 Notification::createNotification(
                     $reviewerId,
-                    'Your review has been removed by a moderator.',
+                    __('api_controllers_3.admin_bells.review_removed'),
                     null,
                     'moderation',
                     true,

@@ -130,7 +130,7 @@ class AdminEventsController extends BaseApiController
             if ((int) $event->created_by !== $adminId) {
                 Notification::createNotification(
                     (int) $event->created_by,
-                    'Your event has been approved!',
+                    __('api_controllers_3.admin_bells.event_approved'),
                     "/events/{$id}",
                     'info',
                     false,

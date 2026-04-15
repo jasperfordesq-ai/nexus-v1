@@ -194,7 +194,7 @@ class AdminInsuranceCertificateController extends BaseApiController
                 if (!empty($existing['user_id'])) {
                     Notification::createNotification(
                         (int) $existing['user_id'],
-                        'Your insurance certificate has been verified!',
+                        __('api_controllers_3.admin_bells.insurance_verified'),
                         '/dashboard',
                         'moderation',
                         true
@@ -235,7 +235,7 @@ class AdminInsuranceCertificateController extends BaseApiController
                 if (!empty($existing['user_id'])) {
                     Notification::createNotification(
                         (int) $existing['user_id'],
-                        'Your insurance certificate was not approved. Please contact support for details.',
+                        __('api_controllers_3.admin_bells.insurance_rejected'),
                         '/help',
                         'moderation',
                         true

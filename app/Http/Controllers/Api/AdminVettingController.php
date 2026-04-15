@@ -318,7 +318,7 @@ class AdminVettingController extends BaseApiController
                 if ($userId) {
                     Notification::createNotification(
                         $userId,
-                        'Your verification record has been removed.',
+                        __('api_controllers_3.admin_bells.vetting_removed'),
                         null,
                         'moderation',
                         false
@@ -405,7 +405,7 @@ class AdminVettingController extends BaseApiController
             foreach ($notifyVerified as $userId) {
                 Notification::createNotification(
                     $userId,
-                    'Your verification has been approved!',
+                    __('api_controllers_3.admin_bells.vetting_approved'),
                     '/dashboard',
                     'moderation',
                     true
@@ -414,7 +414,7 @@ class AdminVettingController extends BaseApiController
             foreach ($notifyRejected as $userId) {
                 Notification::createNotification(
                     $userId,
-                    'Your verification could not be completed. Please contact support.',
+                    __('api_controllers_3.admin_bells.vetting_rejected'),
                     '/help',
                     'moderation',
                     true

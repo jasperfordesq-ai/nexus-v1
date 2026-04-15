@@ -35,5 +35,34 @@
     },
     "listings": {
         "listing_saved_notification": ":saver_name saved your listing \":title\""
+    },
+    "admin_bells": {
+        "comment_hidden": "Your comment has been hidden by a moderator.",
+        "comment_removed": "Your comment has been removed by a moderator.",
+        "post_hidden": "Your post has been hidden by a moderator.",
+        "post_removed": "Your post has been removed by a moderator.",
+        "review_hidden": "Your review has been hidden by a moderator.",
+        "review_removed": "Your review has been removed by a moderator.",
+        "event_approved": "Your event has been approved!",
+        "group_member_approved": "You've been approved to join {{group}}",
+        "group_member_rejected": "Your request to join {{group}} was declined",
+        "group_approved": "Your group has been approved!",
+        "group_member_removed": "You have been removed from {{group}}",
+        "insurance_verified": "Your insurance certificate has been verified!",
+        "insurance_rejected": "Your insurance certificate was not approved. Please contact support for details.",
+        "report_resolved": "Your report has been reviewed and resolved.",
+        "report_reviewed": "Your report has been reviewed.",
+        "vetting_approved": "Your verification has been approved!",
+        "vetting_rejected": "Your verification could not be completed. Please contact support.",
+        "vetting_removed": "Your verification record has been removed.",
+        "volunteer_approved": "Your volunteer application has been approved!",
+        "volunteer_declined": "Your volunteer application was not accepted.",
+        "monitoring_restricted": "Your messaging has been temporarily restricted by your timebank coordinator.",
+        "monitoring_under_review": "Your account has been placed under review by your timebank coordinator.",
+        "monitoring_lifted": "Your messaging restrictions have been lifted.",
+        "account_suspended": "Your account has been suspended. Contact support if you believe this is an error.",
+        "account_banned": "Your account has been banned. Contact support if you believe this is an error.",
+        "super_admin_granted": "You have been granted Tenant Super Admin privileges.",
+        "super_admin_revoked": "Your Tenant Super Admin privileges have been removed."
     }
 }

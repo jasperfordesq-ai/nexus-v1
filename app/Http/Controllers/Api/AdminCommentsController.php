@@ -232,7 +232,7 @@ class AdminCommentsController extends BaseApiController
 
                 Notification::createNotification(
                     $commentAuthorId,
-                    'Your comment has been hidden by a moderator.',
+                    __('api_controllers_3.admin_bells.comment_hidden'),
                     $link,
                     'moderation',
                     true
@@ -287,7 +287,7 @@ class AdminCommentsController extends BaseApiController
             if ($commentAuthorId && $commentAuthorId !== $adminId) {
                 Notification::createNotification(
                     $commentAuthorId,
-                    'Your comment has been removed by a moderator.',
+                    __('api_controllers_3.admin_bells.comment_removed'),
                     null,
                     'moderation',
                     true

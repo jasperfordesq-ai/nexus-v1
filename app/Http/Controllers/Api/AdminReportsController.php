@@ -240,7 +240,7 @@ class AdminReportsController extends BaseApiController
 
                 Notification::createNotification(
                     $reporterId,
-                    'Your report has been reviewed and resolved.',
+                    __('api_controllers_3.admin_bells.report_resolved'),
                     $link,
                     'moderation',
                     false
@@ -296,7 +296,7 @@ class AdminReportsController extends BaseApiController
             if ($reporterId) {
                 Notification::createNotification(
                     $reporterId,
-                    'Your report has been reviewed.',
+                    __('api_controllers_3.admin_bells.report_reviewed'),
                     null,
                     'moderation',
                     false

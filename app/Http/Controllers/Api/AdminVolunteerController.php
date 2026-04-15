@@ -562,7 +562,7 @@ class AdminVolunteerController extends BaseApiController
                     $opportunityTitle = $app->opportunity_title ?? 'a volunteer opportunity';
                     Notification::createNotification(
                         $applicantId,
-                        'Your volunteer application has been approved!',
+                        __('api_controllers_3.admin_bells.volunteer_approved'),
                         '/volunteering',
                         'moderation',
                         true,
@@ -617,7 +617,7 @@ class AdminVolunteerController extends BaseApiController
                 if ($applicantId) {
                     Notification::createNotification(
                         $applicantId,
-                        'Your volunteer application was not accepted.',
+                        __('api_controllers_3.admin_bells.volunteer_declined'),
                         null,
                         'moderation',
                         true,
