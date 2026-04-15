@@ -6,10 +6,13 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\MarketplaceListing;
 use App\Models\MarketplaceOffer;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * MarketplaceOfferService — Offer/negotiation lifecycle for the marketplace module.
@@ -55,6 +58,24 @@ class MarketplaceOfferService
         // Increment contacts count on listing
         MarketplaceListing::where('id', $listingId)->increment('contacts_count');
 
+        // Notify seller of the new offer
+        try {
+            $buyerName = self::userName($buyerId);
+            $amount    = number_format((float) $offer->amount, 2) . ' ' . $offer->currency;
+            self::sendOfferEmail(
+                (int) $listing->user_id,
+                'emails_misc.marketplace_offer.received_subject',
+                'emails_misc.marketplace_offer.received_title',
+                'emails_misc.marketplace_offer.received_body',
+                ['title' => $listing->title, 'buyer' => $buyerName, 'amount' => $amount],
+                ['title' => $listing->title],
+                '/marketplace/listings/' . $listingId,
+                'emails_misc.marketplace_offer.received_cta'
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceOfferService] create email failed: ' . $e->getMessage());
+        }
+
         return $offer;
     }
 
@@ -80,6 +101,24 @@ class MarketplaceOfferService
             ->whereIn('status', ['pending', 'countered'])
             ->update(['status' => 'declined']);
 
+        // Notify buyer their offer was accepted
+        try {
+            $listing = MarketplaceListing::find($offer->marketplace_listing_id);
+            $amount  = number_format((float) $offer->amount, 2) . ' ' . $offer->currency;
+            self::sendOfferEmail(
+                (int) $offer->buyer_id,
+                'emails_misc.marketplace_offer.accepted_subject',
+                'emails_misc.marketplace_offer.accepted_title',
+                'emails_misc.marketplace_offer.accepted_body',
+                ['title' => $listing->title ?? '', 'amount' => $amount],
+                ['title' => $listing->title ?? ''],
+                '/marketplace/orders',
+                'emails_misc.marketplace_offer.accepted_cta'
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceOfferService] accept email failed: ' . $e->getMessage());
+        }
+
         return $offer;
     }
 
@@ -93,6 +132,23 @@ class MarketplaceOfferService
 
         $offer->status = 'declined';
         $offer->save();
+
+        // Notify buyer their offer was declined
+        try {
+            $listing = MarketplaceListing::find($offer->marketplace_listing_id);
+            self::sendOfferEmail(
+                (int) $offer->buyer_id,
+                'emails_misc.marketplace_offer.declined_subject',
+                'emails_misc.marketplace_offer.declined_title',
+                'emails_misc.marketplace_offer.declined_body',
+                ['title' => $listing->title ?? ''],
+                ['title' => $listing->title ?? ''],
+                '/marketplace/listings/' . $offer->marketplace_listing_id,
+                'emails_misc.marketplace_offer.declined_cta'
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceOfferService] decline email failed: ' . $e->getMessage());
+        }
 
         return $offer;
     }
@@ -110,6 +166,24 @@ class MarketplaceOfferService
         $offer->counter_message = $data['message'] ?? null;
         $offer->expires_at = now()->addDays(2); // Reset expiry
         $offer->save();
+
+        // Notify buyer about the counter-offer
+        try {
+            $listing = MarketplaceListing::find($offer->marketplace_listing_id);
+            $amount  = number_format((float) $offer->counter_amount, 2) . ' ' . $offer->currency;
+            self::sendOfferEmail(
+                (int) $offer->buyer_id,
+                'emails_misc.marketplace_offer.countered_subject',
+                'emails_misc.marketplace_offer.countered_title',
+                'emails_misc.marketplace_offer.countered_body',
+                ['title' => $listing->title ?? '', 'amount' => $amount],
+                ['title' => $listing->title ?? ''],
+                '/marketplace/offers',
+                'emails_misc.marketplace_offer.countered_cta'
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceOfferService] counter email failed: ' . $e->getMessage());
+        }
 
         return $offer;
     }
@@ -156,6 +230,24 @@ class MarketplaceOfferService
             ->where('id', '!=', $offer->id)
             ->whereIn('status', ['pending', 'countered'])
             ->update(['status' => 'declined']);
+
+        // Notify seller their counter-offer was accepted
+        try {
+            $listing = MarketplaceListing::find($offer->marketplace_listing_id);
+            $amount  = number_format((float) $offer->amount, 2) . ' ' . $offer->currency;
+            self::sendOfferEmail(
+                (int) $offer->seller_id,
+                'emails_misc.marketplace_offer.counter_accepted_subject',
+                'emails_misc.marketplace_offer.counter_accepted_title',
+                'emails_misc.marketplace_offer.counter_accepted_body',
+                ['title' => $listing->title ?? '', 'amount' => $amount],
+                ['title' => $listing->title ?? ''],
+                '/marketplace/orders',
+                'emails_misc.marketplace_offer.counter_accepted_cta'
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceOfferService] acceptCounter email failed: ' . $e->getMessage());
+        }
 
         return $offer;
     }
@@ -255,6 +347,56 @@ class MarketplaceOfferService
     // -----------------------------------------------------------------
     //  Helpers
     // -----------------------------------------------------------------
+
+    // -----------------------------------------------------------------
+    //  Email helpers
+    // -----------------------------------------------------------------
+
+    /**
+     * Send a marketplace offer email to a user.
+     *
+     * @param int    $userId       Recipient user ID
+     * @param string $subjectKey   Translation key for email subject
+     * @param string $titleKey     Translation key for email title
+     * @param string $bodyKey      Translation key for email body paragraph
+     * @param array  $bodyParams   Body translation params
+     * @param array  $subjectParams Subject translation params (subset of bodyParams)
+     * @param string $link         Relative path for CTA button
+     * @param string $ctaKey       Translation key for CTA button text
+     */
+    private static function sendOfferEmail(int $userId, string $subjectKey, string $titleKey, string $bodyKey, array $bodyParams, array $subjectParams, string $link, string $ctaKey): void
+    {
+        $tenantId = TenantContext::getId();
+        $user     = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+
+        if (!$user || empty($user->email)) {
+            return;
+        }
+
+        $firstName = $user->first_name ?? $user->name ?? 'there';
+        $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+
+        $html = EmailTemplateBuilder::make()
+            ->title(__($titleKey))
+            ->greeting($firstName)
+            ->paragraph(__($bodyKey, $bodyParams))
+            ->button(__($ctaKey), $fullUrl)
+            ->render();
+
+        if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $subjectParams), $html)) {
+            Log::warning('[MarketplaceOfferService] email failed', ['user_id' => $userId, 'subject_key' => $subjectKey]);
+        }
+    }
+
+    private static function userName(int $userId): string
+    {
+        $user = DB::table('users')->where('id', $userId)->select(['first_name', 'last_name', 'name'])->first();
+        if (!$user) {
+            return 'A member';
+        }
+        $full = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+        return $full ?: ($user->name ?? 'A member');
+    }
 
     private static function assertSellerOwns(MarketplaceOffer $offer, int $sellerId): void
     {

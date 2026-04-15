@@ -6,6 +6,8 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\MarketplaceListing;
 use App\Models\MarketplaceReport;
@@ -65,6 +67,24 @@ class MarketplaceReportService
         $report->status = 'received';
         $report->save();
 
+        // Send receipt confirmation to reporter (DSA requirement)
+        try {
+            self::sendReportEmail(
+                $reporterId,
+                'emails_misc.marketplace_report.received_subject',
+                [],
+                'emails_misc.marketplace_report.received_title',
+                'emails_misc.marketplace_report.received_body',
+                [],
+                'emails_misc.marketplace_report.received_ref',
+                ['report_id' => $report->id],
+                '/marketplace/reports/' . $report->id,
+                'emails_misc.marketplace_report.received_cta'
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceReportService] createReport email failed: ' . $e->getMessage());
+        }
+
         return $report;
     }
 
@@ -91,6 +111,23 @@ class MarketplaceReportService
         $report->status = 'under_review';
         $report->handled_by = $adminId;
         $report->save();
+
+        // Notify reporter their report is under active review
+        try {
+            self::sendReportEmail(
+                (int) $report->reporter_id,
+                'emails_misc.marketplace_report.acknowledged_subject',
+                ['report_id' => $report->id],
+                'emails_misc.marketplace_report.acknowledged_title',
+                'emails_misc.marketplace_report.acknowledged_body',
+                ['report_id' => $report->id],
+                null, [],
+                '/marketplace/reports/' . $report->id,
+                'emails_misc.marketplace_report.received_cta'
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceReportService] acknowledgeReport email failed: ' . $e->getMessage());
+        }
 
         return $report;
     }
@@ -131,6 +168,29 @@ class MarketplaceReportService
             self::suspendSeller($report->marketplace_listing_id);
         }
 
+        // Notify reporter of the decision (DSA requirement — action taken or no action)
+        try {
+            $bodyKey = $actionTaken !== 'none'
+                ? 'emails_misc.marketplace_report.resolved_action_taken'
+                : 'emails_misc.marketplace_report.resolved_no_action';
+            $bodyParams = $actionTaken !== 'none' ? ['action' => $actionTaken] : [];
+
+            self::sendReportEmail(
+                (int) $report->reporter_id,
+                'emails_misc.marketplace_report.resolved_subject',
+                ['report_id' => $report->id],
+                'emails_misc.marketplace_report.resolved_title',
+                $bodyKey,
+                $bodyParams,
+                'emails_misc.marketplace_report.resolved_appeal_rights',
+                [],
+                '/marketplace/reports/' . $report->id,
+                'emails_misc.marketplace_report.resolved_cta'
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceReportService] resolveReport email failed: ' . $e->getMessage());
+        }
+
         return $report;
     }
 
@@ -161,6 +221,23 @@ class MarketplaceReportService
         $report->status = 'appealed';
         $report->appeal_text = $appealText;
         $report->save();
+
+        // Confirm appeal receipt to reporter
+        try {
+            self::sendReportEmail(
+                $reporterId,
+                'emails_misc.marketplace_report.appeal_received_subject',
+                ['report_id' => $report->id],
+                'emails_misc.marketplace_report.appeal_received_title',
+                'emails_misc.marketplace_report.appeal_received_body',
+                ['report_id' => $report->id],
+                null, [],
+                '/marketplace/reports/' . $report->id,
+                'emails_misc.marketplace_report.received_cta'
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceReportService] appealReport email failed: ' . $e->getMessage());
+        }
 
         return $report;
     }
@@ -195,6 +272,23 @@ class MarketplaceReportService
             self::removeListing($report->marketplace_listing_id);
         } elseif ($actionTaken === 'seller_suspended') {
             self::suspendSeller($report->marketplace_listing_id);
+        }
+
+        // Send final decision email to reporter (DSA — end of appeals process)
+        try {
+            self::sendReportEmail(
+                (int) $report->reporter_id,
+                'emails_misc.marketplace_report.appeal_resolved_subject',
+                ['report_id' => $report->id],
+                'emails_misc.marketplace_report.appeal_resolved_title',
+                'emails_misc.marketplace_report.appeal_resolved_body',
+                ['report_id' => $report->id],
+                null, [],
+                '/marketplace/reports/' . $report->id,
+                'emails_misc.marketplace_report.appeal_resolved_cta'
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceReportService] resolveAppeal email failed: ' . $e->getMessage());
         }
 
         return $report;
@@ -343,6 +437,23 @@ class MarketplaceReportService
             $report->acknowledged_at = now();
             $report->save();
             $count++;
+
+            // Notify reporter their report is now under review
+            try {
+                self::sendReportEmail(
+                    (int) $report->reporter_id,
+                    'emails_misc.marketplace_report.acknowledged_subject',
+                    ['report_id' => $report->id],
+                    'emails_misc.marketplace_report.acknowledged_title',
+                    'emails_misc.marketplace_report.acknowledged_body',
+                    ['report_id' => $report->id],
+                    null, [],
+                    '/marketplace/reports/' . $report->id,
+                    'emails_misc.marketplace_report.received_cta'
+                );
+            } catch (\Throwable $e) {
+                Log::warning('[MarketplaceReportService] processUnacknowledged email failed: ' . $e->getMessage());
+            }
         }
 
         if ($count > 0) {
@@ -352,6 +463,52 @@ class MarketplaceReportService
         }
 
         return $count;
+    }
+
+    // -----------------------------------------------------------------
+    //  Email helpers
+    // -----------------------------------------------------------------
+
+    /**
+     * Send a DSA report email to a user.
+     *
+     * @param int         $userId         Recipient user ID
+     * @param string      $subjectKey     Translation key for email subject
+     * @param array       $subjectParams  Subject translation params
+     * @param string      $titleKey       Translation key for email title
+     * @param string      $bodyKey        Translation key for main body paragraph
+     * @param array       $bodyParams     Body translation params
+     * @param string|null $noteKey        Optional second paragraph translation key (e.g. reference or rights notice)
+     * @param array       $noteParams     Note translation params
+     * @param string      $link           Relative path for CTA button
+     * @param string      $ctaKey         Translation key for CTA button text
+     */
+    private static function sendReportEmail(int $userId, string $subjectKey, array $subjectParams, string $titleKey, string $bodyKey, array $bodyParams, ?string $noteKey, array $noteParams, string $link, string $ctaKey): void
+    {
+        $tenantId = TenantContext::getId();
+        $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+
+        if (!$user || empty($user->email)) {
+            return;
+        }
+
+        $firstName = $user->first_name ?? $user->name ?? 'there';
+        $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+
+        $builder = EmailTemplateBuilder::make()
+            ->title(__($titleKey))
+            ->greeting($firstName)
+            ->paragraph(__($bodyKey, $bodyParams));
+
+        if ($noteKey !== null) {
+            $builder->paragraph(__($noteKey, $noteParams));
+        }
+
+        $html = $builder->button(__($ctaKey), $fullUrl)->render();
+
+        if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $subjectParams), $html)) {
+            Log::warning('[MarketplaceReportService] email failed', ['user_id' => $userId, 'subject_key' => $subjectKey]);
+        }
     }
 
     // -----------------------------------------------------------------

@@ -6,11 +6,14 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\MarketplaceListing;
 use App\Models\MarketplaceOffer;
 use App\Models\MarketplaceOrder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * MarketplaceOrderService — Order lifecycle management for the marketplace module.
@@ -32,10 +35,10 @@ class MarketplaceOrderService
             throw new \InvalidArgumentException('Offer must be accepted before creating an order.');
         }
 
-        $listing = MarketplaceListing::findOrFail($offer->marketplace_listing_id);
+        $listing  = MarketplaceListing::findOrFail($offer->marketplace_listing_id);
         $tenantId = TenantContext::getId();
 
-        return DB::transaction(function () use ($offer, $listing, $tenantId) {
+        $order = DB::transaction(function () use ($offer, $listing, $tenantId) {
             $order = new MarketplaceOrder();
             $order->tenant_id = $tenantId;
             $order->order_number = self::generateOrderNumber($tenantId);
@@ -50,12 +53,19 @@ class MarketplaceOrderService
             $order->status = 'pending_payment';
             $order->save();
 
-            // Mark listing as sold
-            MarketplaceListing::where('id', $listing->id)
-                ->update(['status' => 'sold']);
+            MarketplaceListing::where('id', $listing->id)->update(['status' => 'sold']);
 
             return $order;
         });
+
+        // Order confirmation emails (outside transaction)
+        try {
+            self::sendOrderConfirmationEmails($order, $listing->title);
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceOrderService] createFromOffer email failed: ' . $e->getMessage());
+        }
+
+        return $order;
     }
 
     /**
@@ -79,7 +89,7 @@ class MarketplaceOrderService
         $shippingCost = isset($data['shipping_cost']) ? (float) $data['shipping_cost'] : null;
         $totalPrice = ($unitPrice * $quantity) + ($shippingCost ?? 0);
 
-        return DB::transaction(function () use (
+        $order = DB::transaction(function () use (
             $buyerId, $listing, $tenantId, $quantity,
             $unitPrice, $totalPrice, $shippingCost, $data
         ) {
@@ -116,6 +126,15 @@ class MarketplaceOrderService
 
             return $order;
         });
+
+        // Order confirmation emails (outside transaction)
+        try {
+            self::sendOrderConfirmationEmails($order, $listing->title);
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceOrderService] createDirectPurchase email failed: ' . $e->getMessage());
+        }
+
+        return $order;
     }
 
     // -----------------------------------------------------------------
@@ -138,6 +157,25 @@ class MarketplaceOrderService
         $order->tracking_url = $data['tracking_url'] ?? null;
         $order->save();
 
+        // Notify buyer their order has shipped
+        try {
+            $listing = MarketplaceListing::find($order->marketplace_listing_id);
+            $title   = $listing->title ?? '';
+            $body    = __('emails_misc.marketplace_order.shipped_body', ['order_number' => $order->order_number, 'title' => htmlspecialchars($title, ENT_QUOTES, 'UTF-8')]);
+            if (!empty($order->tracking_number)) {
+                $body .= '<br>' . __('emails_misc.marketplace_order.shipped_tracking', ['tracking' => htmlspecialchars($order->tracking_number, ENT_QUOTES, 'UTF-8')]);
+            }
+            self::sendOrderEmail(
+                (int) $order->buyer_id,
+                __('emails_misc.marketplace_order.shipped_subject', ['order_number' => $order->order_number]),
+                __('emails_misc.marketplace_order.shipped_title'),
+                $body,
+                '/marketplace/orders/' . $order->id
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceOrderService] markShipped email failed: ' . $e->getMessage());
+        }
+
         return $order;
     }
 
@@ -155,6 +193,19 @@ class MarketplaceOrderService
         $order->auto_complete_at = now()->addDays(14);
         $order->save();
 
+        // Notify seller delivery was confirmed
+        try {
+            self::sendOrderEmail(
+                (int) $order->seller_id,
+                __('emails_misc.marketplace_order.delivered_subject', ['order_number' => $order->order_number]),
+                __('emails_misc.marketplace_order.delivered_title'),
+                __('emails_misc.marketplace_order.delivered_body', ['order_number' => $order->order_number]),
+                '/marketplace/orders/' . $order->id
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceOrderService] confirmDelivery email failed: ' . $e->getMessage());
+        }
+
         return $order;
     }
 
@@ -167,18 +218,34 @@ class MarketplaceOrderService
             throw new \InvalidArgumentException('Cannot cancel an order that has already been shipped or completed.');
         }
 
-        return DB::transaction(function () use ($order, $reason) {
+        $order = DB::transaction(function () use ($order, $reason) {
             $order->status = 'cancelled';
             $order->cancelled_at = now();
             $order->cancellation_reason = $reason;
             $order->save();
 
-            // Re-activate the listing
-            MarketplaceListing::where('id', $order->marketplace_listing_id)
-                ->update(['status' => 'active']);
+            MarketplaceListing::where('id', $order->marketplace_listing_id)->update(['status' => 'active']);
 
             return $order;
         });
+
+        // Notify both parties of the cancellation
+        try {
+            $listing = MarketplaceListing::find($order->marketplace_listing_id);
+            $title   = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
+            $body    = __('emails_misc.marketplace_order.cancelled_body', ['order_number' => $order->order_number, 'title' => $title]);
+            if (!empty($reason)) {
+                $body .= '<br>' . __('emails_misc.marketplace_order.cancelled_reason', ['reason' => htmlspecialchars($reason, ENT_QUOTES, 'UTF-8')]);
+            }
+            $subject = __('emails_misc.marketplace_order.cancelled_subject', ['order_number' => $order->order_number]);
+            $link    = '/marketplace/orders/' . $order->id;
+            self::sendOrderEmail((int) $order->buyer_id,  $subject, __('emails_misc.marketplace_order.cancelled_title'), $body, $link);
+            self::sendOrderEmail((int) $order->seller_id, $subject, __('emails_misc.marketplace_order.cancelled_title'), $body, $link);
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceOrderService] cancel email failed: ' . $e->getMessage());
+        }
+
+        return $order;
     }
 
     /**
@@ -195,12 +262,11 @@ class MarketplaceOrderService
             throw new \InvalidArgumentException('Order must be delivered before it can be completed.');
         }
 
-        return DB::transaction(function () use ($order) {
+        $order = DB::transaction(function () use ($order) {
             $order->status = 'completed';
             $order->escrow_released_at = now();
             $order->save();
 
-            // Lock seller profile to prevent race condition on concurrent completions
             $sellerProfile = \App\Models\MarketplaceSellerProfile::where('user_id', $order->seller_id)
                 ->lockForUpdate()
                 ->first();
@@ -211,6 +277,30 @@ class MarketplaceOrderService
 
             return $order;
         });
+
+        // Notify both parties of completion
+        try {
+            $listing = MarketplaceListing::find($order->marketplace_listing_id);
+            $title   = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
+            $subject = __('emails_misc.marketplace_order.completed_subject', ['order_number' => $order->order_number]);
+            $link    = '/marketplace/orders/' . $order->id;
+            self::sendOrderEmail(
+                (int) $order->buyer_id, $subject,
+                __('emails_misc.marketplace_order.completed_title'),
+                __('emails_misc.marketplace_order.completed_buyer_body', ['order_number' => $order->order_number, 'title' => $title]),
+                $link
+            );
+            self::sendOrderEmail(
+                (int) $order->seller_id, $subject,
+                __('emails_misc.marketplace_order.completed_title'),
+                __('emails_misc.marketplace_order.completed_seller_body', ['order_number' => $order->order_number, 'title' => $title]),
+                $link
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceOrderService] complete email failed: ' . $e->getMessage());
+        }
+
+        return $order;
     }
 
     // -----------------------------------------------------------------
@@ -311,6 +401,58 @@ class MarketplaceOrderService
     // -----------------------------------------------------------------
     //  Helpers
     // -----------------------------------------------------------------
+
+    /**
+     * Send an order email to a single user.
+     */
+    private static function sendOrderEmail(int $userId, string $subject, string $title, string $body, string $link): void
+    {
+        $tenantId = TenantContext::getId();
+        $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+
+        if (!$user || empty($user->email)) {
+            return;
+        }
+
+        $firstName = $user->first_name ?? $user->name ?? 'there';
+        $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+
+        $html = EmailTemplateBuilder::make()
+            ->title($title)
+            ->greeting($firstName)
+            ->paragraph($body)
+            ->button(__('emails_misc.marketplace_order.order_cta'), $fullUrl)
+            ->render();
+
+        if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
+            Log::warning('[MarketplaceOrderService] email failed', ['user_id' => $userId]);
+        }
+    }
+
+    /**
+     * Send order confirmation emails to both buyer and seller.
+     */
+    private static function sendOrderConfirmationEmails(MarketplaceOrder $order, string $listingTitle): void
+    {
+        $title      = htmlspecialchars($listingTitle, ENT_QUOTES, 'UTF-8');
+        $link       = '/marketplace/orders/' . $order->id;
+
+        self::sendOrderEmail(
+            (int) $order->buyer_id,
+            __('emails_misc.marketplace_order.confirmed_buyer_subject', ['order_number' => $order->order_number]),
+            __('emails_misc.marketplace_order.confirmed_buyer_title'),
+            __('emails_misc.marketplace_order.confirmed_buyer_body', ['order_number' => $order->order_number, 'title' => $title]),
+            $link
+        );
+
+        self::sendOrderEmail(
+            (int) $order->seller_id,
+            __('emails_misc.marketplace_order.confirmed_seller_subject', ['order_number' => $order->order_number]),
+            __('emails_misc.marketplace_order.confirmed_seller_title'),
+            __('emails_misc.marketplace_order.confirmed_seller_body', ['order_number' => $order->order_number, 'title' => $title]),
+            $link
+        );
+    }
 
     /**
      * Generate a unique order number: MKT-000001, MKT-000002, etc.
