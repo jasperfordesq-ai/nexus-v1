@@ -41,7 +41,10 @@
     "consent_ignore": "If you did not expect this request, you can safely ignore this email. No action will be taken without your explicit consent.",
     "consent_subject": "Guardian Consent Request — Project NEXUS",
     "info_card_relationship": "Relationship",
-    "info_card_expires": "Expires"
+    "info_card_expires": "Expires",
+    "consent_granted_minor_bell": "Your guardian has approved consent for your volunteering activities.",
+    "consent_withdrawn_minor_bell": "Guardian consent has been withdrawn from your volunteering activities.",
+    "consent_withdrawn_admin_bell": "Guardian consent has been withdrawn by an administrator."
   },
   "safeguarding": {
     "training_verified": "Your {{training_name}} record has been verified!",

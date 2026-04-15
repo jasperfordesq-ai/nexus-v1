@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -208,6 +209,20 @@ class GuardianConsentService
                     'updated_at' => now(),
                 ]);
 
+            // Notify the minor that their guardian has granted consent
+            try {
+                Notification::create([
+                    'tenant_id' => $tenantId,
+                    'user_id'   => (int) $consent->minor_user_id,
+                    'type'      => 'guardian_consent',
+                    'message'   => __('emails_misc.guardian.consent_granted_minor_bell'),
+                    'link'      => '/volunteering',
+                    'is_read'   => false,
+                ]);
+            } catch (\Throwable $notifErr) {
+                Log::warning('GuardianConsentService::grantConsent notification failed', ['error' => $notifErr->getMessage()]);
+            }
+
             return true;
         } catch (\Exception $e) {
             Log::error('GuardianConsentService::grantConsent error: ' . $e->getMessage());
@@ -268,6 +283,27 @@ class GuardianConsentService
                     'withdrawn_by' => $userId,
                     'updated_at' => now(),
                 ]);
+
+            // Notify the minor that consent has been withdrawn
+            try {
+                $minorUserId = (int) $consent->minor_user_id;
+                $bellMsg = $isMinor
+                    ? __('emails_misc.guardian.consent_withdrawn_minor_bell')
+                    : __('emails_misc.guardian.consent_withdrawn_admin_bell');
+
+                if ($minorUserId) {
+                    Notification::create([
+                        'tenant_id' => $tenantId,
+                        'user_id'   => $minorUserId,
+                        'type'      => 'guardian_consent',
+                        'message'   => $bellMsg,
+                        'link'      => '/volunteering',
+                        'is_read'   => false,
+                    ]);
+                }
+            } catch (\Throwable $notifErr) {
+                Log::warning('GuardianConsentService::withdrawConsent notification failed', ['error' => $notifErr->getMessage()]);
+            }
 
             return true;
         } catch (\Exception $e) {

@@ -447,6 +447,24 @@ class EventNotificationService
                 'created_at' => now(),
             ]);
 
+            // Confirm the RSVP to the person who RSVPed
+            try {
+                $selfBell = $status === 'going'
+                    ? __('svc_notifications_2.event.rsvp_confirmed_going', ['title' => $eventTitle])
+                    : __('svc_notifications_2.event.rsvp_confirmed_interested', ['title' => $eventTitle]);
+
+                Notification::create([
+                    'user_id'    => $userId,
+                    'tenant_id'  => $tenantId,
+                    'message'    => $selfBell,
+                    'link'       => $path,
+                    'type'       => 'event_rsvp_confirm',
+                    'created_at' => now(),
+                ]);
+            } catch (\Throwable $e) {
+                Log::warning("[EventNotificationService] RSVP self-confirmation bell failed for user {$userId}: " . $e->getMessage());
+            }
+
             // Send email to organizer about the RSVP
             try {
                 $organizer = DB::table('users')
