@@ -19,6 +19,7 @@ composer.phar
 
 # ─── Documentation (private — not for public repo) ───────────────────────────
 /docs/*
+!/docs/legal/
 !/docs/database-migrations.md
 !/docs/DEPLOYMENT.md
 !/docs/SYSTEM_AUDIT_*.md
