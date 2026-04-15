@@ -61,9 +61,49 @@
     "incident_updated_subject": "[NEXUS] [{{severity}}] Safeguarding Incident #{{incident_id}} — {{status}}"
   },
   "social": {
-    "connection_request": "{{name}} sent you a connection request"
+    "connection_request": "{{name}} sent you a connection request",
+    "connection_accepted": "{{name}} accepted your connection request"
   },
   "marketplace": {
     "listing_pending_notice": "Your listing has been submitted for review and will be published once approved."
+  },
+  "admin_notify": {
+    "new_user_subject": "New member registered — {{community}}",
+    "new_user_title": "New Member Registration",
+    "new_user_preview": "A new member has just registered on {{community}}",
+    "new_user_bell": "New member registered: {{name}}",
+    "new_user_body": "A new member has just registered on <strong>{{community}}</strong>.",
+    "new_user_email_label": "Email",
+    "new_user_status_label": "Status",
+    "new_user_cta": "View Member",
+    "new_listing_subject": "New listing posted — {{community}}",
+    "new_listing_title": "New Listing Posted",
+    "new_listing_preview": "A new listing has been posted on {{community}}",
+    "new_listing_bell": "New listing posted: {{title}} by {{poster}}",
+    "new_listing_body": "A new listing has been posted on <strong>{{community}}</strong>.",
+    "new_listing_type_label": "Type",
+    "new_listing_by_label": "Posted by",
+    "new_listing_cta": "View Listing",
+    "new_group_subject": "New group created — {{community}}",
+    "new_group_title": "New Group Created",
+    "new_group_preview": "A new group has been created on {{community}}",
+    "new_group_bell": "New group created: {{name}}",
+    "new_group_body": "A new group has been created on <strong>{{community}}</strong>.",
+    "new_group_by_label": "Created by",
+    "new_group_cta": "View Group",
+    "new_event_subject": "New event posted — {{community}}",
+    "new_event_title": "New Community Event",
+    "new_event_preview": "A new event has been posted on {{community}}",
+    "new_event_bell": "New event posted: {{title}}",
+    "new_event_body": "A new community event has been posted on <strong>{{community}}</strong>.",
+    "new_event_by_label": "Created by",
+    "new_event_cta": "View Event",
+    "new_vol_opp_subject": "New volunteer opportunity — {{community}}",
+    "new_vol_opp_title": "New Volunteer Opportunity",
+    "new_vol_opp_preview": "A new volunteer opportunity has been posted on {{community}}",
+    "new_vol_opp_bell": "New volunteer opportunity: {{title}}",
+    "new_vol_opp_body": "A new volunteer opportunity has been posted on <strong>{{community}}</strong>.",
+    "new_vol_opp_by_label": "Posted by",
+    "new_vol_opp_cta": "View Opportunity"
   }
 }

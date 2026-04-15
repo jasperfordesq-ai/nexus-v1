@@ -1,28 +1,13 @@
 {
-  "generic": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
-  "not_found": "Seite nicht gefunden",
-  "unauthorized": "Sie haben keine Berechtigung, diese Seite anzuzeigen",
-  "network": "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung.",
-  "loading_failed": "Inhalt konnte nicht geladen werden. Bitte aktualisieren Sie die Seite.",
-  "session_expired": "Sitzung abgelaufen",
-  "session_expired_message": "Ihre Sitzung ist aufgrund von Inaktivität abgelaufen. Bitte melden Sie sich erneut an, um fortzufahren.",
-  "dismiss": "Schließen",
-  "offline_message": "Sie sind offline. Einige Funktionen sind möglicherweise nicht verfügbar.",
-  "update_available": "Update verfügbar",
-  "version_info": "Version {{currentVersion}} ist jetzt verfügbar (Sie haben {{clientVersion}})",
-  "whats_new": "Was ist neu:",
-  "later": "Später",
-  "download_update": "Update herunterladen",
-  "validation": {
-    "required": "Dieses Feld ist erforderlich",
-    "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
-    "phone": "Bitte geben Sie eine gültige Telefonnummer ein",
-    "min_length": "Muss mindestens {{min}} Zeichen lang sein",
-    "max_length": "Darf höchstens {{max}} Zeichen lang sein"
+  "admin": {
+    "federation": {
+      "unknown_key": "Unknown key: :key",
+      "must_be_array": ":field must be an array",
+      "failed_to_load_partner": "Failed to load partner"
+    }
   },
-  "community_not_found": "Community Not Found",
-  "community_not_found_message": "We couldn't find a community called \"{{slug}}\".",
-  "community_not_found_detail": "The community may have been renamed, deactivated, or the URL may be incorrect.",
-  "go_home": "Go Home",
-  "find_community": "Find Community"
+  "validation": {
+    "badge_keys_must_be_array": "badge_keys must be an array",
+    "member_ids_must_be_array": "member_ids must be an array"
+  }
 }

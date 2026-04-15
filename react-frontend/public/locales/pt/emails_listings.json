@@ -1,42 +1,42 @@
 {
   "listings": {
     "expired": {
-      "notification": "Seu anúncio \"{{title}}\" expirou. Você pode renová-lo para torná-lo ativo novamente.",
-      "subject": "Seu anúncio expirou",
-      "heading": "Seu anúncio expirou",
-      "subheading": "Renove seu anúncio para mantê-lo ativo.",
-      "body_expired": "Seu anúncio <strong>\"{{title}}\"</strong> expirou.",
-      "body_renew": "Você pode renová-lo para torná-lo visível para a comunidade novamente.",
-      "cta": "Renovar Anúncio"
+      "notification": "Your listing \"{{title}}\" has expired. You can renew it to make it active again.",
+      "subject": "Your listing has expired",
+      "heading": "Your listing has expired",
+      "subheading": "Renew your listing to keep it active.",
+      "body_expired": "Your listing <strong>\"{{title}}\"</strong> has expired.",
+      "body_renew": "You can renew it to make it visible to the community again.",
+      "cta": "Renew Listing"
     },
     "expiry_reminder": {
-      "notification": "Seu anúncio \"{{title}}\" expira em {{days_text}} (em {{expiry_date}}) — renove-o para mantê-lo ativo.",
-      "subject": "Seu anúncio expira em {{days_text}}",
-      "heading": "Seu anúncio expira em {{days_text}}",
-      "subheading": "Não perca — renove seu anúncio para mantê-lo ativo.",
-      "body_expires": "Seu anúncio <strong>\"{{title}}\"</strong> expira em {{days_text}} (em {{expiry_date}}).",
-      "body_renew": "Renove agora para mantê-lo visível para a comunidade.",
-      "cta": "Ver Anúncio",
-      "days_one": "1 dia",
-      "days_other": "{{count}} dias"
+      "notification": "Your listing \"{{title}}\" expires in {{days_text}} (on {{expiry_date}}) — renew it to keep it active.",
+      "subject": "Your listing expires in {{days_text}}",
+      "heading": "Your listing expires in {{days_text}}",
+      "subheading": "Don't miss out — renew your listing to keep it active.",
+      "body_expires": "Your listing <strong>\"{{title}}\"</strong> expires in {{days_text}} (on {{expiry_date}}).",
+      "body_renew": "Renew it now to keep it visible to the community.",
+      "cta": "View Listing",
+      "days_one": "1 day",
+      "days_other": "{{count}} days"
     },
     "approved": {
-      "notification": "Seu anúncio \"{{title}}\" foi aprovado e agora está ativo.",
-      "notification_short": "Seu anúncio \"{{title}}\" foi aprovado!"
+      "notification": "Your listing \"{{title}}\" has been approved and is now active.",
+      "notification_short": "Your listing \"{{title}}\" has been approved!"
     },
     "rejected": {
-      "notification": "Seu anúncio \"{{title}}\" não foi aprovado. Motivo: {{reason}}",
-      "notification_no_reason": "Seu anúncio \"{{title}}\" não foi aprovado.",
-      "subject": "Seu anúncio precisa de alterações",
-      "heading": "Seu anúncio precisa de alterações",
-      "subheading": "Seu anúncio não foi aprovado — aqui está o que fazer a seguir.",
-      "body_not_approved": "Seu anúncio <strong>\"{{title}}\"</strong> não foi aprovado.",
-      "body_reason": "<strong>Motivo:</strong> {{reason}}",
-      "body_resubmit": "Por favor, revise e atualize seu anúncio, depois reenvie para aprovação.",
-      "cta": "Editar Anúncio"
+      "notification": "Your listing \"{{title}}\" was not approved. Reason: {{reason}}",
+      "notification_no_reason": "Your listing \"{{title}}\" was not approved.",
+      "subject": "Your listing needs changes",
+      "heading": "Your listing needs changes",
+      "subheading": "Your listing was not approved — here's what to do next.",
+      "body_not_approved": "Your listing <strong>\"{{title}}\"</strong> was not approved.",
+      "body_reason": "<strong>Reason:</strong> {{reason}}",
+      "body_resubmit": "Please review and update your listing, then resubmit for approval.",
+      "cta": "Edit Listing"
     },
     "removed": {
-      "notification": "Seu anúncio \"{{title}}\" foi removido por um moderador."
+      "notification": "Your listing \"{{title}}\" has been removed by a moderator."
     }
   }
 }

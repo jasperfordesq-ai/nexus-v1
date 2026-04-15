@@ -1,28 +1,13 @@
 {
-  "generic": "Er is iets misgegaan. Probeer het opnieuw.",
-  "not_found": "Pagina niet gevonden",
-  "unauthorized": "U heeft geen toestemming om deze pagina te bekijken",
-  "network": "Netwerkfout. Controleer uw verbinding.",
-  "loading_failed": "Inhoud kon niet worden geladen. Vernieuw de pagina.",
-  "session_expired": "Sessie verlopen",
-  "session_expired_message": "Uw sessie is verlopen wegens inactiviteit. Log opnieuw in om door te gaan.",
-  "dismiss": "Sluiten",
-  "offline_message": "U bent offline. Sommige functies zijn mogelijk niet beschikbaar.",
-  "update_available": "Update beschikbaar",
-  "version_info": "Versie {{currentVersion}} is nu beschikbaar (u heeft {{clientVersion}})",
-  "whats_new": "Wat is er nieuw:",
-  "later": "Later",
-  "download_update": "Update downloaden",
-  "validation": {
-    "required": "Dit veld is verplicht",
-    "email": "Voer een geldig e-mailadres in",
-    "phone": "Voer een geldig telefoonnummer in",
-    "min_length": "Moet minimaal {{min}} tekens bevatten",
-    "max_length": "Mag maximaal {{max}} tekens bevatten"
+  "admin": {
+    "federation": {
+      "unknown_key": "Unknown key: :key",
+      "must_be_array": ":field must be an array",
+      "failed_to_load_partner": "Failed to load partner"
+    }
   },
-  "community_not_found": "Community Not Found",
-  "community_not_found_message": "We couldn't find a community called \"{{slug}}\".",
-  "community_not_found_detail": "The community may have been renamed, deactivated, or the URL may be incorrect.",
-  "go_home": "Go Home",
-  "find_community": "Find Community"
+  "validation": {
+    "badge_keys_must_be_array": "badge_keys must be an array",
+    "member_ids_must_be_array": "member_ids must be an array"
+  }
 }

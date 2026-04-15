@@ -1,113 +1,130 @@
 {
   "badge_collection": {
-    "collection_complete": "Verzameling Voltooid! Je hebt '{{name}}' afgerond en {{xp}} bonus XP verdiend! {{icon}}"
+    "collection_complete": "Collection Complete! You finished '{{name}}' and earned {{xp}} bonus XP! {{icon}}"
   },
   "broker": {
-    "message_for_review": "Nieuwe boodschap ter beoordeling van {{sender}}"
+    "message_for_review": "New message for review from {{sender}}"
   },
   "federation": {
-    "message_received": "Nieuwe gefedereerde boodschap van {{sender}} ({{partner}})",
-    "transaction_received": "Je hebt {{amount}} tijdcredits ontvangen van {{sender}} ({{partner}})",
-    "connection_request": "{{sender}} van {{community}} wil met je verbinden",
-    "connection_accepted": "{{name}} heeft je verbindingsverzoek geaccepteerd",
-    "connection_declined": "Je verbindingsverzoek is afgewezen"
-  },
-  "job_application": {
-    "shortlisted": "Je aanvraag voor {{title}} is geselecteerd!",
-    "rejected": "Je aanvraag voor {{title}} was niet succesvol",
-    "hired": "Gefeliciteerd! Je bent aangenomen voor {{title}}",
-    "status_updated": "De status van je aanvraag voor {{title}} is bijgewerkt naar {{status}}",
-    "status_updated_generic": "De status van je aanvraag is bijgewerkt",
-    "stuck_in_stage": "Aanvraag #{{id}} is al {{stage}} dagen in '{{days}}'"
-  },
-  "job_team": {
-    "added_as_role": "Je bent toegevoegd als een {{role}} voor '{{title}}'"
-  },
-  "shift_swap": {
-    "requested": "Je hebt een nieuw verzoek voor een dienstwisseling",
-    "declined": "Je verzoek voor een dienstwisseling is afgewezen",
-    "accepted": "Je verzoek voor een dienstwisseling is geaccepteerd",
-    "declined_by_admin": "Je verzoek voor een dienstwisseling is afgewezen door een admin",
-    "accepted_swap_declined_by_admin": "Een dienstwisseling die je hebt geaccepteerd is afgewezen door een admin",
-    "approved_by_admin": "Je dienstwisseling is goedgekeurd door een admin",
-    "accepted_swap_approved_by_admin": "Een dienstwisseling die je hebt geaccepteerd is goedgekeurd door een admin"
-  },
-  "user_security": {
-    "email_changed": "Je e-mailadres is gewijzigd. Als je dit niet hebt gedaan, neem dan onmiddellijk contact op met de ondersteuning."
-  },
-  "group_mention": {
-    "mentioned_in_group": "Je bent genoemd in {{group}}"
-  },
-  "idea_team": {
-    "added_to_group": "Je bent toegevoegd aan {{group}}"
+    "message_received": "New federated message from {{sender}} ({{partner}})",
+    "transaction_received": "You received {{amount}} time credits from {{sender}} ({{partner}})",
+    "connection_request": "{{sender}} from {{community}} wants to connect with you",
+    "connection_accepted": "{{name}} accepted your connection request",
+    "connection_declined": "Your connection request was declined"
   },
   "challenge": {
-    "complete_claim": "Uitdaging Voltooid! Je hebt '{{title}}' afgerond — claim je beloning!",
-    "complete_earned": "Uitdaging Voltooid! Je hebt '{{title}}' afgerond en {{xp}} XP verdiend!"
+    "complete_claim": "Challenge Complete! You finished '{{title}}' — claim your reward!",
+    "complete_earned": "Challenge Complete! You finished '{{title}}' and earned {{xp}} XP!"
   },
   "gamification": {
-    "badge_earned": "Je hebt de '{{name}}' badge verdiend! {{icon}}",
-    "level_up": "Gefeliciteerd! Je hebt Niveau {{level}} bereikt!"
+    "badge_earned": "You earned the '{{name}}' badge! {{icon}}",
+    "level_up": "Congratulations! You've reached Level {{level}}!"
   },
   "job_offer": {
-    "received_bell": "Je hebt een jobaanbieding ontvangen voor {{title}}",
-    "received_push_title": "Jobaanbieding Ontvangen!",
-    "received_push_message": "Je hebt een jobaanbieding ontvangen voor {{title}}",
-    "credits_earned_bell": "Je hebt {{amount}} tijdcredits verdiend voor het voltooien van {{title}}!",
-    "credits_earned_push_title": "Verdiende Tijdcredits!",
-    "credits_earned_push_message": "Je hebt {{amount}} tijdcredits verdiend voor het voltooien van {{title}}!",
-    "accepted_bell": "Aanbieding geaccepteerd voor {{title}}",
-    "accepted_push_title": "Aanbieding geaccepteerd voor {{title}}",
-    "accepted_push_message": "Aanbieding geaccepteerd voor {{title}}",
-    "rejected_bell": "Aanbieding afgewezen voor {{title}}",
-    "rejected_push_title": "Aanbieding afgewezen voor {{title}}",
-    "rejected_push_message": "Aanbieding afgewezen voor {{title}}",
-    "withdrawn_bell": "Jobaanbieding ingetrokken voor {{title}}",
-    "withdrawn_push_title": "Jobaanbieding ingetrokken voor {{title}}",
-    "withdrawn_push_message": "Jobaanbieding ingetrokken voor {{title}}"
+    "received_bell": "You have received a job offer for {{title}}",
+    "received_push_title": "Job Offer Received!",
+    "received_push_message": "You have received a job offer for {{title}}",
+    "credits_earned_bell": "You earned {{amount}} time credits for completing {{title}}!",
+    "credits_earned_push_title": "Time Credits Earned!",
+    "credits_earned_push_message": "You earned {{amount}} time credits for completing {{title}}!",
+    "accepted_bell": "Offer accepted for {{title}}",
+    "accepted_push_title": "Offer accepted for {{title}}",
+    "accepted_push_message": "Offer accepted for {{title}}",
+    "rejected_bell": "Offer rejected for {{title}}",
+    "rejected_push_title": "Offer rejected for {{title}}",
+    "rejected_push_message": "Offer rejected for {{title}}",
+    "withdrawn_bell": "Job offer withdrawn for {{title}}",
+    "withdrawn_push_title": "Job offer withdrawn for {{title}}",
+    "withdrawn_push_message": "Job offer withdrawn for {{title}}"
   },
   "job_alert": {
-    "match_bell": "Nieuwe job die overeenkomt met je alert: {{title}}",
-    "match_push_title": "Nieuwe Job Match",
-    "match_push_message": "Nieuwe job die overeenkomt met je alert: {{title}}"
+    "match_bell": "New job matching your alert: {{title}}",
+    "match_push_title": "New Job Match",
+    "match_push_message": "New job matching your alert: {{title}}"
   },
   "legal": {
-    "update_title": "Bijgewerkt: {{title}}",
-    "update_message": "Bekijk versie {{version}} van onze {{title}}"
+    "update_title": "Updated: {{title}}",
+    "update_message": "Please review version {{version}} of our {{title}}"
   },
   "verification_badge": {
-    "granted": "Je hebt de '{{label}}' verificatiebadge gekregen"
+    "granted": "You have been granted the '{{label}}' verification badge"
   },
   "mention": {
-    "mentioned_in": "@{{name}} heeft je genoemd in een {{entity}}",
-    "mentioned_in_with_preview": "@{{name}} heeft je genoemd in een {{entity}}: \"{{preview}}\""
+    "mentioned_in": "@{{name}} mentioned you in a {{entity}}",
+    "mentioned_in_with_preview": "@{{name}} mentioned you in a {{entity}}: \"{{preview}}\""
   },
   "story": {
-    "reaction": "{{name}} reageerde {{emoji}} op je verhaal"
+    "reaction": "{{name}} reacted {{emoji}} to your story"
   },
   "sub_account": {
     "management_request": "{{name}} has requested to manage your account as a {{type}}"
   },
   "totp": {
-    "rate_limited": "Te veel mislukte pogingen. Probeer het opnieuw over {{minutes}} minuten."
+    "rate_limited": "Too many failed attempts. Please try again in {{minutes}} minutes."
   },
   "registration": {
-    "admin_pending_approval": "Nieuwe gebruiker {{name}} ({{email}}) vereist goedkeuring"
+    "admin_pending_approval": "New user {{name}} ({{email}}) requires approval"
   },
   "nexus_score": {
-    "strength_title": "{{name}} is jouw sterkste gebied!",
-    "strength_message": "Je zit in de topklasse met {{percentage}}% in {{name}}.",
-    "improvement_title": "Verhoog je {{name}} score",
-    "tip_engagement": "Probeer tijdcredits te verzenden en ontvangen met verschillende leden van de gemeenschap.",
-    "tip_quality": "Focus op het succesvol voltooien van transacties en het verdienen van positieve beoordelingen.",
-    "tip_volunteer": "Log regelmatig je vrijwilligersuren en houd consistentie aan.",
-    "tip_activity": "Maak aanbiedingen, sluit je aan bij groepen en houd een dagelijkse inlogreeks vol.",
-    "tip_badges": "Voltooi uitdagingen om meer badges en prestaties te verdienen.",
-    "tip_impact": "Deel berichten en engageer met de community-feed.",
-    "tip_default": "Blijf deelnemen aan de community!",
-    "suggestion_connect_title": "Verbind met meer leden van de community",
-    "suggestion_connect_message": "Ruil credits met nieuwe mensen om de diversiteit van je netwerk te vergroten.",
-    "suggestion_exchanges_title": "Voltooi meer ruilingen",
-    "suggestion_exchanges_message": "Bouw je reputatie op door transacties te voltooien en beoordelingen te verdienen."
+    "strength_title": "{{name}} is your strongest area!",
+    "strength_message": "You're in the top tier with {{percentage}}% in {{name}}.",
+    "improvement_title": "Grow your {{name}} score",
+    "tip_engagement": "Try sending and receiving time credits with different community members.",
+    "tip_quality": "Focus on completing transactions successfully and earning positive reviews.",
+    "tip_volunteer": "Log your volunteer hours regularly and maintain consistency.",
+    "tip_activity": "Create listings, join groups, and maintain a daily login streak.",
+    "tip_badges": "Complete challenges to earn more badges and achievements.",
+    "tip_impact": "Share posts and engage with the community feed.",
+    "tip_default": "Keep participating in the community!",
+    "suggestion_connect_title": "Connect with more community members",
+    "suggestion_connect_message": "Exchange credits with new people to increase your network diversity.",
+    "suggestion_exchanges_title": "Complete more exchanges",
+    "suggestion_exchanges_message": "Build your reputation by completing transactions and earning reviews."
+  },
+  "vetting_approved_title": "Your verification has been approved!",
+  "vetting_approved_heading": "Verification Approved",
+  "vetting_approved_body": "Your background check verification has been approved. Your verified status is now active on your profile.",
+  "vetting_go_to_dashboard": "Go to Dashboard",
+  "vetting_rejected_title": "Your verification could not be completed. Please contact support.",
+  "vetting_rejected_heading": "Verification Not Completed",
+  "vetting_rejected_body": "Your background check verification could not be completed at this time. Please contact your community coordinator for more information or to resubmit.",
+  "vetting_contact_support": "Contact Support",
+  "suspended_by_admin": "Suspended by admin",
+  "account_suspended_title": "Account Suspended",
+  "account_banned_title": "Account Banned",
+  "banned_by_admin": "Banned by admin",
+  "account_deleted_title": "Account Deleted",
+  "reset_by_admin": "Reset by admin",
+  "password_changed_title": "Password Changed",
+  "get_started": "Get Started",
+  "account_reactivated_title": "Account Reactivated",
+  "job_application": {
+    "shortlisted": "Your application for {{title}} has been shortlisted!",
+    "rejected": "Your application for {{title}} was not successful",
+    "hired": "Congratulations! You've been hired for {{title}}",
+    "status_updated": "Your application for {{title}} status updated to {{status}}",
+    "status_updated_generic": "Your application status has been updated",
+    "stuck_in_stage": "Application #{{id}} has been in '{{stage}}' for {{days}}+ days"
+  },
+  "job_team": {
+    "added_as_role": "You've been added as a {{role}} for '{{title}}'"
+  },
+  "shift_swap": {
+    "requested": "You have a new shift swap request",
+    "declined": "Your shift swap request was declined",
+    "accepted": "Your shift swap request was accepted",
+    "declined_by_admin": "Your shift swap request was declined by an admin",
+    "accepted_swap_declined_by_admin": "A shift swap you accepted was declined by an admin",
+    "approved_by_admin": "Your shift swap was approved by an admin",
+    "accepted_swap_approved_by_admin": "A shift swap you accepted was approved by an admin"
+  },
+  "user_security": {
+    "email_changed": "Your email address has been changed. If you did not do this, contact support immediately."
+  },
+  "group_mention": {
+    "mentioned_in_group": "You were mentioned in {{group}}"
+  },
+  "idea_team": {
+    "added_to_group": "You've been added to {{group}}"
   }
 }

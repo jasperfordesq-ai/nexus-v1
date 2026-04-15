@@ -19,7 +19,52 @@
     "log_file_not_found": "Log file not found",
     "log_file_clear_failed": "Failed to clear log file",
     "secret_rotation_requires_ssh": "Secret rotation requires server access. Use SSH to rotate secrets in the .env file.",
-    "secret_deletion_requires_ssh": "Secret deletion requires server access. Use SSH to remove secrets from the .env file."
+    "secret_deletion_requires_ssh": "Secret deletion requires server access. Use SSH to remove secrets from the .env file.",
+    "config_reset_failed": "Failed to reset configuration",
+    "gdpr_request_not_found": "GDPR request not found",
+    "gdpr_request_fetch_failed": "Failed to fetch GDPR request",
+    "user_id_required": "User ID is required",
+    "assigned_to_required": "assigned_to (user ID) is required",
+    "gdpr_request_assign_failed": "Failed to assign GDPR request",
+    "note_text_required": "Note text is required",
+    "gdpr_request_note_failed": "Failed to add note to GDPR request",
+    "slug_and_name_required": "Slug and name are required",
+    "consent_type_create_failed": "Failed to create consent type",
+    "no_fields_to_update": "No fields to update",
+    "consent_type_not_found": "Consent type not found",
+    "consent_type_update_failed": "Failed to update consent type",
+    "consent_type_delete_failed": "Failed to delete consent type",
+    "breach_record_not_found": "Breach record not found",
+    "breach_record_fetch_failed": "Failed to fetch breach record",
+    "breach_record_update_failed": "Failed to update breach record",
+    "invalid_request_type": "Invalid request type. Must be one of: :types",
+    "invalid_log_filename": "Invalid filename",
+    "log_file_read_failed": "Failed to read log file",
+    "feature_key_required": "Key is required",
+    "feature_type_invalid": "Type must be \"feature\" or \"module\"",
+    "feature_flag_update_failed": "Failed to update feature flag"
+  },
+  "admin_federation": {
+    "partnership_request_failed": "Failed to send partnership request",
+    "partnership_detail_failed": "Failed to load partnership detail",
+    "counter_propose_failed": "Failed to counter-propose",
+    "counter_proposal_send_failed": "Failed to send counter-proposal",
+    "permissions_update_failed": "Failed to update permissions",
+    "partnership_permissions_update_failed": "Failed to update partnership permissions",
+    "api_key_name_required": "Name is required",
+    "api_keys_table_not_configured": "Federation API keys table not configured",
+    "api_key_create_failed": "Failed to create API key",
+    "api_key_not_found": "API key not found",
+    "api_key_already_revoked": "API key is already revoked",
+    "api_key_revoke_failed": "Failed to revoke API key",
+    "max_topics_exceeded": "Maximum 10 topics allowed.",
+    "invalid_export_type": "Invalid export type. Allowed: :types",
+    "federation_user_settings_not_found": "Federation user settings table not found",
+    "federation_partnerships_not_found": "Federation partnerships table not found",
+    "federation_transactions_not_found": "Federation transactions table not found",
+    "federation_audit_log_not_found": "Federation audit log table not found",
+    "export_failed": "Failed to export data",
+    "api_key_shown_once_warning": "This key is shown ONCE. Store it securely — it cannot be retrieved again."
   },
   "admin_feed": {
     "item_hidden": "Item hidden",
@@ -178,5 +223,9 @@
   },
   "group_invite": {
     "invite_revoked": "Invite revoked"
+  },
+  "contact_form": {
+    "sent_successfully": "Message sent successfully.",
+    "received_fallback": "Message received. We'll get back to you soon."
   }
 }

@@ -1,42 +1,42 @@
 {
   "listings": {
     "expired": {
-      "notification": "Tá do liosta \"{{title}}\" imithe in éag. Is féidir leat é a athnuachan le go mbeidh sé gníomhach arís.",
-      "subject": "Tá do liosta imithe in éag",
-      "heading": "Tá do liosta imithe in éag",
-      "subheading": "Athnuaigh do liosta le go gcoimeádfaidh tú gníomhach é.",
-      "body_expired": "Tá do liosta <strong>\"{{title}}\"</strong> imithe in éag.",
-      "body_renew": "Is féidir leat é a athnuachan le go mbeidh sé le feiceáil ag an bpobal arís.",
-      "cta": "Athnuaigh an Liosta"
+      "notification": "Your listing \"{{title}}\" has expired. You can renew it to make it active again.",
+      "subject": "Your listing has expired",
+      "heading": "Your listing has expired",
+      "subheading": "Renew your listing to keep it active.",
+      "body_expired": "Your listing <strong>\"{{title}}\"</strong> has expired.",
+      "body_renew": "You can renew it to make it visible to the community again.",
+      "cta": "Renew Listing"
     },
     "expiry_reminder": {
-      "notification": "Rachaidh do liosta \"{{title}}\" in éag i gceann {{days_text}} (ar {{expiry_date}}) — athnuaigh é le go gcoimeádfaidh tú gníomhach é.",
-      "subject": "Rachaidh do liosta in éag i gceann {{days_text}}",
-      "heading": "Rachaidh do liosta in éag i gceann {{days_text}}",
-      "subheading": "Ná caill amach — athnuaigh do liosta le go gcoimeádfaidh tú gníomhach é.",
-      "body_expires": "Rachaidh do liosta <strong>\"{{title}}\"</strong> in éag i gceann {{days_text}} (ar {{expiry_date}}).",
-      "body_renew": "Athnuaigh anois é le go mbeidh sé le feiceáil ag an bpobal.",
-      "cta": "Féach ar an Liosta",
-      "days_one": "1 lá",
-      "days_other": "{{count}} lá"
+      "notification": "Your listing \"{{title}}\" expires in {{days_text}} (on {{expiry_date}}) — renew it to keep it active.",
+      "subject": "Your listing expires in {{days_text}}",
+      "heading": "Your listing expires in {{days_text}}",
+      "subheading": "Don't miss out — renew your listing to keep it active.",
+      "body_expires": "Your listing <strong>\"{{title}}\"</strong> expires in {{days_text}} (on {{expiry_date}}).",
+      "body_renew": "Renew it now to keep it visible to the community.",
+      "cta": "View Listing",
+      "days_one": "1 day",
+      "days_other": "{{count}} days"
     },
     "approved": {
-      "notification": "Tá do liosta \"{{title}}\" ceadaithe agus tá sé gníomhach anois.",
-      "notification_short": "Tá do liosta \"{{title}}\" ceadaithe!"
+      "notification": "Your listing \"{{title}}\" has been approved and is now active.",
+      "notification_short": "Your listing \"{{title}}\" has been approved!"
     },
     "rejected": {
-      "notification": "Níor ceadaíodh do liosta \"{{title}}\". Cúis: {{reason}}",
-      "notification_no_reason": "Níor ceadaíodh do liosta \"{{title}}\".",
-      "subject": "Teastaíonn athruithe ó do liosta",
-      "heading": "Teastaíonn athruithe ó do liosta",
-      "subheading": "Níor ceadaíodh do liosta — seo a leanas na chéad chéimeanna eile.",
-      "body_not_approved": "Níor ceadaíodh do liosta <strong>\"{{title}}\"</strong>.",
-      "body_reason": "<strong>Cúis:</strong> {{reason}}",
-      "body_resubmit": "Athbhreithnigh agus nuashonraigh do liosta, le do thoil, agus ansin cuir isteach arís é le ceadú.",
-      "cta": "Cuir an Liosta in Eagar"
+      "notification": "Your listing \"{{title}}\" was not approved. Reason: {{reason}}",
+      "notification_no_reason": "Your listing \"{{title}}\" was not approved.",
+      "subject": "Your listing needs changes",
+      "heading": "Your listing needs changes",
+      "subheading": "Your listing was not approved — here's what to do next.",
+      "body_not_approved": "Your listing <strong>\"{{title}}\"</strong> was not approved.",
+      "body_reason": "<strong>Reason:</strong> {{reason}}",
+      "body_resubmit": "Please review and update your listing, then resubmit for approval.",
+      "cta": "Edit Listing"
     },
     "removed": {
-      "notification": "Bhain modhnóir do liosta \"{{title}}\"."
+      "notification": "Your listing \"{{title}}\" has been removed by a moderator."
     }
   }
 }

@@ -1491,4 +1491,111 @@ return [
 
     // Group exchanges
     'total_hours_gt_zero'                  => 'Total hours must be greater than 0',
+
+    // Server errors (hardcoded-string audit — 2026-04-14)
+    'unexpected_error'                     => 'An unexpected error occurred.',
+    'access_denied'                        => 'Access denied',
+
+    // Comment errors (hardcoded-string audit — 2026-04-14)
+    'comment_cannot_be_empty'              => 'Comment cannot be empty',
+    'parent_comment_not_found'             => 'Parent comment not found',
+    'comment_unauthorized'                 => 'Unauthorized',
+
+    // Community fund errors (hardcoded-string audit — 2026-04-14)
+    'amount_must_be_greater_than_0'        => 'Amount must be greater than 0',
+    'community_fund_not_found'             => 'Community fund not found',
+    'insufficient_community_fund_balance'  => 'Insufficient community fund balance',
+    'deposit_failed'                       => 'Deposit failed',
+    'withdrawal_failed'                    => 'Withdrawal failed',
+    'donation_failed'                      => 'Donation failed',
+
+    // Maintenance mode (hardcoded-string audit — 2026-04-14)
+    'maintenance_mode'                     => 'Platform is currently under maintenance. Please check back soon.',
+
+    // Auth rate limit with seconds (hardcoded-string audit — 2026-04-14)
+    'too_many_login_attempts_seconds'      => 'Too many login attempts. Try again in :seconds seconds.',
+
+    // Legal acceptance (hardcoded-string audit — 2026-04-14)
+    'legal' => [
+        'no_documents_require_acceptance' => 'No documents require acceptance',
+        'all_documents_accepted'          => 'All documents accepted',
+    ],
+
+    // Onboarding (hardcoded-string audit — 2026-04-14)
+    'onboarding' => [
+        'complete' => 'Onboarding complete!',
+    ],
+
+    // Users (hardcoded-string audit — 2026-04-14)
+    'users' => [
+        'theme_updated'          => 'Theme preferences updated',
+        'language_updated'       => 'Language preference updated',
+        'gdpr_request_submitted' => 'Your request has been submitted and will be processed within 30 days.',
+    ],
+
+    // SERVICE-LAYER i18n CONVERSION (2026-04-14) — English fallbacks
+    'event_edit_forbidden'              => 'You do not have permission to edit this event',
+    'event_delete_forbidden'            => 'Only the event organizer can delete this event',
+    'event_modify_forbidden'            => 'You do not have permission to modify this event',
+    'event_cancel_forbidden'            => 'You do not have permission to cancel this event',
+    'event_attendance_forbidden'        => 'Only the organizer or admin can mark attendance',
+    'event_title_max_255'               => 'Title must not exceed 255 characters',
+    'event_invalid_start_time'          => 'Invalid start_time format',
+    'event_end_after_start'             => 'End time must be after start time',
+    'event_invalid_rsvp_status'         => 'Invalid RSVP status',
+    'event_already_cancelled'           => 'This event is already cancelled',
+    'event_recurrence_frequency_required' => 'Valid recurrence frequency is required',
+    'event_rsvp_update_failed'          => 'Failed to update RSVP',
+    'event_rsvp_remove_failed'          => 'Failed to remove RSVP',
+    'event_image_update_failed'         => 'Failed to update image',
+    'event_cancel_failed'               => 'Failed to cancel event',
+    'event_mark_attendance_failed'      => 'Failed to mark attendance',
+    'event_series_create_failed'        => 'Failed to create series',
+    'event_series_link_failed'          => 'Failed to link event to series',
+    'event_recurring_create_failed'     => 'Failed to create recurring event',
+    'group_edit_forbidden'              => 'You do not have permission to edit this group',
+    'group_delete_forbidden'            => 'Only the group owner can delete this group',
+    'group_manage_members_forbidden'    => 'You do not have permission to manage members',
+    'group_remove_members_forbidden'    => 'You do not have permission to remove members',
+    'group_cannot_change_owner_role'    => 'Cannot change the owner\'s role',
+    'group_cannot_remove_owner'         => 'Cannot remove the group owner',
+    'group_view_join_requests_forbidden' => 'You do not have permission to view join requests',
+    'group_handle_join_requests_forbidden' => 'You do not have permission to handle join requests',
+    'group_member_required_view_discussions' => 'You must be a member to view discussions',
+    'group_member_required_create_discussions' => 'You must be a member to create discussions',
+    'group_member_required_post'        => 'You must be a member to post',
+    'group_modify_forbidden'            => 'You do not have permission to modify this group',
+    'group_name_max_255'                => 'Name must not exceed 255 characters',
+    'group_visibility_invalid'          => 'Visibility must be public or private',
+    'group_user_not_member'             => 'User is not a member of this group',
+    'group_use_leave_endpoint'          => 'Use leave endpoint to remove yourself',
+    'group_action_accept_or_reject'     => 'Action must be accept or reject',
+    'group_content_required'            => 'Content is required',
+    'group_discussion_not_found'        => 'Discussion not found',
+    'group_banned'                      => 'You have been banned from this group',
+    'group_already_member'              => 'Already a member or request pending',
+    'challenge_admin_only_update'       => 'Only admins can update challenges',
+    'challenge_admin_only_delete'       => 'Only admins can delete challenges',
+    'challenge_admin_only_status'       => 'Only admins can change challenge status',
+    'challenge_admin_only_duplicate'    => 'Only admins can duplicate challenges',
+    'idea_admin_only_status'            => 'Only admins can change idea status',
+    'idea_edit_own_only'                => 'You can only edit your own ideas',
+    'idea_delete_own_only'              => 'You can only delete your own ideas',
+    'comment_delete_own_only'           => 'You can only delete your own comments',
+    'challenge_invalid_transition'      => 'Cannot transition from \':from\' to \':to\'',
+    'challenge_closed_for_edits'        => 'Challenge is no longer open for edits',
+    'challenge_voting_not_allowed'      => 'Voting is not currently allowed for this challenge',
+    'idea_only_draft_editable'          => 'Only draft ideas can be edited',
+    'idea_vote_withdrawn_or_draft'      => 'Cannot vote on a withdrawn or draft idea',
+    'idea_cannot_vote_own'              => 'You cannot vote on your own idea',
+    'idea_comment_withdrawn_or_draft'   => 'Cannot comment on a withdrawn or draft idea',
+    'description_cannot_be_empty'       => 'Description cannot be empty',
+    'description_required'              => 'Description is required',
+    'comment_body_required'             => 'Comment body is required',
+    'idea_draft_update_failed'          => 'Failed to update draft',
+    'idea_delete_failed'                => 'Failed to delete idea',
+    'idea_vote_toggle_failed'           => 'Failed to toggle vote',
+    'comment_add_failed'                => 'Failed to add comment',
+    'comment_delete_failed'             => 'Failed to delete comment',
+    'challenge_duplicate_failed'        => 'Failed to duplicate challenge',
 ];

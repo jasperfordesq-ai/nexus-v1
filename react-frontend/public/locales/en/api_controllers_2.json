@@ -175,5 +175,31 @@
     "webauthn.credentials_removed": "Credential(s) removed",
     "webauthn.all_removed": "Removed :count passkey(s). You can now re-register on any device.",
 
-    "maintenance.under_maintenance": "Platform is currently under maintenance. Please check back soon."
+    "maintenance.under_maintenance": "Platform is currently under maintenance. Please check back soon.",
+
+    "block_user.cannot_block_self": "You cannot block yourself",
+
+    "group_conversation.body_required": "Message body is required",
+    "group_conversation.message_too_long": "Message is too long",
+
+    "marketplace_group.auth_required": "Authentication required.",
+
+    "connections.accepted_connection": "Accepted a connection",
+    "connections.connection_accepted": "Connection accepted",
+
+    "admin_crm.invalid_type": "Invalid type parameter",
+
+    "endorsement.cannot_endorse_self": "You cannot endorse yourself",
+    "endorsement.member_not_found": "Member not found",
+    "endorsement.already_endorsed": "You have already endorsed this skill",
+
+    "feed.content_or_image_required": "Post must have content or an image",
+    "feed.quoted_post_not_found": "Quoted post not found",
+    "feed.post_not_found_or_not_owned": "Post not found or not owned by you",
+    "feed.must_be_group_member": "You must be a group member to post",
+    "feed.create_post_failed": "Failed to create post",
+
+    "verification_badge.user_not_found": "User not found",
+    "verification_badge.badge_already_active": "Badge already active",
+    "verification_badge.invalid_badge_type": "Invalid badge type: :type"
 }

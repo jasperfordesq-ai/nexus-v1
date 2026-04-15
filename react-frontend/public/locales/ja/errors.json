@@ -1,28 +1,13 @@
 {
-  "generic": "問題が発生しました。もう一度お試しください。",
-  "not_found": "ページが見つかりません",
-  "unauthorized": "このページを表示する権限がありません",
-  "network": "ネットワークエラーです。接続を確認してください。",
-  "loading_failed": "コンテンツの読み込みに失敗しました。更新してください。",
-  "session_expired": "セッションの有効期限が切れました",
-  "session_expired_message": "操作がなかったため、セッションの有効期限が切れました。続行するには再度ログインしてください。",
-  "dismiss": "閉じる",
-  "offline_message": "オフラインです。一部の機能が利用できない場合があります。",
-  "update_available": "アップデートが利用可能です",
-  "version_info": "バージョン {{currentVersion}} が利用可能です(現在 {{clientVersion}})",
-  "whats_new": "新着情報:",
-  "later": "後で",
-  "download_update": "アップデートをダウンロード",
-  "validation": {
-    "required": "この項目は必須です",
-    "email": "有効なメールアドレスを入力してください",
-    "phone": "有効な電話番号を入力してください",
-    "min_length": "{{min}} 文字以上である必要があります",
-    "max_length": "{{max}} 文字以下である必要があります"
+  "admin": {
+    "federation": {
+      "unknown_key": "Unknown key: :key",
+      "must_be_array": ":field must be an array",
+      "failed_to_load_partner": "Failed to load partner"
+    }
   },
-  "community_not_found": "Community Not Found",
-  "community_not_found_message": "We couldn't find a community called \"{{slug}}\".",
-  "community_not_found_detail": "The community may have been renamed, deactivated, or the URL may be incorrect.",
-  "go_home": "Go Home",
-  "find_community": "Find Community"
+  "validation": {
+    "badge_keys_must_be_array": "badge_keys must be an array",
+    "member_ids_must_be_array": "member_ids must be an array"
+  }
 }
