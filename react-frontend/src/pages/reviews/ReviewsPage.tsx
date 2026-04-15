@@ -94,10 +94,10 @@ function ReviewCard({
     setDeleting(true);
     try {
       await api.delete(`/v2/reviews/${review.id}`);
-      toast.showToast(t('review_card.delete_success'), 'success');
+      toast.success(t('review_card.delete_success'));
       onDelete?.(review.id);
     } catch {
-      toast.showToast(t('review_card.delete_error'), 'error');
+      toast.error(t('review_card.delete_error'));
     } finally {
       setDeleting(false);
     }
@@ -194,16 +194,19 @@ export default function ReviewsPage(): JSX.Element {
     if (isLoadMore) setReceivedLoadingMore(true); else setReceivedLoading(true);
     setReceivedError(false);
     try {
-      const params: Record<string, string | number> = { per_page: 20 };
-      if (cursor) params.cursor = cursor;
-      const data = await api.get(`/v2/reviews/user/${user.id}`, { params });
-      const items: Review[] = data?.items ?? [];
+      const qs = new URLSearchParams({ per_page: '20' });
+      if (cursor) qs.set('cursor', cursor);
+      const res = await api.get<{ items: Review[]; cursor: string | null; has_more: boolean }>(
+        `/v2/reviews/user/${user.id}?${qs}`,
+      );
+      const payload = res.data;
+      const items: Review[] = payload?.items ?? [];
       setReceived(prev => isLoadMore ? [...prev, ...items] : items);
-      setReceivedCursor(data?.cursor ?? null);
-      setReceivedHasMore(data?.has_more ?? false);
+      setReceivedCursor(payload?.cursor ?? null);
+      setReceivedHasMore(payload?.has_more ?? false);
     } catch {
       if (!isLoadMore) setReceivedError(true);
-      else toast.showToast(t('load_error'), 'error');
+      else toast.error(t('load_error'));
     } finally {
       if (isLoadMore) setReceivedLoadingMore(false); else setReceivedLoading(false);
     }
@@ -213,8 +216,9 @@ export default function ReviewsPage(): JSX.Element {
     setPendingLoading(true);
     setPendingError(false);
     try {
-      const data = await api.get('/v2/reviews/pending');
-      setPending(data?.items ?? data ?? []);
+      const res = await api.get<PendingReview[]>('/v2/reviews/pending');
+      const pending = Array.isArray(res.data) ? res.data : [];
+      setPending(pending);
     } catch {
       setPendingError(true);
     } finally {
