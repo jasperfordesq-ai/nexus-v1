@@ -376,6 +376,36 @@ class StripeSubscriptionService
             ]);
             throw $e;
         }
+
+        // Notify tenant admin on actionable status transitions
+        $tenantId = (int) $assignment->tenant_id;
+        if ($stripeStatus === 'past_due') {
+            try {
+                static::sendTenantAdminEmail(
+                    $tenantId,
+                    __('emails_misc.stripe_subscription.past_due_subject'),
+                    __('emails_misc.stripe_subscription.past_due_title'),
+                    __('emails_misc.stripe_subscription.past_due_body'),
+                    '/admin/billing',
+                    __('emails_misc.stripe_subscription.past_due_cta')
+                );
+            } catch (\Throwable $e) {
+                Log::warning('[StripeSubscriptionService] past_due email failed: ' . $e->getMessage());
+            }
+        } elseif (in_array($stripeStatus, ['unpaid', 'incomplete_expired', 'paused'], true)) {
+            try {
+                static::sendTenantAdminEmail(
+                    $tenantId,
+                    __('emails_misc.stripe_subscription.expired_subject'),
+                    __('emails_misc.stripe_subscription.expired_title'),
+                    __('emails_misc.stripe_subscription.expired_body'),
+                    '/admin/billing',
+                    __('emails_misc.stripe_subscription.expired_cta')
+                );
+            } catch (\Throwable $e) {
+                Log::warning('[StripeSubscriptionService] expired email failed: ' . $e->getMessage());
+            }
+        }
     }
 
     /**

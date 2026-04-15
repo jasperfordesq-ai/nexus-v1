@@ -393,7 +393,15 @@
     "payment_failed_subject": "Action required — subscription payment failed",
     "payment_failed_title": "Payment Failed",
     "payment_failed_body": "We were unable to process the payment for your subscription. Please update your payment method to avoid service interruption.",
-    "payment_failed_cta": "Update Payment Method"
+    "payment_failed_cta": "Update Payment Method",
+    "past_due_subject": "Action required — subscription payment overdue",
+    "past_due_title": "Payment Overdue",
+    "past_due_body": "Your subscription payment is overdue. Please update your payment method as soon as possible to avoid service interruption.",
+    "past_due_cta": "Update Payment Method",
+    "expired_subject": "Your subscription has expired",
+    "expired_title": "Subscription Expired",
+    "expired_body": "Your subscription has expired due to non-payment. Please renew your subscription to restore full platform access.",
+    "expired_cta": "Renew Subscription"
   },
   "exchange_rating": {
     "received_subject": "You received a new rating on an exchange",
@@ -532,5 +540,21 @@
     "unsubscribed_title": "Unsubscribed",
     "unsubscribed_body": "You have been successfully unsubscribed from email newsletters sent by <strong>{{community}}</strong>. You will no longer receive newsletter emails from this community.",
     "unsubscribed_body_contact": "If you believe this was a mistake, you can resubscribe by visiting the community platform."
+  },
+  "identity_payment": {
+    "success_subject": "Verification fee payment confirmed",
+    "success_title": "Payment Confirmed",
+    "success_body": "Your identity verification fee payment has been received. Your verification is now in progress — you will be notified once the review is complete.",
+    "success_cta": "View Verification Status",
+    "failed_subject": "Verification fee payment failed",
+    "failed_title": "Payment Failed",
+    "failed_body": "We were unable to process your identity verification fee payment. Please try again to continue your verification.",
+    "failed_cta": "Retry Payment"
+  },
+  "vol_certificate": {
+    "ready_subject": "Your volunteer impact certificate is ready",
+    "ready_title": "Certificate Ready",
+    "ready_body": "Your volunteer impact certificate has been generated. It shows <strong>{{hours}} hours</strong> of approved volunteer time.",
+    "ready_cta": "View & Download Certificate"
   }
 }

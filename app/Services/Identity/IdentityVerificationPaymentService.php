@@ -6,11 +6,13 @@
 
 namespace App\Services\Identity;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Services\StripeService;
 use App\Services\TenantSettingsService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * IdentityVerificationPaymentService — Handles the one-time verification fee.
@@ -145,6 +147,29 @@ class IdentityVerificationPaymentService
 
         IdentityVerificationSessionService::updatePaymentStatus((int) $session['id'], 'completed');
         Log::info("Verification payment completed for session {$session['id']}");
+
+        // Notify user that their verification fee was received
+        try {
+            $userId   = (int) ($session['user_id'] ?? 0);
+            $tenantId = (int) ($session['tenant_id'] ?? 0);
+            if ($userId && $tenantId) {
+                TenantContext::setId($tenantId);
+                $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+                if ($user && !empty($user->email)) {
+                    $firstName = $user->first_name ?? $user->name ?? 'there';
+                    $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
+                    $html = EmailTemplateBuilder::make()
+                        ->title(__('emails_misc.identity_payment.success_title'))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_misc.identity_payment.success_body'))
+                        ->button(__('emails_misc.identity_payment.success_cta'), $frontendUrl . '/verify-identity')
+                        ->render();
+                    Mailer::forCurrentTenant()->send($user->email, __('emails_misc.identity_payment.success_subject'), $html);
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[IdentityVerificationPaymentService] payment success email failed: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -165,5 +190,29 @@ class IdentityVerificationPaymentService
 
         IdentityVerificationSessionService::updatePaymentStatus((int) $session['id'], 'failed');
         Log::warning("Verification payment failed for session {$session['id']}");
+
+        // Notify user so they can retry
+        try {
+            $userId   = (int) ($session['user_id'] ?? 0);
+            $tenantId = (int) ($session['tenant_id'] ?? 0);
+            if ($userId && $tenantId) {
+                TenantContext::setId($tenantId);
+                $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+                if ($user && !empty($user->email)) {
+                    $firstName = $user->first_name ?? $user->name ?? 'there';
+                    $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('warning')
+                        ->title(__('emails_misc.identity_payment.failed_title'))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_misc.identity_payment.failed_body'))
+                        ->button(__('emails_misc.identity_payment.failed_cta'), $frontendUrl . '/verify-identity')
+                        ->render();
+                    Mailer::forCurrentTenant()->send($user->email, __('emails_misc.identity_payment.failed_subject'), $html);
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[IdentityVerificationPaymentService] payment failed email failed: ' . $e->getMessage());
+        }
     }
 }
