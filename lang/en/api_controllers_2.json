@@ -126,6 +126,11 @@
     "sub_account.relationship_revoked": "Relationship revoked",
 
     "two_factor.disabled": "Two-factor authentication has been disabled",
+    "two_factor.disabled_notification": "Two-factor authentication has been disabled on your account. If you did not do this, secure your account immediately.",
+    "two_factor.disabled_email_title": "Two-Factor Authentication Disabled",
+    "two_factor.disabled_email_preview": "2FA has been disabled on your account.",
+    "two_factor.disabled_email_body": "Two-factor authentication has been disabled on your account. If you did not make this change, please secure your account immediately by changing your password and re-enabling 2FA.",
+    "two_factor.disabled_email_subject": "Security Alert: 2FA Disabled — {{tenant}}",
 
     "users.theme_updated": "Theme preference updated",
     "users.password_updated": "Password updated successfully",

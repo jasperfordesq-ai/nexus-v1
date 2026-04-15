@@ -6,6 +6,8 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -226,7 +228,7 @@ class BalanceAlertService
     }
 
     /**
-     * Record that an alert was sent.
+     * Record that an alert was sent and email the org owner.
      */
     private function recordAlert(int $organizationId, string $alertType): void
     {
@@ -240,14 +242,72 @@ class BalanceAlertService
 
         try {
             DB::table('org_balance_alerts')->insert([
-                'tenant_id' => $tenantId,
+                'tenant_id'       => $tenantId,
                 'organization_id' => $organizationId,
-                'alert_type' => $alertType,
+                'alert_type'      => $alertType,
                 'balance_at_alert' => $balance,
-                'created_at' => now(),
+                'created_at'      => now(),
             ]);
         } catch (\Exception $e) {
-            Log::warning('BalanceAlertService::recordAlert failed: ' . $e->getMessage());
+            Log::warning('BalanceAlertService::recordAlert DB insert failed: ' . $e->getMessage());
+        }
+
+        // Email the org owner
+        try {
+            $org = DB::table('vol_organizations')
+                ->where('id', $organizationId)
+                ->where('tenant_id', $tenantId)
+                ->select(['user_id', 'name'])
+                ->first();
+
+            if ($org) {
+                $owner = DB::table('users')
+                    ->where('id', $org->user_id)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['id', 'email', 'first_name', 'name'])
+                    ->first();
+
+                if ($owner && !empty($owner->email)) {
+                    $this->sendBalanceAlertEmail($owner, $org->name, $balance, $alertType);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::warning('BalanceAlertService::recordAlert email failed: ' . $e->getMessage());
+        }
+    }
+
+    private function sendBalanceAlertEmail(object $owner, string $orgName, float $balance, string $alertType): void
+    {
+        $ownerName       = $owner->first_name ?? $owner->name ?? 'Manager';
+        $balanceFormatted = number_format($balance, 2);
+        $orgLink         = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/volunteer-org/wallet';
+        $safeOrgName     = htmlspecialchars($orgName, ENT_QUOTES, 'UTF-8');
+
+        $isCritical = $alertType === 'critical';
+        $bodyKey    = $isCritical
+            ? 'emails_misc.balance_alert.critical_body'
+            : 'emails_misc.balance_alert.low_body';
+        $subjectKey = $isCritical
+            ? 'emails_misc.balance_alert.critical_subject'
+            : 'emails_misc.balance_alert.low_subject';
+
+        $html = EmailTemplateBuilder::make()
+            ->theme($isCritical ? 'danger' : 'warning')
+            ->title(__('emails_misc.balance_alert.title'))
+            ->previewText(__('emails_misc.balance_alert.preview'))
+            ->greeting($ownerName)
+            ->paragraph(__($bodyKey, ['org' => $safeOrgName, 'balance' => $balanceFormatted]))
+            ->paragraph(__('emails_misc.balance_alert.action'))
+            ->button(__('emails_misc.balance_alert.cta'), $orgLink)
+            ->render();
+
+        $subject = __($subjectKey, ['org' => $orgName]);
+        if (!Mailer::forCurrentTenant()->send($owner->email, $subject, $html)) {
+            Log::warning('BalanceAlertService: email failed to send', [
+                'owner_id'  => $owner->id,
+                'org_name'  => $orgName,
+                'alert_type' => $alertType,
+            ]);
         }
     }
 }

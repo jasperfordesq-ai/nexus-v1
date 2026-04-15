@@ -6,8 +6,10 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\DB;
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
+use Illuminate\Support\Facades\DB;
 
 /**
  * EventReminderService — Laravel DI service for automated event reminders.
@@ -156,6 +158,30 @@ class EventReminderService
                         "INSERT INTO notifications (user_id, tenant_id, message, link, type, created_at) VALUES (?, ?, ?, ?, 'event_reminder', NOW())",
                         [$userId, $tenantId, $message, $link]
                     );
+
+                    // Email notification
+                    if (!empty($attendee->email)) {
+                        try {
+                            $subjectKey = $reminderType === '24h'
+                                ? 'notifications.event_reminder_subject_24h'
+                                : 'notifications.event_reminder_subject_1h';
+                            $subject  = __($subjectKey, ['title' => $title]);
+                            $eventUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+                            $name     = $attendee->first_name ?? $attendee->name ?? 'there';
+
+                            $html = EmailTemplateBuilder::make()
+                                ->title(__('emails_misc.events.reminder_email_title'))
+                                ->previewText($message)
+                                ->greeting($name)
+                                ->paragraph($message)
+                                ->button(__('emails_misc.events.reminder_email_cta'), $eventUrl)
+                                ->render();
+
+                            Mailer::forCurrentTenant()->send($attendee->email, $subject, $html);
+                        } catch (\Exception $emailEx) {
+                            error_log("[EventReminderService] Email failed: event={$eventId}, user={$userId}: " . $emailEx->getMessage());
+                        }
+                    }
 
                     // Mark reminder as sent
                     DB::statement(

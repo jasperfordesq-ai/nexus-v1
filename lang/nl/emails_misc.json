@@ -123,5 +123,26 @@
     "new_vol_opp_body": "A new volunteer opportunity has been posted on <strong>{{community}}</strong>.",
     "new_vol_opp_by_label": "Posted by",
     "new_vol_opp_cta": "View Opportunity"
+  },
+  "goals": {
+    "reminder_subject": "Goal reminder — {{title}}",
+    "reminder_title": "Goal Reminder",
+    "reminder_preview": "Time to check in on your goal: {{title}}",
+    "reminder_body": "This is a reminder to check in on your goal and update your progress.",
+    "reminder_cta": "View Goal"
+  },
+  "balance_alert": {
+    "low_subject": "Low wallet balance — {{org}}",
+    "critical_subject": "Critical: Very low wallet balance — {{org}}",
+    "title": "Organisation Wallet Alert",
+    "preview": "Your organisation wallet balance needs attention",
+    "low_body": "Your organisation <strong>{{org}}</strong> has a low wallet balance of {{balance}} credits.",
+    "critical_body": "Your organisation <strong>{{org}}</strong> has a critically low wallet balance of {{balance}} credits.",
+    "action": "Please top up the wallet to ensure continued payment to volunteers.",
+    "cta": "Manage Wallet"
+  },
+  "events": {
+    "reminder_email_title": "Event Reminder",
+    "reminder_email_cta": "View Event"
   }
 }
