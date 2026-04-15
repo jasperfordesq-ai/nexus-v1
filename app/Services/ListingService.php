@@ -1026,6 +1026,54 @@ class ListingService
         $listing->fill(collect($data)->only($allowed)->all());
         $listing->save();
 
+        // Notify users who have saved/favourited this listing (exclude the listing owner)
+        try {
+            $tenantId     = TenantContext::getId();
+            $listingOwner = (int) ($listing->user_id ?? 0);
+            $listingTitle = $listing->title ?? '';
+
+            $savedUsers = DB::table('user_saved_listings as usl')
+                ->join('users as u', 'usl.user_id', '=', 'u.id')
+                ->where('usl.listing_id', $id)
+                ->where('usl.tenant_id', $tenantId)
+                ->where('u.tenant_id', $tenantId)
+                ->whereNotNull('u.email')
+                ->when($listingOwner > 0, fn ($q) => $q->where('usl.user_id', '!=', $listingOwner))
+                ->select(['u.email', 'u.first_name', 'u.name'])
+                ->limit(50)
+                ->get();
+
+            if ($savedUsers->isNotEmpty()) {
+                $tenantName  = TenantContext::getSetting('site_name', 'Project NEXUS');
+                $listingUrl  = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/listings/' . $id;
+
+                foreach ($savedUsers as $savedUser) {
+                    try {
+                        $firstName = $savedUser->first_name ?? $savedUser->name ?? 'there';
+
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('brand')
+                            ->title(__('emails_created.listing_updated.title'))
+                            ->previewText(__('emails_created.listing_updated.preview', ['title' => $listingTitle, 'community' => $tenantName]))
+                            ->greeting($firstName)
+                            ->paragraph(__('emails_created.listing_updated.body', ['title' => $listingTitle, 'community' => $tenantName]))
+                            ->button(__('emails_created.listing_updated.cta'), $listingUrl)
+                            ->render();
+
+                        Mailer::forCurrentTenant()->send(
+                            $savedUser->email,
+                            __('emails_created.listing_updated.subject', ['community' => $tenantName]),
+                            $html
+                        );
+                    } catch (\Throwable $e) {
+                        Log::warning('[ListingService] listing updated email failed for user: ' . $e->getMessage());
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[ListingService] listing updated notifications failed: ' . $e->getMessage());
+        }
+
         return $listing->fresh(['user', 'category', 'skillTags']);
     }
 

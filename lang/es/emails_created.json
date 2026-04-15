@@ -39,5 +39,12 @@
     "label_date": "Date",
     "recurring_note": "This is a recurring donation. You can manage your donations from your account settings.",
     "cta": "View Your Account"
+  },
+  "listing_updated": {
+    "subject": "A listing you saved has been updated — {{community}}",
+    "title": "Saved Listing Updated",
+    "preview": "\"{{title}}\" has been updated on {{community}}",
+    "body": "A listing you saved, <strong>\"{{title}}\"</strong>, has been updated on {{community}}.",
+    "cta": "View Listing"
   }
 }

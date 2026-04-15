@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\EmailTemplate;
+use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\Notification;
@@ -1143,14 +1144,30 @@ class IdeationChallengeService
             Notification::createNotification((int) $challenge->user_id, $message, $link, 'ideation_idea_submitted');
 
             if ($owner->email) {
-                $this->sendIdeationEmail(
-                    $owner,
-                    __('notifications.ideation_email_idea_submitted_title'),
-                    __('notifications.ideation_email_idea_submitted_subtitle', ['name' => $submitterName, 'challenge' => $challenge->title ?? '']),
-                    '"' . htmlspecialchars($ideaTitle) . '"',
-                    __('notifications.ideation_email_view_challenge'),
-                    $link
-                );
+                try {
+                    $tenantName  = TenantContext::getSetting('site_name', 'Project NEXUS');
+                    $firstName   = $owner->first_name ?? $owner->name ?? 'there';
+                    $challengeTitle = $challenge->title ?? '';
+                    $ideaUrl     = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/ideation/' . $challengeId . '/ideas/' . $ideaId;
+
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('brand')
+                        ->title(__('emails_ideation.new_idea.title'))
+                        ->previewText(__('emails_ideation.new_idea.preview', ['submitter' => $submitterName, 'challenge' => $challengeTitle]))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_ideation.new_idea.body', ['submitter' => $submitterName, 'challenge' => $challengeTitle]))
+                        ->highlight($ideaTitle)
+                        ->button(__('emails_ideation.new_idea.cta'), $ideaUrl)
+                        ->render();
+
+                    Mailer::forCurrentTenant()->send(
+                        $owner->email,
+                        __('emails_ideation.new_idea.subject', ['challenge' => $challengeTitle, 'community' => $tenantName]),
+                        $html
+                    );
+                } catch (\Throwable $emailEx) {
+                    Log::warning('[IdeationChallengeService] idea submitted email failed: ' . $emailEx->getMessage());
+                }
             }
         } catch (\Throwable $e) {
             Log::warning("IdeationChallengeService::notifyIdeaSubmitted error: " . $e->getMessage());
@@ -1246,14 +1263,30 @@ class IdeationChallengeService
             Notification::createNotification($ideaAuthorId, $message, $link, 'ideation_idea_commented');
 
             if ($owner->email) {
-                $this->sendIdeationEmail(
-                    $owner,
-                    __('notifications.ideation_email_idea_commented_title'),
-                    __('notifications.ideation_email_idea_commented_subtitle', ['name' => $commenterName]),
-                    '"' . htmlspecialchars($commentText) . '"',
-                    __('notifications.ideation_email_view_idea'),
-                    $link
-                );
+                try {
+                    $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
+                    $firstName  = $owner->first_name ?? $owner->name ?? 'there';
+                    $ideaTitle  = $idea->title ?? '';
+                    $commentUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('brand')
+                        ->title(__('emails_ideation.idea_commented.title'))
+                        ->previewText(__('emails_ideation.idea_commented.preview', ['commenter' => $commenterName]))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_ideation.idea_commented.body', ['commenter' => $commenterName, 'title' => $ideaTitle]))
+                        ->highlight($shortComment)
+                        ->button(__('emails_ideation.idea_commented.cta'), $commentUrl)
+                        ->render();
+
+                    Mailer::forCurrentTenant()->send(
+                        $owner->email,
+                        __('emails_ideation.idea_commented.subject', ['community' => $tenantName]),
+                        $html
+                    );
+                } catch (\Throwable $emailEx) {
+                    Log::warning('[IdeationChallengeService] idea commented email failed: ' . $emailEx->getMessage());
+                }
             }
         } catch (\Throwable $e) {
             Log::warning("IdeationChallengeService::notifyIdeaCommented error: " . $e->getMessage());

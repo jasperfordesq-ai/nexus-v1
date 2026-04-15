@@ -6,8 +6,11 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * LegalDocumentService — Laravel DI-based service for legal document management.
@@ -595,8 +598,13 @@ class LegalDocumentService
                   ->whereColumn('user_legal_acceptances.user_id', 'users.id')
                   ->where('user_legal_acceptances.version_id', $vid);
             })
-            ->select('id', 'name', 'email')
+            ->select('id', 'name', 'first_name', 'email')
             ->get();
+
+        $docType   = $document['title'] ?? $document['document_type'] ?? 'document';
+        $docSlug   = $document['slug'] ?? $document['document_type'] ?? '';
+        $reviewUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/legal/' . $docSlug;
+        $community = TenantContext::getName();
 
         $sentCount = 0;
         foreach ($users as $user) {
@@ -606,12 +614,37 @@ class LegalDocumentService
                     'type'       => 'legal_update',
                     'title'      => __('svc_notifications.legal.update_title', ['title' => $document['title']]),
                     'message'    => __('svc_notifications.legal.update_message', ['version' => $version['version_number'], 'title' => $document['title']]),
-                    'link'       => '/' . ($document['slug'] ?? ''),
+                    'link'       => '/' . $docSlug,
                     'created_at' => now(),
                 ]);
                 $sentCount++;
             } catch (\Throwable $e) {
                 // Continue with other users
+            }
+
+            // Email notification (only if user has an email address)
+            if ($sendEmail && ! empty($user->email)) {
+                try {
+                    $firstName = $user->first_name ?? (explode(' ', $user->name ?? '')[0] ?: 'there');
+
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('warning')
+                        ->title(__('emails_content.legal_update.title'))
+                        ->previewText(__('emails_content.legal_update.preview', ['community' => $community, 'doc_type' => $docType]))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_content.legal_update.body', ['community' => $community, 'doc_type' => $docType]))
+                        ->paragraph(__('emails_content.legal_update.action_required'))
+                        ->button(__('emails_content.legal_update.cta'), $reviewUrl)
+                        ->render();
+
+                    Mailer::forCurrentTenant()->send(
+                        $user->email,
+                        __('emails_content.legal_update.subject', ['community' => $community, 'doc_type' => $docType]),
+                        $html
+                    );
+                } catch (\Throwable $e) {
+                    Log::warning('[LegalDocumentService] email failed for user ' . $user->id . ': ' . $e->getMessage());
+                }
             }
         }
 

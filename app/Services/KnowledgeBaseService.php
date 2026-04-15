@@ -6,8 +6,11 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * KnowledgeBaseService — Laravel DI-based service for knowledge base articles.
@@ -285,7 +288,9 @@ class KnowledgeBaseService
             $content = $this->sanitizeHtml($content);
         }
 
-        return DB::table('knowledge_base_articles')->insertGetId([
+        $isPublished = (bool) ($data['is_published'] ?? false);
+
+        $articleId = DB::table('knowledge_base_articles')->insertGetId([
             'tenant_id'         => $tenantId,
             'title'             => $title,
             'slug'              => $slug,
@@ -295,12 +300,137 @@ class KnowledgeBaseService
             'category_id'       => $data['category_id'] ?? null,
             'parent_article_id' => isset($data['parent_article_id']) ? (int) $data['parent_article_id'] : null,
             'sort_order'        => (int) ($data['sort_order'] ?? 0),
-            'is_published'      => $data['is_published'] ?? false,
+            'is_published'      => $isPublished,
             'created_by'        => $userId,
             'views_count'       => 0,
             'created_at'        => now(),
             'updated_at'        => now(),
         ]);
+
+        if ($isPublished) {
+            $this->sendPublishedEmail($userId, $title, $slug, $articleId, false);
+        }
+
+        return $articleId;
+    }
+
+    /**
+     * Update (publish a new version of) an existing knowledge base article.
+     *
+     * Accepts the same data shape as create(). When is_published transitions to
+     * true a publication-confirmation email is sent to the original author.
+     */
+    public function updateVersion(int $id, array $data): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        $article = DB::table('knowledge_base_articles')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (! $article) {
+            return false;
+        }
+
+        $wasPublished = (bool) $article->is_published;
+
+        $updates = [];
+
+        if (isset($data['title'])) {
+            $updates['title'] = trim($data['title']);
+        }
+        if (isset($data['content'])) {
+            $contentType = $data['content_type'] ?? $article->content_type ?? 'html';
+            $updates['content'] = ($contentType === 'html')
+                ? $this->sanitizeHtml($data['content'])
+                : $data['content'];
+        }
+        if (isset($data['content_type'])) {
+            $updates['content_type'] = in_array($data['content_type'], ['plain', 'html', 'markdown'], true)
+                ? $data['content_type'] : 'html';
+        }
+        if (array_key_exists('video_url', $data)) {
+            $updates['video_url'] = ! empty($data['video_url']) ? trim($data['video_url']) : null;
+        }
+        if (isset($data['category_id'])) {
+            $updates['category_id'] = $data['category_id'];
+        }
+        if (isset($data['sort_order'])) {
+            $updates['sort_order'] = (int) $data['sort_order'];
+        }
+        if (isset($data['is_published'])) {
+            $updates['is_published'] = (bool) $data['is_published'];
+        }
+
+        if (empty($updates)) {
+            return false;
+        }
+
+        $updates['updated_at'] = now();
+
+        DB::table('knowledge_base_articles')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->update($updates);
+
+        // Send publication email when the article is (re-)published
+        $nowPublished = isset($updates['is_published']) ? $updates['is_published'] : $wasPublished;
+        if ($nowPublished) {
+            $finalTitle = $updates['title'] ?? $article->title;
+            $finalSlug  = $article->slug;
+            $authorId   = (int) $article->created_by;
+            $this->sendPublishedEmail($authorId, $finalTitle, $finalSlug, $id, ! $wasPublished ? false : true);
+        }
+
+        return true;
+    }
+
+    /**
+     * Send a publication confirmation email to a KB article author.
+     *
+     * @param  int    $authorId   User ID of the article author
+     * @param  string $title      Article title
+     * @param  string $slug       Article slug
+     * @param  int    $articleId  Article ID (used to build the URL)
+     * @param  bool   $isUpdate   true = updated/re-published, false = first publish
+     */
+    private function sendPublishedEmail(int $authorId, string $title, string $slug, int $articleId, bool $isUpdate): void
+    {
+        try {
+            $author = DB::table('users')
+                ->where('id', $authorId)
+                ->where('tenant_id', TenantContext::getId())
+                ->select('id', 'email', 'name', 'first_name')
+                ->first();
+
+            if (! $author || empty($author->email)) {
+                return;
+            }
+
+            $firstName  = $author->first_name ?? (explode(' ', $author->name ?? '')[0] ?: 'there');
+            $community  = TenantContext::getName();
+            $articleUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/kb/' . $articleId;
+
+            $namespace = $isUpdate ? 'kb_updated' : 'kb_published';
+
+            $html = EmailTemplateBuilder::make()
+                ->theme('success')
+                ->title(__('emails_content.' . $namespace . '.title'))
+                ->previewText(__('emails_content.' . $namespace . '.preview', ['title' => $title, 'community' => $community]))
+                ->greeting($firstName)
+                ->paragraph(__('emails_content.' . $namespace . '.body', ['title' => $title, 'community' => $community]))
+                ->button(__('emails_content.' . $namespace . '.cta'), $articleUrl)
+                ->render();
+
+            Mailer::forCurrentTenant()->send(
+                $author->email,
+                __('emails_content.' . $namespace . '.subject', ['title' => $title, 'community' => $community]),
+                $html
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[KnowledgeBaseService] publication email failed for author ' . $authorId . ': ' . $e->getMessage());
+        }
     }
 
     /**

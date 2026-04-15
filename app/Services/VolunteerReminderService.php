@@ -6,6 +6,8 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -70,6 +72,14 @@ class VolunteerReminderService
                 ->pluck('user_id')
                 ->all();
 
+            // Fetch the opportunity title for this shift once per shift
+            $opportunity = DB::table('vol_opportunities')
+                ->where('id', $shift->opportunity_id)
+                ->first(['title', 'location']);
+
+            $opportunityTitle = htmlspecialchars($opportunity->title ?? '', ENT_QUOTES, 'UTF-8');
+            $opportunityLocation = htmlspecialchars($opportunity->location ?? '', ENT_QUOTES, 'UTF-8');
+
             foreach ($signups as $userId) {
                 // Check if reminder was already sent for this shift+user combination
                 $alreadySent = DB::table('vol_reminders_sent')
@@ -110,6 +120,62 @@ class VolunteerReminderService
                             'channel' => $channel,
                             'sent_at' => now(),
                         ]);
+                    }
+
+                    // Send email if the email channel is enabled
+                    if (in_array('email', $channels, true)) {
+                        $user = DB::table('users')
+                            ->where('id', $userId)
+                            ->where('tenant_id', $tenantId)
+                            ->first(['email', 'first_name', 'name']);
+
+                        if ($user && !empty($user->email)) {
+                            try {
+                                $firstName = $user->first_name ?? $user->name ?? 'there';
+                                $shiftTime = $shift->start_time
+                                    ? date('D, d M Y H:i', strtotime($shift->start_time))
+                                    : '';
+                                $shiftUrl = TenantContext::getFrontendUrl()
+                                    . TenantContext::getSlugPrefix()
+                                    . '/volunteering/opportunities/' . $shift->opportunity_id;
+                                $communityName = TenantContext::getName();
+
+                                $infoCard = [__('emails_volunteer.shift_reminder.label_opportunity') => $opportunityTitle];
+                                if ($shiftTime) {
+                                    $infoCard[__('emails_volunteer.shift_reminder.label_when')] = $shiftTime;
+                                }
+                                if ($opportunityLocation) {
+                                    $infoCard[__('emails_volunteer.shift_reminder.label_location')] = $opportunityLocation;
+                                }
+
+                                $html = EmailTemplateBuilder::make()
+                                    ->theme('info')
+                                    ->title(__('emails_volunteer.shift_reminder.title'))
+                                    ->previewText(__('emails_volunteer.shift_reminder.preview', ['title' => $opportunityTitle]))
+                                    ->greeting($firstName)
+                                    ->paragraph(__('emails_volunteer.shift_reminder.body'))
+                                    ->infoCard($infoCard)
+                                    ->button(__('emails_volunteer.shift_reminder.cta'), $shiftUrl)
+                                    ->render();
+
+                                $subject = __('emails_volunteer.shift_reminder.subject', [
+                                    'title'     => $opportunityTitle,
+                                    'community' => $communityName,
+                                ]);
+
+                                if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
+                                    Log::warning('[VolunteerReminderService] sendReminders email failed', [
+                                        'user_id' => $userId,
+                                        'shift_id' => $shift->id,
+                                    ]);
+                                }
+                            } catch (\Throwable $e) {
+                                Log::warning('[VolunteerReminderService] sendReminders email exception: ' . $e->getMessage(), [
+                                    'user_id' => $userId,
+                                    'shift_id' => $shift->id,
+                                ]);
+                            }
+                        }
                     }
 
                     $sentCount++;
@@ -287,30 +353,337 @@ class VolunteerReminderService
 
     /**
      * Send pre-shift reminders to volunteers with upcoming shifts.
-     * Stub — not yet implemented; logs a warning and returns 0.
      *
-     * @return int Number of reminders sent
+     * Iterates all active tenants, reads their pre_shift reminder setting to
+     * determine the reminder window, then emails each confirmed volunteer whose
+     * shift falls within that window and hasn't been reminded yet.
+     *
+     * @return int Total number of reminders sent across all tenants
      */
     public static function sendPreShiftReminders(): int
     {
-        \Illuminate\Support\Facades\Log::warning(
-            '[VolunteerReminderService] sendPreShiftReminders() is not yet implemented — returning 0.'
-        );
-        return 0;
+        $totalSent = 0;
+
+        // Collect all distinct tenant IDs that have reminder settings enabled,
+        // plus any tenants that have upcoming shifts (fallback 24h window).
+        $tenantIds = DB::table('vol_reminder_settings')
+            ->where('reminder_type', 'pre_shift')
+            ->where('enabled', true)
+            ->pluck('tenant_id')
+            ->unique()
+            ->all();
+
+        // Also include tenants that have shifts but no explicit setting (use 24h default).
+        $tenantsWithShifts = DB::table('vol_shifts')
+            ->where('start_time', '>', now())
+            ->where('start_time', '<=', now()->addHours(24))
+            ->pluck('tenant_id')
+            ->unique()
+            ->all();
+
+        $allTenantIds = array_unique(array_merge($tenantIds, $tenantsWithShifts));
+
+        foreach ($allTenantIds as $tenantId) {
+            try {
+                // Get pre_shift reminder setting for this tenant (or use 24h default)
+                $setting = DB::table('vol_reminder_settings')
+                    ->where('tenant_id', $tenantId)
+                    ->where('reminder_type', 'pre_shift')
+                    ->where('enabled', true)
+                    ->first();
+
+                // Skip tenant if setting explicitly disabled
+                if ($setting !== null && !(bool) $setting->enabled) {
+                    continue;
+                }
+
+                $hoursBefore  = (int) ($setting->hours_before ?? 24);
+                $emailEnabled = (bool) ($setting->email_enabled ?? true);
+                $pushEnabled  = (bool) ($setting->push_enabled ?? true);
+                $smsEnabled   = (bool) ($setting->sms_enabled ?? false);
+
+                // Find shifts within the reminder window for this tenant
+                $shifts = DB::table('vol_shifts')
+                    ->where('tenant_id', $tenantId)
+                    ->where('start_time', '>', now())
+                    ->where('start_time', '<=', now()->addHours($hoursBefore))
+                    ->get();
+
+                foreach ($shifts as $shift) {
+                    // Fetch opportunity once per shift
+                    $opportunity = DB::table('vol_opportunities')
+                        ->where('id', $shift->opportunity_id)
+                        ->first(['title', 'location']);
+
+                    $opportunityTitle    = htmlspecialchars($opportunity->title ?? '', ENT_QUOTES, 'UTF-8');
+                    $opportunityLocation = htmlspecialchars($opportunity->location ?? '', ENT_QUOTES, 'UTF-8');
+
+                    // Get confirmed volunteers for this shift
+                    $signups = DB::table('vol_shift_signups')
+                        ->where('shift_id', $shift->id)
+                        ->where('tenant_id', $tenantId)
+                        ->where('status', 'confirmed')
+                        ->pluck('user_id')
+                        ->all();
+
+                    foreach ($signups as $userId) {
+                        // Skip if already reminded
+                        $alreadySent = DB::table('vol_reminders_sent')
+                            ->where('tenant_id', $tenantId)
+                            ->where('user_id', $userId)
+                            ->where('reminder_type', 'pre_shift')
+                            ->where('reference_id', $shift->id)
+                            ->exists();
+
+                        if ($alreadySent) {
+                            continue;
+                        }
+
+                        try {
+                            // Build channel list
+                            $channels = [];
+                            if ($pushEnabled) {
+                                $channels[] = 'push';
+                            }
+                            if ($emailEnabled) {
+                                $channels[] = 'email';
+                            }
+                            if ($smsEnabled) {
+                                $channels[] = 'sms';
+                            }
+                            if (empty($channels)) {
+                                $channels = ['push'];
+                            }
+
+                            // Record reminder attempt for each channel
+                            foreach ($channels as $channel) {
+                                DB::table('vol_reminders_sent')->insert([
+                                    'tenant_id'     => $tenantId,
+                                    'user_id'       => $userId,
+                                    'reminder_type' => 'pre_shift',
+                                    'reference_id'  => (int) $shift->id,
+                                    'channel'       => $channel,
+                                    'sent_at'       => now(),
+                                ]);
+                            }
+
+                            // Send email
+                            if ($emailEnabled) {
+                                $user = DB::table('users')
+                                    ->where('id', $userId)
+                                    ->where('tenant_id', $tenantId)
+                                    ->first(['email', 'first_name', 'name']);
+
+                                if ($user && !empty($user->email)) {
+                                    // Set tenant context so Mailer and translations use the right tenant
+                                    TenantContext::setId($tenantId);
+
+                                    $firstName    = $user->first_name ?? $user->name ?? 'there';
+                                    $shiftTime    = $shift->start_time
+                                        ? date('D, d M Y H:i', strtotime($shift->start_time))
+                                        : '';
+                                    $shiftUrl     = TenantContext::getFrontendUrl()
+                                        . TenantContext::getSlugPrefix()
+                                        . '/volunteering/opportunities/' . $shift->opportunity_id;
+                                    $communityName = TenantContext::getName();
+
+                                    $infoCard = [__('emails_volunteer.shift_starting_soon.title') => $opportunityTitle];
+                                    if ($shiftTime) {
+                                        $infoCard[__('emails_volunteer.shift_reminder.label_when')] = $shiftTime;
+                                    }
+                                    if ($opportunityLocation) {
+                                        $infoCard[__('emails_volunteer.shift_reminder.label_location')] = $opportunityLocation;
+                                    }
+
+                                    $html = EmailTemplateBuilder::make()
+                                        ->theme('info')
+                                        ->title(__('emails_volunteer.shift_starting_soon.title'))
+                                        ->previewText(__('emails_volunteer.shift_starting_soon.preview', ['title' => $opportunityTitle]))
+                                        ->greeting($firstName)
+                                        ->paragraph(__('emails_volunteer.shift_starting_soon.body'))
+                                        ->infoCard($infoCard)
+                                        ->button(__('emails_volunteer.shift_starting_soon.cta'), $shiftUrl)
+                                        ->render();
+
+                                    $subject = __('emails_volunteer.shift_starting_soon.subject', ['title' => $opportunityTitle]);
+
+                                    if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
+                                        Log::warning('[VolunteerReminderService] sendPreShiftReminders email failed', [
+                                            'tenant_id' => $tenantId,
+                                            'user_id'   => $userId,
+                                            'shift_id'  => $shift->id,
+                                        ]);
+                                    }
+                                }
+                            }
+
+                            $totalSent++;
+                        } catch (\Throwable $e) {
+                            Log::warning('[VolunteerReminderService] sendPreShiftReminders error for user ' . $userId . ': ' . $e->getMessage());
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[VolunteerReminderService] sendPreShiftReminders tenant error for tenant ' . $tenantId . ': ' . $e->getMessage());
+            }
+        }
+
+        return $totalSent;
     }
 
     /**
      * Send post-shift feedback requests to volunteers after their shift ends.
-     * Stub — not yet implemented; logs a warning and returns 0.
      *
-     * @return int Number of feedback requests sent
+     * For each tenant with a post_shift_feedback setting enabled, finds completed
+     * shifts (end_time in the past, within the hours_after window) and emails each
+     * confirmed volunteer asking them to log their hours — unless already sent.
+     *
+     * @return int Total number of feedback requests sent across all tenants
      */
     public static function sendPostShiftFeedback(): int
     {
-        \Illuminate\Support\Facades\Log::warning(
-            '[VolunteerReminderService] sendPostShiftFeedback() is not yet implemented — returning 0.'
-        );
-        return 0;
+        $totalSent = 0;
+
+        // Collect tenants that have post_shift_feedback enabled
+        $settingsByTenant = DB::table('vol_reminder_settings')
+            ->where('reminder_type', 'post_shift_feedback')
+            ->where('enabled', true)
+            ->get()
+            ->keyBy('tenant_id');
+
+        // Also cover tenants with recently-ended shifts but no explicit setting (default 2h window)
+        $tenantsWithEndedShifts = DB::table('vol_shifts')
+            ->where('end_time', '<', now())
+            ->where('end_time', '>=', now()->subHours(2))
+            ->pluck('tenant_id')
+            ->unique()
+            ->all();
+
+        $allTenantIds = array_unique(array_merge(
+            $settingsByTenant->keys()->all(),
+            $tenantsWithEndedShifts
+        ));
+
+        foreach ($allTenantIds as $tenantId) {
+            try {
+                $setting      = $settingsByTenant->get($tenantId);
+                $hoursAfter   = (int) ($setting->hours_after ?? 2);
+                $emailEnabled = (bool) ($setting->email_enabled ?? true);
+                $pushEnabled  = (bool) ($setting->push_enabled ?? true);
+                $smsEnabled   = (bool) ($setting->sms_enabled ?? false);
+
+                // Find shifts that ended within the feedback window
+                $shifts = DB::table('vol_shifts')
+                    ->where('tenant_id', $tenantId)
+                    ->where('end_time', '<', now())
+                    ->where('end_time', '>=', now()->subHours($hoursAfter))
+                    ->get();
+
+                foreach ($shifts as $shift) {
+                    $opportunity = DB::table('vol_opportunities')
+                        ->where('id', $shift->opportunity_id)
+                        ->first(['title']);
+
+                    $opportunityTitle = htmlspecialchars($opportunity->title ?? '', ENT_QUOTES, 'UTF-8');
+
+                    // Get confirmed volunteers
+                    $signups = DB::table('vol_shift_signups')
+                        ->where('shift_id', $shift->id)
+                        ->where('tenant_id', $tenantId)
+                        ->where('status', 'confirmed')
+                        ->pluck('user_id')
+                        ->all();
+
+                    foreach ($signups as $userId) {
+                        // Skip if post-shift feedback already sent for this shift+user
+                        $alreadySent = DB::table('vol_reminders_sent')
+                            ->where('tenant_id', $tenantId)
+                            ->where('user_id', $userId)
+                            ->where('reminder_type', 'post_shift_feedback')
+                            ->where('reference_id', $shift->id)
+                            ->exists();
+
+                        if ($alreadySent) {
+                            continue;
+                        }
+
+                        try {
+                            // Build channel list
+                            $channels = [];
+                            if ($pushEnabled) {
+                                $channels[] = 'push';
+                            }
+                            if ($emailEnabled) {
+                                $channels[] = 'email';
+                            }
+                            if ($smsEnabled) {
+                                $channels[] = 'sms';
+                            }
+                            if (empty($channels)) {
+                                $channels = ['push'];
+                            }
+
+                            // Record feedback request for each channel
+                            foreach ($channels as $channel) {
+                                DB::table('vol_reminders_sent')->insert([
+                                    'tenant_id'     => $tenantId,
+                                    'user_id'       => $userId,
+                                    'reminder_type' => 'post_shift_feedback',
+                                    'reference_id'  => (int) $shift->id,
+                                    'channel'       => $channel,
+                                    'sent_at'       => now(),
+                                ]);
+                            }
+
+                            // Send email
+                            if ($emailEnabled) {
+                                $user = DB::table('users')
+                                    ->where('id', $userId)
+                                    ->where('tenant_id', $tenantId)
+                                    ->first(['email', 'first_name', 'name']);
+
+                                if ($user && !empty($user->email)) {
+                                    TenantContext::setId($tenantId);
+
+                                    $firstName  = $user->first_name ?? $user->name ?? 'there';
+                                    $logHoursUrl = TenantContext::getFrontendUrl()
+                                        . TenantContext::getSlugPrefix()
+                                        . '/volunteering/opportunities/' . $shift->opportunity_id;
+
+                                    $html = EmailTemplateBuilder::make()
+                                        ->theme('success')
+                                        ->title(__('emails_volunteer.post_shift_feedback.title'))
+                                        ->previewText(__('emails_volunteer.post_shift_feedback.preview', ['title' => $opportunityTitle]))
+                                        ->greeting($firstName)
+                                        ->paragraph(__('emails_volunteer.post_shift_feedback.body', ['title' => $opportunityTitle]))
+                                        ->paragraph(__('emails_volunteer.post_shift_feedback.log_hours_prompt'))
+                                        ->button(__('emails_volunteer.post_shift_feedback.cta'), $logHoursUrl)
+                                        ->render();
+
+                                    $subject = __('emails_volunteer.post_shift_feedback.subject', ['title' => $opportunityTitle]);
+
+                                    if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
+                                        Log::warning('[VolunteerReminderService] sendPostShiftFeedback email failed', [
+                                            'tenant_id' => $tenantId,
+                                            'user_id'   => $userId,
+                                            'shift_id'  => $shift->id,
+                                        ]);
+                                    }
+                                }
+                            }
+
+                            $totalSent++;
+                        } catch (\Throwable $e) {
+                            Log::warning('[VolunteerReminderService] sendPostShiftFeedback error for user ' . $userId . ': ' . $e->getMessage());
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[VolunteerReminderService] sendPostShiftFeedback tenant error for tenant ' . $tenantId . ': ' . $e->getMessage());
+            }
+        }
+
+        return $totalSent;
     }
 
     /**

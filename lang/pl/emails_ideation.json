@@ -1,0 +1,16 @@
+{
+  "new_idea": {
+    "subject": "New idea submitted to your challenge: {{challenge}} — {{community}}",
+    "title": "New Idea Submitted!",
+    "preview": "{{submitter}} submitted an idea to your challenge \"{{challenge}}\"",
+    "body": "<strong>{{submitter}}</strong> has submitted a new idea to your challenge <strong>\"{{challenge}}\"</strong>.",
+    "cta": "View Idea"
+  },
+  "idea_commented": {
+    "subject": "New comment on your idea — {{community}}",
+    "title": "New Comment on Your Idea",
+    "preview": "{{commenter}} commented on your idea",
+    "body": "<strong>{{commenter}}</strong> has commented on your idea <strong>\"{{title}}\"</strong>.",
+    "cta": "View Comment"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "legal_update": {
+    "subject": "Important: Updated {{doc_type}} — {{community}}",
+    "title": "Policy Update",
+    "preview": "{{community}} has updated its {{doc_type}}",
+    "body": "{{community}} has published an updated {{doc_type}}. Please review and accept the updated terms to continue using the platform.",
+    "action_required": "Your continued use of the platform requires acceptance of the latest terms.",
+    "cta": "Review & Accept"
+  },
+  "kb_published": {
+    "subject": "Your article is live: {{title}} — {{community}}",
+    "title": "Article Published!",
+    "preview": "Your knowledge base article \"{{title}}\" is now live",
+    "body": "Your article has been published to the {{community}} knowledge base and is now visible to all members.",
+    "cta": "View Article"
+  },
+  "kb_updated": {
+    "subject": "Article updated: {{title}} — {{community}}",
+    "title": "Article Updated",
+    "preview": "Your knowledge base article has been updated",
+    "body": "A new version of your article <strong>\"{{title}}\"</strong> has been published to the {{community}} knowledge base.",
+    "cta": "View Article"
+  }
+}
