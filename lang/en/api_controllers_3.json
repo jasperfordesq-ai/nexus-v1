@@ -36,6 +36,32 @@
     "listings": {
         "listing_saved_notification": ":saver_name saved your listing \":title\""
     },
+    "deliverable": {
+        "assigned": "You've been assigned a deliverable: \"{{title}}\"",
+        "reassigned": "You've been assigned to deliverable: \"{{title}}\""
+    },
+    "deliverable_comment": {
+        "posted": "{{name}} commented on your deliverable \"{{title}}\""
+    },
+    "wallet_admin": {
+        "grant_received": "You received {{amount}} {{unit}} from your timebank coordinator",
+        "balance_adjusted_added": "Your balance was adjusted: +{{amount}} {{unit}} added by coordinator",
+        "balance_adjusted_removed": "Your balance was adjusted: -{{amount}} {{unit}} removed by coordinator"
+    },
+    "comments": {
+        "reaction": "{{name}} reacted to your comment"
+    },
+    "federation": {
+        "review_received": "{{name}} left you a {{rating}}-star review"
+    },
+    "federation_credit": {
+        "action_taken": "{{tenant}} has {{action}} your federation credit agreement."
+    },
+    "volunteer": {
+        "shift_signup_confirmed": "You're signed up for a volunteer shift on {{date}}",
+        "shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
+        "opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled"
+    },
     "admin_bells": {
         "comment_hidden": "Your comment has been hidden by a moderator.",
         "comment_removed": "Your comment has been removed by a moderator.",

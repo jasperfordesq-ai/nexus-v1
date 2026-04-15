@@ -228,12 +228,13 @@ $termsContent = <<<'HTML'
 <p>You may close your account at any time through your account settings. Upon termination, your time credits will expire and cannot be transferred.</p>
 
 <h2 id="insurance">13. Insurance</h2>
-<p>hOUR Timebank Ireland maintains appropriate insurance for its organisational activities. However:</p>
-<ul>
-    <li>This insurance does <strong>not</strong> cover exchanges between members</li>
-    <li>Members are responsible for their own insurance (home, liability, etc.)</li>
-    <li>We recommend members check their existing policies cover volunteer activities</li>
-</ul>
+<div class="legal-notice">
+    <h4>Platform Provider — No Organisational Insurance</h4>
+    <p>As a <strong>platform provider</strong> (not a service provider), hOUR Timebank Ireland does not carry liability insurance for member-to-member exchanges. This is because we do not perform, direct, supervise, or control any exchange between members. We connect people — we are not a party to the exchange itself.</p>
+</div>
+<p>Platform providers (such as online notice boards, community apps, and peer-to-peer platforms) are not liable for the independent actions of the users they connect, and do not carry insurance in respect of those exchanges. Our position is analogous to a community notice board: we provide the space for connections, but what happens between members is independent of us.</p>
+<p><strong>Members are solely responsible for ensuring they have appropriate cover</strong> for any activities they undertake. You should check whether your home insurance, public liability policy, or existing volunteering coverage extends to community exchange activities. If you are offering services professionally, you should hold appropriate professional indemnity or public liability insurance.</p>
+<p>Nothing in this section limits our liability for our own negligence in operating the platform itself.</p>
 
 <h2 id="disputes">14. Dispute Resolution</h2>
 <p>If you have a complaint about the platform or another member:</p>

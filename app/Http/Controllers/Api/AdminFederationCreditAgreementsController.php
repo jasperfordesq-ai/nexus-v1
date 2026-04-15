@@ -193,7 +193,7 @@ class AdminFederationCreditAgreementsController extends BaseApiController
                 foreach ($admins as $admin) {
                     Notification::createNotification(
                         (int) $admin->id,
-                        "{$tenantName} has {$label} your federation credit agreement.",
+                        __('api_controllers_3.federation_credit.action_taken', ['tenant' => $tenantName, 'action' => $label]),
                         '/admin/federation',
                         'federation_credit_agreement_' . $action,
                         true,

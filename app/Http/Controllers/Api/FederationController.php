@@ -951,7 +951,7 @@ class FederationController extends BaseApiController
             $reviewerName = 'A member from another community';
             \App\Models\Notification::createNotification(
                 (int) $input['reviewee_id'],
-                "{$reviewerName} left you a {$rating}-star review",
+                __('api_controllers_3.federation.review_received', ['name' => $reviewerName, 'rating' => $rating]),
                 '/reviews',
                 'review',
                 (int) $reviewee['tenant_id']

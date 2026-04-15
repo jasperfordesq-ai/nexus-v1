@@ -1249,25 +1249,27 @@ class AdminUsersController extends BaseApiController
             }
             $resetLink = $appUrl . $tenant['slug_prefix'] . "/password/reset?token={$token}";
 
-            $html = \App\Core\EmailTemplate::render(
-                "Password Reset",
-                "Reset your password for {$tenantNameSafe}",
-                "<p>Hello <strong>" . htmlspecialchars($user['first_name'] ?? '', ENT_QUOTES, 'UTF-8') . "</strong>,</p>
-                <p>An administrator has requested a password reset for your account.</p>
-                <p>Click the button below to set a new password. This link expires in 1 hour.</p>",
-                "Reset Password",
-                $resetLink,
-                $tenant['name']
-            );
+            $firstName = htmlspecialchars($user['first_name'] ?? '', ENT_QUOTES, 'UTF-8');
+            $html = \App\Core\EmailTemplateBuilder::make()
+                ->theme('warning')
+                ->title(__('emails_misc.admin_actions.password_reset_title'))
+                ->greeting(__('emails_misc.admin_actions.password_reset_greeting', ['name' => $firstName]))
+                ->paragraph(__('emails_misc.admin_actions.password_reset_body'))
+                ->button(__('emails_misc.admin_actions.password_reset_cta'), $resetLink)
+                ->render();
 
             $mailer = \App\Core\Mailer::forCurrentTenant();
-            $mailer->send($user['email'], "Password Reset - {$tenantNameSafe}", $html);
+            $mailer->send(
+                $user['email'],
+                __('emails_misc.admin_actions.password_reset_subject', ['community' => $tenantNameSafe]),
+                $html
+            );
 
             ActivityLog::log($adminId, 'admin_send_password_reset', "Sent password reset email to user #{$id} ({$user['email']})");
 
             return $this->respondWithData(['sent' => true, 'id' => $id]);
         } catch (\Throwable $e) {
-            error_log("[AdminUsers] Failed to send password reset email for user #{$id}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to send password reset email for user #{$id}: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.create_failed', ['resource' => 'password reset email']), null, 500);
         }
     }
@@ -1296,7 +1298,7 @@ class AdminUsersController extends BaseApiController
             $config = json_decode($tenantRow->configuration ?? '{}', true);
             $welcomeConfig = $config['welcome_email'] ?? [];
 
-            $subject = !empty($welcomeConfig['subject']) ? $welcomeConfig['subject'] : "Welcome to {$tenantNameSafe}";
+            $subject = !empty($welcomeConfig['subject']) ? $welcomeConfig['subject'] : __('emails_misc.admin_actions.welcome_resend_subject', ['community' => $tenantNameSafe]);
 
             $firstName = htmlspecialchars($user['first_name'] ?? '', ENT_QUOTES, 'UTF-8');
 
@@ -1313,14 +1315,12 @@ class AdminUsersController extends BaseApiController
             if (stripos($mainMessage, '<!DOCTYPE') !== false || stripos($mainMessage, '<html') !== false) {
                 $html = $mainMessage;
             } else {
-                $html = \App\Core\EmailTemplate::render(
-                    "Welcome!",
-                    "You are a member of {$tenantNameSafe}",
-                    $mainMessage,
-                    "Login & Get Started",
-                    $loginLink,
-                    $tenantName
-                );
+                $html = \App\Core\EmailTemplateBuilder::make()
+                    ->theme('brand')
+                    ->title(__('emails_misc.admin_actions.welcome_resend_title'))
+                    ->paragraph($mainMessage)
+                    ->button(__('emails_misc.admin_actions.welcome_resend_cta'), $loginLink)
+                    ->render();
             }
 
             $mailer = \App\Core\Mailer::forCurrentTenant();
@@ -1330,7 +1330,7 @@ class AdminUsersController extends BaseApiController
 
             return $this->respondWithData(['sent' => true, 'id' => $id]);
         } catch (\Throwable $e) {
-            error_log("[AdminUsers] Failed to send welcome email for user #{$id}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to send welcome email for user #{$id}: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.create_failed', ['resource' => 'welcome email']), null, 500);
         }
     }

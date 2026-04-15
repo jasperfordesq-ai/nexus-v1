@@ -163,10 +163,10 @@ class AdminWalletGrantController extends BaseApiController
 
         // Notify user of credit grant
         try {
-            $hourLabel = $amount == 1 ? 'hour' : 'hours';
+            $unit = $amount == 1 ? 'hour' : 'hours';
             \App\Models\Notification::createNotification(
                 $userId,
-                "You received {$amount} {$hourLabel} from your timebank coordinator",
+                __('api_controllers_3.wallet_admin.grant_received', ['amount' => $amount, 'unit' => $unit]),
                 '/wallet',
                 'transaction'
             );

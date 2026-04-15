@@ -369,7 +369,21 @@
     "set_password_body": "Your password on <strong>{{community}}</strong> has been reset by an administrator.",
     "set_password_body_old_pass": "Your previous password will no longer work. Please use the new password provided to you by your administrator to log in.",
     "set_password_body_contact": "If you did not expect this change, please contact your community administrator immediately.",
-    "set_password_cta": "Log In Now"
+    "set_password_cta": "Log In Now",
+
+    "password_reset_subject": "Password Reset — {{community}}",
+    "password_reset_title": "Password Reset",
+    "password_reset_subtitle": "Reset your password for {{community}}",
+    "password_reset_greeting": "Hello {{name}},",
+    "password_reset_body": "An administrator has requested a password reset for your account. Click the button below to set a new password. This link expires in 1 hour.",
+    "password_reset_cta": "Reset Password",
+
+    "welcome_resend_subject": "Welcome to {{community}}",
+    "welcome_resend_title": "Welcome!",
+    "welcome_resend_subtitle": "You are a member of {{community}}",
+    "welcome_resend_greeting": "Hello {{name}},",
+    "welcome_resend_body": "Welcome to <strong>{{community}}</strong>! Your account is ready to use. Log in to start connecting with your community, browse available services, and offer your own skills.",
+    "welcome_resend_cta": "Login & Get Started"
   },
   "auth": {
     "verify_email_subject": "Verify Your Email — {{community}}",

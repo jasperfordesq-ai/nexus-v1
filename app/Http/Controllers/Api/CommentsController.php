@@ -187,7 +187,7 @@ class CommentsController extends BaseApiController
                     $link = $comment->target_type && $comment->target_id
                         ? "/{$comment->target_type}s/{$comment->target_id}"
                         : null;
-                    $message = "{$reactorName} reacted to your comment";
+                    $message = __('api_controllers_3.comments.reaction', ['name' => $reactorName]);
                     Notification::createNotification((int) $comment->user_id, $message, $link, 'reaction');
                 }
             } catch (\Throwable $e) {

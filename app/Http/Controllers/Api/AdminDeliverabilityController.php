@@ -379,7 +379,7 @@ class AdminDeliverabilityController extends BaseApiController
             if ($assignedTo && $assignedTo !== $adminId) {
                 \App\Models\Notification::createNotification(
                     $assignedTo,
-                    "You've been assigned a deliverable: \"{$title}\"",
+                    __('api_controllers_3.deliverable.assigned', ['title' => $title]),
                     "/deliverables/{$newId}",
                     'deliverable_assigned'
                 );
@@ -479,7 +479,7 @@ class AdminDeliverabilityController extends BaseApiController
                         $deliverableTitle = $existing['title'] ?? 'a deliverable';
                         \App\Models\Notification::createNotification(
                             $newAssignee,
-                            "You've been assigned to deliverable: \"{$deliverableTitle}\"",
+                            __('api_controllers_3.deliverable.reassigned', ['title' => $deliverableTitle]),
                             "/deliverables/{$id}",
                             'deliverable_assigned'
                         );

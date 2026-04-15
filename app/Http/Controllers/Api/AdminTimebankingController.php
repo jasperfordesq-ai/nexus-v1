@@ -230,10 +230,10 @@ class AdminTimebankingController extends BaseApiController
         // Notify user of balance adjustment
         try {
             $absAmount = abs($amount);
-            $hourLabel = $absAmount == 1 ? 'hour' : 'hours';
+            $unit = $absAmount == 1 ? 'hour' : 'hours';
             $msg = $amount > 0
-                ? "Your balance was adjusted: +{$absAmount} {$hourLabel} added by coordinator"
-                : "Your balance was adjusted: -{$absAmount} {$hourLabel} removed by coordinator";
+                ? __('api_controllers_3.wallet_admin.balance_adjusted_added', ['amount' => $absAmount, 'unit' => $unit])
+                : __('api_controllers_3.wallet_admin.balance_adjusted_removed', ['amount' => $absAmount, 'unit' => $unit]);
             \App\Models\Notification::createNotification(
                 $userId,
                 $msg,

@@ -1352,10 +1352,17 @@ class IdeationChallengeService
             $tenantName = $tenant['name'] ?? 'Project NEXUS';
             $fullLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
-            $html = EmailTemplate::render($title, $subtitle, $body, $ctaLabel, $fullLink, $tenantName);
+            $html = \App\Core\EmailTemplateBuilder::make()
+                ->theme('brand')
+                ->title($title)
+                ->paragraph($subtitle)
+                ->paragraph($body)
+                ->button($ctaLabel, $fullLink)
+                ->render();
 
             $mailer = Mailer::forCurrentTenant();
-            $mailer->send($recipient->email, $title . " - $tenantName", $html);
+            $subject = $title . ' — ' . $tenantName;
+            $mailer->send($recipient->email, $subject, $html);
         } catch (\Throwable $e) {
             Log::warning("IdeationChallengeService::sendIdeationEmail error: " . $e->getMessage());
         }

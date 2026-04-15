@@ -508,7 +508,7 @@ class VolunteerService
 
             return true;
         } catch (\Exception $e) {
-            error_log("VolunteerService::updateOpportunity error: " . $e->getMessage());
+            Log::warning("VolunteerService::updateOpportunity error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update opportunity'];
             return false;
         }
@@ -541,9 +541,29 @@ class VolunteerService
 
         try {
             DB::update("UPDATE vol_opportunities SET is_active = 0 WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+
+            // Notify volunteers with approved applications that the opportunity is cancelled
+            try {
+                $oppTitle = $opp->title ?? '';
+                $signedUpUsers = DB::select(
+                    "SELECT DISTINCT user_id FROM vol_applications WHERE opportunity_id = ? AND status = 'approved' AND tenant_id = ?",
+                    [$id, $tenantId]
+                );
+                foreach ($signedUpUsers as $row) {
+                    \App\Models\Notification::createNotification(
+                        (int) $row->user_id,
+                        __('api_controllers_3.volunteer.opportunity_cancelled', ['title' => $oppTitle]),
+                        '/volunteering',
+                        'volunteer_opportunity'
+                    );
+                }
+            } catch (\Throwable $notifErr) {
+                Log::warning('VolunteerService::deleteOpportunity notification failed', ['error' => $notifErr->getMessage()]);
+            }
+
             return true;
         } catch (\Exception $e) {
-            error_log("VolunteerService::deleteOpportunity error: " . $e->getMessage());
+            Log::warning("VolunteerService::deleteOpportunity error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to delete opportunity'];
             return false;
         }
@@ -682,7 +702,7 @@ class VolunteerService
 
             return true;
         } catch (\Exception $e) {
-            error_log("VolunteerService::handleApplication error: " . $e->getMessage());
+            Log::warning("VolunteerService::handleApplication error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update application'];
             return false;
         }
@@ -723,7 +743,7 @@ class VolunteerService
             DB::delete("DELETE FROM vol_applications WHERE id = ? AND tenant_id = ?", [$applicationId, $tenantId]);
             return true;
         } catch (\Exception $e) {
-            error_log("VolunteerService::withdrawApplication error: " . $e->getMessage());
+            Log::warning("VolunteerService::withdrawApplication error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to withdraw application'];
             return false;
         }
@@ -825,10 +845,25 @@ class VolunteerService
                     [$shiftId, $app->id, $tenantId]
                 );
 
+                // Notify volunteer of confirmed shift signup
+                try {
+                    $shiftDate = isset($lockedShift->start_time)
+                        ? date('d M Y H:i', strtotime($lockedShift->start_time))
+                        : date('d M Y', strtotime($shift->start_time));
+                    \App\Models\Notification::createNotification(
+                        $userId,
+                        __('api_controllers_3.volunteer.shift_signup_confirmed', ['date' => $shiftDate]),
+                        '/volunteering',
+                        'volunteer_shift'
+                    );
+                } catch (\Throwable $notifErr) {
+                    Log::warning('VolunteerService::signUpForShift notification failed', ['error' => $notifErr->getMessage()]);
+                }
+
                 return true;
             });
         } catch (\Exception $e) {
-            error_log("VolunteerService::signUpForShift error: " . $e->getMessage());
+            Log::warning("VolunteerService::signUpForShift error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to sign up for shift'];
             return false;
         }
@@ -864,9 +899,21 @@ class VolunteerService
                 return false;
             }
 
+            // Notify volunteer of cancellation
+            try {
+                \App\Models\Notification::createNotification(
+                    $userId,
+                    __('api_controllers_3.volunteer.shift_signup_cancelled'),
+                    '/volunteering',
+                    'volunteer_shift'
+                );
+            } catch (\Throwable $notifErr) {
+                Log::warning('VolunteerService::cancelShiftSignup notification failed', ['error' => $notifErr->getMessage()]);
+            }
+
             return true;
         } catch (\Exception $e) {
-            error_log("VolunteerService::cancelShiftSignup error: " . $e->getMessage());
+            Log::warning("VolunteerService::cancelShiftSignup error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel shift signup'];
             return false;
         }
@@ -963,7 +1010,7 @@ class VolunteerService
 
             return (int) DB::getPdo()->lastInsertId();
         } catch (\Exception $e) {
-            error_log("VolunteerService::logHours error: " . $e->getMessage());
+            Log::warning("VolunteerService::logHours error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to log hours'];
             return null;
         }
@@ -1184,12 +1231,12 @@ class VolunteerService
                 }
             } catch (\Throwable $e) {
                 // Notification failure must not affect the already-committed transaction
-                error_log("VolunteerService::verifyHours notification error: " . $e->getMessage());
+                Log::warning("VolunteerService::verifyHours notification error: " . $e->getMessage());
             }
 
             return true;
         } catch (\Exception $e) {
-            error_log("VolunteerService::verifyHours error: " . $e->getMessage());
+            Log::warning("VolunteerService::verifyHours error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to verify hours'];
             return false;
         }
@@ -1345,13 +1392,13 @@ class VolunteerService
             } catch (\Illuminate\Database\QueryException $e) {
                 // Retry on duplicate slug (integrity constraint violation)
                 if ($attempt >= $maxRetries || $e->getCode() !== '23000') {
-                    error_log("VolunteerService::createOrganization error: " . $e->getMessage());
+                    Log::warning("VolunteerService::createOrganization error: " . $e->getMessage());
                     self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to register organisation'];
                     return null;
                 }
                 // Retry — generateOrgSlug will pick a new suffix on next attempt
             } catch (\Exception $e) {
-                error_log("VolunteerService::createOrganization error: " . $e->getMessage());
+                Log::warning("VolunteerService::createOrganization error: " . $e->getMessage());
                 self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to register organisation'];
                 return null;
             }
@@ -1508,7 +1555,7 @@ class VolunteerService
 
             return (int) DB::getPdo()->lastInsertId();
         } catch (\Exception $e) {
-            error_log("VolunteerService::createReview error: " . $e->getMessage());
+            Log::warning("VolunteerService::createReview error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create review'];
             return null;
         }

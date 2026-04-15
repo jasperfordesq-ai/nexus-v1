@@ -89,5 +89,8 @@
   "webhook.test_delivery": "This is a test webhook delivery.",
   "ai.provider_error": "An error occurred while processing your AI request. Please try again.",
   "event.rsvp_confirmed_going": "You're going to \"{{title}}\"!",
-  "event.rsvp_confirmed_interested": "You've shown interest in \"{{title}}\""
+  "event.rsvp_confirmed_interested": "You've shown interest in \"{{title}}\"",
+  "volunteer.shift_signup_confirmed": "You're signed up for a volunteer shift on {{date}}",
+  "volunteer.shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
+  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled"
 }

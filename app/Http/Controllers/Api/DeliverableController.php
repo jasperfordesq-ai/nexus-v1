@@ -152,7 +152,7 @@ class DeliverableController extends BaseApiController
                 $commenterName = $commenter->first_name ?? $commenter->name ?? 'Someone';
                 \App\Models\Notification::createNotification(
                     (int) $owner->user_id,
-                    "{$commenterName} commented on your deliverable \"{$owner->title}\"",
+                    __('api_controllers_3.deliverable_comment.posted', ['name' => $commenterName, 'title' => $owner->title]),
                     "/deliverables/{$id}",
                     'comment'
                 );
