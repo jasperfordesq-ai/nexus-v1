@@ -87,7 +87,8 @@
   },
   "social": {
     "connection_request": "{{name}} sent you a connection request",
-    "connection_accepted": "{{name}} accepted your connection request"
+    "connection_accepted": "{{name}} accepted your connection request",
+    "connection_declined": "Your connection request to {{name}} was not accepted"
   },
   "marketplace": {
     "listing_pending_notice": "Your listing has been submitted for review and will be published once approved."

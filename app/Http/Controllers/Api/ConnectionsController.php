@@ -6,10 +6,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
+use App\Core\TenantContext;
 use App\Models\User;
 use App\Services\ConnectionService;
 use App\Services\NotificationDispatcher;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 /**
  * ConnectionsController - Member connections (friend requests).
@@ -20,6 +24,7 @@ use Illuminate\Http\JsonResponse;
  *   GET    /api/v2/connections/status/{userId}  status()
  *   POST   /api/v2/connections                  request()
  *   PUT    /api/v2/connections/{id}/accept      accept()
+ *   PUT    /api/v2/connections/{id}/decline     decline()
  *   DELETE /api/v2/connections/{id}             destroy()
  */
 class ConnectionsController extends BaseApiController
@@ -199,6 +204,88 @@ class ConnectionsController extends BaseApiController
             'connection_id' => $connection->id,
             'status'        => 'connected',
         ]);
+    }
+
+    // -----------------------------------------------------------------
+    //  PUT /api/v2/connections/{id}/decline
+    // -----------------------------------------------------------------
+
+    /**
+     * Decline a pending connection request. Notifies the requester by email.
+     */
+    public function decline(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('connections_decline', 30, 60);
+
+        // Fetch the connection before deleting so we can notify the requester
+        $existing = $this->connectionService->getById($id, $userId);
+
+        if ($existing === null) {
+            return $this->respondWithError('NOT_FOUND', __('api.connection_not_found'), null, 404);
+        }
+
+        // Only the receiver can decline a pending request
+        if (($existing['receiver_id'] ?? null) !== $userId || ($existing['status'] ?? '') !== 'pending') {
+            return $this->respondWithError('INVALID_STATE', __('api.connection_not_pending'), null, 409);
+        }
+
+        $requesterId = $existing['requester_id'] ?? null;
+
+        $this->connectionService->delete($id, $userId);
+
+        // Notify the requester that their connection request was not accepted
+        if ($requesterId) {
+            try {
+                $decliner    = User::find($userId);
+                $declinerName = trim(($decliner->first_name ?? '') . ' ' . ($decliner->last_name ?? ''))
+                    ?: ($decliner->name ?? 'Someone');
+                $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+
+                // Bell notification
+                NotificationDispatcher::dispatch(
+                    $requesterId,
+                    'global',
+                    null,
+                    'connection_declined',
+                    __('emails_misc.social.connection_declined', ['name' => $declinerName]),
+                    '/members',
+                    null
+                );
+
+                // Email notification
+                $requester = User::find($requesterId);
+                if ($requester && $requester->email) {
+                    $requesterName = $requester->first_name ?? $requester->name ?? '';
+
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('brand')
+                        ->title(__('emails_security_alerts.connection_declined.title'))
+                        ->previewText(__('emails_security_alerts.connection_declined.preview', ['name' => $declinerName]))
+                        ->greeting($requesterName)
+                        ->paragraph(__('emails_security_alerts.connection_declined.body', ['name' => $declinerName, 'community' => $tenantName]))
+                        ->paragraph(__('emails_security_alerts.connection_declined.suggestion'))
+                        ->button(__('emails_security_alerts.connection_declined.cta'), '/members')
+                        ->render();
+
+                    $subject = __('emails_security_alerts.connection_declined.subject', ['community' => $tenantName]);
+                    $mailer  = Mailer::forCurrentTenant();
+                    if (!$mailer->send($requester->email, $subject, $html)) {
+                        Log::warning('[ConnectionsController] connection declined email failed to send', [
+                            'requester_id' => $requesterId,
+                        ]);
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[ConnectionsController] connection declined notification failed', [
+                    'connection_id' => $id,
+                    'requester_id'  => $requesterId,
+                    'error'         => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $this->noContent();
     }
 
     // -----------------------------------------------------------------

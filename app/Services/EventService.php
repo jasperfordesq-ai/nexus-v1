@@ -6,6 +6,8 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\CommunityEventCreated;
 use App\Events\CommunityEventUpdated;
@@ -195,7 +197,7 @@ class EventService
             'location'    => 'nullable|string|max:255',
         ])->validate();
 
-        return DB::transaction(function () use ($userId, $data) {
+        $event = DB::transaction(function () use ($userId, $data) {
             $event = new Event([
                 'user_id'              => $userId,
                 'title'                => trim($data['title']),
@@ -231,6 +233,42 @@ class EventService
 
             return $fresh ?? $event;
         });
+
+        // Send creation confirmation email to the event organizer
+        try {
+            $creator = DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', TenantContext::getId())
+                ->select(['email', 'first_name', 'name'])
+                ->first();
+
+            if ($creator && !empty($creator->email)) {
+                $firstName  = $creator->first_name ?? $creator->name ?? 'there';
+                $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
+                $eventUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/events/' . $event->id;
+                $eventTitle = $event->title ?? '';
+
+                $html = EmailTemplateBuilder::make()
+                    ->theme('success')
+                    ->title(__('emails_created.event.title'))
+                    ->previewText(__('emails_created.event.preview', ['title' => $eventTitle, 'community' => $tenantName]))
+                    ->greeting($firstName)
+                    ->paragraph(__('emails_created.event.body'))
+                    ->highlight($eventTitle)
+                    ->button(__('emails_created.event.cta'), $eventUrl)
+                    ->render();
+
+                Mailer::forCurrentTenant()->send(
+                    $creator->email,
+                    __('emails_created.event.subject', ['title' => $eventTitle, 'community' => $tenantName]),
+                    $html
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[EventService] creation email failed: ' . $e->getMessage());
+        }
+
+        return $event;
     }
 
     /**

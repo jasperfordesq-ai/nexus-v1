@@ -6,6 +6,9 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
+use App\Core\TenantContext;
 use App\Events\ListingCreated;
 use App\Models\Listing;
 use App\Models\User;
@@ -14,6 +17,7 @@ use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -941,7 +945,41 @@ class ListingService
         // WebSocket broadcast, and Meilisearch indexing.
         $user = User::find($userId);
         if ($user) {
-            event(new ListingCreated($listing, $user, \App\Core\TenantContext::getId()));
+            event(new ListingCreated($listing, $user, TenantContext::getId()));
+        }
+
+        // Send creation confirmation email to the listing creator
+        try {
+            $creator = DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', TenantContext::getId())
+                ->select(['email', 'first_name', 'name'])
+                ->first();
+
+            if ($creator && !empty($creator->email)) {
+                $firstName   = $creator->first_name ?? $creator->name ?? 'there';
+                $tenantName  = TenantContext::getSetting('site_name', 'Project NEXUS');
+                $listingUrl  = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/listings/' . $listing->id;
+                $listingTitle = $listing->title ?? '';
+
+                $html = EmailTemplateBuilder::make()
+                    ->theme('success')
+                    ->title(__('emails_created.listing.title'))
+                    ->previewText(__('emails_created.listing.preview', ['title' => $listingTitle, 'community' => $tenantName]))
+                    ->greeting($firstName)
+                    ->paragraph(__('emails_created.listing.body', ['community' => $tenantName]))
+                    ->highlight($listingTitle)
+                    ->button(__('emails_created.listing.cta'), $listingUrl)
+                    ->render();
+
+                Mailer::forCurrentTenant()->send(
+                    $creator->email,
+                    __('emails_created.listing.subject', ['title' => $listingTitle, 'community' => $tenantName]),
+                    $html
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[ListingService] creation email failed: ' . $e->getMessage());
         }
 
         return $listing;

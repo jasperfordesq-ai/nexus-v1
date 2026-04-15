@@ -6,9 +6,13 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
+use App\Core\TenantContext;
 use App\Models\Goal;
 use App\Models\GoalCheckin;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * GoalService — Eloquent-based service for goal operations.
@@ -155,6 +159,40 @@ class GoalService
 
         $goal->save();
 
+        // Send goal-created email
+        try {
+            $user = DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', TenantContext::getId())
+                ->select(['email', 'name', 'first_name'])
+                ->first();
+
+            if ($user && !empty($user->email)) {
+                $firstName = $user->first_name ?? $user->name ?? 'there';
+                $goalTitle = htmlspecialchars($goal->title ?? '', ENT_QUOTES, 'UTF-8');
+                $goalUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/goals/' . $goal->id;
+                $community = TenantContext::getName();
+
+                $html = EmailTemplateBuilder::make()
+                    ->theme('success')
+                    ->title(__('emails_goals.created.title'))
+                    ->previewText(__('emails_goals.created.preview', ['title' => $goalTitle]))
+                    ->greeting($firstName)
+                    ->paragraph(__('emails_goals.created.body', ['community' => $community]))
+                    ->highlight($goalTitle)
+                    ->button(__('emails_goals.created.cta'), $goalUrl)
+                    ->render();
+
+                Mailer::forCurrentTenant()->send(
+                    $user->email,
+                    __('emails_goals.created.subject', ['title' => $goalTitle, 'community' => $community]),
+                    $html
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[GoalService] created email failed: ' . $e->getMessage());
+        }
+
         return $goal->fresh(['user']);
     }
 
@@ -187,7 +225,49 @@ class GoalService
             return false;
         }
 
-        return (bool) $goal->delete();
+        // Capture data before deletion for the email
+        $goalTitle = $goal->title ?? '';
+        $goalId    = $goal->id;
+
+        $deleted = (bool) $goal->delete();
+
+        if ($deleted) {
+            // Send goal-abandoned/deleted email
+            try {
+                $user = DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', TenantContext::getId())
+                    ->select(['email', 'name', 'first_name'])
+                    ->first();
+
+                if ($user && !empty($user->email)) {
+                    $firstName     = $user->first_name ?? $user->name ?? 'there';
+                    $safeTitle     = htmlspecialchars($goalTitle, ENT_QUOTES, 'UTF-8');
+                    $newGoalUrl    = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/goals';
+                    $community     = TenantContext::getName();
+
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('info')
+                        ->title(__('emails_goals.abandoned.title'))
+                        ->previewText(__('emails_goals.abandoned.preview'))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_goals.abandoned.body', ['title' => $safeTitle, 'community' => $community]))
+                        ->paragraph(__('emails_goals.abandoned.note'))
+                        ->button(__('emails_goals.abandoned.cta'), $newGoalUrl)
+                        ->render();
+
+                    Mailer::forCurrentTenant()->send(
+                        $user->email,
+                        __('emails_goals.abandoned.subject', ['title' => $safeTitle, 'community' => $community]),
+                        $html
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[GoalService] abandoned email failed: ' . $e->getMessage());
+            }
+        }
+
+        return $deleted;
     }
 
     /**
@@ -229,6 +309,40 @@ class GoalService
         $goal->current_value = $target;
         $goal->status = 'completed';
         $goal->save();
+
+        // Send goal-completed email
+        try {
+            $user = DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', TenantContext::getId())
+                ->select(['email', 'name', 'first_name'])
+                ->first();
+
+            if ($user && !empty($user->email)) {
+                $firstName = $user->first_name ?? $user->name ?? 'there';
+                $goalTitle = htmlspecialchars($goal->title ?? '', ENT_QUOTES, 'UTF-8');
+                $goalUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/goals/' . $goal->id;
+                $community = TenantContext::getName();
+
+                $html = EmailTemplateBuilder::make()
+                    ->theme('success')
+                    ->title(__('emails_goals.completed.title'))
+                    ->previewText(__('emails_goals.completed.preview', ['title' => $goalTitle]))
+                    ->greeting($firstName)
+                    ->paragraph(__('emails_goals.completed.body', ['community' => $community]))
+                    ->highlight(__('emails_goals.completed.highlight'))
+                    ->button(__('emails_goals.completed.cta'), $goalUrl)
+                    ->render();
+
+                Mailer::forCurrentTenant()->send(
+                    $user->email,
+                    __('emails_goals.completed.subject', ['title' => $goalTitle, 'community' => $community]),
+                    $html
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[GoalService] completed email failed: ' . $e->getMessage());
+        }
 
         return $goal;
     }

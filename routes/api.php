@@ -320,6 +320,7 @@ Route::get('/v2/connections/pending', [\App\Http\Controllers\Api\ConnectionsCont
 Route::get('/v2/connections/status/{userId}', [\App\Http\Controllers\Api\ConnectionsController::class, 'status']);
 Route::post('/v2/connections/request', [\App\Http\Controllers\Api\ConnectionsController::class, 'request']);
 Route::post('/v2/connections/{id}/accept', [\App\Http\Controllers\Api\ConnectionsController::class, 'accept']);
+Route::post('/v2/connections/{id}/decline', [\App\Http\Controllers\Api\ConnectionsController::class, 'decline']);
 Route::delete('/v2/connections/{id}', [\App\Http\Controllers\Api\ConnectionsController::class, 'destroy']);
 Route::get('/v2/connections/suggestions', [\App\Http\Controllers\Api\ConnectionSuggestionController::class, 'suggestions']);
 

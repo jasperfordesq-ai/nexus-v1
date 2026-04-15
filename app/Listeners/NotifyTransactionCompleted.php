@@ -75,6 +75,28 @@ class NotifyTransactionCompleted implements ShouldQueue
                     $description
                 );
             }
+
+            // 3. Send confirmation email to the SENDER
+            $senderEmailEnabled = true;
+            try {
+                $senderPrefs = \App\Models\User::getNotificationPreferences($sender->id);
+                $senderEmailEnabled = (bool) ($senderPrefs['email_transactions'] ?? true);
+            } catch (\Throwable $prefError) {
+                Log::debug('NotifyTransactionCompleted: could not read sender email_transactions pref', [
+                    'user_id' => $sender->id,
+                    'error' => $prefError->getMessage(),
+                ]);
+            }
+
+            if ($senderEmailEnabled) {
+                $recipientName = $receiver->first_name ?? $receiver->name ?? 'someone';
+                NotificationDispatcher::sendCreditSentEmail(
+                    $sender->id,
+                    $recipientName,
+                    $amount,
+                    $description
+                );
+            }
         } catch (\Throwable $e) {
             Log::error('NotifyTransactionCompleted listener failed', [
                 'transaction_id' => $event->transaction->id ?? null,

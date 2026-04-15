@@ -6,6 +6,8 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\GroupCreated;
 use App\Events\GroupMemberJoined;
@@ -223,7 +225,7 @@ class GroupService
      */
     public static function create(int $userId, array $data): Group
     {
-        return DB::transaction(function () use ($userId, $data) {
+        $group = DB::transaction(function () use ($userId, $data) {
             $group = new Group([
                 'owner_id'             => $userId,
                 'name'                 => trim($data['name']),
@@ -264,6 +266,42 @@ class GroupService
 
             return $fresh ?? $group;
         });
+
+        // Send creation confirmation email to the group creator
+        try {
+            $creator = DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', TenantContext::getId())
+                ->select(['email', 'first_name', 'name'])
+                ->first();
+
+            if ($creator && !empty($creator->email)) {
+                $firstName  = $creator->first_name ?? $creator->name ?? 'there';
+                $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
+                $groupUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups/' . $group->id;
+                $groupName  = $group->name ?? '';
+
+                $html = EmailTemplateBuilder::make()
+                    ->theme('success')
+                    ->title(__('emails_created.group.title'))
+                    ->previewText(__('emails_created.group.preview', ['name' => $groupName, 'community' => $tenantName]))
+                    ->greeting($firstName)
+                    ->paragraph(__('emails_created.group.body', ['community' => $tenantName]))
+                    ->highlight($groupName)
+                    ->button(__('emails_created.group.cta'), $groupUrl)
+                    ->render();
+
+                Mailer::forCurrentTenant()->send(
+                    $creator->email,
+                    __('emails_created.group.subject', ['name' => $groupName, 'community' => $tenantName]),
+                    $html
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[GroupService] creation email failed: ' . $e->getMessage());
+        }
+
+        return $group;
     }
 
     /**
@@ -611,6 +649,40 @@ class GroupService
             ->where('user_id', $targetUserId)
             ->update(['role' => $role]);
 
+        // Email promoted member when they become an admin
+        if ($role === 'admin') {
+            try {
+                $tenantId = TenantContext::getId();
+                $member = DB::table('users')
+                    ->where('id', $targetUserId)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['email', 'first_name', 'name'])
+                    ->first();
+                if ($member && !empty($member->email)) {
+                    $firstName  = $member->first_name ?? $member->name ?? 'there';
+                    $community  = TenantContext::getName();
+                    $groupName  = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
+                    $roleLabel  = ucfirst($role);
+                    $groupUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups/' . $groupId;
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('success')
+                        ->title(__('emails_commerce.group_promoted.title'))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_commerce.group_promoted.body', ['role' => $roleLabel, 'group_name' => $groupName, 'community' => $community]))
+                        ->paragraph(__('emails_commerce.group_promoted.responsibilities', ['role' => $roleLabel]))
+                        ->button(__('emails_commerce.group_promoted.cta'), $groupUrl)
+                        ->render();
+                    Mailer::forCurrentTenant()->send(
+                        $member->email,
+                        __('emails_commerce.group_promoted.subject', ['role' => $roleLabel, 'group_name' => $groupName, 'community' => $community]),
+                        $html
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[GroupService] group_promoted email failed: ' . $e->getMessage());
+            }
+        }
+
         return true;
     }
 
@@ -648,6 +720,37 @@ class GroupService
 
         if ($detached > 0) {
             $group->decrement('cached_member_count');
+        }
+
+        // Email removed member
+        try {
+            $tenantId = TenantContext::getId();
+            $member = DB::table('users')
+                ->where('id', $targetUserId)
+                ->where('tenant_id', $tenantId)
+                ->select(['email', 'first_name', 'name'])
+                ->first();
+            if ($member && !empty($member->email)) {
+                $firstName = $member->first_name ?? $member->name ?? 'there';
+                $community = TenantContext::getName();
+                $groupName = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
+                $browseUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups';
+                $html = EmailTemplateBuilder::make()
+                    ->theme('warning')
+                    ->title(__('emails_commerce.group_removed.title'))
+                    ->greeting($firstName)
+                    ->paragraph(__('emails_commerce.group_removed.body', ['group_name' => $groupName, 'community' => $community]))
+                    ->paragraph(__('emails_commerce.group_removed.suggestion'))
+                    ->button(__('emails_commerce.group_removed.cta'), $browseUrl)
+                    ->render();
+                Mailer::forCurrentTenant()->send(
+                    $member->email,
+                    __('emails_commerce.group_removed.subject', ['group_name' => $groupName, 'community' => $community]),
+                    $html
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[GroupService] group_removed email failed: ' . $e->getMessage());
         }
 
         return true;

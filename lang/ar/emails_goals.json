@@ -1,0 +1,25 @@
+{
+  "created": {
+    "subject": "Goal set: {{title}} — {{community}}",
+    "title": "Goal Created!",
+    "preview": "You've set a new goal: {{title}}",
+    "body": "You've set a new goal on {{community}}. Keep going — we'll send you reminders to help you stay on track.",
+    "cta": "View Your Goal"
+  },
+  "completed": {
+    "subject": "Goal achieved: {{title}} — {{community}}",
+    "title": "Goal Achieved!",
+    "preview": "Congratulations! You've completed your goal: {{title}}",
+    "body": "Amazing work! You've completed your goal on {{community}}. Your contribution to the community is truly valued.",
+    "highlight": "Goal Completed",
+    "cta": "View Your Achievements"
+  },
+  "abandoned": {
+    "subject": "Goal removed: {{title}} — {{community}}",
+    "title": "Goal Removed",
+    "preview": "Your goal has been removed",
+    "body": "Your goal <strong>\"{{title}}\"</strong> has been removed from {{community}}.",
+    "note": "You can set a new goal any time from your profile.",
+    "cta": "Set a New Goal"
+  }
+}

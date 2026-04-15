@@ -27,6 +27,8 @@ use App\Services\JobTemplateService;
 use App\Services\SalaryBenchmarkService;
 use App\Services\CandidateSearchService;
 use App\Services\JobInterviewSchedulingService;
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Http\Requests\Jobs\ListJobVacanciesRequest;
 use App\Models\JobVacancy;
@@ -380,6 +382,77 @@ class JobVacanciesController extends BaseApiController
             }
         } catch (\Throwable $e) {
             \Log::warning('Job application notification failed', ['vacancy_id' => $id, 'error' => $e->getMessage()]);
+        }
+
+        // Email confirmation to applicant
+        try {
+            $job = $job ?? DB::selectOne(
+                'SELECT user_id, title FROM job_vacancies WHERE id = ? AND tenant_id = ?',
+                [$id, $tenantId]
+            );
+            if ($job) {
+                $applicantUser = DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['email', 'first_name', 'name'])
+                    ->first();
+                if ($applicantUser && !empty($applicantUser->email)) {
+                    $firstName = $applicantUser->first_name ?? $applicantUser->name ?? 'there';
+                    $community = TenantContext::getName();
+                    $jobTitle  = htmlspecialchars($job->title, ENT_QUOTES, 'UTF-8');
+                    $appUrl    = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/jobs/' . $id;
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('brand')
+                        ->title(__('emails_commerce.job_application_applicant.title'))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_commerce.job_application_applicant.body', ['job_title' => $jobTitle]))
+                        ->paragraph(__('emails_commerce.job_application_applicant.next_steps'))
+                        ->button(__('emails_commerce.job_application_applicant.cta'), $appUrl)
+                        ->render();
+                    Mailer::forCurrentTenant()->send(
+                        $applicantUser->email,
+                        __('emails_commerce.job_application_applicant.subject', ['job_title' => $jobTitle, 'community' => $community]),
+                        $html
+                    );
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[JobVacanciesController] applicant confirmation email failed: ' . $e->getMessage());
+        }
+
+        // Email alert to job poster / employer
+        try {
+            if ($job && (int) $job->user_id !== $userId) {
+                $posterUser = DB::table('users')
+                    ->where('id', $job->user_id)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['email', 'first_name', 'name'])
+                    ->first();
+                if ($posterUser && !empty($posterUser->email)) {
+                    $posterFirst   = $posterUser->first_name ?? $posterUser->name ?? 'there';
+                    $community     = TenantContext::getName();
+                    $jobTitle      = htmlspecialchars($job->title, ENT_QUOTES, 'UTF-8');
+                    $applicant     = $applicant ?? \App\Models\User::find($userId);
+                    $applicantName = $applicant
+                        ? trim(($applicant->first_name ?? '') . ' ' . ($applicant->last_name ?? '')) ?: ($applicant->name ?? 'Someone')
+                        : 'Someone';
+                    $reviewUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/jobs/' . $id . '/applications';
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('federation')
+                        ->title(__('emails_commerce.job_application_employer.title'))
+                        ->greeting($posterFirst)
+                        ->paragraph(__('emails_commerce.job_application_employer.body', ['applicant_name' => htmlspecialchars($applicantName, ENT_QUOTES, 'UTF-8'), 'job_title' => $jobTitle]))
+                        ->button(__('emails_commerce.job_application_employer.cta'), $reviewUrl)
+                        ->render();
+                    Mailer::forCurrentTenant()->send(
+                        $posterUser->email,
+                        __('emails_commerce.job_application_employer.subject', ['job_title' => $jobTitle, 'community' => $community]),
+                        $html
+                    );
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[JobVacanciesController] employer alert email failed: ' . $e->getMessage());
         }
 
         return $this->respondWithData($vacancy, null, 201);

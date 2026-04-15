@@ -16,6 +16,7 @@ use App\Services\Identity\IdentityVerificationEventService;
 use App\Services\Identity\IdentityVerificationPaymentService;
 use App\Services\Identity\TenantProviderCredentialService;
 use App\Services\MemberVerificationBadgeService;
+use App\Services\NotificationDispatcher;
 
 /**
  * OptionalIdentityVerificationController — Voluntary ID verification for active users.
@@ -103,6 +104,13 @@ class OptionalIdentityVerificationController extends BaseApiController
                             );
                             $latestSession['status'] = 'failed';
                             $latestSession['failure_reason'] = $mismatch;
+
+                            try {
+                                NotificationDispatcher::dispatchVerificationFailed($userId, $mismatch);
+                                NotificationDispatcher::dispatchVerificationCompletedToAdmins($userId, 'failed');
+                            } catch (\Throwable $e) {
+                                Log::warning('[IdentityVerification] mismatch notification failed: ' . $e->getMessage());
+                            }
                         } else {
                             IdentityVerificationSessionService::updateStatus(
                                 (int) $latestSession['id'], 'passed', null, null, null
@@ -113,14 +121,29 @@ class OptionalIdentityVerificationController extends BaseApiController
                                 self::grantIdVerifiedBadge($userId, $tenantId);
                                 $hasIdBadge = true;
                             }
+
+                            try {
+                                NotificationDispatcher::dispatchVerificationPassed($userId);
+                                NotificationDispatcher::dispatchVerificationCompletedToAdmins($userId, 'passed');
+                            } catch (\Throwable $e) {
+                                Log::warning('[IdentityVerification] passed notification failed: ' . $e->getMessage());
+                            }
                         }
                     } elseif ($mappedStatus === 'failed') {
+                        $failureReason = $stripeStatus['failure_reason'] ?? 'Verification failed';
                         IdentityVerificationSessionService::updateStatus(
                             (int) $latestSession['id'], 'failed', null, null,
-                            $stripeStatus['failure_reason'] ?? 'Verification failed'
+                            $failureReason
                         );
                         $latestSession['status'] = 'failed';
-                        $latestSession['failure_reason'] = $stripeStatus['failure_reason'] ?? 'Verification failed';
+                        $latestSession['failure_reason'] = $failureReason;
+
+                        try {
+                            NotificationDispatcher::dispatchVerificationFailed($userId, $failureReason);
+                            NotificationDispatcher::dispatchVerificationCompletedToAdmins($userId, 'failed');
+                        } catch (\Throwable $e) {
+                            Log::warning('[IdentityVerification] failed notification failed: ' . $e->getMessage());
+                        }
                     }
                 } catch (\Throwable $e) {
                     Log::warning('Stripe Identity status check failed', ['error' => $e->getMessage()]);
@@ -336,6 +359,13 @@ class OptionalIdentityVerificationController extends BaseApiController
                 IdentityVerificationEventService::ACTOR_USER,
                 ['provider' => $providerSlug, 'level' => 'document_selfie', 'flow' => 'optional']
             );
+
+            // Send "verification started" instructions email
+            try {
+                NotificationDispatcher::dispatchVerificationStarted($userId);
+            } catch (\Throwable $e) {
+                Log::warning('[IdentityVerification] started email failed: ' . $e->getMessage());
+            }
 
             return $this->respondWithData([
                 'session_id' => $sessionId,

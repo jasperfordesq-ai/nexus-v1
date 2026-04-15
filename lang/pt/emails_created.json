@@ -1,0 +1,43 @@
+{
+  "listing": {
+    "subject": "Your listing is live: {{title}} — {{community}}",
+    "title": "Listing Posted!",
+    "preview": "Your listing \"{{title}}\" is now live on {{community}}",
+    "body": "Your listing is now live on {{community}} and can be discovered by other members.",
+    "cta": "View Your Listing"
+  },
+  "event": {
+    "subject": "Your event is scheduled: {{title}} — {{community}}",
+    "title": "Event Created!",
+    "preview": "Your event \"{{title}}\" has been scheduled on {{community}}",
+    "body": "Your event has been created and is now visible to the community. Members can start RSVPing.",
+    "cta": "View Your Event"
+  },
+  "group": {
+    "subject": "Your group is live: {{name}} — {{community}}",
+    "title": "Group Created!",
+    "preview": "Your group \"{{name}}\" is now live on {{community}}",
+    "body": "Your group has been created on {{community}}. Invite members to get things started.",
+    "cta": "View Your Group"
+  },
+  "credits_sent": {
+    "subject": "You sent {{amount}} hour(s) to {{recipient}} — {{community}}",
+    "title": "Time Credits Sent",
+    "preview": "You sent {{amount}} hour(s) to {{recipient}} on {{community}}",
+    "body": "Your time credit transfer to <strong>{{recipient}}</strong> has been processed successfully.",
+    "label_amount": "Amount",
+    "label_recipient": "Sent To",
+    "label_description": "Description",
+    "cta": "View Your Wallet"
+  },
+  "donation": {
+    "subject": "Thank you for your donation to {{community}}",
+    "title": "Donation Received",
+    "preview": "Thank you for your generous donation to {{community}}",
+    "body": "Thank you for your generous donation to <strong>{{community}}</strong>. Your support makes a real difference.",
+    "label_amount": "Amount",
+    "label_date": "Date",
+    "recurring_note": "This is a recurring donation. You can manage your donations from your account settings.",
+    "cta": "View Your Account"
+  }
+}

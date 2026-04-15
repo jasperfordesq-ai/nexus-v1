@@ -8,9 +8,11 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use App\Core\ApiErrorCodes;
+use App\Core\TenantContext;
 use App\Services\Identity\IdentityProviderRegistry;
 use App\Services\Identity\IdentityVerificationSessionService;
 use App\Services\Identity\RegistrationOrchestrationService;
+use App\Services\NotificationDispatcher;
 use App\Services\RateLimitService;
 
 /**
@@ -129,16 +131,41 @@ class IdentityWebhookController extends BaseApiController
             $result
         );
 
+        $sessionUserId   = (int) $session['user_id'];
+        $sessionTenantId = (int) $session['tenant_id'];
+
+        // Ensure TenantContext is set for email sending
+        if (TenantContext::getId() !== $sessionTenantId) {
+            TenantContext::set($sessionTenantId);
+        }
+
         // Auto-grant ID Verified badge when verification passes
         if ($status === 'passed') {
             try {
                 OptionalIdentityVerificationController::grantIdVerifiedBadge(
-                    (int) $session['user_id'],
-                    (int) $session['tenant_id']
+                    $sessionUserId,
+                    $sessionTenantId
                 );
             } catch (\Throwable $e) {
                 // Non-critical — log but don't fail the webhook
                 error_log("[IdentityWebhook] Failed to grant id_verified badge: " . $e->getMessage());
+            }
+
+            // Send verification passed notification + email
+            try {
+                NotificationDispatcher::dispatchVerificationPassed($sessionUserId);
+                NotificationDispatcher::dispatchVerificationCompletedToAdmins($sessionUserId, 'passed');
+            } catch (\Throwable $e) {
+                error_log("[IdentityWebhook] Failed to dispatch passed notification: " . $e->getMessage());
+            }
+        } elseif ($status === 'failed') {
+            // Send verification failed notification + email
+            try {
+                $failureReason = $result['failure_reason'] ?? '';
+                NotificationDispatcher::dispatchVerificationFailed($sessionUserId, $failureReason);
+                NotificationDispatcher::dispatchVerificationCompletedToAdmins($sessionUserId, 'failed');
+            } catch (\Throwable $e) {
+                error_log("[IdentityWebhook] Failed to dispatch failed notification: " . $e->getMessage());
             }
         }
 

@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\Notification;
@@ -434,6 +435,61 @@ class NotificationDispatcher
     }
 
     /**
+     * Send credit sent confirmation email to the SENDER of a time-credit transfer.
+     */
+    public static function sendCreditSentEmail(int $senderUserId, string $recipientName, float $amount, string $description = ''): void
+    {
+        try {
+            $tenantId = TenantContext::getId();
+
+            $user = DB::table('users')
+                ->where('id', $senderUserId)
+                ->where('tenant_id', $tenantId)
+                ->select(['email', 'name', 'first_name'])
+                ->first();
+
+            if (!$user || empty($user->email)) {
+                return;
+            }
+
+            $senderFirstName = $user->first_name ?? $user->name ?? 'there';
+            $tenantName      = TenantContext::getSetting('site_name', 'Project NEXUS');
+            $baseUrl         = TenantContext::getFrontendUrl();
+            $basePath        = TenantContext::getSlugPrefix();
+            $walletUrl       = $baseUrl . $basePath . '/wallet';
+            $amountDisplay   = $amount . ' hour' . ($amount != 1 ? 's' : '');
+
+            $infoCard = [
+                __('emails_created.credits_sent.label_amount')    => $amountDisplay,
+                __('emails_created.credits_sent.label_recipient') => htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8'),
+            ];
+            if ($description !== '') {
+                $infoCard[__('emails_created.credits_sent.label_description')] = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
+            }
+
+            $html = EmailTemplateBuilder::make()
+                ->theme('success')
+                ->title(__('emails_created.credits_sent.title'))
+                ->previewText(__('emails_created.credits_sent.preview', ['amount' => $amountDisplay, 'recipient' => htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8'), 'community' => $tenantName]))
+                ->greeting($senderFirstName)
+                ->paragraph(__('emails_created.credits_sent.body', ['recipient' => htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8')]))
+                ->infoCard($infoCard)
+                ->button(__('emails_created.credits_sent.cta'), $walletUrl)
+                ->render();
+
+            $subject = __('emails_created.credits_sent.subject', [
+                'amount'    => $amountDisplay,
+                'recipient' => htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8'),
+                'community' => $tenantName,
+            ]);
+
+            Mailer::forCurrentTenant()->send($user->email, $subject, $html);
+        } catch (\Exception $e) {
+            Log::warning("NotificationDispatcher::sendCreditSentEmail failed: " . $e->getMessage());
+        }
+    }
+
+    /**
      * Send review received email to a user.
      */
     public static function sendReviewEmail(int $receiverUserId, string $reviewerName, int $rating, ?string $comment = null, bool $isAnonymous = false): void
@@ -480,6 +536,48 @@ class NotificationDispatcher
     // IDENTITY VERIFICATION NOTIFICATIONS
     // =========================================================================
 
+    /**
+     * Dispatch a "verification started" email when a user begins the identity verification flow.
+     */
+    public static function dispatchVerificationStarted(int $userId): void
+    {
+        $tenantId = TenantContext::getId();
+
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select(['first_name', 'email'])
+            ->first();
+
+        if (!$user || empty($user->email)) {
+            return;
+        }
+
+        $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
+        $baseUrl    = TenantContext::getFrontendUrl();
+        $basePath   = TenantContext::getSlugPrefix();
+        $statusUrl  = $baseUrl . $basePath . '/verify-identity';
+        $firstName  = $user->first_name ?? 'there';
+
+        $html = \App\Core\EmailTemplateBuilder::make()
+            ->theme('brand')
+            ->title(__('emails_identity.started.title'))
+            ->previewText(__('emails_identity.started.preview'))
+            ->greeting($firstName)
+            ->paragraph(__('emails_identity.started.body', ['community' => $tenantName]))
+            ->paragraph(__('emails_identity.started.next_steps'))
+            ->paragraph('<em>' . __('emails_identity.started.note') . '</em>')
+            ->button(__('emails_identity.started.cta'), $statusUrl)
+            ->render();
+
+        try {
+            $subject = __('emails_identity.started.subject', ['community' => $tenantName]);
+            Mailer::forCurrentTenant()->send($user->email, $subject, $html);
+        } catch (\Throwable $e) {
+            Log::warning('[IdentityVerification] started email failed: ' . $e->getMessage());
+        }
+    }
+
     public static function dispatchVerificationPassed(int $userId): void
     {
         $content = __('notifications.verification_passed');
@@ -488,6 +586,41 @@ class NotificationDispatcher
         Notification::createNotification($userId, $content, $link, 'verification_passed');
         $htmlContent = self::buildVerificationPassedEmail();
         self::queueNotification($userId, 'verification_passed', $content, $link, 'instant', $htmlContent);
+
+        // Also send a direct email immediately (queue may have delays)
+        $tenantId = TenantContext::getId();
+
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select(['first_name', 'email'])
+            ->first();
+
+        if ($user && !empty($user->email)) {
+            $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
+            $baseUrl    = TenantContext::getFrontendUrl();
+            $basePath   = TenantContext::getSlugPrefix();
+            $profileUrl = $baseUrl . $basePath . '/profile/' . $userId;
+            $firstName  = $user->first_name ?? 'there';
+
+            $html = \App\Core\EmailTemplateBuilder::make()
+                ->theme('success')
+                ->title(__('emails_identity.passed.title'))
+                ->previewText(__('emails_identity.passed.preview'))
+                ->greeting($firstName)
+                ->paragraph(__('emails_identity.passed.body', ['community' => $tenantName]))
+                ->highlight(__('emails_identity.passed.highlight'))
+                ->paragraph(__('emails_identity.passed.badge_note'))
+                ->button(__('emails_identity.passed.cta'), $profileUrl)
+                ->render();
+
+            try {
+                $subject = __('emails_identity.passed.subject', ['community' => $tenantName]);
+                Mailer::forCurrentTenant()->send($user->email, $subject, $html);
+            } catch (\Throwable $e) {
+                Log::warning('[IdentityVerification] passed email failed: ' . $e->getMessage());
+            }
+        }
     }
 
     public static function dispatchVerificationFailed(int $userId, string $reason = ''): void
@@ -500,6 +633,46 @@ class NotificationDispatcher
         Notification::createNotification($userId, $content, $link, 'verification_failed');
         $htmlContent = self::buildVerificationFailedEmail($reason);
         self::queueNotification($userId, 'verification_failed', $content, $link, 'instant', $htmlContent);
+
+        // Also send a direct email immediately (queue may have delays)
+        $tenantId = TenantContext::getId();
+
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select(['first_name', 'email'])
+            ->first();
+
+        if ($user && !empty($user->email)) {
+            $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
+            $baseUrl    = TenantContext::getFrontendUrl();
+            $basePath   = TenantContext::getSlugPrefix();
+            $retryUrl   = $baseUrl . $basePath . '/verify-identity';
+            $firstName  = $user->first_name ?? 'there';
+
+            $builder = \App\Core\EmailTemplateBuilder::make()
+                ->theme('danger')
+                ->title(__('emails_identity.failed.title'))
+                ->previewText(__('emails_identity.failed.preview'))
+                ->greeting($firstName)
+                ->paragraph(__('emails_identity.failed.body', ['community' => $tenantName]));
+
+            if (!empty($reason)) {
+                $builder->paragraph('<strong>' . __('emails_identity.failed.reason_label') . '</strong> ' . htmlspecialchars($reason));
+            }
+
+            $html = $builder
+                ->paragraph(__('emails_identity.failed.retry_note'))
+                ->button(__('emails_identity.failed.cta'), $retryUrl)
+                ->render();
+
+            try {
+                $subject = __('emails_identity.failed.subject', ['community' => $tenantName]);
+                Mailer::forCurrentTenant()->send($user->email, $subject, $html);
+            } catch (\Throwable $e) {
+                Log::warning('[IdentityVerification] failed email failed: ' . $e->getMessage());
+            }
+        }
     }
 
     public static function dispatchVerificationCompletedToAdmins(int $userId, string $status): void

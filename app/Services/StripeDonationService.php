@@ -6,6 +6,8 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\VolDonation;
 use App\Models\VolGivingDay;
@@ -223,6 +225,63 @@ class StripeDonationService
             'payment_intent_id' => $piId,
             'amount' => $donation->amount,
         ]);
+
+        // Send donation receipt email to the donor
+        try {
+            $donorEmail = $donation->donor_email ?? null;
+            $donorName  = $donation->donor_name ?? null;
+
+            // Fall back to fetching from users table if donation row lacks email
+            if (empty($donorEmail) && !empty($donation->user_id)) {
+                $userRow = DB::table('users')
+                    ->where('id', $donation->user_id)
+                    ->where('tenant_id', $donation->tenant_id)
+                    ->select(['email', 'first_name', 'last_name', 'name'])
+                    ->first();
+                if ($userRow) {
+                    $donorEmail = $userRow->email ?? '';
+                    $donorName  = $donorName ?: (trim(($userRow->first_name ?? '') . ' ' . ($userRow->last_name ?? '')) ?: ($userRow->name ?? ''));
+                }
+            }
+
+            if (!empty($donorEmail)) {
+                // Set tenant context if running from webhook (no active context)
+                if ($donation->tenant_id) {
+                    TenantContext::setById((int) $donation->tenant_id);
+                }
+
+                $tenantName    = TenantContext::getSetting('site_name', 'Project NEXUS');
+                $baseUrl       = TenantContext::getFrontendUrl();
+                $basePath      = TenantContext::getSlugPrefix();
+                $accountUrl    = $baseUrl . $basePath . '/settings';
+                $amountDisplay = number_format((float) $donation->amount, 2) . ' ' . strtoupper($donation->currency ?? 'EUR');
+                $dateDisplay   = date('d M Y');
+                $firstName     = explode(' ', trim($donorName ?: 'there'))[0];
+
+                $infoCard = [
+                    __('emails_created.donation.label_amount') => $amountDisplay,
+                    __('emails_created.donation.label_date')   => $dateDisplay,
+                ];
+
+                $html = EmailTemplateBuilder::make()
+                    ->theme('success')
+                    ->title(__('emails_created.donation.title'))
+                    ->previewText(__('emails_created.donation.preview', ['community' => $tenantName]))
+                    ->greeting($firstName)
+                    ->paragraph(__('emails_created.donation.body', ['community' => $tenantName]))
+                    ->infoCard($infoCard)
+                    ->button(__('emails_created.donation.cta'), $accountUrl)
+                    ->render();
+
+                Mailer::forCurrentTenant()->send(
+                    $donorEmail,
+                    __('emails_created.donation.subject', ['community' => $tenantName]),
+                    $html
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[StripeDonationService] donation receipt email failed: ' . $e->getMessage());
+        }
     }
 
     /**
