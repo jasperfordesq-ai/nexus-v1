@@ -504,7 +504,12 @@
     "reactivation_greeting": "Welcome back, {{name}}!",
     "reactivation_body": "Your account on <strong>{{community}}</strong> has been reactivated by an administrator.",
     "reactivation_body_access": "You can now log in and access the platform again.",
-    "reactivation_cta": "Log In Now"
+    "reactivation_cta": "Log In Now",
+    "self_deletion_subject": "Your account has been deleted — {{community}}",
+    "self_deletion_title": "Account Deleted",
+    "self_deletion_greeting": "Hi {{name}},",
+    "self_deletion_body": "Your account on <strong>{{community}}</strong> has been permanently deleted and your personal data has been anonymised.",
+    "self_deletion_body_contact": "If you did not request this or believe this was an error, please contact your community administrator."
   },
   "auth": {
     "verify_email_subject": "Verify Your Email — {{community}}",
@@ -521,5 +526,11 @@
     "email_greeting": "You have received a voice message from {{sender}}",
     "email_body": "Duration: {{duration}}. Click the button below to listen to the message.",
     "email_cta": "Listen to Voice Message"
+  },
+  "newsletter": {
+    "unsubscribed_subject": "You have been unsubscribed — {{community}}",
+    "unsubscribed_title": "Unsubscribed",
+    "unsubscribed_body": "You have been successfully unsubscribed from email newsletters sent by <strong>{{community}}</strong>. You will no longer receive newsletter emails from this community.",
+    "unsubscribed_body_contact": "If you believe this was a mistake, you can resubscribe by visiting the community platform."
   }
 }

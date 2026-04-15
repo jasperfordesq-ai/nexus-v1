@@ -6,6 +6,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
+use App\Core\TenantContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +16,6 @@ use App\Services\UserService;
 use App\Services\Enterprise\GdprService;
 use App\Services\ListingService;
 use App\Services\MailchimpService;
-use App\Core\TenantContext;
 use App\Models\User;
 use App\Services\MemberRankingService;
 use App\Services\OnboardingConfigService;
@@ -464,21 +466,47 @@ class UsersController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.user_password_required'), 'password', 400);
         }
 
-        $user = \Illuminate\Support\Facades\DB::table('users')
+        $tenantId = $this->getTenantId();
+        $userRow = DB::table('users')
             ->where('id', $userId)
-            ->where('tenant_id', $this->getTenantId())
-            ->select('password_hash')
+            ->where('tenant_id', $tenantId)
+            ->select(['password_hash', 'email', 'first_name', 'name'])
             ->first();
 
-        if (!$user || !password_verify($password, $user->password_hash)) {
+        if (!$userRow || !password_verify($password, $userRow->password_hash)) {
             return $this->respondWithError('INVALID_PASSWORD', __('api.user_invalid_password'), 'password', 403);
         }
+
+        // Capture contact details before anonymization
+        $userEmail = $userRow->email;
+        $userName  = $userRow->first_name ?? $userRow->name ?? 'there';
 
         $success = $this->userService->deleteAccount($userId);
 
         if (!$success) {
             $errors = $this->userService->getErrors();
             return $this->respondWithErrors($errors, 400);
+        }
+
+        // Send farewell confirmation to the now-anonymized account's original email
+        try {
+            if (!empty($userEmail) && filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
+                $community = TenantContext::getName();
+                $html = EmailTemplateBuilder::make()
+                    ->theme('warning')
+                    ->title(__('emails_misc.admin_actions.self_deletion_title'))
+                    ->greeting(__('emails_misc.admin_actions.self_deletion_greeting', ['name' => $userName]))
+                    ->paragraph(__('emails_misc.admin_actions.self_deletion_body', ['community' => $community]))
+                    ->paragraph(__('emails_misc.admin_actions.self_deletion_body_contact'))
+                    ->render();
+                Mailer::forCurrentTenant()->send(
+                    $userEmail,
+                    __('emails_misc.admin_actions.self_deletion_subject', ['community' => $community]),
+                    $html
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[UsersController] deleteAccount farewell email failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
         }
 
         return $this->respondWithData(['message' => __('api_controllers_2.users.account_deleted')]);
@@ -906,7 +934,7 @@ class UsersController extends BaseApiController
                     $mailchimp = $this->mailchimpService;
                     $mailchimp->subscribe($email, $user['first_name'], $user['last_name']);
                 } catch (\Throwable $e) {
-                    error_log("Mailchimp Subscribe Failed: " . $e->getMessage());
+                    \Illuminate\Support\Facades\Log::warning("Mailchimp Subscribe Failed: " . $e->getMessage());
                 }
             } else {
                 if ($existing && $existing['status'] === 'active') {
@@ -916,12 +944,12 @@ class UsersController extends BaseApiController
                         $mailchimp = $this->mailchimpService;
                         $mailchimp->unsubscribe($email);
                     } catch (\Throwable $e) {
-                        error_log("Mailchimp Unsubscribe Failed: " . $e->getMessage());
+                        \Illuminate\Support\Facades\Log::warning("Mailchimp Unsubscribe Failed: " . $e->getMessage());
                     }
                 }
             }
         } catch (\Throwable $e) {
-            error_log("Newsletter Sync From Consent Failed: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Newsletter Sync From Consent Failed: " . $e->getMessage());
         }
     }
 

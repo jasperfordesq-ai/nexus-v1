@@ -6,6 +6,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
+use App\Core\TenantContext;
 use App\Models\NewsletterAnalytics;
 use App\Services\NewsletterService;
 use Illuminate\Http\JsonResponse;
@@ -134,6 +137,26 @@ class NewsletterController extends BaseApiController
             ]);
 
         if ($updated) {
+            // Send unsubscribe confirmation email
+            try {
+                $email = $subscriber->email ?? null;
+                if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $community = TenantContext::getName();
+                    $html = EmailTemplateBuilder::make()
+                        ->title(__('emails_misc.newsletter.unsubscribed_title'))
+                        ->paragraph(__('emails_misc.newsletter.unsubscribed_body', ['community' => $community]))
+                        ->paragraph(__('emails_misc.newsletter.unsubscribed_body_contact'))
+                        ->render();
+                    Mailer::forCurrentTenant()->send(
+                        $email,
+                        __('emails_misc.newsletter.unsubscribed_subject', ['community' => $community]),
+                        $html
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[NewsletterController] unsubscribe confirmation email failed', ['error' => $e->getMessage()]);
+            }
+
             return $this->respondWithData(['unsubscribed' => true]);
         }
 
