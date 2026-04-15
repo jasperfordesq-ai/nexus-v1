@@ -597,8 +597,14 @@ class EventNotificationService
             // Send immediately
             try {
                 $mailer = Mailer::forCurrentTenant();
-                $body = $htmlBody ?? $this->buildDefaultEventEmailHtml($subject, $content, $link, $user);
-                $mailer->send($user->email, $subject, $body);
+                $body   = $htmlBody ?? $this->buildDefaultEventEmailHtml($subject, $content, $link, $user);
+                $sent   = $mailer->send($user->email, $subject, $body);
+                if (!$sent) {
+                    Log::warning("[EventNotificationService] Instant email send returned false", [
+                        'user_id' => $userId,
+                        'type'    => $type,
+                    ]);
+                }
             } catch (\Throwable $e) {
                 Log::warning("[EventNotificationService] Instant email send failed: " . $e->getMessage());
             }
@@ -613,6 +619,7 @@ class EventNotificationService
             // Queue for daily/weekly digest
             try {
                 DB::table('notification_queue')->insert([
+                    'tenant_id'       => TenantContext::getId(),
                     'user_id'         => $userId,
                     'activity_type'   => $type,
                     'content_snippet' => substr($content, 0, 250),

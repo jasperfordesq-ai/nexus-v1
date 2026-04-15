@@ -145,8 +145,8 @@ class GuardianConsentService
                 ->paragraph(__('emails_misc.guardian.consent_body'))
                 ->highlight(__('emails_misc.guardian.consent_highlight'), '📋')
                 ->infoCard([
-                    'Relationship' => $safeRelationship,
-                    'Expires' => __('emails_misc.guardian.consent_expires_label', ['days' => self::CONSENT_EXPIRY_DAYS]),
+                    __('emails_misc.guardian.info_card_relationship') => $safeRelationship,
+                    __('emails_misc.guardian.info_card_expires')      => __('emails_misc.guardian.consent_expires_label', ['days' => self::CONSENT_EXPIRY_DAYS]),
                 ])
                 ->button(__('emails_misc.guardian.consent_cta'), $verifyUrl)
                 ->paragraph(__('emails_misc.guardian.consent_ignore'))

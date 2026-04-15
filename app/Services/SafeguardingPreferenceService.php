@@ -387,6 +387,8 @@ class SafeguardingPreferenceService
             return false;
         }
 
+        $optionLabel = $pref->option?->label ?? "option #{$optionId}";
+
         $pref->update(['revoked_at' => now()]);
 
         self::logActivity($userId, 'safeguarding_consent_revoked', 'user', $userId, [
@@ -395,6 +397,40 @@ class SafeguardingPreferenceService
 
         // Re-evaluate triggers (may deactivate protections)
         SafeguardingTriggerService::activateTriggersForUser($userId, $tenantId);
+
+        // Bell admins/brokers — a member has withdrawn consent, protections may have changed
+        try {
+            $revoker = \App\Models\User::find($userId);
+            $revokerName = $revoker
+                ? (trim(($revoker->first_name ?? '') . ' ' . ($revoker->last_name ?? '')) ?: ($revoker->name ?? 'A member'))
+                : 'A member';
+
+            $staffUsers = DB::select(
+                "SELECT id FROM users WHERE tenant_id = ? AND role IN ('admin', 'tenant_admin', 'broker', 'super_admin') AND status = 'active'",
+                [$tenantId]
+            );
+
+            $bellMessage = __('emails_misc.safeguarding.consent_revoked_admin_bell', [
+                'name'   => $revokerName,
+                'option' => $optionLabel,
+            ]);
+
+            foreach ($staffUsers as $staff) {
+                \App\Models\Notification::create([
+                    'tenant_id' => $tenantId,
+                    'user_id'   => $staff->id,
+                    'type'      => 'safeguarding_flag',
+                    'message'   => $bellMessage,
+                    'link'      => "/admin/safeguarding?user={$userId}",
+                    'is_read'   => false,
+                ]);
+            }
+        } catch (\Throwable $notifErr) {
+            Log::warning('SafeguardingPreferenceService::revokePreference: admin bell failed', [
+                'user_id' => $userId,
+                'error'   => $notifErr->getMessage(),
+            ]);
+        }
 
         return true;
     }

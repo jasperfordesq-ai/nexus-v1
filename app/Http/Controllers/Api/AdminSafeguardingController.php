@@ -6,7 +6,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
+use App\Services\EmailService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -446,7 +448,9 @@ class AdminSafeguardingController extends BaseApiController
                 $wardUser = \App\Models\User::find($wardId);
                 $guardianUser = \App\Models\User::find($guardianId);
 
-                // Notify guardian
+                $communityName = TenantContext::getName() ?: 'the community';
+
+                // Bell — guardian
                 \App\Models\Notification::create([
                     'tenant_id' => $tenantId,
                     'user_id' => $guardianId,
@@ -456,7 +460,7 @@ class AdminSafeguardingController extends BaseApiController
                     'is_read' => false,
                 ]);
 
-                // Notify ward — they must know a guardian has been assigned
+                // Bell — ward
                 \App\Models\Notification::create([
                     'tenant_id' => $tenantId,
                     'user_id' => $wardId,
@@ -465,6 +469,51 @@ class AdminSafeguardingController extends BaseApiController
                     'link' => '/settings/safeguarding',
                     'is_read' => false,
                 ]);
+
+                $emailService = app(EmailService::class);
+
+                // Email — guardian
+                if (!empty($guardianUser->email)) {
+                    $guardianName  = trim(($guardianUser->first_name ?? '') . ' ' . ($guardianUser->last_name ?? '')) ?: ($guardianUser->name ?? '');
+                    $wardName      = trim(($wardUser->first_name ?? '') . ' ' . ($wardUser->last_name ?? '')) ?: ($wardUser->name ?? __('api_controllers_1.admin_safeguarding.a_member'));
+                    $safeGuardian  = htmlspecialchars($guardianName, ENT_QUOTES, 'UTF-8');
+                    $safeWard      = htmlspecialchars($wardName, ENT_QUOTES, 'UTF-8');
+                    $safeCommunity = htmlspecialchars($communityName, ENT_QUOTES, 'UTF-8');
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('info')
+                        ->title(__('emails_misc.safeguarding.guardian_assigned_title'))
+                        ->previewText(__('emails_misc.safeguarding.guardian_assigned_preview', ['name' => $safeWard]))
+                        ->greeting($safeGuardian)
+                        ->paragraph(__('emails_misc.safeguarding.guardian_assigned_body', ['name' => $safeWard, 'community' => $safeCommunity]))
+                        ->paragraph('<em>' . __('emails_misc.safeguarding.guardian_assigned_audit_note') . '</em>')
+                        ->button(__('emails_misc.safeguarding.guardian_assigned_cta'), EmailTemplateBuilder::tenantUrl('/admin/safeguarding'))
+                        ->render();
+                    $subject = __('emails_misc.safeguarding.guardian_assigned_subject');
+                    if (!$emailService->send($guardianUser->email, $subject, $html)) {
+                        \Illuminate\Support\Facades\Log::warning('AdminSafeguardingController: guardian assignment email failed', ['guardian_id' => $guardianId]);
+                    }
+                }
+
+                // Email — ward
+                if (!empty($wardUser->email)) {
+                    $wardName2     = trim(($wardUser->first_name ?? '') . ' ' . ($wardUser->last_name ?? '')) ?: ($wardUser->name ?? '');
+                    $guardianDisplay = trim(($guardianUser->first_name ?? '') . ' ' . ($guardianUser->last_name ?? '')) ?: ($guardianUser->name ?? __('api_controllers_1.admin_safeguarding.a_coordinator'));
+                    $safeWard2     = htmlspecialchars($wardName2, ENT_QUOTES, 'UTF-8');
+                    $safeGuardian2 = htmlspecialchars($guardianDisplay, ENT_QUOTES, 'UTF-8');
+                    $safeCommunity2 = htmlspecialchars($communityName, ENT_QUOTES, 'UTF-8');
+                    $html2 = EmailTemplateBuilder::make()
+                        ->theme('info')
+                        ->title(__('emails_misc.safeguarding.ward_assigned_title'))
+                        ->previewText(__('emails_misc.safeguarding.ward_assigned_preview', ['guardian' => $safeGuardian2, 'community' => $safeCommunity2]))
+                        ->greeting($safeWard2)
+                        ->paragraph(__('emails_misc.safeguarding.ward_assigned_body', ['guardian' => $safeGuardian2, 'community' => $safeCommunity2]))
+                        ->button(__('emails_misc.safeguarding.ward_assigned_cta'), EmailTemplateBuilder::tenantUrl('/settings/safeguarding'))
+                        ->render();
+                    $subject2 = __('emails_misc.safeguarding.ward_assigned_subject');
+                    if (!$emailService->send($wardUser->email, $subject2, $html2)) {
+                        \Illuminate\Support\Facades\Log::warning('AdminSafeguardingController: ward assignment email failed', ['ward_id' => $wardId]);
+                    }
+                }
             } catch (\Throwable $e) {
                 \Illuminate\Support\Facades\Log::warning('Failed to notify ward/guardian of assignment', ['error' => $e->getMessage()]);
             }
@@ -494,15 +543,14 @@ class AdminSafeguardingController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         try {
-            $affected = DB::table('safeguarding_assignments')
+            // Fetch the assignment before revoking so we can notify both parties
+            $assignment = DB::table('safeguarding_assignments')
                 ->where('id', $id)
                 ->where('tenant_id', $tenantId)
                 ->whereNull('revoked_at')
-                ->update([
-                    'revoked_at' => now(),
-                ]);
+                ->first();
 
-            if ($affected === 0) {
+            if (!$assignment) {
                 return $this->respondWithError(
                     'NOT_FOUND',
                     __('api.safeguarding_assignment_not_found_or_revoked'),
@@ -510,6 +558,11 @@ class AdminSafeguardingController extends BaseApiController
                     404
                 );
             }
+
+            DB::table('safeguarding_assignments')
+                ->where('id', $id)
+                ->where('tenant_id', $tenantId)
+                ->update(['revoked_at' => now()]);
 
             // Audit log the revocation
             DB::table('activity_log')->insert([
@@ -523,6 +576,75 @@ class AdminSafeguardingController extends BaseApiController
                 'ip_address' => request()?->ip(),
                 'created_at' => now(),
             ]);
+
+            // Notify both guardian and ward of the revocation
+            try {
+                $communityName  = TenantContext::getName() ?: 'the community';
+                $guardianUser   = \App\Models\User::find($assignment->guardian_user_id);
+                $wardUser       = \App\Models\User::find($assignment->ward_user_id);
+                $wardName       = $wardUser ? (trim(($wardUser->first_name ?? '') . ' ' . ($wardUser->last_name ?? '')) ?: ($wardUser->name ?? '')) : '';
+                $guardianName   = $guardianUser ? (trim(($guardianUser->first_name ?? '') . ' ' . ($guardianUser->last_name ?? '')) ?: ($guardianUser->name ?? '')) : '';
+
+                // Bell — guardian
+                if ($guardianUser) {
+                    \App\Models\Notification::create([
+                        'tenant_id' => $tenantId,
+                        'user_id'   => $assignment->guardian_user_id,
+                        'type'      => 'safeguarding_assignment',
+                        'message'   => __('emails_misc.safeguarding.assignment_revoked_guardian_bell', ['name' => $wardName]),
+                        'link'      => '/admin/safeguarding',
+                        'is_read'   => false,
+                    ]);
+                }
+
+                // Bell — ward
+                if ($wardUser) {
+                    \App\Models\Notification::create([
+                        'tenant_id' => $tenantId,
+                        'user_id'   => $assignment->ward_user_id,
+                        'type'      => 'safeguarding_assignment',
+                        'message'   => __('emails_misc.safeguarding.assignment_revoked_ward_bell'),
+                        'link'      => '/settings/safeguarding',
+                        'is_read'   => false,
+                    ]);
+                }
+
+                $emailService   = app(EmailService::class);
+                $safeCommunity  = htmlspecialchars($communityName, ENT_QUOTES, 'UTF-8');
+                $subject        = __('emails_misc.safeguarding.assignment_revoked_guardian_subject');
+
+                // Email — guardian
+                if ($guardianUser && !empty($guardianUser->email)) {
+                    $safeGuardianName = htmlspecialchars($guardianName, ENT_QUOTES, 'UTF-8');
+                    $safeWardName     = htmlspecialchars($wardName, ENT_QUOTES, 'UTF-8');
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('warning')
+                        ->title(__('emails_misc.safeguarding.assignment_revoked_guardian_subject'))
+                        ->greeting($safeGuardianName)
+                        ->paragraph(__('emails_misc.safeguarding.assignment_revoked_guardian_body', ['name' => $safeWardName, 'community' => $safeCommunity]))
+                        ->render();
+                    if (!$emailService->send($guardianUser->email, $subject, $html)) {
+                        \Illuminate\Support\Facades\Log::warning('AdminSafeguardingController: guardian revocation email failed', ['guardian_id' => $assignment->guardian_user_id]);
+                    }
+                }
+
+                // Email — ward
+                if ($wardUser && !empty($wardUser->email)) {
+                    $safeWardName2 = htmlspecialchars($wardName, ENT_QUOTES, 'UTF-8');
+                    $html2 = EmailTemplateBuilder::make()
+                        ->theme('warning')
+                        ->title(__('emails_misc.safeguarding.assignment_revoked_guardian_subject'))
+                        ->greeting($safeWardName2)
+                        ->paragraph(__('emails_misc.safeguarding.assignment_revoked_ward_body', ['community' => $safeCommunity]))
+                        ->button(__('emails_misc.safeguarding.assignment_revoked_cta'), EmailTemplateBuilder::tenantUrl('/help'))
+                        ->render();
+                    if (!$emailService->send($wardUser->email, $subject, $html2)) {
+                        \Illuminate\Support\Facades\Log::warning('AdminSafeguardingController: ward revocation email failed', ['ward_id' => $assignment->ward_user_id]);
+                    }
+                }
+            } catch (\Throwable $notifErr) {
+                \Illuminate\Support\Facades\Log::warning('AdminSafeguardingController: revocation notification failed', ['error' => $notifErr->getMessage()]);
+            }
 
             return $this->respondWithData(['revoked' => true]);
         } catch (\Illuminate\Database\QueryException $e) {

@@ -333,7 +333,7 @@ class SafeguardingService
 
             $this->logActivity($adminId, 'safeguarding_training_verified', 'safeguarding_training', $recordId);
 
-            // Notify the user whose training was verified
+            // Notify the user whose training was verified (bell + email)
             try {
                 $trainingName = $record->training_name ?? 'safeguarding training';
                 \App\Models\Notification::createNotification(
@@ -344,6 +344,25 @@ class SafeguardingService
                     true,
                     $tenantId
                 );
+
+                $trainee = User::find($record->user_id);
+                if ($trainee && !empty($trainee->email)) {
+                    $traineeName  = trim(($trainee->first_name ?? '') . ' ' . ($trainee->last_name ?? '')) ?: ($trainee->name ?? '');
+                    $safeTraining = htmlspecialchars($trainingName, ENT_QUOTES, 'UTF-8');
+                    $emailBody = EmailTemplateBuilder::make()
+                        ->theme('success')
+                        ->title(__('emails_misc.safeguarding.training_verified_title'))
+                        ->previewText(__('emails_misc.safeguarding.training_verified_preview', ['training' => $safeTraining]))
+                        ->greeting($traineeName)
+                        ->paragraph(__('emails_misc.safeguarding.training_verified_body', ['training' => $safeTraining]))
+                        ->button(__('emails_misc.safeguarding.training_verified_cta'), EmailTemplateBuilder::tenantUrl('/dashboard'))
+                        ->render();
+                    $subject = __('emails_misc.safeguarding.training_verified_subject', ['training' => $trainingName]);
+                    $emailService = app(\App\Services\EmailService::class);
+                    if (!$emailService->send($trainee->email, $subject, $emailBody)) {
+                        Log::warning("SafeguardingService::verifyTraining email send failed for user #{$record->user_id}");
+                    }
+                }
             } catch (\Throwable $notifError) {
                 Log::warning("SafeguardingService::verifyTraining notification failed for record #{$recordId}: " . $notifError->getMessage());
             }
@@ -386,7 +405,7 @@ class SafeguardingService
                 'reason' => $reason,
             ]);
 
-            // Notify the user whose training was rejected
+            // Notify the user whose training was rejected (bell + email — rejection is critical)
             try {
                 $trainingName = $record->training_name ?? 'safeguarding training';
                 \App\Models\Notification::createNotification(
@@ -397,6 +416,30 @@ class SafeguardingService
                     true,
                     $tenantId
                 );
+
+                $trainee = User::find($record->user_id);
+                if ($trainee && !empty($trainee->email)) {
+                    $traineeName  = trim(($trainee->first_name ?? '') . ' ' . ($trainee->last_name ?? '')) ?: ($trainee->name ?? '');
+                    $safeTraining = htmlspecialchars($trainingName, ENT_QUOTES, 'UTF-8');
+                    $safeReason   = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
+                    $emailBody = EmailTemplateBuilder::make()
+                        ->theme('warning')
+                        ->title(__('emails_misc.safeguarding.training_rejected_title'))
+                        ->previewText(__('emails_misc.safeguarding.training_rejected_preview', ['training' => $safeTraining]))
+                        ->greeting($traineeName)
+                        ->paragraph(__('emails_misc.safeguarding.training_rejected_body', ['training' => $safeTraining]))
+                        ->paragraph(__('emails_misc.safeguarding.training_rejected_next_steps'))
+                        ->infoCard([
+                            __('emails_misc.safeguarding.training_rejected_reason_label') => $safeReason,
+                        ])
+                        ->button(__('emails_misc.safeguarding.training_rejected_cta'), EmailTemplateBuilder::tenantUrl('/help'))
+                        ->render();
+                    $subject = __('emails_misc.safeguarding.training_rejected_subject', ['training' => $trainingName]);
+                    $emailService = app(\App\Services\EmailService::class);
+                    if (!$emailService->send($trainee->email, $subject, $emailBody)) {
+                        Log::warning("SafeguardingService::rejectTraining email send failed for user #{$record->user_id}");
+                    }
+                }
             } catch (\Throwable $notifError) {
                 Log::warning("SafeguardingService::rejectTraining notification failed for record #{$recordId}: " . $notifError->getMessage());
             }
