@@ -228,6 +228,33 @@
     "completed_buyer_body": "Your order <strong>{{order_number}}</strong> for <strong>{{title}}</strong> has been completed. Thank you for your purchase!",
     "completed_seller_body": "Order <strong>{{order_number}}</strong> for <strong>{{title}}</strong> has been completed and escrow has been released."
   },
+  "exchange_rating": {
+    "received_subject": "You received a new rating on an exchange",
+    "received_title": "New Exchange Rating",
+    "received_body": "You received a <strong>{{rating}}-star</strong> rating on an exchange.",
+    "received_cta": "View Exchange"
+  },
+  "review": {
+    "received_subject": "You received a new review",
+    "received_title": "New Review",
+    "received_body": "You received a <strong>{{rating}}-star</strong> review.",
+    "received_cta": "View Reviews"
+  },
+  "community_project": {
+    "approved_subject": "Your project proposal has been approved — {{title}}",
+    "approved_title": "Project Approved",
+    "approved_body": "Your community project proposal <strong>{{title}}</strong> has been approved and is now active.",
+    "approved_cta": "View Project",
+    "rejected_subject": "Your project proposal was not approved — {{title}}",
+    "rejected_title": "Project Not Approved",
+    "rejected_body": "Your community project proposal <strong>{{title}}</strong> was not approved.",
+    "rejected_notes_label": "Reviewer notes",
+    "rejected_cta": "Submit a Proposal",
+    "under_review_subject": "Your project proposal is under review — {{title}}",
+    "under_review_title": "Project Under Review",
+    "under_review_body": "Your community project proposal <strong>{{title}}</strong> is now under active review.",
+    "under_review_cta": "View Proposal"
+  },
   "group_invite": {
     "email_subject": "You've been invited to join {{group}}",
     "email_title": "Group Invitation",

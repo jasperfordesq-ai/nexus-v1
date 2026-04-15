@@ -6,6 +6,8 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -348,6 +350,36 @@ class CommunityProjectService
                 'review_notes' => $feedback,
                 'updated_at'   => now(),
             ]);
+
+        // Notify the proposer of the review decision
+        try {
+            $proposedBy = (int) $project->proposed_by;
+            $user = DB::table('users')->where('id', $proposedBy)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+            if ($user && !empty($user->email)) {
+                $firstName  = $user->first_name ?? $user->name ?? 'there';
+                $safeTitle  = htmlspecialchars($project->title ?? '', ENT_QUOTES, 'UTF-8');
+                $prefix     = match ($status) {
+                    'approved'     => 'approved',
+                    'rejected'     => 'rejected',
+                    default        => 'under_review',
+                };
+                $link    = '/volunteering/community-projects/' . $proposalId;
+                $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+                $builder = EmailTemplateBuilder::make()
+                    ->title(__("emails_misc.community_project.{$prefix}_title"))
+                    ->greeting($firstName)
+                    ->paragraph(__("emails_misc.community_project.{$prefix}_body", ['title' => $safeTitle]));
+                if ($status === 'rejected' && !empty($feedback)) {
+                    $builder->paragraph('<strong>' . __('emails_misc.community_project.rejected_notes_label') . ':</strong> ' . htmlspecialchars($feedback, ENT_QUOTES, 'UTF-8'));
+                }
+                $html = $builder->button(__("emails_misc.community_project.{$prefix}_cta"), $fullUrl)->render();
+                if (!Mailer::forCurrentTenant()->send($user->email, __("emails_misc.community_project.{$prefix}_subject", ['title' => $safeTitle]), $html)) {
+                    Log::warning('[CommunityProjectService] review email failed', ['proposal_id' => $proposalId]);
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[CommunityProjectService] review email error: ' . $e->getMessage());
+        }
 
         return true;
     }

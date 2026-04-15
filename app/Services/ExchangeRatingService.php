@@ -6,6 +6,8 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -83,12 +85,32 @@ class ExchangeRatingService
                  VALUES (?, ?, ?, ?, ?, ?, ?, NOW())",
                 [$tenantId, $exchangeId, $userId, $ratedId, $rating, $comment, $role]
             );
-
-            return ['success' => true];
         } catch (\Throwable $e) {
             Log::error('[ExchangeRatingService] submitRating failed: ' . $e->getMessage());
             return ['success' => false, 'error' => 'Failed to submit rating'];
         }
+
+        // Notify the rated user
+        try {
+            $user = DB::table('users')->where('id', $ratedId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+            if ($user && !empty($user->email)) {
+                $firstName = $user->first_name ?? $user->name ?? 'there';
+                $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/exchanges/' . $exchangeId;
+                $html = EmailTemplateBuilder::make()
+                    ->title(__('emails_misc.exchange_rating.received_title'))
+                    ->greeting($firstName)
+                    ->paragraph(__('emails_misc.exchange_rating.received_body', ['rating' => $rating]))
+                    ->button(__('emails_misc.exchange_rating.received_cta'), $fullUrl)
+                    ->render();
+                if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.exchange_rating.received_subject'), $html)) {
+                    Log::warning('[ExchangeRatingService] submitRating email failed', ['rated_id' => $ratedId]);
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[ExchangeRatingService] submitRating email error: ' . $e->getMessage());
+        }
+
+        return ['success' => true];
     }
 
     /**

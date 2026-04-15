@@ -6,11 +6,14 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\ReviewCreated;
 use App\Models\Review;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -239,10 +242,33 @@ class ReviewService
         try {
             ReviewCreated::dispatch($review, (int) TenantContext::getId());
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning('ReviewCreated dispatch failed', [
+            Log::warning('ReviewCreated dispatch failed', [
                 'review_id' => $review->id,
                 'error' => $e->getMessage(),
             ]);
+        }
+
+        // Notify receiver they got a new review (skip anonymous reviews)
+        if (empty($review->is_anonymous)) {
+            try {
+                $tenantId = TenantContext::getId();
+                $receiver = DB::table('users')->where('id', $receiverId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+                if ($receiver && !empty($receiver->email)) {
+                    $firstName = $receiver->first_name ?? $receiver->name ?? 'there';
+                    $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/profile/' . $receiverId . '/reviews';
+                    $html = EmailTemplateBuilder::make()
+                        ->title(__('emails_misc.review.received_title'))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_misc.review.received_body', ['rating' => (int) $review->rating]))
+                        ->button(__('emails_misc.review.received_cta'), $fullUrl)
+                        ->render();
+                    if (!Mailer::forCurrentTenant()->send($receiver->email, __('emails_misc.review.received_subject'), $html)) {
+                        Log::warning('[ReviewService] create email failed', ['receiver_id' => $receiverId]);
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[ReviewService] create email error: ' . $e->getMessage());
+            }
         }
 
         return [
