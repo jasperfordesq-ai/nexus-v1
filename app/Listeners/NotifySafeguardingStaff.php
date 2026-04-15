@@ -6,10 +6,12 @@
 
 namespace App\Listeners;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
+use App\Core\TenantContext;
 use App\Events\SafeguardingFlaggedEvent;
 use App\Models\Notification;
 use App\Models\User;
-use App\Services\EmailService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -18,8 +20,8 @@ use Illuminate\Support\Facades\Log;
  * Notifies all admin and broker users when a member self-identifies
  * safeguarding needs during onboarding.
  *
- * Sends both in-app notifications and emails so that safeguarding flags
- * are never missed. This is queued for performance but runs quickly.
+ * Sends both in-app notifications and HTML emails so that safeguarding
+ * flags are never missed. This is queued for performance but runs quickly.
  */
 class NotifySafeguardingStaff implements ShouldQueue
 {
@@ -38,16 +40,15 @@ class NotifySafeguardingStaff implements ShouldQueue
     public function handle(SafeguardingFlaggedEvent $event): void
     {
         try {
-            $tenantId = $event->tenantId;
+            $tenantId      = $event->tenantId;
             $flaggedUserId = $event->userId;
 
-            // Set tenant context for queued job — required for HasTenantScope
-            // and any service that reads TenantContext::getId()
-            \App\Core\TenantContext::setById($tenantId);
+            // Set tenant context for queued job
+            TenantContext::setById($tenantId);
 
             // Load the flagged member's name
             $flaggedUser = User::find($flaggedUserId);
-            $memberName = $flaggedUser
+            $memberName  = $flaggedUser
                 ? trim(($flaggedUser->first_name ?? '') . ' ' . ($flaggedUser->last_name ?? '')) ?: ($flaggedUser->name ?? 'Unknown member')
                 : 'Unknown member';
 
@@ -58,10 +59,10 @@ class NotifySafeguardingStaff implements ShouldQueue
                  WHERE usp.user_id = ? AND usp.tenant_id = ? AND usp.revoked_at IS NULL AND tso.is_active = 1",
                 [$flaggedUserId, $tenantId]
             );
-            $optionLabels = array_map(fn ($row) => $row->label, $selectedOptions);
+            $optionLabels  = array_map(fn ($row) => $row->label, $selectedOptions);
             $optionSummary = !empty($optionLabels)
                 ? implode(', ', $optionLabels)
-                : 'safeguarding support options';
+                : __('emails_misc.safeguarding.onboarding_flag_options_label');
 
             // Find all admin, tenant_admin, broker, and super_admin users for this tenant
             $staffUsers = DB::select(
@@ -72,13 +73,16 @@ class NotifySafeguardingStaff implements ShouldQueue
 
             if (empty($staffUsers)) {
                 Log::warning('NotifySafeguardingStaff: no admin/broker users found for tenant', [
-                    'tenant_id' => $tenantId,
+                    'tenant_id'       => $tenantId,
                     'flagged_user_id' => $flaggedUserId,
                 ]);
                 return;
             }
 
-            $notificationMessage = "Safeguarding flag: {$memberName} indicated support needs during onboarding — {$optionSummary}";
+            $notificationMessage = __('emails_misc.safeguarding.onboarding_flag_bell', [
+                'name'    => $memberName,
+                'options' => $optionSummary,
+            ]);
             $adminLink = "/admin/safeguarding?user={$flaggedUserId}";
 
             foreach ($staffUsers as $staff) {
@@ -93,24 +97,24 @@ class NotifySafeguardingStaff implements ShouldQueue
                     'created_at' => now(),
                 ]);
 
-                // Email notification
+                // HTML email notification
                 if (!empty($staff->email)) {
-                    $this->sendEmail($staff, $memberName, $optionLabels, $flaggedUserId, $tenantId);
+                    $this->sendEmail($staff, $memberName, $optionLabels, $flaggedUserId, $tenantId, $adminLink);
                 }
             }
 
             Log::info('NotifySafeguardingStaff: notified staff', [
-                'tenant_id' => $tenantId,
-                'flagged_user_id' => $flaggedUserId,
-                'staff_notified' => count($staffUsers),
+                'tenant_id'        => $tenantId,
+                'flagged_user_id'  => $flaggedUserId,
+                'staff_notified'   => count($staffUsers),
                 'options_selected' => $optionLabels,
             ]);
         } catch (\Throwable $e) {
             Log::error('NotifySafeguardingStaff: failed to notify staff', [
-                'user_id' => $event->userId ?? null,
+                'user_id'   => $event->userId ?? null,
                 'tenant_id' => $event->tenantId ?? null,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'error'     => $e->getMessage(),
+                'trace'     => $e->getTraceAsString(),
             ]);
             // Re-throw so Laravel queue retries (safeguarding notifications are legally critical)
             throw $e;
@@ -123,39 +127,50 @@ class NotifySafeguardingStaff implements ShouldQueue
     public function failed(SafeguardingFlaggedEvent $event, \Throwable $exception): void
     {
         Log::critical('NotifySafeguardingStaff: PERMANENTLY FAILED after all retries', [
-            'user_id' => $event->userId,
+            'user_id'   => $event->userId,
             'tenant_id' => $event->tenantId,
-            'error' => $exception->getMessage(),
+            'error'     => $exception->getMessage(),
         ]);
     }
 
-    private function sendEmail(object $staff, string $memberName, array $optionLabels, int $flaggedUserId, int $tenantId): void
-    {
-        $staffName = $staff->first_name ?? $staff->name ?? 'Team member';
-        $optionList = implode("\n  - ", $optionLabels);
+    private function sendEmail(
+        object $staff,
+        string $memberName,
+        array  $optionLabels,
+        int    $flaggedUserId,
+        int    $tenantId,
+        string $adminLink
+    ): void {
+        $staffName  = $staff->first_name ?? $staff->name ?? 'Team member';
+        $adminUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $adminLink;
 
-        /** @var EmailService $emailService */
-        $emailService = app(EmailService::class);
+        $bulletItems = !empty($optionLabels)
+            ? $optionLabels
+            : [__('emails_misc.safeguarding.onboarding_flag_options_label')];
 
-        $sent = $emailService->send(
-            $staff->email,
-            "[NEXUS] Safeguarding flag — {$memberName}",
-            "Hi {$staffName},\n\n"
-            . "A member has indicated safeguarding support needs during onboarding.\n\n"
-            . "Member: {$memberName}\n"
-            . "Selected options:\n  - {$optionList}\n\n"
-            . "Please review this in the admin panel and take appropriate action.\n"
-            . "This may include assigning a guardian, adjusting messaging permissions, or contacting the member directly.\n\n"
-            . "This is an automated notification from the platform safeguarding system.\n"
-            . "All access to safeguarding data is audit-logged.\n"
-        );
+        $html = EmailTemplateBuilder::make()
+            ->theme('warning')
+            ->title(__('emails_misc.safeguarding.onboarding_flag_title'))
+            ->previewText(__('emails_misc.safeguarding.onboarding_flag_preview', ['name' => $memberName]))
+            ->greeting($staffName)
+            ->paragraph(__('emails_misc.safeguarding.onboarding_flag_body'))
+            ->highlight(htmlspecialchars($memberName, ENT_QUOTES, 'UTF-8'), '🚨')
+            ->bulletList($bulletItems)
+            ->paragraph(__('emails_misc.safeguarding.onboarding_flag_review'))
+            ->paragraph('<em>' . __('emails_misc.safeguarding.onboarding_flag_audit_note') . '</em>')
+            ->button(__('emails_misc.safeguarding.onboarding_flag_cta'), $adminUrl)
+            ->render();
+
+        $subject = __('emails_misc.safeguarding.onboarding_flag_subject', ['name' => $memberName]);
+        $mailer  = Mailer::forCurrentTenant();
+        $sent    = $mailer->send($staff->email, $subject, $html);
 
         if (!$sent) {
             Log::critical('NotifySafeguardingStaff: email send returned false — safeguarding notification not delivered', [
-                'staff_id' => $staff->id,
-                'staff_email' => $staff->email,
+                'staff_id'        => $staff->id,
+                'staff_email'     => $staff->email,
                 'flagged_user_id' => $flaggedUserId,
-                'tenant_id' => $tenantId,
+                'tenant_id'       => $tenantId,
             ]);
             throw new \RuntimeException(
                 "Safeguarding email failed to send to staff {$staff->id} ({$staff->email}) — queue will retry"

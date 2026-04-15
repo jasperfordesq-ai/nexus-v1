@@ -6,6 +6,8 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\BrokerMessageCopy;
 use App\Models\Message;
@@ -132,7 +134,7 @@ class BrokerMessageVisibilityService
             'related_listing_id' => $message->listing_id ?? null,
         ]);
 
-        // Notify admin brokers
+        // Notify admin brokers — in-app bell + email for high-priority reasons
         try {
             $sender = User::find($message->sender_id);
             $senderDisplayName = $sender ? trim($sender->name ?? '') : 'A user';
@@ -140,18 +142,35 @@ class BrokerMessageVisibilityService
                 $senderDisplayName = 'A user';
             }
 
-            $adminIds = $this->getTenantBrokerAdminIds();
-            foreach ($adminIds as $adminId) {
-                if ($adminId === (int) $message->sender_id) {
+            $brokerUsers = User::where('tenant_id', $tenantId)
+                ->whereIn('role', ['admin', 'tenant_admin', 'broker', 'super_admin'])
+                ->where('status', 'active')
+                ->select(['id', 'email', 'first_name', 'name'])
+                ->get();
+
+            $reviewUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/admin/broker-controls/messages';
+
+            foreach ($brokerUsers as $broker) {
+                if ((int) $broker->id === (int) $message->sender_id) {
                     continue;
                 }
+
+                // In-app notification (all reasons)
                 Notification::create([
                     'tenant_id' => $tenantId,
-                    'user_id' => $adminId,
-                    'message' => __('svc_notifications.broker.message_for_review', ['sender' => $senderDisplayName]),
-                    'link' => '/admin/broker-controls/messages',
-                    'type' => 'broker_review',
+                    'user_id'   => $broker->id,
+                    'message'   => __('svc_notifications.broker.message_for_review', ['sender' => $senderDisplayName]),
+                    'link'      => '/admin/broker-controls/messages',
+                    'type'      => 'broker_review',
                 ]);
+
+                // Email notification — only for high-priority reasons that affect monitored/vulnerable members
+                if (
+                    in_array($reason, [self::REASON_FLAGGED_USER, self::REASON_HIGH_RISK_LISTING], true)
+                    && !empty($broker->email)
+                ) {
+                    $this->sendBrokerReviewEmail($broker, $senderDisplayName, $reason, $reviewUrl);
+                }
             }
         } catch (\Throwable $e) {
             Log::warning('[BrokerMessageVisibilityService] Admin notification error: ' . $e->getMessage());
@@ -404,6 +423,44 @@ class BrokerMessageVisibilityService
                 ]);
         } catch (\Throwable $e) {
             Log::warning('[BrokerMessageVisibilityService] Failed to clear expired monitoring: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Send an email to a broker when a high-priority message is copied for review.
+     * Only called for REASON_FLAGGED_USER and REASON_HIGH_RISK_LISTING.
+     */
+    private function sendBrokerReviewEmail(object $broker, string $senderDisplayName, string $reason, string $reviewUrl): void
+    {
+        try {
+            $brokerName = $broker->first_name ?? $broker->name ?? 'Broker';
+
+            $bodyKey = $reason === self::REASON_HIGH_RISK_LISTING
+                ? 'emails_misc.safeguarding.broker_message_high_risk_body'
+                : 'emails_misc.safeguarding.broker_message_flagged_body';
+
+            $html = EmailTemplateBuilder::make()
+                ->theme('warning')
+                ->title(__('emails_misc.safeguarding.broker_message_flagged_title'))
+                ->previewText(__('emails_misc.safeguarding.broker_message_flagged_preview'))
+                ->greeting($brokerName)
+                ->paragraph(__($bodyKey, ['sender' => htmlspecialchars($senderDisplayName, ENT_QUOTES, 'UTF-8')]))
+                ->paragraph('<em>' . __('emails_misc.safeguarding.broker_message_audit_note') . '</em>')
+                ->button(__('emails_misc.safeguarding.broker_message_cta'), $reviewUrl)
+                ->render();
+
+            $subject = __('emails_misc.safeguarding.broker_message_flagged_subject', ['sender' => $senderDisplayName]);
+            $mailer  = Mailer::forCurrentTenant();
+
+            if (!$mailer->send($broker->email, $subject, $html)) {
+                Log::warning('[BrokerMessageVisibilityService] Broker review email failed to send', [
+                    'broker_id'    => $broker->id,
+                    'broker_email' => $broker->email,
+                    'reason'       => $reason,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[BrokerMessageVisibilityService] sendBrokerReviewEmail error: ' . $e->getMessage());
         }
     }
 

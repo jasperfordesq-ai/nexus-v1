@@ -85,7 +85,9 @@ class NotifyAdminOfNewVolunteerOpportunity implements ShouldQueue
                     ->button(__('emails_misc.admin_notify.new_vol_opp_cta'), $oppUrl)
                     ->render();
 
-                $mailer->send($adminEmail, $subject, $html);
+                if (!$mailer->send($adminEmail, $subject, $html)) {
+                    Log::warning('NotifyAdminOfNewVolunteerOpportunity: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
+                }
             }
         } catch (\Throwable $e) {
             Log::error('NotifyAdminOfNewVolunteerOpportunity listener failed', [
