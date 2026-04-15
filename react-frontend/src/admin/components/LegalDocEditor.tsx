@@ -466,7 +466,16 @@ function LegalNoticePlugin() {
           $createTextNode(t('enterprise.version_form.notice_body_placeholder')),
         );
         noticeNode.append(heading, paragraph);
-        $insertNodeToNearestRoot(noticeNode);
+
+        // $insertNodeToNearestRoot requires a RangeSelection. If the toolbar button
+        // was clicked before the editor received focus there may be no selection —
+        // fall back to appending at the document root in that case.
+        const selection = $getSelection();
+        if ($isRangeSelection(selection)) {
+          $insertNodeToNearestRoot(noticeNode);
+        } else {
+          $getRoot().append(noticeNode);
+        }
         return true;
       },
       COMMAND_PRIORITY_NORMAL,
@@ -539,7 +548,19 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
   // live preview stays in sync without needing to re-import into Lexical.
   const [currentHtml, setCurrentHtml] = useState(value);
 
-  const initialConfig = {
+  // Sync the preview when the parent updates `value` from outside (e.g. edit mode
+  // loading: LegalDocVersionForm's useEffect fires after mount and sets content from
+  // editVersion, so the initial useState(value) would be stale empty string).
+  // When the user types, onChange → parent → new value → setCurrentHtml(same string) →
+  // React bails out (no-op), so there is no loop.
+  useEffect(() => {
+    setCurrentHtml(value);
+  }, [value]);
+
+  // LexicalComposer only reads initialConfig once — memoised to make that explicit
+  // and avoid any reference-equality surprises with the nodes array.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const initialConfig = useMemo(() => ({
     namespace: 'NexusLegalDocEditor',
     theme: editorTheme,
     nodes: [HeadingNode, QuoteNode, ListNode, ListItemNode, LinkNode, AutoLinkNode, LegalNoticeNode],
@@ -547,16 +568,23 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
       console.error('LegalDocEditor error:', error);
     },
     editable: !disabled,
-  };
+  // disabled intentionally not in deps: initial editability only; DisabledPlugin handles changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), []);
 
   const handleChange = useCallback(
-    (_editorState: EditorState, editor: LexicalEditor) => {
-      editor.read(() => {
+    (editorState: EditorState, editor: LexicalEditor) => {
+      // Read from the specific snapshot that triggered the update, not from
+      // whatever the editor's current state happens to be at call time —
+      // the two can diverge under concurrent Lexical updates.
+      // Pass { editor } so node registrations (including LegalNoticeNode) are
+      // available to $generateHtmlFromNodes during the read.
+      editorState.read(() => {
         const html = $generateHtmlFromNodes(editor);
         const normalised = html === '<p><br></p>' || html === '<p></p>' ? '' : html;
         setCurrentHtml(normalised);
         onChange(normalised);
-      });
+      }, { editor });
     },
     [onChange],
   );
@@ -642,7 +670,10 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
               <HistoryPlugin />
               <ListPlugin />
               <LinkPlugin />
-              <OnChangePlugin onChange={handleChange} />
+              {/* ignoreSelectionChange: skip serialisation on cursor-only moves.
+                  $generateHtmlFromNodes on a 46KB document on every arrow key
+                  is expensive; content hasn't changed so there's nothing to emit. */}
+              <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
               <HtmlImportPlugin html={value} />
               <DisabledPlugin isDisabled={disabled} />
               <LegalNoticePlugin />
@@ -650,14 +681,17 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
           </div>
         </div>
 
-        {/* Live preview */}
+        {/* Live preview — pointer-events-none prevents accidental navigation via
+            the Contact Us / version-history links that CustomLegalDocument renders */}
         {showPreview && (
           <div className="w-1/2 overflow-y-auto max-h-[600px] rounded-lg border border-default-200 dark:border-default-100 bg-[var(--color-surface)] px-4 pt-3 pb-6">
             <p className="text-[0.7rem] font-semibold text-default-400 uppercase tracking-wider mb-4 sticky top-0 bg-[var(--color-surface)] py-1">
               {t('enterprise.version_form.preview_label')}
             </p>
             {currentHtml ? (
-              <CustomLegalDocument document={previewDoc} accentColor="blue" />
+              <div className="pointer-events-none">
+                <CustomLegalDocument document={previewDoc} accentColor="blue" />
+              </div>
             ) : (
               <p className="text-sm text-default-400 italic">
                 {t('enterprise.version_form.placeholder_content')}

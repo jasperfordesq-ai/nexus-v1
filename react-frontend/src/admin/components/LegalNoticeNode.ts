@@ -87,8 +87,12 @@ export class LegalNoticeNode extends ElementNode {
     return { element };
   }
 
-  static importJSON(_serializedNode: SerializedLegalNoticeNode): LegalNoticeNode {
-    return $createLegalNoticeNode();
+  static importJSON(serializedNode: SerializedLegalNoticeNode): LegalNoticeNode {
+    const node = $createLegalNoticeNode();
+    node.setFormat(serializedNode.format);
+    node.setIndent(serializedNode.indent);
+    node.setDirection(serializedNode.direction);
+    return node;
   }
 
   exportJSON(): SerializedLegalNoticeNode {

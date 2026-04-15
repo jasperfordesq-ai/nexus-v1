@@ -184,7 +184,7 @@ export default function LegalDocVersionForm({
           {/* Content */}
           <LegalDocEditor
             value={formData.content}
-            onChange={(html) => setFormData({ ...formData, content: html })}
+            onChange={(html) => setFormData((prev) => ({ ...prev, content: html }))}
             disabled={submitting}
             errorMessage={errors.content}
           />
