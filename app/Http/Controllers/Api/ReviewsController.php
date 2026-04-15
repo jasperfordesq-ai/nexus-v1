@@ -165,7 +165,7 @@ class ReviewsController extends BaseApiController
                 // In-app notification
                 \App\Models\Notification::createNotification(
                     $receiverId,
-                    "{$reviewerName} left you a {$rating}-star review",
+                    __('notifications.review_received_in_app', ['name' => $reviewerName, 'rating' => $rating]),
                     '/reviews',
                     'review'
                 );

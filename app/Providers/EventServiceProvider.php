@@ -24,6 +24,7 @@ use App\Events\VolunteerOpportunityCreated;
 use App\Events\VolunteerOpportunityUpdated;
 use App\Listeners\CopyMessageForBrokerReview;
 use App\Listeners\NotifyAdminOfNewCommunityEvent;
+use App\Listeners\NotifyGroupMemberJoined;
 use App\Listeners\NotifyAdminOfNewGroup;
 use App\Listeners\NotifyAdminOfNewListing;
 use App\Listeners\NotifyAdminOfNewRegistration;
@@ -124,6 +125,7 @@ class EventServiceProvider extends ServiceProvider
 
         GroupMemberJoined::class => [
             PushGroupMembershipToFederatedPartners::class,
+            NotifyGroupMemberJoined::class,
         ],
 
         VolunteerOpportunityCreated::class => [

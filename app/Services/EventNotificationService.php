@@ -99,7 +99,7 @@ class EventNotificationService
                         'event_update'
                     );
                 } catch (\Throwable $e) {
-                    Log::debug("[EventNotificationService] Email failed for user {$attendeeId}: " . $e->getMessage());
+                    Log::warning("[EventNotificationService] Email failed for user {$attendeeId}: " . $e->getMessage());
                 }
 
                 $count++;
@@ -178,7 +178,7 @@ class EventNotificationService
                                 $this->buildReminderEmailHtml($event, $type, $attendee)
                             );
                         } catch (\Throwable $e) {
-                            Log::debug("[EventNotificationService] Reminder email failed for user {$userId}: " . $e->getMessage());
+                            Log::warning("[EventNotificationService] Reminder email failed for user {$userId}: " . $e->getMessage());
                         }
 
                         $sent++;
@@ -279,7 +279,7 @@ class EventNotificationService
                             $this->buildCancellationEmailHtml($event, $reason, $user)
                         );
                     } catch (\Throwable $e) {
-                        Log::debug("[EventNotificationService] Cancellation email failed for user {$uid}: " . $e->getMessage());
+                        Log::warning("[EventNotificationService] Cancellation email failed for user {$uid}: " . $e->getMessage());
                     }
 
                     $count++;
@@ -385,7 +385,7 @@ class EventNotificationService
                         $this->buildUpdateEmailHtml($event, $meaningfulChanges, $attendee)
                     );
                 } catch (\Throwable $e) {
-                    Log::debug("[EventNotificationService] Update email failed for user {$attendeeId}: " . $e->getMessage());
+                    Log::warning("[EventNotificationService] Update email failed for user {$attendeeId}: " . $e->getMessage());
                 }
             }
         } catch (\Throwable $e) {
@@ -469,7 +469,7 @@ class EventNotificationService
                     );
                 }
             } catch (\Throwable $e) {
-                Log::debug("[EventNotificationService] RSVP email failed for organizer {$organizerId}: " . $e->getMessage());
+                Log::warning("[EventNotificationService] RSVP email failed for organizer {$organizerId}: " . $e->getMessage());
             }
         } catch (\Throwable $e) {
             Log::error("EventNotificationService::notifyRsvp error: " . $e->getMessage());

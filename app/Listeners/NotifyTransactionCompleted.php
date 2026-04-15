@@ -40,13 +40,12 @@ class NotifyTransactionCompleted implements ShouldQueue
 
             $senderName = $sender->first_name ?? $sender->name ?? 'Someone';
             $amount = (float) $transaction->amount;
-            $hourLabel = $amount == 1 ? 'hour' : 'hours';
             $description = $transaction->description ?? '';
 
             // 1. Create in-app notification (bell icon) for receiver
-            $content = "{$senderName} sent you {$amount} {$hourLabel}";
+            $content = __('notifications.credit_received', ['name' => $senderName, 'amount' => $amount]);
             if ($description !== '') {
-                $content .= " for \"{$description}\"";
+                $content .= ' ' . __('notifications.credit_received_for', ['description' => $description]);
             }
 
             Notification::createNotification(
