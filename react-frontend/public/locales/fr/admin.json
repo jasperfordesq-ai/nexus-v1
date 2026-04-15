@@ -1248,7 +1248,7 @@
     "version_form": {
       "btn_create": "Create",
       "btn_update": "Update",
-      "content_description": "Content",
+      "content_description": "Write the document content using the rich text editor. Supports headings, lists, links, and notice callout boxes.",
       "content_required": "Content Required",
       "create_info": "Create Info",
       "draft_description": "Draft",

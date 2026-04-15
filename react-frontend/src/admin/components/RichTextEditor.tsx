@@ -18,6 +18,7 @@ import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
@@ -201,7 +202,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
     if (isLink) {
       editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
     } else {
-      const url = prompt(t('rte.enter_url'));
+      const url = prompt(t('rte.enter_url', 'Enter URL'));
       if (url) {
         editor.dispatchCommand(TOGGLE_LINK_COMMAND, url);
       }
@@ -490,11 +491,6 @@ function DisabledPlugin({ isDisabled }: { isDisabled?: boolean }) {
   return null;
 }
 
-/* ───────────────────────── Error Boundary ───────────────────────── */
-
-function EditorErrorBoundary({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
-}
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
@@ -561,7 +557,7 @@ export function RichTextEditor({
                   {placeholder}
                 </div>
               }
-              ErrorBoundary={EditorErrorBoundary}
+              ErrorBoundary={LexicalErrorBoundary}
             />
           </div>
           <HistoryPlugin />
