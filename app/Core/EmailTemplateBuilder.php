@@ -485,7 +485,7 @@ HTML;
     private function renderButton(array $block, array $theme): string
     {
         $text = self::esc($block['text']);
-        $url = $block['url'];
+        $url = self::sanitizeButtonUrl((string) ($block['url'] ?? ''));
         $fallbackText = __('emails.common.button_fallback_short');
 
         return <<<HTML
@@ -696,6 +696,26 @@ HTML;
     private static function esc(string $text): string
     {
         return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+    }
+
+    /**
+     * Sanitize a button URL — allows http/https/mailto and relative paths only.
+     * Prevents javascript:/data:/vbscript: injection via href attributes.
+     */
+    private static function sanitizeButtonUrl(string $url): string
+    {
+        $url = trim($url);
+        if ($url === '') {
+            return '';
+        }
+        if ($url[0] === '/' || $url[0] === '#') {
+            return htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+        }
+        $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
+        if (!in_array($scheme, ['http', 'https', 'mailto'], true)) {
+            return '';
+        }
+        return htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
     }
 
     /**

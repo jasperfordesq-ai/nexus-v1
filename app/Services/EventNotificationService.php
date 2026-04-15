@@ -476,6 +476,87 @@ class EventNotificationService
         }
     }
 
+    /**
+     * Notify the event organizer that their event has been published.
+     *
+     * Sends a confirmation email (theme: success) to the organizer with the
+     * event title, date, and location/online URL. Also dispatches an in-app
+     * bell notification. Optionally notifies any initial attendees (e.g. users
+     * who RSVPed immediately during creation) by delegating to notifyAttendees().
+     *
+     * @param int  $tenantId    Tenant the event belongs to
+     * @param int  $eventId     ID of the newly created event
+     * @param int  $organizerId User ID of the event creator/organizer
+     * @param bool $notifyInitialAttendees  Pass true to also notify existing RSVPs
+     */
+    public function notifyEventCreated(int $tenantId, int $eventId, int $organizerId, bool $notifyInitialAttendees = false): void
+    {
+        try {
+            TenantContext::setId($tenantId);
+
+            $event = DB::table('events')
+                ->where('id', $eventId)
+                ->where('tenant_id', $tenantId)
+                ->select(['id', 'title', 'start_time', 'end_time', 'location', 'is_online', 'online_url'])
+                ->first();
+
+            if (!$event) {
+                Log::error("[EventNotificationService] notifyEventCreated: event {$eventId} not found for tenant {$tenantId}");
+                return;
+            }
+
+            $organizer = DB::table('users')
+                ->where('id', $organizerId)
+                ->where('tenant_id', $tenantId)
+                ->select(['id as user_id', 'email', 'name', 'first_name'])
+                ->first();
+
+            if (!$organizer) {
+                Log::error("[EventNotificationService] notifyEventCreated: organizer {$organizerId} not found for tenant {$tenantId}");
+                return;
+            }
+
+            $eventTitle = $event->title;
+            $path = '/events/' . $eventId;
+            $bellMessage = __('notifications.event_created_confirmation', ['title' => $eventTitle]);
+
+            // In-app bell notification for the organizer
+            Notification::create([
+                'user_id'    => $organizerId,
+                'tenant_id'  => $tenantId,
+                'message'    => $bellMessage,
+                'link'       => $path,
+                'type'       => 'event_created',
+                'created_at' => now(),
+            ]);
+
+            // Email notification to organizer
+            try {
+                $safeTitle = htmlspecialchars($eventTitle, ENT_QUOTES, 'UTF-8');
+                $subject = __('emails_misc.events.created_subject');
+
+                $this->sendEventEmail(
+                    $organizer,
+                    $subject,
+                    $bellMessage,
+                    $path,
+                    'event_created',
+                    $this->buildEventCreatedEmailHtml($event, $organizer)
+                );
+            } catch (\Throwable $e) {
+                Log::warning("[EventNotificationService] notifyEventCreated email failed for organizer {$organizerId}: " . $e->getMessage());
+            }
+
+            // Optionally notify any attendees who RSVPed during creation
+            if ($notifyInitialAttendees) {
+                $initialMessage = __('notifications.event_attendee_confirmation', ['title' => $eventTitle]);
+                $this->notifyAttendees($tenantId, $eventId, $initialMessage);
+            }
+        } catch (\Throwable $e) {
+            Log::error("EventNotificationService::notifyEventCreated error: " . $e->getMessage());
+        }
+    }
+
     // =========================================================================
     // EMAIL SENDING
     // =========================================================================
@@ -832,6 +913,68 @@ HTML;
         </div>
         <div style="text-align: center; margin-top: 24px;">
             <a href="{$eventUrl}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$viewUpdatedLabel}</a>
+        </div>
+    </div>
+</div>
+HTML;
+    }
+
+    /**
+     * Build rich HTML email for event created confirmation (sent to organizer).
+     *
+     * Uses a green success gradient to signal a positive confirmation.
+     * Displays event title, date/time, and location or online indicator.
+     */
+    private function buildEventCreatedEmailHtml(object $event, object $organizer): string
+    {
+        $organizerName = htmlspecialchars($organizer->first_name ?? $organizer->name ?? 'there', ENT_QUOTES, 'UTF-8');
+        $eventTitle = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
+        $tenantName = htmlspecialchars(TenantContext::getSetting('site_name', 'Project NEXUS'), ENT_QUOTES, 'UTF-8');
+        $baseUrl = TenantContext::getFrontendUrl();
+        $basePath = TenantContext::getSlugPrefix();
+        $eventUrl = $baseUrl . $basePath . '/events/' . $event->id;
+
+        $heading = htmlspecialchars(__('emails_misc.events.created_heading'), ENT_QUOTES, 'UTF-8');
+        $greeting = htmlspecialchars(__('emails_misc.events.created_greeting', [':name' => $organizerName]), ENT_QUOTES, 'UTF-8');
+        $body = __('emails_misc.events.created_body', [':title' => $eventTitle]);
+        $detailsLabel = htmlspecialchars(__('emails_misc.events.created_details_label'), ENT_QUOTES, 'UTF-8');
+        $ctaLabel = htmlspecialchars(__('emails_misc.events.created_cta'), ENT_QUOTES, 'UTF-8');
+
+        // Date/time row
+        $dateHtml = '';
+        if (!empty($event->start_time)) {
+            $when = date('l, F j, Y \a\t g:i A', strtotime($event->start_time));
+            $safeWhen = htmlspecialchars($when, ENT_QUOTES, 'UTF-8');
+            $dateHtml = "<p style=\"color: #64748b; margin: 0 0 6px; font-size: 14px;\">&#128197; {$safeWhen}</p>";
+        }
+
+        // Location row
+        $locationHtml = '';
+        if (!empty($event->is_online) && !empty($event->online_url)) {
+            $onlineLabel = htmlspecialchars(__('emails.events.online_event'), ENT_QUOTES, 'UTF-8');
+            $locationHtml = "<p style=\"color: #6366f1; margin: 0; font-size: 14px;\">&#127760; {$onlineLabel}</p>";
+        } elseif (!empty($event->location)) {
+            $safeLoc = htmlspecialchars($event->location, ENT_QUOTES, 'UTF-8');
+            $locationHtml = "<p style=\"color: #64748b; margin: 0; font-size: 14px;\">&#128205; {$safeLoc}</p>";
+        }
+
+        return <<<HTML
+<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #10b981, #059669); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 22px;">{$heading}</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
+    </div>
+    <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$greeting}</p>
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$body}</p>
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
+            <p style="color: #64748b; margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">{$detailsLabel}</p>
+            <h2 style="color: #1e293b; margin: 0 0 10px; font-size: 18px; font-weight: 700;">{$eventTitle}</h2>
+            {$dateHtml}
+            {$locationHtml}
+        </div>
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="{$eventUrl}" style="display: inline-block; background: linear-gradient(135deg, #10b981, #059669); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$ctaLabel}</a>
         </div>
     </div>
 </div>

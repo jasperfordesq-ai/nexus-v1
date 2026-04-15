@@ -58,7 +58,7 @@ class JobExpiryNotificationService
                                 (int) $vacancy->user_id,
                                 __('notifications.job_expiring_soon', ['title' => $vacancy->title, 'days' => $daysLeft]),
                                 "/jobs/{$vacancy->id}",
-                                'job_application'
+                                'job_expiry'
                             );
                         }
 
@@ -84,8 +84,7 @@ class JobExpiryNotificationService
     {
         $name      = htmlspecialchars($user->first_name ?? 'there');
         $title     = htmlspecialchars($vacancy->title);
-        $appUrl    = config('app.url', 'https://app.project-nexus.ie');
-        $renewUrl  = "{$appUrl}/jobs/{$vacancy->id}";
+        $renewUrl  = TenantContext::getFrontendUrl("/jobs/{$vacancy->id}");
         $deadline  = $vacancy->deadline?->format('d M Y') ?? 'soon';
 
         $greeting = __('emails_misc.jobs.expiry_greeting', ['name' => $name]);

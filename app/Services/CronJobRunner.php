@@ -719,7 +719,7 @@ class CronJobRunner
         }
 
         // 2. Clean old notification queue items (older than 30 days, already sent)
-        // Global cleanup — `notification_queue` has no tenant_id column (user-scoped only); housekeeping of stale queue rows.
+        // notification_queue housekeeping — tenant_id column added 2026-03-29; cleans up stale sent rows.
         try {
             $sql = "DELETE FROM notification_queue WHERE status = 'sent' AND sent_at < DATE_SUB(NOW(), INTERVAL 30 DAY)";
             DB::delete($sql);

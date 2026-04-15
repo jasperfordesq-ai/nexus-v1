@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use App\Models\JobAlert;
 use App\Models\JobVacancy;
 use App\Models\User;
@@ -69,8 +70,7 @@ class JobAlertEmailService
             $commitment  = htmlspecialchars(ucfirst(str_replace('_', ' ', $v->commitment ?? '')));
             $type        = htmlspecialchars(ucfirst($v->type ?? ''));
             $deadline    = $v->deadline ? __('emails.job_alert.closes', ['date' => date('d M Y', strtotime($v->deadline))]) : __('emails.job_alert.deadline_open');
-            $appUrl      = config('app.url', 'https://app.project-nexus.ie');
-            $jobUrl      = "{$appUrl}/jobs/{$v->id}";
+            $jobUrl      = TenantContext::getFrontendUrl("/jobs/{$v->id}");
             $viewJobText = __('emails.job_alert.view_job');
 
             $jobItems .= <<<HTML

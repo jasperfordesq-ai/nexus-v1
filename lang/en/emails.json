@@ -218,7 +218,19 @@
     "partnership_title": "Federation Partnership Request",
     "partnership_preview": "{{community}} wants to partner with your community",
     "partnership_body": "{{community}} has sent your community a federation partnership request.",
-    "review_request": "Review Request"
+    "review_request": "Review Request",
+    "connection_request_subject": "New connection request from :community",
+    "connection_request_heading": "Connection Request",
+    "connection_request_body": ":name from :community would like to connect with you.",
+    "connection_request_cta": "View Profile",
+    "connection_accepted_subject": ":name accepted your connection request",
+    "connection_accepted_heading": "Connection Accepted",
+    "connection_accepted_body": ":name from :community has accepted your connection request. You are now connected!",
+    "connection_accepted_cta": "View Connection",
+    "level_discovery": "Discovery",
+    "level_social": "Social",
+    "level_economic": "Economic",
+    "level_integrated": "Integrated"
   },
   "vetting": {
     "subject": "{{heading}} - {{tenant}}"

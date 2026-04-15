@@ -7165,20 +7165,19 @@ DROP TABLE IF EXISTS `notification_queue`;
 CREATE TABLE `notification_queue` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
+  `tenant_id` int(11) NOT NULL,
   `activity_type` varchar(50) NOT NULL,
   `content_snippet` text DEFAULT NULL,
   `link` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `status` enum('pending','sent','failed') NOT NULL DEFAULT 'pending',
+  `status` enum('pending','processing','sent','failed') NOT NULL DEFAULT 'pending',
   `sent_at` datetime DEFAULT NULL,
   `frequency` enum('instant','daily','weekly') DEFAULT 'daily',
   `email_body` longtext DEFAULT NULL,
-  `clicked_at` timestamp NULL DEFAULT NULL,
-  `match` timestamp NULL DEFAULT NULL,
-  `reset_token` varchar(255) DEFAULT NULL,
-  `simplicity` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
+  KEY `idx_nq_tenant_status_frequency` (`tenant_id`,`status`,`frequency`),
+  KEY `idx_nq_status_frequency_created` (`status`,`frequency`,`created_at`),
   CONSTRAINT `notification_queue_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=173 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

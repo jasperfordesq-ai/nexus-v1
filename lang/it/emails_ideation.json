@@ -12,5 +12,32 @@
     "preview": "{{commenter}} commented on your idea",
     "body": "<strong>{{commenter}}</strong> has commented on your idea <strong>\"{{title}}\"</strong>.",
     "cta": "View Comment"
+  },
+  "notifications": {
+    "submitted_subject": "Your idea has been submitted — {{community}}",
+    "submitted_title": "Idea Submitted!",
+    "submitted_preview": "Your idea \"{{title}}\" has been submitted to {{challenge}}",
+    "submitted_body": "Your idea <strong>\"{{title}}\"</strong> has been submitted to the challenge <strong>\"{{challenge}}\"</strong>. The community can now vote and comment on it.",
+    "submitted_cta": "View Your Idea",
+    "voted_subject": "Someone voted for your idea — {{community}}",
+    "voted_title": "New Vote on Your Idea",
+    "voted_preview": "{{voter}} voted for your idea \"{{title}}\"",
+    "voted_body": "<strong>{{voter}}</strong> voted for your idea <strong>\"{{title}}\"</strong>. Keep up the momentum!",
+    "voted_cta": "View Your Idea",
+    "commented_subject": "New comment on your idea — {{community}}",
+    "commented_title": "New Comment on Your Idea",
+    "commented_preview": "{{commenter}} commented on your idea \"{{title}}\"",
+    "commented_body": "<strong>{{commenter}}</strong> left a comment on your idea <strong>\"{{title}}\"</strong>.",
+    "commented_cta": "View Comment",
+    "status_subject": "Your idea status has been updated — {{community}}",
+    "status_title": "Idea Status Update",
+    "status_preview": "Your idea \"{{title}}\" has been marked as {{status}}",
+    "status_body": "Your idea <strong>\"{{title}}\"</strong> has been updated to status: <strong>{{status}}</strong>.",
+    "status_cta": "View Your Idea",
+    "won_subject": "Your idea has been selected! — {{community}}",
+    "won_title": "Your Idea Won!",
+    "won_preview": "Congratulations! Your idea \"{{title}}\" has been selected as a winner",
+    "won_body": "Congratulations! Your idea <strong>\"{{title}}\"</strong> has been selected as a winner. Well done!",
+    "won_cta": "View Your Idea"
   }
 }

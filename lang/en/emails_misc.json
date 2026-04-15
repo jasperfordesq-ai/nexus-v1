@@ -151,7 +151,13 @@
   },
   "events": {
     "reminder_email_title": "Event Reminder",
-    "reminder_email_cta": "View Event"
+    "reminder_email_cta": "View Event",
+    "created_subject": "Your event has been published",
+    "created_heading": "Event Published",
+    "created_greeting": "Hi :name,",
+    "created_body": "Your event <strong>:title</strong> has been published and is now visible to your community.",
+    "created_details_label": "Event Details",
+    "created_cta": "View Event"
   },
   "vol_org_wallet": {
     "payment_subject": "Time credits received from {{org}}",

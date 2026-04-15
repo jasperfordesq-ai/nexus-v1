@@ -26,7 +26,14 @@ class EmailService
     {
         try {
             $mailer = Mailer::forCurrentTenant();
-            return $mailer->send($to, $subject, $body);
+            return $mailer->send(
+                $to,
+                $subject,
+                $body,
+                $options['cc']             ?? null,
+                $options['replyTo']        ?? null,
+                $options['unsubscribeUrl'] ?? null,
+            );
         } catch (\Throwable $e) {
             Log::error('EmailService::send failed', ['to' => self::maskEmail($to), 'error' => $e->getMessage()]);
             return false;

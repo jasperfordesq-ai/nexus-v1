@@ -253,7 +253,12 @@ class FederationEmailService
     public static function sendPartnershipRequestNotification(int $targetTenantId, int $requestingTenantId, string $requestingTenantName, int $requestedLevel, ?string $notes = null): bool
     {
         try {
-            $levelNames = [1 => 'Discovery', 2 => 'Social', 3 => 'Economic', 4 => 'Integrated'];
+            $levelNames = [
+                1 => __('emails.federation.level_discovery'),
+                2 => __('emails.federation.level_social'),
+                3 => __('emails.federation.level_economic'),
+                4 => __('emails.federation.level_integrated'),
+            ];
             $levelName = $levelNames[$requestedLevel] ?? 'Level ' . $requestedLevel;
 
             // Get admin users for target tenant
@@ -313,6 +318,104 @@ class FederationEmailService
             return true;
         } catch (\Exception $e) {
             Log::error('[FederationEmail] sendPartnershipRequestNotification failed', ['error' => $e->getMessage()]);
+            return false;
+        }
+    }
+
+    /**
+     * Send a connection request notification to the recipient.
+     */
+    public static function sendConnectionRequestNotification(int $recipientUserId, int $senderUserId, int $senderTenantId): bool
+    {
+        try {
+            $recipient = self::getUserWithEmail($recipientUserId, TenantContext::getId());
+            if (!$recipient || empty($recipient->email)) {
+                return false;
+            }
+
+            $sender = self::getUserBasicInfo($senderUserId, $senderTenantId);
+            $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
+
+            $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : 'A federation member';
+            $tenantName = $senderTenant->name ?? 'a partner community';
+
+            $recipientName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
+            $safeSenderName = htmlspecialchars($senderName, ENT_QUOTES, 'UTF-8');
+            $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
+
+            $subject = __('emails.federation.connection_request_subject', ['community' => $tenantName]);
+
+            $html = EmailTemplateBuilder::make()
+                ->theme('federation')
+                ->title(__('emails.federation.connection_request_heading'))
+                ->previewText(__('emails.federation.connection_request_body', ['name' => $senderName, 'community' => $tenantName]))
+                ->greeting($recipientName)
+                ->paragraph(__('emails.federation.connection_request_body', ['name' => $safeSenderName, 'community' => $safeTenantName]))
+                ->button(__('emails.federation.connection_request_cta'), EmailTemplateBuilder::tenantUrl('/profile/' . $senderUserId))
+                ->render();
+
+            TenantContext::setById(TenantContext::getId());
+            $mailer = Mailer::forCurrentTenant();
+            $mailer->send($recipient->email, $subject, $html);
+
+            Log::info('[FederationEmail] Connection request notification sent', [
+                'recipient' => $recipientUserId,
+                'sender' => $senderUserId,
+                'sender_tenant' => $senderTenantId,
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('[FederationEmail] sendConnectionRequestNotification failed', ['error' => $e->getMessage()]);
+            return false;
+        }
+    }
+
+    /**
+     * Send a connection accepted notification to the original sender.
+     */
+    public static function sendConnectionAcceptedNotification(int $senderUserId, int $recipientUserId, int $recipientTenantId): bool
+    {
+        try {
+            $sender = self::getUserWithEmail($senderUserId, TenantContext::getId());
+            if (!$sender || empty($sender->email)) {
+                return false;
+            }
+
+            $recipient = self::getUserBasicInfo($recipientUserId, $recipientTenantId);
+            $recipientTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$recipientTenantId]);
+
+            $recipientName = $recipient ? trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) : 'A federation member';
+            $tenantName = $recipientTenant->name ?? 'a partner community';
+
+            $senderName = trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? ''));
+            $safeRecipientName = htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8');
+            $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
+
+            $subject = __('emails.federation.connection_accepted_subject', ['name' => $recipientName]);
+
+            $html = EmailTemplateBuilder::make()
+                ->theme('federation')
+                ->title(__('emails.federation.connection_accepted_heading'))
+                ->previewText(__('emails.federation.connection_accepted_body', ['name' => $recipientName, 'community' => $tenantName]))
+                ->greeting($senderName)
+                ->paragraph(__('emails.federation.connection_accepted_body', ['name' => $safeRecipientName, 'community' => $safeTenantName]))
+                ->button(__('emails.federation.connection_accepted_cta'), EmailTemplateBuilder::tenantUrl('/profile/' . $recipientUserId))
+                ->render();
+
+            TenantContext::setById(TenantContext::getId());
+            $mailer = Mailer::forCurrentTenant();
+            $mailer->send($sender->email, $subject, $html);
+
+            Log::info('[FederationEmail] Connection accepted notification sent', [
+                'sender' => $senderUserId,
+                'recipient' => $recipientUserId,
+                'recipient_tenant' => $recipientTenantId,
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('[FederationEmail] sendConnectionAcceptedNotification failed', ['error' => $e->getMessage()]);
             return false;
         }
     }
