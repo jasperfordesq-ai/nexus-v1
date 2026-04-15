@@ -256,5 +256,85 @@
     "appeal_resolved_preview": "Final decision on your appeal for report #{{report_id}}",
     "appeal_resolved_body": "We have reviewed your appeal for report <strong>#{{report_id}}</strong>.",
     "appeal_resolved_cta": "View Final Decision"
+  },
+  "group_invite": {
+    "email_subject": "You've been invited to join {{group}}",
+    "email_title": "Group Invitation",
+    "email_body": "<strong>{{inviter}}</strong> has invited you to join the group <strong>{{group}}</strong>.",
+    "email_message_label": "Personal message",
+    "email_cta": "Accept Invitation"
+  },
+  "marketplace_rating": {
+    "received_subject": "You received a new rating",
+    "received_title": "New Rating",
+    "received_body": "You received a <strong>{{rating}}-star</strong> rating on order <strong>{{order_number}}</strong>.",
+    "received_cta": "View Order"
+  },
+  "marketplace_dispute": {
+    "opened_subject": "A dispute has been opened on order {{order_number}}",
+    "opened_title": "Dispute Opened",
+    "opened_body": "A dispute has been opened on order <strong>{{order_number}}</strong>. Please respond promptly to help resolve this.",
+    "opened_cta": "View Dispute"
+  },
+  "expense": {
+    "approved_subject": "Expense claim approved — {{type}}",
+    "approved_title": "Expense Approved",
+    "approved_body": "Your expense claim of <strong>{{amount}} {{currency}}</strong> for <strong>{{type}}</strong> has been approved.",
+    "approved_cta": "View Expense",
+    "rejected_subject": "Expense claim not approved — {{type}}",
+    "rejected_title": "Expense Not Approved",
+    "rejected_body": "Your expense claim of <strong>{{amount}} {{currency}}</strong> for <strong>{{type}}</strong> was not approved.",
+    "rejected_notes_label": "Reviewer notes",
+    "rejected_cta": "View Expense",
+    "paid_subject": "Expense reimbursement processed — {{type}}",
+    "paid_title": "Reimbursement Processed",
+    "paid_body": "Your expense of <strong>{{amount}} {{currency}}</strong> for <strong>{{type}}</strong> has been paid.",
+    "paid_ref_label": "Payment reference",
+    "paid_cta": "View Expense"
+  },
+  "listing_moderation": {
+    "approved_subject": "Your listing has been approved — {{title}}",
+    "approved_title": "Listing Approved",
+    "approved_body": "Your listing <strong>{{title}}</strong> has been approved and is now live on the platform.",
+    "approved_cta": "View Listing",
+    "rejected_subject": "Your listing was not approved — {{title}}",
+    "rejected_title": "Listing Not Approved",
+    "rejected_body": "Your listing <strong>{{title}}</strong> was not approved.",
+    "rejected_reason_label": "Reason",
+    "rejected_cta": "Submit Another"
+  },
+  "user_ban": {
+    "banned_subject": "Your account has been suspended",
+    "banned_title": "Account Suspended",
+    "banned_body": "Your account on <strong>{{community}}</strong> has been suspended.",
+    "banned_reason_label": "Reason",
+    "unbanned_subject": "Your account has been reinstated",
+    "unbanned_title": "Account Reinstated",
+    "unbanned_body": "Your account on <strong>{{community}}</strong> has been reinstated. You may now log in."
+  },
+  "group_approval": {
+    "approved_subject": "Your group has been approved — {{group}}",
+    "approved_title": "Group Approved",
+    "approved_body": "Your group <strong>{{group}}</strong> has been approved and is now active.",
+    "approved_cta": "View Group",
+    "rejected_subject": "Your group proposal was not approved — {{group}}",
+    "rejected_title": "Group Not Approved",
+    "rejected_body": "Your group proposal <strong>{{group}}</strong> was not approved.",
+    "rejected_notes_label": "Reason",
+    "rejected_cta": "Submit a Proposal"
+  },
+  "stripe_subscription": {
+    "activated_subject": "Your subscription is now active — {{plan}}",
+    "activated_title": "Subscription Activated",
+    "activated_body": "Your <strong>{{plan}}</strong> subscription has been activated successfully. Thank you for subscribing.",
+    "activated_cta": "Manage Subscription",
+    "cancelled_subject": "Your subscription has been cancelled",
+    "cancelled_title": "Subscription Cancelled",
+    "cancelled_body": "Your subscription has been cancelled. Your platform access will continue until the end of the current billing period.",
+    "cancelled_cta": "Reactivate Subscription",
+    "payment_failed_subject": "Action required — subscription payment failed",
+    "payment_failed_title": "Payment Failed",
+    "payment_failed_body": "We were unable to process the payment for your subscription. Please update your payment method to avoid service interruption.",
+    "payment_failed_cta": "Update Payment Method"
   }
 }

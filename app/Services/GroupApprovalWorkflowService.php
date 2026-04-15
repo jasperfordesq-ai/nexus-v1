@@ -8,8 +8,11 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * GroupApprovalWorkflowService — manages group creation approval workflow.
@@ -93,12 +96,42 @@ class GroupApprovalWorkflowService
     {
         $tenantId = TenantContext::getId();
 
+        $request = DB::selectOne(
+            "SELECT gar.submitted_by, g.name AS group_name, g.id AS group_id
+             FROM group_approval_requests gar
+             LEFT JOIN `groups` g ON g.id = gar.group_id
+             WHERE gar.id = ? AND gar.tenant_id = ? AND gar.status = ?",
+            [$requestId, $tenantId, self::STATUS_PENDING]
+        );
+
         $affected = DB::update(
             "UPDATE group_approval_requests
              SET status = ?, reviewed_by = ?, reviewer_notes = ?, updated_at = NOW()
              WHERE id = ? AND tenant_id = ? AND status = ?",
             [self::STATUS_APPROVED, $approverId, $notes, $requestId, $tenantId, self::STATUS_PENDING]
         );
+
+        if ($affected > 0 && $request) {
+            try {
+                $user = DB::table('users')->where('id', $request->submitted_by)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+                if ($user && !empty($user->email)) {
+                    $firstName = $user->first_name ?? $user->name ?? 'there';
+                    $groupName = htmlspecialchars($request->group_name ?? '', ENT_QUOTES, 'UTF-8');
+                    $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups/' . $request->group_id;
+                    $html = EmailTemplateBuilder::make()
+                        ->title(__('emails_misc.group_approval.approved_title'))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_misc.group_approval.approved_body', ['group' => $groupName]))
+                        ->button(__('emails_misc.group_approval.approved_cta'), $fullUrl)
+                        ->render();
+                    if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.group_approval.approved_subject', ['group' => $groupName]), $html)) {
+                        Log::warning('[GroupApprovalWorkflowService] approveGroup email failed', ['request_id' => $requestId]);
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[GroupApprovalWorkflowService] approveGroup email error: ' . $e->getMessage());
+            }
+        }
 
         return $affected > 0;
     }
@@ -115,12 +148,44 @@ class GroupApprovalWorkflowService
     {
         $tenantId = TenantContext::getId();
 
+        $request = DB::selectOne(
+            "SELECT gar.submitted_by, g.name AS group_name
+             FROM group_approval_requests gar
+             LEFT JOIN `groups` g ON g.id = gar.group_id
+             WHERE gar.id = ? AND gar.tenant_id = ? AND gar.status = ?",
+            [$requestId, $tenantId, self::STATUS_PENDING]
+        );
+
         $affected = DB::update(
             "UPDATE group_approval_requests
              SET status = ?, reviewed_by = ?, reviewer_notes = ?, updated_at = NOW()
              WHERE id = ? AND tenant_id = ? AND status = ?",
             [self::STATUS_REJECTED, $rejecterId, $notes, $requestId, $tenantId, self::STATUS_PENDING]
         );
+
+        if ($affected > 0 && $request) {
+            try {
+                $user = DB::table('users')->where('id', $request->submitted_by)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+                if ($user && !empty($user->email)) {
+                    $firstName = $user->first_name ?? $user->name ?? 'there';
+                    $groupName = htmlspecialchars($request->group_name ?? '', ENT_QUOTES, 'UTF-8');
+                    $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups';
+                    $builder   = EmailTemplateBuilder::make()
+                        ->title(__('emails_misc.group_approval.rejected_title'))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_misc.group_approval.rejected_body', ['group' => $groupName]));
+                    if (!empty($notes)) {
+                        $builder->paragraph('<strong>' . __('emails_misc.group_approval.rejected_notes_label') . ':</strong> ' . htmlspecialchars($notes, ENT_QUOTES, 'UTF-8'));
+                    }
+                    $html = $builder->button(__('emails_misc.group_approval.rejected_cta'), $fullUrl)->render();
+                    if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.group_approval.rejected_subject', ['group' => $groupName]), $html)) {
+                        Log::warning('[GroupApprovalWorkflowService] rejectGroup email failed', ['request_id' => $requestId]);
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[GroupApprovalWorkflowService] rejectGroup email error: ' . $e->getMessage());
+            }
+        }
 
         return $affected > 0;
     }

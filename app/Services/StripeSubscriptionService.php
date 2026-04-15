@@ -6,6 +6,8 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -299,6 +301,21 @@ class StripeSubscriptionService
             ]);
             throw $e;
         }
+
+        // Email tenant admin — subscription is now active
+        try {
+            $plan = DB::selectOne("SELECT name FROM pay_plans WHERE id = ?", [$planId]);
+            static::sendTenantAdminEmail(
+                $tenantId,
+                __('emails_misc.stripe_subscription.activated_subject', ['plan' => $plan->name ?? '']),
+                __('emails_misc.stripe_subscription.activated_title'),
+                __('emails_misc.stripe_subscription.activated_body', ['plan' => htmlspecialchars($plan->name ?? '', ENT_QUOTES, 'UTF-8')]),
+                '/admin/billing',
+                __('emails_misc.stripe_subscription.activated_cta')
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[StripeSubscriptionService] handleCheckoutCompleted email failed: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -400,6 +417,20 @@ class StripeSubscriptionService
             ]);
             throw $e;
         }
+
+        // Email tenant admin — subscription cancelled
+        try {
+            static::sendTenantAdminEmail(
+                (int) $assignment->tenant_id,
+                __('emails_misc.stripe_subscription.cancelled_subject'),
+                __('emails_misc.stripe_subscription.cancelled_title'),
+                __('emails_misc.stripe_subscription.cancelled_body'),
+                '/admin/billing',
+                __('emails_misc.stripe_subscription.cancelled_cta')
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[StripeSubscriptionService] handleSubscriptionDeleted email failed: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -471,6 +502,61 @@ class StripeSubscriptionService
             'customer_id' => $invoice->customer ?? null,
             'amount_due' => $invoice->amount_due ?? null,
         ]);
+
+        // Urgent email to tenant admin — payment failed, action required
+        if ($assignment && !empty($assignment->tenant_id)) {
+            try {
+                static::sendTenantAdminEmail(
+                    (int) $assignment->tenant_id,
+                    __('emails_misc.stripe_subscription.payment_failed_subject'),
+                    __('emails_misc.stripe_subscription.payment_failed_title'),
+                    __('emails_misc.stripe_subscription.payment_failed_body'),
+                    '/admin/billing',
+                    __('emails_misc.stripe_subscription.payment_failed_cta'),
+                    'danger'
+                );
+            } catch (\Throwable $e) {
+                Log::warning('[StripeSubscriptionService] handleInvoicePaymentFailed email failed: ' . $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Send an email to the primary admin user of a tenant.
+     */
+    private static function sendTenantAdminEmail(int $tenantId, string $subject, string $title, string $body, string $link, string $ctaText, string $theme = 'default'): void
+    {
+        TenantContext::setById($tenantId);
+
+        $admin = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('role', 'admin')
+            ->whereNotNull('email')
+            ->select(['email', 'first_name', 'name'])
+            ->first();
+
+        if (!$admin || empty($admin->email)) {
+            return;
+        }
+
+        $firstName = $admin->first_name ?? $admin->name ?? 'there';
+        $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+
+        $builder = EmailTemplateBuilder::make();
+        if ($theme !== 'default') {
+            $builder->theme($theme);
+        }
+
+        $html = $builder
+            ->title($title)
+            ->greeting($firstName)
+            ->paragraph($body)
+            ->button($ctaText, $fullUrl)
+            ->render();
+
+        if (!Mailer::forCurrentTenant()->send($admin->email, $subject, $html)) {
+            Log::warning('[StripeSubscriptionService] tenant admin email failed', ['tenant_id' => $tenantId]);
+        }
     }
 
     /**

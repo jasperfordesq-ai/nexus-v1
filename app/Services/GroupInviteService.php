@@ -6,8 +6,10 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Core\TenantContext;
 
@@ -150,6 +152,33 @@ class GroupInviteService
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+
+            // Send the actual invitation email
+            try {
+                $inviteUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups/invite/' . $token;
+                $subject   = __('emails_misc.group_invite.email_subject', ['group' => $group->name]);
+                $body      = __('emails_misc.group_invite.email_body', [
+                    'inviter' => htmlspecialchars($inviterName, ENT_QUOTES, 'UTF-8'),
+                    'group'   => htmlspecialchars($group->name ?? '', ENT_QUOTES, 'UTF-8'),
+                ]);
+
+                $builder = EmailTemplateBuilder::make()
+                    ->title(__('emails_misc.group_invite.email_title'))
+                    ->greeting('there')
+                    ->paragraph($body);
+
+                if (!empty($message)) {
+                    $builder->paragraph('<em>' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</em>');
+                }
+
+                $html = $builder->button(__('emails_misc.group_invite.email_cta'), $inviteUrl)->render();
+
+                if (!Mailer::forCurrentTenant()->send($email, $subject, $html)) {
+                    Log::warning('[GroupInviteService] invite email failed to send', ['email' => $email, 'group_id' => $groupId]);
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[GroupInviteService] invite email error: ' . $e->getMessage(), ['email' => $email]);
+            }
 
             $results[] = ['email' => $email, 'status' => 'sent', 'token' => $token];
         }

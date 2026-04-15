@@ -6,6 +6,9 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -66,19 +69,41 @@ class AdminListingsService
             ]);
 
         if ($affected > 0) {
-            // Notify listing owner
+            $safeTitle = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
+
+            // Bell notification
             try {
-                $title = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
                 \App\Models\Notification::createNotification(
                     (int) $listing->user_id,
-                    __('emails_listings.listings.approved.notification_short', ['title' => $title]),
+                    __('emails_listings.listings.approved.notification_short', ['title' => $safeTitle]),
                     "/listings/{$listingId}",
                     'listing_approved',
                     true,
                     $tenantId
                 );
             } catch (\Throwable $e) {
-                Log::warning("AdminListingsService::approve notification failed for listing #{$listingId}: " . $e->getMessage());
+                Log::warning("AdminListingsService::approve bell notification failed for listing #{$listingId}: " . $e->getMessage());
+            }
+
+            // Email notification
+            try {
+                TenantContext::setById($tenantId);
+                $user = DB::table('users')->where('id', $listing->user_id)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+                if ($user && !empty($user->email)) {
+                    $firstName = $user->first_name ?? $user->name ?? 'there';
+                    $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/listings/{$listingId}";
+                    $html = EmailTemplateBuilder::make()
+                        ->title(__('emails_misc.listing_moderation.approved_title'))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_misc.listing_moderation.approved_body', ['title' => $safeTitle]))
+                        ->button(__('emails_misc.listing_moderation.approved_cta'), $fullUrl)
+                        ->render();
+                    if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.listing_moderation.approved_subject', ['title' => $safeTitle]), $html)) {
+                        Log::warning("AdminListingsService::approve email failed for listing #{$listingId}");
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning("AdminListingsService::approve email failed for listing #{$listingId}: " . $e->getMessage());
             }
         }
 
@@ -113,25 +138,48 @@ class AdminListingsService
             ]);
 
         if ($affected > 0) {
-            // Notify listing owner
+            $safeTitle = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
+
+            // Bell notification
             try {
-                $title = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
                 if (!empty($reason)) {
-                    $safeReason = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
-                    $message = __('emails_listings.listings.rejected.notification', ['title' => $title, 'reason' => $safeReason]);
+                    $bellMsg = __('emails_listings.listings.rejected.notification', ['title' => $safeTitle, 'reason' => htmlspecialchars($reason, ENT_QUOTES, 'UTF-8')]);
                 } else {
-                    $message = __('emails_listings.listings.rejected.notification_no_reason', ['title' => $title]);
+                    $bellMsg = __('emails_listings.listings.rejected.notification_no_reason', ['title' => $safeTitle]);
                 }
                 \App\Models\Notification::createNotification(
                     (int) $listing->user_id,
-                    $message,
+                    $bellMsg,
                     "/listings/{$listingId}",
                     'listing_rejected',
                     true,
                     $tenantId
                 );
             } catch (\Throwable $e) {
-                Log::warning("AdminListingsService::reject notification failed for listing #{$listingId}: " . $e->getMessage());
+                Log::warning("AdminListingsService::reject bell notification failed for listing #{$listingId}: " . $e->getMessage());
+            }
+
+            // Email notification
+            try {
+                TenantContext::setById($tenantId);
+                $user = DB::table('users')->where('id', $listing->user_id)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+                if ($user && !empty($user->email)) {
+                    $firstName = $user->first_name ?? $user->name ?? 'there';
+                    $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/listings";
+                    $builder   = EmailTemplateBuilder::make()
+                        ->title(__('emails_misc.listing_moderation.rejected_title'))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_misc.listing_moderation.rejected_body', ['title' => $safeTitle]));
+                    if (!empty($reason)) {
+                        $builder->paragraph('<strong>' . __('emails_misc.listing_moderation.rejected_reason_label') . ':</strong> ' . htmlspecialchars($reason, ENT_QUOTES, 'UTF-8'));
+                    }
+                    $html = $builder->button(__('emails_misc.listing_moderation.rejected_cta'), $fullUrl)->render();
+                    if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.listing_moderation.rejected_subject', ['title' => $safeTitle]), $html)) {
+                        Log::warning("AdminListingsService::reject email failed for listing #{$listingId}");
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning("AdminListingsService::reject email failed for listing #{$listingId}: " . $e->getMessage());
             }
         }
 

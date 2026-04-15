@@ -6,12 +6,15 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\MarketplaceDispute;
 use App\Models\MarketplaceOrder;
 use App\Models\MarketplaceSellerProfile;
 use App\Models\MarketplaceSellerRating;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * MarketplaceRatingService — Mutual ratings and dispute management.
@@ -81,6 +84,25 @@ class MarketplaceRatingService
         // Refresh cached seller stats when a buyer rates a seller
         if ($role === 'buyer') {
             self::refreshSellerStats($rateeId);
+        }
+
+        // Notify ratee they received a rating (skip if anonymous)
+        if (!$sellerRating->is_anonymous) {
+            try {
+                $link = '/marketplace/orders/' . $orderId;
+                self::sendRatingEmail(
+                    $rateeId,
+                    __('emails_misc.marketplace_rating.received_subject'),
+                    __('emails_misc.marketplace_rating.received_title'),
+                    __('emails_misc.marketplace_rating.received_body', [
+                        'rating'       => $rating,
+                        'order_number' => $order->order_number,
+                    ]),
+                    $link
+                );
+            } catch (\Throwable $e) {
+                Log::warning('[MarketplaceRatingService] rateOrder email failed: ' . $e->getMessage());
+            }
         }
 
         return $sellerRating;
@@ -184,7 +206,7 @@ class MarketplaceRatingService
             throw new \InvalidArgumentException('Invalid dispute reason.');
         }
 
-        return DB::transaction(function () use ($order, $orderId, $userId, $data, $reason) {
+        $dispute = DB::transaction(function () use ($order, $orderId, $userId, $data, $reason) {
             $dispute = new MarketplaceDispute();
             $dispute->tenant_id = TenantContext::getId();
             $dispute->order_id = $orderId;
@@ -201,6 +223,23 @@ class MarketplaceRatingService
 
             return $dispute;
         });
+
+        // Notify the other party that a dispute was opened
+        try {
+            $otherPartyId = ($userId === (int) $order->buyer_id) ? (int) $order->seller_id : (int) $order->buyer_id;
+            $link = '/marketplace/orders/' . $orderId;
+            self::sendRatingEmail(
+                $otherPartyId,
+                __('emails_misc.marketplace_dispute.opened_subject', ['order_number' => $order->order_number]),
+                __('emails_misc.marketplace_dispute.opened_title'),
+                __('emails_misc.marketplace_dispute.opened_body', ['order_number' => $order->order_number]),
+                $link
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceRatingService] openDispute email failed: ' . $e->getMessage());
+        }
+
+        return $dispute;
     }
 
     /**
@@ -216,6 +255,30 @@ class MarketplaceRatingService
     // -----------------------------------------------------------------
     //  Helpers
     // -----------------------------------------------------------------
+
+    private static function sendRatingEmail(int $userId, string $subject, string $title, string $body, string $link): void
+    {
+        $tenantId = TenantContext::getId();
+        $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+
+        if (!$user || empty($user->email)) {
+            return;
+        }
+
+        $firstName = $user->first_name ?? $user->name ?? 'there';
+        $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+
+        $html = EmailTemplateBuilder::make()
+            ->title($title)
+            ->greeting($firstName)
+            ->paragraph($body)
+            ->button(__('emails_misc.marketplace_rating.received_cta'), $fullUrl)
+            ->render();
+
+        if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
+            Log::warning('[MarketplaceRatingService] email failed', ['user_id' => $userId]);
+        }
+    }
 
     private static function formatRating(MarketplaceSellerRating $rating): array
     {
