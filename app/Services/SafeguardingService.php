@@ -722,10 +722,10 @@ class SafeguardingService
                         ->greeting($safeDlpName)
                         ->highlight(__('emails_misc.safeguarding.dlp_assigned_highlight'), '🚨')
                         ->infoCard([
-                            'Incident' => "#{$incidentId}",
-                            'Severity' => $safeSeverity,
-                            'Title' => $safeTitle,
-                        ], 'Incident Details')
+                            __('emails_misc.safeguarding.info_card_incident') => "#{$incidentId}",
+                            __('emails_misc.safeguarding.info_card_severity') => $safeSeverity,
+                            __('emails_misc.safeguarding.info_card_title')    => $safeTitle,
+                        ], __('emails_misc.safeguarding.info_card_incident_details'))
                         ->paragraph(__('emails_misc.safeguarding.dlp_assigned_body'))
                         ->paragraph(__('emails_misc.safeguarding.dlp_assigned_audit_note'))
                         ->button(__('emails_misc.safeguarding.dlp_assigned_cta'), EmailTemplateBuilder::tenantUrl('/admin/safeguarding'))
@@ -803,11 +803,11 @@ class SafeguardingService
                             ->previewText(__('emails_misc.safeguarding.incident_reported_preview', ['severity' => $safeSeverity, 'type' => $safeType, 'reporter' => $safeReporterName]))
                             ->highlight(__('emails_misc.safeguarding.incident_reported_highlight', ['severity' => $safeSeverity]), '🚨')
                             ->infoCard([
-                                'Reported By' => $safeReporterName,
-                                'Title' => $safeTitle,
-                                'Severity' => $safeSeverity,
-                                'Type' => $safeType,
-                            ], 'Incident Details')
+                                __('emails_misc.safeguarding.info_card_reported_by') => $safeReporterName,
+                                __('emails_misc.safeguarding.info_card_title')       => $safeTitle,
+                                __('emails_misc.safeguarding.info_card_severity')    => $safeSeverity,
+                                __('emails_misc.safeguarding.info_card_type')        => $safeType,
+                            ], __('emails_misc.safeguarding.info_card_incident_details'))
                             ->paragraph(__('emails_misc.safeguarding.incident_reported_review'))
                             ->paragraph(__('emails_misc.safeguarding.incident_reported_auto_note'))
                             ->button(__('emails_misc.safeguarding.incident_reported_cta'), EmailTemplateBuilder::tenantUrl('/admin/safeguarding'))
@@ -897,10 +897,10 @@ class SafeguardingService
                     ->title(__('emails_misc.safeguarding.incident_updated_title'))
                     ->previewText(__('emails_misc.safeguarding.incident_updated_preview', ['severity' => $safeSeverity, 'incident_id' => $incidentId, 'status' => $safeLabel]))
                     ->infoCard([
-                        'Incident' => "#{$incidentId}",
-                        'New Status' => $safeLabel,
-                        'Severity' => $safeSeverity,
-                    ], 'Status Update')
+                        __('emails_misc.safeguarding.info_card_incident')   => "#{$incidentId}",
+                        __('emails_misc.safeguarding.info_card_new_status') => $safeLabel,
+                        __('emails_misc.safeguarding.info_card_severity')   => $safeSeverity,
+                    ], __('emails_misc.safeguarding.info_card_status_update'))
                     ->paragraph(__('emails_misc.safeguarding.incident_updated_review'))
                     ->paragraph(__('emails_misc.safeguarding.incident_reported_auto_note'))
                     ->button(__('emails_misc.safeguarding.dlp_assigned_cta'), EmailTemplateBuilder::tenantUrl('/admin/safeguarding'))

@@ -33,6 +33,13 @@ class SafeguardingTriggerService
     private const CACHE_TTL = 300; // 5 minutes
 
     /**
+     * Internal DB marker for monitoring rows created by the safeguarding system.
+     * Must start with 'Safeguarding:' — the cleanup query uses LIKE 'Safeguarding:%'.
+     * Do NOT translate this constant — it is stored in the database and matched programmatically.
+     */
+    public const MONITORING_REASON_ONBOARDING = 'Safeguarding: self-identified during onboarding';
+
+    /**
      * Known trigger keys with their defaults.
      */
     private const TRIGGER_DEFAULTS = [
@@ -128,7 +135,7 @@ class SafeguardingTriggerService
                     $userId,
                     $needsMonitoring ? 1 : 0,
                     $needsBrokerApproval ? 1 : 0,
-                    'Safeguarding: self-identified during onboarding',
+                    self::MONITORING_REASON_ONBOARDING,
                 ]
             );
         } else {
@@ -136,7 +143,7 @@ class SafeguardingTriggerService
             DB::update(
                 "UPDATE user_messaging_restrictions
                  SET under_monitoring = 0, requires_broker_approval = 0
-                 WHERE tenant_id = ? AND user_id = ? AND monitoring_reason LIKE 'Safeguarding:%'",
+                 WHERE tenant_id = ? AND user_id = ? AND monitoring_reason LIKE 'Safeguarding:%'", // matches MONITORING_REASON_ONBOARDING prefix
                 [$tenantId, $userId]
             );
         }

@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Events\OnboardingCompleted;
 use App\Models\Category;
 use App\Models\Listing;
 use App\Services\OnboardingConfigService;
@@ -280,9 +281,22 @@ class OnboardingService
      */
     public static function completeOnboarding(int $userId): void
     {
+        $tenantId = TenantContext::getId();
+
         User::where('id', $userId)
-            ->where('tenant_id', TenantContext::getId())
+            ->where('tenant_id', $tenantId)
             ->update(['onboarding_completed' => true]);
+
+        // Send confirmation email — queued, never delays the wizard response
+        try {
+            event(new OnboardingCompleted($userId, $tenantId));
+        } catch (\Throwable $e) {
+            Log::error('OnboardingService: failed to dispatch OnboardingCompleted event', [
+                'user_id'   => $userId,
+                'tenant_id' => $tenantId,
+                'error'     => $e->getMessage(),
+            ]);
+        }
     }
 
     /**

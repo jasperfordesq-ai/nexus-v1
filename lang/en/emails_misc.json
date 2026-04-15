@@ -83,7 +83,28 @@
     "broker_message_high_risk_body": "A message related to a high-risk listing from <strong>{{sender}}</strong> has been copied to the broker review queue.",
     "broker_message_reason_label": "Monitoring reason",
     "broker_message_audit_note": "All broker review actions are audit-logged.",
-    "broker_message_cta": "Review Messages"
+    "broker_message_cta": "Review Messages",
+    "info_card_reported_by": "Reported By",
+    "info_card_title": "Title",
+    "info_card_severity": "Severity",
+    "info_card_type": "Type",
+    "info_card_incident_details": "Incident Details",
+    "info_card_incident": "Incident",
+    "info_card_new_status": "New Status",
+    "info_card_status_update": "Status Update",
+    "monitoring_reason_onboarding": "Safeguarding: self-identified during onboarding"
+  },
+  "onboarding_completed": {
+    "subject": "You're all set, {{name}}! Welcome to {{community}}",
+    "title": "You're All Set!",
+    "preview": "Your profile is ready — start exploring {{community}}",
+    "greeting_line": "Your profile is set up and you're now a full member of {{community}}.",
+    "next_steps": "Here's what you can do next:",
+    "step_browse": "Browse listings and offer or request help",
+    "step_connect": "Connect with other members",
+    "step_events": "Join upcoming events and groups",
+    "cta": "Explore the Community",
+    "footer_note": "You can update your profile and preferences at any time from your settings."
   },
   "social": {
     "connection_request": "{{name}} sent you a connection request",

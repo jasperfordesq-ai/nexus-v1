@@ -16,6 +16,7 @@ use App\Events\JobVacancyCreated;
 use App\Events\ListingCreated;
 use App\Events\MemberProfileUpdated;
 use App\Events\MessageSent;
+use App\Events\OnboardingCompleted;
 use App\Events\ReviewCreated;
 use App\Events\SafeguardingFlaggedEvent;
 use App\Events\TransactionCompleted;
@@ -45,6 +46,7 @@ use App\Listeners\PushMessageToFederatedPartner;
 use App\Listeners\PushReviewToFederatedPartner;
 use App\Listeners\PushTransactionToFederatedPartner;
 use App\Listeners\PushVolunteerOpportunityToFederatedPartners;
+use App\Listeners\SendOnboardingCompletionEmail;
 use App\Listeners\SendWelcomeNotification;
 use App\Listeners\UpdateFeedOnListingCreated;
 use App\Listeners\UpdateWalletBalance;
@@ -99,6 +101,10 @@ class EventServiceProvider extends ServiceProvider
 
         JobVacancyCreated::class => [
             NotifyJobAlertSubscribers::class,
+        ],
+
+        OnboardingCompleted::class => [
+            SendOnboardingCompletionEmail::class,
         ],
 
         SafeguardingFlaggedEvent::class => [
