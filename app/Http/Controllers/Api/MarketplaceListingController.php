@@ -1039,6 +1039,7 @@ class MarketplaceListingController extends BaseApiController
         }
 
         return response()->json([
+            'success' => true,
             'data' => [
                 'csv' => $csv,
                 'filename' => 'marketplace-listings-' . date('Y-m-d') . '.csv',

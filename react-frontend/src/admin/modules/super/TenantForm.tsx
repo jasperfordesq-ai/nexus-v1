@@ -586,13 +586,13 @@ export function TenantForm() {
               <div className="grid grid-cols-2 gap-4">
                 <Input
                   label={t('tenant_form.latitude_label')}
-                  placeholder="53.3498"
+                  placeholder="40.7128"
                   value={form.latitude}
                   onValueChange={(v) => updateField('latitude', v)}
                 />
                 <Input
                   label={t('tenant_form.longitude_label')}
-                  placeholder="-6.2603"
+                  placeholder="-74.0060"
                   value={form.longitude}
                   onValueChange={(v) => updateField('longitude', v)}
                 />

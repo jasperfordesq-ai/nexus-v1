@@ -664,6 +664,7 @@ class AuthController extends BaseApiController
 
         if (!empty($_SESSION['user_id'])) {
             return response()->json([
+                'success' => true,
                 'authenticated' => true,
                 'user' => [
                     'id' => $_SESSION['user_id'],
@@ -850,6 +851,7 @@ class AuthController extends BaseApiController
         }
 
         return response()->json([
+            'success' => true,
             'valid' => true,
             'user_id' => $payload['user_id'],
             'tenant_id' => $payload['tenant_id'],
@@ -896,6 +898,7 @@ class AuthController extends BaseApiController
         }
 
         return response()->json([
+            'success' => true,
             'data' => ['revoked' => true]
         ]);
     }
@@ -917,6 +920,7 @@ class AuthController extends BaseApiController
         $revokedCount = $this->tokenService->revokeAllTokensForUser($userId);
 
         return response()->json([
+            'success' => true,
             'data' => [
                 'revoked_count' => $revokedCount,
                 'message' => __('api_controllers_1.auth.tokens_revoked')
@@ -1032,6 +1036,7 @@ class AuthController extends BaseApiController
         $token = \App\Core\Csrf::generate();
 
         return response()->json([
+            'success' => true,
             'data' => [
                 'csrf_token' => $token
             ]

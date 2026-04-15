@@ -1,12 +1,15 @@
 import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 
+// Auto-generated files that should not have SPDX headers added
+const EXCLUDED_FILENAMES = ['expo-env.d.ts'];
+
 function walk(dir, ext, results = []) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
-    if (entry.isDirectory() && !['node_modules', 'vendor', 'dist', '.git'].includes(entry.name)) {
+    if (entry.isDirectory() && !['node_modules', 'vendor', 'dist', '.git', '.expo'].includes(entry.name)) {
       walk(full, ext, results);
-    } else if (ext.some(e => entry.name.endsWith(e))) {
+    } else if (ext.some(e => entry.name.endsWith(e)) && !EXCLUDED_FILENAMES.includes(entry.name)) {
       results.push(full);
     }
   }
