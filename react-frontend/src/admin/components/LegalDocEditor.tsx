@@ -39,6 +39,8 @@ import {
   UNDO_COMMAND,
   REDO_COMMAND,
   COMMAND_PRIORITY_NORMAL,
+  SELECTION_CHANGE_COMMAND,
+  BLUR_COMMAND,
   type EditorState,
   type LexicalEditor,
   $getRoot,
@@ -159,15 +161,59 @@ function LegalDocToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
       // Check if cursor is inside a LegalNoticeNode (at any nesting depth)
       const legalNoticeParent = $findMatchingParent(anchorNode, $isLegalNoticeNode);
       setIsInsideLegalNotice(!!legalNoticeParent);
+    } else {
+      // No range selection (focus lost, or non-range selection type) — reset all
+      // state so the toolbar doesn't show stale formatting after blur.
+      setIsBold(false);
+      setIsItalic(false);
+      setIsUnderline(false);
+      setIsStrikethrough(false);
+      setIsCode(false);
+      setIsLink(false);
+      setBlockType('paragraph');
+      setIsInsideLegalNotice(false);
     }
   }, []);
 
   useEffect(() => {
-    return editor.registerUpdateListener(({ editorState }) => {
-      editorState.read(() => {
-        updateToolbar();
-      });
+    // registerUpdateListener fires on content changes. SELECTION_CHANGE_COMMAND
+    // fires on cursor moves and focus/blur so the toolbar doesn't show stale state
+    // (e.g. Bold still lit after moving focus to a different field).
+    const unregisterUpdate = editor.registerUpdateListener(({ editorState }) => {
+      editorState.read(() => updateToolbar());
     });
+    const unregisterSelection = editor.registerCommand(
+      SELECTION_CHANGE_COMMAND,
+      () => {
+        updateToolbar();
+        return false;
+      },
+      COMMAND_PRIORITY_NORMAL,
+    );
+    // BLUR_COMMAND fires when the editor loses focus. SELECTION_CHANGE_COMMAND may
+    // not fire on blur if Lexical preserves the selection internally for focus return.
+    // Belt-and-suspenders: explicitly reset toolbar state on blur so the admin
+    // doesn't see stale formatting highlights after clicking to another form field.
+    const unregisterBlur = editor.registerCommand(
+      BLUR_COMMAND,
+      () => {
+        setIsBold(false);
+        setIsItalic(false);
+        setIsUnderline(false);
+        setIsStrikethrough(false);
+        setIsCode(false);
+        setIsLink(false);
+        setBlockType('paragraph');
+        setIsInsideLegalNotice(false);
+        return false;
+      },
+      COMMAND_PRIORITY_NORMAL,
+    );
+    return () => {
+      unregisterUpdate();
+      unregisterSelection();
+      unregisterBlur();
+    };
   }, [editor, updateToolbar]);
 
   const formatHeading = (headingSize: 'h2' | 'h3') => {
@@ -468,12 +514,20 @@ function LegalNoticePlugin() {
         );
         noticeNode.append(heading, paragraph);
 
-        // $insertNodeToNearestRoot requires a RangeSelection. If the toolbar button
-        // was clicked before the editor received focus there may be no selection —
-        // fall back to appending at the document root in that case.
+        // If the cursor is already inside a LegalNoticeNode, $insertNodeToNearestRoot
+        // would split it at the cursor position (destructive — cuts content in two).
+        // Instead, insert the new notice as a sibling directly after the existing one.
+        // If there's no selection at all (toolbar clicked before focusing editor),
+        // fall back to appending at the document root.
         const selection = $getSelection();
         if ($isRangeSelection(selection)) {
-          $insertNodeToNearestRoot(noticeNode);
+          const anchorNode = selection.anchor.getNode();
+          const existingNotice = $findMatchingParent(anchorNode, $isLegalNoticeNode);
+          if (existingNotice) {
+            existingNotice.insertAfter(noticeNode);
+          } else {
+            $insertNodeToNearestRoot(noticeNode);
+          }
         } else {
           $getRoot().append(noticeNode);
         }
