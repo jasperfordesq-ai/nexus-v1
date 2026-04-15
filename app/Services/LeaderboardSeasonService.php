@@ -176,6 +176,7 @@ class LeaderboardSeasonService
                 ->map(fn ($r) => (array) $r)
                 ->all();
         } catch (\Throwable $e) {
+            Log::warning('[LeaderboardSeason] getPastSeasons failed: ' . $e->getMessage());
             return [];
         }
     }

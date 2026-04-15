@@ -269,6 +269,7 @@ class GroupReportingService
                 ->where('created_at', '>=', $since)
                 ->count();
         } catch (\Throwable $e) {
+            Log::debug('[GroupReporting] countNewMembers failed: ' . $e->getMessage());
             return 0;
         }
     }
@@ -285,6 +286,7 @@ class GroupReportingService
                 ->where('created_at', '>=', $since)
                 ->count();
         } catch (\Throwable $e) {
+            Log::debug('[GroupReporting] countNewDiscussions failed: ' . $e->getMessage());
             return 0;
         }
     }
@@ -304,6 +306,7 @@ class GroupReportingService
                 ->where('group_posts.created_at', '>=', $since)
                 ->count();
         } catch (\Throwable $e) {
+            Log::debug('[GroupReporting] countNewPosts failed: ' . $e->getMessage());
             return 0;
         }
     }
@@ -320,6 +323,7 @@ class GroupReportingService
                 ->where('created_at', '>=', $since)
                 ->count();
         } catch (\Throwable $e) {
+            Log::debug('[GroupReporting] countNewEvents failed: ' . $e->getMessage());
             return 0;
         }
     }

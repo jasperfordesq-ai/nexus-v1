@@ -109,6 +109,7 @@ class FederatedMessageService
                 ->whereIn('status', ['pending', 'delivered', 'unread'])
                 ->count();
         } catch (\Throwable $e) {
+            Log::debug('[FederatedMessage] getUnreadCount failed: ' . $e->getMessage());
             return 0;
         }
     }

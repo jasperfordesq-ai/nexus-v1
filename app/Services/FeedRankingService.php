@@ -374,6 +374,7 @@ class FeedRankingService
                 return self::computeVitalityFromDays($days);
             }
         } catch (\Exception $e) {
+            Log::debug('[FeedRanking] calculateVitalityScore failed: ' . $e->getMessage());
         }
         return self::VITALITY_MINIMUM;
     }
@@ -416,6 +417,7 @@ class FeedRankingService
                 return min(self::SOCIAL_GRAPH_MAX_BOOST, 1.0 + (log((float) $rows[0]->weighted_interactions + 1, 2) * $bf));
             }
         } catch (\Exception $e) {
+            Log::debug('[FeedRanking] calculateSocialGraphScore failed: ' . $e->getMessage());
         }
         return 1.0;
     }
@@ -448,6 +450,7 @@ class FeedRankingService
                 return max(0.1, 1.0 - $reportCount * self::REPORT_PENALTY_PER);
             }
         } catch (\Exception $e) {
+            Log::debug('[FeedRanking] calculateNegativeSignalsScore failed: ' . $e->getMessage());
         }
         return 1.0;
     }

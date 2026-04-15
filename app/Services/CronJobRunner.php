@@ -8,6 +8,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Core\Mailer;
 use App\Core\Env;
 use App\Core\TenantContext;
@@ -1318,18 +1319,21 @@ class CronJobRunner
             DB::update("UPDATE users SET reset_token = NULL WHERE reset_token IS NOT NULL AND (reset_token_expiry IS NOT NULL AND reset_token_expiry < NOW())");
             echo "   Cleaned expired reset tokens.\n";
         } catch (\Exception $e) {
+            Log::warning('[CronCleanup] Failed to clean expired reset tokens: ' . $e->getMessage());
         }
 
         try {
             DB::delete("DELETE FROM notification_queue WHERE status = 'sent' AND sent_at < DATE_SUB(NOW(), INTERVAL 30 DAY)");
             echo "   Cleaned old notification queue.\n";
         } catch (\Exception $e) {
+            Log::warning('[CronCleanup] Failed to clean notification queue: ' . $e->getMessage());
         }
 
         try {
             DB::delete("DELETE FROM newsletter_suppression_list WHERE expires_at IS NOT NULL AND expires_at < NOW()");
             echo "   Cleaned expired suppressions.\n";
         } catch (\Exception $e) {
+            Log::warning('[CronCleanup] Failed to clean expired suppressions: ' . $e->getMessage());
         }
 
         // Clean expired password_resets table entries (older than 1 hour)
@@ -1337,6 +1341,7 @@ class CronJobRunner
             DB::delete("DELETE FROM password_resets WHERE created_at < DATE_SUB(NOW(), INTERVAL 1 HOUR)");
             echo "   Cleaned expired password_resets.\n";
         } catch (\Exception $e) {
+            Log::warning('[CronCleanup] Failed to clean expired password_resets: ' . $e->getMessage());
         }
 
         // Clean expired API tokens
@@ -1344,6 +1349,7 @@ class CronJobRunner
             DB::delete("DELETE FROM api_tokens WHERE expires_at IS NOT NULL AND expires_at < NOW()");
             echo "   Cleaned expired API tokens.\n";
         } catch (\Exception $e) {
+            Log::warning('[CronCleanup] Failed to clean expired API tokens: ' . $e->getMessage());
         }
 
         // Clean old match cache entries (older than 24 hours)
@@ -1352,6 +1358,7 @@ class CronJobRunner
             DB::delete("DELETE FROM match_cache WHERE expires_at < NOW()");
             echo "   Cleaned expired match cache.\n";
         } catch (\Exception $e) {
+            Log::warning('[CronCleanup] Failed to clean expired match cache: ' . $e->getMessage());
         }
 
         // Clean old cron_logs entries (older than 30 days)
@@ -1359,6 +1366,7 @@ class CronJobRunner
             DB::delete("DELETE FROM cron_logs WHERE executed_at < DATE_SUB(NOW(), INTERVAL 30 DAY)");
             echo "   Cleaned old cron logs.\n";
         } catch (\Exception $e) {
+            Log::warning('[CronCleanup] Failed to clean old cron logs: ' . $e->getMessage());
         }
 
         // Expire stale exchange requests stuck in pending_provider for 14+ days
@@ -1372,6 +1380,7 @@ class CronJobRunner
                 echo "   Expired $expired stale exchange requests (pending_provider > 14 days).\n";
             }
         } catch (\Exception $e) {
+            Log::warning('[CronCleanup] Failed to expire stale exchange requests: ' . $e->getMessage());
         }
     }
 

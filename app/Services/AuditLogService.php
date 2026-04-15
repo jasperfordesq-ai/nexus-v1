@@ -411,6 +411,7 @@ class AuditLogService
 
             return $logs;
         } catch (\Exception $e) {
+            Log::warning('[AuditLog] Failed to fetch audit logs: ' . $e->getMessage());
             return [];
         }
     }
@@ -440,6 +441,7 @@ class AuditLogService
         try {
             return (int) $query->count();
         } catch (\Exception $e) {
+            Log::warning('[AuditLog] Failed to count audit logs: ' . $e->getMessage());
             return 0;
         }
     }
@@ -463,6 +465,7 @@ class AuditLogService
                 ->map(fn ($row) => (array) $row)
                 ->all();
         } catch (\Exception $e) {
+            Log::warning('[AuditLog] Failed to fetch action summary: ' . $e->getMessage());
             return [];
         }
     }
@@ -495,6 +498,7 @@ class AuditLogService
 
             return $logs;
         } catch (\Exception $e) {
+            Log::warning('[AuditLog] Failed to fetch user activity: ' . $e->getMessage());
             return [];
         }
     }

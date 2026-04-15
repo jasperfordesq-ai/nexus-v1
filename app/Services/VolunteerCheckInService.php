@@ -221,6 +221,7 @@ class VolunteerCheckInService
                 ->where('status', 'checked_in')
                 ->exists();
         } catch (\Exception $e) {
+            Log::warning('[VolunteerCheckIn] isUserCheckedIntoOpportunity failed: ' . $e->getMessage());
             return false;
         }
     }

@@ -176,6 +176,7 @@ class SafeguardingService
                 })
                 ->all();
         } catch (\Throwable $e) {
+            Log::warning('[Safeguarding] Failed to fetch safeguarding assignments: ' . $e->getMessage());
             return [];
         }
     }

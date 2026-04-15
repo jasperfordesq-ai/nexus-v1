@@ -743,7 +743,8 @@ class SitemapService
 
         try {
             return date('Y-m-d', strtotime($datetime));
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            Log::debug('[SitemapService] formatDate failed for value: ' . $e->getMessage());
             return null;
         }
     }

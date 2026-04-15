@@ -445,6 +445,7 @@ class ShiftSwapService
                 return true;
             });
         } catch (\RuntimeException $e) {
+            Log::warning('[ShiftSwap] executeSwap validation failed: ' . $e->getMessage());
             return false;
         } catch (\Exception $e) {
             Log::error('ShiftSwapService::executeSwap error: ' . $e->getMessage());
@@ -544,6 +545,7 @@ class ShiftSwapService
 
             return filter_var($result, FILTER_VALIDATE_BOOLEAN);
         } catch (\Throwable $e) {
+            Log::debug('[ShiftSwap] requiresAdminApproval check failed: ' . $e->getMessage());
             return false;
         }
     }

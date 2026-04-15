@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * VolunteerReminderService — manages reminder settings and sends shift/credential
@@ -134,6 +135,7 @@ class VolunteerReminderService
         try {
             $sendAt = new \DateTime($datetime);
         } catch (\Throwable $e) {
+            Log::warning('[VolunteerReminder] Invalid datetime for scheduleReminder: ' . $e->getMessage());
             return false;
         }
 

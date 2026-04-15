@@ -7,6 +7,7 @@
 namespace App\Services\Identity;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * TenantProviderCredentialService
@@ -106,6 +107,7 @@ class TenantProviderCredentialService
 
             return $row !== false;
         } catch (\Throwable $e) {
+            Log::warning('[TenantProviderCredential] hasCredentials check failed: ' . $e->getMessage());
             return false;
         }
     }
@@ -130,6 +132,7 @@ class TenantProviderCredentialService
             }
             return $configured;
         } catch (\Throwable $e) {
+            Log::warning('[TenantProviderCredential] listConfigured failed: ' . $e->getMessage());
             return [];
         }
     }

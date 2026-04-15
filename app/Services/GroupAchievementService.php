@@ -177,6 +177,7 @@ class GroupAchievementService
                 )
             );
         } catch (\Throwable $e) {
+            Log::debug('[GroupAchievement] getEarnedAchievements failed: ' . $e->getMessage());
             return [];
         }
     }

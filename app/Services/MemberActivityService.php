@@ -18,6 +18,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * MemberActivityService — Laravel DI-based service for member activity data.
@@ -373,6 +374,7 @@ class MemberActivityService
                 ->where('created_at', '>=', $thirtyDaysAgo)
                 ->count();
         } catch (\Exception $e) {
+            Log::debug('[MemberActivity] Failed to count comments for user ' . $userId . ': ' . $e->getMessage());
         }
 
         $likesGiven = 0;
@@ -392,6 +394,7 @@ class MemberActivityService
                 ->where('likes.created_at', '>=', $thirtyDaysAgo)
                 ->count();
         } catch (\Exception $e) {
+            Log::debug('[MemberActivity] Failed to count likes for user ' . $userId . ': ' . $e->getMessage());
         }
 
         return [

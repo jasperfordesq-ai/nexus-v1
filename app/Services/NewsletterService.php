@@ -1407,6 +1407,7 @@ HTML;
                 'click_rate' => ($stats->sent ?? 0) > 0 ? round(($stats->clicked ?? 0) / $stats->sent * 100, 1) : 0,
             ];
         } catch (\Exception $e) {
+            Log::warning('[Newsletter] Failed to fetch newsletter stats: ' . $e->getMessage());
             return [];
         }
     }
@@ -1445,6 +1446,7 @@ HTML;
                 ->map(fn ($u) => (array) $u)
                 ->toArray();
         } catch (\Exception $e) {
+            Log::warning('[Newsletter] Failed to fetch filtered recipients: ' . $e->getMessage());
             return [];
         }
     }
@@ -1501,6 +1503,7 @@ HTML;
 
             return (array) $stats;
         } catch (\Exception $e) {
+            Log::warning('[Newsletter] Failed to fetch A/B test results: ' . $e->getMessage());
             return null;
         }
     }
@@ -1523,6 +1526,7 @@ HTML;
                 ]);
             return true;
         } catch (\Exception $e) {
+            Log::warning('[Newsletter] Failed to select A/B winner: ' . $e->getMessage());
             return false;
         }
     }

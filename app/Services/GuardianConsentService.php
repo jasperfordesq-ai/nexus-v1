@@ -62,6 +62,7 @@ class GuardianConsentService
 
             return $age < self::MINOR_AGE_THRESHOLD;
         } catch (\Exception $e) {
+            Log::warning('[GuardianConsent] isMinor check failed: ' . $e->getMessage());
             return false;
         }
     }

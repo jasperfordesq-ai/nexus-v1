@@ -254,6 +254,7 @@ class EmbeddingService
             $data = json_decode($response, true);
             return $data['data'][0]['embedding'] ?? null;
         } catch (\Throwable $e) {
+            Log::debug('[EmbeddingService] generateEmbedding failed: ' . $e->getMessage());
             return null;
         }
     }

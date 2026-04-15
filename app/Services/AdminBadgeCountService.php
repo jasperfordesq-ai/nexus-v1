@@ -75,6 +75,7 @@ class AdminBadgeCountService
                 ->where('status', 'pending')
                 ->count();
         } catch (\Exception $e) {
+            Log::warning('[AdminBadgeCount] Failed to count pending users: ' . $e->getMessage());
             return 0;
         }
     }
@@ -91,6 +92,7 @@ class AdminBadgeCountService
                 })
                 ->count();
         } catch (\Exception $e) {
+            Log::warning('[AdminBadgeCount] Failed to count pending listings: ' . $e->getMessage());
             return 0;
         }
     }
@@ -103,6 +105,7 @@ class AdminBadgeCountService
                 ->where('status', 'pending')
                 ->count();
         } catch (\Exception $e) {
+            Log::warning('[AdminBadgeCount] Failed to count pending organizations: ' . $e->getMessage());
             return 0;
         }
     }
@@ -115,6 +118,7 @@ class AdminBadgeCountService
                 ->where('status', 'new')
                 ->count();
         } catch (\Exception $e) {
+            Log::warning('[AdminBadgeCount] Failed to count fraud alerts: ' . $e->getMessage());
             return 0;
         }
     }
@@ -127,6 +131,7 @@ class AdminBadgeCountService
                 ->where('status', 'pending')
                 ->count();
         } catch (\Exception $e) {
+            Log::warning('[AdminBadgeCount] Failed to count GDPR requests: ' . $e->getMessage());
             return 0;
         }
     }
@@ -145,6 +150,7 @@ class AdminBadgeCountService
 
             return (int) $query->count();
         } catch (\Exception $e) {
+            Log::warning('[AdminBadgeCount] Failed to count 404 errors: ' . $e->getMessage());
             return 0;
         }
     }
@@ -157,6 +163,7 @@ class AdminBadgeCountService
                 ->where('status', 'pending_broker')
                 ->count();
         } catch (\Exception $e) {
+            Log::warning('[AdminBadgeCount] Failed to count pending exchanges: ' . $e->getMessage());
             return 0;
         }
     }
@@ -169,6 +176,7 @@ class AdminBadgeCountService
                 ->whereNull('reviewed_at')
                 ->count();
         } catch (\Exception $e) {
+            Log::warning('[AdminBadgeCount] Failed to count unreviewed messages: ' . $e->getMessage());
             return 0;
         }
     }

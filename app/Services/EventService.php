@@ -998,6 +998,7 @@ class EventService
             );
             return $row ? (int) $row->position : null;
         } catch (\Exception $e) {
+            Log::debug('[EventService] getUserWaitlistPosition failed: ' . $e->getMessage());
             return null;
         }
     }
@@ -1018,6 +1019,7 @@ class EventService
             );
             return array_map(fn($r) => (array) $r, $rows);
         } catch (\Exception $e) {
+            Log::debug('[EventService] getUserReminders failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -1301,6 +1303,7 @@ class EventService
                 'creator'     => $series->creator_name,
             ];
         } catch (\Exception $e) {
+            Log::debug('[EventService] getSeriesInfo failed: ' . $e->getMessage());
             return null;
         }
     }

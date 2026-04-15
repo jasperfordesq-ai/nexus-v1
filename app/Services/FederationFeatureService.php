@@ -177,6 +177,7 @@ class FederationFeatureService
                 return false;
             }
         } catch (\Exception $e) {
+            Log::warning('[FederationFeature] isTenantFederationEnabled DB check failed: ' . $e->getMessage());
             return false;
         }
 

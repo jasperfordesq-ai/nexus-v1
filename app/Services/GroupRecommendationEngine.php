@@ -117,6 +117,7 @@ class GroupRecommendationEngine
                 )
             );
         } catch (\Exception $e) {
+            Log::debug('[GroupRecommendation] getInteractionStats failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -561,6 +562,7 @@ class GroupRecommendationEngine
                 ORDER BY recent_joins DESC LIMIT 50
             ", [$tenantId]);
         } catch (\Exception $e) {
+            Log::debug('[GroupRecommendation] getTrendingBoosts failed: ' . $e->getMessage());
             return [];
         }
 

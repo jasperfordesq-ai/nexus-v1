@@ -38,6 +38,7 @@ class ListingModerationService
 
             return filter_var($value, FILTER_VALIDATE_BOOLEAN);
         } catch (\Exception $e) {
+            Log::warning('[ListingModeration] Failed to check moderation enabled status: ' . $e->getMessage());
             return false;
         }
     }

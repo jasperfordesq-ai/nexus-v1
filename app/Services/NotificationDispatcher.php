@@ -729,6 +729,7 @@ HTML;
 
             return $row ? (array) $row : [];
         } catch (\Exception $e) {
+            Log::debug('[NotificationDispatcher] getExchangeDetails failed: ' . $e->getMessage());
             return [];
         }
     }

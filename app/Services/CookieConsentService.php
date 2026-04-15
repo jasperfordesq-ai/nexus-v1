@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * CookieConsentService — Laravel DI-based service for cookie consent management.
@@ -221,6 +222,7 @@ class CookieConsentService
 
             return true;
         } catch (\Throwable $e) {
+            Log::warning('[CookieConsent] withdrawConsent failed: ' . $e->getMessage());
             return false;
         }
     }
@@ -239,7 +241,7 @@ class CookieConsentService
                 return (array) $row;
             }
         } catch (\Throwable $e) {
-            // Table may not exist
+            Log::debug('[CookieConsent] getTenantSettings failed (table may not exist): ' . $e->getMessage());
         }
 
         return [
@@ -263,6 +265,7 @@ class CookieConsentService
             );
             return true;
         } catch (\Throwable $e) {
+            Log::warning('[CookieConsent] updateTenantSettings failed: ' . $e->getMessage());
             return false;
         }
     }
@@ -293,6 +296,7 @@ class CookieConsentService
                 'marketing'  => $marketing,
             ];
         } catch (\Throwable $e) {
+            Log::warning('[CookieConsent] getStatistics failed: ' . $e->getMessage());
             return ['total' => 0, 'functional' => 0, 'analytics' => 0, 'marketing' => 0];
         }
     }
@@ -333,6 +337,7 @@ class CookieConsentService
                 ->where('expires_at', '<', now())
                 ->delete();
         } catch (\Throwable $e) {
+            Log::warning('[CookieConsent] cleanExpiredConsents failed: ' . $e->getMessage());
             return 0;
         }
     }

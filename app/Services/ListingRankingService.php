@@ -575,6 +575,7 @@ class ListingRankingService
                 ->pluck('category_id')
                 ->all();
         } catch (\Exception $e) {
+            Log::debug('[ListingRanking] getViewerListingCategoryIds failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -589,6 +590,7 @@ class ListingRankingService
                 ->pluck('lf.listing_id')
                 ->all();
         } catch (\Exception $e) {
+            Log::debug('[ListingRanking] getViewerSavedListingIds failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -605,6 +607,7 @@ class ListingRankingService
                 ->map(fn ($r) => (array) $r)
                 ->all();
         } catch (\Exception $e) {
+            Log::debug('[ListingRanking] getUserListings failed: ' . $e->getMessage());
             return [];
         }
     }

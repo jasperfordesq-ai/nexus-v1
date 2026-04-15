@@ -45,6 +45,7 @@ class MatchingService
                 [$tenantId, $userId, $limit]
             );
         } catch (\Throwable $e) {
+            Log::debug('[MatchingService] getSuggestionsForUser failed: ' . $e->getMessage());
             return [];
         }
     }

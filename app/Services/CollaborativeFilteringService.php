@@ -287,6 +287,7 @@ class CollaborativeFilteringService
                 ->map(fn ($id) => (int) $id)
                 ->all();
         } catch (\Throwable $e) {
+            Log::debug('[CollaborativeFiltering] getPopularListingsFallback failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -305,7 +306,7 @@ class CollaborativeFilteringService
                 ->all();
             $fallback = array_values(array_filter($fallback, fn (int $id) => !in_array($id, $savedRows, true)));
         } catch (\Throwable $e) {
-            // listing_favorites table may not exist
+            Log::debug('[CollaborativeFiltering] Could not exclude saved listings (table may not exist): ' . $e->getMessage());
         }
 
         return array_slice($fallback, 0, $limit);
@@ -323,6 +324,7 @@ class CollaborativeFilteringService
                 ->map(fn ($id) => (int) $id)
                 ->all();
         } catch (\Throwable $e) {
+            Log::debug('[CollaborativeFiltering] getPopularMembersFallback failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -346,6 +348,7 @@ class CollaborativeFilteringService
                 [$tenantId]
             );
         } catch (\Throwable $e) {
+            Log::debug('[CollaborativeFiltering] loadListingInteractions failed: ' . $e->getMessage());
             return [];
         }
 
@@ -376,6 +379,7 @@ class CollaborativeFilteringService
                 [$tenantId]
             );
         } catch (\Throwable $e) {
+            Log::debug('[CollaborativeFiltering] loadMemberInteractions failed: ' . $e->getMessage());
             return [];
         }
 

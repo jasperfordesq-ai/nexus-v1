@@ -118,6 +118,7 @@ class GroupWelcomeService
             ]);
             return true;
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('[GroupWelcome] Failed to send welcome notification: ' . $e->getMessage());
             return false;
         }
     }

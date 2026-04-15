@@ -362,6 +362,7 @@ class CrossModuleMatchingService
                 ->map(fn($id) => (int) $id)
                 ->all();
         } catch (\Throwable $e) {
+            Log::debug('[CrossModuleMatching] getDismissedListingIds failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -386,6 +387,7 @@ class CrossModuleMatchingService
                 ($user->skills ?? '') . ' ' . ($user->bio ?? '')
             );
         } catch (\Throwable $e) {
+            Log::debug('[CrossModuleMatching] getUserSkillKeywords failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -406,6 +408,7 @@ class CrossModuleMatchingService
                 ->map(fn($id) => (int) $id)
                 ->all();
         } catch (\Throwable $e) {
+            Log::debug('[CrossModuleMatching] getUserCategoryIds failed: ' . $e->getMessage());
             return [];
         }
     }

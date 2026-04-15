@@ -347,6 +347,7 @@ class ConnectionService
                 self::request($requesterId, $receiverIdOrData);
                 return true;
             } catch (\RuntimeException $e) {
+                Log::warning('[ConnectionService] sendRequest failed: ' . $e->getMessage());
                 return false;
             }
         }
@@ -455,6 +456,7 @@ class ConnectionService
             self::accept($connectionId, $userId);
             return true;
         } catch (\Throwable $e) {
+            Log::warning('[ConnectionService] acceptRequest failed', ['connection_id' => $connectionId, 'error' => $e->getMessage()]);
             return false;
         }
     }

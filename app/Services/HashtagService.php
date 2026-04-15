@@ -6,6 +6,8 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Log;
+
 /**
  *
  * Provides dependency-injectable access to the legacy static service methods.
@@ -103,6 +105,7 @@ class HashtagService
                 )
             );
         } catch (\Throwable $e) {
+            Log::debug('[Hashtag] getTrending failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -131,6 +134,7 @@ class HashtagService
                 )
             );
         } catch (\Throwable $e) {
+            Log::debug('[Hashtag] getPopular failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -160,6 +164,7 @@ class HashtagService
                 )
             );
         } catch (\Throwable $e) {
+            Log::debug('[Hashtag] search failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -202,6 +207,7 @@ class HashtagService
                 'tag'      => $tag,
             ];
         } catch (\Throwable $e) {
+            Log::debug('[Hashtag] getPostsByHashtag failed: ' . $e->getMessage());
             return ['items' => [], 'cursor' => null, 'has_more' => false, 'tag' => $tag];
         }
     }
@@ -219,6 +225,7 @@ class HashtagService
                 ->pluck('tag')
                 ->all();
         } catch (\Throwable $e) {
+            Log::debug('[Hashtag] getPostHashtags failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -247,6 +254,7 @@ class HashtagService
 
             return $result;
         } catch (\Throwable $e) {
+            Log::debug('[Hashtag] getBatchPostHashtags failed: ' . $e->getMessage());
             return [];
         }
     }

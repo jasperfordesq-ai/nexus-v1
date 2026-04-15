@@ -122,6 +122,7 @@ class ExploreService
                 'color' => $row->color,
             ], $rows);
         } catch (\Throwable $e) {
+            Log::debug('[ExploreService] getListingCategories failed: ' . $e->getMessage());
             return [];
         }
     }

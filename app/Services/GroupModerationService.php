@@ -113,6 +113,7 @@ class GroupModerationService
                 })
                 ->exists();
         } catch (\Throwable $e) {
+            Log::warning('[GroupModeration] Failed to check user ban status: ' . $e->getMessage());
             return false;
         }
     }
@@ -139,6 +140,7 @@ class GroupModerationService
                 $query->limit($limit)->offset($offset)->get()->all()
             );
         } catch (\Throwable $e) {
+            Log::warning('[GroupModeration] Failed to fetch pending flags: ' . $e->getMessage());
             return [];
         }
     }
@@ -165,6 +167,7 @@ class GroupModerationService
                 $query->limit($limit)->offset($offset)->get()->all()
             );
         } catch (\Throwable $e) {
+            Log::warning('[GroupModeration] Failed to fetch moderation history: ' . $e->getMessage());
             return [];
         }
     }

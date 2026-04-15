@@ -14,6 +14,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Meilisearch\Client as MeilisearchClient;
 
 /**
@@ -1294,7 +1295,8 @@ class SearchService
                 ->limit($limit)
                 ->get()
                 ->toArray();
-        } catch (\Exception) {
+        } catch (\Exception $e) {
+            Log::warning('[SearchService] Failed to fetch trending queries: ' . $e->getMessage());
             return [];
         }
     }

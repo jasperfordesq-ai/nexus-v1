@@ -185,6 +185,7 @@ class FederationUserService
 
             return $row && (bool) $row->federation_optin;
         } catch (\Throwable $e) {
+            Log::warning('[FederationUser] isOptedIn check failed: ' . $e->getMessage());
             return false;
         }
     }
@@ -244,6 +245,7 @@ class FederationUserService
 
             return $query->get()->map(fn ($row) => (array) $row)->all();
         } catch (\Throwable $e) {
+            Log::warning('[FederationUser] getFederatedUsers failed: ' . $e->getMessage());
             return [];
         }
     }
@@ -272,6 +274,7 @@ class FederationUserService
 
             return $control && (bool) ($control->federation_enabled ?? false);
         } catch (\Throwable $e) {
+            Log::warning('[FederationUser] isFederationAvailableForUser failed: ' . $e->getMessage());
             return false;
         }
     }

@@ -43,6 +43,7 @@ class NexusScoreCacheService
 
             return $cached ? (float) $cached->total_score : null;
         } catch (\Throwable $e) {
+            Log::debug('[NexusScoreCache] getSimple failed: ' . $e->getMessage());
             return null;
         }
     }
@@ -269,6 +270,7 @@ class NexusScoreCacheService
                 'cached_at' => $cached->calculated_at?->toIso8601String(),
             ];
         } catch (\Throwable $e) {
+            Log::debug('[NexusScoreCache] getCachedScore failed: ' . $e->getMessage());
             return null;
         }
     }

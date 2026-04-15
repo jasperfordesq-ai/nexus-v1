@@ -524,6 +524,7 @@ class SocialNotificationService
 
             return $text;
         } catch (\Throwable $e) {
+            Log::debug('[SocialNotification] getPostSnippet failed: ' . $e->getMessage());
             return '';
         }
     }

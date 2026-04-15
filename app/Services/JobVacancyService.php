@@ -1469,6 +1469,7 @@ class JobVacancyService
                 ->avg(DB::raw('(total_score / max_score) * 100'));
             return $avg !== null ? round((float) $avg, 1) : null;
         } catch (\Throwable $e) {
+            Log::debug('[JobVacancy] getScorecardAvg failed: ' . $e->getMessage());
             return null;
         }
     }
@@ -1487,6 +1488,7 @@ class JobVacancyService
                 ->map(fn($r) => (array) $r)
                 ->all();
         } catch (\Throwable $e) {
+            Log::debug('[JobVacancy] getWeeklyApplicationTrend failed: ' . $e->getMessage());
             return [];
         }
     }

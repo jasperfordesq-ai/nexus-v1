@@ -799,6 +799,7 @@ class GdprService
                 [$userId, $userId, $userId, $this->tenantId]
             )->fetchAll();
         } catch (\Throwable $e) {
+            $this->logger->warning('getReviewData failed for user ' . $userId . ': ' . $e->getMessage());
             return [];
         }
     }
@@ -820,6 +821,7 @@ class GdprService
                 [$userId, $userId, $userId, $this->tenantId]
             )->fetchAll();
         } catch (\Throwable $e) {
+            $this->logger->warning('getExchangeData failed for user ' . $userId . ': ' . $e->getMessage());
             return [];
         }
     }
@@ -1907,6 +1909,7 @@ This export will expire in 7 days.
                 [$userId, $this->tenantId]
             )->fetchAll();
         } catch (\Throwable $e) {
+            $this->logger->warning('getVettingRecordsData failed for user ' . $userId . ': ' . $e->getMessage());
             return [];
         }
     }
@@ -1926,6 +1929,7 @@ This export will expire in 7 days.
                 [$userId, $this->tenantId]
             )->fetchAll();
         } catch (\Throwable $e) {
+            $this->logger->warning('getInsuranceCertificatesData failed for user ' . $userId . ': ' . $e->getMessage());
             return [];
         }
     }
@@ -1946,6 +1950,7 @@ This export will expire in 7 days.
                 [$userId, $this->tenantId]
             )->fetchAll();
         } catch (\Throwable $e) {
+            $this->logger->warning('getIdentityVerificationData failed for user ' . $userId . ': ' . $e->getMessage());
             return [];
         }
     }
@@ -1966,6 +1971,7 @@ This export will expire in 7 days.
                 [$userId, $this->tenantId]
             )->fetchAll();
         } catch (\Throwable $e) {
+            $this->logger->warning('getSafeguardingPreferencesData failed for user ' . $userId . ': ' . $e->getMessage());
             return [];
         }
     }
