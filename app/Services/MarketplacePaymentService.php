@@ -6,11 +6,14 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\MarketplaceEscrow;
 use App\Models\MarketplaceOrder;
 use App\Models\MarketplacePayment;
 use App\Models\MarketplaceSellerProfile;
+use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -668,11 +671,51 @@ class MarketplacePaymentService
         $payment->status = $isFullRefund ? 'refunded' : 'partially_refunded';
         $payment->save();
 
+        $order = MarketplaceOrder::withoutGlobalScopes()->find($payment->order_id);
         if ($isFullRefund) {
-            $order = MarketplaceOrder::withoutGlobalScopes()->find($payment->order_id);
             if ($order && !in_array($order->status, ['refunded', 'cancelled'], true)) {
                 $order->status = 'refunded';
                 $order->save();
+            }
+        }
+
+        // Notify buyer of the refund
+        if ($order) {
+            try {
+                $bellKey = $isFullRefund ? 'api_controllers_3.marketplace_order.refunded' : 'api_controllers_3.marketplace_order.partially_refunded';
+                $emailSubjectKey = $isFullRefund ? 'emails_misc.marketplace_order.refunded_subject' : 'emails_misc.marketplace_order.partially_refunded_subject';
+                $emailTitleKey   = $isFullRefund ? 'emails_misc.marketplace_order.refunded_title'   : 'emails_misc.marketplace_order.partially_refunded_title';
+                $emailBodyKey    = $isFullRefund ? 'emails_misc.marketplace_order.refunded_body'     : 'emails_misc.marketplace_order.partially_refunded_body';
+
+                $currency = strtoupper($payment->currency ?? 'EUR');
+                $amountFormatted = number_format($refundedAmount, 2);
+                $orderNumber = $order->order_number;
+
+                Notification::create([
+                    'user_id'    => $order->buyer_id,
+                    'message'    => __($bellKey, ['amount' => $amountFormatted, 'currency' => $currency, 'order_number' => $orderNumber]),
+                    'link'       => '/marketplace/orders/' . $order->id,
+                    'type'       => 'marketplace_order',
+                    'created_at' => now(),
+                ]);
+
+                $buyer = DB::table('users')->where('id', $order->buyer_id)->select(['email', 'first_name', 'name'])->first();
+                if ($buyer && !empty($buyer->email)) {
+                    $firstName = $buyer->first_name ?? $buyer->name ?? 'there';
+                    $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/marketplace/orders/' . $order->id;
+                    $html = EmailTemplateBuilder::make()
+                        ->title(__($emailTitleKey))
+                        ->greeting($firstName)
+                        ->paragraph(__($emailBodyKey, ['amount' => $amountFormatted, 'currency' => $currency, 'order_number' => $orderNumber]))
+                        ->button(__('emails_misc.marketplace_order.order_cta'), $fullUrl)
+                        ->render();
+                    Mailer::forCurrentTenant()->send($buyer->email, __($emailSubjectKey, ['order_number' => $orderNumber]), $html);
+                }
+            } catch (\Throwable $e) {
+                Log::warning('MarketplacePayment webhook: refund notification failed', [
+                    'order_id' => $order->id,
+                    'error' => $e->getMessage(),
+                ]);
             }
         }
 

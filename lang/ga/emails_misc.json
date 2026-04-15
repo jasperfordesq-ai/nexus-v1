@@ -277,7 +277,13 @@
     "completed_title": "Order Completed",
     "completed_preview": "Order {{order_number}} has been successfully completed",
     "completed_buyer_body": "Your order <strong>{{order_number}}</strong> for <strong>{{title}}</strong> has been completed. Thank you for your purchase!",
-    "completed_seller_body": "Order <strong>{{order_number}}</strong> for <strong>{{title}}</strong> has been completed and escrow has been released."
+    "completed_seller_body": "Order <strong>{{order_number}}</strong> for <strong>{{title}}</strong> has been completed and escrow has been released.",
+    "refunded_subject": "Refund processed — {{order_number}}",
+    "refunded_title": "Refund Processed",
+    "refunded_body": "A refund of <strong>{{amount}} {{currency}}</strong> has been processed for your order <strong>{{order_number}}</strong>. The funds will be returned to your original payment method within 5–10 business days.",
+    "partially_refunded_subject": "Partial refund processed — {{order_number}}",
+    "partially_refunded_title": "Partial Refund Processed",
+    "partially_refunded_body": "A partial refund of <strong>{{amount}} {{currency}}</strong> has been processed for your order <strong>{{order_number}}</strong>. The funds will be returned to your original payment method within 5–10 business days."
   },
   "marketplace_report": {
     "received_subject": "Report received — we will review it within 24 hours",

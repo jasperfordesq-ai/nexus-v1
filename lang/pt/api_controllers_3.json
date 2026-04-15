@@ -117,6 +117,8 @@
     "shipped": "Your order #{{order_number}} has been shipped!",
     "delivered": "Order #{{order_number}} — buyer confirmed delivery",
     "cancelled": "Order #{{order_number}} has been cancelled",
-    "completed": "Order #{{order_number}} has been completed!"
+    "completed": "Order #{{order_number}} has been completed!",
+    "refunded": "Refund of {{amount}} {{currency}} processed for order #{{order_number}}",
+    "partially_refunded": "Partial refund of {{amount}} {{currency}} processed for order #{{order_number}}"
   }
 }
