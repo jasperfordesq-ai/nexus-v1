@@ -7,7 +7,9 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Services\NotificationDispatcher;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * ExchangeService — Laravel DI-based service for exchange workflow operations.
@@ -104,7 +106,7 @@ class ExchangeService
             return null;
         }
 
-        return DB::table('exchange_requests')->insertGetId([
+        $id = DB::table('exchange_requests')->insertGetId([
             'tenant_id'       => TenantContext::getId(),
             'listing_id'      => $listingId,
             'requester_id'    => $requesterId,
@@ -115,6 +117,19 @@ class ExchangeService
             'created_at'      => now(),
             'updated_at'      => now(),
         ]);
+
+        // Notify the provider (listing owner) about the new request
+        try {
+            NotificationDispatcher::send(
+                (int) $listing->user_id,
+                'exchange_request_received',
+                ['exchange_id' => $id]
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[ExchangeService] create notification failed: ' . $e->getMessage());
+        }
+
+        return $id;
     }
 
     /**
@@ -122,12 +137,29 @@ class ExchangeService
      */
     public function accept(int $exchangeId, int $providerId): bool
     {
-        return DB::table('exchange_requests')
+        $updated = DB::table('exchange_requests')
             ->where('tenant_id', TenantContext::getId())
             ->where('id', $exchangeId)
             ->where('provider_id', $providerId)
             ->where('status', self::STATUS_PENDING)
             ->update(['status' => self::STATUS_ACCEPTED, 'updated_at' => now()]) > 0;
+
+        if ($updated) {
+            try {
+                $exchange = DB::table('exchange_requests')->where('id', $exchangeId)->first();
+                if ($exchange) {
+                    NotificationDispatcher::send(
+                        (int) $exchange->requester_id,
+                        'exchange_accepted',
+                        ['exchange_id' => $exchangeId]
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[ExchangeService] accept notification failed: ' . $e->getMessage());
+            }
+        }
+
+        return $updated;
     }
 
     /**
@@ -135,7 +167,7 @@ class ExchangeService
      */
     public function decline(int $exchangeId, int $providerId, ?string $reason = null): bool
     {
-        return DB::table('exchange_requests')
+        $updated = DB::table('exchange_requests')
             ->where('tenant_id', TenantContext::getId())
             ->where('id', $exchangeId)
             ->where('provider_id', $providerId)
@@ -145,6 +177,23 @@ class ExchangeService
                 'provider_notes' => $reason,
                 'updated_at'     => now(),
             ]) > 0;
+
+        if ($updated) {
+            try {
+                $exchange = DB::table('exchange_requests')->where('id', $exchangeId)->first();
+                if ($exchange) {
+                    NotificationDispatcher::send(
+                        (int) $exchange->requester_id,
+                        'exchange_request_declined',
+                        ['exchange_id' => $exchangeId, 'reason' => $reason ?? '']
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[ExchangeService] decline notification failed: ' . $e->getMessage());
+            }
+        }
+
+        return $updated;
     }
 
     /**
@@ -161,7 +210,7 @@ class ExchangeService
             return false;
         }
 
-        return DB::table('exchange_requests')
+        $updated = DB::table('exchange_requests')
             ->where('tenant_id', TenantContext::getId())
             ->where('id', $exchangeId)
             ->update([
@@ -169,5 +218,18 @@ class ExchangeService
                 'completed_at' => now(),
                 'updated_at'   => now(),
             ]) > 0;
+
+        if ($updated) {
+            try {
+                $hours = (float) ($exchange->proposed_hours ?? 1);
+                $data  = ['exchange_id' => $exchangeId, 'hours' => $hours];
+                NotificationDispatcher::send((int) $exchange->requester_id, 'exchange_completed', $data);
+                NotificationDispatcher::send((int) $exchange->provider_id,  'exchange_completed', $data);
+            } catch (\Throwable $e) {
+                Log::warning('[ExchangeService] complete notification failed: ' . $e->getMessage());
+            }
+        }
+
+        return $updated;
     }
 }

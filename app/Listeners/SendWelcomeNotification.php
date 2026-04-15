@@ -87,7 +87,9 @@ class SendWelcomeNotification implements ShouldQueue
                     ->render();
 
                 $mailer = \App\Core\Mailer::forCurrentTenant();
-                $mailer->send($userEmail, __('emails.welcome.pending_subject', ['community' => $tenantName]), $html);
+                if (!$mailer->send($userEmail, __('emails.welcome.pending_subject', ['community' => $tenantName]), $html)) {
+                    Log::warning('SendWelcomeNotification: pending welcome email failed to send', ['user_email' => $userEmail]);
+                }
             } else {
                 // Already active user (admin-created) — generic welcome only
                 $html = EmailTemplateBuilder::make()
@@ -108,7 +110,9 @@ class SendWelcomeNotification implements ShouldQueue
                     ->render();
 
                 $mailer = \App\Core\Mailer::forCurrentTenant();
-                $mailer->send($userEmail, __('emails.welcome.subject', ['community' => $tenantName]), $html);
+                if (!$mailer->send($userEmail, __('emails.welcome.subject', ['community' => $tenantName]), $html)) {
+                    Log::warning('SendWelcomeNotification: welcome email failed to send', ['user_email' => $userEmail]);
+                }
             }
         } catch (\Throwable $e) {
             Log::error('SendWelcomeNotification listener failed', [

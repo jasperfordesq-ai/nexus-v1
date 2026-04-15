@@ -6,6 +6,9 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -190,7 +193,7 @@ class InactiveMemberService
     }
 
     /**
-     * Mark inactive members as notified.
+     * Mark inactive members as notified and dispatch a re-engagement email to each.
      */
     public function markNotified(int $tenantId, array $userIds): int
     {
@@ -198,11 +201,54 @@ class InactiveMemberService
             return 0;
         }
 
-        return DB::table('member_activity_flags')
+        $updated = DB::table('member_activity_flags')
             ->where('tenant_id', $tenantId)
             ->whereIn('user_id', $userIds)
             ->whereNull('resolved_at')
             ->update(['notified_at' => now()]);
+
+        // Send re-engagement emails
+        try {
+            TenantContext::setById($tenantId);
+
+            $users = DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('id', $userIds)
+                ->where('status', 'active')
+                ->whereNotNull('email')
+                ->select(['id', 'email', 'first_name', 'name'])
+                ->get();
+
+            $communityName  = TenantContext::getSetting('site_name', 'Project NEXUS');
+            $safeCommunity  = htmlspecialchars($communityName, ENT_QUOTES, 'UTF-8');
+            $feedUrl        = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/feed';
+            $mailer         = Mailer::forCurrentTenant();
+
+            foreach ($users as $user) {
+                try {
+                    $firstName = $user->first_name ?? $user->name ?? 'there';
+
+                    $html = EmailTemplateBuilder::make()
+                        ->title(__('emails_misc.inactive_member.title'))
+                        ->previewText(__('emails_misc.inactive_member.preview'))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_misc.inactive_member.body', ['community' => $safeCommunity]))
+                        ->button(__('emails_misc.inactive_member.cta'), $feedUrl)
+                        ->render();
+
+                    $subject = __('emails_misc.inactive_member.subject', ['community' => $communityName]);
+                    if (!$mailer->send($user->email, $subject, $html)) {
+                        Log::warning('[InactiveMemberService] Re-engagement email failed', ['user_id' => $user->id]);
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('[InactiveMemberService] markNotified email error for user ' . $user->id . ': ' . $e->getMessage());
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[InactiveMemberService] markNotified email batch failed: ' . $e->getMessage());
+        }
+
+        return $updated;
     }
 
     private function upsertFlag(int $userId, int $tenantId, array $data): void

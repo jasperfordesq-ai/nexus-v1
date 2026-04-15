@@ -22,7 +22,14 @@
     "interview_reminder_push_title": "Interview Reminder",
     "interview_in_1_hour": "in 1 hour",
     "interview_in_hours": "in {{hours}} hours",
-    "expiry_greeting": "Hi {{name}},"
+    "expiry_greeting": "Hi {{name}},",
+    "interview_email_subject_proposed": "Interview proposed — {{title}}",
+    "interview_email_subject_accepted": "Interview accepted — {{title}}",
+    "interview_email_subject_declined": "Interview declined — {{title}}",
+    "interview_email_subject_cancelled": "Interview cancelled — {{title}}",
+    "interview_email_subject_reminder": "Upcoming interview — {{title}}",
+    "interview_email_title": "Interview Update",
+    "interview_email_cta": "View Job"
   },
   "guardian": {
     "consent_title": "Guardian Consent Request",
@@ -144,5 +151,24 @@
   "events": {
     "reminder_email_title": "Event Reminder",
     "reminder_email_cta": "View Event"
+  },
+  "vol_org_wallet": {
+    "payment_subject": "Time credits received from {{org}}",
+    "payment_title": "Payment Received",
+    "payment_preview": "You received {{amount}} time credits",
+    "payment_body": "You have received <strong>{{amount}} time credits</strong> from <strong>{{org}}</strong>.",
+    "payment_cta": "View Wallet",
+    "deposit_subject": "Deposit confirmed — {{org}}",
+    "deposit_title": "Deposit Confirmed",
+    "deposit_preview": "Your deposit of {{amount}} credits has been processed",
+    "deposit_body": "Your deposit of <strong>{{amount}} time credits</strong> to <strong>{{org}}</strong> has been processed successfully.",
+    "deposit_cta": "View Wallet"
+  },
+  "inactive_member": {
+    "subject": "We miss you on {{community}}!",
+    "title": "We Miss You!",
+    "preview": "It has been a while — come back and see what is happening",
+    "body": "It has been a while since we have seen you. Your community is growing and there are new opportunities waiting for you.",
+    "cta": "Return to Community"
   }
 }

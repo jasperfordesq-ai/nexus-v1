@@ -6,12 +6,15 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\JobApplication;
 use App\Models\JobInterview;
 use App\Models\Notification;
 use App\Models\Tenant;
 use App\Services\RealtimeService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -84,6 +87,13 @@ class JobInterviewService
                     'message'   => $interviewMsg,
                     'url'       => "/jobs/{$application->vacancy_id}",
                 ]);
+                static::sendInterviewEmail(
+                    $candidateId,
+                    'emails_misc.jobs.interview_email_subject_proposed',
+                    'emails_misc.jobs.interview_requested',
+                    ['title' => $jobTitle],
+                    "/jobs/{$application->vacancy_id}"
+                );
             } catch (\Throwable $e) {
                 Log::warning('JobInterviewService::propose notification failed: ' . $e->getMessage());
             }
@@ -147,6 +157,13 @@ class JobInterviewService
                         'message'   => $acceptMsg,
                         'url'       => "/jobs/{$interview->vacancy_id}/applications",
                     ]);
+                    static::sendInterviewEmail(
+                        (int) $posterId,
+                        'emails_misc.jobs.interview_email_subject_accepted',
+                        'emails_misc.jobs.interview_accepted',
+                        ['title' => $jobTitle],
+                        "/jobs/{$interview->vacancy_id}/applications"
+                    );
                 }
             } catch (\Throwable $e) {
                 Log::warning('JobInterviewService::accept notification failed: ' . $e->getMessage());
@@ -211,6 +228,13 @@ class JobInterviewService
                         'message'   => $declineMsg,
                         'url'       => "/jobs/{$interview->vacancy_id}/applications",
                     ]);
+                    static::sendInterviewEmail(
+                        (int) $posterId,
+                        'emails_misc.jobs.interview_email_subject_declined',
+                        'emails_misc.jobs.interview_declined',
+                        ['title' => $jobTitle],
+                        "/jobs/{$interview->vacancy_id}/applications"
+                    );
                 }
             } catch (\Throwable $e) {
                 Log::warning('JobInterviewService::decline notification failed: ' . $e->getMessage());
@@ -319,6 +343,13 @@ class JobInterviewService
                         'message'   => $cancelMsg,
                         'url'       => "/jobs/{$interview->vacancy_id}",
                     ]);
+                    static::sendInterviewEmail(
+                        (int) $candidateId,
+                        'emails_misc.jobs.interview_email_subject_cancelled',
+                        'emails_misc.jobs.interview_cancelled',
+                        ['title' => $jobTitle],
+                        "/jobs/{$interview->vacancy_id}"
+                    );
                 }
             } catch (\Throwable $e) {
                 Log::warning('JobInterviewService::cancel notification failed: ' . $e->getMessage());
@@ -384,6 +415,13 @@ class JobInterviewService
                             'message'   => $message,
                             'url'       => "/jobs/{$interview->vacancy_id}",
                         ]);
+                        static::sendInterviewEmail(
+                            (int) $candidateId,
+                            'emails_misc.jobs.interview_email_subject_reminder',
+                            'emails_misc.jobs.interview_reminder',
+                            ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt],
+                            "/jobs/{$interview->vacancy_id}"
+                        );
                     }
 
                     // Notify the employer/interviewer
@@ -402,6 +440,13 @@ class JobInterviewService
                             'message'   => $message,
                             'url'       => "/jobs/{$interview->vacancy_id}/applications",
                         ]);
+                        static::sendInterviewEmail(
+                            (int) $posterId,
+                            'emails_misc.jobs.interview_email_subject_reminder',
+                            'emails_misc.jobs.interview_reminder',
+                            ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt],
+                            "/jobs/{$interview->vacancy_id}/applications"
+                        );
                     }
 
                     // Mark as reminded to prevent duplicate sends
@@ -419,5 +464,49 @@ class JobInterviewService
         }
 
         return ['reminders_sent' => $sent, 'errors' => $errors];
+    }
+
+    // =========================================================================
+    // PRIVATE HELPERS
+    // =========================================================================
+
+    /**
+     * Send an interview lifecycle email to a user.
+     *
+     * @param int    $userId     Recipient user ID
+     * @param string $subjectKey Translation key for the email subject
+     * @param string $messageKey Translation key for the notification message (reused as body)
+     * @param array  $params     Translation params (must include 'title')
+     * @param string $jobLink    URL to include as CTA
+     */
+    private static function sendInterviewEmail(int $userId, string $subjectKey, string $messageKey, array $params, string $jobLink): void
+    {
+        try {
+            $tenantId = TenantContext::getId();
+            $user     = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+
+            if (!$user || empty($user->email)) {
+                return;
+            }
+
+            $firstName  = $user->first_name ?? $user->name ?? 'there';
+            $bodyText   = __($messageKey, $params);
+            $subject    = __($subjectKey, $params);
+            $fullUrl    = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $jobLink;
+
+            $html = EmailTemplateBuilder::make()
+                ->title(__('emails_misc.jobs.interview_email_title'))
+                ->previewText($bodyText)
+                ->greeting($firstName)
+                ->paragraph($bodyText)
+                ->button(__('emails_misc.jobs.interview_email_cta'), $fullUrl)
+                ->render();
+
+            if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
+                Log::warning('[JobInterviewService] Interview email failed', ['user_id' => $userId, 'subject_key' => $subjectKey]);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[JobInterviewService] sendInterviewEmail error: ' . $e->getMessage());
+        }
     }
 }
