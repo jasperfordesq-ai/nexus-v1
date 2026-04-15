@@ -545,7 +545,7 @@ class FederationApiMiddleware
             $rateLimit = (int) ($config->rate_limit ?? 1000);
             $requestCount = (int) ($config->request_count ?? 0);
 
-            error_log('FederationApiMiddleware: Using legacy rate limiting. Run migration for proper hourly reset.');
+            \Illuminate\Support\Facades\Log::warning('FederationApiMiddleware: Using legacy rate limiting. Run migration for proper hourly reset.');
         }
 
         $resetTime = strtotime($currentHour) + 3600;

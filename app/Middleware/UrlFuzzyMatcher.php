@@ -171,7 +171,7 @@ class UrlFuzzyMatcher
 
         } catch (\Exception $e) {
             // Silently fail - don't break the application
-            error_log('Fuzzy matcher error: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning('Fuzzy matcher error: ' . $e->getMessage());
         }
 
         return null;

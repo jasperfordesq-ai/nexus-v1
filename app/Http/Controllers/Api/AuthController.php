@@ -232,7 +232,7 @@ class AuthController extends BaseApiController
             } catch (\Throwable $e) {
                 // Sanctum token creation may fail if personal_access_tokens table
                 // doesn't exist yet — fall back gracefully to legacy tokens only
-                error_log('[AuthController] Sanctum token creation failed: ' . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning('[AuthController] Sanctum token creation failed: ' . $e->getMessage());
             }
 
             return response()->json([
@@ -312,7 +312,7 @@ class AuthController extends BaseApiController
             }
         } catch (\Throwable $e) {
             // Sanctum may not be fully set up yet — ignore gracefully
-            error_log('[AuthController] Sanctum token revocation failed: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning('[AuthController] Sanctum token revocation failed: ' . $e->getMessage());
         }
 
         // If a refresh token is provided, revoke it (legacy JWT)
@@ -560,7 +560,7 @@ class AuthController extends BaseApiController
                     );
                 }
             } catch (\Throwable $e) {
-                error_log('[Heartbeat] Bearer user check failed: ' . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning('[Heartbeat] Bearer user check failed: ' . $e->getMessage());
             }
         }
 
@@ -580,7 +580,7 @@ class AuthController extends BaseApiController
                     }
 
                     if (!$user) {
-                        error_log("[Heartbeat] User ID {$_SESSION['user_id']} not found after retries - possible deleted user");
+                        \Illuminate\Support\Facades\Log::warning("[Heartbeat] User ID {$_SESSION['user_id']} not found after retries - possible deleted user");
                         return $this->authError(
                             __('api.user_not_found'),
                             ApiErrorCodes::AUTH_ACCOUNT_DELETED,
@@ -590,7 +590,7 @@ class AuthController extends BaseApiController
                     }
                     $_SESSION['_last_user_check'] = time();
                 } catch (\Throwable $e) {
-                    error_log('[Heartbeat] User check failed: ' . $e->getMessage());
+                    \Illuminate\Support\Facades\Log::warning('[Heartbeat] User check failed: ' . $e->getMessage());
                 }
             }
 

@@ -1108,7 +1108,7 @@ class AppServiceProvider extends ServiceProvider
             }
         } catch (\Throwable $e) {
             // Non-fatal — emails will show raw keys but the app won't crash
-            error_log('loadJsonTranslations failed: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning('loadJsonTranslations failed: ' . $e->getMessage());
         }
     }
 
@@ -1153,7 +1153,7 @@ class AppServiceProvider extends ServiceProvider
             ]);
         } catch (\Throwable $e) {
             // Sentry init failure is non-fatal — log and continue
-            error_log('Sentry initialization failed: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning('Sentry initialization failed: ' . $e->getMessage());
         }
     }
 }

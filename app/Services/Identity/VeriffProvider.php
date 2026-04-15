@@ -143,7 +143,7 @@ class VeriffProvider implements IdentityVerificationProviderInterface
             $this->apiRequest('DELETE', "/sessions/{$providerSessionId}", [], $this->getGlobalApiKey());
             return true;
         } catch (\Throwable $e) {
-            error_log("[VeriffProvider] Failed to cancel session {$providerSessionId}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[VeriffProvider] Failed to cancel session {$providerSessionId}: " . $e->getMessage());
             return false;
         }
     }

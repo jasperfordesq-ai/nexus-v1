@@ -164,7 +164,7 @@ class IdenfyProvider implements IdentityVerificationProviderInterface
             );
             return true;
         } catch (\Throwable $e) {
-            error_log("[IdenfyProvider] Failed to cancel session {$providerSessionId}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[IdenfyProvider] Failed to cancel session {$providerSessionId}: " . $e->getMessage());
             return false;
         }
     }

@@ -43,7 +43,7 @@ class Gamification extends Model
                 ]);
         } catch (\Exception $e) {
             // Column may not exist — silently fail
-            error_log("Gamification::awardPoints error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Gamification::awardPoints error: " . $e->getMessage());
         }
     }
 }

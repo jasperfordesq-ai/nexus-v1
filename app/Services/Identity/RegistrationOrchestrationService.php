@@ -176,7 +176,7 @@ class RegistrationOrchestrationService
     {
         $session = IdentityVerificationSessionService::getById($sessionId);
         if (!$session) {
-            error_log("[RegistrationOrchestrationService] Session {$sessionId} not found");
+            \Illuminate\Support\Facades\Log::warning("[RegistrationOrchestrationService] Session {$sessionId} not found");
             return;
         }
 
@@ -459,7 +459,7 @@ class RegistrationOrchestrationService
                 );
             }
         } catch (\Throwable $e) {
-            error_log("[RegistrationOrchestrationService] Failed to notify admins of pending approval for user #{$userId}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[RegistrationOrchestrationService] Failed to notify admins of pending approval for user #{$userId}: " . $e->getMessage());
         }
 
         return [
@@ -679,7 +679,7 @@ class RegistrationOrchestrationService
                 IdentityVerificationSessionService::markReminderSent((int) $row['id']);
                 $count++;
             } catch (\Throwable $e) {
-                error_log("[VerificationReminder] Failed for session {$row['id']}: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("[VerificationReminder] Failed for session {$row['id']}: " . $e->getMessage());
             }
         }
 

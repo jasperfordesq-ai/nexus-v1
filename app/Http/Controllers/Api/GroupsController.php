@@ -240,7 +240,7 @@ class GroupsController extends BaseApiController
                 $this->groupNotificationService->notifyJoinRequest($id, $userId);
             }
         } catch (\Throwable $e) {
-            error_log("Group join notification error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Group join notification error: " . $e->getMessage());
         }
 
         // Award XP when user actually joins (not just pending request)
@@ -482,7 +482,7 @@ class GroupsController extends BaseApiController
                 $this->groupNotificationService->notifyJoinRejected($id, $requesterId);
             }
         } catch (\Throwable $e) {
-            error_log("Group request notification error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Group request notification error: " . $e->getMessage());
         }
 
         // Award XP to the requester when their join request is accepted
@@ -573,7 +573,7 @@ class GroupsController extends BaseApiController
             $discussionId = $discussion['id'] ?? 0;
             $this->groupNotificationService->notifyNewDiscussion($id, $discussionId, $userId, $discussionTitle);
         } catch (\Throwable $e) {
-            error_log("Group discussion notification error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Group discussion notification error: " . $e->getMessage());
         }
 
         return $this->respondWithData($discussion, null, 201);
@@ -707,7 +707,7 @@ class GroupsController extends BaseApiController
             $announcementTitle = $result['title'] ?? $data['title'] ?? 'New Announcement';
             $this->groupNotificationService->notifyNewAnnouncement($id, $userId, $announcementTitle);
         } catch (\Throwable $e) {
-            error_log("Group announcement notification error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Group announcement notification error: " . $e->getMessage());
         }
 
         return $this->respondWithData($result, null, 201);

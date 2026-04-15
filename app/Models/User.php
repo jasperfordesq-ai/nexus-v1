@@ -308,7 +308,7 @@ class User extends Authenticatable
                     [$userId]
                 );
             } catch (\Exception $e) {
-                error_log("User::createWithTenant federation seed error: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("User::createWithTenant federation seed error: " . $e->getMessage());
             }
         }
 
@@ -345,7 +345,7 @@ class User extends Authenticatable
                 return json_decode($row, true) ?: $defaults;
             }
         } catch (\Exception $e) {
-            error_log('[User::getNotificationPreferences] Error: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning('[User::getNotificationPreferences] Error: ' . $e->getMessage());
         }
 
         return $defaults;
@@ -383,7 +383,7 @@ class User extends Authenticatable
                 ->update(['notification_preferences' => json_encode($sanitized)]);
             return true;
         } catch (\Exception $e) {
-            error_log('[User::updateNotificationPreferences] Error: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning('[User::updateNotificationPreferences] Error: ' . $e->getMessage());
             return false;
         }
     }
@@ -410,7 +410,7 @@ class User extends Authenticatable
 
             if ((bool) $fields['is_super_admin'] !== $currentIsSuperAdmin) {
                 if (empty($_SESSION['is_god'])) {
-                    error_log("SECURITY: Blocked unauthorized is_super_admin change for user {$userId}");
+                    \Illuminate\Support\Facades\Log::warning("SECURITY: Blocked unauthorized is_super_admin change for user {$userId}");
                 } else {
                     $updateData['is_super_admin'] = $fields['is_super_admin'] ? 1 : 0;
                 }

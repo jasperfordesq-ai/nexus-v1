@@ -106,7 +106,7 @@ class PageRenderer
 
         } catch (\Exception $e) {
             DB::rollBack();
-            error_log("PageRenderer::saveBlocks error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("PageRenderer::saveBlocks error: " . $e->getMessage());
             return false;
         }
     }

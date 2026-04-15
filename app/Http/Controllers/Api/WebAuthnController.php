@@ -163,7 +163,7 @@ class WebAuthnController extends BaseApiController
                 false   // requireCtsProfileMatch
             );
         } catch (WebAuthnException $e) {
-            error_log('[WebAuthn] Registration verification failed: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning('[WebAuthn] Registration verification failed: ' . $e->getMessage());
             return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_FAILED, __('api.webauthn_registration_failed'), null, 400);
         }
 
@@ -219,7 +219,7 @@ class WebAuthnController extends BaseApiController
                 'passkey_registered'
             );
         } catch (\Throwable $e) {
-            error_log("Failed to create passkey registered notification: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Failed to create passkey registered notification: " . $e->getMessage());
         }
 
         // Security email: alert user that a passkey was registered
@@ -241,11 +241,11 @@ class WebAuthnController extends BaseApiController
 
                 $subject = __('emails_security_alerts.passkey_registered.subject', ['community' => $tenantName]);
                 if (!$mailer->send($user->email, $subject, $html)) {
-                    error_log("Failed to send passkey registered email to user {$userId}");
+                    \Illuminate\Support\Facades\Log::warning("Failed to send passkey registered email to user {$userId}");
                 }
             }
         } catch (\Throwable $e) {
-            error_log("Failed to send passkey registered email: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Failed to send passkey registered email: " . $e->getMessage());
         }
 
         return $this->respondWithData(['message' => __('api_controllers_2.webauthn.passkey_registered')]);
@@ -388,7 +388,7 @@ class WebAuthnController extends BaseApiController
                 true
             );
         } catch (WebAuthnException $e) {
-            error_log('[WebAuthn] Authentication verification failed: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning('[WebAuthn] Authentication verification failed: ' . $e->getMessage());
             return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_FAILED, __('api.webauthn_auth_failed'), null, 401);
         }
 

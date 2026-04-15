@@ -66,7 +66,7 @@ class IdentityWebhookController extends BaseApiController
 
         // Verify webhook signature
         if (!$provider->verifyWebhookSignature($rawBody, $headers)) {
-            error_log("[IdentityWebhook] Signature verification failed for provider '{$providerSlug}' from IP {$ip}");
+            \Illuminate\Support\Facades\Log::warning("[IdentityWebhook] Signature verification failed for provider '{$providerSlug}' from IP {$ip}");
             return $this->respondWithError(
                 ApiErrorCodes::FORBIDDEN,
                 'Invalid webhook signature',
@@ -90,7 +90,7 @@ class IdentityWebhookController extends BaseApiController
         try {
             $result = $provider->handleWebhook($payload, $headers);
         } catch (\Throwable $e) {
-            error_log("[IdentityWebhook] Provider '{$providerSlug}' handleWebhook() failed: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[IdentityWebhook] Provider '{$providerSlug}' handleWebhook() failed: " . $e->getMessage());
             return $this->respondWithError(
                 ApiErrorCodes::SERVER_INTERNAL_ERROR,
                 'Webhook processing failed',
@@ -102,14 +102,14 @@ class IdentityWebhookController extends BaseApiController
         // Find the matching session
         $providerSessionId = $result['provider_session_id'] ?? '';
         if (empty($providerSessionId)) {
-            error_log("[IdentityWebhook] No provider_session_id in result from '{$providerSlug}'");
+            \Illuminate\Support\Facades\Log::warning("[IdentityWebhook] No provider_session_id in result from '{$providerSlug}'");
             // Acknowledge receipt but log the issue
             return $this->respondWithData(['received' => true, 'warning' => 'no_session_match']);
         }
 
         $session = $this->sessionService->findByProviderSession($providerSlug, $providerSessionId);
         if (!$session) {
-            error_log("[IdentityWebhook] Session not found for provider '{$providerSlug}', session '{$providerSessionId}'");
+            \Illuminate\Support\Facades\Log::warning("[IdentityWebhook] Session not found for provider '{$providerSlug}', session '{$providerSessionId}'");
             // Acknowledge receipt — the session may have been cancelled
             return $this->respondWithData(['received' => true, 'warning' => 'session_not_found']);
         }
@@ -148,7 +148,7 @@ class IdentityWebhookController extends BaseApiController
                 );
             } catch (\Throwable $e) {
                 // Non-critical — log but don't fail the webhook
-                error_log("[IdentityWebhook] Failed to grant id_verified badge: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("[IdentityWebhook] Failed to grant id_verified badge: " . $e->getMessage());
             }
 
             // Send verification passed notification + email
@@ -156,7 +156,7 @@ class IdentityWebhookController extends BaseApiController
                 NotificationDispatcher::dispatchVerificationPassed($sessionUserId);
                 NotificationDispatcher::dispatchVerificationCompletedToAdmins($sessionUserId, 'passed');
             } catch (\Throwable $e) {
-                error_log("[IdentityWebhook] Failed to dispatch passed notification: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("[IdentityWebhook] Failed to dispatch passed notification: " . $e->getMessage());
             }
         } elseif ($status === 'failed') {
             // Send verification failed notification + email
@@ -165,7 +165,7 @@ class IdentityWebhookController extends BaseApiController
                 NotificationDispatcher::dispatchVerificationFailed($sessionUserId, $failureReason);
                 NotificationDispatcher::dispatchVerificationCompletedToAdmins($sessionUserId, 'failed');
             } catch (\Throwable $e) {
-                error_log("[IdentityWebhook] Failed to dispatch failed notification: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("[IdentityWebhook] Failed to dispatch failed notification: " . $e->getMessage());
             }
         }
 

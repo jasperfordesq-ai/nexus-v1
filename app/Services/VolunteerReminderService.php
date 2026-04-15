@@ -180,7 +180,7 @@ class VolunteerReminderService
 
                     $sentCount++;
                 } catch (\Throwable $e) {
-                    error_log("VolunteerReminderService::sendReminders error for user {$userId}: " . $e->getMessage());
+                    \Illuminate\Support\Facades\Log::warning("VolunteerReminderService::sendReminders error for user {$userId}: " . $e->getMessage());
                 }
             }
         }
@@ -229,7 +229,7 @@ class VolunteerReminderService
 
             return true;
         } catch (\Throwable $e) {
-            error_log("VolunteerReminderService::scheduleReminder error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("VolunteerReminderService::scheduleReminder error: " . $e->getMessage());
             return false;
         }
     }
@@ -249,7 +249,7 @@ class VolunteerReminderService
 
             return $deleted > 0;
         } catch (\Throwable $e) {
-            error_log("VolunteerReminderService::cancelReminder error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("VolunteerReminderService::cancelReminder error: " . $e->getMessage());
             return false;
         }
     }
@@ -778,7 +778,7 @@ class VolunteerReminderService
 
             return true;
         } catch (\Throwable $e) {
-            error_log("VolunteerReminderService::updateSetting error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("VolunteerReminderService::updateSetting error: " . $e->getMessage());
             return false;
         }
     }

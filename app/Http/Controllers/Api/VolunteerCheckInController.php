@@ -163,7 +163,7 @@ class VolunteerCheckInController extends BaseApiController
                     'shift_id' => $shiftId,
                 ]);
             } catch (\Throwable $e) {
-                error_log("Webhook dispatch failed for shift.completed: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("Webhook dispatch failed for shift.completed: " . $e->getMessage());
             }
         }
 

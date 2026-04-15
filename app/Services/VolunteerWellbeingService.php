@@ -350,7 +350,7 @@ class VolunteerWellbeingService
                 'updated_at' => $row->updated_at,
             ])->all();
         } catch (\Throwable $e) {
-            error_log("VolunteerWellbeingService::getActiveAlerts error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("VolunteerWellbeingService::getActiveAlerts error: " . $e->getMessage());
             return [];
         }
     }
@@ -406,7 +406,7 @@ class VolunteerWellbeingService
 
             return true;
         } catch (\Throwable $e) {
-            error_log("VolunteerWellbeingService::updateAlert error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("VolunteerWellbeingService::updateAlert error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update alert'];
             return false;
         }
@@ -448,7 +448,7 @@ class VolunteerWellbeingService
             }
         } catch (\Throwable $e) {
             // Non-critical — log but don't fail the assessment
-            error_log("VolunteerWellbeingService::upsertAlert error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("VolunteerWellbeingService::upsertAlert error: " . $e->getMessage());
         }
     }
 }

@@ -60,7 +60,7 @@ class CoreController extends BaseApiController
             $replyTo = "{$name} <{$email}>";
             $sent = $mailer->send($tenantEmail, $emailSubject, $emailBody, null, $replyTo);
         } catch (\Exception $e) {
-            error_log("Contact form email error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Contact form email error: " . $e->getMessage());
         }
 
         // Log submission

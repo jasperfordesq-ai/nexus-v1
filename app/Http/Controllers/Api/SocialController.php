@@ -398,7 +398,7 @@ class SocialController extends BaseApiController
                     'created_at' => date('Y-m-d H:i:s'),
                 ]);
             } catch (\Exception $faEx) {
-                error_log('SocialController::createPost feed_activity failed: ' . $faEx->getMessage());
+                \Illuminate\Support\Facades\Log::warning('SocialController::createPost feed_activity failed: ' . $faEx->getMessage());
             }
 
             // Handle multi-image uploads
@@ -415,7 +415,7 @@ class SocialController extends BaseApiController
                 'media'   => $media,
             ]);
         } catch (\Exception $e) {
-            error_log("Create Post Error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Create Post Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_post_create_failed'), null, 500);
         }
     }
@@ -527,7 +527,7 @@ class SocialController extends BaseApiController
         try {
             $this->feedActivityService->removeActivity('post', $id);
         } catch (\Exception $e) {
-            error_log("SocialController::deletePostV2 feed_activity remove failed: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("SocialController::deletePostV2 feed_activity remove failed: " . $e->getMessage());
         }
 
         return $this->respondWithData(['deleted' => true, 'id' => $id]);
@@ -754,7 +754,7 @@ class SocialController extends BaseApiController
                         $this->socialNotificationService->notifyLike($contentOwnerId, $userId, $targetType, $targetId, '');
                     }
                 } catch (\Throwable $e) {
-                    error_log("notifyLike error (non-critical): " . $e->getMessage());
+                    \Illuminate\Support\Facades\Log::warning("notifyLike error (non-critical): " . $e->getMessage());
                 }
             }
 
@@ -769,7 +769,7 @@ class SocialController extends BaseApiController
                 'likes_count' => $count,
             ]);
         } catch (\Exception $e) {
-            error_log("Social Like Error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Social Like Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_like_failed'), null, 500);
         }
     }
@@ -820,7 +820,7 @@ class SocialController extends BaseApiController
                 'has_more'    => ($offset + count($likers)) < $totalCount,
             ]);
         } catch (\Exception $e) {
-            error_log("Get Likers Error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Get Likers Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_likers_failed'), null, 500);
         }
     }
@@ -882,7 +882,7 @@ class SocialController extends BaseApiController
 
             return $this->respondWithData(['comments' => $comments]);
         } catch (\Exception $e) {
-            error_log("Fetch Comments Error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Fetch Comments Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_comments_failed'), null, 500);
         }
     }
@@ -933,7 +933,7 @@ class SocialController extends BaseApiController
                 ],
             ]);
         } catch (\Exception $e) {
-            error_log("Submit Comment Error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Submit Comment Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_comment_post_failed'), null, 500);
         }
     }
@@ -946,7 +946,7 @@ class SocialController extends BaseApiController
                 $this->socialNotificationService->notifyComment($contentOwnerId, $userId, $targetType, $targetId, $content);
             }
         } catch (\Throwable $e) {
-            error_log("notifyComment error (non-critical): " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("notifyComment error (non-critical): " . $e->getMessage());
         }
     }
 
@@ -993,7 +993,7 @@ class SocialController extends BaseApiController
 
             return $this->respondWithData(['message' => __('api.shared_successfully')]);
         } catch (\Exception $e) {
-            error_log("Share Error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Share Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_share_failed'), null, 500);
         }
     }
@@ -1068,13 +1068,13 @@ class SocialController extends BaseApiController
                 try {
                     $this->feedActivityService->removeActivity('post', $targetId);
                 } catch (\Exception $e) {
-                    error_log("SocialController::delete feed_activity remove failed: " . $e->getMessage());
+                    \Illuminate\Support\Facades\Log::warning("SocialController::delete feed_activity remove failed: " . $e->getMessage());
                 }
             }
 
             return $this->respondWithData(['status' => 'deleted']);
         } catch (\Exception $e) {
-            error_log("Delete Post Error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Delete Post Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_delete_failed'), null, 500);
         }
     }
@@ -1128,7 +1128,7 @@ class SocialController extends BaseApiController
 
             return $this->respondWithData(['action' => $action]);
         } catch (\Exception $e) {
-            error_log("Reaction Error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Reaction Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_reaction_failed'), null, 500);
         }
     }
@@ -1173,7 +1173,7 @@ class SocialController extends BaseApiController
 
             return $this->respondWithData(['message' => __('api.reply_posted')]);
         } catch (\Exception $e) {
-            error_log("Reply Comment Error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Reply Comment Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_reply_failed'), null, 500);
         }
     }
@@ -1209,7 +1209,7 @@ class SocialController extends BaseApiController
 
             return $this->respondWithData(['is_edited' => true]);
         } catch (\Exception $e) {
-            error_log("Edit Comment Error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Edit Comment Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_edit_failed'), null, 500);
         }
     }
@@ -1244,7 +1244,7 @@ class SocialController extends BaseApiController
 
             return $this->respondWithData(['message' => __('api.comment_deleted_user')]);
         } catch (\Exception $e) {
-            error_log("Delete Comment Error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Delete Comment Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_comment_delete_failed'), null, 500);
         }
     }
@@ -1277,7 +1277,7 @@ class SocialController extends BaseApiController
 
             return $this->respondWithData(['users' => $users]);
         } catch (\Exception $e) {
-            error_log("Mention Search Error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Mention Search Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_search_failed'), null, 500);
         }
     }
@@ -1322,7 +1322,7 @@ class SocialController extends BaseApiController
                 'has_more' => count($items) >= $limit,
             ]);
         } catch (\Exception $e) {
-            error_log("Feed Load Error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Feed Load Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_feed_failed'), null, 500);
         }
     }

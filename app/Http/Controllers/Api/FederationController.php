@@ -74,7 +74,7 @@ class FederationController extends BaseApiController
             );
             $partnershipsCount = (int) ($result->cnt ?? 0);
         } catch (\Exception $e) {
-            error_log("FederationV2Api::status partnerships count error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::status partnerships count error: " . $e->getMessage());
         }
 
         return $this->respondWithData([
@@ -241,7 +241,7 @@ class FederationController extends BaseApiController
 
             return $this->respondWithData($formatted);
         } catch (\Exception $e) {
-            error_log("FederationV2Api::partners error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::partners error: " . $e->getMessage());
             return $this->respondWithData([]);
         }
     }
@@ -274,7 +274,7 @@ class FederationController extends BaseApiController
 
             return $this->respondWithData($formatted);
         } catch (\Exception $e) {
-            error_log("FederationV2Api::activity error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::activity error: " . $e->getMessage());
             return $this->respondWithData([]);
         }
     }
@@ -676,7 +676,7 @@ class FederationController extends BaseApiController
                     (int) $messageId,
                 ]);
             } catch (\Throwable $e) {
-                error_log("FederationV1: federation_messages insert failed: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("FederationV1: federation_messages insert failed: " . $e->getMessage());
             }
         }
 
@@ -695,7 +695,7 @@ class FederationController extends BaseApiController
             \Log::warning('[Federation] sender name lookup failed', ['sender_id' => $input['sender_id'] ?? null, 'error' => $e->getMessage()]);
         }
 
-        try { $this->federationEmailService->sendNewMessageNotification((int) $input['recipient_id'], (int) $input['sender_id'], (int) $partnerTenantId, substr($input['body'], 0, 200)); } catch (\Exception $e) { error_log("FederationV1: email failed: " . $e->getMessage()); }
+        try { $this->federationEmailService->sendNewMessageNotification((int) $input['recipient_id'], (int) $input['sender_id'], (int) $partnerTenantId, substr($input['body'], 0, 200)); } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning("FederationV1: email failed: " . $e->getMessage()); }
         try { $this->federationRealtimeService->broadcastNewMessage((int) $input['sender_id'], (int) $partnerTenantId, (int) $input['recipient_id'], (int) $recipient['tenant_id'], ['message_id' => (int) $messageId, 'sender_name' => $senderName, 'sender_tenant_name' => $senderTenantName, 'subject' => $input['subject'], 'body' => $input['body']]); } catch (\Exception $e) { \Log::warning('[Federation] broadcastNewMessage failed', ['error' => $e->getMessage()]); }
         try {
             $notifBody = __('notifications.federation.new_message', [
@@ -830,7 +830,7 @@ class FederationController extends BaseApiController
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            error_log("FederationV1: transaction creation failed: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV1: transaction creation failed: " . $e->getMessage());
             return $this->fedError(500, 'Transaction creation failed', 'TRANSACTION_ERROR');
         }
 

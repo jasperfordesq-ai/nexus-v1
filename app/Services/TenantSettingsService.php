@@ -244,7 +244,7 @@ class TenantSettingsService
             });
         } catch (\Throwable $e) {
             // If DB/cache fails, return empty to avoid blocking login
-            error_log('[TenantSettingsService] loadAll failed for tenant ' . $tenantId . ': ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning('[TenantSettingsService] loadAll failed for tenant ' . $tenantId . ': ' . $e->getMessage());
             return [];
         }
     }

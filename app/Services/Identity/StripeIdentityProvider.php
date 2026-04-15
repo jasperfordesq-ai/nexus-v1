@@ -182,7 +182,7 @@ class StripeIdentityProvider implements IdentityVerificationProviderInterface
 
         $webhookSecret = $this->getGlobalWebhookSecret();
         if (!$webhookSecret) {
-            error_log('[StripeIdentityProvider] No webhook secret configured');
+            \Illuminate\Support\Facades\Log::warning('[StripeIdentityProvider] No webhook secret configured');
             return false;
         }
 
@@ -218,7 +218,7 @@ class StripeIdentityProvider implements IdentityVerificationProviderInterface
             $this->stripeRequest('POST', "/identity/verification_sessions/{$providerSessionId}/cancel", [], $apiKey);
             return true;
         } catch (\Throwable $e) {
-            error_log("[StripeIdentityProvider] Failed to cancel session {$providerSessionId}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[StripeIdentityProvider] Failed to cancel session {$providerSessionId}: " . $e->getMessage());
             return false;
         }
     }

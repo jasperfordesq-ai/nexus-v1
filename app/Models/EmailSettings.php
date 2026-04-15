@@ -217,7 +217,7 @@ class EmailSettings
         $decrypted = openssl_decrypt($encrypted, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
 
         if ($decrypted === false) {
-            error_log("EmailSettings: decryption failed (possible key mismatch)");
+            \Illuminate\Support\Facades\Log::warning("EmailSettings: decryption failed (possible key mismatch)");
             return null;
         }
 

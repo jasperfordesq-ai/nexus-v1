@@ -43,7 +43,7 @@ class Auth
 
             return !empty($user) ? $user : null;
         } catch (\Throwable $e) {
-            error_log("Auth::user() error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Auth::user() error: " . $e->getMessage());
             return null;
         }
     }

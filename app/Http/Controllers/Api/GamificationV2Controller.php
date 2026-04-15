@@ -602,7 +602,7 @@ class GamificationV2Controller extends BaseApiController
 
             return $this->respondWithData($data);
         } catch (\Throwable $e) {
-            error_log('[GamificationV2] currentSeason error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            \Illuminate\Support\Facades\Log::warning('[GamificationV2] currentSeason error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
             return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.gamification_season_current_failed'), null, 500);
         }
     }
@@ -673,7 +673,7 @@ class GamificationV2Controller extends BaseApiController
                 }, $scoreData['insights'] ?? []),
             ]);
         } catch (\Throwable $e) {
-            error_log("NexusScore error for user {$userId}: " . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            \Illuminate\Support\Facades\Log::warning("NexusScore error for user {$userId}: " . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
             return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.gamification_nexus_score_failed'), null, 500);
         }
     }

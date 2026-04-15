@@ -127,7 +127,7 @@ class VolunteerCertificateService
                 'updated_at' => now(),
             ]);
         } catch (\Throwable $e) {
-            error_log("VolunteerCertificateService::generate error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("VolunteerCertificateService::generate error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to generate certificate'];
             return null;
         }
@@ -326,7 +326,7 @@ HTML;
                 ->whereNull('downloaded_at')
                 ->update(['downloaded_at' => now()]);
         } catch (\Throwable $e) {
-            error_log("VolunteerCertificateService::markDownloaded error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("VolunteerCertificateService::markDownloaded error: " . $e->getMessage());
         }
     }
 }

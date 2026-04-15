@@ -80,7 +80,7 @@ class IdentityVerificationEventService
             );
         } catch (\Throwable $e) {
             // Audit logging should never break the main flow
-            error_log("[IdentityVerificationEventService] Failed to log event '{$eventType}' for user {$userId}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[IdentityVerificationEventService] Failed to log event '{$eventType}' for user {$userId}: " . $e->getMessage());
         }
     }
 

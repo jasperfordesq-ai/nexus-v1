@@ -91,7 +91,7 @@ class Csrf
             $postToken = isset($_POST['csrf_token']) ? substr($_POST['csrf_token'], 0, 8) . '...' : 'EMPTY';
             $sessionId = session_id();
             $match = ($sessionToken === $postToken) ? 'MATCH' : 'MISMATCH';
-            error_log("CSRF FAIL | SessionID: $sessionId | TokenMatch: $match | SessionPrefix: $sessionToken | PostPrefix: $postToken");
+            \Illuminate\Support\Facades\Log::warning("CSRF FAIL | SessionID: $sessionId | TokenMatch: $match | SessionPrefix: $sessionToken | PostPrefix: $postToken");
 
             if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
                 throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Invalid CSRF Token');
@@ -124,7 +124,7 @@ class Csrf
             $headerToken = isset($_SERVER['HTTP_X_CSRF_TOKEN']) ? substr($_SERVER['HTTP_X_CSRF_TOKEN'], 0, 8) . '...' : 'EMPTY';
             $postToken = isset($_POST['csrf_token']) ? substr($_POST['csrf_token'], 0, 8) . '...' : 'EMPTY';
             $sessionId = session_id();
-            error_log("CSRF API FAIL | SessionID: $sessionId | SessionPrefix: $sessionToken | HeaderPrefix: $headerToken | PostPrefix: $postToken");
+            \Illuminate\Support\Facades\Log::warning("CSRF API FAIL | SessionID: $sessionId | SessionPrefix: $sessionToken | HeaderPrefix: $headerToken | PostPrefix: $postToken");
 
             if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
                 throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, json_encode(['error' => __('api.invalid_csrf_token'), 'code' => 'csrf_invalid']));

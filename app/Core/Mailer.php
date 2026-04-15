@@ -171,7 +171,7 @@ class Mailer
                     break;
             }
         } catch (\Throwable $e) {
-            error_log("Mailer: Failed to load tenant config for tenant {$tenantId}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Mailer: Failed to load tenant config for tenant {$tenantId}: " . $e->getMessage());
         }
     }
 
@@ -246,11 +246,11 @@ class Mailer
             }
 
             if (!empty($this->host) && !empty($this->username)) {
-                error_log("Mailer: SendGrid failed, falling back to SMTP for: " . self::maskEmail($to));
+                \Illuminate\Support\Facades\Log::warning("Mailer: SendGrid failed, falling back to SMTP for: " . self::maskEmail($to));
                 return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             }
 
-            error_log("Mailer: SendGrid failed and no SMTP fallback configured. Email not sent to: " . self::maskEmail($to));
+            \Illuminate\Support\Facades\Log::warning("Mailer: SendGrid failed and no SMTP fallback configured. Email not sent to: " . self::maskEmail($to));
             return false;
         }
 
@@ -261,11 +261,11 @@ class Mailer
             }
 
             if (!empty($this->host) && !empty($this->username)) {
-                error_log("Mailer: Gmail API failed, falling back to SMTP for: " . self::maskEmail($to));
+                \Illuminate\Support\Facades\Log::warning("Mailer: Gmail API failed, falling back to SMTP for: " . self::maskEmail($to));
                 return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             }
 
-            error_log("Mailer: Gmail API failed and no SMTP fallback configured. Email not sent to: " . self::maskEmail($to));
+            \Illuminate\Support\Facades\Log::warning("Mailer: Gmail API failed and no SMTP fallback configured. Email not sent to: " . self::maskEmail($to));
             return false;
         }
 
@@ -324,11 +324,11 @@ class Mailer
                 return true;
             }
 
-            error_log("SendGrid error ({$statusCode}): " . $response->body());
+            \Illuminate\Support\Facades\Log::warning("SendGrid error ({$statusCode}): " . $response->body());
             if (class_exists(\App\Services\EmailMonitorService::class)) { \App\Services\EmailMonitorService::recordEmailSendStatic('sendgrid', false, $this->tenantId); }
             return false;
         } catch (\Exception $e) {
-            error_log("SendGrid Error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("SendGrid Error: " . $e->getMessage());
             if (class_exists(\App\Services\EmailMonitorService::class)) { \App\Services\EmailMonitorService::recordEmailSendStatic('sendgrid', false, $this->tenantId); }
             return false;
         }
@@ -382,7 +382,7 @@ class Mailer
             return true;
 
         } catch (\Exception $e) {
-            error_log("Gmail API Error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Gmail API Error: " . $e->getMessage());
             return false;
         }
     }
@@ -404,7 +404,7 @@ class Mailer
             $circuitBreakerExpiry = Cache::get(self::CACHE_KEY_CIRCUIT_BREAKER);
             if ($circuitBreakerExpiry && time() < $circuitBreakerExpiry) {
                 $remainingSeconds = $circuitBreakerExpiry - time();
-                error_log("Gmail API circuit breaker is open. Blocked for {$remainingSeconds}s more.");
+                \Illuminate\Support\Facades\Log::warning("Gmail API circuit breaker is open. Blocked for {$remainingSeconds}s more.");
                 return null;
             }
 
@@ -422,13 +422,13 @@ class Mailer
             }
 
             if ($refreshAttempts > self::MAX_REFRESH_ATTEMPTS_PER_HOUR) {
-                error_log("Gmail API rate limit exceeded: {$refreshAttempts} refresh attempts in the last hour");
+                \Illuminate\Support\Facades\Log::warning("Gmail API rate limit exceeded: {$refreshAttempts} refresh attempts in the last hour");
                 return null;
             }
         }
 
         if (empty($this->gmailClientId) || empty($this->gmailClientSecret) || empty($this->gmailRefreshToken)) {
-            error_log("Gmail API Error: Missing credentials");
+            \Illuminate\Support\Facades\Log::warning("Gmail API Error: Missing credentials");
             return null;
         }
 
@@ -448,7 +448,7 @@ class Mailer
             if ($failureCount >= self::CIRCUIT_BREAKER_THRESHOLD) {
                 $breakerExpiry = time() + self::CIRCUIT_BREAKER_TIMEOUT;
                 Cache::put(self::CACHE_KEY_CIRCUIT_BREAKER, $breakerExpiry, self::CIRCUIT_BREAKER_TIMEOUT);
-                error_log("Gmail API circuit breaker opened after {$failureCount} consecutive failures.");
+                \Illuminate\Support\Facades\Log::warning("Gmail API circuit breaker opened after {$failureCount} consecutive failures.");
             }
         }
 
@@ -486,7 +486,7 @@ class Mailer
         curl_close($ch);
 
         if ($curlError) {
-            error_log("Gmail token refresh cURL error: $curlError");
+            \Illuminate\Support\Facades\Log::warning("Gmail token refresh cURL error: $curlError");
             return null;
         }
 
@@ -500,15 +500,15 @@ class Mailer
             'error' => $data['error'] ?? null,
             'error_description' => $data['error_description'] ?? null,
         ];
-        error_log("Gmail token refresh response: " . json_encode($logData));
+        \Illuminate\Support\Facades\Log::warning("Gmail token refresh response: " . json_encode($logData));
 
         if ($httpCode < 200 || $httpCode >= 300) {
-            error_log("Gmail token refresh failed (HTTP $httpCode): " . ($data['error_description'] ?? $response));
+            \Illuminate\Support\Facades\Log::warning("Gmail token refresh failed (HTTP $httpCode): " . ($data['error_description'] ?? $response));
             return null;
         }
 
         if (!isset($data['access_token'])) {
-            error_log("Gmail token refresh response missing access_token field");
+            \Illuminate\Support\Facades\Log::warning("Gmail token refresh response missing access_token field");
             return null;
         }
 
@@ -523,7 +523,7 @@ class Mailer
             // Cache write failure is non-fatal
         }
 
-        error_log("Gmail token refreshed successfully. Expires in {$expiresIn}s.");
+        \Illuminate\Support\Facades\Log::warning("Gmail token refreshed successfully. Expires in {$expiresIn}s.");
 
         return $accessToken;
     }
@@ -587,7 +587,7 @@ class Mailer
             $this->quit();
             return true;
         } catch (\Exception $e) {
-            error_log("SMTP Error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("SMTP Error: " . $e->getMessage());
             return false;
         }
     }

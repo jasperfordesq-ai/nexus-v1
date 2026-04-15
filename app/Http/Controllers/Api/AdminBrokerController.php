@@ -1363,7 +1363,7 @@ class AdminBrokerController extends BaseApiController
                 );
             }
         } catch (\Exception $e) {
-            error_log("Failed to notify admins of risk tag: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Failed to notify admins of risk tag: " . $e->getMessage());
         }
     }
 }

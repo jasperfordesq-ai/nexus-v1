@@ -304,7 +304,7 @@ class SuperPanelAccess
 
         http_response_code(403);
 
-        error_log(sprintf(
+        \Illuminate\Support\Facades\Log::warning(sprintf(
             "SuperPanel ACCESS DENIED: user=%s, tenant=%s, reason=%s, ip=%s",
             $_SESSION['user_id'] ?? 'none',
             $_SESSION['tenant_id'] ?? 'none',

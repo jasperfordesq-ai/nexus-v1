@@ -212,10 +212,10 @@ class AdminEmailController extends BaseApiController
 
         $result = $mailer->send(
             $to,
-            'Project NEXUS — Email Test',
-            '<h2>Email Test</h2>' .
-            '<p>This test email was sent via <strong>' . strtoupper($provider) . '</strong> at ' . date('Y-m-d H:i:s') . '.</p>' .
-            '<p>If you received this, email delivery is working.</p>'
+            __('api_controllers_2.email_test.subject'),
+            '<h2>' . __('api_controllers_2.email_test.heading') . '</h2>' .
+            '<p>' . __('api_controllers_2.email_test.body_provider', ['provider' => strtoupper($provider), 'time' => date('Y-m-d H:i:s')]) . '</p>' .
+            '<p>' . __('api_controllers_2.email_test.body_success') . '</p>'
         );
 
         if ($result) {
@@ -254,10 +254,10 @@ class AdminEmailController extends BaseApiController
 
         $result = $mailer->send(
             $to,
-            'Project NEXUS — Email Provider Test',
-            '<h2>Email Provider Test</h2>' .
-            '<p>Sent via <strong>' . htmlspecialchars(strtoupper($provider)) . '</strong> at ' . date('Y-m-d H:i:s') . '.</p>' .
-            '<p>Tenant-specific configuration is working correctly.</p>'
+            __('api_controllers_2.email_test.provider_subject'),
+            '<h2>' . __('api_controllers_2.email_test.provider_heading') . '</h2>' .
+            '<p>' . __('api_controllers_2.email_test.body_provider', ['provider' => htmlspecialchars(strtoupper($provider)), 'time' => date('Y-m-d H:i:s')]) . '</p>' .
+            '<p>' . __('api_controllers_2.email_test.body_tenant_ok') . '</p>'
         );
 
         if ($result) {

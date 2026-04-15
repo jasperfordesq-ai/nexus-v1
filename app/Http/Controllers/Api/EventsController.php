@@ -265,7 +265,7 @@ class EventsController extends BaseApiController
         try {
             $this->eventNotificationService->notifyEventUpdated($id, $data);
         } catch (\Throwable $e) {
-            error_log("Event update notification error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Event update notification error: " . $e->getMessage());
         }
 
         $event = $this->eventService->getById($id, $userId);
@@ -364,7 +364,7 @@ class EventsController extends BaseApiController
         try {
             $this->eventNotificationService->notifyRsvp($id, $userId, $status);
         } catch (\Throwable $e) {
-            error_log("RSVP notification error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("RSVP notification error: " . $e->getMessage());
         }
 
         // Award XP when user RSVPs as 'going'
@@ -612,7 +612,7 @@ class EventsController extends BaseApiController
             $tenantId = TenantContext::getId();
             $this->eventNotificationService->notifyCancellation($tenantId, $id, $reason);
         } catch (\Throwable $e) {
-            error_log("Event cancellation notification error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Event cancellation notification error: " . $e->getMessage());
         }
 
         return $this->respondWithData([

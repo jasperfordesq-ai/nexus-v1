@@ -33,7 +33,7 @@ class AdminLegalDocController extends BaseApiController
             $versions = $this->legalDocumentService->getVersions($docId);
             return $this->respondWithData($versions);
         } catch (\Exception $e) {
-            error_log("[AdminLegalDocController] getVersions error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminLegalDocController] getVersions error: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.fetch_failed', ['resource' => 'versions']), null, 500);
         }
     }
@@ -62,7 +62,7 @@ class AdminLegalDocController extends BaseApiController
 
             return $this->respondWithData($comparison);
         } catch (\Exception $e) {
-            error_log("[AdminLegalDocController] compareVersions error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminLegalDocController] compareVersions error: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.fetch_failed', ['resource' => 'version comparison']), null, 500);
         }
     }
@@ -95,7 +95,7 @@ class AdminLegalDocController extends BaseApiController
 
             return $this->respondWithData(['id' => $versionId], null, 201);
         } catch (\Exception $e) {
-            error_log("[AdminLegalDocController] createVersion error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminLegalDocController] createVersion error: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.create_failed', ['resource' => 'version']), null, 500);
         }
     }
@@ -112,7 +112,7 @@ class AdminLegalDocController extends BaseApiController
             }
             return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'version publish']), null, 500);
         } catch (\Exception $e) {
-            error_log("[AdminLegalDocController] publishVersion error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminLegalDocController] publishVersion error: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'version publish']), null, 500);
         }
     }
@@ -126,7 +126,7 @@ class AdminLegalDocController extends BaseApiController
             $stats = $this->legalDocumentService->getComplianceSummary($tenantId);
             return $this->respondWithData($stats);
         } catch (\Exception $e) {
-            error_log("[AdminLegalDocController] getComplianceStats error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminLegalDocController] getComplianceStats error: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.fetch_failed', ['resource' => 'compliance stats']), null, 500);
         }
     }
@@ -142,7 +142,7 @@ class AdminLegalDocController extends BaseApiController
             $acceptances = $this->legalDocumentService->getVersionAcceptances($vid, $limit, $offset);
             return $this->respondWithData($acceptances);
         } catch (\Exception $e) {
-            error_log("[AdminLegalDocController] getAcceptances error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminLegalDocController] getAcceptances error: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.fetch_failed', ['resource' => 'acceptances']), null, 500);
         }
     }
@@ -198,7 +198,7 @@ class AdminLegalDocController extends BaseApiController
             $count = $this->legalDocumentService->notifyUsersOfUpdate($docId, $vid, true);
             return $this->respondWithData(['notified' => true, 'count' => $count]);
         } catch (\Exception $e) {
-            error_log("[AdminLegalDocController] notifyUsers error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminLegalDocController] notifyUsers error: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'notifications']), null, 500);
         }
     }
@@ -211,7 +211,7 @@ class AdminLegalDocController extends BaseApiController
             $count = $this->legalDocumentService->getUsersPendingAcceptanceCount($docId, $vid);
             return $this->respondWithData(['count' => $count]);
         } catch (\Exception $e) {
-            error_log("[AdminLegalDocController] getUsersPendingCount error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminLegalDocController] getUsersPendingCount error: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.fetch_failed', ['resource' => 'pending count']), null, 500);
         }
     }
@@ -248,7 +248,7 @@ class AdminLegalDocController extends BaseApiController
             }
             return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'version']), null, 500);
         } catch (\Exception $e) {
-            error_log("[AdminLegalDocController] updateVersion error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminLegalDocController] updateVersion error: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'version']), null, 500);
         }
     }
@@ -278,7 +278,7 @@ class AdminLegalDocController extends BaseApiController
             }
             return $this->respondWithError('SERVER_ERROR', __('api.delete_failed', ['resource' => 'version']), null, 500);
         } catch (\Exception $e) {
-            error_log("[AdminLegalDocController] deleteVersion error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminLegalDocController] deleteVersion error: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.delete_failed', ['resource' => 'version']), null, 500);
         }
     }

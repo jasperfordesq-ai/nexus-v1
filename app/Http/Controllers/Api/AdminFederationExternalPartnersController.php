@@ -191,7 +191,7 @@ class AdminFederationExternalPartnersController extends BaseApiController
                     "UPDATE federation_external_partners SET last_sync_at = NOW(), error_count = 0, last_error = NULL WHERE id = ? AND tenant_id = ?",
                     [$id, $tenantId]
                 );
-                error_log("FederationExternalPartner: metadata sync failed for #{$id}: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("FederationExternalPartner: metadata sync failed for #{$id}: " . $e->getMessage());
             }
         }
 

@@ -68,7 +68,7 @@ class RegistrationPolicyService
             return $row ?: null;
         } catch (\Throwable $e) {
             // Table may not exist yet during migration
-            error_log("[RegistrationPolicyService] Failed to read policy for tenant {$tenantId}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[RegistrationPolicyService] Failed to read policy for tenant {$tenantId}: " . $e->getMessage());
             return null;
         }
     }
@@ -245,7 +245,7 @@ class RegistrationPolicyService
         $key = self::deriveEncryptionKey();
         if (!$key) {
             // Fallback: store as JSON (not ideal but prevents data loss)
-            error_log('[RegistrationPolicyService] APP_KEY not set — storing provider_config as plaintext JSON');
+            \Illuminate\Support\Facades\Log::warning('[RegistrationPolicyService] APP_KEY not set — storing provider_config as plaintext JSON');
             return json_encode($config);
         }
 
@@ -293,7 +293,7 @@ class RegistrationPolicyService
         }
 
         if ($plaintext === false) {
-            error_log('[RegistrationPolicyService] Failed to decrypt provider_config');
+            \Illuminate\Support\Facades\Log::warning('[RegistrationPolicyService] Failed to decrypt provider_config');
             return [];
         }
 

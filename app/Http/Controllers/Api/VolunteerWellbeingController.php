@@ -204,7 +204,7 @@ class VolunteerWellbeingController extends BaseApiController
                 'note' => $note ?: null,
             ]);
         } catch (\Throwable $e) {
-            error_log("Wellbeing checkin failed: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Wellbeing checkin failed: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.vol_checkin_save_failed'), null, 500);
         }
     }

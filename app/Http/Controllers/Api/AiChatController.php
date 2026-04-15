@@ -342,7 +342,7 @@ class AiChatController extends BaseApiController
                 'content' => trim($response['content']),
             ]);
         } catch (\Exception $e) {
-            error_log("AI generateListing error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("AI generateListing error: " . $e->getMessage());
             return $this->respondWithError('AI_ERROR', $this->getFriendlyAiErrorMessage($e), null, 500);
         }
     }
@@ -390,7 +390,7 @@ class AiChatController extends BaseApiController
                 'content' => trim($response['content']),
             ]);
         } catch (\Exception $e) {
-            error_log("AI generateEvent error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("AI generateEvent error: " . $e->getMessage());
             return $this->respondWithError('AI_ERROR', $this->getFriendlyAiErrorMessage($e), null, 500);
         }
     }
@@ -452,7 +452,7 @@ class AiChatController extends BaseApiController
                 'content' => trim($response['content']),
             ]);
         } catch (\Exception $e) {
-            error_log("AI generateMessage error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("AI generateMessage error: " . $e->getMessage());
             return $this->respondWithError('AI_ERROR', $this->getFriendlyAiErrorMessage($e), null, 500);
         }
     }
@@ -531,7 +531,7 @@ class AiChatController extends BaseApiController
                 'content' => trim($response['content']),
             ]);
         } catch (\Exception $e) {
-            error_log("AI generateBio error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("AI generateBio error: " . $e->getMessage());
             return $this->respondWithError('AI_ERROR', $this->getFriendlyAiErrorMessage($e), null, 500);
         }
     }
@@ -562,7 +562,7 @@ class AiChatController extends BaseApiController
             $prompt = $this->buildNewsletterPrompt($type, $context);
 
             if ($type === 'content') {
-                error_log("AI Newsletter Prompt (first 2000 chars): " . substr($prompt, 0, 2000));
+                \Illuminate\Support\Facades\Log::warning("AI Newsletter Prompt (first 2000 chars): " . substr($prompt, 0, 2000));
             }
 
             $messages = [
@@ -587,7 +587,7 @@ class AiChatController extends BaseApiController
                 'type' => $type,
             ]);
         } catch (\Exception $e) {
-            error_log("AI generateNewsletter error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("AI generateNewsletter error: " . $e->getMessage());
             return $this->respondWithError('AI_ERROR', $this->getFriendlyAiErrorMessage($e), null, 500);
         }
     }
@@ -635,7 +635,7 @@ class AiChatController extends BaseApiController
                 'type' => $type,
             ]);
         } catch (\Exception $e) {
-            error_log("AI generateBlog error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("AI generateBlog error: " . $e->getMessage());
             return $this->respondWithError('AI_ERROR', $this->getFriendlyAiErrorMessage($e), null, 500);
         }
     }
@@ -683,7 +683,7 @@ class AiChatController extends BaseApiController
                 'type' => $type,
             ]);
         } catch (\Exception $e) {
-            error_log("AI generatePage error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("AI generatePage error: " . $e->getMessage());
             return $this->respondWithError('AI_ERROR', $this->getFriendlyAiErrorMessage($e), null, 500);
         }
     }
@@ -1599,19 +1599,19 @@ EOT;
             $recentOffers = Listing::getRecent('offer', 5, $twoWeeksAgo) ?: [];
             $recentRequests = Listing::getRecent('request', 5, $twoWeeksAgo) ?: [];
         } catch (\Exception $e) {
-            error_log("Newsletter AI: Error fetching listings - " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Newsletter AI: Error fetching listings - " . $e->getMessage());
         }
 
         try {
             $upcomingEvents = Event::upcoming($tenantId, 5) ?: [];
         } catch (\Exception $e) {
-            error_log("Newsletter AI: Error fetching events - " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Newsletter AI: Error fetching events - " . $e->getMessage());
         }
 
         try {
             $totalMembers = User::count() ?: 0;
         } catch (\Exception $e) {
-            error_log("Newsletter AI: Error fetching user count - " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Newsletter AI: Error fetching user count - " . $e->getMessage());
         }
 
         try {
@@ -1621,7 +1621,7 @@ EOT;
             );
             $newMembersThisMonth = (int) ($result->count ?? 0);
         } catch (\Exception $e) {
-            error_log("Newsletter AI: Error fetching new members count - " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Newsletter AI: Error fetching new members count - " . $e->getMessage());
         }
 
         try {
@@ -1632,7 +1632,7 @@ EOT;
             $exchangesThisMonth = (int) ($result->count ?? 0);
             $hoursExchangedThisMonth = (float) ($result->total_hours ?? 0);
         } catch (\Exception $e) {
-            error_log("Newsletter AI: Error fetching transactions - " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Newsletter AI: Error fetching transactions - " . $e->getMessage());
         }
 
         try {
@@ -1642,7 +1642,7 @@ EOT;
             );
             $activeGroups = array_map(fn($r) => $r->name, $rows);
         } catch (\Exception $e) {
-            error_log("Newsletter AI: Error fetching groups - " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Newsletter AI: Error fetching groups - " . $e->getMessage());
         }
 
         return [

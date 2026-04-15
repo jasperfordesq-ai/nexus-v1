@@ -463,7 +463,7 @@ class VolunteerCommunityController extends BaseApiController
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         } catch (\Exception $e) {
-            error_log("VolunteerCommunityController::createCustomField error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("VolunteerCommunityController::createCustomField error: " . $e->getMessage());
             return $this->respondWithError('INTERNAL_ERROR', __('api.vol_custom_field_create_failed'), null, 500);
         }
     }

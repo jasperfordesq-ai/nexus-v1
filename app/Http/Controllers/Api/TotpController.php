@@ -227,7 +227,7 @@ class TotpController extends BaseApiController
                 )->plainTextToken;
             }
         } catch (\Throwable $e) {
-            error_log('[TotpController] Sanctum token creation failed: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning('[TotpController] Sanctum token creation failed: ' . $e->getMessage());
         }
 
         // Return success response with tokens — MUST match AuthController::login() response shape

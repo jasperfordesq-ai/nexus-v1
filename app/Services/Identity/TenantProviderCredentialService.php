@@ -38,7 +38,7 @@ class TenantProviderCredentialService
 
             return RegistrationPolicyService::decryptConfig($row['credentials_encrypted']);
         } catch (\Throwable $e) {
-            error_log("[TenantProviderCredentialService] Failed to get credentials for tenant {$tenantId}, provider {$providerSlug}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[TenantProviderCredentialService] Failed to get credentials for tenant {$tenantId}, provider {$providerSlug}: " . $e->getMessage());
             return null;
         }
     }

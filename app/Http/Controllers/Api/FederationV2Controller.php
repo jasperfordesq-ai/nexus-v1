@@ -119,7 +119,7 @@ class FederationV2Controller extends BaseApiController
             );
             $partnershipsCount = (int) ($result->cnt ?? 0);
         } catch (\Exception $e) {
-            error_log("FederationV2Api::status partnerships count error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::status partnerships count error: " . $e->getMessage());
         }
 
         // Get real message/transaction counts for the hub stats
@@ -325,7 +325,7 @@ class FederationV2Controller extends BaseApiController
 
             return $this->respondWithData($formatted);
         } catch (\Exception $e) {
-            error_log("FederationV2Api::partners error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::partners error: " . $e->getMessage());
             return $this->respondWithData([]);
         }
     }
@@ -365,7 +365,7 @@ class FederationV2Controller extends BaseApiController
                 ];
             }, $externalPartners);
         } catch (\Throwable $e) {
-            error_log("FederationV2Api::getExternalPartnersForDisplay error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::getExternalPartnersForDisplay error: " . $e->getMessage());
             return [];
         }
     }
@@ -470,7 +470,7 @@ class FederationV2Controller extends BaseApiController
                 'partnership_since' => $p['partnership_since'] ?? null,
             ]);
         } catch (\Exception $e) {
-            error_log("FederationV2Api::partnerDetail error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::partnerDetail error: " . $e->getMessage());
             return response()->json(['success' => false, 'error' => __('errors.admin.federation.failed_to_load_partner')], 500);
         }
     }
@@ -510,7 +510,7 @@ class FederationV2Controller extends BaseApiController
 
             return $this->respondWithData($formatted);
         } catch (\Exception $e) {
-            error_log("FederationV2Api::activity error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::activity error: " . $e->getMessage());
             return $this->respondWithData([]);
         }
     }
@@ -622,7 +622,7 @@ class FederationV2Controller extends BaseApiController
 
             return $this->respondWithCollection($formatted, $nextCursor, $perPage, $hasMore);
         } catch (\Exception $e) {
-            error_log("FederationV2Api::events error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::events error: " . $e->getMessage());
             return $this->respondWithCollection([], null, $perPage, false);
         }
     }
@@ -745,7 +745,7 @@ class FederationV2Controller extends BaseApiController
 
             return $this->respondWithCollection($formatted, $nextCursor, $perPage, $hasMore);
         } catch (\Exception $e) {
-            error_log("FederationV2Api::listings error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::listings error: " . $e->getMessage());
             return $this->respondWithCollection([], null, $perPage, false);
         }
     }
@@ -803,7 +803,7 @@ class FederationV2Controller extends BaseApiController
                 ];
             }, $result['data']);
         } catch (\Throwable $e) {
-            error_log("FederationV2Api::fetchExternalListingsFromPartner error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::fetchExternalListingsFromPartner error: " . $e->getMessage());
             return [];
         }
     }
@@ -850,7 +850,7 @@ class FederationV2Controller extends BaseApiController
                 ];
             }, $result['listings'] ?? []);
         } catch (\Throwable $e) {
-            error_log("FederationV2Api::fetchExternalListings error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::fetchExternalListings error: " . $e->getMessage());
             return [];
         }
     }
@@ -1005,7 +1005,7 @@ class FederationV2Controller extends BaseApiController
 
             return $this->respondWithCollection($formatted, $nextCursor, $perPage, $hasMore, ['total_items' => $totalItems]);
         } catch (\Exception $e) {
-            error_log("FederationV2Api::members error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::members error: " . $e->getMessage());
             return $this->respondWithCollection([], null, $perPage, false, ['total_items' => 0]);
         }
     }
@@ -1056,7 +1056,7 @@ class FederationV2Controller extends BaseApiController
                 ];
             }, $result['data']);
         } catch (\Throwable $e) {
-            error_log("FederationV2Api::fetchExternalMembersFromPartner error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::fetchExternalMembersFromPartner error: " . $e->getMessage());
             return [];
         }
     }
@@ -1099,7 +1099,7 @@ class FederationV2Controller extends BaseApiController
                 ];
             }, $result['members'] ?? []);
         } catch (\Throwable $e) {
-            error_log("FederationV2Api::fetchExternalMembers error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::fetchExternalMembers error: " . $e->getMessage());
             return [];
         }
     }
@@ -1209,7 +1209,7 @@ class FederationV2Controller extends BaseApiController
 
             return $this->respondWithData($member);
         } catch (\Exception $e) {
-            error_log("FederationV2Api::member error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::member error: " . $e->getMessage());
             return $this->respondWithError('INTERNAL_ERROR', __('api.fed_member_profile_failed'), null, 500);
         }
     }
@@ -1296,7 +1296,7 @@ class FederationV2Controller extends BaseApiController
 
                 return $this->respondWithData(array_values($formatted));
             } catch (\Throwable $e) {
-                error_log('FederationV2Api::memberReviews external error: ' . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning('FederationV2Api::memberReviews external error: ' . $e->getMessage());
                 return $this->respondWithData([]);
             }
         }
@@ -1371,7 +1371,7 @@ class FederationV2Controller extends BaseApiController
 
             return $this->respondWithData(array_values($formatted));
         } catch (\Throwable $e) {
-            error_log('FederationV2Api::memberReviews local error: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning('FederationV2Api::memberReviews local error: ' . $e->getMessage());
             return $this->respondWithData([]);
         }
     }
@@ -1495,7 +1495,7 @@ class FederationV2Controller extends BaseApiController
 
             return $this->respondWithData($formatted);
         } catch (\Exception $e) {
-            error_log("FederationV2Api::messages error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::messages error: " . $e->getMessage());
             return $this->respondWithData([]);
         }
     }
@@ -1661,7 +1661,7 @@ class FederationV2Controller extends BaseApiController
                     substr($body, 0, 200)
                 );
             } catch (\Exception $e) {
-                error_log("FederationV2: Failed to send federation message email: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("FederationV2: Failed to send federation message email: " . $e->getMessage());
             }
 
             // 2. Real-time notification via Pusher
@@ -1680,7 +1680,7 @@ class FederationV2Controller extends BaseApiController
                     ]
                 );
             } catch (\Exception $e) {
-                error_log("FederationV2: Failed to send federation message realtime: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("FederationV2: Failed to send federation message realtime: " . $e->getMessage());
             }
 
             // 3. In-app notification + push notification
@@ -1704,7 +1704,7 @@ class FederationV2Controller extends BaseApiController
                     (int)$receiverTenantId  // Receiver's tenant, not sender's
                 );
             } catch (\Exception $e) {
-                error_log("FederationV2: Failed to send federation message in-app notification: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("FederationV2: Failed to send federation message in-app notification: " . $e->getMessage());
             }
 
             // Return the outbound message in the expected format
@@ -1733,7 +1733,7 @@ class FederationV2Controller extends BaseApiController
                 'reference_message_id' => $referenceMessageId ? (int)$referenceMessageId : null,
             ], null, 201);
         } catch (\Exception $e) {
-            error_log("FederationV2Api::sendMessage error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::sendMessage error: " . $e->getMessage());
             return $this->respondWithError('SEND_FAILED', __('api.fed_send_failed'), null, 500);
         }
     }
@@ -1792,7 +1792,7 @@ class FederationV2Controller extends BaseApiController
                 'body' => $body,
             ]);
         } catch (\Throwable $e) {
-            error_log("FederationV2::sendExternalMessage API error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2::sendExternalMessage API error: " . $e->getMessage());
             return $this->respondWithError('EXTERNAL_API_FAILED', __('api.external_partner_api_failed'), null, 502);
         }
 
@@ -1892,7 +1892,7 @@ class FederationV2Controller extends BaseApiController
 
             return $this->respondWithData(['success' => true]);
         } catch (\Exception $e) {
-            error_log("FederationV2Api::markMessageRead error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::markMessageRead error: " . $e->getMessage());
             return $this->respondWithError('INTERNAL_ERROR', __('api.fed_mark_read_failed'), null, 500);
         }
     }
@@ -1928,7 +1928,7 @@ class FederationV2Controller extends BaseApiController
 
             return $this->respondWithData(['updated' => $updated]);
         } catch (\Exception $e) {
-            error_log("FederationV2Api::markMessagesReadBatch error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::markMessagesReadBatch error: " . $e->getMessage());
             return $this->respondWithError('INTERNAL_ERROR', __('api.fed_mark_read_failed'), null, 500);
         }
     }
@@ -2312,7 +2312,7 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithData(['transaction_id' => $txId, 'status' => 'completed', 'amount' => $amount], null, 201);
         } catch (\Throwable $e) {
             DB::rollBack();
-            error_log("FederationV2::sendTransaction internal error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2::sendTransaction internal error: " . $e->getMessage());
             return $this->respondWithError('TRANSACTION_FAILED', __('api.fed_transaction_failed'), null, 500);
         }
     }
@@ -2397,7 +2397,7 @@ class FederationV2Controller extends BaseApiController
             ], null, 201);
         } catch (\Throwable $e) {
             DB::rollBack();
-            error_log("FederationV2::sendExternalTransaction error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("FederationV2::sendExternalTransaction error: " . $e->getMessage());
             return $this->respondWithError('TRANSACTION_FAILED', __('api.fed_transaction_failed'), null, 500);
         }
     }

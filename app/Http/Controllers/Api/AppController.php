@@ -125,7 +125,7 @@ class AppController extends BaseApiController
         $version = preg_replace('/[^a-zA-Z0-9_.-]/', '', substr($version, 0, 20));
         $platform = preg_replace('/[^a-zA-Z0-9_.-]/', '', substr($platform, 0, 20));
 
-        error_log(sprintf(
+        \Illuminate\Support\Facades\Log::warning(sprintf(
             "[APP LOG] Event: %s | Version: %s | Platform: %s | Data: %s",
             $event,
             $version,

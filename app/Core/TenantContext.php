@@ -403,7 +403,7 @@ class TenantContext
             return true;
         }
 
-        error_log("TenantContext::setById() — tenant ID {$tenantId} not found");
+        \Illuminate\Support\Facades\Log::warning("TenantContext::setById() — tenant ID {$tenantId} not found");
         return false;
     }
 

@@ -42,7 +42,7 @@ class RedirectMiddleware
         // which may handle cookies differently
         $loopCookie = $_COOKIE['redirect_loop_detector'] ?? '0';
         if ((int)$loopCookie >= 5) {
-            error_log("REDIRECT LOOP BLOCKED: Too many redirects from " . ($_SERVER['HTTP_HOST'] ?? 'unknown') . " on URI: " . ($_SERVER['REQUEST_URI'] ?? '/'));
+            \Illuminate\Support\Facades\Log::warning("REDIRECT LOOP BLOCKED: Too many redirects from " . ($_SERVER['HTTP_HOST'] ?? 'unknown') . " on URI: " . ($_SERVER['REQUEST_URI'] ?? '/'));
             // Clear the cookie to allow user to continue after a while
             setcookie('redirect_loop_detector', '0', [
                 'expires' => time() - 3600,
@@ -108,7 +108,7 @@ class RedirectMiddleware
                 exit;
             }
         } catch (\Throwable $e) {
-            error_log('Redirect middleware error: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning('Redirect middleware error: ' . $e->getMessage());
         }
 
         $redirectCount--;
@@ -127,7 +127,7 @@ class RedirectMiddleware
         // MOBILE FIX: Increased threshold from 5 to 8 to prevent false positives
         $loopCookie = $_COOKIE['redirect_loop_detector'] ?? '0';
         if ((int)$loopCookie >= 8) {
-            error_log("REDIRECT LOOP BLOCKED (safeRedirect): Attempted redirect to " . $url);
+            \Illuminate\Support\Facades\Log::warning("REDIRECT LOOP BLOCKED (safeRedirect): Attempted redirect to " . $url);
             // Don't redirect, let the page render
             return;
         }

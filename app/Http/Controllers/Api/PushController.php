@@ -227,7 +227,7 @@ class PushController extends BaseApiController
 
             return $this->respondWithError('REGISTRATION_FAILED', __('api.device_registration_failed'), null, 500);
         } catch (\Exception $e) {
-            error_log('[PushApi] Register device error: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning('[PushApi] Register device error: ' . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.server_error'), null, 500);
         }
     }
@@ -258,7 +258,7 @@ class PushController extends BaseApiController
                 'message' => $result ? 'Device unregistered' : 'Device not found',
             ]);
         } catch (\Exception $e) {
-            error_log('[PushApi] Unregister device error: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning('[PushApi] Unregister device error: ' . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.server_error'), null, 500);
         }
     }
