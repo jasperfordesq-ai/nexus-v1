@@ -383,7 +383,29 @@
     "welcome_resend_subtitle": "You are a member of {{community}}",
     "welcome_resend_greeting": "Hello {{name}},",
     "welcome_resend_body": "Welcome to <strong>{{community}}</strong>! Your account is ready to use. Log in to start connecting with your community, browse available services, and offer your own skills.",
-    "welcome_resend_cta": "Login & Get Started"
+    "welcome_resend_cta": "Login & Get Started",
+
+    "approval_subject_credits": "Welcome to {{community}} — {{credits}} time credits are waiting for you!",
+    "approval_subject_approved": "Welcome to {{community}} — your account is approved!",
+    "approval_title": "Welcome to the Community!",
+    "approval_greeting": "Great news, {{name}}!",
+    "approval_body_intro": "Your account has been approved and you're now a full member of the <strong>{{community}}</strong> community.",
+    "approval_body_credits": "To help you get started, we've added <strong>{{credits}} time credit{{plural}}</strong> to your wallet. Use them to request services from other members, or earn more by offering your own skills and time.",
+    "approval_body_next_steps": "Here are a few things you can do right away:",
+    "approval_list_browse": "Browse <strong>listings</strong> to see what services are available",
+    "approval_list_create_listing": "Create your own <strong>listing</strong> to offer your skills",
+    "approval_list_connect": "Connect with other <strong>members</strong> in your community",
+    "approval_list_events": "Check out upcoming <strong>events</strong> and get involved",
+    "approval_body_closing": "We're glad to have you on board. Welcome to the community!",
+    "approval_cta": "Get Started",
+    "approval_bell": "Your account has been approved! Welcome to {{community}}.",
+    "approval_bell_credits": "Your account has been approved! Welcome to {{community}}. You've received {{credits}} welcome time credit{{plural}} to get started.",
+
+    "reactivation_subject": "Your account has been reactivated — {{community}}",
+    "reactivation_greeting": "Welcome back, {{name}}!",
+    "reactivation_body": "Your account on <strong>{{community}}</strong> has been reactivated by an administrator.",
+    "reactivation_body_access": "You can now log in and access the platform again.",
+    "reactivation_cta": "Log In Now"
   },
   "auth": {
     "verify_email_subject": "Verify Your Email — {{community}}",

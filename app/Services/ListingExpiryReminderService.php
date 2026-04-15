@@ -129,14 +129,13 @@ class ListingExpiryReminderService
                     . "<p>" . __('emails_listings.listings.expiry_reminder.body_expires', ['title' => $title, 'days_text' => $daysText, 'expiry_date' => $expiryFormatted]) . "</p>"
                     . "<p>" . __('emails_listings.listings.expiry_reminder.body_renew') . "</p>";
 
-                $html = EmailTemplate::render(
-                    __('emails_listings.listings.expiry_reminder.heading', ['days_text' => $daysText]),
-                    __('emails_listings.listings.expiry_reminder.subheading'),
-                    $body,
-                    __('emails_listings.listings.expiry_reminder.cta'),
-                    $listingUrl,
-                    $tenantName
-                );
+                $html = \App\Core\EmailTemplateBuilder::make()
+                    ->theme('brand')
+                    ->title(__('emails_listings.listings.expiry_reminder.heading', ['days_text' => $daysText]))
+                    ->paragraph(__('emails_listings.listings.expiry_reminder.subheading'))
+                    ->paragraph($body)
+                    ->button(__('emails_listings.listings.expiry_reminder.cta'), $listingUrl)
+                    ->render();
 
                 $mailer = Mailer::forCurrentTenant();
                 $mailer->send($email, __('emails_listings.listings.expiry_reminder.subject', ['days_text' => $daysText]), $html);

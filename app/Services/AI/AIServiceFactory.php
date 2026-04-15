@@ -63,7 +63,7 @@ class AIServiceFactory
                     ];
                 }
             } catch (\Exception $e) {
-                error_log("Provider $providerId not available: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("Provider $providerId not available: " . $e->getMessage());
                 continue;
             }
         }
@@ -136,7 +136,7 @@ class AIServiceFactory
                 return $response;
             } catch (\Exception $e) {
                 $lastError = $e;
-                error_log("AI Provider $providerId failed: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("AI Provider $providerId failed: " . $e->getMessage());
 
                 // Check if this is a rate limit or quota error
                 $message = $e->getMessage();
@@ -267,7 +267,7 @@ class AIServiceFactory
         // VALIDATION: Throw clear error if API key is missing (except for Ollama)
         if ($providerId !== 'ollama') {
             if (empty($providerConfig['api_key'])) {
-                error_log("AI FACTORY ERROR: Provider [$providerId] has no API key configured. Check database settings and config/ai.php");
+                \Illuminate\Support\Facades\Log::warning("AI FACTORY ERROR: Provider [$providerId] has no API key configured. Check database settings and config/ai.php");
                 throw new \Exception("AI Provider '$providerId' is not configured. Missing API key. Please configure it in Admin > AI Settings.");
             }
         }
@@ -345,7 +345,7 @@ class AIServiceFactory
             } catch (\Exception $e) {
                 // Provider failed to instantiate (likely missing API key)
                 // Mark as not configured instead of throwing error
-                error_log("getAvailableProviders: Provider [$id] could not be instantiated: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("getAvailableProviders: Provider [$id] could not be instantiated: " . $e->getMessage());
                 $configured = false;
             }
 

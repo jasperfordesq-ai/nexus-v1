@@ -92,14 +92,13 @@ class ListingExpiryService
                             . "<p>" . __('emails_listings.listings.expired.body_expired', ['title' => $title]) . "</p>"
                             . "<p>" . __('emails_listings.listings.expired.body_renew') . "</p>";
 
-                        $html = EmailTemplate::render(
-                            __('emails_listings.listings.expired.heading'),
-                            __('emails_listings.listings.expired.subheading'),
-                            $body,
-                            __('emails_listings.listings.expired.cta'),
-                            $listingUrl,
-                            $tenantName
-                        );
+                        $html = \App\Core\EmailTemplateBuilder::make()
+                            ->theme('brand')
+                            ->title(__('emails_listings.listings.expired.heading'))
+                            ->paragraph(__('emails_listings.listings.expired.subheading'))
+                            ->paragraph($body)
+                            ->button(__('emails_listings.listings.expired.cta'), $listingUrl)
+                            ->render();
 
                         $mailer = Mailer::forCurrentTenant();
                         $mailer->send($ownerEmail, __('emails_listings.listings.expired.subject'), $html);

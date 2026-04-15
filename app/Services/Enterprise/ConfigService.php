@@ -59,7 +59,7 @@ class ConfigService
                 $this->vault->authenticateToken($token);
             }
         } catch (\Exception $e) {
-            error_log("Failed to initialize Vault: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Failed to initialize Vault: " . $e->getMessage());
             $this->vault = null;
             $this->useVault = false;
         }
@@ -83,7 +83,7 @@ class ConfigService
                 $env = getenv('APP_ENV') ?: 'production';
                 return $this->vault->getSecret("nexus/database/{$env}");
             } catch (\Exception $e) {
-                error_log("Vault database config error, falling back to env: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("Vault database config error, falling back to env: " . $e->getMessage());
             }
         }
 
@@ -107,7 +107,7 @@ class ConfigService
             try {
                 return $this->vault->getSecret('nexus/redis');
             } catch (\Exception $e) {
-                error_log("Vault Redis config error: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("Vault Redis config error: " . $e->getMessage());
             }
         }
 
@@ -128,7 +128,7 @@ class ConfigService
             try {
                 return $this->vault->getSecret('nexus/api-keys/pusher');
             } catch (\Exception $e) {
-                error_log("Vault Pusher config error: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("Vault Pusher config error: " . $e->getMessage());
             }
         }
 
@@ -149,7 +149,7 @@ class ConfigService
             try {
                 return $this->vault->getSecret('nexus/api-keys/openai');
             } catch (\Exception $e) {
-                error_log("Vault OpenAI config error: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("Vault OpenAI config error: " . $e->getMessage());
             }
         }
 
@@ -169,7 +169,7 @@ class ConfigService
             try {
                 return $this->vault->getSecret('nexus/api-keys/anthropic');
             } catch (\Exception $e) {
-                error_log("Vault Anthropic config error: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("Vault Anthropic config error: " . $e->getMessage());
             }
         }
 
@@ -188,7 +188,7 @@ class ConfigService
             try {
                 return $this->vault->getSecret('nexus/api-keys/google-maps');
             } catch (\Exception $e) {
-                error_log("Vault Google Maps config error: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("Vault Google Maps config error: " . $e->getMessage());
             }
         }
 
@@ -210,7 +210,7 @@ class ConfigService
                 }
                 return $config;
             } catch (\Exception $e) {
-                error_log("Vault Firebase config error: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("Vault Firebase config error: " . $e->getMessage());
             }
         }
 
@@ -237,7 +237,7 @@ class ConfigService
             try {
                 return $this->vault->getSecret('nexus/smtp');
             } catch (\Exception $e) {
-                error_log("Vault SMTP config error: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("Vault SMTP config error: " . $e->getMessage());
             }
         }
 
@@ -262,7 +262,7 @@ class ConfigService
                 $data = $this->vault->getSecret('nexus/encryption');
                 return $data['app_key'] ?? '';
             } catch (\Exception $e) {
-                error_log("Vault app key error: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("Vault app key error: " . $e->getMessage());
             }
         }
 

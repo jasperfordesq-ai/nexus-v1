@@ -90,5 +90,17 @@
     "shift_signup_confirmed": "You're signed up for a volunteer shift on {{date}}",
     "shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
     "opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled"
+  },
+  "goals": {
+    "progress_mentor": "{{name}} made progress on their goal: \"{{title}}\"",
+    "completed_mentor": "{{name}} completed their goal: \"{{title}}\"",
+    "completed_self": "Congratulations! You completed your goal: \"{{title}}\""
+  },
+  "feed": {
+    "post_shared": "{{name}} shared your post"
+  },
+  "polls": {
+    "vote_received": "{{name}} voted on your poll: \"{{title}}\"",
+    "ranking_received": "{{name}} submitted a ranking on your poll: \"{{title}}\""
   }
 }

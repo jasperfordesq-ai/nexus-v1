@@ -190,14 +190,13 @@ class ListingModerationService
                     . "<p>" . __('emails_listings.listings.rejected.body_reason', ['reason' => $safeReason]) . "</p>"
                     . "<p>" . __('emails_listings.listings.rejected.body_resubmit') . "</p>";
 
-                $html = EmailTemplate::render(
-                    __('emails_listings.listings.rejected.heading'),
-                    __('emails_listings.listings.rejected.subheading'),
-                    $body,
-                    __('emails_listings.listings.rejected.cta'),
-                    $listingUrl,
-                    $tenantName
-                );
+                $html = \App\Core\EmailTemplateBuilder::make()
+                    ->theme('warning')
+                    ->title(__('emails_listings.listings.rejected.heading'))
+                    ->paragraph(__('emails_listings.listings.rejected.subheading'))
+                    ->paragraph($body)
+                    ->button(__('emails_listings.listings.rejected.cta'), $listingUrl)
+                    ->render();
 
                 $mailer = Mailer::forCurrentTenant();
                 $mailer->send($ownerEmail, __('emails_listings.listings.rejected.subject'), $html);

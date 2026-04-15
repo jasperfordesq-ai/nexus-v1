@@ -106,7 +106,7 @@ class MetricsService
                 };
             }
         } catch (\Exception $e) {
-            error_log("Failed to initialize metrics client: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Failed to initialize metrics client: " . $e->getMessage());
             $this->enabled = false;
         }
     }
@@ -356,7 +356,7 @@ class MetricsService
                 $this->statsd->send($message);
             }
         } catch (\Exception $e) {
-            error_log("Failed to send metric: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Failed to send metric: " . $e->getMessage());
         }
     }
 

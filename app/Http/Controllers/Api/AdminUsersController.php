@@ -850,7 +850,7 @@ class AdminUsersController extends BaseApiController
 
             return $this->respondWithData(['awarded' => true, 'user_id' => $id, 'badge_slug' => $badgeSlug], null, 201);
         } catch (\Throwable $e) {
-            error_log("[AdminUsers] Failed to award badge to user #{$id}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to award badge to user #{$id}: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.create_failed', ['resource' => 'badge award']), null, 500);
         }
     }
@@ -925,7 +925,7 @@ class AdminUsersController extends BaseApiController
 
             return $this->respondWithData(['rechecked' => true, 'user_id' => $id, 'badges' => $badges]);
         } catch (\Throwable $e) {
-            error_log("[AdminUsers] Badge recheck failed for user #{$id}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminUsers] Badge recheck failed for user #{$id}: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.badge_recheck_failed'), null, 500);
         }
     }
@@ -1623,7 +1623,7 @@ class AdminUsersController extends BaseApiController
 
                 if ($existing) {
                     DB::rollBack();
-                    error_log("[AdminUsers] Welcome credits already exist for user #{$userId} (tenant {$userTenantId}) — skipping");
+                    \Illuminate\Support\Facades\Log::warning("[AdminUsers] Welcome credits already exist for user #{$userId} (tenant {$userTenantId}) — skipping");
                     return 0;
                 }
 
@@ -1643,7 +1643,7 @@ class AdminUsersController extends BaseApiController
                 DB::commit();
 
                 ActivityLog::log($adminId, 'welcome_credits_issued', "Awarded {$creditAmount} welcome credits to user #{$userId} ({$user['email']}) on approval");
-                error_log("[AdminUsers] Granted {$creditAmount} welcome credits to user #{$userId} (tenant {$userTenantId})");
+                \Illuminate\Support\Facades\Log::warning("[AdminUsers] Granted {$creditAmount} welcome credits to user #{$userId} (tenant {$userTenantId})");
 
                 return $creditAmount;
             } catch (\Throwable $e) {
@@ -1651,7 +1651,7 @@ class AdminUsersController extends BaseApiController
                 throw $e;
             }
         } catch (\Throwable $e) {
-            error_log("[AdminUsers] Failed to grant welcome credits to user #{$user['id']}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to grant welcome credits to user #{$user['id']}: " . $e->getMessage());
             return 0;
         }
     }
@@ -1671,46 +1671,50 @@ class AdminUsersController extends BaseApiController
             $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
             $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
 
-            $body = "<p>Great news, {$firstName}! Your account has been approved and you're now a full member of the <strong>{$tenantNameSafe}</strong> community.</p>";
+            $plural = $creditsAwarded !== 1 ? 's' : '';
+
+            $builder = \App\Core\EmailTemplateBuilder::make()
+                ->theme('success')
+                ->title(__('emails_misc.admin_actions.approval_title'))
+                ->greeting(__('emails_misc.admin_actions.approval_greeting', ['name' => $firstName]))
+                ->paragraph(__('emails_misc.admin_actions.approval_body_intro', ['community' => $tenantNameSafe]));
 
             if ($creditsAwarded > 0) {
-                $body .= "<p>To help you get started, we've added <strong>{$creditsAwarded} time credit" . ($creditsAwarded !== 1 ? 's' : '') . "</strong> to your wallet. "
-                       . "Use them to request services from other members, or earn more by offering your own skills and time.</p>";
+                $builder->paragraph(__('emails_misc.admin_actions.approval_body_credits', [
+                    'credits' => $creditsAwarded,
+                    'plural'  => $plural,
+                ]));
             }
 
-            $body .= '<p>Here are a few things you can do right away:</p>'
-                    . '<ul style="padding-left: 20px; margin: 10px 0;">'
-                    . '<li style="margin-bottom: 8px;">Browse <strong>listings</strong> to see what services are available</li>'
-                    . '<li style="margin-bottom: 8px;">Create your own <strong>listing</strong> to offer your skills</li>'
-                    . '<li style="margin-bottom: 8px;">Connect with other <strong>members</strong> in your community</li>'
-                    . '<li style="margin-bottom: 8px;">Check out upcoming <strong>events</strong> and get involved</li>'
-                    . '</ul>'
-                    . "<p>We're glad to have you on board. Welcome to the community!</p>";
+            $stepsHtml = '<p>' . __('emails_misc.admin_actions.approval_body_next_steps') . '</p>'
+                . '<ul style="padding-left: 20px; margin: 10px 0;">'
+                . '<li style="margin-bottom: 8px;">' . __('emails_misc.admin_actions.approval_list_browse') . '</li>'
+                . '<li style="margin-bottom: 8px;">' . __('emails_misc.admin_actions.approval_list_create_listing') . '</li>'
+                . '<li style="margin-bottom: 8px;">' . __('emails_misc.admin_actions.approval_list_connect') . '</li>'
+                . '<li style="margin-bottom: 8px;">' . __('emails_misc.admin_actions.approval_list_events') . '</li>'
+                . '</ul>';
 
-            $html = \App\Core\EmailTemplate::render(
-                'Welcome to the Community!',
-                "You're all set, {$firstName}!",
-                $body,
-                __('svc_notifications.get_started'),
-                $loginUrl,
-                $tenant['name']
-            );
+            $html = $builder
+                ->paragraph($stepsHtml)
+                ->paragraph(__('emails_misc.admin_actions.approval_body_closing'))
+                ->button(__('emails_misc.admin_actions.approval_cta'), $loginUrl)
+                ->render();
 
             $subject = $creditsAwarded > 0
-                ? "Welcome to {$tenantNameSafe} — {$creditsAwarded} time credits are waiting for you!"
-                : "Welcome to {$tenantNameSafe} — your account is approved!";
+                ? __('emails_misc.admin_actions.approval_subject_credits', ['community' => $tenantNameSafe, 'credits' => $creditsAwarded])
+                : __('emails_misc.admin_actions.approval_subject_approved', ['community' => $tenantNameSafe]);
 
             $result = (\App\Core\Mailer::forCurrentTenant())->send($user['email'], $subject, $html);
 
             if ($result) {
-                error_log("[AdminUsers] Welcome email sent to user #{$user['id']} (credits: {$creditsAwarded})");
+                \Illuminate\Support\Facades\Log::info("[AdminUsers] Welcome email sent to user #{$user['id']} (credits: {$creditsAwarded})");
             } else {
-                error_log("[AdminUsers] Mailer returned false for welcome email to user #{$user['id']} — check SMTP/Gmail config");
+                \Illuminate\Support\Facades\Log::warning("[AdminUsers] Mailer returned false for welcome email to user #{$user['id']} — check SMTP/Gmail config");
             }
 
             return (bool) $result;
         } catch (\Throwable $e) {
-            error_log("[AdminUsers] Failed to send welcome email to user #{$user['id']}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to send welcome email to user #{$user['id']}: " . $e->getMessage());
             return false;
         }
     }
@@ -1726,9 +1730,15 @@ class AdminUsersController extends BaseApiController
         try {
             $tenant = $this->resolveUserTenant($user);
 
-            $message = "Your account has been approved! Welcome to {$tenant['name']}.";
             if ($creditsAwarded > 0) {
-                $message .= " You've received {$creditsAwarded} welcome time credit" . ($creditsAwarded !== 1 ? 's' : '') . " to get started.";
+                $plural = $creditsAwarded !== 1 ? 's' : '';
+                $message = __('emails_misc.admin_actions.approval_bell_credits', [
+                    'community' => $tenant['name'],
+                    'credits'   => $creditsAwarded,
+                    'plural'    => $plural,
+                ]);
+            } else {
+                $message = __('emails_misc.admin_actions.approval_bell', ['community' => $tenant['name']]);
             }
 
             Notification::createNotification(
@@ -1740,7 +1750,7 @@ class AdminUsersController extends BaseApiController
                 $tenant['tenant_id']
             );
         } catch (\Throwable $e) {
-            error_log("[AdminUsers] Failed to create approval notification for user #{$user['id']}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to create approval notification for user #{$user['id']}: " . $e->getMessage());
         }
     }
 
@@ -1758,31 +1768,30 @@ class AdminUsersController extends BaseApiController
             $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
             $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
 
-            $html = \App\Core\EmailTemplate::render(
-                __('svc_notifications.account_reactivated_title'),
-                "Welcome back, {$firstName}!",
-                '<p>Your account on ' . $tenantNameSafe . ' has been reactivated by an administrator.</p>
-                 <p>You can now log in and access the platform again.</p>',
-                'Log In Now',
-                $loginUrl,
-                $tenant['name']
-            );
+            $html = \App\Core\EmailTemplateBuilder::make()
+                ->theme('brand')
+                ->title(__('svc_notifications.account_reactivated_title'))
+                ->greeting(__('emails_misc.admin_actions.reactivation_greeting', ['name' => $firstName]))
+                ->paragraph(__('emails_misc.admin_actions.reactivation_body', ['community' => $tenantNameSafe]))
+                ->paragraph(__('emails_misc.admin_actions.reactivation_body_access'))
+                ->button(__('emails_misc.admin_actions.reactivation_cta'), $loginUrl)
+                ->render();
 
             $result = (\App\Core\Mailer::forCurrentTenant())->send(
                 $user['email'],
-                "Your account has been reactivated - {$tenantNameSafe}",
+                __('emails_misc.admin_actions.reactivation_subject', ['community' => $tenantNameSafe]),
                 $html
             );
 
             if ($result) {
-                error_log("[AdminUsers] Reactivation email sent to user #{$user['id']}");
+                \Illuminate\Support\Facades\Log::info("[AdminUsers] Reactivation email sent to user #{$user['id']}");
             } else {
-                error_log("[AdminUsers] Mailer returned false for reactivation email to user #{$user['id']} — check SMTP/Gmail config");
+                \Illuminate\Support\Facades\Log::warning("[AdminUsers] Mailer returned false for reactivation email to user #{$user['id']} — check SMTP/Gmail config");
             }
 
             return (bool) $result;
         } catch (\Throwable $e) {
-            error_log("[AdminUsers] Failed to send reactivation email to user #{$user['id']}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to send reactivation email to user #{$user['id']}: " . $e->getMessage());
             return false;
         }
     }
@@ -1806,7 +1815,7 @@ class AdminUsersController extends BaseApiController
                 $tenant['tenant_id']
             );
         } catch (\Throwable $e) {
-            error_log("[AdminUsers] Failed to create reactivation notification for user #{$user['id']}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to create reactivation notification for user #{$user['id']}: " . $e->getMessage());
         }
     }
 

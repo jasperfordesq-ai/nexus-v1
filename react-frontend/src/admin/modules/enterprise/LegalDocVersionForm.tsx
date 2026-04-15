@@ -18,6 +18,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { adminLegalDocs } from '@/admin/api/adminApi';
 import type { LegalDocumentVersion } from '@/admin/api/types';
 import { AlertCircle } from 'lucide-react';
+import { LegalDocEditor } from '@/admin/components';
 
 interface LegalDocVersionFormProps {
   documentId: number;
@@ -181,16 +182,11 @@ export default function LegalDocVersionForm({
           />
 
           {/* Content */}
-          <Textarea
-            label={t('enterprise.version_form.label_content_html')}
-            placeholder={t('enterprise.version_form.placeholder_content')}
+          <LegalDocEditor
             value={formData.content}
-            onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-            minRows={10}
-            isInvalid={!!errors.content}
+            onChange={(html) => setFormData({ ...formData, content: html })}
+            disabled={submitting}
             errorMessage={errors.content}
-            description={t('enterprise.version_form.content_description')}
-            isRequired
           />
 
           {/* Draft Toggle -- only for new versions, editing is always a draft */}

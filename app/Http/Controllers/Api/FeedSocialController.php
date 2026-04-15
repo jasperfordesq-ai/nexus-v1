@@ -93,7 +93,7 @@ class FeedSocialController extends BaseApiController
                 $sharerName = trim($sharer->first_name . ' ' . $sharer->last_name);
                 Notification::createNotification(
                     (int) $original->user_id,
-                    "{$sharerName} shared your post",
+                    __('api_controllers_3.feed.post_shared', ['name' => $sharerName]),
                     "/feed/post/{$id}",
                     'post_shared'
                 );

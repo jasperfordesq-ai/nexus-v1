@@ -241,14 +241,14 @@ class GoalsController extends BaseApiController
                 if ($goal->status === 'completed') {
                     Notification::createNotification(
                         $mentorId,
-                        "{$ownerName} completed their goal: {$goalTitle}",
+                        __('api_controllers_3.goals.completed_mentor', ['name' => $ownerName, 'title' => $goalTitle]),
                         "/goals/{$id}",
                         'goal_completed'
                     );
                 } else {
                     Notification::createNotification(
                         $mentorId,
-                        "{$ownerName} made progress on their goal: {$goalTitle}",
+                        __('api_controllers_3.goals.progress_mentor', ['name' => $ownerName, 'title' => $goalTitle]),
                         "/goals/{$id}",
                         'goal_progress'
                     );
@@ -263,7 +263,7 @@ class GoalsController extends BaseApiController
             if ($goal->status === 'completed') {
                 Notification::createNotification(
                     $userId,
-                    "Congratulations! You completed your goal: {$goal->title}",
+                    __('api_controllers_3.goals.completed_self', ['title' => $goal->title]),
                     "/goals/{$id}",
                     'goal_completed'
                 );
@@ -305,7 +305,7 @@ class GoalsController extends BaseApiController
             $goalTitle = $goal->title ?? 'your goal';
             Notification::createNotification(
                 $userId,
-                "Congratulations! You completed your goal: {$goalTitle}",
+                __('api_controllers_3.goals.completed_self', ['title' => $goalTitle]),
                 "/goals/{$id}",
                 'goal_completed'
             );
@@ -321,7 +321,7 @@ class GoalsController extends BaseApiController
                 $ownerName = $owner->name ?? 'Someone';
                 Notification::createNotification(
                     $mentorId,
-                    "{$ownerName} completed their goal: {$goal->title}",
+                    __('api_controllers_3.goals.completed_mentor', ['name' => $ownerName, 'title' => $goal->title]),
                     "/goals/{$id}",
                     'goal_completed'
                 );

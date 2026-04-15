@@ -13,5 +13,6 @@ export { BulkActionToolbar, type BulkAction } from './BulkActionToolbar';
 export { EmptyState } from './EmptyState';
 export { PageHeader } from './PageHeader';
 export { RichTextEditor } from './RichTextEditor';
+export { LegalDocEditor } from './LegalDocEditor';
 export { IconPicker } from './IconPicker';
 export { VisibilityRulesEditor } from './VisibilityRulesEditor';

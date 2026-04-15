@@ -53,7 +53,7 @@ class EventReminderService
             );
             return true;
         } catch (\Exception $e) {
-            error_log("[EventReminderService] scheduleReminder error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[EventReminderService] scheduleReminder error: " . $e->getMessage());
             return false;
         }
     }
@@ -87,7 +87,7 @@ class EventReminderService
             );
             return true;
         } catch (\Exception $e) {
-            error_log("[EventReminderService] cancelReminder error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[EventReminderService] cancelReminder error: " . $e->getMessage());
             return false;
         }
     }
@@ -115,7 +115,7 @@ class EventReminderService
                 [$tenantId, $windowStart, $windowEnd]
             );
         } catch (\Exception $e) {
-            error_log("[EventReminderService] Query error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("[EventReminderService] Query error: " . $e->getMessage());
             return ['sent' => 0, 'errors' => 1];
         }
 
@@ -179,7 +179,7 @@ class EventReminderService
 
                             Mailer::forCurrentTenant()->send($attendee->email, $subject, $html);
                         } catch (\Exception $emailEx) {
-                            error_log("[EventReminderService] Email failed: event={$eventId}, user={$userId}: " . $emailEx->getMessage());
+                            \Illuminate\Support\Facades\Log::warning("[EventReminderService] Email failed: event={$eventId}, user={$userId}: " . $emailEx->getMessage());
                         }
                     }
 
@@ -191,7 +191,7 @@ class EventReminderService
 
                     $sent++;
                 } catch (\Exception $e) {
-                    error_log("[EventReminderService] Failed: event={$eventId}, user={$userId}: " . $e->getMessage());
+                    \Illuminate\Support\Facades\Log::warning("[EventReminderService] Failed: event={$eventId}, user={$userId}: " . $e->getMessage());
                     $errors++;
                 }
             }

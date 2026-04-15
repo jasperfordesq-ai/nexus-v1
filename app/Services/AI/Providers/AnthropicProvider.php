@@ -51,7 +51,7 @@ class AnthropicProvider extends BaseProvider
 
         // SECURITY: Only log key presence, never expose key content
         if (empty($apiKey)) {
-            error_log("Anthropic Request: API key is empty or not configured");
+            \Illuminate\Support\Facades\Log::warning("Anthropic Request: API key is empty or not configured");
         }
 
         $model = $this->getModel($options);
@@ -133,7 +133,7 @@ class AnthropicProvider extends BaseProvider
 
         // SECURITY: Only log key presence, never expose key content
         if (empty($apiKey)) {
-            error_log("Anthropic Stream Request: API key is empty or not configured");
+            \Illuminate\Support\Facades\Log::warning("Anthropic Stream Request: API key is empty or not configured");
         }
 
         $model = $this->getModel($options);

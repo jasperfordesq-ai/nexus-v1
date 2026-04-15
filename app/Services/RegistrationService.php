@@ -181,14 +181,13 @@ class RegistrationService
 
             $firstName = $user->first_name ?? 'there';
 
-            $html = EmailTemplate::render(
-                __('emails_misc.registration.verify_title'),
-                __('emails_misc.registration.verify_greeting', ['name' => $firstName, 'tenant' => $tenantName]),
-                __('emails_misc.registration.verify_body'),
-                __('emails_misc.registration.verify_cta'),
-                $verifyUrl,
-                $tenantName
-            );
+            $html = \App\Core\EmailTemplateBuilder::make()
+                ->theme('brand')
+                ->title(__('emails_misc.registration.verify_title'))
+                ->greeting(__('emails_misc.registration.verify_greeting', ['name' => $firstName, 'tenant' => $tenantName]))
+                ->paragraph(__('emails_misc.registration.verify_body'))
+                ->button(__('emails_misc.registration.verify_cta'), $verifyUrl)
+                ->render();
 
             $mailer = Mailer::forCurrentTenant();
             $mailer->send($user->email, __('emails_misc.registration.verify_subject', ['tenant' => $tenantName]), $html);

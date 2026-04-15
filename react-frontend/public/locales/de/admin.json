@@ -1271,7 +1271,14 @@
       "version_created": "Version Created",
       "version_management": "Version Management",
       "version_number_required": "Version Number Required",
-      "version_updated": "Version Updated"
+      "version_updated": "Version Updated",
+      "notice_box": "Notice Box",
+      "notice_title_placeholder": "Important Notice",
+      "notice_body_placeholder": "Enter notice body here…",
+      "preview_label": "Live Preview",
+      "preview_title_placeholder": "Document Preview",
+      "split_view": "Split view (editor + preview)",
+      "editor_only": "Editor only"
     },
     "version_list": {
       "current": "Current",

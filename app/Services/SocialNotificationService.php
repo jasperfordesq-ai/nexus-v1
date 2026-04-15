@@ -248,17 +248,16 @@ class SocialNotificationService
             $subtitle = __('notifications.email_liked_subtitle', ['name' => $likerName, 'content_type' => $contentLabel]);
             $body = $contentPreview ? "\"" . htmlspecialchars($contentPreview) . "\"" : __('notifications.content_getting_attention', ['content_type' => $contentLabel]);
 
-            $html = EmailTemplate::render(
-                $title,
-                $subtitle,
-                $body,
-                __('notifications.email_view_content', ['content_type' => ucfirst($contentLabel)]),
-                $fullLink,
-                $tenantName
-            );
+            $html = \App\Core\EmailTemplateBuilder::make()
+                ->theme('brand')
+                ->title($title)
+                ->paragraph($subtitle)
+                ->paragraph($body)
+                ->button(__('notifications.email_view_content', ['content_type' => ucfirst($contentLabel)]), $fullLink)
+                ->render();
 
             $mailer = Mailer::forCurrentTenant();
-            $mailer->send($owner->email, $title . " - $tenantName", $html);
+            $mailer->send($owner->email, $title . ' — ' . $tenantName, $html);
         } catch (\Throwable $e) {
             Log::warning("sendLikeEmail error: " . $e->getMessage());
         }
@@ -281,17 +280,16 @@ class SocialNotificationService
             $subtitle = __('notifications.email_commented_subtitle', ['name' => $commenterName, 'content_type' => $contentLabel]);
             $body = "\"" . htmlspecialchars($commentText) . "\"";
 
-            $html = EmailTemplate::render(
-                $title,
-                $subtitle,
-                $body,
-                __('notifications.email_view_comment'),
-                $fullLink,
-                $tenantName
-            );
+            $html = \App\Core\EmailTemplateBuilder::make()
+                ->theme('brand')
+                ->title($title)
+                ->paragraph($subtitle)
+                ->paragraph($body)
+                ->button(__('notifications.email_view_comment'), $fullLink)
+                ->render();
 
             $mailer = Mailer::forCurrentTenant();
-            $mailer->send($owner->email, $title . " - $tenantName", $html);
+            $mailer->send($owner->email, $title . ' — ' . $tenantName, $html);
         } catch (\Throwable $e) {
             Log::warning("sendCommentEmail error: " . $e->getMessage());
         }
@@ -314,17 +312,16 @@ class SocialNotificationService
             $subtitle = __('notifications.email_shared_subtitle', ['name' => $sharerName, 'content_type' => $contentLabel]);
             $body = __('notifications.content_reaching_more');
 
-            $html = EmailTemplate::render(
-                $title,
-                $subtitle,
-                $body,
-                __('notifications.email_view_content', ['content_type' => ucfirst($contentLabel)]),
-                $fullLink,
-                $tenantName
-            );
+            $html = \App\Core\EmailTemplateBuilder::make()
+                ->theme('brand')
+                ->title($title)
+                ->paragraph($subtitle)
+                ->paragraph($body)
+                ->button(__('notifications.email_view_content', ['content_type' => ucfirst($contentLabel)]), $fullLink)
+                ->render();
 
             $mailer = Mailer::forCurrentTenant();
-            $mailer->send($owner->email, $title . " - $tenantName", $html);
+            $mailer->send($owner->email, $title . ' — ' . $tenantName, $html);
         } catch (\Throwable $e) {
             Log::warning("sendShareEmail error: " . $e->getMessage());
         }

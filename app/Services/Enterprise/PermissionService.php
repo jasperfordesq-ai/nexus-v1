@@ -257,7 +257,7 @@ class PermissionService
             return true;
 
         } catch (\Exception $e) {
-            error_log("Failed to assign role: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Failed to assign role: " . $e->getMessage());
             return false;
         }
     }
@@ -280,7 +280,7 @@ class PermissionService
             return true;
 
         } catch (\Exception $e) {
-            error_log("Failed to revoke role: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Failed to revoke role: " . $e->getMessage());
             return false;
         }
     }
@@ -313,7 +313,7 @@ class PermissionService
             return true;
 
         } catch (\Exception $e) {
-            error_log("Failed to grant permission: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Failed to grant permission: " . $e->getMessage());
             return false;
         }
     }
@@ -344,7 +344,7 @@ class PermissionService
             return true;
 
         } catch (\Exception $e) {
-            error_log("Failed to revoke permission: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Failed to revoke permission: " . $e->getMessage());
             return false;
         }
     }
@@ -480,7 +480,7 @@ class PermissionService
                 $_SERVER['HTTP_USER_AGENT'] ?? null
             ]);
         } catch (\Exception $e) {
-            error_log("Failed to log permission check: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Failed to log permission check: " . $e->getMessage());
         }
     }
 
@@ -511,7 +511,7 @@ class PermissionService
                 $metadata ? json_encode($metadata) : null
             ]);
         } catch (\Exception $e) {
-            error_log("Failed to log audit event: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Failed to log audit event: " . $e->getMessage());
         }
     }
 
@@ -582,7 +582,7 @@ class PermissionService
 
             return (int) DB::getPdo()->lastInsertId();
         } catch (\Exception $e) {
-            error_log("Failed to create role: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Failed to create role: " . $e->getMessage());
             return null;
         }
     }
@@ -602,7 +602,7 @@ class PermissionService
             }
             return true;
         } catch (\Exception $e) {
-            error_log("Failed to attach permissions to role: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Failed to attach permissions to role: " . $e->getMessage());
             return false;
         }
     }

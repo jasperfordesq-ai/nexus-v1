@@ -107,7 +107,7 @@ class CronJobRunner
             ");
         } catch (\Exception $e) {
             // Table likely exists or DB error - log and continue
-            error_log("Cron logs table check: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Cron logs table check: " . $e->getMessage());
         }
     }
 
@@ -161,7 +161,7 @@ class CronJobRunner
                 ]
             );
         } catch (\Exception $e) {
-            error_log("Failed to log cron execution for {$this->currentJobId}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Failed to log cron execution for {$this->currentJobId}: " . $e->getMessage());
         }
 
         $this->currentJobId = null;
@@ -564,7 +564,7 @@ class CronJobRunner
             echo "Done.\n";
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
-            error_log("Newsletter cron error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Newsletter cron error: " . $e->getMessage());
             $status = 'error';
         }
 
@@ -594,7 +594,7 @@ class CronJobRunner
             echo "Done.\n";
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
-            error_log("Recurring newsletter cron error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Recurring newsletter cron error: " . $e->getMessage());
             $status = 'error';
         }
 
@@ -671,7 +671,7 @@ class CronJobRunner
             echo "Done.\n";
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
-            error_log("Newsletter queue cron error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning("Newsletter queue cron error: " . $e->getMessage());
             $status = 'error';
         }
 
