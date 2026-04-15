@@ -57,7 +57,7 @@ export function Error404Tracking() {
     } finally {
       if (mounted.current) setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     mounted.current = true;

@@ -49,7 +49,7 @@ export function ErrorLogs() {
     } finally {
       setLoading(false);
     }
-  }, [page, toast]);
+  }, [page, toast, t])
 
   useEffect(() => {
     loadData();

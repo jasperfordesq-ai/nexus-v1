@@ -246,7 +246,7 @@ export function TenantFeatures() {
             </CardHeader>
             <CardBody className="px-4 pb-4 space-y-4">
               <div>
-                <p className="text-sm font-medium mb-1">Default Language</p>
+                <p className="text-sm font-medium mb-1">{t('shared.default_language')}</p>
                 <p className="text-xs text-default-400 mb-2">
                   Shown to new visitors without a preference
                 </p>
@@ -271,7 +271,7 @@ export function TenantFeatures() {
               </div>
               <Divider />
               <div>
-                <p className="text-sm font-medium mb-1">Available Languages</p>
+                <p className="text-sm font-medium mb-1">{t('shared.available_languages')}</p>
                 <p className="text-xs text-default-400 mb-3">
                   Languages shown in the language switcher
                 </p>
@@ -310,7 +310,7 @@ export function TenantFeatures() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
               <Zap size={18} className="text-primary" />
-              <h3 className="font-semibold">Features</h3>
+              <h3 className="font-semibold">{t('shared.features')}</h3>
               <span className="text-sm text-default-400">Optional add-on modules</span>
             </CardHeader>
             <CardBody className="divide-y divide-divider px-4">
@@ -337,8 +337,8 @@ export function TenantFeatures() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
               <Cog size={18} className="text-secondary" />
-              <h3 className="font-semibold">Core Modules</h3>
-              <span className="text-sm text-default-400">Core platform functionality</span>
+              <h3 className="font-semibold">{t('shared.core_modules')}</h3>
+              <span className="text-sm text-default-400">{t('shared.core_modules_desc')}</span>
             </CardHeader>
             <CardBody className="divide-y divide-divider px-4">
               {Object.entries(config?.modules || {}).map(([key, enabled]) => {
@@ -368,21 +368,21 @@ export function TenantFeatures() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
               <Database size={18} className="text-warning" />
-              <h3 className="font-semibold">Cache</h3>
+              <h3 className="font-semibold">{t('shared.cache')}</h3>
             </CardHeader>
             <CardBody className="px-4 pb-4 space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-default-500">Redis</span>
+                <span className="text-default-500">{t('shared.redis')}</span>
                 <span className={cacheStats?.redis_connected ? 'text-success' : 'text-danger'}>
                   {cacheStats?.redis_connected ? 'Connected' : 'Disconnected'}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-default-500">Memory Used</span>
+                <span className="text-default-500">{t('shared.memory_used')}</span>
                 <span>{cacheStats?.redis_memory_used || '—'}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-default-500">Keys</span>
+                <span className="text-default-500">{t('shared.keys')}</span>
                 <span>{cacheStats?.redis_keys_count ?? '—'}</span>
               </div>
               <Divider />
@@ -403,7 +403,7 @@ export function TenantFeatures() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
               <Timer size={18} className="text-secondary" />
-              <h3 className="font-semibold">Background Jobs</h3>
+              <h3 className="font-semibold">{t('shared.background_jobs')}</h3>
             </CardHeader>
             <CardBody className="px-4 pb-4 space-y-3">
               {jobs.length > 0 ? jobs.map((job) => (
@@ -425,7 +425,7 @@ export function TenantFeatures() {
                   </Button>
                 </div>
               )) : (
-                <p className="text-sm text-default-400">No jobs configured</p>
+                <p className="text-sm text-default-400">{t('shared.no_jobs_configured')}</p>
               )}
             </CardBody>
           </Card>

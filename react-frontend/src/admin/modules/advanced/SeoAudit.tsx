@@ -102,7 +102,7 @@ export function SeoAudit() {
     } finally {
       setRunning(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   const passCount = checks.filter(c => c.status === 'pass').length;
   const warnCount = checks.filter(c => c.status === 'warning').length;

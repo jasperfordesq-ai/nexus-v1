@@ -96,7 +96,7 @@ export function AdminSettings() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     fetchSettings();
@@ -241,7 +241,7 @@ export function AdminSettings() {
           <CardBody className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Open Registration</p>
+                <p className="font-medium">{t('system_settings.open_registration')}</p>
                 <p className="text-sm text-default-500">Allow new users to register without an invitation</p>
               </div>
               <Switch
@@ -252,7 +252,7 @@ export function AdminSettings() {
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Require Email Verification</p>
+                <p className="font-medium">{t('system_settings.require_email_verification')}</p>
                 <p className="text-sm text-default-500">Users must verify their email before accessing the platform</p>
               </div>
               <Switch
@@ -263,8 +263,8 @@ export function AdminSettings() {
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Admin Approval Required</p>
-                <p className="text-sm text-default-500">New registrations require admin approval</p>
+                <p className="font-medium">{t('system_settings.admin_approval_required')}</p>
+                <p className="text-sm text-default-500">{t('system_settings.admin_approval_required_desc')}</p>
               </div>
               <Switch
                 isSelected={form.admin_approval}

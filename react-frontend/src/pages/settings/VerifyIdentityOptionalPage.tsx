@@ -246,8 +246,8 @@ export function VerifyIdentityOptionalPage() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-4">
         <GlassCard className="p-8 text-center max-w-md">
-          <p className="text-theme-muted mb-4">Please log in to verify your identity.</p>
-          <Link to={tenantPath('/login')}><Button color="primary">Go to Login</Button></Link>
+          <p className="text-theme-muted mb-4">{t('identity_auth.please_login')}</p>
+          <Link to={tenantPath('/login')}><Button color="primary">{t('identity_auth.go_to_login')}</Button></Link>
         </GlassCard>
       </div>
     );

@@ -128,7 +128,7 @@ export function StripeOnboardingPage() {
     } finally {
       setIsStarting(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   if (!isAuthenticated) return null;
 

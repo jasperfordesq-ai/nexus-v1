@@ -56,7 +56,7 @@ export function GamificationAnalytics() {
     }
 
     setLoading(false);
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadData();

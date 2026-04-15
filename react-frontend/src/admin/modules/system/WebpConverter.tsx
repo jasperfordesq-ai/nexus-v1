@@ -42,7 +42,7 @@ export function WebpConverter() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     fetchStats();
@@ -96,19 +96,19 @@ export function WebpConverter() {
                   <p className="text-2xl font-bold text-foreground">
                     {stats?.total_images?.toLocaleString() ?? '--'}
                   </p>
-                  <p className="text-sm text-default-500">Total Images</p>
+                  <p className="text-sm text-default-500">{t('webp_converter.total_images')}</p>
                 </div>
                 <div className="rounded-lg border border-default-200 p-4 text-center">
                   <p className="text-2xl font-bold text-success">
                     {stats?.webp_images?.toLocaleString() ?? '--'}
                   </p>
-                  <p className="text-sm text-default-500">Already WebP</p>
+                  <p className="text-sm text-default-500">{t('webp_converter.already_webp')}</p>
                 </div>
                 <div className="rounded-lg border border-default-200 p-4 text-center">
                   <p className="text-2xl font-bold text-warning">
                     {stats?.pending_conversion?.toLocaleString() ?? '--'}
                   </p>
-                  <p className="text-sm text-default-500">Pending Conversion</p>
+                  <p className="text-sm text-default-500">{t('webp_converter.pending_conversion')}</p>
                 </div>
               </div>
               <p className="text-sm text-default-400">

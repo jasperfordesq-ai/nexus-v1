@@ -58,7 +58,7 @@ export function RoleForm() {
     } finally {
       setLoading(false);
     }
-  }, [id, isEdit, toast]);
+  }, [id, isEdit, toast, t])
 
   useEffect(() => {
     loadData();

@@ -118,7 +118,7 @@ export function NewsletterSendTimeOptimizer() {
           <Card>
             <CardHeader className="flex gap-2 items-center">
               <TrendingUp size={20} className="text-success" />
-              <span>Top Recommended Send Times</span>
+              <span>{t('newsletter_send_time.top_recommended')}</span>
             </CardHeader>
             <CardBody>
               <div className="grid gap-3 md:grid-cols-3">
@@ -147,7 +147,7 @@ export function NewsletterSendTimeOptimizer() {
         <Card>
           <CardHeader className="flex gap-2 items-center">
             <Clock size={20} />
-            <span>Engagement Heatmap</span>
+            <span>{t('newsletter_send_time.engagement_heatmap')}</span>
           </CardHeader>
           <CardBody>
             {loading ? (
@@ -194,7 +194,7 @@ export function NewsletterSendTimeOptimizer() {
 
                   {/* Legend */}
                   <div className="flex items-center gap-2 mt-6 justify-center">
-                    <span className="text-sm text-default-500">Low</span>
+                    <span className="text-sm text-default-500">{t('newsletter_send_time.low')}</span>
                     <div className="flex gap-1">
                       <div className="w-4 h-4 rounded bg-default-100 dark:bg-default-50"></div>
                       <div className="w-4 h-4 rounded bg-success-100"></div>
@@ -202,7 +202,7 @@ export function NewsletterSendTimeOptimizer() {
                       <div className="w-4 h-4 rounded bg-success-300"></div>
                       <div className="w-4 h-4 rounded bg-success-500"></div>
                     </div>
-                    <span className="text-sm text-default-500">High</span>
+                    <span className="text-sm text-default-500">{t('newsletter_send_time.high')}</span>
                   </div>
                 </div>
               </div>

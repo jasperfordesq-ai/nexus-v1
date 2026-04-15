@@ -208,7 +208,7 @@ export function IdeationAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, status, toast]);
+  }, [page, search, status, toast, t])
 
   useEffect(() => {
     loadItems();

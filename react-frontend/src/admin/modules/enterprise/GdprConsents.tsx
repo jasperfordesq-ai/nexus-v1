@@ -40,7 +40,7 @@ export function GdprConsents() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadData();

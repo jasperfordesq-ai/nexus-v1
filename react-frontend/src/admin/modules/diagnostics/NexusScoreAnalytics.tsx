@@ -47,7 +47,7 @@ export function NexusScoreAnalytics() {
       })
       .catch(() => toast.error(t('diagnostics.failed_to_load_nexus_score_analytics')))
       .finally(() => setLoading(false));
-  }, [toast]);
+  }, [toast, t])
 
   if (loading) {
     return (

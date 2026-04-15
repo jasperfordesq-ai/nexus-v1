@@ -78,7 +78,20 @@
     "choose_image_file": "Scegli file immagine",
     "select_video": "Seleziona video dal dispositivo",
     "choose_video_file": "Scegli file video",
-    "aria_poll_question": "Domanda del sondaggio"
+    "aria_poll_question": "Domanda del sondaggio",
+    "filter_label": "Filter",
+    "take_photo_title": "Take Photo",
+    "use_your_camera": "Use your camera",
+    "choose_from_gallery": "Choose from gallery",
+    "recording_indicator": "Recording",
+    "record_video_title": "Record Video",
+    "templates_label": "Templates",
+    "background_label": "Background",
+    "font_label": "Font",
+    "options_label": "Options",
+    "or_divider": "or",
+    "poll_add_option_button": "Add Option",
+    "videos_trimmed_notice": "Videos longer than 60s will be trimmed to 60s display duration"
   },
   "viewer": {
     "story_from": "Storia di {{name}}",

@@ -32,7 +32,7 @@ export default function GroupRecommendations() {
     } finally {
       setLoading(false);
     }
-  }, [error]);
+  }, [error, t])
 
   useEffect(() => {
     loadData();

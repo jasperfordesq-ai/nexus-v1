@@ -45,7 +45,7 @@ export function RoleList() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadRoles();

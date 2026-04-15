@@ -54,7 +54,7 @@ export function CampaignList() {
       toast.error(t('gamification.failed_to_load_campaigns'));
     }
     setLoading(false);
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadCampaigns();

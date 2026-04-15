@@ -353,7 +353,7 @@ export function SettingsPage() {
       setIsSaving(true);
       // Sanitize bio with the unified rich-text profile (XSS guard).
       const sanitizedBio = sanitizeRichText(profileData.bio);
-      const payload: Record<string, any> = {
+      const payload: Record<string, unknown> = {
         first_name: profileData.first_name,
         last_name: profileData.last_name,
         name: profileData.first_name && profileData.last_name

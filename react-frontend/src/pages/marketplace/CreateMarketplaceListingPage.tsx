@@ -237,7 +237,7 @@ export function CreateMarketplaceListingPage() {
     }
 
     setImages((prev) => [...prev, ...newImages]);
-  }, [images.length, toast]);
+  }, [images.length, toast, t])
 
   const removeImage = useCallback((id: string) => {
     setImages((prev) => {

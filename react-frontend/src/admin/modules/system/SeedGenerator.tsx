@@ -79,7 +79,7 @@ export function SeedGenerator() {
       <div className="rounded-lg border border-warning-200 bg-warning-50 p-4 mb-4 flex items-start gap-3">
         <AlertTriangle size={20} className="text-warning shrink-0 mt-0.5" />
         <div>
-          <p className="font-medium text-warning-700">Development Only</p>
+          <p className="font-medium text-warning-700">{t('seed_generator.development_only')}</p>
           <p className="text-sm text-warning-600">This tool generates fake data. Only use in development or testing environments. Never run on production.</p>
         </div>
       </div>

@@ -75,7 +75,7 @@ export function CrmDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   const handleExport = useCallback(async (type: 'dashboard' | 'notes' | 'tasks') => {
     try {

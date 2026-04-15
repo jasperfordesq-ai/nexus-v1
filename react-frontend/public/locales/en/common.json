@@ -419,5 +419,7 @@
       "description": "Browse community members, connect and exchange time credits."
     }
   },
-  "checking_authentication": "Checking authentication..."
+  "checking_authentication": "Checking authentication...",
+  "verification_status": "Verification Status",
+  "verify_identity": "Verify Identity"
 }

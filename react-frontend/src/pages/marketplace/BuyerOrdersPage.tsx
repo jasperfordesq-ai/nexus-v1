@@ -314,7 +314,7 @@ export function BuyerOrdersPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [activeTab, toast]);
+  }, [activeTab, toast, t])
 
   // Reload on tab change
   useEffect(() => {
@@ -340,7 +340,7 @@ export function BuyerOrdersPage() {
       logError('Failed to confirm delivery', err);
       toast.error(t('orders.action_error', 'Action failed'));
     }
-  }, [toast]);
+  }, [toast, t])
 
   // Open rating modal
   const handleOpenRating = useCallback((orderId: number) => {

@@ -70,7 +70,7 @@ export function MessageReview() {
     } finally {
       setLoading(false);
     }
-  }, [page, filter, toast]);
+  }, [page, filter, toast, t])
 
   useEffect(() => {
     loadItems();
@@ -169,7 +169,7 @@ export function MessageReview() {
       key: 'flagged',
       label: t('broker.col_flagged'),
       render: (item) => {
-        if (!item.flagged) return <span className="text-sm text-default-400">No</span>;
+        if (!item.flagged) return <span className="text-sm text-default-400">{t('shared.no')}</span>;
         const severityColor = {
           info: 'default' as const,
           warning: 'warning' as const,

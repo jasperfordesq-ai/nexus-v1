@@ -64,7 +64,7 @@ export function MenusAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     fetchData();
@@ -216,7 +216,7 @@ export function MenusAdmin() {
               </div>
               <div className="flex items-center gap-2">
                 <Circle size={14} className="text-amber-500 shrink-0" />
-                <span className="text-theme-muted">Production testing pending</span>
+                <span className="text-theme-muted">{t('menus_admin.production_testing_pending')}</span>
               </div>
             </div>
           </div>
@@ -257,7 +257,7 @@ export function MenusAdmin() {
         <div className="flex items-start gap-3 p-4 mb-4 rounded-medium bg-primary-50 border border-primary-200 text-primary-700">
           <Info size={18} className="shrink-0 mt-0.5" />
           <div className="text-sm">
-            <p className="font-medium">Default menus are active</p>
+            <p className="font-medium">{t('menus_admin.default_menus_active')}</p>
             <p className="mt-0.5 opacity-90">
               The navigation is currently using hardcoded defaults. Create custom menus below to
               override the default navigation for your community.

@@ -51,7 +51,7 @@ export function GroupApprovals() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadItems();

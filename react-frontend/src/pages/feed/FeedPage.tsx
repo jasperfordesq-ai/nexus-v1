@@ -238,8 +238,7 @@ export function FeedPage() {
     const currentAbort = abortRef.current;
     const currentAppendAbort = appendAbortRef.current;
     return () => { currentAbort?.abort(); currentAppendAbort?.abort(); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- abort and reload on filter change; loadFeed excluded to avoid loop
-  }, [filter, feedMode, subFilter]);
+  }, [filter, feedMode, subFilter]); // loadFeed via ref to avoid dependency loop
 
   /* ───────── Scroll position tracking ───────── */
 

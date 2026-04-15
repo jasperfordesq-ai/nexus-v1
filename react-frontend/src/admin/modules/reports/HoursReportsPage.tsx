@@ -192,7 +192,7 @@ export function HoursReportsPage() {
     } catch {
       toast.error(t('reports.failed_to_load_summary_data'));
     }
-  }, [dateFrom, dateTo, toast]);
+  }, [dateFrom, dateTo, toast, t])
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -210,7 +210,7 @@ export function HoursReportsPage() {
     } finally {
       setLoading(false);
     }
-  }, [groupBy, dateFrom, dateTo, sortBy, page, toast]);
+  }, [groupBy, dateFrom, dateTo, sortBy, page, toast, t])
 
   useEffect(() => {
     loadSummary();

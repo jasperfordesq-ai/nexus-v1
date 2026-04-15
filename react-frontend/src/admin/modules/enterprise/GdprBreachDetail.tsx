@@ -85,7 +85,7 @@ export function GdprBreachDetail() {
     } finally {
       setLoading(false);
     }
-  }, [breachId, toast]);
+  }, [breachId, toast, t])
 
   useEffect(() => {
     loadData();

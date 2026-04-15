@@ -56,7 +56,7 @@ export default function ModuleConfiguration() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadConfig();

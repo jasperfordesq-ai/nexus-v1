@@ -208,7 +208,7 @@ export function SafeguardingDashboard() {
       toast.error(t('safeguarding.failed_to_load_safeguarding_data'));
     }
     setLoading(false);
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -236,7 +236,7 @@ export function SafeguardingDashboard() {
       toast.error(t('safeguarding.failed_to_review_message'));
     }
     setReviewing(false);
-  }, [reviewTarget, reviewNotes, toast, reviewModal, loadData]);
+  }, [reviewTarget, reviewNotes, toast, reviewModal, loadData, t])
 
   // ─── Create guardian assignment ───
   const handleCreateAssignment = useCallback(async () => {
@@ -259,7 +259,7 @@ export function SafeguardingDashboard() {
       toast.error(t('safeguarding.failed_to_create_assignment'));
     }
     setCreating(false);
-  }, [wardEmail, guardianEmail, toast, assignModal, loadData]);
+  }, [wardEmail, guardianEmail, toast, assignModal, loadData, t])
 
   // ─── Revoke assignment ───
   const handleRevokeAssignment = useCallback(async (assignmentId: number) => {
@@ -273,7 +273,7 @@ export function SafeguardingDashboard() {
       logError('SafeguardingDashboard.revoke', err);
       toast.error(t('safeguarding.failed_to_revoke_assignment'));
     }
-  }, [toast]);
+  }, [toast, t])
 
   // ─── Filtered items ───
   const filteredFlags = searchQuery

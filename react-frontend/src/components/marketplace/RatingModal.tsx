@@ -131,7 +131,7 @@ export function RatingModal({ orderId, isOpen, onClose, onSuccess }: RatingModal
     } finally {
       setIsSubmitting(false);
     }
-  }, [orderId, rating, comment, isAnonymous, toast, onSuccess, onClose]);
+  }, [orderId, rating, comment, isAnonymous, toast, onSuccess, onClose, t])
 
   const handleClose = useCallback(() => {
     if (!isSubmitting) {

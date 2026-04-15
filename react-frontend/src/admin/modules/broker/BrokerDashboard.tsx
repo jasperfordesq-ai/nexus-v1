@@ -116,7 +116,7 @@ export function BrokerDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadDashboard();
@@ -201,7 +201,7 @@ export function BrokerDashboard() {
       </div>
 
       {/* Quick Links */}
-      <h2 className="text-lg font-semibold text-foreground mb-4">Quick Access</h2>
+      <h2 className="text-lg font-semibold text-foreground mb-4">{t('shared.quick_access')}</h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {quickLinks.map((link) => {
           const Icon = link.icon;
@@ -223,7 +223,7 @@ export function BrokerDashboard() {
       </div>
 
       {/* Recent Activity */}
-      <h2 className="text-lg font-semibold text-foreground mb-4 mt-8">Recent Activity</h2>
+      <h2 className="text-lg font-semibold text-foreground mb-4 mt-8">{t('shared.recent_activity')}</h2>
       {loading && !stats ? (
         <div className="flex items-center justify-center py-12">
           <Spinner size="lg" />
@@ -232,7 +232,7 @@ export function BrokerDashboard() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 pb-0">
             <Activity size={18} className="text-default-500" />
-            <span className="text-sm font-semibold text-foreground">Broker Actions</span>
+            <span className="text-sm font-semibold text-foreground">{t('shared.broker_actions')}</span>
           </CardHeader>
           <Divider className="my-2" />
           <CardBody className="p-0">
@@ -261,7 +261,7 @@ export function BrokerDashboard() {
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center justify-center py-10 text-center">
             <Activity size={40} className="text-default-300 mb-3" />
-            <p className="text-default-500 font-medium">No recent broker activity</p>
+            <p className="text-default-500 font-medium">{t('shared.no_recent_broker_activity')}</p>
             <p className="text-sm text-default-400 mt-1">Actions will appear here as brokers review exchanges and messages</p>
           </CardBody>
         </Card>

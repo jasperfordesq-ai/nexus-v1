@@ -69,7 +69,7 @@ function FeaturedListingsPanel() {
     } finally {
       setFeaturedLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadFeatured();
@@ -347,7 +347,7 @@ export function ListingsAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [page, status, search, toast]);
+  }, [page, status, search, toast, t])
 
   useEffect(() => {
     loadItems();

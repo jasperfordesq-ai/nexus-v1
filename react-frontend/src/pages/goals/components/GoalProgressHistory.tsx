@@ -166,7 +166,7 @@ export function GoalProgressHistory({ goalId, className = '' }: GoalProgressHist
     } finally {
       setIsLoading(false);
     }
-  }, [goalId]);
+  }, [goalId, t])
 
   useEffect(() => {
     loadHistory();

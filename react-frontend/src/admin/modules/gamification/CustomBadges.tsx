@@ -50,7 +50,7 @@ export function CustomBadges() {
       toast.error(t('gamification.failed_to_load_badges'));
     }
     setLoading(false);
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadBadges();

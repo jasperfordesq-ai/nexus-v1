@@ -243,8 +243,8 @@ export function SystemMonitoring() {
               <CardBody className="flex flex-row items-center gap-3 p-4">
                 <FileText size={20} className="text-primary" />
                 <div>
-                  <p className="text-sm font-semibold text-foreground">Log Files</p>
-                  <p className="text-xs text-default-500">Browse server log files</p>
+                  <p className="text-sm font-semibold text-foreground">{t('system_monitoring.log_files')}</p>
+                  <p className="text-xs text-default-500">{t('system_monitoring.log_files_desc')}</p>
                 </div>
               </CardBody>
             </Card>
@@ -252,8 +252,8 @@ export function SystemMonitoring() {
               <CardBody className="flex flex-row items-center gap-3 p-4">
                 <Settings size={20} className="text-warning" />
                 <div>
-                  <p className="text-sm font-semibold text-foreground">System Requirements</p>
-                  <p className="text-xs text-default-500">Check server dependencies</p>
+                  <p className="text-sm font-semibold text-foreground">{t('system_monitoring.system_requirements')}</p>
+                  <p className="text-xs text-default-500">{t('system_monitoring.system_requirements_desc')}</p>
                 </div>
               </CardBody>
             </Card>
@@ -261,7 +261,7 @@ export function SystemMonitoring() {
               <CardBody className="flex flex-row items-center gap-3 p-4">
                 <ToggleLeft size={20} className="text-success" />
                 <div>
-                  <p className="text-sm font-semibold text-foreground">Feature Flags</p>
+                  <p className="text-sm font-semibold text-foreground">{t('system_monitoring.feature_flags')}</p>
                   <p className="text-xs text-default-500">Toggle features &amp; modules</p>
                 </div>
               </CardBody>

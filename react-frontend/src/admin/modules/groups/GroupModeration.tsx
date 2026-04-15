@@ -49,7 +49,7 @@ export function GroupModeration() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadItems();

@@ -141,7 +141,7 @@ export function SellerProfilePage() {
 
     load();
     return () => { cancelled = true; };
-  }, [id]);
+  }, [id, t])
 
   // Update page title
   useEffect(() => {

@@ -194,7 +194,7 @@ export function MatchDetail() {
       <Card shadow="sm" className="mb-6">
         <CardHeader className="flex items-center gap-3 pb-0">
           <Shield size={20} className="text-primary" />
-          <h3 className="text-lg font-semibold">Match Information</h3>
+          <h3 className="text-lg font-semibold">{t('match_detail.match_information')}</h3>
           <div className="ml-auto">
             <StatusBadge status={item.status} />
           </div>
@@ -203,7 +203,7 @@ export function MatchDetail() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {/* Score */}
             <div className="flex flex-col items-center justify-center rounded-xl bg-default-50 p-6">
-              <p className="mb-2 text-sm text-default-500">Match Score</p>
+              <p className="mb-2 text-sm text-default-500">{t('match_detail.match_score')}</p>
               <div className="relative mb-2">
                 <Progress
                   size="lg"
@@ -229,14 +229,14 @@ export function MatchDetail() {
             {/* Details */}
             <div className="space-y-3">
               <div>
-                <p className="text-xs text-default-400">Match Type</p>
+                <p className="text-xs text-default-400">{t('match_detail.match_type')}</p>
                 <Chip size="sm" variant="flat" className="mt-1 capitalize">
                   {(item.match_type || 'one_way').replace('_', ' ')}
                 </Chip>
               </div>
               {item.distance_km !== null && item.distance_km !== undefined && (
                 <div>
-                  <p className="text-xs text-default-400">Distance</p>
+                  <p className="text-xs text-default-400">{t('match_detail.distance')}</p>
                   <p className="flex items-center gap-1 text-sm text-foreground">
                     <MapPin size={14} className="text-default-400" />
                     {item.distance_km.toFixed(1)} km
@@ -245,7 +245,7 @@ export function MatchDetail() {
               )}
               {item.category_name && (
                 <div>
-                  <p className="text-xs text-default-400">Category</p>
+                  <p className="text-xs text-default-400">{t('match_detail.category')}</p>
                   <p className="text-sm text-foreground">{item.category_name}</p>
                 </div>
               )}
@@ -253,7 +253,7 @@ export function MatchDetail() {
 
             {/* Match Reasons */}
             <div>
-              <p className="mb-2 text-xs text-default-400">Match Reasons</p>
+              <p className="mb-2 text-xs text-default-400">{t('match_detail.match_reasons')}</p>
               {item.match_reasons && item.match_reasons.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5">
                   {item.match_reasons.map((reason, i) => (
@@ -278,7 +278,7 @@ export function MatchDetail() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-3 pb-0">
             <User size={18} className="text-primary" />
-            <h3 className="font-semibold">Matched User</h3>
+            <h3 className="font-semibold">{t('match_detail.matched_user')}</h3>
           </CardHeader>
           <CardBody>
             <div className="flex items-start gap-4">
@@ -315,7 +315,7 @@ export function MatchDetail() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-3 pb-0">
             <User size={18} className="text-success" />
-            <h3 className="font-semibold">Listing Owner</h3>
+            <h3 className="font-semibold">{t('match_detail.listing_owner')}</h3>
           </CardHeader>
           <CardBody>
             <div className="flex items-start gap-4">
@@ -354,7 +354,7 @@ export function MatchDetail() {
         <Card shadow="sm" className="mb-6">
           <CardHeader className="flex items-center gap-3 pb-0">
             <FileText size={18} className="text-secondary" />
-            <h3 className="font-semibold">Associated Listing</h3>
+            <h3 className="font-semibold">{t('match_detail.associated_listing')}</h3>
           </CardHeader>
           <CardBody>
             <div className="space-y-2">
@@ -386,7 +386,7 @@ export function MatchDetail() {
         <Card shadow="sm" className="mb-6">
           <CardHeader className="flex items-center gap-3 pb-0">
             <Clock size={18} className="text-default-500" />
-            <h3 className="font-semibold">Review Details</h3>
+            <h3 className="font-semibold">{t('match_detail.review_details')}</h3>
           </CardHeader>
           <CardBody>
             <div className="space-y-2">

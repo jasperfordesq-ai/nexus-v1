@@ -5048,5 +5048,183 @@
     "insert_link": "Insert Link",
     "import_markdown": "Import Markdown",
     "import_md": "Import .md"
+  },
+  "shared": {
+    "no_members_found": "No members found",
+    "no_history_available": "No history available",
+    "history": "History",
+    "log_file_empty": "Log file is empty",
+    "failed_to_load_config": "Failed to load configuration",
+    "no_legal_documents_found": "No legal documents found",
+    "document_details": "Document Details",
+    "content": "Content",
+    "no_jobs_configured": "No jobs configured",
+    "default_language": "Default Language",
+    "available_languages": "Available Languages",
+    "features": "Features",
+    "core_modules": "Core Modules",
+    "core_modules_desc": "Core platform functionality",
+    "cache": "Cache",
+    "redis": "Redis",
+    "memory_used": "Memory Used",
+    "keys": "Keys",
+    "background_jobs": "Background Jobs",
+    "quick_access": "Quick Access",
+    "recent_activity": "Recent Activity",
+    "broker_actions": "Broker Actions",
+    "no_recent_broker_activity": "No recent broker activity",
+    "core_module": "Core module",
+    "no": "No"
+  },
+  "broker_certificates": {
+    "type": "Type",
+    "status": "Status",
+    "provider": "Provider",
+    "policy_number": "Policy Number",
+    "coverage_amount": "Coverage Amount",
+    "start_date": "Start Date",
+    "expiry_date": "Expiry Date",
+    "verified_by": "Verified By",
+    "verified_at": "Verified At",
+    "created": "Created",
+    "certificate_file": "Certificate File",
+    "notes": "Notes"
+  },
+  "broker_vetting": {
+    "type": "Type",
+    "status": "Status",
+    "reference_number": "Reference Number",
+    "issue_date": "Issue Date",
+    "expiry_date": "Expiry Date",
+    "verified_by": "Verified By",
+    "verified_at": "Verified At",
+    "created": "Created",
+    "rejection_details": "Rejection Details",
+    "rejected_by": "Rejected By",
+    "rejected_at": "Rejected At",
+    "reason": "Reason",
+    "notes": "Notes",
+    "document": "Document"
+  },
+  "diagnostics_matching": {
+    "diagnose_user_matches": "Diagnose User Matches",
+    "diagnose_listing_matches": "Diagnose Listing Matches",
+    "engine_status": "Engine Status",
+    "matches_today": "Matches Today",
+    "cache_entries": "Cache Entries",
+    "avg_match_score": "Avg Match Score"
+  },
+  "impact_report_labels": {
+    "transactions": "Transactions",
+    "unique_givers": "Unique Givers",
+    "unique_receivers": "Unique Receivers"
+  },
+  "match_detail": {
+    "match_information": "Match Information",
+    "match_score": "Match Score",
+    "match_type": "Match Type",
+    "distance": "Distance",
+    "category": "Category",
+    "match_reasons": "Match Reasons",
+    "matched_user": "Matched User",
+    "listing_owner": "Listing Owner",
+    "associated_listing": "Associated Listing",
+    "review_details": "Review Details"
+  },
+  "newsletter_diagnostics": {
+    "queue_status": "Queue Status",
+    "total": "Total",
+    "pending": "Pending",
+    "sending": "Sending",
+    "sent": "Sent",
+    "failed": "Failed",
+    "success_rate": "Success Rate",
+    "delivery_health": "Delivery Health",
+    "bounce_rate": "Bounce Rate",
+    "health": "Health",
+    "sender_score": "Sender Score",
+    "score_breakdown": "Score Breakdown",
+    "bounce_penalty": "Bounce penalty",
+    "complaint_penalty": "Complaint penalty",
+    "failure_penalty": "Failure penalty",
+    "suppression_penalty": "Suppression penalty",
+    "volume_bonus": "Volume bonus",
+    "email_configuration": "Email Configuration",
+    "gmail_api": "Gmail API",
+    "tracking_enabled": "Tracking Enabled",
+    "recommendations": "Recommendations"
+  },
+  "newsletter_resend": {
+    "resend_newsletter": "Resend Newsletter",
+    "total_sent": "Total Sent",
+    "opened": "Opened",
+    "clicked": "Clicked",
+    "preview_recipient_count": "Preview Recipient Count",
+    "no_recipients": "No Recipients",
+    "failed_to_load": "Failed to load newsletter information"
+  },
+  "newsletter_send_time": {
+    "top_recommended": "Top Recommended Send Times",
+    "engagement_heatmap": "Engagement Heatmap",
+    "low": "Low",
+    "high": "High"
+  },
+  "newsletter_template_form": {
+    "template_details": "Template Details",
+    "email_settings": "Email Settings",
+    "content": "Content",
+    "test_tip_clients": "Test with multiple email clients",
+    "test_tip_unsubscribe": "Always include an unsubscribe link",
+    "usage_stats": "Usage Stats"
+  },
+  "system_monitoring": {
+    "log_files": "Log Files",
+    "log_files_desc": "Browse server log files",
+    "system_requirements": "System Requirements",
+    "system_requirements_desc": "Check server dependencies",
+    "feature_flags": "Feature Flags"
+  },
+  "performance_labels": {
+    "total_requests": "Total Requests",
+    "slow_queries": "Slow Queries",
+    "memory_spikes": "Memory Spikes"
+  },
+  "system_settings": {
+    "open_registration": "Open Registration",
+    "require_email_verification": "Require Email Verification",
+    "admin_approval_required": "Admin Approval Required",
+    "admin_approval_required_desc": "New registrations require admin approval"
+  },
+  "cron_settings": {
+    "enable_job": "Enable Job",
+    "select_job": "Select a job to configure",
+    "global_settings": "Global Settings"
+  },
+  "cron_setup": {
+    "test_cron_api": "Test Cron API",
+    "verification_checklist": "Verification Checklist"
+  },
+  "webp_converter": {
+    "total_images": "Total Images",
+    "already_webp": "Already WebP",
+    "pending_conversion": "Pending Conversion"
+  },
+  "seed_generator": {
+    "development_only": "Development Only"
+  },
+  "super_controls": {
+    "bulk_operations": "Bulk Operations",
+    "hierarchy": "Hierarchy",
+    "federation_jwt": "Federation JWT authentication",
+    "rotation_policy": "Rotation policy",
+    "troubleshooting": "Troubleshooting"
+  },
+  "menus_admin": {
+    "production_testing_pending": "Production testing pending",
+    "default_menus_active": "Default menus are active"
+  },
+  "log_files_labels": {
+    "total_files": "Total Files",
+    "total_size": "Total Size"
   }
 }

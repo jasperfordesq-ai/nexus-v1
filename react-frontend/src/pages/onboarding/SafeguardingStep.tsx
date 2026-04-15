@@ -88,7 +88,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t]);
 
   useEffect(() => { loadOptions(); }, [loadOptions]);
 
@@ -159,7 +159,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
     }
 
     onNext();
-  }, [selections, options, isRequired, onNext, toast]);
+  }, [selections, selectValues, options, isRequired, onNext, toast, t]);
 
   // ── Loading state ────────────────────────────────────────────────────────
 

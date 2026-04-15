@@ -102,7 +102,6 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- orgId is stable for the tab lifetime
   }, [orgId]);
 
   useEffect(() => {

@@ -93,7 +93,7 @@ export function CronJobSettingsPage() {
       toast.error(t('system.failed_to_load_job_settings'));
     }
     setLoadingJobSettings(false);
-  }, [toast]);
+  }, [toast, t])
 
   // Load global settings
   const loadGlobalSettings = useCallback(async () => {
@@ -107,7 +107,7 @@ export function CronJobSettingsPage() {
       toast.error(t('system.failed_to_load_global_settings'));
     }
     setLoadingGlobalSettings(false);
-  }, [toast]);
+  }, [toast, t])
 
   // Save job settings
   const handleSaveJobSettings = async () => {
@@ -205,7 +205,7 @@ export function CronJobSettingsPage() {
                           }
                         >
                           <div className="flex flex-col gap-1">
-                            <span className="text-sm font-medium">Enable Job</span>
+                            <span className="text-sm font-medium">{t('cron_settings.enable_job')}</span>
                             <span className="text-xs text-default-400">
                               Job will run on schedule when enabled
                             </span>
@@ -312,7 +312,7 @@ export function CronJobSettingsPage() {
                 {!selectedJobId && (
                   <div className="flex flex-col items-center gap-2 py-8 text-default-400">
                     <AlertCircle size={32} />
-                    <p className="text-sm">Select a job to configure</p>
+                    <p className="text-sm">{t('cron_settings.select_job')}</p>
                   </div>
                 )}
               </>
@@ -324,7 +324,7 @@ export function CronJobSettingsPage() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
             <Settings size={18} className="text-secondary" />
-            <span className="text-lg font-semibold">Global Settings</span>
+            <span className="text-lg font-semibold">{t('cron_settings.global_settings')}</span>
           </CardHeader>
           <CardBody className="space-y-4">
             {loadingGlobalSettings ? (

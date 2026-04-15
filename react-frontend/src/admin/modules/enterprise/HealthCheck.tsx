@@ -186,7 +186,7 @@ export function HealthCheck() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-6 pt-5 pb-0">
               <History size={18} className="text-default-500" />
-              <h3 className="text-base font-semibold">History</h3>
+              <h3 className="text-base font-semibold">{t('shared.history')}</h3>
               <Chip size="sm" variant="flat" color="default">
                 Last {history.length} checks
               </Chip>
@@ -199,7 +199,7 @@ export function HealthCheck() {
                 </div>
               ) : history.length === 0 ? (
                 <div className="py-8 text-center">
-                  <p className="text-default-500">No history available</p>
+                  <p className="text-default-500">{t('shared.no_history_available')}</p>
                 </div>
               ) : (
                 <Table aria-label="Health check history" removeWrapper>

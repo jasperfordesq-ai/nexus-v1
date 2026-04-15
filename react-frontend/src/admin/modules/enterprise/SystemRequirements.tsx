@@ -60,7 +60,7 @@ export function SystemRequirements() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadData();

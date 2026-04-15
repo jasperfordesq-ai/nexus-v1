@@ -162,7 +162,7 @@ export default function CoordinatorTasks() {
       setTasks([]);
     }
     setLoading(false);
-  }, [page, statusFilter, priorityFilter, searchQuery, toast]);
+  }, [page, statusFilter, priorityFilter, searchQuery, toast, t])
 
   const loadAdmins = useCallback(async () => {
     if (adminsLoaded) return;
@@ -240,7 +240,7 @@ export default function CoordinatorTasks() {
       toast.error(editingTask ? t('crm.failed_to_update_task') : t('crm.failed_to_create_task'));
     }
     setSaving(false);
-  }, [formTitle, formDescription, formPriority, formAssignedTo, formUserId, formDueDate, editingTask, createModal, resetForm, loadTasks, toast]);
+  }, [formTitle, formDescription, formPriority, formAssignedTo, formUserId, formDueDate, editingTask, createModal, resetForm, loadTasks, toast, t])
 
   const handleDelete = useCallback(async () => {
     if (!deletingTask) return;
@@ -255,7 +255,7 @@ export default function CoordinatorTasks() {
       toast.error(t('crm.failed_to_delete_task'));
     }
     setDeleting(false);
-  }, [deletingTask, deleteModal, loadTasks, toast]);
+  }, [deletingTask, deleteModal, loadTasks, toast, t])
 
   const handleStatusChange = useCallback(async (task: Task, newStatus: Task['status']) => {
     try {
@@ -265,7 +265,7 @@ export default function CoordinatorTasks() {
     } catch {
       toast.error(t('crm.failed_to_update_task_status'));
     }
-  }, [loadTasks, toast]);
+  }, [loadTasks, toast, t])
 
   const handleQuickComplete = useCallback(async (task: Task) => {
     const newStatus = task.status === 'completed' ? 'pending' : 'completed';

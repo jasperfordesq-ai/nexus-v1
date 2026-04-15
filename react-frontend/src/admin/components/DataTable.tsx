@@ -175,7 +175,7 @@ export function DataTable<T extends Record<string, any>>({
         />
       </div>
     );
-  }, [onPageChange, totalPages, page, totalItems]);
+  }, [onPageChange, totalPages, page, totalItems, t])
 
   return (
     <Table

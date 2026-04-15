@@ -56,7 +56,7 @@ export function Subscriptions() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     fetchData();

@@ -30,7 +30,7 @@ export default function GroupRanking() {
     } finally {
       setLoading(false);
     }
-  }, [error]);
+  }, [error, t])
 
   useEffect(() => {
     loadGroups();

@@ -36,7 +36,7 @@ export function SmartMatchMonitoring() {
       })
       .catch(() => toast.error(t('community.failed_to_load_matching_stats')))
       .finally(() => setLoading(false));
-  }, [toast]);
+  }, [toast, t])
 
   if (loading) {
     return (

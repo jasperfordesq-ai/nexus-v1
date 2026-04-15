@@ -68,7 +68,7 @@ export default function LegalDocComplianceDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [error]);
+  }, [error, t])
 
   useEffect(() => {
     loadStats();
@@ -234,7 +234,7 @@ export default function LegalDocComplianceDashboard() {
           {stats.documents.length === 0 ? (
             <div className="text-center py-8">
               <AlertCircle size={40} className="mx-auto text-[var(--color-text-tertiary)] mb-3" />
-              <p className="text-[var(--color-text-secondary)]">No legal documents found</p>
+              <p className="text-[var(--color-text-secondary)]">{t('shared.no_legal_documents_found')}</p>
             </div>
           ) : (
             <Table aria-label={t('enterprise.label_document_compliance_table')}>

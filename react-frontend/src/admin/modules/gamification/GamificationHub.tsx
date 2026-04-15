@@ -43,7 +43,7 @@ export function GamificationHub() {
       toast.error(t('gamification.failed_to_load_gamification_stats'));
     }
     setLoading(false);
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadStats();

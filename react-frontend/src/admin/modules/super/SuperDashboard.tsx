@@ -64,7 +64,7 @@ export function SuperDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadData();

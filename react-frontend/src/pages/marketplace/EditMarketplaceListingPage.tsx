@@ -227,7 +227,7 @@ export function EditMarketplaceListingPage() {
 
     load();
     return () => { cancelled = true; };
-  }, [id, isAuthenticated, user?.id, navigate, tenantPath, toast]);
+  }, [id, isAuthenticated, user?.id, navigate, tenantPath, toast, t])
 
   // Load categories
   useEffect(() => {
@@ -316,7 +316,7 @@ export function EditMarketplaceListingPage() {
     }
 
     setImages((prev) => [...prev, ...newImages]);
-  }, [images.length, toast]);
+  }, [images.length, toast, t])
 
   const removeImage = useCallback((imgId: string) => {
     setImages((prev) => {

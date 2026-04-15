@@ -62,7 +62,7 @@ export function FederationControls() {
       toastRef.current.error(t('super.federation_error', { message: err instanceof Error ? err.message : 'Unknown error' }));
     }
     setLoading(false);
-  }, []);
+  }, [t])
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -231,7 +231,7 @@ export function FederationControls() {
         <CardHeader className="flex items-center gap-3">
           <KeyRound size={20} className={jwtStatus?.configured ? 'text-success' : 'text-warning'} />
           <div className="flex-1">
-            <p className="font-semibold">Federation JWT authentication</p>
+            <p className="font-semibold">{t('super_controls.federation_jwt')}</p>
             <p className="text-xs text-default-500">
               Shared secret used to sign and verify cross-platform federation tokens
             </p>
@@ -338,7 +338,7 @@ export function FederationControls() {
             <AccordionItem
               key="rotate"
               aria-label="How to rotate"
-              title={<span className="font-medium">Rotation policy</span>}
+              title={<span className="font-medium">{t('super_controls.rotation_policy')}</span>}
             >
               <div className="space-y-2 text-default-600">
                 <p>Rotate this secret when:</p>
@@ -364,7 +364,7 @@ export function FederationControls() {
             <AccordionItem
               key="troubleshoot"
               aria-label="Troubleshooting"
-              title={<span className="font-medium">Troubleshooting</span>}
+              title={<span className="font-medium">{t('super_controls.troubleshooting')}</span>}
             >
               <div className="space-y-2 text-default-600 text-xs">
                 <p><strong>Status shows &quot;Not configured&quot; but I set the env var:</strong></p>

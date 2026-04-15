@@ -59,7 +59,7 @@ export default function GroupDetail() {
     } finally {
       setLoading(false);
     }
-  }, [id, error]);
+  }, [id, error, t])
 
   const loadMembers = useCallback(async () => {
     try {
@@ -70,7 +70,7 @@ export default function GroupDetail() {
     } catch {
       error(t('groups.failed_to_load_members'));
     }
-  }, [id, error]);
+  }, [id, error, t])
 
   useEffect(() => {
     if (id) {

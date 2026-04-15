@@ -41,7 +41,7 @@ export function NewsletterDiagnostics() {
       toast.error(t('newsletters.failed_to_load_diagnostics'));
     }
     setLoading(false);
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -128,7 +128,7 @@ export function NewsletterDiagnostics() {
           <Card>
             <CardHeader className="flex gap-2 items-center">
               <Mail size={20} />
-              <span>Queue Status</span>
+              <span>{t('newsletter_diagnostics.queue_status')}</span>
             </CardHeader>
             <CardBody className="gap-4">
               {loading ? (
@@ -139,30 +139,30 @@ export function NewsletterDiagnostics() {
                 <>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-default-600">Total</span>
+                      <span className="text-sm text-default-600">{t('newsletter_diagnostics.total')}</span>
                       <span className="font-semibold">{queueTotal.toLocaleString()}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-default-600">Pending</span>
+                      <span className="text-sm text-default-600">{t('newsletter_diagnostics.pending')}</span>
                       <Chip size="sm" color="warning" variant="flat">{queuePending}</Chip>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-default-600">Sending</span>
+                      <span className="text-sm text-default-600">{t('newsletter_diagnostics.sending')}</span>
                       <Chip size="sm" color="primary" variant="flat">{queueSending}</Chip>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-default-600">Sent</span>
+                      <span className="text-sm text-default-600">{t('newsletter_diagnostics.sent')}</span>
                       <Chip size="sm" color="success" variant="flat">{queueSent}</Chip>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-default-600">Failed</span>
+                      <span className="text-sm text-default-600">{t('newsletter_diagnostics.failed')}</span>
                       <Chip size="sm" color="danger" variant="flat">{queueFailed}</Chip>
                     </div>
                   </div>
 
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-default-600">Success Rate</span>
+                      <span className="text-sm text-default-600">{t('newsletter_diagnostics.success_rate')}</span>
                       <span className="text-sm font-semibold">{queueHealth.toFixed(1)}%</span>
                     </div>
                     <Progress
@@ -191,7 +191,7 @@ export function NewsletterDiagnostics() {
           <Card>
             <CardHeader className="flex gap-2 items-center">
               <Activity size={20} />
-              <span>Delivery Health</span>
+              <span>{t('newsletter_diagnostics.delivery_health')}</span>
             </CardHeader>
             <CardBody className="gap-4">
               {loading ? (
@@ -201,7 +201,7 @@ export function NewsletterDiagnostics() {
               ) : (
                 <>
                   <div>
-                    <p className="text-sm text-default-600 mb-2">Bounce Rate</p>
+                    <p className="text-sm text-default-600 mb-2">{t('newsletter_diagnostics.bounce_rate')}</p>
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-bold">
                         {data?.bounce_rate?.toFixed(2) || '0.00'}%
@@ -220,7 +220,7 @@ export function NewsletterDiagnostics() {
 
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-default-600">Health</span>
+                      <span className="text-sm text-default-600">{t('newsletter_diagnostics.health')}</span>
                       <span className="text-sm font-semibold">
                         {data && data.bounce_rate < 5 ? '95%+' : data && data.bounce_rate < 10 ? '85-95%' : '<85%'}
                       </span>
@@ -233,7 +233,7 @@ export function NewsletterDiagnostics() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-default-600 mb-2">Sender Score</p>
+                    <p className="text-sm text-default-600 mb-2">{t('newsletter_diagnostics.sender_score')}</p>
                     <div className="flex items-baseline gap-2">
                       <span className={`text-3xl font-bold ${
                         (data?.sender_score ?? 100) >= 80 ? 'text-success' :
@@ -253,34 +253,34 @@ export function NewsletterDiagnostics() {
 
                   {data?.sender_score_breakdown && (
                     <div className="space-y-1.5 pt-2 border-t border-default-200">
-                      <p className="text-xs font-medium text-default-500 mb-1">Score Breakdown</p>
+                      <p className="text-xs font-medium text-default-500 mb-1">{t('newsletter_diagnostics.score_breakdown')}</p>
                       {data.sender_score_breakdown.bounce_penalty > 0 && (
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-default-600">Bounce penalty</span>
+                          <span className="text-default-600">{t('newsletter_diagnostics.bounce_penalty')}</span>
                           <span className="text-danger font-medium">-{data.sender_score_breakdown.bounce_penalty}</span>
                         </div>
                       )}
                       {data.sender_score_breakdown.complaint_penalty > 0 && (
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-default-600">Complaint penalty</span>
+                          <span className="text-default-600">{t('newsletter_diagnostics.complaint_penalty')}</span>
                           <span className="text-danger font-medium">-{data.sender_score_breakdown.complaint_penalty}</span>
                         </div>
                       )}
                       {data.sender_score_breakdown.failure_penalty > 0 && (
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-default-600">Failure penalty</span>
+                          <span className="text-default-600">{t('newsletter_diagnostics.failure_penalty')}</span>
                           <span className="text-danger font-medium">-{data.sender_score_breakdown.failure_penalty}</span>
                         </div>
                       )}
                       {data.sender_score_breakdown.suppression_penalty > 0 && (
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-default-600">Suppression penalty</span>
+                          <span className="text-default-600">{t('newsletter_diagnostics.suppression_penalty')}</span>
                           <span className="text-danger font-medium">-{data.sender_score_breakdown.suppression_penalty}</span>
                         </div>
                       )}
                       {data.sender_score_breakdown.volume_bonus > 0 && (
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-default-600">Volume bonus</span>
+                          <span className="text-default-600">{t('newsletter_diagnostics.volume_bonus')}</span>
                           <span className="text-success font-medium">+{data.sender_score_breakdown.volume_bonus}</span>
                         </div>
                       )}
@@ -302,7 +302,7 @@ export function NewsletterDiagnostics() {
         <Card>
           <CardHeader className="flex gap-2 items-center">
             <Settings size={20} />
-            <span>Email Configuration</span>
+            <span>{t('newsletter_diagnostics.email_configuration')}</span>
           </CardHeader>
           <CardBody>
             {loading ? (
@@ -324,7 +324,7 @@ export function NewsletterDiagnostics() {
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-default-100 dark:bg-default-50">
                   {getConfigIcon(data?.configuration?.api_configured || false)}
                   <div className="flex-1">
-                    <p className="text-sm font-medium">Gmail API</p>
+                    <p className="text-sm font-medium">{t('newsletter_diagnostics.gmail_api')}</p>
                     <p className="text-xs text-default-500">
                       {data?.configuration?.api_configured ? 'Active' : 'Not configured'}
                     </p>
@@ -334,7 +334,7 @@ export function NewsletterDiagnostics() {
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-default-100 dark:bg-default-50">
                   {getConfigIcon(data?.configuration?.tracking_enabled || false)}
                   <div className="flex-1">
-                    <p className="text-sm font-medium">Tracking Enabled</p>
+                    <p className="text-sm font-medium">{t('newsletter_diagnostics.tracking_enabled')}</p>
                     <p className="text-xs text-default-500">
                       {data?.configuration?.tracking_enabled ? 'Active' : 'Disabled'}
                     </p>
@@ -351,7 +351,7 @@ export function NewsletterDiagnostics() {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <AlertCircle size={20} className="text-warning" />
-                <span className="font-semibold text-warning">Recommendations</span>
+                <span className="font-semibold text-warning">{t('newsletter_diagnostics.recommendations')}</span>
               </div>
             </CardHeader>
             <CardBody>

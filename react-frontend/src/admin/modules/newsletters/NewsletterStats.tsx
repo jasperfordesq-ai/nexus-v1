@@ -187,7 +187,7 @@ export function NewsletterStats() {
       setError(t('newsletters.error_failed_to_load_stats'));
     }
     setLoading(false);
-  }, [id]);
+  }, [id, t])
 
   useEffect(() => { loadStats(); }, [loadStats]);
 

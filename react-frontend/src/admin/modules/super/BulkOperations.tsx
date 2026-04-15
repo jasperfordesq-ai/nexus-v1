@@ -127,7 +127,7 @@ export function BulkOperations() {
       <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
         <Link to={tenantPath('/admin/super')} className="hover:text-primary">Super Admin</Link>
         <span>/</span>
-        <span className="text-foreground">Bulk Operations</span>
+        <span className="text-foreground">{t('super_controls.bulk_operations')}</span>
       </nav>
       <PageHeader title={t('super.bulk_operations_title')} description={t('super.bulk_operations_desc')} />
 

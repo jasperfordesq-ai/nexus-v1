@@ -282,7 +282,7 @@ export function TemplateForm() {
             {/* Template Details */}
             <Card>
               <CardHeader>
-                <h3 className="text-lg font-semibold">Template Details</h3>
+                <h3 className="text-lg font-semibold">{t('newsletter_template_form.template_details')}</h3>
               </CardHeader>
               <CardBody className="gap-4">
                 <Input
@@ -336,7 +336,7 @@ export function TemplateForm() {
             {/* Email Settings */}
             <Card>
               <CardHeader>
-                <h3 className="text-lg font-semibold">Email Settings</h3>
+                <h3 className="text-lg font-semibold">{t('newsletter_template_form.email_settings')}</h3>
               </CardHeader>
               <CardBody className="gap-4">
                 <Input
@@ -360,7 +360,7 @@ export function TemplateForm() {
             {/* Content Editor */}
             <Card>
               <CardHeader>
-                <h3 className="text-lg font-semibold">Content</h3>
+                <h3 className="text-lg font-semibold">{t('newsletter_template_form.content')}</h3>
               </CardHeader>
               <CardBody className="gap-4">
                 <Suspense fallback={<Spinner size="sm" className="m-4" />}>
@@ -452,8 +452,8 @@ export function TemplateForm() {
                 <ul className="list-inside list-disc space-y-1 text-xs text-success-700 dark:text-success-400">
                   <li>Use inline CSS for email client compatibility</li>
                   <li>Keep content width under 600px</li>
-                  <li>Test with multiple email clients</li>
-                  <li>Always include an unsubscribe link</li>
+                  <li>{t('newsletter_template_form.test_tip_clients')}</li>
+                  <li>{t('newsletter_template_form.test_tip_unsubscribe')}</li>
                   <li>Use web-safe fonts (Arial, Georgia, etc.)</li>
                 </ul>
               </CardBody>
@@ -465,7 +465,7 @@ export function TemplateForm() {
                 <CardBody className="gap-2">
                   <div className="flex items-center gap-2">
                     <BarChart3 size={16} className="text-default-500" />
-                    <span className="text-sm font-semibold">Usage Stats</span>
+                    <span className="text-sm font-semibold">{t('newsletter_template_form.usage_stats')}</span>
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="text-3xl font-bold">

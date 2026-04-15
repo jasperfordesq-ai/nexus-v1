@@ -568,7 +568,7 @@ export function SystemConfig() {
         <PageHeader title={t('enterprise.system_config_title')} description={t('enterprise.system_config_desc')} />
         <Card shadow="sm" className="border-danger-200 bg-danger-50">
           <CardBody className="text-center py-12">
-            <p className="text-danger font-medium mb-3">Failed to load configuration</p>
+            <p className="text-danger font-medium mb-3">{t('shared.failed_to_load_config')}</p>
             <p className="text-sm text-default-500 mb-4">The server returned an error. Your settings are not shown to prevent accidental overwrites.</p>
             <Button color="primary" variant="flat" onPress={loadData} startContent={<RefreshCw size={16} />}>
               Retry

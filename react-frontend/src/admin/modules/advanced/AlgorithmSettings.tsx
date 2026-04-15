@@ -167,7 +167,7 @@ export function AlgorithmSettings() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   const loadHealth = useCallback(async () => {
     setHealthLoading(true);

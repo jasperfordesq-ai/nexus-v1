@@ -49,7 +49,7 @@ export function SmartMatchUsers() {
     } finally {
       setLoading(false);
     }
-  }, [page, toast]);
+  }, [page, toast, t])
 
   useEffect(() => {
     fetchData();

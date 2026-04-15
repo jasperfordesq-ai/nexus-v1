@@ -65,7 +65,7 @@ export function BadgeConfiguration() {
       toast.error(t('gamification.failed_to_load_badge_configuration'));
     }
     setLoading(false);
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadBadges();

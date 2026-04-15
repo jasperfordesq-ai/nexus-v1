@@ -96,7 +96,7 @@ export default function PerformanceDashboard() {
               <Activity className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <div className="text-sm text-default-500">Total Requests</div>
+              <div className="text-sm text-default-500">{t('performance_labels.total_requests')}</div>
               <div className="text-2xl font-bold">{summary.total_requests}</div>
             </div>
           </div>
@@ -108,7 +108,7 @@ export default function PerformanceDashboard() {
               <Clock className="w-5 h-5 text-warning" />
             </div>
             <div>
-              <div className="text-sm text-default-500">Slow Queries</div>
+              <div className="text-sm text-default-500">{t('performance_labels.slow_queries')}</div>
               <div className="text-2xl font-bold">{summary.total_slow_queries}</div>
             </div>
           </div>
@@ -132,7 +132,7 @@ export default function PerformanceDashboard() {
               <MemoryStick className="w-5 h-5 text-secondary" />
             </div>
             <div>
-              <div className="text-sm text-default-500">Memory Spikes</div>
+              <div className="text-sm text-default-500">{t('performance_labels.memory_spikes')}</div>
               <div className="text-2xl font-bold">{summary.memory_spikes.length}</div>
             </div>
           </div>

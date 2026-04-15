@@ -124,7 +124,7 @@ export function BuyNowButton({
     } finally {
       setIsProcessing(false);
     }
-  }, [listingId, isOwnListing, user, toast, onSuccess, checkoutModal]);
+  }, [listingId, isOwnListing, user, toast, onSuccess, checkoutModal, t])
 
   // Format price for button label
   const priceLabel = new Intl.NumberFormat(undefined, {

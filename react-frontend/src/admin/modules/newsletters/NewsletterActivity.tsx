@@ -199,7 +199,7 @@ export function NewsletterActivity() {
       toast.error(t('newsletters.failed_to_load_data'));
     }
     setLoading(false);
-  }, [id, activeTab, page, activityFilter, toast]);
+  }, [id, activeTab, page, activityFilter, toast, t])
 
   useEffect(() => { loadData(); }, [loadData]);
 

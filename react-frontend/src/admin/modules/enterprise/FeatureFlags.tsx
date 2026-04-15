@@ -106,7 +106,7 @@ export function FeatureFlags() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadData();
@@ -222,7 +222,7 @@ export function FeatureFlags() {
                       <p className="mt-0.5 text-xs text-default-400">{description}</p>
                     )}
                     {isCritical && (
-                      <p className="mt-0.5 text-xs font-medium text-warning">Core module</p>
+                      <p className="mt-0.5 text-xs font-medium text-warning">{t('shared.core_module')}</p>
                     )}
                   </div>
                   <Switch

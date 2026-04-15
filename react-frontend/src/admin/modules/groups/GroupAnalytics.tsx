@@ -41,7 +41,7 @@ export function GroupAnalytics() {
       }
     };
     load();
-  }, [toast]);
+  }, [toast, t])
 
   if (loading) {
     return (

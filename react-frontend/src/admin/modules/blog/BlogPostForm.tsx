@@ -125,7 +125,7 @@ export function BlogPostForm() {
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, t])
 
   useEffect(() => {
     if (isEdit) {

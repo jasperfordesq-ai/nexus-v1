@@ -110,7 +110,7 @@ export function LogFileViewer() {
     } finally {
       setLoading(false);
     }
-  }, [filename, lines, level, toast]);
+  }, [filename, lines, level, toast, t])
 
   useEffect(() => {
     setLoading(true);
@@ -268,7 +268,7 @@ export function LogFileViewer() {
       ) : (
         <Card shadow="sm">
           <CardBody className="py-16 text-center">
-            <p className="text-default-500">Log file is empty</p>
+            <p className="text-default-500">{t('shared.log_file_empty')}</p>
           </CardBody>
         </Card>
       )}

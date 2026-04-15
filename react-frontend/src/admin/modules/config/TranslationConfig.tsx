@@ -136,7 +136,7 @@ export function TranslationConfig() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   const loadGlossary = useCallback(async () => {
     try {
@@ -151,7 +151,7 @@ export function TranslationConfig() {
     } finally {
       setGlossaryLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadConfig();

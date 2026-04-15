@@ -143,7 +143,7 @@ export function SafeguardingOptionsAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => { fetchOptions(); }, [fetchOptions]);
 
@@ -199,7 +199,7 @@ export function SafeguardingOptionsAdmin() {
     } finally {
       setSaving(false);
     }
-  }, [form, editingOption, toast, fetchOptions, createModal]);
+  }, [form, editingOption, toast, fetchOptions, createModal, t])
 
   // ── Delete handler ───────────────────────────────────────────────────────
 
@@ -218,7 +218,7 @@ export function SafeguardingOptionsAdmin() {
       logError('Failed to deactivate safeguarding option', error);
       toast.error(t('safeguarding.deactivation_failed'));
     }
-  }, [deleteTarget, toast, fetchOptions, deleteModal]);
+  }, [deleteTarget, toast, fetchOptions, deleteModal, t])
 
   // ── Open edit modal ──────────────────────────────────────────────────────
 

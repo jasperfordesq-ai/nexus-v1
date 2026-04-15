@@ -221,7 +221,7 @@ export function TenantForm() {
       toast.error(t('tenant_form.failed_to_load_tenant'));
     }
     setLoading(false);
-  }, [id, toast]);
+  }, [id, toast, t])
 
   const loadParentTenants = useCallback(async () => {
     try {

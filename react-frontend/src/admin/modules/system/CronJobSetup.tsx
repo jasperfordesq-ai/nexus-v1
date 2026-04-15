@@ -98,7 +98,7 @@ export function CronJobSetup() {
       <Card shadow="sm" className="mb-6">
         <CardBody className="flex flex-row items-center justify-between gap-4">
           <div>
-            <p className="font-medium">Test Cron API</p>
+            <p className="font-medium">{t('cron_setup.test_cron_api')}</p>
             <p className="text-sm text-default-500">
               Verify that the cron job system is responding and reporting jobs
             </p>
@@ -345,7 +345,7 @@ export function CronJobSetup() {
       <Card shadow="sm" className="mt-6">
         <CardHeader className="flex items-center gap-2">
           <Info size={18} className="text-primary" />
-          <h3 className="text-lg font-semibold">Verification Checklist</h3>
+          <h3 className="text-lg font-semibold">{t('cron_setup.verification_checklist')}</h3>
         </CardHeader>
         <CardBody className="space-y-2">
           <div className="flex items-center gap-2">

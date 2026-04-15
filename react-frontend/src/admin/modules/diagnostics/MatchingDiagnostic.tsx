@@ -54,7 +54,7 @@ export function MatchingDiagnostic() {
       })
       .catch(() => toast.error(t('diagnostics.failed_to_load_engine_status')))
       .finally(() => setLoadingEngine(false));
-  }, [toast]);
+  }, [toast, t])
 
   const handleDiagnoseUser = async () => {
     if (!userId) return;
@@ -100,7 +100,7 @@ export function MatchingDiagnostic() {
 
       <div className="space-y-4">
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Stethoscope size={20} /> Diagnose User Matches</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Stethoscope size={20} /> {t('diagnostics_matching.diagnose_user_matches')}</h3></CardHeader>
           <CardBody className="gap-4">
             <p className="text-sm text-default-500">Enter a user ID to see their match results, scores, and the factors contributing to each match.</p>
             <div className="flex gap-3">
@@ -132,7 +132,7 @@ export function MatchingDiagnostic() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">Diagnose Listing Matches</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('diagnostics_matching.diagnose_listing_matches')}</h3></CardHeader>
           <CardBody className="gap-4">
             <p className="text-sm text-default-500">Enter a listing ID to see which users were matched and why.</p>
             <div className="flex gap-3">
@@ -161,22 +161,22 @@ export function MatchingDiagnostic() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">Engine Status</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('diagnostics_matching.engine_status')}</h3></CardHeader>
           <CardBody>
             {loadingEngine ? (
               <div className="flex justify-center py-4"><Spinner size="sm" /></div>
             ) : (
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div className="rounded-lg border border-default-200 p-3 text-center">
-                  <p className="text-sm text-default-500">Matches Today</p>
+                  <p className="text-sm text-default-500">{t('diagnostics_matching.matches_today')}</p>
                   <p className="font-medium">{overview?.total_matches_today ?? '--'}</p>
                 </div>
                 <div className="rounded-lg border border-default-200 p-3 text-center">
-                  <p className="text-sm text-default-500">Cache Entries</p>
+                  <p className="text-sm text-default-500">{t('diagnostics_matching.cache_entries')}</p>
                   <p className="font-medium">{overview?.cache_entries ?? '--'}</p>
                 </div>
                 <div className="rounded-lg border border-default-200 p-3 text-center">
-                  <p className="text-sm text-default-500">Avg Match Score</p>
+                  <p className="text-sm text-default-500">{t('diagnostics_matching.avg_match_score')}</p>
                   <p className="font-medium">
                     {overview?.avg_match_score !== undefined
                       ? `${Number(overview.avg_match_score).toFixed(1)}%`

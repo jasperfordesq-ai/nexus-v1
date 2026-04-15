@@ -46,7 +46,7 @@ export function OrgWallets() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadWallets();

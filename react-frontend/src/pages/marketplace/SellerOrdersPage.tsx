@@ -308,7 +308,7 @@ export function SellerOrdersPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [activeTab, toast]);
+  }, [activeTab, toast, t])
 
   // Reload on tab change
   useEffect(() => {
@@ -364,7 +364,7 @@ export function SellerOrdersPage() {
     } finally {
       setIsSubmittingShip(false);
     }
-  }, [shipOrderId, trackingNumber, trackingUrl, shippingMethod, toast, shipModal]);
+  }, [shipOrderId, trackingNumber, trackingUrl, shippingMethod, toast, shipModal, t])
 
   if (!isAuthenticated) return null;
 

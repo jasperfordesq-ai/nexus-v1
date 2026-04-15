@@ -83,7 +83,7 @@ export function PollsAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, toast]);
+  }, [page, search, toast, t])
 
   useEffect(() => {
     loadItems();

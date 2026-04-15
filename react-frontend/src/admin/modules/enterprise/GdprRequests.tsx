@@ -95,7 +95,7 @@ export function GdprRequests() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, toast]);
+  }, [page, statusFilter, toast, t])
 
   useEffect(() => {
     loadData();

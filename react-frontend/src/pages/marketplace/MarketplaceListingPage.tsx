@@ -384,14 +384,14 @@ export function MarketplaceListingPage() {
 
     load();
     return () => { cancelled = true; };
-  }, [id]);
+  }, [id, t])
 
   // Update page title when listing loads
   useEffect(() => {
     if (listing?.title) {
       document.title = `${listing.title} - ${t('page_title', 'Marketplace')}`;
     }
-  }, [listing?.title]);
+  }, [listing?.title, t])
 
   // JSON-LD structured data — inject via textContent (XSS-safe, avoids dangerouslySetInnerHTML)
   // Must be before any early returns to satisfy Rules of Hooks
@@ -444,7 +444,7 @@ export function MarketplaceListingPage() {
       logError('Failed to toggle save', err);
       toast.error(t('common.save_failed', 'Failed to update saved status'));
     }
-  }, [listing, isAuthenticated, toast]);
+  }, [listing, isAuthenticated, toast, t])
 
   // Share
   const handleShare = useCallback(async () => {
@@ -459,7 +459,7 @@ export function MarketplaceListingPage() {
       await navigator.clipboard.writeText(url);
       toast.success(t('listing.link_copied', 'Link copied to clipboard'));
     }
-  }, [listing?.title, toast]);
+  }, [listing?.title, toast, t])
 
   // Submit report
   const handleSubmitReport = useCallback(async () => {
@@ -473,7 +473,7 @@ export function MarketplaceListingPage() {
       setReportModalOpen(false);
       setReportReason('');
     }
-  }, [listing, reportReason, toast]);
+  }, [listing, reportReason, toast, t])
 
   // Make offer
   const handleMakeOffer = useCallback(async () => {
@@ -499,7 +499,7 @@ export function MarketplaceListingPage() {
     } finally {
       setIsSubmittingOffer(false);
     }
-  }, [listing, offerAmount, offerMessage, toast, offerModal]);
+  }, [listing, offerAmount, offerMessage, toast, offerModal, t])
 
   // Loading state — skeleton instead of spinner
   if (isLoading) {

@@ -89,7 +89,7 @@ export function MatchingConfig() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadConfig();
@@ -153,7 +153,7 @@ export function MatchingConfig() {
     } finally {
       setSaving(false);
     }
-  }, [config, totalValid, totalPct, toast]);
+  }, [config, totalValid, totalPct, toast, t])
 
   /** Clear cache */
   const handleClearCache = useCallback(async () => {
@@ -172,7 +172,7 @@ export function MatchingConfig() {
     } finally {
       setClearing(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   /** Reset to defaults */
   const handleReset = useCallback(() => {
@@ -180,7 +180,7 @@ export function MatchingConfig() {
     setDirty(true);
     setResetModalOpen(false);
     toast.info(t('matching.configuration_reset_to_defaults_save_to'));
-  }, [toast]);
+  }, [toast, t])
 
   if (loading) {
     return (

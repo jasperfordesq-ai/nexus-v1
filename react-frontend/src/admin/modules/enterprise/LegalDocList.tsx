@@ -55,7 +55,7 @@ export function LegalDocList() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadData();

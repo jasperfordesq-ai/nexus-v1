@@ -448,7 +448,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       onPress={() => navigate(tenantPath('/verify-identity-optional'))}
                     >
                       <Fingerprint className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                      <span className="hidden md:inline">Verify Identity</span>
+                      <span className="hidden md:inline">{t('verify_identity')}</span>
                     </Button>
                   )}
                 </>

@@ -52,7 +52,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
     };
 
     loadInfo();
-  }, [isOpen, newsletterId, toast]);
+  }, [isOpen, newsletterId, toast, t])
 
   const handleResend = async () => {
     if (!info) return;
@@ -102,7 +102,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
             <ModalHeader className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <Mail size={20} />
-                <span>Resend Newsletter</span>
+                <span>{t('newsletter_resend.resend_newsletter')}</span>
               </div>
               <p className="text-sm font-normal text-default-500">
                 Send this newsletter to a targeted subset of recipients
@@ -119,15 +119,15 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                     <CardBody className="gap-2">
                       <div className="grid grid-cols-3 gap-4 text-center">
                         <div>
-                          <p className="text-sm text-default-500">Total Sent</p>
+                          <p className="text-sm text-default-500">{t('newsletter_resend.total_sent')}</p>
                           <p className="text-2xl font-bold">{info.total_sent.toLocaleString()}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-default-500">Opened</p>
+                          <p className="text-sm text-default-500">{t('newsletter_resend.opened')}</p>
                           <p className="text-2xl font-bold text-success">{info.total_opened.toLocaleString()}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-default-500">Clicked</p>
+                          <p className="text-sm text-default-500">{t('newsletter_resend.clicked')}</p>
                           <p className="text-2xl font-bold text-primary">{info.total_clicked.toLocaleString()}</p>
                         </div>
                       </div>
@@ -169,7 +169,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                     <CardBody className="flex-row items-center gap-3">
                       <Users size={20} className="text-primary" />
                       <div className="flex-1">
-                        <p className="text-sm font-medium">Preview Recipient Count</p>
+                        <p className="text-sm font-medium">{t('newsletter_resend.preview_recipient_count')}</p>
                         <p className="text-xs text-default-500">
                           This resend will be sent to {recipientCount.toLocaleString()} recipient{recipientCount !== 1 ? 's' : ''}
                         </p>
@@ -182,7 +182,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                       <CardBody className="flex-row items-center gap-3">
                         <AlertCircle size={20} className="text-warning" />
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-warning">No Recipients</p>
+                          <p className="text-sm font-medium text-warning">{t('newsletter_resend.no_recipients')}</p>
                           <p className="text-xs text-warning-600 dark:text-warning-400">
                             There are no recipients matching your selection criteria
                           </p>
@@ -193,7 +193,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                 </div>
               ) : (
                 <div className="flex items-center justify-center py-8">
-                  <div className="text-danger">Failed to load newsletter information</div>
+                  <div className="text-danger">{t('newsletter_resend.failed_to_load')}</div>
                 </div>
               )}
             </ModalBody>

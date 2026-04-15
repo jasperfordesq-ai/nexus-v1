@@ -81,7 +81,7 @@ export function FraudAlerts() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, toast]);
+  }, [page, statusFilter, toast, t])
 
   useEffect(() => {
     loadAlerts();
@@ -107,7 +107,7 @@ export function FraudAlerts() {
   const handleTabChange = useCallback((key: React.Key) => {
     setStatusFilter(String(key));
     setPage(1);
-  }, []);
+  }, [t])
 
   const columns: Column<FraudAlert>[] = useMemo(
     () => [

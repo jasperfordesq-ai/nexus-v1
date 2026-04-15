@@ -179,14 +179,14 @@ export function MarketplaceCategoryPage() {
 
     load();
     return () => { cancelled = true; };
-  }, [slug]);
+  }, [slug, t])
 
   // Update page title
   useEffect(() => {
     if (category?.name) {
       document.title = `${category.name} - ${t('page_title', 'Marketplace')}`;
     }
-  }, [category?.name]);
+  }, [category?.name, t])
 
   // Debounce search
   useEffect(() => {
@@ -248,7 +248,7 @@ export function MarketplaceCategoryPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [category, debouncedQuery, priceMin, priceMax, selectedConditions, sortBy, templateFilterValues, toast]);
+  }, [category, debouncedQuery, priceMin, priceMax, selectedConditions, sortBy, templateFilterValues, toast, t])
 
   // Refetch on filter/category change
   useEffect(() => {

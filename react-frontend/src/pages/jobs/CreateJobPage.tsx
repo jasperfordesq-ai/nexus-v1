@@ -10,7 +10,7 @@
  * Uses HeroUI form components with validation.
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Button,
@@ -213,13 +213,17 @@ export function CreateJobPage() {
   // Unsaved changes tracking
   const formDirtyRef = useRef(false);
 
-  // Parse skills for display
-  const skillsArray = form.skills_required
-    ? form.skills_required
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean)
-    : [];
+  // Parse skills for display — memoized to keep useCallback deps stable
+  const skillsArray = useMemo(
+    () =>
+      form.skills_required
+        ? form.skills_required
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : [],
+    [form.skills_required],
+  );
 
   // Load existing vacancy for editing
   useEffect(() => {
@@ -442,7 +446,7 @@ export function CreateJobPage() {
       }
     }, 800);
     return () => clearTimeout(timer);
-  }, [form.title, form.organization_id, isEditing]); // eslint-disable-line react-hooks/exhaustive-deps -- debounced duplicate check on title/org change
+  }, [form.title, form.organization_id, isEditing]); // debounced duplicate check on title/org change
 
   const handleSubmit = async () => {
     if (!validate()) return;

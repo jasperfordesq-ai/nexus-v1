@@ -132,7 +132,7 @@ export function MarketplaceAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadDashboard();

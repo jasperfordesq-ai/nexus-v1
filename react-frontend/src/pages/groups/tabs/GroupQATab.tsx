@@ -288,7 +288,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
               ? {
                   ...prev,
                   vote_count: prev.vote_count + vote - prev.user_vote,
-                  user_vote: prev.user_vote === vote ? (0 as 0) : vote,
+                  user_vote: prev.user_vote === vote ? (0 as const) : vote,
                 }
               : prev,
           );
@@ -303,7 +303,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                     ? {
                         ...a,
                         vote_count: a.vote_count + vote - a.user_vote,
-                        user_vote: a.user_vote === vote ? (0 as 0) : vote,
+                        user_vote: a.user_vote === vote ? (0 as const) : vote,
                       }
                     : a,
                 ),

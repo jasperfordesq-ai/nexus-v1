@@ -210,7 +210,7 @@ export function MarketplaceSearchPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [debouncedQuery, categoryId, priceMin, priceMax, selectedConditions, sellerType, deliveryMethod, sortBy, postedWithin, toast]);
+  }, [debouncedQuery, categoryId, priceMin, priceMax, selectedConditions, sellerType, deliveryMethod, sortBy, postedWithin, toast, t])
 
   // Refetch on filter change
   useEffect(() => {

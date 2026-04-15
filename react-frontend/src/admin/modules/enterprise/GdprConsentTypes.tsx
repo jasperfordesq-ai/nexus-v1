@@ -81,7 +81,7 @@ export function GdprConsentTypes() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadData();

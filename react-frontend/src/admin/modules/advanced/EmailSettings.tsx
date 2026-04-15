@@ -127,7 +127,7 @@ export function EmailSettings() {
       })
       .catch(() => toast.error(t('advanced.failed_to_load_email_settings')))
       .finally(() => setLoading(false));
-  }, [toast]);
+  }, [toast, t])
 
   const handleSave = async () => {
     setSaving(true);

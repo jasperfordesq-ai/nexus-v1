@@ -78,7 +78,7 @@ export function LogFiles() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadData();
@@ -127,7 +127,7 @@ export function LogFiles() {
           <CardBody className="flex flex-row items-center gap-3 p-4">
             <Files size={20} className="text-primary" />
             <div>
-              <p className="text-xs text-default-500">Total Files</p>
+              <p className="text-xs text-default-500">{t('log_files_labels.total_files')}</p>
               <p className="text-lg font-bold text-foreground">{files.length}</p>
             </div>
           </CardBody>
@@ -136,7 +136,7 @@ export function LogFiles() {
           <CardBody className="flex flex-row items-center gap-3 p-4">
             <HardDrive size={20} className="text-warning" />
             <div>
-              <p className="text-xs text-default-500">Total Size</p>
+              <p className="text-xs text-default-500">{t('log_files_labels.total_size')}</p>
               <p className="text-lg font-bold text-foreground">{formatBytes(totalSize)}</p>
             </div>
           </CardBody>

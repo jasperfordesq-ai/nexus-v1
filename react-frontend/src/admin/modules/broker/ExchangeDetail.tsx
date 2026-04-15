@@ -9,7 +9,7 @@
  * Parity: PHP BrokerControlsController::showExchange()
  */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Button, Chip, Divider, Spinner } from '@heroui/react';
 import { ArrowLeft, User, Shield, Clock } from 'lucide-react';
@@ -38,12 +38,7 @@ export default function ExchangeDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!id) return;
-    loadExchange(parseInt(id));
-  }, [id]);
-
-  async function loadExchange(exchangeId: number) {
+  const loadExchange = useCallback(async (exchangeId: number) => {
     setLoading(true);
     try {
       const res = await adminBroker.showExchange(exchangeId);
@@ -57,7 +52,12 @@ export default function ExchangeDetail() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [t]);
+
+  useEffect(() => {
+    if (!id) return;
+    loadExchange(parseInt(id));
+  }, [id, loadExchange]);
 
   if (loading) {
     return (

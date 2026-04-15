@@ -78,7 +78,20 @@
     "choose_image_file": "Roghnaigh comhad íomhá",
     "select_video": "Roghnaigh físeán ón ngléas",
     "choose_video_file": "Roghnaigh comhad físeáin",
-    "aria_poll_question": "Ceist pobalbhreithe"
+    "aria_poll_question": "Ceist pobalbhreithe",
+    "filter_label": "Filter",
+    "take_photo_title": "Take Photo",
+    "use_your_camera": "Use your camera",
+    "choose_from_gallery": "Choose from gallery",
+    "recording_indicator": "Recording",
+    "record_video_title": "Record Video",
+    "templates_label": "Templates",
+    "background_label": "Background",
+    "font_label": "Font",
+    "options_label": "Options",
+    "or_divider": "or",
+    "poll_add_option_button": "Add Option",
+    "videos_trimmed_notice": "Videos longer than 60s will be trimmed to 60s display duration"
   },
   "viewer": {
     "story_from": "Scéal ó {{name}}",

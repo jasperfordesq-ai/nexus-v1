@@ -225,7 +225,7 @@ export function InsuranceCertificates() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, debouncedSearch, toast]);
+  }, [page, statusFilter, debouncedSearch, toast, t])
 
   useEffect(() => { loadStats(); }, [loadStats]);
   useEffect(() => { loadItems(); }, [loadItems]);
@@ -756,7 +756,7 @@ export function InsuranceCertificates() {
                   </div>
                 )}
                 {userSearchQuery.trim().length >= 2 && !userSearchLoading && userSearchResults.length === 0 && (
-                  <p className="text-xs text-default-400 mt-1">No members found</p>
+                  <p className="text-xs text-default-400 mt-1">{t('shared.no_members_found')}</p>
                 )}
               </div>
             )}
@@ -1022,38 +1022,38 @@ export function InsuranceCertificates() {
               </div>
               <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
                 <div>
-                  <p className="text-default-400">Type</p>
+                  <p className="text-default-400">{t('broker_certificates.type')}</p>
                   <p className="font-medium">{INSURANCE_TYPE_LABELS[viewItem.insurance_type] || viewItem.insurance_type}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">Status</p>
+                  <p className="text-default-400">{t('broker_certificates.status')}</p>
                   <Chip size="sm" variant="flat" color={STATUS_COLOR_MAP[viewItem.status] || 'default'} className="capitalize">
                     {viewItem.status}
                   </Chip>
                 </div>
                 <div>
-                  <p className="text-default-400">Provider</p>
+                  <p className="text-default-400">{t('broker_certificates.provider')}</p>
                   <p className="font-medium">{viewItem.provider_name || '\u2014'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">Policy Number</p>
+                  <p className="text-default-400">{t('broker_certificates.policy_number')}</p>
                   <p className="font-medium font-mono">{viewItem.policy_number || '\u2014'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">Coverage Amount</p>
+                  <p className="text-default-400">{t('broker_certificates.coverage_amount')}</p>
                   {/* #11: EUR instead of GBP */}
                   <p className="font-medium">{viewItem.coverage_amount ? `\u20AC${Number(viewItem.coverage_amount).toLocaleString()}` : '\u2014'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">Start Date</p>
+                  <p className="text-default-400">{t('broker_certificates.start_date')}</p>
                   <p className="font-medium">{viewItem.start_date ? new Date(viewItem.start_date).toLocaleDateString() : '\u2014'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">Expiry Date</p>
+                  <p className="text-default-400">{t('broker_certificates.expiry_date')}</p>
                   <p className="font-medium">{viewItem.expiry_date ? new Date(viewItem.expiry_date).toLocaleDateString() : '\u2014'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">Verified By</p>
+                  <p className="text-default-400">{t('broker_certificates.verified_by')}</p>
                   <p className="font-medium">
                     {viewItem.verifier_first_name
                       ? `${viewItem.verifier_first_name} ${viewItem.verifier_last_name}`
@@ -1061,18 +1061,18 @@ export function InsuranceCertificates() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-default-400">Verified At</p>
+                  <p className="text-default-400">{t('broker_certificates.verified_at')}</p>
                   <p className="font-medium">{viewItem.verified_at ? new Date(viewItem.verified_at).toLocaleString() : '\u2014'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">Created</p>
+                  <p className="text-default-400">{t('broker_certificates.created')}</p>
                   <p className="font-medium">{new Date(viewItem.created_at).toLocaleString()}</p>
                 </div>
               </div>
               {/* #1: Certificate file display/download */}
               {viewItem.certificate_file_path && (
                 <div className="mt-4">
-                  <p className="text-default-400 text-sm mb-1">Certificate File</p>
+                  <p className="text-default-400 text-sm mb-1">{t('broker_certificates.certificate_file')}</p>
                   <a
                     href={resolveAssetUrl(viewItem.certificate_file_path)}
                     target="_blank"
@@ -1087,7 +1087,7 @@ export function InsuranceCertificates() {
               )}
               {viewItem.notes && (
                 <div className="mt-4">
-                  <p className="text-default-400 text-sm mb-1">Notes</p>
+                  <p className="text-default-400 text-sm mb-1">{t('broker_certificates.notes')}</p>
                   <p className="text-sm bg-default-100 p-3 rounded-lg">{viewItem.notes}</p>
                 </div>
               )}

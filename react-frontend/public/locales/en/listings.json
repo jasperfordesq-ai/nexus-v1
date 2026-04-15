@@ -190,5 +190,10 @@
     "create": {
       "title": "Create Listing"
     }
-  }
+  },
+  "delivery_mode": "Delivery Mode",
+  "service_type_physical_only": "In-Person Only",
+  "service_type_remote_only": "Remote / Online",
+  "service_type_hybrid": "In-Person or Remote",
+  "service_type_location_dependent": "Depends on Service"
 }

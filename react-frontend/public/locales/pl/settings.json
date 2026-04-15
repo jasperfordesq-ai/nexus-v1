@@ -486,5 +486,9 @@
   },
   "page_meta": {
     "title": "Settings"
+  },
+  "identity_auth": {
+    "please_login": "Please log in to verify your identity.",
+    "go_to_login": "Go to Login"
   }
 }

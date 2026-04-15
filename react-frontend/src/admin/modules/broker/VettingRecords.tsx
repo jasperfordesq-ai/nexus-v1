@@ -236,7 +236,7 @@ export function VettingRecords() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, searchQuery, toast]);
+  }, [page, statusFilter, searchQuery, toast, t])
 
   useEffect(() => {
     loadStats();
@@ -877,7 +877,7 @@ export function VettingRecords() {
                   </div>
                 )}
                 {userSearchQuery.trim().length >= 2 && !userSearchLoading && userSearchResults.length === 0 && (
-                  <p className="text-xs text-default-400 mt-1">No members found</p>
+                  <p className="text-xs text-default-400 mt-1">{t('shared.no_members_found')}</p>
                 )}
               </div>
             )}
@@ -1150,29 +1150,29 @@ export function VettingRecords() {
               </div>
               <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
                 <div>
-                  <p className="text-default-400">Type</p>
+                  <p className="text-default-400">{t('broker_vetting.type')}</p>
                   <p className="font-medium">{VETTING_TYPE_LABELS[viewItem.vetting_type] || viewItem.vetting_type}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">Status</p>
+                  <p className="text-default-400">{t('broker_vetting.status')}</p>
                   <Chip size="sm" variant="flat" color={STATUS_COLOR_MAP[viewItem.status] || 'default'} className="capitalize">
                     {viewItem.status}
                   </Chip>
                 </div>
                 <div>
-                  <p className="text-default-400">Reference Number</p>
+                  <p className="text-default-400">{t('broker_vetting.reference_number')}</p>
                   <p className="font-medium font-mono">{viewItem.reference_number || '\u2014'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">Issue Date</p>
+                  <p className="text-default-400">{t('broker_vetting.issue_date')}</p>
                   <p className="font-medium">{viewItem.issue_date ? new Date(viewItem.issue_date).toLocaleDateString() : '\u2014'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">Expiry Date</p>
+                  <p className="text-default-400">{t('broker_vetting.expiry_date')}</p>
                   <p className="font-medium">{viewItem.expiry_date ? new Date(viewItem.expiry_date).toLocaleDateString() : '\u2014'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">Verified By</p>
+                  <p className="text-default-400">{t('broker_vetting.verified_by')}</p>
                   <p className="font-medium">
                     {viewItem.verifier_first_name
                       ? `${viewItem.verifier_first_name} ${viewItem.verifier_last_name}`
@@ -1180,11 +1180,11 @@ export function VettingRecords() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-default-400">Verified At</p>
+                  <p className="text-default-400">{t('broker_vetting.verified_at')}</p>
                   <p className="font-medium">{viewItem.verified_at ? new Date(viewItem.verified_at).toLocaleString() : '\u2014'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">Created</p>
+                  <p className="text-default-400">{t('broker_vetting.created')}</p>
                   <p className="font-medium">{new Date(viewItem.created_at).toLocaleString()}</p>
                 </div>
               </div>
@@ -1192,10 +1192,10 @@ export function VettingRecords() {
               {/* #11-12: Rejection details */}
               {viewItem.status === 'rejected' && (
                 <div className="mt-4 p-3 rounded-lg bg-danger-50 border border-danger-200">
-                  <p className="text-sm font-medium text-danger mb-1">Rejection Details</p>
+                  <p className="text-sm font-medium text-danger mb-1">{t('broker_vetting.rejection_details')}</p>
                   <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
                     <div>
-                      <p className="text-default-400">Rejected By</p>
+                      <p className="text-default-400">{t('broker_vetting.rejected_by')}</p>
                       <p className="font-medium">
                         {viewItem.rejector_first_name
                           ? `${viewItem.rejector_first_name} ${viewItem.rejector_last_name}`
@@ -1203,13 +1203,13 @@ export function VettingRecords() {
                       </p>
                     </div>
                     <div>
-                      <p className="text-default-400">Rejected At</p>
+                      <p className="text-default-400">{t('broker_vetting.rejected_at')}</p>
                       <p className="font-medium">{viewItem.rejected_at ? new Date(viewItem.rejected_at).toLocaleString() : '\u2014'}</p>
                     </div>
                   </div>
                   {viewItem.rejection_reason && (
                     <div className="mt-2">
-                      <p className="text-default-400 text-sm">Reason</p>
+                      <p className="text-default-400 text-sm">{t('broker_vetting.reason')}</p>
                       <p className="text-sm">{viewItem.rejection_reason}</p>
                     </div>
                   )}
@@ -1235,14 +1235,14 @@ export function VettingRecords() {
               </div>
               {viewItem.notes && (
                 <div className="mt-4">
-                  <p className="text-default-400 text-sm mb-1">Notes</p>
+                  <p className="text-default-400 text-sm mb-1">{t('broker_vetting.notes')}</p>
                   <p className="text-sm bg-default-100 p-3 rounded-lg whitespace-pre-wrap">{viewItem.notes}</p>
                 </div>
               )}
 
               {/* #10: Document section */}
               <div className="mt-4">
-                <p className="text-default-400 text-sm mb-2">Document</p>
+                <p className="text-default-400 text-sm mb-2">{t('broker_vetting.document')}</p>
                 {viewItem.document_url ? (
                   <div className="flex items-center gap-2">
                     <a

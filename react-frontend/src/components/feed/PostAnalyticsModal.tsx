@@ -73,7 +73,7 @@ export function PostAnalyticsModal({ isOpen, onClose, postId }: PostAnalyticsMod
         setError(t('failed_to_load_analytics'));
       })
       .finally(() => setLoading(false));
-  }, [isOpen, postId]);
+  }, [isOpen, postId, t])
 
   const stats = data ? [
     { label: t('analytics.views', 'Views'), value: data.views_count, icon: Eye, color: 'text-blue-500', bg: 'bg-blue-500/10' },

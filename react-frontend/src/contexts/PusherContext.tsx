@@ -377,7 +377,6 @@ export function PusherProvider({ children }: PusherProviderProps) {
       onFeedPost,
       sendTyping,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isConnected, tenantIdValue, subscribeToConversation, unsubscribeFromConversation, onNewMessage, onTyping, onUnreadCount, onFeedPost, sendTyping]
   );
 

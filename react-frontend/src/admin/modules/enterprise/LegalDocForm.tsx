@@ -83,7 +83,7 @@ export function LegalDocForm() {
     } finally {
       setLoading(false);
     }
-  }, [id, isEdit, toast]);
+  }, [id, isEdit, toast, t])
 
   useEffect(() => {
     loadData();
@@ -156,7 +156,7 @@ export function LegalDocForm() {
         {/* Metadata */}
         <Card shadow="sm">
           <CardBody className="p-4 space-y-4">
-            <h3 className="text-lg font-semibold">Document Details</h3>
+            <h3 className="text-lg font-semibold">{t('shared.document_details')}</h3>
             <Input
               label={t('enterprise.label_title')}
               value={title}
@@ -206,7 +206,7 @@ export function LegalDocForm() {
         {/* Content */}
         <Card shadow="sm">
           <CardBody className="p-4">
-            <h3 className="text-lg font-semibold mb-3">Content</h3>
+            <h3 className="text-lg font-semibold mb-3">{t('shared.content')}</h3>
             <Textarea
               label={t('enterprise.label_document_content')}
               value={content}

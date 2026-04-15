@@ -42,7 +42,7 @@ export function FeedAlgorithm() {
       })
       .catch(() => toast.error(t('advanced.failed_to_load_feed_algorithm_settings')))
       .finally(() => setLoading(false));
-  }, [toast]);
+  }, [toast, t])
 
   const handleSave = async () => {
     setSaving(true);

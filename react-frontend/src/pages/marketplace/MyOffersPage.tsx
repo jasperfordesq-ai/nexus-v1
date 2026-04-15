@@ -134,7 +134,7 @@ export function MyOffersPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [activeTab, toast]);
+  }, [activeTab, toast, t])
 
   // Reload on tab change
   useEffect(() => {
@@ -169,7 +169,7 @@ export function MyOffersPage() {
       logError('Failed to accept offer', err);
       toast.error(t('my_offers.action_error', 'Action failed'));
     }
-  }, [toast, updateOfferLocally]);
+  }, [toast, updateOfferLocally, t])
 
   // Decline offer (seller or buyer declining counter)
   const handleDecline = useCallback(async (offerId: number) => {
@@ -185,7 +185,7 @@ export function MyOffersPage() {
       logError('Failed to decline offer', err);
       toast.error(t('my_offers.action_error', 'Action failed'));
     }
-  }, [toast, updateOfferLocally]);
+  }, [toast, updateOfferLocally, t])
 
   // Withdraw offer (buyer)
   const handleWithdraw = useCallback(async (offerId: number) => {
@@ -201,7 +201,7 @@ export function MyOffersPage() {
       logError('Failed to withdraw offer', err);
       toast.error(t('my_offers.action_error', 'Action failed'));
     }
-  }, [toast, removeOfferLocally]);
+  }, [toast, removeOfferLocally, t])
 
   // Accept counter-offer (buyer)
   const handleAcceptCounter = useCallback(async (offerId: number) => {
@@ -217,7 +217,7 @@ export function MyOffersPage() {
       logError('Failed to accept counter-offer', err);
       toast.error(t('my_offers.action_error', 'Action failed'));
     }
-  }, [toast, updateOfferLocally]);
+  }, [toast, updateOfferLocally, t])
 
   // Open counter-offer modal (seller)
   const openCounterModal = useCallback((offerId: number) => {
@@ -260,7 +260,7 @@ export function MyOffersPage() {
     } finally {
       setIsSubmittingCounter(false);
     }
-  }, [counterTargetId, counterAmount, counterMessage, toast, updateOfferLocally, onCounterClose]);
+  }, [counterTargetId, counterAmount, counterMessage, toast, updateOfferLocally, onCounterClose, t])
 
   if (!isAuthenticated) return null;
 

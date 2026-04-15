@@ -200,7 +200,7 @@ export function MarketplacePage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [debouncedQuery, selectedCategoryId, toast]);
+  }, [debouncedQuery, selectedCategoryId, toast, t])
 
   // Refetch on filter change
   useEffect(() => {

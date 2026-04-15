@@ -288,7 +288,7 @@ export function MenuBuilder() {
     } finally {
       setLoading(false);
     }
-  }, [id, isEdit, flattenItems, toast]);
+  }, [id, isEdit, flattenItems, toast, t])
 
   useEffect(() => { loadMenu(); }, [loadMenu]);
 

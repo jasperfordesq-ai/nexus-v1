@@ -76,7 +76,7 @@ export function UserMonitoring() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadItems();

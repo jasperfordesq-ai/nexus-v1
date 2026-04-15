@@ -202,7 +202,7 @@ export function Subscribers() {
       toast.error(t('newsletters.failed_to_add_subscriber'));
     }
     setAddLoading(false);
-  }, [addForm, loadData, statusFilter, searchQuery, toast]);
+  }, [addForm, loadData, statusFilter, searchQuery, toast, t])
 
   // ───────────────────────────────────────────────────────────────────────────
   // Remove subscriber
@@ -224,7 +224,7 @@ export function Subscribers() {
       toast.error(t('newsletters.failed_to_remove_subscriber'));
     }
     setRemoveLoading(false);
-  }, [removeTarget, loadData, toast]);
+  }, [removeTarget, loadData, toast, t])
 
   // ───────────────────────────────────────────────────────────────────────────
   // Import CSV
@@ -270,7 +270,7 @@ export function Subscribers() {
       setImportRows(rows);
     };
     reader.readAsText(file);
-  }, [toast]);
+  }, [toast, t])
 
   const handleImport = useCallback(async () => {
     if (importRows.length === 0) return;
@@ -291,7 +291,7 @@ export function Subscribers() {
       toast.error(t('newsletters.failed_to_import_subscribers'));
     }
     setImportLoading(false);
-  }, [importRows, loadData, statusFilter, searchQuery, toast]);
+  }, [importRows, loadData, statusFilter, searchQuery, toast, t])
 
   // ───────────────────────────────────────────────────────────────────────────
   // Export CSV
@@ -326,7 +326,7 @@ export function Subscribers() {
       toast.error(t('newsletters.failed_to_export_subscribers'));
     }
     setExportLoading(false);
-  }, [toast]);
+  }, [toast, t])
 
   // ───────────────────────────────────────────────────────────────────────────
   // Sync members
@@ -347,7 +347,7 @@ export function Subscribers() {
       toast.error(t('newsletters.failed_to_sync_members'));
     }
     setSyncLoading(false);
-  }, [loadData, statusFilter, searchQuery, toast]);
+  }, [loadData, statusFilter, searchQuery, toast, t])
 
   // ───────────────────────────────────────────────────────────────────────────
   // Helpers
@@ -361,7 +361,7 @@ export function Subscribers() {
     if (!subscribeUrl) return;
     navigator.clipboard.writeText(subscribeUrl);
     toast.success(t('newsletters.subscribe_link_copied_to_clipboard'));
-  }, [subscribeUrl, toast]);
+  }, [subscribeUrl, toast, t])
 
   const statusColor = (status: string): 'success' | 'warning' | 'danger' | 'default' => {
     switch (status) {

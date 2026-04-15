@@ -447,12 +447,12 @@ export function ListingDetailPage() {
                 {listing.service_type === 'location_dependent' && <HelpCircle className="w-5 h-5 text-gray-600 dark:text-gray-400" />}
               </div>
               <div>
-                <div className="text-xs text-theme-subtle">Delivery Mode</div>
+                <div className="text-xs text-theme-subtle">{t('delivery_mode')}</div>
                 <div className="text-theme-primary">
-                  {listing.service_type === 'physical_only' && 'In-Person Only'}
-                  {listing.service_type === 'remote_only' && 'Remote / Online'}
-                  {listing.service_type === 'hybrid' && 'In-Person or Remote'}
-                  {listing.service_type === 'location_dependent' && 'Depends on Service'}
+                  {listing.service_type === 'physical_only' && t('service_type_physical_only')}
+                  {listing.service_type === 'remote_only' && t('service_type_remote_only')}
+                  {listing.service_type === 'hybrid' && t('service_type_hybrid')}
+                  {listing.service_type === 'location_dependent' && t('service_type_location_dependent')}
                 </div>
               </div>
             </div>

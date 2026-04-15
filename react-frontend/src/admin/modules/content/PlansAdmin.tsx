@@ -59,7 +59,7 @@ export function PlansAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     fetchData();

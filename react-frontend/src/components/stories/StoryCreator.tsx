@@ -168,7 +168,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
       logError('Failed to process image', err);
       toast.error(t('creator.error_process'));
     }
-  }, [toast]);
+  }, [toast, t])
 
   // Handle video selection
   const handleVideoSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -197,7 +197,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
       URL.revokeObjectURL(video.src);
     };
     video.src = url;
-  }, [toast]);
+  }, [toast, t])
 
   // Camera functions
   const startCamera = useCallback(async () => {
@@ -215,7 +215,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
       logError('Camera access failed', err);
       toast.error(t('creator.error_camera'));
     }
-  }, [cameraFacing, mode, toast]);
+  }, [cameraFacing, mode, toast, t])
 
   const stopCamera = useCallback(() => {
     if (cameraStream) {
@@ -670,7 +670,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 </div>
                 {/* Image filters */}
                 <div className="w-full max-w-sm">
-                  <p className="text-white/50 text-xs mb-2 uppercase tracking-wider">Filter</p>
+                  <p className="text-white/50 text-xs mb-2 uppercase tracking-wider">{t('creator.filter_label')}</p>
                   <div className="flex gap-2 overflow-x-auto pb-1">
                     {IMAGE_FILTERS.map((f) => (
                       <Button
@@ -754,11 +754,11 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                     <Camera className="w-8 h-8 text-white/70" />
                   </div>
                   <div className="text-center">
-                    <p className="text-white font-medium">Take Photo</p>
-                    <p className="text-white/50 text-sm mt-1">Use your camera</p>
+                    <p className="text-white font-medium">{t('creator.take_photo_title')}</p>
+                    <p className="text-white/50 text-sm mt-1">{t('creator.use_your_camera')}</p>
                   </div>
                 </Button>
-                <div className="text-white/30 text-xs uppercase tracking-wider">or</div>
+                <div className="text-white/30 text-xs uppercase tracking-wider">{t('creator.or_divider')}</div>
                 <Button
                   variant="flat"
                   onPress={() => fileInputRef.current?.click()}
@@ -768,7 +768,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                   <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
                     <ImagePlus className="w-6 h-6 text-white/70" />
                   </div>
-                  <p className="text-white/70 text-sm">Choose from gallery</p>
+                  <p className="text-white/70 text-sm">{t('creator.choose_from_gallery')}</p>
                 </Button>
               </div>
             )}
@@ -803,7 +803,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 )}
                 {videoDuration > 60 && (
                   <div className="absolute bottom-3 left-3 right-3 bg-red-500/80 backdrop-blur rounded-lg px-3 py-2 text-white text-xs text-center">
-                    Videos longer than 60s will be trimmed to 60s display duration
+                    {t('creator.videos_trimmed_notice')}
                   </div>
                 )}
               </div>
@@ -820,7 +820,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 {isRecording && (
                   <div className="absolute top-4 left-4 flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
-                    <span className="text-white text-sm font-medium">Recording</span>
+                    <span className="text-white text-sm font-medium">{t('creator.recording_indicator')}</span>
                   </div>
                 )}
                 <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-8">
@@ -877,11 +877,11 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                     <Video className="w-8 h-8 text-white/70" />
                   </div>
                   <div className="text-center">
-                    <p className="text-white font-medium">Record Video</p>
-                    <p className="text-white/50 text-sm mt-1">Use your camera</p>
+                    <p className="text-white font-medium">{t('creator.record_video_title')}</p>
+                    <p className="text-white/50 text-sm mt-1">{t('creator.use_your_camera')}</p>
                   </div>
                 </Button>
-                <div className="text-white/30 text-xs uppercase tracking-wider">or</div>
+                <div className="text-white/30 text-xs uppercase tracking-wider">{t('creator.or_divider')}</div>
                 <Button
                   variant="flat"
                   onPress={() => videoInputRef.current?.click()}
@@ -891,7 +891,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                   <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
                     <ImagePlus className="w-6 h-6 text-white/70" />
                   </div>
-                  <p className="text-white/70 text-sm">Choose from gallery</p>
+                  <p className="text-white/70 text-sm">{t('creator.choose_from_gallery')}</p>
                 </Button>
               </div>
             )}
@@ -935,7 +935,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
               {/* Templates */}
               {!textContent && (
                 <div>
-                  <p className="text-white/50 text-xs mb-2 uppercase tracking-wider">Templates</p>
+                  <p className="text-white/50 text-xs mb-2 uppercase tracking-wider">{t('creator.templates_label')}</p>
                   <div className="flex gap-2 overflow-x-auto pb-1">
                     {STORY_TEMPLATES.map((t, idx) => (
                       <Button
@@ -973,7 +973,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
 
               {/* Gradient picker */}
               <div>
-                <p className="text-white/50 text-xs mb-2 uppercase tracking-wider">Background</p>
+                <p className="text-white/50 text-xs mb-2 uppercase tracking-wider">{t('creator.background_label')}</p>
                 <div className="flex gap-2 flex-wrap">
                   {GRADIENT_PRESETS.map((g, idx) => (
                     <Button
@@ -994,7 +994,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
 
               {/* Font picker */}
               <div>
-                <p className="text-white/50 text-xs mb-2 uppercase tracking-wider">Font</p>
+                <p className="text-white/50 text-xs mb-2 uppercase tracking-wider">{t('creator.font_label')}</p>
                 <div className="flex gap-2">
                   {FONT_STYLES.map((f, idx) => (
                     <Button
@@ -1060,7 +1060,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
               />
 
               <div className="space-y-2">
-                <p className="text-white/50 text-xs uppercase tracking-wider">Options</p>
+                <p className="text-white/50 text-xs uppercase tracking-wider">{t('creator.options_label')}</p>
                 {pollOptions.map((option, idx) => (
                   <div key={idx} className="flex gap-2">
                     <Input
@@ -1097,14 +1097,14 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                     startContent={<Plus className="w-4 h-4" />}
                     onPress={addPollOption}
                   >
-                    Add Option
+                    {t('creator.poll_add_option_button')}
                   </Button>
                 )}
               </div>
 
               {/* Background picker for poll */}
               <div>
-                <p className="text-white/50 text-xs mb-2 uppercase tracking-wider">Background</p>
+                <p className="text-white/50 text-xs mb-2 uppercase tracking-wider">{t('creator.background_label')}</p>
                 <div className="flex gap-2 flex-wrap">
                   {GRADIENT_PRESETS.map((g, idx) => (
                     <Button

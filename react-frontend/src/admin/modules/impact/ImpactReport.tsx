@@ -597,7 +597,7 @@ export function ImpactReport() {
               <ArrowLeftRight size={20} className="text-primary" />
             </div>
             <div>
-              <p className="text-sm text-default-500">Transactions</p>
+              <p className="text-sm text-default-500">{t('impact_report_labels.transactions')}</p>
               {loading ? (
                 <div className="mt-1 h-6 w-16 animate-pulse rounded bg-default-200" />
               ) : (
@@ -614,7 +614,7 @@ export function ImpactReport() {
               <Users size={20} className="text-success" />
             </div>
             <div>
-              <p className="text-sm text-default-500">Unique Givers</p>
+              <p className="text-sm text-default-500">{t('impact_report_labels.unique_givers')}</p>
               {loading ? (
                 <div className="mt-1 h-6 w-16 animate-pulse rounded bg-default-200" />
               ) : (
@@ -631,7 +631,7 @@ export function ImpactReport() {
               <Users size={20} className="text-warning" />
             </div>
             <div>
-              <p className="text-sm text-default-500">Unique Receivers</p>
+              <p className="text-sm text-default-500">{t('impact_report_labels.unique_receivers')}</p>
               {loading ? (
                 <div className="mt-1 h-6 w-16 animate-pulse rounded bg-default-200" />
               ) : (

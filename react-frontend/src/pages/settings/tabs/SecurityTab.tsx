@@ -630,8 +630,8 @@ export function SecurityTab({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-4 rounded-lg bg-theme-elevated">
-                {backupCodes.map((code, index) => (
-                  <p key={index} className="font-mono text-sm text-theme-primary text-center py-1">
+                {backupCodes.map((code) => (
+                  <p key={code} className="font-mono text-sm text-theme-primary text-center py-1">
                     {code}
                   </p>
                 ))}

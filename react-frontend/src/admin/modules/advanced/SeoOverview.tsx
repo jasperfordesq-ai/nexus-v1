@@ -113,7 +113,7 @@ export function SeoOverview() {
       })
       .catch(() => toast.error(t('advanced.failed_to_load_sitemap_stats')))
       .finally(() => setSitemapLoading(false));
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadSitemapStats();

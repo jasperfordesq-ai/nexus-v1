@@ -597,7 +597,8 @@ export function UserList() {
                     <p className="text-sm font-medium text-danger mb-1">{t('users.import_errors')}</p>
                     <ul className="text-xs text-danger-600 space-y-1">
                       {importResults.errors.map((err, i) => (
-                        <li key={i}>{err}</li>
+                        // Error strings may duplicate; use index prefix for stable key
+                        <li key={`err-${i}`}>{err}</li>
                       ))}
                     </ul>
                   </div>

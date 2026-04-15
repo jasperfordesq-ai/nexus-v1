@@ -111,7 +111,7 @@ export function ProviderHealthDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     fetchHealth();

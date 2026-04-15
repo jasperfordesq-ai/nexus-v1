@@ -172,7 +172,7 @@ export function TenantHierarchy() {
       toast.error(t('super.failed_to_load_hierarchy'));
     }
     setLoading(false);
-  }, [toast]);
+  }, [toast, t])
 
   useEffect(() => {
     loadHierarchy();
@@ -189,7 +189,7 @@ export function TenantHierarchy() {
         <span>/</span>
         <Link to={tenantPath('/admin/super/tenants')} className="hover:text-primary">Tenants</Link>
         <span>/</span>
-        <span className="text-foreground">Hierarchy</span>
+        <span className="text-foreground">{t('super_controls.hierarchy')}</span>
       </nav>
       <PageHeader
         title={t('super.tenant_hierarchy_title')}

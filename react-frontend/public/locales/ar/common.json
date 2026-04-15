@@ -419,5 +419,7 @@
   "radius_50": "50 km",
   "radius_100": "100 km",
   "go_back": "Go back",
-  "checking_authentication": "Checking authentication..."
+  "checking_authentication": "Checking authentication...",
+  "verification_status": "Verification Status",
+  "verify_identity": "Verify Identity"
 }

@@ -10,7 +10,7 @@
  * No action buttons — this is a pure read-only view.
  */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   Card,
@@ -39,12 +39,7 @@ export function ArchiveDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!id) return;
-    loadArchive(Number(id));
-  }, [id]);
-
-  async function loadArchive(archiveId: number) {
+  const loadArchive = useCallback(async (archiveId: number) => {
     setLoading(true);
     try {
       const res = await adminBroker.showArchive(archiveId);
@@ -58,7 +53,12 @@ export function ArchiveDetail() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [t]);
+
+  useEffect(() => {
+    if (!id) return;
+    loadArchive(Number(id));
+  }, [id, loadArchive]);
 
   if (loading) {
     return (

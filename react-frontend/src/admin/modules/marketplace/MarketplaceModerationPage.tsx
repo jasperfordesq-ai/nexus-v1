@@ -137,7 +137,7 @@ export function MarketplaceModerationPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, moderationFilter, search, toast]);
+  }, [page, moderationFilter, search, toast, t])
 
   useEffect(() => {
     loadListings();

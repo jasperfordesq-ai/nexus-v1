@@ -271,7 +271,7 @@ export function VerificationBadgeSummary({
     <div className="space-y-3">
       <div className="flex items-center gap-2">
         <Shield className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-        <span className="text-sm font-semibold text-theme-primary">Verification Status</span>
+        <span className="text-sm font-semibold text-theme-primary">{t('verification_status')}</span>
       </div>
       {badges.length === 0 ? (
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-elevated">

@@ -52,7 +52,7 @@ export function ReviewArchive() {
     } finally {
       setLoading(false);
     }
-  }, [page, filter, search, toast]);
+  }, [page, filter, search, toast, t])
 
   useEffect(() => {
     loadItems();

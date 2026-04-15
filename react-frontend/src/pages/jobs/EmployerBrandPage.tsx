@@ -168,7 +168,7 @@ export function EmployerBrandPage() {
     } finally {
       setSubmittingReview(false);
     }
-  }, [userId, reviewRating, reviewComment, dimRespect, dimCommunication, dimFlexibility, dimImpact, loadReviews]);
+  }, [userId, reviewRating, reviewComment, dimRespect, dimCommunication, dimFlexibility, dimImpact, loadReviews, t])
 
   const loadData = useCallback(async () => {
     if (!userId) return;

@@ -87,6 +87,7 @@ const RELATIVE_OR_FRAGMENT_REGEX = /^(?:[#/?]|\.{1,2}\/|[a-z0-9._~%!$&'()*+,;=@-
  */
 function isSafeUrl(value: string): boolean {
   // Strip control characters and whitespace that browsers ignore but parsers may not
+  // eslint-disable-next-line no-control-regex
   const cleaned = value.replace(/[\x00-\x20]+/g, '').trim();
   if (cleaned === '') return false;
 

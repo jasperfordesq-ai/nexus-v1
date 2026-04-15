@@ -202,7 +202,7 @@ export function MyListingsPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [user?.id, activeTab, toast]);
+  }, [user?.id, activeTab, toast, t])
 
   // Reload on tab change
   useEffect(() => {
@@ -228,7 +228,7 @@ export function MyListingsPage() {
       logError('Failed to renew listing', err);
       toast.error(t('my_listings.renewed_error', 'Failed to renew listing'));
     }
-  }, [toast, loadListings]);
+  }, [toast, loadListings, t])
 
   // Remove listing
   const confirmRemove = useCallback((listingId: number) => {
@@ -258,7 +258,7 @@ export function MyListingsPage() {
     } finally {
       setIsRemoving(false);
     }
-  }, [removeTargetId, activeTab, stats, toast, onRemoveClose]);
+  }, [removeTargetId, activeTab, stats, toast, onRemoveClose, t])
 
   if (!isAuthenticated) return null;
 

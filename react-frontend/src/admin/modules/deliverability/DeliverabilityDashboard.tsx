@@ -49,7 +49,7 @@ export function DeliverabilityDashboard() {
       })
       .catch(() => toast.error(t('deliverability.failed_to_load_dashboard_data')))
       .finally(() => setLoading(false));
-  }, [toast]);
+  }, [toast, t])
 
   if (loading) {
     return (

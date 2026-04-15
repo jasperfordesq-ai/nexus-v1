@@ -111,7 +111,7 @@ export function SmartMatchingOverview() {
     } finally {
       setClearing(false);
     }
-  }, [toast, loadData]);
+  }, [toast, loadData, t])
 
   const overview = stats?.overview;
 

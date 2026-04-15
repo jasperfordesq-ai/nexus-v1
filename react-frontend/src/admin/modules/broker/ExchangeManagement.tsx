@@ -69,7 +69,7 @@ export function ExchangeManagement() {
     } finally {
       setLoading(false);
     }
-  }, [page, status, toast]);
+  }, [page, status, toast, t])
 
   useEffect(() => {
     loadItems();

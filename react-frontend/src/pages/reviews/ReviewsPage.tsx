@@ -227,10 +227,6 @@ export default function ReviewsPage(): JSX.Element {
     fetchPending();
   }, [fetchReceived, fetchPending]);
 
-  const handleReviewDeleted = useCallback((id: number) => {
-    setReceived(prev => prev.filter(r => r.id !== id));
-  }, []);
-
   const handleReviewWritten = useCallback((pendingItem: PendingReview) => {
     setPending(prev => prev.filter(p => p.exchange_id !== pendingItem.exchange_id));
     setReviewTarget(null);

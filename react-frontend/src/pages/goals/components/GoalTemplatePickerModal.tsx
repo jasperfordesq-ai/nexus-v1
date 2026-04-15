@@ -114,7 +114,7 @@ export function GoalTemplatePickerModal({
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t])
 
   useEffect(() => {
     if (isOpen) {
