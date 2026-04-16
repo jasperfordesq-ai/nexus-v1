@@ -2428,7 +2428,7 @@ class CronJobRunner
     }
 
     /**
-     * Listing expiry reminders — send 3-day warning emails (daily 8am)
+     * Listing expiry reminders — send 7-day, 3-day, 1-day warning emails + expired-today (daily 8am)
      */
     private function listingExpiryRemindersInternal(): void
     {

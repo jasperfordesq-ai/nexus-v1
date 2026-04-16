@@ -469,5 +469,25 @@
     "body": "Your recent exchange has been flagged as disputed due to a difference in reported hours. A coordinator will review this and reach out shortly.",
     "next_steps": "You may be contacted by a broker or coordinator to help resolve this. In the meantime, you can view the exchange details.",
     "cta": "View Exchange"
+  },
+  "onboarding_nurture": {
+    "day2_subject": "Complete your profile to get more connections",
+    "day2_title": "Your Profile Is Almost Ready",
+    "day2_preview": "A complete profile gets 3x more responses",
+    "day2_greeting": "Hi :name,",
+    "day2_body": "You joined :community 2 days ago — great to have you! Adding a photo and a short bio helps community members get to know you and increases your response rate.",
+    "day2_cta": "Complete Your Profile",
+    "day5_subject": "Have you made your first connection yet?",
+    "day5_title": "Connect With Your Community",
+    "day5_preview": "Find people to exchange time with",
+    "day5_greeting": "Hi :name,",
+    "day5_body": "You've been part of :community for a few days now. Connecting with other members is the best way to start exchanging time credits and build relationships.",
+    "day5_cta": "Find Members",
+    "day7_subject": "Your first week at :community — here's what you can do",
+    "day7_title": "One Week In!",
+    "day7_preview": "Here's how to make the most of :community",
+    "day7_greeting": "Hi :name,",
+    "day7_body": "You've been part of :community for a week! Here's a quick reminder of everything you can do: browse listings, make connections, join groups, and attend events.",
+    "day7_cta": "Explore Your Community"
   }
 }

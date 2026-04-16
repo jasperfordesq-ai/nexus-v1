@@ -145,6 +145,14 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->runInBackground()
             ->name('nexus-prune-logs');
+
+        // Onboarding nurture sequence — Day 2, Day 5, Day 7 emails to new users
+        $schedule->call(function () {
+            \App\Services\OnboardingNurtureService::sendDueNurtureEmails();
+        })
+            ->dailyAt('08:00')
+            ->name('onboarding:nurture-sequence')
+            ->withoutOverlapping(30);
     })
     ->withRouting(
         // Routes loaded by RouteServiceProvider (no /api prefix).
