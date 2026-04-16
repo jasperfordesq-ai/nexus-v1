@@ -91,7 +91,10 @@
     "options_label": "Options",
     "or_divider": "or",
     "poll_add_option_button": "Add Option",
-    "videos_trimmed_notice": "Videos longer than 60s will be trimmed to 60s display duration"
+    "videos_trimmed_notice": "Videos longer than 60s will be trimmed to 60s display duration",
+    "share_story": "Share Story",
+    "error_camera_permission": "Camera access was denied. Please enable it in your browser settings.",
+    "error_camera_not_found": "No camera found on this device."
   },
   "viewer": {
     "story_from": "Historia de {{name}}",

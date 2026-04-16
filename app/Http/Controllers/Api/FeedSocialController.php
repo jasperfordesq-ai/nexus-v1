@@ -231,9 +231,13 @@ class FeedSocialController extends BaseApiController
 
         $limit = $this->queryInt('limit', 10, 1, 50);
 
+        // M3: Strip LIKE wildcard characters to prevent pattern injection
+        $escapedQuery = preg_replace('/[%_]/', '', $query);
+        $likePattern = strtolower($escapedQuery) . '%';
+
         $results = DB::table('hashtags')
             ->where('tenant_id', $tenantId)
-            ->where('tag', 'LIKE', strtolower($query) . '%')
+            ->where('tag', 'LIKE', $likePattern)
             ->orderByDesc('post_count')
             ->limit($limit)
             ->select('id', 'tag', 'post_count')

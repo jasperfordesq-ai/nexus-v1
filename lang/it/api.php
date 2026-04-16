@@ -1217,4 +1217,10 @@ return [
     'sdg_goals_must_be_array'           => 'sdg_goals must be an array.',
     'sdg_goals_max'                     => 'You can select at most 17 SDG goals.',
     'sdg_goals_invalid'                 => 'Invalid SDG goal value. Goals must be integers between 1 and 17.',
+
+    'invalid_reaction'                            => 'Invalid reaction emoji.',
+
+    'story_not_found'                            => 'Story not found.',
+
+    'story_expired'                            => 'Story has expired.',
 ];

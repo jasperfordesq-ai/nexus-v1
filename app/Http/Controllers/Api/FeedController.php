@@ -70,7 +70,41 @@ class FeedController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
         if ($this->query('user_id')) {
-            $filters['user_id'] = (int) $this->query('user_id');
+            $profileUserId = (int) $this->query('user_id');
+            $currentUserId = $userId;
+
+            // H6: Enforce profile privacy_profile setting before returning another user's posts
+            if ($profileUserId && $profileUserId !== $currentUserId) {
+                $profile = DB::selectOne(
+                    'SELECT privacy_profile FROM users WHERE id = ? AND tenant_id = ?',
+                    [$profileUserId, $tenantId]
+                );
+                if (!$profile) {
+                    // Profile not found in this tenant — return empty
+                    return $this->respondWithCollection([], null, $filters['limit'] ?? 20, false);
+                }
+                if ($profile->privacy_profile === 'connections') {
+                    // 'connections' — only visible to connected members; check connection
+                    $isConnected = $currentUserId && DB::table('connections')
+                        ->where('tenant_id', $tenantId)
+                        ->where(function ($q) use ($currentUserId, $profileUserId) {
+                            $q->where(function ($q2) use ($currentUserId, $profileUserId) {
+                                $q2->where('requester_id', $currentUserId)->where('receiver_id', $profileUserId);
+                            })->orWhere(function ($q2) use ($currentUserId, $profileUserId) {
+                                $q2->where('requester_id', $profileUserId)->where('receiver_id', $currentUserId);
+                            });
+                        })
+                        ->where('status', 'accepted')
+                        ->exists();
+                    if (!$isConnected) {
+                        return $this->respondWithCollection([], null, $filters['limit'] ?? 20, false);
+                    }
+                }
+                // 'members' means any logged-in member can see — no extra check needed
+                // 'public' means anyone can see — no extra check needed
+            }
+
+            $filters['user_id'] = $profileUserId;
         }
         if ($this->query('group_id')) {
             $filters['group_id'] = (int) $this->query('group_id');
@@ -225,6 +259,17 @@ class FeedController extends BaseApiController
 
         if ($postId <= 0) {
             return $this->respondWithError('INVALID_INPUT', __('api.invalid_post_id'));
+        }
+
+        // M2: Verify the target actually exists in this tenant before recording the report
+        if ($targetType === 'post') {
+            $exists = DB::table('feed_posts')
+                ->where('id', $postId)
+                ->where('tenant_id', $tenantId)
+                ->exists();
+            if (!$exists) {
+                return $this->respondWithError('NOT_FOUND', __('api.post_not_found'), null, 404);
+            }
         }
 
         // Prevent duplicate reports from the same user

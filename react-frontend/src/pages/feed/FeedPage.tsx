@@ -586,7 +586,11 @@ export function FeedPage() {
 
   /* ───────── New-posts banner dismiss ───────── */
 
-  const handleScrollToNewPosts = () => {
+  const isScrollingRef = useRef(false);
+
+  const handleScrollToNewPosts = useCallback(() => {
+    if (isScrollingRef.current) return;
+    isScrollingRef.current = true;
     // Flush buffered posts into the feed
     if (pendingPostsRef.current.length > 0) {
       const buffered = [...pendingPostsRef.current];
@@ -599,7 +603,8 @@ export function FeedPage() {
     }
     setPendingPostCount(0);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+    setTimeout(() => { isScrollingRef.current = false; }, 1000);
+  }, []);
 
   const filterOptions: { key: FeedFilter; label: string }[] = [
     { key: 'all', label: t('filter.all') },

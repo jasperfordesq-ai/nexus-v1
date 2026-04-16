@@ -213,7 +213,14 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
       }
     } catch (err) {
       logError('Camera access failed', err);
-      toast.error(t('creator.error_camera'));
+      const error = err as { name?: string };
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        toast.error(t('creator.error_camera_permission'));
+      } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+        toast.error(t('creator.error_camera_not_found'));
+      } else {
+        toast.error(t('creator.error_camera'));
+      }
     }
   }, [cameraFacing, mode, toast, t])
 
@@ -1161,7 +1168,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
             onPress={handleDiscard}
             startContent={<Trash2 className="w-4 h-4" />}
           >
-            Discard
+            {t('creator.discard')}
           </Button>
 
           <Button
@@ -1171,7 +1178,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
             isLoading={isSubmitting}
             startContent={!isSubmitting ? <Send className="w-4 h-4" /> : undefined}
           >
-            Share Story
+            {t('creator.share_story')}
           </Button>
         </div>
       </div>

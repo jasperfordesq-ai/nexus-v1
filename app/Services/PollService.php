@@ -200,10 +200,12 @@ class PollService
 
             if (! empty($data['options'])) {
                 foreach ($data['options'] as $text) {
+                    // C6: Only insert columns that exist in poll_options schema
+                    // (id, poll_id, tenant_id, label, expires_at, votes — no created_at)
                     DB::table('poll_options')->insert([
-                        'poll_id'    => $poll->id,
-                        'label'      => trim($text),
-                        'created_at' => now(),
+                        'poll_id'   => $poll->id,
+                        'tenant_id' => TenantContext::getId(),
+                        'label'     => trim($text),
                     ]);
                 }
             }
@@ -252,28 +254,50 @@ class PollService
     /**
      * Cast a vote on a poll option.
      *
+     * M1: Wrapped in DB transaction to prevent TOCTOU race conditions.
+     * C4: Validates option_id belongs to this poll and tenant.
+     * C5: Prevents voting on expired polls.
+     *
      * @return bool true if vote was cast, false if already voted
      */
     public static function vote(int $pollId, int $optionId, int $userId): bool
     {
-        $tenantId = TenantContext::getId();
-        $poll = DB::selectOne(
-            'SELECT id FROM polls WHERE id = ? AND tenant_id = ?',
-            [$pollId, $tenantId]
-        );
-        if (!$poll) {
-            throw new \RuntimeException('Poll not found');
-        }
+        return DB::transaction(function () use ($pollId, $optionId, $userId) {
+            $tenantId = TenantContext::getId();
 
-        // Use INSERT IGNORE to atomically prevent double-votes.
-        // The idx_vote_unique (poll_id, user_id) constraint enforces uniqueness;
-        // INSERT IGNORE silently skips if the row already exists.
-        $affected = DB::affectingStatement(
-            'INSERT IGNORE INTO poll_votes (poll_id, option_id, user_id, created_at) VALUES (?, ?, ?, NOW())',
-            [$pollId, $optionId, $userId]
-        );
+            // C5: Fetch poll with end_date to enforce expiry check
+            $poll = DB::selectOne(
+                'SELECT id, end_date FROM polls WHERE id = ? AND tenant_id = ?',
+                [$pollId, $tenantId]
+            );
+            if (!$poll) {
+                throw new \RuntimeException('Poll not found');
+            }
 
-        return $affected > 0;
+            // C5: Prevent voting on expired polls
+            if (!empty($poll->end_date) && strtotime($poll->end_date) <= time()) {
+                throw new \RuntimeException('This poll has closed');
+            }
+
+            // C4: Validate that the option belongs to this poll and tenant
+            $option = DB::selectOne(
+                'SELECT id FROM poll_options WHERE id = ? AND poll_id = ? AND tenant_id = ?',
+                [$optionId, $pollId, $tenantId]
+            );
+            if (!$option) {
+                throw new \InvalidArgumentException('Invalid poll option');
+            }
+
+            // Use INSERT IGNORE to atomically prevent double-votes.
+            // The idx_vote_unique (poll_id, user_id) constraint enforces uniqueness;
+            // INSERT IGNORE silently skips if the row already exists.
+            $affected = DB::affectingStatement(
+                'INSERT IGNORE INTO poll_votes (poll_id, option_id, user_id, created_at) VALUES (?, ?, ?, NOW())',
+                [$pollId, $optionId, $userId]
+            );
+
+            return $affected > 0;
+        });
     }
 
     /**

@@ -223,6 +223,30 @@ class StoryController extends BaseApiController
             return $this->respondWithError('MISSING_REACTION', __('api.story_reaction_required'), 'reaction_type');
         }
 
+        // H5: Verify story exists and is not expired
+        $tenantId = $this->getTenantId();
+        $story = DB::selectOne(
+            'SELECT id, user_id, audience, expires_at FROM stories WHERE id = ? AND tenant_id = ?',
+            [$id, $tenantId]
+        );
+        if (!$story) {
+            return $this->respondWithError('NOT_FOUND', __('api.story_not_found'), null, 404);
+        }
+        if (!empty($story->expires_at) && strtotime($story->expires_at) <= time()) {
+            return $this->respondWithError('NOT_FOUND', __('api.story_expired'), null, 404);
+        }
+
+        // M5: Enforce close_friends audience restriction
+        if ($story->audience === 'close_friends' && (int) $story->user_id !== $userId) {
+            $isFriend = DB::selectOne(
+                'SELECT user_id FROM close_friends WHERE user_id = ? AND friend_id = ? AND tenant_id = ?',
+                [$story->user_id, $userId, $tenantId]
+            );
+            if (!$isFriend) {
+                return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
+            }
+        }
+
         try {
             $this->storyService->reactToStory($id, $userId, $reactionType);
 
@@ -402,6 +426,30 @@ class StoryController extends BaseApiController
         $body = trim(request()->input('body', ''));
         if (empty($body)) {
             return $this->respondWithError('MISSING_BODY', __('api.story_reply_required'), 'body');
+        }
+
+        // H5: Verify story exists and is not expired
+        $tenantId = $this->getTenantId();
+        $story = DB::selectOne(
+            'SELECT id, user_id, audience, expires_at FROM stories WHERE id = ? AND tenant_id = ?',
+            [$id, $tenantId]
+        );
+        if (!$story) {
+            return $this->respondWithError('NOT_FOUND', __('api.story_not_found'), null, 404);
+        }
+        if (!empty($story->expires_at) && strtotime($story->expires_at) <= time()) {
+            return $this->respondWithError('NOT_FOUND', __('api.story_expired'), null, 404);
+        }
+
+        // M5: Enforce close_friends audience restriction
+        if ($story->audience === 'close_friends' && (int) $story->user_id !== $userId) {
+            $isFriend = DB::selectOne(
+                'SELECT user_id FROM close_friends WHERE user_id = ? AND friend_id = ? AND tenant_id = ?',
+                [$story->user_id, $userId, $tenantId]
+            );
+            if (!$isFriend) {
+                return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
+            }
         }
 
         try {

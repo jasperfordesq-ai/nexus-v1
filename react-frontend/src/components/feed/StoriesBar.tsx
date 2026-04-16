@@ -69,9 +69,12 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
     }
   }, [isAuthenticated]);
 
+  const loadStoriesRef = useRef(loadStories);
+  useEffect(() => { loadStoriesRef.current = loadStories; }, [loadStories]);
+
   useEffect(() => {
-    loadStories();
-  }, [loadStories]);
+    loadStoriesRef.current();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- run only on mount; isAuthenticated changes handled by ref update
 
   // Scroll arrow visibility
   const updateArrows = useCallback(() => {

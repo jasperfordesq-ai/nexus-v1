@@ -275,6 +275,7 @@ class FeedService
                 ->where('target_type', $sType)
                 ->whereIn('target_id', $sIds)
                 ->where('tenant_id', $tenantId)
+                ->whereNull('deleted_at')
                 ->groupBy('target_id')
                 ->pluck('cnt', 'target_id');
             foreach ($counts as $targetId => $cnt) {
@@ -920,7 +921,7 @@ class FeedService
                            'post' as type,
                            COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                            u.avatar_url as author_avatar,
-                           (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND target_id = p.id) as comments_count
+                           (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND target_id = p.id AND deleted_at IS NULL) as comments_count
                     FROM feed_posts p
                     JOIN users u ON p.user_id = u.id
                     WHERE p.id = ? AND p.tenant_id = ? AND (p.publish_status = 'published' OR p.publish_status IS NULL) AND (p.is_hidden = 0 OR p.is_hidden IS NULL) AND p.deleted_at IS NULL",
@@ -935,7 +936,7 @@ class FeedService
                            0 as likes_count, p.author_id as user_id, 'blog' as type,
                            COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                            u.avatar_url as author_avatar,
-                           (SELECT COUNT(*) FROM comments WHERE target_type = 'blog' AND target_id = p.id) as comments_count
+                           (SELECT COUNT(*) FROM comments WHERE target_type = 'blog' AND target_id = p.id AND deleted_at IS NULL) as comments_count
                     FROM posts p
                     JOIN users u ON p.author_id = u.id
                     WHERE p.id = ? AND p.tenant_id = ? AND p.status = 'published'",

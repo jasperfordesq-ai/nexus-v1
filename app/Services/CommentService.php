@@ -143,6 +143,9 @@ class CommentService
             }
         }
 
+        // M4: Wrap depth check + insert in a transaction to prevent TOCTOU race
+        // where two concurrent requests both pass the depth check before either inserts.
+        return DB::transaction(function () use ($targetType, $targetId, $userId, $tenantId, $content, $parentId, $data) {
         // Enforce nesting depth limit to prevent infinite recursion attacks
         if (!empty($parentId)) {
             $depth = 0;
@@ -197,6 +200,7 @@ class CommentService
         }
 
         return $comment;
+        }); // end DB::transaction
     }
 
     /**

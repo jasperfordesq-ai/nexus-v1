@@ -1131,6 +1131,12 @@ class SocialController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.social_invalid_reaction'), null, 400);
         }
 
+        // H4: Allowlist emoji reactions to prevent storage of arbitrary Unicode/XSS payloads
+        $allowedEmojis = ['👍', '❤️', '😂', '😮', '😢', '🔥', '👏', '🎉', '😍', '🤔', '😡', '💯'];
+        if (!in_array($emoji, $allowedEmojis, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_reaction'), null, 422);
+        }
+
         try {
             if (true /* CommentService injected via DI */) {
                 $result = $this->commentService->toggleReaction($userId, $tenantId, $commentId, $emoji);

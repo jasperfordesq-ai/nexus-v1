@@ -293,6 +293,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
 
   // Navigation
   const goNext = useCallback(() => {
+    setIsPaused(false);
     // Track: view_complete if at end of story, tap_forward if manual advance
     if (progress >= 0.99) {
       trackEvent('view_complete');
@@ -314,6 +315,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
   }, [currentStoryIdx, stories.length, currentUserIdx, storyUsers.length, onClose, trackEvent, progress]);
 
   const goPrev = useCallback(() => {
+    setIsPaused(false);
     trackEvent('tap_back');
     if (currentStoryIdx > 0) {
       setCurrentStoryIdx((prev) => prev - 1);
@@ -324,7 +326,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
     } else if (currentUserIdx > 0) {
       setCurrentUserIdx((prev) => prev - 1);
     }
-  }, [currentStoryIdx, currentUserIdx]);
+  }, [currentStoryIdx, currentUserIdx, trackEvent]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -349,6 +351,20 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose, goNext, goPrev]);
+
+  // Pause progress timer when tab/window loses visibility
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setIsPaused(true);
+      } else {
+        setIsPaused(false);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 
   // Touch hold to pause (500ms threshold for mobile-friendly hold detection)
   const pointerMovedRef = useRef(false);

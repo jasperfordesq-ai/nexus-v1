@@ -614,6 +614,11 @@ const FeedCard = React.memo(function FeedCard({
 
   const handleVote = (optionId: number) => {
     if (!pollData) return;
+    const pollExpired = pollData.expires_at && new Date(pollData.expires_at) < new Date();
+    if (pollExpired) {
+      toast.error(t('poll.expired'));
+      return;
+    }
     onVotePoll(item.id, optionId);
 
     // Optimistic update: update pollData locally
@@ -1163,9 +1168,19 @@ const FeedCard = React.memo(function FeedCard({
             ) : pollData ? (
               <Card shadow="none" className="bg-[var(--surface-elevated)] border border-[var(--border-default)]">
                 <CardBody className="gap-3 p-4">
+                  {(() => {
+                    const pollExpiredBanner = !!(pollData.expires_at && new Date(pollData.expires_at) < new Date());
+                    return pollExpiredBanner && !pollData.user_vote_option_id ? (
+                      <p className="text-sm text-[var(--text-muted)] py-1 flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5" aria-hidden="true" />
+                        {t('poll.expired')}
+                      </p>
+                    ) : null;
+                  })()}
                   {pollData.options.map((option) => {
                     const isVoted = pollData.user_vote_option_id === option.id;
                     const hasVoted = pollData.user_vote_option_id !== null;
+                    const pollExpired = !!(pollData.expires_at && new Date(pollData.expires_at) < new Date());
 
                     return (
                       <div key={option.id}>
@@ -1199,6 +1214,7 @@ const FeedCard = React.memo(function FeedCard({
                             size="sm"
                             className="w-full justify-start text-[var(--text-primary)] border-[var(--border-default)] hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all"
                             onPress={() => handleVote(option.id)}
+                            isDisabled={!!pollExpired}
                           >
                             {option.text}
                           </Button>

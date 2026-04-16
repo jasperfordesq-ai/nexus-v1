@@ -514,7 +514,10 @@
     "unauthorized": "You do not have permission to perform this action."
   },
   "poll": {
-    "load_failed": "Failed to load poll data."
+    "load_failed": "Failed to load poll data.",
+    "expired": "This poll has ended.",
+    "expiry_past": "Poll expiry date must be in the future.",
+    "min_options_hint": "At least 2 options are required."
   },
   "feed": {
     "end_of_feed": "You're all caught up!"

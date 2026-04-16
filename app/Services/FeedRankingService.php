@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -124,6 +125,13 @@ class FeedRankingService
      */
     private static array $configCacheByTenant = [];
 
+    /**
+     * Tracks which tenant last populated $configCacheByTenant so we can
+     * detect a tenant switch (e.g. in Octane/queue workers) and flush
+     * stale config before it bleeds across tenants.
+     */
+    private static ?int $lastRequestTenantId = null;
+
     public function __construct()
     {
     }
@@ -138,6 +146,11 @@ class FeedRankingService
         // from inside scoring loops (called once per post).
         try {
             $tenantIdForCache = TenantContext::getId();
+            // H1: Detect tenant switch (Octane / queue workers) and flush stale cache
+            if (self::$lastRequestTenantId !== null && self::$lastRequestTenantId !== $tenantIdForCache) {
+                self::$configCacheByTenant = [];
+            }
+            self::$lastRequestTenantId = $tenantIdForCache;
             if ($tenantIdForCache !== null && isset(self::$configCacheByTenant[$tenantIdForCache])) {
                 return self::$configCacheByTenant[$tenantIdForCache];
             }
@@ -211,6 +224,7 @@ class FeedRankingService
     public static function clearStaticCache(): void
     {
         self::$configCacheByTenant = [];
+        self::$lastRequestTenantId = null;
     }
 
     private static function validateConfigArray(array &$c): void
@@ -858,6 +872,7 @@ class FeedRankingService
                 $ctr = $ctrScores[$postId];
                 $impressions = $ctrScores['_impressions'][$postId] ?? 0;
                 if ($impressions >= ($config['ctr_min_impressions'] ?? 5)) {
+                    // L7: 0.9 is a literal constant — no division-by-zero risk here
                     $ctrMultiplier = 1.0 + ($ctr - 0.1) * (($config['ctr_max_boost'] ?? 1.5) - 1.0) / 0.9;
                     $score *= max(0.8, min((float) ($config['ctr_max_boost'] ?? 1.5), $ctrMultiplier));
                 }
@@ -991,13 +1006,43 @@ class FeedRankingService
     public function recordImpression(int $postId, int $userId): void
     {
         if (!self::VIEW_TRACKING_ENABLED || $userId === 0 || $postId === 0) return;
+
+        $tenantId = TenantContext::getId();
+
+        // H2: Per-user per-post debounce — skip duplicate impressions within 5 minutes
+        $debounceKey = "imp:{$tenantId}:{$postId}:{$userId}";
+        if (Cache::has($debounceKey)) return;
+
+        // H3: GDPR — only track if user has analytics consent via cookie_consents table
+        try {
+            $analyticsConsent = Cache::remember(
+                "consent:{$tenantId}:{$userId}",
+                now()->addMinutes(30),
+                fn () => DB::table('cookie_consents')
+                    ->where('user_id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->whereNull('withdrawal_date')
+                    ->where(function ($q) {
+                        $q->whereNull('expires_at')
+                          ->orWhere('expires_at', '>', now());
+                    })
+                    ->orderByDesc('created_at')
+                    ->value('analytics')
+            );
+            // Fail closed: if consent is explicitly 0 (false), do not track
+            if ($analyticsConsent !== null && (int) $analyticsConsent === 0) return;
+        } catch (\Throwable $e) {
+            return; // Fail closed — don't track if we can't verify consent
+        }
+
         try {
             DB::statement(
                 "INSERT INTO feed_impressions (post_id, user_id, tenant_id, created_at)
                  VALUES (?, ?, ?, NOW())
                  ON DUPLICATE KEY UPDATE view_count = view_count + 1, updated_at = NOW()",
-                [$postId, $userId, TenantContext::getId()]
+                [$postId, $userId, $tenantId]
             );
+            Cache::put($debounceKey, 1, now()->addMinutes(5));
         } catch (\Exception $e) {
             // Non-blocking
         }
@@ -1226,6 +1271,7 @@ class FeedRankingService
 
             $result = [];
             foreach ($typeCounts as $type => $count) {
+                // L7: $maxEng is guarded above by the === 0 check, so no division by zero
                 $normalized = $count / $maxEng;
                 $result[$type] = 1.0 + ($normalized * ($maxBoost - 1.0));
             }
@@ -1324,9 +1370,14 @@ class FeedRankingService
         if (empty($userIds)) return [];
         try {
             $ph = implode(',', array_fill(0, count($userIds), '?'));
+            // C1: scope by tenant_id to prevent cross-tenant coordinate leakage
             $rows = DB::select(
-                "SELECT id, latitude, longitude FROM users WHERE id IN ($ph) AND latitude IS NOT NULL AND longitude IS NOT NULL",
-                $userIds
+                "SELECT id, latitude, longitude FROM users
+                 WHERE id IN ($ph)
+                 AND latitude IS NOT NULL
+                 AND longitude IS NOT NULL
+                 AND tenant_id = ?",
+                array_merge($userIds, [TenantContext::getId()])
             );
             $result = [];
             foreach ($rows as $row) {

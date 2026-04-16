@@ -11,6 +11,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Button, Input, Avatar, DatePicker } from '@heroui/react';
 import type { DateInputValue } from '@heroui/react';
+import { today, getLocalTimeZone } from '@internationalized/date';
 import { Plus, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast } from '@/contexts';
@@ -100,6 +101,13 @@ export function PollTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
     if (validOptions.length < 2) {
       toast.error(t('compose.poll_min_options'));
       return;
+    }
+    if (expiresAt) {
+      const expiry = new Date(expiresAt.toString());
+      if (expiry <= new Date()) {
+        toast.error(t('poll.expiry_past'));
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -215,11 +223,18 @@ export function PollTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
           </Button>
         )}
 
+        {validOptions.length < 2 && (
+          <p className="text-xs text-[var(--text-muted)] mt-1">
+            {t('poll.min_options_hint')}
+          </p>
+        )}
+
         <DatePicker
           label={t('compose.poll_end_date')}
           value={expiresAt}
           onChange={setExpiresAt}
           granularity="day"
+          minValue={today(getLocalTimeZone())}
           classNames={{
             inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',
           }}
