@@ -18,7 +18,7 @@ import { api } from '@/lib/api';
 
 // VERSION SYNC — keep this in sync with these 2 other locations:
 //   1. capacitor/android/app/build.gradle  →  versionName "1.1"
-//   2. app/Http/Controllers/Api/MobileAppController.php  →  CURRENT_VERSION = '1.1'
+//   2. app/Http/Controllers/Api/AppController.php  →  CURRENT_VERSION = '1.1'
 // All three must match. Update all three together when releasing a new APK.
 const APP_VERSION = '1.1';
 
