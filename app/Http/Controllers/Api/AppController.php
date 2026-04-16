@@ -17,8 +17,10 @@ class AppController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    // Current app version - UPDATE THIS when releasing a new APK
-    // Must match versionName in capacitor/android/app/build.gradle
+    // VERSION SYNC — keep this in sync with these 2 other locations:
+    //   1. capacitor/android/app/build.gradle  →  versionName "1.1"
+    //   2. react-frontend/src/hooks/useAppUpdate.ts  →  APP_VERSION = '1.1'
+    // All three must match. Update all three together when releasing a new APK.
     private const CURRENT_VERSION = '1.1';
 
     // Minimum required version - users below this MUST update
