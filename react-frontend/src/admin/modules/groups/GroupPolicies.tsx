@@ -33,6 +33,53 @@ interface PolicySection {
   policies: GroupPolicy[];
 }
 
+function buildPolicySections(
+  data: GroupPolicy[],
+  t: (key: string) => string,
+): PolicySection[] {
+  const categoryMap = new Map<string, GroupPolicy[]>();
+
+  data.forEach((policy) => {
+    if (!categoryMap.has(policy.category)) {
+      categoryMap.set(policy.category, []);
+    }
+    categoryMap.get(policy.category)!.push(policy);
+  });
+
+  return [
+    {
+      category: 'features',
+      title: t('groups.policy_features'),
+      policies: categoryMap.get('features') || [],
+    },
+    {
+      category: 'moderation',
+      title: t('groups.policy_moderation'),
+      policies: categoryMap.get('moderation') || [],
+    },
+    {
+      category: 'membership',
+      title: t('groups.policy_membership'),
+      policies: categoryMap.get('membership') || [],
+    },
+    {
+      category: 'creation',
+      title: t('groups.policy_creation'),
+      policies: categoryMap.get('creation') || [],
+    },
+    {
+      category: 'content',
+      title: t('groups.policy_content'),
+      policies: categoryMap.get('content') || [],
+    },
+    {
+      category: 'notifications',
+      title: t('groups.policy_notifications'),
+      policies: categoryMap.get('notifications') || [],
+    },
+  ].filter((section) => section.policies.length > 0);
+}
+
 export default function GroupPolicies({
   isOpen, onClose, typeId, typeName }: GroupPoliciesProps) {
   const { t } = useTranslation('admin');
@@ -47,65 +94,19 @@ export default function GroupPolicies({
       const response = await adminGroups.getPolicies(typeId);
       const data = (response.data as GroupPolicy[]) || [];
       setPolicies(data);
-      organizePolicies(data);
+      setSections(buildPolicySections(data, t));
     } catch {
       error(t('groups.failed_to_load_policies'));
     } finally {
       setLoading(false);
     }
-  }, [typeId, error]);
+  }, [typeId, error, t]);
 
   useEffect(() => {
     if (isOpen) {
       loadPolicies();
     }
   }, [isOpen, loadPolicies]);
-
-  const organizePolicies = (data: GroupPolicy[]) => {
-    const categoryMap = new Map<string, GroupPolicy[]>();
-
-    data.forEach((policy) => {
-      if (!categoryMap.has(policy.category)) {
-        categoryMap.set(policy.category, []);
-      }
-      categoryMap.get(policy.category)!.push(policy);
-    });
-
-    const organized: PolicySection[] = [
-      {
-        category: 'features',
-        title: t('groups.policy_features'),
-        policies: categoryMap.get('features') || [],
-      },
-      {
-        category: 'moderation',
-        title: t('groups.policy_moderation'),
-        policies: categoryMap.get('moderation') || [],
-      },
-      {
-        category: 'membership',
-        title: t('groups.policy_membership'),
-        policies: categoryMap.get('membership') || [],
-      },
-      {
-        category: 'creation',
-        title: t('groups.policy_creation'),
-        policies: categoryMap.get('creation') || [],
-      },
-      {
-        category: 'content',
-        title: t('groups.policy_content'),
-        policies: categoryMap.get('content') || [],
-      },
-      {
-        category: 'notifications',
-        title: t('groups.policy_notifications'),
-        policies: categoryMap.get('notifications') || [],
-      },
-    ].filter((section) => section.policies.length > 0);
-
-    setSections(organized);
-  };
 
   const handlePolicyChange = async (policy: GroupPolicy, newValue: string | number | boolean) => {
     try {
@@ -117,7 +118,7 @@ export default function GroupPolicies({
         p.key === policy.key ? { ...p, value: newValue } : p
       );
       setPolicies(updatedPolicies);
-      organizePolicies(updatedPolicies);
+      setSections(buildPolicySections(updatedPolicies, t));
     } catch {
       error(t('groups.failed_to_update_policy'));
     }

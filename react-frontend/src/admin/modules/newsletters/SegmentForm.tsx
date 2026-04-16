@@ -167,7 +167,7 @@ export function SegmentForm() {
       // Navigate back if segment not found
       navigate(tenantPath('/admin/newsletters/segments'));
     }).finally(() => setLoading(false));
-  }, [isEdit, id, navigate]);
+  }, [isEdit, id, navigate, tenantPath]);
 
   // Load suggestions in create mode
   useEffect(() => {
@@ -267,7 +267,7 @@ export function SegmentForm() {
       setErrors({ form: t('newsletters.failed_to_save_segment') });
     }
     setSaving(false);
-  }, [name, description, isActive, matchType, rules, isEdit, id, navigate, t]);
+  }, [name, description, isActive, matchType, rules, isEdit, id, navigate, tenantPath, t]);
 
   // ── Apply Suggestion ──
 

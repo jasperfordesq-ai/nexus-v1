@@ -79,7 +79,7 @@ export default function CommentsModeration() {
     }).catch(() => {
       toast.error(t('moderation.failed_to_load_tenants'));
     });
-  }, [isSuperAdmin]);
+  }, [isSuperAdmin, t, toast]);
 
   // Build query params for the endpoint
   const buildQueryString = () => {

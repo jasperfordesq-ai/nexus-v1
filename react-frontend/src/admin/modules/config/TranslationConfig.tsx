@@ -157,11 +157,13 @@ export function TranslationConfig() {
     loadConfig();
   }, [loadConfig]);
 
+  const isGlossaryEnabled = config['translation.glossary_enabled'];
+
   useEffect(() => {
-    if (config['translation.glossary_enabled']) {
+    if (isGlossaryEnabled) {
       loadGlossary();
     }
-  }, [config['translation.glossary_enabled'], loadGlossary]);
+  }, [isGlossaryEnabled, loadGlossary]);
 
   // ── Config save ───────────────────────────────────────────────────────────
 

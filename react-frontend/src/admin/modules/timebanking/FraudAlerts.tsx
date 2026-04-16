@@ -101,13 +101,13 @@ export function FraudAlerts() {
         toast.error(t('timebanking.failed_to_update_alert_status'));
       }
     },
-    [loadAlerts, toast]
+    [loadAlerts, toast, t]
   );
 
   const handleTabChange = useCallback((key: React.Key) => {
     setStatusFilter(String(key));
     setPage(1);
-  }, [t])
+  }, [])
 
   const columns: Column<FraudAlert>[] = useMemo(
     () => [
@@ -202,7 +202,7 @@ export function FraudAlerts() {
         ),
       },
     ],
-    [tenantPath, handleStatusChange]
+    [tenantPath, handleStatusChange, t]
   );
 
   return (

@@ -96,7 +96,7 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
       }
     };
     load();
-  }, [dismissedKey]);
+  }, [dismissedKey, t, toast]);
 
   const handleConnect = useCallback(async (suggestion: Suggestion) => {
     setConnectingIds((prev) => new Set(prev).add(suggestion.id));
