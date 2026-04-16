@@ -181,7 +181,6 @@ export function SeoOverview() {
       }
     } catch (err) {
       toast.error(t('advanced.failed_to_save_s_e_o_settings'));
-      console.error('SEO settings save error:', err);
     } finally {
       setSaving(false);
     }

@@ -196,8 +196,7 @@ export function InactiveMembersPage() {
         const tp = meta?.total_pages ?? d.pagination?.total_pages ?? 1;
         setTotalPages(Math.max(1, tp));
       }
-    } catch (err) {
-      console.error('Failed to load inactive members:', err);
+    } catch {
       toast.error(t('reports.failed_to_load_inactive_members'));
     } finally {
       setLoading(false);
@@ -225,8 +224,7 @@ export function InactiveMembersPage() {
         toast.success(t('reports.detection_complete', { count: result.flagged ?? 0 }));
         await loadData();
       }
-    } catch (err) {
-      console.error('Detection failed:', err);
+    } catch {
       toast.error(t('reports.detection_failed'));
     } finally {
       setDetecting(false);
@@ -250,8 +248,7 @@ export function InactiveMembersPage() {
         setSelectedIds(new Set());
         await loadData();
       }
-    } catch (err) {
-      console.error('Failed to mark members as notified:', err);
+    } catch {
       toast.error(t('reports.failed_to_mark_members_as_notified'));
     } finally {
       setNotifying(false);

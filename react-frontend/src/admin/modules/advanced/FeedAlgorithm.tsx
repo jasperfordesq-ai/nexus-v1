@@ -57,7 +57,6 @@ export function FeedAlgorithm() {
       }
     } catch (err) {
       toast.error(t('advanced.failed_to_save_feed_algorithm_settings'));
-      console.error('Feed algorithm save error:', err);
     } finally {
       setSaving(false);
     }

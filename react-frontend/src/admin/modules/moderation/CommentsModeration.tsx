@@ -76,8 +76,7 @@ export default function CommentsModeration() {
           name: String(t.name || 'Unknown'),
         })));
       }
-    }).catch((err) => {
-      console.error('Failed to load tenants:', err);
+    }).catch(() => {
       toast.error(t('moderation.failed_to_load_tenants'));
     });
   }, [isSuperAdmin]);

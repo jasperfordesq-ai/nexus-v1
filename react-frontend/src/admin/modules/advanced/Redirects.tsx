@@ -93,7 +93,6 @@ export function Redirects() {
       }
     } catch (err) {
       toast.error(t('advanced.failed_to_create_redirect'));
-      console.error('Redirect create error:', err);
     } finally {
       setSaving(false);
     }
@@ -115,7 +114,6 @@ export function Redirects() {
       }
     } catch (err) {
       toast.error(t('advanced.failed_to_delete_redirect'));
-      console.error('Redirect delete error:', err);
     } finally {
       setDeleting(false);
     }

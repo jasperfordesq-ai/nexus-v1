@@ -58,7 +58,7 @@ import {
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader, ConfirmModal } from '../../components';
 import type { SuperAdminTenantDetail } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
@@ -104,6 +104,7 @@ export function TenantShow() {
   });
   const [addingAdmin, setAddingAdmin] = useState(false);
   const [removingAdminId, setRemovingAdminId] = useState<number | null>(null);
+  const [demoteTarget, setDemoteTarget] = useState<{ id: number; name: string } | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
   // Guard ref to prevent Switch onValueChange re-entry (HeroUI fires on programmatic isSelected changes)
@@ -229,7 +230,6 @@ export function TenantShow() {
   };
 
   const handleRemoveAdmin = async (admin: { id: number; name: string }) => {
-    if (!window.confirm(t('super.demote_confirm', { name: admin.name }))) return;
     setRemovingAdminId(admin.id);
     try {
       const res = await adminSuper.updateUser(admin.id, { role: 'member' });
@@ -775,7 +775,7 @@ export function TenantShow() {
                           variant="light"
                           color="danger"
                           isLoading={removingAdminId === admin.id}
-                          onPress={() => handleRemoveAdmin(admin)}
+                          onPress={() => setDemoteTarget(admin)}
                           aria-label={`Remove ${admin.name} as admin`}
                         >
                           <UserMinus size={14} />
@@ -947,6 +947,23 @@ export function TenantShow() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* Demote Admin Confirmation */}
+      <ConfirmModal
+        isOpen={!!demoteTarget}
+        onClose={() => setDemoteTarget(null)}
+        onConfirm={() => {
+          if (demoteTarget) {
+            handleRemoveAdmin(demoteTarget);
+            setDemoteTarget(null);
+          }
+        }}
+        title={t('super.demote_admin_title')}
+        message={t('super.demote_confirm', { name: demoteTarget?.name ?? '' })}
+        confirmLabel={t('super.demote')}
+        confirmColor="danger"
+        isLoading={removingAdminId !== null}
+      />
     </div>
   );
 }

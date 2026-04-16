@@ -57,7 +57,7 @@ import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { DynamicIcon } from '@/components/ui';
 import { adminMenus } from '../../api/adminApi';
-import { PageHeader, IconPicker, VisibilityRulesEditor } from '../../components';
+import { PageHeader, IconPicker, VisibilityRulesEditor, ConfirmModal } from '../../components';
 import type { MenuItemType, MenuLocation, VisibilityRules } from '@/types/menu';
 
 import { useTranslation } from 'react-i18next';
@@ -239,6 +239,9 @@ export function MenuBuilder() {
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<Partial<MenuItemData>>({});
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Delete confirmation
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
   // DnD sensors
   const sensors = useSensors(
@@ -661,7 +664,7 @@ export function MenuBuilder() {
                           item={item}
                           isSelected={selectedItemId === item.id}
                           onSelect={() => selectItem(item)}
-                          onDelete={() => handleDeleteItem(item.id)}
+                          onDelete={() => setDeleteTarget(item.id)}
                           depth={getItemDepth(item)}
                         />
                       ))}
@@ -864,6 +867,22 @@ export function MenuBuilder() {
           </Card>
         </div>
       </div>
+
+      {/* Delete Item Confirmation */}
+      <ConfirmModal
+        isOpen={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget !== null) {
+            handleDeleteItem(deleteTarget);
+            setDeleteTarget(null);
+          }
+        }}
+        title={t('content.delete_item_title')}
+        message={t('content.delete_item_message')}
+        confirmLabel={t('common.delete')}
+        confirmColor="danger"
+      />
     </div>
   );
 }

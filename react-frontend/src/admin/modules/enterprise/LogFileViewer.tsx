@@ -134,6 +134,18 @@ export function LogFileViewer() {
     };
   }, [autoRefresh, loadData]);
 
+  const handleDownload = () => {
+    if (!content) return;
+    const text = content.content.map((l) => l.text).join('\n');
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = content.filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handleClear = async () => {
     if (!filename) return;
     setClearing(true);
@@ -226,8 +238,10 @@ export function LogFileViewer() {
             variant="flat"
             startContent={<Download size={14} />}
             size="sm"
+            isDisabled={!content}
+            onPress={handleDownload}
           >
-            Download
+            {t('common.download')}
           </Button>
           <Button
             color="danger"

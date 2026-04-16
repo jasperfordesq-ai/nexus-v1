@@ -836,19 +836,42 @@ class AdminContentController extends BaseApiController
 
     public function getSubscriptions(): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
 
-        $subscriptions = array_map(fn($r) => (array)$r, DB::select(
-            "SELECT tpa.id, tpa.tenant_id, tpa.pay_plan_id, tpa.status, tpa.starts_at, tpa.expires_at,
-                    tpa.trial_ends_at, tpa.stripe_subscription_id, tpa.stripe_current_period_end,
-                    tpa.created_at, tpa.updated_at,
-                    pp.name AS plan_name, pp.slug AS plan_slug, pp.tier_level AS plan_tier_level,
-                    t.name AS tenant_name
-             FROM tenant_plan_assignments tpa
-             JOIN pay_plans pp ON pp.id = tpa.pay_plan_id
-             LEFT JOIN tenants t ON t.id = tpa.tenant_id
-             ORDER BY tpa.created_at DESC"
-        ));
+        // Platform super-admins may view all subscriptions (cross-tenant).
+        // Tenant admins see only their own tenant's subscription.
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $isPlatformSuperAdmin = in_array($user->role ?? '', ['super_admin', 'god'], true)
+            || ($user->is_super_admin ?? false);
+
+        if ($isPlatformSuperAdmin) {
+            $subscriptions = array_map(fn($r) => (array)$r, DB::select(
+                "SELECT tpa.id, tpa.tenant_id, tpa.pay_plan_id, tpa.status, tpa.starts_at, tpa.expires_at,
+                        tpa.trial_ends_at, tpa.stripe_subscription_id, tpa.stripe_current_period_end,
+                        tpa.created_at, tpa.updated_at,
+                        pp.name AS plan_name, pp.slug AS plan_slug, pp.tier_level AS plan_tier_level,
+                        t.name AS tenant_name
+                 FROM tenant_plan_assignments tpa
+                 JOIN pay_plans pp ON pp.id = tpa.pay_plan_id
+                 LEFT JOIN tenants t ON t.id = tpa.tenant_id
+                 ORDER BY tpa.created_at DESC"
+            ));
+        } else {
+            $subscriptions = array_map(fn($r) => (array)$r, DB::select(
+                "SELECT tpa.id, tpa.tenant_id, tpa.pay_plan_id, tpa.status, tpa.starts_at, tpa.expires_at,
+                        tpa.trial_ends_at, tpa.stripe_subscription_id, tpa.stripe_current_period_end,
+                        tpa.created_at, tpa.updated_at,
+                        pp.name AS plan_name, pp.slug AS plan_slug, pp.tier_level AS plan_tier_level,
+                        t.name AS tenant_name
+                 FROM tenant_plan_assignments tpa
+                 JOIN pay_plans pp ON pp.id = tpa.pay_plan_id
+                 LEFT JOIN tenants t ON t.id = tpa.tenant_id
+                 WHERE tpa.tenant_id = ?
+                 ORDER BY tpa.created_at DESC",
+                [$tenantId]
+            ));
+        }
 
         return $this->respondWithData($subscriptions);
     }

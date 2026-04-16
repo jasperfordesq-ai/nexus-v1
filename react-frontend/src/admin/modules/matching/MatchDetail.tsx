@@ -52,12 +52,12 @@ function scoreColor(score: number): 'danger' | 'warning' | 'success' {
   return 'success';
 }
 
-// Score label
-function scoreLabel(score: number): string {
-  if (score >= 90) return 'Excellent';
-  if (score >= 75) return 'Good';
-  if (score >= 50) return 'Fair';
-  return 'Low';
+// Score label key
+function scoreLabelKey(score: number): string {
+  if (score >= 90) return 'matching.score_excellent';
+  if (score >= 75) return 'matching.score_good';
+  if (score >= 50) return 'matching.score_fair';
+  return 'matching.score_low';
 }
 
 export function MatchDetail() {
@@ -153,7 +153,7 @@ export function MatchDetail() {
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/match-approvals'))}
             >
-              Back
+              {t('matching.back')}
             </Button>
           }
         />
@@ -161,10 +161,10 @@ export function MatchDetail() {
           <CardBody className="flex flex-col items-center justify-center py-16">
             <XCircle size={40} className="mb-3 text-danger" />
             <p className="text-lg font-medium text-foreground">
-              Match Not Found
+              {t('matching.match_not_found')}
             </p>
             <p className="mt-1 text-sm text-default-500">
-              {error || 'The match approval could not be loaded.'}
+              {error || t('matching.match_could_not_be_loaded')}
             </p>
           </CardBody>
         </Card>
@@ -177,15 +177,15 @@ export function MatchDetail() {
   return (
     <div>
       <PageHeader
-        title={`Match Approval #${item.id}`}
-        description={`Submitted ${new Date(item.created_at).toLocaleDateString()}`}
+        title={t('matching.match_approval_title', { id: item.id })}
+        description={t('matching.match_submitted_date', { date: new Date(item.created_at).toLocaleDateString() })}
         actions={
           <Button
             variant="flat"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/match-approvals'))}
           >
-            Back to Approvals
+            {t('matching.back_to_approvals')}
           </Button>
         }
       />
@@ -222,7 +222,7 @@ export function MatchDetail() {
                 color={scoreColor(item.match_score)}
                 className="mt-1"
               >
-                {scoreLabel(item.match_score)}
+                {t(scoreLabelKey(item.match_score))}
               </Chip>
             </div>
 
@@ -391,13 +391,13 @@ export function MatchDetail() {
           <CardBody>
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <p className="text-sm text-default-400">Reviewed by:</p>
+                <p className="text-sm text-default-400">{t('matching.reviewed_by')}</p>
                 <p className="text-sm font-medium text-foreground">
-                  {item.reviewer_name || 'Unknown'}
+                  {item.reviewer_name || t('matching.unknown')}
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <p className="text-sm text-default-400">Reviewed at:</p>
+                <p className="text-sm text-default-400">{t('matching.reviewed_at')}</p>
                 <p className="text-sm text-foreground">
                   {new Date(item.reviewed_at).toLocaleString()}
                 </p>
@@ -407,7 +407,7 @@ export function MatchDetail() {
                   <Divider className="my-2" />
                   <div>
                     <p className="mb-1 text-sm text-default-400">
-                      {item.status === 'rejected' ? 'Rejection reason:' : 'Notes:'}
+                      {item.status === 'rejected' ? t('matching.rejection_reason_label') : t('matching.notes_label')}
                     </p>
                     <p className="rounded-lg bg-default-50 p-3 text-sm text-foreground">
                       {item.notes}
@@ -433,7 +433,7 @@ export function MatchDetail() {
                 setRejectReason('');
               }}
             >
-              Reject Match
+              {t('matching.reject_match')}
             </Button>
             <Button
               color="success"
@@ -441,7 +441,7 @@ export function MatchDetail() {
               onPress={handleApprove}
               isLoading={approveLoading}
             >
-              Approve Match
+              {t('matching.approve_match')}
             </Button>
           </CardBody>
         </Card>
@@ -459,14 +459,14 @@ export function MatchDetail() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <XCircle size={20} className="text-danger" />
-            Reject Match
+            {t('matching.reject_match')}
           </ModalHeader>
           <ModalBody>
             <p className="mb-3 text-sm text-default-600">
-              Rejecting match between{' '}
-              <strong>{item.user_1_name}</strong> and{' '}
-              <strong>{item.user_2_name}</strong>.
-              The user will be notified with your reason.
+              {t('matching.rejecting_match_between', {
+                user1: item.user_1_name,
+                user2: item.user_2_name,
+              })}
             </p>
             <Textarea
               label={t('matching.label_rejection_reason')}
@@ -487,7 +487,7 @@ export function MatchDetail() {
               }}
               isDisabled={rejectLoading}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               color="danger"
@@ -495,7 +495,7 @@ export function MatchDetail() {
               isLoading={rejectLoading}
               isDisabled={!rejectReason.trim()}
             >
-              Reject Match
+              {t('matching.reject_match')}
             </Button>
           </ModalFooter>
         </ModalContent>

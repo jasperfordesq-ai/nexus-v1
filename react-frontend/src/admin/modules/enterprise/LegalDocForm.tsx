@@ -121,7 +121,6 @@ export function LegalDocForm() {
       }
     } catch (err) {
       toast.error(t('enterprise.failed_to_save_document'));
-      console.error('Legal document save error:', err);
     } finally {
       setSaving(false);
     }

@@ -77,7 +77,6 @@ export function LegalDocList() {
       }
     } catch (err) {
       toast.error(t('enterprise.failed_to_delete_document'));
-      console.error('Legal document delete error:', err);
     } finally {
       setDeleting(false);
     }

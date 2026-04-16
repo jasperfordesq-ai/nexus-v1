@@ -350,7 +350,16 @@ export function VolunteeringOverview() {
 
       {/* Quick Action Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-        {quickActions.map((action) => (
+        {quickActions.map((action) => {
+          const colorClasses: Record<string, { bg: string; text: string }> = {
+            primary: { bg: 'bg-primary/10', text: 'text-primary' },
+            secondary: { bg: 'bg-secondary/10', text: 'text-secondary' },
+            success: { bg: 'bg-success/10', text: 'text-success' },
+            warning: { bg: 'bg-warning/10', text: 'text-warning' },
+            danger: { bg: 'bg-danger/10', text: 'text-danger' },
+          };
+          const cc = colorClasses[action.color] ?? { bg: 'bg-default/10', text: 'text-default' };
+          return (
           <Card
             key={action.path}
             shadow="sm"
@@ -359,8 +368,8 @@ export function VolunteeringOverview() {
             className="hover:scale-[1.02] transition-transform"
           >
             <CardBody className="flex flex-row items-center gap-3 p-4">
-              <div className={`p-2 rounded-lg bg-${action.color}/10`}>
-                <action.icon size={20} className={`text-${action.color}`} />
+              <div className={`p-2 rounded-lg ${cc.bg}`}>
+                <action.icon size={20} className={cc.text} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm">{action.label}</p>
@@ -369,7 +378,8 @@ export function VolunteeringOverview() {
               <ChevronRight size={16} className="text-default-300 shrink-0" />
             </CardBody>
           </Card>
-        ))}
+          );
+        })}
       </div>
 
       {/* Recent Opportunities */}

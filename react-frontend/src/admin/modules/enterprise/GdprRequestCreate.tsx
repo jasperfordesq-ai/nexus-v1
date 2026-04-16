@@ -137,7 +137,6 @@ export function GdprRequestCreate() {
       }
     } catch (err) {
       toast.error(t('enterprise.gdpr_failed_create_request'));
-      console.error('GDPR request creation error:', err);
     } finally {
       setSaving(false);
     }

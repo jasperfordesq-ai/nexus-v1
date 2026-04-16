@@ -67,7 +67,6 @@ export function RoleList() {
       }
     } catch (err) {
       toast.error(t('enterprise.failed_to_delete_role'));
-      console.error('Role delete error:', err);
     } finally {
       setDeleting(false);
     }

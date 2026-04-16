@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Tabs, Tab, Button, Chip, Avatar, Checkbox,
   Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
+  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input,
 } from '@heroui/react';
 import { Trash2, Users, Eye, EyeOff, Lock, MoreVertical, Power, PowerOff } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
@@ -53,6 +54,9 @@ export function GroupList() {
   const [status, setStatus] = useState('all');
   const [search, setSearch] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<AdminGroup | null>(null);
+  const [cloneTarget, setCloneTarget] = useState<AdminGroup | null>(null);
+  const [cloneName, setCloneName] = useState('');
+  const [cloneLoading, setCloneLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
@@ -135,17 +139,26 @@ export function GroupList() {
     }
   };
 
-  const handleClone = async (item: AdminGroup) => {
-    const name = prompt(t('groups.clone_group_name_prompt'), `${item.name} (Copy)`);
-    if (!name) return;
+  const handleCloneOpen = (item: AdminGroup) => {
+    setCloneTarget(item);
+    setCloneName(`${item.name} (Copy)`);
+  };
+
+  const handleCloneConfirm = async () => {
+    if (!cloneTarget || !cloneName.trim()) return;
+    setCloneLoading(true);
     try {
-      const res = await api.post(`/v2/admin/groups/${item.id}/clone`, { name, clone_members: false });
+      const res = await api.post(`/v2/admin/groups/${cloneTarget.id}/clone`, { name: cloneName.trim(), clone_members: false });
       if (res?.success) {
-        toast.success(t('groups.group_cloned', { name }));
+        toast.success(t('groups.group_cloned', { name: cloneName.trim() }));
+        setCloneTarget(null);
+        setCloneName('');
         loadItems();
       }
     } catch {
       toast.error(t('groups.failed_to_clone_group'));
+    } finally {
+      setCloneLoading(false);
     }
   };
 
@@ -295,7 +308,7 @@ export function GroupList() {
               if (key === 'view') navigate(tenantPath(`/groups/${item.id}`));
               else if (key === 'toggle-status') handleStatusToggle(item);
               else if (key === 'archive') handleArchive(item);
-              else if (key === 'clone') handleClone(item);
+              else if (key === 'clone') handleCloneOpen(item);
               else if (key === 'audit') navigate(tenantPath(`/admin/groups/${item.id}?tab=audit`));
               else if (key === 'delete') setConfirmDelete(item);
             }}
@@ -405,6 +418,34 @@ export function GroupList() {
           isLoading={actionLoading}
         />
       )}
+
+      {/* Clone Group Modal */}
+      <Modal
+        isOpen={!!cloneTarget}
+        onClose={() => { setCloneTarget(null); setCloneName(''); }}
+        size="sm"
+      >
+        <ModalContent>
+          <ModalHeader>{t('groups.clone_group_title')}</ModalHeader>
+          <ModalBody>
+            <Input
+              label={t('groups.clone_group_name_label')}
+              value={cloneName}
+              onValueChange={setCloneName}
+              variant="bordered"
+              autoFocus
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={() => { setCloneTarget(null); setCloneName(''); }} isDisabled={cloneLoading}>
+              {t('common.cancel')}
+            </Button>
+            <Button color="primary" onPress={handleCloneConfirm} isLoading={cloneLoading} isDisabled={!cloneName.trim()}>
+              {t('groups.clone_group_confirm')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

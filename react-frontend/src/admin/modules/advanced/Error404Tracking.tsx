@@ -81,7 +81,6 @@ export function Error404Tracking() {
       }
     } catch (err) {
       toast.error(t('advanced.failed_to_delete_404_entry'));
-      console.error('404 error delete error:', err);
     } finally {
       setDeleting(false);
     }

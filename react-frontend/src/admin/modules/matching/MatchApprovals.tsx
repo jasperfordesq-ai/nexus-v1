@@ -408,16 +408,16 @@ export function MatchApprovals() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <XCircle size={20} className="text-danger" />
-            Reject Match
+            {t('matching.reject_match')}
           </ModalHeader>
           <ModalBody>
             {rejectModal && (
               <div className="mb-3">
                 <p className="text-sm text-default-600">
-                  Rejecting match between{' '}
-                  <strong>{rejectModal.item.user_1_name}</strong> and{' '}
-                  <strong>{rejectModal.item.user_2_name}</strong>.
-                  The user will be notified with your reason.
+                  {t('matching.rejecting_match_between', {
+                    user1: rejectModal.item.user_1_name,
+                    user2: rejectModal.item.user_2_name,
+                  })}
                 </p>
               </div>
             )}
@@ -440,7 +440,7 @@ export function MatchApprovals() {
               }}
               isDisabled={rejectLoading}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               color="danger"
@@ -448,7 +448,7 @@ export function MatchApprovals() {
               isLoading={rejectLoading}
               isDisabled={!rejectReason.trim()}
             >
-              Reject Match
+              {t('matching.reject_match')}
             </Button>
           </ModalFooter>
         </ModalContent>

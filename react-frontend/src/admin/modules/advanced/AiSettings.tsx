@@ -260,7 +260,6 @@ export function AiSettings() {
       }
     } catch (err) {
       toast.error(t('advanced.failed_to_save_a_i_settings'));
-      console.error('AI settings save error:', err);
     } finally {
       setSaving(false);
     }
