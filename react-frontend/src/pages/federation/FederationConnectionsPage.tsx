@@ -46,7 +46,7 @@ type TabKey = 'accepted' | 'pending_received' | 'pending_sent';
 
 export function FederationConnectionsPage() {
   const { t } = useTranslation('federation');
-  usePageTitle(t('connections.page_title', 'Connections'));
+  usePageTitle(t('connections.page_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -116,18 +116,18 @@ export function FederationConnectionsPage() {
       }
       if (response.success) {
         const msgs: Record<string, string> = {
-          accept: tRef.current('connections.accepted_success', 'Connection accepted!'),
-          reject: tRef.current('connections.rejected_success', 'Connection request declined'),
-          remove: tRef.current('connections.removed_success', 'Connection removed'),
+          accept: tRef.current('connections.accepted_success'),
+          reject: tRef.current('connections.rejected_success'),
+          remove: tRef.current('connections.removed_success'),
         };
         toastRef.current.success(msgs[action] ?? '');
         loadConnections(activeTab);
       } else {
-        toastRef.current.error(response.error || tRef.current('connections.action_failed', 'Action failed'));
+        toastRef.current.error(response.error || tRef.current('connections.action_failed'));
       }
     } catch (err) {
       logError(`Failed to ${action} connection`, err);
-      toastRef.current.error(tRef.current('connections.action_failed', 'Action failed'));
+      toastRef.current.error(tRef.current('connections.action_failed'));
     } finally {
       setActionLoading(null);
     }
@@ -137,18 +137,18 @@ export function FederationConnectionsPage() {
       <PageMeta title={t('connections.page_title')} noIndex />
       <Breadcrumbs
         items={[
-          { label: t('connections.breadcrumb_federation', 'Federation'), href: tenantPath('/federation') },
-          { label: t('connections.breadcrumb_connections', 'Connections') },
+          { label: t('connections.breadcrumb_federation'), href: tenantPath('/federation') },
+          { label: t('connections.breadcrumb_connections') },
         ]}
       />
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-theme-primary">
-            {t('connections.title', 'Federation Connections')}
+            {t('connections.title')}
           </h1>
           <p className="text-theme-muted mt-1">
-            {t('connections.subtitle', 'Manage your cross-community connections')}
+            {t('connections.subtitle')}
           </p>
         </div>
       </div>
@@ -163,14 +163,14 @@ export function FederationConnectionsPage() {
           cursor: 'bg-indigo-500',
         }}
       >
-        <Tab key="accepted" title={<div className="flex items-center gap-2"><UserCheck className="w-4 h-4" />{t('connections.tab_connected', 'Connected')}</div>} />
-        <Tab key="pending_received" title={<div className="flex items-center gap-2"><Clock className="w-4 h-4" />{t('connections.tab_received', 'Received')}</div>} />
-        <Tab key="pending_sent" title={<div className="flex items-center gap-2"><Send className="w-4 h-4" />{t('connections.tab_sent', 'Sent')}</div>} />
+        <Tab key="accepted" title={<div className="flex items-center gap-2"><UserCheck className="w-4 h-4" />{t('connections.tab_connected')}</div>} />
+        <Tab key="pending_received" title={<div className="flex items-center gap-2"><Clock className="w-4 h-4" />{t('connections.tab_received')}</div>} />
+        <Tab key="pending_sent" title={<div className="flex items-center gap-2"><Send className="w-4 h-4" />{t('connections.tab_sent')}</div>} />
       </Tabs>
 
       {isLoading ? (
         <div className="flex items-center justify-center py-16">
-          <Spinner size="lg" label={t('connections.loading', 'Loading connections...')} />
+          <Spinner size="lg" label={t('connections.loading')} />
         </div>
       ) : loadError ? (
         <GlassCard className="p-8 text-center">
@@ -191,18 +191,18 @@ export function FederationConnectionsPage() {
             {activeTab === 'pending_sent' && <Send className="w-8 h-8 text-indigo-500" />}
           </div>
           <h3 className="text-lg font-semibold text-theme-primary mb-2">
-            {activeTab === 'accepted' && t('connections.empty_connected', 'No connections yet')}
-            {activeTab === 'pending_received' && t('connections.empty_received', 'No pending requests')}
-            {activeTab === 'pending_sent' && t('connections.empty_sent', 'No sent requests')}
+            {activeTab === 'accepted' && t('connections.empty_connected')}
+            {activeTab === 'pending_received' && t('connections.empty_received')}
+            {activeTab === 'pending_sent' && t('connections.empty_sent')}
           </h3>
           <p className="text-theme-muted mb-4">
-            {activeTab === 'accepted' && t('connections.empty_connected_desc', 'Connect with members from partner communities to grow your network.')}
-            {activeTab === 'pending_received' && t('connections.empty_received_desc', 'When someone sends you a connection request, it will appear here.')}
-            {activeTab === 'pending_sent' && t('connections.empty_sent_desc', 'Connection requests you send will appear here.')}
+            {activeTab === 'accepted' && t('connections.empty_connected_desc')}
+            {activeTab === 'pending_received' && t('connections.empty_received_desc')}
+            {activeTab === 'pending_sent' && t('connections.empty_sent_desc')}
           </p>
           {activeTab === 'accepted' && (
             <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={<Globe className="w-4 h-4" />} onPress={() => navigate(tenantPath('/federation/members'))}>
-              {t('connections.browse_members', 'Browse Federation Members')}
+              {t('connections.browse_members')}
             </Button>
           )}
         </GlassCard>      ) : (
@@ -234,7 +234,7 @@ interface ConnectionCardProps {
 function ConnectionCard({ connection, tab, actionLoading, onAction, onMessage, onViewProfile }: ConnectionCardProps) {
   const { t } = useTranslation('federation');
   const isActioning = actionLoading === connection.id;
-  const displayName = connection.name || t('connections.unknown_member', 'Federation Member');
+  const displayName = connection.name || t('connections.unknown_member');
 
   return (
     <GlassCard className="p-4 sm:p-5">
@@ -262,9 +262,9 @@ function ConnectionCard({ connection, tab, actionLoading, onAction, onMessage, o
           {tab === 'accepted' && (
             <>
               <Button size="sm" variant="flat" className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400" startContent={<MessageSquare className="w-3.5 h-3.5" />} onPress={() => onMessage(connection.user_id, connection.tenant_id)}>
-                {t('connections.message', 'Message')}
+                {t('connections.message')}
               </Button>
-              <Button size="sm" variant="flat" className="text-danger" isIconOnly isLoading={isActioning} onPress={() => onAction(connection.id, 'remove')} aria-label={t('connections.remove', 'Remove connection')}>
+              <Button size="sm" variant="flat" className="text-danger" isIconOnly isLoading={isActioning} onPress={() => onAction(connection.id, 'remove')} aria-label={t('connections.remove')}>
                 <Trash2 className="w-3.5 h-3.5" />
               </Button>
             </>
@@ -272,16 +272,16 @@ function ConnectionCard({ connection, tab, actionLoading, onAction, onMessage, o
           {tab === 'pending_received' && (
             <>
               <Button size="sm" className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={<Check className="w-3.5 h-3.5" />} isLoading={isActioning} onPress={() => onAction(connection.id, 'accept')}>
-                {t('connections.accept', 'Accept')}
+                {t('connections.accept')}
               </Button>
               <Button size="sm" variant="flat" className="text-danger" startContent={<X className="w-3.5 h-3.5" />} isLoading={isActioning} onPress={() => onAction(connection.id, 'reject')}>
-                {t('connections.decline', 'Decline')}
+                {t('connections.decline')}
               </Button>
             </>
           )}
           {tab === 'pending_sent' && (
             <Chip size="sm" variant="flat" className="bg-amber-500/10 text-amber-600 dark:text-amber-400" startContent={<Clock className="w-3 h-3" />}>
-              {t('connections.pending', 'Pending')}
+              {t('connections.pending')}
             </Chip>
           )}
         </div>

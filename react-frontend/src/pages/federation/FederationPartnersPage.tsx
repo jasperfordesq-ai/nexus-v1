@@ -475,7 +475,7 @@ function PartnerCard({ partner, onViewDetails }: PartnerCardProps) {
               className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
               startContent={<Globe className="w-3 h-3" />}
             >
-              {t('federation.external', 'External')}
+              {t('external')}
             </Chip>
           )}
           {partner.partnership_since && (

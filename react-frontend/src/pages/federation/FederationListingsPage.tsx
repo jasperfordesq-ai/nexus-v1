@@ -411,7 +411,7 @@ export function FederationListingsPage() {
             const isExternal = !!selectedListing.is_external;
             const authorAvatar = resolveAvatarUrl(selectedListing.author?.avatar);
             const listingImage = selectedListing.image_url ? resolveAssetUrl(selectedListing.image_url) : null;
-            const authorName = selectedListing.author?.name || t('listings.anonymous_user', 'Anonymous');
+            const authorName = selectedListing.author?.name || t('listings.anonymous_user');
             const canNavigateToProfile = !isExternal && selectedListing.author?.id;
 
             return (
@@ -456,7 +456,7 @@ export function FederationListingsPage() {
                         <Chip size="sm" variant="flat" className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
                           startContent={<Globe className="w-3 h-3" />}
                         >
-                          {t('listings.external_partner', 'External')}
+                          {t('listings.external_partner')}
                         </Chip>
                       )}
                     </div>
@@ -584,7 +584,7 @@ export function FederationListingsPage() {
                       setSelectedListing(null);
                     }}
                   >
-                    {t('listings.close', 'Close')}
+                    {t('listings.close')}
                   </Button>
                 </ModalFooter>
               </>
@@ -670,7 +670,7 @@ function FederatedListingCard({ listing, onViewDetails }: FederatedListingCardPr
             className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
             startContent={<Globe className="w-3 h-3" />}
           >
-            {t('federation.external', 'External')}
+            {t('external')}
           </Chip>
         )}
       </div>
@@ -704,12 +704,12 @@ function FederatedListingCard({ listing, onViewDetails }: FederatedListingCardPr
         <div className="flex items-center gap-2 min-w-0">
           <Avatar
             src={avatarSrc}
-            name={listing.author?.name || t('listings.anonymous_user', 'User')}
+            name={listing.author?.name || t('listings.anonymous_user')}
             size="sm"
             className="flex-shrink-0 w-6 h-6"
           />
           <span className="text-sm text-theme-subtle truncate">
-            {listing.author?.name || t('listings.anonymous_user', 'User')}
+            {listing.author?.name || t('listings.anonymous_user')}
           </span>
         </div>
         <Chip

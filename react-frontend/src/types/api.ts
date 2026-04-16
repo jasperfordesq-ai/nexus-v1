@@ -1540,7 +1540,7 @@ export interface ExchangeFilters {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface FederationPartner {
-  id: number;
+  id: number | string;
   name: string;
   logo?: string | null;
   tagline?: string;

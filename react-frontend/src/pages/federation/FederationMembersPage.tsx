@@ -246,8 +246,8 @@ export function FederationMembersPage() {
     const memberId = String(member.id);
     if (member.is_external || memberId.startsWith('ext-')) {
       toast.info(
-        t('members.external_profile_title', 'External Member'),
-        t('members.external_profile_message', 'This member belongs to an external partner community. You can message them or send credits from the Members page.')
+        t('members.external_profile_title'),
+        t('members.external_profile_message')
       );
       return;
     }
@@ -322,7 +322,7 @@ export function FederationMembersPage() {
             >
               {partners.map((partner) => (
                 <SelectItem key={String(partner.id)}>
-                  {partner.is_external ? `${partner.name} (${t('federation.external', 'External')})` : partner.name}
+                  {partner.is_external ? `${partner.name} (${t('external')})` : partner.name}
                 </SelectItem>
               ))}
             </Select>
@@ -543,7 +543,7 @@ const FederatedMemberCard = memo(function FederatedMemberCard({
                 className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
                 startContent={<Globe className="w-3 h-3" />}
               >
-                {t('federation.external', 'External')}
+                {t('external')}
               </Chip>
             )}
             {typeof member.reputation_score === 'number' && (member.reputation_count ?? 0) > 0 && (
