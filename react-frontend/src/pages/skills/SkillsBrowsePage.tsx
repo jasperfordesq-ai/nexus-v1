@@ -160,13 +160,12 @@ export function SkillsBrowsePage() {
     if (categorySkills[categoryId]) return; // Already cached
     try {
       setLoadingSkills(categoryId);
-      const response = await api.get<CategorySkill[]>(`/v2/skills/categories/${categoryId}`);
+      const response = await api.get<{ skills?: CategorySkill[] }>(`/v2/skills/categories/${categoryId}`);
       if (response.success && response.data) {
         // The endpoint returns a category object with a `skills` array
-        const data = response.data as unknown as { skills?: CategorySkill[] };
         setCategorySkills((prev) => ({
           ...prev,
-          [categoryId]: data.skills || [],
+          [categoryId]: response.data.skills || [],
         }));
       }
     } catch (err) {

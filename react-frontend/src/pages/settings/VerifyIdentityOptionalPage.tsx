@@ -60,10 +60,6 @@ interface StartVerificationResponse {
   already_verified?: boolean;
 }
 
-interface ApiErrorResponse {
-  errors?: Array<{ code: string; message: string }>;
-  data?: { already_paid?: boolean; payment_required?: boolean };
-}
 
 type PageState = 'loading' | 'dob_collection' | 'payment_required' | 'start' | 'in_progress' | 'verified' | 'failed' | 'error';
 
@@ -160,7 +156,7 @@ export function VerifyIdentityOptionalPage() {
     try {
       const response = await api.post('/v2/identity/save-dob', { date_of_birth: dob });
       if (!response.success) {
-        setErrorMessage((response as unknown as ApiErrorResponse)?.errors?.[0]?.message || 'Failed to save date of birth.');
+        setErrorMessage(response.error || 'Failed to save date of birth.');
         return;
       }
       // Re-fetch status to advance to next step
@@ -176,18 +172,17 @@ export function VerifyIdentityOptionalPage() {
     setIsCreatingPayment(true);
     setErrorMessage('');
     try {
-      const response = await api.post<{ client_secret: string }>('/v2/identity/create-payment');
-      if (!response.success) {
-        const data = response as unknown as ApiErrorResponse;
-        if (data?.data?.already_paid || data?.data?.payment_required === false) {
-          await fetchStatus(); // Skip to next step
+      const response = await api.post<{ client_secret?: string; already_paid?: boolean; payment_required?: boolean }>('/v2/identity/create-payment');
+      if (response.success) {
+        if (response.data?.already_paid || response.data?.payment_required === false) {
+          await fetchStatus(); // Already paid, skip to next step
           return;
         }
-        setErrorMessage(data?.errors?.[0]?.message || 'Failed to create payment.');
-        return;
-      }
-      if (response.data?.client_secret) {
-        setClientSecret(response.data.client_secret);
+        if (response.data?.client_secret) {
+          setClientSecret(response.data.client_secret);
+        }
+      } else {
+        setErrorMessage(response.error || 'Failed to create payment.');
       }
     } catch {
       setErrorMessage('Failed to create payment. Please try again.');
@@ -213,11 +208,9 @@ export function VerifyIdentityOptionalPage() {
     try {
       const response = await api.post<StartVerificationResponse>('/v2/identity/start');
       if (!response.success) {
-        const errData = response as unknown as ApiErrorResponse;
-        const errCode = errData?.errors?.[0]?.code;
-        if (errCode === 'DOB_REQUIRED') { setPageState('dob_collection'); return; }
-        if (errCode === 'PAYMENT_REQUIRED') { setPageState('payment_required'); return; }
-        setErrorMessage(errData?.errors?.[0]?.message || 'Unable to start verification.');
+        if (response.code === 'DOB_REQUIRED') { setPageState('dob_collection'); return; }
+        if (response.code === 'PAYMENT_REQUIRED') { setPageState('payment_required'); return; }
+        setErrorMessage(response.error || 'Unable to start verification.');
         userStartedRef.current = false;
         return;
       }

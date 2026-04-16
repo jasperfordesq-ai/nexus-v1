@@ -195,7 +195,7 @@ class AdminBrokerController extends BaseApiController
         $recentActivity = [];
         try {
             if (!$isSuperAdmin && $effectiveTenantId === null) {
-                return $this->respondWithError('Unable to resolve tenant context', 403);
+                return $this->respondWithError(__('api.tenant_context_error'), 403);
             }
             $actWhere = $effectiveTenantId !== null ? 'al.tenant_id = ?' : '1=1';
             $actParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
@@ -250,7 +250,7 @@ class AdminBrokerController extends BaseApiController
 
             $effectiveTenantId = $this->resolveEffectiveTenantId($isSuperAdmin, $tenantId);
             if (!$isSuperAdmin && $effectiveTenantId === null) {
-                return $this->respondWithError('Unable to resolve tenant context', 403);
+                return $this->respondWithError(__('api.tenant_context_error'), 403);
             }
             if ($effectiveTenantId !== null) {
                 $conditions[] = 'er.tenant_id = ?';

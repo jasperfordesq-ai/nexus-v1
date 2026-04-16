@@ -397,6 +397,10 @@ abstract class BaseApiController extends Controller
             return $default;
         }
 
+        if (!is_scalar($value) || (is_string($value) && !is_numeric($value))) {
+            return $default;
+        }
+
         $intVal = (int) $value;
 
         if ($min !== null && $intVal < $min) {
@@ -454,6 +458,10 @@ abstract class BaseApiController extends Controller
         $value = $this->query($key);
 
         if ($value === null || $value === '') {
+            return $default;
+        }
+
+        if (!is_scalar($value) || (is_string($value) && !is_numeric($value))) {
             return $default;
         }
 

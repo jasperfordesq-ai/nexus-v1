@@ -4097,5 +4097,24 @@
         "volunteer_organizations_title": "Volunteer Organizations",
         "volunteering_overview_desc": "Manage and configure volunteering overview settings",
         "volunteering_overview_title": "Volunteering Overview"
+    },
+    "rte": {
+        "bold": "Bold",
+        "italic": "Italic",
+        "underline": "Underline",
+        "strikethrough": "Strikethrough",
+        "inline_code": "Inline Code",
+        "block_quote": "Block Quote",
+        "bullet_list": "Bullet List",
+        "numbered_list": "Numbered List",
+        "heading_2": "Heading 2",
+        "heading_3": "Heading 3",
+        "insert_link": "Insert Link",
+        "remove_link": "Remove Link",
+        "enter_url": "Enter URL",
+        "undo": "Undo",
+        "redo": "Redo",
+        "import_markdown": "Import Markdown",
+        "import_md": "Import .md"
     }
 }

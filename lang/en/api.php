@@ -73,6 +73,7 @@ return [
     'campaign_not_found'           => 'Campaign not found',
     'cron_job_not_found'           => 'Cron job not found',
     'tenant_not_found'             => 'Tenant not found',
+    'tenant_context_error'         => 'Unable to resolve tenant context',
     'legal_doc_not_found'          => 'Legal document not found',
     'document_not_found'           => 'Document not found',
     'api_key_not_found'            => 'API key not found',
