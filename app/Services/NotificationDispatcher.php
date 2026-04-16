@@ -490,6 +490,62 @@ class NotificationDispatcher
     }
 
     /**
+     * Send a review request email to a user after a time-credit transaction.
+     *
+     * @param int    $userId          The user to email
+     * @param string $otherPersonName The name of the person they exchanged with
+     * @param int    $transactionId   The completed transaction ID (for the CTA link)
+     */
+    public static function sendReviewRequestEmail(int $userId, string $otherPersonName, int $transactionId): void
+    {
+        try {
+            $tenantId = TenantContext::getId();
+
+            $user = DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->select(['email', 'name', 'first_name'])
+                ->first();
+
+            if (!$user || empty($user->email)) {
+                return;
+            }
+
+            // Respect email_transactions notification preference
+            try {
+                $prefs = \App\Models\User::getNotificationPreferences($userId);
+                if (!(bool) ($prefs['email_transactions'] ?? true)) {
+                    return;
+                }
+            } catch (\Throwable $prefError) {
+                Log::debug('sendReviewRequestEmail: could not read email_transactions pref', [
+                    'user_id' => $userId,
+                    'error'   => $prefError->getMessage(),
+                ]);
+            }
+
+            $firstName  = $user->first_name ?? $user->name ?? 'there';
+            $baseUrl    = TenantContext::getFrontendUrl();
+            $basePath   = TenantContext::getSlugPrefix();
+            $reviewUrl  = $baseUrl . $basePath . '/reviews/create?transaction_id=' . $transactionId;
+
+            $subject = __('emails.review_request.subject', ['name' => htmlspecialchars($otherPersonName, ENT_QUOTES, 'UTF-8')]);
+
+            $html = EmailTemplateBuilder::make()
+                ->theme('brand')
+                ->title(__('emails.review_request.subject', ['name' => htmlspecialchars($otherPersonName, ENT_QUOTES, 'UTF-8')]))
+                ->greeting($firstName)
+                ->paragraph(__('emails.review_request.body', ['name' => htmlspecialchars($otherPersonName, ENT_QUOTES, 'UTF-8')]))
+                ->button(__('emails.review_request.cta'), $reviewUrl)
+                ->render();
+
+            Mailer::forCurrentTenant()->send($user->email, $subject, $html);
+        } catch (\Exception $e) {
+            Log::warning('NotificationDispatcher::sendReviewRequestEmail failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Send review received email to a user.
      */
     public static function sendReviewEmail(int $receiverUserId, string $reviewerName, int $rating, ?string $comment = null, bool $isAnonymous = false): void

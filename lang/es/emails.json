@@ -53,7 +53,7 @@
   "review_request": {
     "subject": "Deja una reseña para {{name}}",
     "greeting": "Hola {{name}},",
-    "body": "Recientemente intercambiaste servicios con {{other_party}}. Por favor tómate un momento para dejar una reseña.",
+    "body": "How was your exchange with :name? Leave a review to help the community.",
     "cta": "Dejar Reseña"
   },
   "new_message": {
@@ -416,5 +416,21 @@
     "received_body": ":donor has donated :amount time credits to your wallet.",
     "received_message_label": "Their message",
     "received_cta": "View Your Wallet"
+  },
+  "identity_verification": {
+    "passed_subject": "Your identity has been verified",
+    "passed_title": "Identity Verified",
+    "passed_preview": "Congratulations — your identity verification passed",
+    "passed_greeting": "Great news, :name!",
+    "passed_body": "Your identity has been successfully verified. Your profile now displays the Verified badge.",
+    "passed_cta": "View Your Profile",
+    "failed_subject": "Identity verification could not be completed",
+    "failed_title": "Verification Unsuccessful",
+    "failed_preview": "Your identity verification needs attention",
+    "failed_greeting": "Hi :name,",
+    "failed_body": "Unfortunately we were unable to verify your identity at this time.",
+    "failed_reason_label": "Reason",
+    "failed_retry_note": "You can try again from your security settings.",
+    "failed_cta": "Try Again"
   }
 }

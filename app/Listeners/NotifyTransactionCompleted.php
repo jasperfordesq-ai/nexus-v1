@@ -97,6 +97,18 @@ class NotifyTransactionCompleted implements ShouldQueue
                     $description
                 );
             }
+
+            // 4. Queue review request for both parties
+            try {
+                $recipientNameForReview = $receiver->first_name ?? $receiver->name ?? 'someone';
+                NotificationDispatcher::sendReviewRequestEmail($receiver->id, $senderName, $transaction->id);
+                NotificationDispatcher::sendReviewRequestEmail($sender->id, $recipientNameForReview, $transaction->id);
+            } catch (\Throwable $reviewError) {
+                Log::warning('NotifyTransactionCompleted: sendReviewRequestEmail failed', [
+                    'transaction_id' => $transaction->id ?? null,
+                    'error'          => $reviewError->getMessage(),
+                ]);
+            }
         } catch (\Throwable $e) {
             Log::error('NotifyTransactionCompleted listener failed', [
                 'transaction_id' => $event->transaction->id ?? null,
