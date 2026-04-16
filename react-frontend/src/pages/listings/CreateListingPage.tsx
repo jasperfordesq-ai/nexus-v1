@@ -234,7 +234,7 @@ export function CreateListingPage() {
       const payload = {
         ...rest,
         description: enrichedDescription,
-        category_id: parseInt(formData.category_id),
+        category_id: formData.category_id ? parseInt(formData.category_id, 10) : undefined,
         hours_estimate: parseFloat(formData.hours_estimate),
         service_type: formData.service_type,
         skill_tags: formData.skill_tags,
@@ -322,7 +322,7 @@ export function CreateListingPage() {
       <PageMeta title={t('page_meta.create.title')} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('title'), href: '/listings' },
+        { label: t('title'), href: tenantPath('/listings') },
         { label: isEditing ? t('form.edit_title') : t('form.new_title') },
       ]} />
 
@@ -380,6 +380,8 @@ export function CreateListingPage() {
               isRequired
               isInvalid={!!errors.title}
               errorMessage={errors.title}
+              maxLength={255}
+              description={`${formData.title.length}/255`}
               startContent={<FileText className="w-4 h-4 text-theme-subtle" />}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
@@ -400,6 +402,8 @@ export function CreateListingPage() {
               isRequired
               isInvalid={!!errors.description}
               errorMessage={errors.description}
+              maxLength={10000}
+              description={`${formData.description.length}/10000`}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',

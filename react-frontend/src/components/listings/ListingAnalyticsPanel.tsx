@@ -53,9 +53,10 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
   }, [listingId]);
 
   useEffect(() => {
-    loadAnalytics();
+    void loadAnalytics();
     return () => analyticsAbortRef.current?.abort();
-  }, [loadAnalytics]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listingId]); // depend on listingId directly, not loadAnalytics
 
   const maxViewCount = useMemo(
     () => Math.max(...(analytics?.views_over_time ?? []).map((day) => Number(day.count)), 1),
@@ -137,28 +138,36 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
       </div>
 
       {/* Simple sparkline-style visualization using bars */}
-      {viewsOverTime.length > 0 && (
-        <div>
-          <h4 className="text-sm font-medium text-theme-muted mb-2">{t('analytics.views_last_days', 'Views (Last {{days}} Days)', { days: analytics.period_days })}</h4>
-          <div className="flex items-end gap-1 h-16">
-            {viewsOverTime.map((day) => {
-              const height = (Number(day.count) / maxViewCount) * 100;
-              return (
-                <div
-                  key={day.date}
-                  className="flex-1 bg-blue-500/70 rounded-t min-w-[4px] transition-all hover:bg-blue-600"
-                  style={{ height: `${Math.max(height, 4)}%` }}
-                  title={`${day.date}: ${day.count} views`}
-                />
-              );
-            })}
-          </div>
-          <div className="flex justify-between text-[10px] text-theme-subtle mt-1">
-            <span>{viewsOverTime[0]?.date}</span>
-            <span>{viewsOverTime[viewsOverTime.length - 1]?.date}</span>
-          </div>
-        </div>
-      )}
+      <div>
+        <h4 className="text-sm font-medium text-theme-muted mb-2">{t('analytics.views_last_days', 'Views (Last {{days}} Days)', { days: analytics.period_days })}</h4>
+        {viewsOverTime.length === 0 ? (
+          <p className="text-sm text-theme-muted text-center py-4">
+            {t('analytics.no_data', 'No view data available yet')}
+          </p>
+        ) : (
+          <>
+            <div className="flex items-end gap-1 h-16">
+              {viewsOverTime.map((day) => {
+                const height = (Number(day.count) / maxViewCount) * 100;
+                return (
+                  <div
+                    key={day.date}
+                    className="flex-1 bg-blue-500/70 rounded-t min-w-[4px] transition-all hover:bg-blue-600"
+                    style={{ height: `${Math.max(height, 4)}%` }}
+                    title={`${day.date}: ${day.count} views`}
+                    role="img"
+                    aria-label={t('analytics.bar_label', '{{date}}: {{count}} views', { date: day.date, count: day.count })}
+                  />
+                );
+              })}
+            </div>
+            <div className="flex justify-between text-[10px] text-theme-subtle mt-1">
+              <span>{viewsOverTime[0]?.date}</span>
+              <span>{viewsOverTime[viewsOverTime.length - 1]?.date}</span>
+            </div>
+          </>
+        )}
+      </div>
     </GlassCard>
   );
 }

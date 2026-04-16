@@ -75,6 +75,7 @@ export function ListingDetailPage() {
   const [reportReason, setReportReason] = useState<string>('');
   const [reportDetails, setReportDetails] = useState('');
   const { isOpen: isReportOpen, onOpen: onReportOpen, onClose: onReportClose } = useDisclosure();
+  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
@@ -164,7 +165,7 @@ export function ListingDetailPage() {
   }, [loadListing, loadExchangeConfig, checkActiveExchange]);
 
   async function handleDelete() {
-    if (!listing || !window.confirm(t('delete_confirm'))) return;
+    if (!listing) return;
 
     try {
       setIsDeleting(true);
@@ -302,7 +303,7 @@ export function ListingDetailPage() {
       </Helmet>
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('title'), href: '/listings' },
+        { label: t('title'), href: tenantPath('/listings') },
         { label: listing?.title || 'Listing' },
       ]} />
 
@@ -364,7 +365,7 @@ export function ListingDetailPage() {
                 variant="flat"
                 className="bg-red-500/10 text-red-400"
                 startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
-                onPress={handleDelete}
+                onPress={onDeleteOpen}
                 isLoading={isDeleting}
               >
                 {t('detail_delete')}
@@ -622,6 +623,22 @@ export function ListingDetailPage() {
           </div>
         )}
       </GlassCard>
+
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={isDeleteOpen} onClose={onDeleteClose} size="sm">
+        <ModalContent>
+          <ModalHeader>{t('delete_confirm_title', 'Delete listing')}</ModalHeader>
+          <ModalBody>
+            <p className="text-theme-secondary">{t('delete_confirm_body', 'Are you sure you want to delete this listing? This cannot be undone.')}</p>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="light" onPress={onDeleteClose}>{t('cancel', 'Cancel')}</Button>
+            <Button color="danger" onPress={() => { onDeleteClose(); void handleDelete(); }} isLoading={isDeleting}>
+              {t('delete_confirm_button', 'Delete listing')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       {/* Report Listing Modal */}
       <Modal isOpen={isReportOpen} onClose={onReportClose} size="md">

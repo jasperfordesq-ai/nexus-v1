@@ -9,7 +9,7 @@
  * Provides autocomplete suggestions and popular tags for quick selection.
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Button, Input, Chip } from '@heroui/react';
 import { Tag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -28,12 +28,21 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      if (blurTimeoutRef.current) clearTimeout(blurTimeoutRef.current);
+    };
+  }, []);
 
   const fetchSuggestions = useCallback(async (prefix: string) => {
     if (prefix.length < 2) {
       setSuggestions([]);
       return;
     }
+    if (prefix.length > 100) return;
 
     try {
       const response = await api.get<string[]>(`/v2/listings/tags/autocomplete?q=${encodeURIComponent(prefix)}&limit=8`);
@@ -54,7 +63,7 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
     }
 
     debounceRef.current = setTimeout(() => {
-      fetchSuggestions(value);
+      void fetchSuggestions(value);
       setShowSuggestions(true);
     }, 200);
   };
@@ -123,7 +132,7 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
             onKeyDown={handleKeyDown}
             onBlur={() => {
               // Delay hiding to allow clicking suggestions
-              setTimeout(() => setShowSuggestions(false), 200);
+              blurTimeoutRef.current = setTimeout(() => setShowSuggestions(false), 200);
             }}
             onFocus={() => {
               if (suggestions.length > 0) setShowSuggestions(true);

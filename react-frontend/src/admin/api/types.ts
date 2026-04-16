@@ -245,6 +245,9 @@ export interface AdminListing {
   category_name?: string | null;
   hours_estimated?: number | null;
   is_featured?: boolean;
+  price?: number | null;
+  tenant_id?: number;
+  tenant_name?: string | null;
   created_at: string;
   updated_at?: string | null;
 }

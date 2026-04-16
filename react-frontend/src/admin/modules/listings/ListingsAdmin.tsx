@@ -319,6 +319,7 @@ export function ListingsAdmin() {
     item: AdminListing;
   } | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [featureToggleLoading, setFeatureToggleLoading] = useState<number | null>(null);
 
   const loadItems = useCallback(async () => {
     setLoading(true);
@@ -382,6 +383,7 @@ export function ListingsAdmin() {
   };
 
   const handleFeatureToggle = async (item: AdminListing) => {
+    setFeatureToggleLoading(item.id);
     try {
       const res = item.is_featured
         ? await adminListings.unfeature(item.id)
@@ -398,6 +400,8 @@ export function ListingsAdmin() {
       }
     } catch {
       toast.error(t('listings.an_unexpected_error_occurred'));
+    } finally {
+      setFeatureToggleLoading(null);
     }
   };
 
@@ -477,6 +481,7 @@ export function ListingsAdmin() {
               variant="flat"
               color="warning"
               onPress={() => handleFeatureToggle(item)}
+              isLoading={featureToggleLoading === item.id}
               aria-label={item.is_featured ? t('listings.unfeature_listing') : t('listings.feature_listing')}
             >
               {item.is_featured ? <Star size={14} className="fill-warning" /> : <StarOff size={14} />}

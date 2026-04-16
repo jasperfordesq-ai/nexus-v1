@@ -59,6 +59,7 @@ export function ListingsPage() {
 
   const [listings, setListings] = useState<Listing[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState(searchParams.get('q') || '');
@@ -134,6 +135,7 @@ export function ListingsPage() {
       setIsLoading(true);
       if (reset) {
         setLoadError(null);
+        setPaginationError(false);
         cursorRef.current = null;
       }
       const params = new URLSearchParams();
@@ -233,6 +235,8 @@ export function ListingsPage() {
       }
     }).catch((error) => {
       if (!controller.signal.aborted) logError('Failed to load categories', error);
+    }).finally(() => {
+      if (!controller.signal.aborted) setCategoriesLoading(false);
     });
     return () => { controller.abort(); };
   }, []);
@@ -407,6 +411,7 @@ export function ListingsPage() {
               placeholder={t('filter_category_label')}
               selectedKeys={[categories.length > 0 ? (selectedCategory || 'all') : 'all']}
               disallowEmptySelection
+              isDisabled={categoriesLoading}
               onSelectionChange={(keys) => {
                 const val = keys instanceof Set ? ([...keys][0] as string) : 'all';
                 setSelectedCategory(val === 'all' ? '' : (val || ''));
@@ -923,13 +928,13 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
           </div>
           <div className="flex items-center gap-2 text-xs text-theme-subtle min-w-0 overflow-hidden">
             {hours && (
-              <span className="flex items-center gap-1 shrink-0" aria-label={`${hours} hours estimated`}>
+              <span className="flex items-center gap-1 shrink-0" aria-label={t('aria_hours_estimated', '{{hours}} hours estimated', { hours })}>
                 <Clock className="w-3 h-3" aria-hidden="true" />
                 {hours}h
               </span>
             )}
             {listing.location && (
-              <span className="flex items-center gap-1 min-w-0" aria-label={`Location: ${listing.location}`}>
+              <span className="flex items-center gap-1 min-w-0" aria-label={t('aria_location', 'Location: {{location}}', { location: listing.location })}>
                 <MapPin className="w-3 h-3 shrink-0" aria-hidden="true" />
                 <span className="truncate">{listing.location}</span>
               </span>
