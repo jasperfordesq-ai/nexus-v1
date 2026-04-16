@@ -16,7 +16,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Button,
@@ -178,6 +178,9 @@ export function FederationMessagesPage() {
   const { hasFeature, tenantSlug, tenantPath } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // ── Opt-in status ──
+  const [userOptedIn, setUserOptedIn] = useState<boolean | null>(null);
 
   // ── Data state ──
   const [allMessages, setAllMessages] = useState<FederatedMessage[]>([]);
@@ -639,6 +642,26 @@ export function FederationMessagesPage() {
     { label: t('messages.breadcrumb_messages') },
   ];
 
+  // Check opt-in status on mount (proactive gate — avoids 403 on Send)
+  useEffect(() => {
+    let cancelled = false;
+    api.get<{ enabled?: boolean; status?: { user_optin?: boolean } }>('/v2/federation/status').then((res) => {
+      if (cancelled) return;
+      if (res.success && res.data) {
+        const isOptedIn =
+          res.data.enabled === true ||
+          res.data.status?.user_optin === true;
+        setUserOptedIn(isOptedIn);
+      } else {
+        setUserOptedIn(false);
+      }
+    }).catch(() => {
+      setUserOptedIn(false);
+    });
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // ── Check federation feature ──
   const isFederationEnabled = hasFeature('federation');
 
@@ -662,6 +685,29 @@ export function FederationMessagesPage() {
         </GlassCard>
       )}
 
+      {/* Opt-in required notice — shown when feature is enabled but user hasn't opted in */}
+      {isFederationEnabled && userOptedIn === false && (
+        <GlassCard className="p-4 border-l-4 border-indigo-500 bg-indigo-500/10">
+          <div className="flex items-start gap-3">
+            <Globe className="w-5 h-5 text-indigo-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="flex-1">
+              <h3 className="font-semibold text-theme-primary">{t('messages.optin_required')}</h3>
+              <p className="text-sm text-theme-muted mt-1">
+                {t('messages.optin_required_description')}
+              </p>
+            </div>
+            <Button
+              as={Link}
+              to={tenantPath('/federation/onboarding')}
+              size="sm"
+              className="bg-indigo-500 text-white flex-shrink-0"
+            >
+              {t('messages.optin_cta')}
+            </Button>
+          </div>
+        </GlassCard>
+      )}
+
       {/* Header row */}
       <div className="flex items-center justify-between">
         <div>
@@ -675,7 +721,7 @@ export function FederationMessagesPage() {
           className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           onPress={() => setIsComposeOpen(true)}
-          isDisabled={!isFederationEnabled}
+          isDisabled={!isFederationEnabled || userOptedIn === false}
         >
           {t('messages.compose')}
         </Button>
@@ -1268,7 +1314,7 @@ export function FederationMessagesPage() {
                                     className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 h-4 text-[10px]"
                                     startContent={<Globe className="w-2.5 h-2.5" />}
                                   >
-                                    {t('federation.external', 'External')}
+                                    {t('external')}
                                   </Chip>
                                 )}
                               </div>

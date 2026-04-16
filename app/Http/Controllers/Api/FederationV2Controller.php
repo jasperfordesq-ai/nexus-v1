@@ -186,6 +186,8 @@ class FederationV2Controller extends BaseApiController
             'show_reviews_federated' => true,
             'messaging_enabled_federated' => true,
             'transactions_enabled_federated' => true,
+            'service_reach' => $current['service_reach'] ?? 'local_only',
+            'travel_radius_km' => $current['travel_radius_km'] ?? 50,
         ]);
 
         $success = $this->federationUserService->updateSettings($userId, $settings);

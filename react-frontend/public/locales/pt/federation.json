@@ -215,7 +215,8 @@
     "cancel": "Cancel",
     "tx_success": "Credits sent!",
     "tx_success_detail": "{{amount}} hour(s) sent to {{name}}",
-    "tx_failed": "Transfer failed"
+    "tx_failed": "Transfer failed",
+    "optin_required_tooltip": "Enable federation to connect with members from other communities"
   },
   "listings": {
     "page_title": "Federation Listings",
@@ -327,7 +328,10 @@
     "translate_to": "Translate to {{language}}",
     "view_original": "View original",
     "show_translation": "Show translation",
-    "translated_label": "Translated"
+    "translated_label": "Translated",
+    "optin_required": "Federation not enabled for your account",
+    "optin_required_description": "You need to enable federation before you can send messages to members of other communities.",
+    "optin_cta": "Enable Federation"
   },
   "connections": {
     "page_title": "Federation Connections",

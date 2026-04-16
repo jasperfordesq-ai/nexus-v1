@@ -118,6 +118,26 @@ export function FederationOnboardingPage() {
   const [settings, setSettings] = useState<OnboardingSettings>(DEFAULT_SETTINGS);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Idempotency check: redirect already opted-in users straight to the hub
+  useEffect(() => {
+    let cancelled = false;
+    api.get<{ enabled?: boolean; status?: { user_optin?: boolean } }>('/v2/federation/status').then((res) => {
+      if (cancelled) return;
+      if (res.success && res.data) {
+        const isOptedIn =
+          res.data.enabled === true ||
+          res.data.status?.user_optin === true;
+        if (isOptedIn) {
+          navigate(tenantPath('/federation'), { replace: true });
+        }
+      }
+    }).catch(() => {
+      // Non-critical — if the check fails, let the wizard proceed normally
+    });
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Step 4 — partner data
   const [partners, setPartners] = useState<FederationPartner[]>([]);
   const [partnersLoading, setPartnersLoading] = useState(false);

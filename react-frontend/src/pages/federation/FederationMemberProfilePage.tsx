@@ -25,6 +25,7 @@ import {
   ModalFooter,
   Input,
   Textarea,
+  Tooltip,
   useDisclosure,
 } from '@heroui/react';
 import {
@@ -88,6 +89,7 @@ export function FederationMemberProfilePage() {
 
   const [connectionStatus, setConnectionStatus] = useState<string>('none');
   const [connectLoading, setConnectLoading] = useState(false);
+  const [userOptedIn, setUserOptedIn] = useState<boolean | null>(null);
 
   // Transaction modal
   const txModal = useDisclosure();
@@ -119,7 +121,7 @@ export function FederationMemberProfilePage() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await api.get<FederatedMember>(`/v2/federation/members/${id}`);
+      const response = await api.get<FederatedMember>(`/v2/federation/members/${id}`, { signal: controller.signal });
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setMember(response.data);
@@ -143,6 +145,30 @@ export function FederationMemberProfilePage() {
     if (member) loadConnectionStatus();
   }, [member, loadConnectionStatus]);
 
+  // Check the current user's federation opt-in status
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setUserOptedIn(false);
+      return;
+    }
+    let cancelled = false;
+    api.get<{ enabled?: boolean; status?: { user_optin?: boolean } }>('/v2/federation/status').then((res) => {
+      if (cancelled) return;
+      if (res.success && res.data) {
+        const isOptedIn =
+          res.data.enabled === true ||
+          res.data.status?.user_optin === true;
+        setUserOptedIn(isOptedIn);
+      } else {
+        setUserOptedIn(false);
+      }
+    }).catch(() => {
+      setUserOptedIn(false);
+    });
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
+
   const handleConnect = async () => {
     if (!member) return;
     try {
@@ -152,14 +178,14 @@ export function FederationMemberProfilePage() {
         receiver_tenant_id: member.timebank.id,
       });
       if (response.success) {
-        toastRef.current.success(tRef.current('member_profile.connect_sent', 'Connection request sent!'));
+        toastRef.current.success(tRef.current('member_profile.connect_sent'));
         loadConnectionStatus();
       } else {
-        toastRef.current.error(response.error || tRef.current('member_profile.connect_failed', 'Failed to send request'));
+        toastRef.current.error(response.error || tRef.current('member_profile.connect_failed'));
       }
     } catch (err) {
       logError('Failed to send connection request', err);
-      toastRef.current.error(tRef.current('member_profile.connect_failed', 'Failed to send request'));
+      toastRef.current.error(tRef.current('member_profile.connect_failed'));
     } finally {
       setConnectLoading(false);
     }
@@ -182,21 +208,21 @@ export function FederationMemberProfilePage() {
 
     return (
       <div className="space-y-6">
-        <PageMeta title={t('member_profile.external_member_title', 'External Member')} noIndex />
+        <PageMeta title={t('member_profile.external_member_title')} noIndex />
         <Breadcrumbs
           items={[
             { label: t('member_profile.breadcrumb_federation'), href: tenantPath('/federation') },
             { label: t('member_profile.breadcrumb_members'), href: tenantPath('/federation/members') },
-            { label: t('member_profile.external_member_title', 'External Member') },
+            { label: t('member_profile.external_member_title') },
           ]}
         />
         <GlassCard className="p-8 text-center">
           <Globe className="w-12 h-12 text-indigo-500 mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
-            {t('member_profile.external_member_title', 'External Member')}
+            {t('member_profile.external_member_title')}
           </h2>
           <p className="text-theme-muted mb-4 max-w-md mx-auto">
-            {t('member_profile.external_member_description', "This member belongs to an external partner community. Their full profile is on their home platform.")}
+            {t('member_profile.external_member_description')}
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <Button
@@ -346,14 +372,20 @@ export function FederationMemberProfilePage() {
               {/* Actions */}
               <div className="flex flex-wrap gap-3 mt-4">
                 {isAuthenticated && connectionStatus === 'none' && (
-                  <Button
-                    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                    startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
-                    isLoading={connectLoading}
-                    onPress={handleConnect}
+                  <Tooltip
+                    content={userOptedIn === false ? t('member_profile.optin_required_tooltip', 'Enable federation to connect with members from other communities') : undefined}
+                    isDisabled={userOptedIn !== false}
                   >
-                    {t('member_profile.connect', 'Connect')}
-                  </Button>
+                    <Button
+                      className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                      startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
+                      isLoading={connectLoading}
+                      isDisabled={userOptedIn === false}
+                      onPress={handleConnect}
+                    >
+                      {t('member_profile.connect')}
+                    </Button>
+                  </Tooltip>
                 )}
                 {connectionStatus === 'pending_sent' && (
                   <Chip
@@ -361,7 +393,7 @@ export function FederationMemberProfilePage() {
                     variant="flat"
                     className="bg-amber-500/10 text-amber-600 dark:text-amber-400"
                   >
-                    {t('member_profile.request_pending', 'Request Pending')}
+                    {t('member_profile.request_pending')}
                   </Chip>
                 )}
                 {connectionStatus === 'accepted' && (
@@ -370,7 +402,7 @@ export function FederationMemberProfilePage() {
                     variant="flat"
                     className="bg-green-500/10 text-green-600 dark:text-green-400"
                   >
-                    {t('member_profile.connected', 'Connected')}
+                    {t('member_profile.connected')}
                   </Chip>
                 )}
                 {isAuthenticated && member.messaging_enabled && (
@@ -388,14 +420,20 @@ export function FederationMemberProfilePage() {
                   </Button>
                 )}
                 {isAuthenticated && (
-                  <Button
-                    variant="flat"
-                    className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                    startContent={<Coins className="w-4 h-4" aria-hidden="true" />}
-                    onPress={() => txModal.onOpen()}
+                  <Tooltip
+                    content={userOptedIn === false ? t('member_profile.optin_required_tooltip', 'Enable federation to connect with members from other communities') : undefined}
+                    isDisabled={userOptedIn !== false}
                   >
-                    {t('member_profile.send_credits', 'Send Credits')}
-                  </Button>
+                    <Button
+                      variant="flat"
+                      className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                      startContent={<Coins className="w-4 h-4" aria-hidden="true" />}
+                      isDisabled={userOptedIn === false}
+                      onPress={() => txModal.onOpen()}
+                    >
+                      {t('member_profile.send_credits')}
+                    </Button>
+                  </Tooltip>
                 )}
                 <Button
                   variant="flat"
@@ -468,7 +506,7 @@ export function FederationMemberProfilePage() {
                 </ModalHeader>
                 <ModalBody className="gap-4">
                   <Input
-                    label={t('member_profile.amount_hours', 'Amount (hours)')}
+                    label={t('member_profile.amount_hours')}
                     placeholder="1-100"
                     type="number"
                     min={1}
@@ -478,8 +516,8 @@ export function FederationMemberProfilePage() {
                     isRequired
                   />
                   <Textarea
-                    label={t('member_profile.description', 'Description')}
-                    placeholder={t('member_profile.tx_description_placeholder', 'What is this transfer for?')}
+                    label={t('member_profile.description')}
+                    placeholder={t('member_profile.tx_description_placeholder')}
                     value={txDescription}
                     onValueChange={setTxDescription}
                     minRows={2}
@@ -497,7 +535,7 @@ export function FederationMemberProfilePage() {
                 </ModalBody>
                 <ModalFooter>
                   <Button variant="flat" onPress={onClose}>
-                    {t('member_profile.cancel', 'Cancel')}
+                    {t('member_profile.cancel')}
                   </Button>
                   <Button
                     className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
@@ -515,7 +553,7 @@ export function FederationMemberProfilePage() {
                         });
                         if (res.success) {
                           toast.success(
-                            t('member_profile.tx_success', 'Credits sent!'),
+                            t('member_profile.tx_success'),
                             t('member_profile.tx_success_detail', {
                               amount: txAmount,
                               name: member.name,
@@ -526,19 +564,19 @@ export function FederationMemberProfilePage() {
                           onClose();
                         } else {
                           toast.error(
-                            t('member_profile.tx_failed', 'Transfer failed'),
+                            t('member_profile.tx_failed'),
                             (res as { error?: string }).error || 'Unknown error'
                           );
                         }
                       } catch (err) {
                         logError('Federation transaction failed', err);
-                        toast.error(t('member_profile.tx_failed', 'Transfer failed'));
+                        toast.error(t('member_profile.tx_failed'));
                       } finally {
                         setTxSending(false);
                       }
                     }}
                   >
-                    {t('member_profile.send_credits', 'Send Credits')}
+                    {t('member_profile.send_credits')}
                   </Button>
                 </ModalFooter>
               </>
