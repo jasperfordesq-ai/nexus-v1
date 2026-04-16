@@ -125,7 +125,7 @@ export function Layout({
             // Final safety check — must be a root-relative path
             if (!path.startsWith('/')) return;
 
-            navigate(path);
+            navigate(tenantPath(path));
           } catch {
             // Malformed URL — ignore silently
           }
