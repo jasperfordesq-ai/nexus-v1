@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -508,6 +509,27 @@ class StripeSubscriptionService
             ]);
             throw $e;
         }
+
+        // Email tenant admin — subscription renewed successfully
+        try {
+            $plan = DB::selectOne(
+                "SELECT pp.name FROM tenant_plan_assignments tpa
+                 JOIN pay_plans pp ON pp.id = tpa.pay_plan_id
+                 WHERE tpa.id = ?",
+                [$assignment->id]
+            );
+            $planName = $plan->name ?? '';
+            static::sendTenantAdminEmail(
+                (int) $assignment->tenant_id,
+                __('emails_misc.stripe_subscription.renewed_subject'),
+                __('emails_misc.stripe_subscription.renewed_title'),
+                __('emails_misc.stripe_subscription.renewed_body', ['plan' => htmlspecialchars($planName, ENT_QUOTES, 'UTF-8')]),
+                '/admin/billing',
+                __('emails_misc.stripe_subscription.renewed_cta')
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[StripeSubscriptionService] handleInvoicePaid email failed: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -554,6 +576,63 @@ class StripeSubscriptionService
     /**
      * Send an email to the primary admin user of a tenant.
      */
+    /**
+     * Send 7-day renewal reminder emails to tenant admins.
+     * Deduped via a 24h cache key per tenant+period to prevent duplicate sends.
+     *
+     * @return array{sent: int, errors: int}
+     */
+    public static function sendRenewalReminders(): array
+    {
+        $sent   = 0;
+        $errors = 0;
+
+        $assignments = DB::select(
+            "SELECT tpa.id, tpa.tenant_id, tpa.stripe_current_period_end, pp.name AS plan_name
+             FROM tenant_plan_assignments tpa
+             JOIN pay_plans pp ON pp.id = tpa.pay_plan_id
+             WHERE tpa.status = 'active'
+               AND tpa.stripe_current_period_end IS NOT NULL
+               AND tpa.stripe_current_period_end BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 7 DAY)"
+        );
+
+        foreach ($assignments as $assignment) {
+            try {
+                $periodDate = date('Y-m-d', strtotime($assignment->stripe_current_period_end));
+                $cacheKey   = 'subscription_renewal_reminder:' . $assignment->tenant_id . ':' . $periodDate;
+
+                if (Cache::has($cacheKey)) {
+                    continue;
+                }
+
+                // Mark as sent before sending to prevent duplicate sends on retry
+                Cache::put($cacheKey, true, now()->addHours(24));
+
+                $planName = $assignment->plan_name ?? '';
+                $dateFormatted = date('F j, Y', strtotime($assignment->stripe_current_period_end));
+
+                static::sendTenantAdminEmail(
+                    (int) $assignment->tenant_id,
+                    __('emails_misc.stripe_subscription.renewal_reminder_subject'),
+                    __('emails_misc.stripe_subscription.renewal_reminder_title'),
+                    __('emails_misc.stripe_subscription.renewal_reminder_body', [
+                        'plan' => htmlspecialchars($planName, ENT_QUOTES, 'UTF-8'),
+                        'date' => $dateFormatted,
+                    ]),
+                    '/admin/billing',
+                    __('emails_misc.stripe_subscription.renewal_reminder_cta')
+                );
+
+                $sent++;
+            } catch (\Throwable $e) {
+                Log::warning('[StripeSubscriptionService] sendRenewalReminders failed for tenant ' . $assignment->tenant_id . ': ' . $e->getMessage());
+                $errors++;
+            }
+        }
+
+        return ['sent' => $sent, 'errors' => $errors];
+    }
+
     private static function sendTenantAdminEmail(int $tenantId, string $subject, string $title, string $body, string $link, string $ctaText, string $theme = 'default'): void
     {
         TenantContext::setById($tenantId);

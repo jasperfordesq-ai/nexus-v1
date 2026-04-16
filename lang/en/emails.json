@@ -401,6 +401,14 @@
     "exchange_disputed": "\u26A0\uFE0F Exchange Dispute - Broker Review Needed",
     "default": "Notification from Project NEXUS"
   },
+  "exchange_dispute": {
+    "subject": "Your exchange has been flagged for review",
+    "title": "Exchange Under Review",
+    "preview": "An exchange you participated in needs attention",
+    "body": "Your recent exchange has been flagged as disputed due to a difference in reported hours. A coordinator will review this and reach out shortly.",
+    "next_steps": "You may be contacted by a broker or coordinator to help resolve this. In the meantime, you can view the exchange details.",
+    "cta": "View Exchange"
+  },
   "donation": {
     "sent_subject": "You donated :amount time credits",
     "sent_title": "Donation Sent",

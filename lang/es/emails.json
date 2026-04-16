@@ -461,5 +461,13 @@
     "hours_declined_preview": "An update on your volunteer hours",
     "hours_declined_body": "Your volunteer hours for ':opportunity' could not be confirmed at this time. Please contact your coordinator.",
     "hours_declined_cta": "View Volunteering"
+  },
+  "exchange_dispute": {
+    "subject": "Your exchange has been flagged for review",
+    "title": "Exchange Under Review",
+    "preview": "An exchange you participated in needs attention",
+    "body": "Your recent exchange has been flagged as disputed due to a difference in reported hours. A coordinator will review this and reach out shortly.",
+    "next_steps": "You may be contacted by a broker or coordinator to help resolve this. In the meantime, you can view the exchange details.",
+    "cta": "View Exchange"
   }
 }

@@ -407,7 +407,17 @@
     "expired_subject": "Your subscription has expired",
     "expired_title": "Subscription Expired",
     "expired_body": "Your subscription has expired due to non-payment. Please renew your subscription to restore full platform access.",
-    "expired_cta": "Renew Subscription"
+    "expired_cta": "Renew Subscription",
+    "renewed_subject": "Your subscription has been renewed",
+    "renewed_title": "Subscription Renewed",
+    "renewed_preview": "Your :plan subscription renewed successfully",
+    "renewed_body": "Your <strong>:plan</strong> subscription has been automatically renewed. Your next billing date has been updated.",
+    "renewed_cta": "View Billing",
+    "renewal_reminder_subject": "Your subscription renews in 7 days",
+    "renewal_reminder_title": "Upcoming Renewal",
+    "renewal_reminder_preview": "Your :plan subscription renews soon",
+    "renewal_reminder_body": "Your <strong>:plan</strong> subscription is set to automatically renew on <strong>:date</strong>. No action is needed — we will charge your card on file.",
+    "renewal_reminder_cta": "Manage Subscription"
   },
   "exchange_rating": {
     "received_subject": "You received a new rating on an exchange",

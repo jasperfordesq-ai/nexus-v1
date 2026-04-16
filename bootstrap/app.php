@@ -130,6 +130,14 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->runInBackground()
             ->name('identity-poll-stuck');
 
+        // Subscriptions: send 7-day renewal reminder to tenant admins
+        $schedule->call(function () {
+            \App\Services\StripeSubscriptionService::sendRenewalReminders();
+        })
+            ->dailyAt('09:00')
+            ->name('subscriptions:renewal-reminders')
+            ->withoutOverlapping(5);
+
         // H6: Prune unbounded logging tables (cron_logs 90d, error_404_log 30d,
         // activity_log 180d, api_logs 30d, federation_api_logs 30d) daily at 03:00.
         $schedule->command('nexus:prune-logs')

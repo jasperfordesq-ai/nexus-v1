@@ -6,6 +6,8 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\ExchangeHistory;
 use App\Models\ExchangeRequest;
@@ -767,6 +769,54 @@ class ExchangeWorkflowService
         // Dispute
         self::updateStatus($exchangeId, self::STATUS_DISPUTED, null, 'system',
             "Hours mismatch: requester=$requesterHours, provider=$providerHours");
+
+        // Notify both parties of the dispute
+        try {
+            $exchange = DB::table('exchange_requests as er')
+                ->join('users as req', function ($j) { $j->on('req.id', '=', 'er.requester_id'); })
+                ->join('users as prov', function ($j) { $j->on('prov.id', '=', 'er.provider_id'); })
+                ->where('er.id', $exchangeId)
+                ->select([
+                    'er.tenant_id', 'er.id',
+                    'req.id as req_id', 'req.email as req_email', 'req.first_name as req_fname', 'req.name as req_name',
+                    'prov.id as prov_id', 'prov.email as prov_email', 'prov.first_name as prov_fname', 'prov.name as prov_name',
+                    'er.listing_id',
+                ])
+                ->first();
+
+            if ($exchange) {
+                TenantContext::setById($exchange->tenant_id);
+                $link        = '/exchanges/' . $exchangeId;
+                $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
+
+                foreach ([
+                    ['email' => $exchange->req_email, 'name' => $exchange->req_fname ?? $exchange->req_name],
+                    ['email' => $exchange->prov_email, 'name' => $exchange->prov_fname ?? $exchange->prov_name],
+                ] as $party) {
+                    if (empty($party['email'])) {
+                        continue;
+                    }
+
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('warning')
+                        ->title(__('emails.exchange_dispute.title'))
+                        ->previewText(__('emails.exchange_dispute.preview'))
+                        ->greeting($party['name'] ?? 'there')
+                        ->paragraph(__('emails.exchange_dispute.body'))
+                        ->paragraph(__('emails.exchange_dispute.next_steps'))
+                        ->button(__('emails.exchange_dispute.cta'), $frontendUrl . $link)
+                        ->render();
+
+                    Mailer::forCurrentTenant()->send(
+                        $party['email'],
+                        __('emails.exchange_dispute.subject'),
+                        $html
+                    );
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[ExchangeWorkflowService] dispute notification failed: ' . $e->getMessage());
+        }
 
         return true;
     }
