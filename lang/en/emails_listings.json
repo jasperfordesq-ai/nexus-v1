@@ -42,7 +42,11 @@
       "cta": "Edit Listing"
     },
     "removed": {
-      "notification": "Your listing \"{{title}}\" has been removed by a moderator."
+      "notification": "Your listing \"{{title}}\" has been removed by a moderator.",
+      "email_subject": "Your listing has been removed — {{title}}",
+      "email_title": "Listing Removed",
+      "email_body": "Your listing <strong>\"{{title}}\"</strong> has been removed by a moderator.",
+      "email_cta": "Browse Listings"
     }
   }
 }
