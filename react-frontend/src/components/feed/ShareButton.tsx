@@ -267,11 +267,13 @@ export function SharedByAttribution({
   sharerAvatar?: string;
   sharerId?: number;
 }) {
+  const { t } = useTranslation('feed');
   return (
     <div className="flex items-center gap-1.5 px-5 py-2 text-xs text-[var(--text-subtle)] border-b border-[var(--border-default)]">
       <Repeat2 className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
       <span>
-        <span className="font-medium text-[var(--text-muted)]">{sharerName}</span> shared this
+        <span className="font-medium text-[var(--text-muted)]">{sharerName}</span>
+        {' '}{t('share.shared_by_text')}
       </span>
     </div>
   );

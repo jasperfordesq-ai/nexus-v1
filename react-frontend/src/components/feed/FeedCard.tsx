@@ -26,6 +26,11 @@ import {
   Divider,
   Card,
   CardBody,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from '@heroui/react';
 import {
   Heart,
@@ -249,6 +254,8 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
   const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeletingComment, setIsDeletingComment] = useState(false);
 
   const isOwn = currentUserId === comment.author.id || comment.is_own;
 
@@ -260,9 +267,15 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
     setIsSubmittingEdit(false);
   };
 
-  const handleDelete = async () => {
-    if (!window.confirm(t('card.delete_comment_confirm', 'Delete this comment?'))) return;
+  const handleDelete = () => {
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    setIsDeletingComment(true);
     await onDelete(comment.id);
+    setIsDeletingComment(false);
+    setShowDeleteModal(false);
   };
 
   return (
@@ -367,6 +380,46 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
             </>
           )}
         </div>
+
+        {/* Delete Comment Confirmation Modal */}
+        <Modal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          size="sm"
+          classNames={{
+            base: 'bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)]',
+            backdrop: 'bg-black/60 backdrop-blur-sm',
+          }}
+        >
+          <ModalContent>
+            <ModalHeader className="text-[var(--text-primary)] text-sm">
+              {t('card.delete_comment_title')}
+            </ModalHeader>
+            <ModalBody>
+              <p className="text-sm text-[var(--text-muted)]">{t('card.delete_comment_body')}</p>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                size="sm"
+                variant="flat"
+                onPress={() => setShowDeleteModal(false)}
+                className="text-[var(--text-muted)]"
+              >
+                {t('card.cancel')}
+              </Button>
+              <Button
+                size="sm"
+                color="danger"
+                variant="flat"
+                isLoading={isDeletingComment}
+                onPress={confirmDelete}
+                className="font-medium"
+              >
+                {t('card.delete')}
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
 
         {/* Nested Replies */}
         <AnimatePresence>

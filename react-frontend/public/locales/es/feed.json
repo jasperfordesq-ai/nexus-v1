@@ -269,7 +269,14 @@
     "detail_challenge": "Ver Desafío",
     "detail_volunteer": "Ver Oportunidad",
     "detail_blog": "Leer Artículo",
-    "scheduled": "Scheduled"
+    "scheduled": "Scheduled",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "delete_comment_confirm": "Delete this comment?",
+    "delete_comment_title": "Delete Comment",
+    "delete_comment_body": "Are you sure you want to delete this comment? This cannot be undone."
   },
   "hashtag": {
     "title": "Hashtag",
@@ -330,7 +337,8 @@
     "quote_submit": "Post",
     "dm_sent_label": "Sent",
     "dm_send": "Send",
-    "dm_done": "Done"
+    "dm_done": "Done",
+    "shared_by_text": "shared this"
   },
   "trending": {
     "title": "Tendencias",

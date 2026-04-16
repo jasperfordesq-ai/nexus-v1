@@ -65,6 +65,10 @@ import type { FeedItem, FeedFilter, PollData } from '@/components/feed/types';
 import { getAuthor } from '@/components/feed/types';
 import type { ReactionType } from '@/components/social';
 
+/* ───────────────────────── Constants ───────────────────────── */
+
+const SCROLL_THRESHOLD = 200;
+
 /* ───────────────────────── Sidebar Error Boundary ───────────────────────── */
 
 
@@ -199,9 +203,11 @@ export function FeedPage() {
         cursorRef.current = response.meta?.cursor ?? undefined;
       } else {
         if (!append) {
-          setError(response.code === 'SESSION_EXPIRED'
-            ? tRef.current('session_expired', 'Your session has expired. Please log in again.')
-            : tRef.current('error_load'));
+          if (response.code === 'SESSION_EXPIRED') {
+            navigate(tenantPath('/login'));
+          } else {
+            setError(tRef.current('error_load'));
+          }
         }
       }
     } catch (err) {
@@ -217,7 +223,7 @@ export function FeedPage() {
         }
       }
     }
-  }, [filter, feedMode, subFilter]);
+  }, [filter, feedMode, subFilter, navigate, tenantPath]);
 
   // Keep loadFeedRef in sync with latest loadFeed
   loadFeedRef.current = loadFeed;
@@ -243,7 +249,6 @@ export function FeedPage() {
   /* ───────── Scroll position tracking ───────── */
 
   useEffect(() => {
-    const SCROLL_THRESHOLD = 200;
     let ticking = false;
 
     const handleScroll = () => {
@@ -299,7 +304,7 @@ export function FeedPage() {
       if (!matchesFilter) return;
 
       // If scrolled down, buffer the post and show "new posts" chip
-      if (window.scrollY > 200) { // matches SCROLL_THRESHOLD in scroll handler
+      if (window.scrollY > SCROLL_THRESHOLD) {
         pendingPostsRef.current = [incoming, ...pendingPostsRef.current];
         setPendingPostCount((n) => n + 1);
         return;
