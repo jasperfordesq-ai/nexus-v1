@@ -43,6 +43,7 @@ import { useNotifications, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { formatRelativeTime, resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
+import { getNotificationDisplayText } from '@/lib/notificationText';
 import type { Notification } from '@/types/api';
 
 const TYPE_ICONS: Record<string, typeof Bell> = {
@@ -127,7 +128,7 @@ export function NotificationFlyout() {
 
   /* ── Shared notification list content ────────────────────── */
   const notificationHeader = (
-    <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)]">
+    <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)] bg-[var(--surface-solid)]">
       <h3 className="text-sm font-semibold text-theme-primary">
         {t('title')}
         {unreadCount > 0 && (
@@ -167,7 +168,7 @@ export function NotificationFlyout() {
   const notificationBody = (
     <>
       {isLoading ? (
-        <div className="p-4 space-y-3">
+        <div className="p-4 space-y-3 bg-[var(--surface-solid)]">
           {[1, 2, 3].map(i => (
             <div key={i} className="flex gap-3">
               <Skeleton className="w-8 h-8 rounded-full shrink-0" />
@@ -179,12 +180,12 @@ export function NotificationFlyout() {
           ))}
         </div>
       ) : notifications.length === 0 ? (
-        <div className="py-8 text-center">
+        <div className="py-8 text-center bg-[var(--surface-solid)]">
           <Bell className="w-8 h-8 mx-auto text-theme-subtle mb-2 opacity-40" />
           <p className="text-sm text-theme-subtle">{t('flyout.empty')}</p>
         </div>
       ) : (
-        <div className="py-1">
+        <div className="py-1 bg-[var(--surface-solid)]">
           {notifications.map(notification => {
             const isUnread = !notification.read_at;
             const isGrouped = notification.is_grouped && (notification.group_count ?? 0) > 1;
@@ -221,8 +222,8 @@ export function NotificationFlyout() {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm leading-snug ${isUnread ? 'font-medium text-theme-primary' : 'text-theme-secondary'}`}>
-                    {notification.message || notification.body || notification.title}
+                  <p className={`text-sm leading-snug whitespace-normal break-words ${isUnread ? 'font-medium text-theme-primary' : 'text-theme-secondary'}`}>
+                    {getNotificationDisplayText(notification)}
                   </p>
                   <div className="flex items-center gap-2 mt-0.5">
                     <p className="text-xs text-theme-subtle">
@@ -247,7 +248,7 @@ export function NotificationFlyout() {
   );
 
   const notificationFooter = (
-    <div className="border-t border-[var(--border-default)] px-4 py-2.5">
+    <div className="border-t border-[var(--border-default)] px-4 py-2.5 bg-[var(--surface-solid)]">
       <Button
         variant="light"
         fullWidth
@@ -290,7 +291,7 @@ export function NotificationFlyout() {
           hideCloseButton
           classNames={{
             wrapper: 'z-[400]',
-            base: 'bg-[var(--surface-dropdown)] rounded-t-2xl max-h-[85vh]',
+            base: 'bg-[var(--surface-solid)] rounded-t-2xl max-h-[85vh] shadow-2xl border border-[var(--border-default)]',
             header: 'p-0',
             body: 'p-0',
           }}
@@ -328,9 +329,9 @@ export function NotificationFlyout() {
       <PopoverTrigger>
         {bellButton}
       </PopoverTrigger>
-      <PopoverContent className="p-0 bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-2xl rounded-xl w-[360px] max-w-[90vw]">
+      <PopoverContent className="p-0 overflow-hidden isolate bg-[var(--surface-solid)] border border-[var(--border-default)] shadow-2xl rounded-xl w-[360px] max-w-[90vw]">
         {notificationHeader}
-        <div className="max-h-[400px] overflow-y-auto">
+        <div className="max-h-[400px] overflow-y-auto bg-[var(--surface-solid)]">
           {notificationBody}
         </div>
         {notificationFooter}

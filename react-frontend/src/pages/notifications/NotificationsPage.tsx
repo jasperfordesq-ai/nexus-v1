@@ -37,6 +37,7 @@ import { useToast, useTenant, useNotifications } from '@/contexts';
 import { api } from '@/lib/api';
 import { formatRelativeTime, resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
+import { getNotificationDisplayText } from '@/lib/notificationText';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import type { Notification } from '@/types/api';
@@ -378,7 +379,7 @@ const NotificationCard = memo(function NotificationCard({ notification, onMarkRe
 
           <div className="flex-1 min-w-0">
             <p className={`${isUnread ? 'text-theme-primary font-medium' : 'text-theme-muted'}`}>
-              {notification.message || notification.body}
+              {getNotificationDisplayText(notification)}
             </p>
             <div className="flex items-center gap-2 mt-1">
               <p className="text-xs text-theme-subtle">

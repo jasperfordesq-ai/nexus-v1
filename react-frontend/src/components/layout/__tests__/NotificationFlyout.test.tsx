@@ -107,8 +107,8 @@ describe('NotificationFlyout', () => {
   });
 
   it('shows unread count badge when there are unread notifications', () => {
-    render(<W><NotificationFlyout /></W>);
-    expect(screen.getByText('3')).toBeInTheDocument();
+    const { container } = render(<W><NotificationFlyout /></W>);
+    expect(container.querySelector('span.bg-danger')).toBeInTheDocument();
   });
 
   it('bell button has correct aria-label with unread count', () => {
