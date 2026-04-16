@@ -32,6 +32,8 @@ This is a **multi-tenant Laravel + React/TypeScript application**. The backend u
 
 ## Git & Commits
 
+**Commit directly to `main`.** Do not create feature branches or PRs — this is a solo project and the branch-per-change workflow adds unnecessary overhead.
+
 When committing code, always use `--no-verify` flag if pre-commit hooks fail due to pre-existing issues in unstaged files. Do not spend multiple cycles trying to fix pre-existing lint/test errors that are unrelated to the current changes.
 
 Pre-commit hooks (husky/eslint) have known pre-existing failures. When commits are blocked by pre-existing lint or test errors unrelated to current changes, use `--no-verify` to bypass rather than attempting to fix all pre-existing issues.
