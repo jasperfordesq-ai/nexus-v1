@@ -25,7 +25,8 @@ import {
 } from '@heroui/react';
 import { Settings, Save, AlertCircle, Info } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useAuth, useTenant, useToast } from '@/contexts';
+import { Navigate } from 'react-router-dom';
 import { adminCron, adminSystem } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { CronJob, CronJobSettings, GlobalCronSettings } from '../../api/types';
@@ -37,8 +38,15 @@ import { useTranslation } from 'react-i18next';
 
 export function CronJobSettingsPage() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('system.page_title'));
+  usePageTitle(t('system.cron_job_settings_title'));
   const toast = useToast();
+  const { user } = useAuth();
+  const { tenantPath } = useTenant();
+
+  const userRecord = user as Record<string, unknown> | null;
+  const isPlatformSuperAdmin =
+    (user?.role as string) === 'super_admin' ||
+    userRecord?.is_super_admin === true;
 
   const [jobs, setJobs] = useState<CronJob[]>([]);
   const [loadingJobs, setLoadingJobs] = useState(true);
@@ -153,6 +161,10 @@ export function CronJobSettingsPage() {
     }
   }, [selectedJobId, loadJobSettings]);
 
+  if (!isPlatformSuperAdmin) {
+    return <Navigate to={tenantPath('/admin')} replace />;
+  }
+
   return (
     <div>
       <PageHeader
@@ -182,7 +194,7 @@ export function CronJobSettingsPage() {
                   onChange={(e) => setSelectedJobId(e.target.value)}
                 >
                   {jobs.map((job) => (
-                    <SelectItem key={job.id.toString()}>
+                    <SelectItem key={job.slug}>
                       {job.name}
                     </SelectItem>
                   ))}
@@ -214,7 +226,7 @@ export function CronJobSettingsPage() {
 
                         <Input
                           label={t('system.label_custom_schedule')}
-                          placeholder="* * * * *"
+                          placeholder={t('system.placeholder_cron_expression')}
                           description={t('system.desc_cron_expression_leave_empty_to_use_defa')}
                           variant="bordered"
                           value={jobSettings.custom_schedule || ''}
@@ -251,7 +263,7 @@ export function CronJobSettingsPage() {
                         {jobSettings.notify_on_failure && (
                           <Textarea
                             label={t('system.label_notification_emails')}
-                            placeholder="admin@example.com, dev@example.com"
+                            placeholder={t('system.placeholder_notification_emails')}
                             description={t('system.desc_comma_separated_emails')}
                             variant="bordered"
                             minRows={2}
@@ -268,7 +280,7 @@ export function CronJobSettingsPage() {
                         <Input
                           label={t('system.label_max_retries')}
                           type="number"
-                          placeholder="3"
+                          placeholder={t('system.placeholder_max_retries')}
                           description={t('system.desc_number_of_times_to_retry_failed_jobs')}
                           variant="bordered"
                           value={jobSettings.max_retries.toString()}
@@ -283,7 +295,7 @@ export function CronJobSettingsPage() {
                         <Input
                           label={t('system.label_timeout')}
                           type="number"
-                          placeholder="300"
+                          placeholder={t('system.placeholder_timeout_seconds')}
                           description={t('system.desc_maximum_execution_time')}
                           variant="bordered"
                           value={jobSettings.timeout_seconds.toString()}
@@ -336,7 +348,7 @@ export function CronJobSettingsPage() {
                 <Input
                   label={t('system.label_default_notification_email')}
                   type="email"
-                  placeholder="admin@example.com"
+                  placeholder={t('system.placeholder_default_notification_email')}
                   description={t('system.desc_fallback_email_for_job_failure_notificat')}
                   variant="bordered"
                   value={globalSettings.default_notify_email || ''}
@@ -351,7 +363,7 @@ export function CronJobSettingsPage() {
                 <Input
                   label={t('system.label_log_retention')}
                   type="number"
-                  placeholder="30"
+                  placeholder={t('system.placeholder_log_retention_days')}
                   description={t('system.desc_how_long_to_keep_job_execution_logs')}
                   variant="bordered"
                   value={globalSettings.log_retention_days.toString()}
@@ -366,7 +378,7 @@ export function CronJobSettingsPage() {
                 <Input
                   label={t('system.label_max_concurrent_jobs')}
                   type="number"
-                  placeholder="5"
+                  placeholder={t('system.placeholder_max_concurrent_jobs')}
                   description={t('system.desc_maximum_number_of_jobs_that_can_run_simu')}
                   variant="bordered"
                   value={globalSettings.max_concurrent_jobs.toString()}

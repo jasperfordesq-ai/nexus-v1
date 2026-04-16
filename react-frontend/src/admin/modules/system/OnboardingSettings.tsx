@@ -103,12 +103,12 @@ interface SafeguardingOption {
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const COUNTRY_PRESETS_MAP: Record<string, string> = {
-  ireland: 'Ireland',
-  england_wales: 'England & Wales',
-  scotland: 'Scotland',
-  northern_ireland: 'Northern Ireland',
-  custom: 'Custom',
+const COUNTRY_PRESET_LABEL_KEYS: Record<string, string> = {
+  ireland: 'system.onboarding.preset_ireland',
+  england_wales: 'system.onboarding.preset_england_wales',
+  scotland: 'system.onboarding.preset_scotland',
+  northern_ireland: 'system.onboarding.preset_northern_ireland',
+  custom: 'system.onboarding.preset_custom',
 };
 
 const STEP_ICONS: Record<string, typeof Sparkles> = {
@@ -128,6 +128,8 @@ export function OnboardingSettings() {
   const toast = useToast();
   const { tenant, tenantPath } = useTenant();
   const navigate = useNavigate();
+  const getCountryPresetLabel = (preset: string) =>
+    t(COUNTRY_PRESET_LABEL_KEYS[preset] ?? COUNTRY_PRESET_LABEL_KEYS.custom);
 
   const [config, setConfig] = useState<OnboardingConfig | null>(null);
   const [safeguardingOptions, setSafeguardingOptions] = useState<SafeguardingOption[]>([]);
@@ -407,14 +409,17 @@ export function OnboardingSettings() {
           <CardBody className="gap-4">
             <div className="flex items-end gap-3">
               <Select label={t('system.onboarding.country_preset')} selectedKeys={[config.country_preset]} onSelectionChange={(keys) => { const key = Array.from(keys)[0] as string; updateConfig('country_preset', key); }} variant="bordered" description={t('system.onboarding.country_preset_desc')} className="max-w-xs">
-                {Object.entries(COUNTRY_PRESETS_MAP).map(([key, label]) => (
-                  <SelectItem key={key} textValue={label}>
-                    <div className="flex items-center gap-2">
-                      <Globe className="w-4 h-4" />
-                      {label}
-                    </div>
-                  </SelectItem>
-                ))}
+                {Object.keys(COUNTRY_PRESET_LABEL_KEYS).map((key) => {
+                  const label = getCountryPresetLabel(key);
+                  return (
+                    <SelectItem key={key} textValue={label}>
+                      <div className="flex items-center gap-2">
+                        <Globe className="w-4 h-4" />
+                        {label}
+                      </div>
+                    </SelectItem>
+                  );
+                })}
               </Select>
               <Button color="secondary" variant="flat" onPress={presetModal.onOpen} isDisabled={config.country_preset === 'custom'}>
                 {t('system.onboarding.apply_preset')}
@@ -488,7 +493,7 @@ export function OnboardingSettings() {
         <ModalContent>
           <ModalHeader>{t('system.onboarding.apply_country_preset')}</ModalHeader>
           <ModalBody>
-            <p>{t('system.onboarding.preset_confirm', { country: COUNTRY_PRESETS_MAP[config.country_preset] || config.country_preset })}</p>
+            <p>{t('system.onboarding.preset_confirm', { country: getCountryPresetLabel(config.country_preset) })}</p>
             <p className="text-sm text-theme-muted mt-2">{t('system.onboarding.preset_note')}</p>
           </ModalBody>
           <ModalFooter>

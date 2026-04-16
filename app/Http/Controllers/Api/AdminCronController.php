@@ -31,7 +31,7 @@ class AdminCronController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $where = ["(tenant_id = ? OR tenant_id IS NULL)"];
+        $where = ["tenant_id = ?"];
         $values = [$tenantId];
 
         $jobId = $this->query('jobId');
@@ -95,7 +95,7 @@ class AdminCronController extends BaseApiController
         $log = DB::selectOne(
             "SELECT id, job_id, status, executed_at, duration_seconds,
                     LEFT(output, 10000) AS output, tenant_id
-             FROM cron_logs WHERE id = ? AND (tenant_id = ? OR tenant_id IS NULL)",
+             FROM cron_logs WHERE id = ? AND tenant_id = ?",
             [$logId, $tenantId]
         );
 
@@ -120,13 +120,13 @@ class AdminCronController extends BaseApiController
 
         if ($beforeDate) {
             $rowCount = DB::delete(
-                "DELETE FROM cron_logs WHERE (tenant_id = ? OR tenant_id IS NULL) AND executed_at < ?",
+                "DELETE FROM cron_logs WHERE tenant_id = ? AND executed_at < ?",
                 [$tenantId, $beforeDate]
             );
         } else {
             // Clear all logs for this tenant
             $rowCount = DB::delete(
-                "DELETE FROM cron_logs WHERE tenant_id = ? OR tenant_id IS NULL",
+                "DELETE FROM cron_logs WHERE tenant_id = ?",
                 [$tenantId]
             );
         }
@@ -139,7 +139,7 @@ class AdminCronController extends BaseApiController
     // =========================================================================
 
     /** GET /api/v2/admin/cron/jobs/{jobId}/settings */
-    public function getJobSettings(int $jobId): JsonResponse
+    public function getJobSettings(string $jobId): JsonResponse
     {
         // cron_job_settings is a global platform table with no tenant_id column — platform super-admin only.
         $this->requirePlatformSuperAdmin();
@@ -164,7 +164,7 @@ class AdminCronController extends BaseApiController
     }
 
     /** PUT /api/v2/admin/cron/jobs/{jobId}/settings */
-    public function updateJobSettings(int $jobId): JsonResponse
+    public function updateJobSettings(string $jobId): JsonResponse
     {
         // cron_job_settings is a global platform table with no tenant_id column — platform super-admin only.
         $this->requirePlatformSuperAdmin();
@@ -268,21 +268,21 @@ class AdminCronController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $jobsFailed24h = (int) DB::selectOne(
-            "SELECT COUNT(*) as count FROM cron_logs WHERE (tenant_id = ? OR tenant_id IS NULL) AND status = 'error' AND executed_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)",
+            "SELECT COUNT(*) as count FROM cron_logs WHERE tenant_id = ? AND status = 'error' AND executed_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)",
             [$tenantId]
         )->count;
 
         $recentFailures = DB::select(
             "SELECT l.job_id, COALESCE(j.job_name, l.job_id) as job_name, l.executed_at as failed_at, l.output as reason
              FROM cron_logs l LEFT JOIN cron_jobs j ON j.job_name = l.job_id AND j.tenant_id = ?
-             WHERE (l.tenant_id = ? OR l.tenant_id IS NULL) AND l.status = 'error'
+             WHERE l.tenant_id = ? AND l.status = 'error'
              ORDER BY l.executed_at DESC LIMIT 5",
             [$tenantId, $tenantId]
         );
 
         $rateData = DB::selectOne(
             "SELECT SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as successes, COUNT(*) as total
-             FROM cron_logs WHERE (tenant_id = ? OR tenant_id IS NULL) AND executed_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
+             FROM cron_logs WHERE tenant_id = ? AND executed_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
             [$tenantId]
         );
         $avgSuccessRate7d = ($rateData->total ?? 0) > 0

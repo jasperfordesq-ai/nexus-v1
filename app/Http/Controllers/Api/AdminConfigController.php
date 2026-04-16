@@ -312,6 +312,7 @@ class AdminConfigController extends BaseApiController
     public function getCronJobs(): JsonResponse
     {
         $this->requireAdmin();
+        $tenantId = TenantContext::getId();
 
         $jobs = $this->getCronJobDefinitions();
 
@@ -323,9 +324,11 @@ class AdminConfigController extends BaseApiController
                 INNER JOIN (
                     SELECT job_id, MAX(executed_at) as max_date
                     FROM cron_logs
+                    WHERE tenant_id = ?
                     GROUP BY job_id
                 ) cl2 ON cl1.job_id = cl2.job_id AND cl1.executed_at = cl2.max_date
-            ");
+                WHERE cl1.tenant_id = ?
+            ", [$tenantId, $tenantId]);
 
             foreach ($results as $row) {
                 $lastRuns[$row->job_id] = [

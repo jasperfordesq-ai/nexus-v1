@@ -951,6 +951,7 @@ export interface SecretEntryExtended extends SecretEntry {
 
 export interface CronJob {
   id: number;
+  slug: string;
   name: string;
   command: string;
   schedule: string;

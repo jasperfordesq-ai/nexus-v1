@@ -128,6 +128,9 @@ function useAdminNav(): NavSection[] {
     (user?.role as string) === 'super_admin' ||
     userRecord?.is_super_admin === true ||
     userRecord?.is_tenant_super_admin === true;
+  const isPlatformSuperAdmin =
+    (user?.role as string) === 'super_admin' ||
+    userRecord?.is_super_admin === true;
 
   return useMemo(() => {
     const sections: NavSection[] = [
@@ -340,7 +343,9 @@ function useAdminNav(): NavSection[] {
           { label: t('translation_config'), href: '/admin/translation-config', icon: Languages },
           { label: t('cron_jobs'), href: '/admin/cron-jobs', icon: Timer },
           { label: t('cron_logs'), href: '/admin/cron-jobs/logs', icon: FileText },
-          { label: t('cron_settings'), href: '/admin/cron-jobs/settings', icon: Settings },
+          ...(isPlatformSuperAdmin
+            ? [{ label: t('cron_settings'), href: '/admin/cron-jobs/settings', icon: Settings }]
+            : []),
           { label: t('cron_setup'), href: '/admin/cron-jobs/setup', icon: Wrench },
           { label: t('activity_log'), href: '/admin/activity-log', icon: Activity },
           { label: t('tools'), href: '/admin/seed-generator', icon: Wrench },
@@ -394,7 +399,7 @@ function useAdminNav(): NavSection[] {
     }
 
     return sections;
-  }, [hasFeature, isSuperAdmin, t])
+  }, [hasFeature, isPlatformSuperAdmin, isSuperAdmin, t])
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

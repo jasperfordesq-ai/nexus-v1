@@ -44,13 +44,13 @@ import { useTranslation } from 'react-i18next';
 
 export function CronJobSetup() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('system.page_title'));
+  usePageTitle(t('system.cron_job_setup_title'));
   const toast = useToast();
   const [testing, setTesting] = useState(false);
 
-  const copyToClipboard = (text: string, label: string) => {
+  const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success(t('system.label_copied_to_clipboard', { label }));
+    toast.success(t('system.copied_to_clipboard'));
   };
 
   const handleTestConnection = async () => {
@@ -82,12 +82,12 @@ export function CronJobSetup() {
             <AlertTriangle size={16} className="text-warning mt-0.5 shrink-0" />
             <div className="text-sm text-default-700 dark:text-default-300">
               <p className="font-medium mb-1">
-                All cron jobs run via the Laravel scheduler
+                {t('cron_setup.notice_title')}
               </p>
               <p className="text-xs text-default-500">
-                The only cron entry needed is <Code className="text-xs">artisan schedule:run</Code> every
-                minute. HTTP-based cron endpoints (<Code className="text-xs">/cron/*</Code>) were removed
-                to prevent duplicate email sends. Do not use curl-based cron triggers.
+                {t('cron_setup.notice_prefix')} <Code className="text-xs">artisan schedule:run</Code>{' '}
+                {t('cron_setup.notice_middle')} <Code className="text-xs">/cron/*</Code>{' '}
+                {t('cron_setup.notice_suffix')}
               </p>
             </div>
           </div>
@@ -100,7 +100,7 @@ export function CronJobSetup() {
           <div>
             <p className="font-medium">{t('cron_setup.test_cron_api')}</p>
             <p className="text-sm text-default-500">
-              Verify that the cron job system is responding and reporting jobs
+              {t('cron_setup.test_cron_api_desc')}
             </p>
           </div>
           <Button
@@ -110,7 +110,7 @@ export function CronJobSetup() {
             onPress={handleTestConnection}
             isLoading={testing}
           >
-            Test Connection
+            {t('cron_setup.test_connection')}
           </Button>
         </CardBody>
       </Card>
@@ -128,30 +128,27 @@ export function CronJobSetup() {
             }}
           >
             {/* Docker (Primary) */}
-            <Tab key="docker" title={<div className="flex items-center gap-1.5"><Server size={14} /> Docker <Chip size="sm" color="success" variant="flat">Recommended</Chip></div>}>
+            <Tab key="docker" title={<div className="flex items-center gap-1.5"><Server size={14} /> {t('cron_setup.docker')} <Chip size="sm" color="success" variant="flat">{t('cron_setup.recommended')}</Chip></div>}>
               <div className="space-y-4 pt-4">
                 <div>
                   <h3 className="text-base font-semibold mb-2">
-                    1. Add to Host Crontab
+                    {t('cron_setup.docker_step_1')}
                   </h3>
                   <p className="text-sm text-default-600 mb-2">
-                    On the <strong>host machine</strong> (not inside the container), add this single entry:
+                    {t('cron_setup.docker_step_1_desc')}
                   </p>
                   <div className="flex items-center gap-2">
                     <Code className="flex-1 text-xs break-all">
                       * * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run {'>'}{'>'}  /var/log/nexus-scheduler.log 2{'>'}&1
                     </Code>
                     <Button
-                      size="sm"
-                      variant="flat"
-                      isIconOnly
-                      aria-label="Copy crontab entry"
-                      onPress={() =>
-                        copyToClipboard(
-                          '* * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run >> /var/log/nexus-scheduler.log 2>&1',
-                          'Crontab entry'
-                        )
-                      }
+                        size="sm"
+                        variant="flat"
+                        isIconOnly
+                        aria-label={t('system.label_copy_crontab_entry')}
+                        onPress={() =>
+                          copyToClipboard('* * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run >> /var/log/nexus-scheduler.log 2>&1')
+                        }
                     >
                       <Copy size={14} />
                     </Button>
@@ -159,75 +156,74 @@ export function CronJobSetup() {
                 </div>
 
                 <div>
-                  <h3 className="text-base font-semibold mb-2">2. Verify</h3>
+                  <h3 className="text-base font-semibold mb-2">{t('cron_setup.verify')}</h3>
                   <Code className="block text-xs">sudo crontab -l</Code>
                 </div>
 
                 <div className="bg-success/10 border border-success/20 rounded-lg p-3 flex items-start gap-2">
                   <CheckCircle size={16} className="text-success mt-0.5 shrink-0" />
                   <p className="text-xs text-default-600">
-                    <strong>That&apos;s it!</strong> The Laravel scheduler calls <Code className="text-xs">CronJobRunner::runAll()</Code> every
-                    minute, which internally determines which of the 40+ tasks to run.
+                    <strong>{t('cron_setup.thats_it')}</strong> {t('cron_setup.thats_it_prefix')}{' '}
+                    <Code className="text-xs">CronJobRunner::runAll()</Code> {t('cron_setup.thats_it_suffix')}
                   </p>
                 </div>
               </div>
             </Tab>
 
             {/* Linux */}
-            <Tab key="linux" title="Linux / VPS">
+            <Tab key="linux" title={t('cron_setup.linux_vps')}>
               <div className="space-y-4 pt-4">
                 <div>
-                  <h3 className="text-base font-semibold mb-2">1. Edit Crontab</h3>
+                  <h3 className="text-base font-semibold mb-2">{t('cron_setup.linux_step_1')}</h3>
                   <Code className="block text-xs">crontab -e</Code>
                 </div>
 
                 <div>
-                  <h3 className="text-base font-semibold mb-2">2. Add Laravel Scheduler Entry</h3>
+                  <h3 className="text-base font-semibold mb-2">{t('cron_setup.linux_step_2')}</h3>
                   <div className="flex items-center gap-2">
                     <Code className="flex-1 text-xs break-all">
                       * * * * * cd /path/to/your/project && php artisan schedule:run {'>'}{'>'}  /dev/null 2{'>'}&1
                     </Code>
                     <Button
-                      size="sm"
-                      variant="flat"
-                      isIconOnly
-                      aria-label="Copy crontab entry"
-                      onPress={() =>
-                        copyToClipboard(
-                          '* * * * * cd /path/to/your/project && php artisan schedule:run >> /dev/null 2>&1',
-                          'Crontab entry'
-                        )
-                      }
+                        size="sm"
+                        variant="flat"
+                        isIconOnly
+                        aria-label={t('system.label_copy_crontab_entry')}
+                        onPress={() =>
+                          copyToClipboard('* * * * * cd /path/to/your/project && php artisan schedule:run >> /dev/null 2>&1')
+                        }
                     >
                       <Copy size={14} />
                     </Button>
                   </div>
                   <p className="text-xs text-default-500 mt-1">
-                    Replace <Code className="text-xs">/path/to/your/project</Code> with your actual project root.
+                    {t('cron_setup.linux_step_2_desc')} <Code className="text-xs">/path/to/your/project</Code>{' '}
+                    {t('cron_setup.with_your_actual_project_root')}
                   </p>
                 </div>
 
                 <div>
-                  <h3 className="text-base font-semibold mb-2">3. Verify</h3>
+                  <h3 className="text-base font-semibold mb-2">{t('cron_setup.verify')}</h3>
                   <Code className="block text-xs">crontab -l</Code>
                 </div>
               </div>
             </Tab>
 
             {/* cPanel */}
-            <Tab key="cpanel" title="cPanel">
+            <Tab key="cpanel" title={t('cron_setup.cpanel')}>
               <div className="space-y-4 pt-4">
                 <div>
-                  <h3 className="text-base font-semibold mb-2">1. Access Cron Jobs</h3>
+                  <h3 className="text-base font-semibold mb-2">{t('cron_setup.cpanel_step_1')}</h3>
                   <p className="text-sm text-default-600">
-                    Log in to cPanel, navigate to <strong>Advanced</strong> &rarr; <strong>Cron Jobs</strong>
+                    {t('cron_setup.cpanel_step_1_desc')}
                   </p>
                 </div>
 
                 <div>
-                  <h3 className="text-base font-semibold mb-2">2. Add Cron Job</h3>
+                  <h3 className="text-base font-semibold mb-2">{t('cron_setup.cpanel_step_2')}</h3>
                   <p className="text-sm text-default-600 mb-2">
-                    Set to run every minute (<Code className="text-xs">* * * * *</Code>) with:
+                    {t('cron_setup.cpanel_step_2_desc')} <Code className="text-xs">* * * * *</Code>{' '}
+                    {t('cron_setup.with')}
                   </p>
                   <div className="flex items-center gap-2">
                     <Code className="flex-1 text-xs break-all">
@@ -237,35 +233,32 @@ export function CronJobSetup() {
                       size="sm"
                       variant="flat"
                       isIconOnly
-                      aria-label="Copy cPanel command"
+                      aria-label={t('system.label_copy_code')}
                       onPress={() =>
-                        copyToClipboard(
-                          'cd /home/username/public_html && php artisan schedule:run >> /dev/null 2>&1',
-                          'cPanel command'
-                        )
+                        copyToClipboard('cd /home/username/public_html && php artisan schedule:run >> /dev/null 2>&1')
                       }
                     >
                       <Copy size={14} />
                     </Button>
                   </div>
                   <p className="text-xs text-default-500 mt-1">
-                    Replace <Code className="text-xs">/home/username/public_html</Code> with your actual path.
-                    On shared hosting limited to every 5 or 15 minutes, adjust the schedule — the scheduler still handles timing internally.
+                    {t('cron_setup.cpanel_path_prefix')} <Code className="text-xs">/home/username/public_html</Code>{' '}
+                    {t('cron_setup.cpanel_path_suffix')}
                   </p>
                 </div>
               </div>
             </Tab>
 
             {/* Azure */}
-            <Tab key="azure" title="Azure VM">
+            <Tab key="azure" title={t('cron_setup.azure_vm')}>
               <div className="space-y-4 pt-4">
                 <div>
-                  <h3 className="text-base font-semibold mb-2">1. SSH into the VM</h3>
+                  <h3 className="text-base font-semibold mb-2">{t('cron_setup.azure_step_1')}</h3>
                   <Code className="block text-xs">ssh azureuser@your-vm-ip</Code>
                 </div>
 
                 <div>
-                  <h3 className="text-base font-semibold mb-2">2. Add to Root Crontab</h3>
+                  <h3 className="text-base font-semibold mb-2">{t('cron_setup.azure_step_2')}</h3>
                   <div className="flex items-center gap-2">
                     <Code className="flex-1 text-xs break-all">
                       * * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run {'>'}{'>'}  /var/log/nexus-scheduler.log 2{'>'}&1
@@ -274,12 +267,9 @@ export function CronJobSetup() {
                       size="sm"
                       variant="flat"
                       isIconOnly
-                      aria-label="Copy Azure crontab entry"
+                      aria-label={t('system.label_copy_crontab_entry')}
                       onPress={() =>
-                        copyToClipboard(
-                          '* * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run >> /var/log/nexus-scheduler.log 2>&1',
-                          'Azure crontab entry'
-                        )
+                        copyToClipboard('* * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run >> /var/log/nexus-scheduler.log 2>&1')
                       }
                     >
                       <Copy size={14} />
@@ -290,23 +280,24 @@ export function CronJobSetup() {
                 <div className="bg-warning/10 border border-warning/20 rounded-lg p-3 flex items-start gap-2">
                   <AlertTriangle size={16} className="text-warning mt-0.5 shrink-0" />
                   <p className="text-xs text-warning-700 dark:text-warning-300">
-                    Do <strong>not</strong> use Azure WebJobs, Functions, or Cloud Scheduler to hit HTTP
-                    endpoints. Use <Code className="text-xs">artisan schedule:run</Code> only.
+                    {t('cron_setup.azure_warning_prefix')} <strong>{t('cron_setup.not')}</strong>{' '}
+                    {t('cron_setup.azure_warning_middle')} <Code className="text-xs">artisan schedule:run</Code>{' '}
+                    {t('cron_setup.only')}
                   </p>
                 </div>
               </div>
             </Tab>
 
             {/* GCP */}
-            <Tab key="gcp" title="GCP">
+            <Tab key="gcp" title={t('cron_setup.gcp')}>
               <div className="space-y-4 pt-4">
                 <div>
-                  <h3 className="text-base font-semibold mb-2">1. SSH into the GCE VM</h3>
+                  <h3 className="text-base font-semibold mb-2">{t('cron_setup.gcp_step_1')}</h3>
                   <Code className="block text-xs">gcloud compute ssh your-instance-name</Code>
                 </div>
 
                 <div>
-                  <h3 className="text-base font-semibold mb-2">2. Add to Root Crontab</h3>
+                  <h3 className="text-base font-semibold mb-2">{t('cron_setup.gcp_step_2')}</h3>
                   <div className="flex items-center gap-2">
                     <Code className="flex-1 text-xs break-all">
                       * * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run {'>'}{'>'}  /var/log/nexus-scheduler.log 2{'>'}&1
@@ -315,12 +306,9 @@ export function CronJobSetup() {
                       size="sm"
                       variant="flat"
                       isIconOnly
-                      aria-label="Copy GCP crontab entry"
+                      aria-label={t('system.label_copy_crontab_entry')}
                       onPress={() =>
-                        copyToClipboard(
-                          '* * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run >> /var/log/nexus-scheduler.log 2>&1',
-                          'GCP crontab entry'
-                        )
+                        copyToClipboard('* * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run >> /var/log/nexus-scheduler.log 2>&1')
                       }
                     >
                       <Copy size={14} />
@@ -331,8 +319,9 @@ export function CronJobSetup() {
                 <div className="bg-warning/10 border border-warning/20 rounded-lg p-3 flex items-start gap-2">
                   <AlertTriangle size={16} className="text-warning mt-0.5 shrink-0" />
                   <p className="text-xs text-warning-700 dark:text-warning-300">
-                    Do <strong>not</strong> use GCP Cloud Scheduler to hit HTTP endpoints. Use the VM
-                    crontab with <Code className="text-xs">artisan schedule:run</Code> only.
+                    {t('cron_setup.gcp_warning_prefix')} <strong>{t('cron_setup.not')}</strong>{' '}
+                    {t('cron_setup.gcp_warning_middle')} <Code className="text-xs">artisan schedule:run</Code>{' '}
+                    {t('cron_setup.only')}
                   </p>
                 </div>
               </div>
@@ -351,24 +340,24 @@ export function CronJobSetup() {
           <div className="flex items-center gap-2">
             <CheckCircle size={16} className="text-success" />
             <span className="text-sm">
-              <Code className="text-xs">artisan schedule:run</Code> is in the host crontab (every minute)
+              <Code className="text-xs">artisan schedule:run</Code> {t('cron_setup.checklist_schedule')}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle size={16} className="text-success" />
-            <span className="text-sm">First scheduled run has executed (check logs page)</span>
+            <span className="text-sm">{t('cron_setup.checklist_first_run')}</span>
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle size={16} className="text-success" />
-            <span className="text-sm">Cron logs are populating in the dashboard</span>
+            <span className="text-sm">{t('cron_setup.checklist_logs')}</span>
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle size={16} className="text-success" />
-            <span className="text-sm">Test Connection button returns job count</span>
+            <span className="text-sm">{t('cron_setup.checklist_test_connection')}</span>
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle size={16} className="text-success" />
-            <span className="text-sm">No curl-based or HTTP cron triggers are configured</span>
+            <span className="text-sm">{t('cron_setup.checklist_no_http_triggers')}</span>
           </div>
         </CardBody>
       </Card>
