@@ -196,6 +196,7 @@
     "run_audit": "Run Audit",
     "s_e_o_settings_saved_successfully": "SEO Settings Saved Successfully",
     "save_algorithm": "Save Algorithm",
+    "invalid_weight": "Invalid value for {{field}} — must be a number between 0 and 100.",
     "save_area": "Save Area",
     "save_failed": "Save Failed",
     "save_seo_settings": "Save SEO Settings",
@@ -2797,7 +2798,8 @@
     "all_status": "All Status",
     "all_types": "All Types",
     "pending": "Pending",
-    "posts": "Posts"
+    "posts": "Posts",
+    "unauthorized": "You do not have permission to perform this action."
   },
   "new": "NEW",
   "newsletters": {

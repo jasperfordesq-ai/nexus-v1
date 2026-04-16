@@ -191,8 +191,14 @@ export function getItemDetailPath(item: FeedItem): string | null {
     case 'badge_earned':
     case 'level_up':
       return null;
-    default:
+    case 'post':
+    case 'poll':
       return null;
+    default: {
+      const _exhaustiveCheck: never = item.type;
+      void _exhaustiveCheck;
+      return null;
+    }
   }
 }
 

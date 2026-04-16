@@ -45,6 +45,16 @@ export function FeedAlgorithm() {
   }, [toast, t])
 
   const handleSave = async () => {
+    // Validate numeric weights before sending to API
+    const weightFields = ['recency_weight', 'engagement_weight', 'connection_weight', 'diversity_factor'] as const;
+    for (const field of weightFields) {
+      const val = Number(formData[field]);
+      if (!Number.isFinite(val) || val < 0 || val > 100) {
+        toast.error(t('advanced.invalid_weight', { field }));
+        return;
+      }
+    }
+
     setSaving(true);
     try {
       const res = await adminSettings.updateFeedAlgorithm(formData);

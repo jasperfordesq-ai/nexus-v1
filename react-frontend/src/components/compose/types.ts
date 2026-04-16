@@ -45,6 +45,8 @@ export interface TabSubmitProps {
   onClose: () => void;
   groupId: number | null;
   templateData?: TemplateData | null;
+  /** Called when the tab has or loses unsaved content, so ComposeHub can gate beforeunload */
+  onContentChange?: (hasContent: boolean) => void;
 }
 
 /** Registration payload a tab provides so ComposeHub can render a header submit button. */

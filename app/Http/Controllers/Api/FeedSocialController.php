@@ -41,7 +41,11 @@ class FeedSocialController extends BaseApiController
         $tenantId = $this->getTenantId();
         $this->rateLimit('feed_share', 20, 60);
 
-        $comment = $this->input('comment');
+        $comment = strip_tags((string) ($this->input('comment') ?? ''));
+        $comment = mb_substr($comment, 0, 1000);
+        if ($comment === '') {
+            $comment = null;
+        }
 
         // Validate original post exists
         $original = DB::table('feed_posts')

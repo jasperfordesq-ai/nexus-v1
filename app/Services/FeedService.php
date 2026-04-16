@@ -57,17 +57,32 @@ class FeedService
         $subtype = $filters['subtype'] ?? null;
         $cursor = $filters['cursor'] ?? null;
 
-        // Decode cursor: base64("created_at|activity_id") or legacy base64("activity_id")
+        // Decode HMAC-signed cursor: base64(sig.json_payload)
         $cursorCreatedAt = null;
         $cursorActivityId = null;
         if ($cursor) {
-            $decoded = base64_decode($cursor, true);
+            $decoded = base64_decode($cursor, strict: true);
             if ($decoded !== false) {
-                if (str_contains($decoded, '|')) {
-                    [$cursorCreatedAt, $cursorActivityIdStr] = explode('|', $decoded, 2);
-                    $cursorActivityId = ctype_digit($cursorActivityIdStr) ? (int) $cursorActivityIdStr : null;
-                } elseif (ctype_digit($decoded)) {
-                    $cursorActivityId = (int) $decoded;
+                $dotPos = strpos($decoded, '.');
+                if ($dotPos !== false) {
+                    $sig     = substr($decoded, 0, $dotPos);
+                    $payload = substr($decoded, $dotPos + 1);
+                    $expected = hash_hmac('sha256', $payload, config('app.key'));
+                    if (hash_equals($expected, $sig)) {
+                        $data = json_decode($payload, true);
+                        if (isset($data['ts'], $data['id'])) {
+                            $cursorCreatedAt  = $data['ts'];
+                            $cursorActivityId = (int) $data['id'];
+                        }
+                    }
+                } else {
+                    // Legacy unsigned cursor (base64("created_at|id") or base64("id")) — accept for backwards compat
+                    if (str_contains($decoded, '|')) {
+                        [$cursorCreatedAt, $cursorActivityIdStr] = explode('|', $decoded, 2);
+                        $cursorActivityId = ctype_digit($cursorActivityIdStr) ? (int) $cursorActivityIdStr : null;
+                    } elseif (ctype_digit($decoded)) {
+                        $cursorActivityId = (int) $decoded;
+                    }
                 }
             }
         }
@@ -506,12 +521,14 @@ class FeedService
             Log::warning('FeedService: quoted post batch load failed: ' . $e->getMessage());
         }
 
-        // Generate cursor
+        // Generate HMAC-signed cursor
         $nextCursor = null;
         if ($hasMore && !empty($items)) {
             $lastItem = end($items);
             if (isset($lastItem['_activity_id'], $lastItem['_activity_created_at'])) {
-                $nextCursor = base64_encode($lastItem['_activity_created_at'] . '|' . $lastItem['_activity_id']);
+                $payload = json_encode(['ts' => $lastItem['_activity_created_at'], 'id' => $lastItem['_activity_id']]);
+                $sig = hash_hmac('sha256', $payload, config('app.key'));
+                $nextCursor = base64_encode($sig . '.' . $payload);
             }
         }
 
@@ -679,11 +696,18 @@ class FeedService
             }
         }
 
+        // Allowlist emoji (decorative post emoji) to prevent arbitrary Unicode injection
+        $allowedEmojis = ['👍', '❤️', '😂', '😮', '😢', '🔥', '👏', '🎉', '✨', '💡', '🙌', '😍'];
+        $emoji = isset($data['emoji']) ? $data['emoji'] : null;
+        if ($emoji !== null && !in_array($emoji, $allowedEmojis, true)) {
+            $emoji = null;
+        }
+
         $post = $this->feedPost->newInstance([
             'user_id'        => $userId,
             'tenant_id'      => $tenantId,
             'content'        => $content,
-            'emoji'          => $data['emoji'] ?? null,
+            'emoji'          => $emoji,
             'image_url'      => $image,
             'type'           => 'post',
             'parent_type'    => $data['parent_type'] ?? null,

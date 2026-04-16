@@ -30,7 +30,7 @@ export function MobileFAB({ onPress }: MobileFABProps) {
         isIconOnly
         className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30"
         onPress={onPress}
-        aria-label={t('compose.create_post', 'Create post')}
+        aria-label={t('compose.create_post')}
       >
         <PenSquare className="w-5 h-5" />
       </Button>

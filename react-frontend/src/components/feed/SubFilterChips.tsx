@@ -19,13 +19,12 @@ interface SubFilterChipsProps {
 interface SubFilterOption {
   key: string | null;
   labelKey: string;
-  fallback: string;
 }
 
 const LISTING_SUB_FILTERS: SubFilterOption[] = [
-  { key: null, labelKey: 'subfilter.all', fallback: 'All' },
-  { key: 'offer', labelKey: 'subfilter.offers', fallback: 'Offers' },
-  { key: 'request', labelKey: 'subfilter.requests', fallback: 'Requests' },
+  { key: null, labelKey: 'subfilter.all' },
+  { key: 'offer', labelKey: 'subfilter.offers' },
+  { key: 'request', labelKey: 'subfilter.requests' },
 ];
 
 const SUB_FILTERS_MAP: Record<string, SubFilterOption[]> = {
@@ -56,7 +55,7 @@ export function SubFilterChips({ filter, subFilter, onSubFilterChange }: SubFilt
             }
             onPress={() => onSubFilterChange(option.key)}
           >
-            {t(option.labelKey, option.fallback)}
+            {t(option.labelKey)}
           </Button>
         );
       })}

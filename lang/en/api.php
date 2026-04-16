@@ -1397,6 +1397,7 @@ return [
 
     // Feed / social
     'invalid_post_id'                      => 'Invalid post ID',
+    'invalid_target_type'                  => 'Invalid target type',
     'invalid_user'                         => 'Invalid user',
     'database_error'                       => 'Database error',
     'already_reported'                     => 'Already reported',

@@ -73,6 +73,20 @@ export function ComposeHub({
     setActiveTab(defaultTab);
   }, [defaultTab]);
 
+  // Track whether any child tab has unsaved content (reported via callback)
+  const [hasChildContent, setHasChildContent] = useState(false);
+
+  // Warn user if they try to navigate away while compose is open with content
+  useEffect(() => {
+    if (!isOpen || !hasChildContent) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [isOpen, hasChildContent]);
+
   const isMobile = useMediaQuery('(max-width: 639px)');
 
   const handleTemplateSelect = useCallback((data: { title?: string; content: string }) => {
@@ -92,6 +106,7 @@ export function ComposeHub({
   const handleClose = () => {
     setActiveTab(defaultTab);
     setSharedGroupId(groupId ?? null);
+    setHasChildContent(false);
     onClose();
   };
 
@@ -107,6 +122,7 @@ export function ComposeHub({
     onClose: handleClose,
     groupId: sharedGroupId,
     templateData,
+    onContentChange: setHasChildContent,
   };
 
   /** Body content — group selector + active tab */

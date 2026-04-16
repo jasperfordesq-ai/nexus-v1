@@ -52,7 +52,7 @@ interface PostDraft {
   plainText: string;
 }
 
-export function PostTab({ onSuccess, onClose, groupId, templateData, editItem, onEditSuccess }: TabSubmitProps & {
+export function PostTab({ onSuccess, onClose, groupId, templateData, onContentChange, editItem, onEditSuccess }: TabSubmitProps & {
   editItem?: import('@/components/feed/types').FeedItem | null;
   onEditSuccess?: (item: import('@/components/feed/types').FeedItem) => void;
 }) {
@@ -93,6 +93,11 @@ export function PostTab({ onSuccess, onClose, groupId, templateData, editItem, o
 
   const canSubmit = draft.plainText.trim().length > 0 || mediaFiles.length > 0 || selectedGifUrl !== null;
 
+  // Report unsaved content state up to ComposeHub for beforeunload guard
+  useEffect(() => {
+    onContentChange?.(canSubmit);
+  }, [canSubmit, onContentChange]);
+
   const handleHtmlChange = useCallback(
     (html: string) => setDraft((prev) => ({ ...prev, htmlContent: html })),
     [setDraft],
@@ -126,6 +131,15 @@ export function PostTab({ onSuccess, onClose, groupId, templateData, editItem, o
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
+
+    if (draft.plainText.trim().length === 0 && mediaFiles.length === 0 && selectedGifUrl === null) {
+      toast.error(t('compose.content_required'));
+      return;
+    }
+    if (draft.plainText.length > MAX_CONTENT_CHARS) {
+      toast.error(t('compose.content_too_long', { max: MAX_CONTENT_CHARS }));
+      return;
+    }
 
     setIsSubmitting(true);
     try {

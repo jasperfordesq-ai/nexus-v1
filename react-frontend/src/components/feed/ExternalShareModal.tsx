@@ -21,7 +21,7 @@ import {
   Mail,
   Check,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 
@@ -104,13 +104,20 @@ export function ExternalShareModal({ isOpen, onClose, url, title, text }: Extern
   const { t } = useTranslation('feed');
   const toast = useToast();
   const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
       toast.success(t('share.link_copied', 'Link copied to clipboard'));
-      setTimeout(() => setCopied(false), 2000);
+      timeoutRef.current = setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error(t('share.copy_failed', 'Failed to copy link'));
     }

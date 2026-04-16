@@ -199,7 +199,10 @@
     "sdg_selected_one": "{{count}} sprioc roghnaithe",
     "sdg_selected_other": "{{count}} sprioc roghnaithe",
     "save_changes": "Save",
-    "placeholder_hours": "1"
+    "placeholder_hours": "1",
+    "content_required": "Post content cannot be empty.",
+    "content_too_long": "Post is too long (max {{max}} characters).",
+    "groups_load_error": "Failed to load groups."
   },
   "card": {
     "edited": "curtha in eagar",
@@ -503,5 +506,8 @@
     "pending": "Pending",
     "dismiss": "Dismiss",
     "load_failed": "Failed to load suggestions"
+  },
+  "moderation": {
+    "unauthorized": "You do not have permission to perform this action."
   }
 }

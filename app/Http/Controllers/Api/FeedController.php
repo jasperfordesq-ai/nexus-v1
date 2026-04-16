@@ -38,23 +38,42 @@ class FeedController extends BaseApiController
      */
     public function feed(): JsonResponse
     {
+        $tenantId = $this->getTenantId();
+        $this->rateLimit("feed_get:{$tenantId}", 60, 60);
+
         $userId = $this->getOptionalUserId();
 
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
         ];
 
-        if ($this->query('type')) {
-            $filters['type'] = $this->query('type');
+        // Allowlist for the type (feed filter) param
+        $allowedFilters = ['all', 'posts', 'listings', 'events', 'polls', 'goals', 'jobs',
+                           'challenges', 'volunteering', 'blogs', 'discussions',
+                           'following', 'trending', 'for_you', 'groups', 'saved',
+                           'badge_earned', 'level_up'];
+        $typeParam = $this->query('type', 'all');
+        if (!in_array($typeParam, $allowedFilters, true)) {
+            $typeParam = 'all';
         }
+        $filters['type'] = $typeParam;
+
+        // Allowlist for the mode param
+        $allowedModes = ['ranked', 'chronological'];
+        $modeParam = $this->query('mode', 'ranked');
+        if (!in_array($modeParam, $allowedModes, true)) {
+            $modeParam = 'ranked';
+        }
+        $filters['mode'] = $modeParam;
+
         if ($this->query('cursor')) {
             $filters['cursor'] = $this->query('cursor');
         }
         if ($this->query('user_id')) {
-            $filters['user_id'] = $this->query('user_id');
+            $filters['user_id'] = (int) $this->query('user_id');
         }
         if ($this->query('group_id')) {
-            $filters['group_id'] = $this->query('group_id');
+            $filters['group_id'] = (int) $this->query('group_id');
         }
 
         $result = $this->feedService->getFeed($userId, $filters);
@@ -98,7 +117,8 @@ class FeedController extends BaseApiController
     public function like(): JsonResponse
     {
         $userId = $this->requireAuth();
-        $this->rateLimit('feed_like', 60, 60);
+        $tenantId = $this->getTenantId();
+        $this->rateLimit("feed_like:{$tenantId}", 60, 60);
 
         $input = $this->getAllInput();
         $postId = (int) ($input['post_id'] ?? $input['target_id'] ?? 0);
@@ -126,7 +146,8 @@ class FeedController extends BaseApiController
     public function hidePost(): JsonResponse
     {
         $userId = $this->requireAuth();
-        $this->rateLimit('feed_moderate', 30, 60);
+        $tenantId = $this->getTenantId();
+        $this->rateLimit("feed_moderate:{$tenantId}", 30, 60);
 
         $postId = (int) ($this->input('post_id', 0));
 
@@ -158,7 +179,8 @@ class FeedController extends BaseApiController
     public function muteUser(): JsonResponse
     {
         $userId = $this->requireAuth();
-        $this->rateLimit('feed_moderate', 30, 60);
+        $tenantId = $this->getTenantId();
+        $this->rateLimit("feed_moderate:{$tenantId}", 30, 60);
 
         $mutedUserId = (int) ($this->input('user_id', 0));
 
@@ -190,10 +212,16 @@ class FeedController extends BaseApiController
     public function reportPost(): JsonResponse
     {
         $userId = $this->requireAuth();
-        $this->rateLimit('feed_moderate', 30, 60);
+        $tenantId = $this->getTenantId();
+        $this->rateLimit("feed_moderate:{$tenantId}", 30, 60);
 
         $postId = (int) ($this->input('post_id', 0));
+
+        $allowedTargetTypes = ['post', 'comment', 'story'];
         $targetType = $this->input('target_type', 'post');
+        if (!in_array($targetType, $allowedTargetTypes, true)) {
+            return $this->respondWithError('INVALID_INPUT', __('api.invalid_target_type'), null, 422);
+        }
 
         if ($postId <= 0) {
             return $this->respondWithError('INVALID_INPUT', __('api.invalid_post_id'));
@@ -203,7 +231,7 @@ class FeedController extends BaseApiController
         $existing = DB::table('reports')
             ->where('target_id', $postId)
             ->where('reporter_id', $userId)
-            ->where('tenant_id', $this->getTenantId())
+            ->where('tenant_id', $tenantId)
             ->exists();
         if ($existing) {
             return $this->respondWithError('DUPLICATE', __('api.already_reported'), null, 409);
@@ -211,7 +239,7 @@ class FeedController extends BaseApiController
 
         try {
             DB::table('reports')->insert([
-                'tenant_id'   => $this->getTenantId(),
+                'tenant_id'   => $tenantId,
                 'reporter_id' => $userId,
                 'target_type' => $targetType,
                 'target_id'   => $postId,

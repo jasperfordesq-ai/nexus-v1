@@ -535,7 +535,7 @@ export function FeedPage() {
     setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
     try {
       await api.post(`/v2/feed/posts/${item.id}/not-interested`, { type: item.type });
-      toastRef.current.success(tRef.current('toast.not_interested', 'We\'ll show you less like this'));
+      toastRef.current.success(tRef.current('toast.not_interested'));
     } catch (err) {
       logError('Failed to record not-interested', err);
       // Revert: re-insert the item (may not be in original position, but that's acceptable)
@@ -594,11 +594,11 @@ export function FeedPage() {
     { key: 'events', label: t('filter.events') },
     { key: 'polls', label: t('filter.polls') },
     { key: 'goals', label: t('filter.goals') },
-    { key: 'jobs', label: t('filter.jobs', 'Jobs') },
-    { key: 'challenges', label: t('filter.challenges', 'Challenges') },
-    { key: 'volunteering', label: t('filter.volunteering', 'Volunteering') },
-    { key: 'blogs', label: t('filter.blogs', 'Blog') },
-    { key: 'discussions', label: t('filter.discussions', 'Discussions') },
+    { key: 'jobs', label: t('filter.jobs') },
+    { key: 'challenges', label: t('filter.challenges') },
+    { key: 'volunteering', label: t('filter.volunteering') },
+    { key: 'blogs', label: t('filter.blogs') },
+    { key: 'discussions', label: t('filter.discussions') },
   ];
 
 

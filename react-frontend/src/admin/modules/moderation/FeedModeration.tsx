@@ -124,6 +124,15 @@ export default function FeedModeration() {
   const handleAction = async () => {
     if (!confirmAction) return;
 
+    // Re-validate role from auth context before performing any moderation action
+    const isAdmin = user?.role === 'admin' || user?.role === 'super_admin' || user?.is_super_admin === true || user?.is_tenant_super_admin === true;
+    const isModerator = user?.role === 'moderator';
+    if (!isAdmin && !isModerator) {
+      toast.error(t('moderation.unauthorized'));
+      setConfirmAction(null);
+      return;
+    }
+
     setActionLoading(true);
     try {
       const postType = confirmAction.post.type || 'post';

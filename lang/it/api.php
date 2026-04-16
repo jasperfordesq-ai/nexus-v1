@@ -979,7 +979,8 @@ return [
     'organizer_only_update' => 'Only the organizer can update',
     'organizer_only_cancel' => 'Only the organizer can cancel',
     'organizer_only_complete' => 'Only the organizer can complete',
-    'invalid_post_id' => 'Invalid post ID',
+    'invalid_post_id' => 'Invalid post ID'
+    'invalid_target_type'                  => 'Invalid target type',,
     'invalid_user' => 'Invalid user',
     'database_error' => 'Database error',
     'already_reported' => 'Already reported',

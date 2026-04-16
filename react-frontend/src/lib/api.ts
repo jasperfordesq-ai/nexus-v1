@@ -440,7 +440,11 @@ class ApiClient {
       this.pendingRequests.forEach(({ resolve }) => resolve(success));
       this.pendingRequests = [];
 
-      if (!success) {
+      if (success) {
+        // Clear the in-flight request cache so retries after token refresh
+        // get a fresh response with the new token rather than the cached 401.
+        this.inflightRequests.clear();
+      } else {
         tokenManager.clearTokens();
         this.dispatchSessionExpired();
       }

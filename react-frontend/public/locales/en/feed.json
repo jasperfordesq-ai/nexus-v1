@@ -200,7 +200,13 @@
     "media_compression_failed": "{{count}} image(s) failed to process",
     "media_upload_error": "Failed to process images",
     "sdg_selected_one": "{{count}} goal selected",
-    "sdg_selected_other": "{{count}} goals selected"
+    "sdg_selected_other": "{{count}} goals selected",
+    "content_required": "Post content cannot be empty.",
+    "content_too_long": "Post is too long (max {{max}} characters).",
+    "groups_load_error": "Failed to load groups."
+  },
+  "moderation": {
+    "unauthorized": "You do not have permission to perform this action."
   },
   "card": {
     "edited": "edited",

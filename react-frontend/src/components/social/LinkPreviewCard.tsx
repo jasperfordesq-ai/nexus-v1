@@ -42,6 +42,16 @@ interface LinkPreviewCardProps {
 
 /* ───────────────────────── Helpers ───────────────────────── */
 
+function safeUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return '#';
+    return url;
+  } catch {
+    return '#';
+  }
+}
+
 function extractDomain(url: string): string {
   try {
     const hostname = new URL(url).hostname;
@@ -110,7 +120,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
   if (compact) {
     return (
       <a
-        href={preview.url}
+        href={safeUrl(preview.url)}
         target="_blank"
         rel="noopener noreferrer"
         className="block group/link"
@@ -124,7 +134,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
           {showImage && (
             <div className="w-20 h-20 flex-shrink-0 overflow-hidden">
               <img
-                src={imageUrl}
+                src={safeUrl(imageUrl!)}
                 alt={title ? `Preview for ${title}` : `Preview from ${domain}`}
                 className="w-full h-full object-cover"
                 loading="lazy"
@@ -139,7 +149,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
             <div className="flex items-center gap-1.5 mb-1">
               {faviconUrl ? (
                 <img
-                  src={faviconUrl}
+                  src={safeUrl(faviconUrl!)}
                   alt={`${siteName || domain} icon`}
                   className="w-3.5 h-3.5 rounded-sm flex-shrink-0"
                   loading="lazy"
@@ -178,7 +188,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
   // Large layout
   return (
     <a
-      href={preview.url}
+      href={safeUrl(preview.url)}
       target="_blank"
       rel="noopener noreferrer"
       className="block group/link"
@@ -192,7 +202,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
         {showImage && (
           <div className="w-full overflow-hidden" style={{ aspectRatio: '2 / 1' }}>
             <img
-              src={imageUrl}
+              src={safeUrl(imageUrl!)}
               alt={title ? `Preview for ${title}` : `Preview from ${domain}`}
               className="w-full h-full object-cover group-hover/link:scale-[1.02] transition-transform duration-500"
               loading="lazy"

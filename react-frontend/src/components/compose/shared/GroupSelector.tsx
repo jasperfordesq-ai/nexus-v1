@@ -12,7 +12,7 @@ import { Select, SelectItem, Skeleton } from '@heroui/react';
 import { Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
-import { useAuth } from '@/contexts';
+import { useAuth, useToast } from '@/contexts';
 import { logError } from '@/lib/logger';
 
 interface Group {
@@ -29,6 +29,7 @@ interface GroupSelectorProps {
 export function GroupSelector({ value, onChange }: GroupSelectorProps) {
   const { t } = useTranslation('feed');
   const { user } = useAuth();
+  const toast = useToast();
   const [groups, setGroups] = useState<Group[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -39,12 +40,19 @@ export function GroupSelector({ value, onChange }: GroupSelectorProps) {
     async function loadGroups() {
       setIsLoading(true);
       try {
-        const res = await api.get<Group[]>(`/v2/groups?user_id=${user!.id}&limit=50`);
-        if (!cancelled && res.success && res.data) {
-          setGroups(Array.isArray(res.data) ? res.data : []);
+        // Fetch only groups the current user is a member of, scoped to the tenant via the API
+        const res = await api.get<Group[]>('/v2/groups?member=me&limit=50');
+        if (!cancelled) {
+          if (res.success && res.data) {
+            setGroups(Array.isArray(res.data) ? res.data : []);
+          } else if (!res.success) {
+            logError('Failed to load groups for selector', res.error);
+            toast.error(t('compose.groups_load_error'));
+          }
         }
       } catch (err) {
         logError('Failed to load groups for selector', err);
+        if (!cancelled) toast.error(t('compose.groups_load_error'));
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -52,7 +60,7 @@ export function GroupSelector({ value, onChange }: GroupSelectorProps) {
 
     loadGroups();
     return () => { cancelled = true; };
-  }, [user?.id, user]);
+  }, [user?.id, toast, t]);
 
   if (groups.length === 0 && !isLoading) return null;
 

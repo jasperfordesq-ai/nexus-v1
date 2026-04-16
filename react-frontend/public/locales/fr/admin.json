@@ -243,7 +243,8 @@
     "provider_platform_default": "Platform Default",
     "provider_sendgrid": "SendGrid",
     "provider_gmail_api": "Gmail API",
-    "provider_smtp": "Custom SMTP"
+    "provider_smtp": "Custom SMTP",
+    "invalid_weight": "Invalid value for {{field}} — must be a number between 0 and 100."
   },
   "alerts": {
     "pending_approvals": "Pending Approvals",
@@ -2797,7 +2798,8 @@
     "all_status": "All Status",
     "all_types": "All Types",
     "pending": "Pending",
-    "posts": "Posts"
+    "posts": "Posts",
+    "unauthorized": "You do not have permission to perform this action."
   },
   "new": "NOUVEAU",
   "newsletters": {
