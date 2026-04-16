@@ -47,7 +47,7 @@ class AppController extends BaseApiController
     ];
 
     /**
-     * POST /api/v2/app/check-version
+     * POST /api/app/check-version
      *
      * Check app version and return update status.
      * Body: { "version": "1.0.0", "platform": "android" }
@@ -93,7 +93,7 @@ class AppController extends BaseApiController
     }
 
     /**
-     * GET /api/v2/app/version
+     * GET /api/app/version
      *
      * Get current app version info (public endpoint).
      */
@@ -108,7 +108,7 @@ class AppController extends BaseApiController
     }
 
     /**
-     * POST /api/v2/app/log
+     * POST /api/app/log
      *
      * Log app events (crashes, errors, analytics).
      * Body: { "event": "...", "version": "...", "platform": "...", "data": {...} }
