@@ -168,7 +168,8 @@
     "location": "Location",
     "location_placeholder": "市、国",
     "upload_photo_aria": "プロフィール写真をアップロード",
-    "change_photo_aria": "プロフィール写真を変更"
+    "change_photo_aria": "プロフィール写真を変更",
+    "identity_verified_lock": "Your name is locked because your identity has been verified."
   },
   "notification_prefs": {
     "new_messages": "新しいメッセージ",

@@ -126,7 +126,8 @@
     "location": "Suíomh",
     "location_placeholder": "Cathair, Tír",
     "upload_photo_aria": "Uaslódáil grianghraf próifíle",
-    "change_photo_aria": "Athraigh grianghraf próifíle"
+    "change_photo_aria": "Athraigh grianghraf próifíle",
+    "identity_verified_lock": "Your name is locked because your identity has been verified."
   },
   "notification_prefs": {
     "new_messages": "Teachtaireachtaí Nua",

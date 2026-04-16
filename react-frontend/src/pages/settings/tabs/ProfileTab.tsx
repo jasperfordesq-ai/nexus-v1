@@ -139,7 +139,7 @@ export function ProfileTab({
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm">
               <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span className="text-emerald-700 dark:text-emerald-300 font-medium">
-                Your name is locked because your identity has been verified.
+                {t('profile.identity_verified_lock')}
               </span>
             </div>
           )}

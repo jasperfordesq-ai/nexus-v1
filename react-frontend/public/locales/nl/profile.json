@@ -131,5 +131,24 @@
   },
   "page_meta": {
     "title": "Profile"
-  }
+  },
+  "more_options": "More options",
+  "profile_actions": "Profile actions",
+  "block_user": "Block User",
+  "block_modal_title": "Block {{name}}?",
+  "block_modal_description": "They won't be able to see your profile, message you, or interact with your content.",
+  "block_confirm": "Block User",
+  "block_cancel": "Cancel",
+  "blocked_success": "User blocked",
+  "block_failed": "Failed to block user",
+  "identity_verified_lock": "Your name is locked because your identity has been verified.",
+  "feed_error": "Failed to load activity",
+  "no_activity_title": "No activity yet",
+  "no_activity_own": "Share your first post or create a listing to get started!",
+  "no_activity_other": "This member hasn't posted anything yet.",
+  "vote_failed": "Vote failed",
+  "delete_failed": "Delete failed",
+  "post_deleted": "Post deleted",
+  "retry": "Retry",
+  "load_more": "Load more"
 }

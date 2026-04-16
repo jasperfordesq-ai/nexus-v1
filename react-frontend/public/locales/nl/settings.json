@@ -168,7 +168,8 @@
     "location": "Location",
     "location_placeholder": "Stad, Land",
     "upload_photo_aria": "Upload profielfoto",
-    "change_photo_aria": "Wijzig profielfoto"
+    "change_photo_aria": "Wijzig profielfoto",
+    "identity_verified_lock": "Your name is locked because your identity has been verified."
   },
   "notification_prefs": {
     "new_messages": "Nieuwe berichten",

@@ -17,7 +17,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Avatar, Chip, Skeleton, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
+import { Button, Avatar, Chip, Skeleton, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
 import {
   User,
   MapPin,
@@ -166,6 +166,10 @@ export function ProfilePage() {
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [currentBalance, setCurrentBalance] = useState(0);
 
+  // Block confirmation modal
+  const [isBlockConfirmOpen, setIsBlockConfirmOpen] = useState(false);
+  const [isBlocking, setIsBlocking] = useState(false);
+
   // Resolve "me" alias (from gamification notification links) to own profile
   const resolvedId = id === 'me' ? undefined : id;
   const isOwnProfile = !resolvedId || (currentUser && resolvedId === currentUser.id.toString());
@@ -293,7 +297,7 @@ export function ProfilePage() {
               endorsed_by_ids?: string;
             }>;
           }>(`/v2/members/${profileId}/endorsements`);
-          if (endorseRes.success && endorseRes.data?.endorsements) {
+          if (!controller.signal.aborted && endorseRes.success && endorseRes.data?.endorsements) {
             const currentUserId = currentUser?.id?.toString() || '';
             const map: Record<string, { count: number; isEndorsed: boolean }> = {};
             for (const [skill, info] of Object.entries(endorseRes.data.endorsements)) {
@@ -396,6 +400,25 @@ export function ProfilePage() {
       setIsConnecting(false);
     }
   }, [profile?.id, connectionStatus, connectionId]);
+
+  const handleBlock = useCallback(async () => {
+    if (!profile?.id) return;
+    try {
+      setIsBlocking(true);
+      const response = await api.post(`/v2/users/${profile.id}/block`);
+      if (response.success) {
+        setIsBlockConfirmOpen(false);
+        toastRef.current.success(tRef.current('blocked_success'));
+      } else {
+        toastRef.current.error(tRef.current('block_failed'));
+      }
+    } catch (err) {
+      logError('Failed to block user', err);
+      toastRef.current.error(tRef.current('block_failed'));
+    } finally {
+      setIsBlocking(false);
+    }
+  }, [profile?.id]);
 
   if (isLoading) {
     return <LoadingScreen message={t('loading')} />;
@@ -654,27 +677,18 @@ export function ProfilePage() {
                     {isAuthenticated && !isOwnProfile && (
                       <Dropdown>
                         <DropdownTrigger>
-                          <Button isIconOnly variant="flat" className="bg-theme-elevated text-theme-secondary" aria-label={t('more_options', 'More options')}>
+                          <Button isIconOnly variant="flat" className="bg-theme-elevated text-theme-secondary" aria-label={t('more_options')}>
                             <MoreVertical className="w-4 h-4" />
                           </Button>
                         </DropdownTrigger>
                         <DropdownMenu
-                          aria-label={t('profile_actions', 'Profile actions')}
-                          onAction={async (key) => {
-                            if (key === 'block' && profile?.id) {
-                              if (!window.confirm(t('block_confirm', 'Block {{name}}? They won\'t be able to see your profile, message you, or interact with your content.', { name: profile.name || profile.first_name }))) return;
-                              try {
-                                await api.post(`/v2/users/${profile.id}/block`);
-                                toast.success(t('blocked_success', 'User blocked'));
-                              } catch (err) {
-                                logError('Failed to block user', err);
-                                toast.error(t('block_failed', 'Failed to block user'));
-                              }
-                            }
+                          aria-label={t('profile_actions')}
+                          onAction={(key) => {
+                            if (key === 'block') setIsBlockConfirmOpen(true);
                           }}
                         >
                           <DropdownItem key="block" className="text-danger" startContent={<ShieldOff className="w-4 h-4" />}>
-                            {t('block_user', 'Block User')}
+                            {t('block_user')}
                           </DropdownItem>
                         </DropdownMenu>
                       </Dropdown>
@@ -774,8 +788,10 @@ export function ProfilePage() {
                   <Button
                     variant="light"
                     key={tab.key}
+                    id={`tab-${tab.key}`}
                     role="tab"
                     aria-selected={isActive ? 'true' : 'false'}
+                    aria-controls={`panel-${tab.key}`}
                     onPress={() => setActiveTab(tab.key)}
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap h-auto min-w-0 ${
                       isActive
@@ -794,7 +810,7 @@ export function ProfilePage() {
 
         <div className="mt-6">
           {activeTab === 'about' && (
-            <GlassCard className="p-6">
+            <GlassCard role="tabpanel" id="panel-about" aria-labelledby="tab-about" className="p-6">
               <h2 className="text-lg font-semibold text-theme-primary mb-4">{t('about.heading')}</h2>
               {profile.bio ? (
                 <div
@@ -846,7 +862,7 @@ export function ProfilePage() {
           )}
 
           {activeTab === 'listings' && (
-            <div className="grid sm:grid-cols-2 gap-4" role="list" aria-label={t('aria.user_listings', 'User listings')}>
+            <div role="tabpanel" id="panel-listings" aria-labelledby="tab-listings" className="grid sm:grid-cols-2 gap-4">
               {listings.length > 0 ? (
                 listings.map((listing) => (
                   <Link
@@ -911,18 +927,20 @@ export function ProfilePage() {
           )}
 
           {activeTab === 'activity' && profile && (
-            <ProfileFeed userId={profile.id} isOwnProfile={!!isOwnProfile} />
+            <div role="tabpanel" id="panel-activity" aria-labelledby="tab-activity">
+              <ProfileFeed userId={profile.id} isOwnProfile={!!isOwnProfile} />
+            </div>
           )}
 
           {activeTab === 'availability' && profile && (
-            <GlassCard className="p-6">
+            <GlassCard role="tabpanel" id="panel-availability" aria-labelledby="tab-availability" className="p-6">
               <AvailabilityGrid userId={profile.id} editable={false} compact />
             </GlassCard>
           )}
 
           {/* Reviews Tab */}
           {activeTab === 'reviews' && (
-            <div className="space-y-4">
+            <div role="tabpanel" id="panel-reviews" aria-labelledby="tab-reviews" className="space-y-4">
               {isLoadingReviews ? (
                 // Loading skeleton for reviews
                 <div aria-label={t('aria.loading_reviews', 'Loading reviews')} aria-busy="true" className="space-y-3">
@@ -998,7 +1016,7 @@ export function ProfilePage() {
           )}
 
           {activeTab === 'achievements' && (
-            <div className="space-y-4">
+            <div role="tabpanel" id="panel-achievements" aria-labelledby="tab-achievements" className="space-y-4">
               {gamification && gamification.badges.length > 0 ? (
                 <>
                   {/* Summary */}
@@ -1097,6 +1115,35 @@ export function ProfilePage() {
           initialRecipientId={profile.id}
         />
       )}
+
+      {/* Block User Confirmation Modal */}
+      <Modal isOpen={isBlockConfirmOpen} onOpenChange={setIsBlockConfirmOpen} size="sm">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="text-theme-primary">
+                {t('block_modal_title', { name: profile?.name || profile?.first_name })}
+              </ModalHeader>
+              <ModalBody>
+                <p className="text-theme-muted text-sm">{t('block_modal_description')}</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={onClose}>
+                  {t('block_cancel')}
+                </Button>
+                <Button
+                  color="danger"
+                  onPress={() => void handleBlock()}
+                  isLoading={isBlocking}
+                  startContent={<ShieldOff className="w-4 h-4" aria-hidden="true" />}
+                >
+                  {t('block_confirm')}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </motion.div>
   );
 }

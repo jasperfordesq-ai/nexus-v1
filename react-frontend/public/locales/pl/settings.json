@@ -168,7 +168,8 @@
     "location": "Location",
     "location_placeholder": "Miasto, Kraj",
     "upload_photo_aria": "Prześlij zdjęcie profilowe",
-    "change_photo_aria": "Zmień zdjęcie profilowe"
+    "change_photo_aria": "Zmień zdjęcie profilowe",
+    "identity_verified_lock": "Your name is locked because your identity has been verified."
   },
   "notification_prefs": {
     "new_messages": "Nowe wiadomości",
