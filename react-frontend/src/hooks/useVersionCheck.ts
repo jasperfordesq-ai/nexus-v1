@@ -31,11 +31,20 @@ const CHECK_INTERVAL_MS = 5 * 60 * 1000;
 const INITIAL_DELAY_MS = 15_000;
 const SW_UPDATE_FROM_COMMIT_KEY = 'nexus_sw_update_from_commit';
 
+// True when running inside a Capacitor native WebView — evaluated once at
+// module load time so the value is stable across re-renders and safe to use
+// as a dependency-free constant inside hooks.
+const IS_NATIVE = typeof window !== 'undefined' && !!window.Capacitor?.isNativePlatform?.();
+
 export function useVersionCheck() {
   // Once we've notified in this session, don't fire again — the banner is already showing.
   const hasNotified = useRef(false);
 
   const check = useCallback(async () => {
+    // No-op inside the Capacitor native app. The build commit baked into the
+    // WebView never changes during the app's lifetime — only a new APK version
+    // (handled by useAppUpdate) can bump it. Skip to avoid wasting mobile data.
+    if (IS_NATIVE) return;
     if (hasNotified.current) return;
 
     // If the user already clicked "Update" from this build, don't re-fire.

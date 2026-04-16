@@ -105,20 +105,27 @@ export function Layout({
         const listener = await App.addListener('appUrlOpen', (event: { url: string }) => {
           try {
             const url = new URL(event.url);
-            let path = url.pathname;
+            let path = url.pathname || '/';
 
-            // Only navigate to same-origin paths — block absolute URLs and protocol-relative paths
-            if (!path || !path.startsWith('/') || path.startsWith('//')) return;
+            // Block protocol-relative paths — only allow root-relative
+            if (path.startsWith('//')) return;
 
             // For custom scheme (nexus://{tenant-slug}/path), the tenant slug is in
             // the URL hostname. Prepend it so the router lands on the right community.
+            //   nexus://hour-timebank/listings/42  → /hour-timebank/listings/42
+            //   nexus://hour-timebank              → /hour-timebank  (root, pathname='/')
+            //   nexus://hour-timebank/             → /hour-timebank/ (root with trailing slash)
             // Universal links (https://app.project-nexus.ie/{slug}/path) already have
-            // the slug in the pathname, so tenantPath() leaves them as-is.
-            if (url.protocol === 'nexus:' && url.hostname && url.hostname.length > 0) {
-              path = `/${url.hostname}${path}`;
+            // the slug in the pathname, so no prefix is needed.
+            if (url.protocol === 'nexus:' && url.hostname) {
+              // Avoid double-slash when path is already '/'
+              path = `/${url.hostname}${path === '/' ? '' : path}`;
             }
 
-            navigate(tenantPath(path));
+            // Final safety check — must be a root-relative path
+            if (!path.startsWith('/')) return;
+
+            navigate(path);
           } catch {
             // Malformed URL — ignore silently
           }

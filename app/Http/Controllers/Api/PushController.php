@@ -92,6 +92,14 @@ class PushController extends BaseApiController
         $targetUserIds = $this->input('user_ids');
 
         if ($targetUserIds && is_array($targetUserIds)) {
+            // Sanitize to integers only — prevents SQL injection and cross-tenant ID confusion.
+            $targetUserIds = array_values(array_filter(
+                array_map('intval', $targetUserIds),
+                fn($id) => $id > 0
+            ));
+        }
+
+        if (!empty($targetUserIds)) {
             $placeholders = str_repeat('?,', count($targetUserIds) - 1) . '?';
             $subscriptionResults = DB::select("SELECT * FROM push_subscriptions WHERE tenant_id = ? AND user_id IN ($placeholders)", array_merge([$tenantId], $targetUserIds));
         } else {
@@ -125,6 +133,20 @@ class PushController extends BaseApiController
                 ]];
 
                 $webPush = new \Minishlink\WebPush\WebPush($auth);
+                // Sanitize optional notification fields.
+                // icon/badge must be root-relative paths (no external URLs).
+                // url must be a root-relative path (no open-redirect risk).
+                // tag is a plain identifier — strip everything except alphanumeric, dash, underscore.
+                $rawIcon  = $this->input('icon', '/assets/images/pwa/icon.svg');
+                $rawBadge = $this->input('badge', '/assets/images/pwa/badge.png');
+                $rawUrl   = $this->input('url', '/');
+                $rawTag   = $this->input('tag', 'nexus-notification');
+
+                $icon  = (is_string($rawIcon)  && str_starts_with($rawIcon, '/')  && !str_starts_with($rawIcon, '//'))  ? $rawIcon  : '/assets/images/pwa/icon.svg';
+                $badge = (is_string($rawBadge) && str_starts_with($rawBadge, '/') && !str_starts_with($rawBadge, '//')) ? $rawBadge : '/assets/images/pwa/badge.png';
+                $url   = (is_string($rawUrl)   && str_starts_with($rawUrl, '/')   && !str_starts_with($rawUrl, '//'))   ? $rawUrl   : '/';
+                $tag   = preg_replace('/[^a-zA-Z0-9\-_]/', '', (string) $rawTag) ?: 'nexus-notification';
+
                 $webPush->queueNotification(
                     \Minishlink\WebPush\Subscription::create([
                         'endpoint' => $sub['endpoint'],
@@ -132,11 +154,11 @@ class PushController extends BaseApiController
                     ]),
                     json_encode([
                         'title' => $title,
-                        'body' => $body,
-                        'icon' => $this->input('icon', '/assets/images/pwa/icon.svg'),
-                        'badge' => $this->input('badge', '/assets/images/pwa/badge.png'),
-                        'url' => $this->input('url', '/'),
-                        'tag' => $this->input('tag', 'nexus-notification'),
+                        'body'  => $body,
+                        'icon'  => $icon,
+                        'badge' => $badge,
+                        'url'   => $url,
+                        'tag'   => $tag,
                     ])
                 );
 
