@@ -100,7 +100,8 @@ export function Layout({
 
     const init = async () => {
       try {
-        const { App } = await import(/* @vite-ignore */ '@capacitor/app');
+        const capacitorAppModule = '@capacitor/app';
+        const { App } = await import(/* @vite-ignore */ capacitorAppModule);
         const listener = await App.addListener('appUrlOpen', (event: { url: string }) => {
           try {
             const url = new URL(event.url);
@@ -117,7 +118,7 @@ export function Layout({
               path = `/${url.hostname}${path}`;
             }
 
-            navigate(path);
+            navigate(tenantPath(path));
           } catch {
             // Malformed URL — ignore silently
           }
@@ -130,8 +131,7 @@ export function Layout({
 
     init();
     return () => cleanup?.();
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount
-  }, []);
+  }, [navigate, tenantPath]);
 
   return (
     <div className="min-h-screen max-w-[100vw] flex flex-col overflow-x-clip">

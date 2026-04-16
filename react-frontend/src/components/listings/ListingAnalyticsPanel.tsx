@@ -54,7 +54,13 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
 
   useEffect(() => {
     loadAnalytics();
+    return () => analyticsAbortRef.current?.abort();
   }, [loadAnalytics]);
+
+  const maxViewCount = useMemo(
+    () => Math.max(...(analytics?.views_over_time ?? []).map((day) => Number(day.count)), 1),
+    [analytics?.views_over_time]
+  );
 
   if (isLoading) {
     return (
@@ -91,13 +97,9 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
     return null;
   }
 
+  const viewsOverTime = analytics.views_over_time;
   const { summary } = analytics;
   const trendPositive = summary.views_trend_percent >= 0;
-
-  const maxViewCount = useMemo(
-    () => Math.max(...analytics.views_over_time.map((d) => Number(d.count)), 1),
-    [analytics.views_over_time]
-  );
 
   return (
     <GlassCard className="p-6">
@@ -135,11 +137,11 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
       </div>
 
       {/* Simple sparkline-style visualization using bars */}
-      {analytics.views_over_time.length > 0 && (
+      {viewsOverTime.length > 0 && (
         <div>
           <h4 className="text-sm font-medium text-theme-muted mb-2">{t('analytics.views_last_days', 'Views (Last {{days}} Days)', { days: analytics.period_days })}</h4>
           <div className="flex items-end gap-1 h-16">
-            {analytics.views_over_time.map((day) => {
+            {viewsOverTime.map((day) => {
               const height = (Number(day.count) / maxViewCount) * 100;
               return (
                 <div
@@ -152,8 +154,8 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
             })}
           </div>
           <div className="flex justify-between text-[10px] text-theme-subtle mt-1">
-            <span>{analytics.views_over_time[0]?.date}</span>
-            <span>{analytics.views_over_time[analytics.views_over_time.length - 1]?.date}</span>
+            <span>{viewsOverTime[0]?.date}</span>
+            <span>{viewsOverTime[viewsOverTime.length - 1]?.date}</span>
           </div>
         </div>
       )}

@@ -148,7 +148,7 @@ export function usePushNotifications(userId: number | null) {
         // 'prompt' means first ask — system dialog appears immediately.
         // Both are handled identically here since the system dialog is always shown.
         if (permStatus.receive !== 'granted') {
-          logDebug('[Push] Requesting notification permission (status:', permStatus.receive, ')');
+          logDebug(`[Push] Requesting notification permission (status: ${permStatus.receive})`);
           const requestResult: PermissionStatus = await PushNotifications.requestPermissions();
           if (requestResult.receive !== 'granted') {
             logDebug('[Push] User declined notification permission');

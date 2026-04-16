@@ -776,14 +776,14 @@ export function InsuranceCertificates() {
             </Select>
             <Input
               label={t('broker.label_provider_name')}
-              placeholder="e.g., Aviva, Zurich"
+              placeholder={t('broker.placeholder_provider_name_example')}
               value={createForm.provider_name}
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, provider_name: val }))}
               variant="bordered"
             />
             <Input
               label={t('broker.label_policy_number')}
-              placeholder="e.g., PL-12345678"
+              placeholder={t('broker.placeholder_policy_number_example')}
               value={createForm.policy_number}
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, policy_number: val }))}
               variant="bordered"
@@ -791,7 +791,7 @@ export function InsuranceCertificates() {
             {/* #11: EUR instead of GBP */}
             <Input
               label={t('broker.label_coverage_amount')}
-              placeholder="e.g., 1000000"
+              placeholder={t('broker.placeholder_coverage_amount_example')}
               value={createForm.coverage_amount}
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, coverage_amount: val }))}
               variant="bordered"
@@ -877,27 +877,27 @@ export function InsuranceCertificates() {
                 variant="bordered"
                 isRequired
               >
-                {Object.entries(INSURANCE_TYPE_LABELS).map(([key, label]) => (
-                  <SelectItem key={key}>{label}</SelectItem>
+                {INSURANCE_TYPE_KEYS.map((key) => (
+                  <SelectItem key={key}>{t(`broker.insurance_type_${key}`)}</SelectItem>
                 ))}
               </Select>
               <Input
                 label={t('broker.label_provider_name')}
-                placeholder="e.g., Aviva, Zurich"
+                placeholder={t('broker.placeholder_provider_name_example')}
                 value={editForm.provider_name}
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, provider_name: val }))}
                 variant="bordered"
               />
               <Input
                 label={t('broker.label_policy_number')}
-                placeholder="e.g., PL-12345678"
+                placeholder={t('broker.placeholder_policy_number_example')}
                 value={editForm.policy_number}
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, policy_number: val }))}
                 variant="bordered"
               />
               <Input
                 label={t('broker.label_coverage_amount')}
-                placeholder="e.g., 1000000"
+                placeholder={t('broker.placeholder_coverage_amount_example')}
                 value={editForm.coverage_amount}
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, coverage_amount: val }))}
                 variant="bordered"
