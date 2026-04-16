@@ -44,7 +44,7 @@
     "hours_estimated_label": "Estimated Hours",
     "hours_placeholder": "1",
     "location_optional_label": "Location (optional)",
-    "location_placeholder": "e.g., Online, Dublin, Cork...",
+    "location_placeholder": "e.g., Online, New York, Berlin...",
     "cancel": "Cancel",
     "image_label": "Photo (optional)",
     "image_upload_hint": "Click to add a photo",
