@@ -855,7 +855,7 @@ class ListingService
     public static function saveListing(int $userId, int $listingId): bool
     {
         // Verify listing exists in tenant
-        $exists = Listing::query()->where('id', $listingId)->exists();
+        $exists = Listing::query()->where('id', $listingId)->where('tenant_id', TenantContext::getId())->exists();
 
         if (! $exists) {
             return false;
@@ -995,7 +995,7 @@ class ListingService
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      * @throws ValidationException
      */
-    public static function update(int $id, array $data): Listing
+    public static function update(int $id, array $data, bool $isAdmin = false): Listing
     {
         self::validateData($data, isUpdate: true);
 
@@ -1014,6 +1014,11 @@ class ListingService
             // (admin reactivation should go through a dedicated admin endpoint)
             if (in_array($currentStatus, ['deleted', 'suspended'], true) && $data['status'] === 'active') {
                 throw ValidationException::withMessages(['status' => ['Cannot reactivate a ' . $currentStatus . ' listing.']]);
+            }
+            // Non-admin callers may only set user-facing statuses
+            $userAllowedStatuses = ['active', 'draft', 'paused'];
+            if (!$isAdmin && !in_array($data['status'], $userAllowedStatuses, true)) {
+                throw ValidationException::withMessages(['status' => ['You cannot set this status.']]);
             }
         }
 
@@ -1091,6 +1096,12 @@ class ListingService
 
         $listing->status = 'deleted';
         $listing->save();
+
+        // Clean up related records to avoid orphans
+        DB::table('listing_skill_tags')->where('listing_id', $id)->delete();
+        DB::table('user_saved_listings')->where('listing_id', $id)->delete();
+        DB::table('listing_views')->where('listing_id', $id)->delete();
+        DB::table('listing_contacts')->where('listing_id', $id)->delete();
 
         return true;
     }

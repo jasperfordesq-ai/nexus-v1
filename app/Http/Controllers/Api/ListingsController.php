@@ -304,8 +304,10 @@ class ListingsController extends BaseApiController
         // image_url must go through the dedicated uploadImage endpoint — strip from user input
         unset($data['image_url']);
 
+        $isAdmin = $this->listingService->canModify($existing, $userId) && (int) ($existing['user_id'] ?? 0) !== $userId;
+
         try {
-            $this->listingService->update($id, $data);
+            $this->listingService->update($id, $data, $isAdmin);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -717,6 +719,11 @@ class ListingsController extends BaseApiController
         $file = request()->file('image');
         if (!$file || !$file->isValid()) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.listing_no_image_uploaded'), 'image', 400);
+        }
+
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        if (!in_array($file->getMimeType(), $allowedMimes)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Only JPEG, PNG, WebP, and GIF images are allowed.', null, 422);
         }
 
         try {
