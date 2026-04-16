@@ -150,5 +150,7 @@
   "delete_failed": "Delete failed",
   "post_deleted": "Post deleted",
   "retry": "Retry",
-  "load_more": "Load more"
+  "load_more": "Load more",
+  "mute_unavailable": "To mute this user, visit the main feed",
+  "report_unavailable": "To report this post, visit the main feed"
 }

@@ -132,6 +132,8 @@
   "page_meta": {
     "title": "Profile"
   },
+  "mute_unavailable": "To mute this user, visit the main feed",
+  "report_unavailable": "To report this post, visit the main feed",
   "more_options": "More options",
   "profile_actions": "Profile actions",
   "block_user": "Block User",

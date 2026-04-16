@@ -49,8 +49,10 @@ class GamificationV2Controller extends BaseApiController
     /** GET /api/v2/gamification/profile */
     public function profile(): JsonResponse
     {
-        $currentUserId = $this->getUserId();
-        $targetUserId = $this->queryInt('user_id', $currentUserId);
+        // getOptionalUserId() — unauthenticated viewers must be able to load public profiles.
+        // getUserId() would throw 401 for any anonymous user viewing a profile.
+        $currentUserId = $this->getOptionalUserId();
+        $targetUserId = $this->queryInt('user_id', $currentUserId ?? 0);
 
         $this->rateLimit('gamification_profile', 60, 60);
 
@@ -99,10 +101,10 @@ class GamificationV2Controller extends BaseApiController
             ],
             'badges_count' => count($badges),
             'showcased_badges' => $showcasedBadges,
-            'is_own_profile' => ($targetUserId === $currentUserId),
+            'is_own_profile' => ($currentUserId !== null && $targetUserId === $currentUserId),
         ];
 
-        if ($targetUserId === $currentUserId) {
+        if ($currentUserId !== null && $targetUserId === $currentUserId) {
             $profile['xp_values'] = GamificationService::XP_VALUES;
             $profile['level_thresholds'] = GamificationService::LEVEL_THRESHOLDS;
         }
@@ -117,8 +119,9 @@ class GamificationV2Controller extends BaseApiController
     /** GET /api/v2/gamification/badges */
     public function badges(): JsonResponse
     {
-        $currentUserId = $this->getUserId();
-        $targetUserId = $this->queryInt('user_id', $currentUserId);
+        // getOptionalUserId() — unauthenticated viewers must be able to see badges on public profiles.
+        $currentUserId = $this->getOptionalUserId();
+        $targetUserId = $this->queryInt('user_id', $currentUserId ?? 0);
         $type = $this->query('type');
         $showcasedOnly = $this->inputBool('showcased', false);
 

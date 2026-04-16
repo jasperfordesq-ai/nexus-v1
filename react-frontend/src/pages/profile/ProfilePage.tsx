@@ -172,11 +172,21 @@ export function ProfilePage() {
 
   // Resolve "me" alias (from gamification notification links) to own profile
   const resolvedId = id === 'me' ? undefined : id;
-  const isOwnProfile = !resolvedId || (currentUser && resolvedId === currentUser.id.toString());
+  // isOwnProfile must require authentication — unauthenticated users visiting /profile/me
+  // would otherwise get isOwnProfile=true (via !resolvedId) and see the Settings/edit UI.
+  const isOwnProfile = isAuthenticated && (!resolvedId || (currentUser != null && resolvedId === currentUser.id.toString()));
   const profileId = resolvedId || currentUser?.id?.toString();
 
+  // Stable primitive dep for loadProfile — avoids regenerating the callback on every
+  // auth context render where currentUser object identity changes but id is the same.
+  const currentUserId = currentUser?.id?.toString();
+
   const loadProfile = useCallback(async () => {
-    if (!profileId) return;
+    if (!profileId) {
+      // id='me' without auth, or no resolved ID — stop loading immediately
+      setIsLoading(false);
+      return;
+    }
 
     abortRef.current?.abort();
     const controller = new AbortController();
@@ -200,7 +210,7 @@ export function ProfilePage() {
       }
 
       // Check connection status if viewing another user's profile
-      if (isAuthenticated && currentUser && profileId !== currentUser.id.toString()) {
+      if (isAuthenticated && currentUserId && profileId !== currentUserId) {
         requests.push(
           api.get<{ status: ConnectionStatus; connection_id?: number }>(`/v2/connections/status/${profileId}`)
         );
@@ -208,7 +218,7 @@ export function ProfilePage() {
 
       const results = await Promise.all(requests);
       if (controller.signal.aborted) return;
-      const connectionIdx = (isAuthenticated && currentUser && profileId !== currentUser.id.toString())
+      const connectionIdx = (isAuthenticated && currentUserId && profileId !== currentUserId)
         ? (hasGamification ? 4 : 2)
         : -1;
 
@@ -298,7 +308,6 @@ export function ProfilePage() {
             }>;
           }>(`/v2/members/${profileId}/endorsements`);
           if (!controller.signal.aborted && endorseRes.success && endorseRes.data?.endorsements) {
-            const currentUserId = currentUser?.id?.toString() || '';
             const map: Record<string, { count: number; isEndorsed: boolean }> = {};
             for (const [skill, info] of Object.entries(endorseRes.data.endorsements)) {
               const endorserIds = info.endorsed_by_ids?.split(',') || [];
@@ -320,7 +329,7 @@ export function ProfilePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [profileId, isAuthenticated, currentUser, hasGamification]);
+  }, [profileId, isAuthenticated, currentUserId, hasGamification]);
 
   useEffect(() => {
     loadProfile();
@@ -354,6 +363,16 @@ export function ProfilePage() {
       loadReviews();
     }
   }, [activeTab, reviewsLoaded, loadReviews]);
+
+  // Fetch wallet balance once when an authenticated user views another user's profile.
+  // Avoids a fresh API call on every "Send Credits" button press.
+  useEffect(() => {
+    if (isAuthenticated && !isOwnProfile) {
+      api.get<{ balance: number }>('/v2/wallet/balance').then((res) => {
+        if (res.success && res.data) setCurrentBalance(res.data.balance);
+      }).catch((err) => logError('Failed to load wallet balance', err));
+    }
+  }, [isAuthenticated, isOwnProfile]);
 
   const handleConnect = useCallback(async () => {
     if (!profile?.id) return;
@@ -564,7 +583,7 @@ export function ProfilePage() {
                     </time>
                   </span>
                 )}
-                {profile.rating && (
+                {typeof profile.rating === 'number' && profile.rating > 0 && (
                   <span className="flex items-center gap-1" aria-label={`Rating: ${profile.rating.toFixed(1)} out of 5`}>
                     <Star className="w-4 h-4 text-amber-400" aria-hidden="true" />
                     <span aria-hidden="true">{profile.rating.toFixed(1)}</span>
@@ -661,14 +680,7 @@ export function ProfilePage() {
                         variant="flat"
                         className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
                         startContent={<ArrowUpRight className="w-4 h-4" aria-hidden="true" />}
-                        onPress={() => {
-                          api.get<{ balance: number }>('/v2/wallet/balance').then((res) => {
-                            if (res.success && res.data) setCurrentBalance(res.data.balance);
-                          }).catch((err) => {
-                            logError('Failed to load wallet balance', err);
-                          });
-                          setIsTransferModalOpen(true);
-                        }}
+                        onPress={() => setIsTransferModalOpen(true)}
                       >
                         {t('send_credits')}
                       </Button>
@@ -968,7 +980,7 @@ export function ProfilePage() {
               ) : reviews.length > 0 ? (
                 <>
                   {/* Reviews summary */}
-                  {profile.rating && (
+                  {typeof profile.rating === 'number' && profile.rating > 0 && (
                     <GlassCard className="p-4">
                       <div className="flex items-center gap-4">
                         <div className="text-center">
@@ -1093,8 +1105,11 @@ export function ProfilePage() {
           isOpen={isReviewModalOpen}
           onClose={() => setIsReviewModalOpen(false)}
           onSuccess={() => {
+            // Reset the loaded flag — the useEffect watching [activeTab, reviewsLoaded]
+            // will call loadReviews() on the next render with the correct stale-free closure.
+            // Calling loadReviews() directly here would use the old closure where
+            // reviewsLoaded is still true, causing the guard to exit early.
             setReviewsLoaded(false);
-            loadReviews();
           }}
           receiverId={profile.id}
           receiverName={profile.name || ''}

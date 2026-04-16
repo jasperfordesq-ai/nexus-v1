@@ -6,8 +6,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Core\TenantContext;
 use App\Services\BlockUserService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 /**
  * BlockUserController — block/unblock users and list blocked users.
@@ -34,6 +36,16 @@ class BlockUserController extends BaseApiController
 
         if ($userId === $id) {
             return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.block_user.cannot_block_self'), null, 400);
+        }
+
+        // Verify the target user belongs to the current tenant — prevents cross-tenant blocks.
+        $tenantId = TenantContext::getId();
+        $targetExists = DB::table('users')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+        if (!$targetExists) {
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         $reason = $this->input('reason');
