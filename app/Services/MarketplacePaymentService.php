@@ -547,6 +547,67 @@ class MarketplacePaymentService
             'full_refund' => $isFullRefund,
         ]);
 
+        // Send refund notification emails and in-app bells
+        try {
+            $listingTitle = DB::table('marketplace_listings')
+                ->where('id', $order->marketplace_listing_id)
+                ->value('title') ?? 'item';
+            $title = htmlspecialchars($listingTitle, ENT_QUOTES, 'UTF-8');
+
+            $currency = strtoupper($payment->currency ?? 'EUR');
+            $formattedAmount = number_format($refundAmount, 2) . ' ' . $currency;
+
+            $link = '/marketplace/orders/' . $order->id;
+
+            $sendEmail = function (int $userId, string $subject, string $emailTitle, string $body) use ($link): void {
+                $tenantId = TenantContext::getId();
+                $user = DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['email', 'first_name', 'name'])
+                    ->first();
+                if (!$user || empty($user->email)) {
+                    return;
+                }
+
+                $firstName = $user->first_name ?? $user->name ?? 'there';
+                $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+
+                $html = EmailTemplateBuilder::make()
+                    ->title($emailTitle)
+                    ->greeting($firstName)
+                    ->paragraph($body)
+                    ->button(__('emails_misc.marketplace_order.order_cta'), $fullUrl)
+                    ->render();
+
+                if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
+                    Log::warning('[MarketplacePaymentService] refund email failed', ['user_id' => $userId]);
+                }
+            };
+
+            $sendEmail(
+                (int) $order->buyer_id,
+                __('emails_misc.marketplace_order.refunded_buyer_subject', ['order_number' => $order->order_number]),
+                __('emails_misc.marketplace_order.refunded_buyer_title'),
+                __('emails_misc.marketplace_order.refunded_buyer_body', ['amount' => $formattedAmount, 'order_number' => $order->order_number, 'title' => $title])
+            );
+
+            $reasonText = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
+            $sendEmail(
+                (int) $order->seller_id,
+                __('emails_misc.marketplace_order.refunded_seller_subject', ['order_number' => $order->order_number]),
+                __('emails_misc.marketplace_order.refunded_seller_title'),
+                __('emails_misc.marketplace_order.refunded_seller_body', ['amount' => $formattedAmount, 'order_number' => $order->order_number, 'title' => $title, 'reason' => $reasonText])
+            );
+
+            // In-app bell notifications
+            $bellMsg = __('api_controllers_3.marketplace_order.refunded', ['amount' => number_format($refundAmount, 2), 'currency' => $currency, 'order_number' => $order->order_number]);
+            Notification::create(['user_id' => $order->buyer_id, 'message' => $bellMsg, 'link' => $link, 'type' => 'marketplace_order', 'created_at' => now()]);
+            Notification::create(['user_id' => $order->seller_id, 'message' => $bellMsg, 'link' => $link, 'type' => 'marketplace_order', 'created_at' => now()]);
+        } catch (\Throwable $emailEx) {
+            Log::warning('[MarketplacePaymentService] refund notification failed: ' . $emailEx->getMessage());
+        }
+
         return $payment->fresh();
     }
 

@@ -13,6 +13,7 @@ use App\Models\Goal;
 use App\Models\GoalCheckin;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Services\GoalMilestoneEmailService;
 
 /**
  * GoalService — Eloquent-based service for goal operations.
@@ -282,14 +283,33 @@ class GoalService
         }
 
         $current = (float) ($goal->current_value ?? 0);
+        $target  = (float) ($goal->target_value ?? 0);
+
+        $oldPercent = $target > 0 ? min(100.0, ($current / $target) * 100) : 0.0;
+
         $goal->current_value = $current + $increment;
 
-        $target = (float) ($goal->target_value ?? 0);
         if ($target > 0 && $goal->current_value >= $target) {
             $goal->status = 'completed';
         }
 
         $goal->save();
+
+        $newPercent = $target > 0 ? min(100.0, ((float) $goal->current_value / $target) * 100) : 0.0;
+
+        // Fire milestone emails (25 / 50 / 75 / 100%) — silenced to avoid disrupting the response
+        try {
+            GoalMilestoneEmailService::checkAndSendMilestone(
+                TenantContext::getId(),
+                $userId,
+                $id,
+                (string) ($goal->title ?? ''),
+                $oldPercent,
+                $newPercent
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[GoalService] milestone email failed', ['goal' => $id, 'error' => $e->getMessage()]);
+        }
 
         return $goal->fresh(['user']);
     }

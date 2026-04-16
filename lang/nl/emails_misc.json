@@ -283,7 +283,13 @@
     "refunded_body": "A refund of <strong>{{amount}} {{currency}}</strong> has been processed for your order <strong>{{order_number}}</strong>. The funds will be returned to your original payment method within 5–10 business days.",
     "partially_refunded_subject": "Partial refund processed — {{order_number}}",
     "partially_refunded_title": "Partial Refund Processed",
-    "partially_refunded_body": "A partial refund of <strong>{{amount}} {{currency}}</strong> has been processed for your order <strong>{{order_number}}</strong>. The funds will be returned to your original payment method within 5–10 business days."
+    "partially_refunded_body": "A partial refund of <strong>{{amount}} {{currency}}</strong> has been processed for your order <strong>{{order_number}}</strong>. The funds will be returned to your original payment method within 5–10 business days.",
+    "refunded_buyer_subject": "Refund processed — Order {{order_number}}",
+    "refunded_buyer_title": "Refund Processed",
+    "refunded_buyer_body": "Your refund of <strong>{{amount}}</strong> for order <strong>{{order_number}}</strong> ('{{title}}') has been processed. It may take 5–10 business days to appear on your statement.",
+    "refunded_seller_subject": "Refund issued — Order {{order_number}}",
+    "refunded_seller_title": "Refund Issued",
+    "refunded_seller_body": "A refund of <strong>{{amount}}</strong> has been issued for order <strong>{{order_number}}</strong> ('{{title}}'). Reason: {{reason}}"
   },
   "marketplace_report": {
     "received_subject": "Report received — we will review it within 24 hours",
