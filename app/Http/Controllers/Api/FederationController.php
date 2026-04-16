@@ -1063,9 +1063,13 @@ class FederationController extends BaseApiController
                 FROM messages m
                 JOIN users su ON su.id = m.sender_id
                 JOIN users ru ON ru.id = m.receiver_id
+                JOIN federation_user_settings sfus ON sfus.user_id = m.sender_id
+                JOIN federation_user_settings rfus ON rfus.user_id = m.receiver_id
                 LEFT JOIN tenants st ON st.id = su.tenant_id
                 LEFT JOIN tenants rt ON rt.id = ru.tenant_id
-                WHERE m.is_federated = 1";
+                WHERE m.is_federated = 1
+                  AND sfus.federation_optin = 1
+                  AND rfus.federation_optin = 1";
         $params = [];
 
         // Filter to messages involving the partner's tenant

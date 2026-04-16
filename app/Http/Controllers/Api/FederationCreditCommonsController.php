@@ -421,7 +421,7 @@ class FederationCreditCommonsController extends BaseApiController
 
         $results = $txs->map(function ($tx) use ($tenantId, $nodeSlug) {
             return [
-                'uuid' => Str::uuid()->toString(),  // Generate UUID for CC compatibility
+                'uuid' => $tx->transaction_uuid ?? (string) $tx->id,
                 'written' => $tx->created_at ? substr($tx->created_at, 0, 10) : null,
                 'state' => CreditCommonsAdapter::mapNexusStateToCc($tx->status ?? 'completed'),
                 'workflow' => '0|PC-CE=',
