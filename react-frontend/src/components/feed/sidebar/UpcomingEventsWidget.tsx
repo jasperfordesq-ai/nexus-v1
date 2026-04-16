@@ -16,8 +16,8 @@ import { useTenant } from '@/contexts';
 export interface UpcomingEvent {
   id: number;
   title: string;
-  start_date: string;
-  start_time?: string;
+  /** API returns a datetime string like "2026-10-04 09:00:00" in this field */
+  start_time: string;
   location?: string;
 }
 
@@ -25,14 +25,24 @@ interface UpcomingEventsWidgetProps {
   events: UpcomingEvent[];
 }
 
+/** Parse datetime strings that may use a space separator instead of "T" */
+function parseDate(dateStr: string): Date {
+  return new Date(dateStr.replace(' ', 'T'));
+}
+
 function formatMonth(dateStr: string): string {
-  const date = new Date(dateStr);
+  const date = parseDate(dateStr);
   return date.toLocaleString('default', { month: 'short' }).toUpperCase();
 }
 
 function formatDay(dateStr: string): string {
-  const date = new Date(dateStr);
+  const date = parseDate(dateStr);
   return date.getDate().toString();
+}
+
+function formatTime(dateStr: string): string {
+  const date = parseDate(dateStr);
+  return date.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' });
 }
 
 export function UpcomingEventsWidget({ events }: UpcomingEventsWidgetProps) {
@@ -69,10 +79,10 @@ export function UpcomingEventsWidget({ events }: UpcomingEventsWidgetProps) {
             <div className="w-11 h-12 rounded-lg bg-[var(--surface-elevated)] border border-[var(--border-default)] flex flex-col items-center justify-center overflow-hidden flex-shrink-0">
               <div className="w-full h-1 bg-gradient-to-r from-pink-500 to-rose-500" />
               <span className="text-[10px] font-bold text-pink-500 mt-1 leading-none">
-                {formatMonth(event.start_date)}
+                {formatMonth(event.start_time)}
               </span>
               <span className="text-sm font-bold text-[var(--text-primary)] leading-none">
-                {formatDay(event.start_date)}
+                {formatDay(event.start_time)}
               </span>
             </div>
 
@@ -84,7 +94,7 @@ export function UpcomingEventsWidget({ events }: UpcomingEventsWidgetProps) {
               {event.start_time && (
                 <p className="flex items-center gap-1 text-xs text-[var(--text-muted)] mt-0.5">
                   <Clock className="w-3 h-3" aria-hidden="true" />
-                  {event.start_time}
+                  {formatTime(event.start_time)}
                 </p>
               )}
               {event.location && (

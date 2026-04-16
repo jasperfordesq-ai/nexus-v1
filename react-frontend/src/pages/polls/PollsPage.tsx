@@ -75,8 +75,9 @@ import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
 interface PollOption {
   id: number;
   label: string;
-  vote_count: number;
-  percentage: number;
+  /** null when results are hidden (open poll, non-creator ballot-integrity rule) */
+  vote_count: number | null;
+  percentage: number | null;
 }
 
 interface Poll {
@@ -140,7 +141,8 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
   const isOwner = currentUserId === poll.creator.id;
   const isOpen = poll.status === 'open';
   const hasVoted = poll.has_voted;
-  const showResults = hasVoted || !isOpen;
+  const resultsVisible = poll.options.some((o) => o.percentage !== null);
+  const showResults = (hasVoted || !isOpen) && resultsVisible;
 
   const timeRemaining = poll.expires_at ? getTimeRemaining(poll.expires_at) : null;
   const isExpired = poll.expires_at ? new Date(poll.expires_at) <= new Date() : false;
@@ -284,18 +286,18 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
                         {option.label}
                       </span>
                       <span className={`text-xs font-medium ml-2 ${isVotedOption ? 'text-[var(--color-primary)]' : 'text-[var(--text-muted)]'}`}>
-                        {option.percentage}%
+                        {option.percentage !== null ? `${option.percentage}%` : '—'}
                       </span>
                     </div>
                     <Progress
-                      value={option.percentage}
+                      value={option.percentage ?? 0}
                       size="sm"
                       color={isVotedOption ? 'primary' : 'default'}
                       classNames={{
                         track: 'bg-[var(--surface-hover)]',
                         indicator: isVotedOption ? 'bg-gradient-to-r from-indigo-500 to-purple-500' : '',
                       }}
-                      aria-label={`${option.label}: ${option.percentage}%`}
+                      aria-label={`${option.label}: ${option.percentage !== null ? `${option.percentage}%` : '—'}`}
                     />
                   </div>
                 ) : poll.poll_type === 'ranked' ? (
@@ -588,6 +590,9 @@ export function PollsPage() {
         const newTotal = poll.total_votes + (wasVoted ? 0 : 1);
 
         const updatedOptions = poll.options.map((opt) => {
+          // vote_count can be null when results are hidden; skip optimistic
+          // count math in that case (percentage will stay null until reload)
+          if (opt.vote_count === null) return opt;
           let newCount = opt.vote_count;
           if (opt.id === poll.voted_option_id) newCount -= 1;
           if (opt.id === optionId) newCount += 1;

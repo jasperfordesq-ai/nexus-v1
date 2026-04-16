@@ -41,6 +41,7 @@ import { useTenant, useToast } from '@/contexts';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { stripHtmlToText } from '@/lib/sanitize';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 
@@ -161,7 +162,7 @@ function ConnectionCard({ connection, onDisconnect, isActing, tenantPathFn }: Co
                 <p className="text-xs text-theme-muted mt-0.5 truncate">{user.location}</p>
               )}
               {user.bio && (
-                <p className="text-sm text-theme-muted mt-1 line-clamp-2">{user.bio}</p>
+                <p className="text-sm text-theme-muted mt-1 line-clamp-2">{stripHtmlToText(user.bio)}</p>
               )}
               <p className="text-xs text-theme-muted mt-1.5">
                 {t('connected_since', { date: joinedDate })}
@@ -244,7 +245,7 @@ function PendingCard({ connection, onAccept, onDecline, isActing, tenantPathFn }
                 <p className="text-xs text-theme-muted mt-0.5 truncate">{user.location}</p>
               )}
               {user.bio && (
-                <p className="text-sm text-theme-muted mt-1 line-clamp-2">{user.bio}</p>
+                <p className="text-sm text-theme-muted mt-1 line-clamp-2">{stripHtmlToText(user.bio)}</p>
               )}
               <div className="flex items-center gap-1 mt-1.5">
                 <Clock className="w-3 h-3 text-amber-500" aria-hidden="true" />
@@ -329,7 +330,7 @@ function SentCard({ connection, onCancel, isActing, tenantPathFn }: SentCardProp
                 <p className="text-xs text-theme-muted mt-0.5 truncate">{user.location}</p>
               )}
               {user.bio && (
-                <p className="text-sm text-theme-muted mt-1 line-clamp-2">{user.bio}</p>
+                <p className="text-sm text-theme-muted mt-1 line-clamp-2">{stripHtmlToText(user.bio)}</p>
               )}
               <div className="flex items-center gap-1 mt-1.5">
                 <Send className="w-3 h-3 text-indigo-500" aria-hidden="true" />

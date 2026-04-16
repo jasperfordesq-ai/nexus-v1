@@ -160,7 +160,7 @@ export function DashboardPage() {
 
       const coreRequests = [
         api.get<WalletBalance>('/v2/wallet/balance').catch(() => null),
-        api.get<Listing[]>('/v2/listings?per_page=5').catch(() => null),
+        api.get<Listing[]>(`/v2/listings?user_id=${user?.id}&per_page=5`).catch(() => null),
         api.get<{ count: number }>('/v2/wallet/pending-count').catch(() => null),
       ];
 

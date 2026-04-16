@@ -180,5 +180,15 @@ export function sanitizeInline(html: string | null | undefined): string {
   });
 }
 
+/**
+ * Strip all HTML tags and return plain text.
+ * Use for truncated bio/description snippets that should never render HTML.
+ */
+export function stripHtmlToText(html: string | null | undefined): string {
+  if (!html) return '';
+  installHooksOnce();
+  return DOMPurify.sanitize(html, { ALLOWED_TAGS: [], KEEP_CONTENT: true });
+}
+
 /** Exposed for tests / advanced callers that need to share the URL guard. */
 export const __testing = { isSafeUrl };
