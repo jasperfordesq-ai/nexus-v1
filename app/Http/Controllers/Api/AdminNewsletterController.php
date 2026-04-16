@@ -2325,7 +2325,7 @@ class AdminNewsletterController extends BaseApiController
             return $this->respondWithData([
                 'heatmap' => [],
                 'recommendations' => [],
-                'insights' => 'Error loading send-time data.',
+                'insights' => __('admin.newsletters.send_time_data_error'),
             ]);
         }
     }

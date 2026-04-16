@@ -2640,6 +2640,7 @@
         "failed_to_load_data": "Failed to load data",
         "failed_to_load_diagnostics": "Failed to load diagnostics",
         "failed_to_remove_subscriber": "Failed to remove subscriber",
+        "send_time_data_error": "Error loading send-time data.",
         "failed_to_select_winner": "Failed to select winner",
         "failed_to_send_newsletter": "Failed to send newsletter",
         "failed_to_sync_members": "Failed to sync members",

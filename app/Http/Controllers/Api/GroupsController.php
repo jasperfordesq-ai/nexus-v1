@@ -254,7 +254,7 @@ class GroupsController extends BaseApiController
 
         return $this->respondWithData([
             'status'  => $joinStatus,
-            'message' => $joinStatus === 'active' ? 'Successfully joined the group' : 'Join request submitted',
+            'message' => $joinStatus === 'active' ? __('api.group_joined') : __('api.group_join_requested'),
         ]);
     }
 
