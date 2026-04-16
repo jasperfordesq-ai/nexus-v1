@@ -223,7 +223,7 @@ export function GroupDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id, isAuthenticated]);
+  }, [id]);
 
   useEffect(() => {
     loadGroup();

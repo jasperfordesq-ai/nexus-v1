@@ -23,11 +23,11 @@ import { useTranslation } from 'react-i18next';
 // Extended type to include extra fields from the API
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface CronJobExtended extends Omit<CronJob, 'slug'> {
+type CronJobExtended = Omit<CronJob, 'slug'> & {
   slug?: string;
   category?: string;
   description?: string;
-}
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Category colour & label mapping
@@ -49,32 +49,6 @@ const categoryColorMap: Record<string, 'primary' | 'secondary' | 'success' | 'wa
 // Date formatter
 // ─────────────────────────────────────────────────────────────────────────────
 
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return 'Never';
-  const d = new Date(dateStr);
-  return d.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
-function timeAgo(dateStr: string | null): string {
-  if (!dateStr) return 'Never';
-  const d = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - d.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  const diffHours = Math.floor(diffMins / 60);
-  if (diffHours < 24) return `${diffHours}h ago`;
-  const diffDays = Math.floor(diffHours / 24);
-  return `${diffDays}d ago`;
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -88,6 +62,32 @@ export function CronJobs() {
   const [runningJob, setRunningJob] = useState<number | null>(null);
   const [healthMetrics, setHealthMetrics] = useState<CronHealthMetrics | null>(null);
   const [loadingHealth, setLoadingHealth] = useState(true);
+
+  const formatDate = useCallback((dateStr: string | null): string => {
+    if (!dateStr) return t('system.never');
+    const d = new Date(dateStr);
+    return d.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }, [t]);
+
+  const timeAgo = useCallback((dateStr: string | null): string => {
+    if (!dateStr) return t('system.never');
+    const d = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return t('system.just_now');
+    if (diffMins < 60) return t('system.minutes_ago', { count: diffMins });
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return t('system.hours_ago', { count: diffHours });
+    const diffDays = Math.floor(diffHours / 24);
+    return t('system.days_ago', { count: diffDays });
+  }, [t]);
 
   const loadJobs = useCallback(async () => {
     setLoading(true);

@@ -138,7 +138,7 @@ export function TemplateForm() {
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
   useEffect(() => {
     if (isEdit) {

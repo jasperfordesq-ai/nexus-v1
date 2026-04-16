@@ -98,25 +98,33 @@ export function Layout({
 
     const init = async () => {
       try {
-        // @ts-expect-error -- @capacitor/app is an optional native dep, not installed in web builds
-        const { App } = await import('@capacitor/app');
+        const capacitorAppModule = '@capacitor/app';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { App } = await import(/* @vite-ignore */ capacitorAppModule) as any;
         const listener = await App.addListener('appUrlOpen', (event: { url: string }) => {
           try {
             const url = new URL(event.url);
-            let path = url.pathname;
+            let path = url.pathname || '/';
 
-            // Only navigate to same-origin paths — block absolute URLs and protocol-relative paths
-            if (!path || !path.startsWith('/') || path.startsWith('//')) return;
+            // Block protocol-relative paths — only allow root-relative
+            if (path.startsWith('//')) return;
 
             // For custom scheme (nexus://{tenant-slug}/path), the tenant slug is in
             // the URL hostname. Prepend it so the router lands on the right community.
+            //   nexus://hour-timebank/listings/42  → /hour-timebank/listings/42
+            //   nexus://hour-timebank              → /hour-timebank  (root, pathname='/')
+            //   nexus://hour-timebank/             → /hour-timebank/ (root with trailing slash)
             // Universal links (https://app.project-nexus.ie/{slug}/path) already have
-            // the slug in the pathname, so tenantPath() leaves them as-is.
-            if (url.protocol === 'nexus:' && url.hostname && url.hostname.length > 0) {
-              path = `/${url.hostname}${path}`;
+            // the slug in the pathname, so no prefix is needed.
+            if (url.protocol === 'nexus:' && url.hostname) {
+              // Avoid double-slash when path is already '/'
+              path = `/${url.hostname}${path === '/' ? '' : path}`;
             }
 
-            navigate(path);
+            // Final safety check — must be a root-relative path
+            if (!path.startsWith('/')) return;
+
+            navigate(tenantPath(path));
           } catch {
             // Malformed URL — ignore silently
           }
@@ -129,8 +137,7 @@ export function Layout({
 
     init();
     return () => cleanup?.();
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount
-  }, []);
+  }, [navigate, tenantPath]);
 
   return (
     <div className="min-h-screen max-w-[100vw] flex flex-col overflow-x-clip">

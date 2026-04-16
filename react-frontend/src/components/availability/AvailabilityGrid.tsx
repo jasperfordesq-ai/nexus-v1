@@ -137,7 +137,7 @@ export function AvailabilityGrid({
         setIsLoading(false);
       }
     }
-  }, [userId]);
+  }, [userId, tAvail]);
 
   useEffect(() => {
     loadAvailability();

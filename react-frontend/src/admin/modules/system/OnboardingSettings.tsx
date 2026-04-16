@@ -110,6 +110,7 @@ const COUNTRY_PRESET_LABEL_KEYS: Record<string, string> = {
   northern_ireland: 'system.onboarding.preset_northern_ireland',
   custom: 'system.onboarding.preset_custom',
 };
+const DEFAULT_COUNTRY_PRESET_LABEL_KEY = 'system.onboarding.preset_custom';
 
 const STEP_ICONS: Record<string, typeof Sparkles> = {
   welcome: Sparkles,
@@ -129,7 +130,7 @@ export function OnboardingSettings() {
   const { tenant, tenantPath } = useTenant();
   const navigate = useNavigate();
   const getCountryPresetLabel = (preset: string) =>
-    t(COUNTRY_PRESET_LABEL_KEYS[preset] ?? 'system.onboarding.preset_custom');
+    t(COUNTRY_PRESET_LABEL_KEYS[preset] ?? DEFAULT_COUNTRY_PRESET_LABEL_KEY);
 
   const [config, setConfig] = useState<OnboardingConfig | null>(null);
   const [safeguardingOptions, setSafeguardingOptions] = useState<SafeguardingOption[]>([]);

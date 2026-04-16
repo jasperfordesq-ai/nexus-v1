@@ -466,13 +466,14 @@ export default function ConnectionsPage() {
 
   // Load all three tabs on mount
   useEffect(() => {
+    const abortMap = abortRefs.current;
     void fetchConnectionsRef.current('accepted');
     void fetchConnectionsRef.current('pending_received');
     void fetchConnectionsRef.current('pending_sent');
     return () => {
-      abortRefs.current.accepted?.abort();
-      abortRefs.current.pending_received?.abort();
-      abortRefs.current.pending_sent?.abort();
+      abortMap.accepted?.abort();
+      abortMap.pending_received?.abort();
+      abortMap.pending_sent?.abort();
     };
   }, []);
 

@@ -171,7 +171,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     } else if (module.configSource === 'identity_config') {
       loadIdentityConfig();
     }
-  }, [isOpen, module, loadBrokerConfig, loadGroupConfig, loadListingConfig, loadVolunteeringConfig, loadJobConfig]);
+  }, [isOpen, module, loadBrokerConfig, loadGroupConfig, loadListingConfig, loadVolunteeringConfig, loadJobConfig, loadIdentityConfig]);
 
   // ── Save handlers ─────────────────────────────────────────────────────────
 

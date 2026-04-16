@@ -133,14 +133,18 @@ class FCMPushService
     /**
      * Unregister (delete) a device token.
      *
-     * When userId is provided, only deletes the token if it belongs to that user
+     * Always scoped to the current tenant to prevent cross-tenant token deletion.
+     * When userId is provided, also verifies the token belongs to that user
      * (prevents one user from removing another user's push registration).
      */
     public function unregisterDevice(string $token, ?int $userId = null): bool
     {
         try {
+            $tenantId = TenantContext::getId();
+
             $query = DB::table('fcm_device_tokens')
-                ->where('token', $token);
+                ->where('token', $token)
+                ->where('tenant_id', $tenantId); // CRITICAL: scope to current tenant
 
             if ($userId !== null) {
                 $query->where('user_id', $userId);

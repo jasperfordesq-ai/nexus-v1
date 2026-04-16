@@ -20,7 +20,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 REACT_SRC="$PROJECT_ROOT/react-frontend/src"
-PHP_SRC="$PROJECT_ROOT/src"
+PHP_SRCS=(
+    "$PROJECT_ROOT/app"
+    "$PROJECT_ROOT/src"
+)
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -164,7 +167,14 @@ echo ""
 # ---------------------------------------------------------------------------
 echo "--- Check 4: Unscoped DELETE queries on tenant-scoped tables ---"
 
-if [[ -d "$PHP_SRC" ]]; then
+php_src_dirs=()
+for php_src in "${PHP_SRCS[@]}"; do
+    if [[ -d "$php_src" ]]; then
+        php_src_dirs+=("$php_src")
+    fi
+done
+
+if (( ${#php_src_dirs[@]} > 0 )); then
     unscoped_deletes=""
     unscoped_count=0
 
@@ -181,7 +191,16 @@ if [[ -d "$PHP_SRC" ]]; then
         for excl in "${EXCLUDE_FILES[@]}"; do
             exclude_args="$exclude_args --exclude=$excl"
         done
-        matches=$(grep -rn -i "DELETE\s\+FROM\s\+\`\?${table}\`\?" "$PHP_SRC" --include="*.php" $exclude_args 2>/dev/null || true)
+        matches=""
+        for php_src in "${php_src_dirs[@]}"; do
+            dir_matches=$(grep -rn -i "DELETE\s\+FROM\s\+\`\?${table}\`\?" "$php_src" --include="*.php" $exclude_args 2>/dev/null || true)
+            if [[ -n "$dir_matches" ]]; then
+                if [[ -n "$matches" ]]; then
+                    matches+=$'\n'
+                fi
+                matches+="$dir_matches"
+            fi
+        done
 
         if [[ -n "$matches" ]]; then
             while IFS= read -r match_line; do
@@ -216,7 +235,7 @@ if [[ -d "$PHP_SRC" ]]; then
         fails=$((fails + 1))
     fi
 else
-    echo "[WARN] PHP source directory not found at $PHP_SRC, skipping"
+    echo "[WARN] PHP source directories not found at ${PHP_SRCS[*]}, skipping"
     warns=$((warns + 1))
 fi
 

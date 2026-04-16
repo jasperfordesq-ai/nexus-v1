@@ -72,7 +72,11 @@ async function getPushPlugin() {
  * @param userId - Current user's ID (null if not logged in)
  */
 export function usePushNotifications(userId: number | null) {
-  const registeredRef = useRef(false);
+  // Track the userId we last registered for so we can re-register on login.
+  // Using the userId value (not a boolean) means that when userId changes
+  // null → number we always reinitialise, and when it changes number → null
+  // (logout) we know to reset so the next login triggers a fresh registration.
+  const registeredForUserRef = useRef<number | null>(-1); // -1 = never tried
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
 
@@ -122,8 +126,17 @@ export function usePushNotifications(userId: number | null) {
   );
 
   useEffect(() => {
-    // Only run for authenticated users in native app
-    if (!userId || !isNativeApp() || registeredRef.current) return;
+    // Only run for authenticated users in native app.
+    // Re-run whenever userId changes (covers logout → login cycles).
+    if (!userId || !isNativeApp()) return;
+
+    // Skip if already registered for this specific user — but allow
+    // re-registration if the user ID has changed (different account login).
+    if (registeredForUserRef.current === userId) return;
+
+    // Mark immediately (before async work) to prevent concurrent registrations
+    // if userId changes rapidly while initPush() is in flight.
+    registeredForUserRef.current = userId;
 
     let cleanup: (() => void) | undefined;
 
@@ -195,13 +208,14 @@ export function usePushNotifications(userId: number | null) {
           }
         );
 
-        registeredRef.current = true;
-
         cleanup = () => {
           regListener.remove();
           errListener.remove();
           recvListener.remove();
           tapListener.remove();
+          // Reset so a subsequent login (new userId) can re-register.
+          // Do NOT reset here if the userId is still the same — only on unmount.
+          registeredForUserRef.current = -1;
         };
       } catch (err) {
         logError('[Push] Init error', err);
