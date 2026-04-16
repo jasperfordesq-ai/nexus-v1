@@ -120,6 +120,7 @@ export function ComposeHub({
   const tabProps = {
     onSuccess: handleSuccess,
     onClose: handleClose,
+    isOpen,
     groupId: sharedGroupId,
     templateData,
     onContentChange: setHasChildContent,

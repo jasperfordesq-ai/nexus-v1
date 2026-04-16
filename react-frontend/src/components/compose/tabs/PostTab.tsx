@@ -53,6 +53,7 @@ interface PostDraft {
 }
 
 export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onContentChange, editItem, onEditSuccess }: TabSubmitProps & {
+  isOpen?: boolean;
   editItem?: import('@/components/feed/types').FeedItem | null;
   onEditSuccess?: (item: import('@/components/feed/types').FeedItem) => void;
 }) {
