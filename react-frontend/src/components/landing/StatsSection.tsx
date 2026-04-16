@@ -95,7 +95,7 @@ export function StatsSection({ content }: StatsSectionProps) {
       className="mt-16 sm:mt-24 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8"
     >
       {stats.map((stat, index) => (
-        <div key={stat.label} className="text-center">
+        <div key={`stat-${index}`} className="text-center">
           <motion.p
             initial={{ opacity: 0, scale: 0.5 }}
             whileInView={{ opacity: 1, scale: 1 }}

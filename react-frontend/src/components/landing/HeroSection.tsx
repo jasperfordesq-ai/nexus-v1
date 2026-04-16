@@ -89,35 +89,35 @@ export function HeroSection({ content }: HeroSectionProps) {
             className="mt-10 flex flex-col sm:flex-row gap-4 justify-center"
           >
             {isAuthenticated ? (
-              <Link to={tenantPath('/feed')}>
+              <Button
+                as={Link}
+                to={tenantPath('/feed')}
+                size="lg"
+                className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-white font-semibold px-8 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
+                endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
+              >
+                {ctaFeedText}
+              </Button>
+            ) : (
+              <>
                 <Button
+                  as={Link}
+                  to={tenantPath(ctaPrimaryLink)}
                   size="lg"
                   className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-white font-semibold px-8 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
                   endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                 >
-                  {ctaFeedText}
+                  {ctaPrimaryText}
                 </Button>
-              </Link>
-            ) : (
-              <>
-                <Link to={tenantPath(ctaPrimaryLink)}>
-                  <Button
-                    size="lg"
-                    className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-white font-semibold px-8 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
-                    endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
-                  >
-                    {ctaPrimaryText}
-                  </Button>
-                </Link>
-                <Link to={tenantPath(ctaSecondaryLink)}>
-                  <Button
-                    size="lg"
-                    variant="bordered"
-                    className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
-                  >
-                    {ctaSecondaryText}
-                  </Button>
-                </Link>
+                <Button
+                  as={Link}
+                  to={tenantPath(ctaSecondaryLink)}
+                  size="lg"
+                  variant="bordered"
+                  className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
+                >
+                  {ctaSecondaryText}
+                </Button>
               </>
             )}
           </motion.div>

@@ -47,6 +47,9 @@ function RenderSection({ section }: { section: LandingSection }) {
     case 'cta':
       return <CtaSection content={section.content as CtaContent | undefined} />;
     default:
+      if (import.meta.env.DEV) {
+        console.warn(`[LandingPageRenderer] Unknown section type: "${(section as { type: string }).type}"`);
+      }
       return null;
   }
 }

@@ -46,9 +46,10 @@ export const iconMap: Record<LandingIconId, LucideIcon> = {
 
 /**
  * Resolve a LandingIconId to a Lucide icon component.
- * Returns the mapped icon, or a fallback if the id is undefined or unrecognised.
+ * Returns the mapped icon, or the fallback (defaults to Clock) if the id
+ * is undefined or unrecognised.
  */
-export function getIcon(id?: LandingIconId, fallback?: LucideIcon): LucideIcon | undefined {
+export function getIcon(id?: LandingIconId, fallback: LucideIcon = Clock): LucideIcon {
   if (id && id in iconMap) {
     return iconMap[id];
   }

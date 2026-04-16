@@ -71,6 +71,7 @@ export function CoreValuesSection({ content }: CoreValuesSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
           <h2 id="core-values-heading" className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
@@ -85,11 +86,12 @@ export function CoreValuesSection({ content }: CoreValuesSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
           className="grid md:grid-cols-3 gap-4 sm:gap-6 md:gap-8"
         >
           {values.map((value, index) => (
-            <motion.article
-              key={value.title}
+            <motion.div
+              key={`value-${index}`}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -110,7 +112,7 @@ export function CoreValuesSection({ content }: CoreValuesSectionProps) {
                 </h3>
                 <p className="text-theme-muted">{value.description}</p>
               </div>
-            </motion.article>
+            </motion.div>
           ))}
         </motion.div>
       </div>

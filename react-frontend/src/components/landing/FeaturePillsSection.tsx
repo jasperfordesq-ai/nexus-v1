@@ -28,7 +28,7 @@ export function FeaturePillsSection({ content }: FeaturePillsSectionProps) {
   const pills: ResolvedPill[] =
     content?.items && content.items.length > 0
       ? content.items.map((item, index) => ({
-          Icon: getIcon(item.icon, defaultIcons[index]) ?? Clock,
+          Icon: getIcon(item.icon, defaultIcons[index % defaultIcons.length]),
           title: item.title,
           description: item.description,
         }))
@@ -60,7 +60,7 @@ export function FeaturePillsSection({ content }: FeaturePillsSectionProps) {
     >
       {pills.map((pill, index) => (
         <motion.div
-          key={pill.title}
+          key={`pill-${index}`}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

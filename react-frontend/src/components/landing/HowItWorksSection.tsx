@@ -41,7 +41,7 @@ export function HowItWorksSection({ content }: HowItWorksSectionProps) {
       ? content.steps.map((step, index) => {
           const meta = defaultStepMeta[index] ?? FALLBACK_META;
           return {
-            Icon: getIcon(step.icon, meta.icon) ?? FALLBACK_META.icon,
+            Icon: getIcon(step.icon, meta.icon),
             title: step.title,
             description: step.description,
             color: meta.color,
@@ -81,6 +81,7 @@ export function HowItWorksSection({ content }: HowItWorksSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
           <h2 id="how-it-works-heading" className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
@@ -94,7 +95,7 @@ export function HowItWorksSection({ content }: HowItWorksSectionProps) {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {steps.map((step, index) => (
             <motion.div
-              key={step.title}
+              key={`step-${index}`}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
