@@ -103,13 +103,30 @@ const EMPTY_FORM: OptionFormData = {
   },
 };
 
-const TRIGGER_LABELS: Record<string, { label: string; icon: typeof Bell; description: string }> = {
-  notify_admin_on_selection: { label: 'Notify admin/broker', icon: Bell, description: 'Send in-app + email notification to all admins and brokers when a member selects this option' },
-  requires_broker_approval: { label: 'Require broker approval for messaging', icon: MessageSquare, description: 'All outgoing messages from this member will queue for broker approval' },
-  restricts_messaging: { label: 'Monitor messaging', icon: MessageSquare, description: 'All messages to/from this member are copied to the broker inbox for review' },
-  restricts_matching: { label: 'Restrict matching', icon: Users, description: 'Member excluded from automated matching unless the partner is vetted' },
-  requires_vetted_interaction: { label: 'Require vetted interaction partners', icon: ShieldCheck, description: 'Exchanges blocked unless the other party has verified vetting status' },
+const TRIGGER_ICONS: Record<string, typeof Bell> = {
+  notify_admin_on_selection: Bell,
+  requires_broker_approval: MessageSquare,
+  restricts_messaging: MessageSquare,
+  restricts_matching: Users,
+  requires_vetted_interaction: ShieldCheck,
 };
+
+// Maps trigger key → translation key suffix used in safeguarding.trigger_*_label / *_desc
+const TRIGGER_I18N_KEY: Record<string, string> = {
+  notify_admin_on_selection: 'notify_admin',
+  requires_broker_approval: 'broker_approval',
+  restricts_messaging: 'monitor_messaging',
+  restricts_matching: 'restrict_matching',
+  requires_vetted_interaction: 'vetted_interaction',
+};
+
+const TRIGGER_KEYS = [
+  'notify_admin_on_selection',
+  'requires_broker_approval',
+  'restricts_messaging',
+  'restricts_matching',
+  'requires_vetted_interaction',
+] as const;
 
 // ── Component ────────────────────────────────────────────────────────────────
 
@@ -415,8 +432,9 @@ export function SafeguardingOptionsAdmin() {
                 {t('safeguarding.behavioral_triggers_desc')}
               </p>
               <div className="space-y-3">
-                {Object.entries(TRIGGER_LABELS).map(([key, meta]) => {
-                  const Icon = meta.icon;
+                {TRIGGER_KEYS.map((key) => {
+                  const Icon = TRIGGER_ICONS[key]!;
+                  const i18nKey = TRIGGER_I18N_KEY[key]!;
                   return (
                     <Switch
                       key={key}
@@ -427,8 +445,8 @@ export function SafeguardingOptionsAdmin() {
                       <div className="flex items-start gap-2">
                         <Icon className="w-4 h-4 text-theme-muted mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="font-medium text-sm">{meta.label}</p>
-                          <p className="text-xs text-theme-muted">{meta.description}</p>
+                          <p className="font-medium text-sm">{t(`safeguarding.trigger_${i18nKey}_label`)}</p>
+                          <p className="text-xs text-theme-muted">{t(`safeguarding.trigger_${i18nKey}_desc`)}</p>
                         </div>
                       </div>
                     </Switch>
@@ -475,7 +493,7 @@ export function SafeguardingOptionsAdmin() {
           <ModalHeader>{t('safeguarding.deactivate_option')}</ModalHeader>
           <ModalBody>
             <p>
-              Deactivate <strong>&quot;{deleteTarget?.label}&quot;</strong>?
+              {t('safeguarding.deactivate_confirm_question')} <strong>&quot;{deleteTarget?.label}&quot;</strong>?
             </p>
             <p className="text-sm text-theme-muted mt-2">
               {t('safeguarding.deactivate_option_desc')}
@@ -505,7 +523,7 @@ function OptionCard({
   const { t } = useTranslation('admin');
   const triggers = option.triggers || {};
   const activeTriggers = Object.entries(triggers).filter(
-    ([k, v]) => v === true && k in TRIGGER_LABELS
+    ([k, v]) => v === true && k in TRIGGER_I18N_KEY
   );
 
   return (
@@ -528,7 +546,7 @@ function OptionCard({
           <div className="flex flex-wrap gap-1 ml-6 mt-1">
             {activeTriggers.map(([key]) => (
               <Chip key={key} size="sm" variant="flat" color="warning" className="text-xs">
-                {TRIGGER_LABELS[key]?.label || key}
+                {TRIGGER_I18N_KEY[key] ? t(`safeguarding.trigger_${TRIGGER_I18N_KEY[key]}_label`) : key}
               </Chip>
             ))}
           </div>

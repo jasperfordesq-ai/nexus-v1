@@ -31,22 +31,17 @@ const riskColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default'>
   critical: 'danger',
 };
 
-const RISK_LEVELS = [
-  { key: 'low', label: 'Low' },
-  { key: 'medium', label: 'Medium' },
-  { key: 'high', label: 'High' },
-  { key: 'critical', label: 'Critical' },
-];
+const RISK_LEVEL_KEYS = ['low', 'medium', 'high', 'critical'] as const;
 
-const RISK_CATEGORIES = [
-  { key: 'safeguarding', label: 'Safeguarding Concern' },
-  { key: 'financial', label: 'Financial Risk' },
-  { key: 'health_safety', label: 'Health & Safety' },
-  { key: 'legal', label: 'Legal/Regulatory' },
-  { key: 'reputation', label: 'Reputational Risk' },
-  { key: 'fraud', label: 'Potential Fraud' },
-  { key: 'other', label: 'Other' },
-];
+const RISK_CATEGORY_KEYS = [
+  'safeguarding',
+  'financial',
+  'health_safety',
+  'legal',
+  'reputation',
+  'fraud',
+  'other',
+] as const;
 
 interface RiskTagForm {
   listing_id: string;
@@ -229,7 +224,7 @@ export function RiskTagsPage() {
   }
 
   async function handleRemove(tag: RiskTag) {
-    if (!confirm(`Remove risk tag from listing "${tag.listing_title ?? tag.listing_id}"?`)) return;
+    if (!confirm(t('broker.confirm_remove_risk_tag', { title: tag.listing_title ?? String(tag.listing_id) }))) return;
     setRemoving(tag.listing_id);
     try {
       const res = await adminBroker.removeRiskTag(tag.listing_id);
@@ -303,8 +298,7 @@ export function RiskTagsPage() {
       label: t('broker.col_category'),
       sortable: true,
       render: (item) => {
-        const label = RISK_CATEGORIES.find(c => c.key === item.risk_category)?.label;
-        return <span className="text-sm">{label ?? item.risk_category ?? '—'}</span>;
+        return <span className="text-sm">{item.risk_category ? t(`broker.risk_cat_${item.risk_category}`, { defaultValue: item.risk_category }) : '—'}</span>;
       },
     },
     {
@@ -312,7 +306,7 @@ export function RiskTagsPage() {
       label: t('broker.col_approval_req'),
       render: (item) => (
         <Chip size="sm" variant="dot" color={item.requires_approval ? 'warning' : 'default'}>
-          {item.requires_approval ? 'Yes' : 'No'}
+          {item.requires_approval ? t('broker.yes') : t('broker.no')}
         </Chip>
       ),
     },
@@ -321,7 +315,7 @@ export function RiskTagsPage() {
       label: t('broker.col_insurance'),
       render: (item) => (
         <Chip size="sm" variant="dot" color={item.insurance_required ? 'warning' : 'default'}>
-          {item.insurance_required ? 'Yes' : 'No'}
+          {item.insurance_required ? t('broker.yes') : t('broker.no')}
         </Chip>
       ),
     },
@@ -330,7 +324,7 @@ export function RiskTagsPage() {
       label: t('broker.col_dbs'),
       render: (item) => (
         <Chip size="sm" variant="dot" color={item.dbs_required ? 'warning' : 'default'}>
-          {item.dbs_required ? 'Yes' : 'No'}
+          {item.dbs_required ? t('broker.yes') : t('broker.no')}
         </Chip>
       ),
     },
@@ -528,9 +522,9 @@ export function RiskTagsPage() {
               }}
               isRequired
             >
-              {RISK_LEVELS.map(level => (
-                <SelectItem key={level.key}>
-                  {level.label}
+              {RISK_LEVEL_KEYS.map(key => (
+                <SelectItem key={key}>
+                  {t(`broker.risk_level_${key}`)}
                 </SelectItem>
               ))}
             </Select>
@@ -544,9 +538,9 @@ export function RiskTagsPage() {
               }}
               isRequired
             >
-              {RISK_CATEGORIES.map(cat => (
-                <SelectItem key={cat.key}>
-                  {cat.label}
+              {RISK_CATEGORY_KEYS.map(key => (
+                <SelectItem key={key}>
+                  {t(`broker.risk_cat_${key}`)}
                 </SelectItem>
               ))}
             </Select>

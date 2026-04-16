@@ -52,11 +52,6 @@ const MERGE_VARIABLES = [
   '{{view_in_browser}}',
 ];
 
-const CATEGORIES = [
-  { key: 'custom', label: 'Custom' },
-  { key: 'saved', label: 'Saved' },
-  { key: 'starter', label: 'Starter' },
-];
 
 interface TemplateData {
   id: number;
@@ -77,6 +72,12 @@ export function TemplateForm() {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const { tenantPath } = useTenant();
+
+  const CATEGORIES = [
+    { key: 'custom', label: t('template_form.category_custom') },
+    { key: 'saved', label: t('template_form.category_saved') },
+    { key: 'starter', label: t('template_form.category_starter') },
+  ];
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -103,8 +104,8 @@ export function TemplateForm() {
   // Dynamic page title
   usePageTitle(
     isEdit && template
-      ? `Admin - Edit Template: ${template.name}`
-      : 'Admin - Create Template',
+      ? t('template_form.edit_template_name', { name: template.name })
+      : t('template_form.create_template'),
   );
 
   // Load template for edit mode
@@ -130,10 +131,10 @@ export function TemplateForm() {
         setPreviewText(data.preview_text || '');
         setContent(data.content || '');
       } else {
-        setLoadError(res.error || 'Failed to load template');
+        setLoadError(res.error || t('template_form.failed_to_load_template'));
       }
     } catch {
-      setLoadError('An unexpected error occurred while loading the template');
+      setLoadError(t('template_form.unexpected_error_loading'));
     } finally {
       setLoading(false);
     }
@@ -149,7 +150,7 @@ export function TemplateForm() {
     const newErrors: Record<string, string> = {};
 
     if (!name.trim()) {
-      newErrors.name = 'Template name is required';
+      newErrors.name = t('template_form.name_required');
     }
 
     setErrors(newErrors);
@@ -237,21 +238,21 @@ export function TemplateForm() {
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters/templates'))}
             >
-              Back to Templates
+              {t('template_form.back_to_templates')}
             </Button>
           }
         />
         <Card className="max-w-2xl">
           <CardBody className="p-6">
             <p className="text-center text-danger">
-              {loadError || 'Template not found'}
+              {loadError || t('template_form.template_not_found')}
             </p>
             <div className="mt-4 flex justify-center">
               <Button
                 variant="flat"
                 onPress={() => navigate(tenantPath('/admin/newsletters/templates'))}
               >
-                Return to Templates
+                {t('template_form.return_to_templates')}
               </Button>
             </div>
           </CardBody>
@@ -270,7 +271,7 @@ export function TemplateForm() {
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/newsletters/templates'))}
           >
-            Back to Templates
+            {t('template_form.back_to_templates')}
           </Button>
         }
       />
@@ -326,7 +327,7 @@ export function TemplateForm() {
                       isDisabled={submitting}
                     />
                     <span className="text-sm">
-                      {isActive ? 'Active' : 'Inactive'}
+                      {isActive ? t('template_form.active') : t('template_form.inactive')}
                     </span>
                   </div>
                 </div>
@@ -378,10 +379,10 @@ export function TemplateForm() {
                 {/* Merge variables */}
                 <div>
                   <p className="mb-2 text-sm font-medium text-default-700">
-                    Available Merge Variables
+                    {t('template_form.available_merge_variables')}
                   </p>
                   <p className="mb-3 text-xs text-default-500">
-                    Click to copy. These will be replaced with actual values when sent.
+                    {t('template_form.merge_variables_hint')}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {MERGE_VARIABLES.map((variable) => (
@@ -414,7 +415,7 @@ export function TemplateForm() {
                   startContent={<Save size={16} />}
                   isLoading={submitting}
                 >
-                  {isEdit ? 'Update Template' : 'Save Template'}
+                  {isEdit ? t('template_form.update_template') : t('template_form.save_template')}
                 </Button>
 
                 {isEdit && (
@@ -425,7 +426,7 @@ export function TemplateForm() {
                     onPress={handleDuplicate}
                     isDisabled={submitting}
                   >
-                    Duplicate Template
+                    {t('template_form.duplicate_template')}
                   </Button>
                 )}
 
@@ -435,7 +436,7 @@ export function TemplateForm() {
                   onPress={() => navigate(tenantPath('/admin/newsletters/templates'))}
                   isDisabled={submitting}
                 >
-                  Cancel
+                  {t('template_form.cancel')}
                 </Button>
               </CardBody>
             </Card>
@@ -446,15 +447,15 @@ export function TemplateForm() {
                 <div className="flex items-center gap-2">
                   <Lightbulb size={16} className="text-success-600" />
                   <span className="text-sm font-semibold text-success-700 dark:text-success-400">
-                    Email Template Tips
+                    {t('template_form.email_template_tips_heading')}
                   </span>
                 </div>
                 <ul className="list-inside list-disc space-y-1 text-xs text-success-700 dark:text-success-400">
-                  <li>Use inline CSS for email client compatibility</li>
-                  <li>Keep content width under 600px</li>
+                  <li>{t('template_form.tip_inline_css')}</li>
+                  <li>{t('template_form.tip_content_width')}</li>
                   <li>{t('newsletter_template_form.test_tip_clients')}</li>
                   <li>{t('newsletter_template_form.test_tip_unsubscribe')}</li>
-                  <li>Use web-safe fonts (Arial, Georgia, etc.)</li>
+                  <li>{t('template_form.tip_web_safe_fonts')}</li>
                 </ul>
               </CardBody>
             </Card>
@@ -472,8 +473,9 @@ export function TemplateForm() {
                       {template.usage_count ?? 0}
                     </span>
                     <span className="text-sm text-default-500">
-                      newsletter{(template.usage_count ?? 0) !== 1 ? 's' : ''} sent with
-                      this template
+                      {(template.usage_count ?? 0) !== 1
+                        ? t('template_form.usage_stats_sent_plural')
+                        : t('template_form.usage_stats_sent')}
                     </span>
                   </div>
                 </CardBody>

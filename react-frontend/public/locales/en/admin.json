@@ -867,7 +867,13 @@
     "tier_level": "Tier Level",
     "tier_level_desc": "Manage and configure tier level settings",
     "trial_ends": "Trial Ends",
-    "label_slug": "Slug"
+    "label_slug": "Slug",
+    "attr_type_checkbox": "Checkbox",
+    "attr_type_text": "Text",
+    "attr_type_number": "Number",
+    "attr_type_select": "Select",
+    "attr_type_radio": "Radio",
+    "attr_type_date": "Date"
   },
   "crm": {
     "action_cancel": "Cancel",
@@ -1399,7 +1405,23 @@
     "failed_to_load_log_file": "Failed to load log file",
     "label_lines": "Lines",
     "label_level": "Level",
-    "auto_refresh": "Auto-refresh (5s)"
+    "auto_refresh": "Auto-refresh (5s)",
+    "log_lines_100": "100 lines",
+    "log_lines_200": "200 lines",
+    "log_lines_500": "500 lines",
+    "log_lines_1000": "1000 lines",
+    "log_level_all": "All Levels",
+    "log_level_error": "ERROR",
+    "log_level_warning": "WARNING",
+    "log_level_info": "INFO",
+    "log_level_debug": "DEBUG",
+    "log_viewer_back": "Back",
+    "auto_refresh_label": "Auto-refresh (5s)",
+    "btn_clear": "Clear",
+    "log_viewer_title_fallback": "Log File",
+    "log_viewer_loading_desc": "Loading...",
+    "btn_cancel_modal": "Cancel",
+    "btn_clear_file": "Clear File"
   },
   "events": {
     "an_unexpected_error_occurred": "An Unexpected Error Occurred",
@@ -2358,7 +2380,16 @@
     "section_impact_summary": "Impact Summary",
     "section_skills_overview": "Skills Overview",
     "unit_connections": "connections",
-    "save_configuration": "Save Configuration"
+    "save_configuration": "Save Configuration",
+    "btn_configure": "Configure",
+    "btn_export_pdf": "Export PDF",
+    "btn_export_csv": "Export CSV",
+    "btn_refresh": "Refresh",
+    "section_sroi": "Social Return on Investment",
+    "period_description": "Based on {{months}} month period",
+    "section_skills_events": "Skills & Events",
+    "desc_skills_events": "Service categories, listings, and community events",
+    "label_active_listings_stat": "Active Listings"
   },
   "jobs": {
     "add_edit_notes": "Add Edit Notes",
@@ -3233,7 +3264,18 @@
     "ward": "Ward",
     "aria_edit_option": "Edit option",
     "aria_deactivate_option": "Deactivate option",
-    "deactivate_confirm": "Deactivate this option?"
+    "deactivate_confirm": "Deactivate this option?",
+    "trigger_notify_admin_label": "Notify admin/broker",
+    "trigger_notify_admin_desc": "Send in-app + email notification to all admins and brokers when a member selects this option",
+    "trigger_broker_approval_label": "Require broker approval for messaging",
+    "trigger_broker_approval_desc": "All outgoing messages from this member will queue for broker approval",
+    "trigger_monitor_messaging_label": "Monitor messaging",
+    "trigger_monitor_messaging_desc": "All messages to/from this member are copied to the broker inbox for review",
+    "trigger_restrict_matching_label": "Restrict matching",
+    "trigger_restrict_matching_desc": "Member excluded from automated matching unless the partner is vetted",
+    "trigger_vetted_interaction_label": "Require vetted interaction partners",
+    "trigger_vetted_interaction_desc": "Exchanges blocked unless the other party has verified vetting status",
+    "deactivate_confirm_question": "Deactivate"
   },
   "stats": {
     "active_listings": "Active Listings",
@@ -4352,7 +4394,24 @@
     "volunteer_organizations_desc": "Manage and configure volunteer organizations settings",
     "volunteer_organizations_title": "Volunteer Organizations",
     "volunteering_overview_desc": "Manage and configure volunteering overview settings",
-    "volunteering_overview_title": "Volunteering Overview"
+    "volunteering_overview_title": "Volunteering Overview",
+    "aria_move_up": "Move up",
+    "aria_move_down": "Move down",
+    "aria_preview": "Preview",
+    "aria_edit": "Edit",
+    "aria_delete": "Delete",
+    "aria_test": "Test",
+    "aria_retry": "Retry failed",
+    "aria_view_logs": "View logs",
+    "filter_all": "All",
+    "filter_pre_shift": "Pre-shift",
+    "filter_post_shift_feedback": "Post-shift Feedback",
+    "filter_lapsed_volunteer": "Lapsed Volunteer",
+    "filter_credential_expiry": "Credential Expiry",
+    "filter_training_expiry": "Training Expiry",
+    "filter_email": "Email",
+    "filter_push": "Push",
+    "filter_sms": "SMS"
   },
   "mailer": {
     "gmail_not_enabled": "Gmail API is not enabled",

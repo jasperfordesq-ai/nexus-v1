@@ -31,41 +31,6 @@ import { PageHeader } from '../../components';
 import type { TenantConfig, CacheStats, BackgroundJob } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
-// Feature metadata for display
-const FEATURE_META: Record<string, { label: string; description: string }> = {
-  events: { label: 'Events', description: 'Community events with RSVPs' },
-  groups: { label: 'Groups', description: 'Community groups and discussions' },
-  gamification: { label: 'Gamification', description: 'Badges, achievements, XP, leaderboards' },
-  goals: { label: 'Goals', description: 'Personal and community goals' },
-  blog: { label: 'Blog', description: 'Community blog/news posts' },
-  resources: { label: 'Resources', description: 'Shared resource library' },
-  volunteering: { label: 'Volunteering', description: 'Volunteer opportunities and hours' },
-  exchange_workflow: { label: 'Exchange Workflow', description: 'Structured exchange requests with broker approval' },
-  organisations: { label: 'Organisations', description: 'Organization profiles and management' },
-  federation: { label: 'Federation', description: 'Multi-community network and partnerships' },
-  connections: { label: 'Connections', description: 'User connections and friend requests' },
-  reviews: { label: 'Reviews', description: 'Member reviews and ratings' },
-  polls: { label: 'Polls', description: 'Community polls and voting' },
-  job_vacancies: { label: 'Job Vacancies', description: 'Job postings and application management' },
-  ideation_challenges: { label: 'Ideation Challenges', description: 'Community challenges with idea voting' },
-  direct_messaging: { label: 'Direct Messaging', description: 'Private messaging between members' },
-  group_exchanges: { label: 'Group Exchanges', description: 'Multi-party group exchange sessions' },
-  search: { label: 'Search', description: 'Full-text search across listings, members, and content' },
-  ai_chat: { label: 'AI Assistant', description: 'AI-powered chat assistant for members' },
-  marketplace: { label: 'Marketplace', description: 'Commercial buy/sell marketplace (separate from timebanking listings)' },
-  message_translation: { label: 'Message Translation', description: 'AI-powered translation for direct messages and voice transcripts (GPT-4o-mini)' },
-};
-
-const MODULE_META: Record<string, { label: string; description: string }> = {
-  listings: { label: 'Listings', description: 'Service offers and requests marketplace' },
-  wallet: { label: 'Wallet', description: 'Time credit transactions and balance' },
-  messages: { label: 'Messages', description: 'Messaging system' },
-  dashboard: { label: 'Dashboard', description: 'Member dashboard' },
-  feed: { label: 'Feed', description: 'Social activity feed' },
-  notifications: { label: 'Notifications', description: 'In-app notifications' },
-  profile: { label: 'Profile', description: 'User profiles' },
-  settings: { label: 'Settings', description: 'User settings' },
-};
 
 const PLATFORM_LANGUAGES = [
   { code: 'en', label: 'English', short: 'EN' },
@@ -135,7 +100,7 @@ export function TenantFeatures() {
       setConfig((prev) =>
         prev ? { ...prev, features: { ...prev.features, [feature]: enabled } } : prev
       );
-      toast.success(t('config.feature_toggled', { name: FEATURE_META[feature]?.label || feature, status: enabled ? t('config.enabled') : t('config.disabled') }));
+      toast.success(t('config.feature_toggled', { name: t(`tenant_features.label_${feature}`, { defaultValue: feature }), status: enabled ? t('config.enabled') : t('config.disabled') }));
       // Refresh TenantContext so nav items update immediately
       refreshTenant();
     } else {
@@ -151,7 +116,7 @@ export function TenantFeatures() {
       setConfig((prev) =>
         prev ? { ...prev, modules: { ...prev.modules, [module]: enabled } } : prev
       );
-      toast.success(t('config.module_toggled', { name: MODULE_META[module]?.label || module, status: enabled ? t('config.enabled') : t('config.disabled') }));
+      toast.success(t('config.module_toggled', { name: t(`tenant_features.label_${module}`, { defaultValue: module }), status: enabled ? t('config.enabled') : t('config.disabled') }));
       // Refresh TenantContext so nav items update immediately
       refreshTenant();
     } else {
@@ -230,7 +195,7 @@ export function TenantFeatures() {
             onPress={loadConfig}
             size="sm"
           >
-            Refresh
+            {t('tenant_features.refresh')}
           </Button>
         }
       />
@@ -242,13 +207,13 @@ export function TenantFeatures() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
               <Globe size={18} className="text-primary" />
-              <h3 className="font-semibold">Language &amp; Localisation</h3>
+              <h3 className="font-semibold">{t('tenant_features.language_localisation_heading')}</h3>
             </CardHeader>
             <CardBody className="px-4 pb-4 space-y-4">
               <div>
-                <p className="text-sm font-medium mb-1">{t('shared.default_language')}</p>
+                <p className="text-sm font-medium mb-1">{t('tenant_features.default_language')}</p>
                 <p className="text-xs text-default-400 mb-2">
-                  Shown to new visitors without a preference
+                  {t('tenant_features.default_language_hint')}
                 </p>
                 <Select
                   aria-label={t('config.label_default_language')}
@@ -271,9 +236,9 @@ export function TenantFeatures() {
               </div>
               <Divider />
               <div>
-                <p className="text-sm font-medium mb-1">{t('shared.available_languages')}</p>
+                <p className="text-sm font-medium mb-1">{t('tenant_features.available_languages')}</p>
                 <p className="text-xs text-default-400 mb-3">
-                  Languages shown in the language switcher
+                  {t('tenant_features.available_languages_hint')}
                 </p>
                 <div className="space-y-2">
                   {PLATFORM_LANGUAGES.map((lang) => (
@@ -286,7 +251,7 @@ export function TenantFeatures() {
                       <span className="text-sm">
                         {lang.label} ({lang.short})
                         {lang.code === 'en' && (
-                          <span className="ml-2 text-xs text-default-400">always enabled</span>
+                          <span className="ml-2 text-xs text-default-400">{t('tenant_features.always_enabled')}</span>
                         )}
                       </span>
                     </Checkbox>
@@ -301,7 +266,7 @@ export function TenantFeatures() {
                   isDisabled={savingLang}
                   onPress={handleSaveLanguages}
                 >
-                  Save Changes
+                  {t('tenant_features.save_changes')}
                 </Button>
               </div>
             </CardBody>
@@ -310,54 +275,48 @@ export function TenantFeatures() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
               <Zap size={18} className="text-primary" />
-              <h3 className="font-semibold">{t('shared.features')}</h3>
-              <span className="text-sm text-default-400">Optional add-on modules</span>
+              <h3 className="font-semibold">{t('tenant_features.section_features')}</h3>
+              <span className="text-sm text-default-400">{t('tenant_features.optional_addons')}</span>
             </CardHeader>
             <CardBody className="divide-y divide-divider px-4">
-              {Object.entries(config?.features || {}).map(([key, enabled]) => {
-                const meta = FEATURE_META[key];
-                return (
-                  <div key={key} className="flex items-center justify-between py-3">
-                    <div>
-                      <p className="font-medium">{meta?.label || key}</p>
-                      <p className="text-sm text-default-500">{meta?.description || ''}</p>
-                    </div>
-                    <Switch
-                      isSelected={enabled}
-                      onValueChange={(val) => handleFeatureToggle(key, val)}
-                      isDisabled={toggling === key}
-                      size="sm"
-                    />
+              {Object.entries(config?.features || {}).map(([key, enabled]) => (
+                <div key={key} className="flex items-center justify-between py-3">
+                  <div>
+                    <p className="font-medium">{t(`tenant_features.label_${key}`, { defaultValue: key })}</p>
+                    <p className="text-sm text-default-500">{t(`tenant_features.desc_${key}`, { defaultValue: '' })}</p>
                   </div>
-                );
-              })}
+                  <Switch
+                    isSelected={enabled}
+                    onValueChange={(val) => handleFeatureToggle(key, val)}
+                    isDisabled={toggling === key}
+                    size="sm"
+                  />
+                </div>
+              ))}
             </CardBody>
           </Card>
 
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
               <Cog size={18} className="text-secondary" />
-              <h3 className="font-semibold">{t('shared.core_modules')}</h3>
-              <span className="text-sm text-default-400">{t('shared.core_modules_desc')}</span>
+              <h3 className="font-semibold">{t('tenant_features.section_core_modules')}</h3>
+              <span className="text-sm text-default-400">{t('tenant_features.section_core_modules_desc')}</span>
             </CardHeader>
             <CardBody className="divide-y divide-divider px-4">
-              {Object.entries(config?.modules || {}).map(([key, enabled]) => {
-                const meta = MODULE_META[key];
-                return (
-                  <div key={key} className="flex items-center justify-between py-3">
-                    <div>
-                      <p className="font-medium">{meta?.label || key}</p>
-                      <p className="text-sm text-default-500">{meta?.description || ''}</p>
-                    </div>
-                    <Switch
-                      isSelected={enabled}
-                      onValueChange={(val) => handleModuleToggle(key, val)}
-                      isDisabled={toggling === key}
-                      size="sm"
-                    />
+              {Object.entries(config?.modules || {}).map(([key, enabled]) => (
+                <div key={key} className="flex items-center justify-between py-3">
+                  <div>
+                    <p className="font-medium">{t(`tenant_features.label_${key}`, { defaultValue: key })}</p>
+                    <p className="text-sm text-default-500">{t(`tenant_features.desc_${key}`, { defaultValue: '' })}</p>
                   </div>
-                );
-              })}
+                  <Switch
+                    isSelected={enabled}
+                    onValueChange={(val) => handleModuleToggle(key, val)}
+                    isDisabled={toggling === key}
+                    size="sm"
+                  />
+                </div>
+              ))}
             </CardBody>
           </Card>
         </div>
@@ -368,21 +327,21 @@ export function TenantFeatures() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
               <Database size={18} className="text-warning" />
-              <h3 className="font-semibold">{t('shared.cache')}</h3>
+              <h3 className="font-semibold">{t('tenant_features.section_cache')}</h3>
             </CardHeader>
             <CardBody className="px-4 pb-4 space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-default-500">{t('shared.redis')}</span>
+                <span className="text-default-500">{t('tenant_features.section_redis')}</span>
                 <span className={cacheStats?.redis_connected ? 'text-success' : 'text-danger'}>
-                  {cacheStats?.redis_connected ? 'Connected' : 'Disconnected'}
+                  {cacheStats?.redis_connected ? t('tenant_features.connected') : t('tenant_features.disconnected')}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-default-500">{t('shared.memory_used')}</span>
+                <span className="text-default-500">{t('tenant_features.section_memory_used')}</span>
                 <span>{cacheStats?.redis_memory_used || '—'}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-default-500">{t('shared.keys')}</span>
+                <span className="text-default-500">{t('tenant_features.section_keys')}</span>
                 <span>{cacheStats?.redis_keys_count ?? '—'}</span>
               </div>
               <Divider />
@@ -394,7 +353,7 @@ export function TenantFeatures() {
                 onPress={handleClearCache}
                 size="sm"
               >
-                Clear Tenant Cache
+                {t('tenant_features.clear_tenant_cache')}
               </Button>
             </CardBody>
           </Card>
@@ -403,7 +362,7 @@ export function TenantFeatures() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
               <Timer size={18} className="text-secondary" />
-              <h3 className="font-semibold">{t('shared.background_jobs')}</h3>
+              <h3 className="font-semibold">{t('tenant_features.section_background_jobs')}</h3>
             </CardHeader>
             <CardBody className="px-4 pb-4 space-y-3">
               {jobs.length > 0 ? jobs.map((job) => (
@@ -411,7 +370,7 @@ export function TenantFeatures() {
                   <div>
                     <p className="text-sm font-medium">{job.name}</p>
                     <p className="text-xs text-default-400">
-                      {job.last_run_at ? `Last: ${new Date(job.last_run_at).toLocaleString()}` : 'Never run'}
+                      {job.last_run_at ? t('tenant_features.job_last_run', { time: new Date(job.last_run_at).toLocaleString() }) : t('tenant_features.job_never_run')}
                     </p>
                   </div>
                   <Button
@@ -419,13 +378,13 @@ export function TenantFeatures() {
                     size="sm"
                     variant="flat"
                     onPress={() => handleRunJob(job.id)}
-                    aria-label={`Run ${job.name}`}
+                    aria-label={t('tenant_features.run_job_aria', { name: job.name })}
                   >
                     <Play size={14} />
                   </Button>
                 </div>
               )) : (
-                <p className="text-sm text-default-400">{t('shared.no_jobs_configured')}</p>
+                <p className="text-sm text-default-400">{t('tenant_features.no_jobs_configured')}</p>
               )}
             </CardBody>
           </Card>

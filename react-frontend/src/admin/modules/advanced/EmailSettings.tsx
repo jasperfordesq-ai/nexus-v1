@@ -18,12 +18,6 @@ import { adminSettings } from '../../api/adminApi';
 import type { ApiResponse } from '@/lib/api';
 
 import { useTranslation } from 'react-i18next';
-const PROVIDERS = [
-  { key: 'platform_default', label: 'Platform Default' },
-  { key: 'sendgrid', label: 'SendGrid' },
-  { key: 'gmail_api', label: 'Gmail API' },
-  { key: 'smtp', label: 'Custom SMTP' },
-];
 
 interface EmailSettingsForm {
   provider: string;
@@ -78,6 +72,14 @@ const INITIAL_FORM: EmailSettingsForm = {
 
 export function EmailSettings() {
   const { t } = useTranslation('admin');
+
+  const PROVIDERS = [
+    { key: 'platform_default', label: t('advanced.provider_platform_default') },
+    { key: 'sendgrid', label: t('advanced.provider_sendgrid') },
+    { key: 'gmail_api', label: t('advanced.provider_gmail_api') },
+    { key: 'smtp', label: t('advanced.provider_smtp') },
+  ];
+
   usePageTitle(t('advanced.page_title'));
   const toast = useToast();
   const [loading, setLoading] = useState(true);

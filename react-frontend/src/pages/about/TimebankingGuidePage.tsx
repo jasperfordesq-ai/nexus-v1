@@ -237,8 +237,8 @@ export function TimebankingGuidePage() {
                   <p className={`text-4xl sm:text-5xl font-extrabold ${stat.textAccent} mb-2`}>
                     {stat.value}
                   </p>
-                  <p className="font-semibold text-theme-primary mb-1">{t(`timebanking_guide.stat_${stat.value.replace(/[:%]/g, '')}_label`, stat.label)}</p>
-                  <p className="text-sm text-theme-muted">{t(`timebanking_guide.stat_${stat.value.replace(/[:%]/g, '')}_description`, stat.description)}</p>
+                  <p className="font-semibold text-theme-primary mb-1">{t(`timebanking_guide.stat_${stat.value.replace(/[:%]/g, '')}_label`)}</p>
+                  <p className="text-sm text-theme-muted">{t(`timebanking_guide.stat_${stat.value.replace(/[:%]/g, '')}_description`)}</p>
                 </GlassCard>
               </motion.div>
             ))}
@@ -284,8 +284,8 @@ export function TimebankingGuidePage() {
                     <step.icon className="w-8 h-8 text-white" aria-hidden="true" />
                   </div>
 
-                  <h3 className="text-lg font-semibold text-theme-primary mb-3">{t(`timebanking_guide.step_${index}_title`, step.title)}</h3>
-                  <p className="text-theme-muted leading-relaxed">{t(`timebanking_guide.step_${index}_description`, step.description)}</p>
+                  <h3 className="text-lg font-semibold text-theme-primary mb-3">{t(`timebanking_guide.step_${index}_title`)}</h3>
+                  <p className="text-theme-muted leading-relaxed">{t(`timebanking_guide.step_${index}_description`)}</p>
                 </GlassCard>
               </motion.div>
             ))}
@@ -326,10 +326,10 @@ export function TimebankingGuidePage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-theme-primary text-lg mb-1">
-                        {t(`timebanking_guide.value_${index}_title`, value.title)}
+                        {t(`timebanking_guide.value_${index}_title`)}
                       </h3>
                       <p className="text-theme-muted text-sm leading-relaxed">
-                        {t(`timebanking_guide.value_${index}_description`, value.description)}
+                        {t(`timebanking_guide.value_${index}_description`)}
                       </p>
                     </div>
                   </div>

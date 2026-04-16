@@ -513,7 +513,7 @@ export function ImpactReport() {
               onPress={openConfig}
               size="sm"
             >
-              Configure
+              {t('impact.btn_configure')}
             </Button>
             <Button
               variant="flat"
@@ -522,7 +522,7 @@ export function ImpactReport() {
               isDisabled={!data || loading}
               size="sm"
             >
-              Export PDF
+              {t('impact.btn_export_pdf')}
             </Button>
             <Button
               variant="flat"
@@ -532,7 +532,7 @@ export function ImpactReport() {
               }}
               size="sm"
             >
-              Export CSV
+              {t('impact.btn_export_csv')}
             </Button>
             <Button
               variant="flat"
@@ -541,7 +541,7 @@ export function ImpactReport() {
               isLoading={loading}
               size="sm"
             >
-              Refresh
+              {t('impact.btn_refresh')}
             </Button>
           </div>
         }
@@ -552,10 +552,10 @@ export function ImpactReport() {
       <div className="mb-2">
         <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
           <Sparkles size={20} className="text-primary" />
-          Social Return on Investment
+          {t('impact.section_sroi')}
         </h2>
         <p className="text-sm text-default-500 mt-0.5">
-          Based on {data?.sroi.period_months ?? months} month period
+          {t('impact.period_description', { months: data?.sroi.period_months ?? months })}
         </p>
       </div>
 
@@ -652,10 +652,10 @@ export function ImpactReport() {
           <div className="mb-2">
             <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
               <Lightbulb size={20} className="text-warning" />
-              Skills & Events
+              {t('impact.section_skills_events')}
             </h2>
             <p className="text-sm text-default-500 mt-0.5">
-              Service categories, listings, and community events
+              {t('impact.desc_skills_events')}
             </p>
           </div>
 
@@ -689,7 +689,7 @@ export function ImpactReport() {
               loading={loading}
             />
             <StatCard
-              label="Active Listings"
+              label={t('impact.label_active_listings_stat')}
               value={extras.skills?.total_listings ?? '\u2014'}
               icon={Sparkles}
               color="warning"

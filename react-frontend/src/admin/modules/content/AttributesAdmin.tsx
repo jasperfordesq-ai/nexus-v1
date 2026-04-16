@@ -243,7 +243,7 @@ export function AttributesAdmin() {
       sortable: true,
       render: (item) => <span className="font-medium text-foreground">{item.name}</span>,
     },
-    { key: 'slug', label: 'Slug', render: (item) => <span className="text-sm text-default-500 font-mono">{item.slug}</span> },
+    { key: 'slug', label: t('content.label_slug'), render: (item) => <span className="text-sm text-default-500 font-mono">{item.slug}</span> },
     {
       key: 'type',
       label: t('content.label_type'),
@@ -339,8 +339,8 @@ export function AttributesAdmin() {
               }}
               variant="bordered"
             >
-              {ATTRIBUTE_TYPES.map((t) => (
-                <SelectItem key={t.key}>{t.label}</SelectItem>
+              {ATTRIBUTE_TYPES.map((attrType) => (
+                <SelectItem key={attrType.key}>{t(`content.attr_type_${attrType.key}`)}</SelectItem>
               ))}
             </Select>
 

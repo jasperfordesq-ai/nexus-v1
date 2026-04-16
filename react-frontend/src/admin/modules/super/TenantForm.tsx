@@ -56,34 +56,11 @@ const FEATURE_META: { key: string; labelKey: string; descKey: string; icon: type
 ];
 
 const COUNTRY_CODES = [
-  { code: 'IE', label: 'Ireland' },
-  { code: 'GB', label: 'United Kingdom' },
-  { code: 'US', label: 'United States' },
-  { code: 'CA', label: 'Canada' },
-  { code: 'AU', label: 'Australia' },
-  { code: 'NZ', label: 'New Zealand' },
-  { code: 'DE', label: 'Germany' },
-  { code: 'FR', label: 'France' },
-  { code: 'ES', label: 'Spain' },
-  { code: 'IT', label: 'Italy' },
-  { code: 'NL', label: 'Netherlands' },
-  { code: 'BE', label: 'Belgium' },
-  { code: 'PT', label: 'Portugal' },
-  { code: 'SE', label: 'Sweden' },
-  { code: 'NO', label: 'Norway' },
-  { code: 'DK', label: 'Denmark' },
-  { code: 'FI', label: 'Finland' },
-  { code: 'PL', label: 'Poland' },
-  { code: 'AT', label: 'Austria' },
-  { code: 'CH', label: 'Switzerland' },
+  'IE', 'GB', 'US', 'CA', 'AU', 'NZ', 'DE', 'FR', 'ES', 'IT',
+  'NL', 'BE', 'PT', 'SE', 'NO', 'DK', 'FI', 'PL', 'AT', 'CH',
 ];
 
-const SERVICE_AREAS = [
-  { key: 'local', label: 'Local' },
-  { key: 'regional', label: 'Regional' },
-  { key: 'national', label: 'National' },
-  { key: 'international', label: 'International' },
-];
+const SERVICE_AREAS = ['local', 'regional', 'national', 'international'];
 
 const PLATFORM_LANGUAGES = [
   { code: 'en', label: 'English', short: 'EN' },
@@ -538,9 +515,9 @@ export function TenantForm() {
                 description={t('tenant_form.robots_description')}
               >
                 <SelectItem key="index, follow">{t('tenant_form.robots_index_follow')}</SelectItem>
-                <SelectItem key="noindex, follow">noindex, follow</SelectItem>
-                <SelectItem key="index, nofollow">index, nofollow</SelectItem>
-                <SelectItem key="noindex, nofollow">noindex, nofollow</SelectItem>
+                <SelectItem key="noindex, follow">{t('tenant_form.robots.noindex_follow')}</SelectItem>
+                <SelectItem key="index, nofollow">{t('tenant_form.robots.index_nofollow')}</SelectItem>
+                <SelectItem key="noindex, nofollow">{t('tenant_form.robots.noindex_nofollow')}</SelectItem>
               </Select>
             </CardBody>
           </Card>
@@ -565,8 +542,8 @@ export function TenantForm() {
                 }}
                 className="max-w-xs"
               >
-                {COUNTRY_CODES.map((c) => (
-                  <SelectItem key={c.code}>{c.label} ({c.code})</SelectItem>
+                {COUNTRY_CODES.map((code) => (
+                  <SelectItem key={code}>{t(`tenant_form.countries.${code}`)} ({code})</SelectItem>
                 ))}
               </Select>
               <Select
@@ -579,8 +556,8 @@ export function TenantForm() {
                 }}
                 className="max-w-xs"
               >
-                {SERVICE_AREAS.map((s) => (
-                  <SelectItem key={s.key}>{s.label}</SelectItem>
+                {SERVICE_AREAS.map((key) => (
+                  <SelectItem key={key}>{t(`tenant_form.service_areas.${key}`)}</SelectItem>
                 ))}
               </Select>
               <div className="grid grid-cols-2 gap-4">

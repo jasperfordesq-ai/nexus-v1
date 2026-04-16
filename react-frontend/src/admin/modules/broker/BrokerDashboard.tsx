@@ -32,45 +32,48 @@ import { StatCard, PageHeader } from '../../components';
 import type { BrokerDashboardStats, BrokerActivityEntry } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
-const quickLinks = [
+
+type TFunction = (key: string) => string;
+
+const getQuickLinks = (t: TFunction) => [
   {
-    title: 'Exchange Management',
-    description: 'Review and manage exchange requests between members',
+    title: t('broker_dashboard.link_exchange_management_title'),
+    description: t('broker_dashboard.link_exchange_management_desc'),
     icon: ArrowLeftRight,
     color: 'primary' as const,
     path: '/admin/broker-controls/exchanges',
   },
   {
-    title: 'Risk Tags',
-    description: 'View listings flagged with risk tags',
+    title: t('broker_dashboard.link_risk_tags_title'),
+    description: t('broker_dashboard.link_risk_tags_desc'),
     icon: ShieldAlert,
     color: 'danger' as const,
     path: '/admin/broker-controls/risk-tags',
   },
   {
-    title: 'Message Review',
-    description: 'Review broker message copies and flagged conversations',
+    title: t('broker_dashboard.link_message_review_title'),
+    description: t('broker_dashboard.link_message_review_desc'),
     icon: MessageSquareWarning,
     color: 'warning' as const,
     path: '/admin/broker-controls/messages',
   },
   {
-    title: 'User Monitoring',
-    description: 'View users under messaging monitoring',
+    title: t('broker_dashboard.link_user_monitoring_title'),
+    description: t('broker_dashboard.link_user_monitoring_desc'),
     icon: Eye,
     color: 'secondary' as const,
     path: '/admin/broker-controls/monitoring',
   },
   {
-    title: 'Vetting Records',
-    description: 'Manage DBS checks, Garda vetting, and safeguarding compliance',
+    title: t('broker_dashboard.link_vetting_records_title'),
+    description: t('broker_dashboard.link_vetting_records_desc'),
     icon: ShieldCheck,
     color: 'success' as const,
     path: '/admin/broker-controls/vetting',
   },
   {
-    title: 'Configuration',
-    description: 'Configure broker controls, messaging oversight, and risk settings',
+    title: t('broker_dashboard.link_configuration_title'),
+    description: t('broker_dashboard.link_configuration_desc'),
     icon: Settings,
     color: 'default' as const,
     path: '/admin/broker-controls/configuration',
@@ -100,6 +103,8 @@ export function BrokerDashboard() {
   usePageTitle(t('broker.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
+
+  const quickLinks = getQuickLinks(t as TFunction);
 
   const [stats, setStats] = useState<BrokerDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -135,7 +140,7 @@ export function BrokerDashboard() {
             isLoading={loading}
             size="sm"
           >
-            Refresh
+            {t('broker.refresh')}
           </Button>
         }
       />
@@ -243,14 +248,14 @@ export function BrokerDashboard() {
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-foreground">
                       <span className="font-medium">{entry.first_name} {entry.last_name}</span>
-                      {' '}{formatActionLabel(entry.action_type)}
+                      {' '}{formatActionLabel(entry.action_type, t as TFunction)}
                     </p>
                     {entry.details && (
                       <p className="text-xs text-default-400 truncate">{entry.details}</p>
                     )}
                   </div>
                   <span className="shrink-0 text-xs text-default-400">
-                    {formatTimeAgo(entry.created_at)}
+                    {formatTimeAgo(entry.created_at, t as TFunction)}
                   </span>
                 </li>
               ))}
@@ -262,7 +267,7 @@ export function BrokerDashboard() {
           <CardBody className="flex flex-col items-center justify-center py-10 text-center">
             <Activity size={40} className="text-default-300 mb-3" />
             <p className="text-default-500 font-medium">{t('shared.no_recent_broker_activity')}</p>
-            <p className="text-sm text-default-400 mt-1">Actions will appear here as brokers review exchanges and messages</p>
+            <p className="text-sm text-default-400 mt-1">{t('broker_dashboard.activity_empty_hint')}</p>
           </CardBody>
         </Card>
       )}
@@ -270,55 +275,75 @@ export function BrokerDashboard() {
   );
 }
 
+type ChipColor = 'success' | 'danger' | 'primary' | 'warning' | 'secondary' | 'default';
+
+const actionChipColorMap: Record<string, ChipColor> = {
+  exchange_approved: 'success',
+  exchange_rejected: 'danger',
+  message_reviewed: 'primary',
+  risk_tag_added: 'warning',
+  user_monitored: 'secondary',
+  vetting_verified: 'success',
+  vetting_rejected: 'danger',
+  user_banned: 'danger',
+  user_unbanned: 'success',
+  balance_adjusted: 'primary',
+};
+
+const actionChipLabelKey: Record<string, string> = {
+  exchange_approved: 'broker_dashboard.chip_approved',
+  exchange_rejected: 'broker_dashboard.chip_rejected',
+  message_reviewed: 'broker_dashboard.chip_reviewed',
+  risk_tag_added: 'broker_dashboard.chip_risk_tag',
+  user_monitored: 'broker_dashboard.chip_monitored',
+  vetting_verified: 'broker_dashboard.chip_verified',
+  vetting_rejected: 'broker_dashboard.chip_vet_rejected',
+  user_banned: 'broker_dashboard.chip_banned',
+  user_unbanned: 'broker_dashboard.chip_unbanned',
+  balance_adjusted: 'broker_dashboard.chip_balance',
+};
+
+const actionLabelKey: Record<string, string> = {
+  exchange_approved: 'broker_dashboard.action_exchange_approved',
+  exchange_rejected: 'broker_dashboard.action_exchange_rejected',
+  message_reviewed: 'broker_dashboard.action_message_reviewed',
+  risk_tag_added: 'broker_dashboard.action_risk_tag_added',
+  user_monitored: 'broker_dashboard.action_user_monitored',
+  vetting_verified: 'broker_dashboard.action_vetting_verified',
+  vetting_rejected: 'broker_dashboard.action_vetting_rejected',
+  user_banned: 'broker_dashboard.action_user_banned',
+  user_unbanned: 'broker_dashboard.action_user_unbanned',
+  balance_adjusted: 'broker_dashboard.action_balance_adjusted',
+};
+
 function ActivityChip({ actionType }: { actionType: string }) {
-  const config = actionChipConfig[actionType] || { label: actionType, color: 'default' as const };
+  const { t } = useTranslation('admin');
+  const color: ChipColor = actionChipColorMap[actionType] ?? 'default';
+  const labelKey = actionChipLabelKey[actionType];
+  const label = labelKey ? t(labelKey) : actionType;
   return (
-    <Chip size="sm" variant="flat" color={config.color} className="shrink-0">
-      {config.label}
+    <Chip size="sm" variant="flat" color={color} className="shrink-0">
+      {label}
     </Chip>
   );
 }
 
-const actionChipConfig: Record<string, { label: string; color: 'success' | 'danger' | 'primary' | 'warning' | 'secondary' | 'default' }> = {
-  exchange_approved: { label: 'Approved', color: 'success' },
-  exchange_rejected: { label: 'Rejected', color: 'danger' },
-  message_reviewed: { label: 'Reviewed', color: 'primary' },
-  risk_tag_added: { label: 'Risk Tag', color: 'warning' },
-  user_monitored: { label: 'Monitored', color: 'secondary' },
-  vetting_verified: { label: 'Verified', color: 'success' },
-  vetting_rejected: { label: 'Vet Rejected', color: 'danger' },
-  user_banned: { label: 'Banned', color: 'danger' },
-  user_unbanned: { label: 'Unbanned', color: 'success' },
-  balance_adjusted: { label: 'Balance', color: 'primary' },
-};
-
-function formatActionLabel(actionType: string): string {
-  const labels: Record<string, string> = {
-    exchange_approved: 'approved an exchange',
-    exchange_rejected: 'rejected an exchange',
-    message_reviewed: 'reviewed a message',
-    risk_tag_added: 'added a risk tag',
-    user_monitored: 'placed a user under monitoring',
-    vetting_verified: 'verified a vetting record',
-    vetting_rejected: 'rejected a vetting record',
-    user_banned: 'banned a user',
-    user_unbanned: 'unbanned a user',
-    balance_adjusted: 'adjusted a balance',
-  };
-  return labels[actionType] || actionType.replace(/_/g, ' ');
+function formatActionLabel(actionType: string, t: TFunction): string {
+  const key = actionLabelKey[actionType];
+  return key ? t(key) : actionType.replace(/_/g, ' ');
 }
 
-function formatTimeAgo(dateStr: string): string {
+function formatTimeAgo(dateStr: string, t: TFunction): string {
   const date = new Date(dateStr);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
-  if (diffMins < 1) return 'just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffMins < 1) return t('broker_dashboard.time_just_now');
+  if (diffMins < 60) return t('broker_dashboard.time_minutes_ago').replace('{{count}}', String(diffMins));
   const diffHrs = Math.floor(diffMins / 60);
-  if (diffHrs < 24) return `${diffHrs}h ago`;
+  if (diffHrs < 24) return t('broker_dashboard.time_hours_ago').replace('{{count}}', String(diffHrs));
   const diffDays = Math.floor(diffHrs / 24);
-  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffDays < 7) return t('broker_dashboard.time_days_ago').replace('{{count}}', String(diffDays));
   return date.toLocaleDateString();
 }
 

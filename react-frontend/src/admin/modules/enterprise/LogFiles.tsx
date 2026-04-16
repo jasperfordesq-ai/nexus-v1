@@ -97,10 +97,10 @@ export function LogFiles() {
   };
 
   const filters: { key: FilterType; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'errors', label: 'Errors' },
-    { key: 'application', label: 'Application' },
-    { key: 'cron', label: 'Cron' },
+    { key: 'all', label: t('log_files_labels.filter_all') },
+    { key: 'errors', label: t('log_files_labels.filter_errors') },
+    { key: 'application', label: t('log_files_labels.filter_application') },
+    { key: 'cron', label: t('log_files_labels.filter_cron') },
   ];
 
   return (
@@ -146,7 +146,7 @@ export function LogFiles() {
       {/* Search & Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <Input
-          placeholder="Search log files..."
+          placeholder={t('log_files_labels.search_placeholder')}
           startContent={<Search size={16} className="text-default-400" />}
           value={search}
           onValueChange={setSearch}
@@ -201,7 +201,7 @@ export function LogFiles() {
                           {file.size}
                         </Chip>
                         <span className="text-xs text-default-400">
-                          {file.line_count} lines
+                          {t('log_files_labels.lines_count', { count: file.line_count })}
                         </span>
                       </div>
                       <p className="text-xs text-default-400 mt-1">
@@ -212,7 +212,7 @@ export function LogFiles() {
                       size="sm"
                       variant="flat"
                       isIconOnly
-                      aria-label="Download"
+                      aria-label={t('log_files_labels.download')}
                       onPress={() => window.open(`/v2/admin/enterprise/monitoring/log-files/${file.name}?download=1`, '_blank')}
                     >
                       <Download size={14} />

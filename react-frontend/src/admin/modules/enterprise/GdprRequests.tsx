@@ -31,7 +31,7 @@ import type { GdprRequest } from '../../api/types';
 import { useTranslation } from 'react-i18next';
 const STATUS_OPTION_KEYS = ['all', 'pending', 'processing', 'completed', 'rejected'] as const;
 
-function SlaChip({ createdAt }: { createdAt: string }) {
+function SlaChip({ createdAt, t }: { createdAt: string; t: (key: string, opts?: Record<string, unknown>) => string }) {
   const created = new Date(createdAt);
   const deadline = new Date(created.getTime() + 30 * 24 * 60 * 60 * 1000);
   const now = new Date();
@@ -39,22 +39,23 @@ function SlaChip({ createdAt }: { createdAt: string }) {
   const daysRemaining = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
   if (daysRemaining < 0) {
+    const days = Math.abs(daysRemaining);
     return (
       <Chip size="sm" variant="flat" color="danger">
-        Overdue by {Math.abs(daysRemaining)} day{Math.abs(daysRemaining) !== 1 ? 's' : ''}
+        {days === 1 ? t('enterprise.sla_overdue', { days }) : t('enterprise.sla_overdue_plural', { days })}
       </Chip>
     );
   }
   if (daysRemaining <= 7) {
     return (
       <Chip size="sm" variant="flat" color="warning">
-        {daysRemaining} day{daysRemaining !== 1 ? 's' : ''} left
+        {daysRemaining === 1 ? t('enterprise.sla_days_left', { days: daysRemaining }) : t('enterprise.sla_days_left_plural', { days: daysRemaining })}
       </Chip>
     );
   }
   return (
     <Chip size="sm" variant="flat" color="success">
-      {daysRemaining} days left
+      {t('enterprise.sla_days_left_plural', { days: daysRemaining })}
     </Chip>
   );
 }
@@ -135,8 +136,8 @@ export function GdprRequests() {
     },
     {
       key: 'sla',
-      label: 'SLA',
-      render: (r) => <SlaChip createdAt={r.created_at} />,
+      label: t('enterprise.col_sla'),
+      render: (r) => <SlaChip createdAt={r.created_at} t={t} />,
     },
     {
       key: 'created_at',
@@ -156,7 +157,7 @@ export function GdprRequests() {
           </DropdownTrigger>
           <DropdownMenu aria-label={t('enterprise.label_request_actions')}>
             <DropdownItem key="view" onPress={() => navigate(tenantPath(`/admin/enterprise/gdpr/requests/${r.id}`))}>
-              View Details
+              {t('enterprise.view_details')}
             </DropdownItem>
             <DropdownItem key="processing" onPress={() => handleStatusUpdate(r.id, 'processing')}>
               {t('enterprise.mark_processing')}
@@ -195,7 +196,7 @@ export function GdprRequests() {
               onPress={() => navigate(tenantPath('/admin/enterprise/gdpr/requests/create'))}
               size="sm"
             >
-              Create Request
+              {t('enterprise.create_request')}
             </Button>
           </div>
         }

@@ -80,100 +80,136 @@ interface ConfigGroup {
 // Supported platform language codes — names resolved via i18n inside the component
 const SUPPORTED_LOCALE_CODES = ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar'] as const;
 
-const CONFIG_SCHEMA: ConfigGroup[] = [
-  {
-    key: 'general',
-    label: 'General',
-    description: 'Basic platform settings',
-    icon: <Settings2 size={18} />,
-    settings: [
-      { key: 'site_name', label: 'Site Name', description: 'The name displayed in the header and page titles', type: 'text', default: '' },
-      { key: 'site_description', label: 'Site Description', description: 'Brief description shown in SEO metadata', type: 'textarea', default: '' },
-      { key: 'contact_email', label: 'Contact Email', description: 'Main contact email for the platform', type: 'email', default: '' },
-      { key: 'contact_phone', label: 'Contact Phone', description: 'Main contact phone number', type: 'text', default: '' },
-      { key: 'timezone', label: 'Timezone', description: 'Default timezone for date/time display', type: 'text', default: 'UTC' },
-      { key: 'footer_text', label: 'Footer / Legal Text', description: 'Displayed in the site footer (e.g., charity number, company registration)', type: 'textarea', default: '' },
-      {
-        key: 'locale', label: 'Default Locale', description: 'Default language for the platform', type: 'select', default: 'en',
-        options: SUPPORTED_LOCALE_CODES.map((code) => ({ label: code, value: code })),
-      },
-    ],
-  },
-  {
-    key: 'registration',
-    label: 'Registration & Onboarding',
-    description: 'Control how new members join',
-    icon: <UserPlus size={18} />,
-    settings: [
-      { key: 'registration_enabled', label: 'Open Registration', description: 'Allow new members to sign up (simplified toggle — use Registration Policy for granular modes)', type: 'boolean', default: true },
-      { key: 'require_approval', label: 'Require Admin Approval', description: 'New accounts must be approved before activation', type: 'boolean', default: false },
-      { key: 'require_email_verification', label: 'Require Email Verification', description: 'Members must verify email before accessing the platform', type: 'boolean', default: true },
-      { key: 'maintenance_mode', label: 'Maintenance Mode (read-only)', description: 'Managed via CLI: sudo bash scripts/maintenance.sh on|off', type: 'boolean', default: false },
-      { key: 'onboarding_enabled', label: 'Onboarding Flow', description: 'Show guided onboarding for new members', type: 'boolean', default: true },
-      { key: 'welcome_message', label: 'Welcome Message', description: 'Message shown to new members after registration', type: 'textarea', default: '' },
-    ],
-  },
-  {
-    key: 'wallet',
-    label: 'Time Credits & Wallet',
-    description: 'Configure timebanking economics',
-    icon: <Wallet size={18} />,
-    settings: [
-      { key: 'starting_balance', label: 'Starting Balance', description: 'Time credits given to new members on signup', type: 'number', default: 0, validation: { min: 0 } },
-      { key: 'max_transaction', label: 'Max Transaction', description: 'Maximum hours per single transaction (0 = unlimited)', type: 'number', default: 0, validation: { min: 0 } },
-      { key: 'currency_name', label: 'Currency Name', description: 'What to call your time credits (e.g., "Hours", "Credits")', type: 'text', default: 'Hours' },
-      { key: 'currency_symbol', label: 'Currency Symbol', description: 'Symbol for the currency (e.g., "h", "tc")', type: 'text', default: 'h' },
-    ],
-  },
-  {
-    key: 'content',
-    label: 'Content & Moderation',
-    description: 'Content policies and moderation settings',
-    icon: <Shield size={18} />,
-    settings: [
-      { key: 'auto_approve_listings', label: 'Auto-approve Listings', description: 'New listings go live immediately without admin review', type: 'boolean', default: true },
-      { key: 'auto_approve_blog', label: 'Auto-approve Blog Posts', description: 'Blog posts publish immediately', type: 'boolean', default: false },
-      { key: 'max_listing_images', label: 'Max Listing Images', description: 'Maximum images per listing', type: 'number', default: 5, validation: { min: 1, max: 20 } },
-      { key: 'profanity_filter', label: 'Profanity Filter', description: 'Automatically filter offensive language in posts and messages', type: 'boolean', default: false },
-    ],
-  },
-  {
-    key: 'notifications',
-    label: 'Notifications',
-    description: 'Notification and email preferences',
-    icon: <Bell size={18} />,
-    settings: [
-      { key: 'email_notifications_enabled', label: 'Email Notifications', description: 'Send email notifications for platform activity', type: 'boolean', default: true },
-      { key: 'push_notifications_enabled', label: 'Push Notifications', description: 'Enable browser/mobile push notifications', type: 'boolean', default: true },
-      {
-        key: 'digest_frequency', label: 'Digest Frequency', description: 'How often to send activity digest emails', type: 'select', default: 'weekly',
-        options: [
-          { label: 'Daily', value: 'daily' }, { label: 'Weekly', value: 'weekly' },
-          { label: 'Monthly', value: 'monthly' }, { label: 'Never', value: 'never' },
-        ],
-      },
-    ],
-  },
-  {
-    key: 'limits',
-    label: 'Limits & Quotas',
-    description: 'Platform usage limits',
-    icon: <Gauge size={18} />,
-    settings: [
-      { key: 'max_listings_per_user', label: 'Max Listings per User', description: 'Maximum active listings a member can have (0 = unlimited)', type: 'number', default: 0, validation: { min: 0 } },
-      { key: 'max_groups_per_user', label: 'Max Groups per User', description: 'Maximum groups a member can create (0 = unlimited)', type: 'number', default: 0, validation: { min: 0 } },
-      { key: 'max_file_upload_mb', label: 'Max File Upload (MB)', description: 'Maximum file size for uploads in megabytes', type: 'number', default: 10, validation: { min: 1, max: 100 } },
-    ],
-  },
+/** Build the config schema with translated labels/descriptions. Called inside the component so t() is available. */
+function buildConfigSchema(t: (key: string) => string): ConfigGroup[] {
+  return [
+    {
+      key: 'general',
+      label: t('enterprise.system_config.general_label'),
+      description: t('enterprise.system_config.general_desc'),
+      icon: <Settings2 size={18} />,
+      settings: [
+        { key: 'site_name', label: t('enterprise.system_config.setting_site_name_label'), description: t('enterprise.system_config.setting_site_name_desc'), type: 'text', default: '' },
+        { key: 'site_description', label: t('enterprise.system_config.setting_site_description_label'), description: t('enterprise.system_config.setting_site_description_desc'), type: 'textarea', default: '' },
+        { key: 'contact_email', label: t('enterprise.system_config.setting_contact_email_label'), description: t('enterprise.system_config.setting_contact_email_desc'), type: 'email', default: '' },
+        { key: 'contact_phone', label: t('enterprise.system_config.setting_contact_phone_label'), description: t('enterprise.system_config.setting_contact_phone_desc'), type: 'text', default: '' },
+        { key: 'timezone', label: t('enterprise.system_config.setting_timezone_label'), description: t('enterprise.system_config.setting_timezone_desc'), type: 'text', default: 'UTC' },
+        { key: 'footer_text', label: t('enterprise.system_config.setting_footer_text_label'), description: t('enterprise.system_config.setting_footer_text_desc'), type: 'textarea', default: '' },
+        {
+          key: 'locale', label: t('enterprise.system_config.setting_locale_label'), description: t('enterprise.system_config.setting_locale_desc'), type: 'select', default: 'en',
+          options: SUPPORTED_LOCALE_CODES.map((code) => ({ label: code, value: code })),
+        },
+      ],
+    },
+    {
+      key: 'registration',
+      label: t('enterprise.system_config.registration_label'),
+      description: t('enterprise.system_config.registration_desc'),
+      icon: <UserPlus size={18} />,
+      settings: [
+        { key: 'registration_enabled', label: t('enterprise.system_config.setting_registration_enabled_label'), description: t('enterprise.system_config.setting_registration_enabled_desc'), type: 'boolean', default: true },
+        { key: 'require_approval', label: t('enterprise.system_config.setting_require_approval_label'), description: t('enterprise.system_config.setting_require_approval_desc'), type: 'boolean', default: false },
+        { key: 'require_email_verification', label: t('enterprise.system_config.setting_require_email_verification_label'), description: t('enterprise.system_config.setting_require_email_verification_desc'), type: 'boolean', default: true },
+        { key: 'maintenance_mode', label: t('enterprise.system_config.setting_maintenance_mode_label'), description: t('enterprise.system_config.setting_maintenance_mode_desc'), type: 'boolean', default: false },
+        { key: 'onboarding_enabled', label: t('enterprise.system_config.setting_onboarding_enabled_label'), description: t('enterprise.system_config.setting_onboarding_enabled_desc'), type: 'boolean', default: true },
+        { key: 'welcome_message', label: t('enterprise.system_config.setting_welcome_message_label'), description: t('enterprise.system_config.setting_welcome_message_desc'), type: 'textarea', default: '' },
+      ],
+    },
+    {
+      key: 'wallet',
+      label: t('enterprise.system_config.wallet_label'),
+      description: t('enterprise.system_config.wallet_desc'),
+      icon: <Wallet size={18} />,
+      settings: [
+        { key: 'starting_balance', label: t('enterprise.system_config.setting_starting_balance_label'), description: t('enterprise.system_config.setting_starting_balance_desc'), type: 'number', default: 0, validation: { min: 0 } },
+        { key: 'max_transaction', label: t('enterprise.system_config.setting_max_transaction_label'), description: t('enterprise.system_config.setting_max_transaction_desc'), type: 'number', default: 0, validation: { min: 0 } },
+        { key: 'currency_name', label: t('enterprise.system_config.setting_currency_name_label'), description: t('enterprise.system_config.setting_currency_name_desc'), type: 'text', default: 'Hours' },
+        { key: 'currency_symbol', label: t('enterprise.system_config.setting_currency_symbol_label'), description: t('enterprise.system_config.setting_currency_symbol_desc'), type: 'text', default: 'h' },
+      ],
+    },
+    {
+      key: 'content',
+      label: t('enterprise.system_config.content_label'),
+      description: t('enterprise.system_config.content_desc'),
+      icon: <Shield size={18} />,
+      settings: [
+        { key: 'auto_approve_listings', label: t('enterprise.system_config.setting_auto_approve_listings_label'), description: t('enterprise.system_config.setting_auto_approve_listings_desc'), type: 'boolean', default: true },
+        { key: 'auto_approve_blog', label: t('enterprise.system_config.setting_auto_approve_blog_label'), description: t('enterprise.system_config.setting_auto_approve_blog_desc'), type: 'boolean', default: false },
+        { key: 'max_listing_images', label: t('enterprise.system_config.setting_max_listing_images_label'), description: t('enterprise.system_config.setting_max_listing_images_desc'), type: 'number', default: 5, validation: { min: 1, max: 20 } },
+        { key: 'profanity_filter', label: t('enterprise.system_config.setting_profanity_filter_label'), description: t('enterprise.system_config.setting_profanity_filter_desc'), type: 'boolean', default: false },
+      ],
+    },
+    {
+      key: 'notifications',
+      label: t('enterprise.system_config.notifications_label'),
+      description: t('enterprise.system_config.notifications_desc'),
+      icon: <Bell size={18} />,
+      settings: [
+        { key: 'email_notifications_enabled', label: t('enterprise.system_config.setting_email_notifications_enabled_label'), description: t('enterprise.system_config.setting_email_notifications_enabled_desc'), type: 'boolean', default: true },
+        { key: 'push_notifications_enabled', label: t('enterprise.system_config.setting_push_notifications_enabled_label'), description: t('enterprise.system_config.setting_push_notifications_enabled_desc'), type: 'boolean', default: true },
+        {
+          key: 'digest_frequency', label: t('enterprise.system_config.setting_digest_frequency_label'), description: t('enterprise.system_config.setting_digest_frequency_desc'), type: 'select', default: 'weekly',
+          options: [
+            { label: t('enterprise.system_config.digest_daily'), value: 'daily' },
+            { label: t('enterprise.system_config.digest_weekly'), value: 'weekly' },
+            { label: t('enterprise.system_config.digest_monthly'), value: 'monthly' },
+            { label: t('enterprise.system_config.digest_never'), value: 'never' },
+          ],
+        },
+      ],
+    },
+    {
+      key: 'limits',
+      label: t('enterprise.system_config.limits_label'),
+      description: t('enterprise.system_config.limits_desc'),
+      icon: <Gauge size={18} />,
+      settings: [
+        { key: 'max_listings_per_user', label: t('enterprise.system_config.setting_max_listings_per_user_label'), description: t('enterprise.system_config.setting_max_listings_per_user_desc'), type: 'number', default: 0, validation: { min: 0 } },
+        { key: 'max_groups_per_user', label: t('enterprise.system_config.setting_max_groups_per_user_label'), description: t('enterprise.system_config.setting_max_groups_per_user_desc'), type: 'number', default: 0, validation: { min: 0 } },
+        { key: 'max_file_upload_mb', label: t('enterprise.system_config.setting_max_file_upload_mb_label'), description: t('enterprise.system_config.setting_max_file_upload_mb_desc'), type: 'number', default: 10, validation: { min: 1, max: 100 } },
+      ],
+    },
+  ];
+}
+
+/** Static type+default definitions for normalization/validation — no labels (those come from translations) */
+type StaticSettingDef = Pick<ConfigSettingDef, 'key' | 'type' | 'default' | 'validation'>;
+
+const STATIC_SETTINGS: StaticSettingDef[] = [
+  { key: 'site_name', type: 'text', default: '' },
+  { key: 'site_description', type: 'textarea', default: '' },
+  { key: 'contact_email', type: 'email', default: '' },
+  { key: 'contact_phone', type: 'text', default: '' },
+  { key: 'timezone', type: 'text', default: 'UTC' },
+  { key: 'footer_text', type: 'textarea', default: '' },
+  { key: 'locale', type: 'select', default: 'en' },
+  { key: 'registration_enabled', type: 'boolean', default: true },
+  { key: 'require_approval', type: 'boolean', default: false },
+  { key: 'require_email_verification', type: 'boolean', default: true },
+  { key: 'maintenance_mode', type: 'boolean', default: false },
+  { key: 'onboarding_enabled', type: 'boolean', default: true },
+  { key: 'welcome_message', type: 'textarea', default: '' },
+  { key: 'starting_balance', type: 'number', default: 0, validation: { min: 0 } },
+  { key: 'max_transaction', type: 'number', default: 0, validation: { min: 0 } },
+  { key: 'currency_name', type: 'text', default: 'Hours' },
+  { key: 'currency_symbol', type: 'text', default: 'h' },
+  { key: 'auto_approve_listings', type: 'boolean', default: true },
+  { key: 'auto_approve_blog', type: 'boolean', default: false },
+  { key: 'max_listing_images', type: 'number', default: 5, validation: { min: 1, max: 20 } },
+  { key: 'profanity_filter', type: 'boolean', default: false },
+  { key: 'email_notifications_enabled', type: 'boolean', default: true },
+  { key: 'push_notifications_enabled', type: 'boolean', default: true },
+  { key: 'digest_frequency', type: 'select', default: 'weekly' },
+  { key: 'max_listings_per_user', type: 'number', default: 0, validation: { min: 0 } },
+  { key: 'max_groups_per_user', type: 'number', default: 0, validation: { min: 0 } },
+  { key: 'max_file_upload_mb', type: 'number', default: 10, validation: { min: 1, max: 100 } },
 ];
 
-/** All known schema keys for fast lookup */
-const SCHEMA_KEYS = new Set(CONFIG_SCHEMA.flatMap((g) => g.settings.map((s) => s.key)));
+/** All known schema keys — static list for normalization/validation (independent of translations) */
+const SCHEMA_KEYS = new Set(STATIC_SETTINGS.map((s) => s.key));
 
 /** Schema definitions keyed by setting key for fast lookup */
-const SCHEMA_MAP = new Map<string, ConfigSettingDef>(
-  CONFIG_SCHEMA.flatMap((g) => g.settings.map((s) => [s.key, s] as const)),
-);
+const SCHEMA_MAP = new Map<string, StaticSettingDef>(STATIC_SETTINGS.map((s) => [s.key, s]));
 
 /**
  * Normalize a raw API value to the correct JS type based on schema definition.
@@ -225,35 +261,35 @@ function normalizeConfig(data: Record<string, unknown>): Record<string, unknown>
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const URL_RE = /^https?:\/\/.+/;
 
-function validateSetting(def: ConfigSettingDef, value: unknown): string | null {
+function validateSetting(def: ConfigSettingDef, value: unknown, t: (key: string, opts?: Record<string, unknown>) => string): string | null {
   const str = String(value ?? '');
 
   if (def.validation?.required && str.trim() === '') {
-    return `${def.label} is required`;
+    return t('enterprise.system_config.validation_required', { label: def.label });
   }
 
   if (def.type === 'email' && str.trim() !== '' && !EMAIL_RE.test(str)) {
-    return 'Enter a valid email address';
+    return t('enterprise.system_config.validation_invalid_email');
   }
 
   if (def.type === 'url' && str.trim() !== '' && !URL_RE.test(str)) {
-    return 'Enter a valid URL (https://...)';
+    return t('enterprise.system_config.validation_invalid_url');
   }
 
   if (def.type === 'number' && str.trim() !== '') {
     const num = Number(str);
-    if (isNaN(num)) return 'Must be a number';
+    if (isNaN(num)) return t('enterprise.system_config.validation_must_be_number');
     if (def.validation?.min !== undefined && num < def.validation.min) {
-      return `Minimum value is ${def.validation.min}`;
+      return t('enterprise.system_config.validation_min_value', { min: def.validation.min });
     }
     if (def.validation?.max !== undefined && num > def.validation.max) {
-      return `Maximum value is ${def.validation.max}`;
+      return t('enterprise.system_config.validation_max_value', { max: def.validation.max });
     }
   }
 
   if (def.validation?.pattern && str.trim() !== '') {
     const re = new RegExp(def.validation.pattern);
-    if (!re.test(str)) return `Invalid format`;
+    if (!re.test(str)) return t('enterprise.system_config.validation_invalid_format');
   }
 
   return null;
@@ -285,6 +321,9 @@ export function SystemConfig() {
     label: t(`system.lang_${code}`),
     value: code,
   }));
+
+  // Config schema with translated strings — rebuilt on each render (translations change with locale)
+  const configSchema = buildConfigSchema(t);
 
   // ── Data loading ──────────────────────────────────────────────────────
 
@@ -331,7 +370,7 @@ export function SystemConfig() {
     setEdited((prev) => ({ ...prev, [key]: value }));
 
     if (def) {
-      const error = validateSetting(def, value);
+      const error = validateSetting(def, value, t);
       setErrors((prev) => {
         const next = { ...prev };
         if (error) {
@@ -353,9 +392,9 @@ export function SystemConfig() {
     }
     // Validate all schema fields
     const newErrors: Record<string, string> = {};
-    for (const group of CONFIG_SCHEMA) {
+    for (const group of configSchema) {
       for (const def of group.settings) {
-        const error = validateSetting(def, getSettingValue(def.key, def.default));
+        const error = validateSetting(def, getSettingValue(def.key, def.default), t);
         if (error) newErrors[def.key] = error;
       }
     }
@@ -568,10 +607,10 @@ export function SystemConfig() {
         <PageHeader title={t('enterprise.system_config_title')} description={t('enterprise.system_config_desc')} />
         <Card shadow="sm" className="border-danger-200 bg-danger-50">
           <CardBody className="text-center py-12">
-            <p className="text-danger font-medium mb-3">{t('shared.failed_to_load_config')}</p>
-            <p className="text-sm text-default-500 mb-4">The server returned an error. Your settings are not shown to prevent accidental overwrites.</p>
+            <p className="text-danger font-medium mb-3">{t('enterprise.failed_to_load_configuration')}</p>
+            <p className="text-sm text-default-500 mb-4">{t('enterprise.server_error_config_warning')}</p>
             <Button color="primary" variant="flat" onPress={loadData} startContent={<RefreshCw size={16} />}>
-              Retry
+              {t('enterprise.retry')}
             </Button>
           </CardBody>
         </Card>
@@ -605,7 +644,7 @@ export function SystemConfig() {
               onPress={() => setShowResetModal(true)}
               size="sm"
             >
-              Reset to Defaults
+              {t('enterprise.reset_to_defaults')}
             </Button>
             <Button
               color="primary"
@@ -622,7 +661,7 @@ export function SystemConfig() {
       />
 
       <div className="space-y-6">
-        {CONFIG_SCHEMA.map((group) => (
+        {configSchema.map((group) => (
           <Card key={group.key} shadow="sm">
             <CardHeader className="flex items-center gap-3 pb-1">
               <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
@@ -651,7 +690,7 @@ export function SystemConfig() {
               <div className="flex-1 min-w-0">
                 <h3 className="text-base font-semibold text-foreground">{t('system.advanced_custom_settings')}</h3>
                 <p className="text-xs text-default-400">
-                  Configuration keys not defined in the standard schema. These are preserved as raw key-value pairs.
+                  {t('enterprise.system_config.custom_settings_desc')}
                 </p>
               </div>
             </CardHeader>
@@ -673,7 +712,7 @@ export function SystemConfig() {
                       variant="bordered"
                       size="sm"
                       className="flex-1"
-                      description="Managed by other configuration pages"
+                      description={t('enterprise.system_config.managed_by_other_pages')}
                     />
                   </div>
                 );
@@ -698,7 +737,7 @@ export function SystemConfig() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose} size="sm">
-                  Cancel
+                  {t('enterprise.cancel')}
                 </Button>
                 <Button
                   color="danger"
@@ -706,7 +745,7 @@ export function SystemConfig() {
                   isLoading={resetting}
                   size="sm"
                 >
-                  Reset All
+                  {t('enterprise.reset_all')}
                 </Button>
               </ModalFooter>
             </>

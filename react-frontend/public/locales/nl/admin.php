@@ -9,7 +9,7 @@ return [
     'activity' => [
         'card_title' => 'Card',
         'empty' => 'No activity found',
-        'view_all' => 'View All'
+        'view_all' => 'View All',
     ],
     'advanced' => [
         '404_entry_dismissed' => '404 Entry Dismissed',
@@ -239,11 +239,11 @@ return [
         'warnings_count' => 'Warnings',
         'webhook_u_r_l_copied' => 'Webhook URL Copied',
         'webhook_url_hint' => 'Webhook URL',
-        'webhook_url_label' => 'Webhook URL Label'
+        'webhook_url_label' => 'Webhook URL Label',
     ],
     'alerts' => [
         'pending_approvals' => 'Pending Approvals',
-        'pending_listings' => 'Pending Listings'
+        'pending_listings' => 'Pending Listings',
     ],
     'analytics' => [
         'category_demand_title' => 'Category Demand',
@@ -282,7 +282,7 @@ return [
         'refresh' => 'Refresh',
         'top_areas_title' => 'Top Areas',
         'top_earners_title' => 'Top Earners',
-        'top_spenders_title' => 'Top Spenders'
+        'top_spenders_title' => 'Top Spenders',
     ],
     'billing' => [
         'actions' => 'Actions',
@@ -337,7 +337,7 @@ return [
         'trial_ends' => 'Trial Ends',
         'try_again' => 'Try Again',
         'view_invoices' => 'View Invoices',
-        'yearly' => 'Yearly'
+        'yearly' => 'Yearly',
     ],
     'blog' => [
         'an_unexpected_error_occurred' => 'An Unexpected Error Occurred',
@@ -373,7 +373,7 @@ return [
         'slug_desc_edit' => 'Slug Desc Edit',
         'title_required' => 'Title Required',
         'unknown' => 'Unknown',
-        'unpublish' => 'Unpublish'
+        'unpublish' => 'Unpublish',
     ],
     'breadcrumbs' => [
         'activity_log' => 'Activity Log',
@@ -418,7 +418,7 @@ return [
         'templates' => 'Templates',
         'tenant_features' => 'Tenant Features',
         'timebanking' => 'Timebanking',
-        'users' => 'Users'
+        'users' => 'Users',
     ],
     'broker' => [
         'a_reason_is_required' => 'A Reason is Required',
@@ -569,7 +569,7 @@ return [
         'vetting_record_deleted' => 'Vetting Record Deleted',
         'vetting_record_updated' => 'Vetting Record Updated',
         'vetting_records_desc' => 'Manage and configure vetting records settings',
-        'vetting_records_title' => 'Vetting Records'
+        'vetting_records_title' => 'Vetting Records',
     ],
     'categories' => [
         'categories_admin_desc' => 'Manage and configure categories admin settings',
@@ -584,7 +584,7 @@ return [
         'label_type' => 'Type',
         'page_title' => 'Categories',
         'placeholder_name' => 'Name...',
-        'volunteering' => 'Volunteering'
+        'volunteering' => 'Volunteering',
     ],
     'common' => [
         'an_unexpected_error' => 'An Unexpected error',
@@ -601,7 +601,7 @@ return [
         'planned' => 'Planned',
         'refresh' => 'Refresh',
         'unexpected_error' => 'Unexpected error',
-        'unfeature' => 'Unfeature'
+        'unfeature' => 'Unfeature',
     ],
     'community' => [
         'active_matching_users' => 'Active Matching Users',
@@ -638,7 +638,7 @@ return [
         'smart_match_monitoring_desc' => 'Manage and configure smart match monitoring settings',
         'smart_match_monitoring_title' => 'Smart Match Monitoring',
         'smart_match_users_desc' => 'Manage and configure smart match users settings',
-        'smart_match_users_title' => 'Smart Match Users'
+        'smart_match_users_title' => 'Smart Match Users',
     ],
     'completed' => 'Completed',
     'config' => [
@@ -650,7 +650,7 @@ return [
         'language_settings_saved' => 'Language Settings Saved',
         'page_title' => 'Config',
         'tenant_features_desc' => 'Manage and configure tenant features settings',
-        'tenant_features_title' => 'Tenant Features'
+        'tenant_features_title' => 'Tenant Features',
     ],
     'content' => [
         'about_section' => 'About Section',
@@ -775,7 +775,7 @@ return [
         'tier' => 'Tier',
         'tier_level' => 'Tier Level',
         'tier_level_desc' => 'Manage and configure tier level settings',
-        'trial_ends' => 'Trial Ends'
+        'trial_ends' => 'Trial Ends',
     ],
     'crm' => [
         'action_cancel' => 'Cancel',
@@ -957,13 +957,13 @@ return [
         'title_is_required' => 'Title is Required',
         'update_note' => 'Update Note',
         'update_task' => 'Update Task',
-        'valid_user_i_d_is_required' => 'Valid User I D is Required'
+        'valid_user_i_d_is_required' => 'Valid User I D is Required',
     ],
     'data_table' => [
         'admin_data_table' => 'Admin Data Table',
         'no_data' => 'No Data',
         'refresh' => 'Refresh',
-        'search' => 'Search'
+        'search' => 'Search',
     ],
     'deliverability' => [
         'an_unexpected_error_occurred' => 'An Unexpected Error Occurred',
@@ -1023,7 +1023,7 @@ return [
         'status_label' => 'Status Label',
         'title_label' => 'Title Label',
         'title_placeholder' => 'Title Placeholder',
-        'title_required' => 'Title Required'
+        'title_required' => 'Title Required',
     ],
     'details' => 'Details',
     'diagnostics' => [
@@ -1041,7 +1041,7 @@ return [
         'nexus_score_analytics_title' => 'NEXUS Score Analytics',
         'no_diagnostic_data_found_for_this_listin' => 'No diagnostic data found for this listin',
         'no_diagnostic_data_found_for_this_user' => 'No diagnostic data found for this user',
-        'page_title' => 'Diagnostics'
+        'page_title' => 'Diagnostics',
     ],
     'enterprise' => [
         'back_to_roles' => 'Back to Roles',
@@ -1073,7 +1073,7 @@ return [
             'no_changes' => 'No changes',
             'summary_version' => 'Summary Version',
             'title' => 'Enterprise',
-            'version' => 'Version'
+            'version' => 'Version',
         ],
         'configuration_saved' => 'Configuration Saved',
         'connected' => 'Connected',
@@ -1250,13 +1250,13 @@ return [
             'version_created' => 'Version Created',
             'version_management' => 'Version Management',
             'version_number_required' => 'Version Number Required',
-            'version_updated' => 'Version Updated'
+            'version_updated' => 'Version Updated',
         ],
         'version_list' => [
             'current' => 'Current',
-            'effective' => 'Effective'
+            'effective' => 'Effective',
         ],
-        'yes' => 'Yes'
+        'yes' => 'Yes',
     ],
     'events' => [
         'an_unexpected_error_occurred' => 'An Unexpected Error Occurred',
@@ -1290,7 +1290,7 @@ return [
         'tab_cancelled' => 'Cancelled',
         'tab_draft' => 'Draft',
         'tab_published' => 'Published',
-        'unknown' => 'Unknown'
+        'unknown' => 'Unknown',
     ],
     'federation' => [
         'active_partner' => 'Active Partner',
@@ -1727,7 +1727,7 @@ return [
         'webhooks_url_hint' => 'Webhooks URL',
         'webhooks_url_required' => 'Webhooks URL Required',
         'website_description' => 'Website',
-        'your_new_api_key' => 'Your New API Key'
+        'your_new_api_key' => 'Your New API Key',
     ],
     'gamification' => [
         'activate' => 'Activate',
@@ -1849,7 +1849,7 @@ return [
         'search_campaigns' => 'Search Campaigns',
         'top_10_badges' => 'Top 10 Badges',
         'total_badges' => 'Total Badges',
-        'users_awarded' => 'Users Awarded'
+        'users_awarded' => 'Users Awarded',
     ],
     'goals' => [
         'an_unexpected_error_occurred' => 'An Unexpected Error Occurred',
@@ -1881,7 +1881,7 @@ return [
         'search' => 'Search',
         'showing_of_total' => 'Showing of Total',
         'try_adjusting_search' => 'Try Adjusting Search',
-        'yes' => 'Yes'
+        'yes' => 'Yes',
     ],
     'groups' => [
         'activate' => 'Activate',
@@ -2068,7 +2068,7 @@ return [
         'total_score_formula_label' => 'Total Score Formula Label',
         'unknown' => 'Unknown',
         'view_group' => 'View Group',
-        'visibility' => 'Visibility'
+        'visibility' => 'Visibility',
     ],
     'header' => [
         'admin_menu' => 'Admin menu',
@@ -2076,13 +2076,13 @@ return [
         'my_profile' => 'My Profile',
         'notifications' => 'Notifications',
         'sign_out' => 'Sign Out',
-        'toggle_sidebar' => 'Toggle sidebar'
+        'toggle_sidebar' => 'Toggle sidebar',
     ],
     'icon_picker' => [
         'choose_icon' => 'Choose Icon',
         'choose_icon_placeholder' => 'Choose Icon Placeholder',
         'clear_icon' => 'Clear Icon',
-        'search_icons' => 'Search Icons'
+        'search_icons' => 'Search Icons',
     ],
     'ideation' => [
         'an_unexpected_error_occurred' => 'An Unexpected Error Occurred',
@@ -2130,7 +2130,7 @@ return [
         'title' => 'Ideation',
         'total_count' => 'Total',
         'unknown' => 'Unknown',
-        'view_details' => 'View Details'
+        'view_details' => 'View Details',
     ],
     'impact' => [
         'impact_report_desc' => 'Manage and configure impact report settings',
@@ -2144,7 +2144,7 @@ return [
         'label_social_multiplier' => 'Social Multiplier',
         'label_social_value' => 'Social Value',
         'label_total_hours' => 'Total Hours',
-        'page_title' => 'Impact'
+        'page_title' => 'Impact',
     ],
     'jobs' => [
         'add_edit_notes' => 'Add Edit Notes',
@@ -2202,7 +2202,7 @@ return [
         'unfeature_job' => 'Unfeature Job',
         'update_btn' => 'Update Btn',
         'update_status_aria' => 'Update Status Aria',
-        'view_job' => 'View Job'
+        'view_job' => 'View Job',
     ],
     'last_checked' => 'Last checked: :time',
     'listings' => [
@@ -2257,7 +2257,7 @@ return [
         'type' => 'Type',
         'unfeature' => 'Unfeature',
         'unfeature_listing' => 'Unfeature Listing',
-        'unfeatured_success' => 'Unfeatured successfully'
+        'unfeatured_success' => 'Unfeatured successfully',
     ],
     'live' => 'LIVE',
     'matching' => [
@@ -2379,7 +2379,7 @@ return [
         'this_week' => 'This Week',
         'total' => 'Total',
         'view_analytics' => 'View Analytics',
-        'weights_must_sum_to_100' => 'Weights Must Sum to 100'
+        'weights_must_sum_to_100' => 'Weights Must Sum to 100',
     ],
     'moderation' => [
         'action_failed' => 'Failed',
@@ -2542,7 +2542,7 @@ return [
         'status_resolved' => 'Status Resolved',
         'total_reports' => 'Total Reports',
         'untitled' => 'Untitled',
-        'visible' => 'Visible'
+        'visible' => 'Visible',
     ],
     'new' => 'NEW',
     'newsletters' => [
@@ -2637,7 +2637,7 @@ return [
         'subscribers_desc' => 'Manage and configure subscribers settings',
         'subscribers_title' => 'Subscribers',
         'templates_desc' => 'Manage and configure templates settings',
-        'templates_title' => 'Templates'
+        'templates_title' => 'Templates',
     ],
     'no_data' => 'No data available',
     'not_found' => [
@@ -2645,16 +2645,16 @@ return [
         'description' => 'Manage not_found settings and configuration',
         'heading' => 'Heading',
         'page_title' => 'Not_found',
-        'title' => 'Not_found'
+        'title' => 'Not_found',
     ],
     'performance' => [
         'label_performance_metrics' => 'Performance Metrics',
-        'page_title' => 'Performance'
+        'page_title' => 'Performance',
     ],
     'placeholder' => [
         'migration_description' => 'Migration',
         'migration_title' => 'Migration',
-        'open_legacy' => 'Open Legacy'
+        'open_legacy' => 'Open Legacy',
     ],
     'polls' => [
         'an_unexpected_error_occurred' => 'An Unexpected Error Occurred',
@@ -2684,7 +2684,7 @@ return [
         'status' => 'Status',
         'total_count' => 'Total',
         'unknown' => 'Unknown',
-        'votes' => 'Votes'
+        'votes' => 'Votes',
     ],
     'quick_actions' => [
         'advanced_controls' => 'Advanced Controls',
@@ -2695,7 +2695,7 @@ return [
         'new_blog_post' => 'New Blog Post',
         'send_newsletter' => 'Send Newsletter',
         'settings' => 'Settings',
-        'view_listings' => 'View Listings'
+        'view_listings' => 'View Listings',
     ],
     'reports' => [
         'active_30d_total' => 'Active 30d Total',
@@ -2840,7 +2840,7 @@ return [
         'tab_registrations' => 'Registrations',
         'tab_retention' => 'Retention',
         'tab_top_contributors' => 'Top Contributors',
-        'top_contributors' => 'Top Contributors'
+        'top_contributors' => 'Top Contributors',
     ],
     'resources' => [
         'an_unexpected_error_occurred' => 'An Unexpected Error Occurred',
@@ -2854,7 +2854,7 @@ return [
         'resources_admin_title' => 'Resources Admin',
         'unknown' => 'Unknown',
         'updated' => 'Updated',
-        'views' => 'Views'
+        'views' => 'Views',
     ],
     'review' => 'Review',
     'safeguarding' => [
@@ -2974,7 +2974,7 @@ return [
         'type_info' => 'Type Info',
         'type_select' => 'Type Select',
         'update_failed' => 'Update Failed',
-        'ward' => 'Ward'
+        'ward' => 'Ward',
     ],
     'stats' => [
         'active_listings' => 'Active Listings',
@@ -2984,7 +2984,7 @@ return [
         'new_users_this_month' => 'New Users This Month',
         'total_listings' => 'Total Listings',
         'total_members' => 'Total Members',
-        'transactions' => 'Transactions'
+        'transactions' => 'Transactions',
     ],
     'status' => [
         'all_operational' => 'All systems operational',
@@ -2992,7 +2992,7 @@ return [
         'offline' => 'Offline',
         'online' => 'Online',
         'some_attention' => 'Some services need attention',
-        'warning' => 'Warning'
+        'warning' => 'Warning',
     ],
     'super' => [
         'action_failed' => 'Failed',
@@ -3170,7 +3170,7 @@ return [
         'user_updated_successfully' => 'User Updated Successfully',
         'whitelist' => 'Whitelist',
         'whitelist_mode' => 'Whitelist Mode',
-        'whitelist_mode_desc' => 'Manage and configure whitelist mode settings'
+        'whitelist_mode_desc' => 'Manage and configure whitelist mode settings',
     ],
     'system' => [
         'active' => 'Active',
@@ -3404,7 +3404,7 @@ return [
             'welcome_text' => 'Welcome Text',
             'welcome_text_desc' => 'Manage and configure welcome text settings',
             'welcome_text_placeholder' => 'Welcome Text Placeholder',
-            'your_community' => 'Your Community'
+            'your_community' => 'Your Community',
         ],
         'overdue_jobs' => 'Overdue Jobs',
         'page_title' => 'System',
@@ -3533,7 +3533,7 @@ return [
             'verification_settings' => 'Verification Settings',
             'verification_settings_desc' => 'Manage and configure verification settings settings',
             'waitlist_info' => 'Waitlist Info',
-            'your_community' => 'Your Community'
+            'your_community' => 'Your Community',
         ],
         'registration_policy_saved_successfully' => 'Registration Policy Saved Successfully',
         'registration_policy_settings_title' => 'Registration Policy Settings',
@@ -3551,7 +3551,7 @@ return [
         'total_jobs' => 'Total Jobs',
         'twenty_four_h_failures' => 'Twenty Four H Failures',
         'webp_converter_desc' => 'Manage and configure webp converter settings',
-        'webp_converter_title' => 'WebP Converter'
+        'webp_converter_title' => 'WebP Converter',
     ],
     'timebanking' => [
         'a_reason_is_required_for_balance_adjustm' => 'A Reason is Required for Balance Adjustm',
@@ -3643,12 +3643,12 @@ return [
         'top_earners' => 'Top Earners',
         'top_spenders' => 'Top Spenders',
         'user_report_desc' => 'Manage and configure user report settings',
-        'user_report_title' => 'User Report'
+        'user_report_title' => 'User Report',
     ],
     'trends' => [
         'card_title' => 'Card',
         'hours_suffix' => 'Hours Suffix',
-        'no_data' => 'No Data'
+        'no_data' => 'No Data',
     ],
     'user_create' => [
         'back_to_users' => 'Back to Users',
@@ -3687,7 +3687,7 @@ return [
         'status_active' => 'Status Active',
         'status_pending' => 'Status Pending',
         'status_placeholder' => 'Status Placeholder',
-        'title' => 'Create User'
+        'title' => 'Create User',
     ],
     'user_edit' => [
         'account_actions' => 'Account Actions',
@@ -3793,7 +3793,7 @@ return [
         'vetting_status' => 'Vetting Status',
         'welcome_email_failed' => 'Welcome Email Failed',
         'welcome_email_sent' => 'Welcome Email Sent',
-        'withdrawn_on' => 'Withdrawn on'
+        'withdrawn_on' => 'Withdrawn on',
     ],
     'users' => [
         'action_approve' => 'Approve',
@@ -3881,14 +3881,14 @@ return [
         'title' => 'Users',
         'user_action_failed' => 'User Action Failed',
         'user_action_success' => 'User Action successfully',
-        'user_approved_email_warning' => 'User Approved Email'
+        'user_approved_email_warning' => 'User Approved Email',
     ],
     'view_all' => 'View All',
     'visibility_rules' => [
         'min_role' => 'Min Role',
         'requires_auth' => 'Requires Auth',
         'requires_feature' => 'Requires Feature',
-        'title' => 'Visibility_rules'
+        'title' => 'Visibility_rules',
     ],
     'volunteering' => [
         'application_approved' => 'Application Approved',
@@ -3928,6 +3928,6 @@ return [
         'volunteer_organizations_desc' => 'Manage and configure volunteer organizations settings',
         'volunteer_organizations_title' => 'Volunteer Organizations',
         'volunteering_overview_desc' => 'Manage and configure volunteering overview settings',
-        'volunteering_overview_title' => 'Volunteering Overview'
-    ]
+        'volunteering_overview_title' => 'Volunteering Overview',
+    ],
 ];

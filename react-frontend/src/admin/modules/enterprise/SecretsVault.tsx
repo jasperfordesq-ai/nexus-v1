@@ -46,17 +46,17 @@ import type { SecretEntry } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
 
-interface CategoryDef { label: string; icon: typeof Database; color: string }
+interface CategoryDef { icon: typeof Database; color: string }
 
-const DEFAULT_CATEGORY: CategoryDef = { label: 'Other', icon: KeyRound, color: 'text-default-500' };
+const DEFAULT_CATEGORY: CategoryDef = { icon: KeyRound, color: 'text-default-500' };
 
 const CATEGORY_CONFIG: Record<string, CategoryDef> = {
-  database: { label: 'Database', icon: Database, color: 'text-primary' },
-  cache: { label: 'Cache', icon: HardDrive, color: 'text-secondary' },
-  push: { label: 'Push Notifications', icon: Bell, color: 'text-warning' },
-  email: { label: 'Email', icon: Mail, color: 'text-success' },
-  ai: { label: 'AI / ML', icon: Bot, color: 'text-primary' },
-  auth: { label: 'Authentication', icon: Shield, color: 'text-danger' },
+  database: { icon: Database, color: 'text-primary' },
+  cache: { icon: HardDrive, color: 'text-secondary' },
+  push: { icon: Bell, color: 'text-warning' },
+  email: { icon: Mail, color: 'text-success' },
+  ai: { icon: Bot, color: 'text-primary' },
+  auth: { icon: Shield, color: 'text-danger' },
   other: DEFAULT_CATEGORY,
 };
 
@@ -224,7 +224,7 @@ export function SecretsVault() {
                       <ChevronDown size={16} className="text-default-400" />
                     )}
                     <CategoryIcon size={18} className={catConfig.color} />
-                    <h3 className="text-base font-semibold">{t(`enterprise.category_${cat}`, catConfig.label)}</h3>
+                    <h3 className="text-base font-semibold">{t(`enterprise.category_${cat}`)}</h3>
                     <Chip size="sm" variant="flat" color={catSetCount === catSecrets.length ? 'success' : 'warning'}>
                       {t('enterprise.secrets_n_of_m_set', { n: catSetCount, m: catSecrets.length })}
                     </Chip>

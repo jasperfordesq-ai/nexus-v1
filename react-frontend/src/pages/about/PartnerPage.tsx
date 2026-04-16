@@ -206,11 +206,11 @@ export function PartnerPage() {
           >
             <GlassCard className="p-8 sm:p-10 text-center">
               <h2 className="text-xl sm:text-2xl font-bold text-theme-primary mb-6">
-                {t('partner.our_partners_heading', 'Our Partners & Supporters')}
+                {t('partner.our_partners_heading')}
               </h2>
               <img
                 src="/images/timebank_ireland_west_cork_partnership.jpg"
-                alt={t('partner.partners_banner_alt', 'Partner logos: West Cork Development Partnership, SICAP, Cork County Council, Department of Housing Planning Community and Local Government, European Structural and Investment Funds, European Social Fund')}
+                alt={t('partner.partners_banner_alt')}
                 className="w-full max-w-3xl mx-auto rounded-lg bg-white p-4"
               />
             </GlassCard>
@@ -292,10 +292,10 @@ export function PartnerPage() {
                   </div>
 
                   <p className={`text-lg font-extrabold ${card.textAccent} mb-1`}>
-                    {t(`partner.impact_card_${index}_highlight`, card.highlight)}
+                    {t(`partner.impact_card_${index}_highlight`)}
                   </p>
-                  <h3 className="font-semibold text-theme-primary mb-2">{t(`partner.impact_card_${index}_title`, card.title)}</h3>
-                  <p className="text-sm text-theme-muted leading-relaxed">{t(`partner.impact_card_${index}_description`, card.description)}</p>
+                  <h3 className="font-semibold text-theme-primary mb-2">{t(`partner.impact_card_${index}_title`)}</h3>
+                  <p className="text-sm text-theme-muted leading-relaxed">{t(`partner.impact_card_${index}_description`)}</p>
                 </GlassCard>
               </motion.div>
             ))}
@@ -335,8 +335,8 @@ export function PartnerPage() {
                       <type.icon className="w-6 h-6 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-theme-primary text-lg mb-1">{t(`partner.partnership_type_${index}_title`, type.title)}</h3>
-                      <p className="text-theme-muted text-sm leading-relaxed">{t(`partner.partnership_type_${index}_description`, type.description)}</p>
+                      <h3 className="font-semibold text-theme-primary text-lg mb-1">{t(`partner.partnership_type_${index}_title`)}</h3>
+                      <p className="text-theme-muted text-sm leading-relaxed">{t(`partner.partnership_type_${index}_description`)}</p>
                     </div>
                   </div>
                 </GlassCard>
@@ -375,8 +375,8 @@ export function PartnerPage() {
                       <link.icon className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-theme-primary">{t(`partner.learn_more_${linkIndex}_title`, link.title)}</h3>
-                      <p className="text-sm text-theme-muted">{t(`partner.learn_more_${linkIndex}_description`, link.description)}</p>
+                      <h3 className="font-semibold text-theme-primary">{t(`partner.learn_more_${linkIndex}_title`)}</h3>
+                      <p className="text-sm text-theme-muted">{t(`partner.learn_more_${linkIndex}_description`)}</p>
                     </div>
                     <ArrowRight className="w-5 h-5 text-theme-subtle group-hover:text-indigo-500 transition-colors flex-shrink-0" aria-hidden="true" />
                   </GlassCard>

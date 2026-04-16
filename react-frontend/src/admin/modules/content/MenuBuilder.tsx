@@ -89,21 +89,23 @@ interface MenuFormData {
   is_active: boolean;
 }
 
-const LOCATION_OPTIONS: { key: MenuLocation; label: string }[] = [
-  { key: 'header-main', label: 'Header - Main Navigation' },
-  { key: 'header-secondary', label: 'Header - Secondary' },
-  { key: 'footer', label: 'Footer' },
-  { key: 'sidebar', label: 'Sidebar' },
-  { key: 'mobile', label: 'Mobile Menu' },
+type TFunction = (key: string, options?: Record<string, unknown>) => string;
+
+const getLocationOptions = (t: TFunction): { key: MenuLocation; label: string }[] => [
+  { key: 'header-main', label: t('menu_builder.location_header_main') },
+  { key: 'header-secondary', label: t('menu_builder.location_header_secondary') },
+  { key: 'footer', label: t('menu_builder.location_footer') },
+  { key: 'sidebar', label: t('menu_builder.location_sidebar') },
+  { key: 'mobile', label: t('menu_builder.location_mobile') },
 ];
 
-const TYPE_OPTIONS: { key: MenuItemType; label: string; description: string }[] = [
-  { key: 'link', label: 'Link', description: 'Internal page link' },
-  { key: 'external', label: 'External', description: 'External URL (opens in new tab)' },
-  { key: 'dropdown', label: 'Dropdown', description: 'Parent container with child items' },
-  { key: 'page', label: 'CMS Page', description: 'Link to a CMS page' },
-  { key: 'route', label: 'Named Route', description: 'Link by route name' },
-  { key: 'divider', label: 'Divider', description: 'Visual separator' },
+const getTypeOptions = (t: TFunction): { key: MenuItemType; label: string; description: string }[] => [
+  { key: 'link', label: t('menu_builder.type_link_label'), description: t('menu_builder.type_link_desc') },
+  { key: 'external', label: t('menu_builder.type_external_label'), description: t('menu_builder.type_external_desc') },
+  { key: 'dropdown', label: t('menu_builder.type_dropdown_label'), description: t('menu_builder.type_dropdown_desc') },
+  { key: 'page', label: t('menu_builder.type_page_label'), description: t('menu_builder.type_page_desc') },
+  { key: 'route', label: t('menu_builder.type_route_label'), description: t('menu_builder.type_route_desc') },
+  { key: 'divider', label: t('menu_builder.type_divider_label'), description: t('menu_builder.type_divider_desc') },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -179,7 +181,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: Sorta
 
       {item.children && item.children.length > 0 && (
         <Chip size="sm" variant="flat" color="secondary" className="text-[10px]">
-          {item.children.length} sub
+          {t('menu_builder.sub_items', { count: item.children.length })}
         </Chip>
       )}
 
@@ -391,7 +393,7 @@ export function MenuBuilder() {
 
   const handleAddItem = async () => {
     const newItem: Partial<MenuItemData> = {
-      label: 'New Item',
+      label: t('menu_builder.new_item_default'),
       url: '/',
       type: 'link',
       icon: null,
@@ -523,6 +525,11 @@ export function MenuBuilder() {
     const parent = menuItems.find((i) => i.id === item.parent_id);
     return parent ? 1 + getItemDepth(parent) : 0;
   };
+
+  // ─── Translated option arrays ─────────────────────────────────────────────
+
+  const LOCATION_OPTIONS = getLocationOptions(t as TFunction);
+  const TYPE_OPTIONS = getTypeOptions(t as TFunction);
 
   // ─── Parent options for dropdown nesting ──────────────────────────────────
 

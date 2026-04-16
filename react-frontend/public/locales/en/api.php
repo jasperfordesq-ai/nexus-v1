@@ -73,6 +73,7 @@ return [
     'campaign_not_found'           => 'Campaign not found',
     'cron_job_not_found'           => 'Cron job not found',
     'tenant_not_found'             => 'Tenant not found',
+    'tenant_context_error'         => 'Unable to resolve tenant context',
     'legal_doc_not_found'          => 'Legal document not found',
     'document_not_found'           => 'Document not found',
     'api_key_not_found'            => 'API key not found',
@@ -1655,4 +1656,25 @@ return [
     'comment_add_failed'                => 'Failed to add comment',
     'comment_delete_failed'             => 'Failed to delete comment',
     'challenge_duplicate_failed'        => 'Failed to duplicate challenge',
+
+    // Wallet / balance
+    'balance_adjustment_negative'       => 'Adjustment would result in negative balance',
+    'organizer_insufficient_balance'    => 'Organizer has insufficient time credit balance to award the requested hours',
+
+    // Internal / tenant errors
+    'tenant_mismatch_error'             => 'Tenant mismatch — operation skipped',
+    'user_missing_tenant_id'            => 'User has no tenant_id — cannot resolve tenant',
+    'invalid_table_parameter'           => 'Invalid table parameter provided',
+
+    // BlockUserService
+    'cannot_block_yourself'             => 'You cannot block yourself',
+
+    // ConnectionService
+    'cannot_connect_with_yourself'      => 'You cannot connect with yourself',
+    'cannot_send_request_to_user'       => 'Cannot send connection request to this user',
+    'connection_already_exists'         => 'A connection with this user already exists',
+    'only_receiver_can_accept'          => 'Only the receiver can accept a connection request',
+
+    // BookmarkService
+    'invalid_bookmarkable_type'         => 'Invalid bookmarkable type provided',
 ];

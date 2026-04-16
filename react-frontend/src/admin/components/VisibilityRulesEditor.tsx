@@ -7,32 +7,12 @@ import { useTranslation } from 'react-i18next';
 import { Switch, Select, SelectItem } from '@heroui/react';
 import type { VisibilityRules } from '@/types/menu';
 
-const ROLE_OPTIONS = [
-  { key: '', label: 'Any role' },
-  { key: 'user', label: 'Member' },
-  { key: 'admin', label: 'Admin' },
-  { key: 'tenant_admin', label: 'Tenant Admin' },
-  { key: 'super_admin', label: 'Super Admin' },
-];
+const ROLE_KEYS = ['', 'user', 'admin', 'tenant_admin', 'super_admin'];
 
-const FEATURE_OPTIONS = [
-  { key: '', label: 'No feature requirement' },
-  { key: 'events', label: 'Events' },
-  { key: 'groups', label: 'Groups' },
-  { key: 'gamification', label: 'Gamification' },
-  { key: 'goals', label: 'Goals' },
-  { key: 'blog', label: 'Blog' },
-  { key: 'resources', label: 'Resources' },
-  { key: 'volunteering', label: 'Volunteering' },
-  { key: 'exchange_workflow', label: 'Exchange Workflow' },
-  { key: 'organisations', label: 'Organisations' },
-  { key: 'federation', label: 'Federation' },
-  { key: 'connections', label: 'Connections' },
-  { key: 'reviews', label: 'Reviews' },
-  { key: 'polls', label: 'Polls' },
-  { key: 'direct_messaging', label: 'Direct Messaging' },
-  { key: 'group_exchanges', label: 'Group Exchanges' },
-  { key: 'search', label: 'Search' },
+const FEATURE_KEYS = [
+  '', 'events', 'groups', 'gamification', 'goals', 'blog', 'resources',
+  'volunteering', 'exchange_workflow', 'organisations', 'federation',
+  'connections', 'reviews', 'polls', 'direct_messaging', 'group_exchanges', 'search',
 ];
 
 interface VisibilityRulesEditorProps {
@@ -80,8 +60,8 @@ export function VisibilityRulesEditor({ value, onChange }: VisibilityRulesEditor
         size="sm"
         className="max-w-xs"
       >
-        {ROLE_OPTIONS.map((opt) => (
-          <SelectItem key={opt.key}>{opt.label}</SelectItem>
+        {ROLE_KEYS.map((key) => (
+          <SelectItem key={key}>{t(`visibility_rules.roles.${key || 'any'}`)}</SelectItem>
         ))}
       </Select>
 
@@ -95,8 +75,8 @@ export function VisibilityRulesEditor({ value, onChange }: VisibilityRulesEditor
         size="sm"
         className="max-w-xs"
       >
-        {FEATURE_OPTIONS.map((opt) => (
-          <SelectItem key={opt.key}>{opt.label}</SelectItem>
+        {FEATURE_KEYS.map((key) => (
+          <SelectItem key={key}>{t(`visibility_rules.features.${key || 'none'}`)}</SelectItem>
         ))}
       </Select>
     </div>

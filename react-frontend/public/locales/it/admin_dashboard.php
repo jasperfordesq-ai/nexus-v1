@@ -24,6 +24,10 @@ return [
         'transactions' => 'Transazioni',
         'hours_exchanged' => 'Ore Scambiate',
         'hours' => 'Ore',
+        'new_users_this_month' => 'New Users This Month',
+        'active_users' => 'Active Users',
+        'total_listings' => 'Total Listings',
+        'new_listings_this_month' => 'New Listings This Month',
     ],
     'alerts' => [
         'users_pending_one' => ':count Utente in Attesa',
@@ -35,6 +39,8 @@ return [
         'orgs_pending_one' => ':count Organizzazione in Attesa',
         'orgs_pending_other' => ':count Organizzazioni in Attesa',
         'orgs_pending_text' => 'Organizzazioni di volontariato in attesa di approvazione',
+        'pending_approvals' => 'Members awaiting approval',
+        'pending_listings' => 'Listings awaiting moderation',
     ],
     'modules' => [
         'section_title' => 'Moduli della Piattaforma',
@@ -90,6 +96,8 @@ return [
         'new_blog_post' => 'Nuovo Post sul Blog',
         'gamification' => 'Gamification',
         'settings' => 'Impostazioni',
+        'enterprise' => 'Enterprise',
+        'advanced_controls' => 'Advanced Controls',
     ],
     'enterprise' => [
         'card_title' => 'Suite Enterprise',
@@ -106,5 +114,11 @@ return [
         'cache' => 'Cache',
         'queue' => 'Cron Jobs',
         'api' => 'API Email',
+    ],
+    'load_error' => 'Failed to load dashboard data',
+    'trends' => [
+        'card_title' => 'Transaction Trends',
+        'hours_suffix' => 'hrs',
+        'no_data' => 'No trend data available',
     ],
 ];

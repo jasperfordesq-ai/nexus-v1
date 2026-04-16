@@ -27,26 +27,28 @@ import { useTenant, useToast } from '@/contexts';
 import { adminLegalDocs } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
-const DOC_TYPES = [
-  { value: 'terms', label: 'Terms of Service' },
-  { value: 'privacy', label: 'Privacy Policy' },
-  { value: 'cookies', label: 'Cookie Policy' },
-  { value: 'accessibility', label: 'Accessibility Statement' },
-  { value: 'community_guidelines', label: 'Community Guidelines' },
-  { value: 'acceptable_use', label: 'Acceptable Use Policy' },
-];
-
-const STATUS_OPTIONS = [
-  { value: 'draft', label: 'Draft' },
-  { value: 'published', label: 'Published' },
-  { value: 'archived', label: 'Archived' },
-];
 
 export function LegalDocForm() {
   const { t } = useTranslation('admin');
   const { id } = useParams();
   const isEdit = !!id;
-  usePageTitle(`Admin - ${isEdit ? 'Edit' : 'Create'} Legal Document`);
+
+  const DOC_TYPES = [
+    { value: 'terms', label: t('legal_doc_form.doc_type_terms') },
+    { value: 'privacy', label: t('legal_doc_form.doc_type_privacy') },
+    { value: 'cookies', label: t('legal_doc_form.doc_type_cookies') },
+    { value: 'accessibility', label: t('legal_doc_form.doc_type_accessibility') },
+    { value: 'community_guidelines', label: t('legal_doc_form.doc_type_community_guidelines') },
+    { value: 'acceptable_use', label: t('legal_doc_form.doc_type_acceptable_use') },
+  ];
+
+  const STATUS_OPTIONS = [
+    { value: 'draft', label: t('legal_doc_form.status_draft') },
+    { value: 'published', label: t('legal_doc_form.status_published') },
+    { value: 'archived', label: t('legal_doc_form.status_archived') },
+  ];
+
+  usePageTitle(isEdit ? t('legal_doc_form.page_title_edit') : t('legal_doc_form.page_title_create'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -116,7 +118,7 @@ export function LegalDocForm() {
         toast.success(isEdit ? t('enterprise.document_updated') : t('enterprise.document_created'));
         navigate(tenantPath('/admin/legal-documents'));
       } else {
-        const error = (res as { error?: string }).error || 'Save failed';
+        const error = (res as { error?: string }).error || t('legal_doc_form.save_failed_generic');
         toast.error(error);
       }
     } catch (err) {
@@ -137,8 +139,8 @@ export function LegalDocForm() {
   return (
     <div>
       <PageHeader
-        title={isEdit ? 'Edit Legal Document' : 'Create Legal Document'}
-        description={isEdit ? 'Update document content and settings' : 'Create a new legal document'}
+        title={isEdit ? t('legal_doc_form.edit_title') : t('legal_doc_form.create_title')}
+        description={isEdit ? t('legal_doc_form.edit_description') : t('legal_doc_form.create_description')}
         actions={
           <Button
             variant="flat"
@@ -146,7 +148,7 @@ export function LegalDocForm() {
             onPress={() => navigate(tenantPath('/admin/legal-documents'))}
             size="sm"
           >
-            Back to Documents
+            {t('legal_doc_form.back_to_documents')}
           </Button>
         }
       />
@@ -223,7 +225,7 @@ export function LegalDocForm() {
             variant="flat"
             onPress={() => navigate(tenantPath('/admin/legal-documents'))}
           >
-            Cancel
+            {t('legal_doc_form.cancel')}
           </Button>
           <Button
             color="primary"
@@ -231,7 +233,7 @@ export function LegalDocForm() {
             onPress={handleSubmit}
             isLoading={saving}
           >
-            {isEdit ? 'Update Document' : 'Create Document'}
+            {isEdit ? t('legal_doc_form.update_document') : t('legal_doc_form.create_document')}
           </Button>
         </div>
       </div>

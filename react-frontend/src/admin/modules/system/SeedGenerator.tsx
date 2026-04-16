@@ -18,14 +18,14 @@ import { adminTools } from '../../api/adminApi';
 
 import { useTranslation } from 'react-i18next';
 const SEED_OPTIONS = [
-  { key: 'users', label: 'Users', description: 'Generate sample user accounts', count: 50 },
-  { key: 'listings', label: 'Listings', description: 'Generate service offers and requests', count: 100 },
-  { key: 'transactions', label: 'Transactions', description: 'Generate time credit transactions', count: 200 },
-  { key: 'feed_posts', label: 'Feed Posts', description: 'Generate social feed content', count: 75 },
-  { key: 'events', label: 'Events', description: 'Generate community events', count: 20 },
-  { key: 'groups', label: 'Groups', description: 'Generate community groups', count: 10 },
-  { key: 'messages', label: 'Messages', description: 'Generate private messages', count: 150 },
-  { key: 'badges', label: 'Badges', description: 'Award random badges to users', count: 100 },
+  { key: 'users', labelKey: 'seed_generator.option_users_label', descKey: 'seed_generator.option_users_desc', count: 50 },
+  { key: 'listings', labelKey: 'seed_generator.option_listings_label', descKey: 'seed_generator.option_listings_desc', count: 100 },
+  { key: 'transactions', labelKey: 'seed_generator.option_transactions_label', descKey: 'seed_generator.option_transactions_desc', count: 200 },
+  { key: 'feed_posts', labelKey: 'seed_generator.option_feed_posts_label', descKey: 'seed_generator.option_feed_posts_desc', count: 75 },
+  { key: 'events', labelKey: 'seed_generator.option_events_label', descKey: 'seed_generator.option_events_desc', count: 20 },
+  { key: 'groups', labelKey: 'seed_generator.option_groups_label', descKey: 'seed_generator.option_groups_desc', count: 10 },
+  { key: 'messages', labelKey: 'seed_generator.option_messages_label', descKey: 'seed_generator.option_messages_desc', count: 150 },
+  { key: 'badges', labelKey: 'seed_generator.option_badges_label', descKey: 'seed_generator.option_badges_desc', count: 100 },
 ];
 
 export function SeedGenerator() {
@@ -80,14 +80,14 @@ export function SeedGenerator() {
         <AlertTriangle size={20} className="text-warning shrink-0 mt-0.5" />
         <div>
           <p className="font-medium text-warning-700">{t('seed_generator.development_only')}</p>
-          <p className="text-sm text-warning-600">This tool generates fake data. Only use in development or testing environments. Never run on production.</p>
+          <p className="text-sm text-warning-600">{t('seed_generator.warning_body')}</p>
         </div>
       </div>
 
       <Card shadow="sm">
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Database size={20} /> Data Types
+            <Database size={20} /> {t('seed_generator.data_types_heading')}
           </h3>
         </CardHeader>
         <CardBody>
@@ -96,8 +96,8 @@ export function SeedGenerator() {
               <div key={opt.key} className="flex items-center justify-between rounded-lg border border-default-200 p-3">
                 <Checkbox isSelected={selected.includes(opt.key)} onValueChange={() => toggleOption(opt.key)}>
                   <div>
-                    <p className="font-medium">{opt.label}</p>
-                    <p className="text-xs text-default-400">{opt.description}</p>
+                    <p className="font-medium">{t(opt.labelKey)}</p>
+                    <p className="text-xs text-default-400">{t(opt.descKey)}</p>
                   </div>
                 </Checkbox>
                 <Input
@@ -106,7 +106,7 @@ export function SeedGenerator() {
                   defaultValue={String(opt.count)}
                   className="w-20"
                   variant="bordered"
-                  aria-label={`${opt.label} count`}
+                  aria-label={t('seed_generator.count_aria_label', { label: t(opt.labelKey) })}
                   onValueChange={(val) => handleCountChange(opt.key, val)}
                 />
               </div>
@@ -120,7 +120,7 @@ export function SeedGenerator() {
               isLoading={running}
               isDisabled={selected.length === 0}
             >
-              Generate {selected.length} Type{selected.length !== 1 ? 's' : ''}
+              {t('seed_generator.generate_button', { count: selected.length })}
             </Button>
           </div>
         </CardBody>

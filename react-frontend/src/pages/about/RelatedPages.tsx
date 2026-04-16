@@ -74,8 +74,8 @@ export function RelatedPages({ current }: RelatedPagesProps) {
                   <link.icon className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-theme-primary truncate">{t(`related.link_${link.href.replace('/', '')}_label`, link.label)}</p>
-                  <p className="text-xs text-theme-subtle truncate">{t(`related.link_${link.href.replace('/', '')}_description`, link.description)}</p>
+                  <p className="text-sm font-medium text-theme-primary truncate">{t(`related.link_${link.href.replace('/', '')}_label`)}</p>
+                  <p className="text-xs text-theme-subtle truncate">{t(`related.link_${link.href.replace('/', '')}_description`)}</p>
                 </div>
                 <ArrowRight className="w-4 h-4 text-theme-subtle group-hover:text-indigo-500 transition-colors flex-shrink-0" aria-hidden="true" />
               </GlassCard>

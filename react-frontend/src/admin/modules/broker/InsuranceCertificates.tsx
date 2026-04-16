@@ -53,14 +53,14 @@ import { DataTable, StatCard, PageHeader, ConfirmModal, EmptyState, type Column 
 import type { InsuranceCertificate, InsuranceStats, BrokerConfig } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
-const INSURANCE_TYPE_LABELS: Record<string, string> = {
-  public_liability: 'Public Liability',
-  professional_indemnity: 'Professional Indemnity',
-  employers_liability: "Employer's Liability",
-  product_liability: 'Product Liability',
-  personal_accident: 'Personal Accident',
-  other: 'Other',
-};
+const INSURANCE_TYPE_KEYS = [
+  'public_liability',
+  'professional_indemnity',
+  'employers_liability',
+  'product_liability',
+  'personal_accident',
+  'other',
+] as const;
 
 const STATUS_COLOR_MAP: Record<string, 'warning' | 'success' | 'danger' | 'primary' | 'default'> = {
   pending: 'warning',
@@ -425,7 +425,7 @@ export function InsuranceCertificates() {
   const columns: Column<InsuranceCertificate>[] = [
     {
       key: 'member',
-      label: 'Member',
+      label: t('broker.col_member'),
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-2">
@@ -446,17 +446,17 @@ export function InsuranceCertificates() {
     },
     {
       key: 'insurance_type',
-      label: 'Type',
+      label: t('broker.col_type'),
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat" color="primary">
-          {INSURANCE_TYPE_LABELS[item.insurance_type] || item.insurance_type}
+          {t(`broker.insurance_type_${item.insurance_type}`, { defaultValue: item.insurance_type })}
         </Chip>
       ),
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('broker.col_status'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -471,7 +471,7 @@ export function InsuranceCertificates() {
     },
     {
       key: 'provider_name',
-      label: 'Provider',
+      label: t('broker.col_provider'),
       render: (item) => (
         <span className="text-sm text-default-600">
           {item.provider_name || '\u2014'}
@@ -480,7 +480,7 @@ export function InsuranceCertificates() {
     },
     {
       key: 'policy_number',
-      label: 'Policy #',
+      label: t('broker.col_policy'),
       render: (item) => (
         <span className="text-sm text-default-600 font-mono">
           {item.policy_number || '\u2014'}
@@ -489,7 +489,7 @@ export function InsuranceCertificates() {
     },
     {
       key: 'expiry_date',
-      label: 'Expiry Date',
+      label: t('broker.col_expiry'),
       sortable: true,
       render: (item) => {
         if (!item.expiry_date) return <span className="text-sm text-default-500">{'\u2014'}</span>;
@@ -509,7 +509,7 @@ export function InsuranceCertificates() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('broker.col_actions'),
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -584,7 +584,7 @@ export function InsuranceCertificates() {
               size="sm"
               onPress={() => { resetCreateForm(); setCreateOpen(true); }}
             >
-              Add Certificate
+              {t('broker.add_certificate')}
             </Button>
             <Button
               as={Link}
@@ -593,7 +593,7 @@ export function InsuranceCertificates() {
               startContent={<ArrowLeft size={16} />}
               size="sm"
             >
-              Back
+              {t('broker.back')}
             </Button>
           </div>
         }
@@ -695,7 +695,7 @@ export function InsuranceCertificates() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Plus size={20} className="text-primary" />
-            Add Insurance Certificate
+            {t('broker.add_certificate_modal_title')}
           </ModalHeader>
           <ModalBody className="gap-4">
             {/* #9: Member search autocomplete */}
@@ -717,7 +717,7 @@ export function InsuranceCertificates() {
                     setUserSearchQuery('');
                   }}
                 >
-                  Change
+                  {t('broker.change')}
                 </Button>
               </div>
             ) : (
@@ -770,8 +770,8 @@ export function InsuranceCertificates() {
               variant="bordered"
               isRequired
             >
-              {Object.entries(INSURANCE_TYPE_LABELS).map(([key, label]) => (
-                <SelectItem key={key}>{label}</SelectItem>
+              {INSURANCE_TYPE_KEYS.map((key) => (
+                <SelectItem key={key}>{t(`broker.insurance_type_${key}`)}</SelectItem>
               ))}
             </Select>
             <Input
@@ -829,14 +829,14 @@ export function InsuranceCertificates() {
               onPress={() => setCreateOpen(false)}
               isDisabled={createLoading}
             >
-              Cancel
+              {t('broker.cancel')}
             </Button>
             <Button
               color="primary"
               onPress={handleCreate}
               isLoading={createLoading}
             >
-              Create Certificate
+              {t('broker.add_certificate')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -853,7 +853,7 @@ export function InsuranceCertificates() {
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
               <Pencil size={20} className="text-primary" />
-              Edit Insurance Certificate
+              {t('broker.edit_certificate_modal_title')}
             </ModalHeader>
             <ModalBody className="gap-4">
               <div className="flex items-center gap-2 p-3 rounded-lg border border-default-200 bg-default-50">
@@ -935,14 +935,14 @@ export function InsuranceCertificates() {
                 onPress={() => setEditItem(null)}
                 isDisabled={editLoading}
               >
-                Cancel
+                {t('broker.cancel')}
               </Button>
               <Button
                 color="primary"
                 onPress={handleEdit}
                 isLoading={editLoading}
               >
-                Save Changes
+                {t('broker.save_changes')}
               </Button>
             </ModalFooter>
           </ModalContent>
@@ -959,12 +959,11 @@ export function InsuranceCertificates() {
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
               <X size={20} className="text-danger" />
-              Reject Insurance Certificate
+              {t('broker.reject_certificate_modal_title')}
             </ModalHeader>
             <ModalBody>
               <p className="text-default-600 mb-3">
-                Reject the insurance certificate for{' '}
-                <strong>{rejectModal.first_name} {rejectModal.last_name}</strong>?
+                {t('broker.reject_certificate_confirm', { name: `${rejectModal.first_name} ${rejectModal.last_name}` })}
               </p>
               <Textarea
                 label={t('broker.label_reason_required')}
@@ -982,14 +981,14 @@ export function InsuranceCertificates() {
                 onPress={() => { setRejectModal(null); setRejectReason(''); }}
                 isDisabled={rejectLoading}
               >
-                Cancel
+                {t('broker.cancel')}
               </Button>
               <Button
                 color="danger"
                 onPress={handleReject}
                 isLoading={rejectLoading}
               >
-                Reject
+                {t('broker.reject')}
               </Button>
             </ModalFooter>
           </ModalContent>
@@ -1006,7 +1005,7 @@ export function InsuranceCertificates() {
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
               <FileCheck size={20} className="text-primary" />
-              Insurance Certificate Details
+              {t('broker.view_certificate_modal_title')}
             </ModalHeader>
             <ModalBody>
               <div className="flex items-center gap-3 mb-4">
@@ -1023,7 +1022,7 @@ export function InsuranceCertificates() {
               <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
                 <div>
                   <p className="text-default-400">{t('broker_certificates.type')}</p>
-                  <p className="font-medium">{INSURANCE_TYPE_LABELS[viewItem.insurance_type] || viewItem.insurance_type}</p>
+                  <p className="font-medium">{t(`broker.insurance_type_${viewItem.insurance_type}`, { defaultValue: viewItem.insurance_type })}</p>
                 </div>
                 <div>
                   <p className="text-default-400">{t('broker_certificates.status')}</p>
@@ -1080,7 +1079,7 @@ export function InsuranceCertificates() {
                     className="inline-flex items-center gap-2 text-sm text-primary hover:underline bg-primary-50 dark:bg-primary-50/10 px-3 py-2 rounded-lg"
                   >
                     <FileText size={16} />
-                    View Certificate
+                    {t('broker.view_certificate_file')}
                     <ExternalLink size={14} />
                   </a>
                 </div>
@@ -1094,7 +1093,7 @@ export function InsuranceCertificates() {
             </ModalBody>
             <ModalFooter>
               <Button variant="flat" onPress={() => setViewItem(null)}>
-                Close
+                {t('broker.close')}
               </Button>
             </ModalFooter>
           </ModalContent>

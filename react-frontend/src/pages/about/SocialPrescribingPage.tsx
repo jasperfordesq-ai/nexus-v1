@@ -226,8 +226,8 @@ export function SocialPrescribingPage() {
                   <p className={`text-4xl sm:text-5xl font-extrabold ${stat.textAccent} mb-2`}>
                     {stat.value}
                   </p>
-                  <p className="font-semibold text-theme-primary mb-1">{t(`social_prescribing.outcome_${index}_label`, stat.label)}</p>
-                  <p className="text-sm text-theme-muted">{t(`social_prescribing.outcome_${index}_description`, stat.description)}</p>
+                  <p className="font-semibold text-theme-primary mb-1">{t(`social_prescribing.outcome_${index}_label`)}</p>
+                  <p className="text-sm text-theme-muted">{t(`social_prescribing.outcome_${index}_description`)}</p>
                 </GlassCard>
               </motion.div>
             ))}
@@ -253,7 +253,7 @@ export function SocialPrescribingPage() {
                 {strategicFitPoints.map((point, index) => (
                   <li key={point} className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 dark:text-emerald-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                    <span className="text-theme-muted text-sm leading-relaxed">{t(`social_prescribing.strategic_fit_${index}`, point)}</span>
+                    <span className="text-theme-muted text-sm leading-relaxed">{t(`social_prescribing.strategic_fit_${index}`)}</span>
                   </li>
                 ))}
               </ul>
@@ -340,10 +340,10 @@ export function SocialPrescribingPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-theme-primary text-lg mb-2">
-                        {t(`social_prescribing.referral_step_${index}_title`, step.title)}
+                        {t(`social_prescribing.referral_step_${index}_title`)}
                       </h3>
                       <p className="text-theme-muted text-sm leading-relaxed">
-                        {t(`social_prescribing.referral_step_${index}_description`, step.description)}
+                        {t(`social_prescribing.referral_step_${index}_description`)}
                       </p>
                     </div>
                   </div>

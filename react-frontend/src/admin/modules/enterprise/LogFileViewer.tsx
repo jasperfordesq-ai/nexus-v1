@@ -38,20 +38,8 @@ import type { LogFileContent } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
 
-const LINE_OPTIONS = [
-  { key: '100', label: '100 lines' },
-  { key: '200', label: '200 lines' },
-  { key: '500', label: '500 lines' },
-  { key: '1000', label: '1000 lines' },
-];
-
-const LEVEL_OPTIONS = [
-  { key: 'all', label: 'All Levels' },
-  { key: 'ERROR', label: 'ERROR' },
-  { key: 'WARNING', label: 'WARNING' },
-  { key: 'INFO', label: 'INFO' },
-  { key: 'DEBUG', label: 'DEBUG' },
-];
+const LINE_OPTION_KEYS = ['100', '200', '500', '1000'] as const;
+const LEVEL_OPTION_KEYS = ['all', 'ERROR', 'WARNING', 'INFO', 'DEBUG'] as const;
 
 const LEVEL_REGEX = /\[(ERROR|WARNING|INFO|DEBUG)\]/i;
 const LEVEL_START_REGEX = /^(error|warning|info|debug)\b/i;
@@ -166,8 +154,8 @@ export function LogFileViewer() {
   return (
     <div>
       <PageHeader
-        title={filename || 'Log File'}
-        description={content ? `${content.total_lines} total lines${content.filtered_count !== content.total_lines ? `, ${content.filtered_count} filtered` : ''}` : 'Loading...'}
+        title={filename || t('enterprise.log_viewer_title_fallback')}
+        description={content ? `${content.total_lines} total lines${content.filtered_count !== content.total_lines ? `, ${content.filtered_count} filtered` : ''}` : t('enterprise.log_viewer_loading_desc')}
         actions={
           <Button
             variant="flat"
@@ -175,7 +163,7 @@ export function LogFileViewer() {
             onPress={() => navigate(tenantPath('/admin/enterprise/monitoring/log-files'))}
             size="sm"
           >
-            Back
+            {t('enterprise.log_viewer_back')}
           </Button>
         }
       />
@@ -194,8 +182,8 @@ export function LogFileViewer() {
             variant="bordered"
             className="w-36"
           >
-            {LINE_OPTIONS.map((opt) => (
-              <SelectItem key={opt.key}>{opt.label}</SelectItem>
+            {LINE_OPTION_KEYS.map((key) => (
+              <SelectItem key={key}>{t(`enterprise.log_lines_${key}`)}</SelectItem>
             ))}
           </Select>
 
@@ -210,8 +198,8 @@ export function LogFileViewer() {
             variant="bordered"
             className="w-40"
           >
-            {LEVEL_OPTIONS.map((opt) => (
-              <SelectItem key={opt.key}>{opt.label}</SelectItem>
+            {LEVEL_OPTION_KEYS.map((key) => (
+              <SelectItem key={key}>{t(`enterprise.log_level_${key.toLowerCase()}`)}</SelectItem>
             ))}
           </Select>
 
@@ -221,7 +209,7 @@ export function LogFileViewer() {
               isSelected={autoRefresh}
               onValueChange={setAutoRefresh}
             />
-            <span className="text-sm text-default-600">Auto-refresh (5s)</span>
+            <span className="text-sm text-default-600">{t('enterprise.auto_refresh_label')}</span>
           </div>
 
           <div className="flex-1" />
@@ -250,7 +238,7 @@ export function LogFileViewer() {
             onPress={() => setClearModalOpen(true)}
             size="sm"
           >
-            Clear
+            {t('enterprise.btn_clear')}
           </Button>
         </CardBody>
       </Card>
@@ -298,10 +286,10 @@ export function LogFileViewer() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setClearModalOpen(false)}>
-              Cancel
+              {t('enterprise.btn_cancel_modal')}
             </Button>
             <Button color="danger" onPress={handleClear} isLoading={clearing}>
-              Clear File
+              {t('enterprise.btn_clear_file')}
             </Button>
           </ModalFooter>
         </ModalContent>

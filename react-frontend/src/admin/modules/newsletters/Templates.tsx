@@ -58,11 +58,6 @@ interface Template {
   updated_at: string;
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  starter: 'Starter',
-  saved: 'Saved',
-  custom: 'Custom',
-};
 
 const CATEGORY_COLORS: Record<string, 'primary' | 'secondary' | 'success' | 'warning' | 'default'> = {
   starter: 'primary',
@@ -73,6 +68,12 @@ const CATEGORY_COLORS: Record<string, 'primary' | 'secondary' | 'success' | 'war
 export function Templates() {
   const { t } = useTranslation('admin');
   usePageTitle(t('newsletters.page_title'));
+
+  const CATEGORY_LABELS: Record<string, string> = {
+    starter: t('template_form.category_starter'),
+    saved: t('template_form.category_saved'),
+    custom: t('template_form.category_custom'),
+  };
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -176,13 +177,13 @@ export function Templates() {
           }}
         >
           <DropdownItem key="edit" startContent={<Pencil size={14} />}>
-            Edit
+            {t('newsletters.action_edit')}
           </DropdownItem>
           <DropdownItem key="duplicate" startContent={<Copy size={14} />}>
-            Duplicate
+            {t('newsletters.action_duplicate')}
           </DropdownItem>
           <DropdownItem key="preview" startContent={<Eye size={14} />}>
-            Preview
+            {t('newsletters.action_preview')}
           </DropdownItem>
           <DropdownItem
             key="delete"
@@ -190,7 +191,7 @@ export function Templates() {
             className="text-danger"
             color="danger"
           >
-            Delete
+            {t('newsletters.action_delete')}
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
@@ -200,7 +201,7 @@ export function Templates() {
   const columns: Column<Template>[] = [
     {
       key: 'name',
-      label: 'Template Name',
+      label: t('newsletters.col_template_name'),
       sortable: true,
       render: (item) => (
         <div>
@@ -213,7 +214,7 @@ export function Templates() {
     },
     {
       key: 'category',
-      label: 'Category',
+      label: t('newsletters.col_category'),
       render: (item) => (
         <Chip
           size="sm"
@@ -226,7 +227,7 @@ export function Templates() {
     },
     {
       key: 'subject',
-      label: 'Default Subject',
+      label: t('newsletters.col_default_subject'),
       render: (item) => (
         <span className="text-sm text-default-600 line-clamp-1">
           {item.subject || '--'}
@@ -235,20 +236,20 @@ export function Templates() {
     },
     {
       key: 'is_active',
-      label: 'Status',
+      label: t('newsletters.col_status'),
       render: (item) => (
         <Chip
           size="sm"
           variant="dot"
           color={item.is_active ? 'success' : 'default'}
         >
-          {item.is_active ? 'Active' : 'Inactive'}
+          {item.is_active ? t('newsletters.status_active') : t('newsletters.status_inactive')}
         </Chip>
       ),
     },
     {
       key: 'created_at',
-      label: 'Created',
+      label: t('newsletters.col_created'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -284,7 +285,7 @@ export function Templates() {
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters/templates/create'))}
             >
-              Create Template
+              {t('newsletters.create_template')}
             </Button>
           }
         />
@@ -292,7 +293,7 @@ export function Templates() {
           icon={FileText}
           title={t('newsletters.no_templates_created')}
           description={t('newsletters.desc_create_reusable_email_templates_to_speed')}
-          actionLabel="Create Template"
+          actionLabel={t('newsletters.create_template')}
           onAction={() => navigate(tenantPath('/admin/newsletters/templates/create'))}
         />
       </div>
@@ -312,14 +313,14 @@ export function Templates() {
               onPress={loadData}
               isLoading={loading}
             >
-              Refresh
+              {t('newsletters.refresh')}
             </Button>
             <Button
               color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters/templates/create'))}
             >
-              Create Template
+              {t('newsletters.create_template')}
             </Button>
           </div>
         }
@@ -333,7 +334,7 @@ export function Templates() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={`All (${items.length})`} />
+          <Tab key="all" title={t('newsletters.tab_all', { count: items.length })} />
           {Object.entries(categoryCounts).map(([cat, count]) => (
             <Tab key={cat} title={`${CATEGORY_LABELS[cat] || cat} (${count})`} />
           ))}
