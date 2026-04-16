@@ -40,7 +40,7 @@ function resolveTranslationKey(key: string): string | null {
   const namespace = segments[0];
   const translationKey = segments.slice(1).join('.');
 
-  if (!KNOWN_NOTIFICATION_NAMESPACES.has(namespace)) {
+  if (!namespace || !KNOWN_NOTIFICATION_NAMESPACES.has(namespace)) {
     return null;
   }
 
@@ -71,4 +71,3 @@ export function getNotificationDisplayText(notification: Pick<Notification, 'mes
 
   return resolveTranslationKey(rawText) ?? humanizeNotificationKey(rawText);
 }
-
