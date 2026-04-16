@@ -70,6 +70,7 @@ export function ListingDetailPage() {
   const [showComments, setShowComments] = useState(false);
   const [isRenewing, setIsRenewing] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showFullDesc, setShowFullDesc] = useState(false);
   const [isReported, setIsReported] = useState(false);
   const [isReporting, setIsReporting] = useState(false);
   const [reportReason, setReportReason] = useState<string>('');
@@ -291,12 +292,15 @@ export function ListingDetailPage() {
             '@context': 'https://schema.org',
             '@type': 'Service',
             name: listing?.title,
-            ...(listing?.description ? { description: listing.description.substring(0, 300) } : {}),
-            ...(listing?.image_url ? { image: listing.image_url } : {}),
+            ...(listing?.description ? { description: listing.description.substring(0, 160) } : {}),
+            url: `${window.location.origin}${window.location.pathname}`,
+            ...(listing?.image_url ? { image: resolveAssetUrl(listing.image_url) } : {}),
             ...(listing?.category?.name || listing?.category_name ? { category: listing.category?.name || listing.category_name } : {}),
+            ...(listing?.location ? { areaServed: listing.location } : {}),
             provider: {
               '@type': 'Person',
-              name: listing?.user?.name || `${listing?.user?.first_name ?? ''} ${listing?.user?.last_name ?? ''}`.trim() || 'Community Member',
+              name: listing?.user?.name || `${listing?.user?.first_name ?? ''} ${listing?.user?.last_name ?? ''}`.trim() || t('community_member', 'Community Member'),
+              ...(listing?.user?.id ? { url: `${window.location.origin}${tenantPath(`/profile/${listing.user.id}`)}` } : {}),
             },
           })}
         </script>
@@ -392,7 +396,7 @@ export function ListingDetailPage() {
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-4">{listing.title}</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-4 break-words leading-tight">{listing.title}</h1>
 
         {/* Meta Grid - Top Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
@@ -496,7 +500,26 @@ export function ListingDetailPage() {
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-theme-primary mb-3">{t('detail_description')}</h2>
           <div className="prose prose-invert max-w-none">
-            <SafeHtml content={listing.description} className="text-theme-muted whitespace-pre-wrap wrap-break-word" as="div" />
+            {(() => {
+              const isLongDesc = (listing.description?.length ?? 0) > 500;
+              return (
+                <>
+                  <div className={isLongDesc && !showFullDesc ? 'line-clamp-6 overflow-hidden' : ''}>
+                    <SafeHtml content={listing.description} className="text-theme-muted whitespace-pre-wrap wrap-break-word" as="div" />
+                  </div>
+                  {isLongDesc && (
+                    <Button
+                      variant="light"
+                      size="sm"
+                      className="mt-2 text-theme-accent px-0"
+                      onPress={() => setShowFullDesc((prev) => !prev)}
+                    >
+                      {showFullDesc ? t('show_less', 'Show less') : t('show_more', 'Show more')}
+                    </Button>
+                  )}
+                </>
+              );
+            })()}
           </div>
         </div>
 
@@ -698,46 +721,82 @@ export function ListingDetailPage() {
               {listing.type === 'offer' ? t('detail_offered_by') : t('detail_requested_by')}
             </h2>
 
-            <Link
-              to={tenantPath(`/profile/${userId}`)}
-              className="flex items-center gap-4 group hover:bg-theme-hover rounded-lg p-2 -m-2 transition-colors"
-            >
-              <Avatar
-                src={userAvatar}
-                name={userName}
-                size="lg"
-                className="ring-2 ring-white/20 group-hover:ring-indigo-500/50 transition-all"
-              />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-theme-primary group-hover:text-indigo-400 transition-colors">
-                    {userName}
-                  </h3>
-                  {listing.user?.id && <VerificationBadgeRow userId={listing.user.id} size="sm" />}
-                </div>
-                {listing.user?.tagline && (
-                  <p className="text-theme-muted text-sm truncate">{listing.user.tagline}</p>
-                )}
-                <div className="flex items-center gap-3 mt-1 flex-wrap">
-                  {listing.author_rating != null && listing.author_rating > 0 && (
-                    <span className="flex items-center gap-1 text-xs text-theme-muted">
-                      <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" aria-hidden="true" />
-                      <span className="font-medium text-theme-primary">{listing.author_rating.toFixed(1)}</span>
-                      {listing.author_reviews_count != null && listing.author_reviews_count > 0 && (
-                        <span>({listing.author_reviews_count} {listing.author_reviews_count === 1 ? t('review', 'review') : t('reviews', 'reviews')})</span>
-                      )}
-                    </span>
+            {userId ? (
+              <Link
+                to={tenantPath(`/profile/${userId}`)}
+                className="flex items-center gap-4 group hover:bg-theme-hover rounded-lg p-2 -m-2 transition-colors"
+              >
+                <Avatar
+                  src={userAvatar}
+                  name={userName}
+                  size="lg"
+                  className="ring-2 ring-white/20 group-hover:ring-indigo-500/50 transition-all"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-theme-primary group-hover:text-indigo-400 transition-colors">
+                      {userName}
+                    </h3>
+                    {listing.user?.id && <VerificationBadgeRow userId={listing.user.id} size="sm" />}
+                  </div>
+                  {listing.user?.tagline && (
+                    <p className="text-theme-muted text-sm truncate">{listing.user.tagline}</p>
                   )}
-                  {listing.author_exchanges_count != null && listing.author_exchanges_count > 0 && (
-                    <span className="flex items-center gap-1 text-xs text-theme-muted">
-                      <ArrowRightLeft className="w-3.5 h-3.5" aria-hidden="true" />
-                      {listing.author_exchanges_count} {listing.author_exchanges_count === 1 ? t('exchange', 'exchange completed') : t('exchanges_completed', 'exchanges completed')}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-3 mt-1 flex-wrap">
+                    {listing.author_rating != null && listing.author_rating > 0 && (
+                      <span className="flex items-center gap-1 text-xs text-theme-muted">
+                        <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" aria-hidden="true" />
+                        <span className="font-medium text-theme-primary">{listing.author_rating.toFixed(1)}</span>
+                        {listing.author_reviews_count != null && listing.author_reviews_count > 0 && (
+                          <span>({listing.author_reviews_count} {listing.author_reviews_count === 1 ? t('review', 'review') : t('reviews', 'reviews')})</span>
+                        )}
+                      </span>
+                    )}
+                    {listing.author_exchanges_count != null && listing.author_exchanges_count > 0 && (
+                      <span className="flex items-center gap-1 text-xs text-theme-muted">
+                        <ArrowRightLeft className="w-3.5 h-3.5" aria-hidden="true" />
+                        {listing.author_exchanges_count} {listing.author_exchanges_count === 1 ? t('exchange', 'exchange completed') : t('exchanges_completed', 'exchanges completed')}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-theme-subtle mt-1">{t('detail_view_profile')}</p>
                 </div>
-                <p className="text-xs text-theme-subtle mt-1">{t('detail_view_profile')}</p>
-              </div>
-            </Link>
+              </Link>
+            ) : (
+              <span className="flex items-center gap-4 rounded-lg p-2 -m-2">
+                <Avatar
+                  src={userAvatar}
+                  name={userName}
+                  size="lg"
+                  className="ring-2 ring-white/20"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-theme-primary">{userName}</h3>
+                  </div>
+                  {listing.user?.tagline && (
+                    <p className="text-theme-muted text-sm truncate">{listing.user.tagline}</p>
+                  )}
+                  <div className="flex items-center gap-3 mt-1 flex-wrap">
+                    {listing.author_rating != null && listing.author_rating > 0 && (
+                      <span className="flex items-center gap-1 text-xs text-theme-muted">
+                        <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" aria-hidden="true" />
+                        <span className="font-medium text-theme-primary">{listing.author_rating.toFixed(1)}</span>
+                        {listing.author_reviews_count != null && listing.author_reviews_count > 0 && (
+                          <span>({listing.author_reviews_count} {listing.author_reviews_count === 1 ? t('review', 'review') : t('reviews', 'reviews')})</span>
+                        )}
+                      </span>
+                    )}
+                    {listing.author_exchanges_count != null && listing.author_exchanges_count > 0 && (
+                      <span className="flex items-center gap-1 text-xs text-theme-muted">
+                        <ArrowRightLeft className="w-3.5 h-3.5" aria-hidden="true" />
+                        {listing.author_exchanges_count} {listing.author_exchanges_count === 1 ? t('exchange', 'exchange completed') : t('exchanges_completed', 'exchanges completed')}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </span>
+            )}
           </GlassCard>
         );
       })()}

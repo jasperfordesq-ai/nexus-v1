@@ -770,6 +770,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                 width={64}
                 height={64}
                 loading="lazy"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
             ) : (
               <Avatar
@@ -828,7 +829,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                   onPress={handleSaveClick}
                   isDisabled={isSaving}
                   aria-label={isFavorited ? t('unsave_listing', 'Unsave listing') : t('save_listing', 'Save listing')}
-                  className="p-1 rounded transition-colors hover:bg-theme-hover min-w-0 w-auto h-auto"
+                  className="p-1 rounded transition-colors hover:bg-theme-hover min-w-[44px] min-h-[44px]"
                 >
                   <Heart
                     className={`w-4 h-4 transition-colors ${isFavorited ? 'fill-rose-500 text-rose-500' : 'text-theme-muted hover:text-rose-400'}`}
@@ -856,6 +857,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
             width={800}
             height={450}
             loading="lazy"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         ) : (
           <ImagePlaceholder size="sm" />
@@ -895,7 +897,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
               onPress={handleSaveClick}
               isDisabled={isSaving}
               aria-label={isFavorited ? t('unsave_listing', 'Unsave listing') : t('save_listing', 'Save listing')}
-              className="ml-auto p-1 rounded transition-colors hover:bg-theme-hover min-w-0 w-auto h-auto"
+              className="ml-auto p-1 rounded transition-colors hover:bg-theme-hover min-w-[44px] min-h-[44px]"
             >
               <Heart
                 className={`w-4 h-4 transition-colors ${isFavorited ? 'fill-rose-500 text-rose-500' : 'text-theme-muted hover:text-rose-400'}`}

@@ -134,6 +134,11 @@ export function CreateListingPage() {
             latitude: listing.latitude ?? undefined,
             longitude: listing.longitude ?? undefined,
             skill_tags: Array.isArray(listing.skill_tags) ? listing.skill_tags : [],
+            // experience_level, equipment_provided, accessibility_notes are not restored
+            // when editing because these optional fields are encoded into the description
+            // text at submit time (not stored as separate API fields). The user can
+            // re-enter them if desired; the existing description already contains the
+            // formatted values they entered during creation.
           });
           if (listing.image_url) {
             setExistingImageUrl(listing.image_url);
