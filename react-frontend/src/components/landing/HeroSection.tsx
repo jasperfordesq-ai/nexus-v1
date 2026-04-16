@@ -13,7 +13,7 @@ import type { HeroContent } from '@/types';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
-  animate: { opacity: 1, y: 0 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
 const staggerContainer = {
@@ -41,14 +41,14 @@ export function HeroSection({ content }: HeroSectionProps) {
   const ctaPrimaryLink = content?.cta_primary_link || '/register';
   const ctaSecondaryText = content?.cta_secondary_text || t('home.cta_learn_more');
   const ctaSecondaryLink = content?.cta_secondary_link || '/about';
-  const ctaFeedText = t('home.cta_feed', { defaultValue: t('home.cta_dashboard') });
+  const ctaFeedText = t('home.cta_feed');
 
   const scrollToSection = () => {
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <section className="relative py-20 sm:py-32 px-4 sm:px-6 lg:px-8">
+    <section aria-labelledby="hero-heading" className="relative py-20 sm:py-32 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <motion.div
           className="text-center"
@@ -66,6 +66,7 @@ export function HeroSection({ content }: HeroSectionProps) {
 
           {/* Headline */}
           <motion.h1
+            id="hero-heading"
             variants={fadeInUp}
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight"
           >
@@ -88,35 +89,35 @@ export function HeroSection({ content }: HeroSectionProps) {
             className="mt-10 flex flex-col sm:flex-row gap-4 justify-center"
           >
             {isAuthenticated ? (
-              <Link to={tenantPath('/feed')}>
+              <Button
+                as={Link}
+                to={tenantPath('/feed')}
+                size="lg"
+                className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-white font-semibold px-8 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
+                endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
+              >
+                {ctaFeedText}
+              </Button>
+            ) : (
+              <>
                 <Button
+                  as={Link}
+                  to={tenantPath(ctaPrimaryLink)}
                   size="lg"
                   className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-white font-semibold px-8 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
                   endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                 >
-                  {ctaFeedText}
+                  {ctaPrimaryText}
                 </Button>
-              </Link>
-            ) : (
-              <>
-                <Link to={tenantPath(ctaPrimaryLink)}>
-                  <Button
-                    size="lg"
-                    className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-white font-semibold px-8 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
-                    endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
-                  >
-                    {ctaPrimaryText}
-                  </Button>
-                </Link>
-                <Link to={tenantPath(ctaSecondaryLink)}>
-                  <Button
-                    size="lg"
-                    variant="bordered"
-                    className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
-                  >
-                    {ctaSecondaryText}
-                  </Button>
-                </Link>
+                <Button
+                  as={Link}
+                  to={tenantPath(ctaSecondaryLink)}
+                  size="lg"
+                  variant="bordered"
+                  className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
+                >
+                  {ctaSecondaryText}
+                </Button>
               </>
             )}
           </motion.div>
@@ -132,7 +133,7 @@ export function HeroSection({ content }: HeroSectionProps) {
       >
         <Button
           variant="light"
-          className="text-theme-subtle hover:text-theme-primary animate-bounce"
+          className="text-theme-subtle hover:text-theme-primary motion-safe:animate-bounce"
           onPress={scrollToSection}
           isIconOnly
           aria-label={t('home.scroll_down')}

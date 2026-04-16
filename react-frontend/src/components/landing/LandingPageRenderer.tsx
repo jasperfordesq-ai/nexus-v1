@@ -9,9 +9,14 @@
  * Reads the tenant's landing page configuration and renders the enabled
  * sections in the configured order. Falls back to defaults when no
  * custom config is provided.
+ *
+ * Wraps all sections in <MotionConfig reducedMotion="user"> so that
+ * Framer Motion automatically respects the user's prefers-reduced-motion
+ * system preference — all animations become instant when set.
  */
 
 import { useMemo } from 'react';
+import { MotionConfig } from 'framer-motion';
 import { useTenant } from '@/contexts';
 import type {
   LandingSection,
@@ -47,6 +52,9 @@ function RenderSection({ section }: { section: LandingSection }) {
     case 'cta':
       return <CtaSection content={section.content as CtaContent | undefined} />;
     default:
+      if (import.meta.env.DEV) {
+        console.warn(`[LandingPageRenderer] Unknown section type: "${(section as { type: string }).type}"`);
+      }
       return null;
   }
 }
@@ -61,10 +69,10 @@ export function LandingPageRenderer() {
   }, [landingPageConfig.sections]);
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       {sortedSections.map((section) => (
         <RenderSection key={section.id} section={section} />
       ))}
-    </>
+    </MotionConfig>
   );
 }

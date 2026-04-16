@@ -41,7 +41,7 @@ export function HowItWorksSection({ content }: HowItWorksSectionProps) {
       ? content.steps.map((step, index) => {
           const meta = defaultStepMeta[index] ?? FALLBACK_META;
           return {
-            Icon: getIcon(step.icon, meta.icon) ?? FALLBACK_META.icon,
+            Icon: getIcon(step.icon, meta.icon),
             title: step.title,
             description: step.description,
             color: meta.color,
@@ -75,15 +75,16 @@ export function HowItWorksSection({ content }: HowItWorksSectionProps) {
         ];
 
   return (
-    <section id="features" className="py-20 px-4 sm:px-6 lg:px-8">
+    <section id="features" aria-labelledby="how-it-works-heading" className="py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
+          <h2 id="how-it-works-heading" className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
             {title}
           </h2>
           <p className="text-theme-muted max-w-lg mx-auto">
@@ -94,13 +95,13 @@ export function HowItWorksSection({ content }: HowItWorksSectionProps) {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {steps.map((step, index) => (
             <motion.div
-              key={step.title}
+              key={`step-${index}`}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
             >
-              <GlassCard className="p-6 h-full text-center relative group hover:scale-[1.02] transition-transform">
+              <GlassCard className="p-6 h-full text-center relative group motion-safe:hover:scale-[1.02] motion-safe:transition-transform">
                 <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-lg">
                   {index + 1}
                 </div>

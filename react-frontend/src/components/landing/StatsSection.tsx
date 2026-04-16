@@ -14,7 +14,6 @@ interface PlatformStats {
   members: number;
   hours_exchanged: number;
   listings: number;
-  skills: number;
   communities: number;
 }
 
@@ -36,6 +35,7 @@ interface StatsSectionProps {
 export function StatsSection({ content }: StatsSectionProps) {
   const { t } = useTranslation('public');
   const [platformStats, setPlatformStats] = useState<PlatformStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
   const hidden = content?.show_live_stats === false;
 
@@ -54,11 +54,16 @@ export function StatsSection({ content }: StatsSectionProps) {
     } catch (error) {
       if (controller.signal.aborted) return;
       logError('Failed to load platform stats', error);
+    } finally {
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [hidden]);
 
   useEffect(() => {
     loadStats();
+    return () => abortRef.current?.abort();
   }, [loadStats]);
 
   // If show_live_stats is explicitly false, don't render
@@ -83,17 +88,19 @@ export function StatsSection({ content }: StatsSectionProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.8 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
       className="mt-16 sm:mt-24 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8"
     >
       {stats.map((stat, index) => (
-        <div key={stat.label} className="text-center">
+        <div key={`stat-${index}`} className="text-center">
           <motion.p
             initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.9 + index * 0.1 }}
-            className="text-3xl sm:text-4xl font-bold text-gradient"
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: index * 0.1 }}
+            className={`text-3xl sm:text-4xl font-bold text-gradient${isLoading ? ' animate-pulse' : ''}`}
           >
             {stat.value}
           </motion.p>

@@ -10,11 +10,6 @@ import { getIcon } from './iconMap';
 import type { LucideIcon } from 'lucide-react';
 import type { FeaturePillsContent } from '@/types';
 
-const fadeInUp = {
-  initial: { opacity: 0, y: 30 },
-  animate: { opacity: 1, y: 0 },
-};
-
 interface ResolvedPill {
   Icon: LucideIcon;
   title: string;
@@ -33,7 +28,7 @@ export function FeaturePillsSection({ content }: FeaturePillsSectionProps) {
   const pills: ResolvedPill[] =
     content?.items && content.items.length > 0
       ? content.items.map((item, index) => ({
-          Icon: getIcon(item.icon, defaultIcons[index]) ?? Clock,
+          Icon: getIcon(item.icon, defaultIcons[index % defaultIcons.length]),
           title: item.title,
           description: item.description,
         }))
@@ -57,15 +52,19 @@ export function FeaturePillsSection({ content }: FeaturePillsSectionProps) {
 
   return (
     <motion.div
-      variants={fadeInUp}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
       className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto"
     >
       {pills.map((pill, index) => (
         <motion.div
-          key={pill.title}
+          key={`pill-${index}`}
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 + index * 0.1 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: index * 0.1 }}
           className="flex items-center gap-3 p-4 rounded-2xl glass-card backdrop-blur-lg"
         >
           <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
