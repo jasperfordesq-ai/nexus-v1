@@ -131,13 +131,22 @@ class ReviewService
                 $q->whereNull('status')->orWhereIn('status', ['active', 'approved']);
             });
 
-        $total = $baseQuery()->count();
-        $average = $total > 0 ? round((float) $baseQuery()->avg('rating'), 2) : 0;
+        $aggregates = $baseQuery()
+            ->selectRaw('COUNT(*) as total, AVG(rating) as average')
+            ->first();
 
-        // Distribution
+        $total   = (int) ($aggregates->total ?? 0);
+        $average = $total > 0 ? round((float) ($aggregates->average ?? 0), 2) : 0;
+
+        $distRows = $baseQuery()
+            ->selectRaw('rating, COUNT(*) as cnt')
+            ->groupBy('rating')
+            ->get()
+            ->keyBy('rating');
+
         $distribution = [];
         for ($i = 5; $i >= 1; $i--) {
-            $distribution[$i] = $baseQuery()->where('rating', $i)->count();
+            $distribution[$i] = (int) ($distRows->get($i)?->cnt ?? 0);
         }
 
         $positive = ($distribution[5] ?? 0) + ($distribution[4] ?? 0);

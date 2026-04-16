@@ -865,17 +865,20 @@ class UserService
         $stats = self::getUserStats($userId);
         unset($stats['transactions_count']);
 
-        $stats['total_hours_given'] = round((float) DB::table('transactions')
-            ->where('sender_id', $userId)
+        $hourRows = DB::table('transactions')
+            ->selectRaw("
+                SUM(CASE WHEN sender_id = ? THEN amount ELSE 0 END) as given,
+                SUM(CASE WHEN receiver_id = ? THEN amount ELSE 0 END) as received
+            ", [$userId, $userId])
             ->where('tenant_id', $tenantId)
             ->where('status', 'completed')
-            ->sum('amount'), 1);
+            ->where(function ($q) use ($userId) {
+                $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
+            })
+            ->first();
 
-        $stats['total_hours_received'] = round((float) DB::table('transactions')
-            ->where('receiver_id', $userId)
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'completed')
-            ->sum('amount'), 1);
+        $stats['total_hours_given']    = round((float) ($hourRows->given    ?? 0), 1);
+        $stats['total_hours_received'] = round((float) ($hourRows->received ?? 0), 1);
 
         // group_members has no tenant_id column — scope through groups.tenant_id
         $stats['groups_count'] = (int) DB::table('group_members')

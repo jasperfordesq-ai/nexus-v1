@@ -197,42 +197,36 @@ export function ProfilePage() {
       setError(null);
       setErrorCode(null);
 
-      const requests: Promise<unknown>[] = [
-        api.get<UserType>(`/v2/users/${profileId}`),
-        api.get<Listing[]>(`/v2/users/${profileId}/listings?limit=6`),
-      ];
+      // Use named requests to avoid fragile index arithmetic when determining
+      // which result corresponds to which API call.
+      const profileReq = api.get<UserType>(`/v2/users/${profileId}`);
+      const listingsReq = api.get<Listing[]>(`/v2/users/${profileId}/listings?limit=6`);
+      const gamProfileReq = hasGamification
+        ? api.get<GamificationProfileResponse>(`/v2/gamification/profile?user_id=${profileId}`)
+        : null;
+      const gamBadgesReq = hasGamification
+        ? api.get<GamificationBadgeResponse[]>(`/v2/gamification/badges?user_id=${profileId}`)
+        : null;
+      const connectionReq = (isAuthenticated && currentUserId && profileId !== currentUserId)
+        ? api.get<{ status: ConnectionStatus; connection_id?: number }>(`/v2/connections/status/${profileId}`)
+        : null;
 
-      if (hasGamification) {
-        requests.push(
-          api.get<GamificationProfileResponse>(`/v2/gamification/profile?user_id=${profileId}`),
-          api.get<GamificationBadgeResponse[]>(`/v2/gamification/badges?user_id=${profileId}`)
-        );
-      }
+      const [profileRes, listingsRes, gamificationProfileRes, gamificationBadgesRes, connectionRes] =
+        await Promise.all([
+          profileReq,
+          listingsReq,
+          gamProfileReq ?? Promise.resolve(undefined),
+          gamBadgesReq ?? Promise.resolve(undefined),
+          connectionReq ?? Promise.resolve(undefined),
+        ]) as [
+          { success: boolean; data?: ProfileApiUser },
+          { success: boolean; data?: Listing[] },
+          { success: boolean; data?: GamificationProfileResponse } | undefined,
+          { success: boolean; data?: GamificationBadgeResponse[] } | undefined,
+          { success: boolean; data?: { status: ConnectionStatus; connection_id?: number } } | undefined,
+        ];
 
-      // Check connection status if viewing another user's profile
-      if (isAuthenticated && currentUserId && profileId !== currentUserId) {
-        requests.push(
-          api.get<{ status: ConnectionStatus; connection_id?: number }>(`/v2/connections/status/${profileId}`)
-        );
-      }
-
-      const results = await Promise.all(requests);
       if (controller.signal.aborted) return;
-      const connectionIdx = (isAuthenticated && currentUserId && profileId !== currentUserId)
-        ? (hasGamification ? 4 : 2)
-        : -1;
-
-      const [profileRes, listingsRes] = results as [
-        { success: boolean; data?: ProfileApiUser },
-        { success: boolean; data?: Listing[] },
-      ];
-      const gamificationProfileRes = hasGamification
-        ? (results[2] as { success: boolean; data?: GamificationProfileResponse } | undefined)
-        : undefined;
-      const gamificationBadgesRes = hasGamification
-        ? (results[3] as { success: boolean; data?: GamificationBadgeResponse[] } | undefined)
-        : undefined;
-      const connectionRes = connectionIdx >= 0 ? results[connectionIdx] as { success: boolean; data?: { status: ConnectionStatus; connection_id?: number } } | undefined : undefined;
 
       if (profileRes.success && profileRes.data) {
         setProfile(profileRes.data);
