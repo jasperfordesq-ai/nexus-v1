@@ -144,20 +144,5 @@
     "admin": "Admin",
     "expand_sidebar": "Expand sidebar",
     "collapse_sidebar": "Collapse sidebar"
-  },
-  "landing_page": "Landing Page",
-  "job_vacancies": "Job Vacancies",
-  "job_pipeline": "Job Pipeline",
-  "job_bias_audit": "Bias Audit",
-  "job_templates": "Job Templates",
-  "module_configuration": "Module Configuration",
-  "translation_config": "Translation Config",
-  "feature_flags": "Feature Flags",
-  "secrets_vault": "Secrets Vault",
-  "marketplace": "Marketplace",
-  "marketplace_dashboard": "Marketplace Dashboard",
-  "marketplace_moderation": "Marketplace Moderation",
-  "marketplace_sellers": "Marketplace Sellers",
-  "broker_panel": "Broker Panel",
-  "federation_cc_config": "Credit Commons Config"
+  }
 }

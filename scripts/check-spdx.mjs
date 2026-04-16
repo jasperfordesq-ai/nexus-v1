@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'fs';
+import { existsSync, readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 
 // Auto-generated files that should not have SPDX headers added
@@ -36,6 +36,7 @@ let totalWithHeader = 0;
 let totalMissing = 0;
 
 for (const { path: dirPath, ext } of dirs) {
+  if (!existsSync(dirPath)) continue;
   const files = walk(dirPath, ext);
   const missing = files.filter(f => {
     const content = readFileSync(f, 'utf-8');

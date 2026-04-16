@@ -163,9 +163,10 @@ export function SkillsBrowsePage() {
       const response = await api.get<{ skills?: CategorySkill[] }>(`/v2/skills/categories/${categoryId}`);
       if (response.success && response.data) {
         // The endpoint returns a category object with a `skills` array
+        const data = response.data;
         setCategorySkills((prev) => ({
           ...prev,
-          [categoryId]: response.data.skills || [],
+          [categoryId]: data.skills || [],
         }));
       }
     } catch (err) {

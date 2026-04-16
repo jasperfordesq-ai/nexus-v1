@@ -18,7 +18,13 @@
       "body_renew": "Renew it now to keep it visible to the community.",
       "cta": "View Listing",
       "days_one": "1 day",
-      "days_other": "{{count}} days"
+      "days_other": "{{count}} days",
+      "urgent_note": "Act soon to keep your listing visible!",
+      "expired_subject": "Your listing \"{{title}}\" has expired",
+      "expired_title": "Listing Expired",
+      "expired_preview": "Your listing has expired — renew it to stay visible",
+      "expired_body": "Your listing <strong>\"{{title}}\"</strong> has expired. Renew it now to continue receiving responses from community members.",
+      "expired_cta": "Renew Listing"
     },
     "approved": {
       "notification": "Your listing \"{{title}}\" has been approved and is now active.",
@@ -36,7 +42,11 @@
       "cta": "Edit Listing"
     },
     "removed": {
-      "notification": "Your listing \"{{title}}\" has been removed by a moderator."
+      "notification": "Your listing \"{{title}}\" has been removed by a moderator.",
+      "email_subject": "Your listing has been removed — {{title}}",
+      "email_title": "Listing Removed",
+      "email_body": "Your listing <strong>\"{{title}}\"</strong> has been removed by a moderator.",
+      "email_cta": "Browse Listings"
     }
   }
 }

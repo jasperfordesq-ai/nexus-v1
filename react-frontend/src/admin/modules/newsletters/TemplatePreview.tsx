@@ -34,29 +34,64 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
   const [name, setName] = useState('');
   const [subject, setSubject] = useState('');
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   const loadPreview = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const res = await adminNewsletters.previewTemplate(templateId);
       if (res.success && res.data) {
         const data = res.data as { html?: string; name?: string; subject?: string };
-        setHtml(data.html || '<p style="color:#666;text-align:center;padding:40px;">No content</p>');
-        setName(data.name || 'Template Preview');
+        setHtml(data.html || '');
+        setName(data.name || t('template_form.template_preview'));
         setSubject(data.subject || '');
       }
     } catch {
-      setHtml('<p style="color:#c00;text-align:center;padding:40px;">Failed to load preview</p>');
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
-  }, [templateId]);
+  }, [templateId, t]);
 
   useEffect(() => {
     if (isOpen) {
       loadPreview();
     }
   }, [isOpen, loadPreview]);
+
+  const renderBody = () => {
+    if (loading) {
+      return (
+        <div className="flex items-center justify-center py-20">
+          <Spinner size="lg" label={t('template_form.loading_preview')} />
+        </div>
+      );
+    }
+    if (loadError) {
+      return (
+        <div className="flex items-center justify-center py-20 text-danger">
+          {t('template_form.load_failed')}
+        </div>
+      );
+    }
+    if (!html) {
+      return (
+        <div className="flex items-center justify-center py-20 text-default-400">
+          {t('template_form.no_content')}
+        </div>
+      );
+    }
+    return (
+      <iframe
+        title={t('template_form.template_preview')}
+        sandbox="allow-same-origin"
+        srcDoc={html}
+        className="w-full border-0"
+        style={{ minHeight: '500px', height: '70vh' }}
+      />
+    );
+  };
 
   return (
     <Modal
@@ -70,24 +105,12 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
           <span>{name}</span>
           {subject && (
             <span className="text-sm font-normal text-default-500">
-              Subject: {subject}
+              {t('template_form.subject_label')} {subject}
             </span>
           )}
         </ModalHeader>
         <ModalBody className="p-0">
-          {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <Spinner size="lg" label={t('template_form.loading_preview')} />
-            </div>
-          ) : (
-            <iframe
-              title={t('template_form.template_preview')}
-              sandbox="allow-same-origin"
-              srcDoc={html}
-              className="w-full border-0"
-              style={{ minHeight: '500px', height: '70vh' }}
-            />
-          )}
+          {renderBody()}
         </ModalBody>
         <ModalFooter>
           <Button
@@ -95,7 +118,7 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
             startContent={<X size={16} />}
             onPress={onClose}
           >
-            Close
+            {t('template_form.close')}
           </Button>
         </ModalFooter>
       </ModalContent>

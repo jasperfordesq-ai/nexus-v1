@@ -21,6 +21,7 @@ return [
     'group_joined_visit'        => 'Visit group',
     'group_join_rejected'       => 'Your request to join ":group" was not approved',
     'group_browse_others'       => 'Browse other groups',
+    'group_new_member'          => ':name joined your group ":group"',
     'group_new_discussion'      => ':author started a new discussion ":title" in ":group"',
     'group_view_discussion'     => 'View discussion',
     'group_new_announcement'    => ':author posted an announcement ":title" in ":group"',
@@ -181,6 +182,7 @@ return [
     'exchange_ready_confirmation'    => 'Exchange complete - please confirm :hours hours worked',
     'listing_risk_tagged'            => "Listing ':title' tagged as :level risk",
     'credit_received'                => ':name sent you :amount hour(s)',
+    'credit_received_for'            => 'for ":description"',
 
     // Exchange email subjects
     'exchange_email_request_received'   => 'New exchange request for ":title"',
@@ -263,6 +265,7 @@ return [
     'credit_view_wallet'         => 'View Your Wallet',
     'credit_footer'              => ':tenant — Time credits that strengthen communities',
 
+    'review_received_in_app'     => ':name left you a :rating-star review',
     'review_received_heading'    => 'New Review Received!',
     'review_received_body'       => '<strong>:reviewer</strong> has left you a review on :tenant.',
     'review_email_subject'       => ':reviewer left you a :rating-star review on :tenant',

@@ -161,5 +161,23 @@
   "feed.create_post_failed": "Failed to create post",
   "verification_badge.user_not_found": "User not found",
   "verification_badge.badge_already_active": "Badge already active",
-  "verification_badge.invalid_badge_type": "Invalid badge type: :type"
+  "verification_badge.invalid_badge_type": "Invalid badge type: :type",
+  "two_factor.disabled_notification": "Two-factor authentication has been disabled on your account. If you did not do this, secure your account immediately.",
+  "two_factor.disabled_email_title": "Two-Factor Authentication Disabled",
+  "two_factor.disabled_email_preview": "2FA has been disabled on your account.",
+  "two_factor.disabled_email_body": "Two-factor authentication has been disabled on your account. If you did not make this change, please secure your account immediately by changing your password and re-enabling 2FA.",
+  "two_factor.disabled_email_subject": "Security Alert: 2FA Disabled — {{tenant}}",
+  "password_reset.changed_bell": "Your password was changed. If you did not do this, contact support immediately.",
+  "two_factor.enabled_notification": "Two-factor authentication has been enabled on your account.",
+  "webauthn.passkey_removed_bell": "A passkey was removed from your account. If you did not do this, secure your account immediately.",
+  "webauthn.all_passkeys_removed_bell": "All passkeys ({{count}}) were removed from your account. If you did not do this, secure your account immediately.",
+  "email_test": {
+    "subject": "Project NEXUS — Email Test",
+    "heading": "Email Test",
+    "body_provider": "This test email was sent via {{provider}} at {{time}}.",
+    "body_success": "If you received this email, your email configuration is working correctly.",
+    "provider_subject": "Project NEXUS — Email Provider Test",
+    "provider_heading": "Email Provider Test",
+    "body_tenant_ok": "Your tenant email provider is configured and working correctly."
+  }
 }

@@ -124,7 +124,7 @@ class AdminJobsController extends BaseApiController
 
         $errors = $this->jobVacancyService->getErrors();
         $first = $errors[0] ?? [];
-        return $this->respondWithError($first['code'] ?? 'UPDATE_FAILED', $first['message'] ?? 'Failed to update', null, 400);
+        return $this->respondWithError($first['code'] ?? 'UPDATE_FAILED', $first['message'] ?? __('errors.generic.update_failed'), null, 400);
     }
 
     // =====================================================================

@@ -193,13 +193,13 @@ class ImageUploader
             'height' => $newHeight
         ]);
 
-        \\Illuminate\Support\Facades\Log::warning("Auto-resized image: {$srcWidth}x{$srcHeight} -> {$newWidth}x{$newHeight}");
+        \Illuminate\Support\Facades\Log::warning("Auto-resized image: {$srcWidth}x{$srcHeight} -> {$newWidth}x{$newHeight}");
     }
 
     private static function processImage($path, $options)
     {
         if (!\function_exists('imagecreatefromjpeg')) {
-            \\Illuminate\Support\Facades\Log::warning('Warning: GD library not available. Image uploaded without resizing/cropping.');
+            \Illuminate\Support\Facades\Log::warning('Warning: GD library not available. Image uploaded without resizing/cropping.');
             return;
         }
 

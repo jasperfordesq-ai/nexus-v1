@@ -72,7 +72,7 @@ const sections: PlatformLegalSection[] = [
               href="https://project-nexus.ie"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-primary hover:underline"
             >
               project-nexus.ie
             </a>
@@ -86,7 +86,7 @@ const sections: PlatformLegalSection[] = [
               href="https://github.com/jasperfordesq-ai/nexus-v1"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-primary hover:underline"
             >
               github.com/jasperfordesq-ai/nexus-v1
             </a>

@@ -1,0 +1,38 @@
+{
+  "2fa_enabled": {
+    "subject": "Security Alert: Two-factor authentication enabled — {{community}}",
+    "title": "Two-Factor Authentication Enabled",
+    "preview": "Two-factor authentication has been enabled on your account",
+    "body": "Two-factor authentication has been enabled on your account. Your account is now more secure.",
+    "warning": "If you did not make this change, please contact support immediately to secure your account."
+  },
+  "2fa_disabled": {
+    "subject": "Security Alert: Two-factor authentication disabled — {{community}}",
+    "title": "Two-Factor Authentication Disabled",
+    "preview": "Two-factor authentication has been disabled on your account",
+    "body": "Two-factor authentication has been disabled on your account.",
+    "warning": "If you did not make this change, please contact support immediately as your account may be at risk."
+  },
+  "passkey_registered": {
+    "subject": "Security Alert: New passkey registered — {{community}}",
+    "title": "New Passkey Registered",
+    "preview": "A new passkey has been added to your account",
+    "body": "A new passkey has been registered on your {{community}} account.",
+    "warning": "If you did not register this passkey, please contact support immediately to secure your account."
+  },
+  "passkey_removed": {
+    "subject": "Security Alert: Passkey removed — {{community}}",
+    "title": "Passkey Removed",
+    "preview": "A passkey has been removed from your account",
+    "body": "A passkey has been removed from your {{community}} account.",
+    "warning": "If you did not make this change, please contact support immediately to secure your account."
+  },
+  "connection_declined": {
+    "subject": "Your connection request was not accepted — {{community}}",
+    "title": "Connection Request Update",
+    "preview": "Your connection request to {{name}} was not accepted",
+    "body": "Your connection request to <strong>{{name}}</strong> on {{community}} was not accepted at this time.",
+    "suggestion": "Don't be discouraged — there are many other members in your community to connect with.",
+    "cta": "Discover Members"
+  }
+}

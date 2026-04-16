@@ -126,5 +126,10 @@
   },
   "idea_team": {
     "added_to_group": "You've been added to {{group}}"
+  },
+  "goal": {
+    "reminder_bell": "Goal reminder: \"{{title}}\"",
+    "reminder_push_title": "Goal Reminder",
+    "reminder_push_message": "Don't forget your goal: \"{{title}}\""
   }
 }

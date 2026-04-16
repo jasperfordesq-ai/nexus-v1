@@ -701,12 +701,12 @@ class Mailer
         $mailer = new self();
 
         if (!$mailer->useGmailApi) {
-            return ['success' => false, 'message' => 'Gmail API is not enabled'];
+            return ['success' => false, 'message' => __('admin.mailer.gmail_not_enabled')];
         }
 
         $token = $mailer->getGmailAccessToken();
         if (!$token) {
-            return ['success' => false, 'message' => 'Failed to obtain access token. Check credentials.'];
+            return ['success' => false, 'message' => __('admin.mailer.gmail_token_failed')];
         }
 
         $ch = curl_init('https://gmail.googleapis.com/gmail/v1/users/me/profile');
@@ -724,11 +724,11 @@ class Mailer
             $profile = json_decode($response, true);
             return [
                 'success' => true,
-                'message' => 'Connected to Gmail API successfully. Email: ' . ($profile['emailAddress'] ?? 'unknown')
+                'message' => __('admin.mailer.gmail_connected', ['email' => $profile['emailAddress'] ?? 'unknown'])
             ];
         }
 
-        return ['success' => false, 'message' => 'Failed to verify Gmail API connection: ' . $response];
+        return ['success' => false, 'message' => __('admin.mailer.gmail_verify_failed')];
     }
 
     /**

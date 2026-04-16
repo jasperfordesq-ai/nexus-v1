@@ -157,7 +157,11 @@ class Authenticate
                 @session_start();
             }
             $_SESSION['user_id'] = $userId;
-            $_SESSION['tenant_id'] = $eloquentUser->tenant_id;
+            // Use the *request* tenant (not the user's home tenant) so that super-admins
+            // browsing cross-tenant are tracked against the correct community. Falling back
+            // to $eloquentUser->tenant_id only when TenantContext has not resolved a tenant
+            // (e.g. super-admin panel routes that are not tenant-scoped).
+            $_SESSION['tenant_id'] = $tenantId ?? (int) $eloquentUser->tenant_id;
 
             return true;
         } catch (\Throwable $e) {
