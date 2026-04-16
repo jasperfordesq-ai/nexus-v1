@@ -102,7 +102,7 @@ When debugging, do NOT go in circles. If an approach fails twice, stop and reass
 
 | **Sales Site** | http://localhost:3001 |
 | **React Admin** | http://localhost:5173/admin |
-| **PHP Admin (Legacy)** | http://localhost:8090/admin-legacy/ |
+| **PHP Admin (Legacy)** | ~~http://localhost:8090/admin-legacy/~~ — decommissioned |
 | **phpMyAdmin** | http://localhost:8091 (with `--profile tools`) |
 
 ```bash
@@ -222,17 +222,16 @@ This project is **publicly released** under AGPL-3.0-or-later at <https://github
 
 ### 🔴 LEGACY PHP THEMES ARE DEAD — NEVER TOUCH (CRITICAL)
 
-**The old PHP frontend themes — `civicone`, `modern`, `starter`, and any others under `views/` (except admin panels) — are DEAD legacy code.** Do NOT spend any time or credits on them. Ever.
+**ALL `views/` content is DEAD legacy code.** `/admin-legacy/` and `/super-admin/` have been decommissioned. Do NOT spend any time or credits on any PHP views. Ever.
 
-- **NEVER modify, fix, refactor, or audit** legacy PHP theme files (`views/civicone/`, `views/modern/` non-admin, `views/starter/`, etc.)
-- **NEVER create hooks, checks, or CI gates** that reference legacy themes
-- **NEVER suggest improvements** to legacy PHP frontend code
-- The ONLY PHP views that are maintained are `views/admin/` and `views/modern/admin/` (for `/admin-legacy/` and `/super-admin/`)
+- **NEVER modify, fix, refactor, or audit** any PHP view files under `views/` (including `views/admin/`, `views/modern/admin/`, `views/civicone/`, `views/starter/`, etc.)
+- **NEVER create hooks, checks, or CI gates** that reference legacy views
+- **NEVER suggest improvements** to any legacy PHP view code
 - All user-facing UI is React. Period.
 
 ### 🔴 REACT FRONTEND IS THE PRIMARY UI (CRITICAL)
 
-**The React frontend (`react-frontend/`) is the primary frontend for all user-facing pages.** PHP admin views remain at `views/admin/` and `views/modern/admin/` for legacy admin panels (`/admin-legacy/`, `/super-admin/`).
+**The React frontend (`react-frontend/`) is the sole frontend for all pages.** There are no maintained PHP views.
 
 - **ALL UI work** goes in `react-frontend/`
 - **UI stack**: React 18 + TypeScript + **HeroUI** (`@heroui/react`) + **Tailwind CSS 4** + Framer Motion
@@ -240,7 +239,7 @@ This project is **publicly released** under AGPL-3.0-or-later at <https://github
 - Use HeroUI components as primary building blocks
 - Use Tailwind CSS utilities for layout/spacing — **no separate CSS component files**
 - Use CSS tokens in `src/styles/tokens.css` for theme-aware colors
-- **Do NOT** create PHP views (except admin panels at `/admin-legacy/` and `/super-admin/`)
+- **Do NOT** create PHP views
 
 See [react-frontend/CLAUDE.md](react-frontend/CLAUDE.md) for full styling rules, contexts, hooks, and component reference.
 
