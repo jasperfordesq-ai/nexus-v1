@@ -400,5 +400,21 @@
     "exchange_cancelled": "Exchange Cancelled",
     "exchange_disputed": "\u26A0\uFE0F Exchange Dispute - Broker Review Needed",
     "default": "Notification from Project NEXUS"
+  },
+  "donation": {
+    "sent_subject": "You donated :amount time credits",
+    "sent_title": "Donation Sent",
+    "sent_preview": "Your :amount credit donation was sent to :recipient",
+    "sent_greeting": "Thank you for your generosity!",
+    "sent_body": "You successfully donated :amount time credits to :recipient.",
+    "sent_message_label": "Your message",
+    "sent_cta": "View Your Wallet",
+    "received_subject": "You received a donation of :amount time credits",
+    "received_title": "Donation Received",
+    "received_preview": ":donor donated :amount credits to you",
+    "received_greeting": "Great news!",
+    "received_body": ":donor has donated :amount time credits to your wallet.",
+    "received_message_label": "Their message",
+    "received_cta": "View Your Wallet"
   }
 }

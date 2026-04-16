@@ -48,7 +48,7 @@ class CreditDonationService
             return false;
         }
 
-        return DB::transaction(function () use ($tenantId, $fromUserId, $toUserId, $amount, $message) {
+        $success = DB::transaction(function () use ($tenantId, $fromUserId, $toUserId, $amount, $message) {
             // Atomic deduct
             $affected = DB::table('users')
                 ->where('id', $fromUserId)
@@ -89,6 +89,16 @@ class CreditDonationService
 
             return true;
         });
+
+        if ($success) {
+            try {
+                DonationEmailService::sendDonationEmails($tenantId, $donor, $recipient, $amount, $message);
+            } catch (\Throwable $e) {
+                Log::warning('CreditDonationService: donation email failed: ' . $e->getMessage());
+            }
+        }
+
+        return $success;
     }
 
     /**
