@@ -5,6 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
 import path from 'path'
 import { execSync } from 'child_process'
+import { createRequire } from 'module'
 
 // Inject git commit SHA at build time for version verification.
 // In Docker production builds, BUILD_COMMIT is passed as a build arg (since
@@ -18,6 +19,15 @@ const commitHash = process.env.BUILD_COMMIT || (() => {
 })()
 
 const isDocker = !!process.env.DOCKER_ENV
+const require = createRequire(import.meta.url)
+const canOptimizeImages = (() => {
+  try {
+    require.resolve('sharp')
+    return true
+  } catch {
+    return false
+  }
+})()
 
 export default defineConfig(({ command }) => ({
   plugins: [
@@ -67,8 +77,10 @@ export default defineConfig(({ command }) => ({
         navigateFallbackDenylist: [/^\/api\//, /^\/admin-legacy\//, /^\/health\.php/],
       },
     }),
-    // Image optimizer only runs during build — skip in dev for faster startup
-    ...(command === 'build' ? [ViteImageOptimizer({
+    // Image optimizer only runs during build — skip in dev for faster startup.
+    // Some local environments end up with an incomplete sharp install, which
+    // makes vite-plugin-image-optimizer log asset errors despite a successful build.
+    ...(command === 'build' && canOptimizeImages ? [ViteImageOptimizer({
       png: { quality: 80 },
       jpeg: { quality: 80 },
       jpg: { quality: 80 },
@@ -76,6 +88,12 @@ export default defineConfig(({ command }) => ({
       svg: { plugins: [{ name: 'preset-default' }] },
       logStats: true,
     })] : []),
+    ...(command === 'build' && !canOptimizeImages ? [{
+      name: 'nexus:missing-sharp-warning',
+      configResolved() {
+        console.warn('[vite] Skipping image optimization because sharp is not resolvable in this workspace.')
+      },
+    }] : []),
   ],
   define: {
     __BUILD_COMMIT__: JSON.stringify(commitHash),
