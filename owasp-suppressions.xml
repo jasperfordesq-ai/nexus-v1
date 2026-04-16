@@ -269,4 +269,24 @@
     <vulnerabilityName>CVE-2024-39689</vulnerabilityName>
   </suppress>
 
+  <!--
+    FALSE POSITIVE: ejs 3.1.10 is the PATCHED version for CVE-2023-29827.
+    CVE-2023-29827 (CVSS 9.8) describes a prototype pollution vulnerability
+    in ejs ≤ 3.1.9 via the `__proto__` key in the `settings` object passed
+    to render(). The fix was released in ejs 3.1.10.
+    OWASP Dependency Check incorrectly flags 3.1.10 as vulnerable because
+    its NVD CPE matching does not account for the patch version boundary.
+    Our installed version IS the fix — suppressing this confirmed false positive.
+    Reviewed: 2026-04-16.
+  -->
+  <suppress>
+    <notes><![CDATA[
+      FP: ejs 3.1.10 is the patched release for CVE-2023-29827.
+      The vulnerability affected ejs <= 3.1.9; 3.1.10 is the fix.
+      OWASP DC NVD CPE matching error — safe to suppress.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:npm/ejs@.*$</packageUrl>
+    <vulnerabilityName>CVE-2023-29827</vulnerabilityName>
+  </suppress>
+
 </suppressions>

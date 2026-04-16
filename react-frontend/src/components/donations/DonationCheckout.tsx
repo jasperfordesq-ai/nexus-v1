@@ -123,9 +123,8 @@ export function DonationCheckout({
       });
 
       if (response.success && response.data) {
-        const data = response.data as unknown as PaymentIntentResponse;
-        setClientSecret(data.client_secret);
-        setDonationId(data.donation_id);
+        setClientSecret(response.data.client_secret);
+        setDonationId(response.data.donation_id);
         setStep('payment');
       } else {
         toast.error(response.error || t('donations.intent_error', 'Failed to initialize payment. Please try again.'));

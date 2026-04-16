@@ -196,7 +196,15 @@ class AdminFederationController extends BaseApiController
 
             $federationSettings = $config['federation'] ?? [];
             if (isset($input['settings']) && is_array($input['settings'])) {
-                $federationSettings = array_merge($federationSettings, $input['settings']);
+                $allowedSettingKeys = [
+                    'profile_visible_federated', 'appear_in_federated_search',
+                    'show_skills_federated', 'show_location_federated',
+                    'show_reviews_federated', 'messaging_enabled_federated',
+                    'transactions_enabled_federated', 'email_notifications',
+                    'service_reach', 'travel_radius_km',
+                ];
+                $filtered = array_intersect_key($input['settings'], array_flip($allowedSettingKeys));
+                $federationSettings = array_merge($federationSettings, $filtered);
             }
             if (isset($input['federation_enabled'])) {
                 $federationSettings['federation_enabled'] = $input['federation_enabled'];
@@ -600,7 +608,12 @@ class AdminFederationController extends BaseApiController
         try {
             $row = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
             $config = json_decode($row->configuration ?? '{}', true) ?: [];
-            $config['federation_profile'] = array_merge($config['federation_profile'] ?? [], $input);
+            $allowedProfileKeys = ['description', 'contact_email', 'website', 'categories'];
+            $profileInput = isset($input['federation_profile']) && is_array($input['federation_profile'])
+                ? $input['federation_profile']
+                : $input;
+            $filtered = array_intersect_key($profileInput, array_flip($allowedProfileKeys));
+            $config['federation_profile'] = array_merge($config['federation_profile'] ?? [], $filtered);
             DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
             try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
             return $this->respondWithData($config['federation_profile']);

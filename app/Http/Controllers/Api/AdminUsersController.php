@@ -96,7 +96,7 @@ class AdminUsersController extends BaseApiController
 
         if ($search) {
             $conditions[] = "(u.first_name LIKE ? OR u.last_name LIKE ? OR u.email LIKE ? OR CONCAT(u.first_name, ' ', u.last_name) LIKE ?)";
-            $searchTerm = '%' . $search . '%';
+            $searchTerm = '%' . addcslashes($search, '%_') . '%';
             $params[] = $searchTerm;
             $params[] = $searchTerm;
             $params[] = $searchTerm;

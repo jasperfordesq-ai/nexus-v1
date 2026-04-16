@@ -53,7 +53,7 @@ export function DonationReceipt({ donationId }: DonationReceiptProps) {
         const response = await api.get<ReceiptData>(`/v2/donations/${donationId}/receipt`);
 
         if (response.success && response.data) {
-          setReceipt(response.data as unknown as ReceiptData);
+          setReceipt(response.data);
         } else {
           setError(response.error || t('donations.receipt_error', 'Failed to load receipt.'));
         }

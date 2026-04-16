@@ -13,7 +13,10 @@ return new class extends Migration
     {
         // Add 'rejected' to the status ENUM so rejected requests are distinguishable
         // from terminated partnerships and can be re-requested
-        DB::statement("ALTER TABLE federation_partnerships MODIFY COLUMN status ENUM('pending','active','suspended','terminated','rejected') NOT NULL DEFAULT 'pending'");
+        $column = DB::selectOne("SHOW COLUMNS FROM federation_partnerships WHERE Field = 'status'");
+        if ($column && !str_contains($column->Type, "'rejected'")) {
+            DB::statement("ALTER TABLE federation_partnerships MODIFY COLUMN status ENUM('pending','active','suspended','terminated','rejected') NOT NULL DEFAULT 'pending'");
+        }
     }
 
     public function down(): void

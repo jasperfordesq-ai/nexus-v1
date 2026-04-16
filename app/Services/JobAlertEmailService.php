@@ -87,7 +87,7 @@ class JobAlertEmailService
         $heading = __('emails.job_alert.subject_digest', ['count' => $count, 'plural' => $plural]);
         $greeting = __('emails.common.greeting', ['name' => $name]);
         $receivingNotice = __('emails.job_alert.receiving_notice');
-        $manageAlertsLink = '<a href="' . $appUrl . '/jobs/alerts" style="color:#4f46e5;">' . __('emails.job_alert.manage_alerts') . '</a>';
+        $manageAlertsLink = '<a href="' . TenantContext::getFrontendUrl('/jobs/alerts') . '" style="color:#4f46e5;">' . __('emails.job_alert.manage_alerts') . '</a>';
         $unsubscribeText = __('emails.job_alert.unsubscribe', ['link' => $manageAlertsLink]);
 
         return <<<HTML
