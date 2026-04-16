@@ -31,7 +31,7 @@ export function CtaSection({ content }: CtaSectionProps) {
   const buttonLink = content?.button_link || '/register';
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8">
+    <section aria-labelledby="cta-heading" className="py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -39,7 +39,7 @@ export function CtaSection({ content }: CtaSectionProps) {
           viewport={{ once: true }}
           className="p-6 sm:p-8 lg:p-12 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-theme-default"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-4">
+          <h2 id="cta-heading" className="text-3xl sm:text-4xl font-bold text-theme-primary mb-4">
             {title}
           </h2>
           <p className="text-theme-muted mb-8 max-w-xl mx-auto">

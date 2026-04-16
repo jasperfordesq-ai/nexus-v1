@@ -41,14 +41,14 @@ export function HeroSection({ content }: HeroSectionProps) {
   const ctaPrimaryLink = content?.cta_primary_link || '/register';
   const ctaSecondaryText = content?.cta_secondary_text || t('home.cta_learn_more');
   const ctaSecondaryLink = content?.cta_secondary_link || '/about';
-  const ctaFeedText = t('home.cta_feed', { defaultValue: t('home.cta_dashboard') });
+  const ctaFeedText = t('home.cta_feed');
 
   const scrollToSection = () => {
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <section className="relative py-20 sm:py-32 px-4 sm:px-6 lg:px-8">
+    <section aria-labelledby="hero-heading" className="relative py-20 sm:py-32 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <motion.div
           className="text-center"
@@ -66,6 +66,7 @@ export function HeroSection({ content }: HeroSectionProps) {
 
           {/* Headline */}
           <motion.h1
+            id="hero-heading"
             variants={fadeInUp}
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight"
           >

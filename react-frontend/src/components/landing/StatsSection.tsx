@@ -36,6 +36,7 @@ interface StatsSectionProps {
 export function StatsSection({ content }: StatsSectionProps) {
   const { t } = useTranslation('public');
   const [platformStats, setPlatformStats] = useState<PlatformStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
   const hidden = content?.show_live_stats === false;
 
@@ -54,6 +55,10 @@ export function StatsSection({ content }: StatsSectionProps) {
     } catch (error) {
       if (controller.signal.aborted) return;
       logError('Failed to load platform stats', error);
+    } finally {
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [hidden]);
 
@@ -96,7 +101,7 @@ export function StatsSection({ content }: StatsSectionProps) {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ delay: index * 0.1 }}
-            className="text-3xl sm:text-4xl font-bold text-gradient"
+            className={`text-3xl sm:text-4xl font-bold text-gradient${isLoading ? ' animate-pulse' : ''}`}
           >
             {stat.value}
           </motion.p>

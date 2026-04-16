@@ -62,8 +62,9 @@ export function FeaturePillsSection({ content }: FeaturePillsSectionProps) {
         <motion.div
           key={pill.title}
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 + index * 0.1 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: index * 0.1 }}
           className="flex items-center gap-3 p-4 rounded-2xl glass-card backdrop-blur-lg"
         >
           <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">

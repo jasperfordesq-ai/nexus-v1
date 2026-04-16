@@ -75,7 +75,7 @@ export function HowItWorksSection({ content }: HowItWorksSectionProps) {
         ];
 
   return (
-    <section id="features" className="py-20 px-4 sm:px-6 lg:px-8">
+    <section id="features" aria-labelledby="how-it-works-heading" className="py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -83,7 +83,7 @@ export function HowItWorksSection({ content }: HowItWorksSectionProps) {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
+          <h2 id="how-it-works-heading" className="text-2xl sm:text-3xl font-bold text-theme-primary mb-3">
             {title}
           </h2>
           <p className="text-theme-muted max-w-lg mx-auto">
