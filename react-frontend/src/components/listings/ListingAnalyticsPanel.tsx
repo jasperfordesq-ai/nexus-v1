@@ -9,7 +9,7 @@
  * Displays view counts, contact rate, save rate, and trends over time.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Spinner, Button } from '@heroui/react';
 import { Eye, MessageCircle, Heart, TrendingUp, TrendingDown, AlertTriangle, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -27,20 +27,28 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
   const [analytics, setAnalytics] = useState<ListingAnalytics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
+  const analyticsAbortRef = useRef<AbortController | null>(null);
 
   const loadAnalytics = useCallback(async () => {
+    analyticsAbortRef.current?.abort();
+    const controller = new AbortController();
+    analyticsAbortRef.current = controller;
     try {
       setIsLoading(true);
       setError(false);
       const response = await api.get<ListingAnalytics>(`/v2/listings/${listingId}/analytics?days=30`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setAnalytics(response.data);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load listing analytics', err);
       setError(true);
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [listingId]);
 
@@ -86,6 +94,11 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
   const { summary } = analytics;
   const trendPositive = summary.views_trend_percent >= 0;
 
+  const maxViewCount = useMemo(
+    () => Math.max(...analytics.views_over_time.map((d) => Number(d.count)), 1),
+    [analytics.views_over_time]
+  );
+
   return (
     <GlassCard className="p-6">
       <h3 className="text-lg font-semibold text-theme-primary mb-4">{t('analytics.title', 'Listing Analytics')}</h3>
@@ -127,8 +140,7 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
           <h4 className="text-sm font-medium text-theme-muted mb-2">{t('analytics.views_last_days', 'Views (Last {{days}} Days)', { days: analytics.period_days })}</h4>
           <div className="flex items-end gap-1 h-16">
             {analytics.views_over_time.map((day) => {
-              const maxCount = Math.max(...analytics.views_over_time.map((d) => Number(d.count)), 1);
-              const height = (Number(day.count) / maxCount) * 100;
+              const height = (Number(day.count) / maxViewCount) * 100;
               return (
                 <div
                   key={day.date}

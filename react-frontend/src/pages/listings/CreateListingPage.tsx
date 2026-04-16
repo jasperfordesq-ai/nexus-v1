@@ -7,7 +7,7 @@
  * Create/Edit Listing Page
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -79,6 +79,10 @@ export function CreateListingPage() {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const editAbortRef = useRef<AbortController | null>(null);
+  // Stable ref so async handlers always use the latest t() without re-creation
+  const tRef = useRef(t);
+  tRef.current = t;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -109,9 +113,14 @@ export function CreateListingPage() {
     async function loadListing() {
       if (!id) return;
 
+      editAbortRef.current?.abort();
+      const controller = new AbortController();
+      editAbortRef.current = controller;
+
       try {
         setIsLoading(true);
         const response = await api.get<Listing>(`/v2/listings/${id}`);
+        if (controller.signal.aborted) return;
         if (response.success && response.data) {
           const listing = response.data;
           setFormData({
@@ -131,10 +140,13 @@ export function CreateListingPage() {
           }
         }
       } catch (error) {
+        if (controller.signal.aborted) return;
         logError('Failed to load listing', error);
         toast.error(t('form.load_error', 'Failed to load listing'));
       } finally {
-        setIsLoading(false);
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
       }
     }
 
@@ -191,26 +203,27 @@ export function CreateListingPage() {
       // Build enriched description with optional structured details
       let enrichedDescription = formData.description;
       const details: string[] = [];
+      const tFn = tRef.current ?? t;
       if (formData.experience_level) {
-        const labels: Record<string, string> = {
-          beginner_friendly: 'Beginner-friendly (anyone can learn)',
-          some_experience: 'Some experience helpful',
-          experienced: 'Experienced practitioner',
-          professional: 'Professional / certified',
+        const experienceLabels: Record<string, string> = {
+          beginner_friendly: tFn('form.experience_beginner', 'Beginner-friendly (anyone can learn)'),
+          some_experience: tFn('form.experience_some', 'Some experience helpful'),
+          experienced: tFn('form.experience_experienced', 'Experienced practitioner'),
+          professional: tFn('form.experience_professional', 'Professional / certified'),
         };
-        details.push(`Experience: ${labels[formData.experience_level] || formData.experience_level}`);
+        details.push(`${tFn('form.experience_label', 'Experience')}: ${experienceLabels[formData.experience_level] || formData.experience_level}`);
       }
       if (formData.equipment_provided) {
-        const labels: Record<string, string> = {
-          provided: 'Equipment provided',
-          partial: 'Some equipment needed from you',
-          bring_own: 'Bring your own equipment',
-          not_applicable: 'N/A',
+        const equipmentLabels: Record<string, string> = {
+          provided: tFn('form.equipment_provided_option', "I'll provide everything needed"),
+          partial: tFn('form.equipment_partial', 'Some things needed from you'),
+          bring_own: tFn('form.equipment_bring_own', "You'll need to provide your own"),
+          not_applicable: tFn('form.equipment_na', 'Not applicable'),
         };
-        details.push(`Equipment: ${labels[formData.equipment_provided] || formData.equipment_provided}`);
+        details.push(`${tFn('form.equipment_label', 'Equipment')}: ${equipmentLabels[formData.equipment_provided] || formData.equipment_provided}`);
       }
       if (formData.accessibility_notes) {
-        details.push(`Accessibility: ${formData.accessibility_notes}`);
+        details.push(`${tFn('form.accessibility_label', 'Accessibility')}: ${formData.accessibility_notes}`);
       }
       if (details.length > 0) {
         enrichedDescription += '\n\n---\n' + details.join('\n');

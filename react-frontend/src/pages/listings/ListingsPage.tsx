@@ -112,6 +112,8 @@ export function ListingsPage() {
   const cursorRef = useRef<string | null>(null);
   // Track in-flight save requests to prevent double-clicks
   const [savingIds, setSavingIds] = useState<Set<number>>(new Set());
+  // Persistent error indicator for "Load More" failures
+  const [paginationError, setPaginationError] = useState(false);
 
   // Stable refs for values used in loadListings but that should NOT trigger re-creation
   const toastRef = useRef(toast);
@@ -179,6 +181,7 @@ export function ListingsPage() {
           setListings(response.data);
         } else {
           setListings((prev) => [...prev, ...response.data!]);
+          setPaginationError(false);
         }
 
         // Handle pagination meta if present
@@ -199,6 +202,7 @@ export function ListingsPage() {
       if (reset) {
         setLoadError(tRef.current('load_error'));
       } else {
+        setPaginationError(true);
         toastRef.current.error(tRef.current('load_more_error'));
       }
     } finally {
@@ -221,11 +225,16 @@ export function ListingsPage() {
 
   // Load categories once on mount
   useEffect(() => {
+    const controller = new AbortController();
     api.get<Category[]>('/v2/categories?type=listing').then((response) => {
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setCategories(response.data);
       }
-    }).catch((error) => logError('Failed to load categories', error));
+    }).catch((error) => {
+      if (!controller.signal.aborted) logError('Failed to load categories', error);
+    });
+    return () => { controller.abort(); };
   }, []);
 
   // Debounce search input → searchQuery (300ms)
@@ -239,6 +248,19 @@ export function ListingsPage() {
     loadListingsRef.current(true);
     return () => { abortRef.current?.abort(); };
   }, [searchQuery, selectedType, selectedCategory, nearMeEnabled, user?.latitude, user?.longitude, radiusKm, hoursRange, serviceMode, postedWithin]);
+
+  // Restore scroll position on back-navigation; save on unmount
+  useEffect(() => {
+    const key = `listings-scroll${window.location.search}`;
+    const saved = sessionStorage.getItem(key);
+    if (saved) {
+      requestAnimationFrame(() => window.scrollTo(0, parseInt(saved, 10)));
+      sessionStorage.removeItem(key);
+    }
+    return () => {
+      sessionStorage.setItem(key, String(Math.round(window.scrollY)));
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync URL params with filter state (harmless if it re-runs)
   useEffect(() => {
@@ -662,6 +684,9 @@ export function ListingsPage() {
             <div
               className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}
             >
+              <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+                {!isLoading && listings.length > 0 ? t('listings_loaded_count', '{{count}} listings loaded', { count: listings.length }) : ''}
+              </div>
               {listings.map((listing) => (
                 <motion.div
                   key={listing.id}
@@ -691,6 +716,9 @@ export function ListingsPage() {
               >
                 {t('load_more')}
               </Button>
+              {paginationError && (
+                <p className="text-center text-sm text-danger mt-2">{t('load_more_error_persistent', 'Failed to load more listings. Please try again.')}</p>
+              )}
             </div>
           )}
         </>
@@ -840,13 +868,13 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
           {listing.service_type === 'remote_only' && (
             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium flex items-center gap-0.5">
               <Monitor className="w-2.5 h-2.5" aria-hidden="true" />
-              Remote
+              {t('service_type_remote', 'Remote')}
             </span>
           )}
           {listing.service_type === 'hybrid' && (
             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-medium flex items-center gap-0.5">
               <ArrowRightLeft className="w-2.5 h-2.5" aria-hidden="true" />
-              Remote Available
+              {t('service_type_hybrid_available', 'Remote Available')}
             </span>
           )}
           {listing.category_name && (

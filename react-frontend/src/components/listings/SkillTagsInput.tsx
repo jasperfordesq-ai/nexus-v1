@@ -132,14 +132,25 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
               input: 'bg-transparent text-theme-primary',
               inputWrapper: 'bg-theme-elevated border-theme-default',
             }}
+            inputProps={{
+              'aria-expanded': showSuggestions && suggestions.length > 0,
+              'aria-controls': 'skill-suggestions-listbox',
+              'aria-autocomplete': 'list',
+            }}
           />
 
           {/* Autocomplete dropdown */}
           {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute z-10 w-full mt-1 bg-theme-elevated border border-theme-default rounded-lg shadow-lg overflow-hidden">
+            <div
+              id="skill-suggestions-listbox"
+              role="listbox"
+              className="absolute z-10 w-full mt-1 bg-theme-elevated border border-theme-default rounded-lg shadow-lg overflow-hidden"
+            >
               {suggestions.map((suggestion) => (
                 <Button
                   key={suggestion}
+                  role="option"
+                  aria-selected={false}
                   variant="light"
                   className="w-full text-left px-3 py-2 text-sm text-theme-primary hover:bg-theme-hover transition-colors justify-start h-auto rounded-none"
                   onPress={() => addTag(suggestion)}

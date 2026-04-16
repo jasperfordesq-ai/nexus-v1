@@ -634,7 +634,7 @@ export function ListingDetailPage() {
               onValueChange={setReportReason}
               classNames={{ label: 'text-theme-secondary' }}
             >
-              <Radio value="inappropriate">{t('report_reason_inappropriate', 'Inappropriate content')}</Radio>
+              <Radio value="inappropriate" autoFocus>{t('report_reason_inappropriate', 'Inappropriate content')}</Radio>
               <Radio value="safety_concern">{t('report_reason_safety', 'Safety concern')}</Radio>
               <Radio value="misleading">{t('report_reason_misleading', 'Misleading description')}</Radio>
               <Radio value="spam">{t('report_reason_spam', 'Spam or scam')}</Radio>
@@ -707,14 +707,14 @@ export function ListingDetailPage() {
                       <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" aria-hidden="true" />
                       <span className="font-medium text-theme-primary">{listing.author_rating.toFixed(1)}</span>
                       {listing.author_reviews_count != null && listing.author_reviews_count > 0 && (
-                        <span>({listing.author_reviews_count} {listing.author_reviews_count === 1 ? 'review' : 'reviews'})</span>
+                        <span>({listing.author_reviews_count} {listing.author_reviews_count === 1 ? t('review', 'review') : t('reviews', 'reviews')})</span>
                       )}
                     </span>
                   )}
                   {listing.author_exchanges_count != null && listing.author_exchanges_count > 0 && (
                     <span className="flex items-center gap-1 text-xs text-theme-muted">
                       <ArrowRightLeft className="w-3.5 h-3.5" aria-hidden="true" />
-                      {listing.author_exchanges_count} {listing.author_exchanges_count === 1 ? 'exchange' : 'exchanges'} completed
+                      {listing.author_exchanges_count} {listing.author_exchanges_count === 1 ? t('exchange', 'exchange completed') : t('exchanges_completed', 'exchanges completed')}
                     </span>
                   )}
                 </div>
