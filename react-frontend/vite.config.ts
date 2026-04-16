@@ -147,6 +147,9 @@ export default defineConfig(({ command }) => ({
   build: {
     outDir: 'dist',
     rollupOptions: {
+      // Capacitor packages are optional native deps — not installed in web builds.
+      // Guard all usages with window.Capacitor?.isNativePlatform?.() checks.
+      external: ['@capacitor/app', '@capacitor/push-notifications'],
       output: {
         manualChunks: {
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],

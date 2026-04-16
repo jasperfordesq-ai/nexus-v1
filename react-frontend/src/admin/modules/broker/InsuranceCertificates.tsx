@@ -877,8 +877,8 @@ export function InsuranceCertificates() {
                 variant="bordered"
                 isRequired
               >
-                {Object.entries(INSURANCE_TYPE_LABELS).map(([key, label]) => (
-                  <SelectItem key={key}>{label}</SelectItem>
+                {INSURANCE_TYPE_KEYS.map((key) => (
+                  <SelectItem key={key}>{t(`broker.insurance_type_${key}`)}</SelectItem>
                 ))}
               </Select>
               <Input

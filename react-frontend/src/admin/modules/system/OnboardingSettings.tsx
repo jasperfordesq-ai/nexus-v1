@@ -129,7 +129,7 @@ export function OnboardingSettings() {
   const { tenant, tenantPath } = useTenant();
   const navigate = useNavigate();
   const getCountryPresetLabel = (preset: string) =>
-    t(COUNTRY_PRESET_LABEL_KEYS[preset] ?? COUNTRY_PRESET_LABEL_KEYS.custom);
+    t(COUNTRY_PRESET_LABEL_KEYS[preset] ?? 'system.onboarding.preset_custom');
 
   const [config, setConfig] = useState<OnboardingConfig | null>(null);
   const [safeguardingOptions, setSafeguardingOptions] = useState<SafeguardingOption[]>([]);

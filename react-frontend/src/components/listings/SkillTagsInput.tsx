@@ -132,11 +132,9 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
               input: 'bg-transparent text-theme-primary',
               inputWrapper: 'bg-theme-elevated border-theme-default',
             }}
-            inputProps={{
-              'aria-expanded': showSuggestions && suggestions.length > 0,
-              'aria-controls': 'skill-suggestions-listbox',
-              'aria-autocomplete': 'list',
-            }}
+            aria-expanded={showSuggestions && suggestions.length > 0}
+            aria-controls="skill-suggestions-listbox"
+            aria-autocomplete="list"
           />
 
           {/* Autocomplete dropdown */}

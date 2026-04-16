@@ -215,7 +215,7 @@ const SCHEMA_MAP = new Map<string, StaticSettingDef>(STATIC_SETTINGS.map((s) => 
  * Normalize a raw API value to the correct JS type based on schema definition.
  * Handles all the string/boolean/number coercion issues from mixed storage formats.
  */
-function normalizeValue(raw: unknown, def: ConfigSettingDef): unknown {
+function normalizeValue(raw: unknown, def: StaticSettingDef): unknown {
   if (raw === undefined || raw === null) return def.default ?? '';
 
   switch (def.type) {

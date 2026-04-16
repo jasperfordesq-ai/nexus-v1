@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next';
 // Extended type to include extra fields from the API
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface CronJobExtended extends CronJob {
+interface CronJobExtended extends Omit<CronJob, 'slug'> {
   slug?: string;
   category?: string;
   description?: string;
