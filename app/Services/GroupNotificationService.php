@@ -48,7 +48,7 @@ class GroupNotificationService
         $safeGroupName = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
         $message = __('notifications.group_join_request', ['name' => $userName, 'group' => $group->name]);
         $link = "/groups/{$groupId}/members?tab=requests";
-        $htmlContent = "<p><strong>{$safeUserName}</strong> has requested to join <strong>{$safeGroupName}</strong>.</p>"
+        $htmlContent = "<p>" . __('notifications.group_join_request', ['name' => "<strong>{$safeUserName}</strong>", 'group' => "<strong>{$safeGroupName}</strong>"]) . "</p>"
             . "<p><a href=\"{$link}\">" . __('notifications.group_join_request_review') . "</a></p>";
 
         foreach ($admins as $admin) {

@@ -466,7 +466,7 @@ class NewsletterService
 
         // Replace global tokens that are the same for every recipient in this send
         $unsubscribeLink = $unsubscribeToken
-            ? '<a href="' . $apiUrl . '/newsletter/unsubscribe?token=' . $unsubscribeToken . '" style="color:#6366f1;">Unsubscribe</a>'
+            ? '<a href="' . $apiUrl . '/newsletter/unsubscribe?token=' . $unsubscribeToken . '" style="color:#6366f1;">' . __('emails.newsletter.unsubscribe') . '</a>'
             : '';
         $content = str_replace(
             ['{{tenant_name}}', '{{unsubscribe_link}}'],

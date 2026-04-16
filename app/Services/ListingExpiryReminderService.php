@@ -174,10 +174,7 @@ class ListingExpiryReminderService
         $title = htmlspecialchars($listing->title, ENT_QUOTES, 'UTF-8');
         $expiresAt = $listing->expires_at;
 
-        $now = new \DateTime();
-        $expiryDate = new \DateTime($expiresAt);
-        $diff = $now->diff($expiryDate);
-        $daysLeft = $diff->days ?: 1;
+        $daysLeft = max(1, (int) now()->diffInDays(\Carbon\Carbon::parse($expiresAt), false));
 
         $daysText = $daysLeft === 1
             ? __('emails_listings.listings.expiry_reminder.days_one')
@@ -204,7 +201,7 @@ class ListingExpiryReminderService
                 $basePath = TenantContext::getSlugPrefix();
                 $listingUrl = $frontendUrl . $basePath . $link;
 
-                $ownerName = htmlspecialchars($listing->first_name ?? $listing->name ?? 'there', ENT_QUOTES, 'UTF-8');
+                $ownerName = htmlspecialchars($listing->first_name ?? $listing->name ?? __('emails.message.fallback_recipient_name'), ENT_QUOTES, 'UTF-8');
 
                 // Build body — for 1-day window, append urgency note
                 $body = "<p>" . __('emails.common.greeting', ['name' => $ownerName]) . "</p>"
@@ -258,7 +255,7 @@ class ListingExpiryReminderService
                 $basePath = TenantContext::getSlugPrefix();
                 $listingUrl = $frontendUrl . $basePath . $link;
 
-                $ownerName = htmlspecialchars($listing->first_name ?? $listing->name ?? 'there', ENT_QUOTES, 'UTF-8');
+                $ownerName = htmlspecialchars($listing->first_name ?? $listing->name ?? __('emails.message.fallback_recipient_name'), ENT_QUOTES, 'UTF-8');
 
                 $body = "<p>" . __('emails.common.greeting', ['name' => $ownerName]) . "</p>"
                     . "<p>" . __('emails_listings.listings.expiry_reminder.expired_body', ['title' => $title]) . "</p>";

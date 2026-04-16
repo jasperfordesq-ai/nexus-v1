@@ -589,5 +589,21 @@
     "ready_title": "Certificate Ready",
     "ready_body": "Your volunteer impact certificate has been generated. It shows <strong>{{hours}} hours</strong> of approved volunteer time.",
     "ready_cta": "View & Download Certificate"
+  },
+  "gdpr_export": {
+    "html_title": "Your Data Export — {{platform}}",
+    "html_heading": "Your Data Export",
+    "generated_label": "Generated:",
+    "no_data": "No data available",
+    "readme_header": "DATA EXPORT",
+    "readme_user_id": "User ID:",
+    "readme_platform": "Platform:",
+    "readme_intro": "This archive contains all personal data associated with your account.",
+    "readme_files_heading": "FILES INCLUDED:",
+    "readme_file_json": "data.json — Machine-readable format (JSON)",
+    "readme_file_html": "data.html — Human-readable format (HTML)",
+    "readme_file_uploads": "uploads/ — Your uploaded files (if any)",
+    "readme_support": "For questions about this export, please contact support.",
+    "readme_expiry": "This export will expire in 7 days."
   }
 }

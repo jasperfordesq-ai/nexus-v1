@@ -1797,19 +1797,25 @@ class GdprService
 
     private static function generateHtmlExport(array $data): string
     {
+        $platform = $data['export_info']['platform'] ?? config('app.name', 'NEXUS');
+        $title       = __('emails_misc.gdpr_export.html_title', ['platform' => $platform]);
+        $heading     = __('emails_misc.gdpr_export.html_heading');
+        $genLabel    = __('emails_misc.gdpr_export.generated_label');
+        $noData      = __('emails_misc.gdpr_export.no_data');
+
         $html = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
-        $html .= '<title>Your Data Export - NEXUS</title>';
+        $html .= '<title>' . htmlspecialchars($title) . '</title>';
         $html .= '<style>body{font-family:Arial,sans-serif;max-width:1200px;margin:0 auto;padding:20px}';
         $html .= 'h1,h2,h3{color:#333}table{width:100%;border-collapse:collapse;margin:20px 0}';
         $html .= 'th,td{border:1px solid #ddd;padding:10px;text-align:left}th{background:#f5f5f5}</style>';
         $html .= '</head><body>';
-        $html .= '<h1>Your Data Export</h1>';
-        $html .= '<p>Generated: ' . htmlspecialchars($data['export_info']['generated_at']) . '</p>';
+        $html .= '<h1>' . htmlspecialchars($heading) . '</h1>';
+        $html .= '<p>' . htmlspecialchars($genLabel) . ' ' . htmlspecialchars($data['export_info']['generated_at']) . '</p>';
 
         foreach ($data as $section => $content) {
             if ($section === 'export_info') continue;
 
-            $html .= '<h2>' . ucfirst(str_replace('_', ' ', $section)) . '</h2>';
+            $html .= '<h2>' . htmlspecialchars(ucfirst(str_replace('_', ' ', $section))) . '</h2>';
 
             if (is_array($content) && !empty($content)) {
                 if (isset($content[0]) && is_array($content[0])) {
@@ -1835,7 +1841,7 @@ class GdprService
                     $html .= '</table>';
                 }
             } else {
-                $html .= '<p>No data available</p>';
+                $html .= '<p>' . htmlspecialchars($noData) . '</p>';
             }
         }
 
@@ -1845,24 +1851,20 @@ class GdprService
 
     private static function generateExportReadme(array $data): string
     {
-        return "NEXUS DATA EXPORT
-==================
-
-Generated: {$data['export_info']['generated_at']}
-User ID: {$data['export_info']['user_id']}
-Platform: {$data['export_info']['platform']}
-
-This archive contains all personal data associated with your account.
-
-FILES INCLUDED:
-- data.json: Machine-readable format (JSON)
-- data.html: Human-readable format (HTML)
-- uploads/: Your uploaded files (if any)
-
-For questions about this export, please contact support.
-
-This export will expire in 7 days.
-";
+        $platform = $data['export_info']['platform'] ?? config('app.name', 'NEXUS');
+        $header   = $platform . ' ' . __('emails_misc.gdpr_export.readme_header');
+        $sep      = str_repeat('=', mb_strlen($header));
+        return $header . "\n" . $sep . "\n\n"
+            . __('emails_misc.gdpr_export.generated_label') . ' ' . $data['export_info']['generated_at'] . "\n"
+            . __('emails_misc.gdpr_export.readme_user_id') . ' ' . $data['export_info']['user_id'] . "\n"
+            . __('emails_misc.gdpr_export.readme_platform') . ' ' . $platform . "\n\n"
+            . __('emails_misc.gdpr_export.readme_intro') . "\n\n"
+            . __('emails_misc.gdpr_export.readme_files_heading') . "\n"
+            . '- ' . __('emails_misc.gdpr_export.readme_file_json') . "\n"
+            . '- ' . __('emails_misc.gdpr_export.readme_file_html') . "\n"
+            . '- ' . __('emails_misc.gdpr_export.readme_file_uploads') . "\n\n"
+            . __('emails_misc.gdpr_export.readme_support') . "\n\n"
+            . __('emails_misc.gdpr_export.readme_expiry') . "\n";
     }
 
     private static function copyUserUploads(int $userId, string $destDir): void
