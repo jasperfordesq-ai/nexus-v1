@@ -1968,7 +1968,7 @@ class CronJobRunner
         try {
             $totalAlerts = 0;
             $this->forEachTenant(function ($tenantId, $slug) use (&$totalAlerts) {
-                $results = AbuseDetectionService::runAllChecks();
+                $results = (new AbuseDetectionService())->runAllChecks();
                 $count = array_sum($results);
                 $totalAlerts += $count;
                 if ($count > 0) {

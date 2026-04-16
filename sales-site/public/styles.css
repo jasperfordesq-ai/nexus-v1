@@ -70,6 +70,10 @@ img {
   padding: 0 1.5rem;
 }
 
+section[id] {
+  scroll-margin-top: 6rem;
+}
+
 .text-gradient {
   background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
   -webkit-background-clip: text;
@@ -271,12 +275,16 @@ img {
   z-index: 99;
   transform: translateY(-100%);
   opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
   transition: all var(--transition);
 }
 
 .mobile-menu.open {
   transform: translateY(0);
   opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .mobile-link {

@@ -11,6 +11,8 @@
   <meta property="og:url" content="https://project-nexus.ie">
   <meta property="og:site_name" content="Project NEXUS">
   <meta property="og:image" content="https://project-nexus.ie/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Project NEXUS V1.5 &#x2014; Now Open Source">
   <meta name="twitter:description" content="Enterprise-grade community platform for timebanking. Free forever under AGPL-3.0.">
@@ -52,13 +54,13 @@
           GitHub
         </a>
       </div>
-      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-controls="mobile-menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
     </div>
   </nav>
 
-  <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile navigation" aria-hidden="true">
+  <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile navigation" aria-hidden="true" inert>
     <a href="#features" class="mobile-link">Features</a>
     <a href="#federation" class="mobile-link">Federation</a>
     <a href="#communities" class="mobile-link">Communities</a>
@@ -550,18 +552,25 @@ open http://localhost:5173</pre>
   <script>
     const toggle = document.getElementById('nav-toggle');
     const menu = document.getElementById('mobile-menu');
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
     function closeMenu() {
       menu.classList.remove('open');
       menu.setAttribute('aria-hidden', 'true');
+      menu.inert = true;
       toggle.classList.remove('open');
       toggle.setAttribute('aria-expanded', 'false');
       toggle.focus();
     }
+
+    menu.inert = true;
+
     toggle.addEventListener('click', () => {
       const isOpen = menu.classList.toggle('open');
       toggle.classList.toggle('open');
       toggle.setAttribute('aria-expanded', String(isOpen));
       menu.setAttribute('aria-hidden', String(!isOpen));
+      menu.inert = !isOpen;
     });
     menu.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', closeMenu);
@@ -584,7 +593,13 @@ open http://localhost:5173</pre>
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', (e) => {
         const target = document.querySelector(anchor.getAttribute('href'));
-        if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({
+            behavior: prefersReducedMotion.matches ? 'auto' : 'smooth',
+            block: 'start'
+          });
+        }
       });
     });
   </script>

@@ -308,6 +308,25 @@ class AbuseDetectionService
      * @param string|null $notes Resolution notes
      * @return bool
      */
+    /**
+     * Get alert counts by status for the current tenant (used by daily report).
+     *
+     * @return array{new: int, reviewing: int, resolved: int, dismissed: int}
+     */
+    public static function getAlertCounts(): array
+    {
+        $tenantId = TenantContext::getId();
+        $rows = DB::select(
+            "SELECT status, COUNT(*) as cnt FROM abuse_alerts WHERE tenant_id = ? GROUP BY status",
+            [$tenantId]
+        );
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[$row->status] = (int) $row->cnt;
+        }
+        return $counts;
+    }
+
     public function updateAlertStatus(int $id, string $status, ?int $resolvedBy = null, ?string $notes = null): bool
     {
         $alert = AbuseAlert::find($id);
