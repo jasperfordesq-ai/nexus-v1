@@ -1397,6 +1397,7 @@ return [
 
     // Feed / social
     'invalid_post_id'                      => 'Invalid post ID',
+    'invalid_target_type'                  => 'Invalid target type',
     'invalid_user'                         => 'Invalid user',
     'database_error'                       => 'Database error',
     'already_reported'                     => 'Already reported',
@@ -1665,6 +1666,10 @@ return [
     'tenant_mismatch_error'             => 'Tenant mismatch — operation skipped',
     'user_missing_tenant_id'            => 'User has no tenant_id — cannot resolve tenant',
     'invalid_table_parameter'           => 'Invalid table parameter provided',
+
+    // GroupsController join responses
+    'group_joined'                      => 'Successfully joined the group',
+    'group_join_requested'              => 'Join request submitted',
 
     // BlockUserService
     'cannot_block_yourself'             => 'You cannot block yourself',
