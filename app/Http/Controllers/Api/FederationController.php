@@ -603,8 +603,12 @@ class FederationController extends BaseApiController
         }
 
         if ($isExternal) {
+            // For external partners, the recipient is a local user — use the current
+            // tenant context rather than the partner's tenant_id from the API key,
+            // which may differ from the recipient's actual tenant.
+            $recipientTenantId = \App\Core\TenantContext::getId() ?? $partnerTenantId;
             $stmt = $db->prepare("SELECT u.id, u.first_name, u.tenant_id, fus.messaging_enabled_federated FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id WHERE u.id = ? AND u.tenant_id = ? AND fus.federation_optin = 1 AND u.status = 'active'");
-            $stmt->execute([$input['recipient_id'], $partnerTenantId]);
+            $stmt->execute([$input['recipient_id'], $recipientTenantId]);
         } else {
             // FED-004: Check messaging_enabled on partnership to prevent bypass
             $stmt = $db->prepare("SELECT u.id, u.first_name, u.tenant_id, fus.messaging_enabled_federated FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = u.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = u.tenant_id)) WHERE u.id = ? AND fus.federation_optin = 1 AND fp.status = 'active' AND fp.messaging_enabled = 1");

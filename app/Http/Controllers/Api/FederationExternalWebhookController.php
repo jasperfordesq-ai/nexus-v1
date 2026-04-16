@@ -1133,25 +1133,38 @@ class FederationExternalWebhookController extends BaseApiController
             }
         }
 
-        // Record the transaction AND credit the user immediately
-        DB::table('federation_transactions')->insert([
-            'sender_tenant_id'        => 0,
-            'sender_user_id'          => (int) ($data['sender_id'] ?? 0),
-            'receiver_tenant_id'      => TenantContext::getId(),
-            'receiver_user_id'        => $receiverUserId,
-            'amount'                  => $amountInHours,
-            'description'             => $data['reason'] ?? $data['description'] ?? '',
-            'status'                  => 'completed',
-            'external_partner_id'     => $partner->id,
-            'external_receiver_name'  => $data['sender_name'] ?? $data['source_organization_name'] ?? 'External User',
-            'external_transaction_id' => $externalTxId,
-            'created_at'              => now(),
-        ]);
+        // Record the transaction AND credit the user immediately — atomically
+        DB::beginTransaction();
+        try {
+            DB::table('federation_transactions')->insert([
+                'sender_tenant_id'        => 0,
+                'sender_user_id'          => (int) ($data['sender_id'] ?? 0),
+                'receiver_tenant_id'      => TenantContext::getId(),
+                'receiver_user_id'        => $receiverUserId,
+                'amount'                  => $amountInHours,
+                'description'             => $data['reason'] ?? $data['description'] ?? '',
+                'status'                  => 'completed',
+                'external_partner_id'     => $partner->id,
+                'external_receiver_name'  => $data['sender_name'] ?? $data['source_organization_name'] ?? 'External User',
+                'external_transaction_id' => $externalTxId,
+                'created_at'              => now(),
+            ]);
 
-        // Auto-credit the recipient's balance
-        DB::table('users')
-            ->where('id', $receiverUserId)
-            ->increment('balance', $amountInHours);
+            // Auto-credit the recipient's balance
+            DB::table('users')
+                ->where('id', $receiverUserId)
+                ->increment('balance', $amountInHours);
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('[FederationExternalWebhook] Failed to record transaction request', [
+                'error' => $e->getMessage(),
+                'partner' => $partner->name,
+                'external_transaction_id' => $externalTxId,
+            ]);
+            return ['status' => 'error', 'reason' => 'Failed to record transaction'];
+        }
 
         Log::info('[FederationExternalWebhook] Auto-credited user', [
             'user_id' => $receiverUserId,

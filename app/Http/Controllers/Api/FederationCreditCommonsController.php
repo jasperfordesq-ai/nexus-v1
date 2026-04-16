@@ -104,8 +104,15 @@ class FederationCreditCommonsController extends BaseApiController
         $nodeSlug = $this->getNodeSlug($tenantId);
 
         $query = DB::table('users')
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'active');
+            ->where('users.tenant_id', $tenantId)
+            ->where('users.status', 'active')
+            ->whereIn('users.id', function ($sub) use ($tenantId) {
+                $sub->select('fus.user_id')
+                    ->from('federation_user_settings as fus')
+                    ->join('users as u', 'u.id', '=', 'fus.user_id')
+                    ->where('u.tenant_id', $tenantId)
+                    ->where('fus.federation_optin', 1);
+            });
 
         if ($accPath) {
             // Strip node prefix if present
@@ -526,9 +533,28 @@ class FederationCreditCommonsController extends BaseApiController
         }
 
         if ($destState === CreditCommonsAdapter::STATE_ERASED) {
-            // Reverse the balance changes if the transaction was completed
+            // Reverse the balance changes and update state atomically
             if ($entry->state === CreditCommonsAdapter::STATE_COMPLETED && $entry->federation_transaction_id) {
-                $this->reverseTransaction($entry, $tenantId);
+                DB::beginTransaction();
+                try {
+                    $this->reverseTransaction($entry, $tenantId);
+
+                    DB::table('federation_cc_entries')
+                        ->where('id', $entry->id)
+                        ->update($updates);
+
+                    DB::commit();
+                } catch (\Throwable $e) {
+                    DB::rollBack();
+                    return $this->ccError('InternalError', 'Failed to erase transaction: ' . $e->getMessage(), 500);
+                }
+
+                return response()->json([
+                    'data' => [
+                        'uuid' => $uuid,
+                        'state' => $destState,
+                    ],
+                ], 201);
             }
         }
 

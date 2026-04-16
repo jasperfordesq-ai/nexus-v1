@@ -713,7 +713,11 @@ class FederationExternalApiClient
      */
     private static function decryptCredential(string $encryptedValue): string
     {
-        return Crypt::decryptString($encryptedValue);
+        try {
+            return Crypt::decryptString($encryptedValue);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException) {
+            return $encryptedValue; // plaintext fallback
+        }
     }
 
     // ----------------------------------------------------------------

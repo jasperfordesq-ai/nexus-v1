@@ -588,6 +588,10 @@ class FederationKomunitinController extends BaseApiController
      */
     public function createTransfer(Request $request, string $code): JsonResponse
     {
+        if (!TenantContext::hasFeature('federation')) {
+            return response()->json(['error' => __('api.federation.feature_disabled')], 403);
+        }
+
         $tenantId = TenantContext::getId();
         $baseUrl = $request->getSchemeAndHttpHost();
         $payload = $request->json()->all();
