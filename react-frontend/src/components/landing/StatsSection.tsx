@@ -14,7 +14,6 @@ interface PlatformStats {
   members: number;
   hours_exchanged: number;
   listings: number;
-  skills: number;
   communities: number;
 }
 
