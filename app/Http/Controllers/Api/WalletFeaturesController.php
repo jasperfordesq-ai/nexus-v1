@@ -413,7 +413,7 @@ class WalletFeaturesController extends BaseApiController
         $result = $this->transactionExportService->exportPersonalStatementCSV($userId, $filters);
 
         if (!$result['success']) {
-            return $this->error($result['message'] ?? 'Export failed', 400);
+            return $this->error($result['message'] ?? __('errors.generic.export_failed'), 400);
         }
 
         // Send CSV download directly (bypasses JSON response)

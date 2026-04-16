@@ -1350,6 +1350,7 @@ return [
 
     // Resources — not found
     'connection_not_found'                 => 'Connection not found',
+    'connection_not_pending'               => 'This connection request is not pending or you are not the receiver',
     'connection_request_not_found'         => 'Connection request not found',
     'consent_record_not_found'             => 'Consent record not found',
     'notification_not_found'               => 'Notification not found',

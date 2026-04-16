@@ -4009,5 +4009,11 @@
     "volunteer_organizations_title": "Volunteer Organizations",
     "volunteering_overview_desc": "Manage and configure volunteering overview settings",
     "volunteering_overview_title": "Volunteering Overview"
+  },
+  "mailer": {
+    "gmail_not_enabled": "Gmail API is not enabled",
+    "gmail_token_failed": "Failed to obtain access token. Check credentials.",
+    "gmail_connected": "Connected to Gmail API successfully. Email: :email",
+    "gmail_verify_failed": "Failed to verify Gmail API connection"
   }
 }

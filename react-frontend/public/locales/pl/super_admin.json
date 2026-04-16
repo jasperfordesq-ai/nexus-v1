@@ -725,6 +725,7 @@
       "not_whitelisted_badge": "Not Whitelisted",
       "not_whitelisted_warning": "This tenant is not whitelisted for federation. Features cannot be enabled until they are added to the whitelist.",
       "features_card_title": "Tenant Feature Flags",
+      "features_desc": "Control which federation features this tenant can use. These are tenant-level caps on top of system-level settings.",
       "partnerships_card_title": "Partnerships (:count)",
       "col_partner": "Partner Tenant",
       "col_level": "Level",

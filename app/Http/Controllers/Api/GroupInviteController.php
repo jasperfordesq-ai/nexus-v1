@@ -35,7 +35,7 @@ class GroupInviteController extends BaseApiController
         if ($result === null) {
             $errors = $this->inviteService->getErrors();
             $code = ($errors[0]['code'] ?? '') === 'FORBIDDEN' ? 403 : 400;
-            return $this->errorResponse($errors[0]['message'] ?? 'Error listing invites', $code);
+            return $this->errorResponse($errors[0]['message'] ?? __('errors.group_invites.listing_failed'), $code);
         }
 
         return $this->successResponse($result);
@@ -57,7 +57,7 @@ class GroupInviteController extends BaseApiController
         if ($result === null) {
             $errors = $this->inviteService->getErrors();
             $code = ($errors[0]['code'] ?? '') === 'FORBIDDEN' ? 403 : 400;
-            return $this->errorResponse($errors[0]['message'] ?? 'Error creating invite link', $code);
+            return $this->errorResponse($errors[0]['message'] ?? __('errors.group_invites.create_failed'), $code);
         }
 
         return $this->successResponse($result, 201);
@@ -94,7 +94,7 @@ class GroupInviteController extends BaseApiController
         if ($result === null) {
             $errors = $this->inviteService->getErrors();
             $code = ($errors[0]['code'] ?? '') === 'FORBIDDEN' ? 403 : 400;
-            return $this->errorResponse($errors[0]['message'] ?? 'Error sending invites', $code);
+            return $this->errorResponse($errors[0]['message'] ?? __('errors.group_invites.send_failed'), $code);
         }
 
         return $this->successResponse($result);
@@ -119,7 +119,7 @@ class GroupInviteController extends BaseApiController
                 'FORBIDDEN' => 403,
                 default => 400,
             };
-            return $this->errorResponse($errors[0]['message'] ?? 'Error revoking invite', $code);
+            return $this->errorResponse($errors[0]['message'] ?? __('errors.group_invites.revoke_failed'), $code);
         }
 
         return $this->successResponse(['message' => __('api_controllers_1.group_invite.invite_revoked')]);
@@ -145,7 +145,7 @@ class GroupInviteController extends BaseApiController
                 'ALREADY_MEMBER' => 409,
                 default => 400,
             };
-            return $this->errorResponse($errors[0]['message'] ?? 'Error accepting invite', $code);
+            return $this->errorResponse($errors[0]['message'] ?? __('errors.group_invites.accept_failed'), $code);
         }
 
         return $this->successResponse($result);

@@ -304,8 +304,16 @@ class AdminFederationAnalyticsController extends BaseApiController
         }
     }
 
+    private const ALLOWED_TABLES = [
+        'federation_partnerships', 'federation_external_partners', 'federation_transactions',
+        'federation_messages', 'federation_reputation', 'federation_api_logs', 'federation_api_keys',
+    ];
+
     private function tableExists(string $table): bool
     {
+        if (!in_array($table, self::ALLOWED_TABLES, true)) {
+            return false;
+        }
         static $cache = [];
         if (array_key_exists($table, $cache)) {
             return $cache[$table];

@@ -905,9 +905,12 @@ class AdminContentController extends BaseApiController
 
     private function ensureUniqueSlug(string $table, string $slug, int $tenantId): string
     {
+        if (!in_array($table, ['pages', 'menus'], true)) {
+            throw new \InvalidArgumentException("Invalid table: {$table}");
+        }
         $counter = 0;
         $originalSlug = $slug;
-        while (DB::selectOne("SELECT id FROM {$table} WHERE slug = ? AND tenant_id = ?", [$slug, $tenantId])) {
+        while (DB::selectOne("SELECT id FROM `{$table}` WHERE slug = ? AND tenant_id = ?", [$slug, $tenantId])) {
             $counter++;
             $slug = $originalSlug . '-' . $counter;
         }

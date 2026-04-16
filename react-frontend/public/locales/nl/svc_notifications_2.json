@@ -87,5 +87,10 @@
   "event.cancelled_notification": "The event \"{{title}}\" has been cancelled.",
   "event.cancelled_reason_suffix": " Reason: {{reason}}",
   "event.rsvp_cancelled": "This event has been cancelled",
-  "event.rsvp_ended": "This event has already ended"
+  "event.rsvp_ended": "This event has already ended",
+  "event.rsvp_confirmed_going": "You're going to \"{{title}}\"!",
+  "event.rsvp_confirmed_interested": "You've shown interest in \"{{title}}\"",
+  "volunteer.shift_signup_confirmed": "You're signed up for a volunteer shift on {{date}}",
+  "volunteer.shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
+  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled"
 }

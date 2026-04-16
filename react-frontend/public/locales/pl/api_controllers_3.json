@@ -35,5 +35,90 @@
   },
   "listings": {
     "listing_saved_notification": ":saver_name saved your listing \":title\""
+  },
+  "admin_bells": {
+    "comment_hidden": "Your comment has been hidden by a moderator.",
+    "comment_removed": "Your comment has been removed by a moderator.",
+    "post_hidden": "Your post has been hidden by a moderator.",
+    "post_removed": "Your post has been removed by a moderator.",
+    "review_hidden": "Your review has been hidden by a moderator.",
+    "review_removed": "Your review has been removed by a moderator.",
+    "event_approved": "Your event has been approved!",
+    "group_member_approved": "You've been approved to join {{group}}",
+    "group_member_rejected": "Your request to join {{group}} was declined",
+    "group_approved": "Your group has been approved!",
+    "group_member_removed": "You have been removed from {{group}}",
+    "insurance_verified": "Your insurance certificate has been verified!",
+    "insurance_rejected": "Your insurance certificate was not approved. Please contact support for details.",
+    "report_resolved": "Your report has been reviewed and resolved.",
+    "report_reviewed": "Your report has been reviewed.",
+    "vetting_approved": "Your verification has been approved!",
+    "vetting_rejected": "Your verification could not be completed. Please contact support.",
+    "vetting_removed": "Your verification record has been removed.",
+    "volunteer_approved": "Your volunteer application has been approved!",
+    "volunteer_declined": "Your volunteer application was not accepted.",
+    "monitoring_restricted": "Your messaging has been temporarily restricted by your timebank coordinator.",
+    "monitoring_under_review": "Your account has been placed under review by your timebank coordinator.",
+    "monitoring_lifted": "Your messaging restrictions have been lifted.",
+    "account_suspended": "Your account has been suspended. Contact support if you believe this is an error.",
+    "account_banned": "Your account has been banned. Contact support if you believe this is an error.",
+    "super_admin_granted": "You have been granted Tenant Super Admin privileges.",
+    "super_admin_revoked": "Your Tenant Super Admin privileges have been removed."
+  },
+  "deliverable": {
+    "assigned": "You've been assigned a deliverable: \"{{title}}\"",
+    "reassigned": "You've been assigned to deliverable: \"{{title}}\""
+  },
+  "deliverable_comment": {
+    "posted": "{{name}} commented on your deliverable \"{{title}}\""
+  },
+  "wallet_admin": {
+    "grant_received": "You received {{amount}} {{unit}} from your timebank coordinator",
+    "balance_adjusted_added": "Your balance was adjusted: +{{amount}} {{unit}} added by coordinator",
+    "balance_adjusted_removed": "Your balance was adjusted: -{{amount}} {{unit}} removed by coordinator"
+  },
+  "comments": {
+    "reaction": "{{name}} reacted to your comment"
+  },
+  "federation": {
+    "review_received": "{{name}} left you a {{rating}}-star review"
+  },
+  "federation_credit": {
+    "action_taken": "{{tenant}} has {{action}} your federation credit agreement."
+  },
+  "volunteer": {
+    "shift_signup_confirmed": "You're signed up for a volunteer shift on {{date}}",
+    "shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
+    "opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled"
+  },
+  "goals": {
+    "progress_mentor": "{{name}} made progress on their goal: \"{{title}}\"",
+    "completed_mentor": "{{name}} completed their goal: \"{{title}}\"",
+    "completed_self": "Congratulations! You completed your goal: \"{{title}}\""
+  },
+  "feed": {
+    "post_shared": "{{name}} shared your post"
+  },
+  "polls": {
+    "vote_received": "{{name}} voted on your poll: \"{{title}}\"",
+    "ranking_received": "{{name}} submitted a ranking on your poll: \"{{title}}\""
+  },
+  "marketplace_offer": {
+    "received": "{{buyer}} made an offer of {{amount}} on your listing \"{{title}}\"",
+    "accepted": "Your offer on \"{{title}}\" has been accepted!",
+    "declined": "Your offer on \"{{title}}\" was declined.",
+    "countered": "The seller countered your offer on \"{{title}}\" with {{amount}}",
+    "counter_accepted": "Your counter-offer on \"{{title}}\" was accepted!",
+    "withdrawn": "{{buyer}} withdrew their offer on your listing \"{{title}}\""
+  },
+  "marketplace_order": {
+    "confirmed_buyer": "Order #{{order_number}} confirmed — \"{{title}}\"",
+    "confirmed_seller": "You have a new order #{{order_number}} for \"{{title}}\"",
+    "shipped": "Your order #{{order_number}} has been shipped!",
+    "delivered": "Order #{{order_number}} — buyer confirmed delivery",
+    "cancelled": "Order #{{order_number}} has been cancelled",
+    "completed": "Order #{{order_number}} has been completed!",
+    "refunded": "Refund of {{amount}} {{currency}} processed for order #{{order_number}}",
+    "partially_refunded": "Partial refund of {{amount}} {{currency}} processed for order #{{order_number}}"
   }
 }

@@ -126,5 +126,10 @@
   "reset_by_admin": "Reset by admin",
   "password_changed_title": "Password Changed",
   "get_started": "Get Started",
-  "account_reactivated_title": "Account Reactivated"
+  "account_reactivated_title": "Account Reactivated",
+  "goal": {
+    "reminder_bell": "Goal reminder: \"{{title}}\"",
+    "reminder_push_title": "Goal Reminder",
+    "reminder_push_message": "Don't forget your goal: \"{{title}}\""
+  }
 }

@@ -1,0 +1,33 @@
+{
+  "job_application_applicant": {
+    "subject": "Application received: {{job_title}} — {{community}}",
+    "title": "Application Submitted!",
+    "preview": "Your application for {{job_title}} has been received",
+    "body": "Your application for <strong>{{job_title}}</strong> has been received and is being reviewed.",
+    "next_steps": "The hiring team will review your application and be in touch if you're shortlisted.",
+    "cta": "View Application"
+  },
+  "job_application_employer": {
+    "subject": "New application for: {{job_title}} — {{community}}",
+    "title": "New Job Application",
+    "preview": "{{applicant_name}} applied for {{job_title}}",
+    "body": "<strong>{{applicant_name}}</strong> has submitted an application for your vacancy: <strong>{{job_title}}</strong>.",
+    "cta": "Review Application"
+  },
+  "group_removed": {
+    "subject": "You have been removed from {{group_name}} — {{community}}",
+    "title": "Group Membership Update",
+    "preview": "Your membership in {{group_name}} has ended",
+    "body": "Your membership in the group <strong>\"{{group_name}}\"</strong> on {{community}} has ended.",
+    "suggestion": "You can discover and join other groups in your community.",
+    "cta": "Browse Groups"
+  },
+  "group_promoted": {
+    "subject": "You're now a {{role}} of {{group_name}} — {{community}}",
+    "title": "Role Update",
+    "preview": "Congratulations — you've been made a {{role}} of {{group_name}}",
+    "body": "You have been promoted to <strong>{{role}}</strong> of the group <strong>\"{{group_name}}\"</strong> on {{community}}.",
+    "responsibilities": "As {{role}}, you can help manage the group and support its members.",
+    "cta": "Go to Group"
+  }
+}

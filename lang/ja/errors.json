@@ -9,5 +9,22 @@
   "validation": {
     "badge_keys_must_be_array": "badge_keys must be an array",
     "member_ids_must_be_array": "member_ids must be an array"
+  },
+  "group_files": {
+    "listing_failed": "Error listing files",
+    "upload_failed": "Upload failed",
+    "download_failed": "Download failed",
+    "delete_failed": "Delete failed"
+  },
+  "group_invites": {
+    "listing_failed": "Error listing invites",
+    "create_failed": "Error creating invite link",
+    "send_failed": "Error sending invites",
+    "revoke_failed": "Error revoking invite",
+    "accept_failed": "Error accepting invite"
+  },
+  "generic": {
+    "export_failed": "Export failed",
+    "update_failed": "Failed to update"
   }
 }
