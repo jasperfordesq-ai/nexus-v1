@@ -11,6 +11,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * WalletService — Laravel DI-based service for time credit wallet operations.
@@ -379,6 +380,18 @@ class WalletService
 
             return $txn->fresh(['sender', 'receiver']);
         });
+
+        // Fire low-balance / empty-balance alert after transaction completes
+        try {
+            $tenantId = TenantContext::getId();
+            $newBalance = (float) DB::table('users')
+                ->where('id', $senderId)
+                ->where('tenant_id', $tenantId)
+                ->value('balance');
+            WalletAlertService::checkAndSendLowBalanceAlert($tenantId, $senderId, $newBalance);
+        } catch (\Throwable $e) {
+            Log::warning('WalletService: balance alert failed: ' . $e->getMessage());
+        }
 
         return $this->formatTransaction($txn, $senderId);
     }

@@ -338,6 +338,42 @@ class AdminVolunteerController extends BaseApiController
                 [$newStatus, $id, $tenantId]
             );
 
+            // Send hours approved/declined email notification
+            try {
+                $volDetail = DB::selectOne(
+                    "SELECT u.email, u.first_name, u.name, vl.hours, vo.title as opportunity_title
+                     FROM vol_logs vl
+                     LEFT JOIN users u ON vl.user_id = u.id AND u.tenant_id = ?
+                     LEFT JOIN vol_opportunities vo ON vl.opportunity_id = vo.id
+                     WHERE vl.id = ? AND vl.tenant_id = ?",
+                    [$tenantId, $id, $tenantId]
+                );
+
+                if ($volDetail && !empty($volDetail->email)) {
+                    $firstName = $volDetail->first_name ?? $volDetail->name ?? 'there';
+                    $oppTitle = htmlspecialchars($volDetail->opportunity_title ?? 'your volunteering', ENT_QUOTES, 'UTF-8');
+                    $url = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/volunteering';
+                    $emailKey = $newStatus === 'approved' ? 'hours_approved' : 'hours_declined';
+
+                    $html = \App\Core\EmailTemplateBuilder::make()
+                        ->theme($newStatus === 'approved' ? 'success' : 'brand')
+                        ->title(__("emails.volunteer_approval.{$emailKey}_title"))
+                        ->previewText(__("emails.volunteer_approval.{$emailKey}_preview"))
+                        ->greeting($firstName)
+                        ->paragraph(__("emails.volunteer_approval.{$emailKey}_body", ['opportunity' => $oppTitle]))
+                        ->button(__("emails.volunteer_approval.{$emailKey}_cta"), $url)
+                        ->render();
+
+                    \App\Core\Mailer::forCurrentTenant()->send(
+                        $volDetail->email,
+                        __("emails.volunteer_approval.{$emailKey}_subject"),
+                        $html
+                    );
+                }
+            } catch (\Throwable $emailEx) {
+                Log::warning('AdminVolunteerController: hours status email failed: ' . $emailEx->getMessage());
+            }
+
             return $this->respondWithData([
                 'id' => $id,
                 'status' => $newStatus,
@@ -554,7 +590,7 @@ class AdminVolunteerController extends BaseApiController
 
             DB::update("UPDATE vol_applications SET status = 'approved', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
-            // Notify the applicant
+            // Notify the applicant (in-app bell)
             try {
                 $applicantId = (int) $app->user_id;
 
@@ -571,6 +607,38 @@ class AdminVolunteerController extends BaseApiController
                 }
             } catch (\Throwable $e) {
                 Log::warning("AdminVolunteerController::approveApplication notification failed: " . $e->getMessage());
+            }
+
+            // Send approval email to the applicant
+            try {
+                $applicant = DB::table('users')
+                    ->where('id', (int) $app->user_id)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['email', 'first_name', 'name'])
+                    ->first();
+                $oppTitle = htmlspecialchars($app->opportunity_title ?? 'the opportunity', ENT_QUOTES, 'UTF-8');
+
+                if ($applicant && !empty($applicant->email)) {
+                    $firstName = $applicant->first_name ?? $applicant->name ?? 'there';
+                    $url = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/volunteering';
+
+                    $html = \App\Core\EmailTemplateBuilder::make()
+                        ->theme('success')
+                        ->title(__('emails.volunteer_approval.application_approved_title'))
+                        ->previewText(__('emails.volunteer_approval.application_approved_preview', ['opportunity' => $oppTitle]))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails.volunteer_approval.application_approved_body', ['opportunity' => $oppTitle]))
+                        ->button(__('emails.volunteer_approval.application_approved_cta'), $url)
+                        ->render();
+
+                    \App\Core\Mailer::forCurrentTenant()->send(
+                        $applicant->email,
+                        __('emails.volunteer_approval.application_approved_subject'),
+                        $html
+                    );
+                }
+            } catch (\Throwable $emailEx) {
+                Log::warning('AdminVolunteerController: approval email failed: ' . $emailEx->getMessage());
             }
 
             return $this->respondWithData(['message' => __('api_controllers_1.admin_volunteer.application_approved')]);

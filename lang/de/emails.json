@@ -432,5 +432,34 @@
     "failed_reason_label": "Reason",
     "failed_retry_note": "You can try again from your security settings.",
     "failed_cta": "Try Again"
+  },
+  "wallet_alert": {
+    "low_subject": "Your time credit balance is running low",
+    "low_title": "Low Balance Warning",
+    "low_preview": "You have :balance credits remaining",
+    "low_body": "Your time credit balance has dropped to :balance credits. Earn more by offering your skills to the community.",
+    "low_cta": "Browse Listings",
+    "empty_subject": "Your time credit balance is empty",
+    "empty_title": "Balance Empty",
+    "empty_preview": "You have no time credits remaining",
+    "empty_body": "Your time credit balance is now :balance credits. Earn credits by offering your time and skills.",
+    "empty_cta": "Create a Listing"
+  },
+  "volunteer_approval": {
+    "application_approved_subject": "Your volunteer application has been approved",
+    "application_approved_title": "Application Approved",
+    "application_approved_preview": "Welcome to :opportunity!",
+    "application_approved_body": "Your application to volunteer for ':opportunity' has been approved. We look forward to working with you!",
+    "application_approved_cta": "View Volunteering",
+    "hours_approved_subject": "Your volunteer hours have been confirmed",
+    "hours_approved_title": "Hours Confirmed",
+    "hours_approved_preview": "Your volunteer hours have been approved",
+    "hours_approved_body": "Your volunteer hours for ':opportunity' have been approved and added to your record.",
+    "hours_approved_cta": "View Your Hours",
+    "hours_declined_subject": "Volunteer hours update",
+    "hours_declined_title": "Hours Not Confirmed",
+    "hours_declined_preview": "An update on your volunteer hours",
+    "hours_declined_body": "Your volunteer hours for ':opportunity' could not be confirmed at this time. Please contact your coordinator.",
+    "hours_declined_cta": "View Volunteering"
   }
 }
