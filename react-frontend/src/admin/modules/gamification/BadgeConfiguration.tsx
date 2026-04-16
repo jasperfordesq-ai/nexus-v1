@@ -137,18 +137,18 @@ export function BadgeConfiguration() {
         onSelectionChange={(key) => setFilter(key as FilterTab)}
         className="mb-6"
       >
-        <Tab key="all" title={`All (${badges.length})`} />
-        <Tab key="core" title={`Core (${badges.filter((b) => b.badge_tier === 'core').length})`} />
-        <Tab key="template" title={`Template (${badges.filter((b) => b.badge_tier === 'template').length})`} />
-        <Tab key="custom" title={`Custom (${badges.filter((b) => b.badge_tier === 'custom').length})`} />
-        <Tab key="quality" title={`Quality (${badges.filter((b) => b.badge_class === 'quality').length})`} />
+        <Tab key="all" title={t('badge_configuration.tab_all', { count: badges.length })} />
+        <Tab key="core" title={t('badge_configuration.tab_core', { count: badges.filter((b) => b.badge_tier === 'core').length })} />
+        <Tab key="template" title={t('badge_configuration.tab_template', { count: badges.filter((b) => b.badge_tier === 'template').length })} />
+        <Tab key="custom" title={t('badge_configuration.tab_custom', { count: badges.filter((b) => b.badge_tier === 'custom').length })} />
+        <Tab key="quality" title={t('badge_configuration.tab_quality', { count: badges.filter((b) => b.badge_class === 'quality').length })} />
       </Tabs>
 
       {filtered.length === 0 ? (
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center justify-center py-12">
             <Award size={40} className="text-default-300 mb-2" />
-            <p className="text-default-500">No badges found for this filter</p>
+            <p className="text-default-500">{t('badge_configuration.no_badges_for_filter')}</p>
           </CardBody>
         </Card>
       ) : (
@@ -161,7 +161,9 @@ export function BadgeConfiguration() {
                   {TIER_LABELS[tier] ?? tier}
                 </Chip>
                 <span className="text-default-400 text-sm font-normal">
-                  {(grouped[tier] ?? []).length} badge{(grouped[tier] ?? []).length !== 1 ? 's' : ''}
+                  {(grouped[tier] ?? []).length !== 1
+                    ? t('badge_configuration.badge_count_plural', { count: (grouped[tier] ?? []).length })
+                    : t('badge_configuration.badge_count', { count: (grouped[tier] ?? []).length })}
                 </span>
               </h2>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -199,17 +201,17 @@ export function BadgeConfiguration() {
                           </Chip>
                           {badge.threshold > 0 && (
                             <Chip size="sm" variant="flat" color="default">
-                              Threshold: {badge.threshold}
+                              {t('badge_configuration.chip_threshold', { value: badge.threshold })}
                             </Chip>
                           )}
                           {badge.xp_value > 0 && (
                             <Chip size="sm" variant="flat" color="warning">
-                              {badge.xp_value} XP
+                              {t('badge_configuration.chip_xp', { value: badge.xp_value })}
                             </Chip>
                           )}
                           {badge.has_override && (
                             <Chip size="sm" variant="dot" color="secondary">
-                              Customized
+                              {t('badge_configuration.chip_customized')}
                             </Chip>
                           )}
                         </div>
@@ -223,7 +225,7 @@ export function BadgeConfiguration() {
                             onPress={() => handleReset(badge)}
                             className="self-end"
                           >
-                            Reset to Default
+                            {t('badge_configuration.btn_reset_to_default')}
                           </Button>
                         )}
                       </CardBody>
