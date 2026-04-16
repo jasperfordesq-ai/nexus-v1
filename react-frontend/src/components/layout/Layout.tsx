@@ -29,6 +29,7 @@ import { useAppUpdate } from '@/hooks/useAppUpdate';
 import { useVersionCheck } from '@/hooks/useVersionCheck';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
 
 interface LayoutProps {
   /**
@@ -78,6 +79,7 @@ export function Layout({
   // Register FCM device token for push notifications once user is authenticated.
   // No-ops on web browsers — only runs inside the Capacitor native app.
   const { user } = useAuth();
+  const { tenantPath } = useTenant();
   const navigate = useNavigate();
   usePushNotifications(user?.id ?? null);
 
