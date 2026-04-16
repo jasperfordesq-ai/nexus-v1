@@ -8,12 +8,12 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render } from '@/test/test-utils';
+import { render, screen, waitFor } from '@/test/test-utils';
 import React from 'react';
 
 vi.mock('@/lib/api', () => ({
   api: {
-    get: vi.fn().mockResolvedValue({ success: true, data: { members: 100, hours_exchanged: 500, listings: 50, skills: 30, communities: 5 } }),
+    get: vi.fn().mockResolvedValue({ success: true, data: { members: 100, hours_exchanged: 500, listings: 50, communities: 5 } }),
     post: vi.fn().mockResolvedValue({ success: true }),
   },
   tokenManager: { getTenantId: vi.fn() },
@@ -27,6 +27,12 @@ vi.mock('@/contexts', () => ({
     tenantPath: (p: string) => `/test${p}`,
     hasFeature: vi.fn(() => true),
     hasModule: vi.fn(() => true),
+    landingPageConfig: {
+      sections: [
+        { id: 'hero', type: 'hero', enabled: true, order: 0 },
+        { id: 'stats', type: 'stats', enabled: true, order: 1 },
+      ],
+    },
   })),
 
   useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
@@ -61,23 +67,35 @@ vi.mock('framer-motion', () => {
   return {
     motion: motionProxy,
     AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
+    MotionConfig: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
     useAnimation: () => ({ start: vi.fn() }),
     useInView: () => true,
   };
 });
 
 import { HomePage } from './HomePage';
+import { api } from '@/lib/api';
 
 describe('HomePage', () => {
   beforeEach(() => { vi.clearAllMocks(); });
 
-  it('renders without crashing', () => {
+  it('renders the hero section with a level-1 heading', () => {
     render(<HomePage />);
-    expect(document.body).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
   });
 
-  it('contains main content area', () => {
-    const { container } = render(<HomePage />);
-    expect(container.querySelector('div')).toBeTruthy();
+  it('calls the platform stats API on mount', async () => {
+    render(<HomePage />);
+    await waitFor(() => {
+      expect(api.get).toHaveBeenCalledWith('/v2/platform/stats');
+    });
+  });
+
+  it('renders stat values after the API resolves', async () => {
+    render(<HomePage />);
+    await waitFor(() => {
+      // members: 100 → formatStatNumber(100) = '100'
+      expect(screen.getByText('100')).toBeInTheDocument();
+    });
   });
 });
