@@ -1029,12 +1029,14 @@ class ListingsController extends BaseApiController
             }
         }
 
-        // Update sort_order
-        foreach ($imageIds as $index => $imgId) {
-            ListingImage::where('id', (int) $imgId)
-                ->where('listing_id', $id)
-                ->update(['sort_order' => $index]);
-        }
+        // Update sort_order atomically
+        DB::transaction(function () use ($imageIds, $id) {
+            foreach ($imageIds as $index => $imgId) {
+                ListingImage::where('id', (int) $imgId)
+                    ->where('listing_id', $id)
+                    ->update(['sort_order' => $index]);
+            }
+        });
 
         // Update listing.image_url to the first image
         $firstImage = ListingImage::where('listing_id', $id)

@@ -278,4 +278,55 @@ class AdminListingsControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonFragment(['featured' => false, 'id' => 50003]);
     }
+
+    // ================================================================
+    // REJECT — POST /v2/admin/listings/{id}/reject
+    // ================================================================
+
+    public function test_admin_can_reject_listing(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        DB::table('listings')->insert([
+            'id' => 50004,
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Reject Me',
+            'description' => 'Awaiting moderation decision',
+            'type' => 'offer',
+            'status' => 'pending',
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiPost('/v2/admin/listings/50004/reject', [
+            'reason' => 'Content violates community guidelines',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['rejected' => true, 'id' => 50004]);
+    }
+
+    public function test_reject_returns_404_for_nonexistent_listing(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/listings/99999/reject', [
+            'reason' => 'Does not exist',
+        ]);
+
+        $response->assertStatus(404);
+    }
+
+    public function test_reject_requires_admin(): void
+    {
+        $member = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($member);
+
+        $response = $this->apiPost('/v2/admin/listings/1/reject');
+
+        $response->assertStatus(403);
+    }
 }

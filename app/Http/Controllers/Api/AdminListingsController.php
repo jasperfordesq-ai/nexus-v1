@@ -339,6 +339,31 @@ class AdminListingsController extends BaseApiController
     // Moderation
     // =========================================================================
 
+    /** GET /api/v2/admin/listings/featured */
+    public function featured(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $featured = DB::table('listings')
+            ->where('listings.tenant_id', $tenantId)
+            ->where('listings.is_featured', 1)
+            ->select([
+                'listings.id as listing_id',
+                'listings.id',
+                'listings.title',
+                'listings.status',
+                'listings.is_featured',
+                'listings.featured_until',
+                'listings.user_id',
+            ])
+            ->orderByDesc('listings.updated_at')
+            ->get()
+            ->toArray();
+
+        return $this->respondWithData($featured);
+    }
+
     /** GET /api/v2/admin/listings/pending */
     public function pending(): JsonResponse
     {

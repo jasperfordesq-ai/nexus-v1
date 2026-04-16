@@ -221,14 +221,19 @@ class ListingAnalyticsService
     public function updateSaveCount(int $listingId, bool $increment): void
     {
         $tenantId = TenantContext::getId();
-        $op = $increment ? '+ 1' : '- 1';
 
         try {
-            DB::update(
-                "UPDATE listings SET save_count = GREATEST(0, CAST(save_count AS SIGNED) {$op})
-                 WHERE id = ? AND tenant_id = ?",
-                [$listingId, $tenantId]
-            );
+            if ($increment) {
+                DB::statement(
+                    "UPDATE listings SET save_count = GREATEST(0, COALESCE(save_count, 0) + 1) WHERE id = ? AND tenant_id = ?",
+                    [$listingId, $tenantId]
+                );
+            } else {
+                DB::statement(
+                    "UPDATE listings SET save_count = GREATEST(0, COALESCE(save_count, 0) - 1) WHERE id = ? AND tenant_id = ?",
+                    [$listingId, $tenantId]
+                );
+            }
         } catch (\Exception $e) {
             \Log::error("[ListingAnalyticsService] updateSaveCount error: " . $e->getMessage());
         }

@@ -1207,4 +1207,14 @@ return [
     'connection_already_exists' => 'A connection with this user already exists',
     'only_receiver_can_accept' => 'Only the receiver can accept a connection request',
     'invalid_bookmarkable_type' => 'Invalid bookmarkable type provided',
+],
+
+    // PollsController / CommentsController
+    'too_many_poll_options'             => 'Too many poll options (max 20).',
+    'comment_too_long'                  => 'Comment is too long (max 10,000 characters).',
+
+    // ListingService -- sdg_goals validation
+    'sdg_goals_must_be_array'           => 'sdg_goals must be an array.',
+    'sdg_goals_max'                     => 'You can select at most 17 SDG goals.',
+    'sdg_goals_invalid'                 => 'Invalid SDG goal value. Goals must be integers between 1 and 17.',
 ];

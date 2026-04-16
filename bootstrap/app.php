@@ -80,6 +80,14 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('listings-process-search-alerts');
 
+        // Listings: auto-unfeature listings whose featured_until has passed
+        $schedule->call(function () {
+            app(\App\Services\ListingFeaturedService::class)->processExpiredFeatured();
+        })
+            ->hourly()
+            ->name('listings:process-expired-featured')
+            ->withoutOverlapping(5);
+
         // Marketplace: expire stale offers (pending/countered past their expires_at)
         $schedule->call(function () {
             \App\Services\MarketplaceOfferService::expireStaleOffers();

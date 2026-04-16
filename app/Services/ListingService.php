@@ -175,12 +175,29 @@ class ListingService
                         ->pluck('listing_id')->flip()->all();
                 }
 
+                // Batch author ratings to avoid N+1 in the loop below
+                $authorRatings = [];
+                if ($listingsById->isNotEmpty()) {
+                    $userIds = $listingsById->pluck('user_id')->filter()->unique()->values()->all();
+                    if (!empty($userIds)) {
+                        $ratings = DB::table('reviews')
+                            ->whereIn('receiver_id', $userIds)
+                            ->where('tenant_id', $tenantId)
+                            ->select('receiver_id', DB::raw('AVG(rating) as avg_rating'))
+                            ->groupBy('receiver_id')
+                            ->get();
+                        foreach ($ratings as $r) {
+                            $authorRatings[(int) $r->receiver_id] = round((float) $r->avg_rating, 1);
+                        }
+                    }
+                }
+
                 // Preserve Meilisearch relevance order
                 $items = [];
                 foreach ($ids as $id) {
                     $listing = $listingsById[$id] ?? null;
                     if ($listing) {
-                        $items[] = self::formatListingItem($listing, $savedIds, $currentUserId);
+                        $items[] = self::formatListingItem($listing, $savedIds, $currentUserId, $authorRatings);
                     }
                 }
 
@@ -316,8 +333,25 @@ class ListingService
                 ->all();
         }
 
+        // Batch author ratings — one query for all listings to avoid N+1
+        $authorRatings = [];
+        if ($items->isNotEmpty()) {
+            $userIds = $items->pluck('user_id')->filter()->unique()->values()->all();
+            if (!empty($userIds)) {
+                $ratings = DB::table('reviews')
+                    ->whereIn('receiver_id', $userIds)
+                    ->where('tenant_id', \App\Core\TenantContext::getId())
+                    ->select('receiver_id', DB::raw('AVG(rating) as avg_rating'))
+                    ->groupBy('receiver_id')
+                    ->get();
+                foreach ($ratings as $r) {
+                    $authorRatings[(int) $r->receiver_id] = round((float) $r->avg_rating, 1);
+                }
+            }
+        }
+
         $result = $items->map(
-            fn(Listing $listing) => self::formatListingItem($listing, $savedIds, $currentUserId)
+            fn(Listing $listing) => self::formatListingItem($listing, $savedIds, $currentUserId, $authorRatings)
         )->all();
 
         return [
@@ -329,8 +363,10 @@ class ListingService
 
     /**
      * Shape a Listing model into the array contract expected by the React frontend.
+     *
+     * @param array $authorRatings Pre-fetched map of user_id => avg_rating (avoids N+1 when processing lists)
      */
-    private static function formatListingItem(Listing $listing, array $savedIds, ?int $currentUserId): array
+    private static function formatListingItem(Listing $listing, array $savedIds, ?int $currentUserId, array $authorRatings = []): array
     {
         $data = $listing->toArray();
 
@@ -352,14 +388,19 @@ class ListingService
         // Lightweight trust signals for list view
         if ($user) {
             $data['author_verified'] = (bool) ($user->is_verified ?? false);
-            try {
-                $avgRating = DB::table('reviews')
-                    ->where('receiver_id', $user->id)
-                    ->where('tenant_id', \App\Core\TenantContext::getId())
-                    ->avg('rating');
-                $data['author_rating'] = $avgRating ? round((float) $avgRating, 1) : null;
-            } catch (\Throwable $e) {
-                $data['author_rating'] = null;
+            // Use pre-fetched ratings map when available; fall back to single query for single-item calls
+            if (!empty($authorRatings)) {
+                $data['author_rating'] = $authorRatings[$user->id] ?? null;
+            } else {
+                try {
+                    $avgRating = DB::table('reviews')
+                        ->where('receiver_id', $user->id)
+                        ->where('tenant_id', \App\Core\TenantContext::getId())
+                        ->avg('rating');
+                    $data['author_rating'] = $avgRating ? round((float) $avgRating, 1) : null;
+                } catch (\Throwable $e) {
+                    $data['author_rating'] = null;
+                }
             }
         }
 
@@ -1228,6 +1269,21 @@ class ListingService
 
         if ($validator->fails()) {
             throw new ValidationException($validator);
+        }
+
+        // Validate sdg_goals separately (array of ints 1-17, max 17 entries)
+        if (isset($data['sdg_goals'])) {
+            if (!is_array($data['sdg_goals'])) {
+                throw ValidationException::withMessages(['sdg_goals' => [__('api.sdg_goals_must_be_array')]]);
+            }
+            if (count($data['sdg_goals']) > 17) {
+                throw ValidationException::withMessages(['sdg_goals' => [__('api.sdg_goals_max')]]);
+            }
+            foreach ($data['sdg_goals'] as $goal) {
+                if (!is_int($goal) || $goal < 1 || $goal > 17) {
+                    throw ValidationException::withMessages(['sdg_goals' => [__('api.sdg_goals_invalid')]]);
+                }
+            }
         }
     }
 }

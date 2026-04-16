@@ -987,7 +987,8 @@ Route::post('/v2/admin/users/{id}/password', [\App\Http\Controllers\Api\AdminUse
 Route::post('/v2/admin/users/{id}/send-password-reset', [\App\Http\Controllers\Api\AdminUsersController::class, 'sendPasswordReset']);
 Route::post('/v2/admin/users/{id}/send-welcome-email', [\App\Http\Controllers\Api\AdminUsersController::class, 'sendWelcomeEmail']);
 Route::get('/v2/admin/listings', [\App\Http\Controllers\Api\AdminListingsController::class, 'index']);
-Route::get('/v2/admin/listings/featured', [\App\Http\Controllers\Api\ListingsController::class, 'featured']);
+Route::get('/v2/admin/listings/featured', [\App\Http\Controllers\Api\AdminListingsController::class, 'featured']);
+Route::get('/v2/admin/listings/stats', [\App\Http\Controllers\Api\AdminListingsController::class, 'stats']);
 Route::get('/v2/admin/listings/moderation-queue', [\App\Http\Controllers\Api\AdminListingsController::class, 'moderationQueue']);
 Route::get('/v2/admin/listings/moderation-stats', [\App\Http\Controllers\Api\AdminListingsController::class, 'moderationStats']);
 Route::get('/v2/admin/listings/{id}', [\App\Http\Controllers\Api\AdminListingsController::class, 'show']);
