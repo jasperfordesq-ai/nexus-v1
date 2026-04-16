@@ -10,11 +10,6 @@ import { getIcon } from './iconMap';
 import type { LucideIcon } from 'lucide-react';
 import type { FeaturePillsContent } from '@/types';
 
-const fadeInUp = {
-  initial: { opacity: 0, y: 30 },
-  animate: { opacity: 1, y: 0 },
-};
-
 interface ResolvedPill {
   Icon: LucideIcon;
   title: string;
@@ -57,7 +52,10 @@ export function FeaturePillsSection({ content }: FeaturePillsSectionProps) {
 
   return (
     <motion.div
-      variants={fadeInUp}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
       className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto"
     >
       {pills.map((pill, index) => (
