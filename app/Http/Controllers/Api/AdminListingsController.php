@@ -266,6 +266,27 @@ class AdminListingsController extends BaseApiController
                 'type' => 'listing_removed',
                 'created_at' => now(),
             ]);
+            // Email notification
+            $user = DB::table('users')
+                ->where('id', $item->user_id)
+                ->where('tenant_id', $tenantId)
+                ->select(['email', 'first_name', 'name'])
+                ->first();
+            if ($user && !empty($user->email)) {
+                $firstName = $user->first_name ?? $user->name ?? 'there';
+                $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/listings';
+                $html = \App\Core\EmailTemplateBuilder::make()
+                    ->title(__('emails_listings.listings.removed.email_title'))
+                    ->greeting($firstName)
+                    ->paragraph(__('emails_listings.listings.removed.email_body', ['title' => $title]))
+                    ->button(__('emails_listings.listings.removed.email_cta'), $fullUrl)
+                    ->render();
+                \App\Core\Mailer::forCurrentTenant()->send(
+                    $user->email,
+                    __('emails_listings.listings.removed.email_subject', ['title' => $title]),
+                    $html
+                );
+            }
         } catch (\Exception $e) {
             Log::warning("[AdminListingsController] destroy notification failed for listing #{$id}: " . $e->getMessage());
         }

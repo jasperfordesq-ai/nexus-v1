@@ -96,7 +96,7 @@ export default function PerformanceDashboard() {
               <Activity className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <div className="text-sm text-default-500">{t('performance_labels.total_requests')}</div>
+              <div className="text-sm text-default-500">{t('performance.label_total_requests')}</div>
               <div className="text-2xl font-bold">{summary.total_requests}</div>
             </div>
           </div>
@@ -108,7 +108,7 @@ export default function PerformanceDashboard() {
               <Clock className="w-5 h-5 text-warning" />
             </div>
             <div>
-              <div className="text-sm text-default-500">{t('performance_labels.slow_queries')}</div>
+              <div className="text-sm text-default-500">{t('performance.label_slow_queries')}</div>
               <div className="text-2xl font-bold">{summary.total_slow_queries}</div>
             </div>
           </div>
@@ -120,7 +120,7 @@ export default function PerformanceDashboard() {
               <AlertTriangle className="w-5 h-5 text-danger" />
             </div>
             <div>
-              <div className="text-sm text-default-500">N+1 Warnings</div>
+              <div className="text-sm text-default-500">{t('performance.label_n_plus_one_warnings')}</div>
               <div className="text-2xl font-bold">{summary.n_plus_one_warnings}</div>
             </div>
           </div>
@@ -132,7 +132,7 @@ export default function PerformanceDashboard() {
               <MemoryStick className="w-5 h-5 text-secondary" />
             </div>
             <div>
-              <div className="text-sm text-default-500">{t('performance_labels.memory_spikes')}</div>
+              <div className="text-sm text-default-500">{t('performance.label_memory_spikes')}</div>
               <div className="text-2xl font-bold">{summary.memory_spikes.length}</div>
             </div>
           </div>
@@ -145,7 +145,7 @@ export default function PerformanceDashboard() {
     if (!summary || summary.slowest_requests.length === 0) {
       return (
         <div className="text-center py-8 text-default-400">
-          No slow requests in the selected time period
+          {t('performance.no_slow_requests')}
         </div>
       );
     }
@@ -162,7 +162,7 @@ export default function PerformanceDashboard() {
                 </div>
                 <div className="flex items-center gap-4 text-sm text-default-500">
                   <span>{formatTimestamp(request.timestamp)}</span>
-                  <span>{request.query_count} queries</span>
+                  <span>{t('performance.query_count', { count: request.query_count })}</span>
                   <span>{request.memory_mb.toFixed(2)} MB</span>
                 </div>
                 {request.warnings && request.warnings.length > 0 && (
@@ -193,7 +193,7 @@ export default function PerformanceDashboard() {
     if (!summary || summary.slowest_queries.length === 0) {
       return (
         <div className="text-center py-8 text-default-400">
-          No slow queries in the selected time period
+          {t('performance.no_slow_queries')}
         </div>
       );
     }
@@ -213,7 +213,7 @@ export default function PerformanceDashboard() {
                 </code>
                 {query.caller && (
                   <div className="mt-2 text-xs text-default-500">
-                    Called from: {query.caller.class}::{query.caller.function} ({query.caller.file}:{query.caller.line})
+                    {t('performance.called_from', { class: query.caller.class, fn: query.caller.function, file: query.caller.file, line: query.caller.line })}
                   </div>
                 )}
               </div>
@@ -235,7 +235,7 @@ export default function PerformanceDashboard() {
     if (!summary || summary.memory_spikes.length === 0) {
       return (
         <div className="text-center py-8 text-default-400">
-          No memory spikes in the selected time period
+          {t('performance.no_memory_spikes')}
         </div>
       );
     }
@@ -252,7 +252,7 @@ export default function PerformanceDashboard() {
                 </div>
                 <div className="flex items-center gap-4 text-sm text-default-500">
                   <span>{formatTimestamp(spike.timestamp)}</span>
-                  <span>Peak: {spike.peak_memory_mb.toFixed(2)} MB</span>
+                  <span>{t('performance.peak_memory', { value: spike.peak_memory_mb.toFixed(2) })}</span>
                 </div>
               </div>
               <Chip color="secondary" variant="flat" size="lg">
@@ -269,7 +269,7 @@ export default function PerformanceDashboard() {
     if (!summary || Object.keys(summary.request_volume).length === 0) {
       return (
         <div className="text-center py-8 text-default-400">
-          No volume data available
+          {t('performance.no_volume_data')}
         </div>
       );
     }
@@ -320,10 +320,10 @@ export default function PerformanceDashboard() {
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Zap className="w-7 h-7 text-primary" />
-            Performance Monitoring
+            {t('performance.page_title')}
           </h1>
           <p className="text-default-500 mt-1">
-            Track slow queries, requests, and memory usage
+            {t('performance.page_description')}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -333,7 +333,7 @@ export default function PerformanceDashboard() {
             color="primary"
             onPress={() => setHours(1)}
           >
-            1 Hour
+            {t('performance.filter_1_hour')}
           </Button>
           <Button
             size="sm"
@@ -341,7 +341,7 @@ export default function PerformanceDashboard() {
             color="primary"
             onPress={() => setHours(24)}
           >
-            24 Hours
+            {t('performance.filter_24_hours')}
           </Button>
           <Button
             size="sm"
@@ -349,14 +349,14 @@ export default function PerformanceDashboard() {
             color="primary"
             onPress={() => setHours(168)}
           >
-            7 Days
+            {t('performance.filter_7_days')}
           </Button>
           <Button
             size="sm"
             variant="bordered"
             onPress={loadSummary}
           >
-            Refresh
+            {t('common.refresh')}
           </Button>
         </div>
       </div>
@@ -389,10 +389,9 @@ export default function PerformanceDashboard() {
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-warning mt-0.5" />
             <div>
-              <h3 className="font-semibold text-warning mb-1">N+1 Query Warnings Detected</h3>
+              <h3 className="font-semibold text-warning mb-1">{t('performance.n_plus_one_title')}</h3>
               <p className="text-sm text-default-600">
-                {summary.n_plus_one_warnings} request(s) executed more than 10 database queries, which may indicate N+1 query problems.
-                Check the "Slow Requests" tab for requests with high query counts.
+                {t('performance.n_plus_one_body', { count: summary.n_plus_one_warnings })}
               </p>
             </div>
           </div>

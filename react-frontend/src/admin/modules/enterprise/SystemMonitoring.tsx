@@ -136,7 +136,7 @@ export function SystemMonitoring() {
               size="sm"
               endContent={<ArrowRight size={14} />}
             >
-              Log Files
+              {t('enterprise.log_files')}
             </Button>
             <Button
               as={Link}
@@ -145,7 +145,7 @@ export function SystemMonitoring() {
               size="sm"
               endContent={<ArrowRight size={14} />}
             >
-              Requirements
+              {t('enterprise.requirements')}
             </Button>
             <Button
               as={Link}
@@ -262,7 +262,7 @@ export function SystemMonitoring() {
                 <ToggleLeft size={20} className="text-success" />
                 <div>
                   <p className="text-sm font-semibold text-foreground">{t('system_monitoring.feature_flags')}</p>
-                  <p className="text-xs text-default-500">Toggle features &amp; modules</p>
+                  <p className="text-xs text-default-500">{t('enterprise.toggle_features_modules')}</p>
                 </div>
               </CardBody>
             </Card>

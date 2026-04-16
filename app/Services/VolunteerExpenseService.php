@@ -246,31 +246,19 @@ class VolunteerExpenseService
                         'type'     => $expense->expense_type,
                     ];
 
-                    $builder = EmailTemplateBuilder::make()
-                        ->title(__($titleKey))
-                        ->paragraph(__($bodyKey, $params));
-
-                    if (!$isApproved && !empty($notes)) {
-                        $builder->paragraph('<strong>' . __('emails_misc.expense.rejected_notes_label') . ':</strong> ' . htmlspecialchars($notes, ENT_QUOTES, 'UTF-8'));
-                    }
-
                     $link    = '/volunteering/expenses/' . $id;
                     $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
-                    $html    = $builder->button(__('emails_misc.expense.' . ($isApproved ? 'approved' : 'rejected') . '_cta'), $fullUrl)->render();
-
                     $user = DB::table('users')->where('id', $expense->user_id)->where('tenant_id', TenantContext::getId())->select(['email', 'first_name', 'name'])->first();
                     if ($user && !empty($user->email)) {
-                        // Prepend greeting
                         $firstName = $user->first_name ?? $user->name ?? 'there';
-                        $html = EmailTemplateBuilder::make()
+                        $builder = EmailTemplateBuilder::make()
                             ->title(__($titleKey))
                             ->greeting($firstName)
                             ->paragraph(__($bodyKey, $params));
                         if (!$isApproved && !empty($notes)) {
-                            $html->paragraph('<strong>' . __('emails_misc.expense.rejected_notes_label') . ':</strong> ' . htmlspecialchars($notes, ENT_QUOTES, 'UTF-8'));
+                            $builder->paragraph('<strong>' . __('emails_misc.expense.rejected_notes_label') . ':</strong> ' . htmlspecialchars($notes, ENT_QUOTES, 'UTF-8'));
                         }
-                        $renderedHtml = $html->button(__('emails_misc.expense.' . ($isApproved ? 'approved' : 'rejected') . '_cta'), $fullUrl)->render();
-
+                        $renderedHtml = $builder->button(__('emails_misc.expense.' . ($isApproved ? 'approved' : 'rejected') . '_cta'), $fullUrl)->render();
                         if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $params), $renderedHtml)) {
                             Log::warning('[VolunteerExpenseService] reviewExpense email failed', ['user_id' => $expense->user_id]);
                         }
