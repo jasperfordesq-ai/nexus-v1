@@ -49,6 +49,7 @@ class ListingsController extends BaseApiController
 
     public function index(ListListingsRequest $request): JsonResponse
     {
+        $this->rateLimit('listings_index', 120, 60);
         $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
 
         $filters = [];
@@ -137,6 +138,7 @@ class ListingsController extends BaseApiController
 
     public function show(int $id): JsonResponse
     {
+        $this->rateLimit('listings_show', 300, 60);
         $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
         $listing = $this->listingService->getById($id, false, $userId);
 
@@ -365,6 +367,7 @@ class ListingsController extends BaseApiController
 
     public function nearby(): JsonResponse
     {
+        $this->rateLimit('listings_nearby', 60, 60);
         $lat = $this->query('lat');
         $lon = $this->query('lon');
 
@@ -555,6 +558,7 @@ class ListingsController extends BaseApiController
 
     public function popularTags(): JsonResponse
     {
+        $this->rateLimit('listing_tags_popular', 60, 60);
         $limit = $this->queryInt('limit', 20, 1, 50);
 
         $tags = $this->listingSkillTagService->getPopularTags($limit);
@@ -568,6 +572,7 @@ class ListingsController extends BaseApiController
 
     public function autocompleteTags(): JsonResponse
     {
+        $this->rateLimit('listing_tags_autocomplete', 60, 60);
         $prefix = trim($this->query('q', ''));
         if (strlen($prefix) < 2) {
             return $this->respondWithData([]);

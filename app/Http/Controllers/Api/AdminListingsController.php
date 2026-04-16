@@ -222,6 +222,34 @@ class AdminListingsController extends BaseApiController
             Log::warning("[AdminListingsController] approve notification failed for listing #{$id}: " . $e->getMessage());
         }
 
+        // Send approval email to listing creator
+        try {
+            $owner = DB::table('users')
+                ->where('id', $item->user_id)
+                ->where('tenant_id', $tenantId)
+                ->select(['email', 'first_name', 'name'])
+                ->first();
+            if ($owner && !empty($owner->email)) {
+                $firstName  = $owner->first_name ?? $owner->name ?? 'there';
+                $safeTitle  = htmlspecialchars($item->title ?? '', ENT_QUOTES, 'UTF-8');
+                $listingUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/listings/{$id}";
+                $html = \App\Core\EmailTemplateBuilder::make()
+                    ->theme('success')
+                    ->title(__('emails_listings.listings.approved.email_title'))
+                    ->greeting($firstName)
+                    ->paragraph(__('emails_listings.listings.approved.email_body', ['title' => $safeTitle]))
+                    ->button(__('emails_listings.listings.approved.email_cta'), $listingUrl)
+                    ->render();
+                \App\Core\Mailer::forCurrentTenant()->send(
+                    $owner->email,
+                    __('emails_listings.listings.approved.email_subject', ['title' => $safeTitle]),
+                    $html
+                );
+            }
+        } catch (\Exception $e) {
+            Log::warning("[AdminListingsController] approve email failed for listing #{$id}: " . $e->getMessage());
+        }
+
         return $this->respondWithData(['approved' => true, 'id' => $id]);
     }
 
@@ -289,6 +317,19 @@ class AdminListingsController extends BaseApiController
             }
         } catch (\Exception $e) {
             Log::warning("[AdminListingsController] destroy notification failed for listing #{$id}: " . $e->getMessage());
+        }
+
+        // Clean up related records before hard delete to avoid orphans
+        DB::table('listing_skill_tags')->where('listing_id', $id)->delete();
+        DB::table('user_saved_listings')->where('listing_id', $id)->delete();
+        DB::table('listing_views')->where('listing_id', $id)->delete();
+        DB::table('listing_contacts')->where('listing_id', $id)->delete();
+
+        // Remove from search index
+        try {
+            \App\Services\SearchService::removeListing((int) $id);
+        } catch (\Throwable $e) {
+            Log::warning("Failed to remove listing {$id} from search index during admin delete: " . $e->getMessage());
         }
 
         DB::delete("DELETE FROM listings WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);

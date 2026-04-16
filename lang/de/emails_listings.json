@@ -28,7 +28,11 @@
     },
     "approved": {
       "notification": "Your listing \"{{title}}\" has been approved and is now active.",
-      "notification_short": "Your listing \"{{title}}\" has been approved!"
+      "notification_short": "Your listing \"{{title}}\" has been approved!",
+      "email_subject": "Your listing has been approved — {{title}}",
+      "email_title": "Listing Approved",
+      "email_body": "Great news! Your listing <strong>\"{{title}}\"</strong> has been approved and is now active in the community.",
+      "email_cta": "View Listing"
     },
     "rejected": {
       "notification": "Your listing \"{{title}}\" was not approved. Reason: {{reason}}",

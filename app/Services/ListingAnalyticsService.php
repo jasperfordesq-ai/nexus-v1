@@ -81,6 +81,15 @@ class ListingAnalyticsService
     {
         $tenantId = TenantContext::getId();
 
+        // Only allow contacts on active listings
+        $listingStatus = DB::selectOne(
+            "SELECT status FROM listings WHERE id = ? AND tenant_id = ? LIMIT 1",
+            [$listingId, $tenantId]
+        );
+        if (!$listingStatus || !in_array($listingStatus->status ?? 'active', ['active', 'paused'], true)) {
+            return false;
+        }
+
         $validTypes = ['message', 'phone', 'email', 'exchange_request'];
         if (!in_array($contactType, $validTypes, true)) {
             $contactType = 'message';

@@ -705,6 +705,7 @@ class ListingService
             $decoded = base64_decode($cursor, true);
             if ($decoded !== false && str_starts_with($decoded, 'nearby:')) {
                 $offset = (int) substr($decoded, 7);
+                $offset = max(0, min($offset, 10000)); // Cap at 10,000 results
             }
         }
 
@@ -895,10 +896,13 @@ class ListingService
      */
     public static function saveListing(int $userId, int $listingId): bool
     {
-        // Verify listing exists in tenant
-        $exists = Listing::query()->where('id', $listingId)->where('tenant_id', TenantContext::getId())->exists();
+        // Verify listing exists in tenant and is in a saveable state
+        $listing = Listing::query()
+            ->where('id', $listingId)
+            ->where('tenant_id', TenantContext::getId())
+            ->first();
 
-        if (! $exists) {
+        if (! $listing || ! in_array($listing->status ?? 'active', ['active', 'paused'], true)) {
             return false;
         }
 
@@ -1144,6 +1148,13 @@ class ListingService
         DB::table('listing_views')->where('listing_id', $id)->delete();
         DB::table('listing_contacts')->where('listing_id', $id)->delete();
 
+        // Remove from search index
+        try {
+            SearchService::removeListing($id);
+        } catch (\Throwable $e) {
+            Log::warning("Failed to remove listing {$id} from search index: " . $e->getMessage());
+        }
+
         return true;
     }
 
@@ -1263,7 +1274,11 @@ class ListingService
         $rules['category_id']          = "sometimes|nullable|integer|exists:categories,id,tenant_id,{$tenantId}";
         $rules['service_type']         = 'sometimes|in:physical_only,remote_only,hybrid,location_dependent';
         $rules['federated_visibility'] = 'sometimes|in:none,listed,bookable';
-        $rules['hours_estimate']       = 'sometimes|nullable|numeric|min:0';
+        $rules['hours_estimate']       = 'sometimes|nullable|numeric|min:0.5|max:2000';
+        $rules['location']             = 'sometimes|nullable|string|max:255';
+        $rules['latitude']             = 'sometimes|nullable|numeric|min:-90|max:90';
+        $rules['longitude']            = 'sometimes|nullable|numeric|min:-180|max:180';
+        $rules['availability']         = 'sometimes|nullable|array';
 
         $validator = validator($data, $rules);
 
