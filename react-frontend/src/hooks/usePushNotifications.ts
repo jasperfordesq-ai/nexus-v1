@@ -19,7 +19,7 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '@/lib/api';
+import { api, tokenManager } from '@/lib/api';
 import { useTenant } from '@/contexts/TenantContext';
 import { logDebug, logError } from '@/lib/logger';
 
@@ -105,6 +105,17 @@ export function usePushNotifications(userId: number | null) {
       // Reject anything that isn't a same-origin path. This blocks
       // "https://evil.com", "//evil.com", "javascript:...", "mailto:...".
       if (!raw.startsWith('/') || raw.startsWith('//')) return;
+
+      // If the user's session has expired since the notification was delivered,
+      // redirect them to login. Encode the intended path so LoginPage can redirect
+      // back after a successful login (if it supports ?next= in future).
+      const isAuthenticated = tokenManager.hasAccessToken() || tokenManager.hasRefreshToken();
+      if (!isAuthenticated) {
+        logDebug('[Push] Session expired — redirecting to login before navigating to', raw);
+        navigate(tenantPath('/login'));
+        return;
+      }
+
       navigate(tenantPath(raw));
     },
     [navigate, tenantPath]
@@ -125,12 +136,19 @@ export function usePushNotifications(userId: number | null) {
         const permStatus: PermissionStatus = await PushNotifications.checkPermissions();
 
         if (permStatus.receive === 'denied') {
-          logDebug('[Push] Notifications denied by user');
+          // User permanently denied — Android won't show the dialog again.
+          // They must enable it manually in Settings > Apps > Project NEXUS > Notifications.
+          logDebug('[Push] Notifications permanently denied — user must enable in Settings');
           return;
         }
 
-        // 2. Request permission if not yet granted
+        // 2. Request permission if not yet granted.
+        // 'prompt-with-rationale' means the user previously dismissed the dialog;
+        // Android will show the system dialog again with its built-in rationale text.
+        // 'prompt' means first ask — system dialog appears immediately.
+        // Both are handled identically here since the system dialog is always shown.
         if (permStatus.receive !== 'granted') {
+          logDebug('[Push] Requesting notification permission (status:', permStatus.receive, ')');
           const requestResult: PermissionStatus = await PushNotifications.requestPermissions();
           if (requestResult.receive !== 'granted') {
             logDebug('[Push] User declined notification permission');
