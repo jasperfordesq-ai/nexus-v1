@@ -378,8 +378,48 @@ class StripeSubscriptionService
             throw $e;
         }
 
-        // Notify tenant admin on actionable status transitions
+        // Detect plan/price change
         $tenantId = (int) $assignment->tenant_id;
+        $stripeItems = $subscription->items->data ?? [];
+        if (!empty($stripeItems)) {
+            $newPriceId = $stripeItems[0]->price->id ?? null;
+            if ($newPriceId) {
+                // Fetch current price ID from our DB
+                $currentAssignment = DB::selectOne(
+                    "SELECT tpa.*, pp.name as plan_name, pp.stripe_price_id_monthly, pp.stripe_price_id_yearly
+                     FROM tenant_plan_assignments tpa
+                     LEFT JOIN pay_plans pp ON pp.id = tpa.pay_plan_id
+                     WHERE tpa.id = ?",
+                    [$assignment->id]
+                );
+                $currentPriceId = $currentAssignment->stripe_price_id_monthly ?? $currentAssignment->stripe_price_id_yearly ?? null;
+
+                if ($currentPriceId && $newPriceId !== $currentPriceId) {
+                    // Find the new plan name
+                    $newPlan = DB::selectOne(
+                        "SELECT name FROM pay_plans WHERE stripe_price_id_monthly = ? OR stripe_price_id_yearly = ?",
+                        [$newPriceId, $newPriceId]
+                    );
+                    $newPlanName = $newPlan->name ?? 'Updated Plan';
+                    $oldPlanName = $currentAssignment->plan_name ?? 'Previous Plan';
+
+                    try {
+                        static::sendTenantAdminEmail(
+                            $tenantId,
+                            __('emails_misc.stripe_subscription.plan_changed_subject', ['new_plan' => $newPlanName]),
+                            __('emails_misc.stripe_subscription.plan_changed_title'),
+                            __('emails_misc.stripe_subscription.plan_changed_body', ['old_plan' => $oldPlanName, 'new_plan' => $newPlanName]),
+                            '/admin/billing',
+                            __('emails_misc.stripe_subscription.plan_changed_cta')
+                        );
+                    } catch (\Throwable $e) {
+                        Log::warning('[StripeSubscriptionService] plan_changed email failed: ' . $e->getMessage());
+                    }
+                }
+            }
+        }
+
+        // Notify tenant admin on actionable status transitions
         if ($stripeStatus === 'past_due') {
             try {
                 static::sendTenantAdminEmail(
@@ -626,6 +666,82 @@ class StripeSubscriptionService
                 $sent++;
             } catch (\Throwable $e) {
                 Log::warning('[StripeSubscriptionService] sendRenewalReminders failed for tenant ' . $assignment->tenant_id . ': ' . $e->getMessage());
+                $errors++;
+            }
+        }
+
+        return ['sent' => $sent, 'errors' => $errors];
+    }
+
+    /**
+     * Send trial-ending reminder emails (7-day and 1-day windows).
+     * Deduped via a 24h cache key per tenant+window to prevent duplicate sends.
+     *
+     * @return array{sent: int, errors: int}
+     */
+    public static function sendTrialEndingReminders(): array
+    {
+        $sent   = 0;
+        $errors = 0;
+
+        $assignments = DB::select(
+            "SELECT tpa.id, tpa.tenant_id, tpa.stripe_current_period_end,
+                    t.name AS community_name
+             FROM tenant_plan_assignments tpa
+             JOIN tenants t ON t.id = tpa.tenant_id
+             WHERE tpa.status = 'trial'
+               AND tpa.stripe_current_period_end IS NOT NULL"
+        );
+
+        foreach ($assignments as $assignment) {
+            try {
+                $periodEnd    = strtotime($assignment->stripe_current_period_end);
+                $now          = time();
+                $daysUntilEnd = ($periodEnd - $now) / 86400;
+                $dateFormatted = date('F j, Y', $periodEnd);
+                $communityName = htmlspecialchars($assignment->community_name ?? '', ENT_QUOTES, 'UTF-8');
+
+                // 7-day window: between 6 and 8 days away
+                if ($daysUntilEnd >= 6 && $daysUntilEnd < 8) {
+                    $cacheKey = 'trial_ending_reminder:' . $assignment->tenant_id . ':7d';
+                    if (!Cache::has($cacheKey)) {
+                        Cache::put($cacheKey, true, now()->addHours(24));
+                        static::sendTenantAdminEmail(
+                            (int) $assignment->tenant_id,
+                            __('emails_misc.stripe_subscription.trial_ending_7d_subject'),
+                            __('emails_misc.stripe_subscription.trial_ending_7d_title'),
+                            __('emails_misc.stripe_subscription.trial_ending_7d_body', [
+                                'community' => $communityName,
+                                'date'      => $dateFormatted,
+                            ]),
+                            '/admin/billing',
+                            __('emails_misc.stripe_subscription.trial_ending_7d_cta')
+                        );
+                        $sent++;
+                    }
+                }
+
+                // 1-day window: between 0 and 2 days away
+                if ($daysUntilEnd >= 0 && $daysUntilEnd < 2) {
+                    $cacheKey = 'trial_ending_reminder:' . $assignment->tenant_id . ':1d';
+                    if (!Cache::has($cacheKey)) {
+                        Cache::put($cacheKey, true, now()->addHours(24));
+                        static::sendTenantAdminEmail(
+                            (int) $assignment->tenant_id,
+                            __('emails_misc.stripe_subscription.trial_ending_1d_subject'),
+                            __('emails_misc.stripe_subscription.trial_ending_1d_title'),
+                            __('emails_misc.stripe_subscription.trial_ending_1d_body', [
+                                'community' => $communityName,
+                                'date'      => $dateFormatted,
+                            ]),
+                            '/admin/billing',
+                            __('emails_misc.stripe_subscription.trial_ending_1d_cta')
+                        );
+                        $sent++;
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[StripeSubscriptionService] sendTrialEndingReminders failed for tenant ' . $assignment->tenant_id . ': ' . $e->getMessage());
                 $errors++;
             }
         }

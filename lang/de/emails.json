@@ -489,5 +489,11 @@
     "day7_greeting": "Hi :name,",
     "day7_body": "You've been part of :community for a week! Here's a quick reminder of everything you can do: browse listings, make connections, join groups, and attend events.",
     "day7_cta": "Explore Your Community"
-  }
+  },
+  "dispute_resolved_subject": "Your exchange dispute has been resolved",
+  "dispute_resolved_title": "Dispute Resolved",
+  "dispute_resolved_preview": "Your exchange has been successfully completed",
+  "dispute_resolved_body": "Your exchange has been reviewed and a final agreement of :hours hours has been reached.",
+  "dispute_resolved_hours_label": "Final Hours Agreed",
+  "dispute_resolved_cta": "View Exchange"
 }

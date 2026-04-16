@@ -409,6 +409,12 @@
     "next_steps": "You may be contacted by a broker or coordinator to help resolve this. In the meantime, you can view the exchange details.",
     "cta": "View Exchange"
   },
+  "dispute_resolved_subject": "Your exchange dispute has been resolved",
+  "dispute_resolved_title": "Dispute Resolved",
+  "dispute_resolved_preview": "Your exchange has been successfully completed",
+  "dispute_resolved_body": "Your exchange has been reviewed and a final agreement of :hours hours has been reached.",
+  "dispute_resolved_hours_label": "Final Hours Agreed",
+  "dispute_resolved_cta": "View Exchange",
   "donation": {
     "sent_subject": "You donated :amount time credits",
     "sent_title": "Donation Sent",

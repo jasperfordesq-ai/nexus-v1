@@ -835,6 +835,9 @@ class ExchangeWorkflowService
             return false;
         }
 
+        // Capture whether this was a disputed exchange before the transaction changes the status
+        $wasDisputed = $exchange->status === self::STATUS_DISPUTED;
+
         // Run the financial transaction first — notifications must NEVER be inside this block.
         // If notifications threw inside the transaction, the credit transfer would roll back.
         $transactionSucceeded = DB::transaction(function () use ($exchangeId, $exchange, $finalHours) {
@@ -884,9 +887,62 @@ class ExchangeWorkflowService
                     'error' => $e->getMessage(),
                 ]);
             }
+
+            // If this was a disputed exchange, also send a dispute-resolved email
+            if ($wasDisputed) {
+                try {
+                    self::sendDisputeResolvedEmails($exchange, $finalHours);
+                } catch (\Throwable $e) {
+                    Log::warning("Exchange #{$exchangeId}: dispute resolved email failed", [
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
         }
 
         return $transactionSucceeded;
+    }
+
+    /**
+     * Send dispute-resolved emails to both parties of a completed disputed exchange.
+     */
+    private static function sendDisputeResolvedEmails(ExchangeRequest $exchange, float $finalHours): void
+    {
+        $tenantId   = TenantContext::getId();
+        $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
+        $link = '/exchanges/' . $exchange->id;
+
+        $parties = [];
+
+        $requester = User::find($exchange->requester_id);
+        if ($requester && !empty($requester->email)) {
+            $parties[] = ['email' => $requester->email, 'name' => $requester->first_name ?? $requester->name ?? 'there'];
+        }
+
+        $provider = User::find($exchange->provider_id);
+        if ($provider && !empty($provider->email)) {
+            $parties[] = ['email' => $provider->email, 'name' => $provider->first_name ?? $provider->name ?? 'there'];
+        }
+
+        foreach ($parties as $party) {
+            $html = EmailTemplateBuilder::make()
+                ->theme('success')
+                ->title(__('emails.dispute_resolved_title'))
+                ->previewText(__('emails.dispute_resolved_preview'))
+                ->greeting($party['name'])
+                ->paragraph(__('emails.dispute_resolved_body', ['hours' => $finalHours]))
+                ->infoCard([
+                    __('emails.dispute_resolved_hours_label') => number_format($finalHours, 2),
+                ], null)
+                ->button(__('emails.dispute_resolved_cta'), $frontendUrl . $link)
+                ->render();
+
+            Mailer::forCurrentTenant()->send(
+                $party['email'],
+                __('emails.dispute_resolved_subject'),
+                $html
+            );
+        }
     }
 
     private static function createTransaction(int $exchangeId, float $hours): ?int

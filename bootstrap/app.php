@@ -138,6 +138,14 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->name('subscriptions:renewal-reminders')
             ->withoutOverlapping(5);
 
+        // Subscriptions: send trial-ending reminders (7-day and 1-day before expiry)
+        $schedule->call(function () {
+            \App\Services\StripeSubscriptionService::sendTrialEndingReminders();
+        })
+            ->dailyAt('10:00')
+            ->name('subscriptions:trial-ending-reminders')
+            ->withoutOverlapping(5);
+
         // H6: Prune unbounded logging tables (cron_logs 90d, error_404_log 30d,
         // activity_log 180d, api_logs 30d, federation_api_logs 30d) daily at 03:00.
         $schedule->command('nexus:prune-logs')

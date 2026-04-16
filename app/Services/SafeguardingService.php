@@ -921,6 +921,37 @@ class SafeguardingService
                 ]);
             }
 
+            // Also email the reporter about status changes (always, regardless of severity)
+            try {
+                $reporter = DB::table('users')
+                    ->where('id', $reporterId)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['email', 'first_name', 'name'])
+                    ->first();
+
+                if ($reporter && !empty($reporter->email)) {
+                    TenantContext::setById($tenantId);
+                    $firstName = $reporter->first_name ?? $reporter->name ?? 'there';
+                    $safeLabel = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
+
+                    $html = \App\Core\EmailTemplateBuilder::make()
+                        ->theme($newStatus === 'resolved' ? 'success' : 'brand')
+                        ->title(__('emails_misc.safeguarding.reporter_status_title'))
+                        ->previewText(__('emails_misc.safeguarding.reporter_status_preview', ['status' => $safeLabel]))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_misc.safeguarding.reporter_status_body', ['incident_id' => $incidentId, 'status' => $safeLabel]))
+                        ->paragraph(__('emails_misc.safeguarding.reporter_status_confidentiality'))
+                        ->render();
+
+                    $subject = __('emails_misc.safeguarding.reporter_status_subject', ['incident_id' => $incidentId, 'status' => $safeLabel]);
+
+                    $emailService = app(\App\Services\EmailService::class);
+                    $emailService->send($reporter->email, $subject, $html);
+                }
+            } catch (\Throwable $emailEx) {
+                Log::warning('[SafeguardingService] reporter status email failed: ' . $emailEx->getMessage());
+            }
+
             // Send email for status changes on high/critical incidents
             // Safeguarding emails bypass user preferences — always send
             $incident = DB::table('vol_safeguarding_incidents')

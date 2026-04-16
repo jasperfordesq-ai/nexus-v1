@@ -127,7 +127,12 @@
     "assignment_revoked_ward_bell": "Your safeguarding support assignment has been ended",
     "assignment_revoked_ward_body": "Your safeguarding support assignment on {{community}} has been ended. Please contact your coordinator if you have questions.",
     "assignment_revoked_cta": "Contact Support",
-    "consent_revoked_admin_bell": "{{name}} has withdrawn safeguarding consent (option: {{option}})"
+    "consent_revoked_admin_bell": "{{name}} has withdrawn safeguarding consent (option: {{option}})",
+    "reporter_status_subject": "Update on your safeguarding report #:incident_id",
+    "reporter_status_title": "Safeguarding Report Update",
+    "reporter_status_preview": "Your report status has been updated to: :status",
+    "reporter_status_body": "Your safeguarding report #:incident_id has been updated. The current status is now: :status.",
+    "reporter_status_confidentiality": "This report is handled with strict confidentiality. If you have additional information to share, please contact your community coordinator."
   },
   "social": {
     "connection_request": "{{name}} sent you a connection request",
@@ -417,7 +422,19 @@
     "renewal_reminder_title": "Upcoming Renewal",
     "renewal_reminder_preview": "Your :plan subscription renews soon",
     "renewal_reminder_body": "Your <strong>:plan</strong> subscription is set to automatically renew on <strong>:date</strong>. No action is needed — we will charge your card on file.",
-    "renewal_reminder_cta": "Manage Subscription"
+    "renewal_reminder_cta": "Manage Subscription",
+    "plan_changed_subject": "Your subscription plan has changed to :new_plan",
+    "plan_changed_title": "Subscription Plan Changed",
+    "plan_changed_body": "Your subscription has been updated from :old_plan to :new_plan. Your billing will reflect the new plan on your next invoice.",
+    "plan_changed_cta": "View Billing",
+    "trial_ending_7d_subject": "Your free trial ends in 7 days",
+    "trial_ending_7d_title": "Trial Ending Soon",
+    "trial_ending_7d_body": "Your free trial for :community ends in 7 days on :date. Add a payment method to continue without interruption.",
+    "trial_ending_7d_cta": "Add Payment Method",
+    "trial_ending_1d_subject": "Your free trial ends tomorrow",
+    "trial_ending_1d_title": "Trial Ends Tomorrow",
+    "trial_ending_1d_body": "Your free trial for :community ends tomorrow on :date. Add a payment method now to avoid any disruption.",
+    "trial_ending_1d_cta": "Add Payment Method Now"
   },
   "exchange_rating": {
     "received_subject": "You received a new rating on an exchange",
