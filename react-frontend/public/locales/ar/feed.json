@@ -495,7 +495,8 @@
     "comments": "Comments",
     "shares": "Shares",
     "reach": "Reach",
-    "loading": "Loading analytics..."
+    "loading": "Loading analytics...",
+    "load_failed": "Failed to load analytics."
   },
   "failed_to_load_analytics": "Failed to load analytics",
   "suggestions": {

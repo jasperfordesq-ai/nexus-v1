@@ -8,7 +8,7 @@
  * Shows a user search/picker and sends the post link as a message.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Modal,
   ModalContent,
@@ -50,6 +50,10 @@ export function ShareViaDMModal({ isOpen, onClose, postUrl, postContent }: Share
   const [isSending, setIsSending] = useState(false);
   const [sentTo, setSentTo] = useState<Set<number>>(new Set());
 
+  // M4: Mounted guard — prevents setState after unmount in debounced search
+  const isMountedRef = useRef(true);
+  useEffect(() => { return () => { isMountedRef.current = false; }; }, []);
+
   const searchUsers = useCallback(async (q: string) => {
     if (q.length < 2) {
       setUsers([]);
@@ -61,12 +65,12 @@ export function ShareViaDMModal({ isOpen, onClose, postUrl, postContent }: Share
       const response = await api.get<{ data: UserResult[] }>(`/v2/users?search=${encodeURIComponent(q)}&per_page=10`);
       if (response.success && response.data) {
         const items = Array.isArray(response.data) ? response.data : (response.data as { data: UserResult[] }).data ?? [];
-        setUsers(items);
+        if (isMountedRef.current) setUsers(items);
       }
     } catch (err) {
       logError('Failed to search users for DM share', err);
     } finally {
-      setIsSearching(false);
+      if (isMountedRef.current) setIsSearching(false);
     }
   }, []);
 

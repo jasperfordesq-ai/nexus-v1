@@ -276,9 +276,6 @@
     "detail_challenge": "View Challenge",
     "detail_volunteer": "View Opportunity",
     "detail_blog": "Read Article",
-    "post_options": "Post options",
-    "post_actions": "Post actions",
-    "send_comment": "Send comment",
     "edit": "Edit",
     "save": "Save",
     "cancel": "Cancel",
@@ -518,7 +515,8 @@
     "comments": "Comments",
     "shares": "Shares",
     "reach": "Reach",
-    "reactions_breakdown": "Reactions Breakdown"
+    "reactions_breakdown": "Reactions Breakdown",
+    "load_failed": "Failed to load analytics."
   },
   "failed_to_load_analytics": "Failed to load analytics"
 }

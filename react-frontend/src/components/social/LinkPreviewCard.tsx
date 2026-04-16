@@ -217,7 +217,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
           <div className="flex items-center gap-1.5 mb-1.5">
             {faviconUrl ? (
               <img
-                src={faviconUrl}
+                src={safeUrl(faviconUrl)}
                 alt={`${siteName || domain} icon`}
                 className="w-4 h-4 rounded-sm flex-shrink-0"
                 loading="lazy"

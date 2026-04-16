@@ -106,7 +106,7 @@ export function PollTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
     try {
       const payload: Record<string, unknown> = {
         question: draft.question.trim(),
-        options: validOptions.map((o) => o.trim()),
+        options: validOptions,
       };
 
       if (expiresAt) {

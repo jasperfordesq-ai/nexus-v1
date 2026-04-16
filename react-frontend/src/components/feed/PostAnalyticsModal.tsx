@@ -57,23 +57,34 @@ export function PostAnalyticsModal({ isOpen, onClose, postId }: PostAnalyticsMod
   useEffect(() => {
     if (!isOpen) return;
 
-    setLoading(true);
-    setError(null);
+    const controller = new AbortController();
 
-    api.get<PostAnalytics>(`/v2/feed/posts/${postId}/analytics`)
-      .then((res) => {
+    const fetchAnalytics = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await api.get<PostAnalytics>(
+          `/v2/feed/posts/${postId}/analytics`,
+          { signal: controller.signal }
+        );
         if (res.success && res.data) {
           setData(res.data);
         } else {
-          setError(res.error || t('failed_to_load_analytics'));
+          setError(res.error || t('analytics.load_failed'));
         }
-      })
-      .catch((err) => {
-        logError('Failed to load post analytics', err);
-        setError(t('failed_to_load_analytics'));
-      })
-      .finally(() => setLoading(false));
-  }, [isOpen, postId, t])
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          logError('Failed to load post analytics', err);
+          setError(t('analytics.load_failed'));
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+    return () => controller.abort();
+  }, [isOpen, postId]) // t is stable — excluded to avoid re-fetch on language changes
 
   const stats = data ? [
     { label: t('analytics.views', 'Views'), value: data.views_count, icon: Eye, color: 'text-blue-500', bg: 'bg-blue-500/10' },

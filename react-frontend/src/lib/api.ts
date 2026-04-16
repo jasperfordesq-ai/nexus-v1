@@ -764,8 +764,10 @@ class ApiClient {
       });
     }
 
-    // Build headers without Content-Type (browser sets it with boundary)
+    // H9/L10: Build headers WITHOUT Content-Type — browser must set it with the multipart boundary.
+    // Explicitly delete it to guard against inherited values from options.headers.
     const headers = new Headers(options?.headers);
+    headers.delete('Content-Type'); // L10: force-remove in case it was inherited
     headers.set('Accept', 'application/json');
 
     if (!options?.skipAuth) {
@@ -792,13 +794,28 @@ class ApiClient {
     const uploadController = new AbortController();
     const uploadTimeoutId = setTimeout(() => uploadController.abort(), 120000);
 
+    // H9: Combine upload timeout signal with optional caller AbortSignal
+    const callerSignal = options?.signal as AbortSignal | undefined;
+    let uploadSignal: AbortSignal = uploadController.signal;
+    if (callerSignal) {
+      if ('any' in AbortSignal) {
+        uploadSignal = AbortSignal.any([uploadController.signal, callerSignal]);
+      } else {
+        if (callerSignal.aborted) {
+          uploadController.abort(callerSignal.reason);
+        } else {
+          callerSignal.addEventListener('abort', () => uploadController.abort(callerSignal.reason), { once: true });
+        }
+      }
+    }
+
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         method: 'POST',
         headers,
         body: formData,
         credentials: 'include',
-        signal: uploadController.signal,
+        signal: uploadSignal,
       });
       clearTimeout(uploadTimeoutId);
 
