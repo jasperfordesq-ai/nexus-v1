@@ -24,6 +24,28 @@
 @import "./styles/background.css";
 
 /* ─────────────────────────────────────────────
+   EDGE-TO-EDGE SAFE AREA INSETS
+   Required for Capacitor on Android 15 (API 35) and iOS.
+   WindowCompat.setDecorFitsSystemWindows(false) lets the WebView
+   draw behind the status bar and navigation bar. These CSS variables
+   expose the safe zone so layout can avoid those areas.
+   viewport-fit=cover must be set in index.html (already present).
+   ───────────────────────────────────────────── */
+:root {
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+}
+
+/* Ensure the very bottom of the page (e.g. the mobile tab bar) is never
+   hidden behind the Android navigation bar. Any fixed bottom element should
+   add padding-bottom: var(--safe-area-bottom) or use pb-safe-area-bottom. */
+.pb-safe {
+  padding-bottom: var(--safe-area-bottom);
+}
+
+/* ─────────────────────────────────────────────
    THEME-AWARE UTILITY CLASSES
    Use these instead of hardcoded text-white, etc.
    ───────────────────────────────────────────── */
