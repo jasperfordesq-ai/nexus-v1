@@ -305,6 +305,7 @@ export interface Listing {
 export interface ListingDetail extends Listing {
   author_email?: string;
   attributes?: ListingAttribute[];
+  is_liked?: boolean;
   likes_count?: number;
   comments_count?: number;
   coordinates?: {

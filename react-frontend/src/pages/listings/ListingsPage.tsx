@@ -756,13 +756,13 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                 {listing.service_type === 'remote_only' && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium flex items-center gap-0.5">
                     <Monitor className="w-2.5 h-2.5" aria-hidden="true" />
-                    Remote
+                    {t('service_type_remote', 'Remote')}
                   </span>
                 )}
                 {listing.service_type === 'hybrid' && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-medium flex items-center gap-0.5">
                     <ArrowRightLeft className="w-2.5 h-2.5" aria-hidden="true" />
-                    Remote Available
+                    {t('service_type_hybrid_available', 'Remote Available')}
                   </span>
                 )}
                 {listing.category_name && (

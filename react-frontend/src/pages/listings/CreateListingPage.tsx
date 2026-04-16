@@ -172,6 +172,10 @@ export function CreateListingPage() {
       newErrors.hours_estimate = t('form.hours_range');
     }
 
+    if (formData.accessibility_notes && formData.accessibility_notes.length > 200) {
+      newErrors.accessibility_notes = t('form.accessibility_max_length', 'Accessibility notes must be 200 characters or fewer');
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
@@ -239,6 +243,7 @@ export function CreateListingPage() {
           await api.upload(`/v2/listings/${listingId}/image`, imageFile, 'image');
         } catch (imgErr) {
           logError('Failed to upload listing image', imgErr);
+          toast.warning(t('form.image_upload_failed', 'Image upload failed. Your listing was saved without an image.'));
         }
       } else if (removeExistingImage && listingId) {
         try {
@@ -475,6 +480,9 @@ export function CreateListingPage() {
                 placeholder={t('form.accessibility_placeholder', 'e.g., Wheelchair accessible, hearing loop available')}
                 value={formData.accessibility_notes || ''}
                 onChange={(e) => updateField('accessibility_notes', e.target.value)}
+                isInvalid={!!errors.accessibility_notes}
+                errorMessage={errors.accessibility_notes}
+                maxLength={200}
                 classNames={{
                   input: 'bg-transparent text-theme-primary',
                   inputWrapper: 'bg-theme-elevated border-theme-default',

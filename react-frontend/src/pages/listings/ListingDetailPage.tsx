@@ -48,7 +48,7 @@ import { usePageTitle, useSocialInteractions } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
-import type { Listing, ExchangeConfig } from '@/types/api';
+import type { Listing, ListingDetail, ExchangeConfig } from '@/types/api';
 
 export function ListingDetailPage() {
   const { t } = useTranslation('listings');
@@ -135,17 +135,15 @@ export function ListingDetailPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await api.get<Listing>(`/v2/listings/${id}`);
+      const response = await api.get<ListingDetail>(`/v2/listings/${id}`);
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setListing(response.data);
         setIsSaved(response.data.is_favorited ?? false);
-        // Social fields come from the API but aren't on the Listing type
-        const data = response.data as unknown as { is_liked?: boolean; likes_count?: number; comments_count?: number };
         setSocialInit({
-          liked: data.is_liked ?? false,
-          likes: data.likes_count ?? 0,
-          comments: data.comments_count ?? 0,
+          liked: response.data.is_liked ?? false,
+          likes: response.data.likes_count ?? 0,
+          comments: response.data.comments_count ?? 0,
         });
       } else {
         setError(tRef.current('not_found_error'));
@@ -650,6 +648,7 @@ export function ListingDetailPage() {
               onValueChange={setReportDetails}
               maxLength={500}
               variant="bordered"
+              description={`${reportDetails.length}/500`}
               classNames={{ label: 'text-theme-secondary' }}
             />
           </ModalBody>
