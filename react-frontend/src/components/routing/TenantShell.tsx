@@ -138,7 +138,7 @@ function TenantGuard({
   appRoutes?: () => React.ReactNode;
 }) {
   const { t } = useTranslation('common');
-  const { isLoading, notFoundSlug, tenant } = useTenant();
+  const { isLoading, notFoundSlug, tenant, error } = useTenant();
   const { user } = useAuth();
   const location = useLocation();
 
@@ -157,6 +157,12 @@ function TenantGuard({
   // If the slug was not found, show "Community Not Found" page
   if (notFoundSlug) {
     return <CommunityNotFound slug={notFoundSlug} />;
+  }
+
+  // Bootstrap failed (network error, server error, or offline first launch).
+  // Show a retry screen instead of a blank page or partial render.
+  if (!tenant && error) {
+    return <BootstrapError onRetry={() => window.location.reload()} />;
   }
 
   // Check for maintenance mode (after tenant is loaded)
@@ -237,6 +243,39 @@ function SlugUrlGuard({ slug }: { slug: string }) {
     }
   });
   return null;
+}
+
+/**
+ * Bootstrap error screen — shown when tenant config fails to load (offline /
+ * network error / server error). Gives the user a clear message and retry button
+ * instead of a blank screen or a confusing partial render.
+ */
+function BootstrapError({ onRetry }: { onRetry: () => void }) {
+  const { t } = useTranslation('common');
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4 bg-[var(--surface-base)]">
+      <div className="text-center max-w-sm">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/20 mb-6">
+          <svg className="w-8 h-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M12 9v2m0 4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z" />
+          </svg>
+        </div>
+        <h1 className="text-xl font-bold text-theme-primary mb-2">
+          {t('errors.connection_failed', 'Unable to connect')}
+        </h1>
+        <p className="text-theme-muted mb-6 text-sm">
+          {t('errors.connection_failed_detail', 'Check your internet connection and try again.')}
+        </p>
+        <button
+          onClick={onRetry}
+          className="px-6 py-2 rounded-lg bg-primary text-white font-medium text-sm hover:opacity-90 transition-opacity"
+        >
+          {t('actions.retry', 'Try again')}
+        </button>
+      </div>
+    </div>
+  );
 }
 
 /**
