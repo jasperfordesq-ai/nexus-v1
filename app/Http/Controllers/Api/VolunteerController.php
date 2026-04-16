@@ -182,7 +182,7 @@ class VolunteerController extends BaseApiController
         try {
             $opportunity = VolOpportunity::find($id);
             if (!$opportunity || (int) $opportunity->tenant_id !== TenantContext::getId()) {
-                throw new \RuntimeException('Tenant mismatch — skip notification');
+                throw new \RuntimeException(__('api.tenant_mismatch_error'));
             }
             if ($opportunity && $opportunity->created_by && $opportunity->created_by !== $userId) {
                 $volunteer = User::find($userId);
@@ -263,7 +263,7 @@ class VolunteerController extends BaseApiController
         try {
             $application = VolApplication::find($id);
             if (!$application || (int) $application->tenant_id !== TenantContext::getId()) {
-                throw new \RuntimeException('Tenant mismatch — skip notification');
+                throw new \RuntimeException(__('api.tenant_mismatch_error'));
             }
             if ($application && $application->user_id) {
                 $opportunityId = $application->opportunity_id;
@@ -348,7 +348,7 @@ class VolunteerController extends BaseApiController
         try {
             $shift = VolShift::with('opportunity')->find($id);
             if (!$shift || (int) $shift->tenant_id !== TenantContext::getId()) {
-                throw new \RuntimeException('Tenant mismatch — skip notification');
+                throw new \RuntimeException(__('api.tenant_mismatch_error'));
             }
             if ($shift && $shift->opportunity && $shift->opportunity->created_by && $shift->opportunity->created_by !== $userId) {
                 $volunteer = User::find($userId);

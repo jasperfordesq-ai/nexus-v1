@@ -906,7 +906,7 @@ class AdminContentController extends BaseApiController
     private function ensureUniqueSlug(string $table, string $slug, int $tenantId): string
     {
         if (!in_array($table, ['pages', 'menus'], true)) {
-            throw new \InvalidArgumentException("Invalid table: {$table}");
+            throw new \InvalidArgumentException(__('api.invalid_table_parameter'));
         }
         $counter = 0;
         $originalSlug = $slug;

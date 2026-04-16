@@ -1565,7 +1565,7 @@ class AdminUsersController extends BaseApiController
     private function resolveUserTenant(array $user): array
     {
         if (empty($user['tenant_id'])) {
-            throw new \RuntimeException("User #{$user['id']} has no tenant_id — cannot resolve tenant for notifications");
+            throw new \RuntimeException(__('api.user_missing_tenant_id'));
         }
         $userTenantId = (int) $user['tenant_id'];
         $tenantName = 'Project NEXUS';
@@ -1595,7 +1595,7 @@ class AdminUsersController extends BaseApiController
     {
         try {
             if (empty($user['tenant_id'])) {
-                throw new \RuntimeException("User #{$user['id']} has no tenant_id — cannot grant credits");
+                throw new \RuntimeException(__('api.user_missing_tenant_id'));
             }
             $userTenantId = (int) $user['tenant_id'];
             $userId = (int) $user['id'];

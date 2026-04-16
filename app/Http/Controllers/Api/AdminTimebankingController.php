@@ -196,7 +196,7 @@ class AdminTimebankingController extends BaseApiController
                 $newBalance = $currentBalance + $amount;
 
                 if ($newBalance < 0) {
-                    throw new \DomainException('Adjustment would result in negative balance');
+                    throw new \DomainException(__('api.balance_adjustment_negative'));
                 }
 
                 // Atomic balance update using relative arithmetic

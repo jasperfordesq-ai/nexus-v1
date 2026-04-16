@@ -184,7 +184,7 @@ class BookmarkService
     private function validateType(string $type): void
     {
         if (!in_array($type, self::VALID_TYPES, true)) {
-            throw new \InvalidArgumentException("Invalid bookmarkable type: {$type}");
+            throw new \InvalidArgumentException(__('api.invalid_bookmarkable_type'));
         }
     }
 }

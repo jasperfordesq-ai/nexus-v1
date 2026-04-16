@@ -93,7 +93,7 @@ class ConnectionService
     public static function request(int $requesterId, int $receiverId): Connection
     {
         if ($requesterId === $receiverId) {
-            throw new \RuntimeException('Cannot connect with yourself');
+            throw new \RuntimeException(__('api.cannot_connect_with_yourself'));
         }
 
         // Check if either user has blocked the other
@@ -107,7 +107,7 @@ class ConnectionService
             })
             ->exists();
         if ($blocked) {
-            throw new \RuntimeException('Cannot send connection request to this user');
+            throw new \RuntimeException(__('api.cannot_send_request_to_user'));
         }
 
         // Verify receiver exists in the same tenant
@@ -137,7 +137,7 @@ class ConnectionService
                 ->first();
 
             if ($existing) {
-                throw new \RuntimeException('Connection already exists (status: ' . $existing->status . ')');
+                throw new \RuntimeException(__('api.connection_already_exists'));
             }
 
             $connection = new Connection([
@@ -187,11 +187,11 @@ class ConnectionService
             $connection = Connection::query()->lockForUpdate()->findOrFail($connectionId);
 
             if ($connection->receiver_id !== $userId) {
-                throw new \RuntimeException('Only the receiver can accept a connection request');
+                throw new \RuntimeException(__('api.only_receiver_can_accept'));
             }
 
             if ($connection->status !== 'pending') {
-                throw new \RuntimeException('Connection is not pending');
+                throw new \RuntimeException(__('api.connection_not_pending'));
             }
 
             $connection->status = 'accepted';
@@ -357,7 +357,7 @@ class ConnectionService
         $receiverId = (int) ($data['user_id'] ?? 0);
 
         if (! $receiverId) {
-            throw new \RuntimeException('User ID is required');
+            throw new \RuntimeException(__('api.user_id_required'));
         }
 
         $connection = self::request($requesterId, $receiverId);

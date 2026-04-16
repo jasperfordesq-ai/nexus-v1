@@ -30,7 +30,7 @@ class BlockUserService
     public static function block(int $userId, int $blockedUserId, ?string $reason = null): void
     {
         if ($userId === $blockedUserId) {
-            throw new \RuntimeException('Cannot block yourself');
+            throw new \RuntimeException(__('api.cannot_block_yourself'));
         }
 
         // Insert block record (ignore if already exists)

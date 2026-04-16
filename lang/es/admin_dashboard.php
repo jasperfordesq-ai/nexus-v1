@@ -24,6 +24,10 @@ return [
         'transactions' => 'Transacciones',
         'hours_exchanged' => 'Horas Intercambiadas',
         'hours' => 'Horas',
+        'new_users_this_month' => 'New Users This Month',
+        'active_users' => 'Active Users',
+        'total_listings' => 'Total Listings',
+        'new_listings_this_month' => 'New Listings This Month',
     ],
     'alerts' => [
         'users_pending_one' => ':count Usuario Pendiente',
@@ -35,6 +39,8 @@ return [
         'orgs_pending_one' => ':count Organización Pendiente',
         'orgs_pending_other' => ':count Organizaciones Pendientes',
         'orgs_pending_text' => 'Organizaciones de voluntariado esperando aprobación',
+        'pending_approvals' => 'Members awaiting approval',
+        'pending_listings' => 'Listings awaiting moderation',
     ],
     'modules' => [
         'section_title' => 'Módulos de la Plataforma',
@@ -90,6 +96,8 @@ return [
         'new_blog_post' => 'Nueva Entrada de Blog',
         'gamification' => 'Gamificación',
         'settings' => 'Configuración',
+        'enterprise' => 'Enterprise',
+        'advanced_controls' => 'Advanced Controls',
     ],
     'enterprise' => [
         'card_title' => 'Suite Empresarial',
@@ -106,5 +114,11 @@ return [
         'cache' => 'Caché',
         'queue' => 'Tareas Programadas',
         'api' => 'API de Email',
+    ],
+    'load_error' => 'Failed to load dashboard data',
+    'trends' => [
+        'card_title' => 'Transaction Trends',
+        'hours_suffix' => 'hrs',
+        'no_data' => 'No trend data available',
     ],
 ];

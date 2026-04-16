@@ -2350,7 +2350,7 @@ class FederationV2Controller extends BaseApiController
         DB::beginTransaction();
         try {
             // Lock sender row and check balance BEFORE calling external API
-            $senderBalance = DB::selectOne("SELECT balance FROM users WHERE id = ? FOR UPDATE", [$userId]);
+            $senderBalance = DB::selectOne("SELECT balance FROM users WHERE id = ? AND tenant_id = ? FOR UPDATE", [$userId, $tenantId]);
             if (!$senderBalance || $senderBalance->balance < $amount) {
                 DB::rollBack();
                 return $this->respondWithError('INSUFFICIENT_BALANCE', __('api.fed_insufficient_balance'), null, 400);

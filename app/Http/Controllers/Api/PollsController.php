@@ -202,7 +202,7 @@ class PollsController extends BaseApiController
         try {
             $pollModel = Poll::find($id);
             if (!$pollModel || (int) $pollModel->tenant_id !== TenantContext::getId()) {
-                throw new \RuntimeException('Tenant mismatch — skip notification');
+                throw new \RuntimeException(__('api.tenant_mismatch_error'));
             }
             if ($pollModel && (int) $pollModel->user_id !== $userId) {
                 $voter = User::find($userId);

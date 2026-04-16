@@ -165,7 +165,7 @@ export function CronJobSettingsPage() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
             <Settings size={18} className="text-primary" />
-            <span className="text-lg font-semibold">Per-Job Settings</span>
+            <span className="text-lg font-semibold">{t('system.section_per_job_settings')}</span>
           </CardHeader>
           <CardBody className="space-y-4">
             {loadingJobs ? (
@@ -207,7 +207,7 @@ export function CronJobSettingsPage() {
                           <div className="flex flex-col gap-1">
                             <span className="text-sm font-medium">{t('cron_settings.enable_job')}</span>
                             <span className="text-xs text-default-400">
-                              Job will run on schedule when enabled
+                              {t('system.desc_job_will_run_when_enabled')}
                             </span>
                           </div>
                         </Switch>
@@ -240,10 +240,10 @@ export function CronJobSettingsPage() {
                         >
                           <div className="flex flex-col gap-1">
                             <span className="text-sm font-medium">
-                              Notify on Failure
+                              {t('system.label_notify_on_failure')}
                             </span>
                             <span className="text-xs text-default-400">
-                              Send email when job fails
+                              {t('system.desc_notify_on_failure')}
                             </span>
                           </div>
                         </Switch>
@@ -252,7 +252,7 @@ export function CronJobSettingsPage() {
                           <Textarea
                             label={t('system.label_notification_emails')}
                             placeholder="admin@example.com, dev@example.com"
-                            description="Comma-separated email addresses"
+                            description={t('system.desc_comma_separated_emails')}
                             variant="bordered"
                             minRows={2}
                             value={jobSettings.notify_emails || ''}
@@ -302,7 +302,7 @@ export function CronJobSettingsPage() {
                           isLoading={savingJobSettings}
                           className="w-full"
                         >
-                          Save Job Settings
+                          {t('system.btn_save_job_settings')}
                         </Button>
                       </div>
                     )}
@@ -385,7 +385,7 @@ export function CronJobSettingsPage() {
                   isLoading={savingGlobalSettings}
                   className="w-full"
                 >
-                  Save Global Settings
+                  {t('system.btn_save_global_settings')}
                 </Button>
               </>
             )}

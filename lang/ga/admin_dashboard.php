@@ -24,6 +24,10 @@ return [
         'transactions' => 'Idirbhearta',
         'hours_exchanged' => 'Uaireanta Malartaithe',
         'hours' => 'Uaireanta',
+        'new_users_this_month' => 'New Users This Month',
+        'active_users' => 'Active Users',
+        'total_listings' => 'Total Listings',
+        'new_listings_this_month' => 'New Listings This Month',
     ],
     'alerts' => [
         'users_pending_one' => ':count Úsáideoir ar Feitheamh',
@@ -35,6 +39,8 @@ return [
         'orgs_pending_one' => ':count Eagraíocht ar Feitheamh',
         'orgs_pending_other' => ':count Eagraíocht ar Feitheamh',
         'orgs_pending_text' => 'Eagraíochtaí deonaíochta ag fanacht le ceadú',
+        'pending_approvals' => 'Members awaiting approval',
+        'pending_listings' => 'Listings awaiting moderation',
     ],
     'modules' => [
         'section_title' => 'Modúil Ardáin',
@@ -90,6 +96,8 @@ return [
         'new_blog_post' => 'Postáil Bhlag Nua',
         'gamification' => 'Cluichíocht',
         'settings' => 'Socruithe',
+        'enterprise' => 'Enterprise',
+        'advanced_controls' => 'Advanced Controls',
     ],
     'enterprise' => [
         'card_title' => 'Sraith Fiontraíochta',
@@ -106,5 +114,11 @@ return [
         'cache' => 'Taisce',
         'queue' => 'Jabanna Cron',
         'api' => 'API Ríomhphoist',
+    ],
+    'load_error' => 'Failed to load dashboard data',
+    'trends' => [
+        'card_title' => 'Transaction Trends',
+        'hours_suffix' => 'hrs',
+        'no_data' => 'No trend data available',
     ],
 ];

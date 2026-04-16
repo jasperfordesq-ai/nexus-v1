@@ -526,7 +526,7 @@ class EventsController extends BaseApiController
                     ->first();
 
                 if (!$organizer || (float) $organizer->balance < $duration) {
-                    throw new \RuntimeException('Organizer has insufficient time credit balance to award ' . $duration . ' hours');
+                    throw new \RuntimeException(__('api.organizer_insufficient_balance'));
                 }
 
                 // Lock attendee row for consistency
