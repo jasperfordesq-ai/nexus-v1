@@ -46,22 +46,20 @@ interface ConnectionSuggestionsWidgetProps {
 
 /* ─── Dismissed storage ────────────────────────────────────── */
 
-const DISMISSED_KEY = 'nexus_dismissed_suggestions';
-
-function getDismissed(): number[] {
+function getDismissed(key: string): number[] {
   try {
-    const raw = localStorage.getItem(DISMISSED_KEY);
+    const raw = localStorage.getItem(key);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
   }
 }
 
-function addDismissed(userId: number): void {
-  const list = getDismissed();
+function addDismissed(key: string, userId: number): void {
+  const list = getDismissed(key);
   if (!list.includes(userId)) {
     list.push(userId);
-    localStorage.setItem(DISMISSED_KEY, JSON.stringify(list.slice(-100)));
+    localStorage.setItem(key, JSON.stringify(list.slice(-100)));
   }
 }
 
@@ -69,8 +67,11 @@ function addDismissed(userId: number): void {
 
 export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSuggestionsWidgetProps) {
   const { t } = useTranslation('feed');
-  const { tenantPath } = useTenant();
+  const { tenantPath, tenantSlug } = useTenant();
   const toast = useToast();
+
+  // Namespace the dismissed-suggestions key per tenant so dismissals don't leak across tenants
+  const dismissedKey = `nexus_dismissed_suggestions_${tenantSlug ?? 'default'}`;
 
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -82,19 +83,20 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
         setIsLoading(true);
         const response = await api.get<{ suggestions: Suggestion[] }>('/v2/connections/suggestions?limit=8');
         if (response.success && response.data?.suggestions) {
-          const dismissed = getDismissed();
+          const dismissed = getDismissed(dismissedKey);
           setSuggestions(
             response.data.suggestions.filter((s) => !dismissed.includes(s.id))
           );
         }
       } catch (err) {
         logError('Failed to load connection suggestions', err);
+        toast.error(t('suggestions.load_failed', 'Failed to load suggestions'));
       } finally {
         setIsLoading(false);
       }
     };
     load();
-  }, []);
+  }, [dismissedKey]);
 
   const handleConnect = useCallback(async (suggestion: Suggestion) => {
     setConnectingIds((prev) => new Set(prev).add(suggestion.id));
@@ -118,9 +120,9 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
   }, [toast, t]);
 
   const handleDismiss = useCallback((id: number) => {
-    addDismissed(id);
+    addDismissed(dismissedKey, id);
     setSuggestions((prev) => prev.filter((s) => s.id !== id));
-  }, []);
+  }, [dismissedKey]);
 
   // Don't show if no suggestions
   if (!isLoading && suggestions.length === 0) return null;

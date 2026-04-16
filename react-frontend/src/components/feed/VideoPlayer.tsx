@@ -28,7 +28,7 @@ export function VideoPlayer({ media, className = '' }: VideoPlayerProps) {
   const { t } = useTranslation('feed');
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [showPlayOverlay, setShowPlayOverlay] = useState(true);
 
@@ -95,6 +95,7 @@ export function VideoPlayer({ media, className = '' }: VideoPlayerProps) {
       ref={containerRef}
       className={`relative overflow-hidden rounded-xl bg-black/5 dark:bg-white/5 group cursor-pointer ${className}`}
       onClick={handlePlayPause}
+      aria-label={isPlaying ? t('video.pause', 'Pause') : t('video.play', 'Play')}
     >
       <video
         ref={videoRef}

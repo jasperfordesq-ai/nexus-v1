@@ -89,6 +89,7 @@ export function QuotedPostEmbed({ post, isPreview = false }: QuotedPostEmbedProp
               variant="light"
               size="sm"
               className="text-xs text-[var(--color-primary)] p-0 min-w-0 h-auto mt-1"
+              aria-expanded={expanded}
               onPress={(e) => {
                 e.continuePropagation?.();
                 setExpanded(true);
@@ -103,7 +104,7 @@ export function QuotedPostEmbed({ post, isPreview = false }: QuotedPostEmbedProp
           <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden">
             <img
               src={thumbnailUrl}
-              alt={t('feed.quoted_post_image', 'Quoted post image')}
+              alt={t('quoted_post_image', 'Quoted post image')}
               className="w-full h-full object-cover"
               loading="lazy"
             />

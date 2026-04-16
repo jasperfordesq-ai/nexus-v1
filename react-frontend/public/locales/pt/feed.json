@@ -463,7 +463,9 @@
     "select": "Adicionar Vídeo",
     "too_large": "O vídeo deve ter menos de {{size}}MB",
     "invalid_type": "Formato de vídeo inválido. Suportados: MP4, WebM, MOV",
-    "remove": "Remover vídeo"
+    "remove": "Remover vídeo",
+    "mute": "Mute",
+    "unmute": "Unmute"
   },
   "why_shown": {
     "label": "Por que estou vendo isso?",
@@ -487,7 +489,19 @@
     "likes": "Likes",
     "comments": "Comments",
     "shares": "Shares",
-    "reach": "Reach"
+    "reach": "Reach",
+    "loading": "Loading analytics..."
   },
-  "failed_to_load_analytics": "Failed to load analytics"
+  "failed_to_load_analytics": "Failed to load analytics",
+  "suggestions": {
+    "title": "People You May Know",
+    "see_all": "See All",
+    "mutual": "{{count}} mutual connections",
+    "connect": "Connect",
+    "connect_sent": "Connection request sent!",
+    "connect_failed": "Failed to send request",
+    "pending": "Pending",
+    "dismiss": "Dismiss",
+    "load_failed": "Failed to load suggestions"
+  }
 }

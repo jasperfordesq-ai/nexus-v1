@@ -1075,6 +1075,16 @@ class FeedService
     {
         $tenantId = TenantContext::getId();
 
+        // Verify the target post belongs to this tenant before recording the like
+        $postExists = DB::table('feed_posts')
+            ->where('id', $postId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+
+        if (! $postExists) {
+            throw new \InvalidArgumentException('Post not found');
+        }
+
         // Use atomic INSERT IGNORE + check affected rows to prevent duplicate likes
         // from concurrent requests (the uk_likes_user_target unique key enforces this)
         $existing = DB::table('likes')

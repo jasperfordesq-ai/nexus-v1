@@ -89,7 +89,7 @@ export function WhyShown({ item, feedMode }: WhyShownProps) {
           {reasons.map((reason, i) => (
             <li key={i} className="text-xs text-[var(--text-muted)] flex items-start gap-1.5">
               <span className="text-[var(--color-primary)] mt-0.5">•</span>
-              <span>{t(reason, reason)}</span>
+              <span>{t(reason)}</span>
             </li>
           ))}
         </ul>

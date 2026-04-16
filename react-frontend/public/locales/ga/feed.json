@@ -462,7 +462,9 @@
     "select": "Cuir Físeán Leis",
     "too_large": "Ní mór don fhíseán a bheith níos lú ná {{size}}MB",
     "invalid_type": "Formáid físeáin neamhbhailí. Tacaithe: MP4, WebM, MOV",
-    "remove": "Bain físeán"
+    "remove": "Bain físeán",
+    "mute": "Mute",
+    "unmute": "Unmute"
   },
   "quoted_post_image": "Quoted post image",
   "why_shown": {
@@ -487,7 +489,19 @@
     "comments": "Comments",
     "shares": "Shares",
     "reach": "Reach",
-    "reactions_breakdown": "Reactions Breakdown"
+    "reactions_breakdown": "Reactions Breakdown",
+    "loading": "Loading analytics..."
   },
-  "failed_to_load_analytics": "Failed to load analytics"
+  "failed_to_load_analytics": "Failed to load analytics",
+  "suggestions": {
+    "title": "People You May Know",
+    "see_all": "See All",
+    "mutual": "{{count}} mutual connections",
+    "connect": "Connect",
+    "connect_sent": "Connection request sent!",
+    "connect_failed": "Failed to send request",
+    "pending": "Pending",
+    "dismiss": "Dismiss",
+    "load_failed": "Failed to load suggestions"
+  }
 }

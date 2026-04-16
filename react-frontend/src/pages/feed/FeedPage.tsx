@@ -454,7 +454,7 @@ export function FeedPage() {
     onReportOpen();
   }, [onReportOpen]);
 
-  const handleReport = async () => {
+  const handleReport = useCallback(async () => {
     if (!reportPostId || !reportReason.trim()) {
       toastRef.current.error(tRef.current('toast.provide_reason'));
       return;
@@ -475,7 +475,7 @@ export function FeedPage() {
     } finally {
       setIsReporting(false);
     }
-  };
+  }, [reportPostId, reportReason, onReportClose]);
 
   const handleDeletePost = useCallback(async (item: FeedItem) => {
     try {

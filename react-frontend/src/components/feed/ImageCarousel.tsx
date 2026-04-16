@@ -145,6 +145,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
                   className="w-full max-h-[500px] sm:max-h-[500px] max-sm:max-h-[400px] object-contain select-none"
                   draggable={false}
                   loading={currentIndex === 0 ? 'eager' : 'lazy'}
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
               )}
             </motion.div>

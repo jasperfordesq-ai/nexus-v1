@@ -466,7 +466,9 @@
     "select": "Add Video",
     "too_large": "Video must be smaller than {{size}}MB",
     "invalid_type": "Invalid video format. Supported: MP4, WebM, MOV",
-    "remove": "Remove video"
+    "remove": "Remove video",
+    "mute": "Mute",
+    "unmute": "Unmute"
   },
   "why_shown": {
     "label": "Why am I seeing this?",
@@ -483,8 +485,20 @@
     "active_discussion": "Active discussion",
     "frequently_saved": "Frequently saved by others"
   },
+  "suggestions": {
+    "title": "People You May Know",
+    "see_all": "See All",
+    "mutual": "{{count}} mutual connections",
+    "connect": "Connect",
+    "connect_sent": "Connection request sent!",
+    "connect_failed": "Failed to send request",
+    "pending": "Pending",
+    "dismiss": "Dismiss",
+    "load_failed": "Failed to load suggestions"
+  },
   "analytics": {
     "title": "Post Analytics",
+    "loading": "Loading analytics...",
     "views": "Views",
     "likes": "Likes",
     "comments": "Comments",

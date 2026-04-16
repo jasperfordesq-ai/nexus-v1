@@ -174,6 +174,28 @@ class SocialController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.social_invalid_target_type'), 'target_type', 400);
         }
 
+        // Verify the target belongs to this tenant before recording the like
+        $targetTables = [
+            'post'         => 'feed_posts',
+            'listing'      => 'listings',
+            'event'        => 'events',
+            'poll'         => 'polls',
+            'goal'         => 'goals',
+            'resource'     => 'resources',
+            'volunteering' => 'volunteering_opportunities',
+            'review'       => 'reviews',
+            'comment'      => 'comments',
+        ];
+        if (isset($targetTables[$targetType])) {
+            $targetExists = DB::table($targetTables[$targetType])
+                ->where('id', $targetId)
+                ->where('tenant_id', $tenantId)
+                ->exists();
+            if (! $targetExists) {
+                return $this->respondWithError('NOT_FOUND', __('api.post_not_found'), null, 404);
+            }
+        }
+
         // Check existing like (tenant-scoped)
         $existing = DB::table('likes')
             ->where('user_id', $userId)

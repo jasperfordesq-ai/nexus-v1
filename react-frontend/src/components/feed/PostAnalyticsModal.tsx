@@ -92,8 +92,12 @@ export function PostAnalyticsModal({ isOpen, onClose, postId }: PostAnalyticsMod
         </ModalHeader>
         <ModalBody className="pb-6">
           {loading ? (
-            <div className="flex justify-center py-12">
-              <Spinner size="lg" />
+            <div
+              className="flex justify-center py-12"
+              role="status"
+              aria-label={t('analytics.loading', 'Loading analytics...')}
+            >
+              <Spinner size="lg" aria-hidden="true" />
             </div>
           ) : error ? (
             <div className="text-center py-8 text-[var(--text-muted)]">

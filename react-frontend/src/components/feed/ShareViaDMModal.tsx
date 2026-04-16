@@ -75,7 +75,10 @@ export function ShareViaDMModal({ isOpen, onClose, postUrl, postContent }: Share
       searchUsers(query);
     }, 300);
     return () => clearTimeout(timer);
-  }, [query, searchUsers]);
+    // searchUsers is stable (useCallback with []), so it's intentionally excluded
+    // to prevent the debounce timer resetting on unrelated parent re-renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
 
   // Reset state when modal opens
   useEffect(() => {

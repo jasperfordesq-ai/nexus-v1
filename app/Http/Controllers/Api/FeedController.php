@@ -107,7 +107,11 @@ class FeedController extends BaseApiController
             return $this->respondWithError('INVALID_INPUT', __('api.invalid_post_id'));
         }
 
-        $result = $this->feedService->like($postId, $userId);
+        try {
+            $result = $this->feedService->like($postId, $userId);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('NOT_FOUND', __('api.post_not_found'), null, 404);
+        }
 
         return $this->respondWithData($result);
     }

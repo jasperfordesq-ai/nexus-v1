@@ -529,6 +529,9 @@ const FeedCard = React.memo(function FeedCard({
   const confettiTriggeredRef = useRef(false);
   const confettiTimeoutRefs = useRef<ReturnType<typeof setTimeout>[]>([]);
 
+  // Tracks whether comments have been loaded at least once (prevents double-load when defaultShowComments=true)
+  const commentLoadedRef = useRef(false);
+
   // Clean up confetti timeouts on unmount
   useEffect(() => {
     return () => {
@@ -558,10 +561,12 @@ const FeedCard = React.memo(function FeedCard({
           const isMilestone = item.type === 'badge_earned' || item.type === 'level_up';
           if (isMilestone && !confettiTriggeredRef.current) {
             confettiTriggeredRef.current = true;
-            confettiTimeoutRefs.current.push(
-              setTimeout(() => setShowConfetti(true), 300),
-              setTimeout(() => setShowConfetti(false), 2000),
-            );
+            const t1 = setTimeout(() => { setShowConfetti(true); }, 300);
+            const t2 = setTimeout(() => {
+              setShowConfetti(false);
+              confettiTimeoutRefs.current = confettiTimeoutRefs.current.filter(id => id !== t1 && id !== t2);
+            }, 2000);
+            confettiTimeoutRefs.current.push(t1, t2);
           }
         }
       },
@@ -642,19 +647,20 @@ const FeedCard = React.memo(function FeedCard({
   useEffect(() => {
     if (defaultShowComments) {
       loadComments();
+      commentLoadedRef.current = true;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- load once on mount; defaultShowComments is initial prop
   }, []);
 
   const toggleComments = () => {
-    if (!showComments) {
+    if (!showComments && !commentLoadedRef.current) {
       loadComments();
     }
     setShowComments(!showComments);
   };
 
   const handleSubmitComment = async () => {
-    if (!newComment.trim()) return;
+    if (!newComment.trim() || isSubmittingComment) return;
 
     try {
       setIsSubmittingComment(true);

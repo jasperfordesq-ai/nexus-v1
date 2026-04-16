@@ -39,6 +39,9 @@ interface StoriesBarProps {
   friends?: Array<{ id: number; name: string; avatar_url?: string; is_online?: boolean }>;
 }
 
+const SCROLL_DISTANCE = 200;
+const MAX_STORY_NAME_LENGTH = 12;
+
 export function StoriesBar({ friends: _friends }: StoriesBarProps) {
   const { t } = useTranslation('feed');
   const { user, isAuthenticated } = useAuth();
@@ -93,7 +96,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
   const scroll = (direction: 'left' | 'right') => {
     const el = scrollRef.current;
     if (!el) return;
-    const amount = direction === 'left' ? -200 : 200;
+    const amount = direction === 'left' ? -SCROLL_DISTANCE : SCROLL_DISTANCE;
     el.scrollBy({ left: amount, behavior: 'smooth' });
   };
 
@@ -117,7 +120,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
     loadStories();
   };
 
-  const truncateName = (name: string, max = 12): string =>
+  const truncateName = (name: string, max = MAX_STORY_NAME_LENGTH): string =>
     name.length > max ? `${name.slice(0, max)}...` : name;
 
   if (!isAuthenticated) return null;
