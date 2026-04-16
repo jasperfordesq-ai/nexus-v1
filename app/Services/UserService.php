@@ -786,6 +786,37 @@ class UserService
             $profile['level'] = (int) $user->level;
         }
 
+        // Federated reputation fields (only when federation feature is enabled)
+        if (TenantContext::hasFeature('federation')) {
+            $fedOpt = \Illuminate\Support\Facades\DB::table('federation_user_settings')
+                ->where('user_id', $user->id)
+                ->where('federation_optin', 1)
+                ->exists();
+
+            if ($fedOpt) {
+                $profile['federated_partner_id'] = $user->tenant_id;
+
+                $agg = \Illuminate\Support\Facades\DB::table('reviews')
+                    ->where('receiver_id', $user->id)
+                    ->where('review_type', 'federated')
+                    ->where('show_cross_tenant', 1)
+                    ->where(function ($q) {
+                        $q->whereNull('status')->orWhereIn('status', ['active', 'approved']);
+                    })
+                    ->selectRaw('COUNT(*) as cnt, AVG(rating) as avg_rating')
+                    ->first();
+
+                $cnt = (int) ($agg->cnt ?? 0);
+                $avg = ($agg->avg_rating !== null && $cnt > 0) ? round((float) $agg->avg_rating, 2) : null;
+                $profile['federated_reputation_score'] = $avg;
+                $profile['federated_reputation_count'] = $cnt;
+            } else {
+                $profile['federated_partner_id']       = null;
+                $profile['federated_reputation_score'] = null;
+                $profile['federated_reputation_count'] = 0;
+            }
+        }
+
         // Private fields (only for own profile)
         if ($includePrivate) {
             $profile['tenant_id']               = $user->tenant_id;

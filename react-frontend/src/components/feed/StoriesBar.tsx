@@ -93,12 +93,12 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
     };
   }, [updateArrows]);
 
-  const scroll = (direction: 'left' | 'right') => {
+  const scroll = useCallback((direction: 'left' | 'right') => {
     const el = scrollRef.current;
     if (!el) return;
     const amount = direction === 'left' ? -SCROLL_DISTANCE : SCROLL_DISTANCE;
     el.scrollBy({ left: amount, behavior: 'smooth' });
-  };
+  }, []);
 
   const handleStoryClick = (index: number) => {
     setViewerStartIndex(index);

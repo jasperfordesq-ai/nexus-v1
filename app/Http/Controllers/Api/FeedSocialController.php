@@ -62,25 +62,18 @@ class FeedSocialController extends BaseApiController
             return $this->respondWithError('SELF_SHARE', __('api.cannot_share_own_post'), null, 422);
         }
 
-        // Check if already shared
-        $existing = DB::table('post_shares')
-            ->where('user_id', $userId)
-            ->where('original_post_id', $id)
-            ->where('tenant_id', $tenantId)
-            ->exists();
+        // Create share record atomically — INSERT IGNORE prevents race conditions
+        $affected = DB::affectingStatement(
+            'INSERT IGNORE INTO post_shares (user_id, original_post_id, tenant_id, comment, created_at, updated_at)
+             VALUES (?, ?, ?, ?, NOW(), NOW())',
+            [$userId, $id, $tenantId, $comment]
+        );
 
-        if ($existing) {
+        if ($affected === 0) {
             return $this->respondWithError('ALREADY_SHARED', __('api.already_shared_post'), null, 409);
         }
 
-        // Create share record
-        $shareId = DB::table('post_shares')->insertGetId([
-            'user_id'          => $userId,
-            'original_post_id' => $id,
-            'tenant_id'        => $tenantId,
-            'comment'          => $comment,
-            'created_at'       => now(),
-        ]);
+        $shareId = DB::getPdo()->lastInsertId();
 
         // Increment share count on the original post
         DB::table('feed_posts')->where('id', $id)->where('tenant_id', $tenantId)->increment('share_count');

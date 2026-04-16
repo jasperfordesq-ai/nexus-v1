@@ -130,13 +130,41 @@ class CommentService
         // Server-side XSS prevention: sanitize HTML content before storage
         $content = \App\Helpers\HtmlSanitizer::sanitize(trim($data['content']));
 
+        $parentId = $data['parent_id'] ?? null;
+
+        // Check post visibility — prevent commenting on deleted/hidden posts
+        if ($targetType === 'post' || $targetType === 'feed_post') {
+            $post = DB::selectOne(
+                'SELECT id FROM feed_posts WHERE id = ? AND tenant_id = ? AND deleted_at IS NULL',
+                [$targetId, $tenantId]
+            );
+            if (!$post) {
+                throw new \InvalidArgumentException('Target post not found or has been deleted');
+            }
+        }
+
+        // Enforce nesting depth limit to prevent infinite recursion attacks
+        if (!empty($parentId)) {
+            $depth = 0;
+            $currentId = (int)$parentId;
+            while ($currentId && $depth < 15) {
+                $parent = DB::selectOne('SELECT parent_id FROM comments WHERE id = ? AND tenant_id = ?', [$currentId, $tenantId]);
+                if (!$parent) break;
+                $currentId = (int)$parent->parent_id;
+                $depth++;
+            }
+            if ($depth >= 10) {
+                throw new \InvalidArgumentException('Comment nesting too deep');
+            }
+        }
+
         $comment = Comment::create([
             'target_type' => $targetType,
             'target_id' => $targetId,
             'user_id' => $userId,
             'tenant_id' => $tenantId,
             'content' => $content,
-            'parent_id' => $data['parent_id'] ?? null,
+            'parent_id' => $parentId,
         ]);
 
         // Process @mentions in comment content

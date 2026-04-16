@@ -62,7 +62,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, BottomSheet, ConfettiCelebration } from '@/components/ui';
-import { useTenant } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime, formatDate, formatTime } from '@/lib/helpers';
@@ -479,6 +479,7 @@ const FeedCard = React.memo(function FeedCard({
 }: FeedCardProps) {
   const { t } = useTranslation('feed');
   const { tenantPath } = useTenant();
+  const toast = useToast();
   const [showComments, setShowComments] = useState(defaultShowComments);
   const [comments, setComments] = useState<FeedComment[]>([]);
   const [isLoadingComments, setIsLoadingComments] = useState(defaultShowComments);
@@ -487,6 +488,7 @@ const FeedCard = React.memo(function FeedCard({
   const [localCommentsCount, setLocalCommentsCount] = useState(item.comments_count);
   const [pollData, setPollData] = useState<PollData | null>(item.poll_data ?? null);
   const [isLoadingPoll, setIsLoadingPoll] = useState(false);
+  const [pollLoadError, setPollLoadError] = useState(false);
 
   // Double-tap to like
   const [showHeartOverlay, setShowHeartOverlay] = useState(false);
@@ -531,6 +533,12 @@ const FeedCard = React.memo(function FeedCard({
 
   // Tracks whether comments have been loaded at least once (prevents double-load when defaultShowComments=true)
   const commentLoadedRef = useRef(false);
+
+  // H6: Mounted guard — prevents setState calls after unmount
+  const isMountedRef = useRef(true);
+  useEffect(() => {
+    return () => { isMountedRef.current = false; };
+  }, []);
 
   // Clean up confetti timeouts on unmount
   useEffect(() => {
@@ -596,7 +604,10 @@ const FeedCard = React.memo(function FeedCard({
             setPollData(response.data);
           }
         })
-        .catch((err) => logError('Failed to load poll', err))
+        .catch((err) => {
+          logError('Failed to load poll', err);
+          setPollLoadError(true);
+        })
         .finally(() => setIsLoadingPoll(false));
     }
   }, [item.type, item.id, item.poll_data, pollData, isLoadingPoll]);
@@ -634,12 +645,16 @@ const FeedCard = React.memo(function FeedCard({
       );
 
       if (response.success && response.data) {
-        setComments(response.data.comments ?? []);
+        if (isMountedRef.current) setComments(response.data.comments ?? []);
       }
     } catch (err) {
       logError('Failed to load comments', err);
+      if (isMountedRef.current) {
+        toast.error(t('card.comments_load_failed'));
+        setShowComments(false); // Roll back the toggle
+      }
     } finally {
-      setIsLoadingComments(false);
+      if (isMountedRef.current) setIsLoadingComments(false);
     }
   };
 
@@ -671,8 +686,8 @@ const FeedCard = React.memo(function FeedCard({
       });
 
       if (response.success) {
-        setNewComment('');
-        setLocalCommentsCount((prev) => prev + 1);
+        if (isMountedRef.current) setNewComment('');
+        if (isMountedRef.current) setLocalCommentsCount((prev) => prev + 1);
         loadComments(); // Reload to show new comment
       }
     } catch (err) {
@@ -973,6 +988,7 @@ const FeedCard = React.memo(function FeedCard({
                         variant="light"
                         className="justify-start text-[var(--text-primary)]"
                         startContent={<VolumeX className="w-4 h-4" aria-hidden="true" />}
+                        aria-label={t('card.mute_user_label', { name: author.name ?? '' })}
                         onPress={() => { setIsOptionsSheetOpen(false); onMuteUser(item); }}
                       >
                         {t('card.mute_user', { name: author.name })}
@@ -1142,6 +1158,8 @@ const FeedCard = React.memo(function FeedCard({
                   <Skeleton key={i} className="h-10 w-full rounded-lg" />
                 ))}
               </div>
+            ) : pollLoadError ? (
+              <p className="text-sm text-[var(--text-muted)] py-2">{t('poll.load_failed')}</p>
             ) : pollData ? (
               <Card shadow="none" className="bg-[var(--surface-elevated)] border border-[var(--border-default)]">
                 <CardBody className="gap-3 p-4">

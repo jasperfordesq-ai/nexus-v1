@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use App\Models\Poll;
 use Illuminate\Support\Facades\DB;
 
@@ -176,13 +177,21 @@ class PollService
      */
     public static function create(int $userId, array $data): Poll
     {
-        return DB::transaction(function () use ($userId, $data) {
+        $endDate = $data['expires_at'] ?? $data['end_date'] ?? null;
+        if (!empty($endDate)) {
+            $endTimestamp = strtotime($endDate);
+            if ($endTimestamp === false || $endTimestamp <= time()) {
+                throw new \InvalidArgumentException('Poll end date must be in the future');
+            }
+        }
+
+        return DB::transaction(function () use ($userId, $data, $endDate) {
             $poll = new Poll([
                 'user_id'     => $userId,
                 'event_id'    => $data['event_id'] ?? null,
                 'question'    => trim($data['question']),
                 'description' => trim($data['description'] ?? ''),
-                'end_date'    => $data['expires_at'] ?? $data['end_date'] ?? null,
+                'end_date'    => $endDate,
                 'is_active'   => true,
                 'category'    => $data['category'] ?? null,
                 'poll_type'   => $data['poll_type'] ?? 'standard',
@@ -247,6 +256,15 @@ class PollService
      */
     public static function vote(int $pollId, int $optionId, int $userId): bool
     {
+        $tenantId = TenantContext::getId();
+        $poll = DB::selectOne(
+            'SELECT id FROM polls WHERE id = ? AND tenant_id = ?',
+            [$pollId, $tenantId]
+        );
+        if (!$poll) {
+            throw new \RuntimeException('Poll not found');
+        }
+
         // Use INSERT IGNORE to atomically prevent double-votes.
         // The idx_vote_unique (poll_id, user_id) constraint enforces uniqueness;
         // INSERT IGNORE silently skips if the row already exists.

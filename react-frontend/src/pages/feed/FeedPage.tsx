@@ -91,7 +91,7 @@ export function FeedPage() {
   const toast = useToast();
   const pusher = usePusherOptional();
   const navigate = useNavigate();
-  const { tenantPath } = useTenant();
+  const { tenantPath, tenant } = useTenant();
   const isAdmin = user?.is_admin === true || user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_super_admin === true;
   const [items, setItems] = useState<FeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -138,6 +138,10 @@ export function FeedPage() {
 
   // Stable ref for loadFeed — avoids including it in useEffect deps which causes reset loops
   const loadFeedRef = useRef<(append?: boolean) => Promise<void>>(null!);
+
+  // Stable ref for filter — prevents stale closure in Pusher callback (M5)
+  const filterRef = useRef(filter);
+  useEffect(() => { filterRef.current = filter; }, [filter]);
 
   // Infinite scroll: auto-load when sentinel nears viewport
   const handleLoadMore = useCallback(() => { loadFeedRef.current?.(true); }, []);
@@ -213,7 +217,12 @@ export function FeedPage() {
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load feed', err);
-      if (!append) setError(tRef.current('error_load_retry'));
+      if (!append) {
+        setError(tRef.current('error_load_retry'));
+        // M9: Reset pending post count so stale buffered posts are discarded on failure
+        setPendingPostCount(0);
+        pendingPostsRef.current = [];
+      }
     } finally {
       if (!controller.signal.aborted) {
         if (append) {
@@ -285,21 +294,26 @@ export function FeedPage() {
     const unsub = pusher.onFeedPost((event: FeedPostEvent) => {
       const incoming = event.post;
 
+      // C3: Validate tenant_id — discard posts from other tenants
+      if (incoming.tenant_id !== undefined && incoming.tenant_id !== tenant?.id) return;
+
       // If the post was created by the current user it is already prepended
       // optimistically by ComposeHub / the onSuccess reload, so skip it.
       if (user?.id && incoming.author?.id === user.id) return;
 
       // Only surface posts that match the active filter.
+      // M5: Use filterRef.current so the closure always has the latest filter value.
+      const currentFilter = filterRef.current;
       const matchesFilter =
-        filter === 'all' ||
-        (filter === 'posts' && incoming.type === 'post') ||
-        (filter === 'listings' && incoming.type === 'listing') ||
-        (filter === 'events' && incoming.type === 'event') ||
-        (filter === 'polls' && incoming.type === 'poll') ||
-        (filter === 'goals' && incoming.type === 'goal') ||
-        (filter === 'jobs' && incoming.type === 'job') ||
-        (filter === 'challenges' && incoming.type === 'challenge') ||
-        (filter === 'volunteering' && incoming.type === 'volunteer');
+        currentFilter === 'all' ||
+        (currentFilter === 'posts' && incoming.type === 'post') ||
+        (currentFilter === 'listings' && incoming.type === 'listing') ||
+        (currentFilter === 'events' && incoming.type === 'event') ||
+        (currentFilter === 'polls' && incoming.type === 'poll') ||
+        (currentFilter === 'goals' && incoming.type === 'goal') ||
+        (currentFilter === 'jobs' && incoming.type === 'job') ||
+        (currentFilter === 'challenges' && incoming.type === 'challenge') ||
+        (currentFilter === 'volunteering' && incoming.type === 'volunteer');
 
       if (!matchesFilter) return;
 
@@ -321,7 +335,7 @@ export function FeedPage() {
     });
 
     return unsub;
-  }, [pusher, isLoading, filter, user?.id]);
+  }, [pusher, isLoading, user?.id, tenant?.id]);
 
   /* ───────── Like Toggle ───────── */
 
@@ -861,6 +875,13 @@ export function FeedPage() {
 
               {/* Infinite scroll sentinel — triggers auto-load before user reaches bottom */}
               {hasMore && <div ref={infiniteScrollRef} className="h-1" aria-hidden="true" />}
+
+              {/* End-of-feed message */}
+              {!hasMore && items.length > 0 && !isLoading && (
+                <div className="text-center py-8 text-[var(--text-muted)] text-sm">
+                  {t('feed.end_of_feed')}
+                </div>
+              )}
 
               {/* Manual fallback: visible only while loading more */}
               {hasMore && isLoadingMore && (

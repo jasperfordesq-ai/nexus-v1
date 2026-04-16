@@ -682,6 +682,9 @@ class FeedService
                 $publishStatus = 'published';
                 $scheduledAt = null;
             }
+            if ($scheduledTime->diffInDays(now()) > 365) {
+                throw new \InvalidArgumentException('Cannot schedule posts more than 1 year in the future');
+            }
         }
 
         // Validate quoted_post_id if provided (quote repost)
@@ -920,7 +923,7 @@ class FeedService
                            (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND target_id = p.id) as comments_count
                     FROM feed_posts p
                     JOIN users u ON p.user_id = u.id
-                    WHERE p.id = ? AND p.tenant_id = ? AND (p.publish_status = 'published' OR p.publish_status IS NULL) AND (p.is_hidden = 0 OR p.is_hidden IS NULL)",
+                    WHERE p.id = ? AND p.tenant_id = ? AND (p.publish_status = 'published' OR p.publish_status IS NULL) AND (p.is_hidden = 0 OR p.is_hidden IS NULL) AND p.deleted_at IS NULL",
                     [$id, $tenantId]
                 );
                 $items = array_map(fn($r) => (array) $r, $rows);

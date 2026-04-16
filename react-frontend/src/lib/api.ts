@@ -788,13 +788,19 @@ class ApiClient {
       headers.set('X-CSRF-Token', csrfToken);
     }
 
+    // Uploads should not be subject to the 30s default timeout — use 2 minutes
+    const uploadController = new AbortController();
+    const uploadTimeoutId = setTimeout(() => uploadController.abort(), 120000);
+
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         method: 'POST',
         headers,
         body: formData,
         credentials: 'include',
+        signal: uploadController.signal,
       });
+      clearTimeout(uploadTimeoutId);
 
       if (response.status === 401) {
         const refreshed = await this.handleTokenRefresh();
@@ -825,6 +831,7 @@ class ApiClient {
         code: data.code ?? firstError?.code ?? 'UPLOAD_ERROR',
       };
     } catch (error) {
+      clearTimeout(uploadTimeoutId);
       const rawMessage = error instanceof Error ? error.message : 'Upload failed';
       const message = import.meta.env.PROD
         ? 'Upload failed. Please try again.'

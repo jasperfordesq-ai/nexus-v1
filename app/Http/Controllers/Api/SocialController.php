@@ -228,10 +228,20 @@ class SocialController extends BaseApiController
             );
 
             if ($affected > 0 && $targetType === 'post') {
-                DB::table('feed_posts')
+                $updated = DB::table('feed_posts')
                     ->where('id', $targetId)
                     ->where('tenant_id', $tenantId)
                     ->increment('likes_count');
+
+                if ($updated === 0) {
+                    // Post was deleted between our exists-check and increment; clean up the orphaned like
+                    DB::table('likes')
+                        ->where('user_id', $userId)
+                        ->where('target_type', $targetType)
+                        ->where('target_id', $targetId)
+                        ->where('tenant_id', $tenantId)
+                        ->delete();
+                }
             }
 
             $action = 'liked';
@@ -913,6 +923,7 @@ class SocialController extends BaseApiController
     {
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
+        $this->rateLimit('feed_comment:' . $tenantId, 30, 60);
         $content = trim($this->input('content', ''));
 
         if (empty($content)) {

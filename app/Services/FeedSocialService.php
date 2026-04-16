@@ -82,7 +82,13 @@ class FeedSocialService
             ->select('fp.*', 'u.first_name', 'u.last_name', 'u.avatar_url');
 
         if ($cursor !== null) {
-            $query->where('fp.id', '<', (int) base64_decode($cursor));
+            $decoded = base64_decode($cursor, true);
+            if ($decoded !== false && is_numeric(trim($decoded))) {
+                $cursorId = (int) trim($decoded);
+                if ($cursorId > 0 && $cursorId < PHP_INT_MAX) {
+                    $query->where('fp.id', '<', $cursorId);
+                }
+            }
         }
 
         $query->orderByDesc('fp.id');

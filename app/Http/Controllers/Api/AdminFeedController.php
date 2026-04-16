@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\ActivityLog;
+use App\Models\FeedPost;
 use App\Models\Notification;
 
 /**
@@ -97,16 +98,17 @@ class AdminFeedController extends BaseApiController
         }
 
         if ($isHidden !== null) {
-            if (filter_var($isHidden, FILTER_VALIDATE_BOOLEAN)) {
+            if (in_array($isHidden, ['true', '1', 'yes'], true)) {
                 $conditions[] = 'fa.is_hidden = 1';
-            } else {
+            } elseif (in_array($isHidden, ['false', '0', 'no'], true)) {
                 $conditions[] = 'fa.is_hidden = 0';
             }
+            // Invalid values: silently ignore (don't filter by is_hidden)
         }
 
         if ($search) {
             $conditions[] = '(fa.content LIKE ? OR COALESCE(NULLIF(u.name, \'\'), CONCAT(u.first_name, \' \', u.last_name)) LIKE ?)';
-            $searchPattern = '%' . $search . '%';
+            $searchPattern = '%' . addcslashes($search, '%_\\') . '%';
             $params[] = $searchPattern;
             $params[] = $searchPattern;
         }
@@ -324,6 +326,10 @@ class AdminFeedController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.feed_item_not_found'), null, 404);
         }
 
+        if ($effectiveTenantId !== null && (int)$row->tenant_id !== $effectiveTenantId) {
+            return $this->respondWithError('FORBIDDEN', 'Scope violation', null, 403);
+        }
+
         $itemTenantId = (int) $row->tenant_id;
 
         // Capture creator user_id BEFORE deleting so we can notify them
@@ -345,9 +351,9 @@ class AdminFeedController extends BaseApiController
         DB::delete("DELETE FROM likes WHERE target_type = ? AND target_id = ? AND tenant_id = ?", [$sourceType, $id, $itemTenantId]);
         DB::delete("DELETE FROM comments WHERE target_type = ? AND target_id = ? AND tenant_id = ?", [$sourceType, $id, $itemTenantId]);
 
-        // If the source is a post, also delete the feed_posts row
+        // If the source is a post, also soft-delete the feed_posts row
         if ($sourceType === 'post') {
-            DB::delete("DELETE FROM feed_posts WHERE id = ? AND tenant_id = ?", [$id, $itemTenantId]);
+            FeedPost::where('id', $id)->where('tenant_id', $itemTenantId)->delete();
         }
 
         ActivityLog::log(

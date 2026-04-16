@@ -78,6 +78,10 @@ class CommentsController extends BaseApiController
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.comment_text_required'), 'content', 400);
         }
 
+        if (mb_strlen($content) > 10000) {
+            return $this->respondWithError('VALIDATION_INVALID_VALUE', __('api.comment_too_long'), 'content', 422);
+        }
+
         $comment = $this->commentService->create($targetType, $targetId, $userId, $tenantId, $data);
 
         $comment->load('user:id,first_name,last_name,avatar_url');

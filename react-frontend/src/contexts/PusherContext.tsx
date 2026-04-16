@@ -81,6 +81,16 @@ export interface FeedPostEvent {
   timestamp: number;
 }
 
+// M15: Runtime guard for FeedPostEvent payloads received from Pusher
+function isFeedPostEvent(data: unknown): data is FeedPostEvent {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'post' in data &&
+    typeof (data as Record<string, unknown>).post === 'object'
+  );
+}
+
 const PusherContext = createContext<PusherContextValue | null>(null);
 
 interface PusherProviderProps {
@@ -179,7 +189,12 @@ export function PusherProvider({ children }: PusherProviderProps) {
       }),
     });
 
+    // H7: Exponential backoff reconnection on connection errors
+    let reconnectAttempts = 0;
+    const reconnectTimeouts: ReturnType<typeof setTimeout>[] = [];
+
     pusher.connection.bind('connected', () => {
+      reconnectAttempts = 0; // Reset on successful connection
       setIsConnected(true);
     });
 
@@ -187,9 +202,20 @@ export function PusherProvider({ children }: PusherProviderProps) {
       setIsConnected(false);
     });
 
-    pusher.connection.bind('error', (err: Error) => {
+    pusher.connection.bind('error', (err: unknown) => {
       logError('Pusher connection error', err);
       setIsConnected(false);
+
+      // Exponential backoff: 2s, 4s, 8s, 16s, 32s, max 60s
+      const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 60000);
+      reconnectAttempts++;
+
+      const t = setTimeout(() => {
+        if (pusherRef.current) {
+          pusherRef.current.connect();
+        }
+      }, delay);
+      reconnectTimeouts.push(t);
     });
 
     pusherRef.current = pusher;
@@ -215,7 +241,11 @@ export function PusherProvider({ children }: PusherProviderProps) {
     // Subscribe to the tenant-wide feed channel to receive real-time new post events.
     // Channel name must match PusherService::getTenantFeedChannel() on the PHP side.
     const feedChannel = pusher.subscribe(`private-tenant.${tenantId}.feed`);
-    feedChannel.bind('feed.post_created', (data: FeedPostEvent) => {
+    feedChannel.bind('feed.post_created', (data: unknown) => {
+      if (!isFeedPostEvent(data)) {
+        console.warn('[Pusher] Invalid FeedPostEvent payload', data);
+        return;
+      }
       feedPostListenersRef.current.forEach((listener) => listener(data));
     });
     feedChannelRef.current = feedChannel;
@@ -227,6 +257,8 @@ export function PusherProvider({ children }: PusherProviderProps) {
     // Copy ref values into local variables for the cleanup function
     const currentConversationChannels = conversationChannelsRef.current;
     return () => {
+      // H7: Clear any pending reconnect timeouts
+      reconnectTimeouts.forEach(clearTimeout);
       if (userChannelRef.current) {
         userChannelRef.current.unbind_all();
       }

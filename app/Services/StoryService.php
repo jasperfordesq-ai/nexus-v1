@@ -959,6 +959,13 @@ class StoryService
             return;
         }
 
+        $tenantId = TenantContext::getId();
+        $story = DB::selectOne(
+            'SELECT id FROM stories WHERE id = ? AND tenant_id = ?',
+            [$storyId, $tenantId]
+        );
+        if (!$story) return;
+
         DB::insert(
             'INSERT INTO story_analytics (story_id, viewer_id, event_type, watch_duration_ms) VALUES (?, ?, ?, ?)',
             [$storyId, $viewerId, $eventType, $watchDurationMs]
@@ -1228,8 +1235,8 @@ class StoryService
             'SELECT s.*, u.first_name, u.last_name, u.avatar_url
              FROM stories s
              JOIN users u ON u.id = s.user_id
-             WHERE s.id = ?',
-            [$storyId]
+             WHERE s.id = ? AND s.tenant_id = ?',
+            [$storyId, TenantContext::getId()]
         );
 
         if (!$story) {

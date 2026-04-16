@@ -110,6 +110,10 @@ class PollsController extends BaseApiController
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.social_min_2_options'), 'options', 400);
         }
 
+        if (count($data['options']) > 20) {
+            return $this->respondWithError('VALIDATION_INVALID_VALUE', __('api.too_many_poll_options'), 'options', 422);
+        }
+
         $poll = $this->pollService->create($userId, $data);
         $result = $this->pollService->getById($poll->id, $userId);
 

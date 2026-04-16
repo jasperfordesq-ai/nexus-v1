@@ -14,7 +14,7 @@ import type { DateInputValue, TimeInputValue } from '@heroui/react';
 import { today, getLocalTimeZone } from '@internationalized/date';
 import { Calendar, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useAuth, useToast } from '@/contexts';
+import { useAuth, useToast, useTenant } from '@/contexts';
 import { useDraftPersistence } from '@/hooks';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { api } from '@/lib/api';
@@ -52,22 +52,27 @@ interface PostDraft {
   plainText: string;
 }
 
-export function PostTab({ onSuccess, onClose, groupId, templateData, onContentChange, editItem, onEditSuccess }: TabSubmitProps & {
+export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onContentChange, editItem, onEditSuccess }: TabSubmitProps & {
   editItem?: import('@/components/feed/types').FeedItem | null;
   onEditSuccess?: (item: import('@/components/feed/types').FeedItem) => void;
 }) {
   const { t } = useTranslation('feed');
   const { user } = useAuth();
   const toast = useToast();
+  const { tenant } = useTenant();
   const { register, unregister } = useComposeSubmit();
   const isMobile = useMediaQuery('(max-width: 639px)');
   const editorRef = useRef<ComposeEditorHandle>(null);
   const submitRef = useRef<() => void>(() => {});
+  // H8: Ref guard to prevent concurrent double-submissions
+  const isSubmittingRef = useRef(false);
 
   const isEditing = !!editItem;
 
+  // H10: Tenant-scoped draft key prevents cross-tenant draft leakage
+  const draftKey = isEditing ? `compose-edit-${editItem?.id}` : `compose-draft-post-${tenant?.slug ?? 'default'}`;
   const [draft, setDraft, clearDraft] = useDraftPersistence<PostDraft>(
-    isEditing ? `compose-edit-${editItem?.id}` : 'compose-draft-post',
+    draftKey,
     { htmlContent: editItem?.content ?? '', plainText: editItem?.content ?? '' },
   );
 
@@ -79,6 +84,13 @@ export function PostTab({ onSuccess, onClose, groupId, templateData, onContentCh
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
 
   const isScheduled = scheduleDate !== null;
+
+  // H10: Clear draft when modal closes without submitting (avoids stale draft on next open)
+  useEffect(() => {
+    if (!isOpen) {
+      clearDraft();
+    }
+  }, [isOpen, clearDraft]);
 
   // Apply template data when selected from TemplatePicker
   useEffect(() => {
@@ -131,6 +143,9 @@ export function PostTab({ onSuccess, onClose, groupId, templateData, onContentCh
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
+    // H8: Prevent concurrent double-submissions
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
 
     if (draft.plainText.trim().length === 0 && mediaFiles.length === 0 && selectedGifUrl === null) {
       toast.error(t('compose.content_required'));
@@ -221,6 +236,7 @@ export function PostTab({ onSuccess, onClose, groupId, templateData, onContentCh
       toast.error(isEditing ? t('toast.update_failed', 'Failed to update post') : t('compose.post_failed'));
     } finally {
       setIsSubmitting(false);
+      isSubmittingRef.current = false; // H8: Release ref guard
     }
   };
   submitRef.current = handleSubmit;

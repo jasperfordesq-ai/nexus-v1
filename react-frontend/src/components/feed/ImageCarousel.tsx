@@ -13,7 +13,7 @@
  * - Click on image opens fullscreen lightbox.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
 import { Button } from '@heroui/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -34,6 +34,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [direction, setDirection] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   const total = media.length;
 
@@ -99,6 +100,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
   return (
     <>
       <div
+        ref={carouselRef}
         className={`relative overflow-hidden rounded-xl group ${className}`}
         role="region"
         aria-label={t('carousel.aria_label', 'Image carousel, {{current}} of {{total}}', { current: currentIndex + 1, total })}
@@ -214,7 +216,10 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
                         ? 'bg-white scale-110'
                         : 'bg-white/60 hover:bg-white/80'
                     }`}
-                    onPress={() => goTo(idx, idx > currentIndex ? 1 : -1)}
+                    onPress={() => {
+                      goTo(idx, idx > currentIndex ? 1 : -1);
+                      setTimeout(() => carouselRef.current?.focus(), 50);
+                    }}
                     onClick={(e) => e.stopPropagation()}
                     aria-label={t('carousel.go_to_image', 'Go to image {{number}}', { number: idx + 1 })}
                     aria-current={idx === currentIndex ? 'true' : undefined}
@@ -232,7 +237,10 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
                       ? 'bg-white scale-110'
                       : 'bg-white/60 hover:bg-white/80'
                   }`}
-                  onPress={() => goTo(idx, idx > currentIndex ? 1 : -1)}
+                  onPress={() => {
+                    goTo(idx, idx > currentIndex ? 1 : -1);
+                    setTimeout(() => carouselRef.current?.focus(), 50);
+                  }}
                   onClick={(e) => e.stopPropagation()}
                   aria-label={t('carousel.go_to_image', 'Go to image {{number}}', { number: idx + 1 })}
                   aria-current={idx === currentIndex ? 'true' : undefined}

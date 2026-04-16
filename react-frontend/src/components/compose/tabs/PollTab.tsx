@@ -54,7 +54,7 @@ export function PollTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
     }
   }, [templateData, setDraft]);
 
-  const validOptions = draft.options.filter((o) => o.trim().length > 0);
+  const validOptions = draft.options.map((o) => o.trim()).filter((o) => o.length > 0);
   const canSubmit = draft.question.trim().length > 0 && validOptions.length >= 2;
 
   const setQuestion = useCallback(
