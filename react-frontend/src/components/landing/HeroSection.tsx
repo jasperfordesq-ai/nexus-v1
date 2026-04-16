@@ -13,7 +13,7 @@ import type { HeroContent } from '@/types';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
-  animate: { opacity: 1, y: 0 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
 const staggerContainer = {
@@ -133,7 +133,7 @@ export function HeroSection({ content }: HeroSectionProps) {
       >
         <Button
           variant="light"
-          className="text-theme-subtle hover:text-theme-primary animate-bounce"
+          className="text-theme-subtle hover:text-theme-primary motion-safe:animate-bounce"
           onPress={scrollToSection}
           isIconOnly
           aria-label={t('home.scroll_down')}

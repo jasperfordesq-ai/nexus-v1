@@ -29,7 +29,7 @@
 </head>
 <body>
 
-  <nav class="nav" id="nav">
+  <nav class="nav" id="nav" aria-label="Main navigation">
     <div class="nav-inner">
       <a href="/" class="nav-logo">
         <div class="logo-icon">
@@ -58,14 +58,14 @@
     </div>
   </nav>
 
-  <div class="mobile-menu" id="mobile-menu">
+  <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile navigation" aria-hidden="true">
     <a href="#features" class="mobile-link">Features</a>
     <a href="#federation" class="mobile-link">Federation</a>
     <a href="#communities" class="mobile-link">Communities</a>
     <a href="#open-source" class="mobile-link">Open Source</a>
     <a href="https://app.project-nexus.ie" class="mobile-link">Live App</a>
     <a href="https://github.com/jasperfordesq-ai/nexus-v1" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="margin-top:0.5rem;">View on GitHub</a>
-  </div>
+  </nav>
 
   <main>
 
@@ -552,6 +552,7 @@ open http://localhost:5173</pre>
     const menu = document.getElementById('mobile-menu');
     function closeMenu() {
       menu.classList.remove('open');
+      menu.setAttribute('aria-hidden', 'true');
       toggle.classList.remove('open');
       toggle.setAttribute('aria-expanded', 'false');
       toggle.focus();
@@ -560,6 +561,7 @@ open http://localhost:5173</pre>
       const isOpen = menu.classList.toggle('open');
       toggle.classList.toggle('open');
       toggle.setAttribute('aria-expanded', String(isOpen));
+      menu.setAttribute('aria-hidden', String(!isOpen));
     });
     menu.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', closeMenu);
@@ -567,12 +569,16 @@ open http://localhost:5173</pre>
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && menu.classList.contains('open')) { closeMenu(); }
     });
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
-      });
-    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    if (window.IntersectionObserver) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    } else {
+      document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+    }
     const nav = document.getElementById('nav');
     window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 20); }, { passive: true });
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
