@@ -16,8 +16,10 @@
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 
-// Hardcoded to match capacitor/android/app/build.gradle versionName
-// Must be updated here when releasing a new APK
+// VERSION SYNC — keep this in sync with these 2 other locations:
+//   1. capacitor/android/app/build.gradle  →  versionName "1.1"
+//   2. app/Http/Controllers/Api/MobileAppController.php  →  CURRENT_VERSION = '1.1'
+// All three must match. Update all three together when releasing a new APK.
 const APP_VERSION = '1.1';
 
 export interface AppUpdateInfo {

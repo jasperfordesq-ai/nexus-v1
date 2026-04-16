@@ -25,9 +25,9 @@ export function NativeApp() {
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<Record<string, unknown>>({
     app_name: 'Project NEXUS',
-    bundle_id: 'ie.project-nexus.app',
-    package_name: 'ie.projectnexus.app',
-    app_version: '1.0.0',
+    bundle_id: 'com.nexus.timebank',
+    package_name: 'com.nexus.timebank',
+    app_version: '1.1',
     push_enabled: true,
     fcm_server_key: '',
     apns_key_id: '',

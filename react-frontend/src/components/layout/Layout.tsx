@@ -8,8 +8,8 @@
  * Wraps all pages with navigation, footer, and background
  */
 
-import { useState, useCallback } from 'react';
-import { Outlet } from 'react-router-dom';
+import { useState, useCallback, useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Navbar } from './Navbar';
 import { MobileDrawer } from './MobileDrawer';
@@ -27,6 +27,9 @@ import { useApiErrorHandler } from '@/hooks';
 import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 import { useAppUpdate } from '@/hooks/useAppUpdate';
 import { useVersionCheck } from '@/hooks/useVersionCheck';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
 
 interface LayoutProps {
   /**
@@ -72,6 +75,47 @@ export function Layout({
 
   // Check for native app updates (Capacitor only, no-ops on web)
   const { updateInfo, dismiss: dismissUpdate } = useAppUpdate();
+
+  // Register FCM device token for push notifications once user is authenticated.
+  // No-ops on web browsers — only runs inside the Capacitor native app.
+  const { user } = useAuth();
+  const { tenantPath } = useTenant();
+  const navigate = useNavigate();
+  usePushNotifications(user?.id ?? null);
+
+  // Handle deep links when the Capacitor app is opened via a URL scheme or universal link.
+  // Example: nexus://timebank/listings/42 or https://hour-timebank.ie/listings/42
+  // No-ops on web browsers — window.Capacitor is undefined there.
+  useEffect(() => {
+    if (!window.Capacitor?.isNativePlatform?.()) return;
+
+    let cleanup: (() => void) | undefined;
+
+    const init = async () => {
+      try {
+        const { App } = await import(/* @vite-ignore */ '@capacitor/app');
+        const listener = await App.addListener('appUrlOpen', (event: { url: string }) => {
+          try {
+            const url = new URL(event.url);
+            const path = url.pathname;
+            // Only navigate to same-origin paths — block absolute URLs and protocol-relative paths
+            if (path && path.startsWith('/') && !path.startsWith('//')) {
+              navigate(tenantPath(path));
+            }
+          } catch {
+            // Malformed URL — ignore silently
+          }
+        });
+        cleanup = () => listener.remove();
+      } catch {
+        // @capacitor/app not available (web build) — ignore
+      }
+    };
+
+    init();
+    return () => cleanup?.();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount
+  }, []);
 
   return (
     <div className="min-h-screen max-w-[100vw] flex flex-col overflow-x-clip">
