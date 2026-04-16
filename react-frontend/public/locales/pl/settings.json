@@ -37,7 +37,9 @@
     "start_button": "Start Verification",
     "open_window": "Open Verification Window",
     "waiting": "Waiting for verification result...",
-    "cancel_start_over": "Cancel & Start Over"
+    "cancel_start_over": "Cancel & Start Over",
+    "error_save_dob": "Failed to save date of birth. Please try again.",
+    "error_create_payment": "Failed to create payment. Please try again."
   },
   "title": "Settings",
   "account": "Account",

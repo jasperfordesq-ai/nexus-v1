@@ -156,13 +156,13 @@ export function VerifyIdentityOptionalPage() {
     try {
       const response = await api.post('/v2/identity/save-dob', { date_of_birth: dob });
       if (!response.success) {
-        setErrorMessage(response.error || 'Failed to save date of birth.');
+        setErrorMessage(response.error || t('identity.error_save_dob'));
         return;
       }
       // Re-fetch status to advance to next step
       await fetchStatus();
     } catch {
-      setErrorMessage('Failed to save date of birth. Please try again.');
+      setErrorMessage(t('identity.error_save_dob'));
     } finally {
       setIsSavingDob(false);
     }
@@ -182,10 +182,10 @@ export function VerifyIdentityOptionalPage() {
           setClientSecret(response.data.client_secret);
         }
       } else {
-        setErrorMessage(response.error || 'Failed to create payment.');
+        setErrorMessage(response.error || t('identity.error_create_payment'));
       }
     } catch {
-      setErrorMessage('Failed to create payment. Please try again.');
+      setErrorMessage(t('identity.error_create_payment'));
     } finally {
       setIsCreatingPayment(false);
     }
