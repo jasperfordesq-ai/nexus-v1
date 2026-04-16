@@ -84,7 +84,14 @@ export function Layout({
   usePushNotifications(user?.id ?? null);
 
   // Handle deep links when the Capacitor app is opened via a URL scheme or universal link.
-  // Example: nexus://timebank/listings/42 or https://hour-timebank.ie/listings/42
+  //
+  // Supported formats:
+  //   Universal link:  https://app.project-nexus.ie/{tenant-slug}/listings/42
+  //                    → path already contains slug, tenantPath() returns it unchanged
+  //   Custom scheme:   nexus://{tenant-slug}/listings/42
+  //                    → URL#hostname is the tenant slug, URL#pathname is the page path
+  //                    → we prepend the slug ourselves before navigating
+  //
   // No-ops on web browsers — window.Capacitor is undefined there.
   useEffect(() => {
     if (!window.Capacitor?.isNativePlatform?.()) return;
@@ -97,11 +104,20 @@ export function Layout({
         const listener = await App.addListener('appUrlOpen', (event: { url: string }) => {
           try {
             const url = new URL(event.url);
-            const path = url.pathname;
+            let path = url.pathname;
+
             // Only navigate to same-origin paths — block absolute URLs and protocol-relative paths
-            if (path && path.startsWith('/') && !path.startsWith('//')) {
-              navigate(tenantPath(path));
+            if (!path || !path.startsWith('/') || path.startsWith('//')) return;
+
+            // For custom scheme (nexus://{tenant-slug}/path), the tenant slug is in
+            // the URL hostname. Prepend it so the router lands on the right community.
+            // Universal links (https://app.project-nexus.ie/{slug}/path) already have
+            // the slug in the pathname, so tenantPath() leaves them as-is.
+            if (url.protocol === 'nexus:' && url.hostname && url.hostname.length > 0) {
+              path = `/${url.hostname}${path}`;
             }
+
+            navigate(path);
           } catch {
             // Malformed URL — ignore silently
           }
