@@ -113,7 +113,7 @@ function formatDateTime(dateStr: string): string {
   });
 }
 
-function formatRelativeTime(dateStr: string): string {
+function formatRelativeTime(dateStr: string, t: (key: string, opts?: Record<string, unknown>) => string): string {
   const now = new Date();
   const date = new Date(dateStr);
   const diffMs = now.getTime() - date.getTime();
@@ -121,10 +121,10 @@ function formatRelativeTime(dateStr: string): string {
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffMins < 1) return t('crm.just_now');
+  if (diffMins < 60) return t('crm.minutes_ago', { count: diffMins });
+  if (diffHours < 24) return t('crm.hours_ago', { count: diffHours });
+  if (diffDays < 7) return t('crm.days_ago', { count: diffDays });
   return formatDateTime(dateStr);
 }
 
@@ -351,7 +351,7 @@ export function ActivityTimeline() {
                         {/* Right: timestamp */}
                         <div className="text-right shrink-0">
                           <p className="text-xs text-default-400 whitespace-nowrap" title={formatDateTime(entry.created_at)}>
-                            {formatRelativeTime(entry.created_at)}
+                            {formatRelativeTime(entry.created_at, t)}
                           </p>
                           <p className="text-xs text-default-300 mt-0.5">
                             #{entry.user_id}

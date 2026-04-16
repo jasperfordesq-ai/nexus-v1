@@ -1034,7 +1034,11 @@
         "status_all": "All",
         "status_completed": "Completed",
         "status_in_progress": "In Progress",
-        "status_pending": "Pending"
+        "status_pending": "Pending",
+        "days_ago": "{{count}}d ago",
+        "hours_ago": "{{count}}h ago",
+        "just_now": "Just now",
+        "minutes_ago": "{{count}}m ago"
     },
     "data_table": {
         "admin_data_table": "Admin Data Table",
@@ -1340,7 +1344,10 @@
             "current": "Current",
             "effective": "Effective"
         },
-        "yes": "Yes"
+        "yes": "Yes",
+        "log_files": "Log Files",
+        "requirements": "Requirements",
+        "toggle_features_modules": "Toggle features & modules"
     },
     "events": {
         "an_unexpected_error_occurred": "An Unexpected Error Occurred",
@@ -2834,7 +2841,24 @@
     },
     "performance": {
         "label_performance_metrics": "Performance Metrics",
-        "page_title": "Performance"
+        "page_title": "Performance",
+        "called_from": "Called from: {{class}}::{{fn}} ({{file}}:{{line}})",
+        "filter_1_hour": "1 Hour",
+        "filter_24_hours": "24 Hours",
+        "filter_7_days": "7 Days",
+        "label_memory_spikes": "Memory Spikes",
+        "label_n_plus_one_warnings": "N+1 Warnings",
+        "label_slow_queries": "Slow Queries",
+        "label_total_requests": "Total Requests",
+        "n_plus_one_body": "{{count}} request(s) executed more than 10 database queries, which may indicate N+1 query problems. Check the \"Slow Requests\" tab for requests with high query counts.",
+        "n_plus_one_title": "N+1 Query Warnings Detected",
+        "no_memory_spikes": "No memory spikes in the selected time period",
+        "no_slow_queries": "No slow queries in the selected time period",
+        "no_slow_requests": "No slow requests in the selected time period",
+        "no_volume_data": "No volume data available",
+        "page_description": "Track slow queries, requests, and memory usage",
+        "peak_memory": "Peak: {{value}} MB",
+        "query_count": "{{count}} queries"
     },
     "placeholder": {
         "migration_description": "Migration",
@@ -3742,7 +3766,11 @@
         "total_jobs": "Total Jobs",
         "twenty_four_h_failures": "Twenty Four H Failures",
         "webp_converter_desc": "Manage and configure webp converter settings",
-        "webp_converter_title": "WebP Converter"
+        "webp_converter_title": "WebP Converter",
+        "admin_approval_required": "Admin Approval Required",
+        "admin_approval_required_desc": "New registrations require manual approval by an administrator",
+        "open_registration": "Open Registration",
+        "require_email_verification": "Require Email Verification"
     },
     "timebanking": {
         "a_reason_is_required_for_balance_adjustm": "A Reason is Required for Balance Adjustm",

@@ -144,7 +144,7 @@ export function AdminSettings() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('system.admin_settings_title')} description={`Settings for ${tenant?.name || 'your community'}`} />
+        <PageHeader title={t('system.admin_settings_title')} description={t('system.admin_settings_desc', { name: tenant?.name || t('system.your_community') })} />
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
@@ -154,13 +154,13 @@ export function AdminSettings() {
 
   return (
     <div>
-      <PageHeader title={t('system.admin_settings_title')} description={`Settings for ${tenant?.name || 'your community'}`} />
+      <PageHeader title={t('system.admin_settings_title')} description={t('system.admin_settings_desc', { name: tenant?.name || t('system.your_community') })} />
 
       <div className="space-y-4">
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Settings size={20} /> General
+              <Settings size={20} /> {t('system.section_general')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
@@ -213,7 +213,7 @@ export function AdminSettings() {
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Scale size={20} /> Branding &amp; Legal
+              <Scale size={20} /> {t('system.section_branding_legal')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
@@ -231,18 +231,18 @@ export function AdminSettings() {
 
         <Card shadow="sm">
           <CardHeader className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Registration & Access</h3>
+            <h3 className="text-lg font-semibold">{t('system.section_registration_access')}</h3>
             <Link to={tenantPath("/admin/settings/registration-policy")}>
               <Button size="sm" variant="flat" color="primary" startContent={<ShieldCheck size={14} />}>
-                Advanced Policy
+                {t('system.btn_advanced_policy')}
               </Button>
             </Link>
           </CardHeader>
           <CardBody className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('system_settings.open_registration')}</p>
-                <p className="text-sm text-default-500">Allow new users to register without an invitation</p>
+                <p className="font-medium">{t('system.open_registration')}</p>
+                <p className="text-sm text-default-500">{t('system.desc_open_registration')}</p>
               </div>
               <Switch
                 isSelected={form.registration_mode === 'open'}
@@ -252,8 +252,8 @@ export function AdminSettings() {
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('system_settings.require_email_verification')}</p>
-                <p className="text-sm text-default-500">Users must verify their email before accessing the platform</p>
+                <p className="font-medium">{t('system.require_email_verification')}</p>
+                <p className="text-sm text-default-500">{t('system.desc_email_verification')}</p>
               </div>
               <Switch
                 isSelected={form.email_verification}
@@ -263,8 +263,8 @@ export function AdminSettings() {
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('system_settings.admin_approval_required')}</p>
-                <p className="text-sm text-default-500">{t('system_settings.admin_approval_required_desc')}</p>
+                <p className="font-medium">{t('system.admin_approval_required')}</p>
+                <p className="text-sm text-default-500">{t('system.admin_approval_required_desc')}</p>
               </div>
               <Switch
                 isSelected={form.admin_approval}
@@ -274,7 +274,7 @@ export function AdminSettings() {
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-default-400">Maintenance Mode (read-only)</p>
+                <p className="font-medium text-default-400">{t('system.section_maintenance_mode_readonly')}</p>
                 <p className="text-sm text-default-500">Use CLI: <code className="text-xs bg-default-100 px-1 rounded">sudo bash scripts/maintenance.sh on|off</code></p>
               </div>
               <Switch
@@ -293,7 +293,7 @@ export function AdminSettings() {
             onPress={handleSave}
             isLoading={saving}
           >
-            Save Settings
+            {t('system.btn_save_settings')}
           </Button>
         </div>
       </div>
