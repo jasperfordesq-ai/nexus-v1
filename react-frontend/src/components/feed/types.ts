@@ -21,6 +21,7 @@ export interface PostMedia {
 
 export interface FeedItem {
   id: number;
+  tenant_id?: number;
   content: string;
   content_truncated?: boolean;
   title?: string;
@@ -129,6 +130,7 @@ export interface PollData {
   total_votes: number;
   user_vote_option_id: number | null;
   is_active: boolean;
+  expires_at?: string | null;
 }
 
 export interface PollOption {

@@ -182,10 +182,7 @@ class CommentsController extends BaseApiController
         if ($result['action'] === 'added') {
             try {
                 $comment = Comment::find($id);
-                if (!$comment || (int) $comment->tenant_id !== TenantContext::getId()) {
-                    return;
-                }
-                if ($comment && (int) $comment->user_id !== $userId) {
+                if ($comment && (int) $comment->tenant_id === TenantContext::getId() && (int) $comment->user_id !== $userId) {
                     $reactor = User::find($userId);
                     $reactorName = $reactor ? trim(($reactor->first_name ?? '') . ' ' . ($reactor->last_name ?? '')) : 'Someone';
                     $link = $comment->target_type && $comment->target_id

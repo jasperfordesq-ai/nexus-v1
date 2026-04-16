@@ -1140,7 +1140,7 @@ function App() {
       <HelmetProvider>
         <ThemeProvider>
           <GoogleMapsProvider>
-            <BrowserRouter>
+            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <HeroUIRouterProvider>
                 <ScrollToTop />
                 <CookieConsentProvider>

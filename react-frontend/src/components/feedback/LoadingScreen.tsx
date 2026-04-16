@@ -17,7 +17,11 @@ interface LoadingScreenProps {
 }
 
 export function LoadingScreen({ message }: LoadingScreenProps) {
-  const displayMessage = message ?? i18n.t('loading', { ns: 'common', defaultValue: 'Loading...' });
+  const displayMessage = message ?? (
+    i18n.isInitialized && i18n.hasLoadedNamespace('common')
+      ? i18n.t('loading', { ns: 'common', defaultValue: 'Loading...' })
+      : 'Loading...'
+  );
   return (
     <div
       className="min-h-screen flex items-center justify-center"

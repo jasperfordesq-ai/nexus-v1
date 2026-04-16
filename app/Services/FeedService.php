@@ -56,6 +56,7 @@ class FeedService
         $groupId = $filters['group_id'] ?? null;
         $subtype = $filters['subtype'] ?? null;
         $cursor = $filters['cursor'] ?? null;
+        $commentsHasDeletedAt = Schema::hasColumn('comments', 'deleted_at');
 
         // Decode HMAC-signed cursor: base64(sig.json_payload)
         $cursorCreatedAt = null;
@@ -270,12 +271,15 @@ class FeedService
         // Batch load comment counts
         $commentCounts = [];
         foreach ($sourcesByType as $sType => $sIds) {
-            $counts = DB::table('comments')
+            $countsQuery = DB::table('comments')
                 ->selectRaw('target_id, COUNT(*) as cnt')
                 ->where('target_type', $sType)
                 ->whereIn('target_id', $sIds)
-                ->where('tenant_id', $tenantId)
-                ->whereNull('deleted_at')
+                ->where('tenant_id', $tenantId);
+            if ($commentsHasDeletedAt) {
+                $countsQuery->whereNull('deleted_at');
+            }
+            $counts = $countsQuery
                 ->groupBy('target_id')
                 ->pluck('cnt', 'target_id');
             foreach ($counts as $targetId => $cnt) {
@@ -913,6 +917,9 @@ class FeedService
     {
         $tenantId = TenantContext::getId();
         $items = [];
+        $commentDeleteClause = Schema::hasColumn('comments', 'deleted_at')
+            ? " AND deleted_at IS NULL"
+            : '';
 
         switch ($type) {
             case 'post':
@@ -921,7 +928,7 @@ class FeedService
                            'post' as type,
                            COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                            u.avatar_url as author_avatar,
-                           (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND target_id = p.id AND deleted_at IS NULL) as comments_count
+                           (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND target_id = p.id{$commentDeleteClause}) as comments_count
                     FROM feed_posts p
                     JOIN users u ON p.user_id = u.id
                     WHERE p.id = ? AND p.tenant_id = ? AND (p.publish_status = 'published' OR p.publish_status IS NULL) AND (p.is_hidden = 0 OR p.is_hidden IS NULL) AND p.deleted_at IS NULL",
@@ -936,7 +943,7 @@ class FeedService
                            0 as likes_count, p.author_id as user_id, 'blog' as type,
                            COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                            u.avatar_url as author_avatar,
-                           (SELECT COUNT(*) FROM comments WHERE target_type = 'blog' AND target_id = p.id AND deleted_at IS NULL) as comments_count
+                           (SELECT COUNT(*) FROM comments WHERE target_type = 'blog' AND target_id = p.id{$commentDeleteClause}) as comments_count
                     FROM posts p
                     JOIN users u ON p.author_id = u.id
                     WHERE p.id = ? AND p.tenant_id = ? AND p.status = 'published'",
