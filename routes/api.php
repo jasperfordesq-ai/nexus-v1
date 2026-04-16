@@ -508,6 +508,7 @@ Route::delete('/v2/bookmark-collections/{id}', [\App\Http\Controllers\Api\Bookma
 Route::get('/v2/notifications', [\App\Http\Controllers\Api\NotificationsController::class, 'index']);
 Route::get('/v2/notifications/grouped', [\App\Http\Controllers\Api\NotificationsController::class, 'grouped']);
 Route::get('/v2/notifications/counts', [\App\Http\Controllers\Api\NotificationsController::class, 'counts']);
+Route::post('/v2/notifications/group/read', [\App\Http\Controllers\Api\NotificationsController::class, 'markGroupRead']);
 Route::post('/v2/notifications/group/{groupKey}/read', [\App\Http\Controllers\Api\NotificationsController::class, 'markGroupRead']);
 Route::post('/v2/notifications/read-all', [\App\Http\Controllers\Api\NotificationsController::class, 'markAllRead']);
 Route::delete('/v2/notifications', [\App\Http\Controllers\Api\NotificationsController::class, 'destroyAll']);

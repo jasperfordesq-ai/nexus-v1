@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 
 vi.mock('@/lib/api', () => ({
   api: {
@@ -237,6 +237,40 @@ describe('NotificationsPage', () => {
       expect(screen.getByLabelText('Mark as read')).toBeInTheDocument();
     });
     expect(screen.getByLabelText('Delete notification')).toBeInTheDocument();
+  });
+
+  it('marks grouped notifications as read via the body-based endpoint', async () => {
+    vi.mocked(api.get).mockResolvedValue({
+      success: true,
+      data: [
+        {
+          id: 99,
+          type: 'federation_message',
+          title: 'Federation messages',
+          body: '2 people messaged you',
+          message: '2 people messaged you',
+          read_at: null,
+          created_at: '2026-02-19T10:00:00Z',
+          is_grouped: true,
+          group_count: 2,
+          group_key: 'federation_message:/federation/messages',
+        },
+      ],
+    });
+
+    render(<NotificationsPage />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Mark group as read')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByLabelText('Mark group as read'));
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith('/v2/notifications/group/read', {
+        group_key: 'federation_message:/federation/messages',
+      });
+    });
   });
 
   it('shows notification settings button', () => {

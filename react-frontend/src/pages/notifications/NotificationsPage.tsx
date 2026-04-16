@@ -122,7 +122,9 @@ export function NotificationsPage() {
   async function markGroupAsRead(notification: Notification) {
     if (!notification.group_key) return;
     try {
-      await api.post(`/v2/notifications/group/${encodeURIComponent(notification.group_key)}/read`);
+      await api.post('/v2/notifications/group/read', {
+        group_key: notification.group_key,
+      });
       setNotifications((prev) =>
         prev.map((n) =>
           n.group_key === notification.group_key

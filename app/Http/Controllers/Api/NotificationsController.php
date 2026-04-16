@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Core\TenantContext;
 use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -243,14 +244,25 @@ class NotificationsController extends BaseApiController
     }
 
     /**
+     * POST /api/v2/notifications/group/read
      * POST /api/v2/notifications/group/{groupKey}/read
      *
      * Mark all notifications in a group as read.
+     *
+     * The body-based route exists because some group keys contain encoded slashes
+     * (for example notification links like /federation/messages), which are not
+     * reliable as path parameters across proxies and web servers.
      */
-    public function markGroupRead(string $groupKey): JsonResponse
+    public function markGroupRead(Request $request, ?string $groupKey = null): JsonResponse
     {
         $userId = $this->requireAuth();
-        $groupKey = urldecode($groupKey);
+        $groupKey = $groupKey ?? $request->input('group_key');
+
+        if (!is_string($groupKey) || trim($groupKey) === '') {
+            return $this->respondWithError('INVALID_GROUP_KEY', 'Notification group key is required.', 'group_key', 422);
+        }
+
+        $groupKey = urldecode(trim($groupKey));
 
         // Parse group key: "type:link"
         $parts = explode(':', $groupKey, 2);
