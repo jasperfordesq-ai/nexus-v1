@@ -41,6 +41,7 @@ class MarketplaceSellerProfile extends Model
         'total_ratings',
         'community_trust_score',
         'is_community_endorsed',
+        'is_suspended',
         'joined_marketplace_at',
     ];
 

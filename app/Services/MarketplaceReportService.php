@@ -568,12 +568,8 @@ class MarketplaceReportService
 
     /**
      * Suspend the seller who owns the reported listing.
-     * Deactivates all their active listings.
-     *
-     * TODO: Add an `is_suspended` flag to MarketplaceSellerProfile and check it
-     *       in MarketplaceListingService::create() to prevent suspended sellers
-     *       from creating new listings. Currently suspension only deactivates
-     *       existing listings but doesn't block new ones.
+     * Deactivates all their active listings and sets is_suspended = true to
+     * prevent them from creating new listings.
      */
     private static function suspendSeller(int $listingId): void
     {
@@ -589,8 +585,10 @@ class MarketplaceReportService
                 'moderation_status' => 'rejected',
             ]);
 
-        // Mark seller profile as suspended if it exists
         MarketplaceSellerProfile::where('user_id', $listing->user_id)
-            ->update(['is_community_endorsed' => false]);
+            ->update([
+                'is_community_endorsed' => false,
+                'is_suspended'          => true,
+            ]);
     }
 }

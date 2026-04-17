@@ -51,6 +51,7 @@
     "marketplace_listing.no_permission_modify": "You do not have permission to modify this listing.",
     "marketplace_listing.not_found": "Marketplace listing not found.",
     "marketplace_listing.create_failed": "Failed to create listing. Please try again.",
+    "marketplace_listing.seller_suspended": "Your seller account has been suspended. Contact support if you believe this is an error.",
     "marketplace_listing.update_failed": "Failed to update listing. Please try again.",
     "marketplace_listing.no_image_files": "No image files provided.",
     "marketplace_listing.no_valid_images": "No valid images could be uploaded. Allowed: JPEG, PNG, GIF, WebP (max 10 MB).",

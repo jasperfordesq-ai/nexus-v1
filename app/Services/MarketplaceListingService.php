@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\TenantContext;
 use App\Models\MarketplaceListing;
 use App\Models\MarketplaceImage;
+use App\Models\MarketplaceSellerProfile;
 use App\Models\MarketplaceSavedListing;
 use App\Services\MarketplaceConfigurationService;
 use App\Services\SearchService;
@@ -389,6 +390,14 @@ class MarketplaceListingService
      */
     public static function create(int $userId, array $data): MarketplaceListing
     {
+        // Block suspended sellers
+        $profile = MarketplaceSellerProfile::where('user_id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->first();
+        if ($profile && $profile->is_suspended) {
+            throw new \DomainException('SELLER_SUSPENDED');
+        }
+
         // Enforce max active listings per seller
         $maxListings = MarketplaceConfigurationService::maxActiveListings();
         if ($maxListings > 0) {

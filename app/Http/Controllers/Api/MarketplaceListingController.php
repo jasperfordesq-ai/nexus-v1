@@ -239,6 +239,11 @@ class MarketplaceListingController extends BaseApiController
 
         try {
             $listing = MarketplaceListingService::create($userId, $data);
+        } catch (\DomainException $e) {
+            if ($e->getMessage() === 'SELLER_SUSPENDED') {
+                return $this->respondWithError('SELLER_SUSPENDED', __('api_controllers_2.marketplace_listing.seller_suspended'), null, 403);
+            }
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api_controllers_2.marketplace_listing.create_failed'), null, 500);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Marketplace listing creation failed', [
                 'user_id' => $userId,
