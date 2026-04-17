@@ -108,15 +108,6 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   const channelRef = useRef<Channel | null>(null);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Stable ref to refreshCounts — updated on every render so the Pusher effect
-  // can call the latest version without listing refreshCounts as a dependency
-  // (which would cause Pusher to disconnect and reconnect whenever isAuthenticated
-  // changes and triggers a new refreshCounts identity).
-  const refreshCountsRef = useRef(refreshCounts);
-  useEffect(() => {
-    refreshCountsRef.current = refreshCounts;
-  }, [refreshCounts]);
-
   // ─────────────────────────────────────────────────────────────────────────
   // Fetch Notification Counts
   // ─────────────────────────────────────────────────────────────────────────
@@ -156,6 +147,13 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       logError('Failed to fetch notification counts', error);
     }
   }, [isAuthenticated]);
+
+  // Stable ref to refreshCounts — updated on every render so the Pusher effect
+  // can call the latest version without listing refreshCounts as a dependency.
+  const refreshCountsRef = useRef(refreshCounts);
+  useEffect(() => {
+    refreshCountsRef.current = refreshCounts;
+  }, [refreshCounts]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Mark as Read

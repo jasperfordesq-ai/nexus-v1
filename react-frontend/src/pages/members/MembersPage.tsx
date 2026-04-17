@@ -268,7 +268,7 @@ export function MembersPage() {
     // Reset pagination state when filters change
     setHasMore(true);
     setTotalCount(null);
-  }, [activeSortBy, debouncedQuery, nearMeEnabled, user?.latitude, user?.longitude, radiusKm]); // eslint-disable-line react-hooks/exhaustive-deps -- reset pagination on filter change
+  }, [activeSortBy, debouncedQuery, nearMeEnabled, user?.id, user?.latitude, user?.longitude, radiusKm]); // eslint-disable-line react-hooks/exhaustive-deps -- reset pagination on filter change; user.id retries on login/token-refresh
 
   // Fetch presence for visible members
   useEffect(() => {
