@@ -539,10 +539,12 @@ class FeedRankingService
 
     /**
      * Apply user-author diversity to feed items.
+     *
+     * @param array $config Optional tenant config; falls back to class constants.
      */
-    public static function applyContentDiversity(array $items): array
+    public static function applyContentDiversity(array $items, array $config = []): array
     {
-        $maxUser = self::DIVERSITY_MAX_CONSECUTIVE;
+        $maxUser = (int) ($config['diversity_max_consecutive'] ?? self::DIVERSITY_MAX_CONSECUTIVE);
         $result = [];
         $deferred = [];
 
@@ -600,10 +602,12 @@ class FeedRankingService
 
     /**
      * Apply content-type diversity to feed items.
+     *
+     * @param array $config Optional tenant config; falls back to class constants.
      */
-    public static function applyContentTypeDiversity(array $items): array
+    public static function applyContentTypeDiversity(array $items, array $config = []): array
     {
-        $maxType = self::DIVERSITY_TYPE_MAX_CONSECUTIVE;
+        $maxType = (int) ($config['diversity_type_max_consecutive'] ?? self::DIVERSITY_TYPE_MAX_CONSECUTIVE);
         $result = [];
         $deferred = [];
 
@@ -729,28 +733,18 @@ class FeedRankingService
 
     /**
      * Boost a post's visibility.
+     *
+     * NOTE: Not yet implemented — the `post_boosts` table and `feed_posts.boost_factor`
+     * column do not exist in the schema. Implement a migration before enabling this.
      */
     public function boostPost(int $tenantId, int $postId, float $factor = 1.5): bool
     {
-        try {
-            DB::statement(
-                "INSERT INTO post_boosts (post_id, tenant_id, boost_factor, created_at)
-                 VALUES (?, ?, ?, NOW())
-                 ON DUPLICATE KEY UPDATE boost_factor = ?, updated_at = NOW()",
-                [$postId, $tenantId, $factor, $factor]
-            );
-            return true;
-        } catch (\Exception $e) {
-            try {
-                DB::table('feed_posts')
-                    ->where('id', $postId)
-                    ->where('tenant_id', $tenantId)
-                    ->update(['boost_factor' => $factor]);
-                return true;
-            } catch (\Exception $e2) {
-                return false;
-            }
-        }
+        Log::warning('FeedRankingService::boostPost() called but is not implemented — post_boosts table does not exist in schema.', [
+            'tenant_id' => $tenantId,
+            'post_id'   => $postId,
+            'factor'    => $factor,
+        ]);
+        return false;
     }
 
     // =========================================================================
@@ -801,7 +795,7 @@ class FeedRankingService
         $conversationDepths = (self::CONVERSATION_DEPTH_ENABLED && !empty($items)) ? $this->getBatchConversationDepth($items) : [];
         $reactionScores = !empty($items) ? $this->getBatchReactionScores($items) : [];
         $negativeScores = ($viewerId && !empty($items)) ? $this->getBatchNegativeSignals($viewerId, $items, $authorIds) : [];
-        $ctrScores = (!empty($config['ctr_enabled']) && !empty($postIds)) ? $this->getBatchClickThroughRates($postIds) : [];
+        $ctrScores = (!empty($config['ctr_enabled']) && !empty($items)) ? $this->getBatchClickThroughRates($items) : [];
         $userTypePrefs = (!empty($config['user_type_prefs_enabled']) && $viewerId) ? $this->getInstanceUserTypePreferences($viewerId) : [];
         $saveScores = (!empty($config['save_signal_enabled']) && !empty($items)) ? $this->getBatchSaveScores($items) : [];
 
@@ -895,9 +889,9 @@ class FeedRankingService
                 $ctr = $ctrScores[$postId];
                 $impressions = $ctrScores['_impressions'][$postId] ?? 0;
                 if ($impressions >= ($config['ctr_min_impressions'] ?? 5)) {
-                    // L7: 0.9 is a literal constant — no division-by-zero risk here
-                    $ctrMultiplier = 1.0 + ($ctr - 0.1) * (($config['ctr_max_boost'] ?? 1.5) - 1.0) / 0.9;
-                    $score *= max(0.8, min((float) ($config['ctr_max_boost'] ?? 1.5), $ctrMultiplier));
+                    $maxBoost = (float) ($config['ctr_max_boost'] ?? 1.5);
+                    $ctrMultiplier = 1.0 + ($ctr - self::CTR_NEUTRAL_BASELINE) * ($maxBoost - 1.0) / (1.0 - self::CTR_NEUTRAL_BASELINE);
+                    $score *= max(0.8, min($maxBoost, $ctrMultiplier));
                 }
             }
 
@@ -1147,12 +1141,13 @@ class FeedRankingService
             $tenantId = TenantContext::getId();
             $hrs = self::VELOCITY_WINDOW_HOURS;
 
-            // Group by source_type so target_type filters are correct
+            // Group by normalised target_type so engagement table queries match
+            // the values actually stored in likes/comments (may differ from source_type)
             $byType = [];
             foreach ($feedItems as $item) {
                 $sType = $item['type'] ?? $item['source_type'] ?? 'post';
                 $sId   = (int) ($item['id'] ?? $item['post_id'] ?? 0);
-                if ($sId > 0) $byType[$sType][] = $sId;
+                if ($sId > 0) $byType[self::normaliseTargetType($sType)][] = $sId;
             }
 
             $r = [];
@@ -1181,7 +1176,7 @@ class FeedRankingService
             foreach ($feedItems as $item) {
                 $sType = $item['type'] ?? $item['source_type'] ?? 'post';
                 $sId   = (int) ($item['id'] ?? $item['post_id'] ?? 0);
-                if ($sId > 0) $byType[$sType][] = $sId;
+                if ($sId > 0) $byType[self::normaliseTargetType($sType)][] = $sId;
             }
 
             $r = [];
@@ -1205,13 +1200,13 @@ class FeedRankingService
         try {
             $tenantId = TenantContext::getId();
 
-            // Group feed items by their source_type so we match the correct target_type
+            // Group feed items by normalised target_type to match engagement table values
             $byType = [];
             foreach ($feedItems as $item) {
                 $sType = $item['type'] ?? $item['source_type'] ?? 'post';
                 $sId   = (int) ($item['id'] ?? $item['post_id'] ?? 0);
                 if ($sId > 0) {
-                    $byType[$sType][] = $sId;
+                    $byType[self::normaliseTargetType($sType)][] = $sId;
                 }
             }
 
@@ -1244,13 +1239,13 @@ class FeedRankingService
         $tenantId = TenantContext::getId();
         $this->mutedUserSet = [];
         try {
-            // Group items by source_type for correct target_type matching
+            // Group items by normalised target_type so queries match engagement table values
             $byType = [];
             foreach ($feedItems as $item) {
                 $sType = $item['type'] ?? $item['source_type'] ?? 'post';
                 $sId   = (int) ($item['id'] ?? $item['post_id'] ?? 0);
                 if ($sId > 0) {
-                    $byType[$sType][] = $sId;
+                    $byType[self::normaliseTargetType($sType)][] = $sId;
                 }
             }
 
@@ -1296,17 +1291,44 @@ class FeedRankingService
         return $result;
     }
 
-    private function getBatchClickThroughRates(array $postIds): array
+    /**
+     * Fetch click-through rates for feed items.
+     *
+     * feed_impressions and feed_clicks only have a `post_id` column (no target_type).
+     * To prevent cross-contamination (listing #42 getting click data from post #42),
+     * we only look up CTR for items whose source_type is 'post'. All other item types
+     * get 0.0 CTR returned so the CTR signal is skipped for them via the impression
+     * count gate (impressions will be 0, below ctr_min_impressions).
+     *
+     * @param array $feedItems Full feed item arrays (not raw IDs)
+     */
+    private function getBatchClickThroughRates(array $feedItems): array
     {
-        if (empty($postIds) || !self::CLICK_TRACKING_ENABLED) return [];
+        if (empty($feedItems) || !self::CLICK_TRACKING_ENABLED) return [];
+
+        // Only look up CTR for actual posts — other source types share numeric IDs
+        // with posts but have no rows in feed_impressions/feed_clicks.
+        $postOnlyIds = [];
+        foreach ($feedItems as $item) {
+            $sourceType = $item['type'] ?? $item['source_type'] ?? 'post';
+            if ($sourceType === 'post') {
+                $id = (int) ($item['id'] ?? $item['post_id'] ?? 0);
+                if ($id > 0) {
+                    $postOnlyIds[] = $id;
+                }
+            }
+        }
+
+        if (empty($postOnlyIds)) return ['_impressions' => []];
+
         try {
             $tenantId = TenantContext::getId();
-            $ph = implode(',', array_fill(0, count($postIds), '?'));
+            $ph = implode(',', array_fill(0, count($postOnlyIds), '?'));
             $rows = DB::select(
                 "SELECT fi.post_id, SUM(fi.view_count) AS impressions, COALESCE(SUM(fc.click_count),0)/GREATEST(SUM(fi.view_count),1) AS ctr
                  FROM feed_impressions fi LEFT JOIN feed_clicks fc ON fc.post_id=fi.post_id AND fc.tenant_id=fi.tenant_id
                  WHERE fi.post_id IN ($ph) AND fi.tenant_id=? GROUP BY fi.post_id",
-                array_merge($postIds, [$tenantId])
+                array_merge($postOnlyIds, [$tenantId])
             );
             $r = ['_impressions' => []];
             foreach ($rows as $row) {
@@ -1425,11 +1447,11 @@ class FeedRankingService
             $score *= self::hackerNewsDecay($hoursAgo);
         }
 
-        // Engagement
+        // Engagement — log-scaled to match rankFeedItems() formula
         $likes = (int) ($post['likes_count'] ?? 0);
         $comments = (int) ($post['comments_count'] ?? 0);
         $points = ($likes * $config['like_weight']) + ($comments * $config['comment_weight']);
-        $score *= max(1.0, $points);
+        $score *= max(1.0, 1.0 + min(log(1.0 + $points) * 0.3, 2.0));
 
         // Type weight
         $typeWeights = [
@@ -1496,13 +1518,43 @@ class FeedRankingService
     {
         try {
             $tenantId = TenantContext::getId();
-            $rows = DB::select(
-                "SELECT DISTINCT CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END as connected_id
+
+            // 1. Completed time-credit transactions (original signal)
+            $transactionRows = DB::select(
+                "SELECT DISTINCT CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END AS connected_id
                  FROM transactions
                  WHERE (sender_id = ? OR receiver_id = ?) AND tenant_id = ? AND status = 'completed'",
                 [$viewerId, $viewerId, $viewerId, $tenantId]
             );
-            return array_map(fn ($row) => (int) $row->connected_id, $rows);
+
+            // 2. Accepted social connections (connections table, tenant-scoped)
+            $connectionRows = DB::select(
+                "SELECT DISTINCT CASE WHEN requester_id = ? THEN receiver_id ELSE requester_id END AS connected_id
+                 FROM connections
+                 WHERE (requester_id = ? OR receiver_id = ?) AND tenant_id = ? AND status = 'accepted'",
+                [$viewerId, $viewerId, $viewerId, $tenantId]
+            );
+
+            // 3. Co-members in shared groups (group_members, active status, tenant-scoped)
+            // Finds users in any group the viewer belongs to — broadens social graph for new/non-transacting users.
+            $groupMemberRows = DB::select(
+                "SELECT DISTINCT gm2.user_id AS connected_id
+                 FROM group_members gm1
+                 JOIN group_members gm2 ON gm2.group_id = gm1.group_id
+                     AND gm2.user_id != ?
+                     AND gm2.status = 'active'
+                     AND gm2.tenant_id = ?
+                 WHERE gm1.user_id = ? AND gm1.status = 'active' AND gm1.tenant_id = ?",
+                [$viewerId, $tenantId, $viewerId, $tenantId]
+            );
+
+            $ids = array_unique(array_merge(
+                array_map(fn ($row) => (int) $row->connected_id, $transactionRows),
+                array_map(fn ($row) => (int) $row->connected_id, $connectionRows),
+                array_map(fn ($row) => (int) $row->connected_id, $groupMemberRows),
+            ));
+
+            return array_values(array_filter($ids, fn ($id) => $id > 0 && $id !== $viewerId));
         } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
     }
 
@@ -1522,12 +1574,12 @@ class FeedRankingService
         $typeDiv = !empty($config['diversity_type_enabled']);
         if (!$userDiv && !$typeDiv) return $items;
 
-        // Use the static methods for the actual diversity logic
+        // Use the static methods for the actual diversity logic, passing tenant config
         if ($userDiv) {
-            $items = self::applyContentDiversity($items);
+            $items = self::applyContentDiversity($items, $config);
         }
         if ($typeDiv) {
-            $items = self::applyContentTypeDiversity($items);
+            $items = self::applyContentTypeDiversity($items, $config);
         }
 
         return $items;
@@ -1536,6 +1588,28 @@ class FeedRankingService
     // =========================================================================
     // UTILITY
     // =========================================================================
+
+    /**
+     * Normalise a feed_activity source_type value to the target_type string
+     * stored in likes, comments, reactions, and reports tables.
+     *
+     * feed_activity.source_type is the canonical value. Engagement tables use
+     * the same values in almost all cases, but this single method is the
+     * authoritative mapping point — add any future mismatches here rather than
+     * patching individual batch methods.
+     *
+     * Current known divergences (schema-verified 2026-04-17):
+     *   None — all source_type values match their engagement target_type values.
+     *   The method is present so the pattern is established and easy to extend.
+     */
+    private static function normaliseTargetType(string $sourceType): string
+    {
+        return match ($sourceType) {
+            // Identity mapping — no mismatches in current schema.
+            // Example future entry: 'volunteer' => 'volunteer_post',
+            default => $sourceType,
+        };
+    }
 
     private static function getDaysSinceDateStatic(string $dateString): int
     {

@@ -487,6 +487,7 @@
   "why_shown": {
     "label": "Why am I seeing this?",
     "title": "Why you're seeing this",
+    "default_reason": "Ranked for you based on your activity",
     "popular": "Popular in your community",
     "some_engagement": "Getting engagement",
     "community_content": "Community activity",

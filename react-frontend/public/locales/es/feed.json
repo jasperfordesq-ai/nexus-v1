@@ -475,6 +475,7 @@
   "why_shown": {
     "label": "¿Por qué estoy viendo esto?",
     "title": "Por qué estás viendo esto",
+    "default_reason": "Ranked for you based on your activity",
     "popular": "Popular en tu comunidad",
     "some_engagement": "Obteniendo participación",
     "community_content": "Actividad comunitaria",

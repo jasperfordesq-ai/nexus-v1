@@ -14,7 +14,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef, Component, type ReactNode, type ErrorInfo, type KeyboardEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Button,
@@ -93,12 +93,20 @@ export function FeedPage() {
   const toast = useToast();
   const pusher = usePusherOptional();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { tenantPath, tenant } = useTenant();
   const isAdmin = user?.is_admin === true || user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_super_admin === true;
   const [items, setItems] = useState<FeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<FeedFilter>('all');
+
+  // Initialize filter from URL param, fallback to 'all'
+  const [filter, setFilter] = useState<FeedFilter>(() => {
+    const urlFilter = searchParams.get('filter') as FeedFilter | null;
+    const validFilters: FeedFilter[] = ['all', 'posts', 'listings', 'events', 'polls', 'goals', 'jobs', 'challenges', 'volunteering', 'blogs', 'discussions'];
+    return urlFilter && validFilters.includes(urlFilter) ? urlFilter : 'all';
+  });
+
   const [hasMore, setHasMore] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   // Count of real-time posts received while the user hasn't scrolled to top
@@ -108,13 +116,16 @@ export function FeedPage() {
   // Buffer for real-time posts received while scrolled down
   const pendingPostsRef = useRef<FeedItem[]>([]);
 
-  // Feed mode: EdgeRank vs chronological — persisted across page refreshes
+  // Feed mode: EdgeRank vs chronological — persisted in URL + localStorage
   const [feedMode, setFeedMode] = useState<'ranking' | 'recent'>(() => {
+    const urlMode = searchParams.get('mode');
+    if (urlMode === 'ranking' || urlMode === 'recent') return urlMode;
     const stored = localStorage.getItem(FEED_MODE_KEY);
     return stored === 'ranking' || stored === 'recent' ? stored : 'ranking';
   });
-  // Sub-filter (e.g. listings -> offers/requests)
-  const [subFilter, setSubFilter] = useState<string | null>(null);
+
+  // Sub-filter (e.g. listings -> offers/requests) — synced to URL
+  const [subFilter, setSubFilter] = useState<string | null>(() => searchParams.get('subFilter') || null);
 
   // Compose Hub
   const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
@@ -134,6 +145,26 @@ export function FeedPage() {
   // This prevents a fresh load from aborting an in-flight append (or vice versa)
   const abortRef = useRef<AbortController | null>(null);
   const appendAbortRef = useRef<AbortController | null>(null);
+
+  // Sync filter, mode, and subFilter to URL query string without polluting history
+  const syncToUrl = useCallback((updates: { filter?: FeedFilter; mode?: 'ranking' | 'recent'; subFilter?: string | null }) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (updates.filter !== undefined) {
+        if (updates.filter === 'all') next.delete('filter');
+        else next.set('filter', updates.filter);
+      }
+      if (updates.mode !== undefined) {
+        if (updates.mode === 'ranking') next.delete('mode');
+        else next.set('mode', updates.mode);
+      }
+      if (updates.subFilter !== undefined) {
+        if (!updates.subFilter) next.delete('subFilter');
+        else next.set('subFilter', updates.subFilter);
+      }
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
 
   // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
   const tRef = useRef(t);
@@ -701,7 +732,7 @@ export function FeedPage() {
 
       {/* Feed Mode Toggle (For You / Recent) */}
       <div className="flex items-center justify-between">
-        <FeedModeToggle mode={feedMode} onModeChange={(mode) => { localStorage.setItem(FEED_MODE_KEY, mode); setFeedMode(mode); }} />
+        <FeedModeToggle mode={feedMode} onModeChange={(mode) => { localStorage.setItem(FEED_MODE_KEY, mode); setFeedMode(mode); syncToUrl({ mode }); }} />
         {isAuthenticated && (
           <Button
             size="sm"
@@ -779,7 +810,7 @@ export function FeedPage() {
                 ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/20'
                 : 'bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border-default)]'
             }
-            onPress={() => setFilter(opt.key)}
+            onPress={() => { setFilter(opt.key); syncToUrl({ filter: opt.key }); }}
           >
             {opt.label}
           </Button>
@@ -787,7 +818,7 @@ export function FeedPage() {
       </div>
 
       {/* Sub-Filter Chips (contextual, e.g. Listings -> Offers/Requests) */}
-      <SubFilterChips filter={filter} subFilter={subFilter} onSubFilterChange={setSubFilter} />
+      <SubFilterChips filter={filter} subFilter={subFilter} onSubFilterChange={(sf) => { setSubFilter(sf); syncToUrl({ subFilter: sf }); }} />
 
       {/* New posts floating chip — appears when real-time posts arrive while scrolled down */}
       <AnimatePresence>
@@ -822,7 +853,7 @@ export function FeedPage() {
 
       {/* Error State */}
       {error && !isLoading && (
-        <GlassCard className="p-10 text-center" glow="primary">
+        <GlassCard className="p-10 text-center" glow="primary" role="alert">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mx-auto mb-5">
             <AlertTriangle className="w-8 h-8 text-amber-500" aria-hidden="true" />
           </div>
@@ -912,15 +943,14 @@ export function FeedPage() {
                 </div>
               )}
 
-              {/* Manual fallback: visible only while loading more */}
-              {hasMore && isLoadingMore && (
+              {/* Manual fallback: visible only when more items exist but NOT currently loading */}
+              {hasMore && !isLoadingMore && (
                 <div className="pt-6 pb-2 text-center">
                   <Button
                     variant="bordered"
                     className="border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
                     onPress={() => loadFeed(true)}
-                    isLoading={isLoadingMore}
-                    startContent={!isLoadingMore ? <TrendingUp className="w-4 h-4" aria-hidden="true" /> : undefined}
+                    startContent={<TrendingUp className="w-4 h-4" aria-hidden="true" />}
                   >
                     {t('load_more')}
                   </Button>

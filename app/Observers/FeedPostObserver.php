@@ -43,6 +43,17 @@ class FeedPostObserver
     public function restored(FeedPost $post): void
     {
         try {
+            // Fix 4: Only restore visibility if the post was NOT moderation-hidden.
+            // If is_hidden = 1 the post was hidden by moderation before soft-delete;
+            // restoring the soft-delete must not bypass that moderation decision.
+            if ((int) $post->is_hidden === 1) {
+                Log::debug('FeedPostObserver: skipping visibility restore for moderation-hidden post', [
+                    'post_id'   => $post->id,
+                    'tenant_id' => $post->tenant_id,
+                ]);
+                return;
+            }
+
             DB::table('feed_activity')
                 ->where('source_type', 'post')
                 ->where('source_id', $post->id)

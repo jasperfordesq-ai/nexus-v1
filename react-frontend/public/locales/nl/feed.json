@@ -475,6 +475,7 @@
   "why_shown": {
     "label": "Waarom zie ik dit?",
     "title": "Waarom je dit ziet",
+    "default_reason": "Ranked for you based on your activity",
     "popular": "Populair in jouw gemeenschap",
     "some_engagement": "Betrokkenheid krijgen",
     "community_content": "Gemeenschapsactiviteit",

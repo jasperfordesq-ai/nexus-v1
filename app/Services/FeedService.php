@@ -27,6 +27,11 @@ use App\Core\TenantContext;
 class FeedService
 {
     /**
+     * Fix 6: Maximum allowed post body length (50 KB) to prevent oversized payload abuse.
+     */
+    public const MAX_POST_LENGTH = 50000;
+
+    /**
      * Map plural filter names to source_type values (matches legacy).
      */
     private const TYPE_MAP = [
@@ -243,8 +248,8 @@ class FeedService
               ->orderByDesc('feed_activity.id');
 
         // For ranked mode fetch a larger candidate pool so EdgeRank has enough
-        // items to reorder meaningfully. Cap at 200 to avoid memory pressure.
-        $fetchLimit = $isRanked ? min(max($limit * 3, 60), 200) : $limit;
+        // items to reorder meaningfully. Cap at 500 to avoid memory pressure.
+        $fetchLimit = $isRanked ? min(max($limit * 5, 100), 500) : $limit;
 
         $rows = $query->limit($fetchLimit + 1)->get();
 
@@ -544,9 +549,23 @@ class FeedService
         // the correct position in the database.
         if ($isRanked && count($items) > 1) {
             try {
+                // Fetch viewer timezone for Signal 9 (Context Timing) so that
+                // time-of-day boosts are calculated in the viewer's local time.
+                // Falls back to 'UTC' if the column doesn't exist or user is guest.
+                $viewerTimezone = 'UTC';
+                if ($currentUserId) {
+                    $tzValue = DB::table('users')
+                        ->where('id', $currentUserId)
+                        ->where('tenant_id', $tenantId)
+                        ->value('timezone');
+                    if ($tzValue) {
+                        $viewerTimezone = $tzValue;
+                    }
+                }
+
                 /** @var FeedRankingService $rankingService */
                 $rankingService = app(FeedRankingService::class);
-                $items = $rankingService->rankFeedItems($items, $currentUserId);
+                $items = $rankingService->rankFeedItems($items, $currentUserId, $viewerTimezone);
             } catch (\Throwable $e) {
                 Log::warning('FeedService: EdgeRank ranking failed, falling back to chronological: ' . $e->getMessage());
             }
@@ -557,8 +576,11 @@ class FeedService
         // (not the last ranked item) so the next page resumes from the right place.
         // We find the candidate with the smallest (created_at, id) tuple, which is
         // the one that would have appeared last in the chronological query.
-        if ($isRanked && count($items) > $limit) {
-            // Determine the chronological tail of the candidate set before slicing
+        // This must be computed BEFORE slicing — regardless of pool size — so that
+        // small pools (pool <= $limit) still get a correct cursor and don't re-fetch
+        // higher-ranked items that were already served.
+        if ($isRanked && !empty($items)) {
+            // Determine the chronological tail of the full candidate set
             $chronoTail = $items[0]; // start with first item
             foreach ($items as $candidate) {
                 if (
@@ -571,11 +593,11 @@ class FeedService
                     $chronoTail = $candidate;
                 }
             }
+
             // Slice to the requested page size
             $items = array_slice($items, 0, $limit);
-            // If there are more items beyond the slice, we need a cursor
-            // pointing to the chronological tail of the full candidate set
-            $hasMore = true;
+
+            // Build cursor from the chronological tail of the full candidate pool
             $nextCursor = null;
             if (isset($chronoTail['_activity_id'], $chronoTail['_activity_created_at'])) {
                 $payload = json_encode(['ts' => $chronoTail['_activity_created_at'], 'id' => $chronoTail['_activity_id']]);
@@ -587,11 +609,6 @@ class FeedService
                 'cursor'   => $nextCursor,
                 'has_more' => $hasMore,
             ];
-        }
-
-        // Slice ranked results to page size when candidate pool exactly fills limit
-        if ($isRanked) {
-            $items = array_slice($items, 0, $limit);
         }
 
         // Generate HMAC-signed cursor
@@ -709,11 +726,33 @@ class FeedService
 
             $poll = $polls[$pollId] ?? null;
 
+            // Fix 7: for open (non-closed) polls, hide per-option counts from
+            // non-creators to prevent results from influencing remaining voters.
+            // The poll creator always sees full results.
+            $pollIsOpen = $poll && (bool) ($poll->is_active ?? true)
+                && ($poll->end_date === null || strtotime($poll->end_date) > time());
+            $isCreator = $poll && $userId && (int) $poll->user_id === $userId;
+
+            $optionsForResponse = $formattedOptions;
+            if ($pollIsOpen && !$isCreator) {
+                // Strip per-option counts and percentages — expose only option text and ID
+                $optionsForResponse = array_map(fn($opt) => [
+                    'id'         => $opt['id'],
+                    'text'       => $opt['text'],
+                    'vote_count' => null,
+                    'percentage' => null,
+                ], $formattedOptions);
+                // Do not expose total_votes to non-creators of open polls either
+                $totalVotesForResponse = null;
+            } else {
+                $totalVotesForResponse = $totalVotes;
+            }
+
             $pollDataMap[$pollId] = [
                 'id' => $pollId,
                 'question' => $poll->question ?? '',
-                'options' => $formattedOptions,
-                'total_votes' => $totalVotes,
+                'options' => $optionsForResponse,
+                'total_votes' => $totalVotesForResponse,
                 'user_vote_option_id' => $userVotes[$pollId] ?? null,
                 'is_active' => (bool) ($poll->is_active ?? true),
             ];
@@ -738,6 +777,11 @@ class FeedService
 
         if (empty($content) && empty($image)) {
             return ['error' => __('api_controllers_2.feed.content_or_image_required')];
+        }
+
+        // Fix 6: enforce maximum post body length
+        if (mb_strlen($content) > self::MAX_POST_LENGTH) {
+            throw new \InvalidArgumentException('Post content exceeds maximum allowed length of ' . self::MAX_POST_LENGTH . ' characters');
         }
 
         // Determine publish status: scheduled, draft, or published
@@ -915,9 +959,47 @@ class FeedService
             return ['success' => false, 'error' => __('api_controllers_2.feed.content_or_image_required')];
         }
 
+        // Fix 6: enforce maximum post body length on updates
+        if (mb_strlen($content) > self::MAX_POST_LENGTH) {
+            return ['success' => false, 'error' => 'Post content exceeds maximum allowed length of ' . self::MAX_POST_LENGTH . ' characters'];
+        }
+
+        // Fix 5: run spam detection on updated content, mirroring createPost() behaviour
+        $spamFlagged = !empty($content) && \App\Services\ContentModerationService::detectSpam($content);
+
+        if ($spamFlagged) {
+            Log::info('FeedService::updatePost spam flag', [
+                'post_id'   => $postId,
+                'user_id'   => $userId,
+                'tenant_id' => $tenantId,
+            ]);
+        }
+
         $post->content = $content;
+        if ($spamFlagged) {
+            $post->is_hidden = true;
+        }
         $post->updated_at = now();
         $post->save();
+
+        if ($spamFlagged) {
+            try {
+                DB::table('content_moderation_queue')->insertOrIgnore([
+                    'tenant_id'    => $tenantId,
+                    'content_type' => 'post',
+                    'content_id'   => $postId,
+                    'author_id'    => $userId,
+                    'title'        => mb_substr(strip_tags($content), 0, 120),
+                    'status'       => \App\Services\ContentModerationService::STATUS_FLAGGED,
+                    'auto_flagged' => true,
+                    'flag_reason'  => 'spam_pattern_match',
+                    'created_at'   => now(),
+                    'updated_at'   => now(),
+                ]);
+            } catch (\Throwable $e) {
+                Log::warning('FeedService::updatePost spam queue insert failed: ' . $e->getMessage());
+            }
+        }
 
         // Sync feed_activity content
         try {

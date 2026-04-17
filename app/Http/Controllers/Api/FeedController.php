@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Services\FeedService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -126,7 +127,9 @@ class FeedController extends BaseApiController
     public function createPost(): JsonResponse
     {
         $userId = $this->requireAuth();
-        $this->rateLimit('feed_post', 10, 60);
+        $tenantId = $this->getTenantId();
+        // Fix 3: key rate limits on both tenant AND user to prevent one user exhausting tenant quota
+        $this->rateLimit("feed_post:{$tenantId}:{$userId}", 10, 60);
 
         $post = $this->feedService->createPost($userId, $this->getAllInput());
 
@@ -152,7 +155,8 @@ class FeedController extends BaseApiController
     {
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
-        $this->rateLimit("feed_like:{$tenantId}", 60, 60);
+        // Fix 3: key rate limits on both tenant AND user to prevent one user exhausting tenant quota
+        $this->rateLimit("feed_like:{$tenantId}:{$userId}", 60, 60);
 
         $input = $this->getAllInput();
         $postId = (int) ($input['post_id'] ?? $input['target_id'] ?? 0);
@@ -181,7 +185,8 @@ class FeedController extends BaseApiController
     {
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
-        $this->rateLimit("feed_moderate:{$tenantId}", 30, 60);
+        // Fix 3: key rate limits on both tenant AND user to prevent one user exhausting tenant quota
+        $this->rateLimit("feed_moderate:{$tenantId}:{$userId}", 30, 60);
 
         $postId = (int) ($this->input('post_id', 0));
 
@@ -189,11 +194,21 @@ class FeedController extends BaseApiController
             return $this->respondWithError('INVALID_INPUT', __('api.invalid_post_id'));
         }
 
+        // Fix 1: verify the post belongs to this tenant before hiding (IDOR prevention)
+        $postExists = DB::table('feed_posts')
+            ->where('id', $postId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+
+        if (!$postExists) {
+            return $this->respondWithError('NOT_FOUND', __('api.post_not_found'), null, 404);
+        }
+
         try {
             DB::table('user_hidden_posts')->insertOrIgnore([
                 'user_id'    => $userId,
                 'post_id'    => $postId,
-                'tenant_id'  => $this->getTenantId(),
+                'tenant_id'  => $tenantId,
                 'created_at' => now(),
             ]);
 
@@ -214,7 +229,8 @@ class FeedController extends BaseApiController
     {
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
-        $this->rateLimit("feed_moderate:{$tenantId}", 30, 60);
+        // Fix 3: key rate limits on both tenant AND user to prevent one user exhausting tenant quota
+        $this->rateLimit("feed_moderate:{$tenantId}:{$userId}", 30, 60);
 
         $mutedUserId = (int) ($this->input('user_id', 0));
 
@@ -222,11 +238,21 @@ class FeedController extends BaseApiController
             return $this->respondWithError('INVALID_INPUT', __('api.invalid_user'));
         }
 
+        // Fix 2: verify the target user belongs to this tenant before muting
+        $targetExists = DB::table('users')
+            ->where('id', $mutedUserId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+
+        if (!$targetExists) {
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
+        }
+
         try {
             DB::table('user_muted_users')->insertOrIgnore([
                 'user_id'       => $userId,
                 'muted_user_id' => $mutedUserId,
-                'tenant_id'     => $this->getTenantId(),
+                'tenant_id'     => $tenantId,
                 'created_at'    => now(),
             ]);
 
@@ -247,7 +273,8 @@ class FeedController extends BaseApiController
     {
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
-        $this->rateLimit("feed_moderate:{$tenantId}", 30, 60);
+        // Fix 3: key rate limits on both tenant AND user to prevent one user exhausting tenant quota
+        $this->rateLimit("feed_moderate:{$tenantId}:{$userId}", 30, 60);
 
         $postId = (int) ($this->input('post_id', 0));
 

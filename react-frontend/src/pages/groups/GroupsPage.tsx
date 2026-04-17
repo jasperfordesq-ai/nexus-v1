@@ -39,6 +39,7 @@ type GroupFilter = 'all' | 'joined' | 'public' | 'private';
 
 const ITEMS_PER_PAGE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
+const MAX_VISIBLE_TAGS = 3;
 
 export function GroupsPage() {
   const { t } = useTranslation('groups');
@@ -108,14 +109,10 @@ export function GroupsPage() {
         } else {
           setGroups(response.data);
         }
-        // Prefer server-reported has_more; fall back to length heuristic
+        // Always use server-reported has_more; assume false when meta is absent
         const nextCursor = response.meta?.cursor ?? response.meta?.next_cursor ?? null;
         setCursor(nextCursor);
-        if (response.meta !== undefined) {
-          setHasMore(response.meta.has_more);
-        } else {
-          setHasMore(response.data.length >= ITEMS_PER_PAGE);
-        }
+        setHasMore(response.meta?.has_more ?? false);
       } else {
         if (!append) {
           setError(t('load_error'));
@@ -126,6 +123,7 @@ export function GroupsPage() {
       if (!append) {
         setError(t('load_error'));
       } else {
+        logError('Failed to load more groups', err);
         toast.error(t('load_more_error'));
       }
     } finally {
@@ -212,7 +210,7 @@ export function GroupsPage() {
             aria-label={t('filter_placeholder')}
             selectedKeys={[filter]}
             onChange={(e) => setFilter(e.target.value as GroupFilter)}
-            className="w-32 sm:w-40"
+            className="w-full sm:w-40"
             disallowEmptySelection
             classNames={{
               trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
@@ -351,13 +349,13 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
   const memberCount = group.member_count ?? group.members_count ?? 0;
 
   return (
-    <Link to={tenantPath(`/groups/${group.id}`)} aria-label={`${group.name} - ${memberCount} members`}>
+    <Link to={tenantPath(`/groups/${group.id}`)} aria-label={`${group.name} - ${t('members', { count: memberCount })}`}>
       <article>
         <GlassCard className={`p-5 hover:scale-[1.02] transition-transform h-full flex flex-col${featured ? ' ring-1 ring-amber-500/30' : ''}`}>
           {featured && (
-            <div className="flex items-center gap-1.5 mb-2">
+            <div className="flex items-center gap-1.5 mb-2" role="img" aria-label={t('featured_badge')}>
               <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" aria-hidden="true" />
-              <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
+              <span className="text-xs font-medium text-amber-600 dark:text-amber-400" aria-hidden="true">
                 {t('featured_badge')}
               </span>
             </div>
@@ -380,13 +378,13 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
           {/* Tags */}
           {group.tags && group.tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mb-3">
-              {group.tags.slice(0, 3).map((tag: { id: number; name: string }) => (
+              {group.tags.slice(0, MAX_VISIBLE_TAGS).map((tag: { id: number; name: string }) => (
                 <span key={tag.id} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-primary/10 text-primary">
                   {tag.name}
                 </span>
               ))}
-              {group.tags.length > 3 && (
-                <span className="text-[10px] text-theme-subtle">+{group.tags.length - 3}</span>
+              {group.tags.length > MAX_VISIBLE_TAGS && (
+                <span className="text-[10px] text-theme-subtle">+{group.tags.length - MAX_VISIBLE_TAGS}</span>
               )}
             </div>
           )}

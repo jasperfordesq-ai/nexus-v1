@@ -87,7 +87,7 @@ class GroupService
 
         if ($cursor !== null) {
             $cursorId = base64_decode($cursor, true);
-            if ($cursorId !== false) {
+            if ($cursorId !== false && is_numeric($cursorId)) {
                 $query->where('id', '<', (int) $cursorId);
             }
         }
@@ -609,7 +609,7 @@ class GroupService
 
         if ($cursor !== null) {
             $cursorId = base64_decode($cursor, true);
-            if ($cursorId !== false) {
+            if ($cursorId !== false && is_numeric($cursorId)) {
                 $query->where('group_members.id', '>', (int) $cursorId);
             }
         }
@@ -923,7 +923,7 @@ class GroupService
 
         if ($cursor !== null) {
             $cursorId = base64_decode($cursor, true);
-            if ($cursorId !== false) {
+            if ($cursorId !== false && is_numeric($cursorId)) {
                 $query->where('id', '<', (int) $cursorId);
             }
         }
@@ -1076,7 +1076,7 @@ class GroupService
 
         if ($cursor !== null) {
             $cursorId = base64_decode($cursor, true);
-            if ($cursorId !== false) {
+            if ($cursorId !== false && is_numeric($cursorId)) {
                 $query->where('id', '>', (int) $cursorId);
             }
         }

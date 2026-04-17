@@ -44,10 +44,41 @@ class NotificationDispatcher
      * @param string|null $htmlContent Full HTML content for Instant Emails
      * @param bool        $isOrganizer If true, applies strict Organizer Priority rules
      */
-    public static function dispatch($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer = false): void
+    /**
+     * Dispatch a notification (In-App + Email Traffic Cop).
+     *
+     * @param int         $userId      Target User ID
+     * @param string      $contextType 'global', 'group', 'thread'
+     * @param int|null    $contextId   Group ID or Discussion ID
+     * @param string      $activityType 'new_topic', 'new_reply', 'mention'
+     * @param string      $content     Plain text content for email preview
+     * @param string      $link        Relative link to the item
+     * @param string|null $htmlContent Full HTML content for Instant Emails
+     * @param bool        $isOrganizer If true, applies strict Organizer Priority rules
+     * @param int|null    $fromUserId  The actor sending this notification (used for mute check)
+     */
+    public static function dispatch($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer = false, ?int $fromUserId = null): void
     {
         // 1. Create In-App Notification (The "Bell") with 60-second deduplication window
         $tenantId = TenantContext::getId();
+
+        // Fix 9: Skip notification if the sending user is muted by the recipient.
+        // Only checked when fromUserId is provided — system notifications are never suppressed.
+        if ($fromUserId !== null && $fromUserId !== (int) $userId) {
+            $isMuted = DB::table('user_muted_users')
+                ->where('user_id', (int) $userId)
+                ->where('muted_user_id', $fromUserId)
+                ->where('tenant_id', $tenantId)
+                ->exists();
+            if ($isMuted) {
+                Log::debug('NotificationDispatcher: suppressed notification from muted user', [
+                    'recipient' => $userId,
+                    'actor'     => $fromUserId,
+                    'type'      => $activityType,
+                ]);
+                return;
+            }
+        }
         $dedupKey = "notif_dedup:{$tenantId}:{$userId}:{$activityType}:" . md5($link ?? '');
 
         if (Cache::has($dedupKey)) {

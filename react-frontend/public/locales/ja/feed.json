@@ -475,6 +475,7 @@
   "why_shown": {
     "label": "なぜこれを見ているのですか？",
     "title": "なぜこれを見ているのか",
+    "default_reason": "Ranked for you based on your activity",
     "popular": "あなたのコミュニティで人気",
     "some_engagement": "エンゲージメントを得る",
     "community_content": "コミュニティ活動",

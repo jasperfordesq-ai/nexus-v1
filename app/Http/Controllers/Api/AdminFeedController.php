@@ -264,19 +264,23 @@ class AdminFeedController extends BaseApiController
 
         $itemTenantId = (int) $row->tenant_id;
 
-        // Hide from feed_activity (hides from main feed for all users)
-        DB::update(
-            "UPDATE feed_activity SET is_hidden = 1, is_visible = 0 WHERE source_type = ? AND source_id = ? AND tenant_id = ?",
-            [$sourceType, $id, $itemTenantId]
-        );
-
-        // If the source is a post, also set is_hidden on the feed_posts row
-        if ($sourceType === 'post') {
+        // Fix 10: wrap both UPDATEs in a transaction so feed_activity and
+        // feed_posts cannot become out of sync if the second UPDATE fails.
+        DB::transaction(function () use ($sourceType, $id, $itemTenantId) {
+            // Hide from feed_activity (hides from main feed for all users)
             DB::update(
-                "UPDATE feed_posts SET is_hidden = 1 WHERE id = ? AND tenant_id = ?",
-                [$id, $itemTenantId]
+                "UPDATE feed_activity SET is_hidden = 1, is_visible = 0 WHERE source_type = ? AND source_id = ? AND tenant_id = ?",
+                [$sourceType, $id, $itemTenantId]
             );
-        }
+
+            // If the source is a post, also set is_hidden on the feed_posts row
+            if ($sourceType === 'post') {
+                DB::update(
+                    "UPDATE feed_posts SET is_hidden = 1 WHERE id = ? AND tenant_id = ?",
+                    [$id, $itemTenantId]
+                );
+            }
+        });
 
         ActivityLog::log(
             $adminId,

@@ -475,6 +475,7 @@
   "why_shown": {
     "label": "لماذا أرى هذا؟",
     "title": "لماذا ترى هذا",
+    "default_reason": "Ranked for you based on your activity",
     "popular": "شائع في مجتمعك",
     "some_engagement": "الحصول على تفاعل",
     "community_content": "نشاط المجتمع",

@@ -101,7 +101,12 @@ export interface FeedItem {
   }>;
   /** Server-provided ranking reasons (when available) */
   ranking_reasons?: string[];
-  /** EdgeRank score attached by the backend (float, for debugging/analytics). */
+  /**
+   * @internal EdgeRank score attached by the backend (float).
+   * Server-side stripping is the authoritative fix; on the frontend this field
+   * MUST NOT be rendered in any UI element — doing so leaks algorithm signals
+   * and could enable gaming. Read-only diagnostic use in dev tooling only.
+   */
   _edge_rank?: number;
   /** Quoted post (quote repost) — embedded original post */
   quoted_post?: {

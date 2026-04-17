@@ -340,13 +340,14 @@ class StoryService
             throw new \RuntimeException('Only the story owner can view the viewers list');
         }
 
+        // Fix 12: scope the users JOIN to the current tenant to prevent cross-tenant user leakage
         $viewers = DB::select(
             'SELECT u.id, u.first_name, u.last_name, u.avatar_url, sv.viewed_at
              FROM story_views sv
-             JOIN users u ON u.id = sv.viewer_id
+             JOIN users u ON u.id = sv.viewer_id AND u.tenant_id = ?
              WHERE sv.story_id = ?
              ORDER BY sv.viewed_at DESC',
-            [$storyId]
+            [$tenantId, $storyId]
         );
 
         return array_map(fn($v) => [
@@ -496,20 +497,33 @@ class StoryService
             throw new \RuntimeException('Invalid option index');
         }
 
-        // Check if already voted
-        $existing = DB::selectOne(
-            'SELECT id FROM story_poll_votes WHERE story_id = ? AND user_id = ?',
-            [$storyId, $userId]
-        );
+        // Fix 13: wrap the check-then-insert in a transaction and use insertOrIgnore
+        // to prevent a race condition where two concurrent requests both pass the
+        // "already voted" check and both insert (violating the uk_story_poll_vote constraint).
+        $alreadyVoted = false;
+        DB::transaction(function () use ($storyId, $userId, $optionIndex, $tenantId, &$alreadyVoted) {
+            $existing = DB::selectOne(
+                'SELECT id FROM story_poll_votes WHERE story_id = ? AND user_id = ?',
+                [$storyId, $userId]
+            );
 
-        if ($existing) {
+            if ($existing) {
+                $alreadyVoted = true;
+                return;
+            }
+
+            DB::table('story_poll_votes')->insertOrIgnore([
+                'tenant_id'    => $tenantId,
+                'story_id'     => $storyId,
+                'user_id'      => $userId,
+                'option_index' => $optionIndex,
+                'created_at'   => now(),
+            ]);
+        });
+
+        if ($alreadyVoted) {
             throw new \RuntimeException('You have already voted on this poll');
         }
-
-        DB::insert(
-            'INSERT INTO story_poll_votes (story_id, user_id, option_index, created_at) VALUES (?, ?, ?, NOW())',
-            [$storyId, $userId, $optionIndex]
-        );
 
         return $this->getPollResults($storyId);
     }
@@ -691,6 +705,7 @@ class StoryService
     {
         $tenantId = TenantContext::getId();
 
+        // Fix 11: filter out expired and inactive stories from highlights
         $stories = DB::select(
             'SELECT s.*,
                     u.first_name, u.last_name, u.avatar_url,
@@ -701,6 +716,8 @@ class StoryService
              ' . ($viewerId ? 'LEFT JOIN story_views sv ON sv.story_id = s.id AND sv.viewer_id = ' . (int) $viewerId : '') . '
              WHERE shi.highlight_id = ?
                AND s.tenant_id = ?
+               AND s.is_active = 1
+               AND s.expires_at > NOW()
              ORDER BY shi.display_order ASC',
             [$highlightId, $tenantId]
         );
