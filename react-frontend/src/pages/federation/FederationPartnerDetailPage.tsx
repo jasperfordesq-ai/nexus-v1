@@ -205,7 +205,7 @@ export function FederationPartnerDetailPage() {
             {/* Avatar */}
             <div className="relative flex-shrink-0">
               <Avatar
-                name={partner.name[0]}
+                name={partner.name}
                 src={partner.logo || undefined}
                 className="w-24 h-24 ring-4 ring-indigo-500/20 bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-3xl"
               />

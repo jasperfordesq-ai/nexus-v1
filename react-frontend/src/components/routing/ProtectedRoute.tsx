@@ -44,6 +44,21 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to={tenantPath('/login')} state={{ from: tenantPath(location.pathname) }} replace />;
   }
 
+  // Redirect non-admin users away from /admin routes
+  const isAdminRoute = location.pathname.includes('/admin');
+  if (isAdminRoute) {
+    const isAdmin =
+      user?.role === 'admin' ||
+      user?.role === 'super_admin' ||
+      user?.is_super_admin ||
+      user?.is_tenant_super_admin ||
+      user?.role === 'moderator';
+
+    if (!isAdmin) {
+      return <Navigate to={tenantPath('/dashboard')} replace />;
+    }
+  }
+
   // Redirect to onboarding only if the flag is not set AND onboarding is
   // both enabled and mandatory for this tenant. onboarding_completed is the
   // authoritative source of truth — the backend already requires avatar+bio

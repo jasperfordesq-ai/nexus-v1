@@ -93,15 +93,7 @@ class PushCommunityEventToFederatedPartners implements ShouldQueue
     private function pushToPartner(int $partnerId, int $tenantId, int $eventId, array $payload): void
     {
         try {
-            // Prefer a dedicated sendEvent() on the client when available
-            // (another agent is adding it).  Fall back to generic POST.
-            if (method_exists(FederationExternalApiClient::class, 'sendEvent')) {
-                $result = FederationExternalApiClient::sendEvent($partnerId, $payload);
-            } else {
-                $adapter = FederationExternalApiClient::resolveAdapter($partnerId);
-                $endpoint = $adapter->mapEndpoint('events');
-                $result = FederationExternalApiClient::post($partnerId, $endpoint, $payload);
-            }
+            $result = FederationExternalApiClient::sendEvent($partnerId, $payload);
 
             if (empty($result['success'])) {
                 Log::warning('PushCommunityEventToFederatedPartners: partner rejected event', [

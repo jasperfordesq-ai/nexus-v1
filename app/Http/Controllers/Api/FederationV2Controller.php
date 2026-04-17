@@ -925,6 +925,7 @@ class FederationV2Controller extends BaseApiController
             if (!empty($skills)) {
                 $fromWhere .= " AND fus.show_skills_federated = 1";
                 $skillList = array_map('trim', explode(',', $skills));
+                $skillList = array_slice($skillList, 0, 10); // cap at 10 skills
                 $skillIdx = 0;
                 foreach ($skillList as $skill) {
                     if (!empty($skill)) {

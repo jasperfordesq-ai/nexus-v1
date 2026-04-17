@@ -68,13 +68,7 @@ class PushGroupToFederatedPartners implements ShouldQueue
                     continue;
                 }
                 try {
-                    if (method_exists(FederationExternalApiClient::class, 'sendGroup')) {
-                        $result = FederationExternalApiClient::sendGroup($partnerId, $payload);
-                    } else {
-                        $adapter = FederationExternalApiClient::resolveAdapter($partnerId);
-                        $endpoint = $adapter->mapEndpoint('groups');
-                        $result = FederationExternalApiClient::post($partnerId, $endpoint, $payload);
-                    }
+                    $result = FederationExternalApiClient::sendGroup($partnerId, $payload);
 
                     if (empty($result['success'])) {
                         Log::warning('PushGroupToFederatedPartners: partner rejected group', [

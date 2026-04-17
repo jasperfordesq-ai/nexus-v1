@@ -94,9 +94,13 @@ class FeedService
             $sourceType = self::TYPE_MAP[$type] ?? $type;
         }
 
-        // Build query
+        // Build query — scope the users JOIN to the current tenant to prevent cross-tenant user leakage
+        $tenantId = TenantContext::getId();
         $query = $this->feedActivity->newQuery()
-            ->join('users as u', 'feed_activity.user_id', '=', 'u.id')
+            ->join('users as u', function ($join) use ($tenantId) {
+                $join->on('feed_activity.user_id', '=', 'u.id')
+                     ->where('u.tenant_id', '=', $tenantId);
+            })
             ->where('feed_activity.is_visible', true)
             ->select([
                 'feed_activity.id as activity_id',
@@ -183,7 +187,6 @@ class FeedService
         }
 
         // Hide private group posts from non-members (unless viewing a specific group feed)
-        $tenantId = TenantContext::getId();
         if (!isset($filters['group_id'])) {
             if ($currentUserId) {
                 // Authenticated: show public group posts + groups user is a member of
@@ -711,6 +714,16 @@ class FeedService
             $emoji = null;
         }
 
+        // Spam detection: flag matching posts for review rather than blocking
+        $spamFlagged = false;
+        if (!empty($content) && \App\Services\ContentModerationService::detectSpam($content)) {
+            $spamFlagged = true;
+            Log::info('FeedService::createPost spam flag', [
+                'user_id'   => $userId,
+                'tenant_id' => $tenantId,
+            ]);
+        }
+
         $post = $this->feedPost->newInstance([
             'user_id'        => $userId,
             'tenant_id'      => $tenantId,
@@ -729,6 +742,32 @@ class FeedService
 
         $post->save();
 
+        // If spam was detected, hide the post and queue it for moderation review
+        if ($spamFlagged) {
+            DB::table('feed_posts')
+                ->where('id', $post->id)
+                ->where('tenant_id', $tenantId)
+                ->update(['is_hidden' => true]);
+            $post->is_hidden = true;
+
+            try {
+                DB::table('content_moderation_queue')->insertOrIgnore([
+                    'tenant_id'    => $tenantId,
+                    'content_type' => 'post',
+                    'content_id'   => $post->id,
+                    'author_id'    => $userId,
+                    'title'        => mb_substr(strip_tags($content), 0, 120),
+                    'status'       => \App\Services\ContentModerationService::STATUS_FLAGGED,
+                    'auto_flagged' => true,
+                    'flag_reason'  => 'spam_pattern_match',
+                    'created_at'   => now(),
+                    'updated_at'   => now(),
+                ]);
+            } catch (\Throwable $e) {
+                Log::warning('FeedService::createPost spam queue insert failed: ' . $e->getMessage());
+            }
+        }
+
         // Only record in feed_activity for immediately published posts;
         // scheduled/draft posts are added to feed_activity when published
         if ($publishStatus === 'published') {
@@ -743,7 +782,7 @@ class FeedService
                     'content'     => $content,
                     'image_url'   => $image,
                     'metadata'    => null,
-                    'is_visible'  => true,
+                    'is_visible'  => !$spamFlagged,
                     'created_at'  => $post->created_at,
                 ]);
             } catch (\Exception $e) {

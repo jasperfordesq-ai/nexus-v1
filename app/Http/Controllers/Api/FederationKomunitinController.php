@@ -416,8 +416,8 @@ class FederationKomunitinController extends BaseApiController
 
         $perms = $partner['permissions'] ?? null;
         if ($perms === null) {
-            // No permissions column — allow by default
-            return true;
+            // No permissions column — deny by default (null perms = no access)
+            return false;
         }
 
         $permsArr = is_string($perms) ? (json_decode($perms, true) ?: []) : (array) $perms;

@@ -64,8 +64,14 @@ class FederationPartnershipService
             if ($existing['status'] === 'terminated') {
                 return ['success' => false, 'error' => 'Terminated partnerships cannot be re-requested'];
             }
-            // Allow re-requesting after a previous rejection
+            // Allow re-requesting after a previous rejection, but enforce a 7-day cooldown
             if ($existing['status'] === 'rejected') {
+                $rejectedAt = !empty($existing['updated_at'])
+                    ? \Carbon\Carbon::parse($existing['updated_at'])
+                    : null;
+                if ($rejectedAt && $rejectedAt->diffInDays(now()) < 7) {
+                    return ['success' => false, 'error' => 'Partnership was recently rejected. Please wait before re-requesting.'];
+                }
                 DB::table('federation_partnerships')->where('id', $existing['id'])->delete();
             }
         }
@@ -426,13 +432,61 @@ class FederationPartnershipService
         }
 
         try {
-            DB::table('federation_partnerships')->where('id', $partnershipId)->update([
-                'status' => 'terminated',
-                'terminated_at' => now(),
-                'terminated_by' => $terminatedBy,
-                'termination_reason' => $reason,
-                'updated_at' => now(),
-            ]);
+            DB::transaction(function () use ($partnershipId, $partnershipTenantId, $partnerTenantId, $terminatedBy, $reason, $partnership) {
+                DB::table('federation_partnerships')->where('id', $partnershipId)->update([
+                    'status' => 'terminated',
+                    'terminated_at' => now(),
+                    'terminated_by' => $terminatedBy,
+                    'termination_reason' => $reason,
+                    'updated_at' => now(),
+                ]);
+
+                // Sever cross-tenant connections between these two tenants.
+                // federation_connections status ENUM only supports 'pending','accepted','rejected'
+                // — use 'rejected' to mark severed connections.
+                DB::table('federation_connections')
+                    ->where(function ($q) use ($partnershipTenantId, $partnerTenantId) {
+                        $q->where('requester_tenant_id', $partnershipTenantId)
+                          ->where('receiver_tenant_id', $partnerTenantId);
+                    })
+                    ->orWhere(function ($q) use ($partnershipTenantId, $partnerTenantId) {
+                        $q->where('requester_tenant_id', $partnerTenantId)
+                          ->where('receiver_tenant_id', $partnershipTenantId);
+                    })
+                    ->update(['status' => 'rejected', 'updated_at' => now()]);
+
+                // Cancel pending federation transactions between these two tenants.
+                DB::table('federation_transactions')
+                    ->where('status', 'pending')
+                    ->where(function ($q) use ($partnershipTenantId, $partnerTenantId) {
+                        $q->where(function ($inner) use ($partnershipTenantId, $partnerTenantId) {
+                            $inner->where('sender_tenant_id', $partnershipTenantId)
+                                  ->where('receiver_tenant_id', $partnerTenantId);
+                        })->orWhere(function ($inner) use ($partnershipTenantId, $partnerTenantId) {
+                            $inner->where('sender_tenant_id', $partnerTenantId)
+                                  ->where('receiver_tenant_id', $partnershipTenantId);
+                        });
+                    })
+                    ->update([
+                        'status' => 'cancelled',
+                        'cancelled_at' => now(),
+                        'cancellation_reason' => 'Partnership terminated',
+                    ]);
+
+                // Suspend active credit agreements between these two tenants.
+                DB::table('federation_credit_agreements')
+                    ->where('status', 'active')
+                    ->where(function ($q) use ($partnershipTenantId, $partnerTenantId) {
+                        $q->where(function ($inner) use ($partnershipTenantId, $partnerTenantId) {
+                            $inner->where('from_tenant_id', $partnershipTenantId)
+                                  ->where('to_tenant_id', $partnerTenantId);
+                        })->orWhere(function ($inner) use ($partnershipTenantId, $partnerTenantId) {
+                            $inner->where('from_tenant_id', $partnerTenantId)
+                                  ->where('to_tenant_id', $partnershipTenantId);
+                        });
+                    })
+                    ->update(['status' => 'suspended', 'updated_at' => now()]);
+            });
 
             FederationAuditService::log(
                 'partnership_terminated',

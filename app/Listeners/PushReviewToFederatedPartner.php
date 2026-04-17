@@ -110,6 +110,7 @@ class PushReviewToFederatedPartner implements ShouldQueue
             'reviewer_id'               => $review->reviewer_id,
             'reviewer_tenant'           => $review->tenant_id,
             'receiver_external_id'      => $identity->external_user_id,
+            'external_id'               => (string) $review->id,
             'created_at'                => $review->created_at?->toIso8601String(),
         ];
 

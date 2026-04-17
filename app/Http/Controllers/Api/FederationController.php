@@ -374,7 +374,7 @@ class FederationController extends BaseApiController
 
         $query = request()->query('q', '');
         $timebankId = request()->query('timebank_id') !== null ? (int) request()->query('timebank_id') : null;
-        $skills = !empty(request()->query('skills')) ? explode(',', request()->query('skills')) : [];
+        $skills = !empty(request()->query('skills')) ? array_slice(explode(',', request()->query('skills')), 0, 10) : [];
         $location = request()->query('location', '');
         $page = max(1, (int) request()->query('page', 1));
         $perPage = min(100, max(1, (int) request()->query('per_page', 20)));

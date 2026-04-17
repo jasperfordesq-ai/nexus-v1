@@ -48,6 +48,10 @@ class SearchController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.search_query_min_length'), 'q', 400);
         }
 
+        if (mb_strlen($query) > 500) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.search_query_too_long'), 'q', 422);
+        }
+
         // Validate type param
         $type = $this->query('type');
         if ($type !== null) {

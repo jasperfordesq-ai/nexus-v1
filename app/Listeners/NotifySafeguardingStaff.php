@@ -118,6 +118,8 @@ class NotifySafeguardingStaff implements ShouldQueue
             ]);
             // Re-throw so Laravel queue retries (safeguarding notifications are legally critical)
             throw $e;
+        } finally {
+            TenantContext::reset(); // Prevent context leaking to next queued job
         }
     }
 

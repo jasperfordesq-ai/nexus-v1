@@ -72,6 +72,8 @@ class NotifyConnectionRequest implements ShouldQueue
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+        } finally {
+            TenantContext::reset(); // Prevent context leaking to next queued job
         }
     }
 }

@@ -97,13 +97,7 @@ class PushMemberProfileUpdateToFederatedPartners implements ShouldQueue
                 ];
 
                 try {
-                    if (method_exists(FederationExternalApiClient::class, 'sendMember')) {
-                        $result = FederationExternalApiClient::sendMember($partnerId, $payload);
-                    } else {
-                        $adapter = FederationExternalApiClient::resolveAdapter($partnerId);
-                        $endpoint = $adapter->mapEndpoint('members');
-                        $result = FederationExternalApiClient::post($partnerId, $endpoint, $payload);
-                    }
+                    $result = FederationExternalApiClient::sendMember($partnerId, $payload);
 
                     if (empty($result['success'])) {
                         Log::warning('PushMemberProfileUpdateToFederatedPartners: partner rejected', [

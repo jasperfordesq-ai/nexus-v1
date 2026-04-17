@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\ActivityLog;
@@ -28,12 +29,12 @@ class AdminCommentsController extends BaseApiController
      */
     private function isSuperAdmin(): bool
     {
-        $userId = $this->getUserId();
-        $user = DB::selectOne(
-            "SELECT is_super_admin, is_tenant_super_admin FROM users WHERE id = ?",
-            [$userId]
-        );
-        return $user && (!empty($user->is_super_admin) || !empty($user->is_tenant_super_admin));
+        $user = \Illuminate\Support\Facades\Auth::user();
+        if (!$user) return false;
+        $role = (string)($user->role ?? '');
+        return !empty($user->is_super_admin)
+            || !empty($user->is_god)
+            || in_array($role, ['super_admin', 'god'], true);
     }
 
     /**

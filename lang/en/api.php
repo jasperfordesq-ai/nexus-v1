@@ -1450,6 +1450,7 @@ return [
 
     // Search
     'search_query_min_length'              => 'Search query must be at least 2 characters',
+    'search_query_too_long'                => 'Search query is too long (max 500 characters).',
     'invalid_search_type'                  => 'Invalid type. Must be one of: :types',
 
     // Federation

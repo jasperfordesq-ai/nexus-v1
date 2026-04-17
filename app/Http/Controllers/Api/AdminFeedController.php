@@ -6,9 +6,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Core\TenantContext;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 use App\Models\ActivityLog;
 use App\Models\FeedPost;
 use App\Models\Notification;
@@ -28,12 +31,12 @@ class AdminFeedController extends BaseApiController
      */
     private function isSuperAdmin(): bool
     {
-        $userId = $this->getUserId();
-        $user = DB::selectOne(
-            "SELECT is_super_admin, is_tenant_super_admin FROM users WHERE id = ?",
-            [$userId]
-        );
-        return $user && (!empty($user->is_super_admin) || !empty($user->is_tenant_super_admin));
+        $user = \Illuminate\Support\Facades\Auth::user();
+        if (!$user) return false;
+        $role = (string)($user->role ?? '');
+        return !empty($user->is_super_admin)
+            || !empty($user->is_god)
+            || in_array($role, ['super_admin', 'god'], true);
     }
 
     /**
@@ -255,6 +258,10 @@ class AdminFeedController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.feed_item_not_found'), null, 404);
         }
 
+        if ($effectiveTenantId !== null && (int)$row->tenant_id !== $effectiveTenantId) {
+            return $this->respondWithError('FORBIDDEN', 'Scope violation', null, 403);
+        }
+
         $itemTenantId = (int) $row->tenant_id;
 
         // Hide from feed_activity (hides from main feed for all users)
@@ -274,7 +281,7 @@ class AdminFeedController extends BaseApiController
         ActivityLog::log(
             $adminId,
             'hide_feed_item',
-            "Hidden feed {$sourceType} #{$id}" . ($superAdmin ? " (tenant {$itemTenantId})" : '')
+            "Hidden feed {$sourceType} #{$id} (tenant {$itemTenantId})"
         );
 
         // Notify the content creator that their post was hidden
@@ -359,7 +366,7 @@ class AdminFeedController extends BaseApiController
         ActivityLog::log(
             $adminId,
             'delete_feed_item',
-            "Deleted feed {$sourceType} #{$id}" . ($superAdmin ? " (tenant {$itemTenantId})" : '')
+            "Deleted feed {$sourceType} #{$id} (tenant {$itemTenantId})"
         );
 
         // Notify the content creator that their post was removed

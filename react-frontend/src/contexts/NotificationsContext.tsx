@@ -108,6 +108,15 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   const channelRef = useRef<Channel | null>(null);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Stable ref to refreshCounts — updated on every render so the Pusher effect
+  // can call the latest version without listing refreshCounts as a dependency
+  // (which would cause Pusher to disconnect and reconnect whenever isAuthenticated
+  // changes and triggers a new refreshCounts identity).
+  const refreshCountsRef = useRef(refreshCounts);
+  useEffect(() => {
+    refreshCountsRef.current = refreshCounts;
+  }, [refreshCounts]);
+
   // ─────────────────────────────────────────────────────────────────────────
   // Fetch Notification Counts
   // ─────────────────────────────────────────────────────────────────────────
@@ -232,8 +241,8 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       return;
     }
 
-    // Fetch initial counts
-    refreshCounts();
+    // Fetch initial counts via ref to avoid making refreshCounts a dep of this effect
+    refreshCountsRef.current();
 
     // Initialize Pusher (skip if key not configured)
     const pusherKey = getPusherKey();
@@ -242,7 +251,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         console.warn('[NotificationsContext] VITE_PUSHER_KEY is not set — real-time notifications disabled, using polling.');
       }
       // Still set up polling fallback even without Pusher
-      pollingRef.current = setInterval(refreshCounts, POLLING_INTERVAL);
+      pollingRef.current = setInterval(() => refreshCountsRef.current(), POLLING_INTERVAL);
       return () => {
         if (pollingRef.current) {
           clearInterval(pollingRef.current);
@@ -328,7 +337,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
       // Transaction events
       channel.bind('transaction', (data: { type: string; amount: number }) => {
-        refreshCounts();
+        refreshCountsRef.current();
         toast.success(
           i18n.t('realtime.transaction_complete', { ns: 'notifications' }),
           i18n.t('realtime.transaction_amount', { ns: 'notifications', sign: data.type === 'credit' ? '+' : '-', amount: data.amount })
@@ -361,8 +370,9 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       }));
     }
 
-    // Set up polling fallback
-    pollingRef.current = setInterval(refreshCounts, POLLING_INTERVAL);
+    // Set up polling fallback — uses ref so interval doesn't need to be recreated
+    // when refreshCounts identity changes (e.g., after isAuthenticated toggles)
+    pollingRef.current = setInterval(() => refreshCountsRef.current(), POLLING_INTERVAL);
 
     // Cleanup — disconnect() handles unsubscribing internally;
     // calling unsubscribe() before disconnect() causes "WebSocket is already
@@ -382,7 +392,11 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         pollingRef.current = null;
       }
     };
-  }, [isAuthenticated, user?.id, refreshCounts, handleNewNotification, toast, user?.tenant_id]);
+  // refreshCounts is intentionally excluded from deps — it is accessed via
+  // refreshCountsRef so the Pusher connection is not torn down and rebuilt
+  // whenever refreshCounts identity changes (e.g., after isAuthenticated toggles).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user?.id, handleNewNotification, toast, user?.tenant_id]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Context Value

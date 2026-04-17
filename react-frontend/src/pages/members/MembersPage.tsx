@@ -233,8 +233,8 @@ export function MembersPage() {
       setNearMeEnabled(false);
       return;
     }
-    if (!user?.latitude || !user?.longitude) {
-      toast.error(t('members.near_me_no_location', 'Set your location in your profile to use Near me'));
+    if (user?.latitude == null || user?.longitude == null) {
+      toast.error(t('members.near_me_no_location'));
       return;
     }
     setNearMeEnabled(true);
@@ -375,14 +375,14 @@ export function MembersPage() {
               startContent={<MapPin className="w-4 h-4" aria-hidden="true" />}
               onPress={handleNearMeToggle}
               aria-pressed={nearMeEnabled}
-              aria-label={t('members.near_me', 'Near me')}
+              aria-label={t('members.near_me')}
             >
-              {t('members.near_me', 'Near me')}
+              {t('members.near_me')}
             </Button>
 
             {nearMeEnabled && (
               <Select
-                aria-label={t('members.radius_label', 'Radius')}
+                aria-label={t('members.radius_label')}
                 selectedKeys={[String(radiusKm)]}
                 disallowEmptySelection
                 onSelectionChange={(keys) => {
@@ -490,17 +490,19 @@ export function MembersPage() {
                 <EntityMapView
                   items={members}
                   getCoordinates={(m) =>
-                    m.latitude && m.longitude ? { lat: Number(m.latitude), lng: Number(m.longitude) } : null
+                    m.latitude != null && m.longitude != null
+                      ? { lat: Number(m.latitude), lng: Number(m.longitude) }
+                      : null
                   }
                   getMarkerConfig={(m) => ({
                     id: m.id,
-                    title: m.name?.trim() || `${m.first_name || ''} ${m.last_name || ''}`.trim() || 'Member',
+                    title: m.name?.trim() || `${m.first_name || ''} ${m.last_name || ''}`.trim() || t('members.fallback_name'),
                   })}
                   renderInfoContent={(m) => (
                     <div className="p-2 max-w-[200px]">
                       <div className="flex items-center gap-2">
                         {(m.avatar || m.avatar_url) && (
-                          <img src={resolveAvatarUrl(m.avatar ?? m.avatar_url) || undefined} alt={`${m.first_name || ''} ${m.last_name || ''}`.trim() || 'Member avatar'} className="w-8 h-8 rounded-full" width={32} height={32} loading="lazy" />
+                          <img src={resolveAvatarUrl(m.avatar ?? m.avatar_url) || undefined} alt={t('members.avatar_alt', { name: m.name || `${m.first_name || ''} ${m.last_name || ''}`.trim() || t('members.fallback_name') })} className="w-8 h-8 rounded-full" width={32} height={32} loading="lazy" />
                         )}
                         <div>
                           <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100">
@@ -578,7 +580,6 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
   const joinedLabel = sortBy === 'joined' && member.created_at
     ? t('members.joined_date', {
         date: new Date(member.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }),
-        defaultValue: 'Joined {{date}}',
       })
     : null;
 
@@ -611,7 +612,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                     </Chip>
                   )}
                   {hasGamification && showcasedBadges.length > 0 && (
-                    <span className="flex items-center gap-0.5 ml-1" aria-label={t('members.showcased_badges', { defaultValue: 'Showcased badges' })}>
+                    <span className="flex items-center gap-0.5 ml-1" aria-label={t('members.showcased_badges')}>
                       {showcasedBadges.map((badge) => (
                         <Tooltip key={badge.badge_key} content={badge.name}>
                           <span className="text-base leading-none cursor-default" aria-label={badge.name}>{badge.icon || '🏆'}</span>
@@ -632,12 +633,12 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                   </span>
                 )}
                 {member.rating && (
-                  <span className="flex items-center gap-1" aria-label={`Rating: ${member.rating.toFixed(1)} out of 5`}>
+                  <span className="flex items-center gap-1" aria-label={t('members.rating_aria', { rating: member.rating.toFixed(1) })}>
                     <Star className="w-4 h-4 text-amber-400" aria-hidden="true" />
                     <span>{member.rating.toFixed(1)}</span>
                   </span>
                 )}
-                <span className="flex items-center gap-1 shrink-0 whitespace-nowrap" aria-label={`${(member.total_hours_given ?? 0) + (member.total_hours_received ?? 0)} hours exchanged`}>
+                <span className="flex items-center gap-1 shrink-0 whitespace-nowrap" aria-label={t('members.hours_exchanged_aria', { count: (member.total_hours_given ?? 0) + (member.total_hours_received ?? 0) })}>
                   <Clock className="w-4 h-4" aria-hidden="true" />
                   <span>{(member.total_hours_given ?? 0) + (member.total_hours_received ?? 0)}h</span>
                 </span>
@@ -682,7 +683,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
             )}
           </div>
           {hasGamification && showcasedBadges.length > 0 && (
-            <div className="flex items-center justify-center gap-1 mt-1.5" aria-label={t('members.showcased_badges', { defaultValue: 'Showcased badges' })}>
+            <div className="flex items-center justify-center gap-1 mt-1.5" aria-label={t('members.showcased_badges')}>
               {showcasedBadges.map((badge) => (
                 <Tooltip key={badge.badge_key} content={badge.name}>
                   <span className="text-lg leading-none cursor-default" aria-label={badge.name}>{badge.icon || '🏆'}</span>
@@ -696,12 +697,12 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
 
           <div className="flex items-center justify-center gap-4 mt-4 text-xs text-theme-subtle">
             {member.rating && (
-              <span className="flex items-center gap-1" aria-label={`Rating: ${member.rating.toFixed(1)} out of 5`}>
+              <span className="flex items-center gap-1" aria-label={t('members.rating_aria', { rating: member.rating.toFixed(1) })}>
                 <Star className="w-3 h-3 text-amber-400" aria-hidden="true" />
                 <span>{member.rating.toFixed(1)}</span>
               </span>
             )}
-            <span className="flex items-center gap-1 shrink-0 whitespace-nowrap" aria-label={`${(member.total_hours_given ?? 0) + (member.total_hours_received ?? 0)} hours exchanged`}>
+            <span className="flex items-center gap-1 shrink-0 whitespace-nowrap" aria-label={t('members.hours_exchanged_aria', { count: (member.total_hours_given ?? 0) + (member.total_hours_received ?? 0) })}>
               <Clock className="w-3 h-3" aria-hidden="true" />
               <span>{(member.total_hours_given ?? 0) + (member.total_hours_received ?? 0)}h</span>
             </span>

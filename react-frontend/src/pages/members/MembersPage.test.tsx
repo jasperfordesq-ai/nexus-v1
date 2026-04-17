@@ -8,11 +8,17 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@/test/test-utils';
+import { render, screen, fireEvent, waitFor } from '@/test/test-utils';
+
+const { mockApiGet, mockToastError, mockUseAuth } = vi.hoisted(() => ({
+  mockApiGet: vi.fn().mockResolvedValue({ success: true, data: [], meta: {} }),
+  mockToastError: vi.fn(),
+  mockUseAuth: vi.fn(() => ({ user: null, isAuthenticated: false, login: vi.fn(), logout: vi.fn(), register: vi.fn(), updateUser: vi.fn(), refreshUser: vi.fn(), status: 'idle', error: null })),
+}));
 
 vi.mock('@/lib/api', () => ({
   api: {
-    get: vi.fn().mockResolvedValue({ success: true, data: [], meta: {} }),
+    get: mockApiGet,
     post: vi.fn().mockResolvedValue({ success: true }),
   },
   tokenManager: { getTenantId: vi.fn() },
@@ -21,7 +27,7 @@ vi.mock('@/lib/api', () => ({
 vi.mock('@/contexts', () => ({
   useToast: vi.fn(() => ({
     success: vi.fn(),
-    error: vi.fn(),
+    error: mockToastError,
     info: vi.fn(),
   })),
   useTenant: vi.fn(() => ({
@@ -40,7 +46,7 @@ vi.mock('@/contexts', () => ({
   useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
   useFeature: vi.fn(() => true),
   useModule: vi.fn(() => true),
-  useAuth: () => ({ user: null, isAuthenticated: false, login: vi.fn(), logout: vi.fn(), register: vi.fn(), updateUser: vi.fn(), refreshUser: vi.fn(), status: 'idle', error: null }),
+  useAuth: mockUseAuth,
 }));
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
@@ -70,7 +76,11 @@ vi.mock('framer-motion', () => ({
 import { MembersPage } from './MembersPage';
 
 describe('MembersPage', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockApiGet.mockResolvedValue({ success: true, data: [], meta: {} });
+    mockUseAuth.mockReturnValue({ user: null, isAuthenticated: false, login: vi.fn(), logout: vi.fn(), register: vi.fn(), updateUser: vi.fn(), refreshUser: vi.fn(), status: 'idle', error: null });
+  });
 
   it('renders without crashing', () => {
     render(<MembersPage />);
@@ -86,5 +96,37 @@ describe('MembersPage', () => {
     render(<MembersPage />);
     expect(screen.getByLabelText('Grid view')).toBeInTheDocument();
     expect(screen.getByLabelText('List view')).toBeInTheDocument();
+  });
+
+  it('allows Near me when a user has zero coordinates', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: 7, latitude: 0, longitude: 0 },
+      isAuthenticated: true,
+      login: vi.fn(),
+      logout: vi.fn(),
+      register: vi.fn(),
+      updateUser: vi.fn(),
+      refreshUser: vi.fn(),
+      status: 'idle',
+      error: null,
+    });
+
+    render(<MembersPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Near me' }));
+
+    await waitFor(() =>
+      expect(mockApiGet).toHaveBeenLastCalledWith(expect.stringContaining('/v2/members/nearby?'))
+    );
+    expect(mockApiGet).toHaveBeenLastCalledWith(expect.stringContaining('lat=0'));
+    expect(mockApiGet).toHaveBeenLastCalledWith(expect.stringContaining('lon=0'));
+    expect(mockToastError).not.toHaveBeenCalled();
+  });
+
+  it('uses translation keys without inline fallback text on the page shell', () => {
+    render(<MembersPage />);
+
+    expect(screen.getByRole('button', { name: 'Near me' })).toBeInTheDocument();
+    expect(screen.queryByText('members.near_me')).not.toBeInTheDocument();
   });
 });

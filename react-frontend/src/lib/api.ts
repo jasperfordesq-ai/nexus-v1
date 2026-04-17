@@ -52,6 +52,11 @@ const DEFAULT_TENANT_ID = import.meta.env.VITE_DEFAULT_TENANT_ID || null;
 export const SESSION_EXPIRED_EVENT = 'nexus:session_expired';
 export const API_ERROR_EVENT = 'nexus:api_error';
 
+// Debounce SESSION_EXPIRED dispatches to prevent 401 cascade loops.
+// If multiple in-flight requests all get 401 simultaneously, only one
+// SESSION_EXPIRED event fires per 5-second window.
+let lastSessionExpiredTime = 0;
+
 // Event payload types
 export interface ApiErrorEventDetail {
   message: string;
@@ -167,6 +172,9 @@ export const tokenManager = {
   clearTokens(): void {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
+    // NOTE: trusted device token is intentionally preserved across normal logouts
+    // so users don't need to re-verify 2FA on every login from the same device.
+    // If the user explicitly requests "forget this device", call clearTrustedDeviceToken() separately.
   },
 
   // Trusted device token for 2FA "Remember this device" feature
@@ -257,10 +265,14 @@ class ApiClient {
   }
 
   /**
-   * Dispatch session expired event
+   * Dispatch session expired event (debounced — fires at most once per 5 seconds)
    */
   private dispatchSessionExpired(): void {
-    window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT));
+    const now = Date.now();
+    if (now - lastSessionExpiredTime > 5000) {
+      lastSessionExpiredTime = now;
+      window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT));
+    }
   }
 
   /**

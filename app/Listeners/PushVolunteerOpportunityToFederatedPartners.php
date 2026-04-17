@@ -71,13 +71,7 @@ class PushVolunteerOpportunityToFederatedPartners implements ShouldQueue
                     continue;
                 }
                 try {
-                    if (method_exists(FederationExternalApiClient::class, 'sendVolunteering')) {
-                        $result = FederationExternalApiClient::sendVolunteering($partnerId, $payload);
-                    } else {
-                        $adapter = FederationExternalApiClient::resolveAdapter($partnerId);
-                        $endpoint = $adapter->mapEndpoint('volunteering');
-                        $result = FederationExternalApiClient::post($partnerId, $endpoint, $payload);
-                    }
+                    $result = FederationExternalApiClient::sendVolunteering($partnerId, $payload);
 
                     if (empty($result['success'])) {
                         Log::warning('PushVolunteerOpportunityToFederatedPartners: partner rejected', [

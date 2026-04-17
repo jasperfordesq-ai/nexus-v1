@@ -10,6 +10,7 @@ use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\Notification;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -45,8 +46,17 @@ class NotificationDispatcher
      */
     public static function dispatch($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer = false): void
     {
-        // 1. ALWAYS create In-App Notification (The "Bell")
-        Notification::createNotification((int) $userId, $content, $link, $activityType);
+        // 1. Create In-App Notification (The "Bell") with 60-second deduplication window
+        $tenantId = TenantContext::getId();
+        $dedupKey = "notif_dedup:{$tenantId}:{$userId}:{$activityType}:" . md5($link ?? '');
+
+        if (Cache::has($dedupKey)) {
+            // Duplicate within 60s window — skip in-app creation but still process email
+            Log::debug('NotificationDispatcher: deduplicated', ['user' => $userId, 'type' => $activityType]);
+        } else {
+            Cache::put($dedupKey, 1, now()->addSeconds(60));
+            Notification::createNotification((int) $userId, $content, $link, $activityType);
+        }
 
         // 2. CHECK Notification Settings Hierarchy
         $frequency = self::getFrequencySetting($userId, $contextType, $contextId);

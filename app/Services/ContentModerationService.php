@@ -31,7 +31,7 @@ class ContentModerationService
     public const STATUS_FLAGGED = 'flagged';
 
     /** Spam patterns for auto-filter */
-    private const SPAM_PATTERNS = [
+    public const SPAM_PATTERNS = [
         '/\b(buy now|click here|limited offer|free money|act now)\b/i',
         '/https?:\/\/[^\s]{80,}/',
         '/(.)\1{15,}/',
@@ -41,6 +41,24 @@ class ContentModerationService
     public function __construct(
         private readonly ContentModerationQueue $queue,
     ) {}
+
+    /**
+     * Detect spam in content using SPAM_PATTERNS.
+     *
+     * Returns true if any pattern matches. Used during post creation to
+     * flag content for review without blocking submission.
+     *
+     * TODO: Wire this into post creation via FeedService::createPost()
+     */
+    public static function detectSpam(string $content): bool
+    {
+        foreach (self::SPAM_PATTERNS as $pattern) {
+            if (preg_match($pattern, $content)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Get all content moderation items for a tenant with pagination.

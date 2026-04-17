@@ -50,6 +50,31 @@ class Authenticate
                     }
                 }
 
+                // Validate the token's tenant_id matches the current tenant.
+                // This prevents tokens issued for tenant A from being used against tenant B,
+                // even when the user record itself is a super-admin allowed to cross tenants.
+                // Tokens created before the tenant_id column existed will have null — those
+                // are allowed through to avoid breaking existing sessions (nullable = graceful).
+                if ($user && $request->bearerToken()) {
+                    $tokenTenantId = $user->currentAccessToken()?->tenant_id ?? null;
+                    $currentTenantId = \App\Core\TenantContext::getId();
+
+                    if ($tokenTenantId !== null && $currentTenantId !== null
+                        && (int) $tokenTenantId !== (int) $currentTenantId) {
+                        \Illuminate\Support\Facades\Log::debug('[Auth] Sanctum token tenant mismatch', [
+                            'user_id'        => $user->id,
+                            'token_tenant'   => $tokenTenantId,
+                            'request_tenant' => $currentTenantId,
+                        ]);
+                        return response()->json([
+                            'errors' => [
+                                ['code' => 'token_tenant_mismatch', 'message' => 'Token was not issued for this community'],
+                            ],
+                            'success' => false,
+                        ], 403, ['API-Version' => '2.0']);
+                    }
+                }
+
                 // Check user is active (not suspended/banned)
                 if ($user && $user->status !== 'active') {
                     return response()->json([
@@ -96,7 +121,11 @@ class Authenticate
             return substr($header, 7);
         }
 
-        // Also check cookie-based token (used by React frontend)
+        // SECURITY NOTE: auth_token cookie must be set with HttpOnly=true, Secure=true, SameSite=Lax.
+        // Verify the Set-Cookie header is correct when this token is issued.
+        // Prefer Authorization: Bearer header over cookies for API authentication.
+        // Cookie format: cookie('auth_token', $token, $minutes, '/', null, true, true, false, 'Lax')
+        //                Parameters: name, value, minutes, path, domain, secure, httpOnly, raw, sameSite
         return $request->cookie('auth_token');
     }
 

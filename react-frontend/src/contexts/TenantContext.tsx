@@ -277,7 +277,12 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
   // the wrong branding on the login page and potentially authenticating against the
   // wrong community. When tokens are cleared, fall through to backend Host-based
   // resolution or the login page's tenant chooser dropdown.
-  const detected = useMemo(() => detectTenantFromUrl(), []);
+  //
+  // NOTE: detectTenantFromUrl() is called on every render (no useMemo) so that
+  // navigation to a different tenant path is immediately reflected. The function
+  // reads window.location which changes on each route transition. This is
+  // intentionally not memoized — detectTenantFromUrl() is a fast synchronous read.
+  const detected = detectTenantFromUrl();
   const storedSlug = useMemo(() => {
     const hasTokens = tokenManager.hasAccessToken() || tokenManager.hasRefreshToken();
     return hasTokens ? tokenManager.getTenantSlug() : null;
@@ -559,6 +564,9 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
     }
   }, [state.tenant]);
 
+  // NOTE: This useMemo has many dependencies. If adding new context values,
+  // ensure they are added to the dependency array below. Consider splitting
+  // this into smaller memoized objects if the dependency list grows further.
   const value = useMemo<TenantContextValue>(
     () => ({
       ...state,

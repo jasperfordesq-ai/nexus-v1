@@ -224,10 +224,16 @@ class AuthController extends BaseApiController
                 $eloquentUser = \App\Models\User::find((int)$user['id']);
                 if ($eloquentUser) {
                     $tokenAbilities = ['*'];
-                    $sanctumToken = $eloquentUser->createToken(
+                    $tokenResult = $eloquentUser->createToken(
                         $isMobile ? 'mobile-api' : 'web-api',
                         $tokenAbilities
-                    )->plainTextToken;
+                    );
+                    $sanctumToken = $tokenResult->plainTextToken;
+
+                    // Stamp the tenant_id on the token record so the middleware can
+                    // validate cross-tenant token usage (tenant_id column is nullable
+                    // for backwards compatibility with tokens created before migration).
+                    $tokenResult->accessToken->forceFill(['tenant_id' => TenantContext::getId()])->save();
                 }
             } catch (\Throwable $e) {
                 // Sanctum token creation may fail if personal_access_tokens table

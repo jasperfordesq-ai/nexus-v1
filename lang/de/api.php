@@ -1021,6 +1021,7 @@ return [
     'transfer_failed' => 'Transfer failed',
     'purchase_failed' => 'Purchase failed',
     'search_query_min_length' => 'Search query must be at least 2 characters',
+    'search_query_too_long'                => 'Search query is too long (max 500 characters).',
     'invalid_search_type' => 'Invalid type. Must be one of: :types',
     'federation_not_available' => 'Federation is not enabled for your community.',
     'federation_opt_in_failed' => 'Failed to enable federation. Please try again.',

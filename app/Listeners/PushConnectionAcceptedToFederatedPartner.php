@@ -89,13 +89,7 @@ class PushConnectionAcceptedToFederatedPartner implements ShouldQueue
                 ];
 
                 try {
-                    if (method_exists(FederationExternalApiClient::class, 'sendConnection')) {
-                        $result = FederationExternalApiClient::sendConnection($partnerId, $payload);
-                    } else {
-                        $adapter = FederationExternalApiClient::resolveAdapter($partnerId);
-                        $endpoint = $adapter->mapEndpoint('connections');
-                        $result = FederationExternalApiClient::post($partnerId, $endpoint, $payload);
-                    }
+                    $result = FederationExternalApiClient::sendConnection($partnerId, $payload);
 
                     if (empty($result['success'])) {
                         Log::warning('PushConnectionAcceptedToFederatedPartner: partner rejected', [

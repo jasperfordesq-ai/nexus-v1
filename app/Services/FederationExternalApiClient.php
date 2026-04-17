@@ -851,7 +851,7 @@ class FederationExternalApiClient
 
         $query = DB::table('federation_external_partners')
             ->where('id', $partnerId)
-            ->whereIn('status', ['active', 'pending', 'failed']);
+            ->where('status', 'active');
 
         if ($tenantId) {
             $query->where('tenant_id', $tenantId);

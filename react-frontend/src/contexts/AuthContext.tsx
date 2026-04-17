@@ -116,6 +116,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Track whether user was ever authenticated (prevents false "session expired" on first visit)
   const wasAuthenticated = useRef(false);
 
+  // Prevent concurrent logout calls (e.g., triggered by 401 loop while logout is in flight)
+  const isLoggingOutRef = useRef(false);
+
   // ─────────────────────────────────────────────────────────────────────────
   // User Refresh
   // ─────────────────────────────────────────────────────────────────────────
@@ -500,42 +503,52 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // ─────────────────────────────────────────────────────────────────────────
 
   const logout = useCallback(async () => {
+    // Guard against re-entrant logout calls (e.g., a 401 firing while logout is in flight)
+    if (isLoggingOutRef.current) return;
+    isLoggingOutRef.current = true;
+
     const userId = state.user?.id;
     const refreshToken = tokenManager.getRefreshToken();
 
-    // Call logout endpoint to invalidate tokens server-side
-    // We verify the response but still proceed with local logout regardless
     try {
-      const response = await api.post('/auth/logout', { refresh_token: refreshToken });
+      // Call logout endpoint to invalidate tokens server-side
+      // We verify the response but still proceed with local logout regardless
+      try {
+        const response = await api.post('/auth/logout', { refresh_token: refreshToken });
 
-      // Log if server-side logout failed (for audit purposes)
-      if (!response.success) {
-        logWarn('Server-side logout failed', {
-          code: response.code,
-          error: response.error
-        });
+        // Log if server-side logout failed (for audit purposes)
+        if (!response.success) {
+          logWarn('Server-side logout failed', {
+            code: response.code,
+            error: response.error
+          });
+        }
+      } catch {
+        // Log network errors but proceed with local logout
+        logWarn('Logout request failed - proceeding with local logout');
       }
-    } catch {
-      // Log network errors but proceed with local logout
-      logWarn('Logout request failed - proceeding with local logout');
+
+      // Clear auth tokens but preserve tenant context (slug + ID).
+      // Tenant is not a security credential — it's a UX preference that should
+      // survive logout so the user stays on the same community's login page.
+      // Logout preserves trusted device token by design.
+      // Call tokenManager.clearTrustedDeviceToken() for an explicit "forget this device" flow.
+      tokenManager.clearTokens();
+
+      // Clear Sentry user context and capture logout event
+      captureAuthEvent('logout', userId);
+      setSentryUser(null);
+
+      setState({
+        user: null,
+        status: 'idle',
+        error: null,
+        twoFactorToken: null,
+        twoFactorMethods: [],
+      });
+    } finally {
+      isLoggingOutRef.current = false;
     }
-
-    // Clear auth tokens but preserve tenant context (slug + ID).
-    // Tenant is not a security credential — it's a UX preference that should
-    // survive logout so the user stays on the same community's login page.
-    tokenManager.clearTokens();
-
-    // Clear Sentry user context and capture logout event
-    captureAuthEvent('logout', userId);
-    setSentryUser(null);
-
-    setState({
-      user: null,
-      status: 'idle',
-      error: null,
-      twoFactorToken: null,
-      twoFactorMethods: [],
-    });
   }, [state.user?.id]);
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -590,6 +603,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // When access token is removed (logout in another tab), clear state here too.
       if (event.key === 'nexus_access_token' && event.newValue === null && state.status === 'authenticated') {
         tokenManager.clearTokens();
+        // Also clear tenant context so the next login gets a fresh tenant bootstrap.
+        // Without this, a stale tenant slug from the previous session could cause
+        // the wrong community's branding to appear on the login page in this tab.
+        localStorage.removeItem('nexus_tenant_id');
+        localStorage.removeItem('nexus_tenant_slug');
         setState({
           user: null,
           status: 'idle',

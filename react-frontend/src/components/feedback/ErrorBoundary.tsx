@@ -63,9 +63,19 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   handleGoHome = () => {
     // Use stored tenant slug from localStorage — resilient even when the URL
-    // has lost the slug prefix (e.g., after a redirect stripped it)
+    // has lost the slug prefix (e.g., after a redirect stripped it).
+    // Validate the slug before using it to prevent open-redirect via a
+    // poisoned localStorage value (must be alphanumeric/hyphens, 2–50 chars,
+    // and not a reserved path segment).
     const storedSlug = localStorage.getItem('nexus_tenant_slug');
-    window.location.href = storedSlug ? `/${storedSlug}/` : '/';
+    const RESERVED = new Set(['admin', 'api', 'login', 'register', 'static', 'assets']);
+    const safeSlug =
+      storedSlug &&
+      /^[a-z0-9-]{2,50}$/.test(storedSlug) &&
+      !RESERVED.has(storedSlug)
+        ? storedSlug
+        : null;
+    window.location.href = safeSlug ? `/${safeSlug}/` : '/';
   };
 
   handleTryAgain = () => {

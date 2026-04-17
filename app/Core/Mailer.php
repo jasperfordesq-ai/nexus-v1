@@ -38,12 +38,21 @@ class Mailer
     // Tenant context
     private ?int $tenantId = null;
 
-    // Redis cache keys
+    // Redis cache key suffixes (tenant-scoped via cacheKey())
     private const CACHE_KEY_ACCESS_TOKEN = 'gmail_oauth_access_token';
     private const CACHE_KEY_TOKEN_EXPIRY = 'gmail_oauth_token_expiry';
     private const CACHE_KEY_REFRESH_ATTEMPTS = 'gmail_oauth_refresh_attempts';
     private const CACHE_KEY_CIRCUIT_BREAKER = 'gmail_oauth_circuit_breaker';
     private const CACHE_KEY_FAILURE_COUNT = 'gmail_oauth_failure_count';
+
+    /**
+     * Generate a tenant-scoped cache key to prevent cross-tenant token sharing.
+     */
+    private function cacheKey(string $suffix): string
+    {
+        $prefix = $this->tenantId ? "mail:{$this->tenantId}:" : 'mail:platform:';
+        return $prefix . $suffix;
+    }
 
     // Rate limiting & circuit breaker constants
     private const MAX_REFRESH_ATTEMPTS_PER_HOUR = 10;
@@ -395,30 +404,30 @@ class Mailer
         $hasCache = true;
         try {
             // Test if cache is available
-            Cache::has(self::CACHE_KEY_ACCESS_TOKEN);
+            Cache::has($this->cacheKey(self::CACHE_KEY_ACCESS_TOKEN));
         } catch (\Throwable $e) {
             $hasCache = false;
         }
 
         if ($hasCache) {
-            $circuitBreakerExpiry = Cache::get(self::CACHE_KEY_CIRCUIT_BREAKER);
+            $circuitBreakerExpiry = Cache::get($this->cacheKey(self::CACHE_KEY_CIRCUIT_BREAKER));
             if ($circuitBreakerExpiry && time() < $circuitBreakerExpiry) {
                 $remainingSeconds = $circuitBreakerExpiry - time();
                 \Illuminate\Support\Facades\Log::warning("Gmail API circuit breaker is open. Blocked for {$remainingSeconds}s more.");
                 return null;
             }
 
-            $cachedToken = Cache::get(self::CACHE_KEY_ACCESS_TOKEN);
-            $cachedExpiry = Cache::get(self::CACHE_KEY_TOKEN_EXPIRY);
+            $cachedToken = Cache::get($this->cacheKey(self::CACHE_KEY_ACCESS_TOKEN));
+            $cachedExpiry = Cache::get($this->cacheKey(self::CACHE_KEY_TOKEN_EXPIRY));
 
             if ($cachedToken && $cachedExpiry && $cachedExpiry > time()) {
                 return $cachedToken;
             }
 
-            $refreshAttempts = Cache::increment(self::CACHE_KEY_REFRESH_ATTEMPTS);
+            $refreshAttempts = Cache::increment($this->cacheKey(self::CACHE_KEY_REFRESH_ATTEMPTS));
             if ($refreshAttempts === 1) {
                 // First increment — set TTL for the key
-                Cache::put(self::CACHE_KEY_REFRESH_ATTEMPTS, 1, 3600);
+                Cache::put($this->cacheKey(self::CACHE_KEY_REFRESH_ATTEMPTS), 1, 3600);
             }
 
             if ($refreshAttempts > self::MAX_REFRESH_ATTEMPTS_PER_HOUR) {
@@ -435,19 +444,19 @@ class Mailer
         $token = $this->refreshGmailToken();
 
         if ($token) {
-            if ($hasCache) { Cache::forget(self::CACHE_KEY_FAILURE_COUNT); }
+            if ($hasCache) { Cache::forget($this->cacheKey(self::CACHE_KEY_FAILURE_COUNT)); }
             return $token;
         }
 
         if ($hasCache) {
-            $failureCount = Cache::increment(self::CACHE_KEY_FAILURE_COUNT);
+            $failureCount = Cache::increment($this->cacheKey(self::CACHE_KEY_FAILURE_COUNT));
             if ($failureCount === 1) {
-                Cache::put(self::CACHE_KEY_FAILURE_COUNT, 1, 3600);
+                Cache::put($this->cacheKey(self::CACHE_KEY_FAILURE_COUNT), 1, 3600);
             }
 
             if ($failureCount >= self::CIRCUIT_BREAKER_THRESHOLD) {
                 $breakerExpiry = time() + self::CIRCUIT_BREAKER_TIMEOUT;
-                Cache::put(self::CACHE_KEY_CIRCUIT_BREAKER, $breakerExpiry, self::CIRCUIT_BREAKER_TIMEOUT);
+                Cache::put($this->cacheKey(self::CACHE_KEY_CIRCUIT_BREAKER), $breakerExpiry, self::CIRCUIT_BREAKER_TIMEOUT);
                 \Illuminate\Support\Facades\Log::warning("Gmail API circuit breaker opened after {$failureCount} consecutive failures.");
             }
         }
@@ -517,8 +526,8 @@ class Mailer
         $expiryTimestamp = time() + $expiresIn;
 
         try {
-            Cache::put(self::CACHE_KEY_ACCESS_TOKEN, $accessToken, self::TOKEN_TTL);
-            Cache::put(self::CACHE_KEY_TOKEN_EXPIRY, $expiryTimestamp, self::TOKEN_TTL);
+            Cache::put($this->cacheKey(self::CACHE_KEY_ACCESS_TOKEN), $accessToken, self::TOKEN_TTL);
+            Cache::put($this->cacheKey(self::CACHE_KEY_TOKEN_EXPIRY), $expiryTimestamp, self::TOKEN_TTL);
         } catch (\Throwable $e) {
             // Cache write failure is non-fatal
         }

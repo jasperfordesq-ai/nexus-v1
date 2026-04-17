@@ -427,7 +427,7 @@ function PartnerCard({ partner, onViewDetails }: PartnerCardProps) {
       <div className="flex items-start gap-4 mb-4">
         {/* Logo / Avatar */}
         <Avatar
-          name={partner.name[0]}
+          name={partner.name}
           src={partner.logo || undefined}
           size="lg"
           className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex-shrink-0"

@@ -234,7 +234,9 @@ use App\Services\WebAuthnChallengeStore;
 use App\Services\WebPushService;
 use App\Services\WebhookDispatchService;
 use App\Services\AI\AIServiceFactory;
+use App\Observers\CommentObserver;
 use App\Observers\EventObserver;
+use App\Observers\FeedPostObserver;
 use App\Observers\GroupObserver;
 use App\Observers\ListingObserver;
 use App\Observers\UserObserver;
@@ -1031,6 +1033,8 @@ class AppServiceProvider extends ServiceProvider
         User::observe(UserObserver::class);
         Event::observe(EventObserver::class);
         Group::observe(GroupObserver::class);
+        FeedPost::observe(FeedPostObserver::class);
+        \App\Models\Comment::observe(CommentObserver::class);
 
         // Dynamically merge CorsHelper's full origin list (including tenant custom
         // domains from DB) into Laravel's HandleCors config. This ensures custom
