@@ -106,8 +106,8 @@ const ALGORITHM_AREAS: Omit<AlgorithmArea, 'enabled' | 'weights'>[] = [
       { key: 'reputation_weight',    label: 'algo.reputation_weight',     description: 'algo.members_reputation_desc',     min: 0, max: 1, step: 0.05 },
       { key: 'contribution_weight',  label: 'algo.contribution_weight',   description: 'algo.contribution_weight_desc',         min: 0, max: 1, step: 0.05 },
       { key: 'activity_weight',      label: 'algo.activity_weight',       description: 'algo.activity_weight_desc',             min: 0, max: 1, step: 0.05 },
+      { key: 'connectivity_weight',  label: 'advanced.connection_weight', description: 'advanced.connection_weight_desc',         min: 0, max: 1, step: 0.05 },
       { key: 'proximity_weight',     label: 'algo.proximity_weight',      description: 'algo.proximity_weight_desc',                 min: 0, max: 1, step: 0.05 },
-      { key: 'skill_match_weight',   label: 'algo.skill_match_weight',    description: 'algo.members_skill_match_desc',        min: 0, max: 1, step: 0.05 },
     ],
   },
   {
@@ -514,11 +514,11 @@ function getDefaultWeight(area: string, key: string): number {
       reputation_weight: 0.05,
     },
     members: {
-      reputation_weight: 0.35,
+      reputation_weight: 0.2,
       contribution_weight: 0.25,
-      activity_weight: 0.2,
+      activity_weight: 0.25,
+      connectivity_weight: 0.2,
       proximity_weight: 0.1,
-      skill_match_weight: 0.1,
     },
     matching: {
       skill_weight: 0.4,

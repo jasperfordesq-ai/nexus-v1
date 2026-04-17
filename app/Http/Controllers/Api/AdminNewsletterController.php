@@ -1131,7 +1131,9 @@ class AdminNewsletterController extends BaseApiController
 
                 case 'activity_score':
                 case 'community_rank':
-                    $col = $field === 'activity_score' ? 'u.activity_score' : 'u.community_rank';
+                    $col = $field === 'activity_score'
+                        ? '(SELECT COALESCE(cr.activity_score, 0) FROM community_ranks cr WHERE cr.user_id = u.id AND cr.tenant_id = ? LIMIT 1)'
+                        : '(SELECT COALESCE(cr.rank_score, 0) FROM community_ranks cr WHERE cr.user_id = u.id AND cr.tenant_id = ? LIMIT 1)';
                     $numVal = (float) $value;
                     if ($operator === 'greater_than') {
                         $conditions[] = "{$col} > ?";
@@ -1140,6 +1142,7 @@ class AdminNewsletterController extends BaseApiController
                     } else {
                         $conditions[] = "{$col} = ?";
                     }
+                    $params[] = $tenantId;
                     $params[] = $numVal;
                     break;
 

@@ -8,22 +8,33 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
  * MemberRankingService — CommunityRank algorithm for ranking members.
  *
- * Computes weighted scores (activity, contribution, reputation) to rank members
- * within a tenant. Uses Eloquent/DB query builder instead of legacy Database class.
+ * Computes weighted scores (activity, contribution, reputation, connectivity,
+ * proximity) to rank members within a tenant.
+ *
+ * Reputation uses Bayesian smoothing plus a Wilson lower bound so members with
+ * only one or two strong reviews do not outrank consistently trusted members.
  */
 class MemberRankingService
 {
     private const ACTIVITY_LOOKBACK_DAYS = 30;
-    private const WEIGHT_ACTIVITY = 0.30;
+    private const WEIGHT_ACTIVITY = 0.25;
     private const WEIGHT_CONTRIBUTION = 0.25;
-    private const WEIGHT_REPUTATION = 0.25;
-    private const WEIGHT_CONNECTIONS = 0.20;
+    private const WEIGHT_REPUTATION = 0.20;
+    private const WEIGHT_CONNECTIVITY = 0.20;
+    private const WEIGHT_PROXIMITY = 0.10;
+    private const BAYESIAN_PRIOR_MEAN = 3.8;
+    private const BAYESIAN_PRIOR_STRENGTH = 5.0;
+    private const WILSON_Z = 1.96;
+    private const POSITIVE_REVIEW_THRESHOLD = 4.0;
+    private const PROXIMITY_NEUTRAL_SCORE = 0.5;
+    private const PROXIMITY_MAX_DISTANCE_KM = 100.0;
 
     public function __construct(
         private readonly User $user,
@@ -39,7 +50,9 @@ class MemberRankingService
         int $limit = 50,
         int $offset = 0,
         string $search = '',
-        ?int $viewerId = null
+        ?int $viewerId = null,
+        ?float $viewerLatitude = null,
+        ?float $viewerLongitude = null
     ): array
     {
         $config = $this->getConfig();
@@ -53,7 +66,7 @@ class MemberRankingService
                     ->orWhereNull('privacy_search');
             })
             ->select(['id', 'first_name', 'last_name', 'avatar_url', 'points',
-                       'is_verified', 'created_at', 'organization_name', 'profile_type']);
+                       'is_verified', 'created_at', 'organization_name', 'profile_type', 'latitude', 'longitude']);
 
         if ($viewerId) {
             $usersQuery->where('id', '!=', $viewerId);
@@ -67,7 +80,7 @@ class MemberRankingService
                 $usersQuery->whereRaw('1 = 0');
             } else {
                 $like = '%' . $search . '%';
-                $usersQuery->where(function ($query) use ($search, $like) {
+                $usersQuery->where(function (Builder $query) use ($search, $like) {
                     $query->whereRaw(
                         "MATCH(first_name, last_name, bio, skills) AGAINST(? IN BOOLEAN MODE)",
                         [$search]
@@ -109,13 +122,22 @@ class MemberRankingService
             ->pluck('cnt', 'user_id')
             ->all();
 
-        // Contribution: listings created
+        // Contribution: active listings plus completed exchange hours given
         $listingMap = DB::table('listings')
             ->where('tenant_id', $tenantId)
             ->whereIn('user_id', $userIds)
             ->select('user_id', DB::raw('COUNT(*) as cnt'))
             ->groupBy('user_id')
             ->pluck('cnt', 'user_id')
+            ->all();
+
+        $hoursGivenMap = DB::table('transactions')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'completed')
+            ->whereIn('sender_id', $userIds)
+            ->select('sender_id as user_id', DB::raw('COALESCE(SUM(amount), 0) as total_hours'))
+            ->groupBy('sender_id')
+            ->pluck('total_hours', 'user_id')
             ->all();
 
         $requesterConnectionMap = DB::table('connections')
@@ -136,10 +158,8 @@ class MemberRankingService
             ->pluck('cnt', 'user_id')
             ->all();
 
-        // Reputation: average review rating across BOTH local reviews (tenant_id scope)
-        // AND federated reviews received from other tenants (reputation portability).
-        // A single AVG(rating) merges both sets so members carry reputation globally.
-        $ratingMap = DB::table('reviews')
+        // Reputation: aggregate review statistics across local and portable federated reviews.
+        $reviewStats = DB::table('reviews')
             ->whereIn('receiver_id', $userIds)
             ->where(function ($q) use ($tenantId) {
                 $q->where('tenant_id', $tenantId)
@@ -149,14 +169,23 @@ class MemberRankingService
                          ->where('show_cross_tenant', 1);
                   });
             })
-            ->select('receiver_id as user_id', DB::raw('AVG(rating) as avg_rating'))
+            ->select(
+                'receiver_id as user_id',
+                DB::raw('AVG(rating) as avg_rating'),
+                DB::raw('COUNT(*) as review_count'),
+                DB::raw('SUM(CASE WHEN rating >= ' . self::POSITIVE_REVIEW_THRESHOLD . ' THEN 1 ELSE 0 END) as positive_count')
+            )
             ->groupBy('receiver_id')
-            ->pluck('avg_rating', 'user_id')
-            ->all();
+            ->get()
+            ->keyBy('user_id');
 
         // Normalize and score
         $maxActivity = max(1, max(array_merge([0], array_values($txnMap), array_values($postMap))));
-        $maxContrib = max(1, max(array_merge([0], array_values($listingMap))));
+        $contributionRaw = [];
+        foreach ($userIds as $userId) {
+            $contributionRaw[$userId] = ((int) ($listingMap[$userId] ?? 0) * 2) + (float) ($hoursGivenMap[$userId] ?? 0);
+        }
+        $maxContrib = max(1, max(array_merge([0], array_values($contributionRaw))));
         $connectionMap = [];
         foreach ($userIds as $userId) {
             $connectionMap[$userId] = (int) ($requesterConnectionMap[$userId] ?? 0) + (int) ($receiverConnectionMap[$userId] ?? 0);
@@ -164,28 +193,59 @@ class MemberRankingService
         $maxConnections = max(1, max(array_merge([0], array_values($connectionMap))));
 
         $weights = [
-            'activity' => max(0.0, (float) ($config['weight_activity'] ?? self::WEIGHT_ACTIVITY)),
-            'contribution' => max(0.0, (float) ($config['weight_contribution'] ?? self::WEIGHT_CONTRIBUTION)),
-            'reputation' => max(0.0, (float) ($config['weight_reputation'] ?? self::WEIGHT_REPUTATION)),
-            'connections' => max(0.0, (float) ($config['weight_connections'] ?? self::WEIGHT_CONNECTIONS)),
+            'activity' => max(0.0, (float) ($config['activity_weight'] ?? self::WEIGHT_ACTIVITY)),
+            'contribution' => max(0.0, (float) ($config['contribution_weight'] ?? self::WEIGHT_CONTRIBUTION)),
+            'reputation' => max(0.0, (float) ($config['reputation_weight'] ?? self::WEIGHT_REPUTATION)),
+            'connectivity' => max(0.0, (float) ($config['connectivity_weight'] ?? self::WEIGHT_CONNECTIVITY)),
+            'proximity' => max(0.0, (float) ($config['proximity_weight'] ?? self::WEIGHT_PROXIMITY)),
         ];
-        $weightTotal = array_sum($weights) ?: 1.0;
 
-        $ranked = $users->map(function ($user) use ($txnMap, $postMap, $listingMap, $ratingMap, $connectionMap, $maxActivity, $maxContrib, $maxConnections, $weights, $weightTotal) {
+        $globalWeightTotal = max(
+            0.0001,
+            $weights['activity'] + $weights['contribution'] + $weights['reputation'] + $weights['connectivity']
+        );
+
+        $ranked = $users->map(function ($user) use (
+            $txnMap,
+            $postMap,
+            $contributionRaw,
+            $reviewStats,
+            $connectionMap,
+            $maxActivity,
+            $maxContrib,
+            $maxConnections,
+            $weights,
+            $globalWeightTotal,
+            $viewerLatitude,
+            $viewerLongitude
+        ) {
             $activity = (($txnMap[$user->id] ?? 0) + ($postMap[$user->id] ?? 0)) / $maxActivity;
-            $contribution = ($listingMap[$user->id] ?? 0) / $maxContrib;
-            $reputation = min(1.0, ($ratingMap[$user->id] ?? 3.0) / 5.0);
-            $connections = ($connectionMap[$user->id] ?? 0) / $maxConnections;
+            $contribution = ($contributionRaw[$user->id] ?? 0) / $maxContrib;
+            $reputation = $this->calculateReputationScore($reviewStats->get($user->id));
+            $connectivity = ($connectionMap[$user->id] ?? 0) / $maxConnections;
+            $proximity = $this->calculateProximityScore(
+                $viewerLatitude,
+                $viewerLongitude,
+                $user->latitude,
+                $user->longitude
+            );
 
-            $score = (
+            $globalScore = (
                 ($weights['activity'] * $activity)
                 + ($weights['contribution'] * $contribution)
                 + ($weights['reputation'] * $reputation)
-                + ($weights['connections'] * $connections)
-            ) / $weightTotal;
+                + ($weights['connectivity'] * $connectivity)
+            ) / $globalWeightTotal;
+
+            $finalWeightTotal = $globalWeightTotal + ($weights['proximity'] > 0 ? $weights['proximity'] : 0.0);
+            $score = (
+                ($globalScore * $globalWeightTotal)
+                + ($weights['proximity'] * $proximity)
+            ) / max($finalWeightTotal, 0.0001);
 
             if ($user->is_verified) {
                 $score *= 1.1;
+                $globalScore *= 1.1;
             }
 
             return [
@@ -195,15 +255,21 @@ class MemberRankingService
                     : trim($user->first_name . ' ' . $user->last_name),
                 'avatar_url'   => $user->avatar_url,
                 'score'        => round(min(1.0, $score), 4),
+                'global_score' => round(min(1.0, $globalScore), 4),
                 'activity'     => round($activity, 4),
                 'contribution' => round($contribution, 4),
                 'reputation'   => round($reputation, 4),
-                'connections'  => round($connections, 4),
+                'connectivity' => round($connectivity, 4),
+                'proximity'    => round($proximity, 4),
             ];
         })
         ->sortByDesc('score')
         ->values()
         ->all();
+
+        if ($search === '') {
+            $this->persistCommunityRanks($tenantId, $ranked);
+        }
 
         return [
             'items' => array_slice($ranked, $offset, $limit),
@@ -228,22 +294,43 @@ class MemberRankingService
         $defaults = [
             'enabled' => true,
             'activity_lookback_days' => self::ACTIVITY_LOOKBACK_DAYS,
-            'weight_activity' => self::WEIGHT_ACTIVITY,
-            'weight_contribution' => self::WEIGHT_CONTRIBUTION,
-            'weight_reputation' => self::WEIGHT_REPUTATION,
-            'weight_connections' => self::WEIGHT_CONNECTIONS,
+            'activity_weight' => self::WEIGHT_ACTIVITY,
+            'contribution_weight' => self::WEIGHT_CONTRIBUTION,
+            'reputation_weight' => self::WEIGHT_REPUTATION,
+            'connectivity_weight' => self::WEIGHT_CONNECTIVITY,
+            'proximity_weight' => self::WEIGHT_PROXIMITY,
         ];
 
         try {
             $tenantId = TenantContext::getId();
-            $configJson = DB::table('tenants')
-                ->where('id', $tenantId)
-                ->value('configuration');
+            $row = DB::table('communityrank_settings')
+                ->where('tenant_id', $tenantId)
+                ->first();
 
+            if ($row) {
+                return array_merge($defaults, [
+                    'enabled' => (bool) ($row->is_enabled ?? true),
+                    'activity_weight' => (float) ($row->activity_weight ?? $defaults['activity_weight']),
+                    'contribution_weight' => (float) ($row->contribution_weight ?? $defaults['contribution_weight']),
+                    'reputation_weight' => (float) ($row->reputation_weight ?? $defaults['reputation_weight']),
+                    'connectivity_weight' => (float) ($row->connectivity_weight ?? $defaults['connectivity_weight']),
+                    'proximity_weight' => (float) ($row->proximity_weight ?? $defaults['proximity_weight']),
+                ]);
+            }
+
+            $configJson = DB::table('tenants')->where('id', $tenantId)->value('configuration');
             if ($configJson) {
                 $configArr = json_decode($configJson, true);
-                if (is_array($configArr) && isset($configArr['algorithms']['members'])) {
-                    return array_merge($defaults, $configArr['algorithms']['members']);
+                $memberConfig = $configArr['algorithms']['members'] ?? null;
+                if (is_array($memberConfig)) {
+                    return array_merge($defaults, [
+                        'enabled' => (bool) ($memberConfig['enabled'] ?? true),
+                        'activity_weight' => (float) ($memberConfig['activity_weight'] ?? $memberConfig['weight_activity'] ?? $defaults['activity_weight']),
+                        'contribution_weight' => (float) ($memberConfig['contribution_weight'] ?? $memberConfig['weight_contribution'] ?? $defaults['contribution_weight']),
+                        'reputation_weight' => (float) ($memberConfig['reputation_weight'] ?? $memberConfig['weight_reputation'] ?? $defaults['reputation_weight']),
+                        'connectivity_weight' => (float) ($memberConfig['connectivity_weight'] ?? $memberConfig['weight_connections'] ?? $defaults['connectivity_weight']),
+                        'proximity_weight' => (float) ($memberConfig['proximity_weight'] ?? $defaults['proximity_weight']),
+                    ]);
                 }
             }
         } catch (\Exception $e) {
@@ -260,5 +347,132 @@ class MemberRankingService
     {
         $tenantId = TenantContext::getId();
         Cache::forget("community_rank:{$tenantId}");
+    }
+
+    private function calculateReputationScore(object|null $reviewStats): float
+    {
+        if (!$reviewStats) {
+            return 0.5;
+        }
+
+        $reviewCount = max(0, (int) ($reviewStats->review_count ?? 0));
+        if ($reviewCount === 0) {
+            return 0.5;
+        }
+
+        $averageRating = (float) ($reviewStats->avg_rating ?? self::BAYESIAN_PRIOR_MEAN);
+        $positiveCount = max(0, (int) ($reviewStats->positive_count ?? 0));
+
+        $bayesianAverage = (
+            (self::BAYESIAN_PRIOR_STRENGTH * self::BAYESIAN_PRIOR_MEAN)
+            + ($averageRating * $reviewCount)
+        ) / (self::BAYESIAN_PRIOR_STRENGTH + $reviewCount);
+
+        $bayesianScore = min(1.0, max(0.0, $bayesianAverage / 5.0));
+        $wilsonScore = $this->calculateWilsonLowerBound($positiveCount, $reviewCount);
+
+        return round((($bayesianScore * 0.55) + ($wilsonScore * 0.45)), 6);
+    }
+
+    private function calculateWilsonLowerBound(int $positiveCount, int $totalCount): float
+    {
+        if ($totalCount <= 0) {
+            return 0.0;
+        }
+
+        $phat = $positiveCount / $totalCount;
+        $z2 = self::WILSON_Z ** 2;
+
+        $numerator = $phat + ($z2 / (2 * $totalCount))
+            - self::WILSON_Z * sqrt(($phat * (1 - $phat) + ($z2 / (4 * $totalCount))) / $totalCount);
+        $denominator = 1 + ($z2 / $totalCount);
+
+        return min(1.0, max(0.0, $numerator / $denominator));
+    }
+
+    private function calculateProximityScore(
+        ?float $viewerLatitude,
+        ?float $viewerLongitude,
+        ?float $memberLatitude,
+        ?float $memberLongitude
+    ): float {
+        if (
+            $viewerLatitude === null || $viewerLongitude === null
+            || $memberLatitude === null || $memberLongitude === null
+        ) {
+            return self::PROXIMITY_NEUTRAL_SCORE;
+        }
+
+        $distanceKm = $this->calculateDistanceKm($viewerLatitude, $viewerLongitude, $memberLatitude, $memberLongitude);
+        $distanceRatio = min(1.0, max(0.0, $distanceKm / self::PROXIMITY_MAX_DISTANCE_KM));
+
+        return round(1.0 - $distanceRatio, 6);
+    }
+
+    private function calculateDistanceKm(
+        float $lat1,
+        float $lon1,
+        float $lat2,
+        float $lon2
+    ): float {
+        $earthRadiusKm = 6371.0;
+
+        $latDelta = deg2rad($lat2 - $lat1);
+        $lonDelta = deg2rad($lon2 - $lon1);
+        $a = sin($latDelta / 2) ** 2
+            + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($lonDelta / 2) ** 2;
+
+        return $earthRadiusKm * (2 * atan2(sqrt($a), sqrt(1 - $a)));
+    }
+
+    /**
+     * Persist the non-search ranking snapshot so admin/reporting surfaces can
+     * consume CommunityRank consistently.
+     *
+     * @param array<int, array<string, float|int|string|null>> $ranked
+     */
+    private function persistCommunityRanks(int $tenantId, array $ranked): void
+    {
+        if (empty($ranked)) {
+            return;
+        }
+
+        $timestamp = now()->toDateTimeString();
+        $rows = [];
+        foreach ($ranked as $index => $member) {
+            $rows[] = [
+                'tenant_id' => $tenantId,
+                'user_id' => (int) $member['user_id'],
+                'rank_score' => (float) ($member['global_score'] ?? $member['score'] ?? 0.0),
+                'activity_score' => (float) ($member['activity'] ?? 0.0),
+                'contribution_score' => (float) ($member['contribution'] ?? 0.0),
+                'reputation_score' => (float) ($member['reputation'] ?? 0.0),
+                'connectivity_score' => (float) ($member['connectivity'] ?? 0.0),
+                'proximity_score' => (float) ($member['proximity'] ?? 0.0),
+                'rank_position' => $index + 1,
+                'tier' => $this->resolveTier((float) ($member['global_score'] ?? $member['score'] ?? 0.0)),
+                'calculated_at' => $timestamp,
+            ];
+        }
+
+        try {
+            DB::table('community_ranks')->upsert(
+                $rows,
+                ['tenant_id', 'user_id'],
+                ['rank_score', 'activity_score', 'contribution_score', 'reputation_score', 'connectivity_score', 'proximity_score', 'rank_position', 'tier', 'calculated_at']
+            );
+        } catch (\Throwable $e) {
+            // Older environments may not have the rank snapshot tables yet.
+        }
+    }
+
+    private function resolveTier(float $score): string
+    {
+        return match (true) {
+            $score >= 0.85 => 'Platinum',
+            $score >= 0.7 => 'Gold',
+            $score >= 0.5 => 'Silver',
+            default => 'Bronze',
+        };
     }
 }

@@ -43,6 +43,7 @@ export interface User {
   groups_count?: number;
   events_attended?: number;
   rating?: number;
+  community_rank_score?: number;
   xp?: number;
   level?: number;
   showcased_badges?: ShowcasedBadge[];
@@ -61,6 +62,8 @@ export interface User {
   last_login_at?: string;
   distance?: number;
   is_verified?: boolean;
+  /** CommunityRank score (0–1), present when fetched via communityrank sort. */
+  community_rank_score?: number;
   /** If set, this user originates from a federated partner tenant. */
   federated_partner_id?: number | string | null;
   /** Aggregated cross-federation reputation score (0–5). */

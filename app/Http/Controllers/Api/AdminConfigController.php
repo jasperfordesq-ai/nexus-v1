@@ -1240,7 +1240,7 @@ class AdminConfigController extends BaseApiController
             'name' => $membersEnabled ? 'CommunityRank' : 'Alphabetical',
             'key' => $membersEnabled ? 'communityrank' : 'alphabetical',
             'description' => $membersEnabled
-                ? 'Ranked by activity, contributions, reputation, and connections'
+                ? 'Ranked by Bayesian reputation confidence, Wilson review certainty, activity, contributions, connectivity, and proximity'
                 : 'Sorted alphabetically by name',
         ];
 
@@ -1315,20 +1315,36 @@ class AdminConfigController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.no_recognized_algorithm_settings'), null, 422);
         }
 
-        $tenantRow = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
-        $config = [];
-        if ($tenantRow && !empty($tenantRow->configuration)) {
-            $config = json_decode($tenantRow->configuration, true) ?: [];
+        if ($area === 'members') {
+            DB::table('communityrank_settings')->updateOrInsert(
+                ['tenant_id' => $tenantId],
+                [
+                    'is_enabled' => (int) (($updated['enabled'] ?? $currentConfig['enabled'] ?? true) ? 1 : 0),
+                    'activity_weight' => (float) ($updated['activity_weight'] ?? $currentConfig['activity_weight'] ?? 0.25),
+                    'contribution_weight' => (float) ($updated['contribution_weight'] ?? $currentConfig['contribution_weight'] ?? 0.25),
+                    'reputation_weight' => (float) ($updated['reputation_weight'] ?? $currentConfig['reputation_weight'] ?? 0.20),
+                    'connectivity_weight' => (float) ($updated['connectivity_weight'] ?? $currentConfig['connectivity_weight'] ?? 0.20),
+                    'proximity_weight' => (float) ($updated['proximity_weight'] ?? $currentConfig['proximity_weight'] ?? 0.10),
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ]
+            );
+        } else {
+            $tenantRow = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
+            $config = [];
+            if ($tenantRow && !empty($tenantRow->configuration)) {
+                $config = json_decode($tenantRow->configuration, true) ?: [];
+            }
+
+            if (!isset($config['algorithms'])) { $config['algorithms'] = []; }
+            if (!isset($config['algorithms'][$area])) { $config['algorithms'][$area] = []; }
+
+            foreach ($updated as $key => $value) {
+                $config['algorithms'][$area][$key] = $value;
+            }
+
+            DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
         }
-
-        if (!isset($config['algorithms'])) { $config['algorithms'] = []; }
-        if (!isset($config['algorithms'][$area])) { $config['algorithms'][$area] = []; }
-
-        foreach ($updated as $key => $value) {
-            $config['algorithms'][$area][$key] = $value;
-        }
-
-        DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
 
         match ($area) {
             'feed' => $this->feedRankingService->clearCache(),

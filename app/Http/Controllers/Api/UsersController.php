@@ -10,6 +10,7 @@ use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Services\UserService;
@@ -1025,6 +1026,7 @@ class UsersController extends BaseApiController
         $request = request();
         $tenantId = $this->getTenantId();
         $viewerId = $this->getOptionalUserId();
+        $viewer = Auth::user();
 
         $limit = min((int) $request->query('limit', 50), 100);
         $offset = max((int) $request->query('offset', 0), 0);
@@ -1044,7 +1046,9 @@ class UsersController extends BaseApiController
                 $limit,
                 $offset,
                 $search,
-                $viewerId
+                $viewerId,
+                $viewer && $viewer->latitude !== null ? (float) $viewer->latitude : null,
+                $viewer && $viewer->longitude !== null ? (float) $viewer->longitude : null
             );
 
             $totalCount = $ranked['total'];
