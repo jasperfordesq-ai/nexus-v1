@@ -1892,7 +1892,7 @@ class FederationV2Controller extends BaseApiController
 
         try {
             $messageRow = DB::selectOne("
-                SELECT id, status FROM federation_messages
+                SELECT id, status, sender_user_id, sender_tenant_id FROM federation_messages
                 WHERE id = ? AND receiver_tenant_id = ? AND receiver_user_id = ?
                 AND direction = 'inbound'
             ", [$id, $tenantId, $userId]);
@@ -1907,6 +1907,16 @@ class FederationV2Controller extends BaseApiController
                     "UPDATE federation_messages SET status = 'read', read_at = NOW() WHERE id = ? AND receiver_tenant_id = ? AND receiver_user_id = ?",
                     [$id, $tenantId, $userId]
                 );
+
+                // Notify the original sender in real-time that their message was read
+                if (!empty($message['sender_user_id']) && !empty($message['sender_tenant_id'])) {
+                    \App\Services\FederationRealtimeService::broadcastMessageRead(
+                        $userId,
+                        $tenantId,
+                        (int) $message['sender_user_id'],
+                        (int) $message['sender_tenant_id']
+                    );
+                }
             }
 
             return $this->respondWithData(['success' => true]);

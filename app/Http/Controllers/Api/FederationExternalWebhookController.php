@@ -770,25 +770,24 @@ class FederationExternalWebhookController extends BaseApiController
 
     private function handleMembersList(array $data, object $partner): array
     {
-        $users = DB::table('users')
-            ->where('tenant_id', TenantContext::getId())
-            ->where('status', 'active')
+        $users = DB::table('users as u')
+            ->join('federation_user_settings as fus', function ($join) {
+                $join->on('fus.user_id', '=', 'u.id')
+                     ->where('fus.federation_optin', '=', 1);
+            })
+            ->where('u.tenant_id', TenantContext::getId())
+            ->where('u.status', 'active')
             ->limit(100)
-            ->get(['id', 'first_name', 'last_name', 'balance']);
+            ->get(['u.id', 'u.first_name', 'u.last_name', 'fus.profile_visible_federated', 'u.balance']);
 
         $members = [];
         foreach ($users as $user) {
-            // Check federation opt-in
-            $optedIn = DB::table('federation_user_settings')
-                ->where('user_id', $user->id)
-                ->where('federation_optin', 1)
-                ->exists();
-            if (!$optedIn) continue;
-
             $members[] = [
                 'id' => $user->id,
                 'username' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
-                'balance' => ($user->balance ?? 0) * 3600, // Nexus hours → TO seconds
+                // Only include balance when the user has consented to profile visibility in federation.
+                // TODO: Replace with a dedicated `share_balance_federated` column for finer control.
+                'balance' => $user->profile_visible_federated ? ($user->balance ?? 0) * 3600 : null,
                 'tags' => '',
             ];
         }

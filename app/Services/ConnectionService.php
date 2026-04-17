@@ -206,8 +206,8 @@ class ConnectionService
             $tenantId = (int) ($connection->requester?->tenant_id
                 ?? $connection->receiver?->tenant_id
                 ?? 0);
-            if ($tenantId > 0) {
-                ConnectionAccepted::dispatch($connection, $tenantId);
+            if ($tenantId > 0 && $connection->requester && $connection->receiver) {
+                ConnectionAccepted::dispatch($connection, $connection->requester, $connection->receiver, $tenantId);
             }
         } catch (\Throwable $e) {
             Log::error('Failed to dispatch ConnectionAccepted event', [
