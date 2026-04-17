@@ -754,7 +754,7 @@ class UsersController extends BaseApiController
         $offset = max((int) request()->query('offset', 0), 0);
 
         $filters = [
-            'radius_km' => (float) $this->query('radius_km', '25'),
+            'radius_km' => min(500.0, max(0.1, (float) $this->query('radius_km', '25'))),
             'limit'     => $limit,
             'offset'    => $offset,
             'q'         => trim((string) $this->query('q', '')),
@@ -1076,16 +1076,21 @@ class UsersController extends BaseApiController
                                u.location, u.latitude, u.longitude,
                                u.created_at, u.last_login_at, u.is_verified,
                                COALESCE(u.xp, 0) as xp, COALESCE(u.level, 0) as level,
-                               (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id AND tenant_id = u.tenant_id) as rating,
-                               (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as total_hours_given,
-                               (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE receiver_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as total_hours_received,
-                               (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND status = 'active' AND type = 'offer' AND tenant_id = u.tenant_id) as offer_count,
-                               (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND status = 'active' AND type = 'request' AND tenant_id = u.tenant_id) as request_count
+                               r.avg_rating as rating,
+                               COALESCE(tg.total_given, 0) as total_hours_given,
+                               COALESCE(tr.total_received, 0) as total_hours_received,
+                               COALESCE(lo.offer_count, 0) as offer_count,
+                               COALESCE(lreq.request_count, 0) as request_count
                         FROM users u
+                        LEFT JOIN (SELECT receiver_id, AVG(rating) as avg_rating FROM reviews WHERE tenant_id = ? GROUP BY receiver_id) r ON r.receiver_id = u.id
+                        LEFT JOIN (SELECT sender_id, COALESCE(SUM(amount), 0) as total_given FROM transactions WHERE status = 'completed' AND tenant_id = ? GROUP BY sender_id) tg ON tg.sender_id = u.id
+                        LEFT JOIN (SELECT receiver_id, COALESCE(SUM(amount), 0) as total_received FROM transactions WHERE status = 'completed' AND tenant_id = ? GROUP BY receiver_id) tr ON tr.receiver_id = u.id
+                        LEFT JOIN (SELECT user_id, COUNT(*) as offer_count FROM listings WHERE status = 'active' AND type = 'offer' AND tenant_id = ? GROUP BY user_id) lo ON lo.user_id = u.id
+                        LEFT JOIN (SELECT user_id, COUNT(*) as request_count FROM listings WHERE status = 'active' AND type = 'request' AND tenant_id = ? GROUP BY user_id) lreq ON lreq.user_id = u.id
                         WHERE u.tenant_id = ? AND u.id IN ($placeholders)
                         ORDER BY FIELD(u.id, $orderPlaceholders)";
 
-                $detailParams = array_merge([$tenantId], $orderedIds, $orderedIds);
+                $detailParams = array_merge([$tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId], $orderedIds, $orderedIds);
                 $users = DB::select($sql, $detailParams);
                 $users = array_map(fn ($u) => (array) $u, $users);
 
@@ -1162,10 +1167,10 @@ class UsersController extends BaseApiController
         }
 
         $validSorts = [
-            'name' => 'u.name',
-            'joined' => 'u.created_at',
-            'rating' => '(SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id AND tenant_id = u.tenant_id)',
-            'hours_given' => "(SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id)",
+            'name'       => 'u.name',
+            'joined'     => 'u.created_at',
+            'rating'     => 'r.avg_rating',
+            'hours_given' => 'tg.total_given',
         ];
         $orderByField = $validSorts[$sort] ?? 'u.name';
         $orderBy = "$orderByField $order";
@@ -1220,19 +1225,27 @@ class UsersController extends BaseApiController
                        u.location, u.latitude, u.longitude,
                        u.created_at, u.last_login_at, u.is_verified,
                        COALESCE(u.xp, 0) as xp, COALESCE(u.level, 0) as level,
-                       (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id AND tenant_id = u.tenant_id) as rating,
-                       (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as total_hours_given,
-                       (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE receiver_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as total_hours_received,
-                       (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND status = 'active' AND type = 'offer' AND tenant_id = u.tenant_id) as offer_count,
-                       (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND status = 'active' AND type = 'request' AND tenant_id = u.tenant_id) as request_count
+                       r.avg_rating as rating,
+                       COALESCE(tg.total_given, 0) as total_hours_given,
+                       COALESCE(tr.total_received, 0) as total_hours_received,
+                       COALESCE(lo.offer_count, 0) as offer_count,
+                       COALESCE(lreq.request_count, 0) as request_count
                 FROM users u
+                LEFT JOIN (SELECT receiver_id, AVG(rating) as avg_rating FROM reviews WHERE tenant_id = ? GROUP BY receiver_id) r ON r.receiver_id = u.id
+                LEFT JOIN (SELECT sender_id, COALESCE(SUM(amount), 0) as total_given FROM transactions WHERE status = 'completed' AND tenant_id = ? GROUP BY sender_id) tg ON tg.sender_id = u.id
+                LEFT JOIN (SELECT receiver_id, COALESCE(SUM(amount), 0) as total_received FROM transactions WHERE status = 'completed' AND tenant_id = ? GROUP BY receiver_id) tr ON tr.receiver_id = u.id
+                LEFT JOIN (SELECT user_id, COUNT(*) as offer_count FROM listings WHERE status = 'active' AND type = 'offer' AND tenant_id = ? GROUP BY user_id) lo ON lo.user_id = u.id
+                LEFT JOIN (SELECT user_id, COUNT(*) as request_count FROM listings WHERE status = 'active' AND type = 'request' AND tenant_id = ? GROUP BY user_id) lreq ON lreq.user_id = u.id
                 WHERE $whereClause
                 ORDER BY $orderBy
                 LIMIT ? OFFSET ?";
-        $params[] = $limit;
-        $params[] = $offset;
+        $queryParams = array_merge(
+            [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId],
+            $params,
+            [$limit, $offset]
+        );
 
-        $users = DB::select($sql, $params);
+        $users = DB::select($sql, $queryParams);
         $users = array_map(fn ($u) => (array) $u, $users);
 
         foreach ($users as &$user) {

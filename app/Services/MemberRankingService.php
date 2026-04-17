@@ -57,8 +57,29 @@ class MemberRankingService
     ): array
     {
         $config = $this->getConfig();
-        $cutoff = now()->subDays((int) ($config['activity_lookback_days'] ?? self::ACTIVITY_LOOKBACK_DAYS))->toDateTimeString();
-        $contribCutoff = now()->subDays((int) ($config['contribution_lookback_days'] ?? self::CONTRIBUTION_LOOKBACK_DAYS))->toDateTimeString();
+
+        // Bug 4: Clamp lookback days to valid range
+        $activityDays = max(1, min(365, (int) ($config['activity_lookback_days'] ?? self::ACTIVITY_LOOKBACK_DAYS)));
+        $contribDays  = max(1, min(365, (int) ($config['contribution_lookback_days'] ?? self::CONTRIBUTION_LOOKBACK_DAYS)));
+
+        $cutoff       = now()->subDays($activityDays)->toDateTimeString();
+        $contribCutoff = now()->subDays($contribDays)->toDateTimeString();
+
+        // Bug 1: Return from cache for non-search requests
+        $viewerIdKey = $viewerId ?? 0;
+        $latBucket   = (int) round(($viewerLatitude ?? 0) * 10);
+        $lonBucket   = (int) round(($viewerLongitude ?? 0) * 10);
+        $cacheKey    = "community_rank:{$tenantId}:{$viewerIdKey}:{$latBucket}:{$lonBucket}";
+
+        if ($search === '') {
+            $cached = Cache::get($cacheKey);
+            if ($cached !== null) {
+                return [
+                    'items' => array_slice($cached, $offset, $limit),
+                    'total' => count($cached),
+                ];
+            }
+        }
 
         $usersQuery = $this->user->newQuery()
             ->where('tenant_id', $tenantId)
@@ -204,6 +225,18 @@ class MemberRankingService
             'proximity' => max(0.0, (float) ($config['proximity_weight'] ?? self::WEIGHT_PROXIMITY)),
         ];
 
+        // Bug 5: Guard against all-weights-zero configuration
+        $totalUserWeight = array_sum($weights);
+        if ($totalUserWeight <= 0.0) {
+            $weights = [
+                'activity'     => self::WEIGHT_ACTIVITY,
+                'contribution' => self::WEIGHT_CONTRIBUTION,
+                'reputation'   => self::WEIGHT_REPUTATION,
+                'connectivity' => self::WEIGHT_CONNECTIVITY,
+                'proximity'    => self::WEIGHT_PROXIMITY,
+            ];
+        }
+
         $globalWeightTotal = max(
             0.0001,
             $weights['activity'] + $weights['contribution'] + $weights['reputation'] + $weights['connectivity']
@@ -242,15 +275,17 @@ class MemberRankingService
             ) / $globalWeightTotal;
 
             $finalWeightTotal = $globalWeightTotal + ($weights['proximity'] > 0 ? $weights['proximity'] : 0.0);
-            $score = (
+
+            // Bug 3: Use uncapped sortScore for ordering; capped displayScore for UI
+            $rawScore = (
                 ($globalScore * $globalWeightTotal)
                 + ($weights['proximity'] * $proximity)
             ) / max($finalWeightTotal, 0.0001);
 
-            if ($user->is_verified) {
-                $score *= 1.1;
-                $globalScore *= 1.1;
-            }
+            $verifiedBoost  = $user->is_verified ? 1.1 : 1.0;
+            $sortScore      = $rawScore * $verifiedBoost;
+            $displayScore   = round(min(1.0, $sortScore), 4);
+            $displayGlobal  = round(min(1.0, $globalScore * $verifiedBoost), 4);
 
             return [
                 'user_id'      => $user->id,
@@ -258,21 +293,34 @@ class MemberRankingService
                     ? $user->organization_name
                     : trim($user->first_name . ' ' . $user->last_name),
                 'avatar_url'   => $user->avatar_url,
-                'score'        => round(min(1.0, $score), 4),
-                'global_score' => round(min(1.0, $globalScore), 4),
+                'score'        => $displayScore,
+                'global_score' => $displayGlobal,
                 'activity'     => round($activity, 4),
                 'contribution' => round($contribution, 4),
                 'reputation'   => round($reputation, 4),
                 'connectivity' => round($connectivity, 4),
                 'proximity'    => round($proximity, 4),
+                '_sort_score'  => $sortScore,
             ];
         })
-        ->sortByDesc('score')
+        ->sortByDesc('_sort_score')
         ->values()
+        ->map(function ($item) {
+            unset($item['_sort_score']);
+            return $item;
+        })
         ->all();
 
         if ($search === '') {
-            $this->persistCommunityRanks($tenantId, $ranked);
+            // Bug 1: Cache the full ranked array for 3 minutes
+            Cache::put($cacheKey, $ranked, 180);
+
+            // Bug 2: Throttle persistCommunityRanks to once per 10 minutes
+            $persistKey = "community_rank_last_persist:{$tenantId}";
+            if (!Cache::has($persistKey)) {
+                $this->persistCommunityRanks($tenantId, $ranked);
+                Cache::put($persistKey, true, 600);
+            }
         }
 
         return [
@@ -354,6 +402,7 @@ class MemberRankingService
     {
         $tenantId = TenantContext::getId();
         Cache::forget("community_rank:{$tenantId}");
+        Cache::forget("community_rank_last_persist:{$tenantId}");
     }
 
     private function calculateReputationScore(object|null $reviewStats): float

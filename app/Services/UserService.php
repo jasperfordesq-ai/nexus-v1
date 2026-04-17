@@ -660,6 +660,9 @@ class UserService
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->where('status', 'active')
+            ->where(function ($q) {
+                $q->where('privacy_search', 1)->orWhereNull('privacy_search');
+            })
             ->havingRaw('distance <= ?', [$radiusKm])
             ->orderBy('distance');
 

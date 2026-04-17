@@ -49,6 +49,22 @@ type QuickFilter = 'all' | 'new' | 'active';
 const ITEMS_PER_PAGE = 24;
 const SEARCH_DEBOUNCE_MS = 300;
 
+const VALID_SORTS: SortOption[] = ['communityrank', 'name', 'joined', 'rating', 'hours_given'];
+const VALID_VIEW_MODES: ViewMode[] = ['grid', 'list', 'map'];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { opacity: 1, scale: 1 },
+};
+
 export function MembersPage() {
   const { t } = useTranslation('common');
   usePageTitle(t('members.title'));
@@ -68,10 +84,12 @@ export function MembersPage() {
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
-  const initialSort = searchParams.get('sort') as SortOption | null;
+  const rawSort = searchParams.get('sort');
+  const initialSort: SortOption | null = rawSort && (VALID_SORTS as string[]).includes(rawSort) ? rawSort as SortOption : null;
   const [sortBy, setSortBy] = useState<SortOption | null>(initialSort);
+  const storedViewMode = localStorage.getItem('members_view_mode');
   const [viewMode, setViewMode] = useState<ViewMode>(
-    (localStorage.getItem('members_view_mode') as ViewMode) || 'grid'
+    storedViewMode && (VALID_VIEW_MODES as string[]).includes(storedViewMode) ? storedViewMode as ViewMode : 'grid'
   );
   const [nearMeEnabled, setNearMeEnabled] = useState(false);
   const [radiusKm, setRadiusKm] = useState(25);
@@ -281,21 +299,9 @@ export function MembersPage() {
       toast.error(t('members.near_me_no_location'));
       return;
     }
+    setSortBy(null);  // reset sort when entering nearby mode
     setNearMeEnabled(true);
   }
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: { opacity: 1, scale: 1 },
-  };
 
   return (
     <div className="space-y-6">
@@ -517,7 +523,7 @@ export function MembersPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'space-y-3'} aria-label={t('aria.loading_members', 'Loading members')} aria-busy="true">
+            <div role="status" className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'space-y-3'} aria-label={t('aria.loading_members', 'Loading members')} aria-busy="true">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <MemberCardSkeleton key={i} />
               ))}
