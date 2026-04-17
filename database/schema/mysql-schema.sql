@@ -2211,6 +2211,7 @@ CREATE TABLE `federation_cc_entries` (
   `author` varchar(100) DEFAULT NULL COMMENT 'CC account path of entry creator',
   `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'CC metadata (arbitrary key-value)' CHECK (json_valid(`metadata`)),
   `written_at` timestamp NULL DEFAULT NULL COMMENT 'When entry was permanently written',
+  `validated_until` timestamp NULL DEFAULT NULL COMMENT 'Expiry timestamp for validated (V) entries; null = not validated or no expiry',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -2644,6 +2645,7 @@ CREATE TABLE `federation_partnerships` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `tenant_id` int(10) unsigned NOT NULL,
   `partner_tenant_id` int(10) unsigned NOT NULL,
+  `canonical_pair` varchar(64) DEFAULT NULL,
   `status` enum('pending','active','suspended','terminated','rejected') NOT NULL DEFAULT 'pending',
   `federation_level` tinyint(3) unsigned NOT NULL DEFAULT 1,
   `profiles_enabled` tinyint(1) NOT NULL DEFAULT 0,
@@ -2671,6 +2673,7 @@ CREATE TABLE `federation_partnerships` (
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_partnership` (`tenant_id`,`partner_tenant_id`),
+  UNIQUE KEY `idx_federation_canonical_pair` (`canonical_pair`),
   KEY `idx_status` (`status`),
   KEY `idx_tenant` (`tenant_id`),
   KEY `idx_partner` (`partner_tenant_id`),
@@ -5338,7 +5341,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=106 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=108 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -11325,7 +11328,9 @@ INSERT INTO `laravel_migrations` VALUES
 (102,'2026_04_16_000009_optimize_feed_activity_cursor_index',39),
 (103,'2026_04_16_000010_add_tenant_id_to_personal_access_tokens',40),
 (104,'2026_04_17_083057_add_federation_performance_indexes',40),
-(105,'2026_04_17_083436_add_suspended_by_to_federation_partnerships_table',41);
+(105,'2026_04_17_083436_add_suspended_by_to_federation_partnerships_table',41),
+(106,'2026_04_17_000001_add_validated_until_to_federation_cc_entries',42),
+(107,'2026_04_17_100000_add_canonical_pair_to_federation_partnerships',42);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

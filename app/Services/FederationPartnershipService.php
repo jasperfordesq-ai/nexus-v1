@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Jobs\FederationInitialSyncJob;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -53,6 +54,17 @@ class FederationPartnershipService
             return ['success' => false, 'error' => 'Target tenant is not accepting federation requests'];
         }
 
+        // Application-level guard: check canonical_pair to prevent concurrent A→B / B→A duplicates
+        // before the DB-level unique index on canonical_pair can fire.
+        $guardPair = min($requestingTenantId, $targetTenantId) . '-' . max($requestingTenantId, $targetTenantId);
+        $canonicalConflict = DB::table('federation_partnerships')
+            ->where('canonical_pair', $guardPair)
+            ->whereIn('status', ['active', 'pending'])
+            ->exists();
+        if ($canonicalConflict) {
+            return ['success' => false, 'error' => 'A partnership request already exists between these two communities'];
+        }
+
         $existing = self::getPartnership($requestingTenantId, $targetTenantId);
         if ($existing) {
             if ($existing['status'] === 'active') {
@@ -76,14 +88,17 @@ class FederationPartnershipService
             }
         }
 
+        $canonicalPair = min($requestingTenantId, $targetTenantId) . '-' . max($requestingTenantId, $targetTenantId);
+
         try {
             DB::statement(
                 "INSERT INTO federation_partnerships (
-                    tenant_id, partner_tenant_id, status, federation_level,
+                    tenant_id, partner_tenant_id, canonical_pair, status, federation_level,
                     requested_at, requested_by, notes
-                ) VALUES (?, ?, 'pending', ?, NOW(), ?, ?)
+                ) VALUES (?, ?, ?, 'pending', ?, NOW(), ?, ?)
                 ON DUPLICATE KEY UPDATE
                     status = 'pending',
+                    canonical_pair = VALUES(canonical_pair),
                     federation_level = VALUES(federation_level),
                     requested_at = NOW(),
                     requested_by = VALUES(requested_by),
@@ -91,7 +106,7 @@ class FederationPartnershipService
                     terminated_at = NULL,
                     terminated_by = NULL,
                     termination_reason = NULL",
-                [$requestingTenantId, $targetTenantId, $federationLevel, $requestedBy, $notes]
+                [$requestingTenantId, $targetTenantId, $canonicalPair, $federationLevel, $requestedBy, $notes]
             );
 
             FederationAuditService::log(
@@ -169,6 +184,15 @@ class FederationPartnershipService
                 $partnership['partner_tenant_id'], $partnership['tenant_id'], $approvedBy,
                 ['permissions' => $permissions]
             );
+
+            // Dispatch initial snapshot job so both tenants get a sync audit entry
+            // and pre-existing data counts are recorded. Small delay lets the HTTP
+            // approval response finish before the job dequeues.
+            FederationInitialSyncJob::dispatch(
+                (int) $partnership['tenant_id'],
+                (int) $partnership['partner_tenant_id'],
+                $partnershipId
+            )->delay(now()->addSeconds(10));
 
             return ['success' => true, 'message' => __('svc_notifications_2.federation.partnership_approved')];
         } catch (\Exception $e) {
@@ -289,6 +313,13 @@ class FederationPartnershipService
                 $partnership['tenant_id'], $partnership['partner_tenant_id'], $acceptedBy,
                 ['accepted_level' => $acceptedLevel]
             );
+
+            // Dispatch initial snapshot job — same as approvePartnership().
+            FederationInitialSyncJob::dispatch(
+                (int) $partnership['tenant_id'],
+                (int) $partnership['partner_tenant_id'],
+                $partnershipId
+            )->delay(now()->addSeconds(10));
 
             return ['success' => true, 'message' => __('svc_notifications_2.federation.counter_proposal_accepted')];
         } catch (\Exception $e) {
