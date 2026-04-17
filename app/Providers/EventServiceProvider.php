@@ -21,6 +21,7 @@ use App\Events\OnboardingCompleted;
 use App\Events\ReviewCreated;
 use App\Events\SafeguardingFlaggedEvent;
 use App\Events\TransactionCompleted;
+use App\Events\UserFederatedOptOut;
 use App\Events\UserRegistered;
 use App\Events\VolunteerOpportunityCreated;
 use App\Events\VolunteerOpportunityUpdated;
@@ -42,6 +43,7 @@ use App\Listeners\PushConnectionAcceptedToFederatedPartner;
 use App\Listeners\PushGroupMembershipToFederatedPartners;
 use App\Listeners\PushGroupToFederatedPartners;
 use App\Listeners\PushListingToFederatedPartners;
+use App\Listeners\PushFederationDataRetraction;
 use App\Listeners\PushMemberProfileUpdateToFederatedPartners;
 use App\Listeners\PushMessageToFederatedPartner;
 use App\Listeners\PushReviewToFederatedPartner;
@@ -150,6 +152,10 @@ class EventServiceProvider extends ServiceProvider
 
         MemberProfileUpdated::class => [
             PushMemberProfileUpdateToFederatedPartners::class,
+        ],
+
+        UserFederatedOptOut::class => [
+            PushFederationDataRetraction::class,
         ],
     ];
 

@@ -413,7 +413,7 @@ Route::get('/v2/federation/members/{id}', [\App\Http\Controllers\Api\FederationV
 Route::get('/v2/federation/members/{id}/reviews', [\App\Http\Controllers\Api\FederationV2Controller::class, 'memberReviews'])
     ->where('id', '.*');
 Route::get('/v2/federation/messages', [\App\Http\Controllers\Api\FederationV2Controller::class, 'messages']);
-Route::post('/v2/federation/messages', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendMessage']);
+Route::post('/v2/federation/messages', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendMessage'])->middleware('throttle:20,1');
 Route::post('/v2/federation/messages/mark-read-batch', [\App\Http\Controllers\Api\FederationV2Controller::class, 'markMessagesReadBatch']);
 Route::post('/v2/federation/messages/{id}/mark-read', [\App\Http\Controllers\Api\FederationV2Controller::class, 'markMessageRead']);
 Route::post('/v2/federation/messages/{id}/translate', [\App\Http\Controllers\Api\FederationV2Controller::class, 'translateMessage']);
@@ -421,7 +421,7 @@ Route::post('/v2/federation/transactions', [\App\Http\Controllers\Api\Federation
 Route::get('/v2/federation/settings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'getSettings']);
 Route::put('/v2/federation/settings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'updateSettings']);
 Route::get('/v2/federation/connections', [\App\Http\Controllers\Api\FederationV2Controller::class, 'connections']);
-Route::post('/v2/federation/connections', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendConnectionRequest']);
+Route::post('/v2/federation/connections', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendConnectionRequest'])->middleware('throttle:10,1');
 Route::post('/v2/federation/connections/{id}/accept', [\App\Http\Controllers\Api\FederationV2Controller::class, 'acceptConnection']);
 Route::post('/v2/federation/connections/{id}/reject', [\App\Http\Controllers\Api\FederationV2Controller::class, 'rejectConnection']);
 Route::delete('/v2/federation/connections/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'removeConnection']);

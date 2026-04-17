@@ -40,9 +40,10 @@ class FederationExternalApiClient
     private const CONNECT_TIMEOUT = 5;
     private const REQUEST_TIMEOUT = 30;
 
-    /** Retry configuration — keep delays short to avoid blocking PHP workers.
-     *  Worst-case total wait: 200 + 400 + 800 = 1.4s (was 1000 + 2000 + 4000 = 7s). */
-    private const MAX_RETRIES = 3;
+    /** Retry configuration — single immediate retry with a fixed 200 ms delay.
+     *  Worst-case in-process block: 200 ms. Queue-dispatched jobs can use the
+     *  queue's own tries/backoff for further retries without blocking a worker. */
+    private const MAX_RETRIES = 1;
     private const RETRY_BASE_MS = 200;
 
     // ----------------------------------------------------------------
@@ -428,6 +429,36 @@ class FederationExternalApiClient
     }
 
     /**
+     * Notify an external partner to retract (delete) a member's profile.
+     *
+     * Sent when a user deletes their account or opts out of federation.
+     * Uses a DELETE request to the members endpoint with an `action: retracted`
+     * payload, following the same pattern as sendMember() but signalling removal.
+     *
+     * @param int   $partnerId         The partner to notify
+     * @param int   $localUserId       The local user whose data must be retracted
+     * @param array $extra             Optional: external_user_id, reason
+     * @return array{success: bool, data?: array, error?: string, status_code?: int}
+     */
+    public static function retractMemberProfile(int $partnerId, int $localUserId, array $extra = []): array
+    {
+        $adapter  = self::resolveAdapter($partnerId);
+        $endpoint = $adapter->mapEndpoint('members');
+
+        $payload = [
+            'action'           => 'retracted',
+            'local_user_id'    => $localUserId,
+            'external_user_id' => $extra['external_user_id'] ?? null,
+            'reason'           => $extra['reason'] ?? 'opt_out',
+            'retracted_at'     => now()->toISOString(),
+        ];
+
+        // Use DELETE with a body so partners receive the context they need to
+        // identify and purge the correct record.
+        return self::request($partnerId, 'DELETE', $endpoint, $payload);
+    }
+
+    /**
      * Health-check an external partner's API.
      *
      * @return array{success: bool, data?: array, error?: string, status_code?: int}
@@ -481,7 +512,7 @@ class FederationExternalApiClient
             return ['success' => false, 'error' => 'Authentication setup failed: ' . $e->getMessage(), 'status_code' => 0];
         }
 
-        // ---- Execute with retries (only retry on 5xx) ----
+        // ---- Execute with single retry (only retry on 5xx/connection error) ----
         $lastResponse = null;
         $lastException = null;
 
@@ -497,7 +528,14 @@ class FederationExternalApiClient
                     ->connectTimeout(self::CONNECT_TIMEOUT)
                     ->timeout(self::REQUEST_TIMEOUT)
                     // Explicit SSL cert validation — auditable, never disabled.
-                    ->withOptions(['verify' => true])
+                    // CURLOPT_MAXFILESIZE caps the response body at 10 MB to
+                    // prevent a malicious partner from flooding us with data.
+                    ->withOptions([
+                        'verify' => true,
+                        'curl'   => [
+                            CURLOPT_MAXFILESIZE => 10 * 1024 * 1024, // 10 MB response body cap
+                        ],
+                    ])
                     ->acceptJson();
 
                 if ($method === 'GET') {

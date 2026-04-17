@@ -249,6 +249,8 @@ class FederationV2Controller extends BaseApiController
 
         if ($success) {
             $this->federationAuditService->log('user_federation_optout', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
+            // GDPR: propagate retraction to all federated partners asynchronously.
+            \App\Events\UserFederatedOptOut::dispatch($userId, $tenantId, 'opt_out');
             return $this->respondWithData(['success' => true, 'message' => __('api_controllers_1.federation.disabled_successfully')]);
         }
 

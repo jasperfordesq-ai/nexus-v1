@@ -123,9 +123,11 @@ class FederationExternalWebhookController extends BaseApiController
                     return $this->respondWithError('REPLAY_DETECTED', 'Nonce already used', null, 409);
                 }
             } catch (\Throwable $e) {
-                // If the nonce table isn't available (e.g., mid-migration), don't
-                // fail closed on a signed+fresh request — but log loudly.
-                Log::error('[FederationExternalWebhook] Nonce store error', ['error' => $e->getMessage()]);
+                // Nonce store unavailable — fail closed to preserve replay protection.
+                // A temporarily unavailable DB is safer to reject than to silently
+                // bypass the only defence against replayed signed requests.
+                Log::error('[FederationExternalWebhook] Nonce store unavailable — rejecting request', ['error' => $e->getMessage()]);
+                return response()->json(['error' => 'Service temporarily unavailable'], 503);
             }
         }
 

@@ -1068,7 +1068,17 @@ class GdprService
 
             $this->db->commit();
 
-            // 9. Remove from Meilisearch index (outside transaction — external service)
+            // 9. GDPR: retract federated profile from all partner networks (queued, non-blocking)
+            try {
+                \App\Events\UserFederatedOptOut::dispatch($userId, $this->tenantId, 'account_deleted');
+            } catch (\Throwable $e) {
+                $this->logger->warning('GDPR federation retraction dispatch failed', [
+                    'user_id' => $userId,
+                    'error'   => $e->getMessage(),
+                ]);
+            }
+
+            // Original step 9 follows (renumbered). Remove from Meilisearch index (outside transaction — external service)
             try {
                 $meiliClient = new \Meilisearch\Client(
                     env('MEILISEARCH_HOST', 'http://meilisearch:7700'),

@@ -546,6 +546,19 @@ class UserService
             $user->longitude  = null;
             $user->save();
 
+            // GDPR Article 17: retract federated profile from all partner networks.
+            try {
+                $tenantId = (int) ($user->tenant_id ?? \App\Core\TenantContext::getId());
+                if ($tenantId) {
+                    \App\Events\UserFederatedOptOut::dispatch($userId, $tenantId, 'account_deleted');
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Federation retraction dispatch failed after account deletion', [
+                    'user_id' => $userId,
+                    'error'   => $e->getMessage(),
+                ]);
+            }
+
             return true;
         } catch (\Throwable $e) {
             Log::error('Account deletion failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
