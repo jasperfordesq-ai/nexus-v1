@@ -53,7 +53,8 @@
     "share_failed": "Theip ar an bpostáil a roinnt",
     "not_interested": "We'll show you less like this",
     "post_updated": "Post updated",
-    "update_failed": "Failed to update post"
+    "update_failed": "Failed to update post",
+    "like_failed": "Failed to update like"
   },
   "realtime": {
     "new_posts_one": "1 postáil nua",
@@ -522,5 +523,6 @@
   },
   "feed": {
     "end_of_feed": "You're all caught up!"
-  }
+  },
+  "you": "You"
 }

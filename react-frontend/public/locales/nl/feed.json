@@ -54,7 +54,8 @@
     "update_failed": "Bijwerken van bericht mislukt",
     "post_shared": "Bericht gedeeld op je feed",
     "share_removed": "Delen verwijderd",
-    "share_failed": "Bericht delen mislukt"
+    "share_failed": "Bericht delen mislukt",
+    "like_failed": "Failed to update like"
   },
   "realtime": {
     "new_posts_one": "1 new post",
@@ -522,5 +523,6 @@
   },
   "feed": {
     "end_of_feed": "You're all caught up!"
-  }
+  },
+  "you": "You"
 }

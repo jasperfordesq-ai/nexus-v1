@@ -54,7 +54,8 @@
     "update_failed": "投稿の更新に失敗しました",
     "post_shared": "投稿があなたのフィードに共有されました",
     "share_removed": "共有が削除されました",
-    "share_failed": "投稿の共有に失敗しました"
+    "share_failed": "投稿の共有に失敗しました",
+    "like_failed": "Failed to update like"
   },
   "realtime": {
     "new_posts_one": "1 new post",
@@ -522,5 +523,6 @@
   },
   "feed": {
     "end_of_feed": "You're all caught up!"
-  }
+  },
+  "you": "You"
 }

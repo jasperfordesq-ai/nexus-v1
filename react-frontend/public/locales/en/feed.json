@@ -54,7 +54,8 @@
     "update_failed": "Failed to update post",
     "post_shared": "Post shared to your feed",
     "share_removed": "Share removed",
-    "share_failed": "Failed to share post"
+    "share_failed": "Failed to share post",
+    "like_failed": "Failed to update like"
   },
   "realtime": {
     "new_posts_one": "1 new post — Tap to see",
@@ -522,5 +523,6 @@
     "reactions_breakdown": "Reactions Breakdown",
     "load_failed": "Failed to load analytics."
   },
-  "failed_to_load_analytics": "Failed to load analytics"
+  "failed_to_load_analytics": "Failed to load analytics",
+  "you": "You"
 }

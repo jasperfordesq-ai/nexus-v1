@@ -54,7 +54,8 @@
     "update_failed": "فشل في تحديث المنشور",
     "post_shared": "تم مشاركة المنشور في خلاصتك",
     "share_removed": "تمت إزالة المشاركة",
-    "share_failed": "فشل في مشاركة المنشور"
+    "share_failed": "فشل في مشاركة المنشور",
+    "like_failed": "Failed to update like"
   },
   "realtime": {
     "new_posts_one": "1 new post",
@@ -522,5 +523,6 @@
   },
   "feed": {
     "end_of_feed": "You're all caught up!"
-  }
+  },
+  "you": "You"
 }

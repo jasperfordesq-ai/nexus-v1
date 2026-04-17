@@ -291,6 +291,7 @@ export function FeedPage() {
     }
     cursorRef.current = undefined;
     setPendingPostCount(0);
+    pendingPostsRef.current = [];
     loadFeedRef.current();
     const currentAbort = abortRef.current;
     const currentAppendAbort = appendAbortRef.current;
@@ -338,8 +339,8 @@ export function FeedPage() {
     const unsub = pusher.onFeedPost((event: FeedPostEvent) => {
       const incoming = event.post;
 
-      // C3: Validate tenant_id — discard posts from other tenants
-      if (incoming.tenant_id !== undefined && incoming.tenant_id !== tenant?.id) return;
+      // C3: Validate tenant_id — discard posts from other tenants or events without a tenant_id
+      if (!incoming.tenant_id || incoming.tenant_id !== tenant?.id) return;
 
       // If the post was created by the current user it is already prepended
       // optimistically by ComposeHub / the onSuccess reload, so skip it.
@@ -418,6 +419,7 @@ export function FeedPage() {
             : fi
         )
       );
+      toastRef.current.error(tRef.current('toast.like_failed'));
     }
   }, []);
 
@@ -762,7 +764,7 @@ export function FeedPage() {
             onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCompose('post'); } }}
           >
             <Avatar
-              name={user?.first_name || 'You'}
+              name={user?.first_name || t('you')}
               src={resolveAvatarUrl(user?.avatar)}
               size="sm"
               isBordered

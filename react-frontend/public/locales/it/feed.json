@@ -54,7 +54,8 @@
     "update_failed": "Failed to update post",
     "post_shared": "Post condiviso nel tuo feed",
     "share_removed": "Condivisione rimossa",
-    "share_failed": "Impossibile condividere il post"
+    "share_failed": "Impossibile condividere il post",
+    "like_failed": "Failed to update like"
   },
   "realtime": {
     "new_posts_one": "1 nuovo post",
@@ -522,5 +523,6 @@
   },
   "feed": {
     "end_of_feed": "You're all caught up!"
-  }
+  },
+  "you": "You"
 }

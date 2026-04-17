@@ -54,7 +54,8 @@
     "update_failed": "Failed to update post",
     "post_shared": "Publicação partilhada no seu feed",
     "share_removed": "Partilha removida",
-    "share_failed": "Falha ao partilhar publicação"
+    "share_failed": "Falha ao partilhar publicação",
+    "like_failed": "Failed to update like"
   },
   "realtime": {
     "new_posts_one": "1 nova publicação",
@@ -522,5 +523,6 @@
   },
   "feed": {
     "end_of_feed": "You're all caught up!"
-  }
+  },
+  "you": "You"
 }
