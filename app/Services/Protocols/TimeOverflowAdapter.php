@@ -169,10 +169,14 @@ class TimeOverflowAdapter implements FederationProtocolAdapter
      */
     public static function buildTransferPayload(array $nexusTransaction, int $partnerId): array
     {
+        // Invert direction: 'outbound' from Nexus's perspective means TimeOverflow
+        // receives it as 'inbound', and vice versa.
+        $toDirection = (($nexusTransaction['direction'] ?? 'outbound') === 'outbound') ? 'inbound' : 'outbound';
+
         return [
             'partner_id' => $partnerId,
             'external_transaction_id' => (string) ($nexusTransaction['id'] ?? ''),
-            'direction' => $nexusTransaction['direction'] ?? 'inbound',
+            'direction' => $toDirection,
             'local_account_id' => $nexusTransaction['remote_account_id'] ?? null,
             'remote_user_identifier' => $nexusTransaction['sender_email'] ?? $nexusTransaction['sender_identifier'] ?? '',
             'amount' => self::hoursToSeconds((float) ($nexusTransaction['amount'] ?? 0)),

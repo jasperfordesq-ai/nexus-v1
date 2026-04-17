@@ -67,7 +67,7 @@ class NexusAdapter implements FederationProtocolAdapter
 
     public function transformOutboundTransaction(array $nexusTransaction, int $partnerId): array
     {
-        return $nexusTransaction;
+        return array_merge($nexusTransaction, ['source_platform' => 'nexus']);
     }
 
     public function transformOutboundMessage(array $nexusMessage): array

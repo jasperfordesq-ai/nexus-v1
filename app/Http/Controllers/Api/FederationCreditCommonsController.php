@@ -1173,6 +1173,33 @@ class FederationCreditCommonsController extends BaseApiController
     }
 
     /**
+     * Resolve a CC account path or partial name to the account path string
+     * stored in federation_cc_entries (for LIKE queries).
+     *
+     * Returns the username portion for building a LIKE pattern, or the full
+     * path if already in "node/user" format.
+     */
+    private function resolveAccountPath(string $accountRef, int $tenantId): ?string
+    {
+        // Already a full CC path — use as-is
+        if (str_contains($accountRef, '/')) {
+            return $accountRef;
+        }
+
+        // Numeric — look up username
+        if (is_numeric($accountRef)) {
+            $username = DB::table('users')
+                ->where('id', (int) $accountRef)
+                ->where('tenant_id', $tenantId)
+                ->value('username');
+            return $username ?? null;
+        }
+
+        // Treat as username directly
+        return $accountRef;
+    }
+
+    /**
      * Reverse a completed transaction's balance changes.
      */
     private function reverseTransaction(object $entry, int $tenantId): void
