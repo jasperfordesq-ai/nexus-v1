@@ -35,6 +35,7 @@ import { Footer, FooterLink } from './Footer';
 
 function setupDefaultMocks(overrides: {
   tenant?: Record<string, unknown>;
+  connectionsEnabled?: boolean;
   eventsEnabled?: boolean;
   blogEnabled?: boolean;
 } = {}) {
@@ -57,6 +58,7 @@ function setupDefaultMocks(overrides: {
   });
   // useFeature is called twice: once for 'events', once for 'blog'
   mockUseFeature.mockImplementation((feature: string) => {
+    if (feature === 'connections') return overrides.connectionsEnabled ?? false;
     if (feature === 'events') return overrides.eventsEnabled ?? false;
     if (feature === 'blog') return overrides.blogEnabled ?? false;
     return false;
@@ -182,8 +184,15 @@ describe('Footer', () => {
     });
 
     it('renders Members link', () => {
+      setupDefaultMocks({ connectionsEnabled: true });
       render(<Footer />);
       expect(screen.getByText('Members')).toBeInTheDocument();
+    });
+
+    it('does NOT render Members link when connections feature is disabled', () => {
+      setupDefaultMocks({ connectionsEnabled: false });
+      render(<Footer />);
+      expect(screen.queryByText('Members')).not.toBeInTheDocument();
     });
 
     it('renders Events link when events feature is enabled', () => {

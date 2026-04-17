@@ -755,6 +755,7 @@ class UsersController extends BaseApiController
             'radius_km' => (float) $this->query('radius_km', '25'),
             'limit'     => $limit,
             'offset'    => $offset,
+            'q'         => trim((string) $this->query('q', '')),
         ];
 
         $result = $this->userService->getNearby($lat, $lon, $filters, $currentUserId);

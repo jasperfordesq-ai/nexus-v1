@@ -26,6 +26,7 @@ export interface FooterProps {
 export function Footer({ children, copyright }: FooterProps) {
   const { t } = useTranslation('common');
   const { tenant, branding, tenantPath } = useTenant();
+  const hasConnections = useFeature('connections');
   const hasEvents = useFeature('events');
   const hasBlog = useFeature('blog');
   const { resetConsent } = useCookieConsent();
@@ -89,7 +90,7 @@ export function Footer({ children, copyright }: FooterProps) {
                 <h3 className="text-sm font-semibold text-theme-primary mb-3">{t('footer.platform')}</h3>
                 <ul className="space-y-2">
                   <li><FooterLink href={tenantPath('/listings')}>{t('nav.listings')}</FooterLink></li>
-                  <li><FooterLink href={tenantPath('/members')}>{t('nav.members')}</FooterLink></li>
+                  {hasConnections && <li><FooterLink href={tenantPath('/members')}>{t('nav.members')}</FooterLink></li>}
                   {hasEvents && <li><FooterLink href={tenantPath('/events')}>{t('nav.events')}</FooterLink></li>}
                   {hasBlog && <li><FooterLink href={tenantPath('/blog')}>{t('nav.blog')}</FooterLink></li>}
                 </ul>

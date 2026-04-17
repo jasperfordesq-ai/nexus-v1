@@ -441,7 +441,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 <div className="flex flex-wrap gap-2 mb-4">
                   {[
                     { label: t('nav.listings', 'Listings'), path: tenantPath('/listings') },
-                    { label: t('nav.members', 'Members'), path: tenantPath('/members') },
+                    ...(hasFeature('connections') ? [{ label: t('nav.members', 'Members'), path: tenantPath('/members') }] : []),
                     { label: t('nav.events', 'Events'), path: tenantPath('/events') },
                     { label: t('support.help_center', 'Help'), path: tenantPath('/help') },
                   ].map(link => (

@@ -76,10 +76,13 @@ export function MembersPage() {
   const [nearMeEnabled, setNearMeEnabled] = useState(false);
   const [radiusKm, setRadiusKm] = useState(25);
   const { user } = useAuth();
+  const isNearbyMode = nearMeEnabled && user?.latitude != null && user?.longitude != null;
 
   // Refs
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const membersCountRef = useRef(0);
+  const loadAbortRef = useRef<AbortController | null>(null);
+  const requestIdRef = useRef(0);
 
   // Debounce search input
   useEffect(() => {
@@ -106,6 +109,12 @@ export function MembersPage() {
     localStorage.setItem('members_view_mode', viewMode);
   }, [viewMode]);
 
+  useEffect(() => {
+    return () => {
+      loadAbortRef.current?.abort();
+    };
+  }, []);
+
   // Handle quick filter selection
   const handleQuickFilter = useCallback((filter: QuickFilter) => {
     setQuickFilter(filter);
@@ -131,6 +140,11 @@ export function MembersPage() {
 
   // Load members
   const loadMembers = useCallback(async (append = false) => {
+    const requestId = ++requestIdRef.current;
+    loadAbortRef.current?.abort();
+    const controller = new AbortController();
+    loadAbortRef.current = controller;
+
     try {
       if (!append) {
         setIsLoading(true);
@@ -141,10 +155,12 @@ export function MembersPage() {
 
       const params = new URLSearchParams();
       if (debouncedQuery) params.set('q', debouncedQuery);
-      params.set('sort', sortBy);
-      // Quick filters imply descending order for joined and hours_given
-      if (sortBy === 'joined' || sortBy === 'hours_given') {
-        params.set('order', 'desc');
+      if (!isNearbyMode) {
+        params.set('sort', sortBy);
+        // Quick filters imply descending order for joined and hours_given
+        if (sortBy === 'joined' || sortBy === 'hours_given') {
+          params.set('order', 'desc');
+        }
       }
       params.set('limit', ITEMS_PER_PAGE.toString());
 
@@ -153,14 +169,18 @@ export function MembersPage() {
       }
 
       let endpoint = '/v2/users';
-      if (nearMeEnabled && user?.latitude != null && user?.longitude != null) {
+      if (isNearbyMode) {
         endpoint = '/v2/members/nearby';
         params.set('lat', String(user.latitude));
         params.set('lon', String(user.longitude));
         params.set('radius_km', String(radiusKm));
       }
 
-      const response = await api.get<User[]>(`${endpoint}?${params}`);
+      const response = await api.get<User[]>(`${endpoint}?${params}`, { signal: controller.signal });
+
+      if (controller.signal.aborted || requestId !== requestIdRef.current) {
+        return;
+      }
 
       if (response.success && response.data) {
         if (append) {
@@ -182,6 +202,9 @@ export function MembersPage() {
         }
       }
     } catch (err) {
+      if (controller.signal.aborted || requestId !== requestIdRef.current) {
+        return;
+      }
       logError('Failed to load members', err);
       if (!append) {
         setError(t('members.load_failed'));
@@ -189,10 +212,12 @@ export function MembersPage() {
         toast.error(t('members.load_more_failed'));
       }
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      if (requestId === requestIdRef.current) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     }
-  }, [debouncedQuery, sortBy, t, toast, nearMeEnabled, user?.latitude, user?.longitude, radiusKm]);
+  }, [debouncedQuery, sortBy, t, toast, isNearbyMode, user?.latitude, user?.longitude, radiusKm]);
 
   // Load more
   const loadMoreMembers = useCallback(() => {
@@ -282,6 +307,7 @@ export function MembersPage() {
               ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
               : 'bg-theme-elevated text-theme-muted'
           }
+          isDisabled={isNearbyMode}
           startContent={<Users className="w-3.5 h-3.5" aria-hidden="true" />}
           onPress={() => handleQuickFilter('all')}
           aria-pressed={quickFilter === 'all'}
@@ -296,6 +322,7 @@ export function MembersPage() {
               ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
               : 'bg-theme-elevated text-theme-muted'
           }
+          isDisabled={isNearbyMode}
           startContent={<Sparkles className="w-3.5 h-3.5" aria-hidden="true" />}
           onPress={() => handleQuickFilter('new')}
           aria-pressed={quickFilter === 'new'}
@@ -310,6 +337,7 @@ export function MembersPage() {
               ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
               : 'bg-theme-elevated text-theme-muted'
           }
+          isDisabled={isNearbyMode}
           startContent={<TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />}
           onPress={() => handleQuickFilter('active')}
           aria-pressed={quickFilter === 'active'}
@@ -351,6 +379,7 @@ export function MembersPage() {
               placeholder={t('members.sort_by')}
               selectedKeys={[sortBy]}
               disallowEmptySelection
+              isDisabled={isNearbyMode}
               onChange={(e) => setSortBy(e.target.value as SortOption)}
               className="w-36 sm:w-44"
               aria-label={t('members.sort_by')}

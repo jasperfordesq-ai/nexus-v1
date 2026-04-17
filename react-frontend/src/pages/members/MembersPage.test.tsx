@@ -116,11 +116,56 @@ describe('MembersPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Near me' }));
 
     await waitFor(() =>
-      expect(mockApiGet).toHaveBeenLastCalledWith(expect.stringContaining('/v2/members/nearby?'))
+      expect(mockApiGet).toHaveBeenLastCalledWith(
+        expect.stringContaining('/v2/members/nearby?'),
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
+      )
     );
-    expect(mockApiGet).toHaveBeenLastCalledWith(expect.stringContaining('lat=0'));
-    expect(mockApiGet).toHaveBeenLastCalledWith(expect.stringContaining('lon=0'));
+    expect(mockApiGet).toHaveBeenLastCalledWith(
+      expect.stringContaining('lat=0'),
+      expect.objectContaining({ signal: expect.any(AbortSignal) })
+    );
+    expect(mockApiGet).toHaveBeenLastCalledWith(
+      expect.stringContaining('lon=0'),
+      expect.objectContaining({ signal: expect.any(AbortSignal) })
+    );
     expect(mockToastError).not.toHaveBeenCalled();
+  });
+
+  it('keeps search active in Near me mode without sending unsupported sort params', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: 7, latitude: 0, longitude: 0 },
+      isAuthenticated: true,
+      login: vi.fn(),
+      logout: vi.fn(),
+      register: vi.fn(),
+      updateUser: vi.fn(),
+      refreshUser: vi.fn(),
+      status: 'idle',
+      error: null,
+    });
+
+    render(<MembersPage />);
+
+    fireEvent.change(screen.getByPlaceholderText(/Search members/i), { target: { value: 'alex' } });
+    await waitFor(() =>
+      expect(mockApiGet).toHaveBeenLastCalledWith(
+        expect.stringContaining('/v2/users?q=alex'),
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
+      )
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Near me' }));
+
+    await waitFor(() =>
+      expect(mockApiGet).toHaveBeenLastCalledWith(
+        expect.stringContaining('/v2/members/nearby?q=alex'),
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
+      )
+    );
+    const [lastUrl] = mockApiGet.mock.lastCall ?? [''];
+    expect(lastUrl).not.toContain('sort=');
+    expect(lastUrl).not.toContain('order=');
   });
 
   it('uses translation keys without inline fallback text on the page shell', () => {

@@ -623,6 +623,7 @@ class UserService
         $limit    = (int) ($filters['limit'] ?? 20);
         $limit    = min($limit, 100);
         $offset   = max((int) ($filters['offset'] ?? 0), 0);
+        $search   = trim((string) ($filters['q'] ?? ''));
 
         // Haversine formula (result in km) — tenant scoping via HasTenantScope on User model
         $haversine = "(
@@ -636,12 +637,37 @@ class UserService
         $tenantId = TenantContext::getId();
 
         $query = User::query()
-            ->selectRaw("*, $haversine AS distance", [$lat, $lon, $lat])
+            ->selectRaw(
+                "users.*, $haversine AS distance,
+                (SELECT AVG(rating) FROM reviews WHERE receiver_id = users.id AND tenant_id = ?) as rating,
+                (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = users.id AND status = 'completed' AND tenant_id = ?) as total_hours_given,
+                (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE receiver_id = users.id AND status = 'completed' AND tenant_id = ?) as total_hours_received",
+                [$lat, $lon, $lat, $tenantId, $tenantId, $tenantId]
+            )
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->where('status', 'active')
             ->havingRaw('distance <= ?', [$radiusKm])
             ->orderBy('distance');
+
+        if ($search !== '') {
+            $memberIds = SearchService::searchUsersStatic($search, $tenantId);
+            if ($memberIds !== false && !empty($memberIds)) {
+                $query->whereIn('id', array_map('intval', $memberIds));
+            } elseif ($memberIds !== false) {
+                $query->whereRaw('1 = 0');
+            } else {
+                $like = '%' . $search . '%';
+                $query->where(function ($subQuery) use ($search, $like) {
+                    $subQuery->whereRaw(
+                        "MATCH(first_name, last_name, bio, skills) AGAINST(? IN BOOLEAN MODE)",
+                        [$search]
+                    )
+                    ->orWhere('name', 'LIKE', $like)
+                    ->orWhere('location', 'LIKE', $like);
+                });
+            }
+        }
 
         if ($currentUserId) {
             $query->where('id', '!=', $currentUserId);
@@ -685,21 +711,7 @@ class UserService
             }
         }
 
-        $result = $items->map(function (User $user) use ($badgesByUser, $tenantId) {
-            // Compute rating and hours via subqueries for consistency with index()
-            $rating = DB::selectOne(
-                "SELECT AVG(rating) as avg_rating FROM reviews WHERE receiver_id = ? AND tenant_id = ?",
-                [$user->id, $tenantId]
-            );
-            $hoursGiven = DB::selectOne(
-                "SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE sender_id = ? AND status = 'completed' AND tenant_id = ?",
-                [$user->id, $tenantId]
-            );
-            $hoursReceived = DB::selectOne(
-                "SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE receiver_id = ? AND status = 'completed' AND tenant_id = ?",
-                [$user->id, $tenantId]
-            );
-
+        $result = $items->map(function (User $user) use ($badgesByUser) {
             return [
                 'id'                   => $user->id,
                 'name'                 => ($user->profile_type === 'organisation' && $user->organization_name)
@@ -716,9 +728,9 @@ class UserService
                 'is_verified'          => (bool) $user->is_verified,
                 'xp'                   => (int) ($user->xp ?? 0),
                 'level'                => (int) ($user->level ?? 0),
-                'rating'               => $rating->avg_rating ? (float) $rating->avg_rating : null,
-                'total_hours_given'    => (int) $hoursGiven->total,
-                'total_hours_received' => (int) $hoursReceived->total,
+                'rating'               => $user->rating ? (float) $user->rating : null,
+                'total_hours_given'    => (int) ($user->total_hours_given ?? 0),
+                'total_hours_received' => (int) ($user->total_hours_received ?? 0),
                 'showcased_badges'     => $badgesByUser[$user->id] ?? [],
                 'distance'             => round((float) $user->distance, 1),
             ];

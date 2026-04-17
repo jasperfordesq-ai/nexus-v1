@@ -13,6 +13,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 
 // Mock navigate
 const mockNavigate = vi.fn();
+const mockHasFeature = vi.fn(() => true);
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
@@ -50,7 +51,7 @@ vi.mock('react-i18next', () => ({
 vi.mock('@/contexts', () => ({
   useTenant: () => ({
     tenantPath: (p: string) => p,
-    hasFeature: () => true,
+    hasFeature: mockHasFeature,
   }),
   useAuth: () => ({
     isAuthenticated: false,
@@ -87,6 +88,7 @@ function renderOverlay(isOpen = true, onClose = vi.fn()) {
 describe('SearchOverlay', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockHasFeature.mockReturnValue(true);
   });
 
   describe('Rendering', () => {
@@ -127,7 +129,7 @@ describe('SearchOverlay', () => {
       renderOverlay();
       const input = screen.getByPlaceholderText('Search...');
       fireEvent.change(input, { target: { value: 'test' } });
-      expect(screen.getByLabelText('Clear')).toBeTruthy();
+      expect(screen.getByLabelText('aria.clear')).toBeTruthy();
     });
   });
 
@@ -143,13 +145,13 @@ describe('SearchOverlay', () => {
   describe('Close behavior', () => {
     it('has a close button with aria-label', () => {
       renderOverlay();
-      expect(screen.getByLabelText('Close')).toBeTruthy();
+      expect(screen.getByLabelText('Close (ESC)')).toBeTruthy();
     });
 
     it('calls onClose when close button is clicked', () => {
       const onClose = vi.fn();
       renderOverlay(true, onClose);
-      fireEvent.click(screen.getByLabelText('Close'));
+      fireEvent.click(screen.getByLabelText('Close (ESC)'));
       expect(onClose).toHaveBeenCalled();
     });
   });
@@ -174,6 +176,15 @@ describe('SearchOverlay', () => {
       renderOverlay();
       expect(screen.getByText('Listings')).toBeTruthy();
       expect(screen.getByText('Members')).toBeTruthy();
+      expect(screen.getByText('Events')).toBeTruthy();
+      expect(screen.getByText('Help')).toBeTruthy();
+    });
+
+    it('hides Members quick link when connections feature is disabled', () => {
+      mockHasFeature.mockImplementation((feature: string) => feature !== 'connections');
+      renderOverlay();
+      expect(screen.getByText('Listings')).toBeTruthy();
+      expect(screen.queryByText('Members')).toBeNull();
       expect(screen.getByText('Events')).toBeTruthy();
       expect(screen.getByText('Help')).toBeTruthy();
     });
