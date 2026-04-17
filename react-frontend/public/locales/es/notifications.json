@@ -40,7 +40,9 @@
     "mark_read_failed": "Error al marcar la notificación como leída",
     "all_read": "Todas las notificaciones marcadas como leídas",
     "mark_all_failed": "Error al marcar todas como leídas",
-    "delete_failed": "Error al eliminar la notificación"
+    "delete_failed": "Error al eliminar la notificación",
+    "deleted": "Notification deleted",
+    "undo_hint": "Click Undo to restore"
   },
   "realtime": {
     "new_message": "Nuevo Mensaje",
@@ -69,5 +71,7 @@
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "load_more": "Load more",
+  "undo": "Undo"
 }

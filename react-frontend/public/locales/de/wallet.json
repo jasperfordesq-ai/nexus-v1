@@ -60,7 +60,8 @@
     "rating_submitted_desc": "Vielen Dank für Ihr Feedback!",
     "submit_failed": "Einreichung fehlgeschlagen",
     "try_again": "Bitte versuchen Sie es erneut",
-    "submit_error_desc": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+    "submit_error_desc": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+    "recipient_load_failed": "Could not load recipient. Please search manually."
   },
   "error": {
     "load_balance": "Kontostand konnte nicht geladen werden",
@@ -132,5 +133,11 @@
   "exceeds_balance": "Übersteigt das verfügbare Guthaben",
   "optional": "optional",
   "description_placeholder": "Wofür ist diese Überweisung?",
-  "new_balance_after": "Ihr neues Guthaben beträgt {{balance}} Stunden"
+  "new_balance_after": "Ihr neues Guthaben beträgt {{balance}} Stunden",
+  "validation": {
+    "select_recipient": "Please select a recipient",
+    "valid_amount": "Please enter a valid amount",
+    "insufficient_balance": "Insufficient balance",
+    "max_transfer": "Maximum transfer is {{max}} hours"
+  }
 }

@@ -33,7 +33,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { useToast, useTenant, useNotifications } from '@/contexts';
+import { useToast, useTenant, useNotifications, useAuth } from '@/contexts';
+import { usePusherOptional } from '@/contexts/PusherContext';
 import { api } from '@/lib/api';
 import { formatRelativeTime, resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
@@ -49,9 +50,14 @@ export function NotificationsPage() {
   usePageTitle(t('page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
+  const { user } = useAuth();
+  const pusher = usePusherOptional();
   const { refreshCounts, markAsRead: contextMarkAsRead, markAllAsRead: contextMarkAllAsRead } = useNotifications();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [filter, setFilter] = useState<NotificationFilter>('all');
 
@@ -72,10 +78,20 @@ export function NotificationsPage() {
     try {
       setIsLoading(true);
       setLoadError(null);
-      const response = await api.get<Notification[]>('/v2/notifications/grouped?per_page=50');
+      setNextCursor(null);
+      setHasMore(false);
+      const response = await api.get<Notification[] | { data: Notification[]; meta?: { cursor?: string | null; has_more?: boolean } }>('/v2/notifications/grouped?per_page=50');
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
-        setNotifications(response.data);
+        // Handle both array response and paginated {data, meta} response
+        if (Array.isArray(response.data)) {
+          setNotifications(response.data);
+        } else {
+          const paged = response.data as { data: Notification[]; meta?: { cursor?: string | null; has_more?: boolean } };
+          setNotifications(paged.data ?? []);
+          setHasMore(paged.meta?.has_more ?? false);
+          setNextCursor(paged.meta?.cursor ?? null);
+        }
       } else {
         setLoadError(tRef.current('error_load'));
       }
@@ -88,9 +104,67 @@ export function NotificationsPage() {
     }
   }, []);
 
+  const loadMoreNotifications = useCallback(async () => {
+    if (!hasMore || !nextCursor || isLoadingMore) return;
+    try {
+      setIsLoadingMore(true);
+      const response = await api.get<Notification[] | { data: Notification[]; meta?: { cursor?: string | null; has_more?: boolean } }>(`/v2/notifications/grouped?per_page=50&cursor=${encodeURIComponent(nextCursor)}`);
+      if (response.success && response.data) {
+        if (Array.isArray(response.data)) {
+          setNotifications((prev) => [...prev, ...response.data as Notification[]]);
+          setHasMore(false);
+          setNextCursor(null);
+        } else {
+          const paged = response.data as { data: Notification[]; meta?: { cursor?: string | null; has_more?: boolean } };
+          setNotifications((prev) => [...prev, ...(paged.data ?? [])]);
+          setHasMore(paged.meta?.has_more ?? false);
+          setNextCursor(paged.meta?.cursor ?? null);
+        }
+      } else {
+        toastRef.current.error(tRef.current('error_load'));
+      }
+    } catch (error) {
+      logError('Failed to load more notifications', error);
+      toastRef.current.error(tRef.current('error_load'));
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [hasMore, nextCursor, isLoadingMore]);
+
   useEffect(() => {
     loadNotifications();
   }, [loadNotifications]);
+
+  // Subscribe to the user's private Pusher channel for live notification events
+  useEffect(() => {
+    if (!pusher?.client || !user?.id) return;
+    const tenantId = pusher.tenantId;
+    if (!tenantId) return;
+
+    const channelName = `private-tenant.${tenantId}.user.${user.id}`;
+    const channel = pusher.client.subscribe(channelName);
+
+    const handleNewNotification = (data: Notification) => {
+      setNotifications((prev) => {
+        // Avoid duplicates
+        if (prev.some((n) => n.id === data.id)) return prev;
+        return [data, ...prev];
+      });
+      refreshCounts();
+    };
+
+    channel.bind('notification.created', handleNewNotification);
+    channel.bind('new-notification', handleNewNotification);
+
+    return () => {
+      channel.unbind('notification.created', handleNewNotification);
+      channel.unbind('new-notification', handleNewNotification);
+      // Only unsubscribe if still connected (PusherContext manages the channel)
+      if (pusher.client && pusher.isConnected) {
+        pusher.client.unsubscribe(channelName);
+      }
+    };
+  }, [pusher, user?.id, refreshCounts]);
 
   async function markAsRead(id: number) {
     try {
@@ -140,18 +214,65 @@ export function NotificationsPage() {
   }
 
   async function deleteNotification(id: number) {
-    try {
-      const notification = notifications.find((n) => n.id === id);
-      await api.delete(`/v2/notifications/${id}`);
-      setNotifications((prev) => prev.filter((n) => n.id !== id));
-      // If deleted notification was unread, refresh the bell badge count
-      if (notification && !notification.read_at) {
-        refreshCounts();
+    const notificationIndex = notifications.findIndex((n) => n.id === id);
+    const notification = notifications[notificationIndex];
+    if (!notification) return;
+
+    // Optimistically remove from UI
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+
+    let undone = false;
+
+    // Show undo info toast — user can click "Undo" before the timeout
+    const undoTimeout = setTimeout(async () => {
+      if (undone) return;
+      try {
+        await api.delete(`/v2/notifications/${id}`);
+        if (!notification.read_at) {
+          refreshCounts();
+        }
+      } catch (error) {
+        logError('Failed to delete notification', error);
+        // Restore if delete actually failed
+        setNotifications((prev) => {
+          const updated = [...prev];
+          updated.splice(notificationIndex, 0, notification);
+          return updated;
+        });
+        toastRef.current.error(tRef.current('toast.delete_failed'));
       }
-    } catch (error) {
-      logError('Failed to delete notification', error);
-      toastRef.current.error(tRef.current('toast.delete_failed'));
-    }
+    }, 4000);
+
+    toastRef.current.info(
+      tRef.current('toast.deleted', 'Notification deleted'),
+      tRef.current('toast.undo_hint', 'Click to undo within 4 seconds'),
+    );
+
+    // Expose undo mechanism via a module-level ref so the toast button can call it
+    // Since ToastContext doesn't support action buttons, we store the undo callback
+    // and expose it via the page-level state so the user sees a separate "Undo" button
+    setLastDeletedNotification({ notification, index: notificationIndex, timeout: undoTimeout, undone: () => { undone = true; } });
+  }
+
+  // Undo state for last deleted notification
+  const [lastDeletedNotification, setLastDeletedNotification] = useState<{
+    notification: Notification;
+    index: number;
+    timeout: ReturnType<typeof setTimeout>;
+    undone: () => void;
+  } | null>(null);
+
+  function handleUndoDelete() {
+    if (!lastDeletedNotification) return;
+    clearTimeout(lastDeletedNotification.timeout);
+    lastDeletedNotification.undone();
+    // Re-insert at original position
+    setNotifications((prev) => {
+      const updated = [...prev];
+      updated.splice(lastDeletedNotification.index, 0, lastDeletedNotification.notification);
+      return updated;
+    });
+    setLastDeletedNotification(null);
   }
 
   const filteredNotifications = notifications.filter((n) =>
@@ -237,6 +358,21 @@ export function NotificationsPage() {
         </Button>
       </div>
 
+      {/* Undo delete banner */}
+      {lastDeletedNotification && (
+        <div className="flex items-center justify-between p-3 rounded-xl bg-theme-elevated border border-theme-default text-sm">
+          <span className="text-theme-muted">{t('toast.deleted', 'Notification deleted')}</span>
+          <Button
+            size="sm"
+            variant="flat"
+            className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+            onPress={handleUndoDelete}
+          >
+            {t('undo', 'Undo')}
+          </Button>
+        </div>
+      )}
+
       {/* Load Error */}
       {loadError && !isLoading && (
         <GlassCard className="p-8 text-center">
@@ -274,24 +410,39 @@ export function NotificationsPage() {
           description={filter === 'unread' ? t('empty_caught_up_desc') : t('empty_desc')}
         />
       ) : (
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="space-y-3"
-        >
-          {filteredNotifications.map((notification) => (
-            <motion.div key={notification.id} variants={itemVariants}>
-              <NotificationCard
-                notification={notification}
-                onMarkRead={() => notification.is_grouped && notification.group_key
-                  ? markGroupAsRead(notification)
-                  : markAsRead(notification.id)}
-                onDelete={() => deleteNotification(notification.id)}
-              />
-            </motion.div>
-          ))}
-        </motion.div>
+        <>
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="space-y-3"
+          >
+            {filteredNotifications.map((notification) => (
+              <motion.div key={notification.id} variants={itemVariants}>
+                <NotificationCard
+                  notification={notification}
+                  onMarkRead={() => notification.is_grouped && notification.group_key
+                    ? markGroupAsRead(notification)
+                    : markAsRead(notification.id)}
+                  onDelete={() => deleteNotification(notification.id)}
+                />
+              </motion.div>
+            ))}
+          </motion.div>
+          {hasMore && filter === 'all' && (
+            <div className="flex justify-center pt-2">
+              <Button
+                variant="flat"
+                size="sm"
+                className="bg-theme-elevated text-theme-primary"
+                onPress={loadMoreNotifications}
+                isLoading={isLoadingMore}
+              >
+                {t('load_more', 'Load more')}
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

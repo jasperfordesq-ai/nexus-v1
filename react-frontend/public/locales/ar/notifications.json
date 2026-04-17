@@ -40,7 +40,9 @@
     "mark_read_failed": "فشل في وضع علامة على الإشعار كمقروء",
     "all_read": "تم وضع علامة على جميع الإشعارات كمقروءة",
     "mark_all_failed": "فشل في وضع علامة على الكل كمقروء",
-    "delete_failed": "فشل في حذف الإشعار"
+    "delete_failed": "فشل في حذف الإشعار",
+    "deleted": "Notification deleted",
+    "undo_hint": "Click Undo to restore"
   },
   "realtime": {
     "new_message": "رسالة جديدة",
@@ -69,5 +71,7 @@
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "load_more": "Load more",
+  "undo": "Undo"
 }

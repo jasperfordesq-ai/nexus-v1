@@ -266,7 +266,8 @@
     "season_unavailable_desc": "Nie można załadować informacji o sezonie. Rankingi poniżej są nadal dostępne.",
     "session_expired": "Twoja sesja wygasła. Proszę zaloguj się ponownie.",
     "load_error": "Nie udało się załadować tabeli liderów. Proszę spróbuj ponownie.",
-    "type_nexus_score": "NexusScore"
+    "type_nexus_score": "NexusScore",
+    "load_more": "Load More"
   },
   "community": {
     "total_hours": "Łączny czas wymiany",

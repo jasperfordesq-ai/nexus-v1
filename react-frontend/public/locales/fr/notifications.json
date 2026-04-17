@@ -40,7 +40,9 @@
     "mark_read_failed": "Impossible de marquer la notification comme lue",
     "all_read": "Toutes les notifications marquées comme lues",
     "mark_all_failed": "Impossible de tout marquer comme lu",
-    "delete_failed": "Impossible de supprimer la notification"
+    "delete_failed": "Impossible de supprimer la notification",
+    "deleted": "Notification deleted",
+    "undo_hint": "Click Undo to restore"
   },
   "realtime": {
     "new_message": "Nouveau message",
@@ -69,5 +71,7 @@
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "load_more": "Load more",
+  "undo": "Undo"
 }

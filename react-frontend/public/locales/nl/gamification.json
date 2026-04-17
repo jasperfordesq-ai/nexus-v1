@@ -266,7 +266,8 @@
     "season_unavailable_desc": "Kon seizoensinformatie niet laden. Ranglijsten hieronder zijn nog steeds beschikbaar.",
     "session_expired": "Je sessie is verlopen. Log alsjeblieft opnieuw in.",
     "load_error": "Laden van de ranglijst is mislukt. Probeer het opnieuw.",
-    "type_nexus_score": "NexusScore"
+    "type_nexus_score": "NexusScore",
+    "load_more": "Load More"
   },
   "community": {
     "total_hours": "Totaal Uren Uitgewisseld",

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import type React from 'react';
 import {
   Button,
@@ -25,6 +25,7 @@ import {
 import { GlassCard } from '@/components/ui';
 import { PlaceAutocompleteInput } from '@/components/location';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { isPhoneValid } from '@/lib/validation';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTheme } from '@/contexts';
@@ -91,6 +92,7 @@ export function ProfileTab({
   const { t } = useTranslation('settings');
   const { theme, setTheme } = useTheme();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
 
   return (
     <div className="space-y-6">
@@ -173,8 +175,15 @@ export function ProfileTab({
             classNames={inputClassNames}
             max={new Date().toISOString().split('T')[0]}
             isReadOnly={isIdVerified}
+            isDisabled={isIdVerified}
             endContent={isIdVerified ? <Lock className="w-4 h-4 text-theme-subtle" /> : undefined}
-            description={!isIdVerified && !profileData.date_of_birth ? t('profile.dob_description', 'Required for identity verification') : undefined}
+            description={
+              isIdVerified
+                ? t('identity_verified_lock_dob', 'Your date of birth is locked because your identity has been verified.')
+                : !profileData.date_of_birth
+                  ? t('profile.dob_description', 'Required for identity verification')
+                  : undefined
+            }
           />
 
           {/* Phone */}
@@ -183,9 +192,18 @@ export function ProfileTab({
             label={t('profile.phone')}
             placeholder={t('profile.phone_placeholder')}
             value={profileData.phone}
-            onChange={(e) => onProfileDataChange((prev) => ({ ...prev, phone: e.target.value }))}
+            onChange={(e) => {
+              const val = e.target.value;
+              onProfileDataChange((prev) => ({ ...prev, phone: val }));
+              setPhoneError(isPhoneValid(val) ? null : t('profile.phone_invalid'));
+            }}
+            onBlur={() => {
+              setPhoneError(isPhoneValid(profileData.phone) ? null : t('profile.phone_invalid'));
+            }}
             startContent={<Phone className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             classNames={inputClassNames}
+            isInvalid={!!phoneError}
+            errorMessage={phoneError ?? undefined}
           />
 
           {/* Profile Type */}

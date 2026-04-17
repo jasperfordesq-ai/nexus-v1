@@ -60,7 +60,8 @@
     "rating_submitted_desc": "شكرًا على ملاحظاتك!",
     "submit_failed": "فشل في التقديم",
     "try_again": "يرجى المحاولة مرة أخرى",
-    "submit_error_desc": "حدث خطأ. يرجى المحاولة مرة أخرى."
+    "submit_error_desc": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+    "recipient_load_failed": "Could not load recipient. Please search manually."
   },
   "error": {
     "load_balance": "فشل في تحميل رصيد المحفظة",
@@ -132,5 +133,11 @@
   "exceeds_balance": "يتجاوز الرصيد المتاح",
   "optional": "optional",
   "description_placeholder": "ما هو الغرض من هذا التحويل؟",
-  "new_balance_after": "رصيدك الجديد سيكون {{balance}} ساعات"
+  "new_balance_after": "رصيدك الجديد سيكون {{balance}} ساعات",
+  "validation": {
+    "select_recipient": "Please select a recipient",
+    "valid_amount": "Please enter a valid amount",
+    "insufficient_balance": "Insufficient balance",
+    "max_transfer": "Maximum transfer is {{max}} hours"
+  }
 }

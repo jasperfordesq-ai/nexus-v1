@@ -40,7 +40,9 @@
     "mark_read_failed": "Theip ar an bhfógra a mharcáil mar léite",
     "all_read": "Gach fógra marcáilte mar léite",
     "mark_all_failed": "Theip ar gach fógra a mharcáil mar léite",
-    "delete_failed": "Theip ar an bhfógra a scriosadh"
+    "delete_failed": "Theip ar an bhfógra a scriosadh",
+    "deleted": "Notification deleted",
+    "undo_hint": "Click Undo to restore"
   },
   "realtime": {
     "new_message": "Teachtaireacht Nua",
@@ -69,5 +71,7 @@
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "load_more": "Load more",
+  "undo": "Undo"
 }

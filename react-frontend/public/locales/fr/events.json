@@ -250,5 +250,6 @@
   "radius_10": "10 km",
   "radius_25": "25 km",
   "radius_50": "50 km",
-  "radius_100": "100 km"
+  "radius_100": "100 km",
+  "nearby_error": "Unable to load nearby events"
 }

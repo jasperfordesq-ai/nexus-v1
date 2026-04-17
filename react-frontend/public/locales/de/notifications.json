@@ -40,7 +40,9 @@
     "mark_read_failed": "Benachrichtigung konnte nicht als gelesen markiert werden",
     "all_read": "Alle Benachrichtigungen als gelesen markiert",
     "mark_all_failed": "Benachrichtigungen konnten nicht als gelesen markiert werden",
-    "delete_failed": "Benachrichtigung konnte nicht gelöscht werden"
+    "delete_failed": "Benachrichtigung konnte nicht gelöscht werden",
+    "deleted": "Notification deleted",
+    "undo_hint": "Click Undo to restore"
   },
   "realtime": {
     "new_message": "Neue Nachricht",
@@ -69,5 +71,7 @@
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "load_more": "Load more",
+  "undo": "Undo"
 }

@@ -60,7 +60,8 @@
     "rating_submitted_desc": "フィードバックありがとうございます！",
     "submit_failed": "送信に失敗しました",
     "try_again": "もう一度試してください",
-    "submit_error_desc": "エラーが発生しました。もう一度試してください。"
+    "submit_error_desc": "エラーが発生しました。もう一度試してください。",
+    "recipient_load_failed": "Could not load recipient. Please search manually."
   },
   "error": {
     "load_balance": "ウォレット残高の読み込みに失敗しました",
@@ -132,5 +133,11 @@
   "exceeds_balance": "利用可能残高を超えています",
   "optional": "optional",
   "description_placeholder": "この送金は何のためですか？",
-  "new_balance_after": "あなたの新しい残高は{{balance}}時間になります"
+  "new_balance_after": "あなたの新しい残高は{{balance}}時間になります",
+  "validation": {
+    "select_recipient": "Please select a recipient",
+    "valid_amount": "Please enter a valid amount",
+    "insufficient_balance": "Insufficient balance",
+    "max_transfer": "Maximum transfer is {{max}} hours"
+  }
 }

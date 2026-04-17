@@ -197,5 +197,6 @@
     "conversation": {
       "title": "Conversation"
     }
-  }
+  },
+  "character_count": "{{current}}/{{max}}"
 }

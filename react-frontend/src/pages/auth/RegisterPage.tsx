@@ -352,6 +352,11 @@ export function RegisterPage() {
         setPendingResult(result);
         return;
       }
+      // Check if onboarding is required before redirecting to dashboard
+      if ((result as { requiresOnboarding?: boolean }).requiresOnboarding) {
+        navigate(tenantPath('/onboarding'), { replace: true });
+        return;
+      }
       // No gates — redirect to dashboard (fully authenticated)
       navigate(tenantPath('/dashboard'), { replace: true });
     }
@@ -364,6 +369,8 @@ export function RegisterPage() {
 
   const passwordValid = isPasswordValid(password);
   const passwordsMatch = password === passwordConfirm;
+  // Track whether the confirm field has ever been focused (for real-time match indicator)
+  const [confirmTouched, setConfirmTouched] = useState(false);
 
   const isFormValid =
     firstName.trim() &&
@@ -736,7 +743,7 @@ export function RegisterPage() {
                           ) : (
                             <X className="w-3 h-3" aria-hidden="true" />
                           )}
-                          {req.label}
+                          {t(req.label)}
                         </li>
                       );
                     })}
@@ -752,18 +759,34 @@ export function RegisterPage() {
               placeholder={t('register.confirm_password_placeholder')}
               value={passwordConfirm}
               onChange={(e) => setPasswordConfirm(e.target.value)}
+              onFocus={() => setConfirmTouched(true)}
               startContent={<Lock className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               isRequired
               autoComplete="new-password"
-              isInvalid={passwordConfirm.length > 0 && !passwordsMatch}
+              isInvalid={confirmTouched && passwordConfirm.length > 0 && !passwordsMatch}
+              color={
+                confirmTouched && passwordConfirm.length > 0
+                  ? passwordsMatch
+                    ? 'success'
+                    : 'danger'
+                  : 'default'
+              }
               errorMessage={
-                passwordConfirm.length > 0 && !passwordsMatch ? t('register.passwords_must_match') : ''
+                confirmTouched && passwordConfirm.length > 0 && !passwordsMatch
+                  ? t('register.passwords_must_match')
+                  : ''
+              }
+              description={
+                confirmTouched && passwordConfirm.length > 0 && passwordsMatch
+                  ? t('register.passwords_match', { defaultValue: 'Passwords match' })
+                  : undefined
               }
               classNames={{
                 inputWrapper:
                   'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
                 label: 'text-theme-muted',
                 input: 'text-theme-primary placeholder:text-theme-subtle',
+                description: 'text-emerald-600 dark:text-emerald-400',
               }}
             />
           </div>

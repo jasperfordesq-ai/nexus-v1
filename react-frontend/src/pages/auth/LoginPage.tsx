@@ -77,6 +77,7 @@ export function LoginPage() {
 
   // Verification resend state
   const [loginErrorCode, setLoginErrorCode] = useState<string | undefined>();
+  const [loginRetryAfter, setLoginRetryAfter] = useState<number | null>(null);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
   const [resendVerificationSent, setResendVerificationSent] = useState(false);
 
@@ -217,6 +218,7 @@ export function LoginPage() {
     if (!selectedTenantId) return;
 
     setLoginErrorCode(undefined);
+    setLoginRetryAfter(null);
     setResendVerificationSent(false);
     tokenManager.clearTokens();
     tokenManager.setTenantId(selectedTenantId);
@@ -224,6 +226,10 @@ export function LoginPage() {
     const result = await login({ email, password });
     if (!result.success && result.errorCode) {
       setLoginErrorCode(result.errorCode);
+      // Extract retry_after seconds from 429 response
+      if (result.errorCode === 'RATE_LIMITED' || (result as { retryAfter?: number }).retryAfter) {
+        setLoginRetryAfter((result as { retryAfter?: number }).retryAfter ?? null);
+      }
     }
   };
 
@@ -347,6 +353,14 @@ export function LoginPage() {
                       role="alert"
                     >
                       <p className="text-red-600 dark:text-red-400">{error}</p>
+                      {/* Rate limit: show retry_after seconds if available */}
+                      {loginErrorCode === 'RATE_LIMITED' && (
+                        <p className="text-red-600 dark:text-red-400 text-xs mt-1">
+                          {loginRetryAfter && loginRetryAfter > 0
+                            ? t('login.rate_limited_seconds', { seconds: loginRetryAfter, defaultValue: 'Too many attempts. Please wait {{seconds}} seconds.' })
+                            : t('login.rate_limited', { defaultValue: 'Too many attempts. Please try again later.' })}
+                        </p>
+                      )}
                       {/* Resend verification email button */}
                       {loginErrorCode === 'AUTH_EMAIL_NOT_VERIFIED' && (
                         <div className="mt-3">
@@ -487,7 +501,7 @@ export function LoginPage() {
                       label={t('login.email_label')}
                       placeholder={t('login.email_placeholder')}
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => { setEmail(e.target.value); setLoginErrorCode(undefined); setLoginRetryAfter(null); }}
                       startContent={<Mail className="w-4 h-4 text-theme-subtle" />}
                       isRequired
                       autoComplete="username webauthn"
@@ -503,7 +517,7 @@ export function LoginPage() {
                       label={t('login.password_label')}
                       placeholder="••••••••"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) => { setPassword(e.target.value); setLoginErrorCode(undefined); setLoginRetryAfter(null); }}
                       startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
                       endContent={
                         <Button
@@ -649,6 +663,7 @@ export function LoginPage() {
                       startContent={<Shield className="w-4 h-4 text-theme-subtle" />}
                       isRequired
                       autoComplete="one-time-code"
+                      aria-label={useBackupCode ? t('login.twofa_backup_code_label') : t('login.two_factor_code_label', { defaultValue: 'Two-factor authentication code' })}
                       classNames={{
                         inputWrapper: 'glass-card backdrop-blur-lg',
                         label: 'text-theme-muted',

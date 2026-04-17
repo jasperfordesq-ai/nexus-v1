@@ -60,7 +60,8 @@
     "rating_submitted_desc": "Go raibh maith agat as do thuairim!",
     "submit_failed": "Theip ar chur isteach",
     "try_again": "Bain triail eile as le do thoil",
-    "submit_error_desc": "Tharla earráid. Bain triail eile as le do thoil."
+    "submit_error_desc": "Tharla earráid. Bain triail eile as le do thoil.",
+    "recipient_load_failed": "Could not load recipient. Please search manually."
   },
   "error": {
     "load_balance": "Theip ar luchtú iarmhéid an sparáin",
@@ -132,5 +133,11 @@
   "exceeds_balance": "Thar an iarmhéid ar fáil",
   "optional": "roghnach",
   "description_placeholder": "Cad is aidhm leis an aistriú seo?",
-  "new_balance_after": "Beidh d'iarmhéid nua {{balance}} uair"
+  "new_balance_after": "Beidh d'iarmhéid nua {{balance}} uair",
+  "validation": {
+    "select_recipient": "Please select a recipient",
+    "valid_amount": "Please enter a valid amount",
+    "insufficient_balance": "Insufficient balance",
+    "max_transfer": "Maximum transfer is {{max}} hours"
+  }
 }

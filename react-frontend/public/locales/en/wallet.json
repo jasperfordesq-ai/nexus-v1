@@ -60,7 +60,8 @@
     "rating_submitted_desc": "Thank you for your feedback!",
     "submit_failed": "Failed to submit",
     "try_again": "Please try again",
-    "submit_error_desc": "An error occurred. Please try again."
+    "submit_error_desc": "An error occurred. Please try again.",
+    "recipient_load_failed": "Could not load recipient. Please search manually."
   },
   "error": {
     "load_balance": "Failed to load wallet balance",
@@ -120,6 +121,12 @@
     "export_csv": "Export transactions to CSV",
     "loading_transactions": "Loading transactions",
     "transaction_detail": "{{direction}} {{amount}} hours {{name}}"
+  },
+  "validation": {
+    "select_recipient": "Please select a recipient",
+    "valid_amount": "Please enter a valid amount",
+    "insufficient_balance": "Insufficient balance",
+    "max_transfer": "Maximum transfer is {{max}} hours"
   },
   "available_balance": "Available Balance",
   "recipient": "Recipient",

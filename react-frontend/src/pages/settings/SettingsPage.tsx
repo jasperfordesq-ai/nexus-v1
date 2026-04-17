@@ -17,7 +17,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useBlocker } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -79,8 +79,15 @@ export function SettingsPage() {
   const validTabs = ['profile', 'notifications', 'privacy', 'security', 'skills', 'availability', 'linked-accounts'];
   const initialTab = validTabs.includes(searchParams.get('tab') || '') ? searchParams.get('tab')! : 'profile';
   const [activeTab, setActiveTab] = useState(initialTab);
+  const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+
+  // Unsaved changes blocker — intercepts React Router navigation when form is dirty
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      isDirty && currentLocation.pathname !== nextLocation.pathname
+  );
 
   // Modal states
   const passwordModal = useDisclosure();
@@ -90,6 +97,7 @@ export function SettingsPage() {
   const twoFactorDisableModal = useDisclosure();
   const backupCodesModal = useDisclosure();
   const gdprModal = useDisclosure();
+  const marketingConsentModal = useDisclosure();
 
   // Password form
   const [passwordData, setPasswordData] = useState({
@@ -324,6 +332,13 @@ export function SettingsPage() {
     loadSessions();
   }, [user, loadNotificationSettings, loadMatchPreferences, loadMarketingConsent, loadPrivacySettings, loadTwoFactorStatus, loadSessions]);
 
+  // Re-fetch privacy settings when the privacy tab becomes active
+  useEffect(() => {
+    if (activeTab === 'privacy') {
+      loadPrivacySettings();
+    }
+  }, [activeTab, loadPrivacySettings]);
+
   // Load insurance certificates when insurance is enabled
   const loadInsuranceCerts = useCallback(async () => {
     if (!tenant?.compliance?.insurance_enabled) return;
@@ -374,6 +389,7 @@ export function SettingsPage() {
       }
       const response = await api.put('/v2/users/me', payload);
       if (response.success) {
+        setIsDirty(false);
         toast.success(t('toasts.profile_updated'));
         if (refreshUser) await refreshUser();
       } else {
@@ -400,6 +416,7 @@ export function SettingsPage() {
         }),
       ]);
       if (notifResponse.success && matchResponse.success) {
+        setIsDirty(false);
         toast.success(t('toasts.notifications_saved'));
       } else {
         toast.error(notifResponse.error || matchResponse.error || t('toasts.notifications_save_failed'));
@@ -424,6 +441,7 @@ export function SettingsPage() {
         },
       });
       if (response.success) {
+        setIsDirty(false);
         toast.success(t('toasts.privacy_saved'));
       } else {
         toast.error(response.error || t('toasts.privacy_save_failed'));
@@ -594,6 +612,8 @@ export function SettingsPage() {
         }
         toast.success(t('toasts.twofa_enabled'), t('toasts.twofa_enabled_desc'));
         twoFactorSetupModal.onClose();
+        // Refresh 2FA status from server to ensure UI is in sync
+        loadTwoFactorStatus();
         // Show backup codes
         if (response.data?.backup_codes?.length) {
           backupCodesModal.onOpen();
@@ -644,7 +664,7 @@ export function SettingsPage() {
   // Marketing Consent Handler
   // ─────────────────────────────────────────────────────────────────────────
 
-  async function handleMarketingConsentToggle(checked: boolean) {
+  async function applyMarketingConsent(checked: boolean) {
     try {
       setMarketingConsentLoading(true);
       const response = await api.put('/v2/users/me/consent', {
@@ -662,6 +682,16 @@ export function SettingsPage() {
       toast.error(t('toasts.marketing_consent_failed'));
     } finally {
       setMarketingConsentLoading(false);
+    }
+  }
+
+  function handleMarketingConsentToggle(checked: boolean) {
+    if (checked) {
+      // Turning ON — show confirmation dialog first
+      marketingConsentModal.onOpen();
+    } else {
+      // Turning OFF — apply immediately, no confirmation needed
+      applyMarketingConsent(false);
     }
   }
 
@@ -798,7 +828,11 @@ export function SettingsPage() {
       <motion.div variants={itemVariants}>
         <Tabs
           selectedKey={activeTab}
-          onSelectionChange={(key) => setActiveTab(key as string)}
+          onSelectionChange={(key) => {
+            setActiveTab(key as string);
+            // Tab switching resets dirty state — user has moved away from the form
+            setIsDirty(false);
+          }}
           classNames={{
             tabList: 'bg-theme-elevated p-1 rounded-lg overflow-x-auto flex-nowrap',
             cursor: 'bg-theme-hover',
@@ -881,7 +915,10 @@ export function SettingsPage() {
               isSaving={isSaving}
               isUploading={isUploading}
               isIdVerified={isIdVerified}
-              onProfileDataChange={setProfileData}
+              onProfileDataChange={(updater) => {
+                setProfileData(updater);
+                setIsDirty(true);
+              }}
               onSave={saveProfile}
               onAvatarUpload={handleAvatarUpload}
             />
@@ -908,10 +945,10 @@ export function SettingsPage() {
             marketingConsent={marketingConsent}
             marketingConsentLoading={marketingConsentLoading}
             isOrganisation={profileData.profile_type === 'organisation'}
-            onNotificationsChange={setNotifications}
-            onMatchDigestFrequencyChange={setMatchDigestFrequency}
-            onNotifyHotMatchesChange={setNotifyHotMatches}
-            onNotifyMutualMatchesChange={setNotifyMutualMatches}
+            onNotificationsChange={(v) => { setNotifications(v); setIsDirty(true); }}
+            onMatchDigestFrequencyChange={(v) => { setMatchDigestFrequency(v); setIsDirty(true); }}
+            onNotifyHotMatchesChange={(v) => { setNotifyHotMatches(v); setIsDirty(true); }}
+            onNotifyMutualMatchesChange={(v) => { setNotifyMutualMatches(v); setIsDirty(true); }}
             onMarketingConsentToggle={handleMarketingConsentToggle}
             onSave={saveNotifications}
             onRetry={loadNotificationSettings}
@@ -929,7 +966,7 @@ export function SettingsPage() {
             insuranceType={insuranceType}
             insuranceEnabled={!!tenant?.compliance?.insurance_enabled}
             federationEnabled={!!hasFeature?.('federation')}
-            onPrivacyChange={setPrivacy}
+            onPrivacyChange={(v) => { setPrivacy(v); setIsDirty(true); }}
             onSavePrivacy={savePrivacy}
             onInsuranceUpload={handleInsuranceUpload}
             onInsuranceTypeChange={setInsuranceType}
@@ -1005,6 +1042,41 @@ export function SettingsPage() {
         {/* LINKED ACCOUNTS TAB */}
         {activeTab === 'linked-accounts' && <LinkedAccountsTab />}
       </motion.div>
+
+      {/* Marketing Consent Confirmation Modal */}
+      <Modal
+        isOpen={marketingConsentModal.isOpen}
+        onClose={marketingConsentModal.onClose}
+        classNames={{
+          base: 'bg-content1 border border-theme-default',
+          header: 'border-b border-theme-default',
+          body: 'py-6',
+          footer: 'border-t border-theme-default',
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">
+            {t('marketing_consent_confirm_title', 'Subscribe to Marketing Emails')}
+          </ModalHeader>
+          <ModalBody>
+            <p className="text-theme-muted">
+              {t('marketing_consent_confirm_body', 'Are you sure you want to receive occasional marketing emails, product updates, and community highlights? You can unsubscribe at any time.')}
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={marketingConsentModal.onClose}>
+              {t('cancel')}
+            </Button>
+            <Button
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              onPress={() => { marketingConsentModal.onClose(); applyMarketingConsent(true); }}
+              isLoading={marketingConsentLoading}
+            >
+              {t('marketing_consent_confirm_button', 'Yes, subscribe me')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       {/* GDPR Request Modal (triggered from PrivacyTab) */}
       <Modal
@@ -1089,6 +1161,44 @@ export function SettingsPage() {
               isLoading={isSubmittingGdpr}
             >
               {gdprRequestType === 'deletion' ? t('gdpr.confirm_deletion') : t('gdpr.submit_request')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      {/* Unsaved Changes Modal — shown when navigating away with dirty form */}
+      <Modal
+        isOpen={blocker.state === 'blocked'}
+        onClose={() => blocker.reset?.()}
+        classNames={{
+          base: 'bg-content1 border border-theme-default',
+          header: 'border-b border-theme-default',
+          body: 'py-6',
+          footer: 'border-t border-theme-default',
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">
+            {t('unsaved_changes.title')}
+          </ModalHeader>
+          <ModalBody>
+            <p className="text-theme-muted">{t('unsaved_changes.message')}</p>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+              onPress={() => blocker.reset?.()}
+            >
+              {t('unsaved_changes.stay')}
+            </Button>
+            <Button
+              className="bg-red-500 text-white"
+              onPress={() => {
+                setIsDirty(false);
+                blocker.proceed?.();
+              }}
+            >
+              {t('unsaved_changes.leave')}
             </Button>
           </ModalFooter>
         </ModalContent>

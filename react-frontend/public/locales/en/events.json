@@ -31,6 +31,7 @@
   "events_in_month": "Events in {{month}}",
   "loading_aria": "Loading events",
   "error_load_more": "Failed to load more events",
+  "nearby_error": "Unable to load nearby events",
   "category": {
     "all": "All",
     "workshop": "Workshop",

@@ -40,7 +40,9 @@
     "mark_read_failed": "Impossibile segnare la notifica come letta",
     "all_read": "Tutte le notifiche segnate come lette",
     "mark_all_failed": "Impossibile segnare tutte come lette",
-    "delete_failed": "Impossibile eliminare la notifica"
+    "delete_failed": "Impossibile eliminare la notifica",
+    "deleted": "Notification deleted",
+    "undo_hint": "Click Undo to restore"
   },
   "realtime": {
     "new_message": "Nuovo Messaggio",
@@ -69,5 +71,7 @@
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "load_more": "Load more",
+  "undo": "Undo"
 }

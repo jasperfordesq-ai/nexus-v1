@@ -60,7 +60,8 @@
     "rating_submitted_desc": "Merci pour votre retour !",
     "submit_failed": "Échec de la soumission",
     "try_again": "Veuillez réessayer",
-    "submit_error_desc": "Une erreur s'est produite. Veuillez réessayer."
+    "submit_error_desc": "Une erreur s'est produite. Veuillez réessayer.",
+    "recipient_load_failed": "Could not load recipient. Please search manually."
   },
   "error": {
     "load_balance": "Impossible de charger le solde du portefeuille",
@@ -132,5 +133,11 @@
   "exceeds_balance": "Dépasse le solde disponible",
   "optional": "optionnel",
   "description_placeholder": "À quoi sert ce transfert ?",
-  "new_balance_after": "Votre nouveau solde sera de {{balance}} heures"
+  "new_balance_after": "Votre nouveau solde sera de {{balance}} heures",
+  "validation": {
+    "select_recipient": "Please select a recipient",
+    "valid_amount": "Please enter a valid amount",
+    "insufficient_balance": "Insufficient balance",
+    "max_transfer": "Maximum transfer is {{max}} hours"
+  }
 }

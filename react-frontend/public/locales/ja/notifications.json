@@ -40,7 +40,9 @@
     "mark_read_failed": "通知を既読にするのに失敗しました",
     "all_read": "すべての通知が既読にマークされました",
     "mark_all_failed": "すべてを既読にするのに失敗しました",
-    "delete_failed": "通知の削除に失敗しました"
+    "delete_failed": "通知の削除に失敗しました",
+    "deleted": "Notification deleted",
+    "undo_hint": "Click Undo to restore"
   },
   "realtime": {
     "new_message": "新しいメッセージ",
@@ -69,5 +71,7 @@
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "load_more": "Load more",
+  "undo": "Undo"
 }

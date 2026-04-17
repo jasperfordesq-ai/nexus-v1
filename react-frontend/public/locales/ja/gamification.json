@@ -266,7 +266,8 @@
     "season_unavailable_desc": "シーズン情報を読み込めませんでした。以下のランキングはまだ利用可能です。",
     "session_expired": "あなたのセッションは期限切れです。再度ログインしてください。",
     "load_error": "リーダーボードの読み込みに失敗しました。もう一度お試しください。",
-    "type_nexus_score": "NexusScore"
+    "type_nexus_score": "NexusScore",
+    "load_more": "Load More"
   },
   "community": {
     "total_hours": "交換された合計時間",

@@ -266,7 +266,8 @@
     "season_unavailable_desc": "Could not load season information. Rankings below are still available.",
     "session_expired": "Your session has expired. Please log in again.",
     "load_error": "Failed to load leaderboard. Please try again.",
-    "type_nexus_score": "NexusScore"
+    "type_nexus_score": "NexusScore",
+    "load_more": "Load More"
   },
   "community": {
     "total_hours": "Total Hours Exchanged",

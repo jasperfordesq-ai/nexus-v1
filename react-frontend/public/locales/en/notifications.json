@@ -36,11 +36,15 @@
     "system": "System",
     "default": "Notification"
   },
+  "load_more": "Load more",
+  "undo": "Undo",
   "toast": {
     "mark_read_failed": "Failed to mark notification as read",
     "all_read": "All notifications marked as read",
     "mark_all_failed": "Failed to mark all as read",
-    "delete_failed": "Failed to delete notification"
+    "delete_failed": "Failed to delete notification",
+    "deleted": "Notification deleted",
+    "undo_hint": "Click Undo to restore"
   },
   "realtime": {
     "new_message": "New Message",

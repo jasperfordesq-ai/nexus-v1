@@ -1814,6 +1814,24 @@
         "campaign_not_found": "Campaign not Found",
         "campaign_status_changed": "Campaign Status Changed",
         "campaign_updated": "Campaign Updated",
+        "badge_tiers": {
+            "core": "Core",
+            "template": "Template",
+            "custom": "Custom"
+        },
+        "badge_rarities": {
+            "common": "Common",
+            "uncommon": "Uncommon",
+            "rare": "Rare",
+            "epic": "Epic",
+            "legendary": "Legendary"
+        },
+        "badge_classes": {
+            "quantity": "Quantity",
+            "quality": "Quality",
+            "special": "Special",
+            "verification": "Verification"
+        },
         "campaigns": "Campaigns",
         "cancel": "Cancel",
         "col_actions": "Actions",

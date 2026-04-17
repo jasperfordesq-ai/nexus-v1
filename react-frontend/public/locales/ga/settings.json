@@ -127,7 +127,8 @@
     "location_placeholder": "Cathair, Tír",
     "upload_photo_aria": "Uaslódáil grianghraf próifíle",
     "change_photo_aria": "Athraigh grianghraf próifíle",
-    "identity_verified_lock": "Your name is locked because your identity has been verified."
+    "identity_verified_lock": "Your name is locked because your identity has been verified.",
+    "phone_invalid": "Phone must be in international E.164 format (e.g. +1 555 123 4567)"
   },
   "notification_prefs": {
     "new_messages": "Teachtaireachtaí Nua",
@@ -493,5 +494,15 @@
   "identity_auth": {
     "please_login": "Please log in to verify your identity.",
     "go_to_login": "Go to Login"
+  },
+  "identity_verified_lock_dob": "Your date of birth is locked because your identity has been verified.",
+  "marketing_consent_confirm_title": "Subscribe to Marketing Emails",
+  "marketing_consent_confirm_body": "Are you sure you want to receive occasional marketing emails, product updates, and community highlights? You can unsubscribe at any time.",
+  "marketing_consent_confirm_button": "Yes, subscribe me",
+  "unsaved_changes": {
+    "title": "Unsaved Changes",
+    "message": "You have unsaved changes. If you leave, your changes will be lost.",
+    "leave": "Leave Anyway",
+    "stay": "Stay"
   }
 }

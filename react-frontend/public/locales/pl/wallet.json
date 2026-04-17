@@ -60,7 +60,8 @@
     "rating_submitted_desc": "Dziękujemy za Twoją opinię!",
     "submit_failed": "Nie udało się przesłać",
     "try_again": "Proszę spróbować ponownie",
-    "submit_error_desc": "Wystąpił błąd. Proszę spróbować ponownie."
+    "submit_error_desc": "Wystąpił błąd. Proszę spróbować ponownie.",
+    "recipient_load_failed": "Could not load recipient. Please search manually."
   },
   "error": {
     "load_balance": "Nie udało się załadować salda portfela",
@@ -132,5 +133,11 @@
   "exceeds_balance": "Przekracza dostępny bilans",
   "optional": "optional",
   "description_placeholder": "Na co jest ten przelew?",
-  "new_balance_after": "Twój nowy bilans wyniesie {{balance}} godzin"
+  "new_balance_after": "Twój nowy bilans wyniesie {{balance}} godzin",
+  "validation": {
+    "select_recipient": "Please select a recipient",
+    "valid_amount": "Please enter a valid amount",
+    "insufficient_balance": "Insufficient balance",
+    "max_transfer": "Maximum transfer is {{max}} hours"
+  }
 }

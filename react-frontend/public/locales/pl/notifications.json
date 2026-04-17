@@ -40,7 +40,9 @@
     "mark_read_failed": "Nie udało się oznaczyć powiadomienia jako przeczytane",
     "all_read": "Wszystkie powiadomienia oznaczone jako przeczytane",
     "mark_all_failed": "Nie udało się oznaczyć wszystkich jako przeczytane",
-    "delete_failed": "Nie udało się usunąć powiadomienia"
+    "delete_failed": "Nie udało się usunąć powiadomienia",
+    "deleted": "Notification deleted",
+    "undo_hint": "Click Undo to restore"
   },
   "realtime": {
     "new_message": "Nowa wiadomość",
@@ -69,5 +71,7 @@
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "load_more": "Load more",
+  "undo": "Undo"
 }
