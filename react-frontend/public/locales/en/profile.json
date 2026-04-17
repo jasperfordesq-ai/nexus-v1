@@ -153,5 +153,18 @@
   "delete_failed": "Delete failed",
   "post_deleted": "Post deleted",
   "retry": "Retry",
-  "load_more": "Load more"
+  "load_more": "Load more",
+  "disconnect_confirm_title": "Remove connection?",
+  "disconnect_confirm_description": "This will remove {{name}} from your connections. You'll need to send a new request to reconnect.",
+  "disconnect_confirm": "Remove Connection",
+  "disconnect_cancel": "Cancel",
+  "unblock_user": "Unblock User",
+  "unblocked_success": "User unblocked",
+  "unblock_failed": "Failed to unblock user",
+  "view_all_listings": "View all listings",
+  "no_availability": "No availability set",
+  "no_availability_desc": "This member hasn't shared their availability yet.",
+  "login_to_message": "Log in to message",
+  "blocked_by_you": "You have blocked this user",
+  "unblock_to_interact": "Unblock them to send messages or reviews."
 }

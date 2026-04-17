@@ -3,19 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-/**
- * Profile Page - User profile view
- *
- * Features:
- * - User profile header with avatar, meta, connection actions
- * - Detailed stats cards (hours given/received, listings, groups, events)
- * - Tabs: About, Listings, Reviews, Achievements
- * - Reviews tab with star ratings loaded from API
- * - Enhanced connection display with "Connected" chip and "Send Message" button
- */
-
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Chip, Skeleton, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
 import {
@@ -42,6 +31,8 @@ import {
   Rss,
   MoreVertical,
   ShieldOff,
+  ShieldCheck,
+  ExternalLink,
 } from 'lucide-react';
 import { sanitizeRichText } from '@/lib/sanitize';
 import { GlassCard } from '@/components/ui';
@@ -127,11 +118,12 @@ interface GamificationBadgeResponse {
 export function ProfilePage() {
   const { t } = useTranslation('profile');
   const { id } = useParams<{ id: string }>();
-  const { user: currentUser, isAuthenticated } = useAuth();
-  const { tenantPath } = useTenant();
+  const { user: currentUser, isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const { tenantPath, hasModule } = useTenant();
   const hasConnections = useFeature('connections');
   const hasGamification = useFeature('gamification');
   const hasReviews = useFeature('reviews');
+  const hasWallet = hasModule('wallet');
   const toast = useToast();
 
   const [profile, setProfile] = useState<ProfileApiUser | null>(null);
@@ -145,6 +137,15 @@ export function ProfilePage() {
   const [connectionId, setConnectionId] = useState<number | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [gamification, setGamification] = useState<GamificationSummary | null>(null);
+
+  // Block state
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [isBlockConfirmOpen, setIsBlockConfirmOpen] = useState(false);
+  const [isBlocking, setIsBlocking] = useState(false);
+
+  // Disconnect confirmation
+  const [isDisconnectConfirmOpen, setIsDisconnectConfirmOpen] = useState(false);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
@@ -161,15 +162,12 @@ export function ProfilePage() {
   // Reviews state
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoadingReviews, setIsLoadingReviews] = useState(false);
+  const isLoadingReviewsRef = useRef(false);
   const [reviewsLoaded, setReviewsLoaded] = useState(false);
   const [reviewsAvailable, setReviewsAvailable] = useState(true);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [currentBalance, setCurrentBalance] = useState(0);
-
-  // Block confirmation modal
-  const [isBlockConfirmOpen, setIsBlockConfirmOpen] = useState(false);
-  const [isBlocking, setIsBlocking] = useState(false);
 
   // Resolve "me" alias (from gamification notification links) to own profile
   const resolvedId = id === 'me' ? undefined : id;
@@ -184,7 +182,6 @@ export function ProfilePage() {
 
   const loadProfile = useCallback(async () => {
     if (!profileId) {
-      // id='me' without auth, or no resolved ID — stop loading immediately
       setIsLoading(false);
       return;
     }
@@ -198,8 +195,6 @@ export function ProfilePage() {
       setError(null);
       setErrorCode(null);
 
-      // Use named requests to avoid fragile index arithmetic when determining
-      // which result corresponds to which API call.
       const profileReq = api.get<UserType>(`/v2/users/${profileId}`);
       const listingsReq = api.get<Listing[]>(`/v2/users/${profileId}/listings?limit=6`);
       const gamProfileReq = hasGamification
@@ -211,20 +206,25 @@ export function ProfilePage() {
       const connectionReq = (isAuthenticated && currentUserId && profileId !== currentUserId)
         ? api.get<{ status: ConnectionStatus; connection_id?: number }>(`/v2/connections/status/${profileId}`)
         : null;
+      const blockStatusReq = (isAuthenticated && currentUserId && profileId !== currentUserId)
+        ? api.get<{ is_blocked: boolean; is_blocked_by: boolean }>(`/v2/users/${profileId}/block-status`)
+        : null;
 
-      const [profileRes, listingsRes, gamificationProfileRes, gamificationBadgesRes, connectionRes] =
+      const [profileRes, listingsRes, gamificationProfileRes, gamificationBadgesRes, connectionRes, blockStatusRes] =
         await Promise.all([
           profileReq,
           listingsReq,
           gamProfileReq ?? Promise.resolve(undefined),
           gamBadgesReq ?? Promise.resolve(undefined),
           connectionReq ?? Promise.resolve(undefined),
+          blockStatusReq ?? Promise.resolve(undefined),
         ]) as [
-          { success: boolean; data?: ProfileApiUser },
+          { success: boolean; data?: ProfileApiUser; code?: string },
           { success: boolean; data?: Listing[] },
           { success: boolean; data?: GamificationProfileResponse } | undefined,
           { success: boolean; data?: GamificationBadgeResponse[] } | undefined,
           { success: boolean; data?: { status: ConnectionStatus; connection_id?: number } } | undefined,
+          { success: boolean; data?: { is_blocked: boolean; is_blocked_by: boolean } } | undefined,
         ];
 
       if (controller.signal.aborted) return;
@@ -275,15 +275,16 @@ export function ProfilePage() {
           });
         }
       } else {
-        const resCode = (profileRes as { code?: string }).code;
+        const resCode = profileRes.code ?? (profileRes as { code?: string }).code;
         setErrorCode(resCode ?? null);
-        setError(
-          resCode === 'PROFILE_INCOMPLETE'
-            ? tRef.current('profile_incomplete')
-            : tRef.current('not_found'),
-        );
+        // PROFILE_INCOMPLETE gets a friendly EmptyState — don't set error so the
+        // second !profile block handles it with the correct message.
+        if (resCode !== 'PROFILE_INCOMPLETE') {
+          setError(tRef.current('not_found'));
+        }
         return;
       }
+
       if (listingsRes.success && listingsRes.data) {
         setListings(listingsRes.data);
       }
@@ -291,9 +292,12 @@ export function ProfilePage() {
         setConnectionStatus(connectionRes.data.status);
         setConnectionId(connectionRes.data.connection_id ?? null);
       }
+      if (blockStatusRes?.success && blockStatusRes.data) {
+        setIsBlocked(blockStatusRes.data.is_blocked);
+      }
 
       // Fetch endorsement data for skills
-      if (profileRes.success && profileRes.data?.skills?.length) {
+      if (profileRes.data?.skills?.length) {
         try {
           const endorseRes = await api.get<{
             endorsements?: Record<string, {
@@ -332,9 +336,10 @@ export function ProfilePage() {
 
   // Load reviews when Reviews tab is selected (lazy load)
   const loadReviews = useCallback(async () => {
-    if (!profileId || reviewsLoaded || isLoadingReviews) return;
+    if (!profileId || reviewsLoaded || isLoadingReviewsRef.current) return;
 
     try {
+      isLoadingReviewsRef.current = true;
       setIsLoadingReviews(true);
       const response = await api.get<Review[]>(`/v2/reviews/user/${profileId}?per_page=50`);
 
@@ -342,16 +347,15 @@ export function ProfilePage() {
         setReviews(response.data);
         setReviewsLoaded(true);
       } else {
-        // Endpoint may not exist, gracefully hide the tab
         setReviewsAvailable(false);
       }
     } catch {
-      // If the endpoint fails (404 etc.), hide the reviews tab
       setReviewsAvailable(false);
     } finally {
+      isLoadingReviewsRef.current = false;
       setIsLoadingReviews(false);
     }
-  }, [profileId, reviewsLoaded, isLoadingReviews]);
+  }, [profileId, reviewsLoaded]);
 
   useEffect(() => {
     if (activeTab === 'reviews' && !reviewsLoaded) {
@@ -360,14 +364,13 @@ export function ProfilePage() {
   }, [activeTab, reviewsLoaded, loadReviews]);
 
   // Fetch wallet balance once when an authenticated user views another user's profile.
-  // Avoids a fresh API call on every "Send Credits" button press.
   useEffect(() => {
-    if (isAuthenticated && !isOwnProfile) {
+    if (isAuthenticated && !isOwnProfile && hasWallet) {
       api.get<{ balance: number }>('/v2/wallet/balance').then((res) => {
         if (res.success && res.data) setCurrentBalance(res.data.balance);
       }).catch((err) => logError('Failed to load wallet balance', err));
     }
-  }, [isAuthenticated, isOwnProfile]);
+  }, [isAuthenticated, isOwnProfile, hasWallet]);
 
   const handleConnect = useCallback(async () => {
     if (!profile?.id) return;
@@ -376,7 +379,6 @@ export function ProfilePage() {
       setIsConnecting(true);
 
       if (connectionStatus === 'none') {
-        // Send connection request
         const response = await api.post<{ connection_id: number }>('/v2/connections/request', {
           user_id: profile.id,
         });
@@ -388,7 +390,6 @@ export function ProfilePage() {
           toastRef.current.error(tRef.current('toast.failed'), response.error || tRef.current('toast.failed'));
         }
       } else if (connectionStatus === 'pending_received' && connectionId) {
-        // Accept connection request
         const response = await api.post(`/v2/connections/${connectionId}/accept`);
         if (response.success) {
           setConnectionStatus('connected');
@@ -396,8 +397,8 @@ export function ProfilePage() {
         } else {
           toastRef.current.error(tRef.current('toast.failed'), response.error || tRef.current('toast.failed'));
         }
-      } else if ((connectionStatus === 'pending_sent' || connectionStatus === 'connected') && connectionId) {
-        // Cancel/Remove connection
+      } else if (connectionStatus === 'pending_sent' && connectionId) {
+        // Cancel pending request — no confirmation needed
         const response = await api.delete(`/v2/connections/${connectionId}`);
         if (response.success) {
           setConnectionStatus('none');
@@ -415,12 +416,34 @@ export function ProfilePage() {
     }
   }, [profile?.id, connectionStatus, connectionId]);
 
+  const handleDisconnect = useCallback(async () => {
+    if (!connectionId) return;
+    try {
+      setIsDisconnecting(true);
+      const response = await api.delete(`/v2/connections/${connectionId}`);
+      if (response.success) {
+        setConnectionStatus('none');
+        setConnectionId(null);
+        setIsDisconnectConfirmOpen(false);
+        toastRef.current.info(tRef.current('toast.removed_title'), tRef.current('toast.removed'));
+      } else {
+        toastRef.current.error(tRef.current('toast.failed'), response.error || tRef.current('toast.failed'));
+      }
+    } catch (error) {
+      logError('Disconnect action failed', error);
+      toastRef.current.error(tRef.current('toast.failed'), tRef.current('toast.error'));
+    } finally {
+      setIsDisconnecting(false);
+    }
+  }, [connectionId]);
+
   const handleBlock = useCallback(async () => {
     if (!profile?.id) return;
     try {
       setIsBlocking(true);
       const response = await api.post(`/v2/users/${profile.id}/block`);
       if (response.success) {
+        setIsBlocked(true);
         setIsBlockConfirmOpen(false);
         toastRef.current.success(tRef.current('blocked_success'));
       } else {
@@ -434,14 +457,35 @@ export function ProfilePage() {
     }
   }, [profile?.id]);
 
-  if (isLoading) {
+  const handleUnblock = useCallback(async () => {
+    if (!profile?.id) return;
+    try {
+      const response = await api.delete(`/v2/users/${profile.id}/block`);
+      if (response.success) {
+        setIsBlocked(false);
+        toastRef.current.success(tRef.current('unblocked_success'));
+      } else {
+        toastRef.current.error(tRef.current('unblock_failed'));
+      }
+    } catch (err) {
+      logError('Failed to unblock user', err);
+      toastRef.current.error(tRef.current('unblock_failed'));
+    }
+  }, [profile?.id]);
+
+  // Redirect unauthenticated /profile/me to login once auth state is resolved
+  if (id === 'me' && !isAuthLoading && !isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (isLoading || isAuthLoading) {
     return <LoadingScreen message={t('loading')} />;
   }
 
   const fallbackPath = hasConnections ? tenantPath('/members') : tenantPath('/explore');
   const fallbackLabel = hasConnections ? t('browse_members') : t('back_to_explore');
 
-  // Error state with retry
+  // Error state with retry (not PROFILE_INCOMPLETE — that falls through to !profile below)
   if (error && !profile) {
     return (
       <div className="max-w-4xl mx-auto">
@@ -514,7 +558,7 @@ export function ProfilePage() {
       animate="visible"
       className="max-w-4xl mx-auto space-y-6"
     >
-      <PageMeta title={t('page_meta.title')} noIndex />
+      <PageMeta title={profile.name || t('page_meta.title')} noIndex />
       {/* Profile Header */}
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
@@ -549,7 +593,7 @@ export function ProfilePage() {
                   />
                 )}
                 {/* Connected chip for other users */}
-                {!isOwnProfile && connectionStatus === 'connected' && (
+                {!isOwnProfile && hasConnections && connectionStatus === 'connected' && (
                   <Chip
                     color="success"
                     variant="flat"
@@ -622,17 +666,46 @@ export function ProfilePage() {
                       {t('settings')}
                     </Button>
                   </Link>
+                ) : isBlocked ? (
+                  // Blocked state — show only unblock option and a notice
+                  <>
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 text-sm">
+                      <ShieldOff className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                      <span>{t('blocked_by_you')}</span>
+                    </div>
+                    <Button
+                      variant="flat"
+                      className="bg-theme-elevated text-theme-secondary"
+                      startContent={<ShieldCheck className="w-4 h-4" aria-hidden="true" />}
+                      onPress={() => void handleUnblock()}
+                    >
+                      {t('unblock_user')}
+                    </Button>
+                  </>
                 ) : (
                   <>
-                    <Link to={tenantPath(`/messages/new/${profile.id}`)}>
-                      <Button
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                        startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
-                      >
-                        {t('send_message')}
-                      </Button>
-                    </Link>
-                    {isAuthenticated && connectionStatus !== 'connected' && (
+                    {isAuthenticated && (
+                      <Link to={tenantPath(`/messages/new/${profile.id}`)}>
+                        <Button
+                          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                          startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
+                        >
+                          {t('send_message')}
+                        </Button>
+                      </Link>
+                    )}
+                    {!isAuthenticated && (
+                      <Link to={tenantPath('/login')}>
+                        <Button
+                          variant="flat"
+                          className="bg-theme-elevated text-theme-primary"
+                          startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
+                        >
+                          {t('login_to_message')}
+                        </Button>
+                      </Link>
+                    )}
+                    {hasConnections && isAuthenticated && connectionStatus !== 'connected' && (
                       <Button
                         variant="flat"
                         className={
@@ -645,8 +718,6 @@ export function ProfilePage() {
                         startContent={
                           connectionStatus === 'pending_sent' ? (
                             <Clock className="w-4 h-4" aria-hidden="true" />
-                          ) : connectionStatus === 'pending_received' ? (
-                            <UserPlus className="w-4 h-4" aria-hidden="true" />
                           ) : (
                             <UserPlus className="w-4 h-4" aria-hidden="true" />
                           )
@@ -661,6 +732,16 @@ export function ProfilePage() {
                           : t('connect')}
                       </Button>
                     )}
+                    {hasConnections && isAuthenticated && connectionStatus === 'connected' && (
+                      <Button
+                        variant="flat"
+                        className="bg-theme-elevated text-theme-secondary"
+                        startContent={<UserCheck className="w-4 h-4" aria-hidden="true" />}
+                        onPress={() => setIsDisconnectConfirmOpen(true)}
+                      >
+                        {t('connected')}
+                      </Button>
+                    )}
                     {/* Write Review */}
                     {isAuthenticated && hasReviews && (
                       <Button
@@ -673,7 +754,7 @@ export function ProfilePage() {
                       </Button>
                     )}
                     {/* Send credits */}
-                    {isAuthenticated && (
+                    {isAuthenticated && hasWallet && (
                       <Button
                         variant="flat"
                         className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
@@ -684,7 +765,7 @@ export function ProfilePage() {
                       </Button>
                     )}
                     {/* More options (Block) */}
-                    {isAuthenticated && !isOwnProfile && (
+                    {isAuthenticated && (
                       <Dropdown>
                         <DropdownTrigger>
                           <Button isIconOnly variant="flat" className="bg-theme-elevated text-theme-secondary" aria-label={t('more_options')}>
@@ -719,7 +800,7 @@ export function ProfilePage() {
               id: profile.id,
               lat: Number(profile.latitude),
               lng: Number(profile.longitude),
-              title: `${profile.first_name} ${profile.last_name}`,
+              title: profile.name ?? '',
             }]}
             center={{ lat: Number(profile.latitude), lng: Number(profile.longitude) }}
             mapHeight="200px"
@@ -780,7 +861,7 @@ export function ProfilePage() {
           const tabs = [
             { key: 'about', icon: User, label: t('tabs.about') },
             { key: 'listings', icon: ListTodo, label: t('tabs.listings') },
-            { key: 'activity', icon: Rss, label: t('tabs.activity', 'Activity') },
+            { key: 'activity', icon: Rss, label: t('tabs.activity') },
             { key: 'availability', icon: Calendar, label: t('tabs.availability') },
             ...(hasReviews && reviewsAvailable ? [{ key: 'reviews', icon: Star, label: t('tabs.reviews') }] : []),
             ...(hasGamification ? [{ key: 'achievements', icon: Award, label: t('tabs.achievements') }] : []),
@@ -789,7 +870,7 @@ export function ProfilePage() {
             <div
               className="flex items-center gap-1 bg-theme-elevated p-1 rounded-lg overflow-x-auto scrollbar-hide"
               role="tablist"
-              aria-label={t('aria.profile_sections', 'Profile sections')}
+              aria-label={t('aria.profile_sections')}
             >
               {tabs.map((tab) => {
                 const Icon = tab.icon;
@@ -846,7 +927,6 @@ export function ProfilePage() {
                         >
                           {skill}
                         </Chip>
-                        {/* Endorsement button for other users' skills */}
                         {!isOwnProfile && isAuthenticated && profile.id && (
                           <EndorseButton
                             memberId={profile.id}
@@ -872,65 +952,81 @@ export function ProfilePage() {
           )}
 
           {activeTab === 'listings' && (
-            <div role="tabpanel" id="panel-listings" aria-labelledby="tab-listings" className="grid sm:grid-cols-2 gap-4">
-              {listings.length > 0 ? (
-                listings.map((listing) => (
-                  <Link
-                    key={listing.id}
-                    to={tenantPath(`/listings/${listing.id}`)}
-                    aria-label={`${listing.type === 'offer' ? t('listing_type.offer') : t('listing_type.request')}: ${listing.title}`}
-                  >
-                    <article role="listitem">
-                      <GlassCard className="hover:scale-[1.02] transition-transform h-full flex flex-col overflow-hidden">
-                        {listing.image_url && (
-                          <img
-                            src={resolveAssetUrl(listing.image_url)}
-                            alt={listing.title || t('listing_image_alt', { defaultValue: 'Listing image' })}
-                            className="w-full h-32 object-cover"
-                            loading="lazy"
-                          />
-                        )}
-                        <div className="p-5 flex flex-col flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Chip
-                              size="sm"
-                              variant="flat"
-                              className={
-                                listing.type === 'offer'
-                                  ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
-                                  : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
-                              }
-                            >
-                              {listing.type === 'offer' ? t('listing_type.offer') : t('listing_type.request')}
-                            </Chip>
+            <div role="tabpanel" id="panel-listings" aria-labelledby="tab-listings" className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                {listings.length > 0 ? (
+                  listings.map((listing) => (
+                    <Link
+                      key={listing.id}
+                      to={tenantPath(`/listings/${listing.id}`)}
+                      aria-label={`${listing.type === 'offer' ? t('listing_type.offer') : t('listing_type.request')}: ${listing.title}`}
+                    >
+                      <article role="listitem">
+                        <GlassCard className="hover:scale-[1.02] transition-transform h-full flex flex-col overflow-hidden">
+                          {listing.image_url && (
+                            <img
+                              src={resolveAssetUrl(listing.image_url)}
+                              alt={listing.title || t('listing_image_alt')}
+                              className="w-full h-32 object-cover"
+                              loading="lazy"
+                            />
+                          )}
+                          <div className="p-5 flex flex-col flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Chip
+                                size="sm"
+                                variant="flat"
+                                className={
+                                  listing.type === 'offer'
+                                    ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                                    : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                                }
+                              >
+                                {listing.type === 'offer' ? t('listing_type.offer') : t('listing_type.request')}
+                              </Chip>
+                            </div>
+                            <h3 className="font-medium text-theme-primary mb-1">{listing.title}</h3>
+                            <SafeHtml content={listing.description} className="text-sm text-theme-subtle line-clamp-2" as="p" />
+                            <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
+                              <Clock className="w-3 h-3" aria-hidden="true" />
+                              {listing.hours_estimate ?? listing.estimated_hours ?? '\u2014'}h
+                            </div>
                           </div>
-                          <h3 className="font-medium text-theme-primary mb-1">{listing.title}</h3>
-                          <SafeHtml content={listing.description} className="text-sm text-theme-subtle line-clamp-2" as="p" />
-                          <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
-                            <Clock className="w-3 h-3" aria-hidden="true" />
-                            {listing.hours_estimate ?? listing.estimated_hours ?? '\u2014'}h
-                          </div>
-                        </div>
-                      </GlassCard>
-                    </article>
+                        </GlassCard>
+                      </article>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="col-span-2">
+                    <EmptyState
+                      icon={<ListTodo className="w-12 h-12" aria-hidden="true" />}
+                      title={t('no_listings')}
+                      description={isOwnProfile ? t('no_listings_own') : t('no_listings_other')}
+                      action={
+                        isOwnProfile && (
+                          <Link to={tenantPath('/listings/create')}>
+                            <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+                              {t('create_listing')}
+                            </Button>
+                          </Link>
+                        )
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+              {/* View all link — shown when we may have loaded only the first 6 */}
+              {listings.length > 0 && (
+                <div className="text-center pt-2">
+                  <Link to={tenantPath(`/listings?user_id=${profile.id}`)}>
+                    <Button
+                      variant="flat"
+                      className="bg-theme-elevated text-theme-muted"
+                      endContent={<ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />}
+                    >
+                      {t('view_all_listings')}
+                    </Button>
                   </Link>
-                ))
-              ) : (
-                <div className="col-span-2">
-                  <EmptyState
-                    icon={<ListTodo className="w-12 h-12" aria-hidden="true" />}
-                    title={t('no_listings')}
-                    description={isOwnProfile ? t('no_listings_own') : t('no_listings_other')}
-                    action={
-                      isOwnProfile && (
-                        <Link to={tenantPath('/listings/create')}>
-                          <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                            {t('create_listing')}
-                          </Button>
-                        </Link>
-                      )
-                    }
-                  />
                 </div>
               )}
             </div>
@@ -944,7 +1040,18 @@ export function ProfilePage() {
 
           {activeTab === 'availability' && profile && (
             <GlassCard role="tabpanel" id="panel-availability" aria-labelledby="tab-availability" className="p-6">
-              <AvailabilityGrid userId={profile.id} editable={false} compact />
+              <AvailabilityGrid
+                userId={profile.id}
+                editable={false}
+                compact
+                fallback={
+                  <EmptyState
+                    icon={<Calendar className="w-12 h-12" aria-hidden="true" />}
+                    title={t('no_availability')}
+                    description={t('no_availability_desc')}
+                  />
+                }
+              />
             </GlassCard>
           )}
 
@@ -952,8 +1059,7 @@ export function ProfilePage() {
           {activeTab === 'reviews' && (
             <div role="tabpanel" id="panel-reviews" aria-labelledby="tab-reviews" className="space-y-4">
               {isLoadingReviews ? (
-                // Loading skeleton for reviews
-                <div aria-label={t('aria.loading_reviews', 'Loading reviews')} aria-busy="true" className="space-y-3">
+                <div aria-label={t('aria.loading_reviews')} aria-busy="true" className="space-y-3">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <GlassCard key={i} className="p-5">
                       <div className="flex items-start gap-4">
@@ -1014,11 +1120,7 @@ export function ProfilePage() {
                   <EmptyState
                     icon={<Star className="w-12 h-12" aria-hidden="true" />}
                     title={t('no_reviews')}
-                    description={
-                      isOwnProfile
-                        ? t('no_reviews_own')
-                        : t('no_reviews_other')
-                    }
+                    description={isOwnProfile ? t('no_reviews_own') : t('no_reviews_other')}
                   />
                 </GlassCard>
               )}
@@ -1103,10 +1205,6 @@ export function ProfilePage() {
           isOpen={isReviewModalOpen}
           onClose={() => setIsReviewModalOpen(false)}
           onSuccess={() => {
-            // Reset the loaded flag — the useEffect watching [activeTab, reviewsLoaded]
-            // will call loadReviews() on the next render with the correct stale-free closure.
-            // Calling loadReviews() directly here would use the old closure where
-            // reviewsLoaded is still true, causing the guard to exit early.
             setReviewsLoaded(false);
           }}
           receiverId={profile.id}
@@ -1151,6 +1249,37 @@ export function ProfilePage() {
                   startContent={<ShieldOff className="w-4 h-4" aria-hidden="true" />}
                 >
                   {t('block_confirm')}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {/* Disconnect Confirmation Modal */}
+      <Modal isOpen={isDisconnectConfirmOpen} onOpenChange={setIsDisconnectConfirmOpen} size="sm">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="text-theme-primary">
+                {t('disconnect_confirm_title')}
+              </ModalHeader>
+              <ModalBody>
+                <p className="text-theme-muted text-sm">
+                  {t('disconnect_confirm_description', { name: profile?.name || profile?.first_name })}
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={onClose}>
+                  {t('disconnect_cancel')}
+                </Button>
+                <Button
+                  color="danger"
+                  variant="flat"
+                  onPress={() => void handleDisconnect()}
+                  isLoading={isDisconnecting}
+                >
+                  {t('disconnect_confirm')}
                 </Button>
               </ModalFooter>
             </>
@@ -1202,9 +1331,14 @@ interface ReviewCardProps {
 
 function ReviewCard({ review }: ReviewCardProps) {
   const { t } = useTranslation('profile');
+  const { tenantPath } = useTenant();
   const reviewerName = review.reviewer
     ? `${review.reviewer.first_name} ${review.reviewer.last_name}`.trim()
     : t('anonymous');
+
+  const nameContent = (
+    <p className="font-medium text-theme-primary text-sm">{reviewerName}</p>
+  );
 
   return (
     <GlassCard className="p-5">
@@ -1218,7 +1352,13 @@ function ReviewCard({ review }: ReviewCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
             <div>
-              <p className="font-medium text-theme-primary text-sm">{reviewerName}</p>
+              {review.reviewer?.id ? (
+                <Link to={tenantPath(`/profile/${review.reviewer.id}`)} className="hover:underline">
+                  {nameContent}
+                </Link>
+              ) : (
+                nameContent
+              )}
               {review.listing_title && (
                 <p className="text-xs text-theme-subtle truncate">
                   {t('for_listing', { title: review.listing_title })}

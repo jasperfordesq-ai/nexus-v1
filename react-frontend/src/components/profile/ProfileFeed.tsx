@@ -249,8 +249,6 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
               item={item}
               onToggleLike={() => void handleToggleLike(item)}
               onHidePost={() => void handleHidePost(item)}
-              onMuteUser={() => toast.info(t('mute_unavailable', 'To mute this user, visit the main feed'))}
-              onReportPost={() => toast.info(t('report_unavailable', 'To report this post, visit the main feed'))}
               onDeletePost={() => void handleDeletePost(item)}
               onVotePoll={handleVotePoll}
               feedMode="recent"

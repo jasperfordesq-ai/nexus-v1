@@ -10,7 +10,7 @@
  * (read-only) and in settings (editable).
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Button, Spinner, Tooltip } from '@heroui/react';
 import { Calendar, Save, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -55,10 +55,12 @@ export function AvailabilityGrid({
   userId,
   editable = false,
   compact = false,
+  fallback = null,
 }: {
   userId?: string | number;
   editable?: boolean;
   compact?: boolean;
+  fallback?: React.ReactNode;
 }) {
   const toast = useToast();
   const { t } = useTranslation('settings');
@@ -241,7 +243,7 @@ export function AvailabilityGrid({
   const hasAvailability = slots.size > 0 && Array.from(slots.values()).some(Boolean);
 
   if (!editable && !hasAvailability) {
-    return null; // Don't show empty grid on profiles
+    return fallback as React.ReactElement | null;
   }
 
   const displaySlots = compact

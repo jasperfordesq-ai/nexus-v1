@@ -95,10 +95,10 @@ export interface FeedCardProps {
   onReact?: (item: FeedItem, reactionType: ReactionType) => void;
   /** Called with the feed item when the user hides a post. */
   onHidePost: (item: FeedItem) => void;
-  /** Called with the feed item when the user mutes the post author. */
-  onMuteUser: (item: FeedItem) => void;
-  /** Called with the feed item when the user reports a post. */
-  onReportPost: (item: FeedItem) => void;
+  /** Called with the feed item when the user mutes the post author. Omit to hide the menu option. */
+  onMuteUser?: (item: FeedItem) => void;
+  /** Called with the feed item when the user reports a post. Omit to hide the menu option. */
+  onReportPost?: (item: FeedItem) => void;
   /** Called with the feed item when the user deletes their own post. */
   onDeletePost: (item: FeedItem) => void;
   /** Called with the feed item when an admin deletes any post. */
@@ -887,22 +887,26 @@ const FeedCard = React.memo(function FeedCard({
                             {t('card.not_interested', 'Not interested')}
                           </DropdownItem>
                         )}
-                        <DropdownItem
-                          key="mute"
-                          startContent={<VolumeX className="w-4 h-4" aria-hidden="true" />}
-                          onPress={() => onMuteUser(item)}
-                        >
-                          {t('card.mute_user', { name: author.name })}
-                        </DropdownItem>
-                        <DropdownItem
-                          key="report"
-                          startContent={<Flag className="w-4 h-4" aria-hidden="true" />}
-                          className="text-danger"
-                          color="danger"
-                          onPress={() => onReportPost(item)}
-                        >
-                          {t('card.report_post')}
-                        </DropdownItem>
+                        {onMuteUser && (
+                          <DropdownItem
+                            key="mute"
+                            startContent={<VolumeX className="w-4 h-4" aria-hidden="true" />}
+                            onPress={() => onMuteUser(item)}
+                          >
+                            {t('card.mute_user', { name: author.name })}
+                          </DropdownItem>
+                        )}
+                        {onReportPost && (
+                          <DropdownItem
+                            key="report"
+                            startContent={<Flag className="w-4 h-4" aria-hidden="true" />}
+                            className="text-danger"
+                            color="danger"
+                            onPress={() => onReportPost(item)}
+                          >
+                            {t('card.report_post')}
+                          </DropdownItem>
+                        )}
                         {isAdmin && onAdminDeletePost && (
                           <DropdownItem
                             key="admin-delete"
@@ -989,23 +993,27 @@ const FeedCard = React.memo(function FeedCard({
                           {t('card.not_interested', 'Not interested')}
                         </Button>
                       )}
-                      <Button
-                        variant="light"
-                        className="justify-start text-[var(--text-primary)]"
-                        startContent={<VolumeX className="w-4 h-4" aria-hidden="true" />}
-                        aria-label={t('card.mute_user_label', { name: author.name ?? '' })}
-                        onPress={() => { setIsOptionsSheetOpen(false); onMuteUser(item); }}
-                      >
-                        {t('card.mute_user', { name: author.name })}
-                      </Button>
-                      <Button
-                        variant="light"
-                        className="justify-start text-danger"
-                        startContent={<Flag className="w-4 h-4" aria-hidden="true" />}
-                        onPress={() => { setIsOptionsSheetOpen(false); onReportPost(item); }}
-                      >
-                        {t('card.report_post')}
-                      </Button>
+                      {onMuteUser && (
+                        <Button
+                          variant="light"
+                          className="justify-start text-[var(--text-primary)]"
+                          startContent={<VolumeX className="w-4 h-4" aria-hidden="true" />}
+                          aria-label={t('card.mute_user_label', { name: author.name ?? '' })}
+                          onPress={() => { setIsOptionsSheetOpen(false); onMuteUser(item); }}
+                        >
+                          {t('card.mute_user', { name: author.name })}
+                        </Button>
+                      )}
+                      {onReportPost && (
+                        <Button
+                          variant="light"
+                          className="justify-start text-danger"
+                          startContent={<Flag className="w-4 h-4" aria-hidden="true" />}
+                          onPress={() => { setIsOptionsSheetOpen(false); onReportPost(item); }}
+                        >
+                          {t('card.report_post')}
+                        </Button>
+                      )}
                       {isAdmin && onAdminDeletePost && (
                         <Button
                           variant="light"
