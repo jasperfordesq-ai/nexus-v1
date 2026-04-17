@@ -14,7 +14,7 @@ import { Button, Spinner, Chip } from '@heroui/react';
 import { CreditCard, Plus, Pencil, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
-import { useTenant, useToast } from '@/contexts';
+import { useTenant, useToast, useAuth } from '@/contexts';
 import { adminPlans } from '../../api/adminApi';
 import { PageHeader, DataTable, EmptyState, ConfirmModal, type Column } from '../../components';
 
@@ -35,6 +35,12 @@ export function PlansAdmin() {
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const userRecord = user as Record<string, unknown> | null;
+  const isSuperAdmin =
+    (user?.role as string) === 'super_admin' ||
+    userRecord?.is_super_admin === true ||
+    userRecord?.is_tenant_super_admin === true;
 
   const [data, setData] = useState<PlanItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -94,16 +100,19 @@ export function PlansAdmin() {
       key: 'name',
       label: t('content.label_name'),
       sortable: true,
-      render: (item) => (
-        <Button
-          type="button"
-          variant="light"
-          onPress={() => navigate(tenantPath(`/admin/plans/edit/${item.id}`))}
-          className="text-left font-medium text-primary hover:underline min-w-0 h-auto p-0 justify-start"
-        >
-          {item.name}
-        </Button>
-      ),
+      render: (item) =>
+        isSuperAdmin ? (
+          <Button
+            type="button"
+            variant="light"
+            onPress={() => navigate(tenantPath(`/admin/plans/edit/${item.id}`))}
+            className="text-left font-medium text-primary hover:underline min-w-0 h-auto p-0 justify-start"
+          >
+            {item.name}
+          </Button>
+        ) : (
+          <span className="text-sm font-medium">{item.name}</span>
+        ),
     },
     {
       key: 'tier_level',
@@ -132,10 +141,10 @@ export function PlansAdmin() {
         </Chip>
       ),
     },
-    {
+    ...(isSuperAdmin ? [{
       key: 'actions',
       label: t('listings.actions'),
-      render: (item) => (
+      render: (item: PlanItem) => (
         <div className="flex gap-1">
           <Button
             isIconOnly
@@ -159,7 +168,7 @@ export function PlansAdmin() {
           </Button>
         </div>
       ),
-    },
+    }] : []),
   ];
 
   if (loading) {
@@ -177,13 +186,15 @@ export function PlansAdmin() {
         title={t('content.plans_admin_title')}
         description={t('content.plans_admin_desc')}
         actions={
-          <Button
-            color="primary"
-            startContent={<Plus size={16} />}
-            onPress={() => navigate(tenantPath('/admin/plans/create'))}
-          >
-            {t('breadcrumbs.create')} {t('breadcrumbs.plans')}
-          </Button>
+          isSuperAdmin ? (
+            <Button
+              color="primary"
+              startContent={<Plus size={16} />}
+              onPress={() => navigate(tenantPath('/admin/plans/create'))}
+            >
+              {t('breadcrumbs.create')} {t('breadcrumbs.plans')}
+            </Button>
+          ) : undefined
         }
       />
 
@@ -192,8 +203,10 @@ export function PlansAdmin() {
           icon={CreditCard}
           title={t('no_data')}
           description={t('content.desc_create_subscription_plans_to_offer_diffe')}
-          actionLabel={`${t('breadcrumbs.create')} ${t('breadcrumbs.plans')}`}
-          onAction={() => navigate(tenantPath('/admin/plans/create'))}
+          {...(isSuperAdmin ? {
+            actionLabel: `${t('breadcrumbs.create')} ${t('breadcrumbs.plans')}`,
+            onAction: () => navigate(tenantPath('/admin/plans/create')),
+          } : {})}
         />
       ) : (
         <DataTable

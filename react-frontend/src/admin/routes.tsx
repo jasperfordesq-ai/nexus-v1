@@ -413,9 +413,11 @@ export function AdminRoutes() {
       <Route path="timebanking/create-org" element={<Lazy><OrgWallets /></Lazy>} />
       <Route path="timebanking/starting-balances" element={<Lazy><StartingBalances /></Lazy>} />
       <Route path="plans" element={<Lazy><PlansAdmin /></Lazy>} />
-      <Route path="plans/create" element={<Lazy><PlanForm /></Lazy>} />
-      <Route path="plans/edit/:id" element={<Lazy><PlanForm /></Lazy>} />
       <Route path="plans/subscriptions" element={<Lazy><SubscriptionsAdmin /></Lazy>} />
+      <Route element={<SuperAdminRoute />}>
+        <Route path="plans/create" element={<Lazy><PlanForm /></Lazy>} />
+        <Route path="plans/edit/:id" element={<Lazy><PlanForm /></Lazy>} />
+      </Route>
 
       {/* ─── ENTERPRISE ─── */}
       <Route path="enterprise" element={<Lazy><EnterpriseDashboard /></Lazy>} />
