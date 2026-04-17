@@ -50,6 +50,11 @@ class FeedRankingService
     public const GEO_DECAY_INTERVAL = 100;
     public const GEO_DECAY_PER_INTERVAL = 0.03;
     public const GEO_MINIMUM_SCORE = 0.15;
+    /**
+     * Exponential decay lambda: score = exp(-lambda * distanceKm).
+     * lambda = 0.003 gives ~0.5 score at 231 km, floors at GEO_MINIMUM_SCORE.
+     */
+    public const GEO_DECAY_LAMBDA = 0.003;
 
     public const VITALITY_FULL_THRESHOLD = 7;
     public const VITALITY_DECAY_THRESHOLD = 30;
@@ -107,6 +112,25 @@ class FeedRankingService
         'love' => 2.0, 'celebrate' => 1.8, 'insightful' => 1.5,
         'like' => 1.0, 'curious' => 0.8, 'sad' => 0.6, 'angry' => 0.5,
     ];
+
+    /**
+     * Map raw Unicode emoji (stored in reactions.emoji) to named reaction types
+     * that match the keys in REACTION_WEIGHTS.
+     */
+    public const EMOJI_REACTION_MAP = [
+        '❤️' => 'love',
+        '❤'  => 'love',   // bare heart without variation selector
+        '👍' => 'like',
+        '😮' => 'curious',
+        '😢' => 'sad',
+        '😠' => 'angry',
+        '🎉' => 'celebrate',
+        '💡' => 'insightful',
+        '🤔' => 'curious',
+    ];
+
+    /** CTR neutral baseline — real feed CTR is 1–3%, not 10% */
+    public const CTR_NEUTRAL_BASELINE = 0.02;
 
     // View/click tracking
     private const VIEW_TRACKING_ENABLED = true;
@@ -288,11 +312,10 @@ class FeedRankingService
             return 1.0;
         }
 
-        $distanceBeyond = $distanceKm - self::GEO_FULL_SCORE_RADIUS;
-        $decayIntervals = floor($distanceBeyond / self::GEO_DECAY_INTERVAL);
-        $totalDecay = $decayIntervals * self::GEO_DECAY_PER_INTERVAL;
-
-        return max(self::GEO_MINIMUM_SCORE, 1.0 - $totalDecay);
+        // Exponential decay beyond the full-score radius.
+        // score = exp(-lambda * distance), floored at GEO_MINIMUM_SCORE.
+        $score = exp(-self::GEO_DECAY_LAMBDA * $distanceKm);
+        return max(self::GEO_MINIMUM_SCORE, $score);
     }
 
     /**
@@ -774,13 +797,13 @@ class FeedRankingService
 
         $authorCoords = !empty($authorIds) ? $this->getBatchUserCoordinates($authorIds) : [];
         $vitalityScores = !empty($authorIds) ? $this->getBatchVitalityScores($authorIds) : [];
-        $velocityScores = (self::VELOCITY_ENABLED && !empty($postIds)) ? $this->getBatchEngagementVelocity($postIds) : [];
-        $conversationDepths = (self::CONVERSATION_DEPTH_ENABLED && !empty($postIds)) ? $this->getBatchConversationDepth($postIds) : [];
-        $reactionScores = !empty($postIds) ? $this->getBatchReactionScores($postIds) : [];
-        $negativeScores = ($viewerId && !empty($postIds)) ? $this->getBatchNegativeSignals($viewerId, $postIds, $authorIds) : [];
+        $velocityScores = (self::VELOCITY_ENABLED && !empty($items)) ? $this->getBatchEngagementVelocity($items) : [];
+        $conversationDepths = (self::CONVERSATION_DEPTH_ENABLED && !empty($items)) ? $this->getBatchConversationDepth($items) : [];
+        $reactionScores = !empty($items) ? $this->getBatchReactionScores($items) : [];
+        $negativeScores = ($viewerId && !empty($items)) ? $this->getBatchNegativeSignals($viewerId, $items, $authorIds) : [];
         $ctrScores = (!empty($config['ctr_enabled']) && !empty($postIds)) ? $this->getBatchClickThroughRates($postIds) : [];
         $userTypePrefs = (!empty($config['user_type_prefs_enabled']) && $viewerId) ? $this->getInstanceUserTypePreferences($viewerId) : [];
-        $saveScores = (!empty($config['save_signal_enabled']) && !empty($postIds)) ? $this->getBatchSaveScores($postIds) : [];
+        $saveScores = (!empty($config['save_signal_enabled']) && !empty($items)) ? $this->getBatchSaveScores($items) : [];
 
         foreach ($items as &$item) {
             $postId = (int) ($item['id'] ?? $item['post_id'] ?? 0);
@@ -1117,64 +1140,103 @@ class FeedRankingService
         } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
     }
 
-    private function getBatchEngagementVelocity(array $postIds): array
+    private function getBatchEngagementVelocity(array $feedItems): array
     {
-        if (empty($postIds)) return [];
+        if (empty($feedItems)) return [];
         try {
             $tenantId = TenantContext::getId();
-            $ph = implode(',', array_fill(0, count($postIds), '?'));
             $hrs = self::VELOCITY_WINDOW_HOURS;
-            $sql = "SELECT target_id AS post_id, COUNT(*) AS velocity FROM (
-                SELECT target_id FROM likes WHERE target_type='post' AND target_id IN ($ph) AND tenant_id=? AND created_at>=DATE_SUB(NOW(),INTERVAL ? HOUR)
-                UNION ALL
-                SELECT target_id FROM comments WHERE target_type='post' AND target_id IN ($ph) AND tenant_id=? AND created_at>=DATE_SUB(NOW(),INTERVAL ? HOUR)
-            ) AS recent GROUP BY target_id";
-            $params = array_merge($postIds, [$tenantId, $hrs], $postIds, [$tenantId, $hrs]);
-            $rows = DB::select($sql, $params);
-            $r = [];
-            foreach ($rows as $row) { $r[(int) $row->post_id] = (int) $row->velocity; }
-            return $r;
-        } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
-    }
 
-    private function getBatchConversationDepth(array $postIds): array
-    {
-        if (empty($postIds)) return [];
-        try {
-            $tenantId = TenantContext::getId();
-            $ph = implode(',', array_fill(0, count($postIds), '?'));
-            $rows = DB::select(
-                "SELECT target_id AS post_id, COUNT(*) AS depth FROM comments WHERE target_type='post' AND target_id IN ($ph) AND tenant_id=? AND parent_id IS NOT NULL GROUP BY target_id",
-                array_merge($postIds, [$tenantId])
-            );
-            $r = [];
-            foreach ($rows as $row) { $r[(int) $row->post_id] = (int) $row->depth; }
-            return $r;
-        } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
-    }
+            // Group by source_type so target_type filters are correct
+            $byType = [];
+            foreach ($feedItems as $item) {
+                $sType = $item['type'] ?? $item['source_type'] ?? 'post';
+                $sId   = (int) ($item['id'] ?? $item['post_id'] ?? 0);
+                if ($sId > 0) $byType[$sType][] = $sId;
+            }
 
-    private function getBatchReactionScores(array $postIds): array
-    {
-        if (empty($postIds)) return [];
-        try {
-            $tenantId = TenantContext::getId();
-            $ph = implode(',', array_fill(0, count($postIds), '?'));
-            $rows = DB::select(
-                "SELECT target_id AS post_id, reaction_type, COUNT(*) AS cnt FROM reactions WHERE target_type='post' AND target_id IN ($ph) AND tenant_id=? GROUP BY target_id, reaction_type",
-                array_merge($postIds, [$tenantId])
-            );
             $r = [];
-            foreach ($rows as $row) {
-                $pid = (int) $row->post_id;
-                $type = strtolower($row->reaction_type ?? 'like');
-                $weight = self::REACTION_WEIGHTS[$type] ?? 1.0;
-                $r[$pid] = ($r[$pid] ?? 0) + ($weight * (int) $row->cnt);
+            foreach ($byType as $targetType => $ids) {
+                $ph  = implode(',', array_fill(0, count($ids), '?'));
+                $sql = "SELECT target_id, COUNT(*) AS velocity FROM (
+                    SELECT target_id FROM likes WHERE target_type=? AND target_id IN ($ph) AND tenant_id=? AND created_at>=DATE_SUB(NOW(),INTERVAL ? HOUR)
+                    UNION ALL
+                    SELECT target_id FROM comments WHERE target_type=? AND target_id IN ($ph) AND tenant_id=? AND created_at>=DATE_SUB(NOW(),INTERVAL ? HOUR)
+                ) AS recent GROUP BY target_id";
+                $params = array_merge([$targetType], $ids, [$tenantId, $hrs, $targetType], $ids, [$tenantId, $hrs]);
+                $rows = DB::select($sql, $params);
+                foreach ($rows as $row) { $r[(int) $row->target_id] = (int) $row->velocity; }
             }
             return $r;
         } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
     }
 
-    private function getBatchNegativeSignals(int $viewerId, array $postIds, array $authorIds): array
+    private function getBatchConversationDepth(array $feedItems): array
+    {
+        if (empty($feedItems)) return [];
+        try {
+            $tenantId = TenantContext::getId();
+
+            $byType = [];
+            foreach ($feedItems as $item) {
+                $sType = $item['type'] ?? $item['source_type'] ?? 'post';
+                $sId   = (int) ($item['id'] ?? $item['post_id'] ?? 0);
+                if ($sId > 0) $byType[$sType][] = $sId;
+            }
+
+            $r = [];
+            foreach ($byType as $targetType => $ids) {
+                $ph   = implode(',', array_fill(0, count($ids), '?'));
+                $rows = DB::select(
+                    "SELECT target_id, COUNT(*) AS depth FROM comments
+                     WHERE target_type = ? AND target_id IN ($ph) AND tenant_id = ? AND parent_id IS NOT NULL
+                     GROUP BY target_id",
+                    array_merge([$targetType], $ids, [$tenantId])
+                );
+                foreach ($rows as $row) { $r[(int) $row->target_id] = (int) $row->depth; }
+            }
+            return $r;
+        } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
+    }
+
+    private function getBatchReactionScores(array $feedItems): array
+    {
+        if (empty($feedItems)) return [];
+        try {
+            $tenantId = TenantContext::getId();
+
+            // Group feed items by their source_type so we match the correct target_type
+            $byType = [];
+            foreach ($feedItems as $item) {
+                $sType = $item['type'] ?? $item['source_type'] ?? 'post';
+                $sId   = (int) ($item['id'] ?? $item['post_id'] ?? 0);
+                if ($sId > 0) {
+                    $byType[$sType][] = $sId;
+                }
+            }
+
+            $r = [];
+            foreach ($byType as $targetType => $ids) {
+                $ph   = implode(',', array_fill(0, count($ids), '?'));
+                $rows = DB::select(
+                    "SELECT target_id AS post_id, emoji, COUNT(*) AS cnt
+                     FROM reactions
+                     WHERE target_type = ? AND target_id IN ($ph) AND tenant_id = ?
+                     GROUP BY target_id, emoji",
+                    array_merge([$targetType], $ids, [$tenantId])
+                );
+                foreach ($rows as $row) {
+                    $pid   = (int) $row->post_id;
+                    $named = self::EMOJI_REACTION_MAP[$row->emoji] ?? 'like';
+                    $weight = self::REACTION_WEIGHTS[$named] ?? 1.0;
+                    $r[$pid] = ($r[$pid] ?? 0) + ($weight * (int) $row->cnt);
+                }
+            }
+            return $r;
+        } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
+    }
+
+    private function getBatchNegativeSignals(int $viewerId, array $feedItems, array $authorIds): array
     {
         $config = self::getConfig();
         if (empty($config['negative_signals_enabled']) || $viewerId === 0) return [];
@@ -1182,19 +1244,45 @@ class FeedRankingService
         $tenantId = TenantContext::getId();
         $this->mutedUserSet = [];
         try {
-            if (!empty($postIds)) {
-                $ph = implode(',', array_fill(0, count($postIds), '?'));
-                $rows = DB::select("SELECT post_id FROM feed_hidden WHERE user_id=? AND tenant_id=? AND post_id IN ($ph)", array_merge([$viewerId, $tenantId], $postIds));
-                foreach ($rows as $row) { $result[(int) $row->post_id] = (float) $config['hide_penalty']; }
+            // Group items by source_type for correct target_type matching
+            $byType = [];
+            foreach ($feedItems as $item) {
+                $sType = $item['type'] ?? $item['source_type'] ?? 'post';
+                $sId   = (int) ($item['id'] ?? $item['post_id'] ?? 0);
+                if ($sId > 0) {
+                    $byType[$sType][] = $sId;
+                }
             }
+
+            // Hidden items (feed_hidden uses target_id / target_type columns)
+            foreach ($byType as $targetType => $ids) {
+                $ph   = implode(',', array_fill(0, count($ids), '?'));
+                $rows = DB::select(
+                    "SELECT target_id FROM feed_hidden
+                     WHERE user_id = ? AND tenant_id = ? AND target_type = ? AND target_id IN ($ph)",
+                    array_merge([$viewerId, $tenantId, $targetType], $ids)
+                );
+                foreach ($rows as $row) {
+                    $result[(int) $row->target_id] = (float) $config['hide_penalty'];
+                }
+            }
+
+            // Muted authors
             if (!empty($authorIds)) {
                 $ph = implode(',', array_fill(0, count($authorIds), '?'));
                 $rows = DB::select("SELECT muted_user_id FROM feed_muted_users WHERE user_id=? AND tenant_id=? AND muted_user_id IN ($ph)", array_merge([$viewerId, $tenantId], $authorIds));
                 foreach ($rows as $row) { $this->mutedUserSet[(int) $row->muted_user_id] = 1; }
             }
-            if (!empty($postIds)) {
-                $ph = implode(',', array_fill(0, count($postIds), '?'));
-                $rows = DB::select("SELECT target_id, COUNT(*) AS report_count FROM reports WHERE target_type='post' AND target_id IN ($ph) AND tenant_id=? GROUP BY target_id", array_merge($postIds, [$tenantId]));
+
+            // Reported items (reports table uses target_type / target_id)
+            foreach ($byType as $targetType => $ids) {
+                $ph   = implode(',', array_fill(0, count($ids), '?'));
+                $rows = DB::select(
+                    "SELECT target_id, COUNT(*) AS report_count FROM reports
+                     WHERE target_type = ? AND target_id IN ($ph) AND tenant_id = ?
+                     GROUP BY target_id",
+                    array_merge([$targetType], $ids, [$tenantId])
+                );
                 foreach ($rows as $row) {
                     $pid = (int) $row->target_id;
                     if (!isset($result[$pid])) {
@@ -1279,24 +1367,41 @@ class FeedRankingService
         } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
     }
 
-    private function getBatchSaveScores(array $postIds): array
+    private function getBatchSaveScores(array $feedItems): array
     {
-        if (empty($postIds)) return [];
+        if (empty($feedItems)) return [];
         try {
             $tenantId = TenantContext::getId();
-            $ph = implode(',', array_fill(0, count($postIds), '?'));
-            $sql = "SELECT fa.source_id AS post_id, (
-                        COALESCE((SELECT COUNT(*) FROM user_saved_listings usl WHERE usl.listing_id = fa.source_id AND usl.tenant_id = ?), 0) +
-                        COALESCE((SELECT COUNT(*) FROM listing_favorites lf WHERE lf.listing_id = fa.source_id AND lf.tenant_id = ?), 0)
-                    ) AS save_count
-                    FROM feed_activity fa
-                    WHERE fa.source_id IN ($ph) AND fa.tenant_id = ?
-                    AND fa.source_type IN ('listing', 'post')
-                    GROUP BY fa.source_id HAVING save_count > 0";
-            $params = array_merge([$tenantId, $tenantId], $postIds, [$tenantId]);
-            $rows = DB::select($sql, $params);
+
+            // Build (bookmarkable_type, bookmarkable_id) pairs from feed items
+            $pairs = [];
+            foreach ($feedItems as $item) {
+                $sType = $item['type'] ?? $item['source_type'] ?? 'post';
+                $sId   = (int) ($item['id'] ?? $item['post_id'] ?? 0);
+                if ($sId > 0) {
+                    $pairs[] = [$sType, $sId];
+                }
+            }
+            if (empty($pairs)) return [];
+
+            // Build WHERE clause: (bookmarkable_type = ? AND bookmarkable_id = ?) OR ...
+            $conditions = implode(' OR ', array_fill(0, count($pairs), '(bookmarkable_type = ? AND bookmarkable_id = ?)'));
+            $params = [$tenantId];
+            foreach ($pairs as [$t, $id]) {
+                $params[] = $t;
+                $params[] = $id;
+            }
+
+            $rows = DB::select(
+                "SELECT bookmarkable_id AS source_id, COUNT(*) AS save_count
+                 FROM bookmarks
+                 WHERE tenant_id = ? AND ($conditions)
+                 GROUP BY bookmarkable_type, bookmarkable_id
+                 HAVING save_count > 0",
+                $params
+            );
             $r = [];
-            foreach ($rows as $row) { $r[(int) $row->post_id] = (int) $row->save_count; }
+            foreach ($rows as $row) { $r[(int) $row->source_id] = (int) $row->save_count; }
             return $r;
         } catch (\Exception $e) { Log::warning('FeedRankingService batch query failed', ['error' => $e->getMessage()]); return []; }
     }

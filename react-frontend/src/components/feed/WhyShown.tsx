@@ -6,8 +6,9 @@
 /**
  * WhyShown — Popover explaining why a post appears in the user's feed.
  *
- * Infers top reasons from visible item data (engagement, type, freshness, media).
- * Renders as a subtle info icon that opens a HeroUI Popover with bullet points.
+ * Shows backend-provided ranking_reasons when available. Falls back to a single
+ * neutral "Ranked for you based on your activity" message — never fabricates
+ * reasons from client-side engagement heuristics.
  * Only renders in "For You" (ranking) mode, not chronological.
  */
 
@@ -21,52 +22,19 @@ interface WhyShownProps {
   feedMode: 'ranking' | 'recent';
 }
 
-/** Infer top reasons from visible item attributes */
-function inferReasons(item: FeedItem): string[] {
-  const reasons: Array<{ key: string; weight: number }> = [];
-
-  // High engagement
-  if ((item.likes_count + item.comments_count) >= 5) {
-    reasons.push({ key: 'why_shown.popular', weight: 3 });
-  } else if ((item.likes_count + item.comments_count) >= 2) {
-    reasons.push({ key: 'why_shown.some_engagement', weight: 1.5 });
-  }
-
-  // Content type boost
-  const communityTypes = ['event', 'challenge', 'poll', 'volunteer', 'goal'];
-  if (communityTypes.includes(item.type)) {
-    reasons.push({ key: 'why_shown.community_content', weight: 2 });
-  }
-
-  // Freshness (< 4 hours)
-  const hoursAgo = (Date.now() - new Date(item.created_at).getTime()) / (1000 * 60 * 60);
-  if (hoursAgo < 4) {
-    reasons.push({ key: 'why_shown.fresh', weight: 2.5 });
-  }
-
-  // Rich media
-  if (item.media && item.media.length > 0) {
-    reasons.push({ key: 'why_shown.has_media', weight: 1.2 });
-  }
-
-  // Has reactions (diverse engagement)
-  if (item.reactions && item.reactions.total >= 3) {
-    reasons.push({ key: 'why_shown.reactions', weight: 1.8 });
-  }
-
-  // Sort by weight, take top 3
-  reasons.sort((a, b) => b.weight - a.weight);
-  return reasons.slice(0, 3).map((r) => r.key);
-}
-
 export function WhyShown({ item, feedMode }: WhyShownProps) {
   const { t } = useTranslation('feed');
 
   // Only show in ranking mode
   if (feedMode !== 'ranking') return null;
 
-  const reasons = item.ranking_reasons ?? inferReasons(item);
-  if (reasons.length === 0) return null;
+  // Use backend-provided reasons exclusively. If absent or empty, show a single
+  // neutral reason — never fabricate signals from client-side engagement data.
+  const backendReasons = item.ranking_reasons && item.ranking_reasons.length > 0
+    ? item.ranking_reasons
+    : null;
+
+  const reasons: string[] = backendReasons ?? [t('why_shown.default_reason')];
 
   return (
     <Popover placement="bottom" offset={4}>
@@ -75,7 +43,7 @@ export function WhyShown({ item, feedMode }: WhyShownProps) {
           isIconOnly
           variant="light"
           size="sm"
-          className="text-[var(--text-subtle)] hover:text-[var(--text-muted)] transition-colors opacity-0 group-hover:opacity-100 focus-visible:opacity-100 min-w-0 min-h-0 w-auto h-auto p-0.5"
+          className="text-[var(--text-subtle)] hover:text-[var(--text-muted)] transition-colors opacity-60 hover:opacity-100 focus-visible:opacity-100 min-w-0 min-h-0 w-auto h-auto p-0.5"
           aria-label={t('why_shown.label', 'Why am I seeing this?')}
         >
           <Info className="w-3.5 h-3.5" />
@@ -89,7 +57,8 @@ export function WhyShown({ item, feedMode }: WhyShownProps) {
           {reasons.map((reason, i) => (
             <li key={i} className="text-xs text-[var(--text-muted)] flex items-start gap-1.5">
               <span className="text-[var(--color-primary)] mt-0.5">•</span>
-              <span>{t(reason)}</span>
+              {/* Backend reasons are pre-translated strings; fallback is already translated above */}
+              <span>{reason}</span>
             </li>
           ))}
         </ul>

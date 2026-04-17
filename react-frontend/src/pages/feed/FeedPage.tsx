@@ -58,7 +58,7 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
-import { resetFeedImpressions } from '@/hooks/useFeedImpression';
+import { resetImpressions } from '@/hooks/useFeedTracking';
 import { FeedCard } from '@/components/feed/FeedCard';
 import { FeedSkeleton } from '@/components/feed/FeedSkeleton';
 import { FeedEmptyIllustration } from '@/components/illustrations';
@@ -69,6 +69,7 @@ import type { ReactionType } from '@/components/social';
 /* ───────────────────────── Constants ───────────────────────── */
 
 const SCROLL_THRESHOLD = 200;
+const FEED_MODE_KEY = 'nexus_feed_mode';
 
 /* ───────────────────────── Sidebar Error Boundary ───────────────────────── */
 
@@ -107,8 +108,11 @@ export function FeedPage() {
   // Buffer for real-time posts received while scrolled down
   const pendingPostsRef = useRef<FeedItem[]>([]);
 
-  // Feed mode: EdgeRank vs chronological
-  const [feedMode, setFeedMode] = useState<'ranking' | 'recent'>('ranking');
+  // Feed mode: EdgeRank vs chronological — persisted across page refreshes
+  const [feedMode, setFeedMode] = useState<'ranking' | 'recent'>(() => {
+    const stored = localStorage.getItem(FEED_MODE_KEY);
+    return stored === 'ranking' || stored === 'recent' ? stored : 'ranking';
+  });
   // Sub-filter (e.g. listings -> offers/requests)
   const [subFilter, setSubFilter] = useState<string | null>(null);
 
@@ -180,7 +184,7 @@ export function FeedPage() {
         setIsLoading(true);
         setError(null);
         // Clear impression dedup set so each post fires again on the new load
-        resetFeedImpressions();
+        resetImpressions();
       }
 
       const params = new URLSearchParams();
@@ -697,7 +701,7 @@ export function FeedPage() {
 
       {/* Feed Mode Toggle (For You / Recent) */}
       <div className="flex items-center justify-between">
-        <FeedModeToggle mode={feedMode} onModeChange={setFeedMode} />
+        <FeedModeToggle mode={feedMode} onModeChange={(mode) => { localStorage.setItem(FEED_MODE_KEY, mode); setFeedMode(mode); }} />
         {isAuthenticated && (
           <Button
             size="sm"
@@ -787,7 +791,7 @@ export function FeedPage() {
 
       {/* New posts floating chip — appears when real-time posts arrive while scrolled down */}
       <AnimatePresence>
-        {pendingPostCount > 0 && isScrolledDown && (
+        {pendingPostCount > 0 && (feedMode === 'ranking' || isScrolledDown) && (
           <motion.div
             key="new-posts-chip"
             initial={{ opacity: 0, y: -20, scale: 0.9 }}

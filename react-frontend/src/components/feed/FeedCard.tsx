@@ -67,7 +67,6 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime, formatDate, formatTime } from '@/lib/helpers';
 import { useFeedTracking } from '@/hooks/useFeedTracking';
-import { useFeedImpression } from '@/hooks/useFeedImpression';
 import { useLongPress } from '@/hooks/useLongPress';
 import type { FeedItem, FeedComment, PollData } from './types';
 import { getAuthor, getItemDetailPath, getItemDetailLabel } from './types';
@@ -594,10 +593,6 @@ const FeedCard = React.memo(function FeedCard({
   const detailLabel = getItemDetailLabel(item);
   const { ref: trackingRef, recordClick } = useFeedTracking(item.id, isAuthenticated);
 
-  // Impression tracking — fires POST /v2/feed/{id}/impression once per feed load
-  // when ≥50% of the card is visible for ≥1 second.
-  useFeedImpression(item.id, viewTargetRef);
-
   // Load poll data lazily ONLY when the item is a poll, poll_data was NOT
   // provided inline, and we haven't already loaded or started loading it.
   useEffect(() => {
@@ -1036,6 +1031,7 @@ const FeedCard = React.memo(function FeedCard({
               <Link
                 to={tenantPath(detailPath)}
                 className="text-sm font-semibold text-[var(--text-primary)] hover:text-[var(--color-primary)] transition-colors mb-1.5 block"
+                onClick={recordClick}
               >
                 {item.title}
               </Link>
@@ -1306,6 +1302,7 @@ const FeedCard = React.memo(function FeedCard({
             <Link
               to={tenantPath(detailPath)}
               className={`inline-flex items-center justify-center gap-2 py-2 px-5 rounded-xl text-sm font-medium transition-all bg-gradient-to-r ${config.gradient || 'from-[var(--color-primary)]/10 to-[var(--color-primary)]/5'} text-[var(--text-primary)] hover:opacity-80 border border-[var(--border-default)] hover:border-[var(--color-primary)]/30`}
+              onClick={recordClick}
             >
               {config.icon}
               {t(detailLabel)}

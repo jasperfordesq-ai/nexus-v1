@@ -99,8 +99,10 @@ export interface FeedItem {
     content_type?: string | null;
     embed_html?: string | null;
   }>;
-  /** Server-provided ranking reasons (when available) or client-inferred */
+  /** Server-provided ranking reasons (when available) */
   ranking_reasons?: string[];
+  /** EdgeRank score attached by the backend (float, for debugging/analytics). */
+  _edge_rank?: number;
   /** Quoted post (quote repost) — embedded original post */
   quoted_post?: {
     id: number;

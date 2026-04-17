@@ -740,8 +740,13 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
             />
             <PresenceIndicator userId={member.id} size="md" />
           </div>
-          <div className="flex items-center justify-center gap-1.5">
+          <div className="flex items-center justify-center gap-1.5 flex-wrap">
             <h3 className="font-semibold text-theme-primary">{displayName}</h3>
+            {member.is_verified && (
+              <Tooltip content={t('members.verified_member', 'Verified member')}>
+                <BadgeCheck className="w-4 h-4 text-teal-500 shrink-0" aria-label={t('members.verified_member', 'Verified member')} />
+              </Tooltip>
+            )}
             {hasGamification && level > 0 && (
               <Chip size="sm" variant="flat" className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs h-5 min-w-0">
                 {t('common.level_short', { level, defaultValue: 'Lv. {{level}}' })}
@@ -772,6 +777,14 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
               <Clock className="w-3 h-3" aria-hidden="true" />
               <span>{(member.total_hours_given ?? 0) + (member.total_hours_received ?? 0)}h</span>
             </span>
+            {sortBy === 'communityrank' && member.community_rank_score != null && (
+              <Tooltip content={t('members.community_rank_score_tooltip', 'CommunityRank score')}>
+                <span className="flex items-center gap-1 shrink-0 whitespace-nowrap text-violet-600 dark:text-violet-400 cursor-default">
+                  <TrendingUp className="w-3 h-3" aria-hidden="true" />
+                  <span>{Math.round(member.community_rank_score * 100)}%</span>
+                </span>
+              </Tooltip>
+            )}
           </div>
 
           {(member.location || distanceLabel) && (

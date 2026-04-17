@@ -20,6 +20,11 @@ import { readStoredConsent } from '@/contexts/CookieConsentContext';
 /** Set of post IDs already tracked this session (prevents duplicates) */
 const impressedIds = new Set<number>();
 
+/** Call this whenever the feed performs a fresh (non-append) load to clear dedup state. */
+export function resetImpressions(): void {
+  impressedIds.clear();
+}
+
 export function useFeedTracking(postId: number, isAuthenticated: boolean) {
   const ref = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
