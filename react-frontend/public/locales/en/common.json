@@ -432,5 +432,6 @@
   },
   "checking_authentication": "Checking authentication...",
   "verification_status": "Verification Status",
-  "verify_identity": "Verify Identity"
+  "verify_identity": "Verify Identity",
+  "level_short": "Lv. {{level}}"
 }

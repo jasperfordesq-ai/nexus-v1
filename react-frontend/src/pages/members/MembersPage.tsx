@@ -537,11 +537,9 @@ export function MembersPage() {
           ) : (
             <>
               {/* Results count with search context */}
-              {debouncedQuery && (
+              {debouncedQuery && totalCount !== null && (
                 <p className="text-sm text-theme-muted">
-                  {totalCount !== null
-                    ? t('members.results_matching', { shown: members.length.toLocaleString(), total: totalCount.toLocaleString(), query: debouncedQuery })
-                    : `${members.length.toLocaleString()} members matching "${debouncedQuery}"`}
+                  {t('members.results_matching', { shown: members.length.toLocaleString(), total: totalCount.toLocaleString(), query: debouncedQuery })}
                 </p>
               )}
 
@@ -644,13 +642,13 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
 
   // Distance label for nearby mode
   const distanceLabel = member.distance != null
-    ? `${member.distance} km`
+    ? `${Number(member.distance).toFixed(1)} km`
     : null;
 
   if (viewMode === 'list') {
     return (
-      <Link to={tenantPath(`/profile/${member.id}`)}>
-        <article aria-label={`${displayName}'s profile`}>
+      <Link to={tenantPath(`/profile/${member.id}`)} aria-label={`${displayName}'s profile`}>
+        <article>
           <GlassCard className="p-4 hover:bg-theme-hover transition-colors">
             <div className="flex items-center gap-4">
               <div className="relative inline-block">
@@ -672,7 +670,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                   )}
                   {hasGamification && level > 0 && (
                     <Chip size="sm" variant="flat" className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs h-5 min-w-0">
-                      {t('common.level_short', { level, defaultValue: 'Lv. {{level}}' })}
+                      {t('common.level_short', { level })}
                     </Chip>
                   )}
                   {hasGamification && showcasedBadges.length > 0 && (
@@ -696,7 +694,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                     <span>{member.location}</span>
                   </span>
                 )}
-                {member.rating && (
+                {member.rating != null && (
                   <span className="flex items-center gap-1" aria-label={t('members.rating_aria', { rating: member.rating.toFixed(1) })}>
                     <Star className="w-4 h-4 text-amber-400" aria-hidden="true" />
                     <span>{member.rating.toFixed(1)}</span>
@@ -735,8 +733,8 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
   }
 
   return (
-    <Link to={tenantPath(`/profile/${member.id}`)}>
-      <article aria-label={`${displayName}'s profile`}>
+    <Link to={tenantPath(`/profile/${member.id}`)} aria-label={`${displayName}'s profile`}>
+      <article>
         <GlassCard className="p-5 hover:scale-[1.02] transition-transform text-center">
           <div className="relative inline-block mx-auto mb-3">
             <Avatar
@@ -755,7 +753,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
             )}
             {hasGamification && level > 0 && (
               <Chip size="sm" variant="flat" className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs h-5 min-w-0">
-                {t('common.level_short', { level, defaultValue: 'Lv. {{level}}' })}
+                {t('common.level_short', { level })}
               </Chip>
             )}
           </div>
@@ -773,7 +771,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
           )}
 
           <div className="flex items-center justify-center gap-4 mt-4 text-xs text-theme-subtle">
-            {member.rating && (
+            {member.rating != null && (
               <span className="flex items-center gap-1" aria-label={t('members.rating_aria', { rating: member.rating.toFixed(1) })}>
                 <Star className="w-3 h-3 text-amber-400" aria-hidden="true" />
                 <span>{member.rating.toFixed(1)}</span>
