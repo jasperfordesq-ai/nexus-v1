@@ -416,9 +416,9 @@ export function MembersPage() {
               }}
               startContent={<Filter className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             >
-              {membersAlgorithm?.key === 'communityrank' && (
+              {membersAlgorithm?.key === 'communityrank' ? (
                 <SelectItem key="communityrank">{t('members.sort_communityrank')}</SelectItem>
-              )}
+              ) : null}
               <SelectItem key="name">{t('members.sort_name')}</SelectItem>
               <SelectItem key="joined">{t('members.sort_newest')}</SelectItem>
               <SelectItem key="rating">{t('members.sort_rated')}</SelectItem>
@@ -586,7 +586,7 @@ export function MembersPage() {
                 >
                   {members.map((member) => (
                     <motion.div key={member.id} variants={itemVariants}>
-                      <MemberCard member={member} viewMode={viewMode} sortBy={sortBy} />
+                      <MemberCard member={member} viewMode={viewMode} sortBy={sortBy ?? undefined} />
                     </motion.div>
                   ))}
                 </motion.div>

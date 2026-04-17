@@ -678,7 +678,7 @@ export function Partnerships() {
           title={t('federation.reactivate_partnership')}
           message={t('federation.reactivate_partnership_confirm', { name: reactivateTarget.partner_name })}
           confirmLabel={t('federation.reactivate')}
-          confirmColor="success"
+          confirmColor="primary"
           isLoading={actionLoading}
         />
       )}

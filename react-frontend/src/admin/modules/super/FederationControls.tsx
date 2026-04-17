@@ -685,7 +685,7 @@ export function FederationControls() {
             ? t('super.terminate', 'Terminate')
             : t('super.reactivate', 'Reactivate')
         }
-        confirmColor={partnerAction?.type === 'reactivate' ? 'success' : 'danger'}
+        confirmColor={partnerAction?.type === 'reactivate' ? 'primary' : 'danger'}
       />
     </div>
   );
