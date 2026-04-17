@@ -1650,6 +1650,10 @@ Route::put('/v2/admin/users/{id}/global-super-admin', [\App\Http\Controllers\Api
 // Identity verification fee configuration (super admin only)
 Route::put('/v2/admin/super/identity/fee', [\App\Http\Controllers\Api\AdminSuperController::class, 'setIdentityVerificationFee']);
 
+// Billing snapshot and plan assignment (god-level only)
+Route::get('/v2/admin/super/billing/snapshot', [\App\Http\Controllers\Api\AdminSuperController::class, 'getBillingSnapshot']);
+Route::post('/v2/admin/super/billing/assign-plan', [\App\Http\Controllers\Api\AdminSuperController::class, 'assignPlan']);
+
 }); // End Route::middleware(['auth:sanctum', 'super-admin'])
 
 // ============================================

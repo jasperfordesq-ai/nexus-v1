@@ -50,6 +50,7 @@ return [
     'menu_not_found'               => 'Menu not found',
     'menu_item_not_found'          => 'Menu item not found',
     'plan_not_found'               => 'Plan not found',
+    'tenant_and_plan_required'     => 'tenant_id and pay_plan_id are required.',
     'report_not_found'             => 'Report not found',
     'poll_not_found'               => 'Poll not found',
     'newsletter_not_found'         => 'Newsletter not found',

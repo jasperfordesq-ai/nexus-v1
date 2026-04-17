@@ -17,6 +17,7 @@ use App\Services\FederationAuditService;
 use App\Services\FederationFeatureService;
 use App\Services\FederationPartnershipService;
 use App\Services\SuperAdminAuditService;
+use App\Services\TenantBillingService;
 use App\Services\TenantHierarchyService;
 use App\Services\TenantVisibilityService;
 
@@ -1527,5 +1528,42 @@ class AdminSuperController extends BaseApiController
             'fee_cents' => $feeCents,
             'fee_display' => '€' . number_format($feeCents / 100, 2),
         ]);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Billing
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** GET /api/v2/admin/super/billing/snapshot */
+    public function getBillingSnapshot(): JsonResponse
+    {
+        $userId = $this->requireSuperAdmin();
+        $this->requireGod($userId);
+        $snapshot = TenantBillingService::getBillingSnapshot();
+        return $this->respondWithData($snapshot);
+    }
+
+    /** POST /api/v2/admin/super/billing/assign-plan */
+    public function assignPlan(): JsonResponse
+    {
+        $userId = $this->requireSuperAdmin();
+        $this->requireGod($userId);
+        $input    = $this->getAllInput();
+        $tenantId = (int) ($input['tenant_id'] ?? 0);
+        $planId   = (int) ($input['pay_plan_id'] ?? 0);
+        if ($tenantId < 1 || $planId < 1) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.tenant_and_plan_required'), null, 422);
+        }
+        // Verify tenant and plan exist.
+        if (!DB::selectOne('SELECT id FROM tenants WHERE id = ?', [$tenantId])) {
+            return $this->respondWithError('NOT_FOUND', __('api.tenant_not_found'), null, 404);
+        }
+        if (!DB::selectOne('SELECT id FROM pay_plans WHERE id = ? AND is_active = 1', [$planId])) {
+            return $this->respondWithError('NOT_FOUND', __('api.plan_not_found'), null, 404);
+        }
+        $expiresAt = !empty($input['expires_at']) ? $input['expires_at'] : null;
+        $notes     = !empty($input['notes']) ? trim($input['notes']) : null;
+        TenantBillingService::assignPlan($tenantId, $planId, $expiresAt, $notes, $userId);
+        return $this->respondWithData(['assigned' => true]);
     }
 }
