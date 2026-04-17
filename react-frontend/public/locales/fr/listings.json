@@ -219,7 +219,9 @@
   "page_meta": {
     "create": {
       "title": "Créer une annonce"
-    }
+    ,
+  "community_member": "Community Member"
+}
   },
   "filters_label": "Filters",
   "filter_hours": "Duration",
@@ -269,4 +271,6 @@
   "sort_newest": "Newest first",
   "reciprocity_mutual": "Mutual match",
   "reciprocity_one_way": "Match"
+,
+  "community_member": "Community Member"
 }

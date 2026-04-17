@@ -706,14 +706,14 @@ export function ListingsPage() {
                 <div className="p-2 max-w-[250px]">
                   <div className="flex items-center gap-1 mb-1">
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
-                      l.type === 'offer' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                      l.type === 'offer' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
                     }`}>
                       {l.type === 'offer' ? t('offer') : t('request')}
                     </span>
                   </div>
-                  <h4 className="font-semibold text-sm text-gray-900">{l.title}</h4>
-                  <p className="text-xs text-gray-600 line-clamp-2 mt-0.5">{l.description}</p>
-                  {l.location && <p className="text-xs text-gray-500 mt-1">{l.location}</p>}
+                  <h4 className="font-semibold text-sm text-theme-primary">{l.title}</h4>
+                  <p className="text-xs text-theme-secondary line-clamp-2 mt-0.5">{l.description}</p>
+                  {l.location && <p className="text-xs text-theme-muted mt-1">{l.location}</p>}
                 </div>
               )}
               isLoading={isLoading}

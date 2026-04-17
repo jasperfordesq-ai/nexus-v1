@@ -268,5 +268,6 @@
   "review": "review",
   "reviews": "reviews",
   "service_type_hybrid_available": "Remote Available",
-  "service_type_remote": "Remote"
+  "service_type_remote": "Remote",
+  "community_member": "Community Member"
 }

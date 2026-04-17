@@ -90,9 +90,10 @@ export function PlansAdmin() {
     }
   };
 
+  // Platform subscription billing is EUR (Stripe Billing)
   const formatPrice = (price: number) => {
     if (price === 0 || price === null || price === undefined) return t('content.free', 'Free');
-    return `EUR ${Number(price).toFixed(2)}`;
+    return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR' }).format(Number(price));
   };
 
   const columns: Column<PlanItem>[] = [
@@ -223,7 +224,7 @@ export function PlansAdmin() {
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
           title={`${t('common.delete')} ${t('breadcrumbs.plans')}`}
-          message={t('gamification.confirm_delete_campaign', { name: confirmDelete.name })}
+          message={t('content.confirm_delete_plan', { name: confirmDelete.name })}
           confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={actionLoading}
