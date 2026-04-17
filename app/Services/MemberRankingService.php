@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\DB;
 class MemberRankingService
 {
     private const ACTIVITY_LOOKBACK_DAYS = 30;
+    private const CONTRIBUTION_LOOKBACK_DAYS = 90;
     private const WEIGHT_ACTIVITY = 0.25;
     private const WEIGHT_CONTRIBUTION = 0.25;
     private const WEIGHT_REPUTATION = 0.20;
@@ -57,6 +58,7 @@ class MemberRankingService
     {
         $config = $this->getConfig();
         $cutoff = now()->subDays((int) ($config['activity_lookback_days'] ?? self::ACTIVITY_LOOKBACK_DAYS))->toDateTimeString();
+        $contribCutoff = now()->subDays((int) ($config['contribution_lookback_days'] ?? self::CONTRIBUTION_LOOKBACK_DAYS))->toDateTimeString();
 
         $usersQuery = $this->user->newQuery()
             ->where('tenant_id', $tenantId)
@@ -122,10 +124,12 @@ class MemberRankingService
             ->pluck('cnt', 'user_id')
             ->all();
 
-        // Contribution: active listings plus completed exchange hours given
+        // Contribution: listings created within the lookback window (recent activity counts more)
+        // Hours given remains all-time as it reflects lifetime community value.
         $listingMap = DB::table('listings')
             ->where('tenant_id', $tenantId)
             ->whereIn('user_id', $userIds)
+            ->where('created_at', '>=', $contribCutoff)
             ->select('user_id', DB::raw('COUNT(*) as cnt'))
             ->groupBy('user_id')
             ->pluck('cnt', 'user_id')
@@ -294,6 +298,7 @@ class MemberRankingService
         $defaults = [
             'enabled' => true,
             'activity_lookback_days' => self::ACTIVITY_LOOKBACK_DAYS,
+            'contribution_lookback_days' => self::CONTRIBUTION_LOOKBACK_DAYS,
             'activity_weight' => self::WEIGHT_ACTIVITY,
             'contribution_weight' => self::WEIGHT_CONTRIBUTION,
             'reputation_weight' => self::WEIGHT_REPUTATION,
@@ -310,6 +315,7 @@ class MemberRankingService
             if ($row) {
                 return array_merge($defaults, [
                     'enabled' => (bool) ($row->is_enabled ?? true),
+                    'contribution_lookback_days' => (int) ($row->contribution_lookback_days ?? $defaults['contribution_lookback_days']),
                     'activity_weight' => (float) ($row->activity_weight ?? $defaults['activity_weight']),
                     'contribution_weight' => (float) ($row->contribution_weight ?? $defaults['contribution_weight']),
                     'reputation_weight' => (float) ($row->reputation_weight ?? $defaults['reputation_weight']),
@@ -325,6 +331,7 @@ class MemberRankingService
                 if (is_array($memberConfig)) {
                     return array_merge($defaults, [
                         'enabled' => (bool) ($memberConfig['enabled'] ?? true),
+                        'contribution_lookback_days' => (int) ($memberConfig['contribution_lookback_days'] ?? $defaults['contribution_lookback_days']),
                         'activity_weight' => (float) ($memberConfig['activity_weight'] ?? $memberConfig['weight_activity'] ?? $defaults['activity_weight']),
                         'contribution_weight' => (float) ($memberConfig['contribution_weight'] ?? $memberConfig['weight_contribution'] ?? $defaults['contribution_weight']),
                         'reputation_weight' => (float) ($memberConfig['reputation_weight'] ?? $memberConfig['weight_reputation'] ?? $defaults['reputation_weight']),
