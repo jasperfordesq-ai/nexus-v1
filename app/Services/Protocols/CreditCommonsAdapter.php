@@ -520,16 +520,32 @@ class CreditCommonsAdapter implements FederationProtocolAdapter
      *   - node-slug is the local node's identifier (3-15 chars, lowercase alphanumeric + hyphens)
      *   - username is the user's slug (same format)
      *
-     * If the input already contains a '/', it's assumed to be a valid path.
+     * If the input already contains a '/', it's assumed to be a valid path and is
+     * returned unchanged.
+     *
+     * If `$nodeSlug` is provided and the identifier has no '/', the node slug is
+     * prepended to produce a fully-qualified CC account path. Without a node slug
+     * the identifier is returned as-is (callers that know the node slug — such as
+     * FederationCreditCommonsController::toAccountPath() — should always pass it).
+     *
+     * @param string $identifier  Username, numeric user ID, or already-qualified path
+     * @param string $nodeSlug    The partner/local node slug (e.g. "my-timebank")
      */
-    public static function toAccountPath(string $identifier): string
+    public static function toAccountPath(string $identifier, string $nodeSlug = ''): string
     {
         if (str_contains($identifier, '/')) {
-            return $identifier;
+            return $identifier; // already a fully-qualified path
         }
 
-        // For numeric IDs, prefix with a placeholder node slug
-        // The actual node slug should be configured per-partner
+        if ($nodeSlug !== '') {
+            return "{$nodeSlug}/{$identifier}";
+        }
+
+        // TODO: node slug is not available at this call site — the caller should
+        // pass it explicitly. Returning the bare identifier for now; this will
+        // produce unqualified payer/payee values that may be rejected by strict
+        // CC nodes. Use FederationCreditCommonsController::toAccountPath() for
+        // controller-level path building where $tenantId is available.
         return $identifier;
     }
 

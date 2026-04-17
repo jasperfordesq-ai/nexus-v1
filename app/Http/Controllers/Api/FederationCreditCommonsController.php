@@ -314,13 +314,16 @@ class FederationCreditCommonsController extends BaseApiController
                 'updated_at' => now(),
             ]);
 
+            $resolvedPayerPath = $this->toAccountPath($payerId, $tenantId);
+            $resolvedPayeePath = $this->toAccountPath($payeeId, $tenantId);
+
             // Create CC entry
             DB::table('federation_cc_entries')->insert([
                 'tenant_id' => $tenantId,
                 'transaction_uuid' => $uuid,
                 'federation_transaction_id' => null,
-                'payer' => $this->toAccountPath($payerId, $tenantId),
-                'payee' => $this->toAccountPath($payeeId, $tenantId),
+                'payer' => $resolvedPayerPath,
+                'payee' => $resolvedPayeePath,
                 'quant' => $quant,
                 'description' => $description,
                 'state' => CreditCommonsAdapter::STATE_COMPLETED,
@@ -330,15 +333,18 @@ class FederationCreditCommonsController extends BaseApiController
                 'updated_at' => now(),
             ]);
 
+            // Advance the hashchain so direct POST /transaction submissions
+            // remain in chain with relay/commit transactions.
+            $newHash = CreditCommonsNodeService::advanceHashchain(
+                $tenantId, $uuid, $quant, $resolvedPayerPath, $resolvedPayeePath
+            );
+
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('[FederationCC] Transaction failed', ['error' => $e->getMessage()]);
             return $this->ccError('Other', 'Transaction processing failed', 500);
         }
-
-        $payerPath = $this->toAccountPath($payerId, $tenantId);
-        $payeePath = $this->toAccountPath($payeeId, $tenantId);
 
         return response()->json([
             'data' => [
@@ -348,8 +354,8 @@ class FederationCreditCommonsController extends BaseApiController
                 'workflow' => $workflow,
                 'entries' => [
                     [
-                        'payer' => $payerPath,
-                        'payee' => $payeePath,
+                        'payer' => $resolvedPayerPath,
+                        'payee' => $resolvedPayeePath,
                         'quant' => $quant,
                         'description' => $description,
                     ],
@@ -358,7 +364,7 @@ class FederationCreditCommonsController extends BaseApiController
             'meta' => [
                 'transitions' => [],
             ],
-        ], 201);
+        ], 201, ['Last-hash' => $newHash]);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -533,8 +539,12 @@ class FederationCreditCommonsController extends BaseApiController
         }
 
         if ($destState === CreditCommonsAdapter::STATE_ERASED) {
-            // Reverse the balance changes and update state atomically
-            if ($entry->state === CreditCommonsAdapter::STATE_COMPLETED && $entry->federation_transaction_id) {
+            // Reverse the balance changes and update state atomically whenever the
+            // entry reached STATE_COMPLETED — regardless of whether it arrived via
+            // relay (federation_transaction_id set) or was created locally via
+            // POST /transaction (federation_transaction_id = null). Both paths
+            // debit/credit real balances and both need reversal on erase.
+            if ($entry->state === CreditCommonsAdapter::STATE_COMPLETED) {
                 DB::beginTransaction();
                 try {
                     $this->reverseTransaction($entry, $tenantId);

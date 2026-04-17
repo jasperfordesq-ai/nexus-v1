@@ -54,6 +54,27 @@ class FederationKomunitinController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    /**
+     * Valid Komunitin transfer state transitions.
+     *
+     * Based on the Komunitin accounting spec:
+     *   new       → pending   (submitted for processing)
+     *   pending   → accepted  (manually or auto-accepted)
+     *   pending   → rejected  (declined)
+     *   accepted  → completed (funds settled)
+     *   accepted  → failed    (settlement error)
+     *   failed    → pending   (retry allowed)
+     *   rejected, completed — terminal states, no further transitions
+     */
+    private const VALID_TRANSITIONS = [
+        'new'       => ['pending'],
+        'pending'   => ['accepted', 'rejected'],
+        'accepted'  => ['completed', 'failed'],
+        'rejected'  => [],
+        'completed' => [],
+        'failed'    => ['pending'],
+    ];
+
     // ─────────────────────────────────────────────────────────────────────────
     // Currencies
     // ─────────────────────────────────────────────────────────────────────────
@@ -606,6 +627,20 @@ class FederationKomunitinController extends BaseApiController
         $payerId = $rels['payer']['data']['id'] ?? null;
         $payeeId = $rels['payee']['data']['id'] ?? null;
 
+        // Map Komunitin requested state to Nexus internal status.
+        // Only 'committed' (and its alias 'accepted'/'completed') should
+        // immediately settle balances; all other states are non-final.
+        $statusMap = [
+            'new'       => 'pending',
+            'pending'   => 'pending',
+            'accepted'  => 'processing',
+            'committed' => 'completed',
+            'completed' => 'completed',
+            'rejected'  => 'cancelled',
+            'failed'    => 'failed',
+        ];
+        $nexusStatus = $statusMap[$state] ?? 'pending';
+
         if (!$payerId || !$payeeId || $amount <= 0) {
             return $this->jsonApiError('BadRequest', 'Bad Request',
                 'Missing required fields: payer, payee, and amount > 0', 400);
@@ -640,23 +675,28 @@ class FederationKomunitinController extends BaseApiController
                 "Payer account not found in currency {$code}", 404);
         }
 
-        // Execute transfer with atomic balance check to prevent race conditions
+        // Execute transfer — only settle balances when the requested state
+        // is 'committed'/'completed'; pending/accepted/etc. just record the intent.
+        $shouldSettle = ($nexusStatus === 'completed');
+
         DB::beginTransaction();
         try {
-            // Deduct from payer atomically — WHERE balance >= amount prevents overdraw
-            $updated = DB::update(
-                "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
-                [$amount, (int) $payerId, $tenantId, $amount]
-            );
+            if ($shouldSettle) {
+                // Deduct from payer atomically — WHERE balance >= amount prevents overdraw
+                $updated = DB::update(
+                    "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
+                    [$amount, (int) $payerId, $tenantId, $amount]
+                );
 
-            if ($updated === 0) {
-                DB::rollBack();
-                return $this->jsonApiError('Forbidden', 'Forbidden',
-                    'Insufficient balance for this transfer', 403);
+                if ($updated === 0) {
+                    DB::rollBack();
+                    return $this->jsonApiError('Forbidden', 'Forbidden',
+                        'Insufficient balance for this transfer', 403);
+                }
+
+                DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
+                    [$amount, (int) $payeeId, $tenantId]);
             }
-
-            DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
-                [$amount, (int) $payeeId, $tenantId]);
 
             $txId = DB::table('transactions')->insertGetId([
                 'tenant_id' => $tenantId,
@@ -664,7 +704,7 @@ class FederationKomunitinController extends BaseApiController
                 'receiver_id' => (int) $payeeId,
                 'amount' => $amount,
                 'description' => $description,
-                'status' => 'completed',
+                'status' => $nexusStatus,
                 'is_federated' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -713,16 +753,34 @@ class FederationKomunitinController extends BaseApiController
                 'Missing state in request body', 400);
         }
 
+        // Map Nexus internal status back to Komunitin state for transition validation
+        $nexusToKomunitin = [
+            'pending'    => 'new',
+            'processing' => 'pending',
+            'completed'  => 'accepted',
+            'cancelled'  => 'rejected',
+            'failed'     => 'failed',
+        ];
+        $currentKomunitinState = $nexusToKomunitin[$tx->status] ?? 'new';
+
+        $validNextStates = self::VALID_TRANSITIONS[$currentKomunitinState] ?? [];
+        if (!in_array($newState, $validNextStates, true)) {
+            return $this->jsonApiError('UnprocessableEntity', 'Unprocessable Entity',
+                "Invalid state transition from {$currentKomunitinState} to {$newState}", 422);
+        }
+
         $newNexusStatus = match ($newState) {
-            'committed' => 'completed',
-            'pending' => 'pending',
-            'rejected' => 'cancelled',
-            default => null,
+            'committed', 'accepted', 'completed' => 'completed',
+            'pending'   => 'processing',
+            'new'       => 'pending',
+            'rejected'  => 'cancelled',
+            'failed'    => 'failed',
+            default     => null,
         };
 
         if (!$newNexusStatus) {
             return $this->jsonApiError('BadRequest', 'Bad Request',
-                "Invalid state: {$newState}. Must be committed, pending, or rejected", 400);
+                "Invalid state: {$newState}", 400);
         }
 
         DB::table('transactions')
