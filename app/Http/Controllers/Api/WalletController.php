@@ -6,9 +6,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\TransactionCompleted;
-use App\Models\Transaction;
-use App\Models\User;
 use App\Services\WalletService;
 use Illuminate\Http\JsonResponse;
 
@@ -146,21 +143,8 @@ class WalletController extends BaseApiController
             return $this->respondWithError($code, $msg, null, $status);
         }
 
-        // Dispatch TransactionCompleted event (handles XP awards via UpdateWalletBalance listener)
-        try {
-            $transactionId = (int) ($result['id'] ?? 0);
-            $receiverId = (int) ($result['receiver']['id'] ?? 0);
-            if ($transactionId > 0 && $receiverId > 0) {
-                $txn = Transaction::find($transactionId);
-                $sender = User::find($userId);
-                $receiver = User::find($receiverId);
-                if ($txn && $sender && $receiver) {
-                    event(new TransactionCompleted($txn, $sender, $receiver, $this->getTenantId()));
-                }
-            }
-        } catch (\Throwable $e) {
-            \Log::warning('TransactionCompleted event dispatch failed', ['transaction' => $result['id'] ?? null, 'error' => $e->getMessage()]);
-        }
+        // TransactionCompleted is dispatched inside WalletService::transfer()
+        // so it fires for all callers (controller, admin bulk ops, etc.).
 
         return $this->respondWithData($result, null, 201);
     }

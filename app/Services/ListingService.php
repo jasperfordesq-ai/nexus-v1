@@ -10,6 +10,7 @@ use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\ListingCreated;
+use App\Events\ListingUpdated;
 use App\Models\Listing;
 use App\Models\User;
 use App\Services\SearchService;
@@ -1124,7 +1125,19 @@ class ListingService
             Log::warning('[ListingService] listing updated notifications failed: ' . $e->getMessage());
         }
 
-        return $listing->fresh(['user', 'category', 'skillTags']);
+        $freshListing = $listing->fresh(['user', 'category', 'skillTags']);
+
+        // Dispatch ListingUpdated so federation partners receive the edit
+        try {
+            $owner = $freshListing->user ?? User::find($freshListing->user_id);
+            if ($owner) {
+                event(new ListingUpdated($freshListing, $owner, TenantContext::getId()));
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[ListingService] ListingUpdated event dispatch failed: ' . $e->getMessage());
+        }
+
+        return $freshListing;
     }
 
     /**

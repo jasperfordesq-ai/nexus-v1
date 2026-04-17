@@ -45,6 +45,21 @@ class PushVolunteerOpportunityToFederatedPartners implements ShouldQueue
                 return;
             }
 
+            // Only push opportunities that are explicitly marked for federation.
+            // The vol_opportunities schema does not yet have a federated_visibility
+            // column — check is_federated (if present) or fall back to is_active
+            // as a minimum gate so inactive/draft opportunities are never pushed.
+            // TODO: add `is_federated` tinyint column to vol_opportunities to allow
+            //       per-opportunity opt-in (mirrors listings.federated_visibility).
+            if (empty($opportunity->is_federated) && empty($opportunity->federated_visibility)) {
+                // Fall back: only push active, open opportunities
+                $isActive = !empty($opportunity->is_active);
+                $isOpen   = ($opportunity->status ?? 'open') === 'open';
+                if (!$isActive || !$isOpen) {
+                    return;
+                }
+            }
+
             $partners = FederationExternalPartnerService::getActivePartnersWithFlag($tenantId, 'allow_volunteering');
             if (empty($partners)) {
                 return;

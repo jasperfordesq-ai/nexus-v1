@@ -225,6 +225,54 @@ services:
           memory: 128M
 
   # ---------------------------------------------------------------------------
+  # Queue Worker (Laravel queue:work — processes async jobs via Redis)
+  # Federation push listeners, notifications, etc. run here, not in HTTP requests.
+  # ---------------------------------------------------------------------------
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: nexus-php-queue
+    command: php artisan queue:work --sleep=3 --tries=3 --timeout=60
+    restart: unless-stopped
+    volumes:
+      - ./app:/var/www/html/app:ro
+      - ./src:/var/www/html/src:ro
+      - ./config:/var/www/html/config:ro
+      - ./vendor:/var/www/html/vendor:ro
+      - ./artisan:/var/www/html/artisan:ro
+      - ./bootstrap:/var/www/html/bootstrap:ro
+      - ./routes:/var/www/html/routes:ro
+      - ./database:/var/www/html/database:ro
+      - ./composer.json:/var/www/html/composer.json:ro
+      - nexus-php-storage:/var/www/html/storage
+      - nexus-php-bootstrap-cache:/var/www/html/bootstrap/cache
+    env_file:
+      - .env
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_URL=https://api.project-nexus.ie
+      - DB_HOST=db
+      - DB_PORT=3306
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - QUEUE_CONNECTION=redis
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - nexus-php-internal
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  # ---------------------------------------------------------------------------
   # Sales Site (project-nexus.ie) - Marketing/Landing Page
   # ---------------------------------------------------------------------------
   sales:

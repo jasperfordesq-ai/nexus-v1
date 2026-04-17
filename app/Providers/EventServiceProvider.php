@@ -14,6 +14,7 @@ use App\Events\GroupCreated;
 use App\Events\GroupMemberJoined;
 use App\Events\JobVacancyCreated;
 use App\Events\ListingCreated;
+use App\Events\ListingUpdated;
 use App\Events\MemberProfileUpdated;
 use App\Events\MessageSent;
 use App\Events\OnboardingCompleted;
@@ -76,6 +77,10 @@ class EventServiceProvider extends ServiceProvider
             UpdateFeedOnListingCreated::class,
             PushListingToFederatedPartners::class,
             NotifyAdminOfNewListing::class,
+        ],
+
+        ListingUpdated::class => [
+            PushListingToFederatedPartners::class,
         ],
 
         TransactionCompleted::class => [

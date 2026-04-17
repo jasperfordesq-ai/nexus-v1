@@ -10,6 +10,7 @@ namespace App\Listeners;
 
 use App\Core\TenantContext;
 use App\Events\GroupMemberJoined;
+use App\Models\Group;
 use App\Services\FederationExternalApiClient;
 use App\Services\FederationExternalPartnerService;
 use App\Services\FederationFeatureService;
@@ -37,6 +38,18 @@ class PushGroupMembershipToFederatedPartners implements ShouldQueue
                 return;
             }
             if (!$this->federationFeatureService->isTenantFederationEnabled($tenantId)) {
+                return;
+            }
+
+            // Only push membership events for groups that are federated.
+            // Load the group to check its federated_visibility — matches the
+            // gate used in PushGroupToFederatedPartners.
+            $group = Group::find($event->groupId);
+            if (!$group) {
+                return;
+            }
+            $visibility = $group->federated_visibility ?? 'none';
+            if (!in_array($visibility, ['listed', 'public'], true)) {
                 return;
             }
 

@@ -205,6 +205,44 @@ services:
       - nexus-internal
 
   # ---------------------------------------------------------------------------
+  # Queue Worker (Laravel queue:work — processes async jobs via Redis)
+  # Federation push listeners, notifications, etc. run here, not in HTTP requests.
+  # ---------------------------------------------------------------------------
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nexus-queue-worker
+    command: php artisan queue:work --sleep=3 --tries=3 --timeout=60
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    volumes:
+      - .:/var/www/html:cached
+      - nexus-vendor:/var/www/html/vendor
+      - nexus-storage:/var/www/html/storage
+    environment:
+      - DB_TYPE=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=nexus
+      - DB_USER=nexus
+      - DB_PASS=nexus_secret
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - APP_ENV=${APP_ENV:-development}
+      - APP_KEY=${APP_KEY:-nexus-dev-app-key-change-in-production}
+      - JWT_SECRET=${JWT_SECRET:-nexus-dev-jwt-secret-change-in-production}
+      - QUEUE_CONNECTION=redis
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - nexus-internal
+
+  # ---------------------------------------------------------------------------
   # Sales Site (project-nexus.ie) - Marketing/Landing Page
   # ---------------------------------------------------------------------------
   sales:

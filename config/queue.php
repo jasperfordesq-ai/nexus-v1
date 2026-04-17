@@ -11,12 +11,12 @@ return [
     | Default Queue Connection Name
     |--------------------------------------------------------------------------
     |
-    | Currently sync (all jobs execute inline). Database and Redis connections
-    | are configured and ready for when async processing is needed.
+    | Redis is the default for all environments. Use QUEUE_CONNECTION=sync
+    | only in testing (APP_ENV=testing) where Redis is unavailable.
     |
     */
 
-    'default' => env('QUEUE_CONNECTION', 'sync'),
+    'default' => env('QUEUE_CONNECTION', 'redis'),
 
     'connections' => [
 

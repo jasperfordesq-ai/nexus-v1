@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Events\TransactionCompleted;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -391,6 +392,19 @@ class WalletService
             WalletAlertService::checkAndSendLowBalanceAlert($tenantId, $senderId, $newBalance);
         } catch (\Throwable $e) {
             Log::warning('WalletService: balance alert failed: ' . $e->getMessage());
+        }
+
+        // Dispatch TransactionCompleted so federation push, XP awards, and
+        // real-time wallet updates all fire regardless of which caller invoked
+        // this method (WalletController, admin bulk ops, etc.).
+        try {
+            $senderModel   = $this->user->newQuery()->find($senderId);
+            $receiverModel = $this->user->newQuery()->find($txn->receiver_id);
+            if ($senderModel && $receiverModel) {
+                event(new TransactionCompleted($txn, $senderModel, $receiverModel, TenantContext::getId()));
+            }
+        } catch (\Throwable $e) {
+            Log::warning('WalletService: TransactionCompleted dispatch failed: ' . $e->getMessage());
         }
 
         return $this->formatTransaction($txn, $senderId);

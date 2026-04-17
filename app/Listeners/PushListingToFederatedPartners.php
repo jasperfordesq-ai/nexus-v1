@@ -10,6 +10,7 @@ namespace App\Listeners;
 
 use App\Core\TenantContext;
 use App\Events\ListingCreated;
+use App\Events\ListingUpdated;
 use App\Services\FederationExternalApiClient;
 use App\Services\FederationExternalPartnerService;
 use App\Services\FederationFeatureService;
@@ -30,7 +31,7 @@ class PushListingToFederatedPartners implements ShouldQueue
         private readonly FederationFeatureService $federationFeatureService,
     ) {}
 
-    public function handle(ListingCreated $event): void
+    public function handle(ListingCreated|ListingUpdated $event): void
     {
         try {
             // Ensure tenant context is set for queued execution
@@ -100,11 +101,13 @@ class PushListingToFederatedPartners implements ShouldQueue
      * Build a listing payload for outbound federation push.
      * Adapter transforms this into the wire format per partner protocol.
      */
-    private function buildPayload(ListingCreated $event): array
+    private function buildPayload(ListingCreated|ListingUpdated $event): array
     {
         $listing = $event->listing;
+        $action  = $event instanceof ListingCreated ? 'created' : 'updated';
 
         return [
+            'action'         => $action,
             'id'             => $listing->id,
             'title'          => $listing->title,
             'description'    => $listing->description,
@@ -113,6 +116,7 @@ class PushListingToFederatedPartners implements ShouldQueue
             'user_id'        => $event->user->id,
             'tenant_id'      => $event->tenantId,
             'created_at'     => $listing->created_at?->toISOString(),
+            'updated_at'     => $listing->updated_at?->toISOString(),
             'visibility'     => $listing->federated_visibility ?? 'listed',
         ];
     }
