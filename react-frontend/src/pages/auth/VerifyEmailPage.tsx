@@ -19,7 +19,7 @@ import { CheckCircle, XCircle, Loader2, ArrowLeft, Mail, ShieldCheck } from 'luc
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
-import { useTenant, useAuth } from '@/contexts';
+import { useTenant, useAuth, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 
@@ -30,6 +30,7 @@ export function VerifyEmailPage() {
   usePageTitle(t('page_meta.verify_email.title'));
   const { branding, tenantPath, tenant } = useTenant();
   const { isAuthenticated } = useAuth();
+  const toast = useToast();
 
   // Check if tenant requires admin approval (from bootstrap settings)
   const requiresApproval = tenant?.settings?.admin_approval === true
@@ -85,6 +86,7 @@ export function VerifyEmailPage() {
       setIsResending(true);
       await api.post('/auth/resend-verification');
       setResendSuccess(true);
+      toast.success(t('resend_sent', 'Check your inbox — we sent a new verification link'));
     } catch {
       setErrorMessage(t('verify_email.resend_error'));
     } finally {

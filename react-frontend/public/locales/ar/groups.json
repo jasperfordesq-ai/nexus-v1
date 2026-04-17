@@ -72,6 +72,7 @@
     "send_invites": "إرسال الدعوات",
     "invites_sent": "تم إرسال الدعوات!",
     "invites_failed": "فشل في إرسال الدعوات",
+    "invite_link_error": "Failed to generate invite link",
     "notification_prefs": "تفضيلات الإشعارات",
     "discussions_heading": "Discussions",
     "new_discussion": "نقاش جديد",

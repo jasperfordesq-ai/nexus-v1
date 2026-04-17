@@ -156,7 +156,10 @@ export function EventDetailPage() {
       setError(null);
       const [eventRes, attendeesRes] = await Promise.all([
         api.get<Event>(`/v2/events/${id}`),
-        api.get<AttendeeWithCheckIn[]>(`/v2/events/${id}/attendees?per_page=50&status=all`).catch(() => ({ success: true, data: [] })),
+        api.get<AttendeeWithCheckIn[]>(`/v2/events/${id}/attendees?per_page=50&status=all`).catch((err) => {
+          logError('Failed to load attendees', err);
+          return { success: true, data: [] };
+        }),
       ]);
 
       if (controller.signal.aborted) return;
@@ -734,7 +737,7 @@ export function EventDetailPage() {
           {event.max_attendees != null && (
             <>
               <div className="flex items-center gap-2 text-sm">
-                <div className="w-2.5 h-2.5 rounded-full bg-gray-400" />
+                <div className="w-2.5 h-2.5 rounded-full bg-theme-subtle" />
                 <span className="text-theme-muted">{t('detail.max_capacity', { count: event.max_attendees })}</span>
               </div>
               {event.spots_left != null && event.spots_left > 0 && (

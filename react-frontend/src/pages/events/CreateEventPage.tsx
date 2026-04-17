@@ -279,7 +279,8 @@ export function CreateEventPage() {
 
     const reader = new FileReader();
     reader.onload = (ev) => {
-      setImagePreview(ev.target?.result as string);
+      if (!ev.target?.result) return;
+      setImagePreview(ev.target.result as string);
     };
     reader.readAsDataURL(file);
     setExistingImage(null);
@@ -312,7 +313,8 @@ export function CreateEventPage() {
     setImageFile(file);
     const reader = new FileReader();
     reader.onload = (ev) => {
-      setImagePreview(ev.target?.result as string);
+      if (!ev.target?.result) return;
+      setImagePreview(ev.target.result as string);
     };
     reader.readAsDataURL(file);
     setExistingImage(null);

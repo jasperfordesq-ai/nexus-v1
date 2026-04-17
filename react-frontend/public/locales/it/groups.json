@@ -72,6 +72,7 @@
     "send_invites": "Invia inviti",
     "invites_sent": "Inviti inviati!",
     "invites_failed": "Invio inviti fallito",
+    "invite_link_error": "Failed to generate invite link",
     "notification_prefs": "Preferenze di notifica",
     "discussions_heading": "Discussioni",
     "new_discussion": "Nuova discussione",

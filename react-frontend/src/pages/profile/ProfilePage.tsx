@@ -317,8 +317,9 @@ export function ProfilePage() {
             }
             setEndorsements(map);
           }
-        } catch {
+        } catch (endorseErr) {
           // Endorsement data is supplementary — don't fail the whole page
+          logError('Failed to load endorsements', endorseErr);
         }
       }
     } catch (err) {
@@ -580,7 +581,7 @@ export function ProfilePage() {
             {/* Info */}
             <div className="flex-1 text-center sm:text-left">
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2">
-                <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-theme-primary">{profile.name}</h1>
+                <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-theme-primary">{profile.name || profile.first_name || t('member_fallback', 'Member')}</h1>
                 {/* Verification badges */}
                 <VerificationBadgeRow userId={profile.id} size="md" />
                 {/* Cross-federation reputation badge */}

@@ -18,6 +18,11 @@ import {
   Textarea,
   Skeleton,
   Tooltip,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from '@heroui/react';
 import {
   Send,
@@ -88,6 +93,7 @@ function CommentItemInner({
   const [editContent, setEditContent] = useState(comment.content);
   const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
   const [showReactions, setShowReactions] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const isOwn = currentUserId === comment.author.id || comment.is_own;
 
@@ -99,9 +105,9 @@ function CommentItemInner({
     setIsSubmittingEdit(false);
   };
 
-  const handleDelete = async () => {
-    if (!window.confirm(t('delete_comment_confirm', 'Delete this comment?'))) return;
+  const handleDeleteConfirm = async () => {
     await onDelete(comment.id);
+    setShowDeleteModal(false);
   };
 
   const reactions = comment.reactions ?? {};
@@ -228,7 +234,7 @@ function CommentItemInner({
                   <Button
                     variant="light"
                     size="sm"
-                    onPress={handleDelete}
+                    onPress={() => setShowDeleteModal(true)}
                     className="text-[10px] text-red-400 hover:text-red-500 flex items-center gap-0.5 h-auto p-0 min-w-0"
                     startContent={<Trash2 className="w-2.5 h-2.5" aria-hidden="true" />}
                   >
@@ -310,6 +316,44 @@ function CommentItemInner({
           </div>
         )}
       </div>
+
+      {/* Delete confirmation modal */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        size="sm"
+        classNames={{
+          base: 'bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)]',
+          backdrop: 'bg-black/60 backdrop-blur-sm',
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-[var(--text-primary)]">
+            {t('delete_comment_title', 'Delete comment')}
+          </ModalHeader>
+          <ModalBody>
+            <p className="text-sm text-[var(--text-secondary)]">
+              {t('delete_comment_body', 'Are you sure you want to delete this comment? This cannot be undone.')}
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              size="sm"
+              onPress={() => setShowDeleteModal(false)}
+            >
+              {t('cancel', 'Cancel')}
+            </Button>
+            <Button
+              color="danger"
+              size="sm"
+              onPress={() => { void handleDeleteConfirm(); }}
+            >
+              {t('delete', 'Delete')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

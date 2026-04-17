@@ -72,6 +72,7 @@
     "send_invites": "Stuur Uitnodigingen",
     "invites_sent": "Uitnodigingen verzonden!",
     "invites_failed": "Verzenden van uitnodigingen mislukt",
+    "invite_link_error": "Failed to generate invite link",
     "notification_prefs": "Notificatievoorkeuren",
     "discussions_heading": "Discussions",
     "new_discussion": "Nieuwe Discussie",

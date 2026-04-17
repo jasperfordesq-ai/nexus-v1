@@ -163,7 +163,7 @@ export const MessageBubble = memo(function MessageBubble({
     const parts = text.split(new RegExp(`(${highlightQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
     return parts.map((part, i) =>
       part.toLowerCase() === highlightQuery.toLowerCase() ? (
-        <mark key={i} className="bg-yellow-400/40 text-gray-900 dark:text-white rounded px-0.5">{part}</mark>
+        <mark key={i} className="bg-yellow-400/40 text-theme-primary rounded px-0.5">{part}</mark>
       ) : part
     );
   }
@@ -485,7 +485,7 @@ export const MessageBubble = memo(function MessageBubble({
         )}
 
         <div className={`flex items-center gap-1 mt-1 px-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
-          <span className="text-xs text-gray-400 dark:text-white/30">
+          <span className="text-xs text-theme-subtle">
             {new Date(message.created_at || message.sent_at || Date.now()).toLocaleTimeString([], {
               hour: '2-digit',
               minute: '2-digit',
@@ -493,7 +493,7 @@ export const MessageBubble = memo(function MessageBubble({
           </span>
           {/* Read receipts - only show for own messages */}
           {isOwn && (
-            <span className="text-gray-400 dark:text-white/40">
+            <span className="text-theme-subtle">
               {message.is_read || message.read_at ? (
                 <CheckCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
               ) : (

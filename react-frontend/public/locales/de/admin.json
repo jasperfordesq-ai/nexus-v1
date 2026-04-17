@@ -764,7 +764,7 @@
     "placeholder_slug": "Slug...",
     "plan_active_desc": "Manage and configure plan active settings",
     "plan_created": "Plan Created",
-    "plan_deleted_successfully": "plan_deleted_successfully": "Plan Deleted Successfully",
+    "plan_deleted_successfully": "Plan Deleted Successfully",
         "confirm_delete_plan": "Are you sure you want to delete the plan \"{{name}}\"? This action cannot be undone.",
     "plan_name_required": "Plan Name Required",
     "plan_updated": "Plan Updated",
@@ -4062,4 +4062,26 @@
     "gmail_connected": "Connected to Gmail API successfully. Email: :email",
     "gmail_verify_failed": "Failed to verify Gmail API connection"
   }
+    ,"billing": {
+        "control_title": "Billing Control",
+        "control_desc": "Manage tenant subscriptions and user-count based pricing",
+        "col_tenant": "Tenant",
+        "col_users": "Users",
+        "col_subtree_users": "Total (incl. sub-tenants)",
+        "col_current_plan": "Current Plan",
+        "col_suggested_plan": "Suggested",
+        "col_actions": "Actions",
+        "assign_plan": "Assign Plan",
+        "assign_plan_title": "Assign Plan to Tenant",
+        "select_plan": "Select Plan",
+        "expiry_date": "Expiry Date (optional)",
+        "notes": "Notes (optional)",
+        "no_plan": "No Plan",
+        "over_limit": "Over Limit",
+        "on_correct_plan": "OK",
+        "loading": "Loading billing data...",
+        "failed_to_load": "Failed to load billing snapshot",
+        "plan_assigned": "Plan assigned successfully",
+        "failed_to_assign": "Failed to assign plan"
+    }
 }

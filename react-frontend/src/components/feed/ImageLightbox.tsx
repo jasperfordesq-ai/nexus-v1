@@ -145,7 +145,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
         isIconOnly
         variant="flat"
         size="sm"
-        className="absolute top-4 right-4 z-10 bg-white/90 text-black rounded-full shadow-lg"
+        className="absolute top-4 right-4 z-10 bg-theme-elevated text-theme-primary rounded-full shadow-lg"
         onPress={onClose}
         onClick={(e) => e.stopPropagation()}
         aria-label={t('lightbox.close', 'Close image viewer')}

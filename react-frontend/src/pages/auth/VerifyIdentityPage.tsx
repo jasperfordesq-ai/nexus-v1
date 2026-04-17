@@ -77,6 +77,9 @@ export function VerifyIdentityPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [isStarting, setIsStarting] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollStartRef = useRef<number>(Date.now());
+
+  const MAX_POLL_MS = 10 * 60 * 1000;
 
   // Stable refs for t — avoids re-creating callbacks when i18n namespace loads
   const tRef = useRef(t);
@@ -90,6 +93,12 @@ export function VerifyIdentityPage() {
   }, []);
 
   const fetchStatus = useCallback(async () => {
+    if (Date.now() - pollStartRef.current > MAX_POLL_MS) {
+      stopPolling();
+      setPageState('error');
+      setErrorMessage(tRef.current('verify_identity.timeout_error', { defaultValue: 'Verification is taking longer than expected. Please try again.' }));
+      return;
+    }
     try {
       const response = await api.get<VerificationStatus>('/v2/auth/verification-status');
       if (!response.success || !response.data) return;
@@ -137,6 +146,7 @@ export function VerifyIdentityPage() {
 
   const startPolling = useCallback(() => {
     stopPolling();
+    pollStartRef.current = Date.now();
     pollRef.current = setInterval(fetchStatus, 5000);
   }, [fetchStatus, stopPolling]);
 

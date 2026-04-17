@@ -5,6 +5,8 @@
   "copy_link": "نسخ الرابط",
   "delete": "Delete",
   "delete_comment_confirm": "هل تريد حذف هذا التعليق؟",
+  "delete_comment_title": "Delete comment",
+  "delete_comment_body": "Are you sure you want to delete this comment? This cannot be undone.",
   "edit": "Edit",
   "edited": "edited",
   "likers_title": "أحبها",

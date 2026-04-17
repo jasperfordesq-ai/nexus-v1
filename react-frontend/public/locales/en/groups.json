@@ -82,6 +82,7 @@
     "send_invites": "Send Invitations",
     "invites_sent": "Invitations sent!",
     "invites_failed": "Failed to send invitations",
+    "invite_link_error": "Failed to generate invite link",
     "notification_prefs": "Notification preferences",
     "discussions_heading": "Discussions",
     "new_discussion": "New Discussion",

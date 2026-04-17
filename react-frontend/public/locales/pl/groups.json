@@ -72,6 +72,7 @@
     "send_invites": "Wyślij zaproszenia",
     "invites_sent": "Zaproszenia wysłane!",
     "invites_failed": "Nie udało się wysłać zaproszeń",
+    "invite_link_error": "Failed to generate invite link",
     "notification_prefs": "Preferencje powiadomień",
     "discussions_heading": "Discussions",
     "new_discussion": "Nowa dyskusja",

@@ -232,9 +232,14 @@ export function GroupDetailPage() {
   // Load tags for the group (requires auth)
   useEffect(() => {
     if (!id || !isAuthenticated) return;
+    let cancelled = false;
     api.get(`/v2/groups/${id}/tags`)
-      .then((resp) => setGroupTags((resp.data ?? []) as Array<{ id: number; name: string; color?: string }>))
+      .then((resp) => {
+        if (cancelled) return;
+        setGroupTags((resp.data ?? []) as Array<{ id: number; name: string; color?: string }>);
+      })
       .catch((err) => { logError('GroupDetailPage.loadTags', err); });
+    return () => { cancelled = true; };
   }, [id, isAuthenticated]);
 
   // Invite handlers
@@ -245,6 +250,7 @@ export function GroupDetailPage() {
       setInviteLink(resp.data?.invite_url || null);
     } catch (err) {
       logError('GroupDetailPage.generateInviteLink', err);
+      toastRef.current.error(t('detail.invite_link_error', 'Failed to generate invite link'));
     }
   };
 

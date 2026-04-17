@@ -98,7 +98,7 @@ export function VoiceMessagePlayer({ audioUrl, audioBlob, transcript }: VoiceMes
           )}
         </Button>
         <div className="flex-1">
-          <div className="h-1 bg-black/20 dark:bg-white/20 rounded-full overflow-hidden">
+          <div className="h-1 bg-theme-elevated rounded-full overflow-hidden">
             <div
               className="h-full bg-black/60 dark:bg-white/60 rounded-full transition-all"
               style={{ width: `${progress}%` }}

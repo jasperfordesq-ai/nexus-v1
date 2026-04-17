@@ -127,7 +127,7 @@ export function ReactionSummary({
     setIsModalOpen(true);
     setSelectedTab('all');
     setReactorPage(1);
-    loadReactors('all', 1);
+    void loadReactors('all', 1);
   }, [loadReactors]);
 
   const handleTabChange = useCallback(
@@ -136,7 +136,7 @@ export function ReactionSummary({
       setSelectedTab(tabKey);
       setReactorPage(1);
       setReactors([]);
-      loadReactors(tabKey, 1);
+      void loadReactors(tabKey, 1);
     },
     [loadReactors]
   );
@@ -144,7 +144,7 @@ export function ReactionSummary({
   const handleLoadMore = useCallback(() => {
     const nextPage = reactorPage + 1;
     setReactorPage(nextPage);
-    loadReactors(selectedTab, nextPage, true);
+    void loadReactors(selectedTab, nextPage, true);
   }, [reactorPage, selectedTab, loadReactors]);
 
   // Sort reaction types by count descending

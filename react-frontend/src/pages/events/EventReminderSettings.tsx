@@ -51,7 +51,7 @@ export function EventReminderSettings() {
             </p>
           </div>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-medium">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
             <Clock className="w-3.5 h-3.5" aria-hidden="true" />
             {t('common:coming_soon', { defaultValue: 'Coming Soon' })}
           </div>

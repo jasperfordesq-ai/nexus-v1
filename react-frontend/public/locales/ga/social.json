@@ -5,6 +5,8 @@
   "copy_link": "Coipeail Nasc",
   "delete": "Scrios",
   "delete_comment_confirm": "Scrios an tracht seo?",
+  "delete_comment_title": "Delete comment",
+  "delete_comment_body": "Are you sure you want to delete this comment? This cannot be undone.",
   "edit": "Cuir in Eagar",
   "edited": "curtha in eagar",
   "likers_title": "Thaitin le",

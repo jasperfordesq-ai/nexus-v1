@@ -349,7 +349,7 @@ export function ConversationPage() {
         }
 
         // Scroll to bottom for new messages
-        setTimeout(() => scrollToBottom(), 50);
+        requestAnimationFrame(() => scrollToBottom());
       }
     });
 

@@ -11,7 +11,7 @@
  * - New message notifications in conversation list
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -358,10 +358,13 @@ export function MessagesPage() {
   }
 
 
-  const filteredConversations = conversations.filter((conv) => {
-    const otherUser = getOtherUser(conv);
-    return otherUser.name.toLowerCase().includes(searchQuery.toLowerCase());
-  });
+  const filteredConversations = useMemo(
+    () => conversations.filter((conv) => {
+      const otherUser = getOtherUser(conv);
+      return otherUser.name.toLowerCase().includes(searchQuery.toLowerCase());
+    }),
+    [conversations, searchQuery]
+  );
 
   const containerVariants = {
     hidden: { opacity: 0 },

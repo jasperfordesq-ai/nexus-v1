@@ -106,10 +106,10 @@ export function EmptyState({
     >
       {/* Icon circle */}
       <div
-        className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-default-100 border border-default-200 mb-6"
+        className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-theme-elevated border border-theme-default mb-6"
         aria-hidden="true"
       >
-        {icon || <Inbox className="w-10 h-10 text-default-400" />}
+        {icon || <Inbox className="w-10 h-10 text-theme-subtle" />}
       </div>
 
       <h3 className="text-xl font-semibold text-foreground mb-2">{title}</h3>

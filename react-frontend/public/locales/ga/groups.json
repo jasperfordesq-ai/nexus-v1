@@ -159,6 +159,7 @@
     "send_invites": "Send Invitations",
     "invites_sent": "Invitations sent!",
     "invites_failed": "Failed to send invitations",
+    "invite_link_error": "Failed to generate invite link",
     "notification_prefs": "Notification preferences",
     "image_alt_group": "Group",
     "image_alt_cover": "Cover"

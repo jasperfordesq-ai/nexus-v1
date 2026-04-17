@@ -198,6 +198,7 @@ export function DataTable<T extends Record<string, any>>({
             key={col.key}
             allowsSorting={col.sortable}
             width={col.width}
+            scope="col"
           >
             {col.label}
           </TableColumn>

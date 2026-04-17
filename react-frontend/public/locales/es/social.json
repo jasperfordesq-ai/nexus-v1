@@ -5,6 +5,8 @@
   "copy_link": "Copiar Enlace",
   "delete": "Eliminar",
   "delete_comment_confirm": "¿Eliminar este comentario?",
+  "delete_comment_title": "Delete comment",
+  "delete_comment_body": "Are you sure you want to delete this comment? This cannot be undone.",
   "edit": "Editar",
   "edited": "editado",
   "likers_title": "Les gusta a",

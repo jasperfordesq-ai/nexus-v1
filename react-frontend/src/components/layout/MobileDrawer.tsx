@@ -87,6 +87,7 @@ interface IdentityStatusResponse {
 function IdentityVerificationCTA({ userId, tenantPath, onClose }: { userId: number; tenantPath: (p: string) => string; onClose: () => void }) {
   const [isVerified, setIsVerified] = useState<boolean | null>(null);
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
 
   useEffect(() => {
     if (!userId) return;
@@ -109,7 +110,7 @@ function IdentityVerificationCTA({ userId, tenantPath, onClose }: { userId: numb
       className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-sm font-semibold hover:bg-emerald-500/20 h-auto"
     >
       <Fingerprint className="w-4 h-4" />
-      Verify Your Identity
+      {t('nav.verify_identity', 'Verify Your Identity')}
     </Button>
   );
 }

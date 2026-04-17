@@ -91,7 +91,7 @@ export function QuotedPostEmbed({ post, isPreview = false }: QuotedPostEmbedProp
               className="text-xs text-[var(--color-primary)] p-0 min-w-0 h-auto mt-1"
               aria-expanded={expanded}
               onPress={(e) => {
-                e.continuePropagation?.();
+                e.stopPropagation();
                 setExpanded(true);
               }}
             >
