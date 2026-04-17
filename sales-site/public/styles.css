@@ -234,7 +234,16 @@ section[id] {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 10px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  color: var(--text);
+  transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
 }
 
 .nav-toggle span {
@@ -258,6 +267,16 @@ section[id] {
   transform: rotate(-45deg) translate(5px, -5px);
 }
 
+.nav-toggle:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.nav-toggle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.15);
+}
+
 /* Mobile menu */
 .mobile-menu {
   display: none;
@@ -265,19 +284,21 @@ section[id] {
   gap: 0.5rem;
   position: fixed;
   top: 64px;
-  left: 0;
-  right: 0;
-  background: rgba(10, 10, 15, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--border);
-  z-index: 99;
-  transform: translateY(-100%);
+  left: 1rem;
+  right: 1rem;
+  background: rgba(10, 10, 15, 0.98);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  padding: 1.25rem;
+  border: 1px solid rgba(129, 140, 248, 0.14);
+  border-radius: 1.25rem;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+  z-index: 101;
+  transform: translateY(-0.75rem);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: all var(--transition);
+  transition: opacity var(--transition), transform var(--transition), visibility var(--transition);
 }
 
 .mobile-menu.open {
@@ -287,11 +308,36 @@ section[id] {
   pointer-events: auto;
 }
 
+.mobile-scrim {
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(10, 10, 15, 0.18), rgba(10, 10, 15, 0.78));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition);
+  z-index: 100;
+}
+
+.mobile-scrim.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+body.menu-open {
+  overflow: hidden;
+}
+
 .mobile-link {
   color: var(--text-muted);
   font-size: 1rem;
   font-weight: 500;
-  padding: 0.75rem 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0.875rem 0;
   border-bottom: 1px solid var(--border);
 }
 

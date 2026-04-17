@@ -113,6 +113,7 @@
     <a href="https://app.project-nexus.ie" class="mobile-link">Live App</a>
     <a href="https://github.com/jasperfordesq-ai/nexus-v1" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="margin-top:0.5rem;">View on GitHub</a>
   </nav>
+  <div class="mobile-scrim" id="mobile-scrim" hidden aria-hidden="true"></div>
 
   <main>
 
@@ -597,29 +598,42 @@ open http://localhost:5173</pre>
   <script>
     const toggle = document.getElementById('nav-toggle');
     const menu = document.getElementById('mobile-menu');
+    const scrim = document.getElementById('mobile-scrim');
+    const mainContent = document.querySelector('main');
+    const footer = document.querySelector('footer');
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+    function setMenuState(isOpen) {
+      menu.classList.toggle('open', isOpen);
+      toggle.classList.toggle('open', isOpen);
+      toggle.setAttribute('aria-expanded', String(isOpen));
+      menu.setAttribute('aria-hidden', String(!isOpen));
+      menu.inert = !isOpen;
+      document.body.classList.toggle('menu-open', isOpen);
+      scrim.hidden = !isOpen;
+      scrim.classList.toggle('open', isOpen);
+      mainContent.inert = isOpen;
+      footer.inert = isOpen;
+    }
+
     function closeMenu() {
-      menu.classList.remove('open');
-      menu.setAttribute('aria-hidden', 'true');
-      menu.inert = true;
-      toggle.classList.remove('open');
-      toggle.setAttribute('aria-expanded', 'false');
+      setMenuState(false);
       toggle.focus();
     }
 
     menu.inert = true;
+    scrim.hidden = true;
+    mainContent.inert = false;
+    footer.inert = false;
 
     toggle.addEventListener('click', () => {
-      const isOpen = menu.classList.toggle('open');
-      toggle.classList.toggle('open');
-      toggle.setAttribute('aria-expanded', String(isOpen));
-      menu.setAttribute('aria-hidden', String(!isOpen));
-      menu.inert = !isOpen;
+      const isOpen = !menu.classList.contains('open');
+      setMenuState(isOpen);
     });
     menu.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', closeMenu);
     });
+    scrim.addEventListener('click', closeMenu);
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && menu.classList.contains('open')) { closeMenu(); }
     });
