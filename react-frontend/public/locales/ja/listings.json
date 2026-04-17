@@ -101,6 +101,7 @@
   "empty_subtitle": "フィルターを調整するか、新しいリスティングを作成してみてください",
   "map_empty": "位置情報データのあるリスティングはありません",
   "load_more": "もっと読み込む",
+  "load_more_count": "Load more ({{remaining}} remaining)",
   "delete_confirm": "このリスティングを削除してもよろしいですか？",
   "delete_confirm_title": "Delete listing",
   "delete_confirm_body": "Are you sure you want to delete this listing? This cannot be undone.",
@@ -198,7 +199,7 @@
     "views_last_days": "ビュー数（過去{{days}}日）",
     "load_error": "Failed to load analytics",
     "retry": "Retry",
-    "no_data": "No view data available yet",
+    "no_data": "No views yet — check back after your listing gets some traffic",
     "bar_label": "{{date}}: {{count}} views"
   },
   "filter_any_duration": "任意の期間",
@@ -218,10 +219,9 @@
   "results_count": "{{count}} 件のリスティングが見つかりました",
   "page_meta": {
     "create": {
-      "title": "リスティングを作成"
-    ,
-  "community_member": "Community Member"
-}
+      "title": "リスティングを作成",
+      "community_member": "Community Member"
+    }
   },
   "filters_label": "Filters",
   "filter_hours": "Duration",
@@ -270,7 +270,7 @@
   "sort_recommended": "Recommended",
   "sort_newest": "Newest first",
   "reciprocity_mutual": "Mutual match",
-  "reciprocity_one_way": "Match"
-,
-  "community_member": "Community Member"
+  "reciprocity_one_way": "Match",
+  "community_member": "Community Member",
+  "comments_error": "Comments could not be loaded."
 }

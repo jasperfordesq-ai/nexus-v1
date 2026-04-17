@@ -327,10 +327,10 @@ export function ListingsPage() {
     try {
       if (currentlySaved) {
         await api.delete(`/v2/listings/${listingId}/save`);
-        toast.success(t('unsaved_success', 'Listing removed from saved'));
+        toastRef.current.success(tRef.current('unsaved_success', 'Listing removed from saved'));
       } else {
         await api.post(`/v2/listings/${listingId}/save`);
-        toast.success(t('saved_success', 'Listing saved'));
+        toastRef.current.success(tRef.current('saved_success', 'Listing saved'));
       }
     } catch (error) {
       logError('Failed to toggle save listing', error);
@@ -338,7 +338,7 @@ export function ListingsPage() {
       setListings((prev) =>
         prev.map((l) => l.id === listingId ? { ...l, is_favorited: currentlySaved } : l)
       );
-      toast.error(t('save_error', 'Failed to update saved listing'));
+      toastRef.current.error(tRef.current('save_error', 'Failed to update saved listing'));
     } finally {
       setSavingIds((prev) => {
         const next = new Set(prev);
@@ -346,7 +346,7 @@ export function ListingsPage() {
         return next;
       });
     }
-  }, [savingIds, t, toast]);
+  }, [savingIds]);
 
   return (
     <>
@@ -753,7 +753,9 @@ export function ListingsPage() {
                 onPress={() => loadListings()}
                 isLoading={isLoading}
               >
-                {t('load_more')}
+                {totalItems != null && totalItems > listings.length
+                  ? t('load_more_count', 'Load more ({{remaining}} remaining)', { remaining: totalItems - listings.length })
+                  : t('load_more')}
               </Button>
               {paginationError && (
                 <p className="text-center text-sm text-danger mt-2">{t('load_more_error_persistent', 'Failed to load more listings. Please try again.')}</p>
@@ -778,6 +780,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
   const { t } = useTranslation('listings');
   const { tenantPath } = useTenant();
   const isGrid = viewMode === 'grid';
+  const [imgError, setImgError] = useState(false);
   const hours = listing.estimated_hours || listing.hours_estimate;
   const avatarSrc = resolveAvatarUrl(listing.author_avatar || listing.user?.avatar);
   const isFavorited = listing.is_favorited === true;
@@ -794,9 +797,9 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
     // ─── List View ───
     return (
       <Link to={tenantPath(`/listings/${listing.id}`)}>
-        <GlassCard className="p-4 hover:bg-theme-hover transition-colors">
+        <GlassCard className="cursor-pointer p-4 hover:bg-theme-hover transition-colors">
           <div className="flex items-start gap-4">
-            {imageUrl ? (
+            {imageUrl && !imgError ? (
               <img
                 src={imageUrl}
                 alt={listing.title || 'Listing image'}
@@ -804,7 +807,8 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                 width={64}
                 height={64}
                 loading="lazy"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                decoding="async"
+                onError={() => setImgError(true)}
               />
             ) : (
               <Avatar
@@ -893,9 +897,9 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
   // ─── Grid View ───
   return (
     <Link to={tenantPath(`/listings/${listing.id}`)}>
-      <GlassCard className="hover:scale-[1.02] transition-transform h-full flex flex-col overflow-hidden">
+      <GlassCard className="cursor-pointer hover:scale-[1.02] transition-transform h-full flex flex-col overflow-hidden">
         {/* Listing Image */}
-        {imageUrl ? (
+        {imageUrl && !imgError ? (
           <img
             src={imageUrl}
             alt={listing.title || 'Listing image'}
@@ -903,7 +907,8 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
             width={800}
             height={450}
             loading="lazy"
-            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            decoding="async"
+            onError={() => setImgError(true)}
           />
         ) : (
           <ImagePlaceholder size="sm" />

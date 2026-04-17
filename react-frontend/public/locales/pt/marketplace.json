@@ -141,7 +141,8 @@
     "price_label": "Price",
     "currency_label": "Currency",
     "location_label": "Location",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "draft_saved": "Draft saved"
   },
   "search": {
     "page_title": "Pesquisar Mercado",

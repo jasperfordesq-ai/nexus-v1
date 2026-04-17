@@ -101,6 +101,7 @@
   "empty_subtitle": "Prueba ajustando tus filtros o crea un nuevo anuncio",
   "map_empty": "No hay anuncios con datos de ubicación",
   "load_more": "Cargar Más",
+  "load_more_count": "Load more ({{remaining}} remaining)",
   "delete_confirm": "¿Estás seguro de que quieres eliminar este anuncio?",
   "delete_confirm_title": "Delete listing",
   "delete_confirm_body": "Are you sure you want to delete this listing? This cannot be undone.",
@@ -198,7 +199,7 @@
     "views_last_days": "Visitas (Últimos {{days}} Días)",
     "load_error": "Failed to load analytics",
     "retry": "Retry",
-    "no_data": "No view data available yet",
+    "no_data": "No views yet — check back after your listing gets some traffic",
     "bar_label": "{{date}}: {{count}} views"
   },
   "filter_any_duration": "Cualquier duración",
@@ -218,10 +219,9 @@
   "results_count": "{{count}} listados encontrados",
   "page_meta": {
     "create": {
-      "title": "Crear listado"
-    ,
-  "community_member": "Community Member"
-}
+      "title": "Crear listado",
+      "community_member": "Community Member"
+    }
   },
   "filters_label": "Filters",
   "filter_hours": "Duration",
@@ -270,7 +270,7 @@
   "sort_recommended": "Recommended",
   "sort_newest": "Newest first",
   "reciprocity_mutual": "Mutual match",
-  "reciprocity_one_way": "Match"
-,
-  "community_member": "Community Member"
+  "reciprocity_one_way": "Match",
+  "community_member": "Community Member",
+  "comments_error": "Comments could not be loaded."
 }

@@ -51,7 +51,7 @@ import { GlassCard } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { usePageTitle } from '@/hooks';
+import { usePageTitle, useDraftPersistence } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { PlaceAutocompleteInput } from '@/components/location';
 
@@ -77,6 +77,15 @@ interface ImagePreview {
   id: string;
   file: File;
   url: string;
+}
+
+interface MarketplaceListingDraft {
+  title: string;
+  description: string;
+  categoryId: string;
+  condition: string;
+  priceType: string;
+  price: string;
 }
 
 // Labels here serve as fallback defaults; translated labels are applied via
@@ -116,14 +125,25 @@ export function CreateMarketplaceListingPage() {
   const toast = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Form state
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [categoryId, setCategoryId] = useState('');
-  const [condition, setCondition] = useState('good');
-  const [price, setPrice] = useState('');
+  // Form state — persisted draft
+  const [draft, setDraft, clearDraft] = useDraftPersistence<MarketplaceListingDraft>(
+    'marketplace-listing-draft',
+    { title: '', description: '', categoryId: '', condition: 'good', priceType: 'fixed', price: '' },
+  );
+  const title = draft.title;
+  const description = draft.description;
+  const categoryId = draft.categoryId;
+  const condition = draft.condition;
+  const priceType = draft.priceType;
+  const price = draft.price;
   const [currency, setCurrency] = useState('EUR');
-  const [priceType, setPriceType] = useState('fixed');
+
+  const setTitle = (v: string) => setDraft((prev) => ({ ...prev, title: v }));
+  const setDescription = (v: string) => setDraft((prev) => ({ ...prev, description: v }));
+  const setCategoryId = (v: string) => setDraft((prev) => ({ ...prev, categoryId: v }));
+  const setCondition = (v: string) => setDraft((prev) => ({ ...prev, condition: v }));
+  const setPriceType = (v: string) => setDraft((prev) => ({ ...prev, priceType: v }));
+  const setPrice = (v: string) => setDraft((prev) => ({ ...prev, price: v }));
   const [location, setLocation] = useState('');
   const [latitude, setLatitude] = useState<number | undefined>();
   const [longitude, setLongitude] = useState<number | undefined>();
@@ -378,6 +398,7 @@ export function CreateMarketplaceListingPage() {
       }
 
       toast.success(t('create.created_success', 'Listing created successfully!'));
+      clearDraft();
       // Cleanup blob URLs
       images.forEach((img) => URL.revokeObjectURL(img.url));
       if (videoPreviewUrl) URL.revokeObjectURL(videoPreviewUrl);
@@ -415,6 +436,11 @@ export function CreateMarketplaceListingPage() {
           <div>
             <h1 className="text-2xl font-bold text-foreground">{t('create.title', 'Sell Something')}</h1>
             <p className="text-sm text-default-500">{t('create.subtitle', 'Create a new marketplace listing')}</p>
+            {(draft.title || draft.description) && (
+              <p className="text-xs text-default-400 mt-1">
+                {t('create.draft_saved', 'Draft saved')}
+              </p>
+            )}
           </div>
         </div>
 

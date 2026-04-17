@@ -101,6 +101,7 @@
   "empty_subtitle": "Try adjusting your filters or create a new listing",
   "map_empty": "No listings with location data",
   "load_more": "Load More",
+  "load_more_count": "Load more ({{remaining}} remaining)",
   "delete_confirm": "Are you sure you want to delete this listing?",
   "delete_confirm_title": "Delete listing",
   "delete_confirm_body": "Are you sure you want to delete this listing? This cannot be undone.",
@@ -204,7 +205,7 @@
     "views_last_days": "Views (Last {{days}} Days)",
     "load_error": "Failed to load analytics",
     "retry": "Retry",
-    "no_data": "No view data available yet",
+    "no_data": "No views yet — check back after your listing gets some traffic",
     "bar_label": "{{date}}: {{count}} views"
   },
   "filter_hours": "Duration",
@@ -269,5 +270,6 @@
   "reviews": "reviews",
   "service_type_hybrid_available": "Remote Available",
   "service_type_remote": "Remote",
-  "community_member": "Community Member"
+  "community_member": "Community Member",
+  "comments_error": "Comments could not be loaded."
 }

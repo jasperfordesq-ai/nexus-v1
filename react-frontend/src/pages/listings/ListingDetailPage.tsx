@@ -36,7 +36,7 @@ import {
 import { GlassCard, ImagePlaceholder } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { Breadcrumbs } from '@/components/navigation';
-import { LoadingScreen, EmptyState } from '@/components/feedback';
+import { LoadingScreen, EmptyState, ErrorBoundary } from '@/components/feedback';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { LocationMapCard } from '@/components/location';
 import { CommentsSection, LikersModal, ShareButton } from '@/components/social';
@@ -73,6 +73,7 @@ export function ListingDetailPage() {
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [isReported, setIsReported] = useState(false);
   const [isReporting, setIsReporting] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const [reportReason, setReportReason] = useState<string>('');
   const [reportDetails, setReportDetails] = useState('');
   const { isOpen: isReportOpen, onOpen: onReportOpen, onClose: onReportClose } = useDisclosure();
@@ -80,6 +81,8 @@ export function ListingDetailPage() {
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
+  // Dedicated abort ref for checkActiveExchange — keeps it isolated from loadListing's controller
+  const exchangeAbortRef = useRef<AbortController | null>(null);
 
   // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
   const tRef = useRef(t);
@@ -116,9 +119,12 @@ export function ListingDetailPage() {
 
   const checkActiveExchange = useCallback(async () => {
     if (!id || !isAuthenticated) return;
+    exchangeAbortRef.current?.abort();
+    const controller = new AbortController();
+    exchangeAbortRef.current = controller;
     try {
       const response = await api.get<{ id: number; status: string; role: string; proposed_hours: number } | null>(`/v2/exchanges/check?listing_id=${id}`);
-      if (abortRef.current?.signal.aborted) return;
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setActiveExchange(response.data);
       }
@@ -163,8 +169,11 @@ export function ListingDetailPage() {
     loadListing();
     loadExchangeConfig();
     checkActiveExchange();
-    return () => { abortRef.current?.abort(); };
+    return () => { abortRef.current?.abort(); exchangeAbortRef.current?.abort(); };
   }, [loadListing, loadExchangeConfig, checkActiveExchange]);
+
+  // Reset image error state when navigating to a different listing
+  useEffect(() => { setImageError(false); }, [id]);
 
   async function handleDelete() {
     if (!listing) return;
@@ -381,15 +390,16 @@ export function ListingDetailPage() {
 
         {/* Listing Image */}
         <div className="mb-6 overflow-hidden rounded-xl">
-          {listing.image_url ? (
+          {listing.image_url && !imageError ? (
             <img
               src={resolveAssetUrl(listing.image_url)}
               alt={listing.title}
               className="w-full max-h-[28rem] object-cover"
               loading="lazy"
+              decoding="async"
               width={800}
               height={448}
-              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+              onError={() => setImageError(true)}
             />
           ) : (
             <ImagePlaceholder size="lg" />
@@ -886,24 +896,30 @@ export function ListingDetailPage() {
 
       {/* Comments Section — threaded with reactions, replies, edit, delete */}
       {showComments && (
-        <GlassCard className="p-6">
-          <CommentsSection
-            comments={social.comments}
-            commentsCount={social.commentsCount}
-            commentsLoading={social.commentsLoading}
-            commentsLoaded={social.commentsLoaded}
-            loadComments={social.loadComments}
-            submitComment={social.submitComment}
-            editComment={social.editComment}
-            deleteComment={social.deleteComment}
-            toggleReaction={social.toggleReaction}
-            searchMentions={social.searchMentions}
-            isAuthenticated={isAuthenticated}
-            currentUserId={user?.id}
-            currentUserAvatar={user?.avatar ?? undefined}
-            currentUserName={user?.first_name || user?.name}
-          />
-        </GlassCard>
+        <ErrorBoundary fallback={
+          <GlassCard className="p-6 text-center text-theme-muted">
+            {t('comments_error', 'Comments could not be loaded.')}
+          </GlassCard>
+        }>
+          <GlassCard className="p-6">
+            <CommentsSection
+              comments={social.comments}
+              commentsCount={social.commentsCount}
+              commentsLoading={social.commentsLoading}
+              commentsLoaded={social.commentsLoaded}
+              loadComments={social.loadComments}
+              submitComment={social.submitComment}
+              editComment={social.editComment}
+              deleteComment={social.deleteComment}
+              toggleReaction={social.toggleReaction}
+              searchMentions={social.searchMentions}
+              isAuthenticated={isAuthenticated}
+              currentUserId={user?.id}
+              currentUserAvatar={user?.avatar ?? undefined}
+              currentUserName={user?.first_name || user?.name}
+            />
+          </GlassCard>
+        </ErrorBoundary>
       )}
 
       {/* Likers Modal */}

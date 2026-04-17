@@ -101,6 +101,7 @@
   "empty_subtitle": "Spróbuj dostosować swoje filtry lub utworzyć nowe ogłoszenie",
   "map_empty": "Brak ogłoszeń z danymi lokalizacyjnymi",
   "load_more": "Załaduj więcej",
+  "load_more_count": "Load more ({{remaining}} remaining)",
   "delete_confirm": "Czy na pewno chcesz usunąć to ogłoszenie?",
   "delete_confirm_title": "Delete listing",
   "delete_confirm_body": "Are you sure you want to delete this listing? This cannot be undone.",
@@ -198,7 +199,7 @@
     "views_last_days": "Wyświetlenia (Ostatnie {{days}} dni)",
     "load_error": "Failed to load analytics",
     "retry": "Retry",
-    "no_data": "No view data available yet",
+    "no_data": "No views yet — check back after your listing gets some traffic",
     "bar_label": "{{date}}: {{count}} views"
   },
   "filter_any_duration": "Dowolny czas trwania",
@@ -218,10 +219,9 @@
   "results_count": "{{count}} znalezione ogłoszenia",
   "page_meta": {
     "create": {
-      "title": "Utwórz ogłoszenie"
-    ,
-  "community_member": "Community Member"
-}
+      "title": "Utwórz ogłoszenie",
+      "community_member": "Community Member"
+    }
   },
   "filters_label": "Filters",
   "filter_hours": "Duration",
@@ -270,7 +270,7 @@
   "sort_recommended": "Recommended",
   "sort_newest": "Newest first",
   "reciprocity_mutual": "Mutual match",
-  "reciprocity_one_way": "Match"
-,
-  "community_member": "Community Member"
+  "reciprocity_one_way": "Match",
+  "community_member": "Community Member",
+  "comments_error": "Comments could not be loaded."
 }

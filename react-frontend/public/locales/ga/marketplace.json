@@ -142,7 +142,8 @@
     "price_invalid": "Cuir isteach praghas bailí, le do thoil",
     "created_success": "D'éirigh le cruthú an liosta!",
     "created_error": "Theip ar chruthú an liosta",
-    "created_error_retry": "Theip ar chruthú an liosta. Bain triail eile as."
+    "created_error_retry": "Theip ar chruthú an liosta. Bain triail eile as.",
+    "draft_saved": "Draft saved"
   },
   "search": {
     "page_title": "Cuardaigh an Margadh",

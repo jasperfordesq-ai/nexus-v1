@@ -142,7 +142,7 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
         <h4 className="text-sm font-medium text-theme-muted mb-2">{t('analytics.views_last_days', 'Views (Last {{days}} Days)', { days: analytics.period_days })}</h4>
         {viewsOverTime.length === 0 ? (
           <p className="text-sm text-theme-muted text-center py-4">
-            {t('analytics.no_data', 'No view data available yet')}
+            {t('analytics.no_data', 'No views yet — check back after your listing gets some traffic')}
           </p>
         ) : (
           <>

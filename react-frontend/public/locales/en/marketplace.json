@@ -147,7 +147,8 @@
     "price_invalid": "Please enter a valid price",
     "created_success": "Listing created successfully!",
     "created_error": "Failed to create listing",
-    "created_error_retry": "Failed to create listing. Please try again."
+    "created_error_retry": "Failed to create listing. Please try again.",
+    "draft_saved": "Draft saved"
   },
 
   "search": {

@@ -101,6 +101,7 @@
   "empty_subtitle": "حاول تعديل الفلاتر الخاصة بك أو إنشاء قائمة جديدة",
   "map_empty": "لا توجد قوائم تحتوي على بيانات الموقع",
   "load_more": "تحميل المزيد",
+  "load_more_count": "Load more ({{remaining}} remaining)",
   "delete_confirm": "هل أنت متأكد أنك تريد حذف هذه القائمة؟",
   "delete_confirm_title": "Delete listing",
   "delete_confirm_body": "Are you sure you want to delete this listing? This cannot be undone.",
@@ -198,7 +199,7 @@
     "views_last_days": "المشاهدات (آخر {{days}} أيام)",
     "load_error": "Failed to load analytics",
     "retry": "Retry",
-    "no_data": "No view data available yet",
+    "no_data": "No views yet — check back after your listing gets some traffic",
     "bar_label": "{{date}}: {{count}} views"
   },
   "filter_any_duration": "أي مدة",
@@ -218,10 +219,9 @@
   "results_count": "{{count}} قوائم تم العثور عليها",
   "page_meta": {
     "create": {
-      "title": "إنشاء قائمة"
-    ,
-  "community_member": "Community Member"
-}
+      "title": "إنشاء قائمة",
+      "community_member": "Community Member"
+    }
   },
   "filters_label": "Filters",
   "filter_hours": "Duration",
@@ -270,7 +270,7 @@
   "sort_recommended": "Recommended",
   "sort_newest": "Newest first",
   "reciprocity_mutual": "Mutual match",
-  "reciprocity_one_way": "Match"
-,
-  "community_member": "Community Member"
+  "reciprocity_one_way": "Match",
+  "community_member": "Community Member",
+  "comments_error": "Comments could not be loaded."
 }

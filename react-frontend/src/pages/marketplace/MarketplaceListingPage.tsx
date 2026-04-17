@@ -256,6 +256,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
+            decoding="async"
           />
         </AnimatePresence>
 
@@ -320,6 +321,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
                 alt={t('listing.thumbnail_alt', 'Thumbnail {{number}}', { number: idx + 1 })}
                 className="w-full h-full object-cover"
                 loading="lazy"
+                decoding="async"
               />
             </Button>
           ))}
@@ -478,7 +480,7 @@ export function MarketplaceListingPage() {
   // Make offer
   const handleMakeOffer = useCallback(async () => {
     if (!listing || !offerAmount) return;
-    const parsedOffer = parseFloat(offerAmount);
+    const parsedOffer = Math.round(parseFloat(offerAmount) * 100) / 100;
     if (parsedOffer <= 0 || parsedOffer > 999999) {
       toast.error(t('offer.amount_invalid', 'Please enter a valid offer amount'));
       return;
@@ -743,8 +745,11 @@ export function MarketplaceListingPage() {
                 <h3 className="text-sm font-semibold text-default-500 uppercase tracking-wide mb-2">
                   {t('listing.delivery', 'Delivery')}
                 </h3>
-                <p className="text-sm text-foreground capitalize">
-                  {listing.delivery_method.replace(/_/g, ' ')}
+                <p className="text-sm text-foreground">
+                  {listing.delivery_method === 'pickup' ? t('delivery_method.pickup', 'Pickup Only')
+                    : listing.delivery_method === 'shipping' ? t('delivery_method.shipping', 'Shipping Only')
+                    : listing.delivery_method === 'both' ? t('delivery_method.both', 'Pickup or Shipping')
+                    : listing.delivery_method.replace(/_/g, ' ')}
                 </p>
               </GlassCard>
             )}
@@ -810,6 +815,8 @@ export function MarketplaceListingPage() {
                           alt={item.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           loading="lazy"
+                          decoding="async"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
