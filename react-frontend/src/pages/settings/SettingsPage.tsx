@@ -945,7 +945,7 @@ export function SettingsPage() {
             marketingConsent={marketingConsent}
             marketingConsentLoading={marketingConsentLoading}
             isOrganisation={profileData.profile_type === 'organisation'}
-            onNotificationsChange={(v) => { setNotifications(v); setIsDirty(true); }}
+            onNotificationsChange={(updater) => { setNotifications(updater); setIsDirty(true); }}
             onMatchDigestFrequencyChange={(v) => { setMatchDigestFrequency(v); setIsDirty(true); }}
             onNotifyHotMatchesChange={(v) => { setNotifyHotMatches(v); setIsDirty(true); }}
             onNotifyMutualMatchesChange={(v) => { setNotifyMutualMatches(v); setIsDirty(true); }}
@@ -966,7 +966,7 @@ export function SettingsPage() {
             insuranceType={insuranceType}
             insuranceEnabled={!!tenant?.compliance?.insurance_enabled}
             federationEnabled={!!hasFeature?.('federation')}
-            onPrivacyChange={(v) => { setPrivacy(v); setIsDirty(true); }}
+            onPrivacyChange={(updater) => { setPrivacy(updater); setIsDirty(true); }}
             onSavePrivacy={savePrivacy}
             onInsuranceUpload={handleInsuranceUpload}
             onInsuranceTypeChange={setInsuranceType}

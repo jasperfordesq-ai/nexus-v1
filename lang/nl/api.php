@@ -88,6 +88,7 @@ return [
     'attribute_name_required' => 'Attribute name is required',
     'badge_name_required' => 'Badge name is required',
     'badge_slug_required' => 'Badge slug is required',
+    'badge_slug_invalid'           => 'Badge slug does not exist or is not enabled for this tenant',
     'user_ids_required' => 'User IDs array is required',
     'campaign_name_required' => 'Campaign name is required',
     'feature_name_required' => 'Feature name is required',
@@ -1224,4 +1225,10 @@ return [
     'story_not_found'                            => 'Story not found.',
 
     'story_expired'                            => 'Story has expired.',
+
+    // Billing delegates
+    'invalid_delegate_scope'                     => 'Invalid delegate scope. Allowed: view_billing, edit_own_price, manage_children.',
+
+    // Billing grace period
+    'grace_period_days_invalid'                  => 'Days must be between 1 and 365.',
 ];

@@ -10,8 +10,24 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Chip, Spinner, Divider } from '@heroui/react';
-import { CreditCard, ArrowRight, Receipt, Settings } from 'lucide-react';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Button,
+  Chip,
+  Spinner,
+  Divider,
+  Progress,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Textarea,
+  useDisclosure,
+} from '@heroui/react';
+import { CreditCard, ArrowRight, Receipt, Settings, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { usePageTitle } from '@/hooks';
@@ -55,13 +71,24 @@ function statusLabel(status: string, t: TFunction): string {
   }
 }
 
+// Extended subscription type with optional usage fields from the API
+interface SubscriptionWithUsage extends SubscriptionDetails {
+  user_count?: number;
+  plan?: {
+    max_users: number | null;
+  };
+}
+
 export function BillingPage() {
   const { t } = useTranslation('admin');
   usePageTitle(t('billing.title', 'Billing'));
   const toast = useToast();
   const { tenantPath } = useTenant();
+  const { isOpen: isUpgradeOpen, onOpen: onUpgradeOpen, onClose: onUpgradeClose } = useDisclosure();
+  const [upgradeMessage, setUpgradeMessage] = useState('');
+  const [upgradeSending, setUpgradeSending] = useState(false);
 
-  const [subscription, setSubscription] = useState<SubscriptionDetails | null>(null);
+  const [subscription, setSubscription] = useState<SubscriptionWithUsage | null>(null);
   const [loading, setLoading] = useState(true);
   const [portalLoading, setPortalLoading] = useState(false);
 
@@ -70,7 +97,7 @@ export function BillingPage() {
     try {
       const res = await billingApi.getSubscription();
       if (res.success && res.data) {
-        setSubscription(res.data as unknown as SubscriptionDetails);
+        setSubscription(res.data as unknown as SubscriptionWithUsage);
       }
     } catch {
       // No subscription found — that's OK
@@ -98,10 +125,40 @@ export function BillingPage() {
     }
   };
 
+  const handleUpgradeRequest = async () => {
+    setUpgradeSending(true);
+    try {
+      // Fire and forget — endpoint may not exist yet; fall back to mailto on failure
+      await fetch('/api/v2/admin/billing/upgrade-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: upgradeMessage }),
+      });
+      toast.success(t('billing.upgrade_sent', 'Upgrade request sent'));
+      onUpgradeClose();
+      setUpgradeMessage('');
+    } catch {
+      // Fallback: open mailto link
+      const subject = encodeURIComponent('Plan Upgrade Request');
+      const body = encodeURIComponent(upgradeMessage);
+      window.location.href = `mailto:jasper@hour-timebank.ie?subject=${subject}&body=${body}`;
+    } finally {
+      setUpgradeSending(false);
+    }
+  };
+
   const hasActiveSubscription =
     subscription &&
     subscription.status !== 'cancelled' &&
     subscription.status !== 'expired';
+
+  // Usage bar values
+  const userCount = subscription?.user_count ?? null;
+  const maxUsers = subscription?.plan?.max_users ?? null;
+  const usagePct =
+    userCount !== null && maxUsers !== null && maxUsers > 0
+      ? Math.round((userCount / maxUsers) * 100)
+      : null;
 
   return (
     <div>
@@ -109,6 +166,97 @@ export function BillingPage() {
         title={t('billing.title', 'Billing')}
         description={t('billing.description', 'Manage your subscription, payment methods, and invoices')}
       />
+
+      {/* ─── Plan Usage Card ─── */}
+      {!loading && subscription && (
+        <Card className="mb-6">
+          <CardHeader className="flex gap-3">
+            <Users className="w-5 h-5 text-primary" />
+            <h3 className="text-lg font-semibold">
+              {t('billing.your_plan_usage', 'Your Plan Usage')}
+            </h3>
+          </CardHeader>
+          <Divider />
+          <CardBody className="gap-4">
+            {maxUsers === null ? (
+              <p className="text-success font-medium">
+                {t('billing.unlimited_users', 'Unlimited users on your plan ✓')}
+              </p>
+            ) : userCount !== null && usagePct !== null ? (
+              <>
+                <div className="flex items-center justify-between text-sm mb-1">
+                  <span className="text-default-500">
+                    {t('billing.user_count_label', '{{count}} / {{max}} users', {
+                      count: userCount,
+                      max: maxUsers,
+                    })}
+                  </span>
+                  <span className="text-default-500">{usagePct}%</span>
+                </div>
+                <Progress
+                  value={usagePct}
+                  color={usagePct >= 100 ? 'danger' : usagePct >= 80 ? 'warning' : 'primary'}
+                  className="w-full"
+                  aria-label={t('billing.your_plan_usage', 'Your Plan Usage')}
+                />
+                {usagePct >= 100 && (
+                  <p className="text-danger text-sm">
+                    {t(
+                      'billing.over_limit_warning',
+                      'You have exceeded your plan limit. Please contact us to upgrade.'
+                    )}
+                  </p>
+                )}
+                {usagePct >= 80 && usagePct < 100 && (
+                  <p className="text-warning text-sm">
+                    {t('billing.approaching_limit', 'Approaching your plan limit')}
+                  </p>
+                )}
+              </>
+            ) : null}
+
+            <Button
+              color="primary"
+              variant="flat"
+              size="sm"
+              className="self-start"
+              onPress={onUpgradeOpen}
+            >
+              {t('billing.request_upgrade', 'Request Upgrade')}
+            </Button>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* ─── Upgrade Request Modal ─── */}
+      <Modal isOpen={isUpgradeOpen} onClose={onUpgradeClose} size="md">
+        <ModalContent>
+          <ModalHeader>{t('billing.request_upgrade', 'Request Upgrade')}</ModalHeader>
+          <ModalBody>
+            <p className="text-default-500 text-sm mb-3">
+              {t(
+                'billing.upgrade_modal_desc',
+                "We'll be in touch about upgrading your plan."
+              )}
+            </p>
+            <Textarea
+              label={t('billing.upgrade_message', 'Message (optional)')}
+              placeholder={t('billing.upgrade_message_placeholder', 'Describe your needs...')}
+              value={upgradeMessage}
+              onValueChange={setUpgradeMessage}
+              minRows={3}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={onUpgradeClose}>
+              {t('billing.cancel', 'Cancel')}
+            </Button>
+            <Button color="primary" isLoading={upgradeSending} onPress={handleUpgradeRequest}>
+              {t('billing.send_request', 'Send Request')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       {loading ? (
         <div className="flex justify-center py-12">

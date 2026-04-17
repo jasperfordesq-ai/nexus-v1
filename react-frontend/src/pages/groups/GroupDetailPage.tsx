@@ -776,11 +776,15 @@ export function GroupDetailPage() {
       if (response.success) {
         const data = response.data as Record<string, unknown> | undefined;
         const url = (data?.url as string) || (data?.image_url as string) || '';
-        setGroup((prev) => prev ? {
-          ...prev,
-          ...(type === 'avatar' ? { image_url: url } : { cover_image_url: url }),
-        } : null);
-        toastRef.current.success(type === 'avatar' ? tRef.current('toast.image_avatar_updated') : tRef.current('toast.image_cover_updated'));
+        if (!url) {
+          toastRef.current.error(tRef.current('toast.image_upload_failed'));
+        } else {
+          setGroup((prev) => prev ? {
+            ...prev,
+            ...(type === 'avatar' ? { image_url: url } : { cover_image_url: url }),
+          } : null);
+          toastRef.current.success(type === 'avatar' ? tRef.current('toast.image_avatar_updated') : tRef.current('toast.image_cover_updated'));
+        }
       } else {
         toastRef.current.error(response.error || tRef.current('toast.image_upload_failed'));
       }
@@ -863,11 +867,8 @@ export function GroupDetailPage() {
         setJoinRequests((prev) => prev.filter((r) => r.user_id !== userId));
         toastRef.current.success(action === 'accept' ? tRef.current('toast.request_accepted') : tRef.current('toast.request_rejected'));
         if (action === 'accept') {
-          setGroup((prev) => prev ? {
-            ...prev,
-            member_count: (prev.member_count ?? prev.members_count ?? 0) + 1,
-            members_count: (prev.member_count ?? prev.members_count ?? 0) + 1,
-          } : null);
+          // Re-fetch the group to get accurate member counts (avoids stale counts from rapid approvals)
+          loadGroup();
           if (membersLoaded) {
             setMembersLoaded(false);
           }

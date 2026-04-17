@@ -57,9 +57,24 @@ class EnsureCorsHeaders
         }
 
         // Federation endpoints (Komunitin + Credit Commons) are queried by external
-        // partner instances from unknown origins — allow any origin for these paths.
+        // partner instances from unknown origins.
+        // GET (read-only) requests keep the permissive wildcard policy.
+        // Write operations (POST, PUT, PATCH, DELETE) require the Origin to be in
+        // the federation_tenant_whitelist table to prevent unauthorized mutations.
         if ($this->isFederationPath($path)) {
-            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $method = strtoupper($request->method());
+            $isWriteMethod = in_array($method, ['POST', 'PUT', 'PATCH', 'DELETE'], true);
+
+            if ($isWriteMethod && $origin) {
+                if (!$this->isFederationOriginWhitelisted($origin)) {
+                    return response()->json(['message' => 'Origin not in federation whitelist'], 403);
+                }
+                // Whitelisted write — reflect the specific origin
+                $response->headers->set('Access-Control-Allow-Origin', $origin);
+            } else {
+                // Read-only or preflight — keep wildcard
+                $response->headers->set('Access-Control-Allow-Origin', '*');
+            }
             $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
             $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
             return $response;
@@ -79,6 +94,24 @@ class EnsureCorsHeaders
     {
         return str_contains($path, 'federation/komunitin')
             || str_contains($path, 'federation/cc');
+    }
+
+    /**
+     * Check whether the given origin is registered in the federation whitelist.
+     * Matches on the base URL (scheme + host) stored in federation_tenant_whitelist.
+     */
+    private function isFederationOriginWhitelisted(string $origin): bool
+    {
+        try {
+            $count = \Illuminate\Support\Facades\DB::table('federation_tenant_whitelist')
+                ->where('remote_url', 'like', rtrim($origin, '/') . '%')
+                ->where('is_active', true)
+                ->count();
+            return $count > 0;
+        } catch (\Throwable) {
+            // If the table doesn't exist or query fails, deny by default
+            return false;
+        }
     }
 
     private function renderException(Request $request, \Throwable $e): Response

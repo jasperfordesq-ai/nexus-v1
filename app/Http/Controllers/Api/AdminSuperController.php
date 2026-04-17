@@ -1554,16 +1554,128 @@ class AdminSuperController extends BaseApiController
         if ($tenantId < 1 || $planId < 1) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.tenant_and_plan_required'), null, 422);
         }
-        // Verify tenant and plan exist.
         if (!DB::selectOne('SELECT id FROM tenants WHERE id = ?', [$tenantId])) {
             return $this->respondWithError('NOT_FOUND', __('api.tenant_not_found'), null, 404);
         }
         if (!DB::selectOne('SELECT id FROM pay_plans WHERE id = ? AND is_active = 1', [$planId])) {
             return $this->respondWithError('NOT_FOUND', __('api.plan_not_found'), null, 404);
         }
+
         $expiresAt = !empty($input['expires_at']) ? $input['expires_at'] : null;
         $notes     = !empty($input['notes']) ? trim($input['notes']) : null;
-        TenantBillingService::assignPlan($tenantId, $planId, $expiresAt, $notes, $userId);
+
+        // Pricing overrides and discount.
+        $customPriceMonthly = isset($input['custom_price_monthly']) && $input['custom_price_monthly'] !== ''
+            ? (float) $input['custom_price_monthly']
+            : null;
+        $customPriceYearly = isset($input['custom_price_yearly']) && $input['custom_price_yearly'] !== ''
+            ? (float) $input['custom_price_yearly']
+            : null;
+        $discountPct = max(0, min(100, (int) ($input['discount_percentage'] ?? 0)));
+        $discountReason = !empty($input['discount_reason']) ? trim($input['discount_reason']) : null;
+        $nonprofitVerified = !empty($input['nonprofit_verified']);
+
+        TenantBillingService::assignPlan(
+            $tenantId, $planId, $expiresAt, $notes, $userId,
+            $customPriceMonthly, $customPriceYearly,
+            $discountPct, $discountReason, $nonprofitVerified
+        );
         return $this->respondWithData(['assigned' => true]);
+    }
+
+    /** GET /api/v2/admin/super/billing/revenue */
+    public function getRevenueDashboard(): JsonResponse
+    {
+        $userId = $this->requireSuperAdmin();
+        $this->requireGod($userId);
+        return $this->respondWithData(TenantBillingService::getRevenueDashboard());
+    }
+
+    /** GET /api/v2/admin/super/billing/export */
+    public function exportBillingCsv(): \Illuminate\Http\Response
+    {
+        $userId = $this->requireSuperAdmin();
+        $this->requireGod($userId);
+        $csv = TenantBillingService::exportCsv();
+        return response($csv, 200, [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="nexus-billing-' . date('Y-m-d') . '.csv"',
+        ]);
+    }
+
+    /** POST /api/v2/admin/super/billing/delegate/grant */
+    public function grantBillingDelegate(): JsonResponse
+    {
+        $userId = $this->requireSuperAdmin();
+        $this->requireGod($userId);
+        $input        = $this->getAllInput();
+        $targetUserId = (int) ($input['user_id'] ?? 0);
+        $scope        = $input['scope'] ?? '';
+        if (!in_array($scope, ['view_billing', 'edit_own_price', 'manage_children'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_delegate_scope'), null, 422);
+        }
+        TenantBillingService::grantDelegate($targetUserId, $scope, $userId);
+        return $this->respondWithData(['granted' => true]);
+    }
+
+    /** POST /api/v2/admin/super/billing/delegate/revoke */
+    public function revokeBillingDelegate(): JsonResponse
+    {
+        $userId = $this->requireSuperAdmin();
+        $this->requireGod($userId);
+        $input        = $this->getAllInput();
+        $targetUserId = (int) ($input['user_id'] ?? 0);
+        $scope        = $input['scope'] ?? '';
+        if (!in_array($scope, ['view_billing', 'edit_own_price', 'manage_children'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_delegate_scope'), null, 422);
+        }
+        TenantBillingService::revokeDelegate($targetUserId, $scope, $userId);
+        return $this->respondWithData(['revoked' => true]);
+    }
+
+    /** POST /api/v2/admin/super/billing/pause */
+    public function pauseTenantBilling(): JsonResponse
+    {
+        $userId   = $this->requireSuperAdmin();
+        $this->requireGod($userId);
+        $input    = $this->getAllInput();
+        $tenantId = (int) ($input['tenant_id'] ?? 0);
+        if ($tenantId < 1) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.tenant_id_is_required'), 'tenant_id', 422);
+        }
+        TenantBillingService::pauseBilling($tenantId, $userId);
+        return $this->respondWithData(['paused' => true, 'tenant_id' => $tenantId]);
+    }
+
+    /** POST /api/v2/admin/super/billing/resume */
+    public function resumeTenantBilling(): JsonResponse
+    {
+        $userId   = $this->requireSuperAdmin();
+        $this->requireGod($userId);
+        $input    = $this->getAllInput();
+        $tenantId = (int) ($input['tenant_id'] ?? 0);
+        if ($tenantId < 1) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.tenant_id_is_required'), 'tenant_id', 422);
+        }
+        TenantBillingService::resumeBilling($tenantId, $userId);
+        return $this->respondWithData(['resumed' => true, 'tenant_id' => $tenantId]);
+    }
+
+    /** POST /api/v2/admin/super/billing/grace-period */
+    public function setBillingGracePeriod(): JsonResponse
+    {
+        $userId   = $this->requireSuperAdmin();
+        $this->requireGod($userId);
+        $input    = $this->getAllInput();
+        $tenantId = (int) ($input['tenant_id'] ?? 0);
+        $days     = (int) ($input['days'] ?? 0);
+        if ($tenantId < 1) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.tenant_id_is_required'), 'tenant_id', 422);
+        }
+        if ($days < 1 || $days > 365) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.grace_period_days_invalid'), 'days', 422);
+        }
+        TenantBillingService::setGracePeriod($tenantId, $days, $userId);
+        return $this->respondWithData(['grace_period_set' => true, 'tenant_id' => $tenantId, 'days' => $days]);
     }
 }

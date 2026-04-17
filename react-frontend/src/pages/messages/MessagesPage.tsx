@@ -13,7 +13,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Input, Avatar, Badge, Button, Modal, ModalContent, ModalHeader, ModalBody, Tabs, Tab, Skeleton } from '@heroui/react';
 import { Search, MessageSquare, Circle, Plus, Loader2, Archive, RotateCcw, AlertTriangle, ArrowRightLeft, RefreshCw, Users as UsersIcon } from 'lucide-react';
@@ -58,6 +58,7 @@ export function MessagesPage() {
   usePageTitle(t('title'));
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user: currentUser } = useAuth();
   const toast = useToast();
   const pusher = usePusherOptional();
@@ -80,6 +81,10 @@ export function MessagesPage() {
   tRef.current = t;
   const toastRef = useRef(toast);
   toastRef.current = toast;
+
+  // Stable ref for location so handleNewMessage doesn't need location in its dep array
+  const locationRef = useRef(location);
+  locationRef.current = location;
 
   // Broker messaging restriction state
   const [messagingRestricted, setMessagingRestricted] = useState(false);
@@ -157,8 +162,13 @@ export function MessagesPage() {
           created_at: event.created_at || new Date().toISOString(),
         };
 
-        // Increment unread count
-        conv.unread_count = (conv.unread_count || 0) + 1;
+        // Only increment unread count if this conversation is not currently open.
+        // Check the URL path — if the user is viewing /messages/{conv.id} right now,
+        // the ConversationPage will mark it as read so we skip the increment.
+        const isActive = locationRef.current.pathname.endsWith(`/messages/${conv.id}`);
+        if (!isActive) {
+          conv.unread_count = (conv.unread_count || 0) + 1;
+        }
 
         // Move to top of list
         updated.splice(existingIndex, 1);

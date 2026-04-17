@@ -56,7 +56,7 @@ export function ListingsPage() {
   const { t } = useTranslation('listings');
   usePageTitle(t('title'));
   const { isAuthenticated, user } = useAuth();
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasModule } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -305,7 +305,7 @@ export function ListingsPage() {
       return;
     }
     if (!user?.latitude || !user?.longitude) {
-      toast.error(t('near_me_no_location', 'Set your location in your profile to use Near me'));
+      toast.warning(t('near_me_no_location'));
       return;
     }
     setNearMeEnabled(true);
@@ -347,6 +347,10 @@ export function ListingsPage() {
       });
     }
   }, [savingIds]);
+
+  if (!hasModule('listings')) {
+    return null;
+  }
 
   return (
     <>
@@ -675,20 +679,42 @@ export function ListingsPage() {
           </Button>
         </GlassCard>
       ) : listings.length === 0 ? (
-        <EmptyState
-          icon={<Search className="w-12 h-12" />}
-          title={t('empty')}
-          description={t('empty_subtitle')}
-          action={
-            isAuthenticated && (
-              <Link to={tenantPath('/listings/create')}>
-                <Button className="bg-linear-to-r from-indigo-500 to-purple-600 text-white">
-                  {t('create')}
-                </Button>
-              </Link>
-            )
-          }
-        />
+        (() => {
+          const hasActiveFilters = !!(searchQuery || selectedType !== 'all' || selectedCategory || hoursRange !== 'any' || serviceMode !== 'any' || postedWithin !== 'any' || nearMeEnabled);
+          return (
+            <EmptyState
+              icon={<Search className="w-12 h-12" />}
+              title={t('empty')}
+              description={hasActiveFilters ? t('empty_subtitle') : t('empty_subtitle')}
+              action={
+                hasActiveFilters ? (
+                  <Button
+                    className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
+                    startContent={<X className="w-4 h-4" aria-hidden="true" />}
+                    onPress={() => {
+                      setSearchInput('');
+                      setSearchQuery('');
+                      setSelectedType('all');
+                      setSelectedCategory('');
+                      setHoursRange('any');
+                      setServiceMode('any');
+                      setPostedWithin('any');
+                      setNearMeEnabled(false);
+                    }}
+                  >
+                    {t('clear_filters')}
+                  </Button>
+                ) : isAuthenticated ? (
+                  <Link to={tenantPath('/listings/create')}>
+                    <Button className="bg-linear-to-r from-indigo-500 to-purple-600 text-white">
+                      {t('create')}
+                    </Button>
+                  </Link>
+                ) : undefined
+              }
+            />
+          );
+        })()
       ) : (
         <>
           {viewMode === 'map' ? (

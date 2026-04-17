@@ -23,7 +23,7 @@ import { Link } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader, MemberSearchPicker, type MemberSearchMember } from '../../components';
 
 import { useTranslation } from 'react-i18next';
 interface Task {
@@ -138,6 +138,7 @@ export default function CoordinatorTasks() {
   const [formPriority, setFormPriority] = useState<string>('medium');
   const [formAssignedTo, setFormAssignedTo] = useState<string>('');
   const [formUserId, setFormUserId] = useState('');
+  const [formMember, setFormMember] = useState<MemberSearchMember | null>(null);
   const [formDueDate, setFormDueDate] = useState('');
 
   const loadTasks = useCallback(async () => {
@@ -189,6 +190,7 @@ export default function CoordinatorTasks() {
     setFormPriority('medium');
     setFormAssignedTo('');
     setFormUserId('');
+    setFormMember(null);
     setFormDueDate('');
     setEditingTask(null);
   }, []);
@@ -205,6 +207,12 @@ export default function CoordinatorTasks() {
     setFormPriority(task.priority);
     setFormAssignedTo(String(task.assigned_to));
     setFormUserId(task.user_id ? String(task.user_id) : '');
+    setFormMember(task.user_id && task.user_name ? {
+      id: task.user_id,
+      name: task.user_name,
+      email: '',
+      avatar_url: task.user_avatar,
+    } : null);
     setFormDueDate(task.due_date || '');
     createModal.onOpen();
   }, [createModal]);
@@ -562,12 +570,15 @@ export default function CoordinatorTasks() {
                   </Select>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Input
-                    label={t('crm.label_related_member_i_d')}
-                    placeholder={t('crm.placeholder_optional_user_i_d')}
+                  <MemberSearchPicker
+                    label={t('broker.label_search_member')}
+                    placeholder={t('broker.placeholder_type_a_name_or_email_to_search')}
+                    noResultsText={t('shared.no_members_found')}
                     value={formUserId}
+                    selectedMember={formMember}
+                    onSelectedMemberChange={setFormMember}
                     onValueChange={setFormUserId}
-                    type="number"
+                    size="md"
                   />
                   <Input
                     label={t('crm.label_due_date')}

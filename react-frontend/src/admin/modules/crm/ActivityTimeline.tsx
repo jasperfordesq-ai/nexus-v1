@@ -11,18 +11,18 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import {
-  Card, CardBody, Button, Input, Select, SelectItem,
+  Card, CardBody, Button, Select, SelectItem,
   Chip, Spinner, Pagination, Avatar,
 } from '@heroui/react';
 import {
-  Activity, Search, Filter, User, StickyNote, ClipboardList,
+  Activity, Filter, User, StickyNote, ClipboardList,
   LogIn, UserPlus, FileText, ArrowRightLeft, RefreshCw,
 } from 'lucide-react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader, MemberSearchPicker, type MemberSearchMember } from '../../components';
 
 import { useTranslation } from 'react-i18next';
 interface TimelineEntry {
@@ -146,6 +146,7 @@ export function ActivityTimeline() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [filterUserId, setFilterUserId] = useState<string>(searchParams.get('user_id') || '');
+  const [filterMember, setFilterMember] = useState<MemberSearchMember | null>(null);
   const [filterType, setFilterType] = useState<string>('');
   const [filterDays, setFilterDays] = useState<string>('30');
 
@@ -179,6 +180,7 @@ export function ActivityTimeline() {
 
   const handleClearFilters = () => {
     setFilterUserId('');
+    setFilterMember(null);
     setFilterType('');
     setFilterDays('30');
     setPage(1);
@@ -205,14 +207,15 @@ export function ActivityTimeline() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-end gap-3 mb-6">
-        <Input
-          label={t('crm.label_user_i_d')}
-          placeholder={t('crm.placeholder_filter_by_user_i_d')}
-          className="w-40"
+        <MemberSearchPicker
+          label={t('broker.label_search_member')}
+          placeholder={t('broker.placeholder_type_a_name_or_email_to_search')}
+          noResultsText={t('shared.no_members_found')}
+          className="w-full sm:w-72"
           size="sm"
-          type="number"
-          startContent={<Search size={14} />}
           value={filterUserId}
+          selectedMember={filterMember}
+          onSelectedMemberChange={setFilterMember}
           onValueChange={(val) => {
             setFilterUserId(val);
             setPage(1);

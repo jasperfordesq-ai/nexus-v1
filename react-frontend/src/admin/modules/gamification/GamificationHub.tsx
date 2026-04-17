@@ -11,13 +11,13 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Spinner } from '@heroui/react';
-import { Award, Users, Zap, Target, RefreshCw, ArrowRight, Megaphone, BarChart3, Settings2 } from 'lucide-react';
+import { Card, CardBody, CardHeader, Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Select, SelectItem, Textarea, useDisclosure } from '@heroui/react';
+import { Award, Users, Zap, Target, RefreshCw, ArrowRight, Megaphone, BarChart3, Settings2, Gift } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
-import type { GamificationStats } from '../../api/types';
+import type { GamificationStats, BadgeConfigEntry } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
@@ -34,6 +34,14 @@ export function GamificationHub() {
   const [loading, setLoading] = useState(true);
   const [rechecking, setRechecking] = useState(false);
 
+  // Bulk award modal state
+  const { isOpen: isBulkOpen, onOpen: onBulkOpen, onClose: onBulkClose } = useDisclosure();
+  const [badges, setBadges] = useState<BadgeConfigEntry[]>([]);
+  const [badgesLoading, setBadgesLoading] = useState(false);
+  const [selectedBadge, setSelectedBadge] = useState('');
+  const [userIdsText, setUserIdsText] = useState('');
+  const [awarding, setAwarding] = useState(false);
+
   const loadStats = useCallback(async () => {
     setLoading(true);
     const res = await adminGamification.getStats();
@@ -48,6 +56,45 @@ export function GamificationHub() {
   useEffect(() => {
     loadStats();
   }, [loadStats]);
+
+  const handleOpenBulkAward = async () => {
+    onBulkOpen();
+    if (badges.length === 0) {
+      setBadgesLoading(true);
+      const res = await adminGamification.getBadgeConfig();
+      if (res.success && res.data) {
+        setBadges((res.data as BadgeConfigEntry[]).filter((b) => b.is_enabled));
+      }
+      setBadgesLoading(false);
+    }
+  };
+
+  const handleBulkAward = async () => {
+    if (!selectedBadge) {
+      toast.error(t('gamification.bulk_award_select_badge'));
+      return;
+    }
+    const ids = userIdsText
+      .split(/[\n,]+/)
+      .map((s) => parseInt(s.trim(), 10))
+      .filter((n) => !isNaN(n) && n > 0);
+    if (ids.length === 0) {
+      toast.error(t('gamification.bulk_award_no_users'));
+      return;
+    }
+    setAwarding(true);
+    const res = await adminGamification.bulkAward(selectedBadge, ids);
+    setAwarding(false);
+    if (res.success) {
+      const awarded = (res.data as { awarded?: number })?.awarded ?? ids.length;
+      toast.success(t('gamification.bulk_award_success', { count: awarded }));
+      onBulkClose();
+      setSelectedBadge('');
+      setUserIdsText('');
+    } else {
+      toast.error(res.error || t('gamification.bulk_award_failed'));
+    }
+  };
 
   const handleRecheckAll = async () => {
     setRechecking(true);
@@ -71,14 +118,24 @@ export function GamificationHub() {
         title={t('gamification.gamification_hub_title')}
         description={t('gamification.gamification_hub_desc')}
         actions={
-          <Button
-            color="primary"
-            startContent={<RefreshCw size={16} />}
-            onPress={handleRecheckAll}
-            isLoading={rechecking}
-          >
-            {t('gamification.recheck_all_badges')}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="flat"
+              color="secondary"
+              startContent={<Gift size={16} />}
+              onPress={handleOpenBulkAward}
+            >
+              {t('gamification.bulk_award_button')}
+            </Button>
+            <Button
+              color="primary"
+              startContent={<RefreshCw size={16} />}
+              onPress={handleRecheckAll}
+              isLoading={rechecking}
+            >
+              {t('gamification.recheck_all_badges')}
+            </Button>
+          </div>
         }
       />
 
@@ -224,6 +281,48 @@ export function GamificationHub() {
           </CardBody>
         </Card>
       </div>
+
+      {/* Bulk Badge Award Modal */}
+      <Modal isOpen={isBulkOpen} onClose={onBulkClose} size="md">
+        <ModalContent>
+          <ModalHeader>{t('gamification.bulk_award_modal_title')}</ModalHeader>
+          <ModalBody className="gap-4">
+            <p className="text-sm text-default-500">
+              {t('gamification.bulk_award_modal_desc')}
+            </p>
+            {badgesLoading ? (
+              <div className="flex justify-center py-4"><Spinner /></div>
+            ) : (
+              <Select
+                label={t('gamification.bulk_award_badge_label')}
+                placeholder={t('gamification.bulk_award_badge_placeholder')}
+                selectedKeys={selectedBadge ? [selectedBadge] : []}
+                onSelectionChange={(keys) => setSelectedBadge(Array.from(keys)[0] as string ?? '')}
+              >
+                {badges.map((b) => (
+                  <SelectItem key={b.key}>{b.name}</SelectItem>
+                ))}
+              </Select>
+            )}
+            <Textarea
+              label={t('gamification.bulk_award_users_label')}
+              placeholder={t('gamification.bulk_award_users_placeholder')}
+              value={userIdsText}
+              onChange={(e) => setUserIdsText(e.target.value)}
+              minRows={4}
+              description={t('gamification.bulk_award_users_hint')}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={onBulkClose}>
+              {t('common.cancel')}
+            </Button>
+            <Button color="secondary" onPress={handleBulkAward} isLoading={awarding}>
+              {t('gamification.bulk_award_submit')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

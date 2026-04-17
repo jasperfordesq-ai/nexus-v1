@@ -222,9 +222,10 @@ class GamificationV2Controller extends BaseApiController
         if ($serviceType === 'nexus_score') {
             $tableCheck = DB::select("SHOW TABLES LIKE 'nexus_score_cache'");
             if (empty($tableCheck)) {
-                return $this->respondWithData([], ['period' => $period, 'type' => $type, 'your_position' => null, 'total_entries' => 0]);
+                return $this->respondWithData([], ['period' => $period, 'type' => $type, 'your_position' => null, 'total_entries' => 0, 'has_more' => false]);
             }
 
+            // Fetch one extra row to detect whether more pages exist
             $rowResults = DB::select(
                 "SELECT n.user_id, n.total_score, n.percentile, u.name, u.avatar_url, u.xp, u.level
                  FROM nexus_score_cache n
@@ -232,9 +233,13 @@ class GamificationV2Controller extends BaseApiController
                  WHERE n.tenant_id = ? AND u.tenant_id = ? AND u.is_approved = 1
                  ORDER BY n.total_score DESC
                  LIMIT ?",
-                [$tenantId, $tenantId, $limit]
+                [$tenantId, $tenantId, $limit + 1]
             );
             $rows = array_map(fn($r) => (array)$r, $rowResults);
+            $hasMore = count($rows) > $limit;
+            if ($hasMore) {
+                array_pop($rows);
+            }
 
             $leaderboard = [];
             foreach ($rows as $pos => $row) {
@@ -272,17 +277,24 @@ class GamificationV2Controller extends BaseApiController
                 'type' => $type,
                 'your_position' => $currentUserPosition,
                 'total_entries' => $totalNexus,
+                'has_more' => $hasMore,
             ]);
         }
 
         // Standard leaderboard via LeaderboardService
+        // Fetch one extra entry to detect whether more pages exist
         $rawEntries = $this->leaderboardService->getLeaderboardByType(
             $tenantId,
             $serviceType,
             $servicePeriod,
-            $limit,
+            $limit + 1,
             $userId
         );
+
+        $hasMore = count($rawEntries) > $limit;
+        if ($hasMore) {
+            array_pop($rawEntries);
+        }
 
         $leaderboard = [];
         foreach ($rawEntries as $entry) {
@@ -335,6 +347,7 @@ class GamificationV2Controller extends BaseApiController
             'type' => $type,
             'your_position' => $currentUserPosition,
             'total_entries' => $totalMembers,
+            'has_more' => $hasMore,
         ]);
     }
 

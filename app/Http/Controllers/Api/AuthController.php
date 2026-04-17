@@ -105,22 +105,39 @@ class AuthController extends BaseApiController
             );
         }
 
-        // Scope login by tenant when tenant context is available
+        // Scope login by tenant when tenant context is available.
+        // Use a single UNION query that atomically checks both the tenant-scoped user
+        // row and any super-admin cross-tenant row in one round-trip. This eliminates
+        // the timing difference between a normal login and a super-admin login that
+        // would otherwise create a username oracle (two separate queries ≠ equal timing).
         $tenantId = TenantContext::getId();
+        $user = null;
+
         if ($tenantId) {
-            $userRow = DB::selectOne("SELECT u.*, t.configuration FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id WHERE u.email = ? AND u.tenant_id = ?", [$email, $tenantId]);
+            // Priority 1: exact tenant match
+            // Priority 2: super-admin from any tenant (cross-tenant fallback)
+            // UNION picks whichever row matches first; ORDER BY ensures tenant row wins.
+            $userRow = DB::selectOne(
+                "SELECT u.*, t.configuration, 1 AS _match_priority
+                 FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id
+                 WHERE u.email = ? AND u.tenant_id = ?
+                 UNION
+                 SELECT u.*, t.configuration, 2 AS _match_priority
+                 FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id
+                 WHERE u.email = ?
+                   AND (u.is_super_admin = 1 OR u.is_tenant_super_admin = 1 OR u.role = 'super_admin')
+                 ORDER BY _match_priority ASC
+                 LIMIT 1",
+                [$email, $tenantId, $email]
+            );
+            $user = $userRow ? (array)$userRow : null;
+            // Remove internal sorting column from user array
+            if ($user) {
+                unset($user['_match_priority']);
+            }
         } else {
             $userRow = DB::selectOne("SELECT u.*, t.configuration FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id WHERE u.email = ?", [$email]);
-        }
-        $user = $userRow ? (array)$userRow : null;
-
-        // SUPER ADMIN CROSS-TENANT LOGIN fallback
-        if (!$user && $tenantId) {
-            $candidateRow = DB::selectOne("SELECT u.*, t.configuration FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id WHERE u.email = ?", [$email]);
-            $candidate = $candidateRow ? (array)$candidateRow : null;
-            if ($candidate && (!empty($candidate['is_super_admin']) || !empty($candidate['is_tenant_super_admin']) || ($candidate['role'] ?? '') === 'super_admin')) {
-                $user = $candidate;
-            }
+            $user = $userRow ? (array)$userRow : null;
         }
 
         // Constant-time comparison

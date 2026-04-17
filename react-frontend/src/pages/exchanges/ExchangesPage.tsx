@@ -37,7 +37,7 @@ export function ExchangesPage() {
   const { t } = useTranslation('exchanges');
   usePageTitle(t('page_title'));
   const { user } = useAuth();
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasFeature } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -160,6 +160,24 @@ export function ExchangesPage() {
   const isProvider = (exchange: Exchange) => exchange.provider_id === user?.id;
   const otherParty = (exchange: Exchange) =>
     isRequester(exchange) ? exchange.provider : exchange.requester;
+
+  // Show empty state if the tenant feature gate is off
+  if (!hasFeature('exchange_workflow')) {
+    return (
+      <EmptyState
+        icon={<ArrowRightLeft className="w-12 h-12" />}
+        title={t('workflow_not_enabled_title')}
+        description={t('workflow_not_enabled_description')}
+        action={
+          <Link to={tenantPath("/listings")}>
+            <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+              {t('browse_listings')}
+            </Button>
+          </Link>
+        }
+      />
+    );
+  }
 
   // Show empty state if exchange workflow is not enabled
   if (configLoadedRef.current && !config?.exchange_workflow_enabled) {

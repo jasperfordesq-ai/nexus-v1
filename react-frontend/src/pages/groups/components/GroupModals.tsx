@@ -92,18 +92,26 @@ export function NewDiscussionModal({
               {t('detail.new_discussion_modal_title')}
             </ModalHeader>
             <ModalBody className="gap-4">
-              <Input
-                label={t('detail.discussion_title_label')}
-                placeholder={t('detail.discussion_title_placeholder')}
-                value={newDiscussionTitle}
-                onChange={(e) => onTitleChange(e.target.value)}
-                startContent={<FileText className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
-                classNames={{
-                  input: 'bg-transparent text-theme-primary',
-                  inputWrapper: 'bg-theme-elevated border-theme-default',
-                  label: 'text-theme-muted',
-                }}
-              />
+              <div>
+                <Input
+                  label={t('detail.discussion_title_label')}
+                  placeholder={t('detail.discussion_title_placeholder')}
+                  value={newDiscussionTitle}
+                  maxLength={255}
+                  onChange={(e) => onTitleChange(e.target.value)}
+                  startContent={<FileText className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+                  classNames={{
+                    input: 'bg-transparent text-theme-primary',
+                    inputWrapper: 'bg-theme-elevated border-theme-default',
+                    label: 'text-theme-muted',
+                  }}
+                />
+                {newDiscussionTitle.length > Math.floor(255 * 0.8) && (
+                  <p className={`text-xs mt-0.5 text-right ${newDiscussionTitle.length >= 255 ? 'text-danger' : 'text-default-400'}`}>
+                    {newDiscussionTitle.length}/255
+                  </p>
+                )}
+              </div>
               <div>
                 <label className="text-sm text-theme-muted mb-1 block">
                   {t('detail.discussion_content_label')}
@@ -209,42 +217,66 @@ export function GroupSettingsModal({
               {t('detail.settings_modal_title')}
             </ModalHeader>
             <ModalBody className="gap-4">
-              <Input
-                label={t('detail.settings_name_label')}
-                placeholder={t('detail.settings_name_placeholder')}
-                value={settingsName}
-                onChange={(e) => onNameChange(e.target.value)}
-                startContent={<FileText className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
-                classNames={{
-                  input: 'bg-transparent text-theme-primary',
-                  inputWrapper: 'bg-theme-elevated border-theme-default',
-                  label: 'text-theme-muted',
-                }}
-              />
-              <Textarea
-                label={t('detail.settings_desc_label')}
-                placeholder={t('detail.settings_desc_placeholder')}
-                value={settingsDescription}
-                onChange={(e) => onDescriptionChange(e.target.value)}
-                minRows={3}
-                classNames={{
-                  input: 'bg-transparent text-theme-primary',
-                  inputWrapper: 'bg-theme-elevated border-theme-default',
-                  label: 'text-theme-muted',
-                }}
-              />
-              <Input
-                label={t('detail.settings_location_label')}
-                placeholder={t('detail.settings_location_placeholder')}
-                value={settingsLocation}
-                onChange={(e) => onLocationChange(e.target.value)}
-                startContent={<MapPin className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
-                classNames={{
-                  input: 'bg-transparent text-theme-primary',
-                  inputWrapper: 'bg-theme-elevated border-theme-default',
-                  label: 'text-theme-muted',
-                }}
-              />
+              <div>
+                <Input
+                  label={t('detail.settings_name_label')}
+                  placeholder={t('detail.settings_name_placeholder')}
+                  value={settingsName}
+                  maxLength={255}
+                  onChange={(e) => onNameChange(e.target.value)}
+                  startContent={<FileText className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+                  classNames={{
+                    input: 'bg-transparent text-theme-primary',
+                    inputWrapper: 'bg-theme-elevated border-theme-default',
+                    label: 'text-theme-muted',
+                  }}
+                />
+                {settingsName.length > Math.floor(255 * 0.8) && (
+                  <p className={`text-xs mt-0.5 text-right ${settingsName.length >= 255 ? 'text-danger' : 'text-default-400'}`}>
+                    {settingsName.length}/255
+                  </p>
+                )}
+              </div>
+              <div>
+                <Textarea
+                  label={t('detail.settings_desc_label')}
+                  placeholder={t('detail.settings_desc_placeholder')}
+                  value={settingsDescription}
+                  maxLength={2000}
+                  onChange={(e) => onDescriptionChange(e.target.value)}
+                  minRows={3}
+                  classNames={{
+                    input: 'bg-transparent text-theme-primary',
+                    inputWrapper: 'bg-theme-elevated border-theme-default',
+                    label: 'text-theme-muted',
+                  }}
+                />
+                {settingsDescription.length > Math.floor(2000 * 0.8) && (
+                  <p className={`text-xs mt-0.5 text-right ${settingsDescription.length >= 2000 ? 'text-danger' : 'text-default-400'}`}>
+                    {settingsDescription.length}/2000
+                  </p>
+                )}
+              </div>
+              <div>
+                <Input
+                  label={t('detail.settings_location_label')}
+                  placeholder={t('detail.settings_location_placeholder')}
+                  value={settingsLocation}
+                  maxLength={255}
+                  onChange={(e) => onLocationChange(e.target.value)}
+                  startContent={<MapPin className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+                  classNames={{
+                    input: 'bg-transparent text-theme-primary',
+                    inputWrapper: 'bg-theme-elevated border-theme-default',
+                    label: 'text-theme-muted',
+                  }}
+                />
+                {settingsLocation.length > Math.floor(255 * 0.8) && (
+                  <p className={`text-xs mt-0.5 text-right ${settingsLocation.length >= 255 ? 'text-danger' : 'text-default-400'}`}>
+                    {settingsLocation.length}/255
+                  </p>
+                )}
+              </div>
               {/* Images */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="p-3 rounded-lg bg-theme-elevated border border-theme-default">

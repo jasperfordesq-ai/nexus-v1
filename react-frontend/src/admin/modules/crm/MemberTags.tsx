@@ -21,7 +21,7 @@ import { Link } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
-import { PageHeader, ConfirmModal } from '../../components';
+import { PageHeader, ConfirmModal, MemberSearchPicker, type MemberSearchMember } from '../../components';
 
 import { useTranslation } from 'react-i18next';
 interface MemberTag {
@@ -64,6 +64,7 @@ export function MemberTags() {
   // Add tag modal state
   const addModal = useDisclosure();
   const [formUserId, setFormUserId] = useState('');
+  const [formMember, setFormMember] = useState<MemberSearchMember | null>(null);
   const [formTag, setFormTag] = useState('');
   const [formTagSearch, setFormTagSearch] = useState('');
   const [saving, setSaving] = useState(false);
@@ -130,6 +131,7 @@ export function MemberTags() {
 
   const openAddModal = () => {
     setFormUserId('');
+    setFormMember(null);
     setFormTag('');
     setFormTagSearch('');
     addModal.onOpen();
@@ -435,12 +437,14 @@ export function MemberTags() {
             {t('crm.add_tag_title')}
           </ModalHeader>
           <ModalBody className="flex flex-col gap-4">
-            <Input
-              label={t('crm.label_user_i_d')}
-              placeholder={t('crm.placeholder_enter_user_id')}
-              type="number"
+            <MemberSearchPicker
+              label={t('broker.label_search_member')}
+              placeholder={t('broker.placeholder_type_a_name_or_email_to_search')}
+              noResultsText={t('shared.no_members_found')}
               isRequired
               value={formUserId}
+              selectedMember={formMember}
+              onSelectedMemberChange={setFormMember}
               onValueChange={setFormUserId}
             />
             <div className="flex flex-col gap-2">

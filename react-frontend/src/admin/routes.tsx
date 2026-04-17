@@ -277,6 +277,7 @@ const PlanSelector = lazy(() => import('./modules/billing/PlanSelector'));
 const InvoiceHistory = lazy(() => import('./modules/billing/InvoiceHistory'));
 const CheckoutReturn = lazy(() => import('./modules/billing/CheckoutReturn'));
 const BillingControl = lazy(() => import('./modules/billing/BillingControl'));
+const RevenueDashboard = lazy(() => import('./modules/billing/RevenueDashboard'));
 
 // Content module
 const PagesAdmin = lazy(() => import('./modules/content/PagesAdmin'));
@@ -585,6 +586,7 @@ export function AdminRoutes() {
         <Route path="federation/audit" element={<Lazy><FederationAuditLog /></Lazy>} />
         <Route path="federation/tenant/:tenantId/features" element={<Lazy><FederationTenantFeatures /></Lazy>} />
         <Route path="billing" element={<Lazy><BillingControl /></Lazy>} />
+        <Route path="billing/revenue" element={<Lazy><RevenueDashboard /></Lazy>} />
       </Route>
 
       {/* ─── ANALYTICS & REPORTING ─── */}

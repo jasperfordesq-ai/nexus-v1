@@ -27,6 +27,7 @@ import { X, Send, Search, User, AlertCircle } from 'lucide-react';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
+import { useToast } from '@/contexts';
 import { CategorySelect } from './CategorySelect';
 import type { WalletUserSearchResult, Transaction } from '@/types/api';
 
@@ -61,6 +62,9 @@ export function TransferModal({
   initialRecipientId,
 }: TransferModalProps) {
   const { t, i18n } = useTranslation('wallet');
+  const toast = useToast();
+  const [maxTransfer, setMaxTransfer] = useState(1000);
+
   // Form state
   const [formData, setFormData] = useState<TransferFormData>({
     recipient: null,
@@ -94,6 +98,16 @@ export function TransferModal({
       setSearchResults([]);
       setError(null);
 
+      // Fetch max transfer limit from wallet config; fall back silently to current state value
+      api.get<{ max_transfer?: number }>('/v2/wallet/config')
+        .then((res) => {
+          if (cancelled) return;
+          if (res.success && res.data?.max_transfer != null) {
+            setMaxTransfer(res.data.max_transfer);
+          }
+        })
+        .catch(() => { /* use existing default */ });
+
       // Auto-fill recipient if initialRecipientId is provided
       if (initialRecipientId) {
         api.get<{ id: number; first_name: string; last_name: string; avatar_url?: string; username?: string }>(`/v2/users/${initialRecipientId}`)
@@ -114,7 +128,8 @@ export function TransferModal({
             }
           })
           .catch(() => {
-            // Silently fail — user can still search manually
+            if (cancelled) return;
+            toast.warning(t('toast.recipient_load_failed'));
           });
       } else {
         // Focus search input after animation (only when no pre-fill)
@@ -202,8 +217,8 @@ export function TransferModal({
     }
 
     // Check for reasonable max (prevent typos)
-    if (amount > 1000) {
-      return t('validation.max_transfer', 'Maximum transfer is 1000 hours');
+    if (amount > maxTransfer) {
+      return t('validation.max_transfer', { max: maxTransfer });
     }
 
     return null;

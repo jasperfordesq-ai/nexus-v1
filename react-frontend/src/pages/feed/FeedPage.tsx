@@ -94,7 +94,7 @@ export function FeedPage() {
   const pusher = usePusherOptional();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { tenantPath, tenant } = useTenant();
+  const { tenantPath, tenant, hasFeature } = useTenant();
   const isAdmin = user?.is_admin === true || user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_super_admin === true;
   const [items, setItems] = useState<FeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -317,9 +317,22 @@ export function FeedPage() {
           const buffered = [...pendingPostsRef.current];
           pendingPostsRef.current = [];
           setPendingPostCount(0);
+          const currentFilter = filterRef.current;
           setItems((prev) => {
             const existingKeys = new Set(prev.map((p) => `${p.type}-${p.id}`));
-            const newItems = buffered.filter((fi) => !existingKeys.has(`${fi.type}-${fi.id}`));
+            const newItems = buffered
+              .filter((fi) => !existingKeys.has(`${fi.type}-${fi.id}`))
+              .filter((fi) =>
+                currentFilter === 'all' ||
+                (currentFilter === 'posts' && fi.type === 'post') ||
+                (currentFilter === 'listings' && fi.type === 'listing') ||
+                (currentFilter === 'events' && fi.type === 'event') ||
+                (currentFilter === 'polls' && fi.type === 'poll') ||
+                (currentFilter === 'goals' && fi.type === 'goal') ||
+                (currentFilter === 'jobs' && fi.type === 'job') ||
+                (currentFilter === 'challenges' && fi.type === 'challenge') ||
+                (currentFilter === 'volunteering' && fi.type === 'volunteer')
+              );
             return [...newItems, ...prev];
           });
         }
@@ -650,10 +663,23 @@ export function FeedPage() {
       // Chronological mode — flush buffered posts directly to the top
       const buffered = [...pendingPostsRef.current];
       pendingPostsRef.current = [];
+      const currentFilter = filterRef.current;
       if (buffered.length > 0) {
         setItems((prev) => {
           const existingKeys = new Set(prev.map((p) => `${p.type}-${p.id}`));
-          const newItems = buffered.filter((fi) => !existingKeys.has(`${fi.type}-${fi.id}`));
+          const newItems = buffered
+            .filter((fi) => !existingKeys.has(`${fi.type}-${fi.id}`))
+            .filter((fi) =>
+              currentFilter === 'all' ||
+              (currentFilter === 'posts' && fi.type === 'post') ||
+              (currentFilter === 'listings' && fi.type === 'listing') ||
+              (currentFilter === 'events' && fi.type === 'event') ||
+              (currentFilter === 'polls' && fi.type === 'poll') ||
+              (currentFilter === 'goals' && fi.type === 'goal') ||
+              (currentFilter === 'jobs' && fi.type === 'job') ||
+              (currentFilter === 'challenges' && fi.type === 'challenge') ||
+              (currentFilter === 'volunteering' && fi.type === 'volunteer')
+            );
           return [...newItems, ...prev];
         });
       }
@@ -668,7 +694,7 @@ export function FeedPage() {
     { key: 'posts', label: t('filter.posts') },
     { key: 'listings', label: t('filter.listings') },
     { key: 'events', label: t('filter.events') },
-    { key: 'polls', label: t('filter.polls') },
+    ...(hasFeature('polls') ? [{ key: 'polls' as FeedFilter, label: t('filter.polls') }] : []),
     { key: 'goals', label: t('filter.goals') },
     { key: 'jobs', label: t('filter.jobs') },
     { key: 'challenges', label: t('filter.challenges') },

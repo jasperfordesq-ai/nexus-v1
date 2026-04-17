@@ -165,6 +165,7 @@ class MessagesController extends BaseApiController
     public function unreadCount(): JsonResponse
     {
         $userId = $this->requireAuth();
+        $this->rateLimit('messages_unread_count', 60, 60);
 
         $count = $this->messageService->getUnreadCount($userId);
         // Include federation inbox unread count so the bell badge surfaces external messages

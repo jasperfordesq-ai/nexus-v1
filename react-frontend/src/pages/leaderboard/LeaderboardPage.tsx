@@ -75,6 +75,7 @@ interface LeaderboardMeta {
   type: string;
   your_position: number | null;
   total_entries: number;
+  has_more?: boolean;
 }
 
 /**
@@ -372,6 +373,8 @@ function SeasonCard() {
 // Main Leaderboard Page
 // ─────────────────────────────────────────────────────────────────────────────
 
+const LEADERBOARD_PAGE_SIZE = 50;
+
 export function LeaderboardPage() {
   const { t } = useTranslation('gamification');
   usePageTitle(t('leaderboard.page_title'));
@@ -379,6 +382,8 @@ export function LeaderboardPage() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [meta, setMeta] = useState<LeaderboardMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [period, setPeriod] = useState<LeaderboardPeriod>('all');
   const [type, setType] = useState<LeaderboardType>('xp');
@@ -402,7 +407,7 @@ export function LeaderboardPage() {
       const params = new URLSearchParams();
       params.set('period', period);
       params.set('type', type);
-      params.set('limit', '50');
+      params.set('limit', String(LEADERBOARD_PAGE_SIZE));
 
       const response = await api.get<LeaderboardEntry[]>(
         `/v2/gamification/leaderboard?${params}`
@@ -411,7 +416,9 @@ export function LeaderboardPage() {
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setEntries(Array.isArray(response.data) ? response.data : []);
-        setMeta((response.meta as unknown as LeaderboardMeta) ?? null);
+        const responseMeta = (response.meta as unknown as LeaderboardMeta) ?? null;
+        setMeta(responseMeta);
+        setHasMore(responseMeta?.has_more ?? false);
       } else {
         setError(response.code === 'SESSION_EXPIRED'
           ? tRef.current('leaderboard.session_expired', 'Your session has expired. Please log in again.')
@@ -425,6 +432,36 @@ export function LeaderboardPage() {
       setIsLoading(false);
     }
   }, [period, type]);
+
+  const loadMore = useCallback(async () => {
+    if (isLoadingMore || !hasMore) return;
+
+    try {
+      setIsLoadingMore(true);
+
+      const params = new URLSearchParams();
+      params.set('period', period);
+      params.set('type', type);
+      params.set('limit', String(LEADERBOARD_PAGE_SIZE));
+      params.set('offset', String(entries.length));
+
+      const response = await api.get<LeaderboardEntry[]>(
+        `/v2/gamification/leaderboard?${params}`
+      );
+
+      if (response.success && response.data) {
+        const newEntries = Array.isArray(response.data) ? response.data : [];
+        setEntries((prev) => [...prev, ...newEntries]);
+        const responseMeta = (response.meta as unknown as LeaderboardMeta) ?? null;
+        setMeta(responseMeta);
+        setHasMore(responseMeta?.has_more ?? false);
+      }
+    } catch (err) {
+      logError('Failed to load more leaderboard entries', err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [isLoadingMore, hasMore, period, type, entries.length]);
 
   useEffect(() => {
     loadLeaderboard();
@@ -544,6 +581,8 @@ export function LeaderboardPage() {
               entries={entries}
               meta={meta}
               isLoading={isLoading}
+              isLoadingMore={isLoadingMore}
+              hasMore={hasMore}
               error={error}
               period={period}
               type={type}
@@ -559,6 +598,7 @@ export function LeaderboardPage() {
               containerVariants={containerVariants}
               itemVariants={itemVariants}
               loadLeaderboard={loadLeaderboard}
+              loadMore={loadMore}
             />
           </div>
         </Tab>
@@ -613,6 +653,8 @@ interface CompetitiveLeaderboardProps {
   entries: LeaderboardEntry[];
   meta: LeaderboardMeta | null;
   isLoading: boolean;
+  isLoadingMore: boolean;
+  hasMore: boolean;
   error: string | null;
   period: LeaderboardPeriod;
   type: LeaderboardType;
@@ -628,6 +670,7 @@ interface CompetitiveLeaderboardProps {
   containerVariants: Variants;
   itemVariants: Variants;
   loadLeaderboard: () => void;
+  loadMore: () => void;
 }
 
 /**
@@ -638,6 +681,8 @@ function CompetitiveLeaderboard(props: CompetitiveLeaderboardProps) {
     entries,
     meta,
     isLoading,
+    isLoadingMore,
+    hasMore,
     error,
     period,
     type,
@@ -653,6 +698,7 @@ function CompetitiveLeaderboard(props: CompetitiveLeaderboardProps) {
     containerVariants,
     itemVariants,
     loadLeaderboard,
+    loadMore,
   } = props;
   return (
     <div className="space-y-6">
@@ -775,53 +821,70 @@ function CompetitiveLeaderboard(props: CompetitiveLeaderboardProps) {
               description={t('leaderboard.empty_description', { type: typeLabels[type] })}
             />
           ) : (
-            <GlassCard className="overflow-hidden">
-              <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-                className="divide-y divide-white/5"
-              >
-                {entries.map((entry: LeaderboardEntry) => (
-                  <motion.div key={entry.position} variants={itemVariants}>
-                    <Link
-                      to={tenantPath(`/profile/${entry.user.id}`)}
-                      className={`flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-theme-hover transition-colors ${
-                        entry.is_current_user ? 'bg-indigo-500/10 border-l-2 border-indigo-500' : ''
-                      } ${entry.position <= 3 ? 'bg-gradient-to-r from-amber-500/5 to-transparent' : ''}`}
-                    >
-                      {/* Rank */}
-                      <div className="w-8 flex justify-center flex-shrink-0">
-                        {getRankIcon(entry.position)}
-                      </div>
+            <>
+              <GlassCard className="overflow-hidden">
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="divide-y divide-white/5"
+                >
+                  {entries.map((entry: LeaderboardEntry) => (
+                    <motion.div key={entry.position} variants={itemVariants}>
+                      <Link
+                        to={tenantPath(`/profile/${entry.user.id}`)}
+                        className={`flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-theme-hover transition-colors ${
+                          entry.is_current_user ? 'bg-indigo-500/10 border-l-2 border-indigo-500' : ''
+                        } ${entry.position <= 3 ? 'bg-gradient-to-r from-amber-500/5 to-transparent' : ''}`}
+                      >
+                        {/* Rank */}
+                        <div className="w-8 flex justify-center flex-shrink-0">
+                          {getRankIcon(entry.position)}
+                        </div>
 
-                      {/* Avatar */}
-                      <Avatar
-                        name={entry.user.name}
-                        src={resolveAvatarUrl(entry.user.avatar_url)}
-                        size="sm"
-                        showFallback
-                        className={entry.position <= 3 ? 'ring-2 ring-amber-400/50' : ''}
-                      />
+                        {/* Avatar */}
+                        <Avatar
+                          name={entry.user.name}
+                          src={resolveAvatarUrl(entry.user.avatar_url)}
+                          size="sm"
+                          showFallback
+                          className={entry.position <= 3 ? 'ring-2 ring-amber-400/50' : ''}
+                        />
 
-                      {/* Name & Level */}
-                      <div className="flex-1 min-w-0">
-                        <p className={`font-medium truncate ${entry.is_current_user ? 'text-indigo-400' : 'text-theme-primary'}`}>
-                          {entry.user.name}
-                          {entry.is_current_user && <span className="text-xs ml-2 text-indigo-400">{t('leaderboard.you')}</span>}
-                        </p>
-                        <p className="text-xs text-theme-subtle">{t('leaderboard.level', { level: entry.level })}</p>
-                      </div>
+                        {/* Name & Level */}
+                        <div className="flex-1 min-w-0">
+                          <p className={`font-medium truncate ${entry.is_current_user ? 'text-indigo-400' : 'text-theme-primary'}`}>
+                            {entry.user.name}
+                            {entry.is_current_user && <span className="text-xs ml-2 text-indigo-400">{t('leaderboard.you')}</span>}
+                          </p>
+                          <p className="text-xs text-theme-subtle">{t('leaderboard.level', { level: entry.level })}</p>
+                        </div>
 
-                      {/* Score */}
-                      <div className="text-right flex-shrink-0">
-                        {formatScore(entry)}
-                      </div>
-                    </Link>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </GlassCard>
+                        {/* Score */}
+                        <div className="text-right flex-shrink-0">
+                          {formatScore(entry)}
+                        </div>
+                      </Link>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </GlassCard>
+
+              {/* Load More button */}
+              {hasMore && (
+                <div className="flex justify-center pt-2">
+                  <Button
+                    variant="flat"
+                    className="bg-theme-elevated text-theme-primary"
+                    onPress={loadMore}
+                    isLoading={isLoadingMore}
+                    startContent={!isLoadingMore ? <TrendingUp className="w-4 h-4" aria-hidden="true" /> : undefined}
+                  >
+                    {t('leaderboard.load_more')}
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </>
       )}

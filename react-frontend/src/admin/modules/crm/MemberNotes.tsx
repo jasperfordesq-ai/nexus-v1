@@ -21,7 +21,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
-import { PageHeader, ConfirmModal } from '../../components';
+import { PageHeader, ConfirmModal, MemberSearchPicker, type MemberSearchMember } from '../../components';
 
 import { useTranslation } from 'react-i18next';
 interface Note {
@@ -82,12 +82,14 @@ export function MemberNotes() {
   const [page, setPage] = useState(1);
   const [filterCategory, setFilterCategory] = useState<string>('');
   const [filterUserId, setFilterUserId] = useState<string>(searchParams.get('user_id') || '');
+  const [filterMember, setFilterMember] = useState<MemberSearchMember | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Form modal state
   const formModal = useDisclosure();
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [formUserId, setFormUserId] = useState('');
+  const [formMember, setFormMember] = useState<MemberSearchMember | null>(null);
   const [formContent, setFormContent] = useState('');
   const [formCategory, setFormCategory] = useState<CategoryKey>('general');
   const [formPinned, setFormPinned] = useState(false);
@@ -130,6 +132,7 @@ export function MemberNotes() {
   const openCreateModal = () => {
     setEditingNote(null);
     setFormUserId(filterUserId || '');
+    setFormMember(filterMember);
     setFormContent('');
     setFormCategory('general');
     setFormPinned(false);
@@ -139,6 +142,12 @@ export function MemberNotes() {
   const openEditModal = (note: Note) => {
     setEditingNote(note);
     setFormUserId(String(note.user_id));
+    setFormMember({
+      id: note.user_id,
+      name: note.user_name,
+      email: '',
+      avatar_url: note.user_avatar,
+    });
     setFormContent(note.content);
     setFormCategory(note.category as CategoryKey);
     setFormPinned(note.is_pinned === 1);
@@ -298,14 +307,15 @@ export function MemberNotes() {
           ))}
         </Select>
 
-        <Input
-          label={t('crm.label_user_i_d')}
-          placeholder={t('crm.placeholder_filter_by_user_i_d')}
-          className="w-40"
+        <MemberSearchPicker
+          label={t('broker.label_search_member')}
+          placeholder={t('broker.placeholder_type_a_name_or_email_to_search')}
+          noResultsText={t('shared.no_members_found')}
+          className="w-full sm:w-72"
           size="sm"
-          type="number"
-          startContent={<Search size={14} />}
           value={filterUserId}
+          selectedMember={filterMember}
+          onSelectedMemberChange={setFilterMember}
           onValueChange={(val) => {
             setFilterUserId(val);
             setPage(1);
@@ -319,6 +329,7 @@ export function MemberNotes() {
             onPress={() => {
               setFilterCategory('');
               setFilterUserId('');
+              setFilterMember(null);
               setSearchQuery('');
               setPage(1);
             }}
@@ -450,12 +461,14 @@ export function MemberNotes() {
           </ModalHeader>
           <ModalBody className="flex flex-col gap-4">
             {!editingNote && (
-              <Input
-                label={t('crm.label_user_i_d')}
-                placeholder={t('crm.placeholder_enter_user_id')}
-                type="number"
+              <MemberSearchPicker
+                label={t('broker.label_search_member')}
+                placeholder={t('broker.placeholder_type_a_name_or_email_to_search')}
+                noResultsText={t('shared.no_members_found')}
                 isRequired
                 value={formUserId}
+                selectedMember={formMember}
+                onSelectedMemberChange={setFormMember}
                 onValueChange={setFormUserId}
               />
             )}

@@ -15,11 +15,11 @@
 
 import { useState, useEffect, useRef, useCallback, type ChangeEvent, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { Button, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Input, Tooltip, Skeleton } from '@heroui/react';
 import { ArrowLeft, Info, Loader2, MoreVertical, Trash2, Search, X, FileText, AlertTriangle, Languages } from 'lucide-react';
-import { useToast } from '@/contexts';
+import { useToast, useNotifications } from '@/contexts';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
 import { useAuth, usePusherOptional, useTenant } from '@/contexts';
@@ -75,8 +75,9 @@ export function ConversationPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const toast = useToast();
+  const { refreshCounts } = useNotifications();
   const pusher = usePusherOptional();
-  const { hasFeature, tenantPath, tenantSlug } = useTenant();
+  const { hasFeature, hasModule, tenantPath, tenantSlug } = useTenant();
   const isDirectMessagingEnabled = hasFeature('direct_messaging');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -569,8 +570,10 @@ export function ConversationPage() {
 
     if (unreadMessages.length === 0) return;
 
-    // Mark the conversation as read via the API
-    api.put(`/v2/messages/${targetId}/read`).catch((err) => {
+    // Mark the conversation as read via the API and refresh global unread badge
+    api.put(`/v2/messages/${targetId}/read`).then(() => {
+      refreshCounts().catch(() => { /* non-critical */ });
+    }).catch((err) => {
       logError('Failed to mark conversation as read', err);
     });
 
@@ -1325,6 +1328,11 @@ export function ConversationPage() {
       logError('Failed to delete message', error);
       toast.error(t('error_title'), t('delete_error'));
     }
+  }
+
+  // Feature gate: redirect if messages module is disabled for this tenant
+  if (!hasModule('messages')) {
+    return <Navigate to="/" replace />;
   }
 
   if (isLoading) {

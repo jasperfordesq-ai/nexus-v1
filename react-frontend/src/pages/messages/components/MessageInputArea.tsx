@@ -238,32 +238,40 @@ export function MessageInputArea({
           {onGifSelect && (
             <GifPicker onSelect={onGifSelect} />
           )}
-          <Textarea
-            placeholder={t('type_placeholder')}
-            value={newMessage}
-            onChange={(e) => {
-              onNewMessageChange(e.target.value);
-              onTypingIndicator(e.target.value);
-            }}
-            onBlur={onBlurTypingStop}
-            onKeyDown={(e) => {
-              // Enter sends message, Shift+Enter adds newline
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                if (newMessage.trim() || attachments.length > 0) {
-                  const form = e.currentTarget.closest('form');
-                  if (form) form.requestSubmit();
+          <div className="flex-1 flex flex-col">
+            <Textarea
+              placeholder={t('type_placeholder')}
+              value={newMessage}
+              maxLength={10000}
+              onChange={(e) => {
+                onNewMessageChange(e.target.value);
+                onTypingIndicator(e.target.value);
+              }}
+              onBlur={onBlurTypingStop}
+              onKeyDown={(e) => {
+                // Enter sends message, Shift+Enter adds newline
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  if (newMessage.trim() || attachments.length > 0) {
+                    const form = e.currentTarget.closest('form');
+                    if (form) form.requestSubmit();
+                  }
                 }
-              }
-            }}
-            minRows={1}
-            maxRows={4}
-            classNames={{
-              input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
-              inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-            }}
-            aria-label={t('aria_message_input')}
-          />
+              }}
+              minRows={1}
+              maxRows={4}
+              classNames={{
+                input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
+                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+              }}
+              aria-label={t('aria_message_input')}
+            />
+            {newMessage.length > 8000 && (
+              <p className={`text-xs mt-0.5 text-right ${newMessage.length >= 10000 ? 'text-danger' : 'text-theme-muted'}`}>
+                {t('character_count', { current: newMessage.length, max: 10000 })}
+              </p>
+            )}
+          </div>
           {/* Voice recording button - show when no text and no attachments */}
           {!newMessage.trim() && attachments.length === 0 && (
             <Button

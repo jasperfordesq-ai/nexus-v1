@@ -33,8 +33,8 @@ class LeaderboardService
 
     public const PERIODS = ['all_time', 'monthly', 'weekly'];
 
-    /** Cache TTL for leaderboard queries (5 minutes). */
-    public const CACHE_TTL_SECONDS = 300;
+    /** Cache TTL for leaderboard queries (60 seconds — short TTL keeps rankings fresh). */
+    public const CACHE_TTL_SECONDS = 60;
 
     /**
      * Build cache key for a leaderboard slice.

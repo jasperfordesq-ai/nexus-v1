@@ -273,8 +273,21 @@ class AdminGamificationController extends BaseApiController
         if (empty($badgeSlug)) return $this->respondWithError('VALIDATION_ERROR', __('api.badge_slug_required'), 'badge_slug', 422);
         if (empty($userIds) || !is_array($userIds)) return $this->respondWithError('VALIDATION_ERROR', __('api.user_ids_required'), 'user_ids', 422);
 
-        // Filter user_ids to only include users belonging to the current tenant
+        // Validate that the badge_slug exists and is enabled for this tenant
         $tenantId = TenantContext::getId();
+        $badgeDef = BadgeDefinitionService::getBadgeByKey($badgeSlug, $tenantId);
+        if ($badgeDef === null) {
+            // Also check custom badges in DB
+            $customBadge = DB::selectOne(
+                "SELECT id FROM custom_badges WHERE badge_key = ? AND tenant_id = ? AND is_active = 1",
+                [$badgeSlug, $tenantId]
+            );
+            if (!$customBadge) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.badge_slug_invalid'), 'badge_slug', 422);
+            }
+        }
+
+        // Filter user_ids to only include users belonging to the current tenant
         $validUserIds = User::where('tenant_id', $tenantId)
             ->whereIn('id', $userIds)
             ->pluck('id')

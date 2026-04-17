@@ -1653,6 +1653,13 @@ Route::put('/v2/admin/super/identity/fee', [\App\Http\Controllers\Api\AdminSuper
 // Billing snapshot and plan assignment (god-level only)
 Route::get('/v2/admin/super/billing/snapshot', [\App\Http\Controllers\Api\AdminSuperController::class, 'getBillingSnapshot']);
 Route::post('/v2/admin/super/billing/assign-plan', [\App\Http\Controllers\Api\AdminSuperController::class, 'assignPlan']);
+Route::get('/v2/admin/super/billing/revenue', [\App\Http\Controllers\Api\AdminSuperController::class, 'getRevenueDashboard']);
+Route::get('/v2/admin/super/billing/export', [\App\Http\Controllers\Api\AdminSuperController::class, 'exportBillingCsv']);
+Route::post('/v2/admin/super/billing/delegate/grant', [\App\Http\Controllers\Api\AdminSuperController::class, 'grantBillingDelegate']);
+Route::post('/v2/admin/super/billing/delegate/revoke', [\App\Http\Controllers\Api\AdminSuperController::class, 'revokeBillingDelegate']);
+Route::post('/v2/admin/super/billing/pause', [\App\Http\Controllers\Api\AdminSuperController::class, 'pauseTenantBilling']);
+Route::post('/v2/admin/super/billing/resume', [\App\Http\Controllers\Api\AdminSuperController::class, 'resumeTenantBilling']);
+Route::post('/v2/admin/super/billing/grace-period', [\App\Http\Controllers\Api\AdminSuperController::class, 'setBillingGracePeriod']);
 
 }); // End Route::middleware(['auth:sanctum', 'super-admin'])
 
