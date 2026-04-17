@@ -39,7 +39,6 @@ interface AvailabilityData {
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const FULL_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const TIME_SLOTS = [
   '06:00', '07:00', '08:00', '09:00', '10:00', '11:00',
@@ -70,6 +69,7 @@ export function AvailabilityGrid({
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
+  const [timezone, setTimezone] = useState<string | undefined>(undefined);
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
@@ -79,6 +79,14 @@ export function AvailabilityGrid({
   tRef.current = t;
   const toastRef = useRef(toast);
   toastRef.current = toast;
+  const tAvailRef = useRef(tAvail);
+  tAvailRef.current = tAvail;
+
+  // Build day abbreviations inside the component so they respond to locale changes
+  const DAYS = [
+    tAvail('days.mon'), tAvail('days.tue'), tAvail('days.wed'), tAvail('days.thu'),
+    tAvail('days.fri'), tAvail('days.sat'), tAvail('days.sun'),
+  ];
 
   // Build key for slot map (day = grid index: 0=Mon, 6=Sun)
   const slotKey = (day: number, time: string) => `${day}-${time}`;
@@ -129,17 +137,18 @@ export function AvailabilityGrid({
         });
 
         setSlots(newSlots);
+        setTimezone(response.data.timezone);
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load availability', err);
-      setError(tAvail('failed_to_load'));
+      setError(tAvailRef.current('failed_to_load'));
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);
       }
     }
-  }, [userId, tAvail]);
+  }, [userId]);
 
   useEffect(() => {
     loadAvailability();
@@ -200,7 +209,7 @@ export function AvailabilityGrid({
       });
 
       if (response.success) {
-        toastRef.current.success(tRef.current('toasts.availability_saved'));
+        toastRef.current.success(tAvailRef.current('save_success'));
         setIsDirty(false);
       } else {
         toastRef.current.error(response.error || tRef.current('toasts.availability_save_failed'));
@@ -215,7 +224,12 @@ export function AvailabilityGrid({
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-8">
+      <div
+        className="flex justify-center py-8"
+        role="status"
+        aria-busy="true"
+        aria-label={tAvail('loading')}
+      >
         <Spinner size="lg" />
       </div>
     );
@@ -233,7 +247,7 @@ export function AvailabilityGrid({
           startContent={<RefreshCw className="w-3 h-3" aria-hidden="true" />}
           onPress={loadAvailability}
         >
-          Retry
+          {tAvail('retry')}
         </Button>
       </GlassCard>
     );
@@ -267,7 +281,7 @@ export function AvailabilityGrid({
               onPress={handleSave}
               isLoading={isSaving}
             >
-              Save
+              {tAvail('save')}
             </Button>
           )}
         </div>
@@ -275,13 +289,13 @@ export function AvailabilityGrid({
 
       {editable && (
         <p className="text-sm text-theme-subtle">
-          Click on time slots to mark when you are available. Your availability helps other members find the best time to connect.
+          {tAvail('instructions')}
         </p>
       )}
 
       {/* Grid */}
       <div className="overflow-x-auto -mx-2 px-2">
-        <div className="min-w-[640px]">
+        <div className="min-w-[640px] min-h-[200px]">
           {/* Day Headers */}
           <div className="grid grid-cols-[60px_repeat(7,1fr)] gap-1 mb-1">
             <div /> {/* Empty corner cell */}
@@ -327,6 +341,7 @@ export function AvailabilityGrid({
                         `}
                         variant="flat"
                         aria-label={`${FULL_DAYS[dayIdx] ?? ''} ${time}: ${isAvail ? tAvail('available') : tAvail('unavailable')}`}
+                        aria-pressed={isAvail}
                       />
                     </Tooltip>
                   );
@@ -336,6 +351,13 @@ export function AvailabilityGrid({
           </div>
         </div>
       </div>
+
+      {/* Timezone */}
+      {timezone && (
+        <p className="text-xs text-theme-muted mt-2">
+          {tAvail('timezone_label')}: {timezone}
+        </p>
+      )}
 
       {/* Legend */}
       <div className="flex items-center gap-4 text-xs text-theme-subtle">

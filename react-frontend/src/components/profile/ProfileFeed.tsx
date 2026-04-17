@@ -10,7 +10,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Button, Skeleton, Divider } from '@heroui/react';
-import { Rss, TrendingUp, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Rss, ChevronDown, AlertTriangle, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { FeedCard } from '@/components/feed/FeedCard';
@@ -202,7 +202,7 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
   if (isLoading) {
     return (
       <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
+        {[1, 2, 3, 4].map((i) => (
           <FeedSkeleton key={i} />
         ))}
       </div>
@@ -266,7 +266,7 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
             className="border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
             onPress={() => void loadFeed(cursorRef.current)}
             isLoading={isLoadingMore}
-            startContent={!isLoadingMore ? <TrendingUp className="w-4 h-4" aria-hidden="true" /> : undefined}
+            startContent={!isLoadingMore ? <ChevronDown className="w-4 h-4" aria-hidden="true" /> : undefined}
           >
             {t('load_more', 'Load more')}
           </Button>
