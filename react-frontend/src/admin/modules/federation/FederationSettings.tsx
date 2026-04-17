@@ -87,7 +87,7 @@ export function FederationSettings() {
         toast.success(t('federation.federation_settings_saved_successfully'));
         setDirty(false);
       } else {
-        const error = (res as { error?: string }).error || 'Failed to save federation settings';
+        const error = (res as { error?: string }).error || t('federation.save_failed');
         toast.error(error);
       }
     } catch {

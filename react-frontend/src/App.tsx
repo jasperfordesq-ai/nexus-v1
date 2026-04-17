@@ -175,6 +175,7 @@ const FederationMemberProfilePage = lazyWithRetry(() => import('@/pages/federati
 const FederationMessagesPage = lazyWithRetry(() => import('@/pages/federation/FederationMessagesPage'));
 const FederationListingsPage = lazyWithRetry(() => import('@/pages/federation/FederationListingsPage'));
 const FederationEventsPage = lazyWithRetry(() => import('@/pages/federation/FederationEventsPage'));
+const FederationGroupsPage = lazyWithRetry(() => import('@/pages/federation/FederationGroupsPage'));
 const FederationSettingsPage = lazyWithRetry(() => import('@/pages/federation/FederationSettingsPage'));
 const FederationOnboardingPage = lazyWithRetry(() => import('@/pages/federation/FederationOnboardingPage'));
 const FederationConnectionsPage = lazyWithRetry(() => import('@/pages/federation/FederationConnectionsPage'));
@@ -1071,6 +1072,13 @@ function AppRoutes() {
             <FeatureGate feature="federation" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Federation">
                 <FederationEventsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="federation/groups" element={
+            <FeatureGate feature="federation" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Federation">
+                <FederationGroupsPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />

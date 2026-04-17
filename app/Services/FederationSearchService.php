@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use App\Services\FederationExternalApiClient;
 use App\Services\FederationExternalPartnerService;
 use Illuminate\Support\Facades\Cache;
@@ -35,6 +36,7 @@ class FederationSearchService
         }
 
         $cacheKey = 'fed_search_' . md5(json_encode([
+            'caller_tenant' => TenantContext::getId(),
             'tenants' => $partnerTenantIds,
             'filters' => $filters,
         ]));
@@ -196,9 +198,15 @@ class FederationSearchService
         $params[] = $offset;
 
         try {
-            // Count query for the real total (before LIMIT/OFFSET)
-            $countSql = "SELECT COUNT(*) as cnt " . $fromClause;
-            $totalCount = (int) DB::selectOne($countSql, $countParams)->cnt;
+            // Count query for the real total — only run on the first page to avoid a double
+            // COUNT on every "Load More" / paginated request.
+            $isFirstPage = ($filters['offset'] ?? 0) === 0;
+            if ($isFirstPage) {
+                $countSql = "SELECT COUNT(*) as cnt " . $fromClause;
+                $totalCount = (int) DB::selectOne($countSql, $countParams)->cnt;
+            } else {
+                $totalCount = $filters['known_total'] ?? 0;
+            }
 
             $members = array_map(
                 fn ($row) => (array) $row,
@@ -249,6 +257,8 @@ class FederationSearchService
                 $sql .= " AND u.skills LIKE ?";
                 $params[] = '%' . $query . '%';
             }
+
+            $sql .= " LIMIT 500";
 
             $results = array_map(
                 fn ($row) => $row->skills,

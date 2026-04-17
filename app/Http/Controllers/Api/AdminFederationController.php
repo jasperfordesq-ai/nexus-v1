@@ -364,6 +364,44 @@ class AdminFederationController extends BaseApiController
         }
     }
 
+    public function reactivatePartnership($id): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $id = (int) $id;
+
+        if (!$id || !$this->tableExists('federation_partnerships')) {
+            return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404);
+        }
+
+        try {
+            $result = FederationPartnershipService::reactivatePartnership($id, $adminId);
+
+            if (!$result['success']) {
+                $statusCode = str_contains($result['error'] ?? '', 'not found') ? 404 : 409;
+                return $this->respondWithError('REACTIVATE_FAILED', $result['error'], null, $statusCode);
+            }
+
+            // Notify the other tenant's admins that partnership was reactivated
+            $partnership = FederationPartnershipService::getPartnershipById($id);
+            if ($partnership) {
+                $otherTenantId = ((int) $partnership['tenant_id'] === $tenantId)
+                    ? (int) $partnership['partner_tenant_id']
+                    : (int) $partnership['tenant_id'];
+                $tenantName = $this->getTenantName($tenantId);
+                $this->notifyPartnerAdmins(
+                    $otherTenantId,
+                    __('svc_notifications_2.federation.notify_partnership_reactivated', ['tenant_name' => $tenantName]),
+                    'federation_partnership_reactivated'
+                );
+            }
+
+            return $this->respondWithData(['message' => __('api.partnership_reactivated')]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('UPDATE_FAILED', __('api.update_failed', ['resource' => 'partnership']));
+        }
+    }
+
     public function requestPartnership(): JsonResponse
     {
         $this->requireAdmin();

@@ -164,22 +164,47 @@ class FederationCreditService
             $approverColumn = $isFromTenant ? 'approved_by_from' : 'approved_by_to';
 
             // Record approval for the approving party without yet activating.
-            DB::update(
-                "UPDATE federation_credit_agreements SET {$approverColumn} = ?, updated_at = NOW() WHERE id = ?",
+            // WHERE status = 'pending' AND {approverColumn} IS NULL guards against
+            // TOCTOU: if the agreement was suspended or already approved between
+            // the SELECT above and this UPDATE, 0 rows will be affected.
+            $rowsAffected = DB::update(
+                "UPDATE federation_credit_agreements SET {$approverColumn} = ?, updated_at = NOW() WHERE id = ? AND status = 'pending' AND {$approverColumn} IS NULL",
                 [$approvedBy, $agreementId]
             );
 
+            if ($rowsAffected === 0) {
+                // Another request already recorded approval, or the agreement was
+                // suspended/activated between the read and write. Reload and report.
+                $current = DB::selectOne(
+                    "SELECT status FROM federation_credit_agreements WHERE id = ?",
+                    [$agreementId]
+                );
+                $currentStatus = $current->status ?? 'unknown';
+
+                if ($currentStatus !== 'pending') {
+                    $this->errors[] = "Agreement is no longer pending (current status: {$currentStatus})";
+                    return ['success' => false, 'error' => "Agreement is no longer pending (current status: {$currentStatus})"];
+                }
+
+                // Same party trying to approve twice — idempotent, continue to reload
+            }
+
             // Reload to check whether both parties have now approved.
+            // Use FOR UPDATE to lock the row for the activation step, preventing
+            // two simultaneous approvals from both activating the agreement.
             $updated = DB::selectOne(
-                "SELECT approved_by_from, approved_by_to FROM federation_credit_agreements WHERE id = ?",
+                "SELECT approved_by_from, approved_by_to, status FROM federation_credit_agreements WHERE id = ? FOR UPDATE",
                 [$agreementId]
             );
 
-            $bothApproved = $updated && $updated->approved_by_from !== null && $updated->approved_by_to !== null;
+            $bothApproved = $updated
+                && $updated->approved_by_from !== null
+                && $updated->approved_by_to !== null
+                && $updated->status === 'pending';
 
             if ($bothApproved) {
                 DB::update(
-                    "UPDATE federation_credit_agreements SET status = 'active', updated_at = NOW() WHERE id = ?",
+                    "UPDATE federation_credit_agreements SET status = 'active', updated_at = NOW() WHERE id = ? AND status = 'pending'",
                     [$agreementId]
                 );
                 Log::info('[FederationCredit] Agreement fully approved — both parties consented', ['id' => $agreementId]);

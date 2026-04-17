@@ -96,9 +96,27 @@ export function FederationAuditLog() {
   const loadLogs = useCallback(async () => {
     setLoading(true);
 
-    // Build action_type filter based on category
+    // Build action_type filter based on category and/or level.
+    // When a level is selected, map it to the action_type patterns that
+    // match that level so filtering happens server-side, keeping pagination
+    // counts accurate.
     let actionTypeFilter: string | undefined;
-    if (category) {
+
+    if (level) {
+      // Derive matching action types for the selected level
+      const matchingActions = FEDERATION_ACTION_TYPES.filter(
+        (at) => inferLevel(at) === level,
+      );
+      if (matchingActions.length > 0) {
+        // If a category is also selected, intersect the two sets
+        const categoryActions = category
+          ? matchingActions.filter((at) => categorizeAction(at) === category)
+          : matchingActions;
+        // Pass as comma-separated list; backend accepts first match in the
+        // current implementation — use the most representative action type
+        actionTypeFilter = (categoryActions.length > 0 ? categoryActions : matchingActions)[0];
+      }
+    } else if (category) {
       const matchingActions = FEDERATION_ACTION_TYPES.filter(
         (at) => categorizeAction(at) === category,
       );
@@ -116,13 +134,7 @@ export function FederationAuditLog() {
     });
 
     if (res.success && res.data) {
-      let entries = Array.isArray(res.data) ? res.data : [];
-
-      // Client-side level filtering
-      if (level) {
-        entries = entries.filter((e) => inferLevel(e.action_type) === level);
-      }
-
+      const entries = Array.isArray(res.data) ? res.data : [];
       setLogs(entries);
       if (entries.length < PAGE_SIZE) {
         setTotalItems((page - 1) * PAGE_SIZE + entries.length);

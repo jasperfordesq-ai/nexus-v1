@@ -64,7 +64,7 @@ class FederationNativeIngestController extends BaseApiController
 
     public function groups(Request $request): JsonResponse
     {
-        return $this->ingest($request, 'group.received');
+        return $this->ingest($request, 'group.received', false);
     }
 
     public function connections(Request $request): JsonResponse
@@ -85,9 +85,12 @@ class FederationNativeIngestController extends BaseApiController
     /**
      * Shared ingest path: validates payload, logs the event, returns 202 Accepted.
      *
+     * @param bool $queuedForProcessing  Set to false when no async pipeline is wired
+     *                                   up for this event type (avoids misleading clients).
+     *
      * Any downstream persistence is handled by dedicated listeners (other agents).
      */
-    private function ingest(Request $request, string $eventType): JsonResponse
+    private function ingest(Request $request, string $eventType, bool $queuedForProcessing = true): JsonResponse
     {
         $partner = FederationApiMiddleware::getPartner();
         if (!$partner) {
@@ -166,7 +169,7 @@ class FederationNativeIngestController extends BaseApiController
         return $this->respondWithData([
             'received' => true,
             'event' => $eventType,
-            'queued_for_processing' => true,
+            'queued_for_processing' => $queuedForProcessing,
         ], null, 202);
     }
 }

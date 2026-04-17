@@ -10,7 +10,10 @@ use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\GroupCreated;
+use App\Events\GroupDeleted;
 use App\Events\GroupMemberJoined;
+use App\Events\GroupMemberLeft;
+use App\Events\GroupUpdated;
 use App\Models\Group;
 use App\Models\GroupDiscussion;
 use App\Models\GroupPost;
@@ -377,6 +380,16 @@ class GroupService
             $group->decrement('cached_member_count');
             try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_MEMBER_LEFT, ['user_id' => $userId]); } catch (\Throwable $e) { \Log::warning('GroupService: failed to fire member_left webhook', ['group_id' => $groupId, 'user_id' => $userId, 'error' => $e->getMessage()]); }
             try { GroupAuditService::log(GroupAuditService::ACTION_MEMBER_LEFT, $groupId, $userId); } catch (\Throwable $e) { \Log::warning('GroupService: failed to log member_left audit', ['group_id' => $groupId, 'user_id' => $userId, 'error' => $e->getMessage()]); }
+
+            try {
+                GroupMemberLeft::dispatch($groupId, $userId, (int) TenantContext::getId());
+            } catch (\Throwable $e) {
+                Log::warning('Failed to dispatch GroupMemberLeft', [
+                    'group_id' => $groupId,
+                    'user_id'  => $userId,
+                    'error'    => $e->getMessage(),
+                ]);
+            }
         }
 
         return $detached > 0;
@@ -454,6 +467,15 @@ class GroupService
         if (! empty($updates)) {
             $group->fill($updates);
             $group->save();
+
+            try {
+                GroupUpdated::dispatch($group->fresh() ?? $group, (int) TenantContext::getId());
+            } catch (\Throwable $e) {
+                Log::warning('Failed to dispatch GroupUpdated', [
+                    'group_id' => $group->id ?? null,
+                    'error'    => $e->getMessage(),
+                ]);
+            }
         }
 
         return true;
@@ -484,7 +506,9 @@ class GroupService
             return false;
         }
 
-        return DB::transaction(function () use ($group, $id, $userId) {
+        $groupName = $group->name;
+
+        return DB::transaction(function () use ($group, $id, $userId, $groupName) {
             // Fetch active members before deleting (to notify them)
             $memberIds = DB::table('group_members')
                 ->where('group_id', $id)
@@ -532,6 +556,15 @@ class GroupService
 
             // Delete the group itself
             $group->delete();
+
+            try {
+                GroupDeleted::dispatch($id, (int) TenantContext::getId(), $groupName);
+            } catch (\Throwable $e) {
+                Log::warning('Failed to dispatch GroupDeleted', [
+                    'group_id' => $id,
+                    'error'    => $e->getMessage(),
+                ]);
+            }
 
             return true;
         });

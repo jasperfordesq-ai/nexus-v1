@@ -1053,8 +1053,34 @@ class FederationExternalWebhookController extends BaseApiController
                 DB::beginTransaction();
                 try {
                     // Reverse the credit — include tenant_id from the original transaction record
-                    DB::update("UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
-                        [$tx->amount, $tx->receiver_user_id, $tx->receiver_tenant_id, $tx->amount]);
+                    // AND balance >= amount guard ensures we only succeed if the user still has
+                    // the credits. If 0 rows are affected the user has already spent them.
+                    $rowsAffected = DB::update(
+                        "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
+                        [$tx->amount, $tx->receiver_user_id, $tx->receiver_tenant_id, $tx->amount]
+                    );
+
+                    if ($rowsAffected === 0) {
+                        // User has already spent the credits — mark as disputed instead
+                        DB::table('federation_transactions')
+                            ->where('id', $tx->id)
+                            ->update([
+                                'status'              => 'disputed',
+                                'cancellation_reason' => 'reversal_failed: insufficient_balance',
+                                'cancelled_at'        => now(),
+                            ]);
+
+                        DB::commit();
+
+                        Log::warning('[FederationExternalWebhook] Transaction cancellation reversal failed — user balance insufficient, flagged as disputed', [
+                            'transaction_id'   => $tx->id,
+                            'receiver_user_id' => $tx->receiver_user_id,
+                            'amount'           => $tx->amount,
+                            'partner'          => $partner->name,
+                        ]);
+
+                        return ['status' => 'reversal_failed', 'reason' => 'User balance insufficient — transaction flagged as disputed'];
+                    }
 
                     DB::table('federation_transactions')
                         ->where('id', $tx->id)

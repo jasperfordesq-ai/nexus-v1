@@ -22,12 +22,13 @@ class FederationRealtimeService
     }
 
     /**
-     * Get the federation channel name for a user.
-     * Format: private-federation.user.{userId}.{tenantId}
+     * Get the user channel name for delivering federation messages.
+     * Reuses the existing tenant user channel so PusherContext needs no extra subscription.
+     * Format: private-tenant.{tenantId}.user.{userId}
      */
     public static function getUserFederationChannel(int $userId, int $tenantId): string
     {
-        return "private-federation.user.{$userId}.{$tenantId}";
+        return "private-tenant.{$tenantId}.user.{$userId}";
     }
 
     /**
@@ -37,11 +38,17 @@ class FederationRealtimeService
      */
     public static function getConversationChannel(int $user1Id, int $tenant1Id, int $user2Id, int $tenant2Id): string
     {
-        // Sort to ensure deterministic channel name regardless of who is sender/receiver
+        // Sort by user ID first (integer comparison), then by tenant ID to break ties.
+        // Lexicographic string comparison ("9-1" <= "10-1") is wrong — use integers.
         $pair1 = "{$user1Id}-{$tenant1Id}";
         $pair2 = "{$user2Id}-{$tenant2Id}";
 
-        if ($pair1 <= $pair2) {
+        $cmp = $user1Id <=> $user2Id;
+        if ($cmp === 0) {
+            $cmp = $tenant1Id <=> $tenant2Id;
+        }
+
+        if ($cmp <= 0) {
             return "private-federation.conversation.{$pair1}.{$pair2}";
         }
 
@@ -216,11 +223,19 @@ class FederationRealtimeService
         return false;
     }
 
+    /** Cached Pusher instance — created once per process lifecycle. */
+    private static ?Pusher $pusherInstance = null;
+
     /**
      * Get a Pusher instance from environment configuration.
+     * Uses static caching to avoid creating a new SDK object on every call.
      */
     private static function getPusherInstance(): ?Pusher
     {
+        if (self::$pusherInstance !== null) {
+            return self::$pusherInstance;
+        }
+
         $appId = config('broadcasting.connections.pusher.app_id', env('PUSHER_APP_ID'));
         $key = config('broadcasting.connections.pusher.key', env('PUSHER_APP_KEY'));
         $secret = config('broadcasting.connections.pusher.secret', env('PUSHER_APP_SECRET'));
@@ -232,10 +247,11 @@ class FederationRealtimeService
         }
 
         try {
-            return new Pusher($key, $secret, $appId, [
+            self::$pusherInstance = new Pusher($key, $secret, $appId, [
                 'cluster' => $cluster,
                 'useTLS' => true,
             ]);
+            return self::$pusherInstance;
         } catch (\Exception $e) {
             Log::error('[FederationRealtime] Failed to create Pusher instance', ['error' => $e->getMessage()]);
             return null;

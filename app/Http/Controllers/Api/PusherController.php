@@ -154,6 +154,10 @@ class PusherController extends BaseApiController
     {
         try {
             $tenantId = TenantContext::getId();
+            if ($tenantId === null) {
+                Log::warning('[PusherAuth] authFederation called without tenant context', ['user' => $userId]);
+                return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
+            }
             $auth = $this->federationRealtimeService->authFederationChannel($channelName, $socketId, $userId, $tenantId);
 
             if ($auth === null) {

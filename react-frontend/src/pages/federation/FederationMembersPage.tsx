@@ -109,9 +109,11 @@ export function FederationMembersPage() {
   const [selectedPartner, setSelectedPartner] = useState<string>('');
   const [serviceReach, setServiceReach] = useState<ServiceReachFilter>('all');
   const [skillsFilter, setSkillsFilter] = useState('');
+  const [debouncedSkillsFilter, setDebouncedSkillsFilter] = useState('');
 
-  // Debounce ref
+  // Debounce refs
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const skillsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const tRef = useRef(t);
   tRef.current = t;
@@ -134,6 +136,22 @@ export function FederationMembersPage() {
       }
     };
   }, [searchQuery]);
+
+  // Debounce skills filter input
+  useEffect(() => {
+    if (skillsTimeoutRef.current) {
+      clearTimeout(skillsTimeoutRef.current);
+    }
+    skillsTimeoutRef.current = setTimeout(() => {
+      setDebouncedSkillsFilter(skillsFilter);
+    }, SEARCH_DEBOUNCE_MS);
+
+    return () => {
+      if (skillsTimeoutRef.current) {
+        clearTimeout(skillsTimeoutRef.current);
+      }
+    };
+  }, [skillsFilter]);
 
   // Load partners for dropdown
   useEffect(() => {
@@ -173,7 +191,7 @@ export function FederationMembersPage() {
       if (debouncedQuery) params.set('q', debouncedQuery);
       if (selectedPartner) params.set('partner_id', selectedPartner);
       if (serviceReach !== 'all') params.set('service_reach', serviceReach);
-      if (skillsFilter.trim()) params.set('skills', skillsFilter.trim());
+      if (debouncedSkillsFilter.trim()) params.set('skills', debouncedSkillsFilter.trim());
       params.set('per_page', ITEMS_PER_PAGE.toString());
 
       if (append && cursorParam) {
@@ -220,7 +238,7 @@ export function FederationMembersPage() {
         setIsLoadingMore(false);
       }
     }
-  }, [federationEnabled, debouncedQuery, selectedPartner, serviceReach, skillsFilter]);
+  }, [federationEnabled, debouncedQuery, selectedPartner, serviceReach, debouncedSkillsFilter]);
   loadMembersRef.current = loadMembers;
 
   // Load on mount and when filters change
@@ -232,7 +250,7 @@ export function FederationMembersPage() {
     return () => {
       abortRef.current?.abort();
     };
-  }, [debouncedQuery, selectedPartner, serviceReach, skillsFilter]);
+  }, [debouncedQuery, selectedPartner, serviceReach, debouncedSkillsFilter]);
 
   // Load more handler
   const handleLoadMore = useCallback(() => {

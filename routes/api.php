@@ -407,8 +407,8 @@ Route::get('/v2/federation/partners', [\App\Http\Controllers\Api\FederationV2Con
 Route::get('/v2/federation/partners/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'partnerDetail']);
 Route::get('/v2/federation/activity', [\App\Http\Controllers\Api\FederationV2Controller::class, 'activity']);
 Route::get('/v2/federation/events', [\App\Http\Controllers\Api\FederationV2Controller::class, 'events']);
-Route::get('/v2/federation/listings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'listings']);
-Route::get('/v2/federation/members', [\App\Http\Controllers\Api\FederationV2Controller::class, 'members']);
+Route::get('/v2/federation/listings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'listings'])->middleware('throttle:60,1');
+Route::get('/v2/federation/members', [\App\Http\Controllers\Api\FederationV2Controller::class, 'members'])->middleware('throttle:60,1');
 Route::get('/v2/federation/members/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'member']);
 Route::get('/v2/federation/members/{id}/reviews', [\App\Http\Controllers\Api\FederationV2Controller::class, 'memberReviews'])
     ->where('id', '.*');
@@ -1479,6 +1479,7 @@ Route::get('/v2/admin/federation/partnerships', [\App\Http\Controllers\Api\Admin
 Route::post('/v2/admin/federation/partnerships/{id}/approve', [\App\Http\Controllers\Api\AdminFederationController::class, 'approvePartnership']);
 Route::post('/v2/admin/federation/partnerships/{id}/reject', [\App\Http\Controllers\Api\AdminFederationController::class, 'rejectPartnership']);
 Route::post('/v2/admin/federation/partnerships/{id}/terminate', [\App\Http\Controllers\Api\AdminFederationController::class, 'terminatePartnership']);
+Route::post('/v2/admin/federation/partnerships/{id}/reactivate', [\App\Http\Controllers\Api\AdminFederationController::class, 'reactivatePartnership']);
 Route::post('/v2/admin/federation/partnerships/request', [\App\Http\Controllers\Api\AdminFederationController::class, 'requestPartnership']);
 Route::get('/v2/admin/federation/partnerships/{id}', [\App\Http\Controllers\Api\AdminFederationController::class, 'partnershipDetail']);
 Route::post('/v2/admin/federation/partnerships/{id}/counter-propose', [\App\Http\Controllers\Api\AdminFederationController::class, 'counterProposePartnership']);

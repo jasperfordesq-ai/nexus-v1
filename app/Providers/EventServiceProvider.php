@@ -10,8 +10,12 @@ use App\Events\CommunityEventCreated;
 use App\Events\CommunityEventUpdated;
 use App\Events\ConnectionAccepted;
 use App\Events\ConnectionRequested;
+use App\Events\FederatedGroupReceived;
 use App\Events\GroupCreated;
+use App\Events\GroupDeleted;
 use App\Events\GroupMemberJoined;
+use App\Events\GroupMemberLeft;
+use App\Events\GroupUpdated;
 use App\Events\JobVacancyCreated;
 use App\Events\ListingCreated;
 use App\Events\ListingUpdated;
@@ -27,8 +31,10 @@ use App\Events\VolunteerOpportunityCreated;
 use App\Events\VolunteerOpportunityUpdated;
 use App\Listeners\CopyMessageForBrokerReview;
 use App\Listeners\NotifyAdminOfNewCommunityEvent;
+use App\Listeners\HandleFederatedGroupReceived;
 use App\Listeners\NotifyGroupMemberJoined;
 use App\Listeners\NotifyAdminOfNewGroup;
+use App\Listeners\PushGroupRetractionToFederatedPartners;
 use App\Listeners\NotifyAdminOfNewListing;
 use App\Listeners\NotifyAdminOfNewRegistration;
 use App\Listeners\NotifyAdminOfNewVolunteerOpportunity;
@@ -131,14 +137,30 @@ class EventServiceProvider extends ServiceProvider
             PushCommunityEventToFederatedPartners::class,
         ],
 
+        FederatedGroupReceived::class => [
+            HandleFederatedGroupReceived::class,
+        ],
+
         GroupCreated::class => [
             PushGroupToFederatedPartners::class,
             NotifyAdminOfNewGroup::class,
         ],
 
+        GroupUpdated::class => [
+            PushGroupToFederatedPartners::class,
+        ],
+
+        GroupDeleted::class => [
+            PushGroupRetractionToFederatedPartners::class,
+        ],
+
         GroupMemberJoined::class => [
             PushGroupMembershipToFederatedPartners::class,
             NotifyGroupMemberJoined::class,
+        ],
+
+        GroupMemberLeft::class => [
+            PushGroupRetractionToFederatedPartners::class,
         ],
 
         VolunteerOpportunityCreated::class => [

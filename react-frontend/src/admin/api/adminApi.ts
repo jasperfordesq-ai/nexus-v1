@@ -1362,6 +1362,9 @@ export const adminFederation = {
   terminatePartnership: (id: number) =>
     api.post<{ success: boolean }>(`/v2/admin/federation/partnerships/${id}/terminate`, {}),
 
+  reactivatePartnership: (id: number) =>
+    api.post<{ success: boolean }>(`/v2/admin/federation/partnerships/${id}/reactivate`, {}),
+
   getDirectory: (params?: { search?: string; region?: string; category?: string; topic?: string; exclude_partnered?: boolean }) =>
     api.get<Array<{ id: number; name: string; slug: string; domain: string; description?: string; region?: string }>>(`/v2/admin/federation/directory${buildQuery(params || {})}`),
 
@@ -1758,6 +1761,9 @@ export const adminSuper = {
 
   terminatePartnership: (id: number, reason: string) =>
     api.post<{ success: boolean }>(`/v2/admin/super/federation/partnerships/${id}/terminate`, { reason }),
+
+  reactivatePartnership: (id: number) =>
+    api.post<{ success: boolean }>(`/v2/admin/super/federation/partnerships/${id}/reactivate`, {}),
 
   getTenantFederationFeatures: (tenantId: number) =>
     api.get<TenantFederationFeatures>(`/v2/admin/super/federation/tenant/${tenantId}/features`),

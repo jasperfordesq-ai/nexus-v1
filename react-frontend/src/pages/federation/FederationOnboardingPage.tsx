@@ -121,11 +121,12 @@ export function FederationOnboardingPage() {
   // Idempotency check: redirect already opted-in users straight to the hub
   useEffect(() => {
     let cancelled = false;
-    api.get<{ enabled?: boolean; status?: { user_optin?: boolean } }>('/v2/federation/status').then((res) => {
+    api.get<{ enabled?: boolean; user_opted_in?: boolean; status?: { user_optin?: boolean } }>('/v2/federation/status').then((res) => {
       if (cancelled) return;
       if (res.success && res.data) {
         const isOptedIn =
           res.data.enabled === true ||
+          res.data.user_opted_in === true ||
           res.data.status?.user_optin === true;
         if (isOptedIn) {
           navigate(tenantPath('/federation'), { replace: true });

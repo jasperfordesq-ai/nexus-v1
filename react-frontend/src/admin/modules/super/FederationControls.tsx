@@ -43,7 +43,7 @@ export function FederationControls() {
   const [lockdownConfirm, setLockdownConfirm] = useState(false);
   const [lockdownReason, setLockdownReason] = useState('');
   const [addTenantId, setAddTenantId] = useState('');
-  const [partnerAction, setPartnerAction] = useState<{ type: 'suspend' | 'terminate'; id: number } | null>(null);
+  const [partnerAction, setPartnerAction] = useState<{ type: 'suspend' | 'terminate' | 'reactivate'; id: number } | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -119,14 +119,21 @@ export function FederationControls() {
 
   const handlePartnerAction = async () => {
     if (!partnerAction) return;
-    const res = partnerAction.type === 'suspend'
-      ? await adminSuper.suspendPartnership(partnerAction.id, t('super.suspended_by_super_admin', 'Suspended by super admin'))
-      : await adminSuper.terminatePartnership(partnerAction.id, t('super.terminated_by_super_admin', 'Terminated by super admin'));
+    let res;
+    if (partnerAction.type === 'suspend') {
+      res = await adminSuper.suspendPartnership(partnerAction.id, t('super.suspended_by_super_admin', 'Suspended by super admin'));
+    } else if (partnerAction.type === 'terminate') {
+      res = await adminSuper.terminatePartnership(partnerAction.id, t('super.terminated_by_super_admin', 'Terminated by super admin'));
+    } else {
+      res = await adminSuper.reactivatePartnership(partnerAction.id);
+    }
     if (res?.success) {
       toastRef.current.success(
         partnerAction.type === 'suspend'
           ? t('super.partnership_suspended', 'Partnership suspended')
-          : t('super.partnership_terminated', 'Partnership terminated')
+          : partnerAction.type === 'terminate'
+          ? t('super.partnership_terminated', 'Partnership terminated')
+          : t('super.partnership_reactivated', 'Partnership reactivated')
       );
       loadData();
     } else {
@@ -231,16 +238,16 @@ export function FederationControls() {
         <CardHeader className="flex items-center gap-3">
           <KeyRound size={20} className={jwtStatus?.configured ? 'text-success' : 'text-warning'} />
           <div className="flex-1">
-            <p className="font-semibold">{t('super_controls.federation_jwt')}</p>
+            <p className="font-semibold">{t('super.jwt_card.title')}</p>
             <p className="text-xs text-default-500">
-              Shared secret used to sign and verify cross-platform federation tokens
+              {t('super.jwt_card.subtitle')}
             </p>
           </div>
           {jwtStatus ? (
             jwtStatus.configured ? (
-              <Chip color="success" variant="flat" size="sm">Configured · {jwtStatus.key_bits}-bit</Chip>
+              <Chip color="success" variant="flat" size="sm">{t('super.jwt_card.chip_configured', { bits: jwtStatus.key_bits })}</Chip>
             ) : (
-              <Chip color="warning" variant="flat" size="sm" startContent={<AlertTriangle size={14} />}>Not configured</Chip>
+              <Chip color="warning" variant="flat" size="sm" startContent={<AlertTriangle size={14} />}>{t('super.jwt_card.chip_not_configured')}</Chip>
             )
           ) : (
             <Chip variant="flat" size="sm">…</Chip>
@@ -249,24 +256,21 @@ export function FederationControls() {
         <CardBody className="gap-3 text-sm">
           {jwtStatus?.configured && jwtStatus.key_bits < jwtStatus.recommended_bits && (
             <div className="rounded-md border border-warning bg-warning-50 dark:bg-warning-950 p-3 text-warning-700 dark:text-warning-300">
-              <strong>Key is weaker than recommended.</strong> Current: {jwtStatus.key_bits}-bit.
-              Recommended: at least {jwtStatus.recommended_bits}-bit. Regenerate with the openssl
-              command below and replace the env var.
+              <strong>{t('super.jwt_card.warn_weak_key_heading')}</strong>{' '}
+              {t('super.jwt_card.warn_weak_key_body', { current: jwtStatus.key_bits, recommended: jwtStatus.recommended_bits })}
             </div>
           )}
 
           {!jwtStatus?.configured && (
             <div className="rounded-md border border-warning bg-warning-50 dark:bg-warning-950 p-3 text-warning-700 dark:text-warning-300">
-              <strong>FEDERATION_JWT_SECRET is not set on this server.</strong> JWT-authenticated
-              federation requests will fail. Partnerships using <Code size="sm">api_key</Code>,
-              <Code size="sm">hmac</Code>, or <Code size="sm">oauth2</Code> still work — only the
-              JWT auth method is affected.
+              <strong>{t('super.jwt_card.warn_not_set_heading')}</strong>{' '}
+              {t('super.jwt_card.warn_not_set_body')}
             </div>
           )}
 
           <div className="text-default-600">
-            <span className="font-medium">Issuer (iss claim):</span>{' '}
-            <Code size="sm">{jwtStatus?.issuer || '(falls back to APP_URL)'}</Code>
+            <span className="font-medium">{t('super.jwt_card.issuer_label')}</span>{' '}
+            <Code size="sm">{jwtStatus?.issuer || t('super.jwt_card.issuer_fallback')}</Code>
           </div>
 
           <Divider />
@@ -274,8 +278,8 @@ export function FederationControls() {
           <Accordion variant="light" isCompact>
             <AccordionItem
               key="what"
-              aria-label="What is this for"
-              title={<span className="font-medium">What is this for?</span>}
+              aria-label={t('super.jwt_card.accordion_what_aria')}
+              title={<span className="font-medium">{t('super.jwt_card.accordion_what_title')}</span>}
             >
               <div className="space-y-2 text-default-600">
                 <p>
@@ -299,8 +303,8 @@ export function FederationControls() {
 
             <AccordionItem
               key="setup"
-              aria-label="How to configure"
-              title={<span className="font-medium">How to configure (first-time setup)</span>}
+              aria-label={t('super.jwt_card.accordion_setup_aria')}
+              title={<span className="font-medium">{t('super.jwt_card.accordion_setup_title')}</span>}
             >
               <div className="space-y-3 text-default-600">
                 <div>
@@ -337,8 +341,8 @@ export function FederationControls() {
 
             <AccordionItem
               key="rotate"
-              aria-label="How to rotate"
-              title={<span className="font-medium">{t('super_controls.rotation_policy')}</span>}
+              aria-label={t('super.jwt_card.accordion_rotate_aria')}
+              title={<span className="font-medium">{t('super.jwt_card.accordion_rotate_title')}</span>}
             >
               <div className="space-y-2 text-default-600">
                 <p>Rotate this secret when:</p>
@@ -363,8 +367,8 @@ export function FederationControls() {
 
             <AccordionItem
               key="troubleshoot"
-              aria-label="Troubleshooting"
-              title={<span className="font-medium">{t('super_controls.troubleshooting')}</span>}
+              aria-label={t('super.jwt_card.accordion_troubleshoot_aria')}
+              title={<span className="font-medium">{t('super.jwt_card.accordion_troubleshoot_title')}</span>}
             >
               <div className="space-y-2 text-default-600 text-xs">
                 <p><strong>Status shows &quot;Not configured&quot; but I set the env var:</strong></p>
@@ -617,6 +621,13 @@ export function FederationControls() {
                         </Button>
                       </div>
                     )}
+                    {p.status === 'suspended' && (
+                      <div className="flex gap-1 shrink-0 ml-2">
+                        <Button size="sm" variant="flat" color="success" onPress={() => setPartnerAction({ type: 'reactivate', id: p.id })}>
+                          {t('super.reactivate', 'Reactivate')}
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -658,13 +669,23 @@ export function FederationControls() {
         title={partnerAction
           ? (partnerAction.type === 'suspend'
             ? t('super.suspend_partnership', 'Suspend Partnership')
-            : t('super.terminate_partnership', 'Terminate Partnership'))
+            : partnerAction.type === 'terminate'
+            ? t('super.terminate_partnership', 'Terminate Partnership')
+            : t('super.reactivate_partnership', 'Reactivate Partnership'))
           : ''}
         message={partnerAction?.type === 'suspend'
           ? t('super.suspend_partnership_confirm', 'All federation features will be temporarily disabled for this partnership.')
-          : t('super.terminate_partnership_confirm', 'This will permanently end this partnership. This action cannot be undone.')}
-        confirmLabel={partnerAction?.type === 'suspend' ? t('super.suspend', 'Suspend') : t('super.terminate', 'Terminate')}
-        confirmColor="danger"
+          : partnerAction?.type === 'terminate'
+          ? t('super.terminate_partnership_confirm', 'This will permanently end this partnership. This action cannot be undone.')
+          : t('super.reactivate_partnership_confirm', 'This will restore federation features for this partnership.')}
+        confirmLabel={
+          partnerAction?.type === 'suspend'
+            ? t('super.suspend', 'Suspend')
+            : partnerAction?.type === 'terminate'
+            ? t('super.terminate', 'Terminate')
+            : t('super.reactivate', 'Reactivate')
+        }
+        confirmColor={partnerAction?.type === 'reactivate' ? 'success' : 'danger'}
       />
     </div>
   );

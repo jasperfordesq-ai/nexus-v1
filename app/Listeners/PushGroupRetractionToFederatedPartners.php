@@ -9,8 +9,8 @@ declare(strict_types=1);
 namespace App\Listeners;
 
 use App\Core\TenantContext;
-use App\Events\GroupCreated;
-use App\Events\GroupUpdated;
+use App\Events\GroupDeleted;
+use App\Events\GroupMemberLeft;
 use App\Services\FederationExternalApiClient;
 use App\Services\FederationExternalPartnerService;
 use App\Services\FederationFeatureService;
@@ -18,10 +18,14 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
 /**
- * PushGroupToFederatedPartners — broadcasts newly-created groups to external
- * federation partners that have `allow_groups = 1`.
+ * PushGroupRetractionToFederatedPartners — notifies federation partners when a
+ * group is deleted or a member leaves, so shadow tables stay in sync.
+ *
+ * Handles two events:
+ *   - GroupDeleted:    pushes action='deleted' so partners can remove the shadow row
+ *   - GroupMemberLeft: pushes action='member_left' so partners can decrement counts
  */
-class PushGroupToFederatedPartners implements ShouldQueue
+class PushGroupRetractionToFederatedPartners implements ShouldQueue
 {
     /** Route to the standard federation queue (bulk, non-time-critical). */
     public string $queue = 'federation';
@@ -30,9 +34,11 @@ class PushGroupToFederatedPartners implements ShouldQueue
         private readonly FederationFeatureService $federationFeatureService,
     ) {}
 
-    public function handle(GroupCreated|GroupUpdated $event): void
+    /**
+     * @param GroupDeleted|GroupMemberLeft $event
+     */
+    public function handle(GroupDeleted|GroupMemberLeft $event): void
     {
-        $group    = $event->group;
         $tenantId = $event->tenantId;
 
         try {
@@ -45,29 +51,27 @@ class PushGroupToFederatedPartners implements ShouldQueue
                 return;
             }
 
-            $visibility = $group->federated_visibility ?? 'none';
-            if (!in_array($visibility, ['listed', 'public'], true)) {
-                return;
-            }
-
             $partners = FederationExternalPartnerService::getActivePartnersWithFlag($tenantId, 'allow_groups');
             if (empty($partners)) {
                 return;
             }
 
-            $action = $event instanceof GroupUpdated ? 'updated' : 'created';
-
-            $payload = [
-                'action'      => $action,
-                'id'          => $group->id,
-                'external_id' => (string) $group->id,
-                'name'        => $group->name ?? null,
-                'description' => $group->description ?? null,
-                'visibility'  => $group->visibility ?? null,
-                'owner_id'    => $group->owner_id ?? null,
-                'tenant_id'   => $tenantId,
-                'created_at'  => $group->created_at?->toISOString(),
-            ];
+            if ($event instanceof GroupDeleted) {
+                $payload = [
+                    'action'    => 'deleted',
+                    'id'        => $event->groupId,
+                    'tenant_id' => $tenantId,
+                    'name'      => $event->groupName,
+                ];
+            } else {
+                // GroupMemberLeft
+                $payload = [
+                    'action'    => 'member_left',
+                    'id'        => $event->groupId,
+                    'tenant_id' => $tenantId,
+                    'user_id'   => $event->userId,
+                ];
+            }
 
             foreach ($partners as $partner) {
                 $partnerId = (int) ($partner['id'] ?? 0);
@@ -78,26 +82,25 @@ class PushGroupToFederatedPartners implements ShouldQueue
                     $result = FederationExternalApiClient::sendGroup($partnerId, $payload);
 
                     if (empty($result['success'])) {
-                        Log::warning('PushGroupToFederatedPartners: partner rejected group', [
+                        Log::warning('PushGroupRetractionToFederatedPartners: partner rejected retraction', [
                             'partner_id' => $partnerId,
                             'tenant_id'  => $tenantId,
-                            'group_id'   => $group->id,
+                            'group_id'   => $event instanceof GroupDeleted ? $event->groupId : $event->groupId,
+                            'action'     => $payload['action'],
                             'error'      => $result['error'] ?? null,
                         ]);
                     }
                 } catch (\Throwable $e) {
-                    Log::warning('PushGroupToFederatedPartners: partner push failed', [
+                    Log::warning('PushGroupRetractionToFederatedPartners: partner push failed', [
                         'partner_id' => $partnerId,
                         'tenant_id'  => $tenantId,
-                        'group_id'   => $group->id,
                         'error'      => $e->getMessage(),
                     ]);
                 }
             }
         } catch (\Throwable $e) {
-            Log::error('PushGroupToFederatedPartners listener failed', [
+            Log::error('PushGroupRetractionToFederatedPartners listener failed', [
                 'tenant_id' => $tenantId ?? null,
-                'group_id'  => $group->id ?? null,
                 'error'     => $e->getMessage(),
             ]);
         }

@@ -51,6 +51,7 @@ import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
+import { usePusherOptional } from '@/contexts/PusherContext';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
@@ -290,6 +291,90 @@ export function FederationMessagesPage() {
   useEffect(() => {
     loadMessages();
   }, [loadMessages]);
+
+  // ── Real-time: subscribe to federation-message events on the user channel ──
+  const pusher = usePusherOptional();
+
+  useEffect(() => {
+    if (!pusher?.client || !user?.id || !pusher.tenantId) return;
+
+    const channelName = `private-tenant.${pusher.tenantId}.user.${user.id}`;
+    const channel = pusher.client.channel(channelName);
+    if (!channel) return;
+
+    function handleFederationMessage(data: {
+      message_id?: number;
+      sender_user_id?: number;
+      sender_tenant_id?: number;
+      sender_name?: string;
+      sender_tenant_name?: string;
+      subject?: string;
+      body?: string;
+      timestamp?: string;
+    }) {
+      // Append the incoming message as a synthetic FederatedMessage so the
+      // thread list and active thread view update without a page reload.
+      if (!data.message_id || !data.sender_user_id || !data.body) return;
+
+      const partnerKey = `${data.sender_user_id}-${data.sender_tenant_id}`;
+
+      setAllMessages((prev) => {
+        // Avoid duplicates (e.g. if the page also re-fetched)
+        if (prev.some((m) => m.id === data.message_id)) return prev;
+
+        const synthetic: FederatedMessage = {
+          id: data.message_id!,
+          direction: 'inbound',
+          status: 'unread',
+          subject: data.subject ?? '',
+          body: data.body!,
+          created_at: data.timestamp ?? new Date().toISOString(),
+          read_at: null,
+          sender: {
+            id: data.sender_user_id!,
+            name: data.sender_name ?? '',
+            avatar: null,
+            tenant_id: data.sender_tenant_id ?? 0,
+            tenant_name: data.sender_tenant_name ?? '',
+          },
+          receiver: {
+            id: user?.id ?? 0,
+            name: '',
+            avatar: null,
+            tenant_id: Number(pusher?.tenantId ?? 0),
+            tenant_name: '',
+          },
+        };
+        return [...prev, synthetic];
+      });
+
+      // If the sender's thread is not currently open, show a toast notification
+      setActiveThreadKey((current) => {
+        if (current !== partnerKey) {
+          toastRef.current.info(
+            tRef.current('messages.realtime_new_message', { name: data.sender_name ?? tRef.current('messages.someone') }),
+          );
+        }
+        return current;
+      });
+
+      // Scroll to bottom if the relevant thread is open
+      setTimeout(() => {
+        setActiveThreadKey((current) => {
+          if (current === partnerKey) {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }
+          return current;
+        });
+      }, 100);
+    }
+
+    channel.bind('federation-message', handleFederationMessage);
+
+    return () => {
+      channel.unbind('federation-message', handleFederationMessage);
+    };
+  }, [pusher?.client, pusher?.tenantId, user?.id]);
 
   // ── Handle compose URL params ──
   useEffect(() => {

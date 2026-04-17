@@ -132,6 +132,7 @@ export function Partnerships() {
   const [terminateTarget, setTerminateTarget] = useState<Partnership | null>(null);
   const [approveTarget, setApproveTarget] = useState<Partnership | null>(null);
   const [rejectTarget, setRejectTarget] = useState<Partnership | null>(null);
+  const [reactivateTarget, setReactivateTarget] = useState<Partnership | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('all');
 
@@ -262,6 +263,25 @@ export function Partnerships() {
       }
     } catch {
       toast.error(t('federation.failed_to_terminate_partnership'));
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleReactivate = async () => {
+    if (!reactivateTarget) return;
+    setActionLoading(true);
+    try {
+      const res = await adminFederation.reactivatePartnership(reactivateTarget.id);
+      if (res.success) {
+        toast.success(t('federation.partnership_reactivated', { name: reactivateTarget.partner_name }));
+        setReactivateTarget(null);
+        loadData();
+      } else {
+        toast.error(t('federation.failed_to_reactivate_partnership'));
+      }
+    } catch {
+      toast.error(t('federation.failed_to_reactivate_partnership'));
     } finally {
       setActionLoading(false);
     }
@@ -466,10 +486,12 @@ export function Partnerships() {
                 else if (key === 'reject') setRejectTarget(item);
                 else if (key === 'terminate') setTerminateTarget(item);
                 else if (key === 'counter') openCounterProposal(item);
+                else if (key === 'reactivate') setReactivateTarget(item);
               }}
               items={[
                 ...(item.status === 'pending' ? [{ key: 'approve' }, { key: 'reject' }, { key: 'counter' }] : []),
                 ...(item.status === 'active' ? [{ key: 'terminate' }] : []),
+                ...(item.status === 'suspended' ? [{ key: 'reactivate' }] : []),
               ]}
             >
               {(action) => {
@@ -488,9 +510,14 @@ export function Partnerships() {
                     {t('federation.counter_propose')}
                   </DropdownItem>
                 );
-                return (
+                if (action.key === 'terminate') return (
                   <DropdownItem key="terminate" startContent={<Ban size={14} />} className="text-danger" color="danger">
                     {t('federation.terminate')}
+                  </DropdownItem>
+                );
+                return (
+                  <DropdownItem key="reactivate" startContent={<CheckCircle size={14} />} className="text-success">
+                    {t('federation.reactivate')}
                   </DropdownItem>
                 );
               }}
@@ -638,6 +665,20 @@ export function Partnerships() {
           message={t('federation.terminate_partnership_confirm', { name: terminateTarget.partner_name })}
           confirmLabel={t('federation.terminate')}
           confirmColor="danger"
+          isLoading={actionLoading}
+        />
+      )}
+
+      {/* Reactivate confirmation */}
+      {reactivateTarget && (
+        <ConfirmModal
+          isOpen={!!reactivateTarget}
+          onClose={() => setReactivateTarget(null)}
+          onConfirm={handleReactivate}
+          title={t('federation.reactivate_partnership')}
+          message={t('federation.reactivate_partnership_confirm', { name: reactivateTarget.partner_name })}
+          confirmLabel={t('federation.reactivate')}
+          confirmColor="success"
           isLoading={actionLoading}
         />
       )}

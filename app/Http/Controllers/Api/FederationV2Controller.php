@@ -556,6 +556,7 @@ class FederationV2Controller extends BaseApiController
                     (fp.tenant_id = :tid1 AND fp.partner_tenant_id = e.tenant_id)
                     OR (fp.partner_tenant_id = :tid2 AND fp.tenant_id = e.tenant_id)
                 )
+                JOIN federation_user_settings fus ON fus.user_id = e.user_id AND fus.federation_optin = 1
                 WHERE fp.status = 'active' AND fp.events_enabled = 1
                 AND e.tenant_id != :tid3 AND e.status = 'active'
             ";
@@ -638,6 +639,10 @@ class FederationV2Controller extends BaseApiController
     /** GET /api/v2/federation/listings */
     public function listings(): JsonResponse
     {
+        if (!\App\Core\TenantContext::hasFeature('federation')) {
+            return $this->respondWithError('FORBIDDEN', __('errors.federation.feature_disabled'), null, 403);
+        }
+
         $this->getUserId();
         $tenantId = $this->getTenantId();
 
@@ -866,6 +871,10 @@ class FederationV2Controller extends BaseApiController
     /** GET /api/v2/federation/members */
     public function members(): JsonResponse
     {
+        if (!\App\Core\TenantContext::hasFeature('federation')) {
+            return $this->respondWithError('FORBIDDEN', __('errors.federation.feature_disabled'), null, 403);
+        }
+
         $this->getUserId();
         $tenantId = $this->getTenantId();
 
@@ -939,13 +948,18 @@ class FederationV2Controller extends BaseApiController
                 }
             }
 
-            // Count query (without cursor) for total_items
-            $countStmt = DB::getPdo()->prepare("SELECT COUNT(*) " . $fromWhere);
-            foreach ($filterParams as $key => $value) {
-                $countStmt->bindValue($key, $value, is_int($value) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
+            // Count query (without cursor) for total_items — only run on the first page
+            // to avoid an expensive double COUNT on every "Load More" paginated request.
+            if ($cursorId === null) {
+                $countStmt = DB::getPdo()->prepare("SELECT COUNT(*) " . $fromWhere);
+                foreach ($filterParams as $key => $value) {
+                    $countStmt->bindValue($key, $value, is_int($value) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
+                }
+                $countStmt->execute();
+                $totalItems = (int) ($countStmt->fetchColumn() ?: 0);
+            } else {
+                $totalItems = 0; // Total not recomputed on paginated pages
             }
-            $countStmt->execute();
-            $totalItems = (int) ($countStmt->fetchColumn() ?: 0);
 
             // Data query with cursor and limit
             $params = $filterParams;

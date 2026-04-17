@@ -1603,6 +1603,22 @@ export interface FederatedListing {
   partner_name?: string;
 }
 
+export interface FederatedGroup {
+  id: number | string;
+  name: string;
+  description?: string | null;
+  privacy?: string | null;
+  member_count: number;
+  cover_image?: string | null;
+  timebank: {
+    id: number | string;
+    name: string;
+  };
+  created_at?: string;
+  external_partner_id?: number;
+  partner_name?: string;
+}
+
 export interface FederatedMember {
   id: number | string;
   name?: string;

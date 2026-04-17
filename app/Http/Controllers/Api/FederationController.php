@@ -704,7 +704,7 @@ class FederationController extends BaseApiController
         }
 
         try { $this->federationEmailService->sendNewMessageNotification((int) $input['recipient_id'], (int) $input['sender_id'], (int) $partnerTenantId, substr($input['body'], 0, 200)); } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning("FederationV1: email failed: " . $e->getMessage()); }
-        try { $this->federationRealtimeService->broadcastNewMessage((int) $input['sender_id'], (int) $partnerTenantId, (int) $input['recipient_id'], (int) $recipient['tenant_id'], ['message_id' => (int) $messageId, 'sender_name' => $senderName, 'sender_tenant_name' => $senderTenantName, 'subject' => $input['subject'], 'body' => $input['body']]); } catch (\Exception $e) { \Log::warning('[Federation] broadcastNewMessage failed', ['error' => $e->getMessage()]); }
+        try { $this->federationRealtimeService->broadcastNewMessage((int) $input['sender_id'], (int) $partnerTenantId, (int) $input['recipient_id'], (int) $recipient['tenant_id'], ['message_id' => (int) $messageId, 'sender_name' => $senderName, 'sender_tenant_name' => $senderTenantName, 'subject' => $sanitizedSubject, 'body' => $sanitizedBody]); } catch (\Exception $e) { \Log::warning('[Federation] broadcastNewMessage failed', ['error' => $e->getMessage()]); }
         try {
             $notifBody = __('notifications.federation.new_message', [
                 'sender' => $senderName,

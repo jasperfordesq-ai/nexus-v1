@@ -1775,7 +1775,13 @@
     "status_pending": "Pending",
     "status_rejected": "Rejected",
     "status_suspended": "Suspended",
-    "status_terminated": "Terminated"
+    "status_terminated": "Terminated",
+    "failed_to_reactivate_partnership": "Failed to reactivate partnership",
+    "partnership_reactivated": "Partnership reactivated",
+    "reactivate": "Reactivate",
+    "reactivate_partnership": "Reactivate Partnership",
+    "reactivate_partnership_confirm": "This will restore federation features for this partnership.",
+    "save_failed": "Failed to save federation settings"
   },
   "gamification": {
     "activate": "Activate",
@@ -2648,7 +2654,7 @@
     "failed_to_import_subscribers": "Failed to import subscribers",
     "failed_to_load_data": "Failed to load data",
     "send_time_data_error": "Error loading send-time data.",
-        "failed_to_load_diagnostics": "Failed to load diagnostics",
+    "failed_to_load_diagnostics": "Failed to load diagnostics",
     "failed_to_remove_subscriber": "Failed to remove subscriber",
     "failed_to_select_winner": "Failed to select winner",
     "failed_to_send_newsletter": "Failed to send newsletter",
@@ -3260,7 +3266,31 @@
     "user_updated_successfully": "User Updated Successfully",
     "whitelist": "Whitelist",
     "whitelist_mode": "Whitelist Mode",
-    "whitelist_mode_desc": "Manage and configure whitelist mode settings"
+    "whitelist_mode_desc": "Manage and configure whitelist mode settings",
+    "reactivate": "Reactivate",
+    "reactivate_partnership": "Reactivate Partnership",
+    "reactivate_partnership_confirm": "This will restore federation features for this partnership.",
+    "partnership_reactivated": "Partnership reactivated",
+    "jwt_card": {
+      "title": "JWT Authentication Configuration",
+      "subtitle": "Shared secret used to sign and verify cross-platform federation tokens",
+      "chip_configured": "Configured · {{bits}}-bit",
+      "chip_not_configured": "Not configured",
+      "warn_weak_key_heading": "Key is weaker than recommended.",
+      "warn_weak_key_body": "Current: {{current}}-bit. Recommended: at least {{recommended}}-bit. Regenerate with the openssl command below and replace the env var.",
+      "warn_not_set_heading": "FEDERATION_JWT_SECRET is not set on this server.",
+      "warn_not_set_body": "JWT-authenticated federation requests will fail. Partnerships using api_key, hmac, or oauth2 still work — only the JWT auth method is affected.",
+      "issuer_label": "Issuer (iss claim):",
+      "issuer_fallback": "(falls back to APP_URL)",
+      "accordion_what_aria": "What is this for",
+      "accordion_what_title": "What is this for?",
+      "accordion_setup_aria": "How to configure",
+      "accordion_setup_title": "How to configure (first-time setup)",
+      "accordion_rotate_aria": "How to rotate",
+      "accordion_rotate_title": "Rotation Policy",
+      "accordion_troubleshoot_aria": "Troubleshooting",
+      "accordion_troubleshoot_title": "Troubleshooting"
+    }
   },
   "system": {
     "active": "Active",
@@ -3402,7 +3432,6 @@
     "hours_ago": "{{count}}h ago",
     "just_now": "Just now",
     "minutes_ago": "{{count}}m ago",
-    "never": "Never",
     "not_scheduled": "Not Scheduled",
     "onboarding": {
       "apply_country_preset": "Apply Country Preset",
