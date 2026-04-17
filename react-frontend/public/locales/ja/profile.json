@@ -166,5 +166,12 @@
   "no_availability_desc": "This member hasn't shared their availability yet.",
   "login_to_message": "Log in to message",
   "blocked_by_you": "You have blocked this user",
-  "unblock_to_interact": "Unblock them to send messages or reviews."
+  "unblock_to_interact": "Unblock them to send messages or reviews.",
+  "member_fallback": "Member",
+  "cancel_request": "Cancel Request",
+  "login_to_review": "Log in to write a review",
+  "show_more_skills": "Show {{count}} more",
+  "show_less": "Show less",
+  "read_more": "Read more",
+  "read_less": "Read less"
 }

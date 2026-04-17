@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Avatar, Chip, Skeleton, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
+import { Button, Avatar, Chip, Skeleton, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip } from '@heroui/react';
 import {
   User,
   MapPin,
@@ -158,6 +158,9 @@ export function ProfilePage() {
 
   // Endorsement data keyed by skill name
   const [endorsements, setEndorsements] = useState<Record<string, { count: number; isEndorsed: boolean }>>({});
+  const [isLoadingEndorsements, setIsLoadingEndorsements] = useState(true);
+  const [showAllSkills, setShowAllSkills] = useState(false);
+  const [bioExpanded, setBioExpanded] = useState(false);
 
   // Reviews state
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -194,6 +197,8 @@ export function ProfilePage() {
       setIsLoading(true);
       setError(null);
       setErrorCode(null);
+      setEndorsements({});
+      setIsLoadingEndorsements(true);
 
       const profileReq = api.get<UserType>(`/v2/users/${profileId}`);
       const listingsReq = api.get<Listing[]>(`/v2/users/${profileId}/listings?limit=6`);
@@ -209,8 +214,18 @@ export function ProfilePage() {
       const blockStatusReq = (isAuthenticated && currentUserId && profileId !== currentUserId)
         ? api.get<{ is_blocked: boolean; is_blocked_by: boolean }>(`/v2/users/${profileId}/block-status`)
         : null;
+      const endorsementsReq = api.get<{
+        endorsements?: Record<string, {
+          skill_name: string;
+          count: number;
+          endorsed_by_ids?: string;
+        }>;
+      }>(`/v2/members/${profileId}/endorsements`).catch((err: unknown) => {
+        logError('Failed to load endorsements', err);
+        return undefined;
+      });
 
-      const [profileRes, listingsRes, gamificationProfileRes, gamificationBadgesRes, connectionRes, blockStatusRes] =
+      const [profileRes, listingsRes, gamificationProfileRes, gamificationBadgesRes, connectionRes, blockStatusRes, endorsementsRes] =
         await Promise.all([
           profileReq,
           listingsReq,
@@ -218,6 +233,7 @@ export function ProfilePage() {
           gamBadgesReq ?? Promise.resolve(undefined),
           connectionReq ?? Promise.resolve(undefined),
           blockStatusReq ?? Promise.resolve(undefined),
+          endorsementsReq,
         ]) as [
           { success: boolean; data?: ProfileApiUser; code?: string },
           { success: boolean; data?: Listing[] },
@@ -225,6 +241,7 @@ export function ProfilePage() {
           { success: boolean; data?: GamificationBadgeResponse[] } | undefined,
           { success: boolean; data?: { status: ConnectionStatus; connection_id?: number } } | undefined,
           { success: boolean; data?: { is_blocked: boolean; is_blocked_by: boolean } } | undefined,
+          { success: boolean; data?: { endorsements?: Record<string, { skill_name: string; count: number; endorsed_by_ids?: string }> } } | undefined,
         ];
 
       if (controller.signal.aborted) return;
@@ -296,31 +313,16 @@ export function ProfilePage() {
         setIsBlocked(blockStatusRes.data.is_blocked);
       }
 
-      // Fetch endorsement data for skills
-      if (profileRes.data?.skills?.length) {
-        try {
-          const endorseRes = await api.get<{
-            endorsements?: Record<string, {
-              skill_name: string;
-              count: number;
-              endorsed_by_ids?: string;
-            }>;
-          }>(`/v2/members/${profileId}/endorsements`);
-          if (!controller.signal.aborted && endorseRes.success && endorseRes.data?.endorsements) {
-            const map: Record<string, { count: number; isEndorsed: boolean }> = {};
-            for (const [skill, info] of Object.entries(endorseRes.data.endorsements)) {
-              const endorserIds = info.endorsed_by_ids?.split(',') || [];
-              map[skill] = {
-                count: info.count || 0,
-                isEndorsed: currentUserId ? endorserIds.includes(currentUserId) : false,
-              };
-            }
-            setEndorsements(map);
-          }
-        } catch (endorseErr) {
-          // Endorsement data is supplementary — don't fail the whole page
-          logError('Failed to load endorsements', endorseErr);
+      if (!controller.signal.aborted && endorsementsRes?.success && endorsementsRes.data?.endorsements) {
+        const map: Record<string, { count: number; isEndorsed: boolean }> = {};
+        for (const [skill, info] of Object.entries(endorsementsRes.data.endorsements)) {
+          const endorserIds = info.endorsed_by_ids?.split(',') ?? [];
+          map[skill] = {
+            count: info.count || 0,
+            isEndorsed: currentUserId ? endorserIds.includes(currentUserId) : false,
+          };
         }
+        setEndorsements(map);
       }
     } catch (err) {
       if (controller.signal.aborted) return;
@@ -328,6 +330,7 @@ export function ProfilePage() {
       setError(tRef.current('load_error'));
     } finally {
       setIsLoading(false);
+      setIsLoadingEndorsements(false);
     }
   }, [profileId, isAuthenticated, currentUserId, hasGamification]);
 
@@ -563,16 +566,17 @@ export function ProfilePage() {
       {/* Profile Header */}
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
             {/* Avatar */}
             <div className="relative">
               <Avatar
-                src={resolveAvatarUrl(profile.avatar_url || profile.avatar)}
+                src={profile.avatar_url || profile.avatar ? resolveAvatarUrl(profile.avatar_url || profile.avatar) : undefined}
                 name={profile.name}
+                showFallback
                 className="w-24 h-24 sm:w-32 sm:h-32 ring-4 ring-theme-default"
               />
               {hasGamification && profile.level && (
-                <div className="absolute -bottom-2 -right-2 px-2 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold">
+                <div className="absolute -bottom-2 -right-2 px-2 py-1 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary,var(--color-primary))] text-white text-xs font-bold">
                   {t('level', { level: profile.level })}
                 </div>
               )}
@@ -581,7 +585,7 @@ export function ProfilePage() {
             {/* Info */}
             <div className="flex-1 text-center sm:text-left">
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2">
-                <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-theme-primary">{profile.name || profile.first_name || t('member_fallback', 'Member')}</h1>
+                <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-theme-primary truncate max-w-xs sm:max-w-sm lg:max-w-md">{profile.name || profile.first_name || t('member_fallback', 'Member')}</h1>
                 {/* Verification badges */}
                 <VerificationBadgeRow userId={profile.id} size="md" />
                 {/* Cross-federation reputation badge */}
@@ -613,10 +617,12 @@ export function ProfilePage() {
               {/* Meta */}
               <div className="flex flex-wrap justify-center sm:justify-start gap-4 mt-4 text-sm text-theme-subtle">
                 {profile.location && (
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" aria-hidden="true" />
-                    {profile.location}
-                  </span>
+                  <Tooltip content={profile.location}>
+                    <span className="flex items-center gap-1 max-w-[200px]">
+                      <MapPin className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                      <span className="truncate">{profile.location}</span>
+                    </span>
+                  </Tooltip>
                 )}
                 {profile.created_at && (
                   <span className="flex items-center gap-1">
@@ -727,7 +733,7 @@ export function ProfilePage() {
                         isLoading={isConnecting}
                       >
                         {connectionStatus === 'pending_sent'
-                          ? t('pending')
+                          ? t('cancel_request')
                           : connectionStatus === 'pending_received'
                           ? t('accept')
                           : t('connect')}
@@ -753,6 +759,20 @@ export function ProfilePage() {
                       >
                         {t('write_review')}
                       </Button>
+                    )}
+                    {!isAuthenticated && hasReviews && (
+                      <Tooltip content={t('login_to_review')}>
+                        <span>
+                          <Button
+                            variant="flat"
+                            className="bg-amber-500/20 text-amber-600 dark:text-amber-400"
+                            startContent={<Star className="w-4 h-4" aria-hidden="true" />}
+                            isDisabled
+                          >
+                            {t('write_review')}
+                          </Button>
+                        </span>
+                      </Tooltip>
                     )}
                     {/* Send credits */}
                     {isAuthenticated && hasWallet && (
@@ -812,37 +832,39 @@ export function ProfilePage() {
       </motion.div>
 
       {/* Stats Cards Row */}
-      <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        <ProfileStatCard
-          icon={<ArrowUpRight className="w-5 h-5" aria-hidden="true" />}
-          label={t('stats.hours_given')}
-          value={profile.total_hours_given ?? 0}
-          color="emerald"
-        />
-        <ProfileStatCard
-          icon={<ArrowDownLeft className="w-5 h-5" aria-hidden="true" />}
-          label={t('stats.hours_received')}
-          value={profile.total_hours_received ?? 0}
-          color="indigo"
-        />
-        <ProfileStatCard
-          icon={<ListTodo className="w-5 h-5" aria-hidden="true" />}
-          label={t('stats.active_listings')}
-          value={profile.stats?.listings_count ?? listings.length}
-          color="purple"
-        />
-        <ProfileStatCard
-          icon={<Users className="w-5 h-5" aria-hidden="true" />}
-          label={t('stats.groups')}
-          value={profile.groups_count ?? 0}
-          color="amber"
-        />
-        <ProfileStatCard
-          icon={<CalendarCheck className="w-5 h-5" aria-hidden="true" />}
-          label={t('stats.events')}
-          value={profile.events_attended ?? 0}
-          color="rose"
-        />
+      <motion.div variants={itemVariants}>
+        <dl className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <ProfileStatCard
+            icon={<ArrowUpRight className="w-5 h-5" aria-hidden="true" />}
+            label={t('stats.hours_given')}
+            value={profile.total_hours_given ?? 0}
+            color="emerald"
+          />
+          <ProfileStatCard
+            icon={<ArrowDownLeft className="w-5 h-5" aria-hidden="true" />}
+            label={t('stats.hours_received')}
+            value={profile.total_hours_received ?? 0}
+            color="indigo"
+          />
+          <ProfileStatCard
+            icon={<ListTodo className="w-5 h-5" aria-hidden="true" />}
+            label={t('stats.active_listings')}
+            value={profile.stats?.listings_count ?? listings.length}
+            color="purple"
+          />
+          <ProfileStatCard
+            icon={<Users className="w-5 h-5" aria-hidden="true" />}
+            label={t('stats.groups')}
+            value={profile.groups_count ?? 0}
+            color="amber"
+          />
+          <ProfileStatCard
+            icon={<CalendarCheck className="w-5 h-5" aria-hidden="true" />}
+            label={t('stats.events')}
+            value={profile.events_attended ?? 0}
+            color="rose"
+          />
+        </dl>
       </motion.div>
 
       {/* Story Highlights */}
@@ -905,12 +927,23 @@ export function ProfilePage() {
             <GlassCard role="tabpanel" id="panel-about" aria-labelledby="tab-about" className="p-6">
               <h2 className="text-lg font-semibold text-theme-primary mb-4">{t('about.heading')}</h2>
               {profile.bio ? (
-                <div
-                  className="text-theme-muted whitespace-pre-wrap prose prose-sm max-w-none dark:prose-invert"
-                  dangerouslySetInnerHTML={{
-                    __html: sanitizeRichText(profile.bio),
-                  }}
-                />
+                <div>
+                  <div
+                    className={`text-theme-muted whitespace-pre-wrap prose prose-sm max-w-none dark:prose-invert${!isOwnProfile && !bioExpanded && profile.bio.length > 300 ? ' line-clamp-4' : ''}`}
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeRichText(profile.bio),
+                    }}
+                  />
+                  {!isOwnProfile && profile.bio.length > 300 && (
+                    <button
+                      type="button"
+                      className="mt-1 text-xs text-indigo-500 hover:underline focus:outline-none"
+                      onClick={() => setBioExpanded((v) => !v)}
+                    >
+                      {bioExpanded ? t('read_less') : t('read_more')}
+                    </button>
+                  )}
+                </div>
               ) : (
                 <p className="text-theme-subtle italic">{t('about.no_bio')}</p>
               )}
@@ -919,7 +952,7 @@ export function ProfilePage() {
                 <div className="mt-6">
                   <h3 className="text-sm font-medium text-theme-muted mb-3">{t('about.skills')}</h3>
                   <div className="flex flex-wrap gap-2">
-                    {profile.skills.map((skill) => (
+                    {(showAllSkills ? profile.skills : profile.skills.slice(0, 8)).map((skill) => (
                       <div key={skill} className="inline-flex items-center gap-1.5">
                         <Chip
                           variant="flat"
@@ -929,16 +962,40 @@ export function ProfilePage() {
                           {skill}
                         </Chip>
                         {!isOwnProfile && isAuthenticated && profile.id && (
-                          <EndorseButton
-                            memberId={profile.id}
-                            skillName={skill}
-                            endorsementCount={endorsements[skill]?.count ?? 0}
-                            isEndorsed={endorsements[skill]?.isEndorsed ?? false}
-                            compact
-                          />
+                          isLoadingEndorsements ? (
+                            <Skeleton className="rounded w-6 h-4" />
+                          ) : (
+                            <EndorseButton
+                              memberId={profile.id}
+                              skillName={skill}
+                              endorsementCount={endorsements[skill]?.count ?? 0}
+                              isEndorsed={endorsements[skill]?.isEndorsed ?? false}
+                              compact
+                            />
+                          )
                         )}
                       </div>
                     ))}
+                    {profile.skills.length > 8 && !showAllSkills && (
+                      <Chip
+                        variant="flat"
+                        size="sm"
+                        className="bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover"
+                        onClick={() => setShowAllSkills(true)}
+                      >
+                        {t('show_more_skills', { count: profile.skills.length - 8 })}
+                      </Chip>
+                    )}
+                    {showAllSkills && profile.skills.length > 8 && (
+                      <Chip
+                        variant="flat"
+                        size="sm"
+                        className="bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover"
+                        onClick={() => setShowAllSkills(false)}
+                      >
+                        {t('show_less')}
+                      </Chip>
+                    )}
                   </div>
                 </div>
               )}
@@ -961,9 +1018,10 @@ export function ProfilePage() {
                       key={listing.id}
                       to={tenantPath(`/listings/${listing.id}`)}
                       aria-label={`${listing.type === 'offer' ? t('listing_type.offer') : t('listing_type.request')}: ${listing.title}`}
+                      className="cursor-pointer"
                     >
                       <article role="listitem">
-                        <GlassCard className="hover:scale-[1.02] transition-transform h-full flex flex-col overflow-hidden">
+                        <GlassCard className="hover:scale-[1.02] transition-transform h-full flex flex-col overflow-hidden cursor-pointer">
                           {listing.image_url && (
                             <img
                               src={resolveAssetUrl(listing.image_url)}
@@ -977,6 +1035,7 @@ export function ProfilePage() {
                               <Chip
                                 size="sm"
                                 variant="flat"
+                                aria-label={listing.type === 'offer' ? t('listing_type.offer') : t('listing_type.request')}
                                 className={
                                   listing.type === 'offer'
                                     ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
@@ -986,7 +1045,7 @@ export function ProfilePage() {
                                 {listing.type === 'offer' ? t('listing_type.offer') : t('listing_type.request')}
                               </Chip>
                             </div>
-                            <h3 className="font-medium text-theme-primary mb-1">{listing.title}</h3>
+                            <h3 className="font-medium text-theme-primary mb-1 line-clamp-1">{listing.title}</h3>
                             <SafeHtml content={listing.description} className="text-sm text-theme-subtle line-clamp-2" as="p" />
                             <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
                               <Clock className="w-3 h-3" aria-hidden="true" />
@@ -1017,12 +1076,12 @@ export function ProfilePage() {
                 )}
               </div>
               {/* View all link — shown when we may have loaded only the first 6 */}
-              {listings.length > 0 && (
+              {listings.length >= 6 && (
                 <div className="text-center pt-2">
                   <Link to={tenantPath(`/listings?user_id=${profile.id}`)}>
                     <Button
-                      variant="flat"
-                      className="bg-theme-elevated text-theme-muted"
+                      variant="light"
+                      color="primary"
                       endContent={<ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />}
                     >
                       {t('view_all_listings')}
@@ -1061,7 +1120,10 @@ export function ProfilePage() {
             <div role="tabpanel" id="panel-reviews" aria-labelledby="tab-reviews" className="space-y-4">
               {isLoadingReviews ? (
                 <div aria-label={t('aria.loading_reviews')} aria-busy="true" className="space-y-3">
-                  {Array.from({ length: 3 }).map((_, i) => (
+                  <GlassCard className="p-4">
+                    <Skeleton className="h-4 w-24 rounded" />
+                  </GlassCard>
+                  {Array.from({ length: 2 }).map((_, i) => (
                     <GlassCard key={i} className="p-5">
                       <div className="flex items-start gap-4">
                         <Skeleton className="rounded-full flex-shrink-0">
@@ -1112,9 +1174,11 @@ export function ProfilePage() {
                   )}
 
                   {/* Individual reviews */}
-                  {reviews.map((review) => (
-                    <ReviewCard key={review.id} review={review} />
-                  ))}
+                  <div aria-label={t('aria.user_reviews')}>
+                    {reviews.map((review) => (
+                      <ReviewCard key={review.id} review={review} />
+                    ))}
+                  </div>
                 </>
               ) : (
                 <GlassCard className="p-6">
@@ -1234,7 +1298,7 @@ export function ProfilePage() {
           {(onClose) => (
             <>
               <ModalHeader className="text-theme-primary">
-                {t('block_modal_title', { name: profile?.name || profile?.first_name })}
+                {t('block_modal_title', { name: profile?.name || profile?.first_name || t('member_fallback') })}
               </ModalHeader>
               <ModalBody>
                 <p className="text-theme-muted text-sm">{t('block_modal_description')}</p>
@@ -1312,12 +1376,12 @@ function ProfileStatCard({ icon, label, value, color }: ProfileStatCardProps) {
   };
 
   return (
-    <GlassCard className="p-4 text-center">
+    <GlassCard className="p-4 text-center hover:bg-theme-hover transition-colors">
       <div className={`inline-flex p-2 rounded-lg bg-gradient-to-br ${colorClasses[color]} mb-2`}>
         {icon}
       </div>
-      <div className="text-xl font-bold text-theme-primary">{value}</div>
-      <div className="text-xs text-theme-subtle">{label}</div>
+      <dd className="text-xl font-bold text-theme-primary">{value}</dd>
+      <dt className="text-xs text-theme-subtle">{label}</dt>
     </GlassCard>
   );
 }
