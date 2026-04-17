@@ -260,7 +260,18 @@
     "no_location": "No hay miembros con datos de ubicación",
     "fallback_name": "Miembro",
     "load_failed": "Error al cargar miembros",
-    "load_more_failed": "Error al cargar más miembros"
+    "load_more_failed": "Error al cargar más miembros",
+    "near_me": "Near me",
+    "near_me_no_location": "Set your location in your profile to use Near me",
+    "radius_label": "Radius",
+    "sort_communityrank": "Community Rank",
+    "avatar_alt": "{{name}} avatar",
+    "joined_date": "Joined {{date}}",
+    "showcased_badges": "Showcased badges",
+    "verified_member": "Verified member",
+    "community_rank_score_tooltip": "CommunityRank score",
+    "rating_aria": "Rating: {{rating}} out of 5",
+    "hours_exchanged_aria": "{{count}} hours exchanged"
   },
   "update_banner": {
     "message": "Hay una nueva versión disponible.",

@@ -260,7 +260,18 @@
     "no_location": "لا يوجد أعضاء ببيانات موقع",
     "fallback_name": "عضو",
     "load_failed": "فشل تحميل الأعضاء",
-    "load_more_failed": "فشل تحميل المزيد من الأعضاء"
+    "load_more_failed": "فشل تحميل المزيد من الأعضاء",
+    "near_me": "Near me",
+    "near_me_no_location": "Set your location in your profile to use Near me",
+    "radius_label": "Radius",
+    "sort_communityrank": "Community Rank",
+    "avatar_alt": "{{name}} avatar",
+    "joined_date": "Joined {{date}}",
+    "showcased_badges": "Showcased badges",
+    "verified_member": "Verified member",
+    "community_rank_score_tooltip": "CommunityRank score",
+    "rating_aria": "Rating: {{rating}} out of 5",
+    "hours_exchanged_aria": "{{count}} hours exchanged"
   },
   "update_banner": {
     "message": "يتوفر إصدار جديد.",
