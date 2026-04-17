@@ -27,7 +27,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, MemberCardSkeleton, AlgorithmLabel } from '@/components/ui';
+import { GlassCard, MemberCardSkeleton, AlgorithmLabel, useAlgorithmInfo } from '@/components/ui';
 import { PresenceIndicator } from '@/components/social';
 import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
@@ -41,7 +41,7 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import type { User } from '@/types/api';
 
-type SortOption = 'name' | 'joined' | 'rating' | 'hours_given';
+type SortOption = 'communityrank' | 'name' | 'joined' | 'rating' | 'hours_given';
 type ViewMode = 'grid' | 'list' | 'map';
 type QuickFilter = 'all' | 'new' | 'active';
 
@@ -67,15 +67,23 @@ export function MembersPage() {
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
-  const [sortBy, setSortBy] = useState<SortOption>(
-    (searchParams.get('sort') as SortOption) || 'name'
-  );
+  const initialSort = searchParams.get('sort') as SortOption | null;
+  const [sortBy, setSortBy] = useState<SortOption | null>(initialSort);
   const [viewMode, setViewMode] = useState<ViewMode>(
     (localStorage.getItem('members_view_mode') as ViewMode) || 'grid'
   );
   const [nearMeEnabled, setNearMeEnabled] = useState(false);
   const [radiusKm, setRadiusKm] = useState(25);
   const { user } = useAuth();
+  const membersAlgorithm = useAlgorithmInfo('members');
+  const defaultSort: SortOption | null = membersAlgorithm
+    ? membersAlgorithm.key === 'communityrank'
+      ? 'communityrank'
+      : 'name'
+    : membersAlgorithm === null
+      ? 'name'
+      : null;
+  const activeSortBy = sortBy ?? defaultSort;
   const isNearbyMode = nearMeEnabled && user?.latitude != null && user?.longitude != null;
 
   // Refs
@@ -123,23 +131,27 @@ export function MembersPage() {
     } else if (filter === 'active') {
       setSortBy('hours_given');
     } else {
-      setSortBy('name');
+      setSortBy(defaultSort ?? 'name');
     }
-  }, []);
+  }, [defaultSort]);
 
   // Sync quickFilter when sortBy changes from the Select dropdown
   useEffect(() => {
-    if (sortBy === 'joined') {
+    if (activeSortBy === 'joined') {
       setQuickFilter('new');
-    } else if (sortBy === 'hours_given') {
+    } else if (activeSortBy === 'hours_given') {
       setQuickFilter('active');
     } else {
       setQuickFilter('all');
     }
-  }, [sortBy]);
+  }, [activeSortBy]);
 
   // Load members
   const loadMembers = useCallback(async (append = false) => {
+    if (!activeSortBy) {
+      return;
+    }
+
     const requestId = ++requestIdRef.current;
     loadAbortRef.current?.abort();
     const controller = new AbortController();
@@ -156,9 +168,9 @@ export function MembersPage() {
       const params = new URLSearchParams();
       if (debouncedQuery) params.set('q', debouncedQuery);
       if (!isNearbyMode) {
-        params.set('sort', sortBy);
+        params.set('sort', activeSortBy);
         // Quick filters imply descending order for joined and hours_given
-        if (sortBy === 'joined' || sortBy === 'hours_given') {
+        if (activeSortBy === 'joined' || activeSortBy === 'hours_given') {
           params.set('order', 'desc');
         }
       }
@@ -217,7 +229,7 @@ export function MembersPage() {
         setIsLoadingMore(false);
       }
     }
-  }, [debouncedQuery, sortBy, t, toast, isNearbyMode, user?.latitude, user?.longitude, radiusKm]);
+  }, [activeSortBy, debouncedQuery, t, toast, isNearbyMode, user?.latitude, user?.longitude, radiusKm]);
 
   // Load more
   const loadMoreMembers = useCallback(() => {
@@ -230,11 +242,14 @@ export function MembersPage() {
 
   // Load on mount and when filters change
   useEffect(() => {
+    if (!activeSortBy) {
+      return;
+    }
     loadMembers();
     // Reset pagination state when filters change
     setHasMore(true);
     setTotalCount(null);
-  }, [debouncedQuery, sortBy, nearMeEnabled, user?.latitude, user?.longitude, radiusKm]); // eslint-disable-line react-hooks/exhaustive-deps -- reset pagination on filter change
+  }, [activeSortBy, debouncedQuery, nearMeEnabled, user?.latitude, user?.longitude, radiusKm]); // eslint-disable-line react-hooks/exhaustive-deps -- reset pagination on filter change
 
   // Fetch presence for visible members
   useEffect(() => {
@@ -247,11 +262,14 @@ export function MembersPage() {
 
   // Update URL params
   useEffect(() => {
+    if (!activeSortBy || !defaultSort) {
+      return;
+    }
     const params = new URLSearchParams();
     if (debouncedQuery) params.set('q', debouncedQuery);
-    if (sortBy !== 'name') params.set('sort', sortBy);
+    if (activeSortBy !== defaultSort) params.set('sort', activeSortBy);
     setSearchParams(params, { replace: true });
-  }, [debouncedQuery, sortBy, setSearchParams]);
+  }, [activeSortBy, debouncedQuery, defaultSort, setSearchParams]);
 
   function handleNearMeToggle() {
     if (nearMeEnabled) {
@@ -292,7 +310,9 @@ export function MembersPage() {
             <p className="text-theme-muted">
               {t('members.subtitle')}
             </p>
-            <AlgorithmLabel area="members" />
+            {activeSortBy === 'communityrank' && !isNearbyMode && (
+              <AlgorithmLabel area="members" />
+            )}
           </div>
         </div>
       </div>
@@ -377,7 +397,7 @@ export function MembersPage() {
           <div className="flex gap-3">
             <Select
               placeholder={t('members.sort_by')}
-              selectedKeys={[sortBy]}
+              selectedKeys={activeSortBy ? [activeSortBy] : []}
               disallowEmptySelection
               isDisabled={isNearbyMode}
               onChange={(e) => setSortBy(e.target.value as SortOption)}
@@ -389,6 +409,9 @@ export function MembersPage() {
               }}
               startContent={<Filter className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             >
+              {membersAlgorithm?.key === 'communityrank' && (
+                <SelectItem key="communityrank">{t('members.sort_communityrank')}</SelectItem>
+              )}
               <SelectItem key="name">{t('members.sort_name')}</SelectItem>
               <SelectItem key="joined">{t('members.sort_newest')}</SelectItem>
               <SelectItem key="rating">{t('members.sort_rated')}</SelectItem>

@@ -56,22 +56,28 @@ function fetchAlgorithms(): Promise<AlgorithmsResponse | null> {
   return fetchPromise;
 }
 
+export function useAlgorithmInfo(area: AlgorithmArea) {
+  const [info, setInfo] = useState<AlgorithmInfo | null | undefined>(
+    cachedData ? cachedData[area] : undefined
+  );
+
+  useEffect(() => {
+    if (info !== undefined) return;
+    fetchAlgorithms().then((data) => {
+      setInfo(data ? data[area] : null);
+    });
+  }, [area, info]);
+
+  return info;
+}
+
 interface AlgorithmLabelProps {
   /** Which page area to show the algorithm for */
   area: AlgorithmArea;
 }
 
 export function AlgorithmLabel({ area }: AlgorithmLabelProps) {
-  const [info, setInfo] = useState<AlgorithmInfo | null>(
-    cachedData ? cachedData[area] : null
-  );
-
-  useEffect(() => {
-    if (info) return;
-    fetchAlgorithms().then((data) => {
-      if (data) setInfo(data[area]);
-    });
-  }, [area, info]);
+  const info = useAlgorithmInfo(area);
 
   if (!info || DEFAULT_KEYS.has(info.key)) return null;
 

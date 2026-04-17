@@ -11,7 +11,7 @@ export { GlassInput, type GlassInputProps } from './GlassInput';
 // UX Components
 export { BottomSheet, type BottomSheetProps } from './BottomSheet';
 export { BackToTop } from './BackToTop';
-export { AlgorithmLabel } from './AlgorithmLabel';
+export { AlgorithmLabel, useAlgorithmInfo } from './AlgorithmLabel';
 export { ImagePlaceholder } from './ImagePlaceholder';
 export { DynamicIcon, ICON_MAP, ICON_NAMES } from './DynamicIcon';
 export { ConfettiCelebration } from './ConfettiCelebration';

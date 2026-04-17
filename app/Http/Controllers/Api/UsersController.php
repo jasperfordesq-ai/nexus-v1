@@ -37,6 +37,7 @@ class UsersController extends BaseApiController
         private readonly ListingService $listingService,
         private readonly MailchimpService $mailchimpService,
         private readonly UserService $userService,
+        private readonly MemberRankingService $memberRankingService,
     ) {}
 
     // ================================================================
@@ -1028,10 +1029,132 @@ class UsersController extends BaseApiController
         $limit = min((int) $request->query('limit', 50), 100);
         $offset = max((int) $request->query('offset', 0), 0);
         $search = $request->query('q', '');
-        $sort = $request->query('sort', 'name');
+        $sort = (string) $request->query('sort', '');
+        if ($sort === '') {
+            $sort = $this->memberRankingService->isEnabled() ? 'communityrank' : 'name';
+        }
         $order = strtoupper($request->query('order', 'ASC'));
         if (!in_array($order, ['ASC', 'DESC'])) {
             $order = 'ASC';
+        }
+
+        if ($sort === 'communityrank' && $this->memberRankingService->isEnabled()) {
+            $ranked = $this->memberRankingService->rankMembers(
+                $tenantId,
+                $limit,
+                $offset,
+                $search,
+                $viewerId
+            );
+
+            $totalCount = $ranked['total'];
+            $orderedIds = array_map(
+                static fn (array $member): int => (int) ($member['user_id'] ?? 0),
+                $ranked['items']
+            );
+            $rankByUserId = [];
+            foreach ($ranked['items'] as $member) {
+                $rankByUserId[(int) $member['user_id']] = $member;
+            }
+
+            $users = [];
+            if (!empty($orderedIds)) {
+                $placeholders = implode(',', array_fill(0, count($orderedIds), '?'));
+                $orderPlaceholders = implode(',', array_fill(0, count($orderedIds), '?'));
+                $sql = "SELECT u.id,
+                               CASE
+                                   WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL AND u.organization_name != '' THEN u.organization_name
+                                   ELSE CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))
+                               END as name,
+                               u.first_name, u.last_name,
+                               u.avatar_url as avatar,
+                               COALESCE(u.tagline, LEFT(u.bio, 120)) as tagline,
+                               u.location, u.latitude, u.longitude,
+                               u.created_at, u.last_login_at, u.is_verified,
+                               COALESCE(u.xp, 0) as xp, COALESCE(u.level, 0) as level,
+                               (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id AND tenant_id = u.tenant_id) as rating,
+                               (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as total_hours_given,
+                               (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE receiver_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as total_hours_received,
+                               (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND status = 'active' AND type = 'offer' AND tenant_id = u.tenant_id) as offer_count,
+                               (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND status = 'active' AND type = 'request' AND tenant_id = u.tenant_id) as request_count
+                        FROM users u
+                        WHERE u.tenant_id = ? AND u.id IN ($placeholders)
+                        ORDER BY FIELD(u.id, $orderPlaceholders)";
+
+                $detailParams = array_merge([$tenantId], $orderedIds, $orderedIds);
+                $users = DB::select($sql, $detailParams);
+                $users = array_map(fn ($u) => (array) $u, $users);
+
+                foreach ($users as &$user) {
+                    $user['rating'] = $user['rating'] ? (float) $user['rating'] : null;
+                    $user['total_hours_given'] = (int) $user['total_hours_given'];
+                    $user['hours_given'] = $user['total_hours_given'];
+                    $user['total_hours_received'] = (int) $user['total_hours_received'];
+                    $user['offer_count'] = (int) $user['offer_count'];
+                    $user['request_count'] = (int) $user['request_count'];
+                    $user['is_verified'] = (bool) $user['is_verified'];
+                    $user['xp'] = (int) $user['xp'];
+                    $user['level'] = (int) $user['level'];
+                    $rankInfo = $rankByUserId[$user['id']] ?? null;
+                    if ($rankInfo) {
+                        $user['community_rank_score'] = (float) ($rankInfo['score'] ?? 0.0);
+                    }
+                }
+                unset($user);
+            }
+
+            // Enrich with showcased badges if gamification is enabled
+            if (TenantContext::hasFeature('gamification')) {
+                $userIds = array_column($users, 'id');
+                if (!empty($userIds)) {
+                    $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+                    $badgeRows = DB::select(
+                        "SELECT user_id, badge_key, name, icon
+                         FROM user_badges
+                         WHERE user_id IN ($placeholders) AND tenant_id = ? AND is_showcased = 1
+                         ORDER BY showcase_order ASC",
+                        array_merge(array_map('intval', $userIds), [$tenantId])
+                    );
+
+                    $badgesByUser = [];
+                    foreach ($badgeRows as $row) {
+                        $uid = (int) $row->user_id;
+                        if (!isset($badgesByUser[$uid])) {
+                            $badgesByUser[$uid] = [];
+                        }
+                        if (count($badgesByUser[$uid]) < 3) {
+                            $def = GamificationService::getBadgeByKey($row->badge_key);
+                            $badgesByUser[$uid][] = [
+                                'badge_key' => $row->badge_key,
+                                'name'      => $def['name'] ?? $row->name ?? $row->badge_key,
+                                'icon'      => $def['icon'] ?? $row->icon ?? '',
+                            ];
+                        }
+                    }
+
+                    foreach ($users as &$user) {
+                        $user['showcased_badges'] = $badgesByUser[$user['id']] ?? [];
+                    }
+                    unset($user);
+                }
+            } else {
+                foreach ($users as &$user) {
+                    $user['showcased_badges'] = [];
+                }
+                unset($user);
+            }
+
+            $users = array_map(static function (array $u): array {
+                unset($u['hours_given'], $u['offer_count'], $u['request_count'], $u['last_login_at']);
+                return $u;
+            }, $users);
+
+            return $this->respondWithData($users, [
+                'total_items' => $totalCount,
+                'per_page'    => $limit,
+                'offset'      => $offset,
+                'has_more'    => ($offset + $limit) < $totalCount,
+            ]);
         }
 
         $validSorts = [

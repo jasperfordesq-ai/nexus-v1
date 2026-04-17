@@ -58,6 +58,7 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { resetFeedImpressions } from '@/hooks/useFeedImpression';
 import { FeedCard } from '@/components/feed/FeedCard';
 import { FeedSkeleton } from '@/components/feed/FeedSkeleton';
 import { FeedEmptyIllustration } from '@/components/illustrations';
@@ -143,6 +144,10 @@ export function FeedPage() {
   const filterRef = useRef(filter);
   useEffect(() => { filterRef.current = filter; }, [filter]);
 
+  // Stable ref for feedMode — prevents stale closure in Pusher callback
+  const feedModeRef = useRef(feedMode);
+  useEffect(() => { feedModeRef.current = feedMode; }, [feedMode]);
+
   // Infinite scroll: auto-load when sentinel nears viewport
   const handleLoadMore = useCallback(() => { loadFeedRef.current?.(true); }, []);
   const infiniteScrollRef = useInfiniteScroll({
@@ -174,11 +179,13 @@ export function FeedPage() {
         appendAbortRef.current?.abort();
         setIsLoading(true);
         setError(null);
+        // Clear impression dedup set so each post fires again on the new load
+        resetFeedImpressions();
       }
 
       const params = new URLSearchParams();
       params.set('per_page', '20');
-      params.set('sort', feedMode);
+      params.set('mode', feedMode === 'ranking' ? 'ranked' : 'chronological');
       params.set('tz', Intl.DateTimeFormat().resolvedOptions().timeZone);
       if (filter !== 'all') params.set('type', filter);
       if (subFilter) params.set('subtype', subFilter);
@@ -267,8 +274,10 @@ export function FeedPage() {
         const scrolledDown = window.scrollY > SCROLL_THRESHOLD;
         setIsScrolledDown(scrolledDown);
 
-        // If user scrolled back to top, flush buffered posts
-        if (!scrolledDown && pendingPostsRef.current.length > 0) {
+        // If user scrolled back to top naturally, flush buffered posts.
+        // In ranking mode we don't auto-flush on scroll — the banner stays visible
+        // so the user can choose to reload (triggering EdgeRank re-sort) by tapping it.
+        if (!scrolledDown && pendingPostsRef.current.length > 0 && feedModeRef.current === 'recent') {
           const buffered = [...pendingPostsRef.current];
           pendingPostsRef.current = [];
           setPendingPostCount(0);
@@ -317,14 +326,16 @@ export function FeedPage() {
 
       if (!matchesFilter) return;
 
-      // If scrolled down, buffer the post and show "new posts" chip
-      if (window.scrollY > SCROLL_THRESHOLD) {
+      // In ranking mode, never blindly prepend real-time posts — the EdgeRank algorithm
+      // determines order, so live posts should be surfaced via the "new posts" banner
+      // which triggers a full reload. Always buffer in ranking mode.
+      if (feedModeRef.current === 'ranking' || window.scrollY > SCROLL_THRESHOLD) {
         pendingPostsRef.current = [incoming, ...pendingPostsRef.current];
         setPendingPostCount((n) => n + 1);
         return;
       }
 
-      // At top of feed — prepend directly
+      // Chronological mode at top of feed — prepend directly
       setItems((prev) => {
         // Guard against duplicates (e.g. race between Pusher event and manual reload)
         if (prev.some((p) => p.type === incoming.type && p.id === incoming.id)) {
@@ -591,17 +602,26 @@ export function FeedPage() {
   const handleScrollToNewPosts = useCallback(() => {
     if (isScrollingRef.current) return;
     isScrollingRef.current = true;
-    // Flush buffered posts into the feed
-    if (pendingPostsRef.current.length > 0) {
+    setPendingPostCount(0);
+
+    if (feedModeRef.current === 'ranking') {
+      // In ranking mode, trigger a full reload so EdgeRank re-scores and re-orders
+      pendingPostsRef.current = [];
+      cursorRef.current = undefined;
+      loadFeedRef.current();
+    } else {
+      // Chronological mode — flush buffered posts directly to the top
       const buffered = [...pendingPostsRef.current];
       pendingPostsRef.current = [];
-      setItems((prev) => {
-        const existingKeys = new Set(prev.map((p) => `${p.type}-${p.id}`));
-        const newItems = buffered.filter((fi) => !existingKeys.has(`${fi.type}-${fi.id}`));
-        return [...newItems, ...prev];
-      });
+      if (buffered.length > 0) {
+        setItems((prev) => {
+          const existingKeys = new Set(prev.map((p) => `${p.type}-${p.id}`));
+          const newItems = buffered.filter((fi) => !existingKeys.has(`${fi.type}-${fi.id}`));
+          return [...newItems, ...prev];
+        });
+      }
     }
-    setPendingPostCount(0);
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => { isScrollingRef.current = false; }, 1000);
   }, []);

@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Models\FeedActivity;
 use App\Models\FeedPost;
 use App\Models\Like;
+use App\Services\FeedRankingService;
 use App\Services\LinkPreviewService;
 use App\Services\MentionService;
 use Illuminate\Support\Facades\DB;
@@ -51,6 +52,8 @@ class FeedService
     public function getFeed(?int $currentUserId, array $filters = []): array
     {
         $limit = min((int) ($filters['limit'] ?? 20), 100);
+        $mode = $filters['mode'] ?? 'ranked';
+        $isRanked = ($mode !== 'chronological' && $mode !== 'recent');
         $type = $filters['type'] ?? 'all';
         $profileUserId = $filters['user_id'] ?? null;
         $groupId = $filters['group_id'] ?? null;
@@ -239,9 +242,13 @@ class FeedService
         $query->orderByDesc('feed_activity.created_at')
               ->orderByDesc('feed_activity.id');
 
-        $rows = $query->limit($limit + 1)->get();
+        // For ranked mode fetch a larger candidate pool so EdgeRank has enough
+        // items to reorder meaningfully. Cap at 200 to avoid memory pressure.
+        $fetchLimit = $isRanked ? min(max($limit * 3, 60), 200) : $limit;
 
-        $hasMore = $rows->count() > $limit;
+        $rows = $query->limit($fetchLimit + 1)->get();
+
+        $hasMore = $rows->count() > $fetchLimit;
         if ($hasMore) {
             $rows->pop();
         }
@@ -323,6 +330,7 @@ class FeedService
             $entry = [
                 'id' => (int) $row->source_id,
                 'type' => $row->source_type,
+                'user_id' => (int) $row->user_id,
                 'title' => $row->title,
                 'content' => $contentResult['text'],
                 'content_truncated' => $contentResult['truncated'],
@@ -527,6 +535,63 @@ class FeedService
         } catch (\Exception $e) {
             // Quoted post loading should never break the feed
             Log::warning('FeedService: quoted post batch load failed: ' . $e->getMessage());
+        }
+
+        // Apply EdgeRank ranking when mode is 'ranked' (the default).
+        // rankFeedItems re-orders the full candidate pool; we then slice to the
+        // requested page size and generate a cursor from the chronologically-last
+        // item in the *unranked* candidate pool so the next page continues from
+        // the correct position in the database.
+        if ($isRanked && count($items) > 1) {
+            try {
+                /** @var FeedRankingService $rankingService */
+                $rankingService = app(FeedRankingService::class);
+                $items = $rankingService->rankFeedItems($items, $currentUserId);
+            } catch (\Throwable $e) {
+                Log::warning('FeedService: EdgeRank ranking failed, falling back to chronological: ' . $e->getMessage());
+            }
+        }
+
+        // For ranked mode we fetched up to $fetchLimit candidates. The cursor
+        // must point to the chronologically-last item in the *full candidate set*
+        // (not the last ranked item) so the next page resumes from the right place.
+        // We find the candidate with the smallest (created_at, id) tuple, which is
+        // the one that would have appeared last in the chronological query.
+        if ($isRanked && count($items) > $limit) {
+            // Determine the chronological tail of the candidate set before slicing
+            $chronoTail = $items[0]; // start with first item
+            foreach ($items as $candidate) {
+                if (
+                    $candidate['_activity_created_at'] < $chronoTail['_activity_created_at'] ||
+                    (
+                        $candidate['_activity_created_at'] === $chronoTail['_activity_created_at'] &&
+                        $candidate['_activity_id'] < $chronoTail['_activity_id']
+                    )
+                ) {
+                    $chronoTail = $candidate;
+                }
+            }
+            // Slice to the requested page size
+            $items = array_slice($items, 0, $limit);
+            // If there are more items beyond the slice, we need a cursor
+            // pointing to the chronological tail of the full candidate set
+            $hasMore = true;
+            $nextCursor = null;
+            if (isset($chronoTail['_activity_id'], $chronoTail['_activity_created_at'])) {
+                $payload = json_encode(['ts' => $chronoTail['_activity_created_at'], 'id' => $chronoTail['_activity_id']]);
+                $sig = hash_hmac('sha256', $payload, config('app.key'));
+                $nextCursor = base64_encode($sig . '.' . $payload);
+            }
+            return [
+                'items'    => $items,
+                'cursor'   => $nextCursor,
+                'has_more' => $hasMore,
+            ];
+        }
+
+        // Slice ranked results to page size when candidate pool exactly fills limit
+        if ($isRanked) {
+            $items = array_slice($items, 0, $limit);
         }
 
         // Generate HMAC-signed cursor

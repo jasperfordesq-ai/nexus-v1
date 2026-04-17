@@ -78,7 +78,21 @@ import { MembersPage } from './MembersPage';
 describe('MembersPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockApiGet.mockResolvedValue({ success: true, data: [], meta: {} });
+    mockApiGet.mockImplementation((url: string) => {
+      if (url.includes('/v2/config/algorithms')) {
+        return Promise.resolve({
+          success: true,
+          data: {
+            feed: { name: 'Chronological', key: 'chronological', description: 'Newest first' },
+            listings: { name: 'Newest First', key: 'newest', description: 'Newest listings first' },
+            members: { name: 'CommunityRank', key: 'communityrank', description: 'Ranked by activity, contributions, reputation, and connections' },
+            matching: { name: 'Disabled', key: 'disabled', description: 'Disabled' },
+          },
+        });
+      }
+
+      return Promise.resolve({ success: true, data: [], meta: {} });
+    });
     mockUseAuth.mockReturnValue({ user: null, isAuthenticated: false, login: vi.fn(), logout: vi.fn(), register: vi.fn(), updateUser: vi.fn(), refreshUser: vi.fn(), status: 'idle', error: null });
   });
 
@@ -96,6 +110,19 @@ describe('MembersPage', () => {
     render(<MembersPage />);
     expect(screen.getByLabelText('Grid view')).toBeInTheDocument();
     expect(screen.getByLabelText('List view')).toBeInTheDocument();
+  });
+
+  it('defaults the directory to Community Rank when the algorithm is enabled', async () => {
+    render(<MembersPage />);
+
+    await waitFor(() =>
+      expect(mockApiGet).toHaveBeenCalledWith(
+        expect.stringContaining('/v2/users?sort=communityrank'),
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
+      )
+    );
+
+    expect(await screen.findByText('CommunityRank')).toBeInTheDocument();
   });
 
   it('allows Near me when a user has zero coordinates', async () => {
@@ -150,7 +177,7 @@ describe('MembersPage', () => {
     fireEvent.change(screen.getByPlaceholderText(/Search members/i), { target: { value: 'alex' } });
     await waitFor(() =>
       expect(mockApiGet).toHaveBeenLastCalledWith(
-        expect.stringContaining('/v2/users?q=alex'),
+        expect.stringContaining('/v2/users?q=alex&sort=communityrank'),
         expect.objectContaining({ signal: expect.any(AbortSignal) })
       )
     );
