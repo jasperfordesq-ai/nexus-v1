@@ -39,12 +39,15 @@ class FederationActivityService
 
         try {
             $rows = DB::select(
-                "SELECT id, action_type as type, category, data, actor_user_id,
-                        actor_name, source_tenant_id, target_tenant_id, created_at
-                 FROM federation_audit_log
-                 WHERE (source_tenant_id = ? OR target_tenant_id = ?)
-                   AND level IN ('info', 'warning')
-                 ORDER BY created_at DESC
+                "SELECT fal.id, fal.action_type as type, fal.category, fal.data, fal.actor_user_id,
+                        fal.actor_name, fal.source_tenant_id, fal.target_tenant_id, fal.created_at,
+                        st.name AS source_tenant_name, tt.name AS target_tenant_name
+                 FROM federation_audit_log fal
+                 LEFT JOIN tenants st ON st.id = fal.source_tenant_id
+                 LEFT JOIN tenants tt ON tt.id = fal.target_tenant_id
+                 WHERE (fal.source_tenant_id = ? OR fal.target_tenant_id = ?)
+                   AND fal.level IN ('info', 'warning')
+                 ORDER BY fal.created_at DESC
                  LIMIT ? OFFSET ?",
                 [$tenantId, $tenantId, $limit, $offset]
             );
@@ -55,16 +58,11 @@ class FederationActivityService
 
                 // Build human-readable title from action type
                 $title = self::buildActivityTitle($row->type, $row->category, $isIncoming);
-                $subtitle = $row->actor_name ?? 'Federation Network';
 
-                // Fetch partner tenant name if available
+                // Use pre-fetched tenant name from JOIN (no per-row query)
                 $partnerTenantId = $isIncoming ? $row->source_tenant_id : $row->target_tenant_id;
-                if ($partnerTenantId) {
-                    $tenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$partnerTenantId]);
-                    if ($tenant) {
-                        $subtitle = $tenant->name;
-                    }
-                }
+                $partnerTenantName = $isIncoming ? $row->source_tenant_name : $row->target_tenant_name;
+                $subtitle = $partnerTenantName ?? $row->actor_name ?? 'Federation Network';
 
                 return [
                     'id' => (int) $row->id,
