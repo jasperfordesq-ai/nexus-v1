@@ -11,6 +11,7 @@ namespace App\Http\Controllers\Api;
 use App\Core\TenantContext;
 use App\Services\CreditCommonsNodeService;
 use App\Services\Protocols\CreditCommonsAdapter;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -99,6 +100,7 @@ class FederationCreditCommonsController extends BaseApiController
     {
         $tenantId = TenantContext::getId();
         $accPath = $request->query('acc_path', '');
+        $filterTag = $request->query('filter')['tag'] ?? $request->query('filter_tag');
         $limit = min((int) $request->query('limit', '10'), 50);
 
         $nodeSlug = $this->getNodeSlug($tenantId);
@@ -120,6 +122,13 @@ class FederationCreditCommonsController extends BaseApiController
             $query->where(function ($q) use ($search) {
                 $q->where('username', 'LIKE', "{$search}%")
                     ->orWhere('name', 'LIKE', "{$search}%");
+            });
+        }
+
+        if ($filterTag) {
+            $query->where(function ($q) use ($filterTag) {
+                $q->where('tags', 'LIKE', "%{$filterTag}%")
+                    ->orWhere('skills', 'LIKE', "%{$filterTag}%");
             });
         }
 
@@ -285,37 +294,48 @@ class FederationCreditCommonsController extends BaseApiController
         $uuid = (string) Str::uuid();
         $nodeSlug = $this->getNodeSlug($tenantId);
 
+        // Determine initial state based on workflow.
+        // Workflows starting with '+|P' (e.g., '+|PPC-PE+CE-') require an approval step —
+        // the first state is Pending. Workflows starting with '0|P' (e.g., '0|PC-CE=') mean
+        // the transaction can start in Pending but may also go direct to Completed.
+        // We use the '+|' prefix as the signal that approval is mandatory.
+        $requiresApproval = str_starts_with($workflow ?? '', '+|');
+        $initialState = $requiresApproval ? CreditCommonsAdapter::STATE_PENDING : CreditCommonsAdapter::STATE_COMPLETED;
+
+        $resolvedPayerPath = $this->toAccountPath($payerId, $tenantId);
+        $resolvedPayeePath = $this->toAccountPath($payeeId, $tenantId);
+        $newHash = null;
+
         // Execute the transaction with pessimistic locking to prevent race conditions
         DB::beginTransaction();
         try {
-            // Lock payer row and check balance atomically
-            $updated = DB::update(
-                "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
-                [$quant, $payerId, $tenantId, $quant]
-            );
+            if ($initialState === CreditCommonsAdapter::STATE_COMPLETED) {
+                // Lock payer row and check balance atomically
+                $updated = DB::update(
+                    "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
+                    [$quant, $payerId, $tenantId, $quant]
+                );
 
-            if ($updated === 0) {
-                DB::rollBack();
-                return $this->ccError('InsufficientBalance', 'Payer has insufficient balance', 400);
+                if ($updated === 0) {
+                    DB::rollBack();
+                    return $this->ccError('InsufficientBalance', 'Payer has insufficient balance', 400);
+                }
+
+                DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
+                    [$quant, $payeeId, $tenantId]);
+
+                DB::table('transactions')->insertGetId([
+                    'tenant_id' => $tenantId,
+                    'sender_id' => $payerId,
+                    'receiver_id' => $payeeId,
+                    'amount' => $quant,
+                    'description' => $description,
+                    'status' => 'completed',
+                    'is_federated' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
             }
-
-            DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
-                [$quant, $payeeId, $tenantId]);
-
-            $txId = DB::table('transactions')->insertGetId([
-                'tenant_id' => $tenantId,
-                'sender_id' => $payerId,
-                'receiver_id' => $payeeId,
-                'amount' => $quant,
-                'description' => $description,
-                'status' => 'completed',
-                'is_federated' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-
-            $resolvedPayerPath = $this->toAccountPath($payerId, $tenantId);
-            $resolvedPayeePath = $this->toAccountPath($payeeId, $tenantId);
 
             // Create CC entry
             DB::table('federation_cc_entries')->insert([
@@ -326,18 +346,20 @@ class FederationCreditCommonsController extends BaseApiController
                 'payee' => $resolvedPayeePath,
                 'quant' => $quant,
                 'description' => $description,
-                'state' => CreditCommonsAdapter::STATE_COMPLETED,
+                'state' => $initialState,
                 'workflow' => $workflow,
-                'written_at' => now(),
+                'written_at' => $initialState === CreditCommonsAdapter::STATE_COMPLETED ? now() : null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
 
-            // Advance the hashchain so direct POST /transaction submissions
-            // remain in chain with relay/commit transactions.
-            $newHash = CreditCommonsNodeService::advanceHashchain(
-                $tenantId, $uuid, $quant, $resolvedPayerPath, $resolvedPayeePath
-            );
+            // Only advance the hashchain for completed transactions — the chain
+            // only includes permanently written entries, not pending proposals.
+            if ($initialState === CreditCommonsAdapter::STATE_COMPLETED) {
+                $newHash = CreditCommonsNodeService::advanceHashchain(
+                    $tenantId, $uuid, $quant, $resolvedPayerPath, $resolvedPayeePath
+                );
+            }
 
             DB::commit();
         } catch (\Throwable $e) {
@@ -346,11 +368,13 @@ class FederationCreditCommonsController extends BaseApiController
             return $this->ccError('Other', 'Transaction processing failed', 500);
         }
 
+        $responseHeaders = $newHash ? ['Last-hash' => $newHash] : [];
+
         return response()->json([
             'data' => [
                 'uuid' => $uuid,
-                'written' => now()->format('Y-m-d'),
-                'state' => CreditCommonsAdapter::STATE_COMPLETED,
+                'written' => $initialState === CreditCommonsAdapter::STATE_COMPLETED ? now()->format('Y-m-d') : null,
+                'state' => $initialState,
                 'workflow' => $workflow,
                 'entries' => [
                     [
@@ -358,13 +382,14 @@ class FederationCreditCommonsController extends BaseApiController
                         'payee' => $resolvedPayeePath,
                         'quant' => $quant,
                         'description' => $description,
+                        'secs_valid_left' => 0,
                     ],
                 ],
             ],
             'meta' => [
-                'transitions' => [],
+                'transitions' => CreditCommonsAdapter::STATE_TRANSITIONS[$initialState] ?? [],
             ],
-        ], 201, ['Last-hash' => $newHash]);
+        ], 201, $responseHeaders);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -387,42 +412,42 @@ class FederationCreditCommonsController extends BaseApiController
 
         $nodeSlug = $this->getNodeSlug($tenantId);
 
-        $query = DB::table('transactions')
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'completed');
+        // Query federation_cc_entries directly — this table uses CC state codes
+        // (P, V, C, E, X) natively, avoiding the lossy Nexus status mapping that
+        // previously collapsed P and V into the same 'pending' bucket.
+        $query = DB::table('federation_cc_entries')
+            ->where('tenant_id', $tenantId);
 
         if ($since) $query->where('created_at', '>=', $since);
         if ($until) $query->where('created_at', '<=', $until);
 
         if ($involving) {
-            $involvingId = $this->resolveAccountId($involving, $tenantId);
-            if ($involvingId) {
-                $query->where(function ($q) use ($involvingId) {
-                    $q->where('sender_id', $involvingId)->orWhere('receiver_id', $involvingId);
-                });
-            }
+            $query->where(function ($q) use ($involving) {
+                $q->where('payer', 'LIKE', "%{$involving}%")
+                  ->orWhere('payee', 'LIKE', "%{$involving}%");
+            });
         }
 
         if ($payer) {
-            $payerId = $this->resolveAccountId($payer, $tenantId);
-            if ($payerId) $query->where('sender_id', $payerId);
+            $payerPath = $this->resolveAccountPath($payer, $tenantId);
+            if ($payerPath) $query->where('payer', 'LIKE', "%{$payerPath}%");
         }
 
         if ($payee) {
-            $payeeId = $this->resolveAccountId($payee, $tenantId);
-            if ($payeeId) $query->where('receiver_id', $payeeId);
+            $payeePath = $this->resolveAccountPath($payee, $tenantId);
+            if ($payeePath) $query->where('payee', 'LIKE', "%{$payeePath}%");
         }
 
         if ($states) {
-            // CC states are single letters concatenated: "PC" = Pending + Completed
-            $ccStates = str_split($states);
-            $nexusStatuses = array_map(fn($s) => CreditCommonsAdapter::mapCcStateToNexus($s), $ccStates);
-            $query->whereIn('status', array_unique($nexusStatuses));
+            // CC states are single letters concatenated: "PC" = Pending + Completed, "V" = Validated only.
+            // Filter by the state column directly — no lossy Nexus mapping, V and P remain distinct.
+            $ccStates = str_split(strtoupper($states));
+            $query->whereIn('state', $ccStates);
         }
 
         $orderCol = match ($sort) {
             'written', 'created' => 'created_at',
-            'amount', 'quant' => 'amount',
+            'amount', 'quant' => 'quant',
             default => 'created_at',
         };
 
@@ -433,17 +458,21 @@ class FederationCreditCommonsController extends BaseApiController
             ->get();
 
         $results = $txs->map(function ($tx) use ($tenantId, $nodeSlug) {
+            $secsValidLeft = isset($tx->validated_until)
+                ? max(0, now()->diffInSeconds(Carbon::parse($tx->validated_until), false))
+                : 0;
             return [
-                'uuid' => $tx->transaction_uuid ?? (string) $tx->id,
-                'written' => $tx->created_at ? substr($tx->created_at, 0, 10) : null,
-                'state' => CreditCommonsAdapter::mapNexusStateToCc($tx->status ?? 'completed'),
-                'workflow' => '0|PC-CE=',
+                'uuid' => $tx->transaction_uuid,
+                'written' => $tx->written_at ? substr($tx->written_at, 0, 10) : null,
+                'state' => $tx->state,
+                'workflow' => $tx->workflow ?? '0|PC-CE=',
                 'entries' => [
                     [
-                        'payer' => $this->toAccountPath((int) $tx->sender_id, $tenantId),
-                        'payee' => $this->toAccountPath((int) $tx->receiver_id, $tenantId),
-                        'quant' => (float) $tx->amount,
+                        'payer' => $tx->payer,
+                        'payee' => $tx->payee,
+                        'quant' => (float) $tx->quant,
                         'description' => $tx->description ?? '',
+                        'secs_valid_left' => $secsValidLeft,
                     ],
                 ],
             ];
@@ -484,6 +513,10 @@ class FederationCreditCommonsController extends BaseApiController
 
         $transitions = CreditCommonsAdapter::STATE_TRANSITIONS[$entry->state] ?? [];
 
+        $secsValidLeft = isset($entry->validated_until)
+            ? max(0, now()->diffInSeconds(\Carbon\Carbon::parse($entry->validated_until), false))
+            : 0;
+
         return response()->json([
             'data' => [
                 'uuid' => $entry->transaction_uuid,
@@ -496,6 +529,7 @@ class FederationCreditCommonsController extends BaseApiController
                         'payee' => $entry->payee,
                         'quant' => (float) $entry->quant,
                         'description' => $entry->description ?? '',
+                        'secs_valid_left' => $secsValidLeft,
                     ],
                 ],
             ],
@@ -622,6 +656,9 @@ class FederationCreditCommonsController extends BaseApiController
             ->get();
 
         $results = $rows->map(function ($entry) {
+            $secsValidLeft = isset($entry->validated_until)
+                ? max(0, now()->diffInSeconds(Carbon::parse($entry->validated_until), false))
+                : 0;
             return [
                 'uuid' => $entry->transaction_uuid,
                 'payer' => $entry->payer,
@@ -632,6 +669,7 @@ class FederationCreditCommonsController extends BaseApiController
                 'written' => $entry->written_at,
                 'workflow' => $entry->workflow ?? '0|PC-CE=',
                 'state' => $entry->state,
+                'secs_valid_left' => $secsValidLeft,
                 'metadata' => $entry->metadata ? json_decode($entry->metadata, true) : null,
             ];
         })->all();
@@ -663,6 +701,9 @@ class FederationCreditCommonsController extends BaseApiController
         }
 
         $results = $rows->map(function ($entry) {
+            $secsValidLeft = isset($entry->validated_until)
+                ? max(0, now()->diffInSeconds(Carbon::parse($entry->validated_until), false))
+                : 0;
             return [
                 'uuid' => $entry->transaction_uuid,
                 'payer' => $entry->payer,
@@ -673,6 +714,7 @@ class FederationCreditCommonsController extends BaseApiController
                 'written' => $entry->written_at,
                 'workflow' => $entry->workflow ?? '0|PC-CE=',
                 'state' => $entry->state,
+                'secs_valid_left' => $secsValidLeft,
                 'metadata' => $entry->metadata ? json_decode($entry->metadata, true) : null,
             ];
         })->all();

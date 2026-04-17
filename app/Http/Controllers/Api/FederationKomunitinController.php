@@ -245,8 +245,15 @@ class FederationKomunitinController extends BaseApiController
             });
         }
 
-        // Cursor pagination: page[after] = offset index
-        $offset = $afterCursor ? (int) $afterCursor : 0;
+        if ($filterTag) {
+            $query->where(function ($q) use ($filterTag) {
+                $q->where('tags', 'LIKE', "%{$filterTag}%")
+                    ->orWhere('skills', 'LIKE', "%{$filterTag}%");
+            });
+        }
+
+        // Cursor pagination: decode opaque cursor
+        $offset = $this->decodeCursor($afterCursor);
 
         $users = $query->orderBy('id')
             ->offset($offset)
@@ -545,8 +552,8 @@ class FederationKomunitinController extends BaseApiController
             default => 'created_at',
         };
 
-        // Cursor pagination
-        $offset = $afterCursor ? (int) $afterCursor : 0;
+        // Cursor pagination: decode opaque cursor
+        $offset = $this->decodeCursor($afterCursor);
 
         $transactions = $query->orderBy($sortCol, $sortDesc ? 'desc' : 'asc')
             ->offset($offset)
@@ -878,13 +885,47 @@ class FederationKomunitinController extends BaseApiController
     {
         $accountCode = strtoupper($code) . str_pad((string) $user->id, 4, '0', STR_PAD_LEFT);
 
+        // Resolve credit limit: prefer tenant setting, fall back to credit agreement max, then -100h default.
+        $creditLimitHours = null;
+        try {
+            $settingVal = DB::table('tenant_settings')
+                ->where('tenant_id', $tenantId)
+                ->where('setting_key', 'federation.komunitin.default_credit_limit')
+                ->value('setting_value');
+            if ($settingVal !== null) {
+                $creditLimitHours = (float) $settingVal;
+            }
+        } catch (\Throwable $e) {
+            // table may not exist in minimal test schemas
+        }
+
+        if ($creditLimitHours === null) {
+            try {
+                $maxMonthly = DB::table('federation_credit_agreements')
+                    ->where('to_tenant_id', $tenantId)
+                    ->where('status', 'active')
+                    ->value('max_monthly_credits');
+                if ($maxMonthly !== null) {
+                    // Negate: credit limit is expressed as negative in Komunitin spec
+                    $creditLimitHours = -(float) $maxMonthly;
+                }
+            } catch (\Throwable $e) {
+                // table may not exist
+            }
+        }
+
+        if ($creditLimitHours === null) {
+            $creditLimitHours = -100.0;
+        }
+
         return [
             'type' => 'accounts',
             'id' => (string) $user->id,
             'attributes' => [
                 'code' => $accountCode,
                 'balance' => KomunitinAdapter::hoursToMinorUnits((float) $user->balance),
-                'creditLimit' => KomunitinAdapter::hoursToMinorUnits(-100.0),
+                'creditLimit' => KomunitinAdapter::hoursToMinorUnits($creditLimitHours),
+                'debitLimit' => KomunitinAdapter::hoursToMinorUnits(0.0),
                 'created' => $user->created_at,
                 'updated' => $user->updated_at ?? $user->created_at,
             ],
@@ -960,7 +1001,10 @@ class FederationKomunitinController extends BaseApiController
         int $status = 200,
         ?array $links = null
     ): JsonResponse {
-        $response = ['data' => $isSingle ? $data : array_values($data)];
+        $response = [
+            '@context' => 'https://komunitin.org/ns',
+            'data' => $isSingle ? $data : array_values($data),
+        ];
 
         if ($links) {
             $response['links'] = $links;
@@ -1004,6 +1048,8 @@ class FederationKomunitinController extends BaseApiController
 
     /**
      * Build a pagination URL with page[size] and page[after] parameters.
+     *
+     * The cursor is base64-encoded JSON so it is opaque to clients.
      */
     private function buildPaginationUrl(Request $request, int $offset, int $pageSize): string
     {
@@ -1016,8 +1062,31 @@ class FederationKomunitinController extends BaseApiController
         unset($params['page_after']);
 
         $params['page[size]'] = $pageSize;
-        $params['page[after]'] = $offset;
+        $params['page[after]'] = base64_encode(json_encode(['offset' => $offset]));
 
         return $baseUrl . '?' . http_build_query($params);
+    }
+
+    /**
+     * Decode an opaque cursor string into a numeric offset.
+     *
+     * Accepts both the new base64-JSON format and legacy raw integers
+     * for backwards compatibility.
+     */
+    private function decodeCursor(?string $cursor): int
+    {
+        if ($cursor === null || $cursor === '') {
+            return 0;
+        }
+        // Try new opaque base64-JSON format first
+        $decoded = base64_decode($cursor, true);
+        if ($decoded !== false) {
+            $parsed = json_decode($decoded, true);
+            if (is_array($parsed) && isset($parsed['offset'])) {
+                return max(0, (int) $parsed['offset']);
+            }
+        }
+        // Fall back to legacy raw integer cursor
+        return max(0, (int) $cursor);
     }
 }

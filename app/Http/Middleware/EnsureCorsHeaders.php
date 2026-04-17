@@ -56,6 +56,15 @@ class EnsureCorsHeaders
             return $response;
         }
 
+        // Federation endpoints (Komunitin + Credit Commons) are queried by external
+        // partner instances from unknown origins — allow any origin for these paths.
+        if ($this->isFederationPath($path)) {
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+            return $response;
+        }
+
         if (CorsHelper::isOriginAllowed($origin)) {
             $response->headers->set('Access-Control-Allow-Origin', $origin);
             $response->headers->set('Access-Control-Allow-Credentials', 'true');
@@ -64,6 +73,12 @@ class EnsureCorsHeaders
         }
 
         return $response;
+    }
+
+    private function isFederationPath(string $path): bool
+    {
+        return str_contains($path, 'federation/komunitin')
+            || str_contains($path, 'federation/cc');
     }
 
     private function renderException(Request $request, \Throwable $e): Response
