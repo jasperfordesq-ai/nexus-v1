@@ -158,11 +158,38 @@ class StripeSubscriptionService
             ? $plan->stripe_price_id_yearly
             : $plan->stripe_price_id_monthly;
 
+        // Free plan — activate directly without Stripe
+        if ((float) $plan->price_monthly === 0.0 && (float) $plan->price_yearly === 0.0) {
+            $existing = DB::selectOne(
+                "SELECT id FROM tenant_plan_assignments WHERE tenant_id = ?",
+                [$tenantId]
+            );
+            if ($existing) {
+                DB::update(
+                    "UPDATE tenant_plan_assignments
+                     SET pay_plan_id = ?, status = 'active', stripe_subscription_id = NULL,
+                         starts_at = NOW(), expires_at = NULL, updated_at = NOW()
+                     WHERE tenant_id = ?",
+                    [$planId, $tenantId]
+                );
+            } else {
+                DB::insert(
+                    "INSERT INTO tenant_plan_assignments
+                     (tenant_id, pay_plan_id, status, stripe_subscription_id, starts_at, created_at, updated_at)
+                     VALUES (?, ?, 'active', NULL, NOW(), NOW(), NOW())",
+                    [$tenantId, $planId]
+                );
+            }
+            Log::info('Free plan activated for tenant', ['tenant_id' => $tenantId, 'plan_id' => $planId]);
+            return ['activated' => true, 'checkout_url' => null];
+        }
+
         // Auto-sync to Stripe if price IDs are missing (e.g., pre-existing plans)
         if (empty($priceId)) {
             Log::info("Auto-syncing plan {$planId} to Stripe (no price ID for {$billingInterval})");
             static::syncPlanToStripe($planId);
-            $plan->refresh();
+            // Reload plan from DB after sync (stdClass from selectOne has no refresh())
+            $plan = DB::selectOne("SELECT * FROM pay_plans WHERE id = ?", [$planId]);
             $priceId = $billingInterval === 'yearly'
                 ? $plan->stripe_price_id_yearly
                 : $plan->stripe_price_id_monthly;

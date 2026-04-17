@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Card,
   CardBody,
@@ -23,7 +24,7 @@ import {
 import { Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { billingApi, type Plan, type SubscriptionDetails } from '../../api/billingApi';
 import { PageHeader } from '../../components';
 
@@ -31,6 +32,8 @@ export function PlanSelector() {
   const { t } = useTranslation('admin');
   usePageTitle(t('billing.choose_plan', 'Choose a Plan'));
   const toast = useToast();
+  const { tenantPath } = useTenant();
+  const navigate = useNavigate();
 
   const [plans, setPlans] = useState<Plan[]>([]);
   const [subscription, setSubscription] = useState<SubscriptionDetails | null>(null);
@@ -73,8 +76,17 @@ export function PlanSelector() {
         billing_interval: billingInterval,
       });
       if (res.success && res.data) {
-        const data = res.data as unknown as { checkout_url: string };
-        window.location.href = data.checkout_url;
+        const data = res.data as unknown as { checkout_url: string | null; activated?: boolean };
+        if (data.activated) {
+          toast.success(t('billing.free_plan_activated', 'Plan activated successfully'));
+          navigate(tenantPath('/admin/billing'));
+        } else if (data.checkout_url) {
+          window.location.href = data.checkout_url;
+        } else {
+          toast.error(t('billing.checkout_error', 'Failed to start checkout'));
+        }
+      } else {
+        toast.error(t('billing.checkout_error', 'Failed to start checkout'));
       }
     } catch {
       toast.error(t('billing.checkout_error', 'Failed to start checkout'));

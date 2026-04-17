@@ -64,9 +64,9 @@ export const billingApi = {
   getSubscription: () =>
     api.get<SubscriptionDetails>('/v2/admin/billing/subscription'),
 
-  /** Create a Stripe Checkout session, returns a redirect URL */
+  /** Create a Stripe Checkout session, returns a redirect URL (or activated:true for free plans) */
   createCheckout: (data: { plan_id: number; billing_interval: 'monthly' | 'yearly' }) =>
-    api.post<{ checkout_url: string }>('/v2/admin/billing/checkout', data),
+    api.post<{ checkout_url: string | null; activated?: boolean }>('/v2/admin/billing/checkout', data),
 
   /** Create a Stripe Customer Portal session, returns a redirect URL */
   createPortal: () =>

@@ -148,6 +148,17 @@ class AdminBillingController extends BaseApiController
              ORDER BY tier_level ASC, name ASC"
         ));
 
+        // Deduplicate by tier_level — keep lowest id per tier to avoid showing multiple free/same-tier plans
+        $seenTiers = [];
+        $plans = array_values(array_filter($plans, function (array $plan) use (&$seenTiers): bool {
+            $tier = $plan['tier_level'];
+            if (in_array($tier, $seenTiers, true)) {
+                return false;
+            }
+            $seenTiers[] = $tier;
+            return true;
+        }));
+
         foreach ($plans as &$plan) {
             if (isset($plan['features'])) {
                 $decoded = json_decode($plan['features'], true) ?: [];

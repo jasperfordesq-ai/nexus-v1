@@ -291,6 +291,7 @@
     "cancels_at_period_end": "Cancels at Period End",
     "change_plan": "Change Plan",
     "checkout_error": "Checkout error",
+    "free_plan_activated": "Plan activated successfully",
     "checkout_failed": "Checkout Failed",
     "checkout_failed_desc": "Manage and configure checkout failed settings",
     "checkout_success": "Checkout successfully",
