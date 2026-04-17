@@ -167,10 +167,14 @@ export function ListingsPage() {
 
       let endpoint = '/v2/listings';
       if (nearMeEnabled && user?.latitude != null && user?.longitude != null) {
-        endpoint = '/v2/listings/nearby';
-        params.set('lat', String(user.latitude));
-        params.set('lon', String(user.longitude));
-        params.set('radius_km', String(radiusKm));
+        const lat = Number(user.latitude);
+        const lon = Number(user.longitude);
+        if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+          endpoint = '/v2/listings/nearby';
+          params.set('lat', String(lat));
+          params.set('lon', String(lon));
+          params.set('radius_km', String(radiusKm));
+        }
       }
 
       const response = await api.get<Listing[]>(`${endpoint}?${params}`);
