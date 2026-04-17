@@ -173,7 +173,9 @@ class GroupService
         }
 
         if ($currentUserId) {
+            $tenantId = TenantContext::getId();
             $membership = DB::table('group_members')
+                ->whereIn('group_id', fn ($q) => $q->select('id')->from('groups')->where('tenant_id', $tenantId))
                 ->where('group_id', $id)
                 ->where('user_id', $currentUserId)
                 ->first();
@@ -192,6 +194,7 @@ class GroupService
             // Recent members (last 5 active members)
             $recentMembers = DB::table('group_members')
                 ->join('users', 'group_members.user_id', '=', 'users.id')
+                ->whereIn('group_members.group_id', fn ($q) => $q->select('id')->from('groups')->where('tenant_id', $tenantId))
                 ->where('group_members.group_id', $id)
                 ->where('group_members.status', 'active')
                 ->orderByDesc('group_members.created_at')

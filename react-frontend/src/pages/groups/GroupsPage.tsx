@@ -104,7 +104,7 @@ export function GroupsPage() {
       const response = await api.get<Group[]>(`/v2/groups?${params}`);
       if (response.success && response.data) {
         if (append) {
-          setGroups((prev) => [...prev, ...response.data!]);
+          setGroups((prev) => [...prev, ...response.data]);
         } else {
           setGroups(response.data);
         }
