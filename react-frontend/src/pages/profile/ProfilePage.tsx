@@ -129,6 +129,7 @@ export function ProfilePage() {
   const { id } = useParams<{ id: string }>();
   const { user: currentUser, isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
+  const hasConnections = useFeature('connections');
   const hasGamification = useFeature('gamification');
   const hasReviews = useFeature('reviews');
   const toast = useToast();
@@ -437,6 +438,9 @@ export function ProfilePage() {
     return <LoadingScreen message={t('loading')} />;
   }
 
+  const fallbackPath = hasConnections ? tenantPath('/members') : tenantPath('/explore');
+  const fallbackLabel = hasConnections ? t('browse_members') : t('back_to_explore');
+
   // Error state with retry
   if (error && !profile) {
     return (
@@ -446,13 +450,13 @@ export function ProfilePage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <div className="flex justify-center gap-3">
-            <Link to={tenantPath('/members')}>
+            <Link to={fallbackPath}>
               <Button
                 variant="flat"
                 className="bg-theme-elevated text-theme-primary"
                 startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
               >
-                {t('browse_members')}
+                {fallbackLabel}
               </Button>
             </Link>
             <Button
@@ -476,13 +480,13 @@ export function ProfilePage() {
         title={errorCode === 'PROFILE_INCOMPLETE' ? t('profile_incomplete') : t('not_found')}
         description={errorCode === 'PROFILE_INCOMPLETE' ? t('profile_incomplete_desc') : t('not_found_desc')}
         action={
-          <Link to={tenantPath('/members')}>
+          <Link to={fallbackPath}>
             <Button
               variant="flat"
               className="bg-theme-elevated text-theme-primary"
               startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('browse_members')}
+              {fallbackLabel}
             </Button>
           </Link>
         }
