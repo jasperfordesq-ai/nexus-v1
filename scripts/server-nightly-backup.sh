@@ -42,8 +42,9 @@ fi
 mkdir -p "$BACKUP_DIR"
 
 log "Dumping database: $DB_NAME → $BACKUP_FILE"
-docker exec "$DB_CONTAINER" \
-    mariadb-dump -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" \
+export MYSQL_PWD="$DB_PASS"
+docker exec -e MYSQL_PWD "$DB_CONTAINER" \
+    mariadb-dump -u "$DB_USER" "$DB_NAME" \
     | gzip > "$BACKUP_FILE"
 
 # Verify

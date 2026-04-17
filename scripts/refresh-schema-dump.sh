@@ -33,7 +33,8 @@ if [[ "$MODE" == "--local" ]] || [[ "$MODE" == "auto" && -z "${DEPLOY_ENV:-}" ]]
     DB_PASS=$(docker exec nexus-php-app printenv DB_PASS 2>/dev/null || echo "nexus_secret")
     DB_NAME=$(docker exec nexus-php-app printenv DB_NAME 2>/dev/null || echo "nexus")
 
-    DUMP_CMD="docker exec $DB_CONTAINER mysqldump -u $DB_USER -p$DB_PASS"
+    export MYSQL_PWD="$DB_PASS"
+    DUMP_CMD="docker exec -e MYSQL_PWD $DB_CONTAINER mysqldump -u $DB_USER"
     echo "[schema-dump] Using local Docker DB ($DB_CONTAINER)"
 elif [[ "$MODE" == "--production" ]] || [[ "${DEPLOY_ENV:-}" == "production" ]]; then
     # Production: run inside the DB container directly
@@ -47,7 +48,8 @@ elif [[ "$MODE" == "--production" ]] || [[ "${DEPLOY_ENV:-}" == "production" ]];
         exit 1
     fi
 
-    DUMP_CMD="docker exec $DB_CONTAINER mysqldump -u $DB_USER -p$DB_PASS"
+    export MYSQL_PWD="$DB_PASS"
+    DUMP_CMD="docker exec -e MYSQL_PWD $DB_CONTAINER mysqldump -u $DB_USER"
     echo "[schema-dump] Using production DB ($DB_CONTAINER)"
 else
     echo "[schema-dump] ERROR: Unknown mode '$MODE'. Use --local or --production." >&2
