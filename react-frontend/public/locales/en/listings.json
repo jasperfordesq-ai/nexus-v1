@@ -175,6 +175,11 @@
   "save_error": "Failed to update saved listing",
   "featured": "Featured",
   "featured_badge": "Featured listing",
+  "sort_label": "Sort",
+  "sort_recommended": "Recommended",
+  "sort_newest": "Newest first",
+  "reciprocity_mutual": "Mutual match",
+  "reciprocity_one_way": "Match",
   "skill_tags": {
     "label": "Skill Tags",
     "placeholder": "Type a skill and press Enter...",

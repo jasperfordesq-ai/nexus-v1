@@ -114,14 +114,18 @@ class ListingsController extends BaseApiController
         // Count total matching listings (without cursor/limit)
         $totalCount = $this->listingService->countAll($filters);
 
-        // Apply MatchRank if enabled; skip when featured_first is set
-        if ($this->listingRankingService->isEnabled() && !empty($result['items']) && empty($filters['featured_first'])) {
+        // Apply MatchRank unless the user has explicitly chosen newest-first sort.
+        // featured listings get FEATURED_BOOST (5×) inside the ranker so they always pin to top.
+        $sortNewest = $this->query('sort') === 'newest';
+        if ($this->listingRankingService->isEnabled() && !empty($result['items']) && !$sortNewest) {
             $result['items'] = $this->listingRankingService->rankListings(
                 $result['items'],
                 $userId,
                 ['search' => $filters['search'] ?? null]
             );
             $result['items'] = array_map(static function (array $item): array {
+                $reciprocity = $item['_score_breakdown']['reciprocity'] ?? 1.0;
+                $item['reciprocity_match'] = $reciprocity >= 2.0 ? 'mutual' : ($reciprocity > 1.0 ? 'one_way' : null);
                 unset($item['_match_rank'], $item['_score_breakdown']);
                 return $item;
             }, $result['items']);
@@ -436,6 +440,24 @@ class ListingsController extends BaseApiController
         }
 
         $result = $this->listingService->getNearby($lat, $lon, $filters);
+
+        // Apply MatchRank on top of the distance-filtered set (same rules as index).
+        // Proximity is already baked into the MatchRank geo score, so nearby listings
+        // are still prioritised; engagement, quality, and reciprocity break ties.
+        $sortNewest = $this->query('sort') === 'newest';
+        if ($this->listingRankingService->isEnabled() && !empty($result['items']) && !$sortNewest) {
+            $result['items'] = $this->listingRankingService->rankListings(
+                $result['items'],
+                $userId,
+                ['search' => $filters['search'] ?? null]
+            );
+            $result['items'] = array_map(static function (array $item): array {
+                $reciprocity = $item['_score_breakdown']['reciprocity'] ?? 1.0;
+                $item['reciprocity_match'] = $reciprocity >= 2.0 ? 'mutual' : ($reciprocity > 1.0 ? 'one_way' : null);
+                unset($item['_match_rank'], $item['_score_breakdown']);
+                return $item;
+            }, $result['items']);
+        }
 
         return $this->respondWithCollection(
             $result['items'],

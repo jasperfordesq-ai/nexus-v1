@@ -265,6 +265,7 @@ export interface Listing {
   can_edit?: boolean;
   can_delete?: boolean;
   is_reported?: boolean;  // Whether current user has already reported this listing
+  reciprocity_match?: 'one_way' | 'mutual' | null;  // Set by MatchRank when viewer has a matching offer/request
   created_at: string;
   updated_at: string;
 

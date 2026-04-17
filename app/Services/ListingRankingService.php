@@ -44,6 +44,9 @@ class ListingRankingService
     private const RECIPROCITY_MATCH_BOOST = 1.5;
     private const RECIPROCITY_MUTUAL_BOOST = 2.0;
 
+    // Featured boost — ensures is_featured listings always appear at top
+    private const FEATURED_BOOST = 5.0;
+
     private ?array $config = null;
     private array $ownerListingsCache = [];
 
@@ -175,6 +178,9 @@ class ListingRankingService
             }
             if (!empty($cfUserSuggestIds[$listing['id'] ?? 0])) {
                 $finalScore *= 1.10;
+            }
+            if (!empty($listing['is_featured'])) {
+                $finalScore *= self::FEATURED_BOOST;
             }
 
             $listing['_match_rank'] = $finalScore;

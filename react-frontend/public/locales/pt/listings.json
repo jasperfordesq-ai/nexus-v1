@@ -263,5 +263,10 @@
   "review": "review",
   "reviews": "reviews",
   "service_type_hybrid_available": "Remote Available",
-  "service_type_remote": "Remote"
+  "service_type_remote": "Remote",
+  "sort_label": "Sort",
+  "sort_recommended": "Recommended",
+  "sort_newest": "Newest first",
+  "reciprocity_mutual": "Mutual match",
+  "reciprocity_one_way": "Match"
 }

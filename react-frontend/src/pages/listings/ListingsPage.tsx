@@ -32,6 +32,8 @@ import {
   Star,
   SlidersHorizontal,
   X,
+  Zap,
+  ArrowUpDown,
 } from 'lucide-react';
 import { GlassCard, AlgorithmLabel, ListingSkeleton, ImagePlaceholder } from '@/components/ui';
 import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
@@ -48,6 +50,7 @@ import type { Listing, Category } from '@/types/api';
 
 type ListingType = 'all' | 'offer' | 'request';
 type ViewMode = 'grid' | 'list' | 'map';
+type SortMode = 'recommended' | 'newest';
 
 export function ListingsPage() {
   const { t } = useTranslation('listings');
@@ -98,6 +101,10 @@ export function ListingsPage() {
     // Auto-expand if any advanced filter is active from URL
     !!(searchParams.get('hours') || searchParams.get('service') || searchParams.get('posted') || searchParams.get('near_me')),
   );
+  const [sortMode, setSortMode] = useState<SortMode>(() => {
+    const v = searchParams.get('sort');
+    return v === 'newest' ? 'newest' : 'recommended';
+  });
 
   // Count of active advanced filters (shown as badge on the toggle button)
   const activeFilterCount = useMemo(() => {
@@ -164,6 +171,9 @@ export function ListingsPage() {
       if (postedWithin !== 'any') {
         params.set('posted_within', postedWithin);
       }
+      if (sortMode === 'newest') {
+        params.set('sort', 'newest');
+      }
 
       let endpoint = '/v2/listings';
       if (nearMeEnabled && user?.latitude != null && user?.longitude != null) {
@@ -216,7 +226,7 @@ export function ListingsPage() {
         setIsLoading(false);
       }
     }
-  }, [searchQuery, selectedType, selectedCategory, nearMeEnabled, user?.latitude, user?.longitude, radiusKm, hoursRange, serviceMode, postedWithin]);
+  }, [searchQuery, selectedType, selectedCategory, nearMeEnabled, user?.latitude, user?.longitude, radiusKm, hoursRange, serviceMode, postedWithin, sortMode]);
 
   // Keep a ref so effects always call the latest version without depending on it
   const loadListingsRef = useRef(loadListings);
@@ -429,6 +439,26 @@ export function ListingsPage() {
               items={categoryItems}
             >
               {(cat) => <SelectItem key={cat.slug}>{cat.name}</SelectItem>}
+            </Select>
+
+            {/* Sort order */}
+            <Select
+              aria-label={t('sort_label', 'Sort')}
+              selectedKeys={[sortMode]}
+              disallowEmptySelection
+              onSelectionChange={(keys) => {
+                const val = keys instanceof Set ? ([...keys][0] as string) : 'recommended';
+                setSortMode((val === 'newest' ? 'newest' : 'recommended') as SortMode);
+              }}
+              className="w-full sm:w-44"
+              classNames={{
+                trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                value: 'text-theme-primary',
+              }}
+              startContent={<ArrowUpDown className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+            >
+              <SelectItem key="recommended">{t('sort_recommended', 'Recommended')}</SelectItem>
+              <SelectItem key="newest">{t('sort_newest', 'Newest first')}</SelectItem>
             </Select>
 
             {/* Filters toggle */}
@@ -791,6 +821,18 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                 }`}>
                   {listing.type === 'offer' ? t('offering') : t('requesting')}
                 </span>
+                {listing.reciprocity_match === 'mutual' && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-600 dark:text-violet-400 font-medium flex items-center gap-0.5">
+                    <Zap className="w-2.5 h-2.5" aria-hidden="true" />
+                    {t('reciprocity_mutual', 'Mutual match')}
+                  </span>
+                )}
+                {listing.reciprocity_match === 'one_way' && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-sky-500/20 text-sky-600 dark:text-sky-400 font-medium flex items-center gap-0.5">
+                    <Zap className="w-2.5 h-2.5" aria-hidden="true" />
+                    {t('reciprocity_one_way', 'Match')}
+                  </span>
+                )}
                 {listing.service_type === 'remote_only' && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium flex items-center gap-0.5">
                     <Monitor className="w-2.5 h-2.5" aria-hidden="true" />
@@ -876,6 +918,24 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
             {listing.type === 'offer' ? t('offering') : t('requesting')}
           </span>
           {listing.is_featured && <FeaturedBadge />}
+          {listing.reciprocity_match === 'mutual' && (
+            <span
+              className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-600 dark:text-violet-400 font-medium flex items-center gap-0.5"
+              title={t('reciprocity_mutual', 'Mutual match — they want what you offer, and offer what you need')}
+            >
+              <Zap className="w-2.5 h-2.5" aria-hidden="true" />
+              {t('reciprocity_mutual', 'Mutual match')}
+            </span>
+          )}
+          {listing.reciprocity_match === 'one_way' && (
+            <span
+              className="text-[10px] px-1.5 py-0.5 rounded-full bg-sky-500/20 text-sky-600 dark:text-sky-400 font-medium flex items-center gap-0.5"
+              title={t('reciprocity_one_way', 'Matches your offer or request')}
+            >
+              <Zap className="w-2.5 h-2.5" aria-hidden="true" />
+              {t('reciprocity_one_way', 'Match')}
+            </span>
+          )}
           {listing.service_type === 'remote_only' && (
             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium flex items-center gap-0.5">
               <Monitor className="w-2.5 h-2.5" aria-hidden="true" />
