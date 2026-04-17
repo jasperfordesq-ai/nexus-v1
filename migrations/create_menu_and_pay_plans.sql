@@ -138,7 +138,7 @@ INSERT INTO pay_plans (name, slug, description, tier_level, features, allowed_la
 ('Enterprise', 'enterprise', 'Full platform access with premium support', 3,
  JSON_OBJECT('listings', true, 'groups', true, 'wallet', true, 'custom_menus', true, 'page_builder', true, 'analytics', true, 'ai_features', true, 'white_label', true, 'priority_support', true, 'custom_domain', true),
  JSON_ARRAY('modern', 'civicone', 'skeleton'),
- 999, 999, 199.00, 1990.00);
+ 999, 999, 0.00, 0.00);
 
 -- Assign master tenant to Enterprise plan (tenant_id = 1)
 INSERT INTO tenant_plan_assignments (tenant_id, pay_plan_id, status, starts_at, expires_at) VALUES

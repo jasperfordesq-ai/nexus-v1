@@ -658,7 +658,7 @@ class AdminContentController extends BaseApiController
 
         $plans = array_map(fn($r) => (array)$r, DB::select(
             "SELECT id, name, slug, description, tier_level, features, allowed_layouts,
-                    max_menus, max_menu_items, price_monthly, price_yearly, is_active, created_at, updated_at
+                    max_menus, max_menu_items, max_users, price_monthly, price_yearly, is_active, created_at, updated_at
              FROM pay_plans ORDER BY tier_level ASC, name ASC"
         ));
 
@@ -680,7 +680,7 @@ class AdminContentController extends BaseApiController
 
         $result = DB::selectOne(
             "SELECT id, name, slug, description, tier_level, features, allowed_layouts,
-                    max_menus, max_menu_items, price_monthly, price_yearly, is_active, created_at, updated_at
+                    max_menus, max_menu_items, max_users, price_monthly, price_yearly, is_active, created_at, updated_at
              FROM pay_plans WHERE id = ?", [$id]
         );
 
@@ -710,13 +710,14 @@ class AdminContentController extends BaseApiController
         }
 
         DB::insert(
-            "INSERT INTO pay_plans (name, slug, description, tier_level, features, allowed_layouts, max_menus, max_menu_items, price_monthly, price_yearly, is_active, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+            "INSERT INTO pay_plans (name, slug, description, tier_level, features, allowed_layouts, max_menus, max_menu_items, max_users, price_monthly, price_yearly, is_active, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
             [$name, $slug, $input['description'] ?? '', (int)($input['tier_level'] ?? 0),
              isset($input['features']) ? json_encode($input['features']) : '[]',
              isset($input['allowed_layouts']) ? json_encode($input['allowed_layouts']) : '[]',
              isset($input['max_menus']) ? (int)$input['max_menus'] : null,
              isset($input['max_menu_items']) ? (int)$input['max_menu_items'] : null,
+             isset($input['max_users']) && $input['max_users'] !== '' ? (int)$input['max_users'] : null,
              isset($input['price_monthly']) ? (float)$input['price_monthly'] : null,
              isset($input['price_yearly']) ? (float)$input['price_yearly'] : null,
              (int)($input['is_active'] ?? 1)]
@@ -735,7 +736,7 @@ class AdminContentController extends BaseApiController
         }
 
         $result = DB::selectOne(
-            "SELECT id, name, slug, description, tier_level, features, allowed_layouts, max_menus, max_menu_items, price_monthly, price_yearly, is_active, created_at, updated_at
+            "SELECT id, name, slug, description, tier_level, features, allowed_layouts, max_menus, max_menu_items, max_users, price_monthly, price_yearly, is_active, created_at, updated_at
              FROM pay_plans WHERE id = ?", [$newPlanId]
         );
 
@@ -775,6 +776,7 @@ class AdminContentController extends BaseApiController
         if (array_key_exists('allowed_layouts', $input)) { $updates[] = 'allowed_layouts = ?'; $params[] = json_encode($input['allowed_layouts'] ?? []); }
         if (isset($input['max_menus'])) { $updates[] = 'max_menus = ?'; $params[] = (int)$input['max_menus']; }
         if (isset($input['max_menu_items'])) { $updates[] = 'max_menu_items = ?'; $params[] = (int)$input['max_menu_items']; }
+        if (array_key_exists('max_users', $input)) { $updates[] = 'max_users = ?'; $params[] = ($input['max_users'] !== '' && $input['max_users'] !== null) ? (int)$input['max_users'] : null; }
         if (array_key_exists('price_monthly', $input)) { $updates[] = 'price_monthly = ?'; $params[] = isset($input['price_monthly']) ? (float)$input['price_monthly'] : null; }
         if (array_key_exists('price_yearly', $input)) { $updates[] = 'price_yearly = ?'; $params[] = isset($input['price_yearly']) ? (float)$input['price_yearly'] : null; }
         if (isset($input['is_active'])) { $updates[] = 'is_active = ?'; $params[] = (int)$input['is_active']; }
@@ -797,7 +799,7 @@ class AdminContentController extends BaseApiController
         }
 
         $result = DB::selectOne(
-            "SELECT id, name, slug, description, tier_level, features, allowed_layouts, max_menus, max_menu_items, price_monthly, price_yearly, is_active, created_at, updated_at
+            "SELECT id, name, slug, description, tier_level, features, allowed_layouts, max_menus, max_menu_items, max_users, price_monthly, price_yearly, is_active, created_at, updated_at
              FROM pay_plans WHERE id = ?", [$id]
         );
 

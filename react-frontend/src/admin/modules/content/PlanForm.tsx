@@ -25,6 +25,7 @@ interface PlanFormData {
   price_monthly: string;
   price_yearly: string;
   tier_level: string;
+  max_users: string;
   max_menus: string;
   max_menu_items: string;
   features: string;
@@ -47,6 +48,7 @@ export function PlanForm() {
     price_monthly: '',
     price_yearly: '',
     tier_level: '1',
+    max_users: '',
     max_menus: '',
     max_menu_items: '',
     features: '',
@@ -68,6 +70,7 @@ export function PlanForm() {
               price_monthly: plan.price_monthly !== undefined && plan.price_monthly !== null ? String(plan.price_monthly) : '',
               price_yearly: plan.price_yearly !== undefined && plan.price_yearly !== null ? String(plan.price_yearly) : '',
               tier_level: plan.tier_level !== undefined ? String(plan.tier_level) : '1',
+              max_users: plan.max_users !== undefined && plan.max_users !== null ? String(plan.max_users) : '',
               max_menus: plan.max_menus !== undefined && plan.max_menus !== null ? String(plan.max_menus) : '',
               max_menu_items: plan.max_menu_items !== undefined && plan.max_menu_items !== null ? String(plan.max_menu_items) : '',
               features: Array.isArray(plan.features) ? (plan.features as string[]).join(', ') : '',
@@ -96,6 +99,7 @@ export function PlanForm() {
       { label: t('content.monthly_price', 'Monthly Price'), value: formData.price_monthly, allowZero: true },
       { label: t('content.annual_price', 'Annual Price'), value: formData.price_yearly, allowZero: true },
       { label: t('content.tier_level', 'Tier Level'), value: formData.tier_level, allowZero: true },
+      { label: t('content.max_users', 'Max Users'), value: formData.max_users, allowZero: true },
       { label: t('content.max_menus', 'Max Menus'), value: formData.max_menus, allowZero: true },
       { label: t('content.max_menu_items', 'Max Menu Items'), value: formData.max_menu_items, allowZero: true },
     ];
@@ -128,6 +132,7 @@ export function PlanForm() {
       price_monthly: formData.price_monthly ? Number(formData.price_monthly) : undefined,
       price_yearly: formData.price_yearly ? Number(formData.price_yearly) : undefined,
       tier_level: formData.tier_level ? Number(formData.tier_level) : undefined,
+      max_users: formData.max_users !== '' ? Number(formData.max_users) : null,
       max_menus: formData.max_menus ? Number(formData.max_menus) : undefined,
       max_menu_items: formData.max_menu_items ? Number(formData.max_menu_items) : undefined,
       features: featuresArr,
@@ -229,6 +234,17 @@ export function PlanForm() {
             description={t('content.tier_level_desc', 'Higher tier = more features (0 = free, 1 = basic, 2 = pro, etc.)')}
             value={formData.tier_level}
             onValueChange={(v) => handleChange('tier_level', v)}
+          />
+          <Input
+            label={t('content.max_users', 'Max Users')}
+            type="number"
+            min="0"
+            step="1"
+            placeholder={t('content.max_users_placeholder', 'e.g., 100 — leave blank for unlimited')}
+            variant="bordered"
+            description={t('content.max_users_desc', 'Maximum active members on this plan. Leave blank for unlimited.')}
+            value={formData.max_users}
+            onValueChange={(v) => handleChange('max_users', v)}
           />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input
