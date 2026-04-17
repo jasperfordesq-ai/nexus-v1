@@ -380,36 +380,38 @@ class FederationController extends BaseApiController
         $perPage = min(100, max(1, (int) request()->query('per_page', 20)));
 
         if ($isExternal) {
-            $sql = "SELECT SQL_CALC_FOUND_ROWS u.id, u.username, u.first_name, u.last_name, u.avatar_url as avatar, u.location, u.bio, u.skills, u.created_at, u.tenant_id, fus.service_reach, t.name as timebank_name
-                    FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id JOIN tenants t ON t.id = u.tenant_id
+            $baseCondition = "FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id JOIN tenants t ON t.id = u.tenant_id
                     WHERE u.tenant_id = ? AND fus.federation_optin = 1 AND fus.appear_in_federated_search = 1 AND u.status = 'active'";
             $params = [$partnerTenantId];
         } else {
             // FED-005: Check profiles_enabled on partnership to enforce permission boundaries
-            $sql = "SELECT SQL_CALC_FOUND_ROWS u.id, u.username, u.first_name, u.last_name, u.avatar_url as avatar, u.location, u.bio, u.skills, u.created_at, u.tenant_id, fus.service_reach, t.name as timebank_name
-                    FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id JOIN tenants t ON t.id = u.tenant_id
+            $baseCondition = "FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id JOIN tenants t ON t.id = u.tenant_id
                     JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = u.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = u.tenant_id))
                     WHERE fus.federation_optin = 1 AND fus.appear_in_federated_search = 1 AND fp.status = 'active' AND fp.profiles_enabled = 1 AND u.tenant_id != ?";
             $params = [$partnerTenantId, $partnerTenantId, $partnerTenantId];
         }
 
         if (!empty($query)) {
-            $sql .= " AND (u.first_name LIKE ? OR u.last_name LIKE ? OR u.username LIKE ? OR u.skills LIKE ?)";
+            $baseCondition .= " AND (u.first_name LIKE ? OR u.last_name LIKE ? OR u.username LIKE ? OR u.skills LIKE ?)";
             $term = "%{$query}%";
             array_push($params, $term, $term, $term, $term);
         }
-        if ($timebankId) { $sql .= " AND u.tenant_id = ?"; $params[] = $timebankId; }
-        foreach ($skills as $skill) { $sql .= " AND u.skills LIKE ?"; $params[] = "%{$skill}%"; }
-        if (!empty($location)) { $sql .= " AND u.location LIKE ?"; $params[] = "%{$location}%"; }
+        if ($timebankId) { $baseCondition .= " AND u.tenant_id = ?"; $params[] = $timebankId; }
+        foreach ($skills as $skill) { $baseCondition .= " AND u.skills LIKE ?"; $params[] = "%{$skill}%"; }
+        if (!empty($location)) { $baseCondition .= " AND u.location LIKE ?"; $params[] = "%{$location}%"; }
 
+        // COUNT query uses same WHERE conditions without LIMIT
+        $countStmt = $db->prepare("SELECT COUNT(*) " . $baseCondition);
+        $countStmt->execute($params);
+        $total = (int) $countStmt->fetchColumn();
+
+        $sql = "SELECT u.id, u.username, u.first_name, u.last_name, u.avatar_url as avatar, u.location, u.bio, u.skills, u.created_at, u.tenant_id, fus.service_reach, t.name as timebank_name " . $baseCondition;
         $sql .= " ORDER BY u.first_name ASC, u.last_name ASC LIMIT ?, ?";
-        $params[] = (int) (($page - 1) * $perPage);
-        $params[] = (int) $perPage;
+        $paginatedParams = array_merge($params, [(int) (($page - 1) * $perPage), (int) $perPage]);
 
         $stmt = $db->prepare($sql);
-        $stmt->execute($params);
+        $stmt->execute($paginatedParams);
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        $total = (int) $db->query("SELECT FOUND_ROWS()")->fetchColumn();
 
         $formatted = array_map(fn($m) => [
             'id' => (int) $m['id'], 'username' => $m['username'],
@@ -491,32 +493,34 @@ class FederationController extends BaseApiController
         $perPage = min(100, max(1, (int) request()->query('per_page', 20)));
 
         if ($isExternal) {
-            $sql = "SELECT SQL_CALC_FOUND_ROWS l.id, l.title, l.description, l.type, l.category_id, c.name as category_name, l.price as rate, l.created_at, l.user_id, u.first_name, u.last_name, u.avatar_url as avatar, l.tenant_id, t.name as timebank_name
-                    FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id LEFT JOIN categories c ON c.id = l.category_id
+            $baseCondition = "FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id LEFT JOIN categories c ON c.id = l.category_id
                     WHERE l.status = 'active' AND l.tenant_id = ? AND fus.federation_optin = 1";
             $params = [$partnerTenantId];
         } else {
             // FED-006: Check listings_enabled on partnership to enforce permission boundaries
-            $sql = "SELECT SQL_CALC_FOUND_ROWS l.id, l.title, l.description, l.type, l.category_id, c.name as category_name, l.price as rate, l.created_at, l.user_id, u.first_name, u.last_name, u.avatar_url as avatar, l.tenant_id, t.name as timebank_name
-                    FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id LEFT JOIN categories c ON c.id = l.category_id
+            $baseCondition = "FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id LEFT JOIN categories c ON c.id = l.category_id
                     JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = l.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = l.tenant_id))
                     WHERE l.status = 'active' AND fus.federation_optin = 1 AND fp.status = 'active' AND fp.listings_enabled = 1 AND l.tenant_id != ?";
             $params = [$partnerTenantId, $partnerTenantId, $partnerTenantId];
         }
 
-        if (!empty($query)) { $sql .= " AND (l.title LIKE ? OR l.description LIKE ?)"; $term = "%{$query}%"; array_push($params, $term, $term); }
-        if (!empty($type) && in_array($type, ['offer', 'request'])) { $sql .= " AND l.type = ?"; $params[] = $type; }
-        if ($timebankId) { $sql .= " AND l.tenant_id = ?"; $params[] = $timebankId; }
-        if (!empty($category)) { $sql .= " AND l.category_id = ?"; $params[] = $category; }
+        if (!empty($query)) { $baseCondition .= " AND (l.title LIKE ? OR l.description LIKE ?)"; $term = "%{$query}%"; array_push($params, $term, $term); }
+        if (!empty($type) && in_array($type, ['offer', 'request'])) { $baseCondition .= " AND l.type = ?"; $params[] = $type; }
+        if ($timebankId) { $baseCondition .= " AND l.tenant_id = ?"; $params[] = $timebankId; }
+        if (!empty($category)) { $baseCondition .= " AND l.category_id = ?"; $params[] = $category; }
 
+        // COUNT query uses same WHERE conditions without LIMIT
+        $countStmt = $db->prepare("SELECT COUNT(*) " . $baseCondition);
+        $countStmt->execute($params);
+        $total = (int) $countStmt->fetchColumn();
+
+        $sql = "SELECT l.id, l.title, l.description, l.type, l.category_id, c.name as category_name, l.price as rate, l.created_at, l.user_id, u.first_name, u.last_name, u.avatar_url as avatar, l.tenant_id, t.name as timebank_name " . $baseCondition;
         $sql .= " ORDER BY l.created_at DESC LIMIT ?, ?";
-        $params[] = (int) (($page - 1) * $perPage);
-        $params[] = (int) $perPage;
+        $paginatedParams = array_merge($params, [(int) (($page - 1) * $perPage), (int) $perPage]);
 
         $stmt = $db->prepare($sql);
-        $stmt->execute($params);
+        $stmt->execute($paginatedParams);
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        $total = (int) $db->query("SELECT FOUND_ROWS()")->fetchColumn();
 
         $formatted = array_map(fn($l) => [
             'id' => (int) $l['id'], 'title' => $l['title'], 'description' => $l['description'],
@@ -1009,24 +1013,27 @@ class FederationController extends BaseApiController
 
         // Scope reviews to the calling partner's tenant — a partner can only read
         // reviews where the reviewer or receiver belongs to their tenant.
-        $sql = "SELECT SQL_CALC_FOUND_ROWS r.id, r.reviewer_id, r.reviewer_tenant_id, r.receiver_id, r.receiver_tenant_id, r.rating, r.comment, r.review_type, r.status, r.transaction_id, r.created_at,
-                       u.first_name as reviewer_first_name, u.last_name as reviewer_last_name, u.avatar_url as reviewer_avatar,
-                       t.name as reviewer_tenant_name
-                FROM reviews r
+        $baseCondition = "FROM reviews r
                 JOIN users u ON u.id = r.reviewer_id
                 LEFT JOIN tenants t ON t.id = r.reviewer_tenant_id
                 WHERE r.receiver_id = ? AND r.review_type = 'federated' AND r.show_cross_tenant = 1 AND r.status = 'approved'
                 AND (r.reviewer_tenant_id = ? OR r.receiver_tenant_id = ?)";
         $params = [$userId, $partnerTenantId, $partnerTenantId];
 
+        // COUNT query uses same WHERE conditions without LIMIT
+        $countStmt = $db->prepare("SELECT COUNT(*) " . $baseCondition);
+        $countStmt->execute($params);
+        $total = (int) $countStmt->fetchColumn();
+
+        $sql = "SELECT r.id, r.reviewer_id, r.reviewer_tenant_id, r.receiver_id, r.receiver_tenant_id, r.rating, r.comment, r.review_type, r.status, r.transaction_id, r.created_at,
+                       u.first_name as reviewer_first_name, u.last_name as reviewer_last_name, u.avatar_url as reviewer_avatar,
+                       t.name as reviewer_tenant_name " . $baseCondition;
         $sql .= " ORDER BY r.created_at DESC LIMIT ?, ?";
-        $params[] = (int) (($page - 1) * $perPage);
-        $params[] = (int) $perPage;
+        $paginatedParams = array_merge($params, [(int) (($page - 1) * $perPage), (int) $perPage]);
 
         $stmt = $db->prepare($sql);
-        $stmt->execute($params);
+        $stmt->execute($paginatedParams);
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        $total = (int) $db->query("SELECT FOUND_ROWS()")->fetchColumn();
 
         $formatted = array_map(fn($r) => [
             'id' => (int) $r['id'],
@@ -1060,11 +1067,7 @@ class FederationController extends BaseApiController
         $page = max(1, (int) request()->query('page', 1));
         $perPage = min(100, max(1, (int) request()->query('per_page', 20)));
 
-        $sql = "SELECT SQL_CALC_FOUND_ROWS m.id, m.sender_id, m.receiver_id, m.subject, m.body, m.created_at, m.is_read,
-                       su.first_name as sender_first_name, su.last_name as sender_last_name, su.tenant_id as sender_tenant_id,
-                       ru.first_name as receiver_first_name, ru.last_name as receiver_last_name, ru.tenant_id as receiver_tenant_id,
-                       st.name as sender_tenant_name, rt.name as receiver_tenant_name
-                FROM messages m
+        $baseCondition = "FROM messages m
                 JOIN users su ON su.id = m.sender_id
                 JOIN users ru ON ru.id = m.receiver_id
                 JOIN federation_user_settings sfus ON sfus.user_id = m.sender_id
@@ -1078,30 +1081,37 @@ class FederationController extends BaseApiController
 
         // Filter to messages involving the partner's tenant
         if ($direction === 'inbound') {
-            $sql .= " AND ru.tenant_id = ?";
+            $baseCondition .= " AND ru.tenant_id = ?";
             $params[] = $partnerTenantId;
         } elseif ($direction === 'outbound') {
-            $sql .= " AND su.tenant_id = ?";
+            $baseCondition .= " AND su.tenant_id = ?";
             $params[] = $partnerTenantId;
         } else {
-            $sql .= " AND (su.tenant_id = ? OR ru.tenant_id = ?)";
+            $baseCondition .= " AND (su.tenant_id = ? OR ru.tenant_id = ?)";
             $params[] = $partnerTenantId;
             $params[] = $partnerTenantId;
         }
 
         if (!empty($since)) {
-            $sql .= " AND m.created_at >= ?";
+            $baseCondition .= " AND m.created_at >= ?";
             $params[] = $since;
         }
 
+        // COUNT query uses same WHERE conditions without LIMIT
+        $countStmt = $db->prepare("SELECT COUNT(*) " . $baseCondition);
+        $countStmt->execute($params);
+        $total = (int) $countStmt->fetchColumn();
+
+        $sql = "SELECT m.id, m.sender_id, m.receiver_id, m.subject, m.body, m.created_at, m.is_read,
+                       su.first_name as sender_first_name, su.last_name as sender_last_name, su.tenant_id as sender_tenant_id,
+                       ru.first_name as receiver_first_name, ru.last_name as receiver_last_name, ru.tenant_id as receiver_tenant_id,
+                       st.name as sender_tenant_name, rt.name as receiver_tenant_name " . $baseCondition;
         $sql .= " ORDER BY m.created_at DESC LIMIT ?, ?";
-        $params[] = (int) (($page - 1) * $perPage);
-        $params[] = (int) $perPage;
+        $paginatedParams = array_merge($params, [(int) (($page - 1) * $perPage), (int) $perPage]);
 
         $stmt = $db->prepare($sql);
-        $stmt->execute($params);
+        $stmt->execute($paginatedParams);
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        $total = (int) $db->query("SELECT FOUND_ROWS()")->fetchColumn();
 
         $formatted = array_map(fn($m) => [
             'id' => (int) $m['id'],

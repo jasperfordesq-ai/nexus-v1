@@ -28,6 +28,9 @@ use Illuminate\Support\Facades\Log;
  */
 class PushFederationDataRetraction implements ShouldQueue
 {
+    /** Route to the standard federation queue (bulk, non-time-critical). */
+    public string $queue = 'federation';
+
     public function __construct(
         private readonly FederationFeatureService $federationFeatureService,
     ) {}

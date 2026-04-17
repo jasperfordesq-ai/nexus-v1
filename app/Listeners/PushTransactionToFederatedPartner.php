@@ -25,6 +25,9 @@ use Illuminate\Support\Facades\Log;
  */
 class PushTransactionToFederatedPartner implements ShouldQueue
 {
+    /** Process on the high-priority federation queue to minimise transaction latency. */
+    public string $queue = 'federation-high';
+
     public function __construct(
         private readonly FederationFeatureService $federationFeatureService,
     ) {}

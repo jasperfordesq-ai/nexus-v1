@@ -31,6 +31,9 @@ use Illuminate\Support\Facades\Log;
  */
 class PushMemberProfileUpdateToFederatedPartners implements ShouldQueue
 {
+    /** Route to the standard federation queue (bulk, non-time-critical). */
+    public string $queue = 'federation';
+
     /** Profile fields we are willing to broadcast to federation partners. */
     private const SYNCABLE_FIELDS = [
         'first_name', 'last_name', 'name',
@@ -45,7 +48,6 @@ class PushMemberProfileUpdateToFederatedPartners implements ShouldQueue
 
     public function handle(MemberProfileUpdated $event): void
     {
-        $user     = $event->user;
         $tenantId = $event->tenantId;
 
         try {
@@ -64,8 +66,17 @@ class PushMemberProfileUpdateToFederatedPartners implements ShouldQueue
                 return;
             }
 
+            // Re-fetch the user from DB to ensure we always push the latest data.
+            // The serialized model snapshot on the event may be stale if a second
+            // profile update occurred before this queue job ran.
+            $freshUser = \App\Models\User::find((int) $event->user->id);
+            if (!$freshUser) {
+                // User was deleted between dispatch and processing — nothing to push.
+                return;
+            }
+
             $identities = FederatedIdentity::query()
-                ->where('local_user_id', (int) $user->id)
+                ->where('local_user_id', (int) $freshUser->id)
                 ->get();
             if ($identities->isEmpty()) {
                 return;
@@ -77,7 +88,7 @@ class PushMemberProfileUpdateToFederatedPartners implements ShouldQueue
 
             $changes = [];
             foreach ($syncable as $field) {
-                $changes[$field] = $user->{$field} ?? null;
+                $changes[$field] = $freshUser->{$field} ?? null;
             }
 
             foreach ($identities as $identity) {
@@ -88,7 +99,7 @@ class PushMemberProfileUpdateToFederatedPartners implements ShouldQueue
 
                 $payload = [
                     'action'           => 'profile_updated',
-                    'local_user_id'    => $user->id,
+                    'local_user_id'    => $freshUser->id,
                     'external_user_id' => $identity->external_user_id,
                     'tenant_id'        => $tenantId,
                     'changed_fields'   => $syncable,
@@ -103,7 +114,7 @@ class PushMemberProfileUpdateToFederatedPartners implements ShouldQueue
                         Log::warning('PushMemberProfileUpdateToFederatedPartners: partner rejected', [
                             'partner_id' => $partnerId,
                             'tenant_id'  => $tenantId,
-                            'user_id'    => $user->id,
+                            'user_id'    => $freshUser->id,
                             'error'      => $result['error'] ?? null,
                         ]);
                     }
@@ -111,7 +122,7 @@ class PushMemberProfileUpdateToFederatedPartners implements ShouldQueue
                     Log::warning('PushMemberProfileUpdateToFederatedPartners: partner push failed', [
                         'partner_id' => $partnerId,
                         'tenant_id'  => $tenantId,
-                        'user_id'    => $user->id,
+                        'user_id'    => $freshUser->id,
                         'error'      => $e->getMessage(),
                     ]);
                 }
@@ -119,7 +130,7 @@ class PushMemberProfileUpdateToFederatedPartners implements ShouldQueue
         } catch (\Throwable $e) {
             Log::error('PushMemberProfileUpdateToFederatedPartners listener failed', [
                 'tenant_id' => $tenantId ?? null,
-                'user_id'   => $user->id ?? null,
+                'user_id'   => $event->user->id ?? null,
                 'error'     => $e->getMessage(),
             ]);
         }

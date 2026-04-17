@@ -22,19 +22,24 @@ class PruneLogs extends Command
     protected $signature = 'nexus:prune-logs
                             {--chunk=1000 : Number of rows to delete per iteration}';
 
-    protected $description = 'Prune old rows from unbounded logging tables (cron_logs, error_404_log, activity_log, api_logs, federation_api_logs)';
+    protected $description = 'Prune old rows from unbounded logging tables (cron_logs, error_404_log, activity_log, api_logs, federation_api_logs, federation_messages)';
 
     /**
      * Retention policy per table (in days) and the timestamp column to filter on.
      *
+     * federation_messages: 90-day retention keeps audit trail for disputes while
+     * preventing unbounded growth on busy federation networks.
+     * Override via FEDERATION_MESSAGES_RETENTION_DAYS env var if needed.
+     *
      * @var array<int, array{table: string, days: int, column: string}>
      */
     private const RETENTION = [
-        ['table' => 'cron_logs',           'days' => 90,  'column' => 'executed_at'],
-        ['table' => 'error_404_log',       'days' => 30,  'column' => 'last_seen_at'],
-        ['table' => 'activity_log',        'days' => 180, 'column' => 'created_at'],
-        ['table' => 'api_logs',            'days' => 30,  'column' => 'created_at'],
-        ['table' => 'federation_api_logs', 'days' => 30,  'column' => 'created_at'],
+        ['table' => 'cron_logs',             'days' => 90,  'column' => 'executed_at'],
+        ['table' => 'error_404_log',         'days' => 30,  'column' => 'last_seen_at'],
+        ['table' => 'activity_log',          'days' => 180, 'column' => 'created_at'],
+        ['table' => 'api_logs',              'days' => 30,  'column' => 'created_at'],
+        ['table' => 'federation_api_logs',   'days' => 30,  'column' => 'created_at'],
+        ['table' => 'federation_messages',   'days' => 90,  'column' => 'created_at'],
     ];
 
     public function handle(): int
