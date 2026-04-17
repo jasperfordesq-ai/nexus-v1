@@ -97,6 +97,7 @@ export function CampaignForm() {
   const [loadingBadges, setLoadingBadges] = useState(true);
   const [loadingCampaign, setLoadingCampaign] = useState(isEdit);
   const [saving, setSaving] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // Load available badges
   useEffect(() => {
@@ -151,9 +152,29 @@ export function CampaignForm() {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
+  /** Extract field-level errors from API response errors object */
+  function applyApiErrors(
+    resErrors: Record<string, string | string[]> | Array<{ message: string }> | undefined,
+  ): string | null {
+    if (!resErrors) return null;
+    if (Array.isArray(resErrors)) {
+      // Generic array of messages — no field to bind
+      return resErrors[0]?.message ?? null;
+    }
+    // Record<field, message> — bind per-field and return null (no generic toast)
+    const mapped: Record<string, string> = {};
+    for (const [field, msg] of Object.entries(resErrors)) {
+      mapped[field] = Array.isArray(msg) ? msg[0] : msg;
+    }
+    setFieldErrors(mapped);
+    return null;
+  }
+
   const handleSave = async () => {
+    setFieldErrors({});
+
     if (!formData.name.trim()) {
-      toast.error(t('gamification.campaign_name_required'));
+      setFieldErrors({ name: t('gamification.campaign_name_required') });
       return;
     }
 
@@ -176,10 +197,9 @@ export function CampaignForm() {
         toast.success(t('gamification.campaign_updated'));
         navigate(tenantPath('/admin/gamification/campaigns'));
       } else {
-        const errorMsg = (res as { error?: string }).error
-          || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
-          || t('gamification.failed_to_update_campaign');
-        toast.error(errorMsg);
+        const resAny = res as { error?: string; errors?: Record<string, string | string[]> | Array<{ message: string }> };
+        const genericMsg = applyApiErrors(resAny.errors) ?? resAny.error ?? t('gamification.failed_to_update_campaign');
+        if (genericMsg) toast.error(genericMsg);
       }
     } else {
       const res = await adminGamification.createCampaign(payload);
@@ -187,10 +207,9 @@ export function CampaignForm() {
         toast.success(t('gamification.campaign_created'));
         navigate(tenantPath('/admin/gamification/campaigns'));
       } else {
-        const errorMsg = (res as { error?: string }).error
-          || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
-          || t('gamification.failed_to_create_campaign');
-        toast.error(errorMsg);
+        const resAny = res as { error?: string; errors?: Record<string, string | string[]> | Array<{ message: string }> };
+        const genericMsg = applyApiErrors(resAny.errors) ?? resAny.error ?? t('gamification.failed_to_create_campaign');
+        if (genericMsg) toast.error(genericMsg);
       }
     }
 
@@ -228,10 +247,12 @@ export function CampaignForm() {
             label={t('gamification.label_name')}
             placeholder={t('gamification.placeholder_campaign_name')}
             value={formData.name}
-            onValueChange={(v) => updateField('name', v)}
+            onValueChange={(v) => { updateField('name', v); setFieldErrors((prev) => ({ ...prev, name: '' })); }}
             isRequired
             variant="bordered"
             autoFocus
+            isInvalid={!!fieldErrors.name}
+            errorMessage={fieldErrors.name}
           />
 
           <Textarea
@@ -241,6 +262,8 @@ export function CampaignForm() {
             onValueChange={(v) => updateField('description', v)}
             variant="bordered"
             minRows={3}
+            isInvalid={!!fieldErrors.description}
+            errorMessage={fieldErrors.description}
           />
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -302,6 +325,8 @@ export function CampaignForm() {
             onValueChange={(v) => updateField('xp_amount', v)}
             variant="bordered"
             description={t('gamification.desc_bonus_xp')}
+            isInvalid={!!fieldErrors.xp_amount}
+            errorMessage={fieldErrors.xp_amount}
           />
 
           <Select

@@ -70,7 +70,7 @@ export function ResetPasswordPage() {
     // Validation - must match backend requirements (PasswordResetApiController)
     const passwordErrors = validatePassword(password);
     if (passwordErrors.length > 0) {
-      setError(passwordErrors[0] ?? '');
+      setError(t(passwordErrors[0] ?? ''));
       return;
     }
     if (password !== confirmPassword) {
@@ -204,7 +204,7 @@ export function ResetPasswordPage() {
                         ) : (
                           <X className="w-3 h-3" />
                         )}
-                        {req.label}
+                        {t(req.label)}
                       </li>
                     );
                   })}

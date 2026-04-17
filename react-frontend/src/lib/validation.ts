@@ -33,27 +33,27 @@ export interface PasswordRequirement {
 export const PASSWORD_REQUIREMENTS: PasswordRequirement[] = [
   {
     id: 'length',
-    label: `At least ${PASSWORD_MIN_LENGTH} characters`,
+    label: 'auth.password_requirements.length',
     test: (p) => p.length >= PASSWORD_MIN_LENGTH,
   },
   {
     id: 'uppercase',
-    label: 'At least one uppercase letter',
+    label: 'auth.password_requirements.uppercase',
     test: (p) => /[A-Z]/.test(p),
   },
   {
     id: 'lowercase',
-    label: 'At least one lowercase letter',
+    label: 'auth.password_requirements.lowercase',
     test: (p) => /[a-z]/.test(p),
   },
   {
     id: 'number',
-    label: 'At least one number',
+    label: 'auth.password_requirements.number',
     test: (p) => /[0-9]/.test(p),
   },
   {
     id: 'special',
-    label: 'At least one special character',
+    label: 'auth.password_requirements.special',
     test: (p) => /[\W_]/.test(p),
   },
 ];
@@ -150,6 +150,36 @@ export function validateEmail(email: string): string | null {
     return 'Please enter a valid email address';
   }
 
+  return null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Phone Validation (E.164 international format)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Validate a phone number in E.164 format: starts with +, followed by 7–15 digits.
+ * Empty string is considered valid (phone is optional).
+ *
+ * @param phone - The phone number to validate
+ * @returns true if phone is valid E.164 or empty
+ */
+export function isPhoneValid(phone: string): boolean {
+  if (!phone || !phone.trim()) return true; // optional field
+  return /^\+[1-9]\d{6,14}$/.test(phone.trim());
+}
+
+/**
+ * Validate a phone number and return an error message if invalid.
+ *
+ * @param phone - The phone number to validate
+ * @returns Error message or null if valid
+ */
+export function validatePhone(phone: string): string | null {
+  if (!phone || !phone.trim()) return null; // optional
+  if (!isPhoneValid(phone)) {
+    return 'Phone must be in international format (e.g. +1 555 123 4567)';
+  }
   return null;
 }
 

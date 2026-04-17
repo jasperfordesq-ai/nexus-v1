@@ -17,11 +17,7 @@ import { adminGamification } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { BadgeConfigEntry } from '../../api/types';
 
-const TIER_LABELS: Record<string, string> = {
-  core: 'Core',
-  template: 'Template',
-  custom: 'Custom',
-};
+// TIER_LABELS removed — tier display names now come from i18n (gamification.badge_tiers.*)
 
 const TIER_COLORS: Record<string, 'primary' | 'success' | 'warning' | 'secondary' | 'danger'> = {
   core: 'primary',
@@ -158,7 +154,7 @@ export function BadgeConfiguration() {
             <div key={tier} className="mb-8">
               <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
                 <Chip color={TIER_COLORS[tier] ?? 'primary'} size="sm" variant="flat">
-                  {TIER_LABELS[tier] ?? tier}
+                  {t(`gamification.badge_tiers.${tier}`, { defaultValue: tier })}
                 </Chip>
                 <span className="text-default-400 text-sm font-normal">
                   {(grouped[tier] ?? []).length !== 1
@@ -197,7 +193,7 @@ export function BadgeConfiguration() {
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
                           <Chip size="sm" variant="flat" color={RARITY_COLORS[badge.rarity] ?? 'default'}>
-                            {badge.rarity}
+                            {t(`gamification.badge_rarities.${badge.rarity}`, { defaultValue: badge.rarity })}
                           </Chip>
                           {badge.threshold > 0 && (
                             <Chip size="sm" variant="flat" color="default">

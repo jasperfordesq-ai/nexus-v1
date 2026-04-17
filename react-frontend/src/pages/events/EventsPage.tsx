@@ -67,10 +67,15 @@ export function EventsPage() {
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const EVENT_CATEGORIES = EVENT_CATEGORY_IDS.map((cat) => ({
-    ...cat,
-    name: t(`category.${cat.id}`),
-  }));
+  const EVENT_CATEGORIES = EVENT_CATEGORY_IDS.map((cat) => {
+    const key = `category.${cat.id}`;
+    const translated = t(key);
+    // Fall back to capitalized ID if translation key is missing (t() returns the key itself when missing)
+    const name = translated === key
+      ? cat.id.charAt(0).toUpperCase() + cat.id.slice(1)
+      : translated;
+    return { ...cat, name };
+  });
 
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -173,6 +178,9 @@ export function EventsPage() {
       if (controller.signal.aborted) return;
       logError('Failed to load events', err);
       if (!append) {
+        if (nearMeEnabled) {
+          toastRef.current.error(tRef.current('nearby_error'));
+        }
         setError(tRef.current('unable_to_load'));
       } else {
         toastRef.current.error(tRef.current('error_load_more'));

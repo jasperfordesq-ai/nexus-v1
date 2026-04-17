@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import Papa from 'papaparse';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Tabs, Tab, Skeleton } from '@heroui/react';
@@ -184,40 +185,23 @@ export function WalletPage() {
            + (balance?.pending_out ?? balance?.pending_outgoing ?? 0),
   }), [balance]);
 
-  /**
-   * Sanitize cell value to prevent CSV injection
-   * Prefixes dangerous characters with a single quote
-   */
-  function sanitizeCsvCell(value: string): string {
-    // If the cell starts with =, +, -, @, tab, or carriage return, prefix with single quote
-    if (/^[=+\-@\t\r]/.test(value)) {
-      return `'${value}`;
-    }
-    return value;
-  }
-
-  // Export transactions to CSV
+  // Export transactions to CSV using papaparse
   function handleExport() {
     if (transactions.length === 0) {
       toast.info(t('toast.no_data'));
       return;
     }
 
-    // Create CSV content
-    const headers = [t('csv.date'), t('csv.type'), t('csv.amount'), t('csv.description'), t('csv.other_party'), t('csv.status')];
-    const rows = transactions.map((tx) => [
-      new Date(tx.created_at).toLocaleDateString(),
-      tx.type === 'credit' ? t('csv.received') : t('csv.sent'),
-      tx.amount.toString(),
-      sanitizeCsvCell(tx.description || ''),
-      sanitizeCsvCell(tx.other_user?.name || tx.other_party?.name || ''),
-      tx.status,
-    ]);
+    const data = transactions.map((tx) => ({
+      [t('csv.date')]: new Date(tx.created_at).toLocaleDateString(),
+      [t('csv.type')]: tx.type === 'credit' ? t('csv.received') : t('csv.sent'),
+      [t('csv.amount')]: tx.amount,
+      [t('csv.description')]: tx.description || '',
+      [t('csv.other_party')]: tx.other_user?.name || tx.other_party?.name || '',
+      [t('csv.status')]: tx.status,
+    }));
 
-    const csvContent = [
-      headers.join(','),
-      ...rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')),
-    ].join('\n');
+    const csvContent = Papa.unparse(data);
 
     // Create and download file
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -431,7 +415,7 @@ export function WalletPage() {
                   <TransactionCard key={transaction.id} transaction={transaction} />
                 ))}
                 {/* Load More Button */}
-                {hasMoreTransactions && filter === 'all' && (
+                {hasMoreTransactions && (
                   <div className="pt-4 text-center">
                     <Button
                       variant="flat"

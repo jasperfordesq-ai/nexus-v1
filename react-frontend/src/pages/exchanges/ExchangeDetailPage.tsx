@@ -697,6 +697,8 @@ export function ExchangeDetailPage() {
                   {/* Icon circle */}
                   <div
                     className={`relative z-10 w-9 h-9 rounded-full flex items-center justify-center border-2 flex-shrink-0 ${entry.colorClass}`}
+                    aria-label={t(entry.label)}
+                    role="img"
                   >
                     {entry.icon}
                   </div>

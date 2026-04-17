@@ -209,6 +209,7 @@ function HeartOverlay({ show }: { show: boolean }) {
           exit={{ scale: 1.4, opacity: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
           className="absolute inset-0 flex items-center justify-center pointer-events-none z-10"
+          aria-hidden="true"
         >
           <Heart className="w-20 h-20 text-white fill-white drop-shadow-lg" />
         </motion.div>
