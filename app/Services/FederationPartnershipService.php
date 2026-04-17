@@ -396,6 +396,21 @@ class FederationPartnershipService
             return ['success' => false, 'error' => 'Only a partner tenant can reactivate this partnership'];
         }
 
+        // Reactivation consent guard: only the party that suspended the partnership
+        // should be able to reactivate it unilaterally.
+        //
+        // NOTE: The schema lacks a dedicated `suspended_by` column — suspendPartnership()
+        // currently does not persist the suspending party's tenant ID. Until a migration
+        // adds `suspended_by int(10) unsigned DEFAULT NULL` to federation_partnerships and
+        // suspendPartnership() is updated to write it, we fall back to `terminated_by`
+        // (which is shared between suspension and termination contexts and may be NULL for
+        // suspensions). Full consent enforcement therefore requires that migration.
+        //
+        // Current behaviour: if `terminated_by` is set (a user ID, not a tenant ID), we
+        // cannot determine the suspending *tenant* reliably — so we allow either party to
+        // reactivate for now. This is a known gap; see suspendPartnership() which only
+        // stores a reason string, not the suspending tenant.
+
         try {
             DB::table('federation_partnerships')->where('id', $partnershipId)->update([
                 'status' => 'active',
@@ -430,6 +445,9 @@ class FederationPartnershipService
         if ((int) $partnership['tenant_id'] !== $tenantId && (int) $partnership['partner_tenant_id'] !== $tenantId) {
             return ['success' => false, 'error' => 'Only a partner tenant can terminate this partnership'];
         }
+
+        $partnershipTenantId = (int) $partnership['tenant_id'];
+        $partnerTenantId = (int) $partnership['partner_tenant_id'];
 
         try {
             DB::transaction(function () use ($partnershipId, $partnershipTenantId, $partnerTenantId, $terminatedBy, $reason, $partnership) {

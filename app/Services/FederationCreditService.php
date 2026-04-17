@@ -159,19 +159,36 @@ class FederationCreditService
                 return ['success' => false, 'error' => 'Unauthorized: tenant is not party to this agreement'];
             }
 
-            // Set the correct approved_by column based on which party is approving
-            $approverColumn = ((int) $agreement->from_tenant_id === $tenantId)
-                ? 'approved_by_from'
-                : 'approved_by_to';
+            // Record this party's approval in the correct column.
+            $isFromTenant = ((int) $agreement->from_tenant_id === $tenantId);
+            $approverColumn = $isFromTenant ? 'approved_by_from' : 'approved_by_to';
 
+            // Record approval for the approving party without yet activating.
             DB::update(
-                "UPDATE federation_credit_agreements SET status = 'active', {$approverColumn} = ?, updated_at = NOW() WHERE id = ?",
+                "UPDATE federation_credit_agreements SET {$approverColumn} = ?, updated_at = NOW() WHERE id = ?",
                 [$approvedBy, $agreementId]
             );
 
-            Log::info('[FederationCredit] Agreement approved', ['id' => $agreementId, 'by' => $approvedBy]);
+            // Reload to check whether both parties have now approved.
+            $updated = DB::selectOne(
+                "SELECT approved_by_from, approved_by_to FROM federation_credit_agreements WHERE id = ?",
+                [$agreementId]
+            );
 
-            return ['success' => true, 'id' => $agreementId, 'status' => 'active'];
+            $bothApproved = $updated && $updated->approved_by_from !== null && $updated->approved_by_to !== null;
+
+            if ($bothApproved) {
+                DB::update(
+                    "UPDATE federation_credit_agreements SET status = 'active', updated_at = NOW() WHERE id = ?",
+                    [$agreementId]
+                );
+                Log::info('[FederationCredit] Agreement fully approved — both parties consented', ['id' => $agreementId]);
+                return ['success' => true, 'id' => $agreementId, 'status' => 'active'];
+            }
+
+            // Only one side has approved; keep status as 'pending' until the other party approves.
+            Log::info('[FederationCredit] Agreement partially approved — awaiting other party', ['id' => $agreementId, 'by' => $approvedBy]);
+            return ['success' => true, 'id' => $agreementId, 'status' => 'pending'];
         } catch (\Exception $e) {
             Log::error('[FederationCredit] approveAgreement failed', ['error' => $e->getMessage()]);
             $this->errors[] = 'Failed to approve agreement';
