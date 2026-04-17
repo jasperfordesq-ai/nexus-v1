@@ -165,4 +165,52 @@ class AdminBillingController extends BaseApiController
 
         return $this->respondWithData($plans);
     }
+
+    /**
+     * POST /v2/admin/billing/upgrade-request
+     *
+     * Tenant admin submits an upgrade request to God.
+     * Logs to billing_audit_log and sends email to Jasper.
+     * Body: { message?: string }
+     */
+    public function requestUpgrade(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $user     = $this->getAuthUser();
+
+        $message  = $this->getInput('message', '');
+
+        // Fetch tenant name
+        $tenant = DB::table('tenants')->where('id', $tenantId)->value('name') ?? 'Unknown';
+
+        // Log to billing_audit_log
+        DB::table('billing_audit_log')->insert([
+            'tenant_id'       => $tenantId,
+            'acted_by_user_id' => $user->id ?? null,
+            'action'          => 'upgrade_requested',
+            'old_value'       => null,
+            'new_value'       => json_encode(['message' => $message]),
+            'notes'           => 'Self-service upgrade request from tenant admin',
+            'created_at'      => now(),
+            'updated_at'      => now(),
+        ]);
+
+        // Email Jasper
+        try {
+            \Illuminate\Support\Facades\Mail::raw(
+                "Upgrade request from tenant: {$tenant} (ID: {$tenantId})\n\n" .
+                "Requested by: " . ($user->email ?? 'unknown') . "\n\n" .
+                "Message: " . ($message ?: '(none)'),
+                function ($m) use ($tenant) {
+                    $m->to('jasper@hour-timebank.ie')
+                      ->subject("Plan Upgrade Request — {$tenant}");
+                }
+            );
+        } catch (\Throwable $e) {
+            Log::warning('BillingController: upgrade request email failed', ['error' => $e->getMessage()]);
+        }
+
+        return $this->respondWithData(['sent' => true]);
+    }
 }
