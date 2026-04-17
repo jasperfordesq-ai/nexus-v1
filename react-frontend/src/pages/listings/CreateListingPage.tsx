@@ -159,6 +159,7 @@ export function CreateListingPage() {
     if (isEditing) {
       loadListing();
     }
+    return () => { editAbortRef.current?.abort(); };
   }, [id, isEditing, t, toast]);
 
   function validateForm(): boolean {

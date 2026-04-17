@@ -1109,6 +1109,7 @@ return [
     'job_bulk_ids_status_required'         => 'application_ids and status are required',
     'job_bulk_max_1000'                    => 'Maximum 1000 application IDs per request',
     'job_ai_generate_failed'               => 'Failed to generate description',
+    'listing_ai_generate_failed'           => 'Could not generate description. Please try again.',
     'job_resume_visibility_failed'         => 'Failed to update resume visibility',
     'job_candidate_not_found'              => 'Candidate profile not found or not searchable',
     'job_referral_failed'                  => 'Unable to create referral token',

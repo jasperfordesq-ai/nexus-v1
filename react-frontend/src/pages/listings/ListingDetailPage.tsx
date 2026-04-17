@@ -163,6 +163,7 @@ export function ListingDetailPage() {
     loadListing();
     loadExchangeConfig();
     checkActiveExchange();
+    return () => { abortRef.current?.abort(); };
   }, [loadListing, loadExchangeConfig, checkActiveExchange]);
 
   async function handleDelete() {

@@ -89,7 +89,11 @@ class ListingsController extends BaseApiController
             $filters['max_hours'] = max(0, min(2000, (float) $this->query('max_hours')));
         }
         if ($this->query('service_type')) {
-            $filters['service_type'] = $this->query('service_type');
+            $allowed = ['physical_only', 'remote_only', 'hybrid', 'location_dependent'];
+            $types = array_filter(explode(',', $this->query('service_type')), fn($t) => in_array(trim($t), $allowed, true));
+            if (!empty($types)) {
+                $filters['service_type'] = implode(',', $types);
+            }
         }
         if ($this->query('posted_within')) {
             $filters['posted_within'] = max(1, min(365, (int) $this->query('posted_within')));
@@ -386,7 +390,7 @@ class ListingsController extends BaseApiController
         }
 
         $filters = [
-            'radius_km' => (float) $this->query('radius_km', '25'),
+            'radius_km' => max(0.1, min(500, (float) $this->query('radius_km', '25'))),
             'limit'     => $this->queryInt('per_page', 20, 1, 100),
         ];
 
@@ -412,7 +416,11 @@ class ListingsController extends BaseApiController
             $filters['max_hours'] = max(0, min(2000, (float) $this->query('max_hours')));
         }
         if ($this->query('service_type')) {
-            $filters['service_type'] = $this->query('service_type');
+            $allowed = ['physical_only', 'remote_only', 'hybrid', 'location_dependent'];
+            $types = array_filter(explode(',', $this->query('service_type')), fn($t) => in_array(trim($t), $allowed, true));
+            if (!empty($types)) {
+                $filters['service_type'] = implode(',', $types);
+            }
         }
         if ($this->query('posted_within')) {
             $filters['posted_within'] = max(1, min(365, (int) $this->query('posted_within')));
@@ -1112,7 +1120,8 @@ class ListingsController extends BaseApiController
         ]);
 
         if (!empty($result['error'])) {
-            return $this->respondWithError('AI_SERVICE_ERROR', $result['reply'] ?? 'Could not generate description.', null, 503);
+            \Log::error('Listing AI description generation failed', ['error' => $result]);
+            return $this->respondWithError('AI_SERVICE_ERROR', __('api.listing_ai_generate_failed'), null, 503);
         }
 
         return $this->respondWithData(['description' => $result['reply']]);
