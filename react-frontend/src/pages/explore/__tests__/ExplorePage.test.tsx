@@ -19,6 +19,7 @@ const mockTenant = {
   hasFeature: mockHasFeature,
   hasModule: vi.fn(() => true),
   tenant: { id: 1, name: 'Test', slug: 'test' },
+  branding: { name: 'Test Community', logo_url: null },
   features: [],
   configuration: {},
   isLoading: false,
@@ -169,6 +170,10 @@ vi.mock('@/lib/helpers', () => ({
 
 vi.mock('@/lib/api', () => ({
   default: { post: vi.fn().mockResolvedValue({}) },
+}));
+
+vi.mock('@/components/seo/PageMeta', () => ({
+  PageMeta: () => null,
 }));
 
 vi.mock('@/components/explore', () => ({
@@ -426,5 +431,16 @@ describe('ExplorePage', () => {
     expect(screen.queryByText('polls.title')).not.toBeInTheDocument();
     expect(screen.queryByText('jobs.title')).not.toBeInTheDocument();
     expect(screen.queryByText('resources.title')).not.toBeInTheDocument();
+  });
+
+  it('hides members-directory sections when connections feature is disabled', () => {
+    mockHasFeature.mockImplementation((feature?: string) => feature !== 'connections');
+
+    render(<ExplorePage />);
+
+    expect(screen.queryByText('tabs.people')).not.toBeInTheDocument();
+    expect(screen.queryByText('suggested_connections.title')).not.toBeInTheDocument();
+    expect(screen.queryByText('new_members.title')).not.toBeInTheDocument();
+    expect(screen.getByText('blog_posts.title')).toBeInTheDocument();
   });
 });

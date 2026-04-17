@@ -22,7 +22,7 @@ import {
 import { UserPlus, Users, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
-import { useTenant, useToast } from '@/contexts';
+import { useFeature, useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
@@ -68,6 +68,7 @@ function addDismissed(key: string, userId: number): void {
 export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSuggestionsWidgetProps) {
   const { t } = useTranslation('feed');
   const { tenantPath, tenantSlug } = useTenant();
+  const hasConnections = useFeature('connections');
   const toast = useToast();
 
   // Namespace the dismissed-suggestions key per tenant so dismissals don't leak across tenants
@@ -78,6 +79,12 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
   const [connectingIds, setConnectingIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
+    if (!hasConnections) {
+      setSuggestions([]);
+      setIsLoading(false);
+      return;
+    }
+
     const load = async () => {
       try {
         setIsLoading(true);
@@ -96,7 +103,7 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
       }
     };
     load();
-  }, [dismissedKey, t, toast]);
+  }, [dismissedKey, hasConnections, t, toast]);
 
   const handleConnect = useCallback(async (suggestion: Suggestion) => {
     setConnectingIds((prev) => new Set(prev).add(suggestion.id));
@@ -125,7 +132,7 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
   }, [dismissedKey]);
 
   // Don't show if no suggestions
-  if (!isLoading && suggestions.length === 0) return null;
+  if (!hasConnections || (!isLoading && suggestions.length === 0)) return null;
 
   /* ─── Loading skeleton ─── */
   if (isLoading) {

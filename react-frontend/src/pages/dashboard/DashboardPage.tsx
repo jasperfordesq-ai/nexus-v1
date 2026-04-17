@@ -128,6 +128,7 @@ export function DashboardPage() {
   const hasGamification = useFeature('gamification');
   const hasEvents = useFeature('events');
   const hasGroups = useFeature('groups');
+  const hasConnections = useFeature('connections');
   const hasFeedModule = useModule('feed');
   const hasListingsModule = useModule('listings');
 
@@ -576,7 +577,7 @@ export function DashboardPage() {
                 <QuickActionLink to={tenantPath('/listings/create')} icon={<Plus aria-hidden="true" />} label={t('quick_actions.create_listing')} />
                 <QuickActionLink to={tenantPath('/messages')} icon={<MessageSquare aria-hidden="true" />} label={t('quick_actions.messages')} />
                 <QuickActionLink to={tenantPath('/wallet')} icon={<Wallet aria-hidden="true" />} label={t('quick_actions.view_wallet')} />
-                <QuickActionLink to={tenantPath('/members')} icon={<Users aria-hidden="true" />} label={t('quick_actions.find_members')} />
+                {hasConnections && <QuickActionLink to={tenantPath('/members')} icon={<Users aria-hidden="true" />} label={t('quick_actions.find_members')} />}
                 {hasEvents && (<QuickActionLink to={tenantPath('/events')} icon={<Calendar aria-hidden="true" />} label={t('quick_actions.browse_events')} />)}
                 <QuickActionLink to={tenantPath('/notifications')} icon={<Bell aria-hidden="true" />} label={t('quick_actions.notifications')} />
               </div>

@@ -11,7 +11,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts';
+import { useAuth, useFeature } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { WidgetSkeleton } from './WidgetSkeleton';
@@ -46,6 +46,7 @@ interface SidebarApiResponse {
 
 export function FeedSidebar() {
   const { isAuthenticated } = useAuth();
+  const hasConnections = useFeature('connections');
   const [data, setData] = useState<SidebarApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -83,7 +84,7 @@ export function FeedSidebar() {
       {data?.friends && data.friends.length > 0 && (
         <FriendsWidget friends={data.friends} />
       )}
-      {data?.community_stats && (
+      {hasConnections && data?.community_stats && (
         <CommunityPulseWidget stats={data.community_stats} />
       )}
       {data?.suggested_listings && data.suggested_listings.length > 0 && (
@@ -92,7 +93,7 @@ export function FeedSidebar() {
       {data?.top_categories && data.top_categories.length > 0 && (
         <TopCategoriesWidget categories={data.top_categories} />
       )}
-      {isAuthenticated && <ConnectionSuggestionsWidget layout="sidebar" />}
+      {isAuthenticated && hasConnections && <ConnectionSuggestionsWidget layout="sidebar" />}
       {data?.upcoming_events && data.upcoming_events.length > 0 && (
         <UpcomingEventsWidget events={data.upcoming_events} />
       )}

@@ -127,6 +127,10 @@ vi.mock('@/components/endorsements/TopEndorsedWidget', () => ({
   TopEndorsedWidget: () => <div data-testid="top-endorsed-widget">TopEndorsedWidget</div>,
 }));
 
+vi.mock('@/components/feed/ConnectionSuggestionsWidget', () => ({
+  ConnectionSuggestionsWidget: () => <div data-testid="connection-suggestions-widget">ConnectionSuggestionsWidget</div>,
+}));
+
 vi.mock('../WidgetSkeleton', () => ({
   WidgetSkeleton: ({ lines }: { lines?: number }) => (
     <div data-testid="widget-skeleton">WidgetSkeleton (lines={lines ?? 3})</div>
@@ -173,7 +177,7 @@ describe('FeedSidebar', () => {
     expect(screen.getByTestId('community-pulse-widget')).toBeInTheDocument();
     expect(screen.getByTestId('suggested-listings-widget')).toBeInTheDocument();
     expect(screen.getByTestId('top-categories-widget')).toBeInTheDocument();
-    expect(screen.getByTestId('people-widget')).toBeInTheDocument();
+    expect(screen.getByTestId('connection-suggestions-widget')).toBeInTheDocument();
     expect(screen.getByTestId('upcoming-events-widget')).toBeInTheDocument();
     expect(screen.getByTestId('popular-groups-widget')).toBeInTheDocument();
     expect(screen.getByTestId('trending-hashtags')).toBeInTheDocument();
@@ -253,6 +257,21 @@ describe('FeedSidebar', () => {
     // No sidebar data widgets should render since data is null
     expect(screen.queryByTestId('friends-widget')).not.toBeInTheDocument();
     expect(screen.queryByTestId('community-pulse-widget')).not.toBeInTheDocument();
+  });
+
+  it('hides connection-related widgets when connections feature is disabled', async () => {
+    const { useFeature } = await import('@/contexts');
+    vi.mocked(useFeature).mockImplementation((feature: string) => feature !== 'connections');
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: fullSidebarData });
+
+    render(<FeedSidebar />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('suggested-listings-widget')).toBeInTheDocument();
+    });
+
+    expect(screen.queryByTestId('community-pulse-widget')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('connection-suggestions-widget')).not.toBeInTheDocument();
   });
 
   it('handles empty sidebar data (all fields undefined)', async () => {

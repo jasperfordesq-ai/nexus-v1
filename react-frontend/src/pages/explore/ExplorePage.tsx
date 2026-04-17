@@ -386,12 +386,14 @@ export default function ExplorePage() {
   const navigate = useNavigate();
   const { tenantPath, hasFeature } = useTenant();
   const { isAuthenticated } = useAuth();
+  const hasConnections = hasFeature('connections');
   const [searchQuery, setSearchQuery] = useState('');
 
   // ── Tab navigation (persisted in URL ?tab=...) ──────────────────────────
   const [searchParams, setSearchParams] = useSearchParams();
   const tabFromUrl = searchParams.get('tab');
-  const activeTab: ExploreTab = isValidTab(tabFromUrl) ? tabFromUrl : 'all';
+  const requestedTab: ExploreTab = isValidTab(tabFromUrl) ? tabFromUrl : 'all';
+  const activeTab: ExploreTab = !hasConnections && requestedTab === 'people' ? 'all' : requestedTab;
 
   const handleTabChange = useCallback((key: React.Key) => {
     const newTab = String(key) as ExploreTab;
@@ -618,7 +620,7 @@ export default function ExplorePage() {
           <Tab key="all" title={t('tabs.all')} />
           <Tab key="for_you" title={t('tabs.for_you')} />
           <Tab key="listings" title={t('tabs.listings')} />
-          <Tab key="people" title={t('tabs.people')} />
+          {hasConnections && <Tab key="people" title={t('tabs.people')} />}
           <Tab key="events" title={t('tabs.events')} />
           <Tab key="groups" title={t('tabs.groups')} />
         </Tabs>
@@ -1260,7 +1262,7 @@ export default function ExplorePage() {
       )}
 
       {/* ─── Suggested Connections (Phase 1) ────────────────────────────── */}
-      {showSection('all', 'people') && isAuthenticated && data?.suggested_connections && data.suggested_connections.length > 0 && (
+      {showSection('all', 'people') && hasConnections && isAuthenticated && data?.suggested_connections && data.suggested_connections.length > 0 && (
         <ExploreSection
           title={t('suggested_connections.title')}
           subtitle={t('suggested_connections.subtitle')}
@@ -1648,7 +1650,7 @@ export default function ExplorePage() {
       )}
 
       {/* ─── New Members ──────────────────────────────────────────────────── */}
-      {showSection('all', 'people') && (isLoading || (data?.new_members && data.new_members.length > 0)) && (
+      {showSection('all', 'people') && hasConnections && (isLoading || (data?.new_members && data.new_members.length > 0)) && (
         <ExploreSection
           title={t('new_members.title')}
           subtitle={t('new_members.subtitle')}
@@ -1771,7 +1773,7 @@ export default function ExplorePage() {
       {!isLoading && activeTab === 'listings' && !data?.popular_listings?.length && !data?.recommended_listings?.length && (
         <EmptyState icon={ListTodo} message={t('empty_listings', 'No listings to show yet. Be the first to create one!')} cta={t('create_listing', 'Create Listing')} onAction={() => navigate(tenantPath('/listings/new'))} />
       )}
-      {!isLoading && activeTab === 'people' && !data?.suggested_connections?.length && !data?.new_members?.length && !data?.top_contributors?.length && (
+      {!isLoading && hasConnections && activeTab === 'people' && !data?.suggested_connections?.length && !data?.new_members?.length && !data?.top_contributors?.length && (
         <EmptyState icon={Users} message={t('empty_people', 'No members to show yet. Invite someone to join!')} />
       )}
       {!isLoading && activeTab === 'events' && !data?.upcoming_events?.length && (

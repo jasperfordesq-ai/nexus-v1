@@ -10,6 +10,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@/test/test-utils';
 
+const { mockUseFeature } = vi.hoisted(() => ({
+  mockUseFeature: vi.fn(() => true),
+}));
+
 // Mock dependencies
 vi.mock('@/lib/api', () => ({
   api: {
@@ -31,7 +35,7 @@ vi.mock('@/contexts', () => ({
     hasFeature: vi.fn(() => true),
     hasModule: vi.fn(() => true),
   })),
-  useFeature: vi.fn(() => true),
+  useFeature: mockUseFeature,
   useModule: vi.fn(() => true),
   useNotifications: vi.fn(() => ({
     counts: { messages: 3, notifications: 5 },
@@ -75,6 +79,7 @@ import { DashboardPage } from './DashboardPage';
 describe('DashboardPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseFeature.mockReturnValue(true);
   });
 
   it('renders without crashing', () => {
@@ -128,5 +133,14 @@ describe('DashboardPage', () => {
 
     render(<DashboardPage />);
     expect(screen.getByText('Complete your profile setup')).toBeInTheDocument();
+  });
+
+  it('hides Find Members quick action when connections feature is disabled', () => {
+    mockUseFeature.mockImplementation((feature: string) => feature !== 'connections');
+
+    render(<DashboardPage />);
+
+    expect(screen.queryByText('Find Members')).not.toBeInTheDocument();
+    expect(screen.getByText('Create Listing')).toBeInTheDocument();
   });
 });
