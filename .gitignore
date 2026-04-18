@@ -64,6 +64,7 @@ CLAUDE.md
 !/scripts/backup-production-db.sh
 !/scripts/server-nightly-backup.sh
 !/scripts/setup-rclone-gdrive.sh
+!/scripts/setup-rclone-local.sh
 !/scripts/check-migration-drift.sh
 !/scripts/check-migration-ci.sh
 !/scripts/maintenance.sh
