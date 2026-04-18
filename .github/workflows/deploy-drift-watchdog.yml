@@ -1,0 +1,142 @@
+# Copyright © 2024–2026 Jasper Ford
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Deploy Drift Watchdog (Telegram alerting)
+# Runs every 10 minutes. Compares the commit on api.project-nexus.ie against
+# origin/main. On drift >30 min, sends a Telegram alert AND fails the workflow.
+
+name: Deploy Drift Watchdog
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  VERSION_URL: https://api.project-nexus.ie/version.php
+  DRIFT_THRESHOLD_MINUTES: 30
+
+jobs:
+  check-drift:
+    name: Check prod matches main
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Fetch version.php from production
+        id: prod
+        run: |
+          HTTP_CODE=$(curl -sS -o prod.json -w "%{http_code}" \
+            --max-time 20 --retry 3 --retry-delay 5 \
+            "${VERSION_URL}" || echo "000")
+          echo "HTTP status: ${HTTP_CODE}"
+
+          if [ "${HTTP_CODE}" != "200" ]; then
+            echo "status=endpoint_unreachable" >> "$GITHUB_OUTPUT"
+            echo "http_code=${HTTP_CODE}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          cat prod.json; echo ""
+          PROD_COMMIT=$(jq -r '.commit // "unknown"' prod.json)
+
+          if [ "${PROD_COMMIT}" = "unknown" ] || [ -z "${PROD_COMMIT}" ]; then
+            echo "status=no_commit_field" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "status=ok" >> "$GITHUB_OUTPUT"
+          echo "prod_commit=${PROD_COMMIT}" >> "$GITHUB_OUTPUT"
+          echo "prod_commit_short=${PROD_COMMIT:0:8}" >> "$GITHUB_OUTPUT"
+
+      - name: Get latest commit on main
+        id: main
+        run: |
+          MAIN_COMMIT=$(git rev-parse HEAD)
+          MAIN_TS=$(git log -1 --format=%ct HEAD)
+          MAIN_SUBJECT=$(git log -1 --format=%s HEAD)
+          echo "main_commit=${MAIN_COMMIT}" >> "$GITHUB_OUTPUT"
+          echo "main_commit_short=${MAIN_COMMIT:0:8}" >> "$GITHUB_OUTPUT"
+          echo "main_timestamp=${MAIN_TS}" >> "$GITHUB_OUTPUT"
+          echo "main_subject=${MAIN_SUBJECT}" >> "$GITHUB_OUTPUT"
+
+      - name: Compare and decide
+        id: decide
+        run: |
+          PROD_STATUS="${{ steps.prod.outputs.status }}"
+          PROD="${{ steps.prod.outputs.prod_commit }}"
+          PROD_SHORT="${{ steps.prod.outputs.prod_commit_short }}"
+          MAIN="${{ steps.main.outputs.main_commit }}"
+          MAIN_SHORT="${{ steps.main.outputs.main_commit_short }}"
+          MAIN_TS="${{ steps.main.outputs.main_timestamp }}"
+          MAIN_SUBJECT="${{ steps.main.outputs.main_subject }}"
+          HTTP_CODE="${{ steps.prod.outputs.http_code }}"
+
+          NOW=$(date -u +%s)
+          AGE_MIN=$(( (NOW - MAIN_TS) / 60 ))
+
+          if [ "${PROD_STATUS}" = "endpoint_unreachable" ]; then
+            echo "alert=true" >> "$GITHUB_OUTPUT"
+            echo "message=🚨 PROD UNREACHABLE%0A%0Aversion.php returned HTTP ${HTTP_CODE}. Production may be down." >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "${PROD_STATUS}" = "no_commit_field" ]; then
+            echo "alert=true" >> "$GITHUB_OUTPUT"
+            echo "message=⚠️ VERSION.PHP BROKEN%0A%0AEndpoint responded but no commit field." >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "${PROD}" = "${MAIN}" ]; then
+            echo "✅ In sync on ${MAIN_SHORT}"
+            echo "alert=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "${AGE_MIN}" -lt "${DRIFT_THRESHOLD_MINUTES}" ]; then
+            echo "ℹ️  Drift but main only ${AGE_MIN} min old (within grace window)"
+            echo "alert=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "alert=true" >> "$GITHUB_OUTPUT"
+          echo "message=⚠️ DEPLOY DRIFT%0A%0AProd is ${AGE_MIN} min behind main.%0A%0AProd: ${PROD_SHORT}%0AMain: ${MAIN_SHORT} — ${MAIN_SUBJECT}%0A%0ARun a deploy, or investigate." >> "$GITHUB_OUTPUT"
+
+      - name: Send Telegram alert
+        if: steps.decide.outputs.alert == 'true'
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT:  ${{ secrets.TELEGRAM_CHAT_ID }}
+          MSG:      ${{ steps.decide.outputs.message }}
+        run: |
+          if [ -z "${TG_TOKEN}" ] || [ -z "${TG_CHAT}" ]; then
+            echo "::error::TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID secret is not set"
+            exit 1
+          fi
+
+          MESSAGE=$(printf '%s' "${MSG}" | sed 's/%0A/\n/g')
+
+          RESPONSE=$(curl -sS --max-time 20 --retry 2 \
+            "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TG_CHAT}" \
+            --data-urlencode "text=${MESSAGE}")
+
+          echo "${RESPONSE}"
+
+          if echo "${RESPONSE}" | jq -e '.ok == true' > /dev/null; then
+            echo "✅ Telegram alert sent"
+          else
+            echo "::error::Telegram API rejected the message"
+            exit 1
+          fi
+
+      - name: Fail workflow when alert sent
+        if: steps.decide.outputs.alert == 'true'
+        run: exit 1
