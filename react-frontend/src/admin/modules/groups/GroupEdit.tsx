@@ -35,7 +35,7 @@ import type { AdminGroup, GroupType } from '../../api/types';
 export function GroupEdit() {
   const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasFeature } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -153,7 +153,7 @@ export function GroupEdit() {
     const [updateRes, statusRes] = await Promise.all([
       adminGroups.updateGroup(Number(id), updatePayload),
       group?.status !== status
-        ? adminGroups.updateStatus(Number(id), status)
+        ? adminGroups.updateStatus(Number(id), status as 'active' | 'inactive')
         : Promise.resolve({ success: true }),
     ]);
 
@@ -382,26 +382,28 @@ export function GroupEdit() {
           </CardBody>
         </Card>
 
-        {/* Federation */}
-        <Card>
-          <CardHeader className="flex items-center gap-2 pb-0">
-            <Globe size={18} className="text-default-500" />
-            <h3 className="font-semibold">{t('groups.edit_section_federation')}</h3>
-          </CardHeader>
-          <CardBody>
-            <Select
-              label={t('groups.edit_label_federated_visibility')}
-              selectedKeys={[federatedVisibility]}
-              onSelectionChange={(keys) => setFederatedVisibility(Array.from(keys)[0] as 'none' | 'listed' | 'joinable')}
-              variant="bordered"
-              description={t('groups.edit_federated_desc')}
-            >
-              <SelectItem key="none">{t('groups.federated_none')}</SelectItem>
-              <SelectItem key="listed">{t('groups.federated_listed')}</SelectItem>
-              <SelectItem key="joinable">{t('groups.federated_joinable')}</SelectItem>
-            </Select>
-          </CardBody>
-        </Card>
+        {/* Federation — only shown when the tenant has federation enabled */}
+        {hasFeature('federation') && (
+          <Card>
+            <CardHeader className="flex items-center gap-2 pb-0">
+              <Globe size={18} className="text-default-500" />
+              <h3 className="font-semibold">{t('groups.edit_section_federation')}</h3>
+            </CardHeader>
+            <CardBody>
+              <Select
+                label={t('groups.edit_label_federated_visibility')}
+                selectedKeys={[federatedVisibility]}
+                onSelectionChange={(keys) => setFederatedVisibility(Array.from(keys)[0] as 'none' | 'listed' | 'joinable')}
+                variant="bordered"
+                description={t('groups.edit_federated_desc')}
+              >
+                <SelectItem key="none">{t('groups.federated_none')}</SelectItem>
+                <SelectItem key="listed">{t('groups.federated_listed')}</SelectItem>
+                <SelectItem key="joinable">{t('groups.federated_joinable')}</SelectItem>
+              </Select>
+            </CardBody>
+          </Card>
+        )}
 
         {/* Admin Controls */}
         <Card>
