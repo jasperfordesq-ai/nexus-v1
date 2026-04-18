@@ -164,7 +164,7 @@ export function CampaignForm() {
     // Record<field, message> — bind per-field and return null (no generic toast)
     const mapped: Record<string, string> = {};
     for (const [field, msg] of Object.entries(resErrors)) {
-      mapped[field] = Array.isArray(msg) ? msg[0] : msg;
+      mapped[field] = Array.isArray(msg) ? (msg[0] ?? '') : (msg ?? '');
     }
     setFieldErrors(mapped);
     return null;

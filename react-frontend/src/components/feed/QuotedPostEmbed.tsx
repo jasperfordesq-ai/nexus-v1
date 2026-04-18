@@ -90,10 +90,8 @@ export function QuotedPostEmbed({ post, isPreview = false }: QuotedPostEmbedProp
               size="sm"
               className="text-xs text-[var(--color-primary)] p-0 min-w-0 h-auto mt-1"
               aria-expanded={expanded}
-              onPress={(e) => {
-                e.stopPropagation();
-                setExpanded(true);
-              }}
+              onClick={(e) => e.stopPropagation()}
+              onPress={() => setExpanded(true)}
             >
               {t('card.read_more', 'Read more')}
             </Button>
