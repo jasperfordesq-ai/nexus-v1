@@ -76,6 +76,16 @@ export function UserList() {
   const [filter, setFilter] = useState(searchParams.get('filter') || 'all');
   const [search, setSearch] = useState('');
 
+  // Sync filter state when the URL changes externally (e.g. sidebar link click)
+  useEffect(() => {
+    const urlFilter = searchParams.get('filter') || 'all';
+    if (urlFilter !== filter) {
+      setFilter(urlFilter);
+      setPage(1);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
   // Import modal state
   const [importOpen, setImportOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);

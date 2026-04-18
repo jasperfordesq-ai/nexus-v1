@@ -625,12 +625,33 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
 
   // ── Active route detection ───────────────────────────────────────────────
   const isActive = (href: string) => {
-    const cleanHref = href.split('?')[0] ?? '';
-    const fullPath = tenantPath(cleanHref);
-    if (cleanHref === '/admin') {
+    const [path, rawQuery] = href.split('?');
+    const cleanPath = path ?? '';
+    const fullPath = tenantPath(cleanPath);
+
+    if (cleanPath === '/admin') {
       return location.pathname === fullPath;
     }
-    return location.pathname.startsWith(fullPath);
+
+    if (!location.pathname.startsWith(fullPath)) return false;
+
+    if (rawQuery) {
+      // Query-specific link: all required params must match the current URL
+      const required = new URLSearchParams(rawQuery);
+      const current = new URLSearchParams(location.search);
+      for (const [k, v] of required.entries()) {
+        if (current.get(k) !== v) return false;
+      }
+      return true;
+    }
+
+    // No-query link: treat as the "base/default" view.
+    // Not active if the current URL has a non-default filter that would
+    // belong to a sibling query-specific link (e.g. ?filter=pending).
+    const currentFilter = new URLSearchParams(location.search).get('filter');
+    if (currentFilter && currentFilter !== 'all') return false;
+
+    return true;
   };
 
   // ── Track recent page visit ──────────────────────────────────────────────
