@@ -413,7 +413,9 @@
     "cancel": "Cancel",
     "send_request": "Send Request",
     "upgrade_sent": "Upgrade request sent",
-    "free_plan_activated": "Plan activated successfully"
+    "free_plan_activated": "Plan activated successfully",
+    "not_available": "Not available",
+    "contact_support": "Contact support"
   },
   "blog": {
     "an_unexpected_error_occurred": "An Unexpected Error Occurred",

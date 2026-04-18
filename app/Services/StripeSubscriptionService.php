@@ -199,10 +199,11 @@ class StripeSubscriptionService
             }
         }
 
-        // Build success/cancel URLs — point to the React admin billing page
-        $frontendBase = rtrim(env('REACT_FRONTEND_URL', env('APP_URL', 'https://app.project-nexus.ie')), '/');
-        $successUrl = $frontendBase . '/admin/billing/checkout-return?session_id={CHECKOUT_SESSION_ID}';
-        $cancelUrl = $frontendBase . '/admin/billing?cancelled=1';
+        // Build success/cancel URLs — must include tenant slug for React Router to resolve the tenant
+        $frontendBase = rtrim(TenantContext::getFrontendUrl(), '/');
+        $slugPrefix   = TenantContext::getSlugPrefix(); // e.g. "/hour-timebank"
+        $successUrl   = $frontendBase . $slugPrefix . '/admin/billing/checkout-return?session_id={CHECKOUT_SESSION_ID}';
+        $cancelUrl    = $frontendBase . $slugPrefix . '/admin/billing?cancelled=1';
 
         try {
             $session = $client->checkout->sessions->create([

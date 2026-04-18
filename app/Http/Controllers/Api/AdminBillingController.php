@@ -62,6 +62,31 @@ class AdminBillingController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_plan_id'), 'plan_id', 422);
         }
 
+        // Block downgrade to free plan or lower tier while on an active paid subscription
+        $targetPlan = DB::selectOne("SELECT id, price_monthly, price_yearly, tier_level FROM pay_plans WHERE id = ?", [$planId]);
+        if (!$targetPlan) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_plan_id'), 'plan_id', 422);
+        }
+        $isFreeTarget = ((float) $targetPlan->price_monthly === 0.0 && (float) $targetPlan->price_yearly === 0.0);
+        if ($isFreeTarget) {
+            $currentSub = DB::selectOne(
+                "SELECT tpa.id, pp.tier_level
+                 FROM tenant_plan_assignments tpa
+                 JOIN pay_plans pp ON pp.id = tpa.pay_plan_id
+                 WHERE tpa.tenant_id = ? AND tpa.status IN ('active','trialing','trial')
+                 LIMIT 1",
+                [$tenantId]
+            );
+            if ($currentSub && (int) $currentSub->tier_level > 0) {
+                return $this->respondWithError(
+                    'DOWNGRADE_NOT_ALLOWED',
+                    'Downgrading to a free plan is not allowed through self-service. Please contact support.',
+                    'plan_id',
+                    422
+                );
+            }
+        }
+
         try {
             $result = StripeSubscriptionService::createCheckoutSession($tenantId, $planId, $billingInterval);
             return $this->respondWithData($result);

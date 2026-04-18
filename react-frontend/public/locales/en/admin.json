@@ -413,7 +413,9 @@
     "upgrade_message_placeholder": "Describe your needs...",
     "cancel": "Cancel",
     "send_request": "Send Request",
-    "upgrade_sent": "Upgrade request sent"
+    "upgrade_sent": "Upgrade request sent",
+    "not_available": "Not available",
+    "contact_support": "Contact support"
   },
   "blog": {
     "an_unexpected_error_occurred": "An Unexpected Error Occurred",

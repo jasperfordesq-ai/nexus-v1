@@ -101,6 +101,18 @@ export function PlanSelector() {
     subscription.status !== 'cancelled' &&
     subscription.status !== 'expired';
 
+  const isActivePaidSubscription =
+    !!subscription &&
+    subscription.status !== 'cancelled' &&
+    subscription.status !== 'expired' &&
+    subscription.plan_tier_level > 0;
+
+  const isFreePlan = (plan: Plan) =>
+    plan.price_monthly === 0 && plan.price_yearly === 0;
+
+  const isDowngrade = (plan: Plan) =>
+    isActivePaidSubscription && isFreePlan(plan) && !isCurrentPlan(plan);
+
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat(undefined, {
       style: 'currency',
@@ -149,13 +161,14 @@ export function PlanSelector() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
             {plans.map((plan) => {
               const isCurrent = isCurrentPlan(plan);
+              const isDowngradeBlocked = isDowngrade(plan);
               const price =
                 billingInterval === 'monthly' ? plan.price_monthly : plan.price_yearly;
 
               return (
                 <Card
                   key={plan.id}
-                  className={`relative ${isCurrent ? 'border-2 border-primary' : ''}`}
+                  className={`relative ${isCurrent ? 'border-2 border-primary' : ''} ${isDowngradeBlocked ? 'opacity-60' : ''}`}
                 >
                   {isCurrent && (
                     <Chip
@@ -165,6 +178,16 @@ export function PlanSelector() {
                       className="absolute top-3 right-3 z-10"
                     >
                       {t('billing.current', 'Current')}
+                    </Chip>
+                  )}
+                  {isDowngradeBlocked && (
+                    <Chip
+                      size="sm"
+                      color="default"
+                      variant="flat"
+                      className="absolute top-3 right-3 z-10"
+                    >
+                      {t('billing.not_available', 'Not available')}
                     </Chip>
                   )}
                   <CardHeader className="flex-col items-start gap-1 pb-0">
@@ -194,16 +217,18 @@ export function PlanSelector() {
                   </CardBody>
                   <CardFooter>
                     <Button
-                      color={isCurrent ? 'default' : 'primary'}
-                      variant={isCurrent ? 'flat' : 'solid'}
-                      isDisabled={!!isCurrent}
+                      color={isCurrent || isDowngradeBlocked ? 'default' : 'primary'}
+                      variant={isCurrent || isDowngradeBlocked ? 'flat' : 'solid'}
+                      isDisabled={!!isCurrent || isDowngradeBlocked}
                       isLoading={checkoutLoading === plan.id}
                       onPress={() => handleSubscribe(plan.id)}
                       fullWidth
                     >
                       {isCurrent
                         ? t('billing.current', 'Current')
-                        : t('billing.subscribe', 'Subscribe')}
+                        : isDowngradeBlocked
+                          ? t('billing.contact_support', 'Contact support')
+                          : t('billing.subscribe', 'Subscribe')}
                     </Button>
                   </CardFooter>
                 </Card>
