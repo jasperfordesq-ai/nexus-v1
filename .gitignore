@@ -244,3 +244,4 @@ create_*_summary.sh
 # ─── Confidential legal documents (never commit) ─────────────────────────────
 DPO_Confidentiality_Agreement_*.docx
 *.docx
+.codex_tmp/
