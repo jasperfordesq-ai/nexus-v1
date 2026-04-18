@@ -657,18 +657,48 @@ class AdminContentController extends BaseApiController
         $this->requireAdmin();
 
         $plans = array_map(fn($r) => (array)$r, DB::select(
-            "SELECT id, name, slug, description, tier_level, features, allowed_layouts,
-                    max_menus, max_menu_items, max_users, price_monthly, price_yearly, is_active, created_at, updated_at
-             FROM pay_plans ORDER BY tier_level ASC, name ASC"
+            "SELECT pp.id, pp.name, pp.slug, pp.description, pp.tier_level, pp.features, pp.allowed_layouts,
+                    pp.max_menus, pp.max_menu_items, pp.max_users, pp.price_monthly, pp.price_yearly,
+                    pp.is_active, pp.stripe_product_id, pp.stripe_price_id_monthly, pp.stripe_price_id_yearly,
+                    pp.created_at, pp.updated_at,
+                    (SELECT COUNT(*) FROM tenant_plan_assignments tpa WHERE tpa.pay_plan_id = pp.id AND tpa.status IN ('active','trialing','trial')) AS tenant_count
+             FROM pay_plans pp ORDER BY pp.tier_level ASC, pp.name ASC"
         ));
 
         foreach ($plans as &$plan) {
             if (isset($plan['features'])) { $plan['features'] = json_decode($plan['features'], true) ?: []; }
             if (isset($plan['allowed_layouts'])) { $plan['allowed_layouts'] = json_decode($plan['allowed_layouts'], true) ?: []; }
+            $plan['stripe_synced'] = !empty($plan['stripe_product_id']);
+            $plan['tenant_count'] = (int) $plan['tenant_count'];
         }
         unset($plan);
 
         return $this->respondWithData($plans);
+    }
+
+    public function syncPlanToStripe($id): JsonResponse
+    {
+        $this->requireSuperAdmin();
+        $id = (int) $id;
+
+        if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_plan_id'), 'id', 400); }
+
+        $existing = DB::selectOne("SELECT id FROM pay_plans WHERE id = ?", [$id]);
+        if (!$existing) { return $this->respondWithError('NOT_FOUND', __('api.plan_not_found'), 'id', 404); }
+
+        try {
+            StripeSubscriptionService::syncPlanToStripe($id);
+            $plan = DB::selectOne("SELECT stripe_product_id, stripe_price_id_monthly, stripe_price_id_yearly FROM pay_plans WHERE id = ?", [$id]);
+            return $this->respondWithData([
+                'synced'                  => true,
+                'stripe_product_id'       => $plan->stripe_product_id ?? null,
+                'stripe_price_id_monthly' => $plan->stripe_price_id_monthly ?? null,
+                'stripe_price_id_yearly'  => $plan->stripe_price_id_yearly ?? null,
+            ]);
+        } catch (\Exception $e) {
+            Log::warning('Manual Stripe sync failed', ['plan_id' => $id, 'error' => $e->getMessage()]);
+            return $this->respondWithError('STRIPE_ERROR', 'Stripe sync failed: ' . $e->getMessage(), null, 500);
+        }
     }
 
     public function getPlan($id): JsonResponse

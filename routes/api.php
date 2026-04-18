@@ -1561,6 +1561,7 @@ Route::post('/v2/admin/plans', [\App\Http\Controllers\Api\AdminContentController
 Route::get('/v2/admin/plans/{id}', [\App\Http\Controllers\Api\AdminContentController::class, 'getPlan']);
 Route::put('/v2/admin/plans/{id}', [\App\Http\Controllers\Api\AdminContentController::class, 'updatePlan']);
 Route::delete('/v2/admin/plans/{id}', [\App\Http\Controllers\Api\AdminContentController::class, 'deletePlan']);
+Route::post('/v2/admin/plans/{id}/sync-stripe', [\App\Http\Controllers\Api\AdminContentController::class, 'syncPlanToStripe']);
 Route::get('/v2/admin/subscriptions', [\App\Http\Controllers\Api\AdminContentController::class, 'getSubscriptions']);
 // Billing — Stripe subscription management
 Route::get('/v2/admin/billing/subscription', [\App\Http\Controllers\Api\AdminBillingController::class, 'getSubscription']);

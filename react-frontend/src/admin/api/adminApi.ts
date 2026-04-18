@@ -1529,14 +1529,40 @@ export const adminMenus = {
 // Plans & Subscriptions
 // ─────────────────────────────────────────────────────────────────────────────
 
+export interface PlanListItem {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+  tier_level: number;
+  max_users?: number | null;
+  price_monthly: number;
+  price_yearly: number;
+  is_active: boolean;
+  stripe_synced: boolean;
+  stripe_product_id?: string | null;
+  stripe_price_id_monthly?: string | null;
+  stripe_price_id_yearly?: string | null;
+  tenant_count: number;
+}
+
+export interface PlanDetail extends PlanListItem {
+  max_menus?: number;
+  max_menu_items?: number;
+  features?: string[];
+  allowed_layouts?: string[];
+}
+
 export const adminPlans = {
-  list: () => api.get<Array<{ id: number; name: string; slug: string; tier_level: number; price_monthly: number; price_yearly: number; is_active: boolean }>>('/v2/admin/plans'),
-  get: (id: number) => api.get<{ id: number; name: string; slug: string; description?: string; tier_level: number; price_monthly: number; price_yearly: number; max_menus?: number; max_menu_items?: number; features?: string[]; allowed_layouts?: string[]; is_active: boolean }>(`/v2/admin/plans/${id}`),
-  create: (data: { name: string; description?: string; price_monthly?: number; price_yearly?: number; tier_level?: number; max_menus?: number; max_menu_items?: number; features?: string[]; allowed_layouts?: string[]; is_active?: boolean }) =>
+  list: () => api.get<PlanListItem[]>('/v2/admin/plans'),
+  get: (id: number) => api.get<PlanDetail>(`/v2/admin/plans/${id}`),
+  create: (data: { name: string; description?: string; price_monthly?: number; price_yearly?: number; tier_level?: number; max_users?: number | null; max_menus?: number; max_menu_items?: number; features?: string[]; allowed_layouts?: string[]; is_active?: boolean }) =>
     api.post<{ id: number }>('/v2/admin/plans', data),
   update: (id: number, data: Record<string, unknown>) =>
     api.put<{ success: boolean }>(`/v2/admin/plans/${id}`, data),
   delete: (id: number) => api.delete<{ success: boolean }>(`/v2/admin/plans/${id}`),
+  syncStripe: (id: number) =>
+    api.post<{ synced: boolean; stripe_product_id: string | null; stripe_price_id_monthly: string | null; stripe_price_id_yearly: string | null }>(`/v2/admin/plans/${id}/sync-stripe`, {}),
   getSubscriptions: () => api.get<Array<{ id: number; tenant_id: number; tenant_name: string; plan_id: number; plan_name: string; status: string; created_at: string }>>('/v2/admin/subscriptions'),
 };
 
