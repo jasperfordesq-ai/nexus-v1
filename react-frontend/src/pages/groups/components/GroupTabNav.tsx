@@ -48,11 +48,13 @@ export function GroupTabNav({
 
   const primaryTabs = [
     { key: 'feed', icon: Newspaper, label: t('detail.tab_feed', 'Feed') },
+    // Subgroups shown as a primary tab (not buried in More) so users can drill through hierarchy
+    ...(hasSubGroups ? [{ key: 'subgroups', icon: FolderTree, label: `${t('detail.tab_subgroups', 'Subgroups')} (${subGroupCount})` }] : []),
     { key: 'discussion', icon: MessageSquare, label: t('detail.tab_discussion', 'Discussion') },
     { key: 'members', icon: Users, label: t('detail.tab_members', 'Members') },
     { key: 'events', icon: Calendar, label: t('detail.tab_events', 'Events') },
     { key: 'files', icon: FolderOpen, label: t('detail.tab_files', 'Files') },
-  ].filter(tab => hasGroupTab(`tab_${tab.key}` as keyof import('@/types').GroupTabConfig));
+  ].filter(tab => tab.key === 'subgroups' || hasGroupTab(`tab_${tab.key}` as keyof import('@/types').GroupTabConfig));
 
   const secondaryTabs = [
     // Content
@@ -66,7 +68,6 @@ export function GroupTabNav({
     { key: 'challenges', icon: Flag, label: t('detail.tab_challenges', 'Challenges'), section: null },
     // Admin (conditional)
     ...(userIsAdmin ? [{ key: 'analytics', icon: Newspaper, label: t('detail.tab_analytics', 'Analytics'), section: t('detail.tab_section_admin', 'Admin') }] : []),
-    ...(hasSubGroups ? [{ key: 'subgroups', icon: FolderTree, label: `${t('detail.tab_subgroups', 'Subgroups')} (${subGroupCount})`, section: null }] : []),
   ].filter(tab => hasGroupTab(`tab_${tab.key}` as keyof import('@/types').GroupTabConfig));
 
   const isSecondaryActive = secondaryTabs.some((tab) => tab.key === activeTab);

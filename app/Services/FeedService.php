@@ -247,9 +247,7 @@ class FeedService
         $query->orderByDesc('feed_activity.created_at')
               ->orderByDesc('feed_activity.id');
 
-        // For ranked mode fetch a larger candidate pool so EdgeRank has enough
-        // items to reorder meaningfully. Cap at 500 to avoid memory pressure.
-        $fetchLimit = $isRanked ? min(max($limit * 5, 100), 500) : $limit;
+        $fetchLimit = $limit;
 
         $rows = $query->limit($fetchLimit + 1)->get();
 
@@ -573,15 +571,10 @@ class FeedService
 
         // For ranked mode we fetched up to $fetchLimit candidates. The cursor
         // must point to the chronologically-last item in the *full candidate set*
-        // (not the last ranked item) so the next page resumes from the right place.
-        // We find the candidate with the smallest (created_at, id) tuple, which is
-        // the one that would have appeared last in the chronological query.
-        // This must be computed BEFORE slicing — regardless of pool size — so that
-        // small pools (pool <= $limit) still get a correct cursor and don't re-fetch
-        // higher-ranked items that were already served.
+        // In ranked mode, cursor must point to the chronological tail of the served
+        // items so the next page resumes at the correct DB position.
         if ($isRanked && !empty($items)) {
-            // Determine the chronological tail of the full candidate set
-            $chronoTail = $items[0]; // start with first item
+            $chronoTail = $items[0];
             foreach ($items as $candidate) {
                 if (
                     $candidate['_activity_created_at'] < $chronoTail['_activity_created_at'] ||
@@ -594,16 +587,6 @@ class FeedService
                 }
             }
 
-            // has_more must account for two cases:
-            // 1. $hasMore: DB has items beyond the candidate pool
-            // 2. The ranked pool is larger than $limit — slicing will discard items
-            //    that the next page needs to pick up via the cursor
-            $hasMoreRanked = $hasMore || (count($items) > $limit);
-
-            // Slice to the requested page size
-            $items = array_slice($items, 0, $limit);
-
-            // Build cursor from the chronological tail of the full candidate pool
             $nextCursor = null;
             if (isset($chronoTail['_activity_id'], $chronoTail['_activity_created_at'])) {
                 $payload = json_encode(['ts' => $chronoTail['_activity_created_at'], 'id' => $chronoTail['_activity_id']]);
@@ -613,7 +596,7 @@ class FeedService
             return [
                 'items'    => $items,
                 'cursor'   => $nextCursor,
-                'has_more' => $hasMoreRanked,
+                'has_more' => $hasMore,
             ];
         }
 

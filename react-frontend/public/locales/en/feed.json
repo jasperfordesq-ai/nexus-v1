@@ -291,7 +291,10 @@
     "load_failed": "Failed to load poll data.",
     "expired": "This poll has ended.",
     "expiry_past": "Poll expiry date must be in the future.",
-    "min_options_hint": "At least 2 options are required."
+    "min_options_hint": "At least 2 options are required.",
+    "closed": "Closed",
+    "closes_hours": "Closes in {{hours}}h",
+    "closes_days": "Closes in {{days}}d"
   },
   "feed": {
     "end_of_feed": "You're all caught up!"
