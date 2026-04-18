@@ -165,11 +165,9 @@ class SmartGroupRankingService
     private static function updateFeaturedByType(int $tenantId, string $type, int $limit): array
     {
         try {
-            // Get all active groups for this tenant (top-level for local hubs)
-            $typeCondition = '';
-            if ($type === 'local_hubs') {
-                $typeCondition = 'AND (g.parent_id IS NULL OR g.parent_id = 0)';
-            }
+            // Target leaf groups only (bottom of hierarchy — no children).
+            // Featuring top-level containers would be misleading; members join leaf groups.
+            $typeCondition = 'AND NOT EXISTS (SELECT 1 FROM `groups` child WHERE child.parent_id = g.id AND child.tenant_id = g.tenant_id)';
 
             $groups = DB::select(
                 "SELECT g.id, g.cached_member_count
