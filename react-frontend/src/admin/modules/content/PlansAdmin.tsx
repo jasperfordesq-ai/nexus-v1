@@ -287,7 +287,7 @@ export function PlansAdmin() {
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
           title={`${t('common.delete', 'Delete')} ${t('breadcrumbs.plans', 'Plan')}`}
-          message={t('content.confirm_delete_plan', { name: confirmDelete.name }, `Delete plan "${confirmDelete.name}"? This cannot be undone.`)}
+          message={t('content.confirm_delete_plan', `Delete plan "${confirmDelete.name}"? This cannot be undone.`, { name: confirmDelete.name })}
           confirmLabel={t('common.delete', 'Delete')}
           confirmColor="danger"
           isLoading={actionLoading}
