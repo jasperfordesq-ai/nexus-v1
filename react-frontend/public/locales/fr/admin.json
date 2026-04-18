@@ -3562,7 +3562,7 @@
     "failed_to_save_native_app_settings": "Failed to save native app settings",
     "failed_to_save_registration_policy": "Failed to save registration policy",
     "failed_to_save_settings": "Failed to save settings",
-    "filter_activity_placeholder": "Filter Activity Placeholder",
+    "filter_activity_placeholder": "Filter by user, action, or IP address...",
     "global_settings_saved_successfully": "Global Settings Saved Successfully",
     "health_checks_completed": "Health Checks Completed",
     "health_score": "Health Score",
