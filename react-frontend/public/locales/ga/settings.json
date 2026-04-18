@@ -128,7 +128,9 @@
     "upload_photo_aria": "Uaslódáil grianghraf próifíle",
     "change_photo_aria": "Athraigh grianghraf próifíle",
     "identity_verified_lock": "Your name is locked because your identity has been verified.",
-    "phone_invalid": "Phone must be in international E.164 format (e.g. +1 555 123 4567)"
+    "phone_invalid": "Phone must be in international E.164 format (e.g. +1 555 123 4567)",
+    "date_of_birth": "Dáta Breithe",
+    "dob_description": "Riachtanach le haghaidh fíoraithe céannachta"
   },
   "notification_prefs": {
     "new_messages": "Teachtaireachtaí Nua",
@@ -176,7 +178,11 @@
     "personal_accident": "Timpiste Phearsanta",
     "other": "Eile",
     "uploading": "Ag Uaslódáil...",
-    "upload_certificate": "Uaslódáil Teastas"
+    "upload_certificate": "Uaslódáil Teastas",
+    "status_verified": "Fíoraithe",
+    "status_pending": "Ar Feitheamh",
+    "status_submitted": "Curtha Isteach",
+    "status_rejected": "Diúltaithe"
   },
   "tabs": {
     "profile": "Próifíl",

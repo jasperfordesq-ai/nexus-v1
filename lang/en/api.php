@@ -40,6 +40,7 @@ return [
     'event_not_found'              => 'Event not found',
     'listing_not_found'            => 'Listing not found',
     'group_not_found'              => 'Group not found',
+    'invalid_group_type'           => 'Invalid group type',
     'job_not_found'                => 'Job not found',
     'blog_post_not_found'          => 'Blog post not found',
     'review_not_found'             => 'Review not found',

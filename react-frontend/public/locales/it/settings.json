@@ -170,7 +170,9 @@
     "upload_photo_aria": "Carica foto profilo",
     "change_photo_aria": "Cambia foto profilo",
     "identity_verified_lock": "Your name is locked because your identity has been verified.",
-    "phone_invalid": "Phone must be in international E.164 format (e.g. +1 555 123 4567)"
+    "phone_invalid": "Phone must be in international E.164 format (e.g. +1 555 123 4567)",
+    "date_of_birth": "Data di Nascita",
+    "dob_description": "Richiesta per la verifica dell'identità"
   },
   "notification_prefs": {
     "new_messages": "Nuovi Messaggi",
@@ -218,7 +220,11 @@
     "personal_accident": "Infortuni Personali",
     "other": "Altro",
     "uploading": "Caricamento...",
-    "upload_certificate": "Carica Certificato"
+    "upload_certificate": "Carica Certificato",
+    "status_verified": "Verificato",
+    "status_pending": "In attesa",
+    "status_submitted": "Inviato",
+    "status_rejected": "Rifiutato"
   },
   "tabs": {
     "profile": "Profilo",

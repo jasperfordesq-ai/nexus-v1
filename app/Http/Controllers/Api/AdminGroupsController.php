@@ -463,11 +463,61 @@ class AdminGroupsController extends BaseApiController
 
         $updates = [];
         $params = [];
+
+        // Basic text fields
         foreach (['name', 'description', 'visibility', 'location'] as $field) {
-            if (isset($input[$field])) {
+            if (array_key_exists($field, $input)) {
                 $updates[] = "{$field} = ?";
-                $params[] = $field === 'name' ? trim($input[$field]) : $input[$field];
+                $params[] = $field === 'name' ? trim($input[$field]) : ($input[$field] ?? null);
             }
+        }
+
+        // Nullable integer: type_id (null = no type)
+        if (array_key_exists('type_id', $input)) {
+            $typeId = $input['type_id'] !== null && $input['type_id'] !== '' ? (int) $input['type_id'] : null;
+            if ($typeId !== null) {
+                $typeExists = DB::selectOne("SELECT id FROM group_types WHERE id = ? AND tenant_id = ?", [$typeId, $tenantId]);
+                if (!$typeExists) {
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_group_type'), null, 422);
+                }
+            }
+            $updates[] = 'type_id = ?';
+            $params[] = $typeId;
+        }
+
+        // Boolean flags
+        if (array_key_exists('is_featured', $input)) {
+            $updates[] = 'is_featured = ?';
+            $params[] = (int) (bool) $input['is_featured'];
+        }
+
+        // Federated visibility
+        if (array_key_exists('federated_visibility', $input)) {
+            $fv = $input['federated_visibility'];
+            if (!in_array($fv, ['none', 'listed', 'joinable'], true)) {
+                $fv = 'none';
+            }
+            $updates[] = 'federated_visibility = ?';
+            $params[] = $fv;
+        }
+
+        // Branding colors (nullable varchar)
+        foreach (['primary_color', 'accent_color'] as $field) {
+            if (array_key_exists($field, $input)) {
+                $color = $input[$field] ?? null;
+                // Allow null or a valid hex color
+                if ($color !== null && !preg_match('/^#[0-9A-Fa-f]{6}$/', $color)) {
+                    $color = null;
+                }
+                $updates[] = "{$field} = ?";
+                $params[] = $color;
+            }
+        }
+
+        // Cover image URL (set directly — image upload via dedicated endpoint)
+        if (array_key_exists('cover_image_url', $input)) {
+            $updates[] = 'cover_image_url = ?';
+            $params[] = $input['cover_image_url'] ?: null;
         }
 
         if (empty($updates)) {

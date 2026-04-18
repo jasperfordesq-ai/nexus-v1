@@ -175,7 +175,9 @@
     "upload_photo_aria": "Upload profile photo",
     "change_photo_aria": "Change profile photo",
     "identity_verified_lock": "Your name is locked because your identity has been verified.",
-    "phone_invalid": "Phone must be in international E.164 format (e.g. +1 555 123 4567)"
+    "phone_invalid": "Phone must be in international E.164 format (e.g. +1 555 123 4567)",
+    "date_of_birth": "Date of Birth",
+    "dob_description": "Required for identity verification"
   },
   "notification_prefs": {
     "new_messages": "New Messages",
@@ -223,7 +225,11 @@
     "personal_accident": "Personal Accident",
     "other": "Other",
     "uploading": "Uploading...",
-    "upload_certificate": "Upload Certificate"
+    "upload_certificate": "Upload Certificate",
+    "status_verified": "Verified",
+    "status_pending": "Pending",
+    "status_submitted": "Submitted",
+    "status_rejected": "Rejected"
   },
   "tabs": {
     "profile": "Profile",
@@ -366,7 +372,7 @@
     "missing_fields": "Missing fields",
     "missing_password_fields": "Please fill in all password fields",
     "password_too_short": "Password too short",
-    "password_too_short_desc": "New password must be at least 8 characters",
+    "password_too_short_desc": "New password must be at least 12 characters",
     "passwords_dont_match": "Passwords don't match",
     "passwords_dont_match_desc": "New password and confirmation must match",
     "password_changed": "Password changed",

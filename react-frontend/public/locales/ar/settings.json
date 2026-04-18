@@ -170,7 +170,9 @@
     "upload_photo_aria": "تحميل صورة الملف الشخصي",
     "change_photo_aria": "تغيير صورة الملف الشخصي",
     "identity_verified_lock": "Your name is locked because your identity has been verified.",
-    "phone_invalid": "Phone must be in international E.164 format (e.g. +1 555 123 4567)"
+    "phone_invalid": "Phone must be in international E.164 format (e.g. +1 555 123 4567)",
+    "date_of_birth": "تاريخ الميلاد",
+    "dob_description": "مطلوب للتحقق من الهوية"
   },
   "notification_prefs": {
     "new_messages": "رسائل جديدة",
@@ -218,7 +220,11 @@
     "personal_accident": "الحوادث الشخصية",
     "other": "Other",
     "uploading": "جارٍ التحميل...",
-    "upload_certificate": "تحميل الشهادة"
+    "upload_certificate": "تحميل الشهادة",
+    "status_verified": "تم التحقق",
+    "status_pending": "قيد الانتظار",
+    "status_submitted": "تم الإرسال",
+    "status_rejected": "مرفوض"
   },
   "tabs": {
     "profile": "Profile",

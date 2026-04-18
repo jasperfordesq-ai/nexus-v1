@@ -1225,11 +1225,22 @@ export interface AdminGroup {
   name: string;
   description?: string;
   image_url?: string | null;
+  cover_image_url?: string | null;
   visibility: string;
   status: string;
   creator_name?: string;
   member_count: number;
   location?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  type_id?: number | null;
+  type?: { id: number; name: string; icon?: string; color?: string } | null;
+  is_featured?: boolean;
+  federated_visibility?: 'none' | 'listed' | 'joinable';
+  primary_color?: string | null;
+  accent_color?: string | null;
+  tenant_name?: string;
+  stats?: { posts_count: number; events_count: number; activity_score: number };
   created_at: string;
 }
 

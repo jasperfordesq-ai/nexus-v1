@@ -170,7 +170,9 @@
     "upload_photo_aria": "プロフィール写真をアップロード",
     "change_photo_aria": "プロフィール写真を変更",
     "identity_verified_lock": "Your name is locked because your identity has been verified.",
-    "phone_invalid": "Phone must be in international E.164 format (e.g. +1 555 123 4567)"
+    "phone_invalid": "Phone must be in international E.164 format (e.g. +1 555 123 4567)",
+    "date_of_birth": "生年月日",
+    "dob_description": "本人確認に必要です"
   },
   "notification_prefs": {
     "new_messages": "新しいメッセージ",
@@ -218,7 +220,11 @@
     "personal_accident": "個人事故",
     "other": "Other",
     "uploading": "アップロード中...",
-    "upload_certificate": "証明書をアップロードする"
+    "upload_certificate": "証明書をアップロードする",
+    "status_verified": "確認済み",
+    "status_pending": "保留中",
+    "status_submitted": "提出済み",
+    "status_rejected": "拒否"
   },
   "tabs": {
     "profile": "Profile",

@@ -787,7 +787,7 @@ export const adminGroups = {
   getGroup: (id: number) =>
     api.get<AdminGroup>(`/v2/admin/groups/${id}`),
 
-  updateGroup: (id: number, data: Partial<Pick<AdminGroup, 'name' | 'description' | 'location' | 'status' | 'visibility'>>) =>
+  updateGroup: (id: number, data: Partial<Pick<AdminGroup, 'name' | 'description' | 'location' | 'visibility' | 'type_id' | 'is_featured' | 'federated_visibility' | 'primary_color' | 'accent_color' | 'cover_image_url'>>) =>
     api.put<AdminGroup>(`/v2/admin/groups/${id}`, data),
 
   getMembers: (groupId: number, params?: { role?: string; limit?: number; offset?: number }) =>

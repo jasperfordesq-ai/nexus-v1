@@ -170,7 +170,9 @@
     "upload_photo_aria": "Upload profielfoto",
     "change_photo_aria": "Wijzig profielfoto",
     "identity_verified_lock": "Your name is locked because your identity has been verified.",
-    "phone_invalid": "Phone must be in international E.164 format (e.g. +1 555 123 4567)"
+    "phone_invalid": "Phone must be in international E.164 format (e.g. +1 555 123 4567)",
+    "date_of_birth": "Geboortedatum",
+    "dob_description": "Vereist voor identiteitsverificatie"
   },
   "notification_prefs": {
     "new_messages": "Nieuwe berichten",
@@ -218,7 +220,11 @@
     "personal_accident": "Persoonlijk ongeval",
     "other": "Other",
     "uploading": "Uploaden...",
-    "upload_certificate": "Certificaat uploaden"
+    "upload_certificate": "Certificaat uploaden",
+    "status_verified": "Geverifieerd",
+    "status_pending": "In behandeling",
+    "status_submitted": "Ingediend",
+    "status_rejected": "Afgewezen"
   },
   "tabs": {
     "profile": "Profile",
