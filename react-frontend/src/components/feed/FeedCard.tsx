@@ -621,16 +621,19 @@ const FeedCard = React.memo(function FeedCard({
     }
     onVotePoll(item.id, optionId);
 
-    // Optimistic update: update pollData locally
-    const totalBefore = pollData.total_votes + (pollData.user_vote_option_id ? 0 : 1);
+    // Optimistic update: update pollData locally.
+    // total_votes / vote_count may be null (non-creators of open polls) — coalesce to 0.
+    const prevTotal = pollData.total_votes ?? 0;
+    const totalBefore = prevTotal + (pollData.user_vote_option_id ? 0 : 1);
     const updatedOptions = pollData.options.map((opt) => {
-      let newCount = opt.vote_count;
+      let newCount = opt.vote_count ?? 0;
       if (opt.id === pollData.user_vote_option_id) newCount -= 1;
       if (opt.id === optionId) newCount += 1;
+      const safeCount = Math.max(0, newCount);
       return {
         ...opt,
-        vote_count: Math.max(0, newCount),
-        percentage: totalBefore > 0 ? Math.round((Math.max(0, newCount) / totalBefore) * 100 * 10) / 10 : 0,
+        vote_count: safeCount,
+        percentage: totalBefore > 0 ? Math.round((safeCount / totalBefore) * 100 * 10) / 10 : 0,
       };
     });
 
