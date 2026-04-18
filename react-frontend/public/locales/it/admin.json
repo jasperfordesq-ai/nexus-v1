@@ -779,7 +779,9 @@
     "planned": "Planned",
     "refresh": "Refresh",
     "unexpected_error": "Unexpected error",
-    "unfeature": "Unfeature"
+    "unfeature": "Unfeature",
+    "select_all": "Select all",
+    "select_item": "Select item"
   },
   "community": {
     "active_matching_users": "Active Matching Users",
@@ -4566,5 +4568,8 @@
     "label_ai_chat": "AI Chat",
     "label_marketplace": "Marketplace",
     "label_message_translation": "Message Translation"
+  },
+  "aria": {
+    "breadcrumbs": "Breadcrumb navigation"
   }
 }
