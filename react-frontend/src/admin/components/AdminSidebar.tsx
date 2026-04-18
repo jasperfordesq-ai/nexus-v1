@@ -7,12 +7,18 @@
  * Admin Sidebar Navigation
  * Collapsible sidebar matching the PHP admin navigation structure.
  * Uses Lucide icons (consistent with React frontend).
+ *
+ * Features:
+ * - Zone grouping: 4 named super-groups containing related sections
+ * - Accordion collapse: opening one section auto-closes others in the same zone
+ * - Search/filter: real-time fuzzy search across all 139 nav items
+ * - Recent pages: last 5 visited admin pages tracked in localStorage
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@heroui/react';
+import { Button, Input } from '@heroui/react';
 import { useAuth, useTenant } from '@/contexts';
 import { adminBroker } from '../api/adminApi';
 import {
@@ -91,6 +97,7 @@ import {
   ShoppingBag,
   Store,
   Languages,
+  X,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -113,6 +120,118 @@ interface NavSection {
   items?: NavItem[];
   condition?: string;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Zone config — groups related sections into collapsible super-sections
+// Dashboard (key:'dashboard') and Super Admin (key:'super-admin') are NOT zoned.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type NavZoneKey = 'people' | 'content_commerce' | 'growth' | 'platform' | 'ops';
+
+interface NavZone {
+  key: NavZoneKey;
+  label: string; // i18n key in admin_nav.json (top-level)
+  sectionKeys: string[];
+}
+
+interface RecentPage {
+  label: string;
+  href: string;
+  visitedAt: number;
+}
+
+const ZONES: NavZone[] = [
+  {
+    // Individual member management: who your people are
+    key: 'people',
+    label: 'zone_members',
+    sectionKeys: ['users', 'crm'],
+  },
+  {
+    // What your community does: content, activities, commerce
+    key: 'content_commerce',
+    label: 'zone_community',
+    sectionKeys: ['community', 'listings', 'content', 'jobs', 'marketplace'],
+  },
+  {
+    // Keeping the platform safe: content + user safety together
+    key: 'growth',
+    label: 'zone_safety',
+    sectionKeys: ['moderation', 'matching'],
+  },
+  {
+    // Growing and measuring the community (no safety mixed in)
+    key: 'platform',
+    label: 'zone_growth',
+    sectionKeys: ['engagement', 'marketing', 'analytics'],
+  },
+  {
+    // Running the platform: config, finance, infrastructure
+    key: 'ops',
+    label: 'zone_platform',
+    sectionKeys: ['financial', 'enterprise', 'advanced', 'federation', 'system'],
+  },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// localStorage — Recent pages tracking
+// ─────────────────────────────────────────────────────────────────────────────
+
+const RECENT_PAGES_KEY = 'admin_recent_pages';
+const RECENT_PAGES_MAX = 5;
+
+function readRecentPages(): RecentPage[] {
+  try {
+    const raw = localStorage.getItem(RECENT_PAGES_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return (parsed as RecentPage[]).filter(
+      (p) =>
+        p !== null &&
+        typeof p === 'object' &&
+        typeof (p as RecentPage).label === 'string' &&
+        typeof (p as RecentPage).href === 'string',
+    );
+  } catch {
+    return [];
+  }
+}
+
+function saveRecentPage(page: RecentPage): RecentPage[] {
+  const existing = readRecentPages();
+  const updated = [page, ...existing.filter((p) => p.href !== page.href)].slice(
+    0,
+    RECENT_PAGES_MAX,
+  );
+  try {
+    localStorage.setItem(RECENT_PAGES_KEY, JSON.stringify(updated));
+  } catch {
+    // Quota errors silently ignored
+  }
+  return updated;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Fuzzy search — simple character-sequence match (no external dependency)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function fuzzyMatch(query: string, target: string): boolean {
+  if (!query) return true;
+  const q = query.toLowerCase().trim();
+  const t = target.toLowerCase();
+  if (t.includes(q)) return true;
+  // Character-sequence: every char of q must appear in order in t
+  let qi = 0;
+  for (let ti = 0; ti < t.length && qi < q.length; ti++) {
+    if (t[ti] === q[qi]) qi++;
+  }
+  return qi === q.length;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Navigation data hook
+// ─────────────────────────────────────────────────────────────────────────────
 
 // ⚠️ TRANSLATION KEY CONVENTION — READ BEFORE EDITING
 // ALL labels use TOP-LEVEL keys from admin_nav.json: t('users'), t('admin'), etc.
@@ -341,19 +460,18 @@ function useAdminNav(): NavSection[] {
           { label: t('tenant_features'), href: '/admin/tenant-features', icon: Cog },
           { label: t('module_configuration'), href: '/admin/module-configuration', icon: Puzzle, badge: 'BETA' },
           { label: t('translation_config'), href: '/admin/translation-config', icon: Languages },
+          { label: t('activity_log'), href: '/admin/activity-log', icon: Activity },
           { label: t('cron_jobs'), href: '/admin/cron-jobs', icon: Timer },
           { label: t('cron_logs'), href: '/admin/cron-jobs/logs', icon: FileText },
+          { label: t('cron_setup'), href: '/admin/cron-jobs/setup', icon: Wrench },
           ...(isPlatformSuperAdmin
             ? [{ label: t('cron_settings'), href: '/admin/cron-jobs/settings', icon: Settings }]
             : []),
-          { label: t('cron_setup'), href: '/admin/cron-jobs/setup', icon: Wrench },
-          { label: t('activity_log'), href: '/admin/activity-log', icon: Activity },
-          { label: t('tools'), href: '/admin/seed-generator', icon: Wrench },
         ],
       },
     ];
 
-    // Conditionally add federation
+    // Conditionally add federation (belongs in 'platform' zone)
     if (hasFeature('federation')) {
       sections.splice(sections.length - 1, 0, {
         key: 'federation',
@@ -377,7 +495,7 @@ function useAdminNav(): NavSection[] {
       });
     }
 
-    // Super Admin section — only visible to super admins
+    // Super Admin section — only visible to super admins, always at bottom (not in any zone)
     if (isSuperAdmin) {
       sections.push({
         key: 'super-admin',
@@ -411,14 +529,20 @@ interface AdminSidebarProps {
   onToggle: () => void;
 }
 
+interface FilteredNavItem extends NavItem {
+  sectionLabel: string;
+}
+
 export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
   const { t } = useTranslation('admin_nav');
   const sections = useAdminNav();
   const location = useLocation();
   const { tenantPath } = useTenant();
+
+  // ── Expanded sections (accordion per zone) ──────────────────────────────
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     () => {
-      // Auto-expand the active section
+      // Auto-expand the active section on mount
       const active = new Set<string>();
       for (const section of sections) {
         if (section.href && location.pathname === tenantPath(section.href)) {
@@ -436,7 +560,16 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
     }
   );
 
-  // Dynamic unreviewed message count for sidebar badge
+  // ── Zone collapse state (all open by default) ───────────────────────────
+  const [collapsedZones, setCollapsedZones] = useState<Set<NavZoneKey>>(new Set());
+
+  // ── Search query ────────────────────────────────────────────────────────
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // ── Recent pages (from localStorage) ────────────────────────────────────
+  const [recentPages, setRecentPages] = useState<RecentPage[]>(() => readRecentPages());
+
+  // ── Dynamic unreviewed message count for sidebar badge ──────────────────
   const [unreviewedCount, setUnreviewedCount] = useState(0);
 
   const fetchUnreviewedCount = useCallback(async () => {
@@ -456,18 +589,41 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
     return () => clearInterval(interval);
   }, [fetchUnreviewedCount]);
 
-  const toggleSection = (key: string) => {
+  // ── Section map for O(1) zone lookup ────────────────────────────────────
+  const sectionMap = useMemo(
+    () => new Map(sections.map((s) => [s.key, s])),
+    [sections],
+  );
+
+  // ── Toggle a section (accordion within zone) ─────────────────────────────
+  const toggleSection = (key: string, zoneKey: NavZoneKey | null) => {
     setExpandedSections((prev) => {
       const next = new Set(prev);
       if (next.has(key)) {
         next.delete(key);
       } else {
+        // Accordion: close all sibling sections in the same zone first
+        if (zoneKey) {
+          const zone = ZONES.find((z) => z.key === zoneKey);
+          zone?.sectionKeys.forEach((sk) => next.delete(sk));
+        }
         next.add(key);
       }
       return next;
     });
   };
 
+  // ── Toggle a zone (show/hide all its sections) ───────────────────────────
+  const toggleZone = (key: NavZoneKey) => {
+    setCollapsedZones((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  // ── Active route detection ───────────────────────────────────────────────
   const isActive = (href: string) => {
     const cleanHref = href.split('?')[0] ?? '';
     const fullPath = tenantPath(cleanHref);
@@ -476,6 +632,129 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
     }
     return location.pathname.startsWith(fullPath);
   };
+
+  // ── Track recent page visit ──────────────────────────────────────────────
+  const trackVisit = (label: string, href: string) => {
+    const updated = saveRecentPage({ label, href, visitedAt: Date.now() });
+    setRecentPages(updated);
+  };
+
+  // ── Search: filtered results across all sections ─────────────────────────
+  const filteredResults = useMemo((): FilteredNavItem[] => {
+    if (!searchQuery.trim()) return [];
+    return sections.flatMap((section) =>
+      (section.items ?? [])
+        .filter((item) => fuzzyMatch(searchQuery, item.label))
+        .map((item) => ({ ...item, sectionLabel: section.label })),
+    );
+  }, [sections, searchQuery]);
+
+  // ── Render a single nav item link ────────────────────────────────────────
+  const renderNavItem = (item: NavItem) => {
+    const ItemIcon = item.icon;
+    const isMessageReview = item.href === '/admin/broker-controls/messages';
+    const dynamicBadge =
+      isMessageReview && unreviewedCount > 0 ? String(unreviewedCount) : item.badge;
+
+    return (
+      <li key={item.href}>
+        <Link
+          to={tenantPath(item.href)}
+          onClick={() => trackVisit(item.label, item.href)}
+          className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
+            isActive(item.href)
+              ? 'bg-primary/10 text-primary font-medium'
+              : 'text-default-500 hover:bg-default-100 hover:text-foreground'
+          }`}
+        >
+          <ItemIcon size={16} className="shrink-0" />
+          <span>{item.label}</span>
+          {dynamicBadge && (
+            <span
+              className={`ml-auto rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                isMessageReview && unreviewedCount > 0
+                  ? 'bg-danger text-danger-foreground'
+                  : 'bg-primary text-primary-foreground'
+              }`}
+            >
+              {dynamicBadge}
+            </span>
+          )}
+        </Link>
+      </li>
+    );
+  };
+
+  // ── Render a collapsible section ─────────────────────────────────────────
+  const renderSection = (section: NavSection, zoneKey: NavZoneKey | null) => {
+    const Icon = section.icon;
+    const isExpanded = expandedSections.has(section.key);
+    const sectionActive = section.href
+      ? isActive(section.href)
+      : section.items?.some((item) => isActive(item.href));
+    const isSuperSection = section.key === 'super-admin';
+
+    // Single-link section (Dashboard)
+    if (section.href && !section.items) {
+      return (
+        <li key={section.key}>
+          <Link
+            to={tenantPath(section.href)}
+            onClick={() => trackVisit(section.label, section.href!)}
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              sectionActive
+                ? 'bg-primary/10 text-primary'
+                : 'text-default-600 hover:bg-default-100 hover:text-foreground'
+            }`}
+            title={collapsed ? section.label : undefined}
+          >
+            <Icon size={20} className="shrink-0" />
+            {!collapsed && <span>{section.label}</span>}
+          </Link>
+        </li>
+      );
+    }
+
+    // Collapsible section
+    return (
+      <li key={section.key}>
+        {isSuperSection && !collapsed && (
+          <div className="my-2 border-t border-warning/30" />
+        )}
+        <div className={isSuperSection ? 'rounded-lg bg-primary/5 py-1 px-1' : ''}>
+          <Button
+            variant="light"
+            onPress={() => toggleSection(section.key, zoneKey)}
+            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors h-auto min-w-0 justify-start ${
+              sectionActive
+                ? 'text-primary'
+                : 'text-default-600 hover:bg-default-100 hover:text-foreground'
+            }`}
+            title={collapsed ? section.label : undefined}
+          >
+            <Icon size={20} className="shrink-0" />
+            {!collapsed && (
+              <>
+                <span className="flex-1 text-left">{section.label}</span>
+                {isExpanded ? (
+                  <ChevronDown size={16} className="shrink-0" />
+                ) : (
+                  <ChevronRight size={16} className="shrink-0" />
+                )}
+              </>
+            )}
+          </Button>
+          {!collapsed && isExpanded && section.items && (
+            <ul className="ml-4 mt-1 space-y-0.5 border-l border-divider pl-3">
+              {section.items.map((item) => renderNavItem(item))}
+            </ul>
+          )}
+        </div>
+      </li>
+    );
+  };
+
+  const showRecent = !collapsed && recentPages.length >= 2 && !searchQuery.trim();
 
   return (
     <aside
@@ -501,109 +780,162 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
         </Button>
       </div>
 
+      {/* Search bar — hidden in icon-only mode */}
+      {!collapsed && (
+        <div className="px-2 py-2 border-b border-divider">
+          <Input
+            size="sm"
+            variant="flat"
+            placeholder={t('search_nav')}
+            value={searchQuery}
+            onValueChange={setSearchQuery}
+            startContent={<Search size={14} className="text-default-400" />}
+            endContent={
+              searchQuery ? (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="text-default-400 hover:text-foreground"
+                  aria-label="Clear search"
+                >
+                  <X size={14} />
+                </button>
+              ) : null
+            }
+            classNames={{
+              input: 'text-sm',
+              inputWrapper: 'h-8 min-h-8',
+            }}
+            aria-label={t('search_nav')}
+          />
+        </div>
+      )}
+
       {/* Navigation */}
       <nav className="h-[calc(100vh-4rem)] overflow-y-auto px-2 py-3">
-        <ul className="space-y-1">
-          {sections.map((section) => {
-            const Icon = section.icon;
-            const isExpanded = expandedSections.has(section.key);
-            const sectionActive = section.href
-              ? isActive(section.href)
-              : section.items?.some((item) => isActive(item.href));
-            const isSuperSection = section.key === 'super-admin';
 
-            // Single-link section (like Dashboard)
-            if (section.href && !section.items) {
-              return (
-                <li key={section.key}>
-                  <Link
-                    to={tenantPath(section.href)}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                      sectionActive
-                        ? 'bg-primary/10 text-primary'
-                        : 'text-default-600 hover:bg-default-100 hover:text-foreground'
-                    }`}
-                    title={collapsed ? section.label : undefined}
-                  >
-                    <Icon size={20} className="shrink-0" />
-                    {!collapsed && <span>{section.label}</span>}
-                  </Link>
+        {/* ── Search results view ──────────────────────────────────────────── */}
+        {searchQuery.trim() ? (
+          <ul className="space-y-0.5 py-1">
+            {filteredResults.length === 0 ? (
+              <li className="px-4 py-6 text-center text-sm text-default-400">
+                {t('no_results')}
+              </li>
+            ) : (
+              filteredResults.map((item) => {
+                const ItemIcon = item.icon;
+                return (
+                  <li key={item.href}>
+                    <Link
+                      to={tenantPath(item.href)}
+                      onClick={() => {
+                        setSearchQuery('');
+                        trackVisit(item.label, item.href);
+                      }}
+                      className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
+                        isActive(item.href)
+                          ? 'bg-primary/10 text-primary font-medium'
+                          : 'text-default-500 hover:bg-default-100 hover:text-foreground'
+                      }`}
+                    >
+                      <ItemIcon size={16} className="shrink-0" />
+                      <span className="flex-1 truncate">{item.label}</span>
+                      <span className="text-[10px] text-default-400 truncate max-w-[80px]">
+                        {item.sectionLabel}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })
+            )}
+          </ul>
+        ) : (
+          /* ── Normal zone view ───────────────────────────────────────────── */
+          <ul className="space-y-1">
+            {/* Dashboard — always pinned at top, no zone */}
+            {(() => {
+              const dashboard = sectionMap.get('dashboard');
+              return dashboard ? renderSection(dashboard, null) : null;
+            })()}
+
+            {/* Recent pages — shown if 2+ visits and sidebar is expanded */}
+            {showRecent && (
+              <>
+                <li className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-default-400">
+                  {t('recent')}
                 </li>
-              );
-            }
+                {recentPages.map((page) => (
+                  <li key={page.href}>
+                    <Link
+                      to={tenantPath(page.href)}
+                      className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
+                        isActive(page.href)
+                          ? 'bg-primary/10 text-primary font-medium'
+                          : 'text-default-500 hover:bg-default-100 hover:text-foreground'
+                      }`}
+                    >
+                      <Clock size={14} className="shrink-0 text-default-400" />
+                      <span className="truncate">{page.label}</span>
+                    </Link>
+                  </li>
+                ))}
+                <li>
+                  <div className="mx-3 mb-1 mt-1 border-b border-divider/50" />
+                </li>
+              </>
+            )}
 
-            // Collapsible section (with super-admin visual distinction)
-            return (
-              <li key={section.key}>
-                {isSuperSection && !collapsed && (
-                  <div className="my-2 border-t border-warning/30" />
-                )}
-                <div className={isSuperSection ? 'rounded-lg bg-primary/5 py-1 px-1' : ''}>
-                  <Button
-                    variant="light"
-                    onPress={() => toggleSection(section.key)}
-                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors h-auto min-w-0 justify-start ${
-                      sectionActive
-                        ? 'text-primary'
-                        : 'text-default-600 hover:bg-default-100 hover:text-foreground'
-                    }`}
-                    title={collapsed ? section.label : undefined}
-                  >
-                    <Icon size={20} className="shrink-0" />
-                    {!collapsed && (
-                      <>
-                        <span className="flex-1 text-left">{section.label}</span>
-                        {isExpanded ? (
-                          <ChevronDown size={16} className="shrink-0" />
-                        ) : (
-                          <ChevronRight size={16} className="shrink-0" />
-                        )}
-                      </>
-                    )}
-                  </Button>
-                  {!collapsed && isExpanded && section.items && (
-                    <ul className="ml-4 mt-1 space-y-0.5 border-l border-divider pl-3">
-                      {section.items.map((item) => {
-                        const ItemIcon = item.icon;
-                        return (
-                          <li key={item.href}>
-                            <Link
-                              to={tenantPath(item.href)}
-                              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
-                                isActive(item.href)
-                                  ? 'bg-primary/10 text-primary font-medium'
-                                  : 'text-default-500 hover:bg-default-100 hover:text-foreground'
-                              }`}
-                            >
-                              <ItemIcon size={16} className="shrink-0" />
-                              <span>{item.label}</span>
-                              {(() => {
-                                const isMessageReview = item.href === '/admin/broker-controls/messages';
-                                const dynamicBadge = isMessageReview && unreviewedCount > 0
-                                  ? String(unreviewedCount)
-                                  : item.badge;
-                                if (!dynamicBadge) return null;
-                                return (
-                                  <span className={`ml-auto rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                                    isMessageReview && unreviewedCount > 0
-                                      ? 'bg-danger text-danger-foreground'
-                                      : 'bg-primary text-primary-foreground'
-                                  }`}>
-                                    {dynamicBadge}
-                                  </span>
-                                );
-                              })()}
-                            </Link>
-                          </li>
-                        );
-                      })}
+            {/* Zones */}
+            {ZONES.map((zone, zoneIdx) => {
+              const zoneSections = zone.sectionKeys
+                .map((k) => sectionMap.get(k))
+                .filter((s): s is NavSection => s !== undefined);
+
+              if (zoneSections.length === 0) return null;
+
+              const isZoneOpen = !collapsedZones.has(zone.key);
+
+              return (
+                <li key={zone.key}>
+                  {/* Zone header */}
+                  {!collapsed ? (
+                    <button
+                      onClick={() => toggleZone(zone.key)}
+                      className="flex w-full items-center gap-1 px-3 py-1 mt-2 text-[10px] font-semibold uppercase tracking-wider text-default-400 hover:text-default-600 transition-colors"
+                      aria-expanded={isZoneOpen}
+                    >
+                      <span className="flex-1 text-left">{t(zone.label)}</span>
+                      <ChevronDown
+                        size={11}
+                        className={`shrink-0 transition-transform duration-200 ${isZoneOpen ? '' : '-rotate-90'}`}
+                      />
+                    </button>
+                  ) : (
+                    /* Icon-only mode: thin divider in place of zone header */
+                    <div className="mx-2 my-2 border-t border-divider" />
+                  )}
+
+                  {/* Zone sections (accordion within zone) */}
+                  {isZoneOpen && (
+                    <ul className="space-y-1">
+                      {zoneSections.map((section) => renderSection(section, zone.key))}
                     </ul>
                   )}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+
+                  {/* Divider between zones (not after last zone) */}
+                  {!collapsed && zoneIdx < ZONES.length - 1 && (
+                    <div className="mx-3 mt-2 border-b border-divider/40" />
+                  )}
+                </li>
+              );
+            })}
+
+            {/* Super Admin — always pinned at bottom, no zone */}
+            {(() => {
+              const superAdmin = sectionMap.get('super-admin');
+              return superAdmin ? renderSection(superAdmin, null) : null;
+            })()}
+          </ul>
+        )}
 
         {/* Quick link to simplified Broker Panel */}
         <div className="mt-4 border-t border-divider pt-3">
