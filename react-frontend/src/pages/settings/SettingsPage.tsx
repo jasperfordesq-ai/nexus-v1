@@ -295,11 +295,11 @@ export function SettingsPage() {
       if (response.success && response.data) {
         setSessions(Array.isArray(response.data) ? response.data : []);
       } else {
-        setSessionsError(t('security.sessions_coming_soon', { defaultValue: 'Session management coming soon' }));
+        setSessionsError(t('sessions_coming_soon'));
       }
     } catch (error) {
       logError('Failed to load sessions', error);
-      setSessionsError(t('security.sessions_coming_soon', { defaultValue: 'Session management coming soon' }));
+      setSessionsError(t('sessions_coming_soon'));
     } finally {
       setSessionsLoading(false);
     }
@@ -510,7 +510,7 @@ export function SettingsPage() {
       return;
     }
 
-    if (passwordData.new_password.length < 8) {
+    if (passwordData.new_password.length < 12) {
       toast.error(t('toasts.password_too_short'), t('toasts.password_too_short_desc'));
       return;
     }
@@ -915,6 +915,7 @@ export function SettingsPage() {
               isSaving={isSaving}
               isUploading={isUploading}
               isIdVerified={isIdVerified}
+              isDirty={isDirty}
               onProfileDataChange={(updater) => {
                 setProfileData(updater);
                 setIsDirty(true);

@@ -55,6 +55,7 @@ interface ProfileTabProps {
   isSaving: boolean;
   isUploading: boolean;
   isIdVerified?: boolean;
+  isDirty?: boolean;
   onProfileDataChange: (updater: (prev: ProfileFormData) => ProfileFormData) => void;
   onSave: () => void;
   onAvatarUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -85,6 +86,7 @@ export function ProfileTab({
   isSaving,
   isUploading,
   isIdVerified = false,
+  isDirty = false,
   onProfileDataChange,
   onSave,
   onAvatarUpload,
@@ -114,6 +116,7 @@ export function ProfileTab({
               accept="image/*"
               onChange={onAvatarUpload}
               className="hidden"
+              disabled={isUploading}
               aria-label={t('profile.upload_photo_aria', { defaultValue: 'Upload profile photo' })}
             />
             <Button
@@ -284,9 +287,10 @@ export function ProfileTab({
 
           <Button
             onPress={onSave}
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            color="primary"
             startContent={<Save className="w-4 h-4" aria-hidden="true" />}
             isLoading={isSaving}
+            isDisabled={!isDirty || isSaving}
           >
             {t('save_changes')}
           </Button>
@@ -317,7 +321,7 @@ export function ProfileTab({
                   key={mode}
                   size="sm"
                   variant={theme === mode ? 'solid' : 'flat'}
-                  className={theme === mode ? 'bg-indigo-500 text-white' : 'text-theme-secondary'}
+                  color={theme === mode ? 'primary' : 'default'}
                   onPress={() => setTheme(mode)}
                 >
                   {t(`theme.${mode}`)}

@@ -387,20 +387,20 @@ export function PrivacyTab({
                     >
                       <div>
                         <p className="text-sm font-medium text-theme-primary">
-                          {cert.insurance_type.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}
+                          {t(`insurance.${cert.insurance_type}`, { defaultValue: cert.insurance_type })}
                         </p>
                         <p className="text-xs text-theme-muted">
                           {cert.provider_name || t('insurance.unknown_provider')}
-                          {cert.expiry_date ? ` — Expires ${new Date(cert.expiry_date).toLocaleDateString()}` : ''}
+                          {cert.expiry_date ? ` ${t('insurance.expires', { date: new Date(cert.expiry_date).toLocaleDateString() })}` : ''}
                         </p>
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                         cert.status === 'verified' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
                           : cert.status === 'pending' || cert.status === 'submitted' ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
                           : cert.status === 'rejected' ? 'bg-red-500/20 text-red-600 dark:text-red-400'
                           : 'bg-default-200 text-default-600'
                       }`}>
-                        {cert.status}
+                        {t(`insurance.status_${cert.status}`, { defaultValue: cert.status })}
                       </span>
                     </div>
                   ))}
