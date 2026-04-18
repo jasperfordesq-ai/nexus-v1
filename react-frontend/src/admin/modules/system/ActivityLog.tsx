@@ -142,7 +142,7 @@ export function ActivityLog() {
       sortable: true,
       render: (entry) => (
         <Chip size="sm" variant="flat" color={getActionColor(entry.action)}>
-          {entry.action}
+          {t(`system.action.${entry.action}`, { defaultValue: entry.action })}
         </Chip>
       ),
     },
