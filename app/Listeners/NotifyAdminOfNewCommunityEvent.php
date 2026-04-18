@@ -49,7 +49,7 @@ class NotifyAdminOfNewCommunityEvent implements ShouldQueue
 
             $admins = DB::table('users')
                 ->where('tenant_id', $event->tenantId)
-                ->whereIn('role', ['admin', 'broker', 'coordinator'])
+                ->whereIn('role', ['super_admin', 'admin', 'tenant_admin', 'broker', 'coordinator'])
                 ->where('status', 'active')
                 ->select(['id', 'email', 'first_name', 'name'])
                 ->get();
