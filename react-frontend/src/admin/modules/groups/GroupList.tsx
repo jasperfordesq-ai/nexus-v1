@@ -16,7 +16,7 @@ import {
   Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input,
 } from '@heroui/react';
-import { Trash2, Users, Eye, EyeOff, Lock, MoreVertical, Power, PowerOff } from 'lucide-react';
+import { Trash2, Users, Eye, EyeOff, Lock, MoreVertical, Power, PowerOff, Pencil } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminGroups } from '../../api/adminApi';
@@ -306,6 +306,7 @@ export function GroupList() {
             aria-label={t('groups.label_group_actions')}
             onAction={(key) => {
               if (key === 'view') navigate(tenantPath(`/groups/${item.id}`));
+              else if (key === 'edit') navigate(tenantPath(`/admin/groups/${item.id}/edit`));
               else if (key === 'toggle-status') handleStatusToggle(item);
               else if (key === 'archive') handleArchive(item);
               else if (key === 'clone') handleCloneOpen(item);
@@ -315,6 +316,9 @@ export function GroupList() {
           >
             <DropdownItem key="view" startContent={<Eye size={14} />}>
               {t('groups.view_group')}
+            </DropdownItem>
+            <DropdownItem key="edit" startContent={<Pencil size={14} />}>
+              {t('groups.edit_group')}
             </DropdownItem>
             <DropdownItem
               key="toggle-status"
