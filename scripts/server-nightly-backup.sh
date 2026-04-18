@@ -28,7 +28,15 @@ ENV_FILE="/opt/nexus-php/.env"
 DB_CONTAINER="nexus-php-db"
 KEEP_DAYS=7
 DATE=$(date +%Y-%m-%d)
-RCLONE_REMOTE="${RCLONE_REMOTE:-}"  # e.g. "nexus-backups:nexus-backups" — leave empty to skip
+# Auto-detect rclone gdrive remote if not set explicitly.
+# setup-rclone-gdrive.sh sets this in the cron environment; this fallback
+# handles manual runs and future invocations without the cron env var.
+if [[ -z "${RCLONE_REMOTE:-}" ]] && command -v rclone &>/dev/null; then
+    if rclone listremotes 2>/dev/null | grep -q "^gdrive:"; then
+        RCLONE_REMOTE="gdrive:nexus-backups"
+    fi
+fi
+RCLONE_REMOTE="${RCLONE_REMOTE:-}"
 
 log()     { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"; }
 success() { log "✓ $1"; }
