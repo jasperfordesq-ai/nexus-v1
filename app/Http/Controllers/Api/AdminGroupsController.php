@@ -114,7 +114,9 @@ class AdminGroupsController extends BaseApiController
         try {
             $group = $this->groupService->getById((int) $id);
 
-            if (!$group || ($group['tenant_id'] ?? null) != $tenantId) {
+            // TenantScope already limits the query to the current tenant; if null the group
+            // simply doesn't exist (or belongs to another tenant).
+            if (!$group) {
                 return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
             }
 
@@ -131,7 +133,7 @@ class AdminGroupsController extends BaseApiController
                 'activity_score' => (int) ($group['member_count'] ?? 0) * 10,
             ];
 
-            $tenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [(int) $group['tenant_id']]);
+            $tenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$tenantId]);
             $group['tenant_name'] = $tenant->name ?? 'Unknown';
 
             return $this->respondWithData($group);
