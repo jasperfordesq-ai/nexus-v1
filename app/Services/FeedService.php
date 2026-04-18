@@ -96,10 +96,15 @@ class FeedService
             }
         }
 
-        // Map type filter to source_type
+        // Virtual filters ("saved", "following") are scope filters, not source_type filters.
+        // They constrain the result set by user relationship rather than content type.
+        $isSavedFilter = $type === 'saved';
+        $isFollowingFilter = $type === 'following';
+
+        // Map type filter to source_type (excluding virtual filters)
         $sourceType = null;
-        if ($type !== 'all') {
-            $sourceType = self::TYPE_MAP[$type] ?? $type;
+        if ($type !== 'all' && !$isSavedFilter && !$isFollowingFilter) {
+            $sourceType = self::TYPE_MAP[$type] ?? null;
         }
 
         // Build query — scope the users JOIN to the current tenant to prevent cross-tenant user leakage
@@ -128,6 +133,46 @@ class FeedService
 
         if ($sourceType !== null) {
             $query->where('feed_activity.source_type', $sourceType);
+        }
+
+        // "Saved" virtual filter: only items the current user has bookmarked.
+        // Joins bookmarks on (bookmarkable_type, bookmarkable_id) = (source_type, source_id).
+        // Anonymous users get an empty result set.
+        if ($isSavedFilter) {
+            if (!$currentUserId) {
+                return ['items' => [], 'cursor' => null, 'has_more' => false];
+            }
+            $query->whereExists(function ($sub) use ($currentUserId, $tenantId) {
+                $sub->select(DB::raw(1))
+                    ->from('bookmarks')
+                    ->whereColumn('bookmarks.bookmarkable_type', 'feed_activity.source_type')
+                    ->whereColumn('bookmarks.bookmarkable_id', 'feed_activity.source_id')
+                    ->where('bookmarks.user_id', $currentUserId)
+                    ->where('bookmarks.tenant_id', $tenantId);
+            });
+        }
+
+        // "Following" virtual filter: only items authored by users the current user
+        // has an accepted connection with (in either direction).
+        if ($isFollowingFilter) {
+            if (!$currentUserId) {
+                return ['items' => [], 'cursor' => null, 'has_more' => false];
+            }
+            $query->whereExists(function ($sub) use ($currentUserId, $tenantId) {
+                $sub->select(DB::raw(1))
+                    ->from('connections')
+                    ->where('connections.tenant_id', $tenantId)
+                    ->where('connections.status', 'accepted')
+                    ->where(function ($q) use ($currentUserId) {
+                        $q->where(function ($q2) use ($currentUserId) {
+                            $q2->where('connections.requester_id', $currentUserId)
+                               ->whereColumn('connections.receiver_id', 'feed_activity.user_id');
+                        })->orWhere(function ($q2) use ($currentUserId) {
+                            $q2->where('connections.receiver_id', $currentUserId)
+                               ->whereColumn('connections.requester_id', 'feed_activity.user_id');
+                        });
+                    });
+            });
         }
 
         if ($profileUserId !== null) {
@@ -744,6 +789,9 @@ class FeedService
                 'total_votes' => $totalVotesForResponse,
                 'user_vote_option_id' => $userVotes[$pollId] ?? null,
                 'is_active' => (bool) ($poll->is_active ?? true),
+                'expires_at' => $poll && !empty($poll->end_date)
+                    ? date('c', strtotime((string) $poll->end_date))
+                    : null,
             ];
         }
 

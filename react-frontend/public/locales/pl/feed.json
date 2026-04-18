@@ -28,7 +28,9 @@
     "challenges": "Challenges",
     "volunteering": "Volunteering",
     "blogs": "Blog",
-    "discussions": "Discussions"
+    "discussions": "Discussions",
+    "following": "Following",
+    "saved": "Saved"
   },
   "report": {
     "title": "Zgłoś post",

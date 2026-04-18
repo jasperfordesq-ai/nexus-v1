@@ -28,7 +28,9 @@
     "challenges": "Sfide",
     "volunteering": "Volontariato",
     "blogs": "Blog",
-    "discussions": "Discussioni"
+    "discussions": "Discussioni",
+    "following": "Following",
+    "saved": "Saved"
   },
   "report": {
     "title": "Segnala post",

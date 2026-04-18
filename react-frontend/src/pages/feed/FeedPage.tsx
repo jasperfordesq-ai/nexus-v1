@@ -331,7 +331,11 @@ export function FeedPage() {
                 (currentFilter === 'goals' && fi.type === 'goal') ||
                 (currentFilter === 'jobs' && fi.type === 'job') ||
                 (currentFilter === 'challenges' && fi.type === 'challenge') ||
-                (currentFilter === 'volunteering' && fi.type === 'volunteer')
+                (currentFilter === 'volunteering' && fi.type === 'volunteer') ||
+                (currentFilter === 'blogs' && fi.type === 'blog') ||
+                (currentFilter === 'discussions' && fi.type === 'discussion') ||
+                currentFilter === 'saved' ||
+                currentFilter === 'following'
               );
             return [...newItems, ...prev];
           });
@@ -371,7 +375,11 @@ export function FeedPage() {
         (currentFilter === 'goals' && incoming.type === 'goal') ||
         (currentFilter === 'jobs' && incoming.type === 'job') ||
         (currentFilter === 'challenges' && incoming.type === 'challenge') ||
-        (currentFilter === 'volunteering' && incoming.type === 'volunteer');
+        (currentFilter === 'volunteering' && incoming.type === 'volunteer') ||
+        (currentFilter === 'blogs' && incoming.type === 'blog') ||
+        (currentFilter === 'discussions' && incoming.type === 'discussion') ||
+        currentFilter === 'saved' ||
+        currentFilter === 'following';
 
       if (!matchesFilter) return;
 
@@ -678,7 +686,9 @@ export function FeedPage() {
               (currentFilter === 'goals' && fi.type === 'goal') ||
               (currentFilter === 'jobs' && fi.type === 'job') ||
               (currentFilter === 'challenges' && fi.type === 'challenge') ||
-              (currentFilter === 'volunteering' && fi.type === 'volunteer')
+              (currentFilter === 'volunteering' && fi.type === 'volunteer') ||
+              (currentFilter === 'blogs' && fi.type === 'blog') ||
+              (currentFilter === 'discussions' && fi.type === 'discussion')
             );
           return [...newItems, ...prev];
         });
@@ -691,6 +701,10 @@ export function FeedPage() {
 
   const filterOptions: { key: FeedFilter; label: string }[] = [
     { key: 'all', label: t('filter.all') },
+    ...(user ? [
+      { key: 'following' as FeedFilter, label: t('filter.following', 'Following') },
+      { key: 'saved' as FeedFilter, label: t('filter.saved', 'Saved') },
+    ] : []),
     { key: 'posts', label: t('filter.posts') },
     { key: 'listings', label: t('filter.listings') },
     { key: 'events', label: t('filter.events') },

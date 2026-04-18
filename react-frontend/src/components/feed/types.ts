@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-export type FeedFilter = 'all' | 'posts' | 'listings' | 'events' | 'polls' | 'goals' | 'jobs' | 'challenges' | 'volunteering' | 'blogs' | 'discussions';
+export type FeedFilter = 'all' | 'posts' | 'listings' | 'events' | 'polls' | 'goals' | 'jobs' | 'challenges' | 'volunteering' | 'blogs' | 'discussions' | 'saved' | 'following';
 export type PostMode = 'text' | 'poll';
 
 /** A single media attachment (image/video) on a post. */
@@ -134,7 +134,7 @@ export interface PollData {
   id: number;
   question: string;
   options: PollOption[];
-  total_votes: number;
+  total_votes: number | null;
   user_vote_option_id: number | null;
   is_active: boolean;
   expires_at?: string | null;
@@ -143,8 +143,8 @@ export interface PollData {
 export interface PollOption {
   id: number;
   text: string;
-  vote_count: number;
-  percentage: number;
+  vote_count: number | null;
+  percentage: number | null;
 }
 
 export interface FeedCommentAuthor {

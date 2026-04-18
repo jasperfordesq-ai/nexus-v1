@@ -1197,8 +1197,12 @@ const FeedCard = React.memo(function FeedCard({
                       <div className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-muted)]">
                         <BarChart3 className="w-3.5 h-3.5" aria-hidden="true" />
                         <span>{t('card.type_poll', 'Poll')}</span>
-                        <span className="text-[var(--border-default)]">·</span>
-                        <span>{pollData.total_votes} {pollData.total_votes === 1 ? t('card.vote', 'vote') : t('card.votes', 'votes')}</span>
+                        {pollData.total_votes != null && (
+                          <>
+                            <span className="text-[var(--border-default)]">·</span>
+                            <span>{pollData.total_votes} {pollData.total_votes === 1 ? t('card.vote', 'vote') : t('card.votes', 'votes')}</span>
+                          </>
+                        )}
                       </div>
                       {pollExpired ? (
                         <span className="text-xs font-medium text-[var(--text-muted)] bg-[var(--surface-hover)] px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -1225,7 +1229,7 @@ const FeedCard = React.memo(function FeedCard({
                                 {/* Background fill */}
                                 <div
                                   className={`absolute inset-0 transition-all duration-500 ${isVoted ? 'bg-[var(--color-primary)]/12' : 'bg-[var(--surface-hover)]'}`}
-                                  style={{ width: `${option.percentage}%` }}
+                                  style={{ width: `${option.percentage ?? 0}%` }}
                                   aria-hidden="true"
                                 />
                                 <div className="relative flex items-center justify-between gap-2">
@@ -1233,11 +1237,13 @@ const FeedCard = React.memo(function FeedCard({
                                     {isVoted && <Check className="w-3.5 h-3.5 inline me-1 -mt-0.5" aria-hidden="true" />}
                                     {option.text}
                                   </span>
-                                  <span className={`text-xs font-semibold shrink-0 ${isVoted ? 'text-[var(--color-primary)]' : 'text-[var(--text-muted)]'}`}>
-                                    {option.percentage}%
-                                  </span>
+                                  {option.percentage != null && (
+                                    <span className={`text-xs font-semibold shrink-0 ${isVoted ? 'text-[var(--color-primary)]' : 'text-[var(--text-muted)]'}`}>
+                                      {option.percentage}%
+                                    </span>
+                                  )}
                                 </div>
-                                {option.vote_count > 0 && (
+                                {option.vote_count != null && option.vote_count > 0 && (
                                   <p className="relative text-xs text-[var(--text-subtle)] mt-0.5">
                                     {option.vote_count} {option.vote_count === 1 ? t('card.vote', 'vote') : t('card.votes', 'votes')}
                                   </p>
