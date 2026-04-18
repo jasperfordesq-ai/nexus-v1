@@ -91,7 +91,10 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
         const firstSegment = window.location.pathname.split('/').filter(Boolean)[0]?.toLowerCase();
         const isReservedOrEmpty = !firstSegment || RESERVED_PATHS.has(firstSegment);
 
-        if (isReservedOrEmpty) {
+        // Guard: if the storedSlug is itself a reserved word (e.g. tenant slug "admin"),
+        // prepending it would just produce another reserved-looking path → infinite loop.
+        const slugIsReserved = RESERVED_PATHS.has(storedSlug.toLowerCase());
+        if (isReservedOrEmpty && !slugIsReserved) {
           const path = window.location.pathname === '/' ? '' : window.location.pathname;
           window.location.replace(`${window.location.origin}/${storedSlug}${path}${window.location.search}${window.location.hash}`);
           return null;
@@ -241,7 +244,7 @@ function SlugUrlGuard({ slug }: { slug: string }) {
       const correctedUrl = prefix + currentPath + window.location.search + window.location.hash;
       window.history.replaceState(window.history.state, '', correctedUrl);
     }
-  });
+  }, [slug]);
   return null;
 }
 

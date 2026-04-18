@@ -9,7 +9,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import {
   Card,
   CardBody,
@@ -84,6 +84,15 @@ export function BillingPage() {
   usePageTitle(t('billing.title', 'Billing'));
   const toast = useToast();
   const { tenantPath } = useTenant();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (searchParams.get('cancelled') === '1') {
+      toast.warning(t('billing.checkout_cancelled', 'Checkout was cancelled. No charge was made.'));
+      navigate(tenantPath('/admin/billing'), { replace: true });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const { isOpen: isUpgradeOpen, onOpen: onUpgradeOpen, onClose: onUpgradeClose } = useDisclosure();
   const [upgradeMessage, setUpgradeMessage] = useState('');
   const [upgradeSending, setUpgradeSending] = useState(false);
