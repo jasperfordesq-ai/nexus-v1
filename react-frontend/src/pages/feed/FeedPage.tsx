@@ -282,12 +282,16 @@ export function FeedPage() {
   // Track previous filter to detect filter changes and auto-reset subFilter
   const prevFilterRef = useRef(filter);
   useEffect(() => {
-    // If the main filter changed, reset subFilter first
+    // If the main filter changed and a subFilter was set, reset it.
+    // Only early-return when the reset actually triggers a re-render — if subFilter
+    // was already null, setSubFilter(null) is a no-op and the effect would never
+    // re-fire, leaving loadFeed uncalled (the bug that made filter clicks do nothing).
     if (prevFilterRef.current !== filter) {
       prevFilterRef.current = filter;
-      setSubFilter(null);
-      // The state update above will trigger this effect again with subFilter=null
-      return;
+      if (subFilter !== null) {
+        setSubFilter(null);
+        return;
+      }
     }
     cursorRef.current = undefined;
     setPendingPostCount(0);
