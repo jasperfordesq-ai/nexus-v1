@@ -17,7 +17,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useSearchParams, useBlocker } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -83,11 +83,16 @@ export function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Unsaved changes blocker — intercepts React Router navigation when form is dirty
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      isDirty && currentLocation.pathname !== nextLocation.pathname
-  );
+  // Warn on browser close/refresh when form is dirty
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [isDirty]);
 
   // Modal states
   const passwordModal = useDisclosure();
@@ -1162,44 +1167,6 @@ export function SettingsPage() {
               isLoading={isSubmittingGdpr}
             >
               {gdprRequestType === 'deletion' ? t('gdpr.confirm_deletion') : t('gdpr.submit_request')}
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-      {/* Unsaved Changes Modal — shown when navigating away with dirty form */}
-      <Modal
-        isOpen={blocker.state === 'blocked'}
-        onClose={() => blocker.reset?.()}
-        classNames={{
-          base: 'bg-content1 border border-theme-default',
-          header: 'border-b border-theme-default',
-          body: 'py-6',
-          footer: 'border-t border-theme-default',
-        }}
-      >
-        <ModalContent>
-          <ModalHeader className="text-theme-primary">
-            {t('unsaved_changes.title')}
-          </ModalHeader>
-          <ModalBody>
-            <p className="text-theme-muted">{t('unsaved_changes.message')}</p>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              variant="flat"
-              className="bg-theme-elevated text-theme-primary"
-              onPress={() => blocker.reset?.()}
-            >
-              {t('unsaved_changes.stay')}
-            </Button>
-            <Button
-              className="bg-red-500 text-white"
-              onPress={() => {
-                setIsDirty(false);
-                blocker.proceed?.();
-              }}
-            >
-              {t('unsaved_changes.leave')}
             </Button>
           </ModalFooter>
         </ModalContent>
