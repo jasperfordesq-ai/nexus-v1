@@ -3078,10 +3078,10 @@
   "no_data": "No data available",
   "not_found": {
     "back_to_dashboard": "Back to Dashboard",
-    "description": "Manage not_found settings and configuration",
-    "heading": "Heading",
-    "page_title": "Not_found",
-    "title": "Not_found"
+    "description": "The page you are looking for does not exist or has been moved.",
+    "heading": "Page not found",
+    "page_title": "Page Not Found",
+    "title": "Page Not Found"
   },
   "performance": {
     "label_performance_metrics": "Performance Metrics",

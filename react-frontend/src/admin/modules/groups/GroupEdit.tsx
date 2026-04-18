@@ -16,7 +16,7 @@ import {
   Spinner,
   Textarea,
 } from '@heroui/react';
-import { ArrowLeft, Save, Users } from 'lucide-react';
+import { ArrowLeft, Save, Users, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
@@ -32,6 +32,7 @@ export function GroupEdit() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [group, setGroup] = useState<AdminGroup | null>(null);
 
@@ -57,11 +58,10 @@ export function GroupEdit() {
       setLocation(g.location ?? '');
       setStatus(g.status === 'active' ? 'active' : 'inactive');
     } else {
-      toast.error(t('groups.failed_to_load_group'));
-      navigate(tenantPath('/admin/groups'));
+      setLoadError(res.error ?? t('groups.failed_to_load_group'));
     }
     setLoading(false);
-  }, [id, navigate, tenantPath, toast, t]);
+  }, [id, t]);
 
   useEffect(() => { loadGroup(); }, [loadGroup]);
 
@@ -96,6 +96,24 @@ export function GroupEdit() {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
         <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 pb-8">
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-4 text-default-500">
+          <AlertTriangle size={40} className="text-warning" />
+          <p className="text-lg font-medium">{loadError}</p>
+          <Button
+            variant="flat"
+            startContent={<ArrowLeft size={16} />}
+            onPress={() => navigate(tenantPath('/admin/groups'))}
+          >
+            {t('groups.back_to_groups')}
+          </Button>
+        </div>
       </div>
     );
   }
