@@ -594,6 +594,12 @@ class FeedService
                 }
             }
 
+            // has_more must account for two cases:
+            // 1. $hasMore: DB has items beyond the candidate pool
+            // 2. The ranked pool is larger than $limit — slicing will discard items
+            //    that the next page needs to pick up via the cursor
+            $hasMoreRanked = $hasMore || (count($items) > $limit);
+
             // Slice to the requested page size
             $items = array_slice($items, 0, $limit);
 
@@ -607,7 +613,7 @@ class FeedService
             return [
                 'items'    => $items,
                 'cursor'   => $nextCursor,
-                'has_more' => $hasMore,
+                'has_more' => $hasMoreRanked,
             ];
         }
 
