@@ -3739,7 +3739,12 @@
       "welcome_text": "Welcome Text",
       "welcome_text_desc": "Manage and configure welcome text settings",
       "welcome_text_placeholder": "Welcome Text Placeholder",
-      "your_community": "Your Community"
+      "your_community": "Your Community",
+      "preset_ireland": "Ireland",
+      "preset_england_wales": "England & Wales",
+      "preset_scotland": "Scotland",
+      "preset_northern_ireland": "Northern Ireland",
+      "preset_custom": "Custom"
     },
     "overdue_jobs": "Overdue Jobs",
     "page_title": "System",
