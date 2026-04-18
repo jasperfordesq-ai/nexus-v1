@@ -670,7 +670,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                   )}
                   {hasGamification && level > 0 && (
                     <Chip size="sm" variant="flat" className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs h-5 min-w-0">
-                      {t('common.level_short', { level })}
+                      {t('level_short', { level })}
                     </Chip>
                   )}
                   {hasGamification && showcasedBadges.length > 0 && (
@@ -753,7 +753,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
             )}
             {hasGamification && level > 0 && (
               <Chip size="sm" variant="flat" className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs h-5 min-w-0">
-                {t('common.level_short', { level })}
+                {t('level_short', { level })}
               </Chip>
             )}
           </div>

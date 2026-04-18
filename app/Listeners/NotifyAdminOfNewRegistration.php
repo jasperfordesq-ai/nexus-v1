@@ -23,7 +23,9 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
     public function handle(UserRegistered $event): void
     {
         try {
-            TenantContext::setById($event->tenantId);
+            if (!TenantContext::setById($event->tenantId)) {
+                throw new \RuntimeException("Tenant {$event->tenantId} not found — cannot send admin registration notification.");
+            }
 
             $user = $event->user;
             $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
@@ -43,6 +45,7 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
                 ->get();
 
             if ($admins->isEmpty()) {
+                Log::info('NotifyAdminOfNewRegistration: no active admins found for tenant', ['tenant_id' => $event->tenantId]);
                 return;
             }
 
@@ -57,38 +60,40 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
 
                 $adminName = $admin->first_name ?? $admin->name ?? 'Admin';
 
-                // In-app bell notification
-                $bellContent = __('emails_misc.admin_notify.new_user_bell', ['name' => $newUserName]);
-                Notification::createNotification((int) $admin->id, $bellContent, '/admin/members', 'new_user_registered');
+                try {
+                    // In-app bell notification
+                    $bellContent = __('emails_misc.admin_notify.new_user_bell', ['name' => $newUserName]);
+                    Notification::createNotification((int) $admin->id, $bellContent, '/admin/members', 'new_user_registered');
 
-                // Email
-                $html = EmailTemplateBuilder::make()
-                    ->theme('info')
-                    ->title(__('emails_misc.admin_notify.new_user_title'))
-                    ->previewText(__('emails_misc.admin_notify.new_user_preview', ['community' => $tenantName]))
-                    ->greeting($adminName)
-                    ->paragraph(__('emails_misc.admin_notify.new_user_body', ['community' => htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8')]))
-                    ->highlight(htmlspecialchars($newUserName, ENT_QUOTES, 'UTF-8'))
-                    ->bulletList(array_filter([
-                        __('emails_misc.admin_notify.new_user_email_label') . ': ' . htmlspecialchars($newUserEmail, ENT_QUOTES, 'UTF-8'),
-                        __('emails_misc.admin_notify.new_user_status_label') . ': ' . ucfirst($user->status ?? 'pending'),
-                    ]))
-                    ->button(__('emails_misc.admin_notify.new_user_cta'), $profileUrl)
-                    ->render();
+                    // Email
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('info')
+                        ->title(__('emails_misc.admin_notify.new_user_title'))
+                        ->previewText(__('emails_misc.admin_notify.new_user_preview', ['community' => $tenantName]))
+                        ->greeting($adminName)
+                        ->paragraph(__('emails_misc.admin_notify.new_user_body', ['community' => htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8')]))
+                        ->highlight(htmlspecialchars($newUserName, ENT_QUOTES, 'UTF-8'))
+                        ->bulletList(array_filter([
+                            __('emails_misc.admin_notify.new_user_email_label') . ': ' . htmlspecialchars($newUserEmail, ENT_QUOTES, 'UTF-8'),
+                            __('emails_misc.admin_notify.new_user_status_label') . ': ' . ucfirst($user->status ?? 'pending'),
+                        ]))
+                        ->button(__('emails_misc.admin_notify.new_user_cta'), $profileUrl)
+                        ->render();
 
-                if (!$mailer->send($adminEmail, $subject, $html)) {
-                    Log::warning('NotifyAdminOfNewRegistration: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
+                    if (!$mailer->send($adminEmail, $subject, $html)) {
+                        Log::warning('NotifyAdminOfNewRegistration: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
+                    }
+                } catch (\Throwable $e) {
+                    Log::error('NotifyAdminOfNewRegistration: failed for admin', [
+                        'admin_id'  => $admin->id,
+                        'user_id'   => $user->id,
+                        'tenant_id' => $event->tenantId,
+                        'error'     => $e->getMessage(),
+                    ]);
                 }
             }
-        } catch (\Throwable $e) {
-            Log::error('NotifyAdminOfNewRegistration listener failed', [
-                'user_id'  => $event->user->id ?? null,
-                'tenant_id' => $event->tenantId,
-                'error'    => $e->getMessage(),
-                'trace'    => $e->getTraceAsString(),
-            ]);
         } finally {
-            TenantContext::reset(); // Prevent context leaking to next queued job
+            TenantContext::reset();
         }
     }
 }
