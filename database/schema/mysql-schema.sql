@@ -7753,7 +7753,6 @@ CREATE TABLE `polls` (
   `end_date` datetime DEFAULT NULL,
   `is_active` tinyint(1) DEFAULT 1,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `expires_at` timestamp NULL DEFAULT NULL,
   `poll_type` enum('standard','ranked') NOT NULL DEFAULT 'standard' COMMENT 'Type of poll voting mechanism',
   `category` varchar(100) DEFAULT NULL COMMENT 'Poll category (e.g., governance, feedback, social)',
   `tags` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'JSON array of tag strings' CHECK (json_valid(`tags`)),
