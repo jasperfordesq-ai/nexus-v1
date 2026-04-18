@@ -4,14 +4,22 @@
 # Author: Jasper Ford
 # See NOTICE file for attribution and acknowledgements.
 #
-# Nightly Production Database Backup
+# Nightly Production Backup — database + Docker volumes
 # Runs ON the production server (not from dev machine) — install via cron:
 #
 #   sudo crontab -e
 #   0 2 * * * bash /opt/nexus-php/scripts/server-nightly-backup.sh >> /opt/nexus-php/backups/backup.log 2>&1
 #
-# Keeps the last 7 daily backups. Backup files are named:
-#   nexus_prod_backup_YYYY-MM-DD.sql.gz
+# What gets backed up:
+#   nexus_db_YYYY-MM-DD.sql.gz        — full MariaDB dump
+#   nexus_uploads_YYYY-MM-DD.tar.gz   — user-uploaded images/files (nexus-php-uploads volume)
+#   nexus_storage_YYYY-MM-DD.tar.gz   — Laravel storage/ (nexus-php-storage volume)
+#
+# Retention: 7 daily backups per type. Older files are deleted automatically.
+#
+# Optional offsite sync (rclone):
+#   Install rclone, configure a remote called "nexus-backups", then set:
+#   RCLONE_REMOTE="nexus-backups:nexus-backups" in this script or the environment.
 
 set -euo pipefail
 
@@ -20,46 +28,93 @@ ENV_FILE="/opt/nexus-php/.env"
 DB_CONTAINER="nexus-php-db"
 KEEP_DAYS=7
 DATE=$(date +%Y-%m-%d)
-BACKUP_FILE="${BACKUP_DIR}/nexus_prod_backup_${DATE}.sql.gz"
+RCLONE_REMOTE="${RCLONE_REMOTE:-}"  # e.g. "nexus-backups:nexus-backups" — leave empty to skip
 
-log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"; }
+log()     { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"; }
+success() { log "✓ $1"; }
+fail()    { log "✗ ERROR: $1"; exit 1; }
 
 log "=== Nightly backup starting ==="
-
-# Read credentials from .env
-DB_NAME=$(grep '^DB_DATABASE=' "$ENV_FILE" | cut -d= -f2 | tr -d '"' || \
-          grep '^DB_NAME=' "$ENV_FILE" | cut -d= -f2 | tr -d '"')
-DB_USER=$(grep '^DB_USERNAME=' "$ENV_FILE" | cut -d= -f2 | tr -d '"' || \
-          grep '^DB_USER=' "$ENV_FILE" | cut -d= -f2 | tr -d '"')
-DB_PASS=$(grep '^DB_PASSWORD=' "$ENV_FILE" | cut -d= -f2 | tr -d '"' || \
-          grep '^DB_PASS=' "$ENV_FILE" | cut -d= -f2 | tr -d '"')
-
-if [[ -z "${DB_NAME:-}" || -z "${DB_USER:-}" || -z "${DB_PASS:-}" ]]; then
-    log "ERROR: Could not read DB credentials from $ENV_FILE"
-    exit 1
-fi
-
 mkdir -p "$BACKUP_DIR"
 
-log "Dumping database: $DB_NAME → $BACKUP_FILE"
-export MYSQL_PWD="$DB_PASS"
-docker exec -e MYSQL_PWD "$DB_CONTAINER" \
-    mariadb-dump -u "$DB_USER" "$DB_NAME" \
-    | gzip > "$BACKUP_FILE"
+# ---------------------------------------------------------------------------
+# 1. Database
+# ---------------------------------------------------------------------------
+DB_BACKUP="${BACKUP_DIR}/nexus_db_${DATE}.sql.gz"
 
-# Verify
-if [[ ! -s "$BACKUP_FILE" ]]; then
-    log "ERROR: Backup file is empty or missing"
-    exit 1
+DB_NAME=$(grep -E '^DB_(DATABASE|NAME)=' "$ENV_FILE" | head -1 | cut -d= -f2 | tr -d '"')
+DB_USER=$(grep -E '^DB_(USERNAME|USER)='  "$ENV_FILE" | head -1 | cut -d= -f2 | tr -d '"')
+DB_PASS=$(grep -E '^DB_(PASSWORD|PASS)='  "$ENV_FILE" | head -1 | cut -d= -f2 | tr -d '"')
+
+[[ -z "${DB_NAME:-}" || -z "${DB_USER:-}" || -z "${DB_PASS:-}" ]] && \
+    fail "Could not read DB credentials from $ENV_FILE"
+
+log "Dumping database: $DB_NAME → $DB_BACKUP"
+docker exec -e MYSQL_PWD="$DB_PASS" "$DB_CONTAINER" \
+    mariadb-dump -u "$DB_USER" "$DB_NAME" \
+    | gzip > "$DB_BACKUP"
+
+[[ ! -s "$DB_BACKUP" ]] && fail "Database backup is empty"
+success "Database backup — $(du -sh "$DB_BACKUP" | cut -f1)"
+
+# ---------------------------------------------------------------------------
+# 2. Uploads volume  (nexus-php-uploads → httpdocs/uploads/)
+# ---------------------------------------------------------------------------
+UPLOADS_BACKUP="${BACKUP_DIR}/nexus_uploads_${DATE}.tar.gz"
+
+log "Backing up uploads volume → $UPLOADS_BACKUP"
+docker run --rm \
+    -v nexus-php-uploads:/data:ro \
+    -v "${BACKUP_DIR}:/out" \
+    alpine \
+    tar czf "/out/nexus_uploads_${DATE}.tar.gz" -C /data .
+
+[[ ! -s "$UPLOADS_BACKUP" ]] && fail "Uploads backup is empty"
+success "Uploads backup — $(du -sh "$UPLOADS_BACKUP" | cut -f1)"
+
+# ---------------------------------------------------------------------------
+# 3. Laravel storage volume  (nexus-php-storage → storage/)
+# ---------------------------------------------------------------------------
+STORAGE_BACKUP="${BACKUP_DIR}/nexus_storage_${DATE}.tar.gz"
+
+log "Backing up storage volume → $STORAGE_BACKUP"
+docker run --rm \
+    -v nexus-php-storage:/data:ro \
+    -v "${BACKUP_DIR}:/out" \
+    alpine \
+    tar czf "/out/nexus_storage_${DATE}.tar.gz" -C /data .
+
+[[ ! -s "$STORAGE_BACKUP" ]] && fail "Storage backup is empty"
+success "Storage backup — $(du -sh "$STORAGE_BACKUP" | cut -f1)"
+
+# ---------------------------------------------------------------------------
+# 4. Rotation — keep last KEEP_DAYS per type
+# ---------------------------------------------------------------------------
+log "Rotating old backups (keeping last $KEEP_DAYS days each)..."
+for pattern in "nexus_db_*.sql.gz" "nexus_uploads_*.tar.gz" "nexus_storage_*.tar.gz"; do
+    find "$BACKUP_DIR" -name "$pattern" -mtime +"$KEEP_DAYS" -delete
+done
+REMAINING=$(find "$BACKUP_DIR" -name "nexus_*.gz" | wc -l)
+log "Rotation done — $REMAINING file(s) retained"
+
+# ---------------------------------------------------------------------------
+# 5. Optional: sync to offsite rclone remote
+# ---------------------------------------------------------------------------
+if [[ -n "$RCLONE_REMOTE" ]]; then
+    if command -v rclone &>/dev/null; then
+        log "Syncing to $RCLONE_REMOTE ..."
+        rclone sync "$BACKUP_DIR" "$RCLONE_REMOTE" \
+            --include "nexus_*.gz" \
+            --transfers=4 \
+            --log-level INFO
+        success "Offsite sync complete"
+    else
+        log "WARNING: RCLONE_REMOTE set but rclone not installed — skipping offsite sync"
+    fi
 fi
 
-SIZE=$(du -sh "$BACKUP_FILE" | cut -f1)
-log "Backup complete — $SIZE"
-
-# Rotate: remove backups older than KEEP_DAYS
-log "Rotating old backups (keeping last $KEEP_DAYS days)..."
-find "$BACKUP_DIR" -name "nexus_prod_backup_*.sql.gz" -mtime +"$KEEP_DAYS" -delete
-REMAINING=$(find "$BACKUP_DIR" -name "nexus_prod_backup_*.sql.gz" | wc -l)
-log "Rotation done — $REMAINING backup(s) retained"
-
-log "=== Nightly backup finished ==="
+# ---------------------------------------------------------------------------
+# 6. Summary
+# ---------------------------------------------------------------------------
+TOTAL=$(du -sh "$BACKUP_DIR" | cut -f1)
+log "=== Nightly backup finished — total backup dir: $TOTAL ==="
