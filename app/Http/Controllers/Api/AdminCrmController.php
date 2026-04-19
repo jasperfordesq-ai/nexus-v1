@@ -101,7 +101,16 @@ class AdminCrmController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         $totalMembers = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->cnt;
-        $activeMembers = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND last_login_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)", [$tenantId])->cnt;
+        $activeMembers = (int) DB::selectOne(
+            "SELECT COUNT(*) as cnt
+             FROM users
+             WHERE tenant_id = ?
+               AND (
+                   last_active_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                   OR last_login_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+               )",
+            [$tenantId]
+        )->cnt;
         $newThisMonth = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')", [$tenantId])->cnt;
         $pendingApprovals = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 0", [$tenantId])->cnt;
 
@@ -911,7 +920,16 @@ class AdminCrmController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         $totalMembers = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->cnt;
-        $activeMembers = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND last_login_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)", [$tenantId])->cnt;
+        $activeMembers = (int) DB::selectOne(
+            "SELECT COUNT(*) as cnt
+             FROM users
+             WHERE tenant_id = ?
+               AND (
+                   last_active_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                   OR last_login_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+               )",
+            [$tenantId]
+        )->cnt;
         $newThisMonth = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')", [$tenantId])->cnt;
         $pendingApprovals = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 0", [$tenantId])->cnt;
         $approvedMembers = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 1", [$tenantId])->cnt;
