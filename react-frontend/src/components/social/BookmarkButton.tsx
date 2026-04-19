@@ -10,7 +10,8 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Button, Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Button } from '@heroui/react';
 import { Bookmark, BookmarkCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
@@ -105,52 +106,67 @@ export function BookmarkButton({
 
   const iconSize = size === 'sm' ? 'w-[18px] h-[18px]' : 'w-5 h-5';
 
+  // Close the collection picker when clicking outside it
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!isPickerOpen) return;
+    const onDocClick = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setIsPickerOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, [isPickerOpen]);
+
+  /*
+    Previously the Button was wrapped in HeroUI's `PopoverTrigger`, which intercepted
+    the press event and silently swallowed taps on the main bookmark toggle. The
+    picker is now rendered as a plain absolutely-positioned panel so the Button's
+    onPress fires cleanly, and the picker only appears on long-press.
+  */
   return (
-    <Popover
-      isOpen={isPickerOpen}
-      onOpenChange={(open) => {
-        // Suppress the toggle that fires immediately after long-press touch-end
-        if (longPressFiredRef.current) {
-          longPressFiredRef.current = false;
-          return;
-        }
-        // Only respond to close events — opening is controlled by long-press only
-        if (!open) setIsPickerOpen(false);
-      }}
-      placement="bottom"
-      offset={8}
-    >
-      <PopoverTrigger>
-        <Button
-          isIconOnly
-          size={size}
-          variant="light"
-          className={`${
-            bookmarked
-              ? 'text-amber-500'
-              : 'text-[var(--text-muted)] hover:text-amber-500'
-          } transition-colors min-w-0 ${className}`}
-          onPress={handlePress}
-          isDisabled={isLoading}
-          aria-label={bookmarked ? t('bookmark.remove', 'Remove from saved') : t('bookmark.save', 'Save')}
-          onTouchStart={longPressHandlers.onTouchStart}
-          onTouchMove={longPressHandlers.onTouchMove}
-          onTouchEnd={longPressHandlers.onTouchEnd}
-        >
-          {bookmarked ? (
-            <BookmarkCheck className={`${iconSize} fill-amber-500 text-amber-500`} aria-hidden="true" />
-          ) : (
-            <Bookmark className={iconSize} aria-hidden="true" />
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="p-1">
-        <BookmarkCollectionPicker
-          selectedId={collectionId}
-          onSelect={handleCollectionSelect}
-          onClose={() => setIsPickerOpen(false)}
-        />
-      </PopoverContent>
-    </Popover>
+    <div ref={wrapperRef} className="relative inline-flex">
+      <Button
+        isIconOnly
+        size={size}
+        variant="light"
+        className={`${
+          bookmarked
+            ? 'text-amber-500'
+            : 'text-[var(--text-muted)] hover:text-amber-500'
+        } transition-colors min-w-0 ${className}`}
+        onPress={handlePress}
+        isDisabled={isLoading}
+        aria-label={bookmarked ? t('bookmark.remove', 'Remove from saved') : t('bookmark.save', 'Save')}
+        onTouchStart={longPressHandlers.onTouchStart}
+        onTouchMove={longPressHandlers.onTouchMove}
+        onTouchEnd={longPressHandlers.onTouchEnd}
+      >
+        {bookmarked ? (
+          <BookmarkCheck className={`${iconSize} fill-amber-500 text-amber-500`} aria-hidden="true" />
+        ) : (
+          <Bookmark className={iconSize} aria-hidden="true" />
+        )}
+      </Button>
+
+      <AnimatePresence>
+        {isPickerOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: -4 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: -4 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="absolute top-full right-0 mt-2 z-50 rounded-xl bg-[var(--surface-dropdown)]/95 backdrop-blur-xl border border-[var(--border-default)] shadow-xl shadow-black/20 p-1"
+          >
+            <BookmarkCollectionPicker
+              selectedId={collectionId}
+              onSelect={handleCollectionSelect}
+              onClose={() => setIsPickerOpen(false)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

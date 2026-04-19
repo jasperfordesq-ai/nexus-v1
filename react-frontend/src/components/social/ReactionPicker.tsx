@@ -225,7 +225,14 @@ export function ReactionPicker({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.6, y: 8 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="absolute bottom-full left-1/2 -translate-x-1/2 pb-2 z-50"
+            /*
+              Anchor the popup to the BUTTON'S left edge rather than centering it.
+              The feed card is `overflow-hidden`, and after the footer redesign the
+              Like button sits near the card's left edge — a centered popup was
+              getting clipped on the left. Extending rightward keeps it inside the
+              card body which always has room.
+            */
+            className="absolute bottom-full left-0 pb-2 z-50"
             onMouseEnter={() => {
               if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
               if (closeTimeoutRef.current) {
