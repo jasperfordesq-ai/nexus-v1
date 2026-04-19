@@ -22,6 +22,21 @@ This project uses **Claude Opus 4.6 Agent Teams** (swarm mode) for large, multi-
 
 ---
 
+## Don't Hallucinate Fixes
+
+- Never claim you've fixed something you haven't actually edited. If you're unsure a file was changed, re-read it.
+- If the user reports an issue persists, re-verify from scratch rather than insisting the previous fix was correct.
+
+---
+
+## Deployment & Verification
+
+- After deploying a fix, verify the fix actually resolved the issue before claiming completion. Check production logs/endpoints.
+- Do NOT claim bugs are 'fixed' or 'complete' without verification. If you haven't verified, say so explicitly.
+- When a fix reveals another bug, expect to iterate — don't mark the task done on the first deploy.
+
+---
+
 ## Project Overview (Stack)
 
 This is a **multi-tenant Laravel + React/TypeScript application**. The backend uses Laravel with tenant scoping. The frontend is TypeScript React. Always check tenant context when debugging issues. Always use TypeScript for new frontend files. The primary language stack is TypeScript (React/RN), PHP (Laravel), with JSON configs and Markdown docs.
@@ -47,6 +62,12 @@ When performing audits, use parallel agent teams (5-8 agents) scoped by domain/m
 ## Agent Guidelines
 
 When running audits, limit parallel background agents to **5 maximum**. Do NOT spawn excessive background tasks. Report progress concisely without flooding the session with notifications.
+
+## Agent & Background Task Hygiene
+
+- Limit parallel background agents to what's necessary; excessive background tasks flood the conversation with stale notifications.
+- If a sub-agent stalls or hits context limits, kill it and retry with a narrower scope rather than waiting.
+- Prefer focused single-domain audits over 8+ parallel agents unless explicitly requested.
 
 ---
 
@@ -464,6 +485,12 @@ ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.
 **NEVER toggle only one layer.** Always use `maintenance.sh` which handles both.
 
 ---
+
+## Database & Migrations
+
+- Before writing code that queries tables, verify actual column names via schema inspection — do not assume.
+- When generating migrations, check for FK column type consistency (signed vs unsigned int) against referenced tables.
+- Use current Laravel 12 migration APIs; avoid deprecated patterns.
 
 ## Database Migrations
 
