@@ -564,7 +564,7 @@ export function EventsPage() {
                       isLoading={isLoadingMore}
                     >
                       {totalCount != null && totalCount > events.length
-                        ? t('load_more_count', 'Load more ({{remaining}} remaining)', { remaining: (totalCount - events.length).toLocaleString() })
+                        ? t('load_more_count', { remaining: (totalCount - events.length).toLocaleString() })
                         : t('load_more')}
                     </Button>
                   </div>

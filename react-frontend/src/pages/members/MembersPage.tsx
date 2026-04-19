@@ -339,7 +339,7 @@ export function MembersPage() {
                 className="bg-white text-indigo-700 font-semibold hover:bg-white/90 shrink-0 shadow-lg"
                 startContent={<UserCircle className="w-4 h-4" />}
               >
-                {t('members.my_profile', 'My Profile')}
+                {t('members.my_profile')}
               </Button>
             </Link>
           )}
@@ -629,7 +629,7 @@ export function MembersPage() {
                       isLoading={isLoadingMore}
                     >
                       {totalCount != null && totalCount > members.length
-                        ? t('members.load_more_count', 'Load more ({{remaining}} remaining)', { remaining: (totalCount - members.length).toLocaleString() })
+                        ? t('members.load_more_count', { remaining: (totalCount - members.length).toLocaleString() })
                         : t('members.load_more')}
                     </Button>
                   </div>

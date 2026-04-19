@@ -189,7 +189,7 @@ export function GroupsPage() {
               {totalCount != null && !isLoading && (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-medium">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true" />
-                  {t('count_pill', '{{count}} groups', { count: totalCount.toLocaleString() })}
+                  {t('count_pill', { count: totalCount.toLocaleString() })}
                 </span>
               )}
             </div>
@@ -364,7 +364,7 @@ export function GroupsPage() {
                       isLoading={isLoadingMore}
                     >
                       {totalCount != null && totalCount > groups.length
-                        ? t('load_more_count', 'Load more ({{remaining}} remaining)', { remaining: (totalCount - groups.length).toLocaleString() })
+                        ? t('load_more_count', { remaining: (totalCount - groups.length).toLocaleString() })
                         : t('load_more')}
                     </Button>
                   </div>

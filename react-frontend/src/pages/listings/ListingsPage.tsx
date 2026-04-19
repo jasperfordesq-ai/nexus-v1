@@ -815,7 +815,7 @@ export function ListingsPage() {
                   isLoading={isLoading}
                 >
                   {totalItems != null && totalItems > listings.length
-                    ? t('load_more_count', 'Load more ({{remaining}} remaining)', { remaining: totalItems - listings.length })
+                    ? t('load_more_count', { remaining: totalItems - listings.length })
                     : t('load_more')}
                 </Button>
                 {paginationError && (
