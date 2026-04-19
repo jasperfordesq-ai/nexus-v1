@@ -66,6 +66,9 @@ class ShareService
 
         $ownerId = $this->resolveOwnerId($type, $id, $tenantId);
         if ($ownerId === null) {
+            \Illuminate\Support\Facades\Log::warning('ShareService::toggle resolveOwnerId returned null', [
+                'userId' => $userId, 'type' => $type, 'id' => $id, 'tenantId' => $tenantId,
+            ]);
             throw new \RuntimeException('not_found');
         }
 

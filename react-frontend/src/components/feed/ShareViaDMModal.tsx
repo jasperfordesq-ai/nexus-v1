@@ -62,7 +62,10 @@ export function ShareViaDMModal({ isOpen, onClose, postUrl, postContent }: Share
 
     try {
       setIsSearching(true);
-      const response = await api.get<{ data: UserResult[] }>(`/v2/users?search=${encodeURIComponent(q)}&per_page=10`);
+      // Backend /v2/users (UsersController::index) reads ?q=... and ?limit=...
+      // The previous ?search=...&per_page=... params were ignored, which meant
+      // the query fell through to the full member-directory rank path and timed out.
+      const response = await api.get<{ data: UserResult[] }>(`/v2/users?q=${encodeURIComponent(q)}&limit=10`);
       if (response.success && response.data) {
         const items = Array.isArray(response.data) ? response.data : (response.data as { data: UserResult[] }).data ?? [];
         if (isMountedRef.current) setUsers(items);
@@ -128,7 +131,11 @@ export function ShareViaDMModal({ isOpen, onClose, postUrl, postContent }: Share
       onClose={onClose}
       size="md"
       classNames={{
-        base: 'bg-[var(--color-surface)] border border-[var(--border-default)]',
+        // `--color-surface` doesn't exist in tokens.css — that's why this modal
+        // was rendering transparent. Use the opaque dropdown surface + explicit
+        // backdrop, matching the pattern used by other feed modals.
+        base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)]',
+        backdrop: 'bg-black/60 backdrop-blur-sm',
         header: 'border-b border-[var(--border-default)]',
       }}
     >
