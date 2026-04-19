@@ -2,7 +2,7 @@
 # =============================================================================
 # Project NEXUS - Cloudflare Cache Purge (All Domains)
 # =============================================================================
-# Purges the entire Cloudflare cache for all 8 project domains.
+# Purges the entire Cloudflare cache for all 7 project domains.
 # Called automatically after every deployment by safe-deploy.sh.
 #
 # Usage:
@@ -17,7 +17,7 @@
 DEPLOY_DIR="/opt/nexus-php"
 TOKEN_FILE="$DEPLOY_DIR/.cloudflare-api-token"
 
-# All 8 Cloudflare zone IDs
+# All 7 Cloudflare zone IDs (exchangemembers.com excluded — API token 403)
 declare -A ZONES=(
     ["project-nexus.ie"]="d6d9903416081a10ac2d496d9b8456fb"
     ["hour-timebank.ie"]="54502ac7dc583e8acdb9b5ed87b0ba60"
@@ -25,7 +25,6 @@ declare -A ZONES=(
     ["timebank.global"]="7ac1e69f5a1fdc7894236548adf7be1e"
     ["nexuscivic.ie"]="65eb5427905a35e7c6186977f8c5a370"
     ["project-nexus.net"]="ab50a7ee4c5f427b7bc436db26496c7d"
-    ["exchangemembers.com"]="2a86de7c12258fb6343dc090b6581367"
     ["festivalflags.ie"]="e9009e5ca261271de5ea7de4aa3ede62"
 )
 

@@ -33,4 +33,4 @@ purge_cloudflare_cache() {
     return 1  # Non-blocking for deploy (maintenance mode still disabled) but clearly logged
 }
 
-purge_cloudflare_cache || true
+purge_cloudflare_cache

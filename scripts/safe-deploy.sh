@@ -154,7 +154,8 @@ if run_phase "$DEPLOY_SCRIPTS/phases/smoke-tests.sh"; then
     run_phase "$DEPLOY_SCRIPTS/phases/maintenance-off.sh"
 
     # Purge Cloudflare cache AFTER maintenance is off
-    run_phase "$DEPLOY_SCRIPTS/phases/purge-cloudflare.sh"
+    CF_PURGE_OK=true
+    bash "$DEPLOY_SCRIPTS/phases/purge-cloudflare.sh" || CF_PURGE_OK=false
 
     # Pre-render all tenant public pages with real data
     run_phase "$DEPLOY_SCRIPTS/phases/prerender-tenants.sh"
@@ -162,11 +163,19 @@ if run_phase "$DEPLOY_SCRIPTS/phases/smoke-tests.sh"; then
     # Remove dangling Docker images (prevents disk bloat over time)
     run_phase "$DEPLOY_SCRIPTS/phases/prune-images.sh"
 
+    DEPLOYED_COMMIT=$(git log -1 --format='%h')
+    DEPLOYED_SUBJECT=$(git log -1 --format='%s')
+    DEPLOYED_TIME=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+    CF_STATUS=$( [ "$CF_PURGE_OK" = "true" ] && echo "Purged (all domains)" || echo "PARTIAL — check logs (exchangemembers.com 403)" )
+
     echo "" | tee -a "$LOG_FILE"
     echo "============================================" | tee -a "$LOG_FILE"
-    echo "  Deployment Successful!"                     | tee -a "$LOG_FILE"
+    echo "  Deployment Successful!" | tee -a "$LOG_FILE"
     echo "============================================" | tee -a "$LOG_FILE"
-    git log -1 --format='%h - %s (%ar)' | tee -a "$LOG_FILE"
+    echo "  Commit:    $DEPLOYED_COMMIT — $DEPLOYED_SUBJECT" | tee -a "$LOG_FILE"
+    echo "  Live at:   $DEPLOYED_TIME" | tee -a "$LOG_FILE"
+    echo "  CF Purge:  $CF_STATUS" | tee -a "$LOG_FILE"
+    echo "============================================" | tee -a "$LOG_FILE"
     echo "" | tee -a "$LOG_FILE"
     log_info "Log saved to: $LOG_FILE"
 
