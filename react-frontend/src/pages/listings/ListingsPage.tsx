@@ -702,7 +702,7 @@ export function ListingsPage() {
             <EmptyState
               icon={<Search className="w-12 h-12" />}
               title={t('empty')}
-              description={hasActiveFilters ? t('empty_subtitle') : t('empty_subtitle')}
+              description={hasActiveFilters ? t('empty_subtitle') : t('empty_no_listings', 'Be the first to share what you can offer or what you need.')}
               action={
                 hasActiveFilters ? (
                   <Button
@@ -1059,7 +1059,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
               src={avatarSrc}
               name={listing.author_name || 'User'}
               size="sm"
-              className="shrink-0 w-6 h-6"
+              className="shrink-0 w-8 h-8"
             />
             <span className="text-sm text-theme-subtle truncate">{listing.author_name}</span>
             {listing.author_rating != null && listing.author_rating > 0 && (

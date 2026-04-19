@@ -1363,7 +1363,7 @@ const FeedCard = React.memo(function FeedCard({
                 <img
                   src={resolveAssetUrl(item.image_url)}
                   alt={t('card.image_alt', '{{type}} image by {{name}}', { type: typeLabel ?? t('card.type_post', 'Post'), name: author.name })}
-                  className="w-full max-h-[28rem] object-cover hover:scale-[1.02] transition-transform duration-500"
+                  className="w-full max-h-[28rem] object-cover group-hover:scale-[1.02] transition-transform duration-500"
                   loading="lazy"
                   width={800}
                   height={448}
@@ -1374,12 +1374,13 @@ const FeedCard = React.memo(function FeedCard({
               <img
                 src={resolveAssetUrl(item.image_url)}
                 alt={t('card.image_alt', '{{type}} image by {{name}}', { type: t('card.type_post', 'Post'), name: author.name })}
-                className="w-full max-h-[28rem] object-cover hover:scale-[1.02] transition-transform duration-500"
+                className="w-full max-h-[28rem] object-cover group-hover:scale-[1.02] transition-transform duration-500"
                 loading="lazy"
                 width={800}
                 height={448}
               />
             )}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200 pointer-events-none" aria-hidden="true" />
           </div>
         ) : null}
 
@@ -1771,10 +1772,10 @@ const FeedCard = React.memo(function FeedCard({
                 <Button
                   size="sm"
                   variant="light"
-                  className={`${item.is_liked
-                    ? 'text-rose-500 font-medium'
-                    : 'text-[var(--text-muted)] hover:text-rose-500'
-                  } transition-colors`}
+                  className={`transition-all ${item.is_liked
+                    ? 'text-rose-500 font-medium bg-rose-500/5'
+                    : 'text-[var(--text-muted)] hover:text-rose-500 hover:bg-rose-500/5'
+                  }`}
                   startContent={
                     <Heart
                       className={`w-[18px] h-[18px] transition-all ${item.is_liked ? 'fill-rose-500 text-rose-500 scale-110' : ''}`}

@@ -751,19 +751,25 @@ export function FeedPage() {
       )}
 
       {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500 p-5 sm:p-6">
-        <div className="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
-        <div className="absolute -left-3 -top-3 w-24 h-24 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
-        <div className="relative flex items-center justify-between gap-4">
+      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500 p-6 sm:p-8">
+        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <div className="flex items-center gap-3 mb-1.5">
-              <div className="p-1.5 bg-white/20 rounded-xl backdrop-blur-sm">
-                <Newspaper className="w-5 h-5 text-white" aria-hidden="true" />
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                <Newspaper className="w-6 h-6 text-white" aria-hidden="true" />
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-white">{t('title')}</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('title')}</h1>
             </div>
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-3 flex-wrap">
               <p className="text-white/80 text-sm">{t('subtitle')}</p>
+              {!isLoading && items.length > 0 && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-pink-300 animate-pulse" aria-hidden="true" />
+                  {t('items_loaded', '{{count}} posts', { count: items.length })}
+                </span>
+              )}
               <AlgorithmLabel area="feed" />
             </div>
           </div>
@@ -847,18 +853,18 @@ export function FeedPage() {
       )}
 
       {/* Filter Tabs */}
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
         {filterOptions.map((opt) => (
           <Button
             key={opt.key}
             size="sm"
             variant={filter === opt.key ? 'solid' : 'flat'}
             radius="full"
-            className={
+            className={`shrink-0 ${
               filter === opt.key
                 ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/20'
                 : 'bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:text-indigo-500 hover:bg-indigo-500/5 border border-[var(--border-default)] transition-colors'
-            }
+            }`}
             onPress={() => { setFilter(opt.key); syncToUrl({ filter: opt.key }); }}
           >
             {opt.label}
@@ -949,7 +955,13 @@ export function FeedPage() {
               )}
             </GlassCard>
           ) : (
-            <div className="space-y-4">
+            <motion.div
+              key={`${filter}-${subFilter ?? ''}-${feedMode}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-4"
+            >
               <AnimatePresence>
                 {items.map((item, index) => (
                   <React.Fragment key={`${item.type}-${item.id}`}>
@@ -1018,7 +1030,7 @@ export function FeedPage() {
                   ))}
                 </div>
               )}
-            </div>
+            </motion.div>
           )}
         </>
       )}

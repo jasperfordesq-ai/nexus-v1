@@ -559,11 +559,11 @@ export function MembersPage() {
                           <img src={resolveAvatarUrl(m.avatar ?? m.avatar_url) || undefined} alt={t('members.avatar_alt', { name: m.name || `${m.first_name || ''} ${m.last_name || ''}`.trim() || t('members.fallback_name') })} className="w-8 h-8 rounded-full" width={32} height={32} loading="lazy" />
                         )}
                         <div>
-                          <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+                          <h4 className="font-semibold text-sm text-theme-primary">
                             {m.name || `${m.first_name || ''} ${m.last_name || ''}`.trim()}
                           </h4>
                           {m.tagline && (
-                            <p className="text-xs text-gray-600 dark:text-gray-400">{m.tagline}</p>
+                            <p className="text-xs text-theme-muted">{m.tagline}</p>
                           )}
                         </div>
                       </div>
@@ -574,6 +574,7 @@ export function MembersPage() {
                 />
               ) : (
                 <motion.div
+                  key={`${debouncedQuery}-${activeSortBy}-${quickFilter}`}
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
@@ -613,7 +614,9 @@ export function MembersPage() {
                       onPress={loadMoreMembers}
                       isLoading={isLoadingMore}
                     >
-                      {t('members.load_more')}
+                      {totalCount != null && totalCount > members.length
+                        ? t('members.load_more_count', 'Load more ({{remaining}} remaining)', { remaining: (totalCount - members.length).toLocaleString() })
+                        : t('members.load_more')}
                     </Button>
                   </div>
                 </div>
