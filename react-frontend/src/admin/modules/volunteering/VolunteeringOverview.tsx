@@ -203,10 +203,10 @@ export function VolunteeringOverview() {
   })) : [];
 
   const quickActions: QuickAction[] = [
-    { label: t('volunteering.review_applications', 'Review Applications'), description: t('volunteering.review_applications_desc', 'Review pending volunteer applications'), icon: ClipboardCheck, path: '/admin/volunteering/approvals', color: 'warning' },
-    { label: t('volunteering.verify_hours', 'Verify Hours'), description: t('volunteering.verify_hours_desc', 'Approve or decline logged hours'), icon: Clock, path: '/admin/volunteering/hours', color: 'success' },
-    { label: t('volunteering.manage_organizations', 'Manage Organizations'), description: t('volunteering.manage_organizations_desc', 'View and manage volunteer orgs'), icon: Building2, path: '/admin/volunteering/organizations', color: 'secondary' },
-    { label: t('volunteering.view_expenses', 'View Expenses'), description: t('volunteering.view_expenses_desc', 'Review expense submissions'), icon: DollarSign, path: '/admin/volunteering/expenses', color: 'primary' },
+    { label: t('volunteering.review_applications'), description: t('volunteering.review_applications_desc'), icon: ClipboardCheck, path: '/admin/volunteering/approvals', color: 'warning' },
+    { label: t('volunteering.verify_hours'), description: t('volunteering.verify_hours_desc'), icon: Clock, path: '/admin/volunteering/hours', color: 'success' },
+    { label: t('volunteering.manage_organizations'), description: t('volunteering.manage_organizations_desc'), icon: Building2, path: '/admin/volunteering/organizations', color: 'secondary' },
+    { label: t('volunteering.view_expenses'), description: t('volunteering.view_expenses_desc'), icon: DollarSign, path: '/admin/volunteering/expenses', color: 'primary' },
   ];
 
   // Build alert banners for urgent items
@@ -264,19 +264,19 @@ export function VolunteeringOverview() {
       {/* Trends Chart */}
       <Card shadow="sm" className="mb-6">
         <CardHeader className="flex flex-row items-center justify-between">
-          <h3 className="text-lg font-semibold">{t('volunteering.trends_title', 'Trends (Last 12 Weeks)')}</h3>
+          <h3 className="text-lg font-semibold">{t('volunteering.trends_title')}</h3>
           <ButtonGroup size="sm" variant="flat">
             <Button
               color={trendPeriod === 'week' ? 'primary' : 'default'}
               onPress={() => setTrendPeriod('week')}
             >
-              {t('volunteering.weekly', 'Weekly')}
+              {t('volunteering.weekly')}
             </Button>
             <Button
               color={trendPeriod === 'month' ? 'primary' : 'default'}
               onPress={() => setTrendPeriod('month')}
             >
-              {t('volunteering.monthly', 'Monthly')}
+              {t('volunteering.monthly')}
             </Button>
           </ButtonGroup>
         </CardHeader>
@@ -288,7 +288,7 @@ export function VolunteeringOverview() {
           ) : chartData.length === 0 ? (
             <div className="flex flex-col items-center py-8 text-default-400">
               <Activity size={40} className="mb-2" />
-              <p>{t('volunteering.no_trend_data', 'No trend data available')}</p>
+              <p>{t('volunteering.no_trend_data')}</p>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
@@ -321,7 +321,7 @@ export function VolunteeringOverview() {
                 <Area
                   type="monotone"
                   dataKey="hours"
-                  name={t('volunteering.chart_hours', 'Hours')}
+                  name={t('volunteering.chart_hours')}
                   stroke="var(--chart-color-success, #22c55e)"
                   fill="url(#gradHours)"
                   strokeWidth={2}
@@ -329,7 +329,7 @@ export function VolunteeringOverview() {
                 <Area
                   type="monotone"
                   dataKey="applications"
-                  name={t('volunteering.chart_applications', 'Applications')}
+                  name={t('volunteering.chart_applications')}
                   stroke="var(--chart-color-info, #3b82f6)"
                   fill="url(#gradApplications)"
                   strokeWidth={2}
@@ -337,7 +337,7 @@ export function VolunteeringOverview() {
                 <Area
                   type="monotone"
                   dataKey="volunteers"
-                  name={t('volunteering.chart_volunteers', 'Volunteers')}
+                  name={t('volunteering.chart_volunteers')}
                   stroke="var(--chart-color-accent, #a855f7)"
                   fill="url(#gradVolunteers)"
                   strokeWidth={2}
@@ -397,7 +397,7 @@ export function VolunteeringOverview() {
                 <div key={opp.id} className="flex items-center justify-between rounded-lg border border-default-200 p-3">
                   <div>
                     <p className="font-medium">{opp.title}</p>
-                    <p className="text-xs text-default-400">{t('volunteering.by_name', { name: `${opp.first_name} ${opp.last_name}` })}</p>
+                      <p className="text-xs text-default-400">{t('volunteering.by_name', { name: `${opp.first_name} ${opp.last_name}`.trim() })}</p>
                   </div>
                   <Chip size="sm" variant="flat" color={['active', 'open'].includes(opp.status) ? 'success' : 'default'} className="capitalize">{opp.status}</Chip>
                 </div>
@@ -409,7 +409,7 @@ export function VolunteeringOverview() {
 
       {/* Activity Feed */}
       <Card shadow="sm">
-        <CardHeader><h3 className="text-lg font-semibold">{t('volunteering.activity_feed', 'Activity Feed')}</h3></CardHeader>
+        <CardHeader><h3 className="text-lg font-semibold">{t('volunteering.activity_feed')}</h3></CardHeader>
         <CardBody>
           {activitiesLoading ? (
             <div className="space-y-4">
@@ -426,7 +426,7 @@ export function VolunteeringOverview() {
           ) : activities.length === 0 ? (
             <div className="flex flex-col items-center py-8 text-default-400">
               <Clock size={40} className="mb-2" />
-              <p>{t('volunteering.no_recent_activity', 'No recent activity')}</p>
+              <p>{t('volunteering.no_recent_activity')}</p>
             </div>
           ) : (
             <div className="space-y-4">

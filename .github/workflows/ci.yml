@@ -457,6 +457,9 @@ jobs:
       - name: "BLOCKING: Check for hardcoded strings in email templates"
         run: bash scripts/check-i18n.sh
 
+      - name: "BLOCKING: Check recurring admin locale coverage"
+        run: node scripts/check-admin-i18n.mjs
+
 
   # ─────────────────────────────────────────────────────────────────
   # Stage 6b: SPDX/AGPL License Compliance Check
