@@ -100,19 +100,7 @@ class AdminCrmController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $totalMembers = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->cnt;
-        $activeMembers = (int) DB::selectOne(
-            "SELECT COUNT(*) as cnt
-             FROM users
-             WHERE tenant_id = ?
-               AND (
-                   last_active_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-                   OR last_login_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-               )",
-            [$tenantId]
-        )->cnt;
-        $newThisMonth = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')", [$tenantId])->cnt;
-        $pendingApprovals = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 0", [$tenantId])->cnt;
+        $memberStats = $this->getMemberStats($tenantId);
 
         $openTasks = 0; $overdueTasks = 0;
         try {
@@ -123,16 +111,12 @@ class AdminCrmController extends BaseApiController
         $totalNotes = 0;
         try { $totalNotes = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM member_notes WHERE tenant_id = ?", [$tenantId])->cnt; } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
-        $neverLoggedIn = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND last_login_at IS NULL AND is_approved = 1", [$tenantId])->cnt;
-        $approvedMembers = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 1", [$tenantId])->cnt;
-        $retentionRate = $approvedMembers > 0 ? round(($activeMembers / $approvedMembers) * 100, 1) : 0;
-
         return $this->respondWithData([
-            'total_members' => $totalMembers, 'active_members' => $activeMembers,
-            'new_this_month' => $newThisMonth, 'pending_approvals' => $pendingApprovals,
+            'total_members' => $memberStats['total_members'], 'active_members' => $memberStats['active_members'],
+            'new_this_month' => $memberStats['new_this_month'], 'pending_approvals' => $memberStats['pending_approvals'],
             'open_tasks' => $openTasks, 'overdue_tasks' => $overdueTasks,
-            'total_notes' => $totalNotes, 'never_logged_in' => $neverLoggedIn,
-            'retention_rate' => $retentionRate,
+            'total_notes' => $totalNotes, 'never_logged_in' => $memberStats['never_logged_in'],
+            'retention_rate' => $memberStats['retention_rate'],
         ]);
     }
 
@@ -918,29 +902,14 @@ class AdminCrmController extends BaseApiController
     {
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
-
-        $totalMembers = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->cnt;
-        $activeMembers = (int) DB::selectOne(
-            "SELECT COUNT(*) as cnt
-             FROM users
-             WHERE tenant_id = ?
-               AND (
-                   last_active_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-                   OR last_login_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-               )",
-            [$tenantId]
-        )->cnt;
-        $newThisMonth = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')", [$tenantId])->cnt;
-        $pendingApprovals = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 0", [$tenantId])->cnt;
-        $approvedMembers = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 1", [$tenantId])->cnt;
-        $retentionRate = $approvedMembers > 0 ? round(($activeMembers / $approvedMembers) * 100, 1) : 0;
+        $memberStats = $this->getMemberStats($tenantId);
 
         $rows = [
-            ['metric' => 'Total Members', 'value' => $totalMembers],
-            ['metric' => 'Active Members', 'value' => $activeMembers],
-            ['metric' => 'New This Month', 'value' => $newThisMonth],
-            ['metric' => 'Pending Approvals', 'value' => $pendingApprovals],
-            ['metric' => 'Retention Rate', 'value' => $retentionRate . '%'],
+            ['metric' => __('admin.label_total_members'), 'value' => $memberStats['total_members']],
+            ['metric' => __('admin.label_active_members'), 'value' => $memberStats['active_members']],
+            ['metric' => __('admin.label_new_this_month'), 'value' => $memberStats['new_this_month']],
+            ['metric' => __('admin.label_pending_approvals'), 'value' => $memberStats['pending_approvals']],
+            ['metric' => __('admin.label_retention_rate'), 'value' => $memberStats['retention_rate'] . '%'],
         ];
 
         return $this->streamCsv('crm-dashboard', ['Metric', 'Value'], $rows);
@@ -949,6 +918,86 @@ class AdminCrmController extends BaseApiController
     // ─────────────────────────────────────────────────────────────────────────
     // Helpers
     // ─────────────────────────────────────────────────────────────────────────
+
+    private function getMemberStats(int $tenantId): array
+    {
+        $memberWhere = $this->approvedActiveMemberWhere('u');
+        $recentActivityWhere = $this->recentMemberActivityWhere('u');
+
+        $totalMembers = (int) DB::selectOne(
+            "SELECT COUNT(*) as cnt
+             FROM users u
+             WHERE {$memberWhere}",
+            [$tenantId]
+        )->cnt;
+
+        $activeMembers = (int) DB::selectOne(
+            "SELECT COUNT(*) as cnt
+             FROM users u
+             WHERE {$memberWhere}
+               AND ({$recentActivityWhere})",
+            [$tenantId]
+        )->cnt;
+
+        $newThisMonth = (int) DB::selectOne(
+            "SELECT COUNT(*) as cnt
+             FROM users u
+             WHERE {$memberWhere}
+               AND u.created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')",
+            [$tenantId]
+        )->cnt;
+
+        $pendingApprovals = (int) DB::selectOne(
+            "SELECT COUNT(*) as cnt
+             FROM users u
+             WHERE u.tenant_id = ?
+               AND u.is_approved = 0",
+            [$tenantId]
+        )->cnt;
+
+        $neverLoggedIn = (int) DB::selectOne(
+            "SELECT COUNT(*) as cnt
+             FROM users u
+             WHERE {$memberWhere}
+               AND u.last_login_at IS NULL",
+            [$tenantId]
+        )->cnt;
+
+        $activityRate = $totalMembers > 0
+            ? round(($activeMembers / $totalMembers) * 100, 1)
+            : 0;
+
+        return [
+            'total_members' => $totalMembers,
+            'active_members' => $activeMembers,
+            'new_this_month' => $newThisMonth,
+            'pending_approvals' => $pendingApprovals,
+            'never_logged_in' => $neverLoggedIn,
+            'retention_rate' => $activityRate,
+        ];
+    }
+
+    private function approvedActiveMemberWhere(string $alias = 'u'): string
+    {
+        $prefix = $alias !== '' ? $alias . '.' : '';
+
+        return "{$prefix}tenant_id = ? AND {$prefix}is_approved = 1 AND ({$prefix}status IS NULL OR {$prefix}status = 'active')";
+    }
+
+    private function recentMemberActivityWhere(string $alias = 'u'): string
+    {
+        $prefix = $alias !== '' ? $alias . '.' : '';
+
+        return "EXISTS (
+                    SELECT 1
+                    FROM user_presence up
+                    WHERE up.tenant_id = {$prefix}tenant_id
+                      AND up.user_id = {$prefix}id
+                      AND up.last_activity_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                )
+                OR {$prefix}last_active_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                OR {$prefix}last_login_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+    }
 
     private function streamCsv(string $filename, array $headers, array $rows): StreamedResponse
     {
