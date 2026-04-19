@@ -176,11 +176,18 @@
   "save_error": "Theip ar liostú sábháilte a nuashonrú",
   "featured": "Molta",
   "featured_badge": "Liostú molta",
+  "sort_label": "Sort",
+  "sort_recommended": "Recommended",
+  "sort_newest": "Newest first",
+  "reciprocity_mutual": "Mutual match",
+  "reciprocity_one_way": "Match",
   "skill_tags": {
     "label": "Clibeanna Scileanna",
     "placeholder": "Clóscríobh scil agus brúigh Iontráil...",
     "aria_add": "Cuir clib scile leis"
   },
+  "more_filters": "More filters",
+  "filters_label": "Filters",
   "aria": {
     "view_mode": "Mód amhairc",
     "loading_listings": "Liostaí á luchtú"
@@ -201,8 +208,6 @@
     "no_data": "No views yet — check back after your listing gets some traffic",
     "bar_label": "{{date}}: {{count}} views"
   },
-  "more_filters": "More filters",
-  "filters_label": "Filters",
   "filter_hours": "Duration",
   "filter_any_duration": "Any duration",
   "filter_quick": "Quick (under 1h)",
@@ -220,17 +225,16 @@
   "filter_this_month": "This month",
   "clear_filters": "Clear filters",
   "results_count": "{{count}} listings found",
-  "page_meta": {
-    "create": {
-      "title": "Create Listing",
-      "community_member": "Community Member"
-    }
-  },
   "radius_5": "5 km",
   "radius_10": "10 km",
   "radius_25": "25 km",
   "radius_50": "50 km",
   "radius_100": "100 km",
+  "page_meta": {
+    "create": {
+      "title": "Create Listing"
+    }
+  },
   "delivery_mode": "Delivery Mode",
   "service_type_physical_only": "In-Person Only",
   "service_type_remote_only": "Remote / Online",
@@ -266,11 +270,6 @@
   "reviews": "reviews",
   "service_type_hybrid_available": "Remote Available",
   "service_type_remote": "Remote",
-  "sort_label": "Sort",
-  "sort_recommended": "Recommended",
-  "sort_newest": "Newest first",
-  "reciprocity_mutual": "Mutual match",
-  "reciprocity_one_way": "Match",
   "community_member": "Community Member",
   "comments_error": "Comments could not be loaded."
 }

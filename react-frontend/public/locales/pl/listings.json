@@ -176,12 +176,18 @@
   "save_error": "Nie udało się zaktualizować zapisanego ogłoszenia",
   "featured": "Featured",
   "featured_badge": "Wyróżnione ogłoszenie",
+  "sort_label": "Sort",
+  "sort_recommended": "Recommended",
+  "sort_newest": "Newest first",
+  "reciprocity_mutual": "Mutual match",
+  "reciprocity_one_way": "Match",
   "skill_tags": {
     "label": "Tagi umiejętności",
     "placeholder": "Wpisz umiejętność i naciśnij Enter...",
     "aria_add": "Dodaj tag umiejętności"
   },
   "more_filters": "Więcej filtrów",
+  "filters_label": "Filters",
   "aria": {
     "view_mode": "Tryb widoku",
     "loading_listings": "Ładowanie ogłoszeń"
@@ -202,6 +208,7 @@
     "no_data": "No views yet — check back after your listing gets some traffic",
     "bar_label": "{{date}}: {{count}} views"
   },
+  "filter_hours": "Duration",
   "filter_any_duration": "Dowolny czas trwania",
   "filter_quick": "Szybkie (poniżej 1h)",
   "filter_short": "Krótkie (1-3h)",
@@ -213,24 +220,21 @@
   "filter_in_person": "Tylko osobiście",
   "filter_posted_date": "Data publikacji",
   "filter_any_time": "Dowolny czas",
+  "filter_today": "Today",
   "filter_this_week": "W tym tygodniu",
   "filter_this_month": "W tym miesiącu",
   "clear_filters": "Wyczyść filtry",
   "results_count": "{{count}} znalezione ogłoszenia",
-  "page_meta": {
-    "create": {
-      "title": "Utwórz ogłoszenie",
-      "community_member": "Community Member"
-    }
-  },
-  "filters_label": "Filters",
-  "filter_hours": "Duration",
-  "filter_today": "Today",
   "radius_5": "5 km",
   "radius_10": "10 km",
   "radius_25": "25 km",
   "radius_50": "50 km",
   "radius_100": "100 km",
+  "page_meta": {
+    "create": {
+      "title": "Utwórz ogłoszenie"
+    }
+  },
   "delivery_mode": "Delivery Mode",
   "service_type_physical_only": "In-Person Only",
   "service_type_remote_only": "Remote / Online",
@@ -266,11 +270,6 @@
   "reviews": "reviews",
   "service_type_hybrid_available": "Remote Available",
   "service_type_remote": "Remote",
-  "sort_label": "Sort",
-  "sort_recommended": "Recommended",
-  "sort_newest": "Newest first",
-  "reciprocity_mutual": "Mutual match",
-  "reciprocity_one_way": "Match",
   "community_member": "Community Member",
   "comments_error": "Comments could not be loaded."
 }

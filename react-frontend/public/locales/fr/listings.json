@@ -176,12 +176,18 @@
   "save_error": "Échec de la mise à jour de l'annonce sauvegardée",
   "featured": "En vedette",
   "featured_badge": "Annonce en vedette",
+  "sort_label": "Sort",
+  "sort_recommended": "Recommended",
+  "sort_newest": "Newest first",
+  "reciprocity_mutual": "Mutual match",
+  "reciprocity_one_way": "Match",
   "skill_tags": {
     "label": "Étiquettes de compétences",
     "placeholder": "Saisissez une compétence et appuyez sur Entrée...",
     "aria_add": "Ajouter une étiquette de compétence"
   },
   "more_filters": "Plus de filtres",
+  "filters_label": "Filters",
   "aria": {
     "view_mode": "Mode d’affichage",
     "loading_listings": "Chargement des annonces"
@@ -202,6 +208,7 @@
     "no_data": "No views yet — check back after your listing gets some traffic",
     "bar_label": "{{date}}: {{count}} views"
   },
+  "filter_hours": "Duration",
   "filter_any_duration": "Toute durée",
   "filter_quick": "Rapide (moins de 1h)",
   "filter_short": "Court (1-3h)",
@@ -213,24 +220,21 @@
   "filter_in_person": "Uniquement en personne",
   "filter_posted_date": "Date de publication",
   "filter_any_time": "Tout moment",
+  "filter_today": "Today",
   "filter_this_week": "Cette semaine",
   "filter_this_month": "Ce mois-ci",
   "clear_filters": "Effacer les filtres",
   "results_count": "{{count}} annonces trouvées",
-  "page_meta": {
-    "create": {
-      "title": "Créer une annonce",
-      "community_member": "Community Member"
-    }
-  },
-  "filters_label": "Filters",
-  "filter_hours": "Duration",
-  "filter_today": "Today",
   "radius_5": "5 km",
   "radius_10": "10 km",
   "radius_25": "25 km",
   "radius_50": "50 km",
   "radius_100": "100 km",
+  "page_meta": {
+    "create": {
+      "title": "Créer une annonce"
+    }
+  },
   "delivery_mode": "Delivery Mode",
   "service_type_physical_only": "In-Person Only",
   "service_type_remote_only": "Remote / Online",
@@ -266,11 +270,6 @@
   "reviews": "reviews",
   "service_type_hybrid_available": "Remote Available",
   "service_type_remote": "Remote",
-  "sort_label": "Sort",
-  "sort_recommended": "Recommended",
-  "sort_newest": "Newest first",
-  "reciprocity_mutual": "Mutual match",
-  "reciprocity_one_way": "Match",
   "community_member": "Community Member",
   "comments_error": "Comments could not be loaded."
 }
