@@ -709,7 +709,7 @@ class AdminCrmController extends BaseApiController
 
         $userId = $this->queryInt('user_id');
         $type = $this->query('type');
-        $allowedTypes = ['login', 'signup', 'listing_created', 'contact_added', 'mention_received', 'note_added', 'task_created', 'group_joined', 'profile_updated'];
+        $allowedTypes = ['login', 'signup', 'listing_created', 'exchange_completed', 'note_added', 'task_created', 'group_joined', 'profile_updated'];
         if ($type && !in_array($type, $allowedTypes, true)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.admin_crm.invalid_type'), null, 400);
         }
@@ -723,40 +723,50 @@ class AdminCrmController extends BaseApiController
         $countParams = [];
         $safeDays = (int) $days;
         $useDayFilter = $safeDays > 0;
+        $nullText = "CAST(NULL AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_unicode_ci";
 
         // 1. Logins
         if (!$type || $type === 'login') {
-            $sql = "SELECT 'login' as activity_type, u.id as user_id, u.name as user_name, u.avatar_url as user_avatar,
-                     'Logged in' as description, NULL as metadata, u.last_login_at as created_at
-                     FROM users u WHERE u.tenant_id = ? AND u.last_login_at IS NOT NULL";
+            $activityAt = "COALESCE(up.last_activity_at, u.last_active_at, u.last_login_at)";
+            $sql = "SELECT CONVERT('login' USING utf8mb4) COLLATE utf8mb4_unicode_ci as activity_type, u.id as user_id,
+                     CONVERT(u.name USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_name,
+                     CONVERT(u.avatar_url USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_avatar,
+                     CONVERT('Logged in' USING utf8mb4) COLLATE utf8mb4_unicode_ci as description, {$nullText} as metadata, {$activityAt} as created_at
+                     FROM users u
+                     LEFT JOIN user_presence up ON up.tenant_id = u.tenant_id AND up.user_id = u.id
+                     WHERE u.tenant_id = ? AND {$activityAt} IS NOT NULL";
             $p = [$tenantId]; $cp = [$tenantId];
             if ($userId) { $sql .= " AND u.id = ?"; $p[] = $userId; $cp[] = $userId; }
-            if ($useDayFilter) { $sql .= " AND u.last_login_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
-            $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
+            if ($useDayFilter) { $sql .= " AND {$activityAt} >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
+            $this->appendTimelineBranch($unions, $params, $countParams, $sql, $p, $cp);
         }
 
         // 2. Signups
         if (!$type || $type === 'signup') {
-            $sql = "SELECT 'signup' as activity_type, u.id as user_id, u.name as user_name, u.avatar_url as user_avatar,
-                     'Registered an account' as description, NULL as metadata, u.created_at as created_at
+            $sql = "SELECT CONVERT('signup' USING utf8mb4) COLLATE utf8mb4_unicode_ci as activity_type, u.id as user_id,
+                     CONVERT(u.name USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_name,
+                     CONVERT(u.avatar_url USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_avatar,
+                     CONVERT('Registered an account' USING utf8mb4) COLLATE utf8mb4_unicode_ci as description, {$nullText} as metadata, u.created_at as created_at
                      FROM users u WHERE u.tenant_id = ?";
             $p = [$tenantId]; $cp = [$tenantId];
             if ($userId) { $sql .= " AND u.id = ?"; $p[] = $userId; $cp[] = $userId; }
             if ($useDayFilter) { $sql .= " AND u.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
-            $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
+            $this->appendTimelineBranch($unions, $params, $countParams, $sql, $p, $cp);
         }
 
         // 3. Listings created
         if (!$type || $type === 'listing_created') {
             try {
                 DB::selectOne("SELECT 1 FROM listings LIMIT 1");
-                $sql = "SELECT 'listing_created' as activity_type, l.user_id, u.name as user_name, u.avatar_url as user_avatar,
-                         CONCAT('Created listing: ', l.title) as description, NULL as metadata, l.created_at
+                $sql = "SELECT CONVERT('listing_created' USING utf8mb4) COLLATE utf8mb4_unicode_ci as activity_type, l.user_id,
+                         CONVERT(u.name USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_name,
+                         CONVERT(u.avatar_url USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_avatar,
+                         CONVERT(CONCAT('Created listing: ', COALESCE(l.title, '')) USING utf8mb4) COLLATE utf8mb4_unicode_ci as description, {$nullText} as metadata, l.created_at
                          FROM listings l LEFT JOIN users u ON u.id = l.user_id WHERE l.tenant_id = ?";
                 $p = [$tenantId]; $cp = [$tenantId];
                 if ($userId) { $sql .= " AND l.user_id = ?"; $p[] = $userId; $cp[] = $userId; }
                 if ($useDayFilter) { $sql .= " AND l.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
-                $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
+                $this->appendTimelineBranch($unions, $params, $countParams, $sql, $p, $cp);
             } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
 
@@ -764,14 +774,16 @@ class AdminCrmController extends BaseApiController
         if (!$type || $type === 'exchange_completed') {
             try {
                 DB::selectOne("SELECT 1 FROM transactions LIMIT 1");
-                $sql = "SELECT 'exchange_completed' as activity_type, t.sender_id as user_id, u.name as user_name, u.avatar_url as user_avatar,
-                         CONCAT('Completed exchange with ', r.name) as description, NULL as metadata, t.created_at
+                $sql = "SELECT CONVERT('exchange_completed' USING utf8mb4) COLLATE utf8mb4_unicode_ci as activity_type, t.sender_id as user_id,
+                         CONVERT(u.name USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_name,
+                         CONVERT(u.avatar_url USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_avatar,
+                         CONVERT(CONCAT('Completed exchange with ', COALESCE(r.name, 'Unknown member')) USING utf8mb4) COLLATE utf8mb4_unicode_ci as description, {$nullText} as metadata, t.created_at
                          FROM transactions t LEFT JOIN users u ON u.id = t.sender_id LEFT JOIN users r ON r.id = t.receiver_id
                          WHERE t.tenant_id = ? AND t.status = 'completed'";
                 $p = [$tenantId]; $cp = [$tenantId];
                 if ($userId) { $sql .= " AND t.sender_id = ?"; $p[] = $userId; $cp[] = $userId; }
                 if ($useDayFilter) { $sql .= " AND t.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
-                $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
+                $this->appendTimelineBranch($unions, $params, $countParams, $sql, $p, $cp);
             } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
 
@@ -779,14 +791,16 @@ class AdminCrmController extends BaseApiController
         if (!$type || $type === 'note_added') {
             try {
                 DB::selectOne("SELECT 1 FROM member_notes LIMIT 1");
-                $sql = "SELECT 'note_added' as activity_type, mn.user_id, u.name as user_name, u.avatar_url as user_avatar,
-                         CONCAT('Note added by ', a.name, ': ', LEFT(mn.content, 80)) as description, NULL as metadata, mn.created_at
+                $sql = "SELECT CONVERT('note_added' USING utf8mb4) COLLATE utf8mb4_unicode_ci as activity_type, mn.user_id,
+                         CONVERT(u.name USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_name,
+                         CONVERT(u.avatar_url USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_avatar,
+                         CONVERT(CONCAT('Note added by ', COALESCE(a.name, 'System'), ': ', LEFT(COALESCE(mn.content, ''), 80)) USING utf8mb4) COLLATE utf8mb4_unicode_ci as description, {$nullText} as metadata, mn.created_at
                          FROM member_notes mn LEFT JOIN users u ON u.id = mn.user_id LEFT JOIN users a ON a.id = mn.author_id
                          WHERE mn.tenant_id = ?";
                 $p = [$tenantId]; $cp = [$tenantId];
                 if ($userId) { $sql .= " AND mn.user_id = ?"; $p[] = $userId; $cp[] = $userId; }
                 if ($useDayFilter) { $sql .= " AND mn.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
-                $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
+                $this->appendTimelineBranch($unions, $params, $countParams, $sql, $p, $cp);
             } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
 
@@ -794,13 +808,15 @@ class AdminCrmController extends BaseApiController
         if (!$type || $type === 'task_created') {
             try {
                 DB::selectOne("SELECT 1 FROM coordinator_tasks LIMIT 1");
-                $sql = "SELECT 'task_created' as activity_type, ct.created_by as user_id, u.name as user_name, u.avatar_url as user_avatar,
-                         CONCAT('Created task: ', ct.title) as description, NULL as metadata, ct.created_at
+                $sql = "SELECT CONVERT('task_created' USING utf8mb4) COLLATE utf8mb4_unicode_ci as activity_type, ct.created_by as user_id,
+                         CONVERT(u.name USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_name,
+                         CONVERT(u.avatar_url USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_avatar,
+                         CONVERT(CONCAT('Created task: ', COALESCE(ct.title, 'Untitled')) USING utf8mb4) COLLATE utf8mb4_unicode_ci as description, {$nullText} as metadata, ct.created_at
                          FROM coordinator_tasks ct LEFT JOIN users u ON u.id = ct.created_by WHERE ct.tenant_id = ?";
                 $p = [$tenantId]; $cp = [$tenantId];
                 if ($userId) { $sql .= " AND ct.created_by = ?"; $p[] = $userId; $cp[] = $userId; }
                 if ($useDayFilter) { $sql .= " AND ct.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
-                $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
+                $this->appendTimelineBranch($unions, $params, $countParams, $sql, $p, $cp);
             } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
 
@@ -808,26 +824,30 @@ class AdminCrmController extends BaseApiController
         if (!$type || $type === 'group_joined') {
             try {
                 DB::selectOne("SELECT 1 FROM group_members LIMIT 1");
-                $sql = "SELECT 'group_joined' as activity_type, gm.user_id, u.name as user_name, u.avatar_url as user_avatar,
-                         CONCAT('Joined group: ', g.name) as description, NULL as metadata, gm.created_at
+                $sql = "SELECT CONVERT('group_joined' USING utf8mb4) COLLATE utf8mb4_unicode_ci as activity_type, gm.user_id,
+                         CONVERT(u.name USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_name,
+                         CONVERT(u.avatar_url USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_avatar,
+                         CONVERT(CONCAT('Joined group: ', COALESCE(g.name, 'Unknown group')) USING utf8mb4) COLLATE utf8mb4_unicode_ci as description, {$nullText} as metadata, gm.created_at
                          FROM group_members gm LEFT JOIN users u ON u.id = gm.user_id
                          INNER JOIN `groups` g ON g.id = gm.group_id AND g.tenant_id = ? WHERE 1=1";
                 $p = [$tenantId]; $cp = [$tenantId];
                 if ($userId) { $sql .= " AND gm.user_id = ?"; $p[] = $userId; $cp[] = $userId; }
                 if ($useDayFilter) { $sql .= " AND gm.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
-                $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
+                $this->appendTimelineBranch($unions, $params, $countParams, $sql, $p, $cp);
             } catch (\Throwable $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
 
         // 8. Profile updates
         if (!$type || $type === 'profile_updated') {
-            $sql = "SELECT 'profile_updated' as activity_type, u.id as user_id, u.name as user_name, u.avatar_url as user_avatar,
-                     'Updated their profile' as description, NULL as metadata, u.updated_at as created_at
+            $sql = "SELECT CONVERT('profile_updated' USING utf8mb4) COLLATE utf8mb4_unicode_ci as activity_type, u.id as user_id,
+                     CONVERT(u.name USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_name,
+                     CONVERT(u.avatar_url USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_avatar,
+                     CONVERT('Updated their profile' USING utf8mb4) COLLATE utf8mb4_unicode_ci as description, {$nullText} as metadata, u.updated_at as created_at
                      FROM users u WHERE u.tenant_id = ? AND u.updated_at > u.created_at";
             $p = [$tenantId]; $cp = [$tenantId];
             if ($userId) { $sql .= " AND u.id = ?"; $p[] = $userId; $cp[] = $userId; }
             if ($useDayFilter) { $sql .= " AND u.updated_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
-            $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
+            $this->appendTimelineBranch($unions, $params, $countParams, $sql, $p, $cp);
         }
 
         if (empty($unions)) {
@@ -918,6 +938,39 @@ class AdminCrmController extends BaseApiController
     // ─────────────────────────────────────────────────────────────────────────
     // Helpers
     // ─────────────────────────────────────────────────────────────────────────
+
+    private function appendTimelineBranch(
+        array &$unions,
+        array &$params,
+        array &$countParams,
+        string $sql,
+        array $branchParams,
+        array $countBranchParams
+    ): void {
+        if (!$this->canRunTimelineBranch($sql, $branchParams)) {
+            return;
+        }
+
+        $unions[] = $sql;
+        $params = array_merge($params, $branchParams);
+        $countParams = array_merge($countParams, $countBranchParams);
+    }
+
+    private function canRunTimelineBranch(string $sql, array $params): bool
+    {
+        try {
+            DB::select("SELECT 1 FROM ({$sql}) AS timeline_branch LIMIT 1", $params);
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::warning('CRM timeline branch skipped', [
+                'error' => $e->getMessage(),
+                'sql' => $sql,
+            ]);
+
+            return false;
+        }
+    }
 
     private function getMemberStats(int $tenantId): array
     {
