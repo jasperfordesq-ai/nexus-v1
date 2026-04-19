@@ -1073,7 +1073,7 @@ class FederationKomunitinController extends BaseApiController
      * Accepts both the new base64-JSON format and legacy raw integers
      * for backwards compatibility.
      */
-    private function decodeCursor(?string $cursor): int
+    protected function decodeCursor(?string $cursor): int
     {
         if ($cursor === null || $cursor === '') {
             return 0;
