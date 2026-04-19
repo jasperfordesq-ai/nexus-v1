@@ -57,6 +57,23 @@ interface GoalsMeta {
   total_pages: number;
 }
 
+interface RawGoal {
+  id: number;
+  title: string;
+  user_id: number;
+  mentor_id?: number | null;
+  buddy_id?: number | null;
+  current_value?: number;
+  target_value?: number;
+  status: 'active' | 'completed' | 'abandoned';
+  created_at: string;
+  user?: {
+    first_name?: string;
+    last_name?: string;
+    name?: string;
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Status color map
 // ---------------------------------------------------------------------------
@@ -66,6 +83,24 @@ const statusColors: Record<string, 'primary' | 'success' | 'danger'> = {
   completed: 'success',
   abandoned: 'danger',
 };
+
+function normalizeGoal(item: RawGoal): Goal {
+  const memberName = item.user?.name
+    ?? [item.user?.first_name, item.user?.last_name].filter(Boolean).join(' ').trim()
+    ?? '';
+
+  return {
+    id: item.id,
+    title: item.title,
+    member_name: memberName,
+    member_id: item.user_id,
+    target_value: Number(item.target_value ?? 0),
+    current_value: Number(item.current_value ?? 0),
+    status: item.status,
+    has_buddy: Boolean(item.mentor_id ?? item.buddy_id),
+    created_at: item.created_at,
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Component
@@ -99,9 +134,16 @@ export function GoalsAdmin() {
       const res = await api.get(`/v2/admin/goals?${params.toString()}`);
 
       if (res.success && res.data) {
-        const payload = res.data as { items: Goal[]; meta: GoalsMeta };
-        setGoals(payload.items || []);
-        setMeta(payload.meta || { page: 1, per_page: 50, total: 0, total_pages: 1 });
+        const items = Array.isArray(res.data)
+          ? (res.data as RawGoal[]).map(normalizeGoal)
+          : [];
+        setGoals(items);
+        setMeta({
+          page: res.meta?.current_page ?? page,
+          per_page: res.meta?.per_page ?? 50,
+          total: res.meta?.total ?? 0,
+          total_pages: res.meta?.total_pages ?? 1,
+        });
       }
     } catch {
       toast.error(t('goals.failed_to_load_goals'));

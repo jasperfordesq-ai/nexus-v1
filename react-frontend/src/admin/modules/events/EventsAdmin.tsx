@@ -43,11 +43,19 @@ interface AdminEvent {
   created_at: string;
 }
 
-interface EventsMeta {
-  page: number;
-  per_page: number;
-  total: number;
-  total_pages: number;
+interface RawAdminEvent {
+  id: number;
+  title: string;
+  description?: string;
+  start_date: string;
+  end_date?: string;
+  location?: string;
+  creator_name?: string;
+  organizer_name?: string;
+  status: string;
+  attendees_count?: number;
+  max_attendees?: number;
+  created_at: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -64,6 +72,22 @@ const statusColors: Record<string, 'success' | 'danger' | 'default' | 'warning'>
 };
 
 const PAGE_SIZE = 50;
+
+function normalizeAdminEvent(item: RawAdminEvent): AdminEvent {
+  return {
+    id: item.id,
+    title: item.title,
+    description: item.description,
+    start_date: item.start_date,
+    end_date: item.end_date,
+    location: item.location,
+    organizer_name: item.organizer_name ?? item.creator_name,
+    status: item.status,
+    attendees_count: item.attendees_count,
+    max_attendees: item.max_attendees,
+    created_at: item.created_at,
+  };
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
@@ -100,9 +124,11 @@ export function EventsAdmin() {
 
       const res = await api.get(`/v2/admin/events?${params.toString()}`);
       if (res.success && res.data) {
-        const payload = res.data as { items?: AdminEvent[]; meta?: EventsMeta };
-        setItems(payload.items || []);
-        setTotal(payload.meta?.total || 0);
+        const items = Array.isArray(res.data)
+          ? (res.data as RawAdminEvent[]).map(normalizeAdminEvent)
+          : [];
+        setItems(items);
+        setTotal(res.meta?.total ?? 0);
       }
     } catch {
       toast.error(t('events.failed_to_load_events'));

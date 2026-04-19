@@ -22,6 +22,10 @@ interface AdminBreadcrumbsProps {
   items?: BreadcrumbItem[];
 }
 
+function humanizeSegment(segment: string): string {
+  return segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
+}
+
 // Map URL segments to i18n keys for breadcrumb labels
 const SEGMENT_LABEL_KEYS: Record<string, string> = {
   // Core
@@ -235,7 +239,10 @@ export function AdminBreadcrumbs({ items }: AdminBreadcrumbsProps) {
       if (/^\d+$/.test(segment)) continue;
 
       const labelKey = SEGMENT_LABEL_KEYS[segment];
-      const label = labelKey ? t(labelKey) : segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
+      const translatedLabel = labelKey ? t(labelKey) : null;
+      const label = translatedLabel && translatedLabel !== labelKey
+        ? translatedLabel
+        : humanizeSegment(segment);
       const isLast = i === segments.length - 1;
 
       crumbs.push({

@@ -53,11 +53,21 @@ interface Challenge {
   created_at: string;
 }
 
-interface ChallengeMeta {
-  page: number;
-  per_page: number;
-  total: number;
-  total_pages: number;
+interface RawChallenge {
+  id: number;
+  title: string;
+  ideas_count?: number;
+  status: ChallengeStatus;
+  created_at: string;
+  start_date?: string | null;
+  end_date?: string | null;
+  starts_at?: string | null;
+  ends_at?: string | null;
+  submission_deadline?: string | null;
+  voting_deadline?: string | null;
+  creator_name?: string;
+  first_name?: string;
+  last_name?: string;
 }
 
 type ChallengeStatus = Challenge['status'];
@@ -70,6 +80,23 @@ const statusColors: Record<ChallengeStatus, 'success' | 'warning' | 'default' | 
   closed: 'danger',
   archived: 'secondary',
 };
+
+function normalizeChallenge(item: RawChallenge): Challenge {
+  const creatorName = item.creator_name
+    ?? [item.first_name, item.last_name].filter(Boolean).join(' ').trim()
+    ?? '';
+
+  return {
+    id: item.id,
+    title: item.title,
+    creator_name: creatorName,
+    ideas_count: item.ideas_count ?? 0,
+    status: item.status,
+    start_date: item.start_date ?? item.starts_at ?? item.created_at ?? item.submission_deadline ?? '',
+    end_date: item.end_date ?? item.ends_at ?? item.voting_deadline ?? '',
+    created_at: item.created_at,
+  };
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ChallengeActions — extracted to module level to avoid remount on every render
@@ -199,9 +226,11 @@ export function IdeationAdmin() {
 
       const res = await api.get(`/v2/admin/ideation?${params.toString()}`);
       if (res.success && res.data) {
-        const payload = res.data as { items?: Challenge[]; meta?: ChallengeMeta };
-        setItems(payload.items || []);
-        setTotal(payload.meta?.total || 0);
+        const items = Array.isArray(res.data)
+          ? (res.data as RawChallenge[]).map(normalizeChallenge)
+          : [];
+        setItems(items);
+        setTotal(res.meta?.total ?? 0);
       }
     } catch {
       toast.error(t('ideation.failed_to_load_ideation_challenges'));
@@ -379,6 +408,13 @@ export function IdeationAdmin() {
         data={items}
         isLoading={loading}
         searchPlaceholder={t('ideation.search_challenges_placeholder')}
+        emptyContent={
+          search
+            ? t('ideation.no_matching_challenges')
+            : status === 'all'
+              ? t('ideation.no_challenges_found')
+              : t('ideation.no_status_challenges', { status })
+        }
         onSearch={(q) => {
           setSearch(q);
           setPage(1);

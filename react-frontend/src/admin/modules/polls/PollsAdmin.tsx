@@ -31,17 +31,42 @@ interface Poll {
   created_at: string;
 }
 
-interface PollsMeta {
-  page: number;
-  per_page: number;
-  total: number;
-  total_pages: number;
+interface RawPoll {
+  id: number;
+  question: string;
+  created_at: string;
+  end_date?: string | null;
+  is_active?: boolean;
+  options?: Array<{ id: number }>;
+  total_votes?: number;
+  user?: {
+    first_name?: string;
+    last_name?: string;
+    name?: string;
+  };
 }
 
 const statusColors: Record<string, 'success' | 'default'> = {
   active: 'success',
   ended: 'default',
 };
+
+function normalizePoll(item: RawPoll): Poll {
+  const creatorName = item.user?.name
+    ?? [item.user?.first_name, item.user?.last_name].filter(Boolean).join(' ').trim()
+    ?? '';
+  const isEnded = !!item.end_date && new Date(item.end_date).getTime() <= Date.now();
+
+  return {
+    id: item.id,
+    question: item.question,
+    options_count: item.options?.length ?? 0,
+    votes_count: item.total_votes ?? 0,
+    creator_name: creatorName,
+    status: isEnded || item.is_active === false ? 'ended' : 'active',
+    created_at: item.created_at,
+  };
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
@@ -74,9 +99,11 @@ export function PollsAdmin() {
 
       const res = await api.get(`/v2/admin/polls?${params.toString()}`);
       if (res.success && res.data) {
-        const payload = res.data as { items?: Poll[]; meta?: PollsMeta };
-        setItems(payload.items || []);
-        setTotal(payload.meta?.total || 0);
+        const items = Array.isArray(res.data)
+          ? (res.data as RawPoll[]).map(normalizePoll)
+          : [];
+        setItems(items);
+        setTotal(res.meta?.total ?? 0);
       }
     } catch {
       toast.error(t('polls.failed_to_load_polls'));
@@ -223,6 +250,11 @@ export function PollsAdmin() {
         data={items}
         isLoading={loading}
         searchPlaceholder={t('polls.search_polls_placeholder')}
+        emptyContent={
+          search
+            ? t('polls.no_matching_polls')
+            : t('polls.no_polls_found')
+        }
         onSearch={(q) => {
           setSearch(q);
           setPage(1);
