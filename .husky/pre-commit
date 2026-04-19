@@ -1,4 +1,15 @@
 #!/usr/bin/env sh
 
-# Pre-commit hook disabled — run lint-staged manually when needed
-exit 0
+set -e
+
+# Keep the local guardrail focused on the admin i18n surfaces that have regressed.
+STAGED_FILES="$(git diff --cached --name-only --diff-filter=ACMR)"
+
+if [ -z "$STAGED_FILES" ]; then
+  exit 0
+fi
+
+echo "$STAGED_FILES" | grep -Eq '^(react-frontend/src/admin/|react-frontend/public/locales/en/admin\.json|react-frontend/public/locales/en/admin_nav\.json|scripts/check-admin-i18n\.mjs|package\.json|\.husky/pre-commit)' || exit 0
+
+echo "Running local admin i18n guardrail..."
+npm run check:admin-i18n
