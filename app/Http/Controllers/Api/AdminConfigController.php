@@ -19,6 +19,7 @@ use App\Services\SearchService;
 use App\Services\SmartMatchingEngine;
 use App\Services\TenantFeatureConfig;
 use App\Services\TenantSettingsService;
+use App\Jobs\RunAdminCronJob;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
@@ -288,20 +289,70 @@ class AdminConfigController extends BaseApiController
     {
         $this->requireAdmin();
 
-        $jobs = [
-            ['id' => 'digest_emails', 'name' => 'Email Digest Sender', 'status' => 'idle', 'last_run_at' => null, 'next_run_at' => null],
-            ['id' => 'badge_checker', 'name' => 'Badge Award Checker', 'status' => 'idle', 'last_run_at' => null, 'next_run_at' => null],
-            ['id' => 'streak_updater', 'name' => 'Login Streak Updater', 'status' => 'idle', 'last_run_at' => null, 'next_run_at' => null],
+        // job_id values written by CronJobRunner for each of these tasks
+        $cronIdMap = [
+            'digest_emails'  => 'daily-digest',
+            'badge_checker'  => 'gamification-daily',
+            'streak_updater' => 'gamification-streaks',
         ];
+
+        $lastRuns = [];
+        try {
+            $rows = DB::select(
+                "SELECT cl.job_id, cl.status, cl.executed_at
+                 FROM cron_logs cl
+                 INNER JOIN (
+                     SELECT job_id, MAX(executed_at) AS max_date
+                     FROM cron_logs
+                     WHERE job_id IN (?, ?, ?) AND tenant_id IS NULL
+                     GROUP BY job_id
+                 ) latest ON cl.job_id = latest.job_id AND cl.executed_at = latest.max_date",
+                array_values($cronIdMap)
+            );
+            foreach ($rows as $row) {
+                $lastRuns[$row->job_id] = ['last_run_at' => $row->executed_at, 'status' => $row->status];
+            }
+        } catch (\Throwable) {}
+
+        $definitions = [
+            ['id' => 'digest_emails',  'name' => 'Email Digest Sender'],
+            ['id' => 'badge_checker',  'name' => 'Badge Award Checker'],
+            ['id' => 'streak_updater', 'name' => 'Login Streak Updater'],
+        ];
+
+        $jobs = array_map(function ($def) use ($cronIdMap, $lastRuns) {
+            $cronId = $cronIdMap[$def['id']];
+            $run    = $lastRuns[$cronId] ?? null;
+            return [
+                'id'          => $def['id'],
+                'name'        => $def['name'],
+                'status'      => $run ? $run['status'] : 'idle',
+                'last_run_at' => $run ? $run['last_run_at'] : null,
+                'next_run_at' => null,
+            ];
+        }, $definitions);
 
         return $this->respondWithData($jobs);
     }
 
-    /** POST /api/v2/admin/config/jobs/run */
-    public function runJob(): JsonResponse
+    /** POST /api/v2/admin/background-jobs/{id}/run */
+    public function runJob(string $id): JsonResponse
     {
         $this->requireAdmin();
-        return $this->respondWithData(['triggered' => true]);
+
+        $methodMap = [
+            'digest_emails'  => 'dailyDigest',
+            'badge_checker'  => 'gamificationDaily',
+            'streak_updater' => 'gamificationStreaks',
+        ];
+
+        if (!isset($methodMap[$id])) {
+            return $this->respondWithError('Unknown job: ' . $id, 400);
+        }
+
+        RunAdminCronJob::dispatch($methodMap[$id]);
+
+        return $this->respondWithData(['triggered' => true, 'job' => $id]);
     }
 
     // =========================================================================
