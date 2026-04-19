@@ -11,14 +11,14 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Button, Spinner, Chip } from '@heroui/react';
-import { Menu, Plus, Pencil, Trash2, Info, AlertTriangle, CheckCircle2, Circle } from 'lucide-react';
+import { Menu, Plus, Pencil, Trash2, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminMenus } from '../../api/adminApi';
 import { PageHeader, DataTable, EmptyState, ConfirmModal, type Column } from '../../components';
 
-import { useTranslation } from 'react-i18next';
 interface MenuItem {
   id: number;
   name: string;
@@ -41,7 +41,22 @@ export function MenusAdmin() {
   const [actionLoading, setActionLoading] = useState(false);
   const [locationFilter, setLocationFilter] = useState<string | null>(null);
 
-  const LOCATIONS = ['header-main', 'header-secondary', 'footer', 'sidebar', 'mobile'];
+  const LOCATIONS: string[] = [
+    'header-main',
+    'header-secondary',
+    'footer',
+    'sidebar',
+    'mobile',
+  ];
+
+  const LOCATION_LABELS: Record<string, string> = {
+    'header-main': t('menu_builder.location_header_main'),
+    'header-secondary': t('menu_builder.location_header_secondary'),
+    'footer': t('menu_builder.location_footer'),
+    'sidebar': t('menu_builder.location_sidebar'),
+    'mobile': t('menu_builder.location_mobile'),
+  };
+
   const filteredData = locationFilter
     ? data.filter((m) => m.location === locationFilter)
     : data;
@@ -64,7 +79,7 @@ export function MenusAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast, t]);
 
   useEffect(() => {
     fetchData();
@@ -109,11 +124,15 @@ export function MenusAdmin() {
       key: 'location',
       label: t('content.label_location'),
       sortable: true,
-      render: (item) => <span className="text-sm text-default-500 capitalize">{item.location || '--'}</span>,
+      render: (item) => (
+        <span className="text-sm text-default-500">
+          {LOCATION_LABELS[item.location] ?? item.location ?? '--'}
+        </span>
+      ),
     },
     {
       key: 'item_count',
-      label: t('content.items', 'Items'),
+      label: t('content.items'),
       sortable: true,
       render: (item) => <span className="text-sm text-default-600">{item.item_count ?? 0}</span>,
     },
@@ -122,7 +141,7 @@ export function MenusAdmin() {
       label: t('content.label_active'),
       render: (item) => (
         <Chip size="sm" variant="flat" color={item.is_active ? 'success' : 'default'}>
-          {item.is_active ? t('content.label_active') : t('reports.label_inactive', 'Inactive')}
+          {item.is_active ? t('content.label_active') : t('reports.label_inactive')}
         </Chip>
       ),
     },
@@ -176,52 +195,27 @@ export function MenusAdmin() {
             startContent={<Plus size={16} />}
             onPress={() => navigate(tenantPath('/admin/menus/builder/new'))}
           >
-            {t('breadcrumbs.create')} {t('breadcrumbs.menus')}
+            {t('content.create_menu_title')}
           </Button>
         }
       />
 
-      {/* Developer status notice */}
-      <div className="p-4 mb-4 rounded-lg bg-amber-500/5 border border-amber-500/20">
-        <div className="flex items-start gap-3">
-          <AlertTriangle size={18} className="text-amber-500 shrink-0 mt-0.5" />
-          <div className="text-sm space-y-2">
-            <p className="font-medium text-theme-primary">Menu Manager — Development Status</p>
-            <p className="text-theme-muted">
-              The admin builder is fully functional (create, edit, reorder, delete menus and items). However,
-              custom menus do not yet appear on the live site. The menu system kill switch is currently
-              <strong className="text-amber-600 dark:text-amber-400"> OFF</strong> — the frontend uses hardcoded
-              navigation until custom menus are created and the switch is enabled.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 pt-1">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={14} className="text-green-500 shrink-0" />
-                <span className="text-theme-muted">Admin CRUD &amp; drag-drop reordering</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={14} className="text-green-500 shrink-0" />
-                <span className="text-theme-muted">Icon picker &amp; visibility rules</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={14} className="text-green-500 shrink-0" />
-                <span className="text-theme-muted">Tenant-scoped API (backend ready)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={14} className="text-green-500 shrink-0" />
-                <span className="text-theme-muted">Frontend integration code (ready)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Circle size={14} className="text-amber-500 shrink-0" />
-                <span className="text-theme-muted">Kill switch OFF (enable after creating menus)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Circle size={14} className="text-amber-500 shrink-0" />
-                <span className="text-theme-muted">{t('menus_admin.production_testing_pending')}</span>
-              </div>
-            </div>
-          </div>
+      {/* How it works notice */}
+      <div className="flex items-start gap-3 p-4 mb-4 rounded-lg bg-primary-50/50 dark:bg-primary-900/10 border border-primary-200 dark:border-primary-800">
+        <Info size={16} className="text-primary-500 shrink-0 mt-0.5" />
+        <div className="text-sm">
+          <p className="font-medium text-theme-primary">{t('content.menus_how_it_works_title')}</p>
+          <p className="mt-0.5 text-theme-muted">{t('content.menus_how_it_works_desc')}</p>
         </div>
       </div>
+
+      {/* Info notice when no custom menus exist */}
+      {data.length === 0 && (
+        <div className="flex items-start gap-3 p-4 mb-4 rounded-medium bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300">
+          <Info size={16} className="shrink-0 mt-0.5" />
+          <p className="text-sm">{t('content.menus_using_defaults_desc')}</p>
+        </div>
+      )}
 
       {/* Location filter chips */}
       {data.length > 0 && (
@@ -232,7 +226,7 @@ export function MenusAdmin() {
             className="cursor-pointer"
             onClick={() => setLocationFilter(null)}
           >
-            All ({data.length})
+            {t('content.filter_all', { count: data.length })}
           </Chip>
           {LOCATIONS.map((loc) => {
             const count = data.filter((m) => m.location === loc).length;
@@ -242,27 +236,13 @@ export function MenusAdmin() {
                 key={loc}
                 variant={locationFilter === loc ? 'solid' : 'flat'}
                 color={locationFilter === loc ? 'primary' : 'default'}
-                className="cursor-pointer capitalize"
+                className="cursor-pointer"
                 onClick={() => setLocationFilter(locationFilter === loc ? null : loc)}
               >
-                {loc} ({count})
+                {LOCATION_LABELS[loc] ?? loc} ({count})
               </Chip>
             );
           })}
-        </div>
-      )}
-
-      {/* Info notice when no custom menus exist */}
-      {data.length === 0 && (
-        <div className="flex items-start gap-3 p-4 mb-4 rounded-medium bg-primary-50 border border-primary-200 text-primary-700">
-          <Info size={18} className="shrink-0 mt-0.5" />
-          <div className="text-sm">
-            <p className="font-medium">{t('menus_admin.default_menus_active')}</p>
-            <p className="mt-0.5 opacity-90">
-              The navigation is currently using hardcoded defaults. Create custom menus below to
-              override the default navigation for your community.
-            </p>
-          </div>
         </div>
       )}
 
@@ -271,14 +251,14 @@ export function MenusAdmin() {
           icon={Menu}
           title={t('no_data')}
           description={t('content.desc_create_custom_navigation_menus_for_your_')}
-          actionLabel={`${t('breadcrumbs.create')} ${t('breadcrumbs.menus')}`}
+          actionLabel={t('content.create_menu_title')}
           onAction={() => navigate(tenantPath('/admin/menus/builder/new'))}
         />
       ) : (
         <DataTable
           columns={columns}
           data={filteredData}
-          searchPlaceholder={t('data_table.search', 'Search menus...')}
+          searchPlaceholder={t('data_table.search')}
           onRefresh={fetchData}
         />
       )}
@@ -288,7 +268,7 @@ export function MenusAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title={`${t('common.delete')} ${t('breadcrumbs.menus')}`}
+          title={t('content.delete_menu_title')}
           message={t('gamification.confirm_delete_campaign', { name: confirmDelete.name })}
           confirmLabel={t('common.delete')}
           confirmColor="danger"

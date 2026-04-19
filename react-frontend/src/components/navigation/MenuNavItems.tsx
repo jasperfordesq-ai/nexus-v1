@@ -18,6 +18,7 @@ import {
   Button,
 } from '@heroui/react';
 import { ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { DynamicIcon } from '@/components/ui';
 import { useTenant, useAuth } from '@/contexts';
 import type { ApiMenu, ApiMenuItem } from '@/types/menu';
@@ -87,6 +88,7 @@ export function DesktopMenuItems({ menus }: DesktopMenuItemsProps) {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation('common');
 
   const dropdownNavigate = (href: string) => {
     if (href.startsWith('http')) {
@@ -139,7 +141,7 @@ export function DesktopMenuItems({ menus }: DesktopMenuItemsProps) {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
-                aria-label={`${item.label} navigation`}
+                aria-label={`${item.label} ${t('nav.more')}`}
                 className="min-w-[180px]"
                 classNames={{
                   base: 'bg-[var(--surface-overlay)] border border-[var(--border-default)] shadow-xl',

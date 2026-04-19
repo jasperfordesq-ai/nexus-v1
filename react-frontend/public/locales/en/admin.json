@@ -888,7 +888,15 @@
         "indent_hint": "Drag right to nest · Drag left to un-nest",
         "hide_preview": "Hide Preview",
         "edit_menu_title": "Edit Menu",
-        "create_menu_title": "Create Menu"
+        "create_menu_title": "Create Menu",
+        "load_defaults": "Load Defaults",
+        "load_defaults_desc": "Start from the standard navigation items",
+        "filter_all": "All ({{count}})",
+        "menus_how_it_works_title": "How it works",
+        "menus_how_it_works_desc": "Create a menu at each location to override the defaults. 'Header (Main)' replaces the top nav — it goes live as soon as you save.",
+        "menus_using_defaults_desc": "Navigation is using the platform defaults. Create a 'Header (Main)' menu to customise it.",
+        "create_menu_action": "Create Menu",
+        "delete_menu_title": "Delete Menu"
     },
     "crm": {
         "action_cancel": "Cancel",
@@ -4323,6 +4331,13 @@
         "sub_items_plural": "{{count}} sub-items",
         "new_item_default": "New Item",
         "drag_hint": "Drag right to nest · Drag left to un-nest",
-        "nest_inside": "Nest inside {{label}}"
+        "nest_inside": "Nest inside {{label}}",
+        "group_core": "Core",
+        "group_community": "Community",
+        "group_features": "Features",
+        "group_gamification": "Gamification",
+        "group_info": "Info",
+        "group_legal": "Legal",
+        "placeholder_css": "e.g., text-red-500"
     }
 }

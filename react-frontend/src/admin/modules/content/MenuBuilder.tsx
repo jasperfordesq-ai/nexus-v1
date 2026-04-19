@@ -9,7 +9,7 @@
  * icon picker, visibility rules editor, page/route pickers, and nested item support.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Card,
   CardBody,
@@ -68,34 +68,6 @@ import { useTranslation } from 'react-i18next';
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Known app routes for the route-type picker */
-const APP_ROUTES: { value: string; label: string; group: string }[] = [
-  { value: '/dashboard', label: 'Dashboard', group: 'Core' },
-  { value: '/feed', label: 'Feed', group: 'Core' },
-  { value: '/listings', label: 'Listings', group: 'Core' },
-  { value: '/listings/new', label: 'Create Listing', group: 'Core' },
-  { value: '/messages', label: 'Messages', group: 'Core' },
-  { value: '/wallet', label: 'Wallet', group: 'Core' },
-  { value: '/members', label: 'Members', group: 'Community' },
-  { value: '/groups', label: 'Groups', group: 'Community' },
-  { value: '/events', label: 'Events', group: 'Community' },
-  { value: '/search', label: 'Search', group: 'Community' },
-  { value: '/volunteering', label: 'Volunteering', group: 'Features' },
-  { value: '/organisations', label: 'Organisations', group: 'Features' },
-  { value: '/goals', label: 'Goals', group: 'Features' },
-  { value: '/blog', label: 'Blog', group: 'Features' },
-  { value: '/resources', label: 'Resources', group: 'Features' },
-  { value: '/jobs', label: 'Jobs', group: 'Features' },
-  { value: '/marketplace', label: 'Marketplace', group: 'Features' },
-  { value: '/leaderboard', label: 'Leaderboard', group: 'Gamification' },
-  { value: '/achievements', label: 'Achievements', group: 'Gamification' },
-  { value: '/about', label: 'About', group: 'Info' },
-  { value: '/contact', label: 'Contact', group: 'Info' },
-  { value: '/help', label: 'Help Center', group: 'Info' },
-  { value: '/terms', label: 'Terms', group: 'Legal' },
-  { value: '/privacy', label: 'Privacy Policy', group: 'Legal' },
-];
-
 const NEST_THRESHOLD = 40;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -133,6 +105,89 @@ interface PageOption {
 }
 
 type TFunction = (key: string, options?: Record<string, unknown>) => string;
+
+/** Route picker — labels from existing nav.* keys via cross-namespace lookup */
+const getAppRoutes = (t: TFunction): { value: string; label: string; group: string }[] => [
+  { value: '/dashboard', label: t('common:nav.dashboard'), group: t('menu_builder.group_core') },
+  { value: '/feed', label: t('common:nav.feed'), group: t('menu_builder.group_core') },
+  { value: '/listings', label: t('common:nav.listings'), group: t('menu_builder.group_core') },
+  { value: '/messages', label: t('common:nav.messages'), group: t('menu_builder.group_core') },
+  { value: '/wallet', label: t('common:nav.wallet'), group: t('menu_builder.group_core') },
+  { value: '/members', label: t('common:nav.members'), group: t('menu_builder.group_community') },
+  { value: '/groups', label: t('common:nav.groups'), group: t('menu_builder.group_community') },
+  { value: '/events', label: t('common:nav.events'), group: t('menu_builder.group_community') },
+  { value: '/connections', label: t('common:nav.connections'), group: t('menu_builder.group_community') },
+  { value: '/volunteering', label: t('common:nav.volunteering'), group: t('menu_builder.group_features') },
+  { value: '/organisations', label: t('common:nav.organisations'), group: t('menu_builder.group_features') },
+  { value: '/goals', label: t('common:nav.goals'), group: t('menu_builder.group_features') },
+  { value: '/blog', label: t('common:nav.blog'), group: t('menu_builder.group_features') },
+  { value: '/resources', label: t('common:nav.resources'), group: t('menu_builder.group_features') },
+  { value: '/jobs', label: t('common:nav.jobs'), group: t('menu_builder.group_features') },
+  { value: '/marketplace', label: t('common:nav.marketplace'), group: t('menu_builder.group_features') },
+  { value: '/leaderboard', label: t('common:nav.leaderboard'), group: t('menu_builder.group_gamification') },
+  { value: '/achievements', label: t('common:nav.achievements'), group: t('menu_builder.group_gamification') },
+  { value: '/about', label: t('common:nav.about'), group: t('menu_builder.group_info') },
+  { value: '/faq', label: t('common:nav.faq'), group: t('menu_builder.group_info') },
+  { value: '/explore', label: t('common:nav.explore'), group: t('menu_builder.group_info') },
+];
+
+/**
+ * Returns a starter set of menu items mirroring the hardcoded fallback nav.
+ * Used to pre-populate a new menu so admins can edit from a known baseline.
+ */
+function getDefaultItems(t: TFunction): MenuItemData[] {
+  let seq = Date.now();
+  const next = () => seq++;
+
+  const communityId = next();
+  return [
+    {
+      id: next(), label: t('common:nav.feed'), url: '/feed', type: 'link',
+      icon: 'Newspaper', target: '_self', sort_order: 0, parent_id: null,
+      visibility_rules: null, is_active: 1, css_class: null,
+    },
+    {
+      id: next(), label: t('common:nav.explore'), url: '/explore', type: 'link',
+      icon: 'Compass', target: '_self', sort_order: 1, parent_id: null,
+      visibility_rules: null, is_active: 1, css_class: null,
+    },
+    {
+      id: next(), label: t('common:nav.listings'), url: '/listings', type: 'link',
+      icon: 'ListTodo', target: '_self', sort_order: 2, parent_id: null,
+      visibility_rules: null, is_active: 1, css_class: null,
+    },
+    {
+      id: communityId, label: t('common:nav.community'), url: null, type: 'dropdown',
+      icon: 'Users', target: '_self', sort_order: 3, parent_id: null,
+      visibility_rules: null, is_active: 1, css_class: null,
+    },
+    {
+      id: next(), label: t('common:nav.members'), url: '/members', type: 'link',
+      icon: 'Users', target: '_self', sort_order: 4, parent_id: communityId,
+      visibility_rules: null, is_active: 1, css_class: null,
+    },
+    {
+      id: next(), label: t('common:nav.events'), url: '/events', type: 'link',
+      icon: 'Calendar', target: '_self', sort_order: 5, parent_id: communityId,
+      visibility_rules: null, is_active: 1, css_class: null,
+    },
+    {
+      id: next(), label: t('common:nav.groups'), url: '/groups', type: 'link',
+      icon: 'Users', target: '_self', sort_order: 6, parent_id: communityId,
+      visibility_rules: null, is_active: 1, css_class: null,
+    },
+    {
+      id: next(), label: t('common:nav.volunteering'), url: '/volunteering', type: 'link',
+      icon: 'Heart', target: '_self', sort_order: 7, parent_id: communityId,
+      visibility_rules: null, is_active: 1, css_class: null,
+    },
+    {
+      id: next(), label: t('common:nav.resources'), url: '/resources', type: 'link',
+      icon: 'FolderOpen', target: '_self', sort_order: 8, parent_id: communityId,
+      visibility_rules: null, is_active: 1, css_class: null,
+    },
+  ];
+}
 
 const getLocationOptions = (t: TFunction): { key: MenuLocation; label: string }[] => [
   { key: 'header-main', label: t('menu_builder.location_header_main') },
@@ -702,6 +757,7 @@ export function MenuBuilder() {
 
   const LOCATION_OPTIONS = getLocationOptions(t as TFunction);
   const TYPE_OPTIONS = getTypeOptions(t as TFunction);
+  const APP_ROUTES = useMemo(() => getAppRoutes(t as TFunction), [t]);
 
   const parentOptions = menuItems
     .filter((i) => i.type === 'dropdown' && i.id !== selectedItemId)
@@ -823,17 +879,28 @@ export function MenuBuilder() {
             </CardHeader>
             <CardBody>
               {menuItems.length === 0 ? (
-                <div className="flex flex-col items-center py-12 text-default-400">
-                  <Menu size={40} className="mb-3" />
-                  <p className="text-sm mb-3">{t('no_data')}</p>
-                  <Button
-                    size="sm"
-                    color="primary"
-                    startContent={<Plus size={14} />}
-                    onPress={handleAddItem}
-                  >
-                    {t('federation.add')}
-                  </Button>
+                <div className="flex flex-col items-center py-12 text-default-400 gap-3">
+                  <Menu size={40} />
+                  <p className="text-sm">{t('no_data')}</p>
+                  <div className="flex gap-2 flex-wrap justify-center">
+                    <Button
+                      size="sm"
+                      color="primary"
+                      startContent={<Plus size={14} />}
+                      onPress={handleAddItem}
+                    >
+                      {t('federation.add')}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      startContent={<Eye size={14} />}
+                      onPress={() => setMenuItems(getDefaultItems(t as TFunction))}
+                    >
+                      {t('content.load_defaults')}
+                    </Button>
+                  </div>
+                  <p className="text-[11px] text-default-400">{t('content.load_defaults_desc')}</p>
                 </div>
               ) : (
                 <>
@@ -1075,7 +1142,7 @@ export function MenuBuilder() {
                     <div className="space-y-3 pl-2 border-l-2 border-default-100">
                       <Input
                         label={t('content.label_c_s_s_class')}
-                        placeholder="e.g., text-red-500"
+                        placeholder={t('menu_builder.placeholder_css')}
                         variant="bordered"
                         size="sm"
                         value={editForm.css_class || ''}
