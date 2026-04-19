@@ -74,6 +74,13 @@ interface GuideCardProps {
   accentClassName: string;
 }
 
+interface SnapshotCardProps {
+  eyebrow: string;
+  value: string;
+  body: string;
+  accentClassName: string;
+}
+
 function formatPercent(value: number, maximumFractionDigits = 1): string {
   return `${Number(value.toFixed(maximumFractionDigits)).toLocaleString(undefined, {
     maximumFractionDigits,
@@ -190,6 +197,18 @@ function GuideCard({ icon: Icon, title, body, accentClassName }: GuideCardProps)
           <p className="text-sm leading-6 text-default-500">{body}</p>
         </div>
       </div>
+    </div>
+  );
+}
+
+function SnapshotCard({ eyebrow, value, body, accentClassName }: SnapshotCardProps) {
+  return (
+    <div className="rounded-[26px] border border-default-200/70 bg-content1/80 p-5 shadow-sm">
+      <div className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${accentClassName}`}>
+        {eyebrow}
+      </div>
+      <p className="mt-4 text-2xl font-semibold tracking-tight text-foreground">{value}</p>
+      <p className="mt-3 text-sm leading-6 text-default-500">{body}</p>
     </div>
   );
 }
@@ -408,6 +427,48 @@ export default function OnboardingFunnel() {
     },
   ];
 
+  const snapshotCards: SnapshotCardProps[] = [
+    {
+      eyebrow: t('crm.snapshot_conversion_title'),
+      value: formatPercent(overallConversion),
+      body: t('crm.snapshot_conversion_body', {
+        members: finalStage?.count.toLocaleString() ?? '0',
+        stage: finalStage?.name ?? t('crm.no_stages_available'),
+      }),
+      accentClassName: 'bg-success/10 text-success',
+    },
+    {
+      eyebrow: t('crm.snapshot_volume_title'),
+      value: latestMonth?.count.toLocaleString() ?? '0',
+      body: latestMonth
+        ? `${t('crm.snapshot_volume_body', {
+            members: latestMonth.count.toLocaleString(),
+            month: formatMonthLabel(latestMonth.month),
+          })}${
+            monthOverMonthChange !== null
+              ? ` ${t('crm.snapshot_volume_delta', {
+                  change: formatSignedPercent(monthOverMonthChange),
+                })}`
+              : ''
+          }`
+        : t('crm.no_registration_data'),
+      accentClassName: 'bg-secondary/10 text-secondary',
+    },
+    {
+      eyebrow: t('crm.snapshot_priority_title'),
+      value: biggestDropoff
+        ? `${biggestDropoff.from.name} -> ${biggestDropoff.to.name}`
+        : t('crm.not_enough_stages'),
+      body: biggestDropoff
+        ? t('crm.snapshot_priority_body', {
+            loss: biggestDropoff.loss.toLocaleString(),
+            rate: formatPercent(biggestDropoff.rate),
+          })
+        : t('crm.no_stages_available'),
+      accentClassName: 'bg-danger/10 text-danger',
+    },
+  ];
+
   return (
     <div className="mx-auto max-w-7xl space-y-6 pb-10">
       <section className="relative overflow-hidden rounded-[32px] border border-black/5 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(241,245,249,0.88))] px-6 py-7 shadow-[0_20px_60px_rgba(15,23,42,0.08)] dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(15,23,42,0.96),rgba(30,41,59,0.88))] dark:shadow-[0_24px_80px_rgba(2,6,23,0.45)] sm:px-8 sm:py-8">
@@ -543,6 +604,18 @@ export default function OnboardingFunnel() {
         </CardBody>
       </Card>
 
+      <Card className="border border-default-200/70 bg-content1/90 shadow-sm">
+        <CardHeader className="flex flex-col items-start gap-2 px-6 pb-0 pt-6">
+          <h2 className="text-lg font-semibold text-foreground">{t('crm.snapshot_title')}</h2>
+          <p className="text-sm text-default-500">{t('crm.snapshot_desc')}</p>
+        </CardHeader>
+        <CardBody className="grid gap-4 px-6 pb-6 pt-5 lg:grid-cols-3">
+          {snapshotCards.map((card) => (
+            <SnapshotCard key={card.eyebrow} {...card} />
+          ))}
+        </CardBody>
+      </Card>
+
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.95fr)]">
         <Card className="overflow-hidden border border-default-200/70 bg-content1/90 shadow-lg">
           <CardHeader className="flex flex-col items-start gap-3 px-6 pb-0 pt-6">
@@ -594,13 +667,21 @@ export default function OnboardingFunnel() {
 
                         <div className="rounded-[28px] border border-default-200/70 bg-default-50/70 p-4 dark:border-white/10 dark:bg-white/[0.03] sm:p-5">
                           <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
-                            <div>
+                            <div className="space-y-2">
+                              <Chip size="sm" variant="flat" className="w-fit">
+                                {t('crm.stage_number', { number: index + 1 })}
+                              </Chip>
                               <p className="text-lg font-semibold text-foreground">{stage.name}</p>
                               <p className="text-sm text-default-500">
                                 {formatPercent(stage.shareOfEntry)} {t('crm.stage_share_label')}
                               </p>
                             </div>
-                            <div className="text-right">
+                            <div className="space-y-2 text-right">
+                              {index > 0 && (
+                                <Chip size="sm" color="danger" variant="flat" className="font-medium">
+                                  {stage.lossFromPrevious.toLocaleString()} {t('crm.lost_since_previous')}
+                                </Chip>
+                              )}
                               <p className="text-2xl font-semibold tracking-tight text-foreground">
                                 {stage.count.toLocaleString()}
                               </p>
@@ -776,6 +857,13 @@ export default function OnboardingFunnel() {
                           <p className={`text-xl font-semibold ${tone.textClassName}`}>
                             {formatPercent(transition.rate)}
                           </p>
+                        </div>
+
+                        <div className="mb-3 flex items-center justify-between gap-3 text-sm text-default-500">
+                          <span>{t('crm.transition_loss_detail', { members: transition.loss.toLocaleString() })}</span>
+                          <Chip size="sm" color={tone.chipColor} variant="flat">
+                            {transition.loss.toLocaleString()} {t('crm.dropped_off')}
+                          </Chip>
                         </div>
 
                         <Progress
