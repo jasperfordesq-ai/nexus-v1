@@ -27,7 +27,7 @@ import {
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { LocationMapCard } from '@/components/location';
-import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
+import { resolveAvatarUrl, formatDateValue, formatRelativeTime } from '@/lib/helpers';
 import type { Group } from '@/types/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -104,6 +104,7 @@ export function GroupHeader({
   onJoinRequest,
 }: GroupHeaderProps) {
   const { t } = useTranslation('groups');
+  const createdDateLabel = formatDateValue(group.created_at);
 
   return (
     <GlassCard className="p-6 sm:p-8">
@@ -130,7 +131,7 @@ export function GroupHeader({
                 </>
               )}
               {' '}<span aria-hidden="true">&#183;</span>{' '}{t('detail.created')}{' '}
-              <time dateTime={group.created_at}>{new Date(group.created_at).toLocaleDateString()}</time>
+              <time dateTime={group.created_at}>{createdDateLabel}</time>
             </p>
           </div>
         </div>
@@ -227,7 +228,7 @@ export function GroupHeader({
         )}
         <div className="flex items-center gap-2 text-theme-muted">
           <Calendar className="w-5 h-5" aria-hidden="true" />
-          <span>{t('detail.created')} <time dateTime={group.created_at}>{new Date(group.created_at).toLocaleDateString()}</time></span>
+          <span>{t('detail.created')} <time dateTime={group.created_at}>{createdDateLabel}</time></span>
         </div>
       </div>
 

@@ -55,6 +55,7 @@ export function GroupsPage() {
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [cursor, setCursor] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
   const [filter, setFilter] = useState<GroupFilter>('all');
@@ -82,6 +83,7 @@ export function GroupsPage() {
       if (!append) {
         setIsLoading(true);
         setError(null);
+        setTotalCount(null);
       } else {
         setIsLoadingMore(true);
       }
@@ -113,6 +115,9 @@ export function GroupsPage() {
         const nextCursor = response.meta?.cursor ?? response.meta?.next_cursor ?? null;
         setCursor(nextCursor);
         setHasMore(response.meta?.has_more ?? false);
+        if (response.meta?.total_items !== undefined) {
+          setTotalCount(response.meta.total_items);
+        }
       } else {
         if (!append) {
           setError(t('load_error'));
@@ -167,25 +172,39 @@ export function GroupsPage() {
   return (
     <div className="space-y-6">
       <PageMeta title={t('page_title', { defaultValue: 'Groups' })} description={t('page_description', { defaultValue: 'Browse and join community groups and interest circles.' })} />
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <Users className="w-7 h-7 text-purple-600 dark:text-purple-400" aria-hidden="true" />
-            {t('title')}
-          </h1>
-          <p className="text-theme-muted mt-1">{t('subtitle')}</p>
+      {/* Hero Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-indigo-600 via-purple-500 to-pink-500 p-6 sm:p-8">
+        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                <Users className="w-6 h-6 text-white" aria-hidden="true" />
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('title')}</h1>
+            </div>
+            <div className="flex items-center gap-3 flex-wrap">
+              <p className="text-white/80 text-sm">{t('subtitle', { defaultValue: 'Browse and join community groups and interest circles.' })}</p>
+              {totalCount != null && !isLoading && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true" />
+                  {t('count_pill', '{{count}} groups', { count: totalCount.toLocaleString() })}
+                </span>
+              )}
+            </div>
+          </div>
+          {isAuthenticated && (
+            <Link to={tenantPath('/groups/create')}>
+              <Button
+                className="bg-white text-indigo-700 font-semibold hover:bg-white/90 shrink-0 shadow-lg"
+                startContent={<Plus className="w-4 h-4" />}
+              >
+                {t('create_group')}
+              </Button>
+            </Link>
+          )}
         </div>
-        {isAuthenticated && (
-          <Link to={tenantPath('/groups/create')}>
-            <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-              startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('create_group')}
-            </Button>
-          </Link>
-        )}
       </div>
 
       {/* Filters */}
@@ -233,7 +252,7 @@ export function GroupsPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadGroups()}
           >
@@ -259,7 +278,7 @@ export function GroupsPage() {
               action={
                 isAuthenticated && (
                   <Link to={tenantPath('/groups/create')}>
-                    <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+                    <Button className="bg-linear-to-r from-indigo-500 to-purple-600 text-white">
                       {t('create_group')}
                     </Button>
                   </Link>
@@ -268,6 +287,7 @@ export function GroupsPage() {
             />
           ) : (
             <motion.div
+              key={debouncedQuery + filter}
               variants={containerVariants}
               initial="hidden"
               animate="visible"
@@ -319,15 +339,35 @@ export function GroupsPage() {
 
               {/* Load More Button */}
               {hasMore && (
-                <div className="pt-4 text-center">
-                  <Button
-                    variant="flat"
-                    className="bg-theme-elevated text-theme-muted"
-                    onPress={loadMoreGroups}
-                    isLoading={isLoadingMore}
-                  >
-                    {t('load_more')}
-                  </Button>
+                <div className="space-y-3 pt-4">
+                  {totalCount != null && totalCount > 0 && (
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-xs text-theme-muted px-1">
+                        <span>{groups.length.toLocaleString()} / {totalCount.toLocaleString()}</span>
+                        <span className="font-medium text-theme-secondary">{Math.round((groups.length / totalCount) * 100)}%</span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-theme-elevated overflow-hidden">
+                        <motion.div
+                          className="h-full rounded-full bg-linear-to-r from-indigo-500 to-purple-600"
+                          initial={{ width: '0%' }}
+                          animate={{ width: `${Math.round((groups.length / totalCount) * 100)}%` }}
+                          transition={{ duration: 0.6, ease: 'easeOut' }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <div className="text-center">
+                    <Button
+                      variant="flat"
+                      className="bg-theme-elevated text-theme-muted hover:bg-theme-hover"
+                      onPress={loadMoreGroups}
+                      isLoading={isLoadingMore}
+                    >
+                      {totalCount != null && totalCount > groups.length
+                        ? t('load_more_count', 'Load more ({{remaining}} remaining)', { remaining: (totalCount - groups.length).toLocaleString() })
+                        : t('load_more')}
+                    </Button>
+                  </div>
                 </div>
               )}
             </motion.div>

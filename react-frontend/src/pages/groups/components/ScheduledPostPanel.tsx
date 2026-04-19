@@ -28,6 +28,7 @@ import { CalendarClock, Plus, X } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 import { GlassCard } from '@/components/ui';
+import { formatDateTime } from '@/lib/helpers';
 import { useTranslation } from 'react-i18next';
 
 interface ScheduledPostPanelProps {
@@ -196,7 +197,7 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
                     {post.post_type}
                   </Chip>
                   <span className="text-xs text-default-400">
-                    {new Date(post.scheduled_at).toLocaleString()}
+                    {formatDateTime(post.scheduled_at)}
                   </span>
                   {post.is_recurring && post.recurrence_pattern && (
                     <Chip size="sm" variant="flat" color="secondary">

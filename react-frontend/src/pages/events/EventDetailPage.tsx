@@ -64,7 +64,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
+import { formatDateTime, formatDateValue, formatMonthShort, resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
 import type { Event, User, RsvpResponse } from '@/types/api';
 
 type RsvpOption = 'going' | 'interested' | 'not_going';
@@ -525,6 +525,12 @@ export function EventDetailPage() {
   const isPast = startDate < new Date();
   const goingCount = event.attendees_count ?? 0;
   const interestedCount = event.interested_count ?? 0;
+  const startMonthLabel = formatMonthShort(startDate, true);
+  const fullDateLabel = formatDateValue(startDate, { weekday: 'long', month: 'long', day: 'numeric' });
+  const startTimeLabel = formatDateTime(startDate, { hour: '2-digit', minute: '2-digit' });
+  const endTimeLabel = endDate
+    ? formatDateTime(endDate, { hour: '2-digit', minute: '2-digit' })
+    : null;
 
   return (
     <motion.div
@@ -582,7 +588,7 @@ export function EventDetailPage() {
             {/* Date Badge */}
             <div className="bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-xl p-4 text-center">
               <div className="text-amber-400 text-sm font-medium uppercase">
-                {startDate.toLocaleString('default', { month: 'short' })}
+                {startMonthLabel}
               </div>
               <div className="text-theme-primary text-3xl font-bold">
                 {startDate.getDate()}
@@ -767,7 +773,7 @@ export function EventDetailPage() {
             <div>
               <div className="text-xs text-theme-subtle">{t('detail.date_label')}</div>
               <time dateTime={event.start_date} className="text-theme-primary block">
-                {startDate.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+                {fullDateLabel}
               </time>
             </div>
           </div>
@@ -780,13 +786,13 @@ export function EventDetailPage() {
               <div className="text-xs text-theme-subtle">{t('detail.time_label')}</div>
               <div className="text-theme-primary">
                 <time dateTime={event.start_date}>
-                  {startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {startTimeLabel}
                 </time>
-                {endDate && (
+                {endDate && endTimeLabel && (
                   <>
                     {' - '}
                     <time dateTime={event.end_date!}>
-                      {endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {endTimeLabel}
                     </time>
                   </>
                 )}
@@ -1301,6 +1307,8 @@ export function EventDetailPage() {
             <div className="space-y-3">
               {seriesEvents.map((seriesEvent) => {
                 const evtDate = new Date(seriesEvent.start_date);
+                const monthLabel = formatMonthShort(evtDate, true);
+                const timeLabel = formatDateTime(evtDate, { hour: '2-digit', minute: '2-digit' });
                 return (
                   <Link key={seriesEvent.id} to={tenantPath(`/events/${seriesEvent.id}`)}>
                     <Card
@@ -1311,7 +1319,7 @@ export function EventDetailPage() {
                         {/* Mini Date Badge */}
                         <div className="bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-lg p-2 text-center min-w-[48px]">
                           <div className="text-amber-400 text-[10px] font-medium uppercase leading-none">
-                            {evtDate.toLocaleString('default', { month: 'short' })}
+                            {monthLabel}
                           </div>
                           <div className="text-theme-primary text-lg font-bold leading-tight">
                             {evtDate.getDate()}
@@ -1323,7 +1331,7 @@ export function EventDetailPage() {
                             {seriesEvent.title}
                           </p>
                           <p className="text-theme-subtle text-sm">
-                            {evtDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {timeLabel}
                             {seriesEvent.location && ` \u00B7 ${seriesEvent.location}`}
                           </p>
                         </div>

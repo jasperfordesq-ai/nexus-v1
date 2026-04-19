@@ -16,6 +16,7 @@ import { EmptyState } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts';
 import { useTenant } from '@/contexts';
+import { formatDateTime, formatMonthShort } from '@/lib/helpers';
 import type { Event } from '@/types/api';
 
 interface GroupEventsTabProps {
@@ -79,6 +80,8 @@ export function GroupEventsTab({
           {events.map((event) => {
             const eventDate = new Date(event.start_date);
             const isPast = eventDate < new Date();
+            const monthLabel = formatMonthShort(eventDate, true);
+            const timeLabel = formatDateTime(eventDate, { hour: '2-digit', minute: '2-digit' });
 
             return (
               <Link key={event.id} to={tenantPath(`/events/${event.id}`)}>
@@ -86,7 +89,7 @@ export function GroupEventsTab({
                   {/* Date Badge */}
                   <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex flex-col items-center justify-center text-center">
                     <span className="text-xs font-medium text-indigo-400 uppercase">
-                      {eventDate.toLocaleDateString(undefined, { month: 'short' })}
+                      {monthLabel}
                     </span>
                     <span className="text-lg font-bold text-theme-primary leading-none">
                       {eventDate.getDate()}
@@ -98,7 +101,7 @@ export function GroupEventsTab({
                     <div className="flex items-center gap-3 mt-1 text-xs text-theme-subtle">
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" aria-hidden="true" />
-                        {eventDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                        {timeLabel}
                       </span>
                       {event.location && (
                         <span className="flex items-center gap-1 truncate">

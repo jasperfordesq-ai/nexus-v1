@@ -26,6 +26,7 @@ import { Webhook, Plus, Trash2, AlertTriangle } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 import { GlassCard } from '@/components/ui';
+import { formatDateValue } from '@/lib/helpers';
 import { useTranslation } from 'react-i18next';
 
 interface WebhookConfigPanelProps {
@@ -228,7 +229,7 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
                   {wh.last_fired_at && (
                     <span className="text-xs text-default-400">
                       {t('webhooks.last_fired', 'Last fired')}{' '}
-                      {new Date(wh.last_fired_at).toLocaleDateString()}
+                      {formatDateValue(wh.last_fired_at)}
                     </span>
                   )}
                 </div>

@@ -95,6 +95,7 @@ export function MembersPage() {
   const [nearMeEnabled, setNearMeEnabled] = useState(false);
   const [radiusKm, setRadiusKm] = useState(25);
   const { user, isAuthenticated } = useAuth();
+  const { tenantPath } = useTenant();
   const membersAlgorithm = useAlgorithmInfo('members');
   const defaultSort: SortOption | null = membersAlgorithm
     ? membersAlgorithm.key === 'communityrank'

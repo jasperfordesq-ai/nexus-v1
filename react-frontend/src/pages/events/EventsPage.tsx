@@ -38,6 +38,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { logError } from '@/lib/logger';
+import { formatDateTime, formatDateValue, formatMonthShort } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 import type { Event } from '@/types/api';
@@ -46,6 +47,20 @@ type EventFilter = 'upcoming' | 'past' | 'all';
 
 const ITEMS_PER_PAGE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
+
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.05,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+};
 
 /** Event category metadata — names resolved via t() inside the component */
 const EVENT_CATEGORY_IDS = [
@@ -82,6 +97,7 @@ export function EventsPage() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
   const [, setNextCursor] = useState<string | null>(null);
   const nextCursorRef = useRef<string | null>(null);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
@@ -131,6 +147,7 @@ export function EventsPage() {
       if (!append) {
         setIsLoading(true);
         setError(null);
+        setTotalCount(null);
       } else {
         setIsLoadingMore(true);
       }
@@ -168,6 +185,9 @@ export function EventsPage() {
         nextCursorRef.current = cursor;
         setNextCursor(cursor);
         setHasMore(response.meta?.has_more ?? (response.data?.length ?? 0) >= ITEMS_PER_PAGE);
+        if (response.meta?.total_items !== undefined) {
+          setTotalCount(response.meta.total_items);
+        }
       } else {
         if (controller.signal.aborted) return;
         if (!append) {
@@ -236,7 +256,7 @@ export function EventsPage() {
   // Group events by month
   const groupedEvents = events.reduce((groups, event) => {
     const date = new Date(event.start_date);
-    const key = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+    const key = formatDateValue(date, { month: 'long', year: 'numeric' });
     if (!groups[key]) groups[key] = [];
     groups[key].push(event);
     return groups;
@@ -245,25 +265,39 @@ export function EventsPage() {
   return (
     <div className="space-y-6">
       <PageMeta title={t('page_title', { defaultValue: 'Events' })} description={t('page_description', { defaultValue: 'Discover community events, workshops, and meetups near you.' })} />
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <Calendar className="w-7 h-7 text-amber-400" aria-hidden="true" />
-            {t('title')}
-          </h1>
-          <p className="text-theme-muted mt-1">{t('subtitle')}</p>
+      {/* Hero Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-indigo-600 via-purple-500 to-pink-500 p-6 sm:p-8">
+        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                <Calendar className="w-6 h-6 text-white" aria-hidden="true" />
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('title')}</h1>
+            </div>
+            <div className="flex items-center gap-3 flex-wrap">
+              <p className="text-white/80 text-sm">{t('page_description', { defaultValue: 'Discover community events, workshops, and meetups near you.' })}</p>
+              {totalCount != null && !isLoading && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true" />
+                  {t('count_pill', { count: totalCount.toLocaleString() })}
+                </span>
+              )}
+            </div>
+          </div>
+          {isAuthenticated && (
+            <Link to={tenantPath('/events/create')}>
+              <Button
+                className="bg-white text-indigo-700 font-semibold hover:bg-white/90 shrink-0 shadow-lg"
+                startContent={<Plus className="w-4 h-4" />}
+              >
+                {t('create_event')}
+              </Button>
+            </Link>
+          )}
         </div>
-        {isAuthenticated && (
-          <Link to={tenantPath('/events/create')}>
-            <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-              startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('create_event')}
-            </Button>
-          </Link>
-        )}
       </div>
 
       {/* Search & Time Filter */}
@@ -338,12 +372,12 @@ export function EventsPage() {
           )}
 
           {MAPS_ENABLED && (
-            <div className="flex rounded-lg overflow-hidden border border-default-200" role="group" aria-label={t('view_mode_aria')}>
+            <div className="flex rounded-xl overflow-hidden border border-white/20 bg-white/10" role="group" aria-label={t('view_mode_aria')}>
               <Button
                 isIconOnly
                 size="sm"
                 variant="light"
-                className={`rounded-none ${viewMode === 'list' ? 'bg-primary/10 text-primary' : ''}`}
+                className={`rounded-none ${viewMode === 'list' ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400' : 'text-theme-muted hover:bg-theme-hover'}`}
                 aria-label={t('view_list')}
                 aria-pressed={viewMode === 'list'}
                 onPress={() => setViewMode('list')}
@@ -354,7 +388,7 @@ export function EventsPage() {
                 isIconOnly
                 size="sm"
                 variant="light"
-                className={`rounded-none ${viewMode === 'map' ? 'bg-primary/10 text-primary' : ''}`}
+                className={`rounded-none ${viewMode === 'map' ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400' : 'text-theme-muted hover:bg-theme-hover'}`}
                 aria-label={t('view_map')}
                 aria-pressed={viewMode === 'map'}
                 onPress={() => setViewMode('map')}
@@ -378,7 +412,7 @@ export function EventsPage() {
               color={isSelected ? 'primary' : 'default'}
               className={
                 isSelected
-                  ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white cursor-pointer'
+                  ? 'bg-linear-to-r from-indigo-500 to-purple-600 text-white cursor-pointer'
                   : 'bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover'
               }
               startContent={<IconComp className="w-3.5 h-3.5" aria-hidden="true" />}
@@ -398,7 +432,7 @@ export function EventsPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadEvents()}
           >
@@ -447,7 +481,7 @@ export function EventsPage() {
               action={
                 isAuthenticated && (
                   <Link to={tenantPath('/events/create')}>
-                    <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+                    <Button className="bg-linear-to-r from-indigo-500 to-purple-600 text-white">
                       {t('create_event')}
                     </Button>
                   </Link>
@@ -466,10 +500,10 @@ export function EventsPage() {
               })}
               renderInfoContent={(e) => (
                 <div className="p-2 max-w-[250px]">
-                  <h4 className="font-semibold text-sm text-gray-900">{e.title}</h4>
-                  {e.location && <p className="text-xs text-gray-500 mt-0.5">{e.location}</p>}
-                  <p className="text-xs text-gray-600 mt-1">
-                    {new Date(e.start_date).toLocaleDateString()}
+                  <h4 className="font-semibold text-sm text-theme-primary">{e.title}</h4>
+                  {e.location && <p className="text-xs text-theme-muted mt-0.5">{e.location}</p>}
+                  <p className="text-xs text-theme-muted mt-1">
+                    {formatDateValue(e.start_date)}
                   </p>
                 </div>
               )}
@@ -477,7 +511,13 @@ export function EventsPage() {
               emptyMessage={t('no_location')}
             />
           ) : (
-            <div className="space-y-8">
+            <motion.div
+              key={debouncedQuery + filter + selectedCategory}
+              className="space-y-8"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
               {Object.entries(groupedEvents).map(([month, monthEvents]) => (
                 <section key={month} aria-label={t('events_in_month', 'Events in {{month}}', { month })}>
                   <h2 className="text-lg font-semibold text-theme-secondary mb-4 flex items-center gap-2">
@@ -488,9 +528,7 @@ export function EventsPage() {
                     {monthEvents.map((event) => (
                       <motion.div
                         key={event.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
+                        variants={itemVariants}
                       >
                         <EventCard event={event} />
                       </motion.div>
@@ -501,18 +539,38 @@ export function EventsPage() {
 
               {/* Load More Button */}
               {hasMore && (
-                <div className="pt-4 text-center">
-                  <Button
-                    variant="flat"
-                    className="bg-theme-elevated text-theme-muted"
-                    onPress={loadMoreEvents}
-                    isLoading={isLoadingMore}
-                  >
-                    {t('load_more')}
-                  </Button>
+                <div className="space-y-3 pt-4">
+                  {totalCount != null && totalCount > 0 && (
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-xs text-theme-muted px-1">
+                        <span>{events.length.toLocaleString()} / {totalCount.toLocaleString()}</span>
+                        <span className="font-medium text-theme-secondary">{Math.round((events.length / totalCount) * 100)}%</span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-theme-elevated overflow-hidden">
+                        <motion.div
+                          className="h-full rounded-full bg-linear-to-r from-indigo-500 to-purple-600"
+                          initial={{ width: '0%' }}
+                          animate={{ width: `${Math.round((events.length / totalCount) * 100)}%` }}
+                          transition={{ duration: 0.6, ease: 'easeOut' }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <div className="text-center">
+                    <Button
+                      variant="flat"
+                      className="bg-theme-elevated text-theme-muted hover:bg-theme-hover"
+                      onPress={loadMoreEvents}
+                      isLoading={isLoadingMore}
+                    >
+                      {totalCount != null && totalCount > events.length
+                        ? t('load_more_count', 'Load more ({{remaining}} remaining)', { remaining: (totalCount - events.length).toLocaleString() })
+                        : t('load_more')}
+                    </Button>
+                  </div>
                 </div>
               )}
-            </div>
+            </motion.div>
           )}
         </>
       )}
@@ -530,9 +588,13 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
   const startDate = new Date(event.start_date);
   const isPast = startDate < new Date();
   const isCancelled = event.status === 'cancelled';
+  const eventDateLabel = formatDateValue(startDate);
+  const monthLabel = formatMonthShort(startDate, true);
+  const weekdayLabel = formatDateValue(startDate, { weekday: 'short' });
+  const timeLabel = formatDateTime(startDate, { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <Link to={tenantPath(`/events/${event.id}`)} aria-label={`${event.title} on ${startDate.toLocaleDateString()}`}>
+    <Link to={tenantPath(`/events/${event.id}`)} aria-label={`${event.title} on ${eventDateLabel}`}>
       <article>
         <GlassCard className={`p-5 hover:scale-[1.01] transition-transform ${isPast || isCancelled ? 'opacity-60' : ''}`}>
           <div className="flex gap-3 sm:gap-4">
@@ -540,13 +602,13 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
             <div className="flex-shrink-0 w-14 sm:w-16 text-center">
               <time dateTime={event.start_date} className="block bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-lg p-2">
                 <span className="text-amber-400 text-xs font-medium uppercase block">
-                  {startDate.toLocaleString('default', { month: 'short' })}
+                  {monthLabel}
                 </span>
                 <span className="text-theme-primary text-xl sm:text-2xl font-bold block">
                   {startDate.getDate()}
                 </span>
                 <span className="text-theme-subtle text-xs block">
-                  {startDate.toLocaleString('default', { weekday: 'short' })}
+                  {weekdayLabel}
                 </span>
               </time>
             </div>
@@ -573,7 +635,7 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
                 <span className="flex items-center gap-1">
                   <Clock className="w-4 h-4" aria-hidden="true" />
                   <time dateTime={event.start_date}>
-                    {startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {timeLabel}
                   </time>
                 </span>
                 {event.location && (
