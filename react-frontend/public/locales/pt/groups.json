@@ -387,5 +387,7 @@
     "create": {
       "title": "Create Group"
     }
-  }
+  },
+  "count_pill": "{{count}} grupos",
+  "load_more_count": "Carregar mais ({{remaining}} restantes)"
 }

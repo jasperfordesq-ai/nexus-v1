@@ -387,5 +387,7 @@
       "title": "Groep Aanmaken"
     }
   },
-  "page_title": "Groups"
+  "page_title": "Groups",
+  "count_pill": "{{count}} groepen",
+  "load_more_count": "Meer laden ({{remaining}} resterend)"
 }

@@ -387,5 +387,7 @@
     "create": {
       "title": "Create Group"
     }
-  }
+  },
+  "count_pill": "{{count}} グループ",
+  "load_more_count": "さらに読み込む (残り {{remaining}} 件)"
 }

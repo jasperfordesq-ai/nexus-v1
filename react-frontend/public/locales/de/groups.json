@@ -387,5 +387,7 @@
       "title": "Gruppe erstellen"
     }
   },
-  "page_title": "Groups"
+  "page_title": "Groups",
+  "count_pill": "{{count}} Gruppen",
+  "load_more_count": "Mehr laden ({{remaining}} verbleibend)"
 }

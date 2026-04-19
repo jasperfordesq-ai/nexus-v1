@@ -272,7 +272,9 @@
     "verified_member": "Verified member",
     "community_rank_score_tooltip": "CommunityRank score",
     "rating_aria": "Rating: {{rating}} out of 5",
-    "hours_exchanged_aria": "{{count}} hours exchanged"
+    "hours_exchanged_aria": "{{count}} hours exchanged",
+    "my_profile": "マイプロフィール",
+    "load_more_count": "さらに読み込む (残り {{remaining}} 件)"
   },
   "update_banner": {
     "message": "新しいバージョンが利用可能です。",

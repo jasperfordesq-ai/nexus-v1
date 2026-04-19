@@ -387,5 +387,7 @@
     "create": {
       "title": "Create Group"
     }
-  }
+  },
+  "count_pill": "{{count}} grúpa",
+  "load_more_count": "Lódáil tuilleadh ({{remaining}} fágtha)"
 }

@@ -387,5 +387,7 @@
       "title": "إنشاء مجموعة"
     }
   },
-  "page_title": "Groups"
+  "page_title": "Groups",
+  "count_pill": "{{count}} مجموعة",
+  "load_more_count": "تحميل المزيد (يتبقى {{remaining}})"
 }

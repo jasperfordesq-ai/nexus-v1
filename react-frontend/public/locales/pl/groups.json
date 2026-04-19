@@ -387,5 +387,7 @@
       "title": "Utwórz grupę"
     }
   },
-  "page_title": "Groups"
+  "page_title": "Groups",
+  "count_pill": "{{count}} grup",
+  "load_more_count": "Załaduj więcej ({{remaining}} pozostało)"
 }

@@ -251,5 +251,7 @@
     "create": {
       "title": "Create Event"
     }
-  }
+  },
+  "count_pill": "{{count}} events",
+  "load_more_count": "Load more ({{remaining}} remaining)"
 }

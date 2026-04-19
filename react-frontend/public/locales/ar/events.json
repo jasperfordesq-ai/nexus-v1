@@ -251,5 +251,7 @@
   "radius_25": "25 km",
   "radius_50": "50 km",
   "radius_100": "100 km",
-  "nearby_error": "Unable to load nearby events"
+  "nearby_error": "Unable to load nearby events",
+  "count_pill": "{{count}} فعالية",
+  "load_more_count": "تحميل المزيد (يتبقى {{remaining}})"
 }
