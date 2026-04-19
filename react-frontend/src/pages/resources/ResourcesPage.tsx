@@ -537,25 +537,30 @@ export function ResourcesPage() {
   return (
     <div className="space-y-6">
       <PageMeta title={t('page_title', { defaultValue: 'Resources' })} description={t('page_description', { defaultValue: 'Community resources, documents, and guides.' })} />
-      {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <FolderOpen className="w-7 h-7 text-amber-400" aria-hidden="true" />
-            {t('resources.heading')}
-          </h1>
-          <p className="text-theme-muted mt-1">{t('resources.subtitle')}</p>
+      {/* Hero Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-amber-500 via-orange-500 to-yellow-500 p-6 sm:p-8">
+        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                <FolderOpen className="w-6 h-6 text-white" aria-hidden="true" />
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('resources.heading')}</h1>
+            </div>
+            <p className="text-white/80 text-sm">{t('resources.subtitle')}</p>
+          </div>
+          {isAuthenticated && (
+            <Button
+              className="bg-white text-amber-700 font-semibold hover:bg-white/90 shrink-0 shadow-lg"
+              startContent={<Upload className="w-4 h-4" aria-hidden="true" />}
+              onPress={uploadModal.onOpen}
+            >
+              {t('resources.upload_resource')}
+            </Button>
+          )}
         </div>
-
-        {isAuthenticated && (
-          <Button
-            className="bg-gradient-to-r from-amber-500 to-orange-600 text-white"
-            startContent={<Upload className="w-4 h-4" aria-hidden="true" />}
-            onPress={uploadModal.onOpen}
-          >
-            {t('resources.upload_resource')}
-          </Button>
-        )}
       </div>
 
       {/* Search & Admin Controls */}
@@ -580,7 +585,7 @@ export function ResourcesPage() {
             <Button
               size="sm"
               variant={isReordering ? 'solid' : 'flat'}
-              className={isReordering ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+              className={isReordering ? 'bg-linear-to-r from-amber-500 to-orange-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               startContent={<GripVertical className="w-3.5 h-3.5" aria-hidden="true" />}
               onPress={() => setIsReordering(!isReordering)}
             >
@@ -594,7 +599,7 @@ export function ResourcesPage() {
               <Button
                 size="sm"
                 variant={!selectedCategory ? 'solid' : 'flat'}
-                className={!selectedCategory ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+                className={!selectedCategory ? 'bg-linear-to-r from-amber-500 to-orange-600 text-white' : 'bg-theme-elevated text-theme-muted'}
                 onPress={() => setSelectedCategory(null)}
               >
                 {t('resources.filter_all')}
@@ -606,7 +611,7 @@ export function ResourcesPage() {
                   variant={selectedCategory === cat.id ? 'solid' : 'flat'}
                   className={
                     selectedCategory === cat.id
-                      ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
+                      ? 'bg-linear-to-r from-amber-500 to-orange-600 text-white'
                       : 'bg-theme-elevated text-theme-muted'
                   }
                   onPress={() => setSelectedCategory(cat.id)}
@@ -677,7 +682,7 @@ export function ResourcesPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('resources.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-amber-500 to-orange-600 text-white"
+            className="bg-linear-to-r from-amber-500 to-orange-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadResources()}
           >
@@ -1052,7 +1057,7 @@ export function ResourcesPage() {
                     value={uploadProgress}
                     className="w-full"
                     classNames={{
-                      indicator: 'bg-gradient-to-r from-amber-500 to-orange-600',
+                      indicator: 'bg-linear-to-r from-amber-500 to-orange-600',
                       track: 'bg-theme-elevated',
                     }}
                     aria-label={t('resources.aria_upload_progress', 'Upload progress')}
@@ -1077,7 +1082,7 @@ export function ResourcesPage() {
               {t('resources.cancel')}
             </Button>
             <Button
-              className="bg-gradient-to-r from-amber-500 to-orange-600 text-white"
+              className="bg-linear-to-r from-amber-500 to-orange-600 text-white"
               startContent={!isUploading ? <Upload className="w-4 h-4" aria-hidden="true" /> : undefined}
               onPress={handleUploadSubmit}
               isLoading={isUploading}

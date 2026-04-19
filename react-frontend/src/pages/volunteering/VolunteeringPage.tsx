@@ -217,44 +217,50 @@ export function VolunteeringPage() {
         description={t('page_description', { defaultValue: 'Discover volunteering opportunities in your community.' })}
       />
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <Heart className="w-7 h-7 text-rose-400" aria-hidden="true" />
-            {t('heading')}
-          </h1>
-          <p className="text-theme-muted mt-1">{t('subtitle')}</p>
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          {hasApprovedOrg && (
-            <Link to={tenantPath('/volunteering/create')}>
+      {/* Hero Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-rose-600 via-pink-500 to-fuchsia-500 p-6 sm:p-8">
+        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                <Heart className="w-6 h-6 text-white" aria-hidden="true" />
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('heading')}</h1>
+            </div>
+            <p className="text-white/80 text-sm">{t('subtitle')}</p>
+          </div>
+          <div className="flex gap-2 flex-wrap shrink-0">
+            {hasApprovedOrg && (
+              <Link to={tenantPath('/volunteering/create')}>
+                <Button
+                  className="bg-white text-rose-700 font-semibold hover:bg-white/90 shadow-lg"
+                  startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+                >
+                  {t('post_opportunity')}
+                </Button>
+              </Link>
+            )}
+            {hasApprovedOrg && (
+              <Link to={tenantPath('/volunteering/my-organisations')}>
+                <Button
+                  className="bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm"
+                  startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
+                >
+                  {t('my_organisations', 'My Organisations')}
+                </Button>
+              </Link>
+            )}
+            <Link to={tenantPath('/organisations')}>
               <Button
-                className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
-                startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+                className="bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm"
+                startContent={<Globe className="w-4 h-4" aria-hidden="true" />}
               >
-                {t('post_opportunity')}
+                {t('browse_organisations', 'Browse Organisations')}
               </Button>
             </Link>
-          )}
-          {hasApprovedOrg && (
-            <Link to={tenantPath('/volunteering/my-organisations')}>
-              <Button
-                className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
-                startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
-              >
-                {t('my_organisations', 'My Organisations')}
-              </Button>
-            </Link>
-          )}
-          <Link to={tenantPath('/organisations')}>
-            <Button
-              className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
-              startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('browse_organisations')}
-            </Button>
-          </Link>
+          </div>
         </div>
       </div>
 
@@ -297,7 +303,7 @@ export function VolunteeringPage() {
                   id={`vol-tab-${key}`}
                   aria-selected={tab === key}
                   variant={tab === key ? 'solid' : 'flat'}
-                  className={tab === key ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+                  className={tab === key ? 'bg-linear-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
                   onPress={() => setTab(key)}
                   startContent={<Icon className="w-4 h-4" aria-hidden="true" />}
                 >
@@ -472,7 +478,7 @@ function OpportunitiesTab() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load_opportunities')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+            className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadOpportunities()}
           >
@@ -557,7 +563,7 @@ function OpportunitiesTab() {
           <ModalFooter>
             <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('cancel')}</Button>
             <Button
-              className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+              className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
               onPress={handleApply}
               isLoading={isApplying}
             >
@@ -670,7 +676,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
           {onApply && (
             <Button
               size="sm"
-              className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+              className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
               onPress={onApply}
               endContent={<Send className="w-4 h-4" aria-hidden="true" />}
             >
@@ -798,7 +804,7 @@ function ApplicationsTab() {
             key={s}
             size="sm"
             variant={statusFilter === s ? 'solid' : 'flat'}
-            className={statusFilter === s ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+            className={statusFilter === s ? 'bg-linear-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
             onPress={() => setStatusFilter(s)}
           >
             {s ? t('status_' + s) : t('filter_all')}
@@ -812,7 +818,7 @@ function ApplicationsTab() {
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+            className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadApplications()}
           >
@@ -1033,7 +1039,7 @@ function HoursTab() {
       {/* Log Hours Button */}
       <div className="flex justify-end">
         <Button
-          className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+          className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           onPress={onOpen}
         >
@@ -1047,7 +1053,7 @@ function HoursTab() {
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+            className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadSummary()}
           >
@@ -1119,7 +1125,7 @@ function HoursTab() {
                   <Progress
                     value={(totalHours / (Math.ceil(totalHours / 50) * 50)) * 100}
                     classNames={{
-                      indicator: 'bg-gradient-to-r from-rose-500 to-pink-600',
+                      indicator: 'bg-linear-to-r from-rose-500 to-pink-600',
                       track: 'bg-theme-hover',
                     }}
                     size="md"
@@ -1173,7 +1179,7 @@ function HoursTab() {
                   description={t('no_hours_description')}
                   action={
                     <Button
-                      className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+                      className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
                       onPress={onOpen}
                     >
                       {t('log_hours')}
@@ -1246,7 +1252,7 @@ function HoursTab() {
           <ModalFooter>
             <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('cancel')}</Button>
             <Button
-              className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+              className="bg-linear-to-r from-rose-500 to-pink-600 text-white"
               onPress={handleLogHours}
               isLoading={isLogging}
               isDisabled={!logForm.hours || !logForm.date || !logForm.organization_id}

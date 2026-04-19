@@ -287,7 +287,7 @@ export function JobsPage() {
   if (!hasFeature('job_vacancies')) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 py-16 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 flex items-center justify-center mb-4">
+        <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 flex items-center justify-center mb-4">
           <Briefcase className="w-8 h-8 text-blue-500" aria-hidden="true" />
         </div>
         <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">{t('feature_not_available', 'Jobs Not Available')}</h2>
@@ -314,22 +314,26 @@ export function JobsPage() {
   return (
     <div className="space-y-6">
       <PageMeta title={t('page_title', { defaultValue: 'Job Vacancies' })} description={t('page_description', { defaultValue: 'Find job opportunities, volunteering positions, and timebank roles.' })} />
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <Briefcase className="w-7 h-7 text-blue-400" aria-hidden="true" />
-            {t('title')}
-          </h1>
-          <p className="text-theme-muted mt-1">{t('subtitle')}</p>
-        </div>
-        <div className="flex gap-2">
+      {/* Hero Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-600 via-indigo-500 to-violet-500 p-6 sm:p-8">
+        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                <Briefcase className="w-6 h-6 text-white" aria-hidden="true" />
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('title')}</h1>
+            </div>
+            <p className="text-white/80 text-sm">{t('subtitle')}</p>
+          </div>
           {isAuthenticated && (
-            <>
+            <div className="flex gap-2 flex-wrap shrink-0">
               <Link to={tenantPath('/jobs/my-applications')}>
                 <Button
                   variant="flat"
-                  className="bg-theme-elevated text-theme-muted"
+                  className="bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm"
                   startContent={<FileText className="w-4 h-4" aria-hidden="true" />}
                 >
                   {t('my_applications.title')}
@@ -338,7 +342,7 @@ export function JobsPage() {
               <Link to={tenantPath('/jobs/alerts')}>
                 <Button
                   variant="flat"
-                  className="bg-theme-elevated text-theme-muted"
+                  className="bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm"
                   startContent={<Bell className="w-4 h-4" aria-hidden="true" />}
                 >
                   {t('alerts.title')}
@@ -346,13 +350,13 @@ export function JobsPage() {
               </Link>
               <Link to={tenantPath('/jobs/create')}>
                 <Button
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                  className="bg-white text-blue-700 font-semibold hover:bg-white/90 shadow-lg"
                   startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                 >
                   {t('create_vacancy')}
                 </Button>
               </Link>
-            </>
+            </div>
           )}
         </div>
       </div>
@@ -406,7 +410,7 @@ export function JobsPage() {
 
       {/* Employer onboarding banner for first-time posters */}
       {isAuthenticated && activeTab === 'browse' && myPostings.length === 0 && !isLoadingMyPostings && (
-        <GlassCard className="p-4 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
+        <GlassCard className="p-4 bg-linear-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
@@ -420,7 +424,7 @@ export function JobsPage() {
             <Link to={tenantPath('/jobs/employer-onboarding')}>
               <Button
                 size="sm"
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
                 startContent={<Rocket className="w-3.5 h-3.5" aria-hidden="true" />}
               >
                 {t('onboarding.start_wizard')}
@@ -491,7 +495,7 @@ export function JobsPage() {
                   color={isSelected ? 'primary' : 'default'}
                   className={
                     isSelected
-                      ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white cursor-pointer'
+                      ? 'bg-linear-to-r from-indigo-500 to-purple-600 text-white cursor-pointer'
                       : 'bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover'
                   }
                   startContent={<IconComp className="w-3.5 h-3.5" aria-hidden="true" />}
@@ -515,7 +519,7 @@ export function JobsPage() {
                   color={isSelected ? 'secondary' : 'default'}
                   className={
                     isSelected
-                      ? 'bg-gradient-to-r from-violet-500 to-fuchsia-600 text-white cursor-pointer'
+                      ? 'bg-linear-to-r from-violet-500 to-fuchsia-600 text-white cursor-pointer'
                       : 'bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover'
                   }
                   onClick={() => setSelectedCommitment(filter.id)}
@@ -534,7 +538,7 @@ export function JobsPage() {
               <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
               <p className="text-theme-muted mb-4">{error}</p>
               <Button
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
                 startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
                 onPress={() => loadVacancies()}
               >
@@ -568,7 +572,7 @@ export function JobsPage() {
                   action={
                     isAuthenticated && (
                       <Link to={tenantPath('/jobs/create')}>
-                        <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+                        <Button className="bg-linear-to-r from-indigo-500 to-purple-600 text-white">
                           {t('create_vacancy')}
                         </Button>
                       </Link>
@@ -655,7 +659,7 @@ export function JobsPage() {
           <div className="flex justify-end">
             <Link to={tenantPath('/jobs/create')}>
               <Button
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
                 startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
               >
                 {t('create_vacancy')}
@@ -683,7 +687,7 @@ export function JobsPage() {
               description={t('my_postings.empty_description', 'Post a vacancy to start receiving applications from your community.')}
               action={
                 <Link to={tenantPath('/jobs/create')}>
-                  <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+                  <Button className="bg-linear-to-r from-indigo-500 to-purple-600 text-white">
                     {t('create_vacancy')}
                   </Button>
                 </Link>
@@ -767,11 +771,11 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
   return (
     <Link to={tenantPath(`/jobs/${vacancy.id}`)} aria-label={vacancy.title}>
       <article>
-        <GlassCard className={`p-5 hover:scale-[1.01] transition-transform ${vacancy.is_featured ? 'ring-2 ring-warning/50 bg-gradient-to-r from-amber-500/5 to-orange-500/5' : ''}`}>
+        <GlassCard className={`p-5 hover:scale-[1.01] transition-transform ${vacancy.is_featured ? 'ring-2 ring-warning/50 bg-linear-to-r from-amber-500/5 to-orange-500/5' : ''}`}>
           <div className="flex gap-3 sm:gap-4">
             {/* Icon */}
             <div className="flex-shrink-0">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center relative">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-linear-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center relative">
                 <Briefcase className="w-6 h-6 text-blue-400" aria-hidden="true" />
                 {/* J10: Featured star */}
                 {vacancy.is_featured && (
@@ -910,7 +914,7 @@ const MyPostingCard = memo(function MyPostingCard({ vacancy }: MyPostingCardProp
       <div className="flex gap-3 sm:gap-4">
         {/* Icon */}
         <div className="flex-shrink-0">
-          <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-lg bg-linear-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
             <Briefcase className="w-6 h-6 text-indigo-400" aria-hidden="true" />
           </div>
         </div>

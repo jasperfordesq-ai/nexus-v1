@@ -276,27 +276,31 @@ export function MarketplacePage() {
       />
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <ShoppingBag className="w-7 h-7 text-primary" />
-              {t('page_title', 'Marketplace')}
-            </h1>
-            <p className="text-default-500 text-sm mt-1">
-              {t('hub.subtitle', 'Buy, sell, and trade items in your community')}
-            </p>
+        {/* Hero Banner */}
+        <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-teal-600 via-cyan-500 to-blue-500 p-6 sm:p-8">
+          <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+          <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+          <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                  <ShoppingBag className="w-6 h-6 text-white" aria-hidden="true" />
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('page_title', 'Marketplace')}</h1>
+              </div>
+              <p className="text-white/80 text-sm">{t('hub.subtitle', 'Buy, sell, and trade items in your community')}</p>
+            </div>
+            {isAuthenticated && (
+              <Button
+                as={Link}
+                to={tenantPath('/marketplace/sell')}
+                className="bg-white text-teal-700 font-semibold hover:bg-white/90 shrink-0 shadow-lg"
+                startContent={<Plus className="w-4 h-4" />}
+              >
+                {t('hub.sell_something', 'Sell Something')}
+              </Button>
+            )}
           </div>
-          {isAuthenticated && (
-            <Button
-              as={Link}
-              to={tenantPath('/marketplace/sell')}
-              color="primary"
-              startContent={<Plus className="w-4 h-4" />}
-            >
-              {t('hub.sell_something', 'Sell Something')}
-            </Button>
-          )}
         </div>
 
         {/* Search bar */}
@@ -305,10 +309,10 @@ export function MarketplacePage() {
             placeholder={t('hub.search_placeholder', 'Search marketplace...')}
             value={searchQuery}
             onValueChange={setSearchQuery}
-            startContent={<Search className="w-4 h-4 text-default-400" />}
+            startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             size="lg"
             variant="bordered"
-            classNames={{ inputWrapper: 'bg-background' }}
+            classNames={{ inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover', input: 'text-theme-primary placeholder:text-theme-subtle' }}
             isClearable
             onClear={() => setSearchQuery('')}
           />
@@ -330,7 +334,7 @@ export function MarketplacePage() {
             {/* Featured listings */}
             {featuredListings.length > 0 && !debouncedQuery && selectedCategoryId == null && (
               <div className="mb-8">
-                <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
                   <Star className="w-5 h-5 text-warning" />
                   {t('hub.featured_listings', 'Featured Listings')}
                 </h2>
@@ -369,7 +373,7 @@ export function MarketplacePage() {
               />
             ) : (
               <>
-                <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
                   <Grid3X3 className="w-5 h-5 text-default-400" />
                   {debouncedQuery || selectedCategoryId != null ? t('hub.search_results', 'Search Results') : t('hub.latest_listings', 'Latest Listings')}
                 </h2>
@@ -402,8 +406,8 @@ export function MarketplacePage() {
             {isAuthenticated && (
               <GlassCard className="p-5 text-center space-y-3">
                 <ShoppingBag className="w-10 h-10 text-primary mx-auto" />
-                <h3 className="font-semibold text-foreground">{t('hub.sidebar_cta_title', 'Got something to sell?')}</h3>
-                <p className="text-sm text-default-500">
+                <h3 className="font-semibold text-theme-primary">{t('hub.sidebar_cta_title', 'Got something to sell?')}</h3>
+                <p className="text-sm text-theme-muted">
                   {t('hub.sidebar_cta_description', 'List your items and reach your community.')}
                 </p>
                 <Button
@@ -421,7 +425,7 @@ export function MarketplacePage() {
             {/* Categories list */}
             {apiCategories.length > 0 && (
               <GlassCard className="p-5">
-                <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                <h3 className="font-semibold text-theme-primary mb-3 flex items-center gap-2">
                   <Tag className="w-4 h-4 text-primary" />
                   {t('hub.categories', 'Categories')}
                 </h3>
@@ -432,7 +436,7 @@ export function MarketplacePage() {
                       to={tenantPath(`/marketplace/category/${cat.slug}`)}
                       className="flex items-center justify-between py-2 px-2 rounded-lg hover:bg-default-100 transition-colors text-sm group"
                     >
-                      <span className="text-foreground group-hover:text-primary transition-colors">
+                      <span className="text-theme-primary group-hover:text-primary transition-colors">
                         {cat.name}
                       </span>
                       <div className="flex items-center gap-1">
@@ -447,7 +451,7 @@ export function MarketplacePage() {
 
             {/* Quick links */}
             <GlassCard className="p-5">
-              <h3 className="font-semibold text-foreground mb-3">{t('hub.quick_links', 'Quick Links')}</h3>
+              <h3 className="font-semibold text-theme-primary mb-3">{t('hub.quick_links', 'Quick Links')}</h3>
               <div className="space-y-2">
                 <Link
                   to={tenantPath('/marketplace/search')}
