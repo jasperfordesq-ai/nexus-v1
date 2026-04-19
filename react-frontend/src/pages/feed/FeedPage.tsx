@@ -750,30 +750,33 @@ export function FeedPage() {
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <Newspaper className="w-5 h-5 text-white" aria-hidden="true" />
+      {/* Hero Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500 p-5 sm:p-6">
+        <div className="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="absolute -left-3 -top-3 w-24 h-24 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="relative flex items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-1.5">
+              <div className="p-1.5 bg-white/20 rounded-xl backdrop-blur-sm">
+                <Newspaper className="w-5 h-5 text-white" aria-hidden="true" />
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold text-white">{t('title')}</h1>
             </div>
-            {t('title')}
-          </h1>
-          <div className="flex items-center gap-2 mt-1">
-            <p className="text-[var(--text-muted)] text-sm">{t('subtitle')}</p>
-            <AlgorithmLabel area="feed" />
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-white/80 text-sm">{t('subtitle')}</p>
+              <AlgorithmLabel area="feed" />
+            </div>
           </div>
+          {isAuthenticated && (
+            <Button
+              className="hidden sm:flex bg-white text-indigo-700 font-semibold hover:bg-white/90 shrink-0 shadow-lg"
+              startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+              onPress={() => openCompose('post')}
+            >
+              {t('new_post')}
+            </Button>
+          )}
         </div>
-
-        {isAuthenticated && (
-          <Button
-            className="hidden sm:flex bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
-            startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-            onPress={() => openCompose('post')}
-          >
-            {t('new_post')}
-          </Button>
-        )}
       </div>
 
       {/* Feed Mode Toggle (For You / Recent) */}
@@ -854,7 +857,7 @@ export function FeedPage() {
             className={
               filter === opt.key
                 ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/20'
-                : 'bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border-default)]'
+                : 'bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:text-indigo-500 hover:bg-indigo-500/5 border border-[var(--border-default)] transition-colors'
             }
             onPress={() => { setFilter(opt.key); syncToUrl({ filter: opt.key }); }}
           >
@@ -947,10 +950,10 @@ export function FeedPage() {
             </GlassCard>
           ) : (
             <div className="space-y-4">
-              <AnimatePresence initial={false}>
+              <AnimatePresence>
                 {items.map((item, index) => (
                   <React.Fragment key={`${item.type}-${item.id}`}>
-                    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0, overflow: 'hidden' }} transition={{ duration: 0.25 }}>
+                    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0, overflow: 'hidden' }} transition={{ duration: 0.25, delay: Math.min(index * 0.04, 0.4) }}>
                       <FeedCard
                         item={item}
                         onToggleLike={handleToggleLike}
@@ -984,8 +987,12 @@ export function FeedPage() {
 
               {/* End-of-feed message */}
               {!hasMore && items.length > 0 && !isLoading && (
-                <div className="text-center py-8 text-[var(--text-muted)] text-sm">
-                  {t('feed.end_of_feed')}
+                <div className="text-center py-10">
+                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--surface-elevated)] text-[var(--text-muted)] text-sm border border-[var(--border-default)]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400/60" aria-hidden="true" />
+                    {t('feed.end_of_feed')}
+                    <span className="w-1.5 h-1.5 rounded-full bg-purple-400/60" aria-hidden="true" />
+                  </span>
                 </div>
               )}
 
