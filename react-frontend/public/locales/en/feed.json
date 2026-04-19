@@ -295,8 +295,14 @@
     "expiry_past": "Poll expiry date must be in the future.",
     "min_options_hint": "At least 2 options are required.",
     "closed": "Closed",
+    "closes_minutes": "Closes in {{minutes}}m",
     "closes_hours": "Closes in {{hours}}h",
-    "closes_days": "Closes in {{days}}d"
+    "closes_days": "Closes in {{days}}d",
+    "live": "Live",
+    "view_full": "View full poll",
+    "vote_to_see_results": "Vote to see results",
+    "results_hidden_until_close": "Results revealed when poll closes",
+    "your_vote": "Your vote"
   },
   "feed": {
     "end_of_feed": "You're all caught up!"

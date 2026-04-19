@@ -1170,87 +1170,162 @@ const FeedCard = React.memo(function FeedCard({
         {item.type === 'poll' && (
           <div className="mb-4">
             {isLoadingPoll ? (
-              <div className="space-y-2.5">
-                <Skeleton className="h-5 w-2/3 rounded-lg" />
-                {[1, 2, 3].map((i) => (
-                  <Skeleton key={i} className="h-11 w-full rounded-xl" />
-                ))}
+              <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-elevated)] overflow-hidden">
+                <div className="h-1 bg-gradient-to-r from-amber-500/40 via-orange-500/40 to-amber-500/40" />
+                <div className="p-5 space-y-3">
+                  <Skeleton className="h-6 w-3/4 rounded-lg" />
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-12 w-full rounded-xl" />
+                  ))}
+                </div>
               </div>
             ) : pollLoadError ? (
-              <p className="text-sm text-[var(--text-muted)] py-2">{t('poll.load_failed')}</p>
+              <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-elevated)] p-5 text-center">
+                <BarChart3 className="w-8 h-8 mx-auto mb-2 text-[var(--text-subtle)]" aria-hidden="true" />
+                <p className="text-sm text-[var(--text-muted)]">{t('poll.load_failed')}</p>
+              </div>
             ) : pollData ? (
               (() => {
                 const now = new Date();
                 const pollExpired = !!(pollData.expires_at && new Date(pollData.expires_at) < now);
                 const hasVoted = pollData.user_vote_option_id !== null;
+                const showResults = hasVoted || pollExpired;
+                const totalVotes = pollData.total_votes ?? 0;
+                // Backend hides per-option counts on OPEN polls for non-creators
+                // (prevents results from influencing remaining voters). In that case
+                // total_votes is null even though the user has voted.
+                const resultsHidden = showResults && pollData.total_votes == null;
+
+                // Identify leading option when results are visible
+                const leadingOptionId = showResults
+                  ? pollData.options.reduce<number | null>((lead, opt) => {
+                      if (opt.percentage == null) return lead;
+                      const leadOpt = pollData.options.find((o) => o.id === lead);
+                      const leadPct = leadOpt?.percentage ?? -1;
+                      return opt.percentage > leadPct ? opt.id : lead;
+                    }, pollData.options[0]?.id ?? null)
+                  : null;
 
                 const timeRemaining = (() => {
                   if (!pollData.expires_at || pollExpired) return null;
                   const ms = new Date(pollData.expires_at).getTime() - now.getTime();
                   const hours = Math.floor(ms / 3600000);
+                  const minutes = Math.floor(ms / 60000);
+                  if (minutes < 60) return t('poll.closes_minutes', `Closes in ${minutes}m`, { minutes });
                   if (hours < 24) return t('poll.closes_hours', `Closes in ${hours}h`, { hours });
                   const days = Math.floor(hours / 24);
                   return t('poll.closes_days', `Closes in ${days}d`, { days });
                 })();
 
+                const pollDetailPath = tenantPath('/polls');
+
                 return (
-                  <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-elevated)] overflow-hidden">
-                    {/* Poll header */}
-                    <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-[var(--border-subtle)]">
-                      <div className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-muted)]">
-                        <BarChart3 className="w-3.5 h-3.5" aria-hidden="true" />
-                        <span>{t('card.type_poll', 'Poll')}</span>
-                        {pollData.total_votes != null && (
-                          <>
-                            <span className="text-[var(--border-default)]">·</span>
-                            <span>{pollData.total_votes} {pollData.total_votes === 1 ? t('card.vote', 'vote') : t('card.votes', 'votes')}</span>
-                          </>
+                  <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-elevated)] overflow-hidden shadow-sm">
+                    {/* Gradient accent bar */}
+                    <div className={`h-1 bg-gradient-to-r ${pollExpired ? 'from-gray-400/30 to-gray-500/30' : 'from-amber-500 via-orange-500 to-amber-500'}`} />
+
+                    {/* Header: pill + status */}
+                    <div className="flex items-center justify-between gap-2 px-5 pt-4">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500/15 to-orange-500/15 border border-amber-500/20">
+                          <BarChart3 className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+                          <span className="text-[11px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">
+                            {t('card.type_poll', 'Poll')}
+                          </span>
+                        </div>
+                        {!pollExpired && (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                            <span className="relative flex h-1.5 w-1.5">
+                              <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-60 animate-ping" />
+                              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                            </span>
+                            {t('poll.live', 'Live')}
+                          </span>
                         )}
                       </div>
                       {pollExpired ? (
-                        <span className="text-xs font-medium text-[var(--text-muted)] bg-[var(--surface-hover)] px-2 py-0.5 rounded-full flex items-center gap-1">
-                          <Clock className="w-3 h-3" aria-hidden="true" />
+                        <Chip size="sm" variant="flat" color="default" startContent={<Clock className="w-3 h-3" />} className="h-6 text-[11px]">
                           {t('poll.closed', 'Closed')}
-                        </span>
+                        </Chip>
                       ) : timeRemaining ? (
-                        <span className="text-xs text-[var(--color-primary)] flex items-center gap-1">
-                          <Clock className="w-3 h-3" aria-hidden="true" />
+                        <Chip size="sm" variant="flat" color="warning" startContent={<Clock className="w-3 h-3" />} className="h-6 text-[11px]">
                           {timeRemaining}
-                        </span>
+                        </Chip>
                       ) : null}
                     </div>
 
+                    {/* Question */}
+                    {pollData.question && (
+                      <h3 className="px-5 pt-3 text-[15px] sm:text-base font-semibold leading-snug text-[var(--text-primary)]">
+                        {pollData.question}
+                      </h3>
+                    )}
+
                     {/* Options */}
-                    <div className="p-3 space-y-2">
+                    <div className="px-5 pt-3 pb-2 space-y-2">
                       {pollData.options.map((option) => {
                         const isVoted = pollData.user_vote_option_id === option.id;
+                        const isLeading = showResults && option.id === leadingOptionId && totalVotes > 0;
+                        const pct = option.percentage ?? 0;
 
-                        if (hasVoted || pollExpired) {
+                        if (showResults) {
                           return (
-                            <div key={option.id} className={`rounded-lg overflow-hidden border ${isVoted ? 'border-[var(--color-primary)]/40' : 'border-[var(--border-subtle)]'}`}>
-                              <div className="relative px-3 py-2.5">
-                                {/* Background fill */}
+                            <div
+                              key={option.id}
+                              className={`relative rounded-xl overflow-hidden border transition-colors ${
+                                isVoted
+                                  ? 'border-amber-500/60 bg-amber-500/5'
+                                  : isLeading
+                                    ? 'border-[var(--border-default)] bg-[var(--surface-base)]'
+                                    : 'border-[var(--border-subtle)] bg-[var(--surface-base)]'
+                              }`}
+                            >
+                              {/* Animated percentage fill (skipped when results are hidden) */}
+                              {!resultsHidden && (
                                 <div
-                                  className={`absolute inset-0 transition-all duration-500 ${isVoted ? 'bg-[var(--color-primary)]/12' : 'bg-[var(--surface-hover)]'}`}
-                                  style={{ width: `${option.percentage ?? 0}%` }}
+                                  className={`absolute inset-y-0 left-0 transition-[width] duration-700 ease-out ${
+                                    isVoted
+                                      ? 'bg-gradient-to-r from-amber-500/25 to-orange-500/20'
+                                      : isLeading
+                                        ? 'bg-[var(--surface-hover)]'
+                                        : 'bg-[var(--surface-hover)]/60'
+                                  }`}
+                                  style={{ width: `${pct}%` }}
                                   aria-hidden="true"
                                 />
-                                <div className="relative flex items-center justify-between gap-2">
-                                  <span className={`text-sm leading-snug ${isVoted ? 'font-semibold text-[var(--color-primary)]' : 'text-[var(--text-primary)]'}`}>
-                                    {isVoted && <Check className="w-3.5 h-3.5 inline me-1 -mt-0.5" aria-hidden="true" />}
+                              )}
+                              <div className="relative flex items-center justify-between gap-3 px-3.5 py-3">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  {isVoted ? (
+                                    <span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-amber-500 text-white">
+                                      <Check className="w-3 h-3" aria-hidden="true" />
+                                    </span>
+                                  ) : isLeading && !resultsHidden ? (
+                                    <TrendingUp className="w-4 h-4 flex-shrink-0 text-[var(--text-muted)]" aria-hidden="true" />
+                                  ) : (
+                                    <span className="flex-shrink-0 w-5 h-5" aria-hidden="true" />
+                                  )}
+                                  <span className={`text-sm leading-snug truncate ${(isVoted || (isLeading && !resultsHidden)) ? 'font-semibold text-[var(--text-primary)]' : 'text-[var(--text-primary)]'}`}>
                                     {option.text}
                                   </span>
+                                </div>
+                                <div className="flex flex-col items-end shrink-0">
                                   {option.percentage != null && (
-                                    <span className={`text-xs font-semibold shrink-0 ${isVoted ? 'text-[var(--color-primary)]' : 'text-[var(--text-muted)]'}`}>
+                                    <span className={`text-sm font-bold tabular-nums ${isVoted ? 'text-amber-600 dark:text-amber-400' : 'text-[var(--text-primary)]'}`}>
                                       {option.percentage}%
                                     </span>
                                   )}
+                                  {option.vote_count != null && (
+                                    <span className="text-[10px] text-[var(--text-subtle)] tabular-nums">
+                                      {option.vote_count} {option.vote_count === 1 ? t('card.vote', 'vote') : t('card.votes', 'votes')}
+                                    </span>
+                                  )}
+                                  {isVoted && resultsHidden && (
+                                    <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
+                                      {t('poll.your_vote', 'Your vote')}
+                                    </span>
+                                  )}
                                 </div>
-                                {option.vote_count != null && option.vote_count > 0 && (
-                                  <p className="relative text-xs text-[var(--text-subtle)] mt-0.5">
-                                    {option.vote_count} {option.vote_count === 1 ? t('card.vote', 'vote') : t('card.votes', 'votes')}
-                                  </p>
-                                )}
                               </div>
                             </div>
                           );
@@ -1261,12 +1336,54 @@ const FeedCard = React.memo(function FeedCard({
                             key={option.id}
                             onClick={() => handleVote(option.id)}
                             disabled={pollExpired}
-                            className="w-full text-left px-3 py-2.5 rounded-lg border border-[var(--border-default)] bg-[var(--surface-base)] hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 active:scale-[0.99] transition-all text-sm text-[var(--text-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="group relative w-full text-left px-4 py-3 rounded-xl border-2 border-[var(--border-default)] bg-[var(--surface-base)] hover:border-amber-500 hover:bg-amber-500/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-elevated)] active:scale-[0.99] transition-all text-sm font-medium text-[var(--text-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            {option.text}
+                            <span className="flex items-center justify-between gap-3">
+                              <span className="truncate">{option.text}</span>
+                              <ArrowRight className="w-4 h-4 text-[var(--text-subtle)] group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all" aria-hidden="true" />
+                            </span>
                           </button>
                         );
                       })}
+                    </div>
+
+                    {/* Footer: meta + CTA */}
+                    <div className="flex items-center justify-between gap-3 px-5 py-3 border-t border-[var(--border-subtle)] bg-[var(--surface-base)]/40">
+                      <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] min-w-0">
+                        {resultsHidden ? (
+                          <span className="inline-flex items-center gap-1.5 min-w-0">
+                            <EyeOff className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
+                            <span className="truncate">
+                              {t('poll.results_hidden_until_close', 'Results revealed when poll closes')}
+                            </span>
+                          </span>
+                        ) : pollData.total_votes == null ? (
+                          <span className="inline-flex items-center gap-1.5 min-w-0">
+                            <EyeOff className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
+                            <span className="truncate">
+                              {t('poll.vote_to_see_results', 'Vote to see results')}
+                            </span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1">
+                            <Users className="w-3.5 h-3.5" aria-hidden="true" />
+                            <span className="tabular-nums font-medium">
+                              {totalVotes} {totalVotes === 1 ? t('card.vote', 'vote') : t('card.votes', 'votes')}
+                            </span>
+                          </span>
+                        )}
+                      </div>
+                      <Button
+                        as={Link}
+                        to={pollDetailPath}
+                        size="sm"
+                        variant="flat"
+                        color="warning"
+                        endContent={<ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />}
+                        className="h-8 font-semibold"
+                      >
+                        {t('poll.view_full', 'View full poll')}
+                      </Button>
                     </div>
                   </div>
                 );
