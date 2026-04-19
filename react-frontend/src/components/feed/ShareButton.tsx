@@ -127,10 +127,11 @@ export function ShareButton({
       setLocalCount(Math.max(0, newCount));
 
       // Polymorphic toggle endpoint — single API for all shareable types.
-      // The backend treats POST with an existing share as a toggle-off, so
-      // we always send POST here; DELETE is used only for explicit unshare.
-      const endpoint = newIsShared ? api.post : api.delete;
-      const response = await endpoint('/v2/shares', { type: resolvedType, id: resolvedId });
+      // POST /v2/shares is idempotent: if a share already exists for this user+item,
+      // the backend (ShareService::toggle) removes it and returns {shared: false}.
+      // We always POST — never assign `api.post`/`api.delete` to a variable, since
+      // that loses the `this` binding and breaks `this.request` inside the method.
+      const response = await api.post('/v2/shares', { type: resolvedType, id: resolvedId });
       if (!response.success) {
         setLocalIsShared(!newIsShared);
         setLocalCount(localCount);

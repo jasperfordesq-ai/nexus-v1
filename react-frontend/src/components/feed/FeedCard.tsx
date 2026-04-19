@@ -156,7 +156,15 @@ const SHAREABLE_TYPES = new Set<FeedItem['type']>([
  * - `accentGradient` is the saturated top accent strip — matches the pattern established by the poll card redesign.
  */
 const typeConfig = {
-  post: { labelKey: null, color: 'default' as const, icon: null, softGradient: '', accentGradient: '' },
+  post: {
+    labelKey: null,
+    color: 'default' as const,
+    icon: null,
+    softGradient: '',
+    // Neutral strip on post cards — keeps every feed card visually matched
+    // without implying a "type" colour (posts have no type chip).
+    accentGradient: 'from-[var(--border-default)] via-[var(--border-subtle)] to-[var(--border-default)]',
+  },
   listing: {
     labelKey: 'card.type_listing',
     color: 'primary' as const,
@@ -789,8 +797,12 @@ const FeedCard = React.memo(function FeedCard({
       {/* Confetti celebration overlay for milestones */}
       <ConfettiCelebration show={showConfetti} />
 
-      {/* Type accent bar — saturated gradient matches the poll-card pattern for visual unity across all typed cards */}
-      {typeLabel && config.accentGradient && (
+      {/*
+        Accent strip on every card. Typed cards use their saturated type colour
+        (green=event, amber=poll, etc.); native posts use a neutral border-coloured
+        strip so every card has matching anatomy in the feed.
+      */}
+      {config.accentGradient && (
         <div className={`h-1 bg-gradient-to-r ${config.accentGradient}`} aria-hidden="true" />
       )}
 
