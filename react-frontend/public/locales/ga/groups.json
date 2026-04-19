@@ -389,5 +389,16 @@
     }
   },
   "count_pill": "{{count}} grúpa",
-  "load_more_count": "Lódáil tuilleadh ({{remaining}} fágtha)"
+  "load_more_count": "Lódáil tuilleadh ({{remaining}} fágtha)",
+  "notifications": {
+    "prefs_title": "Notification Preferences",
+    "frequency_label": "Notification Frequency",
+    "frequency_instant": "Instant",
+    "frequency_digest": "Digest",
+    "frequency_muted": "Muted",
+    "email_enabled": "Email notifications",
+    "push_enabled": "Push notifications",
+    "prefs_saved": "Notification preferences saved",
+    "prefs_save_failed": "Failed to save preferences"
+  }
 }
