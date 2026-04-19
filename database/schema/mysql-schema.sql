@@ -402,6 +402,42 @@ CREATE TABLE `badges` (
   KEY `idx_badge_class` (`badge_class`)
 ) ENGINE=InnoDB AUTO_INCREMENT=892 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `billing_audit_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `billing_audit_log` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `acted_by_user_id` int(10) unsigned DEFAULT NULL COMMENT 'God/delegate who made the change. NULL = system.',
+  `action` varchar(60) NOT NULL COMMENT 'plan_assigned, price_overridden, discount_applied, grace_period_set, plan_paused, plan_resumed, delegate_granted, delegate_revoked, upgrade_requested',
+  `old_value` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`old_value`)),
+  `new_value` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`new_value`)),
+  `notes` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `billing_audit_log_tenant_id_index` (`tenant_id`),
+  KEY `billing_audit_log_acted_by_user_id_index` (`acted_by_user_id`),
+  KEY `billing_audit_log_created_at_index` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `billing_delegates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `billing_delegates` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL,
+  `granted_by_user_id` int(10) unsigned NOT NULL COMMENT 'Must be God (is_god=1).',
+  `scope` varchar(60) NOT NULL COMMENT 'view_billing | edit_own_price | manage_children',
+  `granted_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `revoked_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `billing_delegates_user_id_scope_unique` (`user_id`,`scope`),
+  KEY `billing_delegates_user_id_index` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `blog_posts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -960,7 +996,7 @@ CREATE TABLE `community_ranks` (
   KEY `idx_tenant` (`tenant_id`),
   KEY `idx_rank_score` (`rank_score`),
   KEY `idx_position` (`tenant_id`,`rank_position`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Community rank scores for users';
+) ENGINE=InnoDB AUTO_INCREMENT=665 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Community rank scores for users';
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `communityrank_settings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2071,6 +2107,21 @@ CREATE TABLE `exchange_requests` (
   CONSTRAINT `exchange_requests_ibfk_7` FOREIGN KEY (`risk_tag_id`) REFERENCES `listing_risk_tags` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `failed_jobs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `failed_jobs` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(255) NOT NULL,
+  `connection` text NOT NULL,
+  `queue` text NOT NULL,
+  `payload` longtext NOT NULL,
+  `exception` longtext NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `fcm_device_tokens`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -2613,31 +2664,6 @@ CREATE TABLE `federation_neighborhoods` (
   KEY `idx_neighborhood_region` (`region`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `federation_notifications`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `federation_notifications` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `tenant_id` int(10) unsigned NOT NULL,
-  `user_id` int(10) unsigned DEFAULT NULL,
-  `type` varchar(50) NOT NULL,
-  `title` varchar(200) NOT NULL,
-  `message` text DEFAULT NULL,
-  `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`data`)),
-  `related_tenant_id` int(10) unsigned DEFAULT NULL,
-  `related_partnership_id` int(10) unsigned DEFAULT NULL,
-  `is_read` tinyint(1) NOT NULL DEFAULT 0,
-  `read_at` timestamp NULL DEFAULT NULL,
-  `read_by` int(10) unsigned DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `idx_tenant` (`tenant_id`),
-  KEY `idx_user` (`user_id`),
-  KEY `idx_unread` (`tenant_id`,`is_read`),
-  KEY `idx_type` (`type`),
-  KEY `idx_created` (`created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `federation_partnerships`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -2700,23 +2726,6 @@ CREATE TABLE `federation_rate_limits` (
   KEY `idx_window` (`window_start`),
   KEY `idx_operation` (`operation`),
   KEY `federation_rate_limits_tenant_id_index` (`tenant_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `federation_realtime_queue`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `federation_realtime_queue` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `tenant_id` int(11) NOT NULL,
-  `user_id` int(11) DEFAULT NULL COMMENT 'NULL for tenant-wide events',
-  `event_type` varchar(50) NOT NULL,
-  `event_data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`event_data`)),
-  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `delivered_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `idx_tenant_user` (`tenant_id`,`user_id`),
-  KEY `idx_pending_events` (`tenant_id`,`user_id`,`delivered_at`),
-  KEY `idx_cleanup` (`delivered_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `federation_reputation`;
@@ -2789,24 +2798,6 @@ CREATE TABLE `federation_tenant_features` (
   KEY `idx_tenant` (`tenant_id`),
   KEY `idx_feature` (`feature_key`)
 ) ENGINE=InnoDB AUTO_INCREMENT=151 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `federation_tenant_settings`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `federation_tenant_settings` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `tenant_id` int(11) NOT NULL,
-  `federation_enabled` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Whether federation is enabled for this tenant',
-  `allow_incoming_messages` tinyint(1) NOT NULL DEFAULT 1,
-  `allow_outgoing_messages` tinyint(1) NOT NULL DEFAULT 1,
-  `allow_transactions` tinyint(1) NOT NULL DEFAULT 1,
-  `require_approval` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Require admin approval for new partnerships',
-  `max_partners` int(10) unsigned DEFAULT 100 COMMENT 'Maximum number of partnerships',
-  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_tenant` (`tenant_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Per-tenant federation settings';
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `federation_tenant_topics`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5341,7 +5332,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=108 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=123 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5724,7 +5715,7 @@ CREATE TABLE `login_attempts` (
   PRIMARY KEY (`id`),
   KEY `idx_identifier_type` (`identifier`,`type`),
   KEY `idx_attempted_at` (`attempted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=35413 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35441 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `marketplace_categories`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6180,6 +6171,7 @@ CREATE TABLE `marketplace_seller_profiles` (
   `total_ratings` int(11) NOT NULL DEFAULT 0,
   `community_trust_score` decimal(5,2) DEFAULT NULL,
   `is_community_endorsed` tinyint(1) NOT NULL DEFAULT 0,
+  `is_suspended` tinyint(1) NOT NULL DEFAULT 0,
   `joined_marketplace_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -6488,7 +6480,7 @@ CREATE TABLE `member_notes` (
   KEY `idx_member_notes_tenant_user` (`tenant_id`,`user_id`),
   KEY `idx_member_notes_author` (`tenant_id`,`author_id`),
   KEY `idx_member_notes_category` (`tenant_id`,`category`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `member_tags`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6503,7 +6495,7 @@ CREATE TABLE `member_tags` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_member_tags` (`tenant_id`,`user_id`,`tag`),
   KEY `idx_member_tags_tag` (`tenant_id`,`tag`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `member_verification_badges`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -7593,6 +7585,7 @@ CREATE TABLE `pay_plans` (
   `allowed_layouts` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Array of layout names allowed for this plan' CHECK (json_valid(`allowed_layouts`)),
   `max_menus` int(11) DEFAULT 5 COMMENT 'Maximum number of custom menus allowed',
   `max_menu_items` int(11) DEFAULT 50 COMMENT 'Maximum menu items per menu',
+  `max_users` int(10) unsigned DEFAULT NULL COMMENT 'Maximum active members per tenant; null = unlimited',
   `price_monthly` decimal(10,2) DEFAULT 0.00,
   `price_yearly` decimal(10,2) DEFAULT 0.00,
   `is_active` tinyint(1) DEFAULT 1,
@@ -7605,7 +7598,7 @@ CREATE TABLE `pay_plans` (
   UNIQUE KEY `slug` (`slug`),
   KEY `idx_pay_plans_tier` (`tier_level`),
   KEY `idx_pay_plans_active` (`is_active`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `peer_endorsements`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -7863,11 +7856,13 @@ CREATE TABLE `post_shares` (
   `shared_post_id` int(11) DEFAULT NULL COMMENT 'The new feed_posts.id created by sharing',
   `comment` text DEFAULT NULL COMMENT 'Optional comment when sharing',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `post_shares_uniq_share` (`tenant_id`,`user_id`,`original_type`,`original_post_id`),
   KEY `idx_post` (`post_id`),
   KEY `idx_user` (`user_id`),
   KEY `idx_original` (`original_post_id`,`tenant_id`),
   KEY `idx_user_tenant` (`user_id`,`tenant_id`),
-  KEY `idx_created_tenant` (`tenant_id`,`created_at`)
+  KEY `idx_created_tenant` (`tenant_id`,`created_at`),
+  KEY `post_shares_type_target_tenant_idx` (`original_type`,`original_post_id`,`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `post_views`;
@@ -7885,7 +7880,7 @@ CREATE TABLE `post_views` (
   UNIQUE KEY `post_views_ip_unique` (`tenant_id`,`post_id`,`ip_hash`),
   KEY `post_views_tenant_id_index` (`tenant_id`),
   KEY `post_views_post_id_index` (`post_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=141 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `posts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -8078,7 +8073,7 @@ CREATE TABLE `reports` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tenant_id` int(11) NOT NULL,
   `reporter_id` int(11) NOT NULL,
-  `target_type` enum('listing','user','message') NOT NULL,
+  `target_type` enum('listing','user','message','post','comment','story') NOT NULL,
   `target_id` int(11) NOT NULL,
   `reason` text NOT NULL,
   `status` enum('open','resolved','dismissed') NOT NULL DEFAULT 'open',
@@ -9026,6 +9021,14 @@ CREATE TABLE `tenant_plan_assignments` (
   `starts_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `expires_at` timestamp NULL DEFAULT NULL COMMENT 'NULL means unlimited',
   `trial_ends_at` timestamp NULL DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `custom_price_monthly` decimal(10,2) DEFAULT NULL COMMENT 'Per-tenant price override (monthly). NULL = use plan default.',
+  `custom_price_yearly` decimal(10,2) DEFAULT NULL COMMENT 'Per-tenant price override (yearly). NULL = use plan default.',
+  `discount_percentage` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT '0–100 % discount applied on top of custom/plan price.',
+  `discount_reason` varchar(255) DEFAULT NULL COMMENT 'Reason for discount (charity verified, early adopter, hardship, etc.)',
+  `grace_period_ends_at` timestamp NULL DEFAULT NULL COMMENT 'If over user limit, grace period ends here. NULL = not in grace.',
+  `is_paused` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Billing paused (e.g. between grant funding cycles).',
+  `nonprofit_verified` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Verified non-profit — eligible for 20% automatic discount.',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `stripe_subscription_id` varchar(255) DEFAULT NULL,
@@ -10143,6 +10146,7 @@ CREATE TABLE `users` (
   `insurance_status` enum('none','pending','verified','expired') NOT NULL DEFAULT 'none',
   `insurance_expires_at` date DEFAULT NULL,
   `preferred_language` varchar(5) NOT NULL DEFAULT 'en',
+  `timezone` varchar(64) DEFAULT 'UTC' COMMENT 'IANA timezone name used for context-timing feed ranking',
   `availability` varchar(255) DEFAULT NULL COMMENT 'e.g. weekdays, weekends, flexible',
   `interests` text DEFAULT NULL COMMENT 'Comma-separated interest keywords',
   `resume_searchable` tinyint(1) DEFAULT 0,
@@ -11329,7 +11333,22 @@ INSERT INTO `laravel_migrations` VALUES
 (104,'2026_04_17_083057_add_federation_performance_indexes',40),
 (105,'2026_04_17_083436_add_suspended_by_to_federation_partnerships_table',41),
 (106,'2026_04_17_000001_add_validated_until_to_federation_cc_entries',42),
-(107,'2026_04_17_100000_add_canonical_pair_to_federation_partnerships',42);
+(107,'2026_04_17_100000_add_canonical_pair_to_federation_partnerships',42),
+(108,'2026_04_17_000001_add_timezone_to_user_profiles',43),
+(109,'2026_04_17_000002_expand_reports_target_type_enum',43),
+(110,'2026_04_17_200000_drop_dead_federation_tables',43),
+(111,'2026_04_17_210000_add_is_suspended_to_marketplace_seller_profiles',43),
+(112,'2026_04_17_165921_add_max_users_to_pay_plans_table',44),
+(113,'2026_04_17_181747_seed_pricing_tiers',45),
+(114,'2026_04_17_184149_extend_billing_tables',46),
+(115,'2026_04_17_220000_extend_billing_tables',46),
+(116,'2026_04_17_184520_extend_billing_tables',47),
+(117,'2026_04_18_000001_redesign_pricing_plans',47),
+(118,'2026_04_18_000002_consolidate_tenants_to_free_plan',48),
+(119,'2026_04_18_000003_seed_paid_plan_tiers',49),
+(120,'2026_04_18_120000_drop_polls_expires_at_column',50),
+(121,'2026_04_18_180000_create_failed_jobs_table',50),
+(122,'2026_04_19_100000_polymorphic_post_shares',50);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

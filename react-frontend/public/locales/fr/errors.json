@@ -26,5 +26,8 @@
   "generic": {
     "export_failed": "Export failed",
     "update_failed": "Failed to update"
+  },
+  "federation": {
+    "feature_disabled": "Federation is not enabled for this community"
   }
 }

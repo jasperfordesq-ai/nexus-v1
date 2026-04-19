@@ -119,79 +119,127 @@ export interface FeedCardProps {
 
 /* ───────────────────────── Type Badge Config ───────────────────────── */
 
+/**
+ * Item types the backend `BookmarkService` accepts.
+ * MUST stay in sync with `app/Services/BookmarkService.php::VALID_TYPES`.
+ */
+const BOOKMARKABLE_TYPES = new Set<FeedItem['type']>([
+  'post',
+  'listing',
+  'event',
+  'job',
+  'blog',
+  'discussion',
+]);
+
+/**
+ * Item types the backend `ShareService` accepts for polymorphic reposting.
+ * MUST stay in sync with `app/Services/ShareService.php::VALID_TYPES`.
+ * Milestones (badge_earned, level_up) and reviews are not repostable.
+ */
+const SHAREABLE_TYPES = new Set<FeedItem['type']>([
+  'post',
+  'listing',
+  'event',
+  'poll',
+  'job',
+  'blog',
+  'discussion',
+  'goal',
+  'challenge',
+  'volunteer',
+]);
+
+/**
+ * Per-type card config.
+ * - `softGradient` is used for the subtle body tint (e.g. view-detail CTA, milestone card backgrounds).
+ * - `accentGradient` is the saturated top accent strip — matches the pattern established by the poll card redesign.
+ */
 const typeConfig = {
-  post: { labelKey: null, color: 'default' as const, icon: null, gradient: '' },
+  post: { labelKey: null, color: 'default' as const, icon: null, softGradient: '', accentGradient: '' },
   listing: {
     labelKey: 'card.type_listing',
     color: 'primary' as const,
     icon: <ShoppingBag className="w-3 h-3" aria-hidden="true" />,
-    gradient: 'from-indigo-500/10 to-blue-500/10',
+    softGradient: 'from-indigo-500/10 to-blue-500/10',
+    accentGradient: 'from-indigo-500 via-blue-500 to-indigo-500',
   },
   event: {
     labelKey: 'card.type_event',
     color: 'success' as const,
     icon: <Calendar className="w-3 h-3" aria-hidden="true" />,
-    gradient: 'from-emerald-500/10 to-green-500/10',
+    softGradient: 'from-emerald-500/10 to-green-500/10',
+    accentGradient: 'from-emerald-500 via-green-500 to-emerald-500',
   },
   poll: {
     labelKey: 'card.type_poll',
     color: 'warning' as const,
     icon: <BarChart3 className="w-3 h-3" aria-hidden="true" />,
-    gradient: 'from-amber-500/10 to-orange-500/10',
+    softGradient: 'from-amber-500/10 to-orange-500/10',
+    accentGradient: 'from-amber-500 via-orange-500 to-amber-500',
   },
   goal: {
     labelKey: 'card.type_goal',
     color: 'secondary' as const,
     icon: <Target className="w-3 h-3" aria-hidden="true" />,
-    gradient: 'from-purple-500/10 to-pink-500/10',
+    softGradient: 'from-purple-500/10 to-pink-500/10',
+    accentGradient: 'from-purple-500 via-pink-500 to-purple-500',
   },
   review: {
     labelKey: 'card.type_review',
     color: 'warning' as const,
     icon: <Star className="w-3 h-3" aria-hidden="true" />,
-    gradient: 'from-amber-500/10 to-yellow-500/10',
+    softGradient: 'from-amber-500/10 to-yellow-500/10',
+    accentGradient: 'from-amber-500 via-yellow-500 to-amber-500',
   },
   job: {
     labelKey: 'card.type_job',
     color: 'primary' as const,
     icon: <TrendingUp className="w-3 h-3" aria-hidden="true" />,
-    gradient: 'from-blue-500/10 to-cyan-500/10',
+    softGradient: 'from-blue-500/10 to-cyan-500/10',
+    accentGradient: 'from-blue-500 via-cyan-500 to-blue-500',
   },
   challenge: {
     labelKey: 'card.type_challenge',
     color: 'secondary' as const,
     icon: <Target className="w-3 h-3" aria-hidden="true" />,
-    gradient: 'from-violet-500/10 to-purple-500/10',
+    softGradient: 'from-violet-500/10 to-purple-500/10',
+    accentGradient: 'from-violet-500 via-purple-500 to-violet-500',
   },
   volunteer: {
     labelKey: 'card.type_volunteer',
     color: 'success' as const,
     icon: <Heart className="w-3 h-3" aria-hidden="true" />,
-    gradient: 'from-green-500/10 to-emerald-500/10',
+    softGradient: 'from-green-500/10 to-emerald-500/10',
+    accentGradient: 'from-green-500 via-emerald-500 to-green-500',
   },
   blog: {
     labelKey: 'card.type_blog',
     color: 'primary' as const,
     icon: <BookOpen className="w-3 h-3" aria-hidden="true" />,
-    gradient: 'from-sky-500/10 to-blue-500/10',
+    softGradient: 'from-sky-500/10 to-blue-500/10',
+    accentGradient: 'from-sky-500 via-blue-500 to-sky-500',
   },
   discussion: {
     labelKey: 'card.type_discussion',
     color: 'secondary' as const,
     icon: <Users className="w-3 h-3" aria-hidden="true" />,
-    gradient: 'from-fuchsia-500/10 to-purple-500/10',
+    softGradient: 'from-fuchsia-500/10 to-purple-500/10',
+    accentGradient: 'from-fuchsia-500 via-purple-500 to-fuchsia-500',
   },
   badge_earned: {
     labelKey: 'card.type_badge_earned',
     color: 'warning' as const,
     icon: <Trophy className="w-3 h-3" aria-hidden="true" />,
-    gradient: 'from-yellow-500/10 to-amber-500/10',
+    softGradient: 'from-yellow-500/10 to-amber-500/10',
+    accentGradient: 'from-yellow-500 via-amber-500 to-yellow-500',
   },
   level_up: {
     labelKey: 'card.type_level_up',
     color: 'success' as const,
     icon: <Zap className="w-3 h-3" aria-hidden="true" />,
-    gradient: 'from-emerald-500/10 to-teal-500/10',
+    softGradient: 'from-emerald-500/10 to-teal-500/10',
+    accentGradient: 'from-emerald-500 via-teal-500 to-emerald-500',
   },
 };
 
@@ -741,9 +789,9 @@ const FeedCard = React.memo(function FeedCard({
       {/* Confetti celebration overlay for milestones */}
       <ConfettiCelebration show={showConfetti} />
 
-      {/* Type accent bar */}
-      {typeLabel && (
-        <div className={`h-0.5 bg-gradient-to-r ${config.gradient}`} />
+      {/* Type accent bar — saturated gradient matches the poll-card pattern for visual unity across all typed cards */}
+      {typeLabel && config.accentGradient && (
+        <div className={`h-1 bg-gradient-to-r ${config.accentGradient}`} aria-hidden="true" />
       )}
 
       <div className="p-5">
@@ -815,12 +863,14 @@ const FeedCard = React.memo(function FeedCard({
                 <Tooltip content={new Date(item.created_at).toLocaleString()} placement="bottom" delay={500} closeDelay={0} size="sm">
                   <p className="text-xs text-[var(--text-subtle)] flex items-center gap-1 cursor-default">
                     <Clock className="w-3 h-3" aria-hidden="true" />
-                    {formatRelativeTime(item.created_at)}
+                    <span>
+                      {formatRelativeTime(item.created_at)}
+                      {item.updated_at && item.updated_at !== item.created_at && (
+                        <span className="italic"> · {t('card.edited')}</span>
+                      )}
+                    </span>
                   </p>
                 </Tooltip>
-                {item.updated_at && item.updated_at !== item.created_at && (
-                  <span className="text-[10px] text-[var(--text-subtle)] italic">({t('card.edited')})</span>
-                )}
                 <WhyShown item={item} feedMode={feedMode} />
               </div>
             </div>
@@ -1076,21 +1126,165 @@ const FeedCard = React.memo(function FeedCard({
           </div>
         )}
 
-        {/* Event/Listing metadata */}
-        {(item.type === 'event' || item.type === 'listing') && (item.start_date || item.location) && (
-          <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[var(--text-muted)]">
-            {item.start_date && (
-              <span className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
-                <span>{formatDate(item.start_date, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                <span className="text-[var(--text-subtle)]">{formatTime(item.start_date)}</span>
-              </span>
+        {/* Event: calendar-page date chip + countdown + location. Listing: date + location only. */}
+        {(item.type === 'event' || item.type === 'listing' || item.type === 'volunteer') && (item.start_date || item.location) && (() => {
+          const isEvent = item.type === 'event';
+          const startMs = item.start_date ? new Date(item.start_date).getTime() : null;
+          const deltaMs = startMs != null ? startMs - Date.now() : null;
+          const isUpcoming = deltaMs != null && deltaMs > 0;
+          const isImminent = isUpcoming && deltaMs! < 48 * 3600 * 1000;
+          const countdown = (() => {
+            if (!isImminent || deltaMs == null) return null;
+            const hours = Math.floor(deltaMs / 3600000);
+            const minutes = Math.floor(deltaMs / 60000);
+            if (minutes < 60) return t('card.event.starts_in_minutes', 'Starts in {{minutes}}m', { minutes });
+            return t('card.event.starts_in_hours', 'Starts in {{hours}}h', { hours });
+          })();
+          const dateForChip = item.start_date ? new Date(item.start_date) : null;
+
+          return (
+            <div className="mb-4 flex flex-wrap items-center gap-3 text-xs text-[var(--text-muted)]">
+              {/* Event-only: calendar-page date chip */}
+              {isEvent && dateForChip && (
+                <div className="flex items-center gap-2.5">
+                  <div className="flex flex-col items-center justify-center rounded-lg overflow-hidden border border-[var(--border-default)] bg-[var(--surface-base)] w-11 h-12 shadow-sm" aria-hidden="true">
+                    <div className="w-full px-1 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-gradient-to-r from-emerald-500 to-green-500 text-white text-center leading-tight">
+                      {dateForChip.toLocaleString(undefined, { month: 'short' })}
+                    </div>
+                    <div className="flex-1 flex items-center justify-center text-lg font-bold tabular-nums text-[var(--text-primary)] leading-none">
+                      {dateForChip.getDate()}
+                    </div>
+                  </div>
+                  <div className="flex flex-col text-xs">
+                    <span className="text-[var(--text-primary)] font-medium">
+                      {formatDate(item.start_date!, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                    <span className="text-[var(--text-subtle)]">{formatTime(item.start_date!)}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Non-event types keep the simpler inline date */}
+              {!isEvent && item.start_date && (
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
+                  <span>{formatDate(item.start_date, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                  <span className="text-[var(--text-subtle)]">{formatTime(item.start_date)}</span>
+                </span>
+              )}
+
+              {/* Countdown pill for imminent events */}
+              {isEvent && countdown && (
+                <Chip
+                  size="sm"
+                  variant="flat"
+                  color="success"
+                  startContent={<Clock className="w-3 h-3" aria-hidden="true" />}
+                  className="h-6 text-[11px] font-medium"
+                >
+                  {countdown}
+                </Chip>
+              )}
+
+              {item.location && (
+                <span className="flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
+                  <span className="truncate">{item.location}</span>
+                </span>
+              )}
+            </div>
+          );
+        })()}
+
+        {/* Job-specific chips: job_type (paid/volunteer/timebank), commitment, location */}
+        {item.type === 'job' && (item.job_type || item.commitment || item.location) && (
+          <div className="mb-4 flex flex-wrap items-center gap-2 text-xs">
+            {item.job_type && (
+              <Chip
+                size="sm"
+                variant="flat"
+                color="primary"
+                startContent={<TrendingUp className="w-3 h-3" aria-hidden="true" />}
+                className="h-6 text-[11px] font-medium"
+              >
+                {t(`card.job.type_${item.job_type}`, item.job_type)}
+              </Chip>
+            )}
+            {item.commitment && (
+              <Chip
+                size="sm"
+                variant="flat"
+                color="default"
+                startContent={<Clock className="w-3 h-3" aria-hidden="true" />}
+                className="h-6 text-[11px] font-medium"
+              >
+                {t(`card.job.commitment_${item.commitment}`, item.commitment)}
+              </Chip>
             )}
             {item.location && (
-              <span className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
-                <span>{item.location}</span>
+              <span className="flex items-center gap-1.5 text-[var(--text-muted)]">
+                <MapPin className="w-3.5 h-3.5 text-[var(--color-primary)]" aria-hidden="true" />
+                <span className="truncate">{item.location}</span>
               </span>
+            )}
+          </div>
+        )}
+
+        {/* Volunteer-specific chips: credits_offered + organization */}
+        {item.type === 'volunteer' && (item.credits_offered != null || item.organization) && (
+          <div className="mb-4 flex flex-wrap items-center gap-2 text-xs">
+            {item.credits_offered != null && item.credits_offered > 0 && (
+              <Chip
+                size="sm"
+                variant="flat"
+                color="success"
+                startContent={<Clock className="w-3 h-3" aria-hidden="true" />}
+                className="h-6 text-[11px] font-medium"
+              >
+                {t('card.volunteer.credits_offered', '{{count}} time credits', { count: item.credits_offered })}
+              </Chip>
+            )}
+            {item.organization && (
+              <span className="flex items-center gap-1.5 text-[var(--text-muted)]">
+                <Users className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
+                <span className="truncate">{item.organization}</span>
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Challenge-specific chips: submission deadline + ideas count */}
+        {item.type === 'challenge' && (item.submission_deadline || item.ideas_count != null) && (
+          <div className="mb-4 flex flex-wrap items-center gap-2 text-xs">
+            {item.submission_deadline && (() => {
+              const deadlineMs = new Date(item.submission_deadline).getTime() - Date.now();
+              const isClosingSoon = deadlineMs > 0 && deadlineMs < 72 * 3600 * 1000;
+              return (
+                <Chip
+                  size="sm"
+                  variant="flat"
+                  color={isClosingSoon ? 'warning' : 'secondary'}
+                  startContent={<Clock className="w-3 h-3" aria-hidden="true" />}
+                  className="h-6 text-[11px] font-medium"
+                >
+                  {isClosingSoon
+                    ? t('card.challenge.closing_soon', 'Closing soon')
+                    : t('card.challenge.closes_on', 'Closes {{date}}', {
+                        date: formatDate(item.submission_deadline!, { month: 'short', day: 'numeric' }),
+                      })}
+                </Chip>
+              );
+            })()}
+            {item.ideas_count != null && item.ideas_count > 0 && (
+              <Chip
+                size="sm"
+                variant="flat"
+                color="default"
+                startContent={<Target className="w-3 h-3" aria-hidden="true" />}
+                className="h-6 text-[11px] font-medium"
+              >
+                {t('card.challenge.ideas_count', '{{count}} ideas', { count: item.ideas_count })}
+              </Chip>
             )}
           </div>
         )}
@@ -1392,43 +1586,61 @@ const FeedCard = React.memo(function FeedCard({
           </div>
         )}
 
-        {/* Review Display */}
+        {/* Review Display — oversized stars, pull-quote styling, receiver avatar inline */}
         {item.type === 'review' && item.rating && item.receiver && (
-          <Card shadow="none" className="mb-4 bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20">
-            <CardBody className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-[var(--text-muted)] uppercase tracking-wide font-medium">{t('card.reviewed')}</span>
-                  <Link
-                    to={tenantPath(`/profile/${item.receiver.id}`)}
-                    className="text-sm font-semibold text-[var(--text-primary)] hover:text-[var(--color-primary)] transition-colors"
-                  >
-                    {item.receiver.name}
-                  </Link>
-                </div>
-                <div className="flex items-center gap-0.5">
+          <Card shadow="none" className="mb-4 bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 overflow-hidden">
+            <CardBody className="p-5">
+              <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+                <Link
+                  to={tenantPath(`/profile/${item.receiver.id}`)}
+                  className="flex items-center gap-2.5 min-w-0 group/receiver"
+                >
+                  <Avatar
+                    name={item.receiver.name}
+                    size="sm"
+                    className="ring-2 ring-amber-500/30 flex-shrink-0"
+                  />
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider leading-none">
+                      {t('card.reviewed')}
+                    </div>
+                    <div className="text-sm font-semibold text-[var(--text-primary)] group-hover/receiver:text-[var(--color-primary)] transition-colors truncate">
+                      {item.receiver.name}
+                    </div>
+                  </div>
+                </Link>
+                <div className="flex items-center gap-1" aria-label={t('card.review.rating_aria', '{{rating}} out of 5 stars', { rating: item.rating })}>
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
-                      className={`w-4 h-4 transition-colors ${star <= item.rating! ? 'text-amber-400 fill-amber-400' : 'text-[var(--text-subtle)]'}`}
+                      className={`w-6 h-6 transition-colors ${star <= item.rating! ? 'text-amber-400 fill-amber-400 drop-shadow-sm' : 'text-[var(--border-default)]'}`}
                       aria-hidden="true"
                     />
                   ))}
                 </div>
               </div>
               {item.content && (
-                <p className="text-sm text-[var(--text-secondary)] italic leading-relaxed">&ldquo;{item.content}&rdquo;</p>
+                <blockquote className="relative border-s-4 border-amber-500/60 ps-4 py-1 text-[15px] text-[var(--text-secondary)] italic leading-relaxed">
+                  <span className="absolute -top-1 -start-1 text-2xl text-amber-500/40 leading-none select-none" aria-hidden="true">&ldquo;</span>
+                  {item.content}
+                </blockquote>
               )}
             </CardBody>
           </Card>
         )}
 
-        {/* Badge Earned Display */}
+        {/* Badge Earned — celebratory "moment" framing with oversized icon */}
         {item.type === 'badge_earned' && (
-          <Card shadow="none" className="mb-4 bg-gradient-to-br from-yellow-500/10 to-amber-500/10 border border-yellow-500/20">
-            <CardBody className="p-4 text-center">
-              <div className="text-4xl mb-2" aria-hidden="true">{item.badge_icon || '\uD83C\uDFC6'}</div>
-              <p className="text-sm font-semibold text-[var(--text-primary)]">
+          <Card shadow="none" className="mb-4 bg-gradient-to-br from-yellow-500/20 via-amber-500/15 to-orange-500/10 border border-yellow-500/30 overflow-hidden relative">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(251,191,36,0.18),_transparent_70%)] pointer-events-none" aria-hidden="true" />
+            <CardBody className="p-6 text-center relative">
+              <div className="mx-auto mb-3 inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 shadow-lg shadow-amber-500/30 text-5xl" aria-hidden="true">
+                {item.badge_icon || '\uD83C\uDFC6'}
+              </div>
+              <p className="text-xs font-semibold text-amber-700 dark:text-amber-300 uppercase tracking-[0.2em] mb-1">
+                {t('card.milestone.badge_unlocked', 'Badge unlocked')}
+              </p>
+              <p className="text-base font-bold text-[var(--text-primary)] leading-snug">
                 {t('card.badge_earned_message', {
                   name: author.name,
                   badge: item.badge_name || item.title || '',
@@ -1439,12 +1651,18 @@ const FeedCard = React.memo(function FeedCard({
           </Card>
         )}
 
-        {/* Level Up Display */}
+        {/* Level Up — celebratory "moment" framing with oversized icon */}
         {item.type === 'level_up' && (
-          <Card shadow="none" className="mb-4 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20">
-            <CardBody className="p-4 text-center">
-              <div className="text-4xl mb-2" aria-hidden="true">{'\u2B50'}</div>
-              <p className="text-sm font-semibold text-[var(--text-primary)]">
+          <Card shadow="none" className="mb-4 bg-gradient-to-br from-emerald-500/20 via-teal-500/15 to-cyan-500/10 border border-emerald-500/30 overflow-hidden relative">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(16,185,129,0.18),_transparent_70%)] pointer-events-none" aria-hidden="true" />
+            <CardBody className="p-6 text-center relative">
+              <div className="mx-auto mb-3 inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-500/30" aria-hidden="true">
+                <Zap className="w-10 h-10 text-white fill-white" />
+              </div>
+              <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 uppercase tracking-[0.2em] mb-1">
+                {t('card.milestone.level_reached', 'Level reached')}
+              </p>
+              <p className="text-base font-bold text-[var(--text-primary)] leading-snug">
                 {t('card.level_up_message', {
                   name: author.name,
                   level: item.new_level || item.title?.replace('Level ', '') || '',
@@ -1460,7 +1678,7 @@ const FeedCard = React.memo(function FeedCard({
           <div className="mb-3">
             <Link
               to={tenantPath(detailPath)}
-              className={`inline-flex items-center justify-center gap-2 py-2 px-5 rounded-xl text-sm font-medium transition-all bg-gradient-to-r ${config.gradient || 'from-[var(--color-primary)]/10 to-[var(--color-primary)]/5'} text-[var(--text-primary)] hover:opacity-80 border border-[var(--border-default)] hover:border-[var(--color-primary)]/30`}
+              className={`inline-flex items-center justify-center gap-2 py-2 px-5 rounded-xl text-sm font-medium transition-all bg-gradient-to-r ${config.softGradient || 'from-[var(--color-primary)]/10 to-[var(--color-primary)]/5'} text-[var(--text-primary)] hover:opacity-80 border border-[var(--border-default)] hover:border-[var(--color-primary)]/30`}
               onClick={recordClick}
             >
               {config.icon}
@@ -1515,65 +1733,79 @@ const FeedCard = React.memo(function FeedCard({
         {/* Divider before actions */}
         <Divider className="mb-1" />
 
-        {/* Action Buttons */}
-        <div className="flex items-center justify-around -mx-1">
-          {onReact ? (
-            <ReactionPicker
-              userReaction={(item.reactions?.user_reaction as ReactionType | null) ?? null}
-              onReact={(type) => onReact(item, type)}
-              isAuthenticated={isAuthenticated}
-              size="sm"
-            />
-          ) : (
-            <Tooltip content={item.is_liked ? t('card.unlike') : t('card.like_action')} delay={400} closeDelay={0} size="sm">
+        {/* Action Buttons — reactions + comment as primary; share + bookmark as ghost icon-only secondary actions */}
+        <div className="flex items-center justify-between gap-1 -mx-1">
+          <div className="flex items-center gap-1 min-w-0 flex-1">
+            {onReact ? (
+              <ReactionPicker
+                userReaction={(item.reactions?.user_reaction as ReactionType | null) ?? null}
+                onReact={(type) => onReact(item, type)}
+                isAuthenticated={isAuthenticated}
+                size="sm"
+              />
+            ) : (
+              <Tooltip content={item.is_liked ? t('card.unlike') : t('card.like_action')} delay={400} closeDelay={0} size="sm">
+                <Button
+                  size="sm"
+                  variant="light"
+                  className={`${item.is_liked
+                    ? 'text-rose-500 font-medium'
+                    : 'text-[var(--text-muted)] hover:text-rose-500'
+                  } transition-colors`}
+                  startContent={
+                    <Heart
+                      className={`w-[18px] h-[18px] transition-all ${item.is_liked ? 'fill-rose-500 text-rose-500 scale-110' : ''}`}
+                      aria-hidden="true"
+                    />
+                  }
+                  onPress={isAuthenticated ? () => onToggleLike(item) : undefined}
+                  isDisabled={!isAuthenticated}
+                >
+                  {t('card.like_action')}
+                </Button>
+              </Tooltip>
+            )}
+
+            <Tooltip content={t('card.view_comments')} delay={400} closeDelay={0} size="sm">
               <Button
                 size="sm"
                 variant="light"
-                className={`flex-1 max-w-[140px] ${item.is_liked
-                  ? 'text-rose-500 font-medium'
-                  : 'text-[var(--text-muted)] hover:text-rose-500'
-                } transition-colors`}
-                startContent={
-                  <Heart
-                    className={`w-[18px] h-[18px] transition-all ${item.is_liked ? 'fill-rose-500 text-rose-500 scale-110' : ''}`}
-                    aria-hidden="true"
-                  />
-                }
-                onPress={isAuthenticated ? () => onToggleLike(item) : undefined}
-                isDisabled={!isAuthenticated}
+                className={`${showComments ? 'text-[var(--color-primary)] font-medium' : 'text-[var(--text-muted)]'} hover:text-[var(--color-primary)] transition-colors`}
+                startContent={<MessageCircle className={`w-[18px] h-[18px] ${showComments ? 'fill-[var(--color-primary)]/20' : ''}`} aria-hidden="true" />}
+                onPress={toggleComments}
               >
-                {t('card.like_action')}
+                {t('card.comment_action')}
               </Button>
             </Tooltip>
-          )}
+          </div>
 
-          <Tooltip content={t('card.view_comments')} delay={400} closeDelay={0} size="sm">
-            <Button
-              size="sm"
-              variant="light"
-              className={`flex-1 max-w-[140px] ${showComments ? 'text-[var(--color-primary)] font-medium' : 'text-[var(--text-muted)]'} hover:text-[var(--color-primary)] transition-colors`}
-              startContent={<MessageCircle className={`w-[18px] h-[18px] ${showComments ? 'fill-[var(--color-primary)]/20' : ''}`} aria-hidden="true" />}
-              onPress={toggleComments}
-            >
-              {t('card.comment_action')}
-            </Button>
-          </Tooltip>
+          <div className="flex items-center gap-0.5 flex-shrink-0">
+            {/*
+              Share button — polymorphic. Available for every type in SHAREABLE_TYPES
+              (post, listing, event, poll, job, blog, discussion, goal, challenge, volunteer).
+              The Quote Post option is auto-disabled for non-post types inside ShareButton
+              because quote post requires a feed_posts row (quoted_post_id FK).
+            */}
+            {isAuthenticated && SHAREABLE_TYPES.has(item.type) && (
+              <ShareButton
+                type={item.type}
+                id={item.id}
+                shareCount={item.share_count ?? 0}
+                isShared={item.is_shared ?? false}
+                isAuthenticated={isAuthenticated}
+                post={item}
+                compact
+              />
+            )}
 
-          {/* Share Button (enhanced dropdown) */}
-          {isAuthenticated && (
-            <ShareButton
-              postId={item.id}
-              shareCount={item.share_count ?? 0}
-              isShared={item.is_shared ?? false}
-              isAuthenticated={isAuthenticated}
-              post={item}
-            />
-          )}
-
-          {/* Bookmark Button */}
-          {isAuthenticated && (
-            <BookmarkButton type={item.type === 'post' ? 'post' : item.type} id={item.id} isBookmarked={item.is_bookmarked} />
-          )}
+            {/*
+              Bookmark — only rendered for types BookmarkService::VALID_TYPES supports.
+              Keep this list in sync with app/Services/BookmarkService.php::VALID_TYPES.
+            */}
+            {isAuthenticated && BOOKMARKABLE_TYPES.has(item.type) && (
+              <BookmarkButton type={item.type} id={item.id} isBookmarked={item.is_bookmarked} />
+            )}
+          </div>
         </div>
 
         {/* Post Analytics Modal */}

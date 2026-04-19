@@ -12,6 +12,7 @@ use App\Models\Like;
 use App\Services\FeedRankingService;
 use App\Services\LinkPreviewService;
 use App\Services\MentionService;
+use App\Services\ShareService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -446,7 +447,9 @@ class FeedService
             unset($item);
         }
 
-        // Batch load views_count + share_count for post items from feed_posts table
+        // Batch load views_count + share_count for post items from feed_posts table.
+        // For typed items (listing, event, etc.), share_count comes from post_shares
+        // via ShareService::batchShareCount below.
         $postIds = [];
         foreach ($items as $item) {
             if ($item['type'] === 'post') {
@@ -474,22 +477,70 @@ class FeedService
             unset($item);
         }
 
-        // Batch load bookmark status for current user
-        if ($currentUserId && !empty($postIds)) {
-            $bookmarkedPostIds = DB::table('bookmarks')
-                ->where('user_id', $currentUserId)
-                ->where('tenant_id', $tenantId)
-                ->where('bookmarkable_type', 'post')
-                ->whereIn('bookmarkable_id', $postIds)
-                ->pluck('bookmarkable_id')
-                ->all();
-            $bookmarkedSet = array_flip($bookmarkedPostIds);
+        // Batch load polymorphic share_count + is_shared for every shareable item type.
+        // Must stay in sync with ShareService::VALID_TYPES.
+        $shareableTypes = ShareService::VALID_TYPES;
+        $shareTypeToIds = [];
+        foreach ($items as $item) {
+            if (in_array($item['type'], $shareableTypes, true)) {
+                $shareTypeToIds[$item['type']][] = (int) $item['id'];
+            }
+        }
+        if (!empty($shareTypeToIds)) {
+            /** @var ShareService $shareService */
+            $shareService = app(ShareService::class);
+            $countMap = $shareService->batchShareCount($shareTypeToIds, $tenantId);
+            $sharedMap = $currentUserId
+                ? $shareService->batchIsShared($currentUserId, $shareTypeToIds, $tenantId)
+                : [];
+
             foreach ($items as &$item) {
-                if ($item['type'] === 'post') {
-                    $item['is_bookmarked'] = isset($bookmarkedSet[$item['id']]);
+                if (!in_array($item['type'], $shareableTypes, true)) {
+                    continue;
                 }
+                // For posts, prefer the denormalized feed_posts.share_count already set above.
+                // For typed items, fall back to the computed count from post_shares.
+                if ($item['type'] !== 'post' || !isset($item['share_count'])) {
+                    $item['share_count'] = $countMap[$item['type']][$item['id']] ?? 0;
+                }
+                $item['is_shared'] = $sharedMap[$item['type']][$item['id']] ?? false;
             }
             unset($item);
+        }
+
+        // Batch load bookmark status for current user across ALL bookmarkable types.
+        // Keep this list in sync with app/Services/BookmarkService.php::VALID_TYPES.
+        if ($currentUserId) {
+            $bookmarkableTypes = ['post', 'listing', 'event', 'job', 'blog', 'discussion'];
+            $typeIdPairs = [];
+            foreach ($items as $item) {
+                if (in_array($item['type'], $bookmarkableTypes, true)) {
+                    $typeIdPairs[$item['type']][] = (int) $item['id'];
+                }
+            }
+            if (!empty($typeIdPairs)) {
+                $bookmarkedByType = [];
+                foreach ($typeIdPairs as $bkType => $ids) {
+                    if (empty($ids)) {
+                        continue;
+                    }
+                    $rows = DB::table('bookmarks')
+                        ->where('user_id', $currentUserId)
+                        ->where('tenant_id', $tenantId)
+                        ->where('bookmarkable_type', $bkType)
+                        ->whereIn('bookmarkable_id', array_unique($ids))
+                        ->pluck('bookmarkable_id')
+                        ->all();
+                    $bookmarkedByType[$bkType] = array_flip($rows);
+                }
+                foreach ($items as &$item) {
+                    if (in_array($item['type'], $bookmarkableTypes, true)) {
+                        $set = $bookmarkedByType[$item['type']] ?? [];
+                        $item['is_bookmarked'] = isset($set[$item['id']]);
+                    }
+                }
+                unset($item);
+            }
         }
 
         // Batch load link previews for post items

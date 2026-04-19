@@ -1688,6 +1688,9 @@ return [
     // BookmarkService
     'invalid_bookmarkable_type'         => 'Invalid bookmarkable type provided',
 
+    // ShareService
+    'invalid_shareable_type'            => 'Invalid shareable type provided',
+
     // PollsController / CommentsController
     'too_many_poll_options'             => 'Too many poll options (max 20).',
     'comment_too_long'                  => 'Comment is too long (max 10,000 characters).',

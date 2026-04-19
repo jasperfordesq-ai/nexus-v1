@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\FeedSocialService;
+use App\Services\ShareService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
@@ -24,6 +25,7 @@ class FeedSocialController extends BaseApiController
 
     public function __construct(
         private readonly FeedSocialService $socialService,
+        private readonly ShareService $shareService,
     ) {}
 
     // =============================================
@@ -33,123 +35,155 @@ class FeedSocialController extends BaseApiController
     /**
      * POST /api/v2/feed/posts/{id}/share
      *
-     * Share a feed post (creates a share record, optional comment).
+     * Legacy: share a native feed post. Delegates to ShareService with type='post'.
+     * New polymorphic clients should call POST /api/v2/shares instead.
      */
     public function sharePost(int $id): JsonResponse
     {
-        $userId = $this->requireAuth();
-        $tenantId = $this->getTenantId();
-        $this->rateLimit('feed_share', 20, 60);
-
-        $comment = strip_tags((string) ($this->input('comment') ?? ''));
-        $comment = mb_substr($comment, 0, 1000);
-        if ($comment === '') {
-            $comment = null;
-        }
-
-        // Validate original post exists
-        $original = DB::table('feed_posts')
-            ->where('id', $id)
-            ->where('tenant_id', $tenantId)
-            ->first();
-
-        if (! $original) {
-            return $this->respondWithError('NOT_FOUND', __('api.post_not_found'), null, 404);
-        }
-
-        // Cannot share own post
-        if ((int) $original->user_id === $userId) {
-            return $this->respondWithError('SELF_SHARE', __('api.cannot_share_own_post'), null, 422);
-        }
-
-        // Create share record atomically — INSERT IGNORE prevents race conditions
-        $affected = DB::affectingStatement(
-            'INSERT IGNORE INTO post_shares (user_id, original_post_id, tenant_id, comment, created_at, updated_at)
-             VALUES (?, ?, ?, ?, NOW(), NOW())',
-            [$userId, $id, $tenantId, $comment]
-        );
-
-        if ($affected === 0) {
-            return $this->respondWithError('ALREADY_SHARED', __('api.already_shared_post'), null, 409);
-        }
-
-        $shareId = DB::getPdo()->lastInsertId();
-
-        // Increment share count on the original post
-        DB::table('feed_posts')->where('id', $id)->where('tenant_id', $tenantId)->increment('share_count');
-
-        // Notify the original post author (sharer !== author already guaranteed above)
-        try {
-            $sharer = DB::table('users')
-                ->where('id', $userId)
-                ->where('tenant_id', $tenantId)
-                ->select('first_name', 'last_name')
-                ->first();
-
-            if ($sharer) {
-                $sharerName = trim($sharer->first_name . ' ' . $sharer->last_name);
-                Notification::createNotification(
-                    (int) $original->user_id,
-                    __('api_controllers_3.feed.post_shared', ['name' => $sharerName]),
-                    "/feed/post/{$id}",
-                    'post_shared'
-                );
-            }
-        } catch (\Throwable $e) {
-            // Non-critical — don't fail the share if notification fails
-        }
-
-        return $this->respondWithData([
-            'id'               => $shareId,
-            'original_post_id' => $id,
-            'user_id'          => $userId,
-            'comment'          => $comment,
-        ], null, 201);
+        return $this->doShare('post', $id);
     }
 
     /**
      * DELETE /api/v2/feed/posts/{id}/share
      *
-     * Remove a share/repost.
+     * Legacy: remove a share on a native feed post.
      */
     public function unsharePost(int $id): JsonResponse
     {
-        $userId = $this->requireAuth();
-        $tenantId = $this->getTenantId();
-
-        $deleted = DB::table('post_shares')
-            ->where('user_id', $userId)
-            ->where('original_post_id', $id)
-            ->where('tenant_id', $tenantId)
-            ->delete();
-
-        if (! $deleted) {
-            return $this->respondWithError('NOT_FOUND', __('api.share_not_found'), null, 404);
-        }
-
-        // Decrement share count
-        DB::table('feed_posts')
-            ->where('id', $id)
-            ->where('tenant_id', $tenantId)
-            ->update(['share_count' => DB::raw('GREATEST(share_count - 1, 0)')]);
-
-        return $this->respondWithData(['message' => __('api_controllers_1.feed_social.post_unshared')]);
+        return $this->doUnshare('post', $id);
     }
 
     /**
-     * GET /api/v2/feed/posts/{id}/sharers
+     * POST /api/v2/shares
+     * Body: { type: string, id: int, comment?: string }
      *
-     * Get users who shared a post, with share count and viewer status.
+     * Polymorphic toggle-style share for ANY feed item type
+     * (post, listing, event, poll, job, blog, discussion, goal, challenge, volunteer).
+     * If the user already shared this item, this acts as an UNSHARE (toggles off).
+     *
+     * @return JsonResponse { data: { shared: bool, count: int, share_id: ?int } }
+     */
+    public function share(): JsonResponse
+    {
+        $type = (string) ($this->input('type') ?? '');
+        $id = (int) ($this->input('id') ?? 0);
+        $comment = $this->input('comment');
+        $comment = $comment === null ? null : (string) $comment;
+
+        if ($type === '' || $id <= 0) {
+            return $this->respondWithError('INVALID_INPUT', __('api.invalid_input'), null, 422);
+        }
+
+        return $this->doShare($type, $id, $comment);
+    }
+
+    /**
+     * DELETE /api/v2/shares
+     * Body: { type: string, id: int }
+     *
+     * Explicit unshare endpoint (idempotent — returns 200 even if no row existed).
+     */
+    public function unshare(): JsonResponse
+    {
+        $type = (string) ($this->input('type') ?? '');
+        $id = (int) ($this->input('id') ?? 0);
+
+        if ($type === '' || $id <= 0) {
+            return $this->respondWithError('INVALID_INPUT', __('api.invalid_input'), null, 422);
+        }
+
+        return $this->doUnshare($type, $id);
+    }
+
+    /**
+     * Shared share/toggle path used by both the legacy post-specific endpoint and
+     * the new polymorphic /v2/shares endpoint.
+     */
+    private function doShare(string $type, int $id, ?string $comment = null): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('feed_share', 20, 60);
+
+        try {
+            $result = $this->shareService->toggle($userId, $type, $id, $comment);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('INVALID_INPUT', __('api.invalid_shareable_type'), null, 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('NOT_FOUND', __('api.post_not_found'), null, 404);
+        } catch (\DomainException $e) {
+            return $this->respondWithError('SELF_SHARE', __('api.cannot_share_own_post'), null, 422);
+        }
+
+        return $this->respondWithData([
+            'shared'   => $result['shared'],
+            'count'    => $result['count'],
+            'share_id' => $result['share_id'],
+            'type'     => $type,
+            'id'       => $id,
+        ], null, $result['shared'] ? 201 : 200);
+    }
+
+    /**
+     * Shared unshare path. Idempotent: returns success even if no existing share.
+     */
+    private function doUnshare(string $type, int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        try {
+            $this->shareService->validateType($type);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('INVALID_INPUT', __('api.invalid_shareable_type'), null, 422);
+        }
+
+        // If a share exists, toggle() will remove it. Otherwise this is a no-op.
+        if (!$this->shareService->isShared($userId, $type, $id)) {
+            return $this->respondWithData([
+                'shared' => false,
+                'count'  => $this->shareService->getShareCount($type, $id),
+                'type'   => $type,
+                'id'     => $id,
+            ]);
+        }
+
+        try {
+            $result = $this->shareService->toggle($userId, $type, $id);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('NOT_FOUND', __('api.post_not_found'), null, 404);
+        } catch (\DomainException $e) {
+            // Can't happen on an unshare (self-share check only triggers on new shares).
+            return $this->respondWithError('INVALID_INPUT', __('api.invalid_input'), null, 422);
+        }
+
+        return $this->respondWithData([
+            'shared' => $result['shared'],
+            'count'  => $result['count'],
+            'type'   => $type,
+            'id'     => $id,
+        ]);
+    }
+
+    /**
+     * GET /api/v2/feed/posts/{id}/sharers[?type=]
+     *
+     * Get users who shared an item. `type` defaults to 'post' for backwards
+     * compatibility with the /feed/posts/{id}/sharers URL shape.
      */
     public function getSharers(int $id): JsonResponse
     {
         $tenantId = $this->getTenantId();
         $this->rateLimit('feed_sharers', 30, 60);
 
+        $type = (string) $this->query('type', 'post');
+        if (!in_array($type, ShareService::VALID_TYPES, true)) {
+            $type = 'post';
+        }
+
         $limit = $this->queryInt('limit', 20, 1, 100);
 
         $sharers = DB::table('post_shares as ps')
             ->join('users as u', 'ps.user_id', '=', 'u.id')
+            ->where('ps.original_type', $type)
             ->where('ps.original_post_id', $id)
             ->where('ps.tenant_id', $tenantId)
             ->orderByDesc('ps.created_at')
@@ -159,25 +193,20 @@ class FeedSocialController extends BaseApiController
             ->map(fn ($r) => (array) $r)
             ->all();
 
-        $shareCount = (int) DB::table('post_shares')
-            ->where('original_post_id', $id)
-            ->where('tenant_id', $tenantId)
-            ->count();
+        $shareCount = $this->shareService->getShareCount($type, $id, $tenantId);
 
         $hasShared = false;
         $viewerId = $this->getOptionalUserId();
         if ($viewerId) {
-            $hasShared = DB::table('post_shares')
-                ->where('user_id', $viewerId)
-                ->where('original_post_id', $id)
-                ->where('tenant_id', $tenantId)
-                ->exists();
+            $hasShared = $this->shareService->isShared($viewerId, $type, $id, $tenantId);
         }
 
         return $this->respondWithData([
             'sharers'     => $sharers,
             'share_count' => $shareCount,
             'has_shared'  => $hasShared,
+            'type'        => $type,
+            'id'          => $id,
         ]);
     }
 

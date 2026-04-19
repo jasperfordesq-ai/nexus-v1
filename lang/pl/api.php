@@ -1210,6 +1210,7 @@ return [
     'connection_already_exists' => 'A connection with this user already exists',
     'only_receiver_can_accept' => 'Only the receiver can accept a connection request',
     'invalid_bookmarkable_type' => 'Invalid bookmarkable type provided',
+    'invalid_shareable_type'            => 'Invalid shareable type provided',
 ],
 
     // PollsController / CommentsController

@@ -284,7 +284,35 @@
     "delete_comment_title": "Delete Comment",
     "delete_comment_body": "Are you sure you want to delete this comment? This cannot be undone.",
     "comments_load_failed": "Failed to load comments.",
-    "mute_user_label": "Mute {{name}}"
+    "mute_user_label": "Mute {{name}}",
+    "event": {
+      "starts_in_minutes": "Starts in {{minutes}}m",
+      "starts_in_hours": "Starts in {{hours}}h"
+    },
+    "job": {
+      "type_paid": "Paid",
+      "type_volunteer": "Volunteer",
+      "type_timebank": "Time Credits",
+      "commitment_full_time": "Full-time",
+      "commitment_part_time": "Part-time",
+      "commitment_contract": "Contract",
+      "commitment_flexible": "Flexible"
+    },
+    "volunteer": {
+      "credits_offered": "{{count}} time credits"
+    },
+    "challenge": {
+      "closing_soon": "Closing soon",
+      "closes_on": "Closes {{date}}",
+      "ideas_count": "{{count}} ideas"
+    },
+    "review": {
+      "rating_aria": "{{rating}} out of 5 stars"
+    },
+    "milestone": {
+      "badge_unlocked": "Badge unlocked",
+      "level_reached": "Level reached"
+    }
   },
   "hashtag": {
     "title": "Hashtag",

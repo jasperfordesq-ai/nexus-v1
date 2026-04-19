@@ -475,6 +475,9 @@ Route::get('/v2/feed/sidebar', [\App\Http\Controllers\Api\FeedSidebarController:
 Route::post('/v2/feed/posts/{id}/share', [\App\Http\Controllers\Api\FeedSocialController::class, 'sharePost']);
 Route::delete('/v2/feed/posts/{id}/share', [\App\Http\Controllers\Api\FeedSocialController::class, 'unsharePost']);
 Route::get('/v2/feed/posts/{id}/sharers', [\App\Http\Controllers\Api\FeedSocialController::class, 'getSharers']);
+// Polymorphic share endpoints — body: { type, id, comment? }
+Route::post('/v2/shares', [\App\Http\Controllers\Api\FeedSocialController::class, 'share']);
+Route::delete('/v2/shares', [\App\Http\Controllers\Api\FeedSocialController::class, 'unshare']);
 Route::get('/v2/feed/hashtags/trending', [\App\Http\Controllers\Api\FeedSocialController::class, 'getTrendingHashtags']);
 Route::get('/v2/feed/hashtags/search', [\App\Http\Controllers\Api\FeedSocialController::class, 'searchHashtags']);
 Route::get('/v2/feed/hashtags/{tag}', [\App\Http\Controllers\Api\FeedSocialController::class, 'getHashtagPosts']);

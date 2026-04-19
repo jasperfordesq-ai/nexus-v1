@@ -40,6 +40,7 @@ return [
     'event_not_found'              => 'Event not found',
     'listing_not_found'            => 'Listing not found',
     'group_not_found'              => 'Group not found',
+    'invalid_group_type'           => 'Invalid group type',
     'job_not_found'                => 'Job not found',
     'blog_post_not_found'          => 'Blog post not found',
     'review_not_found'             => 'Review not found',
@@ -50,6 +51,7 @@ return [
     'menu_not_found'               => 'Menu not found',
     'menu_item_not_found'          => 'Menu item not found',
     'plan_not_found'               => 'Plan not found',
+    'tenant_and_plan_required'     => 'tenant_id and pay_plan_id are required.',
     'report_not_found'             => 'Report not found',
     'poll_not_found'               => 'Poll not found',
     'newsletter_not_found'         => 'Newsletter not found',
@@ -112,6 +114,7 @@ return [
     'attribute_name_required'      => 'Attribute name is required',
     'badge_name_required'          => 'Badge name is required',
     'badge_slug_required'          => 'Badge slug is required',
+    'badge_slug_invalid'           => 'Badge slug does not exist or is not enabled for this tenant',
     'user_ids_required'            => 'User IDs array is required',
     'campaign_name_required'       => 'Campaign name is required',
     'feature_name_required'        => 'Feature name is required',
@@ -1109,6 +1112,7 @@ return [
     'job_bulk_ids_status_required'         => 'application_ids and status are required',
     'job_bulk_max_1000'                    => 'Maximum 1000 application IDs per request',
     'job_ai_generate_failed'               => 'Failed to generate description',
+    'listing_ai_generate_failed'           => 'Could not generate description. Please try again.',
     'job_resume_visibility_failed'         => 'Failed to update resume visibility',
     'job_candidate_not_found'              => 'Candidate profile not found or not searchable',
     'job_referral_failed'                  => 'Unable to create referral token',
@@ -1450,6 +1454,7 @@ return [
 
     // Search
     'search_query_min_length'              => 'Search query must be at least 2 characters',
+    'search_query_too_long'                => 'Search query is too long (max 500 characters).',
     'invalid_search_type'                  => 'Invalid type. Must be one of: :types',
 
     // Federation
@@ -1682,4 +1687,28 @@ return [
 
     // BookmarkService
     'invalid_bookmarkable_type'         => 'Invalid bookmarkable type provided',
+
+    // ShareService
+    'invalid_shareable_type'            => 'Invalid shareable type provided',
+
+    // PollsController / CommentsController
+    'too_many_poll_options'             => 'Too many poll options (max 20).',
+    'comment_too_long'                  => 'Comment is too long (max 10,000 characters).',
+
+    // ListingService — sdg_goals validation
+    'sdg_goals_must_be_array'           => 'sdg_goals must be an array.',
+    'sdg_goals_max'                     => 'You can select at most 17 SDG goals.',
+    'sdg_goals_invalid'                 => 'Invalid SDG goal value. Goals must be integers between 1 and 17.',
+
+    'invalid_reaction'                            => 'Invalid reaction emoji.',
+
+    'story_not_found'                            => 'Story not found.',
+
+    'story_expired'                            => 'Story has expired.',
+
+    // Billing delegates
+    'invalid_delegate_scope'                     => 'Invalid delegate scope. Allowed: view_billing, edit_own_price, manage_children.',
+
+    // Billing grace period
+    'grace_period_days_invalid'                  => 'Days must be between 1 and 365.',
 ];

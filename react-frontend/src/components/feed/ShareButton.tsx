@@ -41,22 +41,38 @@ import { ExternalShareModal } from './ExternalShareModal';
 import { ShareViaDMModal } from './ShareViaDMModal';
 
 export interface ShareButtonProps {
-  postId: number;
+  /**
+   * Legacy: pass when `type` is omitted — resolves to type='post'. Prefer `type` + `id`.
+   * Kept for test compatibility.
+   */
+  postId?: number;
+  /** Polymorphic item type (post, listing, event, poll, job, blog, discussion, goal, challenge, volunteer). */
+  type?: FeedItem['type'];
+  /** Polymorphic item id. */
+  id?: number;
   shareCount: number;
   isShared: boolean;
   isAuthenticated: boolean;
   /** The full FeedItem — needed for quote post and share modals. */
   post: FeedItem;
   onShareChange?: (newCount: number, newIsShared: boolean) => void;
+  /**
+   * When true, render an icon-only ghost trigger — used in the feed card footer
+   * where share is a secondary action. Defaults to false (full button with label).
+   */
+  compact?: boolean;
 }
 
 export function ShareButton({
   postId,
+  type,
+  id,
   shareCount,
   isShared,
   isAuthenticated,
   post,
   onShareChange,
+  compact = false,
 }: ShareButtonProps) {
   const toast = useToast();
   const { t } = useTranslation('feed');
@@ -70,7 +86,32 @@ export function ShareButton({
   const [showExternalShareModal, setShowExternalShareModal] = useState(false);
   const [showDMModal, setShowDMModal] = useState(false);
 
-  const postUrl = `${window.location.origin}/${tenantSlug}/feed?post=${postId}`;
+  // Resolve the polymorphic identity with a safe fallback to the legacy postId path.
+  const resolvedType: FeedItem['type'] = type ?? 'post';
+  const resolvedId: number = id ?? postId ?? 0;
+  const isNativePost = resolvedType === 'post';
+
+  // Deep-link URL varies by type. Posts live in /feed?post=, typed items have dedicated detail pages.
+  const postUrl = (() => {
+    const base = `${window.location.origin}/${tenantSlug}`;
+    switch (resolvedType) {
+      case 'post':
+      case 'poll':
+      case 'discussion':
+      case 'badge_earned':
+      case 'level_up':
+        return `${base}/feed?post=${resolvedId}`;
+      case 'listing':    return `${base}/listings/${resolvedId}`;
+      case 'event':      return `${base}/events/${resolvedId}`;
+      case 'job':        return `${base}/jobs/${resolvedId}`;
+      case 'blog':       return `${base}/blog/${resolvedId}`;
+      case 'goal':       return `${base}/goals`;
+      case 'challenge':  return `${base}/ideation/${resolvedId}`;
+      case 'volunteer':  return `${base}/volunteering/opportunities/${resolvedId}`;
+      case 'review':     return `${base}/feed?post=${resolvedId}`;
+      default:           return `${base}/feed?post=${resolvedId}`;
+    }
+  })();
   const postTitle = post.title || post.content?.slice(0, 80) || 'Post';
   const postText = post.content?.slice(0, 200) || '';
 
@@ -85,23 +126,20 @@ export function ShareButton({
       setLocalIsShared(newIsShared);
       setLocalCount(Math.max(0, newCount));
 
+      // Polymorphic toggle endpoint — single API for all shareable types.
+      // The backend treats POST with an existing share as a toggle-off, so
+      // we always send POST here; DELETE is used only for explicit unshare.
+      const endpoint = newIsShared ? api.post : api.delete;
+      const response = await endpoint('/v2/shares', { type: resolvedType, id: resolvedId });
+      if (!response.success) {
+        setLocalIsShared(!newIsShared);
+        setLocalCount(localCount);
+        toast.error(response.error || t('toast.share_failed'));
+        return;
+      }
       if (newIsShared) {
-        const response = await api.post(`/v2/feed/posts/${postId}/share`);
-        if (!response.success) {
-          setLocalIsShared(false);
-          setLocalCount(localCount);
-          toast.error(response.error || t('toast.share_failed'));
-          return;
-        }
         toast.success(t('toast.post_shared'));
       } else {
-        const response = await api.delete(`/v2/feed/posts/${postId}/share`);
-        if (!response.success) {
-          setLocalIsShared(true);
-          setLocalCount(localCount);
-          toast.error(response.error || t('toast.share_failed'));
-          return;
-        }
         toast.info(t('toast.share_removed'));
       }
 
@@ -114,7 +152,7 @@ export function ShareButton({
     } finally {
       setIsLoading(false);
     }
-  }, [isAuthenticated, localIsShared, localCount, postId, isShared, shareCount, onShareChange, toast, t]);
+  }, [isAuthenticated, localIsShared, localCount, resolvedType, resolvedId, isShared, shareCount, onShareChange, toast, t]);
 
   const handleCopyLink = useCallback(async () => {
     try {
@@ -168,30 +206,62 @@ export function ShareButton({
     <>
       <Dropdown placement="bottom">
         <DropdownTrigger>
-          <Button
-            size="sm"
-            variant="light"
-            className={`flex-1 max-w-[140px] ${
-              localIsShared
-                ? 'text-emerald-500 font-medium'
-                : 'text-[var(--text-muted)] hover:text-emerald-500'
-            } transition-colors`}
-            startContent={
-              <Repeat2
-                className={`w-[18px] h-[18px] transition-all ${
-                  localIsShared ? 'text-emerald-500' : ''
-                }`}
-                aria-hidden="true"
-              />
-            }
-            isDisabled={!isAuthenticated || isLoading}
-          >
-            {localCount > 0 ? t('share.button_label_count', { count: localCount }) : t('share.button_label')}
-          </Button>
+          {compact ? (
+            <Button
+              isIconOnly
+              size="sm"
+              variant="light"
+              aria-label={localCount > 0
+                ? t('share.button_label_count', { count: localCount })
+                : t('share.button_label')}
+              className={`${
+                localIsShared
+                  ? 'text-emerald-500'
+                  : 'text-[var(--text-muted)] hover:text-emerald-500'
+              } transition-colors min-w-0`}
+              isDisabled={!isAuthenticated || isLoading}
+            >
+              <span className="relative inline-flex items-center">
+                <Repeat2
+                  className={`w-[18px] h-[18px] transition-all ${
+                    localIsShared ? 'text-emerald-500' : ''
+                  }`}
+                  aria-hidden="true"
+                />
+                {localCount > 0 && (
+                  <span className="absolute -top-1 -right-2 text-[10px] font-semibold tabular-nums bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 rounded-full px-1 min-w-[16px] h-4 flex items-center justify-center leading-none">
+                    {localCount}
+                  </span>
+                )}
+              </span>
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              variant="light"
+              className={`flex-1 max-w-[140px] ${
+                localIsShared
+                  ? 'text-emerald-500 font-medium'
+                  : 'text-[var(--text-muted)] hover:text-emerald-500'
+              } transition-colors`}
+              startContent={
+                <Repeat2
+                  className={`w-[18px] h-[18px] transition-all ${
+                    localIsShared ? 'text-emerald-500' : ''
+                  }`}
+                  aria-hidden="true"
+                />
+              }
+              isDisabled={!isAuthenticated || isLoading}
+            >
+              {localCount > 0 ? t('share.button_label_count', { count: localCount }) : t('share.button_label')}
+            </Button>
+          )}
         </DropdownTrigger>
         <DropdownMenu
           aria-label={t('share.menu_label', 'Share options')}
           onAction={handleDropdownAction}
+          disabledKeys={isNativePost ? [] : ['quote']}
         >
           <DropdownItem
             key="repost"
@@ -202,13 +272,20 @@ export function ShareButton({
           >
             {localIsShared ? t('share.repost_remove', 'Remove Repost') : t('share.repost', 'Repost')}
           </DropdownItem>
-          <DropdownItem
-            key="quote"
-            startContent={<Quote className="w-4 h-4" aria-hidden="true" />}
-            description={t('share.quote_desc', 'Repost with your commentary')}
-          >
-            {t('share.quote', 'Quote Post')}
-          </DropdownItem>
+          {/*
+            Quote Post requires the original to be a feed_posts row (quoted_post_id FK).
+            Hidden for typed items — supporting typed quotes needs a schema change
+            (quoted_source_type / quoted_source_id on feed_posts).
+          */}
+          {isNativePost ? (
+            <DropdownItem
+              key="quote"
+              startContent={<Quote className="w-4 h-4" aria-hidden="true" />}
+              description={t('share.quote_desc', 'Repost with your commentary')}
+            >
+              {t('share.quote', 'Quote Post')}
+            </DropdownItem>
+          ) : null}
           <DropdownItem
             key="copy"
             startContent={<Copy className="w-4 h-4" aria-hidden="true" />}
