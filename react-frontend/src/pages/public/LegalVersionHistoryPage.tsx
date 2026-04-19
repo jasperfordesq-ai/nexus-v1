@@ -44,6 +44,7 @@ import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
+import { formatDateValue } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import type {
   LegalDocumentType,
@@ -90,7 +91,7 @@ interface VersionComparison {
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return 'Unknown';
-  return new Date(dateStr).toLocaleDateString(undefined, {
+  return formatDateValue(dateStr, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

@@ -6,9 +6,83 @@ on:
     types: [opened, edited, synchronize]
 
 jobs:
-  # ─────────────────────────────────────────────────────────────────
-  # Enforce root cause analysis on bug fix PRs
-  # ─────────────────────────────────────────────────────────────────
+  translation-review-check:
+    name: Translation Review Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check PR description for locale review metadata
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const body = pr.body || '';
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              per_page: 100,
+            });
+
+            const localeFiles = files
+              .map((file) => file.filename)
+              .filter((filename) => /^react-frontend\/public\/locales\/(?!en\/).+\.json$/.test(filename));
+
+            if (localeFiles.length === 0) {
+              console.log('No non-English locale files changed - skipping translation review check.');
+              return;
+            }
+
+            const statusMatch =
+              body.match(/^\*\*Translation Status:\*\*\s*(.+)$/mi) ||
+              body.match(/^Translation Status:\s*(.+)$/mi);
+            const reviewerMatch =
+              body.match(/^\*\*Translation Reviewer:\*\*\s*(.+)$/mi) ||
+              body.match(/^Translation Reviewer:\s*(.+)$/mi);
+
+            const status = statusMatch?.[1]?.trim().toLowerCase() ?? '';
+            const reviewer = reviewerMatch?.[1]?.trim() ?? '';
+            const allowedStatuses = new Set(['reviewed', 'approved']);
+            const errors = [];
+
+            if (!status) {
+              errors.push('Missing "Translation Status:" in the PR description.');
+            } else if (!allowedStatuses.has(status)) {
+              errors.push(`Translation Status must be one of: ${Array.from(allowedStatuses).join(', ')}.`);
+            }
+
+            if (!reviewer) {
+              errors.push('Missing "Translation Reviewer:" in the PR description.');
+            } else if (/^(n\/a|na|pending|tbd)$/i.test(reviewer)) {
+              errors.push('Translation Reviewer must identify the person who reviewed the locale content.');
+            }
+
+            if (errors.length === 0) {
+              console.log(`Translation review metadata present for ${localeFiles.length} locale file(s).`);
+              return;
+            }
+
+            const message = [
+              '## Translation Review Required',
+              '',
+              'This PR changes non-English locale files and must include explicit review metadata.',
+              '',
+              ...errors.map((error) => `- ${error}`),
+              '',
+              'Add these fields to the PR description:',
+              '- `Translation Status: reviewed` or `Translation Status: approved`',
+              '- `Translation Reviewer: @handle`',
+              '',
+              'Changed locale files:',
+              ...localeFiles.slice(0, 10).map((filename) => `- \`${filename}\``),
+            ];
+
+            if (localeFiles.length > 10) {
+              message.push(`- ...and ${localeFiles.length - 10} more`);
+            }
+
+            core.setFailed(message.join('\n'));
+
   root-cause-check:
     name: Root Cause Analysis Check
     runs-on: ubuntu-latest
@@ -22,24 +96,22 @@ jobs:
             const title = pr.title.toLowerCase();
             const body = pr.body || '';
 
-            // Only enforce on fix/bugfix PRs
             const isFix = title.startsWith('fix') || title.includes('bug') || title.includes('hotfix');
 
             if (!isFix) {
-              console.log('Not a fix PR — skipping root cause check.');
+              console.log('Not a fix PR - skipping root cause check.');
               return;
             }
 
-            // Check for root cause section
             const hasRootCause = body.includes('Root Cause:') || body.includes('**Root Cause:**');
             const hasPrevention = body.includes('Prevention:') || body.includes('**Prevention:**');
 
             const errors = [];
             if (!hasRootCause) {
-              errors.push('Missing "Root Cause:" section — explain WHY the bug happened');
+              errors.push('Missing "Root Cause:" section - explain WHY the bug happened');
             }
             if (!hasPrevention) {
-              errors.push('Missing "Prevention:" section — explain what stops this from happening again');
+              errors.push('Missing "Prevention:" section - explain what stops this from happening again');
             }
 
             if (errors.length > 0) {
@@ -48,7 +120,7 @@ jobs:
                 '',
                 'This PR appears to be a bug fix but is missing required root cause analysis.',
                 '',
-                ...errors.map(e => `- ${e}`),
+                ...errors.map((error) => `- ${error}`),
                 '',
                 'Please edit the PR description to include these sections.',
                 'See `docs/REGRESSION_PREVENTION.md` for guidance.',
@@ -56,5 +128,5 @@ jobs:
 
               core.setFailed(message);
             } else {
-              console.log('Root cause analysis found — PR description looks good.');
+              console.log('Root cause analysis found - PR description looks good.');
             }

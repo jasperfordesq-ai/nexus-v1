@@ -19,8 +19,8 @@ import {
 import { GlassCard } from '@/components/ui';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { formatDateValue, resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                             */
@@ -62,7 +62,7 @@ function statusColor(status: string): 'warning' | 'success' | 'danger' | 'defaul
   }
 }
 
-function formatDate(d: string) { return new Date(d).toLocaleDateString(); }
+function formatDate(d: string) { return formatDateValue(d); }
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                         */

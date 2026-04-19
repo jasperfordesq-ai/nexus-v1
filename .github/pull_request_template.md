@@ -22,6 +22,16 @@
 **Prevention:**
 <!-- What have you added to stop this from ever happening again? (test, type guard, CI check, etc.) -->
 
+## Translation Review (required when non-English locale files change)
+**Translation Status:**
+<!-- Use `reviewed` or `approved` when locale content changed -->
+
+**Translation Reviewer:**
+<!-- Name or @handle of the reviewer who checked the locale content -->
+
+**Translation Notes:**
+<!-- Optional: call out machine-filled follow-up, scope, or reviewer caveats -->
+
 ## Pre-Deployment Checklist
 - [ ] `npx tsc --noEmit` passes in `react-frontend/`
 - [ ] `npm run build` succeeds in `react-frontend/`
@@ -30,6 +40,7 @@
 - [ ] No `data.data ??` patterns introduced (use `'data' in data ? data.data : data`)
 - [ ] No new `as any` type assertions without justification
 - [ ] If locale files changed, `npm run check:i18n:drift` still passes
+- [ ] If locale files changed, `npm run check:i18n:baseline` still passes
 - [ ] If locale files changed, `npm run check:i18n:gaps` was reviewed and any machine-filled copy is called out in the PR
 
 ## Test Plan

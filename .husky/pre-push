@@ -32,3 +32,4 @@ echo "$CHANGED_FILES" | grep -Eq '^(react-frontend/src/|react-frontend/public/lo
 echo "Running local i18n guardrails before push..."
 npm run check:admin-i18n
 npm run check:i18n:drift
+npm run check:i18n:baseline

@@ -25,7 +25,7 @@ import {
 } from '@heroui/react';
 import { X, Send, Search, User, AlertCircle } from 'lucide-react';
 import { api } from '@/lib/api';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { formatNumber, resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import { useToast } from '@/contexts';
 import { CategorySelect } from './CategorySelect';
@@ -61,7 +61,7 @@ export function TransferModal({
   onTransferComplete,
   initialRecipientId,
 }: TransferModalProps) {
-  const { t, i18n } = useTranslation('wallet');
+  const { t } = useTranslation('wallet');
   const toast = useToast();
   const [maxTransfer, setMaxTransfer] = useState(1000);
 
@@ -492,7 +492,12 @@ export function TransferModal({
                     })}
                   </p>
                   <p className="text-theme-subtle text-xs mt-1">
-                    {t('new_balance_after', { balance: new Intl.NumberFormat(i18n.language, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(currentBalance - parsedAmount) })}
+                    {t('new_balance_after', {
+                      balance: formatNumber(currentBalance - parsedAmount, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }),
+                    })}
                   </p>
                 </div>
               )}

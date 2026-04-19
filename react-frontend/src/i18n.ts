@@ -24,13 +24,35 @@ export const SUPPORTED_LOCALE_CODES = [
 
 const DEV_MISSING_KEY_PREFIX = '[missing]';
 const loggedMissingKeys = new Set<string>();
+const thrownMissingKeys = new Set<string>();
+const STRICT_MISSING_KEY_STORAGE_KEY = 'nexus_i18n_strict_missing_keys';
 
-const formatMissingKey = (key: string) => {
-  if (import.meta.env.DEV && !loggedMissingKeys.has(key)) {
-    loggedMissingKeys.add(key);
-    console.error(`[i18n] Missing translation key: ${key}`);
+const isStrictMissingKeyMode = () => {
+  if (!import.meta.env.DEV) return false;
+  if (import.meta.env.VITE_I18N_STRICT_MISSING === '1') return true;
+
+  try {
+    return window.localStorage.getItem(STRICT_MISSING_KEY_STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
+};
+
+const reportMissingKey = (identifier: string) => {
+  if (import.meta.env.DEV && !loggedMissingKeys.has(identifier)) {
+    loggedMissingKeys.add(identifier);
+    console.error(`[i18n] Missing translation key: ${identifier}`);
   }
 
+  if (isStrictMissingKeyMode() && !thrownMissingKeys.has(identifier)) {
+    thrownMissingKeys.add(identifier);
+    queueMicrotask(() => {
+      throw new Error(`[i18n] Missing translation key: ${identifier}`);
+    });
+  }
+};
+
+const formatMissingKey = (key: string) => {
   return import.meta.env.DEV ? `${DEV_MISSING_KEY_PREFIX} ${key}` : key;
 };
 
@@ -44,8 +66,13 @@ i18n
     nonExplicitSupportedLngs: false,
     load: 'currentOnly',
     cleanCode: true,
+    saveMissing: import.meta.env.DEV,
     appendNamespaceToMissingKey: import.meta.env.DEV,
     parseMissingKeyHandler: formatMissingKey,
+    missingKeyHandler: (lng, ns, key) => {
+      const localeList = Array.isArray(lng) ? lng.join(',') : lng || 'unknown';
+      reportMissingKey(`${ns}:${key} [${localeList}]`);
+    },
     // Tenant-aware filtering still happens in LanguageSwitcher. supportedLngs keeps
     // detection and fallback behavior constrained to the locales we actually ship.
     defaultNS: 'common',
