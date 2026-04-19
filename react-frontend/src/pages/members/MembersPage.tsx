@@ -339,8 +339,8 @@ export function MembersPage() {
           variant={quickFilter === 'all' ? 'solid' : 'flat'}
           className={
             quickFilter === 'all'
-              ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
-              : 'bg-theme-elevated text-theme-muted'
+              ? 'bg-linear-to-r from-indigo-500 to-purple-600 text-white'
+              : 'bg-theme-elevated text-theme-secondary hover:text-indigo-500 hover:bg-indigo-500/5 transition-colors'
           }
           isDisabled={isNearbyMode}
           startContent={<Users className="w-3.5 h-3.5" aria-hidden="true" />}
@@ -354,8 +354,8 @@ export function MembersPage() {
           variant={quickFilter === 'new' ? 'solid' : 'flat'}
           className={
             quickFilter === 'new'
-              ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
-              : 'bg-theme-elevated text-theme-muted'
+              ? 'bg-linear-to-r from-indigo-500 to-purple-600 text-white'
+              : 'bg-theme-elevated text-theme-secondary hover:text-emerald-500 hover:bg-emerald-500/5 transition-colors'
           }
           isDisabled={isNearbyMode}
           startContent={<Sparkles className="w-3.5 h-3.5" aria-hidden="true" />}
@@ -369,8 +369,8 @@ export function MembersPage() {
           variant={quickFilter === 'active' ? 'solid' : 'flat'}
           className={
             quickFilter === 'active'
-              ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
-              : 'bg-theme-elevated text-theme-muted'
+              ? 'bg-linear-to-r from-indigo-500 to-purple-600 text-white'
+              : 'bg-theme-elevated text-theme-secondary hover:text-amber-500 hover:bg-amber-500/5 transition-colors'
           }
           isDisabled={isNearbyMode}
           startContent={<TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />}
@@ -379,17 +379,6 @@ export function MembersPage() {
         >
           {t('members.active')}
         </Button>
-
-        {/* Member count */}
-        {totalCount !== null && !isLoading && (
-          <Chip
-            variant="flat"
-            size="sm"
-            className="bg-theme-elevated text-theme-muted ml-auto"
-          >
-            {t('members.showing', { shown: members.length.toLocaleString(), total: totalCount.toLocaleString() })}
-          </Chip>
-        )}
       </div>
 
       {/* Search & Sort Filters */}
@@ -470,35 +459,35 @@ export function MembersPage() {
               </Select>
             )}
 
-            <div className="flex rounded-lg overflow-hidden border border-theme-default" role="group" aria-label={t('aria.view_mode', 'View mode')}>
+            <div className="flex rounded-xl overflow-hidden border border-theme-default" role="group" aria-label={t('aria.view_mode', 'View mode')}>
               <Button
                 isIconOnly
                 size="sm"
                 variant="light"
-                className={`rounded-none ${viewMode === 'grid' ? 'bg-theme-hover' : 'bg-theme-elevated'}`}
+                className={`rounded-none transition-colors ${viewMode === 'grid' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
                 aria-label={t('aria.grid_view', 'Grid view')}
                 aria-pressed={viewMode === 'grid'}
                 onPress={() => setViewMode('grid')}
               >
-                <Grid className="w-4 h-4 text-theme-primary" aria-hidden="true" />
+                <Grid className="w-4 h-4" aria-hidden="true" />
               </Button>
               <Button
                 isIconOnly
                 size="sm"
                 variant="light"
-                className={`rounded-none ${viewMode === 'list' ? 'bg-theme-hover' : 'bg-theme-elevated'}`}
+                className={`rounded-none transition-colors ${viewMode === 'list' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
                 aria-label={t('aria.list_view', 'List view')}
                 aria-pressed={viewMode === 'list'}
                 onPress={() => setViewMode('list')}
               >
-                <List className="w-4 h-4 text-theme-primary" aria-hidden="true" />
+                <List className="w-4 h-4" aria-hidden="true" />
               </Button>
               {MAPS_ENABLED && (
                 <Button
                   isIconOnly
                   size="sm"
                   variant="light"
-                  className={`rounded-none rounded-r-lg ${viewMode === 'map' ? 'bg-primary/10 text-primary' : 'bg-theme-elevated'}`}
+                  className={`rounded-none rounded-r-xl transition-colors ${viewMode === 'map' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
                   aria-label={t('aria.map_view', 'Map view')}
                   aria-pressed={viewMode === 'map'}
                   onPress={() => setViewMode('map')}
@@ -675,7 +664,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
     return (
       <Link to={tenantPath(`/profile/${member.id}`)} aria-label={`${displayName}'s profile`}>
         <article>
-          <GlassCard className="p-4 hover:bg-theme-hover transition-colors">
+          <GlassCard className="p-4 hover:bg-theme-hover hover:shadow-md hover:shadow-indigo-500/5 border-l-4 border-l-indigo-500/20 hover:border-l-indigo-500/50 transition-all duration-200">
             <div className="flex items-center gap-4">
               <div className="relative inline-block">
                 <Avatar

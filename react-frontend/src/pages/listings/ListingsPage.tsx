@@ -8,6 +8,15 @@
  */
 
 import { useState, useEffect, useCallback, memo, useRef, useMemo } from 'react';
+
+const listingContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+const listingItemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.25 } },
+};
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -481,7 +490,7 @@ export function ListingsPage() {
             <Button
               variant={showAdvancedFilters ? 'solid' : 'flat'}
               className={showAdvancedFilters
-                ? 'bg-primary text-white min-h-[40px]'
+                ? 'bg-linear-to-r from-indigo-500 to-purple-600 text-white min-h-[40px]'
                 : 'bg-theme-elevated text-theme-primary min-h-[40px]'}
               startContent={<SlidersHorizontal className="w-4 h-4" aria-hidden="true" />}
               onPress={() => setShowAdvancedFilters((prev) => !prev)}
@@ -496,32 +505,32 @@ export function ListingsPage() {
               )}
             </Button>
 
-            <div className="flex rounded-lg overflow-hidden border border-theme-default" role="group" aria-label={t('aria.view_mode', 'View mode')}>
+            <div className="flex rounded-xl overflow-hidden border border-theme-default" role="group" aria-label={t('aria.view_mode', 'View mode')}>
               <Button
                 isIconOnly
                 variant="light"
-                className={`rounded-none min-w-[44px] min-h-[44px] ${viewMode === 'grid' ? 'bg-theme-hover' : 'bg-theme-elevated'}`}
+                className={`rounded-none min-w-[44px] min-h-[44px] transition-colors ${viewMode === 'grid' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
                 aria-label={t('aria_grid_view')}
                 aria-pressed={viewMode === 'grid'}
                 onPress={() => setViewMode('grid')}
               >
-                <Grid className="w-4 h-4 text-theme-primary" aria-hidden="true" />
+                <Grid className="w-4 h-4" aria-hidden="true" />
               </Button>
               <Button
                 isIconOnly
                 variant="light"
-                className={`rounded-none min-w-[44px] min-h-[44px] ${viewMode === 'list' ? 'bg-theme-hover' : 'bg-theme-elevated'}`}
+                className={`rounded-none min-w-[44px] min-h-[44px] transition-colors ${viewMode === 'list' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
                 aria-label={t('aria_list_view')}
                 aria-pressed={viewMode === 'list'}
                 onPress={() => setViewMode('list')}
               >
-                <List className="w-4 h-4 text-theme-primary" aria-hidden="true" />
+                <List className="w-4 h-4" aria-hidden="true" />
               </Button>
               {MAPS_ENABLED && (
                 <Button
                   isIconOnly
                   variant="light"
-                  className={`rounded-none rounded-r-lg min-w-[44px] min-h-[44px] ${viewMode === 'map' ? 'bg-primary/10 text-primary' : 'bg-theme-elevated'}`}
+                  className={`rounded-none rounded-r-xl min-w-[44px] min-h-[44px] transition-colors ${viewMode === 'map' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
                   aria-label={t('aria_map_view')}
                   aria-pressed={viewMode === 'map'}
                   onPress={() => setViewMode('map')}
@@ -754,28 +763,29 @@ export function ListingsPage() {
               emptyMessage={t('map_empty')}
             />
           ) : (
-            <div
-              className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}
-            >
+            <>
               <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
                 {!isLoading && listings.length > 0 ? t('listings_loaded_count', '{{count}} listings loaded', { count: listings.length }) : ''}
               </div>
-              {listings.map((listing) => (
-                <motion.div
-                  key={listing.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <ListingCard
-                    listing={listing}
-                    viewMode={viewMode}
-                    isSaving={savingIds.has(listing.id)}
-                    onToggleSave={isAuthenticated ? handleToggleSave : undefined}
-                  />
-                </motion.div>
-              ))}
-            </div>
+              <motion.div
+                key={`${searchQuery}-${selectedType}-${selectedCategory}-${sortMode}`}
+                variants={listingContainerVariants}
+                initial="hidden"
+                animate="visible"
+                className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}
+              >
+                {listings.map((listing) => (
+                  <motion.div key={listing.id} variants={listingItemVariants}>
+                    <ListingCard
+                      listing={listing}
+                      viewMode={viewMode}
+                      isSaving={savingIds.has(listing.id)}
+                      onToggleSave={isAuthenticated ? handleToggleSave : undefined}
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
+            </>
           )}
 
           {/* Load More with progress */}
@@ -849,7 +859,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
     // ─── List View ───
     return (
       <Link to={tenantPath(`/listings/${listing.id}`)}>
-        <GlassCard className="cursor-pointer p-4 hover:bg-theme-hover transition-colors">
+        <GlassCard className={`cursor-pointer p-4 hover:bg-theme-hover hover:shadow-md transition-all duration-200 border-l-4 ${listing.type === 'offer' ? 'border-l-emerald-500/60' : 'border-l-amber-500/60'}`}>
           <div className="flex items-start gap-4">
             {imageUrl && !imgError ? (
               <img
