@@ -360,28 +360,40 @@ export function ListingsPage() {
         keywords={t("page_meta_keywords")}
       />
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        {/* Hero Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-indigo-600 via-purple-600 to-emerald-500 p-6 sm:p-8">
+        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-              <ListTodo className="w-7 h-7 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-              {t('title')}
-            </h1>
-            <div className="flex items-center gap-2 mt-1">
-              <p className="text-theme-muted">{t('page_subtitle')}</p>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                <ListTodo className="w-6 h-6 text-white" aria-hidden="true" />
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('title')}</h1>
+            </div>
+            <div className="flex items-center gap-3 flex-wrap">
+              <p className="text-white/80 text-sm">{t('page_subtitle')}</p>
+              {totalItems != null && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true" />
+                  {t('results_count', '{{count}} listings found', { count: totalItems })}
+                </span>
+              )}
               <AlgorithmLabel area="listings" />
             </div>
           </div>
-        {isAuthenticated && (
-          <Link to={tenantPath('/listings/create')}>
-            <Button
-              className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
-              startContent={<Plus className="w-4 h-4" />}
-            >
-              {t('create')}
-            </Button>
-          </Link>
-        )}
+          {isAuthenticated && (
+            <Link to={tenantPath('/listings/create')}>
+              <Button
+                className="bg-white text-indigo-700 font-semibold hover:bg-white/90 shrink-0 shadow-lg"
+                startContent={<Plus className="w-4 h-4" />}
+              >
+                {t('create')}
+              </Button>
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Filters */}
@@ -647,12 +659,8 @@ export function ListingsPage() {
         )}
       </GlassCard>
 
-      {/* Results count */}
-      {!isLoading && totalItems != null && listings.length > 0 && (
-        <p className="text-sm text-theme-muted">
-          {t('results_count', '{{count}} listings found', { count: totalItems })}
-        </p>
-      )}
+
+
 
       {/* Listings Grid/List */}
       {isLoading && listings.length === 0 ? (
@@ -770,22 +778,40 @@ export function ListingsPage() {
             </div>
           )}
 
-          {/* Load More */}
+          {/* Load More with progress */}
           {hasMore && (
-            <div className="text-center pt-4">
-              <Button
-                variant="flat"
-                className="bg-theme-elevated text-theme-primary"
-                onPress={() => loadListings()}
-                isLoading={isLoading}
-              >
-                {totalItems != null && totalItems > listings.length
-                  ? t('load_more_count', 'Load more ({{remaining}} remaining)', { remaining: totalItems - listings.length })
-                  : t('load_more')}
-              </Button>
-              {paginationError && (
-                <p className="text-center text-sm text-danger mt-2">{t('load_more_error_persistent', 'Failed to load more listings. Please try again.')}</p>
+            <div className="space-y-3 pt-4">
+              {totalItems != null && totalItems > 0 && (
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs text-theme-muted px-1">
+                    <span>{listings.length.toLocaleString()} / {totalItems.toLocaleString()}</span>
+                    <span className="font-medium text-theme-secondary">{Math.round((listings.length / totalItems) * 100)}%</span>
+                  </div>
+                  <div className="h-1.5 rounded-full bg-theme-elevated overflow-hidden">
+                    <motion.div
+                      className="h-full rounded-full bg-linear-to-r from-indigo-500 to-purple-600"
+                      initial={{ width: '0%' }}
+                      animate={{ width: `${Math.round((listings.length / totalItems) * 100)}%` }}
+                      transition={{ duration: 0.6, ease: 'easeOut' }}
+                    />
+                  </div>
+                </div>
               )}
+              <div className="text-center">
+                <Button
+                  variant="flat"
+                  className="bg-theme-elevated text-theme-primary hover:bg-theme-hover"
+                  onPress={() => loadListings()}
+                  isLoading={isLoading}
+                >
+                  {totalItems != null && totalItems > listings.length
+                    ? t('load_more_count', 'Load more ({{remaining}} remaining)', { remaining: totalItems - listings.length })
+                    : t('load_more')}
+                </Button>
+                {paginationError && (
+                  <p className="text-center text-sm text-danger mt-2">{t('load_more_error_persistent', 'Failed to load more listings. Please try again.')}</p>
+                )}
+              </div>
             </div>
           )}
         </>
@@ -922,27 +948,53 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
 
   // ─── Grid View ───
   return (
-    <Link to={tenantPath(`/listings/${listing.id}`)}>
-      <GlassCard className="cursor-pointer hover:scale-[1.02] transition-transform h-full flex flex-col overflow-hidden">
-        {/* Listing Image */}
-        {imageUrl && !imgError ? (
-          <img
-            src={imageUrl}
-            alt={listing.title || 'Listing image'}
-            className="w-full h-36 object-cover"
-            width={800}
-            height={450}
-            loading="lazy"
-            decoding="async"
-            onError={() => setImgError(true)}
-          />
-        ) : (
-          <ImagePlaceholder size="sm" />
-        )}
+    <Link to={tenantPath(`/listings/${listing.id}`)} className="group">
+      <GlassCard className="cursor-pointer hover:scale-[1.02] hover:shadow-lg hover:shadow-indigo-500/10 transition-all duration-200 h-full flex flex-col overflow-hidden">
+        {/* Listing Image with hover overlay and floating save button */}
+        <div className="relative overflow-hidden">
+          {imageUrl && !imgError ? (
+            <img
+              src={imageUrl}
+              alt={listing.title || 'Listing image'}
+              className="w-full h-36 object-cover transition-transform duration-300 group-hover:scale-105"
+              width={800}
+              height={450}
+              loading="lazy"
+              decoding="async"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <ImagePlaceholder size="sm" />
+          )}
+          {/* Dark overlay on hover */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 pointer-events-none" aria-hidden="true" />
+          {/* Floating save button */}
+          {onToggleSave && (
+            <div className="absolute top-2 right-2">
+              <Button
+                isIconOnly
+                size="sm"
+                onPress={handleSaveClick}
+                isDisabled={isSaving}
+                aria-label={isFavorited ? t('unsave_listing', 'Unsave listing') : t('save_listing', 'Save listing')}
+                className={`min-w-[36px] min-h-[36px] rounded-full backdrop-blur-sm shadow-lg transition-all ${
+                  isFavorited
+                    ? 'bg-rose-500/90 text-white hover:bg-rose-600'
+                    : 'bg-black/40 text-white hover:bg-black/60'
+                }`}
+              >
+                <Heart
+                  className={`w-4 h-4 transition-colors ${isFavorited ? 'fill-white' : ''}`}
+                  aria-hidden="true"
+                />
+              </Button>
+            </div>
+          )}
+        </div>
 
         <div className="p-5 flex flex-col flex-1">
         {/* Type + Category Badges */}
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-3 flex-wrap">
           <span className={`text-xs px-2 py-1 rounded-full font-medium ${
             listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
           }`}>
@@ -983,22 +1035,6 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
             <span className="text-xs px-2 py-1 rounded-full bg-theme-hover text-theme-muted">
               {listing.category_name}
             </span>
-          )}
-          {onToggleSave && (
-            <Button
-              isIconOnly
-              size="sm"
-              variant="flat"
-              onPress={handleSaveClick}
-              isDisabled={isSaving}
-              aria-label={isFavorited ? t('unsave_listing', 'Unsave listing') : t('save_listing', 'Save listing')}
-              className="ml-auto p-1 rounded transition-colors hover:bg-theme-hover min-w-[44px] min-h-[44px]"
-            >
-              <Heart
-                className={`w-4 h-4 transition-colors ${isFavorited ? 'fill-rose-500 text-rose-500' : 'text-theme-muted hover:text-rose-400'}`}
-                aria-hidden="true"
-              />
-            </Button>
           )}
         </div>
 

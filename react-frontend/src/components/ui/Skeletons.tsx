@@ -11,33 +11,47 @@
 import { Skeleton } from '@heroui/react';
 
 /**
- * Skeleton for listing cards in lists
+ * Skeleton for listing grid cards — matches ListingCard grid layout
  */
 export function ListingSkeleton() {
   return (
-    <div className="p-4 rounded-lg bg-theme-elevated">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
-          <Skeleton className="h-5 w-3/4 rounded mb-2" />
-          <Skeleton className="h-4 w-full rounded mb-2" />
-          <Skeleton className="h-4 w-1/2 rounded" />
+    <div className="rounded-xl bg-theme-elevated overflow-hidden">
+      {/* Image area with shimmer sweep */}
+      <div className="h-36 bg-theme-hover relative overflow-hidden">
+        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.8s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      </div>
+      <div className="p-5">
+        <div className="flex gap-2 mb-3">
+          <Skeleton className="h-5 w-16 rounded-full" />
+          <Skeleton className="h-5 w-12 rounded-full" />
         </div>
-        <Skeleton className="h-6 w-20 rounded-full" />
+        <Skeleton className="h-5 w-3/4 rounded-lg mb-2" />
+        <Skeleton className="h-4 w-full rounded-lg mb-1.5" />
+        <Skeleton className="h-4 w-2/3 rounded-lg mb-4" />
+        <div className="flex items-center justify-between pt-3 border-t border-theme-default">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-6 w-6 rounded-full" />
+            <Skeleton className="h-4 w-20 rounded-lg" />
+          </div>
+          <Skeleton className="h-4 w-12 rounded-lg" />
+        </div>
       </div>
     </div>
   );
 }
 
 /**
- * Skeleton for member cards with avatar
+ * Skeleton for member grid cards — matches MemberCard grid layout
  */
 export function MemberCardSkeleton() {
   return (
-    <div className="p-4 rounded-lg bg-theme-elevated flex items-center gap-4">
-      <Skeleton className="h-12 w-12 rounded-full flex-shrink-0" />
-      <div className="flex-1 min-w-0">
-        <Skeleton className="h-4 w-24 rounded mb-2" />
-        <Skeleton className="h-3 w-32 rounded" />
+    <div className="p-5 rounded-xl bg-theme-elevated text-center">
+      <Skeleton className="h-20 w-20 rounded-full mx-auto mb-3" />
+      <Skeleton className="h-4 w-28 rounded-lg mx-auto mb-2" />
+      <Skeleton className="h-3 w-36 rounded-lg mx-auto mb-4" />
+      <div className="flex justify-center gap-3">
+        <Skeleton className="h-6 w-14 rounded-full" />
+        <Skeleton className="h-6 w-12 rounded-full" />
       </div>
     </div>
   );

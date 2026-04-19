@@ -306,17 +306,25 @@ export function MembersPage() {
   return (
     <div className="space-y-6">
       <PageMeta title={t('page_meta.members.title')} description={t('page_meta.members.description')} />
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <Users className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-            {t('members.title')}
-          </h1>
-          <div className="flex items-center gap-2 mt-1">
-            <p className="text-theme-muted">
-              {t('members.subtitle')}
-            </p>
+      {/* Hero Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-indigo-600 via-purple-500 to-pink-500 p-6 sm:p-8">
+        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="relative">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+              <Users className="w-6 h-6 text-white" aria-hidden="true" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('members.title')}</h1>
+          </div>
+          <div className="flex items-center gap-3 flex-wrap">
+            <p className="text-white/80 text-sm">{t('members.subtitle')}</p>
+            {totalCount != null && !isLoading && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true" />
+                {t('members.showing', { shown: members.length.toLocaleString(), total: totalCount.toLocaleString() })}
+              </span>
+            )}
             {activeSortBy === 'communityrank' && !isNearbyMode && (
               <AlgorithmLabel area="members" />
             )}
@@ -590,17 +598,35 @@ export function MembersPage() {
                 </motion.div>
               )}
 
-              {/* Load More Button */}
+              {/* Load More with progress */}
               {hasMore && (
-                <div className="pt-4 text-center">
-                  <Button
-                    variant="flat"
-                    className="bg-theme-elevated text-theme-muted"
-                    onPress={loadMoreMembers}
-                    isLoading={isLoadingMore}
-                  >
-                    {t('members.load_more')}
-                  </Button>
+                <div className="space-y-3 pt-4">
+                  {totalCount != null && totalCount > 0 && (
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-xs text-theme-muted px-1">
+                        <span>{members.length.toLocaleString()} / {totalCount.toLocaleString()}</span>
+                        <span className="font-medium text-theme-secondary">{Math.round((members.length / totalCount) * 100)}%</span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-theme-elevated overflow-hidden">
+                        <motion.div
+                          className="h-full rounded-full bg-linear-to-r from-indigo-500 to-purple-600"
+                          initial={{ width: '0%' }}
+                          animate={{ width: `${Math.round((members.length / totalCount) * 100)}%` }}
+                          transition={{ duration: 0.6, ease: 'easeOut' }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <div className="text-center">
+                    <Button
+                      variant="flat"
+                      className="bg-theme-elevated text-theme-muted hover:bg-theme-hover"
+                      onPress={loadMoreMembers}
+                      isLoading={isLoadingMore}
+                    >
+                      {t('members.load_more')}
+                    </Button>
+                  </div>
                 </div>
               )}
             </>
@@ -733,14 +759,14 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
   }
 
   return (
-    <Link to={tenantPath(`/profile/${member.id}`)} aria-label={`${displayName}'s profile`}>
+    <Link to={tenantPath(`/profile/${member.id}`)} aria-label={`${displayName}'s profile`} className="group">
       <article>
-        <GlassCard className="p-5 hover:scale-[1.02] transition-transform text-center">
+        <GlassCard className="p-5 hover:scale-[1.03] hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-200 text-center">
           <div className="relative inline-block mx-auto mb-3">
             <Avatar
               src={avatarSrc}
               name={displayName}
-              className="w-16 h-16 ring-2 ring-theme-muted/20"
+              className="w-20 h-20 ring-2 ring-theme-muted/20 group-hover:ring-indigo-400/50 transition-all duration-200"
             />
             <PresenceIndicator userId={member.id} size="md" />
           </div>
@@ -770,22 +796,29 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
             <p className="text-sm text-theme-subtle line-clamp-1 mt-1">{member.tagline}</p>
           )}
 
-          <div className="flex items-center justify-center gap-4 mt-4 text-xs text-theme-subtle">
+          {/* Stat chips */}
+          <div className="flex items-center justify-center gap-2 mt-4 flex-wrap">
             {member.rating != null && (
-              <span className="flex items-center gap-1" aria-label={t('members.rating_aria', { rating: member.rating.toFixed(1) })}>
-                <Star className="w-3 h-3 text-amber-400" aria-hidden="true" />
-                <span>{member.rating.toFixed(1)}</span>
+              <span
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-medium"
+                aria-label={t('members.rating_aria', { rating: member.rating.toFixed(1) })}
+              >
+                <Star className="w-3 h-3 fill-amber-500 text-amber-500" aria-hidden="true" />
+                {member.rating.toFixed(1)}
               </span>
             )}
-            <span className="flex items-center gap-1 shrink-0 whitespace-nowrap" aria-label={t('members.hours_exchanged_aria', { count: (member.total_hours_given ?? 0) + (member.total_hours_received ?? 0) })}>
+            <span
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-theme-hover text-theme-muted text-xs font-medium"
+              aria-label={t('members.hours_exchanged_aria', { count: (member.total_hours_given ?? 0) + (member.total_hours_received ?? 0) })}
+            >
               <Clock className="w-3 h-3" aria-hidden="true" />
-              <span>{(member.total_hours_given ?? 0) + (member.total_hours_received ?? 0)}h</span>
+              {(member.total_hours_given ?? 0) + (member.total_hours_received ?? 0)}h
             </span>
             {sortBy === 'communityrank' && member.community_rank_score != null && (
               <Tooltip content={t('members.community_rank_score_tooltip', 'CommunityRank score')}>
-                <span className="flex items-center gap-1 shrink-0 whitespace-nowrap text-violet-600 dark:text-violet-400 cursor-default">
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-violet-500/10 text-violet-600 dark:text-violet-400 text-xs font-medium cursor-default">
                   <TrendingUp className="w-3 h-3" aria-hidden="true" />
-                  <span>{Math.round(member.community_rank_score * 100)}%</span>
+                  {Math.round(member.community_rank_score * 100)}%
                 </span>
               </Tooltip>
             )}
