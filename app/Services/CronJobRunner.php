@@ -149,15 +149,17 @@ class CronJobRunner
         }
 
         $duration = microtime(true) - $this->jobStartTime;
+        $tenantId = TenantContext::getId();
 
         try {
             DB::insert(
-                "INSERT INTO cron_logs (job_id, status, output, duration_seconds, executed_by, tenant_id) VALUES (?, ?, ?, ?, NULL, NULL)",
+                "INSERT INTO cron_logs (job_id, status, output, duration_seconds, executed_by, tenant_id) VALUES (?, ?, ?, ?, NULL, ?)",
                 [
                     $this->currentJobId,
                     $status,
                     substr($output, 0, 65000),
-                    round($duration, 2)
+                    round($duration, 2),
+                    $tenantId,
                 ]
             );
         } catch (\Exception $e) {
@@ -175,10 +177,11 @@ class CronJobRunner
     private function logSubTask(string $jobId, string $status, string $output, float $startTime): void
     {
         $duration = microtime(true) - $startTime;
+        $tenantId = TenantContext::getId();
         try {
             DB::insert(
-                "INSERT INTO cron_logs (job_id, status, output, duration_seconds, executed_by, tenant_id) VALUES (?, ?, ?, ?, NULL, NULL)",
-                [$jobId, $status, substr($output, 0, 65000), round($duration, 2)]
+                "INSERT INTO cron_logs (job_id, status, output, duration_seconds, executed_by, tenant_id) VALUES (?, ?, ?, ?, NULL, ?)",
+                [$jobId, $status, substr($output, 0, 65000), round($duration, 2), $tenantId]
             );
         } catch (\Exception $e) {
             // Silently fail — don't break the cron run

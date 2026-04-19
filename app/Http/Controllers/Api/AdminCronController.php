@@ -31,31 +31,31 @@ class AdminCronController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $where = ["tenant_id = ?"];
-        $values = [$tenantId];
+        $where = [$this->getCronLogVisibilityClause()];
+        $values = [$tenantId, $tenantId];
 
         $jobId = $this->query('jobId');
         if ($jobId) {
-            $where[] = "job_id = ?";
+            $where[] = "l.job_id = ?";
             $values[] = $jobId;
         }
 
         $status = $this->query('status');
         if ($status) {
             $dbStatus = $status === 'failed' ? 'error' : $status;
-            $where[] = "status = ?";
+            $where[] = "l.status = ?";
             $values[] = $dbStatus;
         }
 
         $startDate = $this->query('startDate');
         if ($startDate) {
-            $where[] = "executed_at >= ?";
+            $where[] = "l.executed_at >= ?";
             $values[] = $startDate;
         }
 
         $endDate = $this->query('endDate');
         if ($endDate) {
-            $where[] = "executed_at <= ?";
+            $where[] = "l.executed_at <= ?";
             $values[] = $endDate;
         }
 
@@ -63,25 +63,32 @@ class AdminCronController extends BaseApiController
         $offset = $this->queryInt('offset', 0, 0);
 
         $whereClause = implode(' AND ', $where);
+        $joinSql = $this->getCronLogJoinSql();
 
         $total = (int) DB::selectOne(
-            "SELECT COUNT(*) as total FROM cron_logs WHERE {$whereClause}",
+            "SELECT COUNT(*) as total {$joinSql} WHERE {$whereClause}",
             $values
         )->total;
 
         $logs = DB::select(
-            "SELECT id, job_id, status, executed_at, duration_seconds, output AS error_message, tenant_id
-             FROM cron_logs WHERE {$whereClause} ORDER BY executed_at DESC LIMIT ? OFFSET ?",
+            "SELECT
+                l.id,
+                l.job_id,
+                COALESCE(j.job_name, l.job_id) AS job_name,
+                l.status,
+                l.executed_at,
+                l.duration_seconds,
+                l.output,
+                l.executed_by,
+                l.tenant_id
+             {$joinSql}
+             WHERE {$whereClause}
+             ORDER BY l.executed_at DESC
+             LIMIT ? OFFSET ?",
             array_merge($values, [$limit, $offset])
         );
 
-        $logsArray = array_map(function ($log) {
-            $arr = (array) $log;
-            if (($arr['status'] ?? '') === 'error') {
-                $arr['status'] = 'failed';
-            }
-            return $arr;
-        }, $logs);
+        $logsArray = array_map(fn($log) => $this->mapCronLogRow($log), $logs);
 
         return $this->success(['data' => $logsArray, 'meta' => ['total' => $total, 'limit' => $limit, 'offset' => $offset]]);
     }
@@ -93,22 +100,26 @@ class AdminCronController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $log = DB::selectOne(
-            "SELECT id, job_id, status, executed_at, duration_seconds,
-                    LEFT(output, 10000) AS output, tenant_id
-             FROM cron_logs WHERE id = ? AND tenant_id = ?",
-            [$logId, $tenantId]
+            "SELECT
+                l.id,
+                l.job_id,
+                COALESCE(j.job_name, l.job_id) AS job_name,
+                l.status,
+                l.executed_at,
+                l.duration_seconds,
+                LEFT(l.output, 10000) AS output,
+                l.executed_by,
+                l.tenant_id
+             {$this->getCronLogJoinSql()}
+             WHERE l.id = ? AND {$this->getCronLogVisibilityClause()}",
+            [$tenantId, $logId, $tenantId, $tenantId]
         );
 
         if (!$log) {
             return $this->error(__('api_controllers_1.admin_cron.log_not_found'), 404);
         }
 
-        $arr = (array) $log;
-        if (($arr['status'] ?? '') === 'error') {
-            $arr['status'] = 'failed';
-        }
-
-        return $this->success($arr);
+        return $this->success($this->mapCronLogRow($log));
     }
 
     /** DELETE /api/v2/admin/cron/logs */
@@ -266,24 +277,32 @@ class AdminCronController extends BaseApiController
     {
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
+        $joinSql = $this->getCronLogJoinSql();
+        $visibilityClause = $this->getCronLogVisibilityClause();
 
         $jobsFailed24h = (int) DB::selectOne(
-            "SELECT COUNT(*) as count FROM cron_logs WHERE tenant_id = ? AND status = 'error' AND executed_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)",
-            [$tenantId]
+            "SELECT COUNT(*) as count {$joinSql}
+             WHERE {$visibilityClause}
+               AND l.status = 'error'
+               AND l.executed_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)",
+            [$tenantId, $tenantId, $tenantId]
         )->count;
 
         $recentFailures = DB::select(
             "SELECT l.job_id, COALESCE(j.job_name, l.job_id) as job_name, l.executed_at as failed_at, l.output as reason
-             FROM cron_logs l LEFT JOIN cron_jobs j ON j.job_name = l.job_id AND j.tenant_id = ?
-             WHERE l.tenant_id = ? AND l.status = 'error'
+             {$joinSql}
+             WHERE {$visibilityClause}
+               AND l.status = 'error'
              ORDER BY l.executed_at DESC LIMIT 5",
-            [$tenantId, $tenantId]
+            [$tenantId, $tenantId, $tenantId]
         );
 
         $rateData = DB::selectOne(
-            "SELECT SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as successes, COUNT(*) as total
-             FROM cron_logs WHERE tenant_id = ? AND executed_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
-            [$tenantId]
+            "SELECT SUM(CASE WHEN l.status = 'success' THEN 1 ELSE 0 END) as successes, COUNT(*) as total
+             {$joinSql}
+             WHERE {$visibilityClause}
+               AND l.executed_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
+            [$tenantId, $tenantId, $tenantId]
         );
         $avgSuccessRate7d = ($rateData->total ?? 0) > 0
             ? round(($rateData->successes ?? 0) / $rateData->total, 2)
@@ -313,5 +332,35 @@ class AdminCronController extends BaseApiController
             'avg_success_rate_7d' => (float) $avgSuccessRate7d,
             'alert_status' => $alertStatus,
         ]);
+    }
+
+    private function getCronLogJoinSql(): string
+    {
+        return "FROM cron_logs l LEFT JOIN cron_jobs j ON j.job_name = l.job_id AND j.tenant_id = ?";
+    }
+
+    private function getCronLogVisibilityClause(): string
+    {
+        return "(l.tenant_id = ? OR (l.tenant_id IS NULL AND j.id IS NOT NULL))";
+    }
+
+    private function mapCronLogRow(object $log): array
+    {
+        $row = (array) $log;
+
+        if (($row['status'] ?? '') === 'error') {
+            $row['status'] = 'failed';
+        }
+
+        $executedBy = $row['executed_by'] ?? null;
+        if ($executedBy === null || $executedBy === '') {
+            $row['executed_by'] = 'cron';
+        } elseif ($executedBy === 'cron' || str_starts_with((string) $executedBy, 'manual-')) {
+            $row['executed_by'] = (string) $executedBy;
+        } else {
+            $row['executed_by'] = 'manual-' . $executedBy;
+        }
+
+        return $row;
     }
 }

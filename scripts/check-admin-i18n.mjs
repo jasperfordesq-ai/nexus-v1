@@ -158,6 +158,16 @@ function shouldAuditKey(relPath, namespace, key) {
       prefixes: ['system.'],
     },
     {
+      file: '/src/admin/modules/system/CronJobLogs.tsx',
+      namespace: 'admin',
+      prefixes: ['system.'],
+    },
+    {
+      file: '/src/admin/modules/system/CronJobSetup.tsx',
+      namespace: 'admin',
+      prefixes: ['system.', 'cron_setup.'],
+    },
+    {
       file: '/src/admin/modules/config/TenantFeatures.tsx',
       namespace: 'admin',
       prefixes: ['tenant_features.', 'config.tenant_features_', 'config.feature_', 'config.module_', 'config.failed_', 'config.cache_', 'config.job_', 'config.language_', 'config.enabled', 'config.disabled', 'config.label_default_language'],

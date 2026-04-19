@@ -57,7 +57,7 @@ import { useTranslation } from 'react-i18next';
 
 export function CronJobLogs() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('system.page_title'));
+  usePageTitle(t('system.cron_job_logs_title'));
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 

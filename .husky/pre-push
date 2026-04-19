@@ -1,4 +1,34 @@
 #!/usr/bin/env sh
 
-# Pre-push hook disabled — run checks manually before pushing
-exit 0
+set -e
+
+CHANGED_FILES=""
+
+while read -r LOCAL_REF LOCAL_SHA REMOTE_REF REMOTE_SHA
+do
+  if [ "$LOCAL_SHA" = "0000000000000000000000000000000000000000" ]; then
+    continue
+  fi
+
+  if [ "$REMOTE_SHA" = "0000000000000000000000000000000000000000" ]; then
+    RANGE="$LOCAL_SHA"
+  else
+    RANGE="$REMOTE_SHA..$LOCAL_SHA"
+  fi
+
+  DIFF_FILES="$(git diff --name-only "$RANGE" || true)"
+  if [ -n "$DIFF_FILES" ]; then
+    CHANGED_FILES="${CHANGED_FILES}
+$DIFF_FILES"
+  fi
+done
+
+if [ -z "$CHANGED_FILES" ]; then
+  exit 0
+fi
+
+echo "$CHANGED_FILES" | grep -Eq '^(react-frontend/src/|react-frontend/public/locales/|react-frontend/i18next\.config\.ts|react-frontend/package\.json|lang/|scripts/check-i18n-drift\.mjs|scripts/check-admin-i18n\.mjs|\.husky/pre-push|package\.json)' || exit 0
+
+echo "Running local i18n guardrails before push..."
+npm run check:admin-i18n
+npm run check:i18n:drift

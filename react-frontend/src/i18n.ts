@@ -8,15 +8,32 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpBackend from 'i18next-http-backend';
 
+export const SUPPORTED_LOCALE_CODES = [
+  'ar',
+  'de',
+  'en',
+  'es',
+  'fr',
+  'ga',
+  'it',
+  'ja',
+  'nl',
+  'pl',
+  'pt',
+] as const;
+
 i18n
   .use(HttpBackend)
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     fallbackLng: 'en',
-    // supportedLngs is intentionally not set here — tenant-aware filtering is handled
-    // in LanguageSwitcher which reads from TenantContext. fallbackLng: 'en' ensures
-    // graceful fallback for any unsupported locale.
+    supportedLngs: SUPPORTED_LOCALE_CODES as unknown as string[],
+    nonExplicitSupportedLngs: false,
+    load: 'currentOnly',
+    cleanCode: true,
+    // Tenant-aware filtering still happens in LanguageSwitcher. supportedLngs keeps
+    // detection and fallback behavior constrained to the locales we actually ship.
     defaultNS: 'common',
     ns: [
       'common', 'events', 'groups', 'profile', 'wallet',

@@ -7,6 +7,10 @@
   "scripts": {
     "dev": "vite",
     "copy-locales": "node -e \"const fs=require('fs');if(fs.existsSync('../lang')){fs.cpSync('../lang','public/locales',{recursive:true,force:true});console.log('[i18n] lang/ copied to public/locales/')}else{console.log('[i18n] ../lang not found, using committed locales')}\"",
+    "i18n:status": "i18next-cli status",
+    "i18n:sync": "i18next-cli sync",
+    "i18n:lint": "i18next-cli lint",
+    "i18n:types": "i18next-cli types",
     "prebuild": "npm run copy-locales",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
@@ -83,6 +87,7 @@
     "cross-env": "^10.1.0",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "i18next-cli": "^1.54.2",
     "jsdom": "^25.0.0",
     "sharp": "^0.33.0",
     "svgo": "^4.0.1",
