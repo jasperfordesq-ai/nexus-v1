@@ -53,7 +53,7 @@ RUN docker-php-ext-configure gd \
         fileinfo
 
 # Redis extension (for sessions/cache)
-RUN pecl install redis && docker-php-ext-enable redis
+RUN pecl install redis-6.1.0 && docker-php-ext-enable redis
 
 # PCOV extension (for PHPUnit code coverage — lightweight, no overhead when disabled)
 RUN pecl install pcov && docker-php-ext-enable pcov

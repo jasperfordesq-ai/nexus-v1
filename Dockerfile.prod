@@ -51,7 +51,7 @@ RUN docker-php-ext-configure gd \
         fileinfo
 
 # Redis extension
-RUN pecl install redis && docker-php-ext-enable redis
+RUN pecl install redis-6.1.0 && docker-php-ext-enable redis
 
 # =============================================================================
 # Apache Configuration
