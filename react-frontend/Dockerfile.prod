@@ -42,7 +42,11 @@ ENV BUILD_COMMIT=$BUILD_COMMIT
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit
 
-# Copy source and build (postbuild step pre-renders 19 public pages)
+# Copy source and build
+# NODE_OPTIONS: tsc's overload resolution peaks above the default 2GB heap on
+# this codebase and crashes with "Debug Failure. No error for last overload
+# signature" (really an OOM mid-inference). Bump to 4GB.
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 COPY . .
 RUN npm run build
 
