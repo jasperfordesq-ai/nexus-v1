@@ -312,7 +312,9 @@
     "milestone": {
       "badge_unlocked": "Badge unlocked",
       "level_reached": "Level reached"
-    }
+    ,
+  "items_loaded": "{{count}} posts"
+}
   },
   "hashtag": {
     "title": "Hashtag",
@@ -565,4 +567,6 @@
     "end_of_feed": "You're all caught up!"
   },
   "you": "You"
+,
+  "items_loaded": "{{count}} posts"
 }

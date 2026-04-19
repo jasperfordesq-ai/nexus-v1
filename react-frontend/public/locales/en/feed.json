@@ -565,5 +565,6 @@
     "load_failed": "Failed to load analytics."
   },
   "failed_to_load_analytics": "Failed to load analytics",
-  "you": "You"
+  "you": "You",
+  "items_loaded": "{{count}} posts"
 }
