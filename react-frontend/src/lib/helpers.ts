@@ -11,6 +11,8 @@ import type { User } from '@/types/api';
 import { logError } from './logger';
 import i18n from '../i18n';
 
+type DateValue = Date | number | string;
+
 /**
  * API Base URL for resolving relative image/asset URLs
  * This is the PHP backend URL where uploads are stored
@@ -85,7 +87,7 @@ export function getUserInitials(user: Pick<User, 'first_name' | 'last_name'>): s
  * Format a date string to a relative time string
  */
 export function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString);
+  const date = toDateValue(dateString);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffSecs = Math.floor(diffMs / 1000);
@@ -102,14 +104,29 @@ export function formatRelativeTime(dateString: string): string {
   if (diffDays < 7) return rtf.format(-diffDays, 'day');
   if (diffDays < 30) return rtf.format(-diffWeeks, 'week');
 
-  return date.toLocaleDateString(i18n.language);
+  return formatDateValue(date);
 }
 
 /**
- * Format a date for display
+ * Normalize date-like values before formatting.
  */
-export function formatDate(dateString: string, options?: Intl.DateTimeFormatOptions): string {
-  return new Date(dateString).toLocaleDateString(i18n.language, options ?? {
+function toDateValue(value: DateValue): Date {
+  if (value instanceof Date) {
+    return value;
+  }
+
+  if (typeof value === 'string' && value.includes(' ') && !value.includes('T')) {
+    return new Date(value.replace(' ', 'T'));
+  }
+
+  return new Date(value);
+}
+
+/**
+ * Format a date-like value for display.
+ */
+export function formatDateValue(value: DateValue, options?: Intl.DateTimeFormatOptions): string {
+  return toDateValue(value).toLocaleDateString(i18n.language, options ?? {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -117,13 +134,65 @@ export function formatDate(dateString: string, options?: Intl.DateTimeFormatOpti
 }
 
 /**
- * Format a time for display
+ * Backwards-compatible date helper for existing call sites.
+ */
+export function formatDate(dateString: string, options?: Intl.DateTimeFormatOptions): string {
+  return formatDateValue(dateString, options);
+}
+
+/**
+ * Format a date-time value for display.
+ */
+export function formatDateTime(value: DateValue, options?: Intl.DateTimeFormatOptions): string {
+  return toDateValue(value).toLocaleString(i18n.language, options);
+}
+
+/**
+ * Format a time for display.
  */
 export function formatTime(dateString: string): string {
-  return new Date(dateString).toLocaleTimeString(i18n.language, {
+  return toDateValue(dateString).toLocaleTimeString(i18n.language, {
     hour: '2-digit',
     minute: '2-digit',
   });
+}
+
+/**
+ * Format a locale-aware number string.
+ */
+export function formatNumber(value: number, options?: Intl.NumberFormatOptions): string {
+  return new Intl.NumberFormat(i18n.language, options).format(value);
+}
+
+/**
+ * Format a locale-aware currency string.
+ */
+export function formatCurrency(
+  value: number,
+  currency: string,
+  options?: Omit<Intl.NumberFormatOptions, 'style' | 'currency'>
+): string {
+  return new Intl.NumberFormat(i18n.language, {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+    ...options,
+  }).format(value);
+}
+
+/**
+ * Format a short month label for date badges and compact cards.
+ */
+export function formatMonthShort(value: DateValue, uppercase = false): string {
+  const formatted = new Intl.DateTimeFormat(i18n.language, { month: 'short' }).format(toDateValue(value));
+  return uppercase ? formatted.toUpperCase() : formatted;
+}
+
+/**
+ * Format the day-of-month portion of a date-like value.
+ */
+export function formatDayOfMonth(value: DateValue): string {
+  return String(toDateValue(value).getDate());
 }
 
 /**

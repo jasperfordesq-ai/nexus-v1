@@ -22,6 +22,18 @@ export const SUPPORTED_LOCALE_CODES = [
   'pt',
 ] as const;
 
+const DEV_MISSING_KEY_PREFIX = '[missing]';
+const loggedMissingKeys = new Set<string>();
+
+const formatMissingKey = (key: string) => {
+  if (import.meta.env.DEV && !loggedMissingKeys.has(key)) {
+    loggedMissingKeys.add(key);
+    console.error(`[i18n] Missing translation key: ${key}`);
+  }
+
+  return import.meta.env.DEV ? `${DEV_MISSING_KEY_PREFIX} ${key}` : key;
+};
+
 i18n
   .use(HttpBackend)
   .use(LanguageDetector)
@@ -32,6 +44,8 @@ i18n
     nonExplicitSupportedLngs: false,
     load: 'currentOnly',
     cleanCode: true,
+    appendNamespaceToMissingKey: import.meta.env.DEV,
+    parseMissingKeyHandler: formatMissingKey,
     // Tenant-aware filtering still happens in LanguageSwitcher. supportedLngs keeps
     // detection and fallback behavior constrained to the locales we actually ship.
     defaultNS: 'common',

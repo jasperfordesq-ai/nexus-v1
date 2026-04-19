@@ -35,6 +35,27 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const LOCALES_DIR = path.resolve(__dirname, '../react-frontend/public/locales');
+const ENV_PATH = path.resolve(__dirname, '../.env');
+
+if (fs.existsSync(ENV_PATH)) {
+  const envLines = fs.readFileSync(ENV_PATH, 'utf8').split(/\r?\n/);
+  for (const line of envLines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+
+    const equalsIndex = trimmed.indexOf('=');
+    if (equalsIndex === -1) continue;
+
+    const key = trimmed.slice(0, equalsIndex).trim();
+    const rawValue = trimmed.slice(equalsIndex + 1).trim();
+    if (!key || process.env[key] !== undefined) continue;
+
+    const quoted =
+      (rawValue.startsWith('"') && rawValue.endsWith('"')) ||
+      (rawValue.startsWith("'") && rawValue.endsWith("'"));
+    process.env[key] = quoted ? rawValue.slice(1, -1) : rawValue;
+  }
+}
 
 // ── Config ───────────────────────────────────────────────────────────────────
 
@@ -47,8 +68,8 @@ const DEEPL_URL = DEEPL_KEY?.endsWith(':fx')
   ? 'https://api-free.deepl.com/v2/translate'
   : 'https://api.deepl.com/v2/translate';
 
-// DeepL language codes for our supported languages
-// Irish (ga) is NOT supported by DeepL — kept as English fallback
+// DeepL language codes for our supported languages.
+// Irish (ga) falls back to OpenAI because DeepL does not support it.
 const LANG_MAP = {
   de: 'DE',
   fr: 'FR',
@@ -59,8 +80,9 @@ const LANG_MAP = {
   pl: 'PL',
   ja: 'JA',
   ar: 'AR',
-  // ga: not supported by DeepL
 };
+
+const SUPPORTED_LANGUAGES = ['de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar', 'ga'];
 
 // Admin-only namespaces — intentionally English-only, skip translation
 const SKIP_NAMESPACES = new Set([
@@ -74,6 +96,7 @@ const SKIP_NAMESPACES = new Set([
   'api_controllers_1.json',
   'api_controllers_2.json',
   'api_controllers_3.json',
+  'super_admin.json',
 ]);
 
 // Strings matching these patterns are NOT translated (URLs, placeholders, etc.)
@@ -180,7 +203,7 @@ async function translateBatchDeepL(texts, targetLang) {
 
 const LANG_NAMES = {
   de: 'German', fr: 'French', it: 'Italian', pt: 'Portuguese', es: 'Spanish',
-  nl: 'Dutch', pl: 'Polish', ja: 'Japanese', ar: 'Arabic',
+  nl: 'Dutch', pl: 'Polish', ja: 'Japanese', ar: 'Arabic', ga: 'Irish',
 };
 
 async function translateBatchOpenAI(texts, targetLangCode, targetLangDeepL) {
@@ -260,9 +283,21 @@ ${JSON.stringify(toTranslate, null, 2)}`;
 }
 
 async function translateBatch(texts, targetLangCode, targetLangDeepL) {
+  if (targetLangCode === 'ga') {
+    if (!OPENAI_KEY) {
+      throw new Error('Irish translation requires OPENAI_API_KEY because DeepL does not support ga.');
+    }
+    return translateBatchOpenAI(texts, targetLangCode, targetLangDeepL);
+  }
+
   if (USE_OPENAI) {
     return translateBatchOpenAI(texts, targetLangCode, targetLangDeepL);
   }
+
+  if (!targetLangDeepL) {
+    throw new Error(`No translation backend is configured for ${targetLangCode}.`);
+  }
+
   return translateBatchDeepL(texts, targetLangDeepL);
 }
 
@@ -284,7 +319,7 @@ async function main() {
 
   const enDir = path.join(LOCALES_DIR, 'en');
   const enFiles = fs.readdirSync(enDir).filter(f => f.endsWith('.json'));
-  const languages = Object.keys(LANG_MAP);
+  const languages = SUPPORTED_LANGUAGES;
 
   let totalGaps = 0;
   let totalTranslated = 0;
@@ -295,8 +330,12 @@ async function main() {
   for (const lang of langs) {
     if (langFilter && lang !== langFilter) continue;
     const deeplCode = LANG_MAP[lang];
-    if (!deeplCode) {
-      console.log(`⚠️  ${lang}: Not supported by DeepL — skipping (stays as English fallback)`);
+    if (lang === 'ga' && !OPENAI_KEY && !SUMMARY_ONLY && !DRY_RUN) {
+      console.log('⚠️  ga: DeepL does not support Irish and OPENAI_API_KEY is not set — skipping');
+      continue;
+    }
+    if (!deeplCode && !OPENAI_KEY && !SUMMARY_ONLY && !DRY_RUN) {
+      console.log(`⚠️  ${lang}: No translation backend available — skipping`);
       continue;
     }
 
@@ -408,8 +447,8 @@ async function main() {
   console.log('\n' + '─'.repeat(60));
   if (SUMMARY_ONLY) {
     console.log(`📊 Total gaps found: ${totalGaps}`);
-    console.log(`   Affected languages: ${langs.filter(l => LANG_MAP[l]).join(', ')}`);
-    console.log(`   Irish (ga) is skipped — DeepL does not support it`);
+    console.log(`   Affected languages: ${langs.filter(l => SUPPORTED_LANGUAGES.includes(l)).join(', ')}`);
+    console.log(`   Irish (ga) uses OpenAI when OPENAI_API_KEY is available`);
   } else if (DRY_RUN) {
     console.log(`📊 Dry run complete: ${totalGaps} strings would be translated`);
   } else {

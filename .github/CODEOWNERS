@@ -1,0 +1,9 @@
+# Locale and translation workflow ownership
+/react-frontend/public/locales/ @jasperfordesq-ai
+/lang/ @jasperfordesq-ai
+/scripts/check-i18n-drift.mjs @jasperfordesq-ai
+/scripts/check-admin-i18n.mjs @jasperfordesq-ai
+/scripts/translate-i18n-gaps.mjs @jasperfordesq-ai
+/react-frontend/src/i18n.ts @jasperfordesq-ai
+/react-frontend/i18next.config.ts @jasperfordesq-ai
+/.github/LOCALIZATION_WORKFLOW.md @jasperfordesq-ai

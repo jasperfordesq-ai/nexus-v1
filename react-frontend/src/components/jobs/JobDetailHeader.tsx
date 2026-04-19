@@ -39,7 +39,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { formatDateValue, resolveAvatarUrl } from '@/lib/helpers';
 import { MatchBadge } from './MatchBadge';
 import type { JobVacancy, MatchResult } from './JobDetailTypes';
 import { TYPE_CHIP_COLORS } from './JobDetailTypes';
@@ -135,7 +135,7 @@ export function JobDetailHeader({
                 {vacancy.organization?.name ?? vacancy.creator?.name}
               </p>
               <p className="text-xs text-theme-subtle">
-                {t('posted_by')} {vacancy.creator?.name} &middot; {vacancy.created_at ? new Date(vacancy.created_at).toLocaleDateString() : ''}
+                {t('posted_by')} {vacancy.creator?.name} &middot; {vacancy.created_at ? formatDateValue(vacancy.created_at) : ''}
               </p>
             </div>
           </div>
@@ -291,7 +291,7 @@ export function JobDetailHeader({
             <Calendar className="w-4 h-4" aria-hidden="true" />
             {isPastDeadline
               ? t('deadline_passed')
-              : `${t('detail.deadline_label')}: ${deadlineDate.toLocaleDateString()}`}
+              : `${t('detail.deadline_label')}: ${formatDateValue(deadlineDate)}`}
           </span>
         )}
 

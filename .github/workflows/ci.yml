@@ -460,6 +460,9 @@ jobs:
       - name: "BLOCKING: Check recurring admin locale coverage"
         run: node scripts/check-admin-i18n.mjs
 
+      - name: "INFO: Audit non-admin English fallback gaps"
+        run: npm run check:i18n:gaps
+
 
   # ─────────────────────────────────────────────────────────────────
   # Stage 6b: SPDX/AGPL License Compliance Check

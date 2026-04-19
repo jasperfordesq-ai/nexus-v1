@@ -27,7 +27,7 @@ import { useAuth, useTenant, useFeature, useModule, useNotifications } from '@/c
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
+import { formatDayOfMonth, formatMonthShort, formatRelativeTime, resolveAvatarUrl } from '@/lib/helpers';
 import type { WalletBalance, Listing, Event, Group } from '@/types/api';
 
 interface GamificationProfile {
@@ -396,8 +396,8 @@ export function DashboardPage() {
                     <div className="divide-y divide-[var(--glass-border)]">
                       {stats.upcomingEvents.map((event) => {
                         const eventDate = new Date(event.start_date);
-                        const day = eventDate.getDate();
-                        const month = eventDate.toLocaleString('default', { month: 'short' }).toUpperCase();
+                        const day = formatDayOfMonth(eventDate);
+                        const month = formatMonthShort(eventDate, true);
                         return (
                           <Link key={event.id} to={tenantPath(`/events/${event.id}`)} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0 group">
                             <div className="w-12 h-14 rounded-lg bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex flex-col items-center justify-center shrink-0">

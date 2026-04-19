@@ -14,7 +14,7 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { formatDateTime, formatDateValue, resolveAvatarUrl } from '@/lib/helpers';
 import { api } from '@/lib/api';
 import type { Application, HistoryEntry } from './JobDetailTypes';
 import { STATUS_COLORS } from './JobDetailTypes';
@@ -105,7 +105,7 @@ export function ApplicationCard({ application, onUpdateStatus, tenantPathFn, nav
             <p className="text-xs text-theme-subtle">{application.applicant.email}</p>
           )}
           <p className="text-xs text-theme-subtle mt-1">
-            {new Date(application.created_at).toLocaleDateString()}
+            {formatDateValue(application.created_at)}
           </p>
           {application.message && (
             <p className="text-sm text-theme-secondary mt-2 whitespace-pre-wrap">
@@ -184,7 +184,7 @@ export function ApplicationCard({ application, onUpdateStatus, tenantPathFn, nav
                   {entry.changed_by_name && (
                     <span> - {entry.changed_by_name}</span>
                   )}
-                  <span className="ml-2">{new Date(entry.changed_at).toLocaleString()}</span>
+                  <span className="ml-2">{formatDateTime(entry.changed_at)}</span>
                   {entry.notes && (
                     <p className="text-theme-subtle mt-0.5 italic">{entry.notes}</p>
                   )}

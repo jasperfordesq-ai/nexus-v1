@@ -15,6 +15,7 @@ import { Button, Card, CardBody, CardHeader, Chip, Spinner } from '@heroui/react
 import { AlertTriangle, Printer, Receipt } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
+import { formatCurrency, formatDateValue } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 
 /* ───────────────────────── Types ───────────────────────── */
@@ -39,7 +40,7 @@ interface DonationReceiptProps {
 /* ───────────────────────── Component ───────────────────────── */
 
 export function DonationReceipt({ donationId }: DonationReceiptProps) {
-  const { t, i18n } = useTranslation('volunteering');
+  const { t } = useTranslation('volunteering');
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -89,11 +90,7 @@ export function DonationReceipt({ donationId }: DonationReceiptProps) {
     );
   }
 
-  const formattedAmount = receipt.amount.toLocaleString(undefined, {
-    style: 'currency',
-    currency: receipt.currency,
-    minimumFractionDigits: 2,
-  });
+  const formattedAmount = formatCurrency(receipt.amount, receipt.currency);
 
   return (
     <>
@@ -145,7 +142,7 @@ export function DonationReceipt({ donationId }: DonationReceiptProps) {
 
             <div className="flex justify-between">
               <span className="text-theme-muted">{t('donations.receipt_date', 'Date')}</span>
-              <span className="text-theme-primary">{new Date(receipt.date).toLocaleDateString(i18n.language)}</span>
+              <span className="text-theme-primary">{formatDateValue(receipt.date)}</span>
             </div>
 
             <div className="flex justify-between">

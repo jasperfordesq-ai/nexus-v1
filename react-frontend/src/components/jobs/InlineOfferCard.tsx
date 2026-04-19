@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { formatDateValue } from '@/lib/helpers';
 import type { InlineOffer } from './JobDetailTypes';
 
 interface InlineOfferCardProps {
@@ -53,7 +54,7 @@ export function InlineOfferCard({
               {pendingOffer.start_date && (
                 <span className="flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
-                  {t('inline_response.offer_start_date', 'Start Date')}: {new Date(pendingOffer.start_date).toLocaleDateString()}
+                  {t('inline_response.offer_start_date', 'Start Date')}: {formatDateValue(pendingOffer.start_date)}
                 </span>
               )}
             </div>

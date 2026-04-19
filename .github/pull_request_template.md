@@ -29,6 +29,8 @@
 - [ ] New DELETE/UPDATE queries include `AND tenant_id = ?` for tenant-scoped tables
 - [ ] No `data.data ??` patterns introduced (use `'data' in data ? data.data : data`)
 - [ ] No new `as any` type assertions without justification
+- [ ] If locale files changed, `npm run check:i18n:drift` still passes
+- [ ] If locale files changed, `npm run check:i18n:gaps` was reviewed and any machine-filled copy is called out in the PR
 
 ## Test Plan
 <!-- How to verify this change works -->

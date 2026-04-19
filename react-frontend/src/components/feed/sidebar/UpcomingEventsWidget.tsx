@@ -12,6 +12,7 @@ import { CalendarDays, Clock, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
+import { formatDayOfMonth, formatMonthShort, formatTime } from '@/lib/helpers';
 
 export interface UpcomingEvent {
   id: number;
@@ -25,24 +26,13 @@ interface UpcomingEventsWidgetProps {
   events: UpcomingEvent[];
 }
 
-/** Parse datetime strings that may use a space separator instead of "T" */
-function parseDate(dateStr: string): Date {
-  return new Date(dateStr.replace(' ', 'T'));
-}
-
+/** Compact calendar label helpers for the widget date card. */
 function formatMonth(dateStr: string): string {
-  const date = parseDate(dateStr);
-  return date.toLocaleString('default', { month: 'short' }).toUpperCase();
+  return formatMonthShort(dateStr, true);
 }
 
 function formatDay(dateStr: string): string {
-  const date = parseDate(dateStr);
-  return date.getDate().toString();
-}
-
-function formatTime(dateStr: string): string {
-  const date = parseDate(dateStr);
-  return date.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' });
+  return formatDayOfMonth(dateStr);
 }
 
 export function UpcomingEventsWidget({ events }: UpcomingEventsWidgetProps) {
