@@ -26,6 +26,7 @@ import {
   Sparkles,
   TrendingUp,
   BadgeCheck,
+  UserCircle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, MemberCardSkeleton, AlgorithmLabel, useAlgorithmInfo } from '@/components/ui';
@@ -93,7 +94,7 @@ export function MembersPage() {
   );
   const [nearMeEnabled, setNearMeEnabled] = useState(false);
   const [radiusKm, setRadiusKm] = useState(25);
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const membersAlgorithm = useAlgorithmInfo('members');
   const defaultSort: SortOption | null = membersAlgorithm
     ? membersAlgorithm.key === 'communityrank'
@@ -310,25 +311,37 @@ export function MembersPage() {
       <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-indigo-600 via-purple-500 to-pink-500 p-6 sm:p-8">
         <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
         <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
-        <div className="relative">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-              <Users className="w-6 h-6 text-white" aria-hidden="true" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                <Users className="w-6 h-6 text-white" aria-hidden="true" />
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('members.title')}</h1>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('members.title')}</h1>
+            <div className="flex items-center gap-3 flex-wrap">
+              <p className="text-white/80 text-sm">{t('members.subtitle')}</p>
+              {totalCount != null && !isLoading && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true" />
+                  {t('members.showing', { shown: members.length.toLocaleString(), total: totalCount.toLocaleString() })}
+                </span>
+              )}
+              {activeSortBy === 'communityrank' && !isNearbyMode && (
+                <AlgorithmLabel area="members" />
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-3 flex-wrap">
-            <p className="text-white/80 text-sm">{t('members.subtitle')}</p>
-            {totalCount != null && !isLoading && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true" />
-                {t('members.showing', { shown: members.length.toLocaleString(), total: totalCount.toLocaleString() })}
-              </span>
-            )}
-            {activeSortBy === 'communityrank' && !isNearbyMode && (
-              <AlgorithmLabel area="members" />
-            )}
-          </div>
+          {isAuthenticated && user && (
+            <Link to={tenantPath(`/profile/${user.id}`)}>
+              <Button
+                className="bg-white text-indigo-700 font-semibold hover:bg-white/90 shrink-0 shadow-lg"
+                startContent={<UserCircle className="w-4 h-4" />}
+              >
+                {t('members.my_profile', 'My Profile')}
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
 

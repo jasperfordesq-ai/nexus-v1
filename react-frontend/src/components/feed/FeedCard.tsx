@@ -345,16 +345,16 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
         />
       </Link>
       <div className="flex-1 min-w-0">
-        <div className="bg-[var(--surface-elevated)] rounded-2xl px-3.5 py-2.5 border border-[var(--border-default)]">
+        <div className="bg-theme-elevated rounded-2xl px-3.5 py-2.5 border border-theme-default">
           <div className="flex items-center gap-2">
             <Link
               to={tenantPath(`/profile/${comment.author.id}`)}
-              className="text-xs font-semibold text-[var(--text-primary)] hover:text-[var(--color-primary)] transition-colors"
+              className="text-xs font-semibold text-theme-primary hover:text-primary transition-colors"
             >
               {comment.author.name}
             </Link>
             {comment.edited && (
-              <span className="text-[10px] text-[var(--text-subtle)] italic">({t('card.edited')})</span>
+              <span className="text-[10px] text-theme-subtle italic">({t('card.edited')})</span>
             )}
           </div>
           {isEditing ? (
@@ -364,8 +364,8 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
                 onChange={(e) => setEditContent(e.target.value)}
                 size="sm"
                 classNames={{
-                  input: 'bg-transparent text-[var(--text-primary)] text-xs',
-                  inputWrapper: 'bg-[var(--surface-hover)] border-[var(--border-default)] min-h-[32px]',
+                  input: 'bg-transparent text-theme-primary text-xs',
+                  inputWrapper: 'bg-[var(--surface-hover)] border-theme-default min-h-[32px]',
                 }}
               />
               <div className="flex gap-1.5">
@@ -393,13 +393,13 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
               </div>
             </div>
           ) : containsHtml(comment.content) ? (
-            <SafeHtml content={comment.content} className="text-xs text-[var(--text-secondary)] mt-0.5 whitespace-pre-wrap leading-relaxed" as="div" />
+            <SafeHtml content={comment.content} className="text-xs text-theme-secondary mt-0.5 whitespace-pre-wrap leading-relaxed" as="div" />
           ) : (
-            <p className="text-xs text-[var(--text-secondary)] mt-0.5 whitespace-pre-wrap leading-relaxed"><MentionRenderer text={comment.content} showUserCard={false} /></p>
+            <p className="text-xs text-theme-secondary mt-0.5 whitespace-pre-wrap leading-relaxed"><MentionRenderer text={comment.content} showUserCard={false} /></p>
           )}
         </div>
         <div className="flex items-center gap-3 mt-1 px-1">
-          <span className="text-[10px] text-[var(--text-subtle)]">
+          <span className="text-[10px] text-theme-subtle">
             <Clock className="w-2.5 h-2.5 inline me-0.5 -mt-px" aria-hidden="true" />
             {formatRelativeTime(comment.created_at)}
           </span>
@@ -407,7 +407,7 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
             <Button
               variant="light"
               size="sm"
-              className="text-[10px] text-[var(--color-primary)] p-0 min-w-0 h-auto"
+              className="text-[10px] text-primary p-0 min-w-0 h-auto"
               onPress={() => setShowReplies(!showReplies)}
             >
               {showReplies ? t('card.hide') : `${comment.replies.length}`} {comment.replies.length === 1 ? t('card.reply') : t('card.replies')}
@@ -419,7 +419,7 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
                 variant="light"
                 size="sm"
                 onPress={() => { setIsEditing(true); setEditContent(comment.content); }}
-                className="text-[10px] text-[var(--text-subtle)] hover:text-[var(--text-primary)] flex items-center gap-0.5 h-auto p-0 min-w-0"
+                className="text-[10px] text-theme-subtle hover:text-theme-primary flex items-center gap-0.5 h-auto p-0 min-w-0"
                 startContent={<Pencil className="w-2.5 h-2.5" aria-hidden="true" />}
               >
                 {t('card.edit', 'Edit')}
@@ -448,18 +448,18 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
           }}
         >
           <ModalContent>
-            <ModalHeader className="text-[var(--text-primary)] text-sm">
+            <ModalHeader className="text-theme-primary text-sm">
               {t('card.delete_comment_title')}
             </ModalHeader>
             <ModalBody>
-              <p className="text-sm text-[var(--text-muted)]">{t('card.delete_comment_body')}</p>
+              <p className="text-sm text-theme-muted">{t('card.delete_comment_body')}</p>
             </ModalBody>
             <ModalFooter>
               <Button
                 size="sm"
                 variant="flat"
                 onPress={() => setShowDeleteModal(false)}
-                className="text-[var(--text-muted)]"
+                className="text-theme-muted"
               >
                 {t('card.cancel')}
               </Button>
@@ -484,7 +484,7 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="mt-2 ms-2 space-y-2 border-s-2 border-[var(--color-primary)]/30 ps-3"
+              className="mt-2 ms-2 space-y-2 border-s-2 border-primary/30 ps-3"
             >
               {comment.replies.map((reply) => (
                 <div key={reply.id} className="flex items-start gap-2">
@@ -495,11 +495,11 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
                     className="w-6 h-6 flex-shrink-0"
                   />
                   <div>
-                    <div className="bg-[var(--surface-elevated)] rounded-xl px-2.5 py-1.5 border border-[var(--border-default)]">
-                      <span className="text-[10px] font-semibold text-[var(--text-primary)]">{reply.author.name}</span>
-                      <p className="text-[11px] text-[var(--text-secondary)] whitespace-pre-wrap">{reply.content}</p>
+                    <div className="bg-theme-elevated rounded-xl px-2.5 py-1.5 border border-theme-default">
+                      <span className="text-[10px] font-semibold text-theme-primary">{reply.author.name}</span>
+                      <p className="text-[11px] text-theme-secondary whitespace-pre-wrap">{reply.content}</p>
                     </div>
-                    <span className="text-[10px] text-[var(--text-subtle)] ms-1">
+                    <span className="text-[10px] text-theme-subtle ms-1">
                       {formatRelativeTime(reply.created_at)}
                     </span>
                   </div>
@@ -827,7 +827,7 @@ const FeedCard = React.memo(function FeedCard({
                   name={author.name}
                   src={resolveAvatarUrl(author.avatar)}
                   size="md"
-                  className="ring-2 ring-[var(--border-default)] group-hover:ring-[var(--color-primary)]/30 transition-all"
+                  className="ring-2 ring-[var(--border-default)] group-hover:ring-primary/30 transition-all"
                   isBordered
                 />
               </Link>
@@ -837,7 +837,7 @@ const FeedCard = React.memo(function FeedCard({
                 <UserHoverCard userId={author.id}>
                   <Link
                     to={tenantPath(`/profile/${author.id}`)}
-                    className="font-semibold text-[var(--text-primary)] hover:text-[var(--color-primary)] transition-colors text-sm truncate"
+                    className="font-semibold text-theme-primary hover:text-primary transition-colors text-sm truncate"
                   >
                     {author.name}
                   </Link>
@@ -884,7 +884,7 @@ const FeedCard = React.memo(function FeedCard({
               </div>
               <div className="flex items-center gap-1.5">
                 <Tooltip content={new Date(item.created_at).toLocaleString()} placement="bottom" delay={500} closeDelay={0} size="sm">
-                  <p className="text-xs text-[var(--text-subtle)] flex items-center gap-1 cursor-default">
+                  <p className="text-xs text-theme-subtle flex items-center gap-1 cursor-default">
                     <Clock className="w-3 h-3" aria-hidden="true" />
                     <span>
                       {formatRelativeTime(item.created_at)}
@@ -910,7 +910,7 @@ const FeedCard = React.memo(function FeedCard({
                       isIconOnly
                       size="sm"
                       variant="light"
-                      className="text-[var(--text-subtle)] hover:text-[var(--text-primary)] min-w-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="text-theme-subtle hover:text-theme-primary min-w-0 opacity-0 group-hover:opacity-100 transition-opacity"
                       aria-label={t('card.post_options', 'Post options')}
                     >
                       <MoreHorizontal className="w-4 h-4" />
@@ -1005,7 +1005,7 @@ const FeedCard = React.memo(function FeedCard({
                 isIconOnly
                 size="sm"
                 variant="light"
-                className="sm:hidden text-[var(--text-subtle)] hover:text-[var(--text-primary)] min-w-0"
+                className="sm:hidden text-theme-subtle hover:text-theme-primary min-w-0"
                 aria-label={t('card.post_options', 'Post options')}
                 onPress={() => setIsOptionsSheetOpen(true)}
               >
@@ -1024,7 +1024,7 @@ const FeedCard = React.memo(function FeedCard({
                     <>
                       <Button
                         variant="light"
-                        className="justify-start text-[var(--text-primary)]"
+                        className="justify-start text-theme-primary"
                         startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}
                         onPress={() => { setIsOptionsSheetOpen(false); setShowAnalytics(true); }}
                       >
@@ -1033,7 +1033,7 @@ const FeedCard = React.memo(function FeedCard({
                       {onEditPost && item.type === 'post' && (
                         <Button
                           variant="light"
-                          className="justify-start text-[var(--text-primary)]"
+                          className="justify-start text-theme-primary"
                           startContent={<Pencil className="w-4 h-4" aria-hidden="true" />}
                           onPress={() => { setIsOptionsSheetOpen(false); onEditPost(item); }}
                         >
@@ -1053,7 +1053,7 @@ const FeedCard = React.memo(function FeedCard({
                     <>
                       <Button
                         variant="light"
-                        className="justify-start text-[var(--text-primary)]"
+                        className="justify-start text-theme-primary"
                         startContent={<EyeOff className="w-4 h-4" aria-hidden="true" />}
                         onPress={() => { setIsOptionsSheetOpen(false); onHidePost(item); }}
                       >
@@ -1062,7 +1062,7 @@ const FeedCard = React.memo(function FeedCard({
                       {onNotInterested && (
                         <Button
                           variant="light"
-                          className="justify-start text-[var(--text-primary)]"
+                          className="justify-start text-theme-primary"
                           startContent={<ThumbsDown className="w-4 h-4" aria-hidden="true" />}
                           onPress={() => { setIsOptionsSheetOpen(false); onNotInterested(item); }}
                         >
@@ -1072,7 +1072,7 @@ const FeedCard = React.memo(function FeedCard({
                       {onMuteUser && (
                         <Button
                           variant="light"
-                          className="justify-start text-[var(--text-primary)]"
+                          className="justify-start text-theme-primary"
                           startContent={<VolumeX className="w-4 h-4" aria-hidden="true" />}
                           aria-label={t('card.mute_user_label', { name: author.name ?? '' })}
                           onPress={() => { setIsOptionsSheetOpen(false); onMuteUser(item); }}
@@ -1114,13 +1114,13 @@ const FeedCard = React.memo(function FeedCard({
             detailPath ? (
               <Link
                 to={tenantPath(detailPath)}
-                className="text-sm font-semibold text-[var(--text-primary)] hover:text-[var(--color-primary)] transition-colors mb-1.5 block"
+                className="text-sm font-semibold text-theme-primary hover:text-primary transition-colors mb-1.5 block"
                 onClick={recordClick}
               >
                 {item.title}
               </Link>
             ) : (
-              <p className="text-sm font-semibold text-[var(--text-primary)] mb-1.5">{item.title}</p>
+              <p className="text-sm font-semibold text-theme-primary mb-1.5">{item.title}</p>
             )
           )}
           <FeedContentRenderer
@@ -1166,23 +1166,23 @@ const FeedCard = React.memo(function FeedCard({
           const dateForChip = item.start_date ? new Date(item.start_date) : null;
 
           return (
-            <div className="mb-4 flex flex-wrap items-center gap-3 text-xs text-[var(--text-muted)]">
+            <div className="mb-4 flex flex-wrap items-center gap-3 text-xs text-theme-muted">
               {/* Event-only: calendar-page date chip */}
               {isEvent && dateForChip && (
                 <div className="flex items-center gap-2.5">
-                  <div className="flex flex-col items-center justify-center rounded-lg overflow-hidden border border-[var(--border-default)] bg-[var(--surface-base)] w-11 h-12 shadow-sm" aria-hidden="true">
+                  <div className="flex flex-col items-center justify-center rounded-lg overflow-hidden border border-theme-default bg-[var(--surface-base)] w-11 h-12 shadow-sm" aria-hidden="true">
                     <div className="w-full px-1 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-gradient-to-r from-emerald-500 to-green-500 text-white text-center leading-tight">
                       {dateForChip.toLocaleString(undefined, { month: 'short' })}
                     </div>
-                    <div className="flex-1 flex items-center justify-center text-lg font-bold tabular-nums text-[var(--text-primary)] leading-none">
+                    <div className="flex-1 flex items-center justify-center text-lg font-bold tabular-nums text-theme-primary leading-none">
                       {dateForChip.getDate()}
                     </div>
                   </div>
                   <div className="flex flex-col text-xs">
-                    <span className="text-[var(--text-primary)] font-medium">
+                    <span className="text-theme-primary font-medium">
                       {formatDate(item.start_date!, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
-                    <span className="text-[var(--text-subtle)]">{formatTime(item.start_date!)}</span>
+                    <span className="text-theme-subtle">{formatTime(item.start_date!)}</span>
                   </div>
                 </div>
               )}
@@ -1192,7 +1192,7 @@ const FeedCard = React.memo(function FeedCard({
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
                   <span>{formatDate(item.start_date, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                  <span className="text-[var(--text-subtle)]">{formatTime(item.start_date)}</span>
+                  <span className="text-theme-subtle">{formatTime(item.start_date)}</span>
                 </span>
               )}
 
@@ -1245,8 +1245,8 @@ const FeedCard = React.memo(function FeedCard({
               </Chip>
             )}
             {item.location && (
-              <span className="flex items-center gap-1.5 text-[var(--text-muted)]">
-                <MapPin className="w-3.5 h-3.5 text-[var(--color-primary)]" aria-hidden="true" />
+              <span className="flex items-center gap-1.5 text-theme-muted">
+                <MapPin className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
                 <span className="truncate">{item.location}</span>
               </span>
             )}
@@ -1268,7 +1268,7 @@ const FeedCard = React.memo(function FeedCard({
               </Chip>
             )}
             {item.organization && (
-              <span className="flex items-center gap-1.5 text-[var(--text-muted)]">
+              <span className="flex items-center gap-1.5 text-theme-muted">
                 <Users className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
                 <span className="truncate">{item.organization}</span>
               </span>
@@ -1388,7 +1388,7 @@ const FeedCard = React.memo(function FeedCard({
         {item.type === 'poll' && (
           <div className="mb-4">
             {isLoadingPoll ? (
-              <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-elevated)] overflow-hidden">
+              <div className="rounded-2xl border border-theme-default bg-theme-elevated overflow-hidden">
                 <div className="h-1 bg-gradient-to-r from-amber-500/40 via-orange-500/40 to-amber-500/40" />
                 <div className="p-5 space-y-3">
                   <Skeleton className="h-6 w-3/4 rounded-lg" />
@@ -1398,9 +1398,9 @@ const FeedCard = React.memo(function FeedCard({
                 </div>
               </div>
             ) : pollLoadError ? (
-              <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-elevated)] p-5 text-center">
-                <BarChart3 className="w-8 h-8 mx-auto mb-2 text-[var(--text-subtle)]" aria-hidden="true" />
-                <p className="text-sm text-[var(--text-muted)]">{t('poll.load_failed')}</p>
+              <div className="rounded-2xl border border-theme-default bg-theme-elevated p-5 text-center">
+                <BarChart3 className="w-8 h-8 mx-auto mb-2 text-theme-subtle" aria-hidden="true" />
+                <p className="text-sm text-theme-muted">{t('poll.load_failed')}</p>
               </div>
             ) : pollData ? (
               (() => {
@@ -1438,7 +1438,7 @@ const FeedCard = React.memo(function FeedCard({
                 const pollDetailPath = tenantPath('/polls');
 
                 return (
-                  <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-elevated)] overflow-hidden shadow-sm">
+                  <div className="rounded-2xl border border-theme-default bg-theme-elevated overflow-hidden shadow-sm">
                     {/* Gradient accent bar */}
                     <div className={`h-1 bg-gradient-to-r ${pollExpired ? 'from-gray-400/30 to-gray-500/30' : 'from-amber-500 via-orange-500 to-amber-500'}`} />
 
@@ -1474,7 +1474,7 @@ const FeedCard = React.memo(function FeedCard({
 
                     {/* Question */}
                     {pollData.question && (
-                      <h3 className="px-5 pt-3 text-[15px] sm:text-base font-semibold leading-snug text-[var(--text-primary)]">
+                      <h3 className="px-5 pt-3 text-[15px] sm:text-base font-semibold leading-snug text-theme-primary">
                         {pollData.question}
                       </h3>
                     )}
@@ -1494,7 +1494,7 @@ const FeedCard = React.memo(function FeedCard({
                                 isVoted
                                   ? 'border-amber-500/60 bg-amber-500/5'
                                   : isLeading
-                                    ? 'border-[var(--border-default)] bg-[var(--surface-base)]'
+                                    ? 'border-theme-default bg-[var(--surface-base)]'
                                     : 'border-[var(--border-subtle)] bg-[var(--surface-base)]'
                               }`}
                             >
@@ -1519,22 +1519,22 @@ const FeedCard = React.memo(function FeedCard({
                                       <Check className="w-3 h-3" aria-hidden="true" />
                                     </span>
                                   ) : isLeading && !resultsHidden ? (
-                                    <TrendingUp className="w-4 h-4 flex-shrink-0 text-[var(--text-muted)]" aria-hidden="true" />
+                                    <TrendingUp className="w-4 h-4 flex-shrink-0 text-theme-muted" aria-hidden="true" />
                                   ) : (
                                     <span className="flex-shrink-0 w-5 h-5" aria-hidden="true" />
                                   )}
-                                  <span className={`text-sm leading-snug truncate ${(isVoted || (isLeading && !resultsHidden)) ? 'font-semibold text-[var(--text-primary)]' : 'text-[var(--text-primary)]'}`}>
+                                  <span className={`text-sm leading-snug truncate ${(isVoted || (isLeading && !resultsHidden)) ? 'font-semibold text-theme-primary' : 'text-theme-primary'}`}>
                                     {option.text}
                                   </span>
                                 </div>
                                 <div className="flex flex-col items-end shrink-0">
                                   {option.percentage != null && (
-                                    <span className={`text-sm font-bold tabular-nums ${isVoted ? 'text-amber-600 dark:text-amber-400' : 'text-[var(--text-primary)]'}`}>
+                                    <span className={`text-sm font-bold tabular-nums ${isVoted ? 'text-amber-600 dark:text-amber-400' : 'text-theme-primary'}`}>
                                       {option.percentage}%
                                     </span>
                                   )}
                                   {option.vote_count != null && (
-                                    <span className="text-[10px] text-[var(--text-subtle)] tabular-nums">
+                                    <span className="text-[10px] text-theme-subtle tabular-nums">
                                       {option.vote_count} {option.vote_count === 1 ? t('card.vote', 'vote') : t('card.votes', 'votes')}
                                     </span>
                                   )}
@@ -1554,11 +1554,11 @@ const FeedCard = React.memo(function FeedCard({
                             key={option.id}
                             onClick={() => handleVote(option.id)}
                             disabled={pollExpired}
-                            className="group relative w-full text-left px-4 py-3 rounded-xl border-2 border-[var(--border-default)] bg-[var(--surface-base)] hover:border-amber-500 hover:bg-amber-500/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-elevated)] active:scale-[0.99] transition-all text-sm font-medium text-[var(--text-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="group relative w-full text-left px-4 py-3 rounded-xl border-2 border-theme-default bg-[var(--surface-base)] hover:border-amber-500 hover:bg-amber-500/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-elevated)] active:scale-[0.99] transition-all text-sm font-medium text-theme-primary disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <span className="flex items-center justify-between gap-3">
                               <span className="truncate">{option.text}</span>
-                              <ArrowRight className="w-4 h-4 text-[var(--text-subtle)] group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all" aria-hidden="true" />
+                              <ArrowRight className="w-4 h-4 text-theme-subtle group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all" aria-hidden="true" />
                             </span>
                           </button>
                         );
@@ -1567,7 +1567,7 @@ const FeedCard = React.memo(function FeedCard({
 
                     {/* Footer: meta + CTA */}
                     <div className="flex items-center justify-between gap-3 px-5 py-3 border-t border-[var(--border-subtle)] bg-[var(--surface-base)]/40">
-                      <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] min-w-0">
+                      <div className="flex items-center gap-2 text-xs text-theme-muted min-w-0">
                         {resultsHidden ? (
                           <span className="inline-flex items-center gap-1.5 min-w-0">
                             <EyeOff className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
@@ -1628,7 +1628,7 @@ const FeedCard = React.memo(function FeedCard({
                     <div className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider leading-none">
                       {t('card.reviewed')}
                     </div>
-                    <div className="text-sm font-semibold text-[var(--text-primary)] group-hover/receiver:text-[var(--color-primary)] transition-colors truncate">
+                    <div className="text-sm font-semibold text-theme-primary group-hover/receiver:text-primary transition-colors truncate">
                       {item.receiver.name}
                     </div>
                   </div>
@@ -1644,7 +1644,7 @@ const FeedCard = React.memo(function FeedCard({
                 </div>
               </div>
               {item.content && (
-                <blockquote className="relative border-s-4 border-amber-500/60 ps-4 py-1 text-[15px] text-[var(--text-secondary)] italic leading-relaxed">
+                <blockquote className="relative border-s-4 border-amber-500/60 ps-4 py-1 text-[15px] text-theme-secondary italic leading-relaxed">
                   <span className="absolute -top-1 -start-1 text-2xl text-amber-500/40 leading-none select-none" aria-hidden="true">&ldquo;</span>
                   {item.content}
                 </blockquote>
@@ -1664,7 +1664,7 @@ const FeedCard = React.memo(function FeedCard({
               <p className="text-xs font-semibold text-amber-700 dark:text-amber-300 uppercase tracking-[0.2em] mb-1">
                 {t('card.milestone.badge_unlocked', 'Badge unlocked')}
               </p>
-              <p className="text-base font-bold text-[var(--text-primary)] leading-snug">
+              <p className="text-base font-bold text-theme-primary leading-snug">
                 {t('card.badge_earned_message', {
                   name: author.name,
                   badge: item.badge_name || item.title || '',
@@ -1686,7 +1686,7 @@ const FeedCard = React.memo(function FeedCard({
               <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 uppercase tracking-[0.2em] mb-1">
                 {t('card.milestone.level_reached', 'Level reached')}
               </p>
-              <p className="text-base font-bold text-[var(--text-primary)] leading-snug">
+              <p className="text-base font-bold text-theme-primary leading-snug">
                 {t('card.level_up_message', {
                   name: author.name,
                   level: item.new_level || item.title?.replace('Level ', '') || '',
@@ -1702,7 +1702,7 @@ const FeedCard = React.memo(function FeedCard({
           <div className="mb-3">
             <Link
               to={tenantPath(detailPath)}
-              className={`inline-flex items-center justify-center gap-2 py-2 px-5 rounded-xl text-sm font-medium transition-all bg-gradient-to-r ${config.softGradient || 'from-[var(--color-primary)]/10 to-[var(--color-primary)]/5'} text-[var(--text-primary)] hover:opacity-80 border border-[var(--border-default)] hover:border-[var(--color-primary)]/30`}
+              className={`inline-flex items-center justify-center gap-2 py-2 px-5 rounded-xl text-sm font-medium transition-all bg-gradient-to-r ${config.softGradient || 'from-primary/10 to-primary/5'} text-theme-primary hover:opacity-80 border border-theme-default hover:border-primary/30`}
               onClick={recordClick}
             >
               {config.icon}
@@ -1714,7 +1714,7 @@ const FeedCard = React.memo(function FeedCard({
 
         {/* Stats Row — Reactions + Comments Count + Views */}
         {((item.reactions?.total ?? item.likes_count) > 0 || localCommentsCount > 0 || (item.views_count ?? 0) > 0) && (
-          <div className="flex items-center justify-between text-xs text-[var(--text-subtle)] mb-3">
+          <div className="flex items-center justify-between text-xs text-theme-subtle mb-3">
             <span className="flex items-center gap-3">
               {item.reactions && item.reactions.total > 0 ? (
                 <ReactionSummary
@@ -1745,7 +1745,7 @@ const FeedCard = React.memo(function FeedCard({
               <Button
                 variant="light"
                 size="sm"
-                className="text-xs text-[var(--text-subtle)] hover:text-[var(--text-primary)] p-0 min-w-0 h-auto"
+                className="text-xs text-theme-subtle hover:text-theme-primary p-0 min-w-0 h-auto"
                 onPress={toggleComments}
               >
                 {localCommentsCount} {localCommentsCount === 1 ? t('card.comment') : t('card.comments')}
@@ -1774,7 +1774,7 @@ const FeedCard = React.memo(function FeedCard({
                   variant="light"
                   className={`transition-all ${item.is_liked
                     ? 'text-rose-500 font-medium bg-rose-500/5'
-                    : 'text-[var(--text-muted)] hover:text-rose-500 hover:bg-rose-500/5'
+                    : 'text-theme-muted hover:text-rose-500 hover:bg-rose-500/5'
                   }`}
                   startContent={
                     <Heart
@@ -1794,8 +1794,8 @@ const FeedCard = React.memo(function FeedCard({
               <Button
                 size="sm"
                 variant="light"
-                className={`${showComments ? 'text-[var(--color-primary)] font-medium' : 'text-[var(--text-muted)]'} hover:text-[var(--color-primary)] transition-colors`}
-                startContent={<MessageCircle className={`w-[18px] h-[18px] ${showComments ? 'fill-[var(--color-primary)]/20' : ''}`} aria-hidden="true" />}
+                className={`transition-all ${showComments ? 'text-primary font-medium bg-primary/5' : 'text-theme-muted hover:text-primary hover:bg-primary/5'}`}
+                startContent={<MessageCircle className={`w-[18px] h-[18px] ${showComments ? 'fill-primary/20' : ''}`} aria-hidden="true" />}
                 onPress={toggleComments}
               >
                 {t('card.comment_action')}
@@ -1849,7 +1849,7 @@ const FeedCard = React.memo(function FeedCard({
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2, ease: 'easeInOut' }}
-              className="mt-3 pt-3 border-t border-[var(--border-default)] space-y-3"
+              className="mt-3 pt-3 border-t border-theme-default space-y-3"
             >
               {/* Comment Input */}
               {isAuthenticated && (
@@ -1863,15 +1863,15 @@ const FeedCard = React.memo(function FeedCard({
                     size="sm"
                     radius="full"
                     classNames={{
-                      input: 'bg-transparent text-[var(--text-primary)] text-sm',
-                      inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40 h-9',
+                      input: 'bg-transparent text-theme-primary text-sm',
+                      inputWrapper: 'bg-theme-elevated border-theme-default hover:border-primary/40 h-9',
                     }}
                     endContent={
                       <Button
                         isIconOnly
                         size="sm"
                         variant="light"
-                        className="text-[var(--color-primary)] min-w-0 w-auto h-auto p-0 disabled:opacity-30"
+                        className="text-primary min-w-0 w-auto h-auto p-0 disabled:opacity-30"
                         onPress={handleSubmitComment}
                         isDisabled={!newComment.trim() || isSubmittingComment}
                         aria-label={t('card.send_comment', 'Send comment')}
@@ -1897,7 +1897,7 @@ const FeedCard = React.memo(function FeedCard({
                   ))}
                 </div>
               ) : comments.length === 0 ? (
-                <p className="text-xs text-[var(--text-subtle)] text-center py-3 italic">
+                <p className="text-xs text-theme-subtle text-center py-3 italic">
                   {t('card.no_comments')}
                 </p>
               ) : (

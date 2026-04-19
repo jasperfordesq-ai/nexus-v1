@@ -740,7 +740,7 @@ export function FeedPage() {
           style={{ height: Math.max(pullDistance, isRefreshing ? 48 : 0), transition: pullDistance > 0 ? 'none' : 'height 0.3s ease-out' }}
         >
           <RefreshCw
-            className={`w-5 h-5 text-[var(--color-primary)] ${isRefreshing ? 'animate-spin' : ''}`}
+            className={`w-5 h-5 text-primary ${isRefreshing ? 'animate-spin' : ''}`}
             style={{
               transform: isRefreshing ? undefined : `rotate(${pullDistance * 4}deg)`,
               opacity: isRefreshing ? 1 : Math.min(pullDistance / 60, 1),
@@ -807,7 +807,7 @@ export function FeedPage() {
 
       {/* Quick Post Box */}
       {isAuthenticated && (
-        <GlassCard className="p-4 hover:border-[var(--color-primary)]/20 transition-colors">
+        <GlassCard className="p-4 hover:border-primary/20 transition-colors">
           <div
             className="flex items-center gap-3 cursor-pointer"
             role="button"
@@ -823,7 +823,7 @@ export function FeedPage() {
               isBordered
               className="ring-2 ring-[var(--border-default)]"
             />
-            <div className="flex-1 bg-[var(--surface-elevated)] rounded-full px-4 py-2.5 text-[var(--text-subtle)] text-sm border border-[var(--border-default)] hover:border-[var(--color-primary)]/30 transition-colors">
+            <div className="flex-1 bg-theme-elevated rounded-full px-4 py-2.5 text-theme-subtle text-sm border border-theme-default hover:border-primary/30 transition-colors">
               {t('whats_on_your_mind')}
             </div>
             <div className="flex gap-1">
@@ -831,7 +831,7 @@ export function FeedPage() {
                 isIconOnly
                 size="sm"
                 variant="light"
-                className="text-[var(--text-muted)]"
+                className="text-theme-muted"
                 onPress={() => openCompose('post')}
                 aria-label={t('add_image_aria')}
               >
@@ -841,7 +841,7 @@ export function FeedPage() {
                 isIconOnly
                 size="sm"
                 variant="light"
-                className="text-[var(--text-muted)]"
+                className="text-theme-muted"
                 onPress={() => openCompose('poll')}
                 aria-label={t('create_poll_aria')}
               >
@@ -863,7 +863,7 @@ export function FeedPage() {
             className={`shrink-0 ${
               filter === opt.key
                 ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/20'
-                : 'bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:text-indigo-500 hover:bg-indigo-500/5 border border-[var(--border-default)] transition-colors'
+                : 'bg-theme-elevated text-theme-muted hover:text-indigo-500 hover:bg-indigo-500/5 border border-theme-default transition-colors'
             }`}
             onPress={() => { setFilter(opt.key); syncToUrl({ filter: opt.key }); }}
           >
@@ -912,8 +912,8 @@ export function FeedPage() {
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mx-auto mb-5">
             <AlertTriangle className="w-8 h-8 text-amber-500" aria-hidden="true" />
           </div>
-          <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">{t('unable_to_load')}</h2>
-          <p className="text-[var(--text-muted)] mb-5 text-sm max-w-xs mx-auto">{error}</p>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
+          <p className="text-theme-muted mb-5 text-sm max-w-xs mx-auto">{error}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
@@ -938,8 +938,8 @@ export function FeedPage() {
               <div className="mx-auto mb-6">
                 <FeedEmptyIllustration className="w-32 h-32 mx-auto" />
               </div>
-              <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">{t('empty_title')}</h2>
-              <p className="text-sm text-[var(--text-muted)] mb-6 max-w-xs mx-auto">
+              <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('empty_title')}</h2>
+              <p className="text-sm text-theme-muted mb-6 max-w-xs mx-auto">
                 {filter !== 'all'
                   ? t('empty_filtered', { filter })
                   : t('empty_desc')}
@@ -1000,7 +1000,7 @@ export function FeedPage() {
               {/* End-of-feed message */}
               {!hasMore && items.length > 0 && !isLoading && (
                 <div className="text-center py-10">
-                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--surface-elevated)] text-[var(--text-muted)] text-sm border border-[var(--border-default)]">
+                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-theme-elevated text-theme-muted text-sm border border-theme-default">
                     <span className="w-1.5 h-1.5 rounded-full bg-indigo-400/60" aria-hidden="true" />
                     {t('feed.end_of_feed')}
                     <span className="w-1.5 h-1.5 rounded-full bg-purple-400/60" aria-hidden="true" />
@@ -1013,7 +1013,7 @@ export function FeedPage() {
                 <div className="pt-6 pb-2 text-center">
                   <Button
                     variant="bordered"
-                    className="border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
+                    className="border-theme-default text-theme-muted hover:border-primary hover:text-primary transition-colors"
                     onPress={() => loadFeed(true)}
                     startContent={<TrendingUp className="w-4 h-4" aria-hidden="true" />}
                   >
@@ -1062,7 +1062,7 @@ export function FeedPage() {
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-[var(--text-primary)]">
+          <ModalHeader className="text-theme-primary">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-danger/10 flex items-center justify-center">
                 <Flag className="w-4 h-4 text-danger" aria-hidden="true" />
@@ -1071,7 +1071,7 @@ export function FeedPage() {
             </div>
           </ModalHeader>
           <ModalBody>
-            <p className="text-sm text-[var(--text-muted)] mb-3">
+            <p className="text-sm text-theme-muted mb-3">
               {t('report.description')}
             </p>
             <Textarea
@@ -1081,8 +1081,8 @@ export function FeedPage() {
               onChange={(e) => setReportReason(e.target.value)}
               minRows={3}
               classNames={{
-                input: 'bg-transparent text-[var(--text-primary)]',
-                inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)]',
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
               }}
               autoFocus
             />
@@ -1091,7 +1091,7 @@ export function FeedPage() {
             <Button
               variant="flat"
               onPress={onReportClose}
-              className="text-[var(--text-muted)]"
+              className="text-theme-muted"
             >
               {t('report.cancel')}
             </Button>
