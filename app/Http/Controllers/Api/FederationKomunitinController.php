@@ -253,7 +253,7 @@ class FederationKomunitinController extends BaseApiController
         }
 
         // Cursor pagination: decode opaque cursor
-        $offset = $this->decodeCursor($afterCursor);
+        $offset = $this->decodeOffsetCursor($afterCursor);
 
         $users = $query->orderBy('id')
             ->offset($offset)
@@ -553,7 +553,7 @@ class FederationKomunitinController extends BaseApiController
         };
 
         // Cursor pagination: decode opaque cursor
-        $offset = $this->decodeCursor($afterCursor);
+        $offset = $this->decodeOffsetCursor($afterCursor);
 
         $transactions = $query->orderBy($sortCol, $sortDesc ? 'desc' : 'asc')
             ->offset($offset)
@@ -1068,12 +1068,14 @@ class FederationKomunitinController extends BaseApiController
     }
 
     /**
-     * Decode an opaque cursor string into a numeric offset.
+     * Decode an opaque cursor string into a numeric OFFSET for
+     * Federation pagination. Distinct from BaseApiController::decodeCursor,
+     * which decodes a base64 cursor into a string ID.
      *
      * Accepts both the new base64-JSON format and legacy raw integers
      * for backwards compatibility.
      */
-    protected function decodeCursor(?string $cursor): int
+    protected function decodeOffsetCursor(?string $cursor): int
     {
         if ($cursor === null || $cursor === '') {
             return 0;
