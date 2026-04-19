@@ -17,6 +17,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Button,
   Dropdown,
@@ -131,12 +132,27 @@ export function ShareButton({
       // the backend (ShareService::toggle) removes it and returns {shared: false}.
       // We always POST — never assign `api.post`/`api.delete` to a variable, since
       // that loses the `this` binding and breaks `this.request` inside the method.
-      const response = await api.post('/v2/shares', { type: resolvedType, id: resolvedId });
+      const response = await api.post<{ shared: boolean; count: number }>(
+        '/v2/shares',
+        { type: resolvedType, id: resolvedId }
+      );
       if (!response.success) {
         setLocalIsShared(!newIsShared);
         setLocalCount(localCount);
-        toast.error(response.error || t('toast.share_failed'));
+        // Map backend error codes to specific toast messages. Falls back to the
+        // generic share-failed string so unknown codes still give the user feedback.
+        const code = (response as { code?: string }).code;
+        if (code === 'SELF_SHARE') {
+          toast.error(t('share.cannot_share_own_post', 'You cannot share your own post'));
+        } else {
+          toast.error(response.error || t('toast.share_failed'));
+        }
         return;
+      }
+      // Reconcile local state from authoritative server response when available.
+      if (response.data) {
+        setLocalIsShared(response.data.shared);
+        setLocalCount(response.data.count);
       }
       if (newIsShared) {
         toast.success(t('toast.post_shared'));
@@ -336,23 +352,31 @@ export function ShareButton({
 }
 
 /**
- * SharedByAttribution - Shows "Shared by X" on reposted content
+ * SharedByAttribution - Shows "Shared by X" header on reposted content.
+ * Rendered by FeedCard when `item.shared_by` is populated.
  */
 export function SharedByAttribution({
-  sharerName,
+  user,
 }: {
-  sharerName: string;
-  sharerAvatar?: string;
-  sharerId?: number;
+  user: {
+    id: number;
+    name: string;
+    avatar_url?: string | null;
+    shared_at?: string;
+  };
 }) {
   const { t } = useTranslation('feed');
+  const { tenantPath } = useTenant();
   return (
-    <div className="flex items-center gap-1.5 px-5 py-2 text-xs text-[var(--text-subtle)] border-b border-[var(--border-default)]">
-      <Repeat2 className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
-      <span>
-        <span className="font-medium text-[var(--text-muted)]">{sharerName}</span>
-        {' '}{t('share.shared_by_text')}
-      </span>
+    <div className="flex items-center gap-2 text-xs text-[var(--text-subtle)]">
+      <Repeat2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" aria-hidden="true" />
+      <Link
+        to={tenantPath(`/profile/${user.id}`)}
+        className="inline-flex items-center gap-1.5 hover:text-[var(--text-primary)] transition-colors"
+      >
+        <span className="font-semibold text-[var(--text-muted)]">{user.name}</span>
+        <span>{t('share.shared_by_text', 'shared this')}</span>
+      </Link>
     </div>
   );
 }

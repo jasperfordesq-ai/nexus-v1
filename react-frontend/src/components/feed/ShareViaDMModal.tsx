@@ -54,26 +54,40 @@ export function ShareViaDMModal({ isOpen, onClose, postUrl, postContent }: Share
   const isMountedRef = useRef(true);
   useEffect(() => { return () => { isMountedRef.current = false; }; }, []);
 
+  // Track the latest search token so out-of-order responses from rapid typing
+  // don't overwrite newer results with stale ones.
+  const searchTokenRef = useRef(0);
+
   const searchUsers = useCallback(async (q: string) => {
     if (q.length < 2) {
       setUsers([]);
+      setIsSearching(false);
       return;
     }
 
+    const token = ++searchTokenRef.current;
     try {
       setIsSearching(true);
       // Backend /v2/users (UsersController::index) reads ?q=... and ?limit=...
-      // The previous ?search=...&per_page=... params were ignored, which meant
-      // the query fell through to the full member-directory rank path and timed out.
-      const response = await api.get<{ data: UserResult[] }>(`/v2/users?q=${encodeURIComponent(q)}&limit=10`);
+      const response = await api.get<UserResult[] | { data: UserResult[] }>(
+        `/v2/users?q=${encodeURIComponent(q)}&limit=10`
+      );
+      // Bail if a newer search has already fired — don't overwrite live results.
+      if (token !== searchTokenRef.current || !isMountedRef.current) return;
       if (response.success && response.data) {
-        const items = Array.isArray(response.data) ? response.data : (response.data as { data: UserResult[] }).data ?? [];
-        if (isMountedRef.current) setUsers(items);
+        const items = Array.isArray(response.data)
+          ? response.data
+          : (response.data as { data?: UserResult[] }).data ?? [];
+        setUsers(items);
       }
     } catch (err) {
-      logError('Failed to search users for DM share', err);
+      if (token === searchTokenRef.current) {
+        logError('Failed to search users for DM share', err);
+      }
     } finally {
-      if (isMountedRef.current) setIsSearching(false);
+      if (token === searchTokenRef.current && isMountedRef.current) {
+        setIsSearching(false);
+      }
     }
   }, []);
 

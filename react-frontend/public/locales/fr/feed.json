@@ -374,7 +374,8 @@
     "dm_sent_label": "Sent",
     "dm_send": "Send",
     "dm_done": "Done",
-    "shared_by_text": "shared this"
+    "shared_by_text": "shared this",
+    "cannot_share_own_post": "You cannot share your own post"
   },
   "trending": {
     "title": "Tendances",

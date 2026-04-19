@@ -79,7 +79,7 @@ import { LinkPreviewCard } from '@/components/social/LinkPreviewCard';
 import { MentionRenderer } from '@/components/social/MentionRenderer';
 import { UserHoverCard } from '@/components/social/UserHoverCard';
 import { SafeHtml, containsHtml } from '@/components/ui/SafeHtml';
-import { ShareButton } from './ShareButton';
+import { ShareButton, SharedByAttribution } from './ShareButton';
 import { QuotedPostEmbed } from './QuotedPostEmbed';
 import { BookmarkButton } from '@/components/social';
 import { PostAnalyticsModal } from './PostAnalyticsModal';
@@ -807,6 +807,17 @@ const FeedCard = React.memo(function FeedCard({
       )}
 
       <div className="p-5">
+        {/*
+          Shared-by attribution — rendered when this feed item appears in the
+          viewer's feed because someone they know reposted it. Backend populates
+          `shared_by` via post_shares join.
+        */}
+        {item.shared_by && (
+          <div className="mb-3">
+            <SharedByAttribution user={item.shared_by} />
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">

@@ -605,5 +605,12 @@
     "readme_file_uploads": "uploads/ — Your uploaded files (if any)",
     "readme_support": "For questions about this export, please contact support.",
     "readme_expiry": "This export will expire in 7 days."
+  },
+  "billing": {
+    "plan_assigned_subject": "Your Project NEXUS plan has been updated",
+    "plan_assigned_title": "Plan Updated",
+    "plan_assigned_body": "Your platform plan has been updated to <strong>:plan</strong>. The effective price is <strong>:price</strong>. Expiry: :expiry.:notes",
+    "plan_assigned_cta": "View Billing",
+    "plan_assigned_no_expiry": "No expiry set"
   }
 }

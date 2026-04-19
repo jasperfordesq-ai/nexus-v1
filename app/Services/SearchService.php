@@ -219,7 +219,22 @@ class SearchService
             try {
                 $client->createIndex($name, ['primaryKey' => $cfg['pk']]);
             } catch (\Throwable) {
-                // Index already exists — update settings only
+                // Index already exists — update settings only.
+                // But: an old index created WITHOUT a primary key will silently drop
+                // every addDocuments call with "primary_key_multiple_candidates_found".
+                // Detect that pre-existing failure mode and recreate the index so
+                // tenants don't end up with a permanently empty search index.
+                try {
+                    $info = $client->getRawIndex($name);
+                    if (!isset($info['primaryKey']) || $info['primaryKey'] === null) {
+                        $client->deleteIndex($name);
+                        // Wait a beat for async deletion before recreate.
+                        usleep(200_000);
+                        $client->createIndex($name, ['primaryKey' => $cfg['pk']]);
+                    }
+                } catch (\Throwable) {
+                    // If repair fails, proceed — surface via next indexing attempt.
+                }
             }
             $idx = $client->index($name);
             $idx->updateSearchableAttributes($cfg['searchable']);
@@ -357,6 +372,11 @@ class SearchService
             'last_name'         => $user->last_name ?? '',
             'organization_name' => $user->organization_name ?? '',
             'bio'               => $user->bio ?? '',
+            // skills + location are searchable in the index config (ensureIndexes);
+            // the Eloquent path previously omitted them so those searches silently
+            // failed until the nightly sync ran.
+            'skills'            => $user->skills ?? '',
+            'location'          => $user->location ?? '',
             'status'            => $user->status ?? 'active',
             'profile_type'      => $user->profile_type ?? 'individual',
             'avatar_url'        => $user->avatar_url ?? '',
@@ -1315,13 +1335,15 @@ class SearchService
     {
         $limit = min($limit, 200);
 
-        // Try Meilisearch first for typo-tolerant, ranked results
+        // Try Meilisearch first for typo-tolerant, ranked results.
+        // If Meili returns non-empty hits, trust them. Otherwise fall back to SQL
+        // so an empty/broken index doesn't silently hide all members.
         $meiliResult = static::searchUserIds($query, $tenantId, $limit);
-        if ($meiliResult !== null) {
+        if ($meiliResult !== null && !empty($meiliResult['ids'])) {
             return $meiliResult['ids'];
         }
 
-        // Fall back to SQL LIKE
+        // Fall back to SQL LIKE (also runs when Meili is available but empty).
         $like = '%' . $query . '%';
         return User::where('tenant_id', $tenantId)
             ->where(function ($q) use ($like) {
@@ -1331,6 +1353,10 @@ class SearchService
                   ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$like]);
             })
             ->whereNotIn('status', ['banned', 'suspended'])
+            // Respect search-opt-out (matches SQL path in UsersController::index).
+            ->where(function ($q) {
+                $q->where('privacy_search', 1)->orWhereNull('privacy_search');
+            })
             ->limit($limit)
             ->pluck('id')
             ->all();

@@ -93,18 +93,20 @@ describe('ShareButton', () => {
     await user.click(btn);
 
     await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith('/v2/feed/posts/1/share');
+      // Polymorphic endpoint — ShareButton always POSTs to /v2/shares.
+      // The backend treats an existing share as a toggle-off.
+      expect(api.post).toHaveBeenCalledWith('/v2/shares', { type: 'post', id: 1 });
     });
   });
 
-  it('calls api.delete when unsharing a shared post', async () => {
+  it('calls api.post (toggle endpoint) when unsharing a shared post', async () => {
     const user = userEvent.setup();
     render(<ShareButton {...defaultProps} isShared={true} />);
     const btn = screen.getByRole('button');
     await user.click(btn);
 
     await waitFor(() => {
-      expect(api.delete).toHaveBeenCalledWith('/v2/feed/posts/1/share');
+      expect(api.post).toHaveBeenCalledWith('/v2/shares', { type: 'post', id: 1 });
     });
   });
 

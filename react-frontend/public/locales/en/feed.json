@@ -366,6 +366,8 @@
     "button_label": "Share",
     "button_label_count": "Share ({{count}})",
     "shared_by": "<0>{{name}}</0> shared this",
+    "shared_by_text": "shared this",
+    "cannot_share_own_post": "You cannot share your own post",
     "menu_label": "Share options",
     "repost": "Repost",
     "repost_desc": "Share to your feed",

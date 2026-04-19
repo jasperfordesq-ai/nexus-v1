@@ -177,7 +177,24 @@ class FeedService
         }
 
         if ($profileUserId !== null) {
-            $query->where('feed_activity.user_id', (int) $profileUserId);
+            $pid = (int) $profileUserId;
+            // Profile feeds include the user's own activity AND items they've
+            // reposted — the latter surface on their profile as "Shared by X"
+            // via the shared_by hydration further down. Without this OR branch,
+            // reposts were invisible because post_shares rows don't create
+            // feed_activity rows (the table has a unique index on source).
+            $query->where(function ($q) use ($pid, $tenantId) {
+                $q->where('feed_activity.user_id', $pid)
+                  ->orWhereExists(function ($sub) use ($pid, $tenantId) {
+                      $sub->select(DB::raw(1))
+                          ->from('post_shares')
+                          ->whereColumn('post_shares.tenant_id', 'feed_activity.tenant_id')
+                          ->whereColumn('post_shares.original_type', 'feed_activity.source_type')
+                          ->whereColumn('post_shares.original_post_id', 'feed_activity.source_id')
+                          ->where('post_shares.tenant_id', $tenantId)
+                          ->where('post_shares.user_id', $pid);
+                  });
+            });
         }
 
         if ($groupId !== null) {
@@ -433,6 +450,12 @@ class FeedService
             $items[] = $entry;
         }
 
+        // Defensive: drop feed items whose underlying source resource has been deleted.
+        // Orphans shouldn't exist (deletion paths call FeedActivityService::deleteActivity),
+        // but historical data gaps let them slip through — they surface as "Post not found"
+        // when a user tries to share/react. Hide them from the feed entirely.
+        $items = $this->filterOutOrphanedItems($items, $tenantId);
+
         // Enrich review receivers with names
         if (!empty($receiverIds)) {
             $nameMap = DB::table('users')
@@ -506,6 +529,107 @@ class FeedService
                 $item['is_shared'] = $sharedMap[$item['type']][$item['id']] ?? false;
             }
             unset($item);
+
+            // Populate shared_by so cards can render "Shared by X" attribution.
+            //
+            // Priority for picking which sharer to surface:
+            //   1. If a profile feed is being viewed (profileUserId is set) AND that
+            //      user has reposted the item — use them. Lets the profile owner's
+            //      reposts carry their own attribution.
+            //   2. Otherwise, use the most recent sharer who is not the original
+            //      author and not the current viewer (surfaces "my friend shared this").
+            //
+            // Single grouped query per type keeps hydration O(types).
+            $sharerIdsToResolve = []; // user_id => true
+            $latestSharerByItem = []; // "type:id" => ['user_id' => int, 'shared_at' => string]
+            foreach ($shareTypeToIds as $type => $ids) {
+                if (empty($ids)) {
+                    continue;
+                }
+                $idsWithShares = array_filter(
+                    $ids,
+                    fn ($id) => ($countMap[$type][$id] ?? 0) > 0
+                );
+                if (empty($idsWithShares)) {
+                    continue;
+                }
+                // If the profile feed belongs to a specific user, prefer *their*
+                // shares so attribution on their profile reads "Shared by them".
+                if ($profileUserId !== null) {
+                    $profileRows = DB::table('post_shares')
+                        ->where('tenant_id', $tenantId)
+                        ->where('original_type', $type)
+                        ->whereIn('original_post_id', array_values($idsWithShares))
+                        ->where('user_id', (int) $profileUserId)
+                        ->select('original_post_id', 'user_id', 'created_at')
+                        ->get();
+                    foreach ($profileRows as $row) {
+                        $key = $type . ':' . (int) $row->original_post_id;
+                        $latestSharerByItem[$key] = [
+                            'user_id'   => (int) $row->user_id,
+                            'shared_at' => (string) $row->created_at,
+                        ];
+                        $sharerIdsToResolve[(int) $row->user_id] = true;
+                    }
+                }
+
+                // Fallback: most recent non-self sharer for items we haven't covered yet.
+                $rows = DB::table('post_shares')
+                    ->where('tenant_id', $tenantId)
+                    ->where('original_type', $type)
+                    ->whereIn('original_post_id', array_values($idsWithShares))
+                    ->when($currentUserId, fn ($q) => $q->where('user_id', '!=', $currentUserId))
+                    ->select('original_post_id', 'user_id', 'created_at')
+                    ->orderByDesc('created_at')
+                    ->get();
+                foreach ($rows as $row) {
+                    $key = $type . ':' . (int) $row->original_post_id;
+                    if (!isset($latestSharerByItem[$key])) {
+                        $latestSharerByItem[$key] = [
+                            'user_id'    => (int) $row->user_id,
+                            'shared_at'  => (string) $row->created_at,
+                        ];
+                        $sharerIdsToResolve[(int) $row->user_id] = true;
+                    }
+                }
+            }
+            if (!empty($sharerIdsToResolve)) {
+                $sharerInfo = DB::table('users')
+                    ->whereIn('id', array_keys($sharerIdsToResolve))
+                    ->where('tenant_id', $tenantId)
+                    ->select('id', 'first_name', 'last_name', 'avatar_url')
+                    ->get()
+                    ->keyBy('id');
+                foreach ($items as &$item) {
+                    if (!in_array($item['type'], $shareableTypes, true)) {
+                        continue;
+                    }
+                    $key = $item['type'] . ':' . (int) $item['id'];
+                    if (!isset($latestSharerByItem[$key])) {
+                        continue;
+                    }
+                    $entry = $latestSharerByItem[$key];
+                    // Don't render "Shared by X" on the original author's own post
+                    // when they're viewing it — attribution reads weird on content
+                    // they created themselves. Exception: we're viewing their profile
+                    // and THEY reposted it (rare self-repost case — keep attribution).
+                    if ((int) $item['user_id'] === (int) ($currentUserId ?? 0)) {
+                        continue;
+                    }
+                    $info = $sharerInfo[$entry['user_id']] ?? null;
+                    if (!$info) {
+                        continue;
+                    }
+                    $name = trim(($info->first_name ?? '') . ' ' . ($info->last_name ?? ''));
+                    $item['shared_by'] = [
+                        'id'         => (int) $info->id,
+                        'name'       => $name !== '' ? $name : 'Unknown',
+                        'avatar_url' => $info->avatar_url,
+                        'shared_at'  => $entry['shared_at'],
+                    ];
+                }
+                unset($item);
+            }
         }
 
         // Batch load bookmark status for current user across ALL bookmarkable types.
@@ -712,6 +836,68 @@ class FeedService
             'cursor'   => $nextCursor,
             'has_more' => $hasMore,
         ];
+    }
+
+    /**
+     * Filter out feed items whose source resource has been deleted.
+     * Orphans render as "ghost" cards that fail every interaction (share, react,
+     * bookmark), so the cleanest UX is to hide them from the feed entirely.
+     *
+     * Types that don't have a distinct source row (post, review, badge_earned,
+     * level_up, discussion) are passed through unchanged.
+     *
+     * @param  array<int, array<string, mixed>>  $items
+     */
+    private function filterOutOrphanedItems(array $items, int $tenantId): array
+    {
+        if (empty($items)) {
+            return $items;
+        }
+
+        // Keep this list in sync with FeedActivityService source_type tables.
+        // Review/badge_earned/level_up/discussion don't need validation — they
+        // either have no source row or their source is inlined in the activity.
+        $sourceTables = [
+            'listing'   => 'listings',
+            'event'     => 'events',
+            'poll'      => 'polls',
+            'job'       => 'job_vacancies',
+            'blog'      => 'blog_posts',
+            'goal'      => 'goals',
+            'challenge' => 'ideation_challenges',
+            'volunteer' => 'vol_opportunities',
+        ];
+
+        $idsByType = [];
+        foreach ($items as $item) {
+            if (isset($sourceTables[$item['type']])) {
+                $idsByType[$item['type']][] = (int) $item['id'];
+            }
+        }
+        if (empty($idsByType)) {
+            return $items;
+        }
+
+        $existsByType = [];
+        foreach ($idsByType as $type => $ids) {
+            $table = $sourceTables[$type];
+            $existing = DB::table($table)
+                ->whereIn('id', array_unique($ids))
+                ->where('tenant_id', $tenantId)
+                ->pluck('id')
+                ->all();
+            $existsByType[$type] = array_flip($existing);
+        }
+
+        return array_values(array_filter(
+            $items,
+            static function (array $item) use ($existsByType, $sourceTables): bool {
+                if (!isset($sourceTables[$item['type']])) {
+                    return true;
+                }
+                return isset($existsByType[$item['type']][(int) $item['id']]);
+            }
+        ));
     }
 
     /**

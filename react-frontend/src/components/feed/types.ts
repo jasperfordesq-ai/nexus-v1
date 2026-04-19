@@ -80,6 +80,17 @@ export interface FeedItem {
   publish_status?: 'published' | 'scheduled' | 'draft';
   /** Scheduling: when the post is scheduled to be published */
   scheduled_at?: string;
+  /**
+   * When the viewer sees this item because someone they know reposted it,
+   * the backend populates this field so the card can render a "Shared by X" header.
+   * Not populated for original content.
+   */
+  shared_by?: {
+    id: number;
+    name: string;
+    avatar_url?: string | null;
+    shared_at: string;
+  };
   /** Reaction data (replaces simple like system) */
   reactions?: {
     counts: Record<string, number>;
