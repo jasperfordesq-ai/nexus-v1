@@ -469,6 +469,12 @@ jobs:
       - name: "BLOCKING: Prevent hardcoded English breadcrumbs"
         run: node scripts/check-admin-breadcrumbs.mjs
 
+      - name: "BLOCKING: Exhaustive t() key coverage (ratchets down via baseline)"
+        run: node scripts/check-i18n-coverage.mjs
+
+      - name: "BLOCKING: Variable-name mismatches between t() args and {{placeholders}}"
+        run: node scripts/check-i18n-vars.mjs
+
       - name: "INFO: Audit non-admin English fallback gaps"
         run: npm run check:i18n:gaps
 

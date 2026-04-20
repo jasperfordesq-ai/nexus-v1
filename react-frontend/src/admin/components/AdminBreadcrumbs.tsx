@@ -281,11 +281,20 @@ export function AdminBreadcrumbs({ items }: AdminBreadcrumbsProps) {
       // Skip numeric IDs
       if (/^\d+$/.test(segment)) continue;
 
+      // Breadcrumb labels must be fully translatable. If a URL segment is not
+      // in SEGMENT_LABEL_KEYS, or the mapped key has no locale value, render
+      // a visible "⚠ <segment>" marker instead of silently humanizing the
+      // segment in English — that way missing mappings are noticed and
+      // fixed rather than hiding as "fine-looking" hardcoded English.
+      // CI guardrail: scripts/check-admin-breadcrumbs.mjs blocks unmapped segments.
       const labelKey = SEGMENT_LABEL_KEYS[segment];
-      const translatedLabel = labelKey ? t(labelKey) : null;
-      const label = translatedLabel && translatedLabel !== labelKey
-        ? translatedLabel
-        : humanizeSegment(segment);
+      let label: string;
+      if (labelKey) {
+        const translated = t(labelKey);
+        label = translated && translated !== labelKey ? translated : `⚠ ${segment}`;
+      } else {
+        label = `⚠ ${segment}`;
+      }
       const isLast = i === segments.length - 1;
 
       crumbs.push({
