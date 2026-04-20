@@ -21,7 +21,10 @@
     "advanced_search": "Cuardach Casta",
     "saved_items": "Earraí Sábháilte",
     "unable_to_load": "Ní féidir na liostaí a luchtú",
-    "load_more_failed": "Theip ar luchtú tuilleadh liostaí"
+    "load_more_failed": "Theip ar luchtú tuilleadh liostaí",
+    "my_listings": "My Listings",
+    "my_offers": "My Offers",
+    "my_orders": "My Orders"
   },
   "hub_feature_gate": {
     "title": "Níl an Margadh ar Fáil",

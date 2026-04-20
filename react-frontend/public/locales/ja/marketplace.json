@@ -21,7 +21,10 @@
     "advanced_search": "詳細検索",
     "saved_items": "保存したアイテム",
     "unable_to_load": "リスティングを読み込めません",
-    "load_more_failed": "追加のリスティングの読み込みに失敗しました"
+    "load_more_failed": "追加のリスティングの読み込みに失敗しました",
+    "my_listings": "My Listings",
+    "my_offers": "My Offers",
+    "my_orders": "My Orders"
   },
   "hub_feature_gate": {
     "title": "マーケットプレイスはご利用いただけません",

@@ -1,7 +1,6 @@
 {
   "page_title": "Marketplace",
   "meta_description": "Buy, sell, and trade items in your community marketplace.",
-
   "hub": {
     "subtitle": "Buy, sell, and trade items in your community",
     "sell_something": "Sell Something",
@@ -22,14 +21,15 @@
     "advanced_search": "Advanced Search",
     "saved_items": "Saved Items",
     "unable_to_load": "Unable to load listings",
-    "load_more_failed": "Failed to load more listings"
+    "load_more_failed": "Failed to load more listings",
+    "my_listings": "My Listings",
+    "my_offers": "My Offers",
+    "my_orders": "My Orders"
   },
-
   "hub_feature_gate": {
     "title": "Marketplace Not Available",
     "description": "The marketplace feature is not enabled for this community."
   },
-
   "listing": {
     "not_found_title": "Listing Not Found",
     "not_found_description": "This listing may have been removed or is no longer available.",
@@ -70,7 +70,6 @@
     "report_reason_placeholder": "Please describe why you are reporting this listing...",
     "report_submit": "Submit Report"
   },
-
   "offer": {
     "modal_title": "Make an Offer",
     "asking_price": "Asking price:",
@@ -100,7 +99,6 @@
     "withdraw": "Withdraw",
     "accept_counter": "Accept Counter"
   },
-
   "create": {
     "page_title": "Sell Something - Marketplace",
     "title": "Sell Something",
@@ -150,7 +148,6 @@
     "created_error_retry": "Failed to create listing. Please try again.",
     "draft_saved": "Draft saved"
   },
-
   "search": {
     "page_title": "Search Marketplace",
     "meta_description": "Search and filter items in the community marketplace.",
@@ -193,7 +190,6 @@
     "last_days_one": "Last {{count}} day",
     "last_days_other": "Last {{count}} days"
   },
-
   "seller": {
     "page_title": "Seller Profile",
     "not_found_title": "Seller Not Found",
@@ -219,7 +215,6 @@
     "reviews_coming_soon_description": "Buyer reviews will be available in Phase 2. Check back later to see what the community thinks about this seller.",
     "view_listings": "View {{name}}'s marketplace listings."
   },
-
   "category": {
     "not_found_title": "Category Not Found",
     "not_found_description": "This category does not exist.",
@@ -246,7 +241,6 @@
     "load_more": "Load More",
     "browse_description": "Browse {{name}} listings in the marketplace."
   },
-
   "common": {
     "free": "Free",
     "negotiable": "Negotiable",
@@ -263,7 +257,6 @@
     "cancel": "Cancel",
     "sort_by": "Sort by"
   },
-
   "condition": {
     "new": "New",
     "like_new": "Like New",
@@ -271,39 +264,33 @@
     "fair": "Fair",
     "poor": "Poor"
   },
-
   "price_type": {
     "fixed": "Fixed Price",
     "negotiable": "Negotiable",
     "free": "Free"
   },
-
   "delivery_method": {
     "pickup": "Pickup Only",
     "shipping": "Shipping Only",
     "both": "Pickup or Shipping",
     "community_delivery": "Community Delivery"
   },
-
   "sort": {
     "newest": "Newest First",
     "price_asc": "Price: Low to High",
     "price_desc": "Price: High to Low",
     "popular": "Most Popular"
   },
-
   "time_ago": {
     "just_now": "Just now",
     "minutes_ago": "{{count}}m ago",
     "hours_ago": "{{count}}h ago",
     "days_ago": "{{count}}d ago"
   },
-
   "categories": {
     "label": "Filter by category",
     "all": "All"
   },
-
   "filters": {
     "category": "Category",
     "price_range": "Price Range",
@@ -325,28 +312,23 @@
     "clear": "Clear All",
     "title": "Filters"
   },
-
   "gallery": {
     "no_images": "No images available",
     "image_alt": "Listing image",
     "select_image": "View image {{number}}",
     "thumbnail_alt": "Image {{number}}"
   },
-
   "collection_image": "Collection image {{number}}",
-
   "price": {
     "free": "Free",
     "contact": "Contact for price",
     "negotiable": "Negotiable"
   },
-
   "empty": {
     "no_listings": "No listings yet",
     "subtitle": "Check back later or be the first to list something.",
     "start_selling": "Start Selling"
   },
-
   "edit": {
     "page_title": "Edit Listing - Marketplace",
     "title": "Edit Listing",
@@ -360,7 +342,6 @@
     "updated_error": "Failed to update listing",
     "updated_error_retry": "Failed to update listing. Please try again."
   },
-
   "my_listings": {
     "page_title": "My Listings - Marketplace",
     "title": "My Listings",
@@ -392,7 +373,6 @@
     "empty_expired_title": "No Expired Listings",
     "empty_expired_description": "You don't have any expired listings."
   },
-
   "my_offers": {
     "page_title": "My Offers - Marketplace",
     "title": "My Offers",
@@ -417,7 +397,6 @@
     "counter_sent_success": "Counter-offer sent",
     "send_counter": "Send Counter"
   },
-
   "collections": {
     "page_title": "My Collections",
     "meta_description": "Manage your marketplace collections and saved searches.",
@@ -452,7 +431,6 @@
     "sign_in_title": "Sign In Required",
     "sign_in_description": "Sign in to manage your collections and saved searches."
   },
-
   "saved_searches": {
     "tab_title": "Saved Searches",
     "empty_title": "No Saved Searches",
@@ -469,7 +447,6 @@
     "channel_push": "Push",
     "channel_both": "Email & Push"
   },
-
   "promotions": {
     "title": "Promote Listing",
     "load_error": "Failed to load promotion options.",
@@ -482,7 +459,6 @@
     "top_of_category": "Top of Category",
     "homepage_carousel": "Homepage Carousel"
   },
-
   "free": {
     "page_title": "Free Items",
     "meta_description": "Browse free items available in your community marketplace.",
@@ -495,7 +471,6 @@
     "no_items_title": "No Free Items",
     "no_items_description": "There are no free items available right now. Check back later or be the first to give something away!"
   },
-
   "group_marketplace": {
     "active_listings": "active listings",
     "total_listed": "total listed",
@@ -505,14 +480,12 @@
     "empty_description": "Be the first group member to list something for sale!",
     "tab_label": "Marketplace"
   },
-
   "hybrid_pricing": {
     "tooltip": "Time credits earned through community timebanking",
     "explanation": "Hybrid pricing lets you pay with a combination of regular currency and time credits you have earned through community service.",
     "label": "Pay with cash + time credits",
     "learn_more": "What are time credits?"
   },
-
   "community_delivery": {
     "title": "Community Delivery",
     "description": "A community member can deliver this item and earn time credits.",
@@ -540,7 +513,6 @@
     "delivery_confirmed": "Delivery confirmed! Time credits awarded.",
     "confirm_failed": "Failed to confirm delivery"
   },
-
   "ai_reply": {
     "suggest": "Suggest Reply",
     "suggested_reply": "AI Suggested Reply",
@@ -550,7 +522,6 @@
     "use_reply": "Use This Reply",
     "error": "Failed to generate a reply. Please try again."
   },
-
   "map": {
     "page_title": "Map Search - Marketplace",
     "meta_description": "Find marketplace listings near you on the map.",
@@ -573,7 +544,6 @@
     "distance_km": "{{km}} km away",
     "distance_meters": "{{m}}m away"
   },
-
   "shipping": {
     "title": "Shipping Options",
     "add_option": "Add Shipping Option",
@@ -605,13 +575,11 @@
     "loading": "Loading shipping options...",
     "no_options": "No shipping options available for this seller."
   },
-
   "listing_location": {
     "location_title": "Location",
     "approximate_location": "Approximate location",
     "get_directions": "Directions"
   },
-
   "orders": {
     "load_error": "Failed to load orders",
     "action_error": "Action failed",
@@ -698,7 +666,6 @@
       "error": "Failed to submit rating"
     }
   },
-
   "onboarding": {
     "page_title": "Seller Onboarding - Marketplace",
     "title": "Seller Payment Setup",

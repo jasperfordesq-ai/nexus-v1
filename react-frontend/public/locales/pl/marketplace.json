@@ -21,7 +21,10 @@
     "advanced_search": "Wyszukiwanie zaawansowane",
     "saved_items": "Zapisane przedmioty",
     "unable_to_load": "Nie udało się załadować ogłoszeń",
-    "load_more_failed": "Nie udało się załadować kolejnych ogłoszeń"
+    "load_more_failed": "Nie udało się załadować kolejnych ogłoszeń",
+    "my_listings": "My Listings",
+    "my_offers": "My Offers",
+    "my_orders": "My Orders"
   },
   "hub_feature_gate": {
     "title": "Marketplace niedostępny",

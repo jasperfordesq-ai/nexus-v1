@@ -21,9 +21,7 @@ import { Button, Input } from '@heroui/react';
 import {
   Search,
   Plus,
-  Tag,
   ShoppingBag,
-  ChevronRight,
   Star,
   Grid3X3,
   Heart,
@@ -95,7 +93,6 @@ export function MarketplacePage() {
   // State
   const [listings, setListings] = useState<MarketplaceListingItem[]>([]);
   const [categories, setCategories] = useState<MarketplaceCategory[]>([]);
-  const [apiCategories, setApiCategories] = useState<ApiCategory[]>([]);
   const [featuredListings, setFeaturedListings] = useState<MarketplaceListingItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -129,7 +126,6 @@ export function MarketplacePage() {
       try {
         const response = await api.get<ApiCategory[]>('/v2/marketplace/categories');
         if (!cancelled && response.success && response.data) {
-          setApiCategories(response.data);
           setCategories(response.data.map(toSharedCategory));
         }
       } catch (err) {
@@ -419,33 +415,6 @@ export function MarketplacePage() {
                 >
                   {t('hub.sell_something', 'Sell Something')}
                 </Button>
-              </GlassCard>
-            )}
-
-            {/* Categories list */}
-            {apiCategories.length > 0 && (
-              <GlassCard className="p-5">
-                <h3 className="font-semibold text-theme-primary mb-3 flex items-center gap-2">
-                  <Tag className="w-4 h-4 text-primary" />
-                  {t('hub.categories', 'Categories')}
-                </h3>
-                <div className="space-y-1">
-                  {apiCategories.map((cat) => (
-                    <Link
-                      key={cat.id}
-                      to={tenantPath(`/marketplace/category/${cat.slug}`)}
-                      className="flex items-center justify-between py-2 px-2 rounded-lg hover:bg-default-100 transition-colors text-sm group"
-                    >
-                      <span className="text-theme-primary group-hover:text-primary transition-colors">
-                        {cat.name}
-                      </span>
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs text-default-400">{cat.listing_count}</span>
-                        <ChevronRight className="w-3.5 h-3.5 text-default-300 group-hover:text-primary transition-colors" />
-                      </div>
-                    </Link>
-                  ))}
-                </div>
               </GlassCard>
             )}
 

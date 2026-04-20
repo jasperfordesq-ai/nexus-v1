@@ -25,8 +25,9 @@ export function CategoryChips({ categories, activeId, onSelect }: CategoryChipsP
   const { t } = useTranslation('marketplace');
 
   return (
+    <div className="w-full overflow-x-auto scrollbar-hide">
     <div
-      className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide"
+      className="flex items-center gap-2 pb-2 flex-nowrap"
       role="listbox"
       aria-label={t('categories.label', 'Filter by category')}
     >
@@ -58,6 +59,7 @@ export function CategoryChips({ categories, activeId, onSelect }: CategoryChipsP
           {category.name}
         </Chip>
       ))}
+    </div>
     </div>
   );
 }

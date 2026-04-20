@@ -20,7 +20,10 @@
     "unable_to_load": "Impossible de charger les annonces",
     "load_more_failed": "Échec du chargement de plus d'annonces",
     "all": "All",
-    "categories": "Categories"
+    "categories": "Categories",
+    "my_listings": "My Listings",
+    "my_offers": "My Offers",
+    "my_orders": "My Orders"
   },
   "hub_feature_gate": {
     "title": "Marché non disponible",

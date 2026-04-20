@@ -20,7 +20,10 @@
     "unable_to_load": "غير قادر على تحميل القوائم",
     "load_more_failed": "فشل في تحميل المزيد من القوائم",
     "all": "All",
-    "categories": "Categories"
+    "categories": "Categories",
+    "my_listings": "My Listings",
+    "my_offers": "My Offers",
+    "my_orders": "My Orders"
   },
   "hub_feature_gate": {
     "title": "السوق غير متاح",
