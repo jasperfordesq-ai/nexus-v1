@@ -49,7 +49,8 @@
     "offer": "Offerta",
     "request": "Richiesta",
     "empty": "Nessun annuncio recente",
-    "create_first": "Crei il Suo primo annuncio"
+    "create_first": "Crei il Suo primo annuncio",
+    "user_fallback": "User"
   },
   "activity": {
     "action_listing": "ha condiviso un annuncio",
@@ -96,6 +97,12 @@
     "sent": "Inviato {{amount}}h",
     "received": "Ricevuto {{amount}}h",
     "review": "Recensione",
-    "none_pending": "Nessuna recensione in sospeso"
+    "none_pending": "Nessuna recensione in sospeso",
+    "pending_subtitle": "Open this review request",
+    "view_all_pending": "View All Pending"
+  },
+  "fallback_name": "there",
+  "common": {
+    "loading": "Loading"
   }
 }

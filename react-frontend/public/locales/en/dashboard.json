@@ -3,10 +3,14 @@
     "title": "Dashboard",
     "description": "Your personal dashboard. View your balance, listings, and activity."
   },
+  "fallback_name": "there",
   "welcome_back": "Welcome back, {{name}}!",
   "community_activity": "Here's what's happening in your {{community}} community",
   "unable_to_load": "Unable to Load Dashboard",
   "try_again": "Try Again",
+  "common": {
+    "loading": "Loading"
+  },
   "onboarding": {
     "banner_title": "Complete your profile setup",
     "banner_subtitle": "Tell us about your interests and skills to get personalized matches",
@@ -48,6 +52,7 @@
     "requesting": "Requesting",
     "offer": "Offer",
     "request": "Request",
+    "user_fallback": "User",
     "empty": "No recent listings",
     "create_first": "Create your first listing"
   },
@@ -96,6 +101,8 @@
     "sent": "Sent {{amount}}h",
     "received": "Received {{amount}}h",
     "review": "Review",
-    "none_pending": "No pending reviews"
+    "none_pending": "No pending reviews",
+    "pending_subtitle": "Open this review request",
+    "view_all_pending": "View All Pending"
   }
 }

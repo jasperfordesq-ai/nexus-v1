@@ -49,7 +49,8 @@
     "offer": "Offer",
     "request": "Request",
     "empty": "最近のリストはありません",
-    "create_first": "最初のリストを作成してください"
+    "create_first": "最初のリストを作成してください",
+    "user_fallback": "User"
   },
   "activity": {
     "action_listing": "リストを共有しました",
@@ -96,6 +97,12 @@
     "sent": "{{amount}}hを送信しました",
     "received": "{{amount}}hを受信しました",
     "review": "Review",
-    "none_pending": "保留中のレビューはありません"
+    "none_pending": "保留中のレビューはありません",
+    "pending_subtitle": "Open this review request",
+    "view_all_pending": "View All Pending"
+  },
+  "fallback_name": "there",
+  "common": {
+    "loading": "Loading"
   }
 }

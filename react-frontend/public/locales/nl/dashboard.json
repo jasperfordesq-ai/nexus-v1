@@ -49,7 +49,8 @@
     "offer": "Offer",
     "request": "Request",
     "empty": "Geen recente aanbiedingen",
-    "create_first": "Maak je eerste aanbieding"
+    "create_first": "Maak je eerste aanbieding",
+    "user_fallback": "User"
   },
   "activity": {
     "action_listing": "deelde een aanbieding",
@@ -96,6 +97,12 @@
     "sent": "Verzonden {{amount}}h",
     "received": "Ontvangen {{amount}}h",
     "review": "Review",
-    "none_pending": "Geen uitstaande beoordelingen"
+    "none_pending": "Geen uitstaande beoordelingen",
+    "pending_subtitle": "Open this review request",
+    "view_all_pending": "View All Pending"
+  },
+  "fallback_name": "there",
+  "common": {
+    "loading": "Loading"
   }
 }

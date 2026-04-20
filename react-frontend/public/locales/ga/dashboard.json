@@ -49,7 +49,8 @@
     "offer": "Tairiscint",
     "request": "Iarratas",
     "empty": "Gan liostaí le déanaí",
-    "create_first": "Cruthaigh do chéad liosta"
+    "create_first": "Cruthaigh do chéad liosta",
+    "user_fallback": "User"
   },
   "activity": {
     "action_listing": "roinnt liosta",
@@ -96,6 +97,12 @@
     "sent": "Seolta {{amount}}u",
     "received": "Faighte {{amount}}u",
     "review": "Léirmheas",
-    "none_pending": "Gan léirmheasanna ar feitheamh"
+    "none_pending": "Gan léirmheasanna ar feitheamh",
+    "pending_subtitle": "Open this review request",
+    "view_all_pending": "View All Pending"
+  },
+  "fallback_name": "there",
+  "common": {
+    "loading": "Loading"
   }
 }

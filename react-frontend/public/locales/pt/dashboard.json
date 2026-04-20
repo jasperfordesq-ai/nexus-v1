@@ -49,7 +49,8 @@
     "offer": "Oferta",
     "request": "Pedido",
     "empty": "Sem anúncios recentes",
-    "create_first": "Crie o seu primeiro anúncio"
+    "create_first": "Crie o seu primeiro anúncio",
+    "user_fallback": "User"
   },
   "activity": {
     "action_listing": "partilhou um anúncio",
@@ -96,6 +97,12 @@
     "sent": "Enviou {{amount}}h",
     "received": "Recebeu {{amount}}h",
     "review": "Avaliar",
-    "none_pending": "Sem avaliações pendentes"
+    "none_pending": "Sem avaliações pendentes",
+    "pending_subtitle": "Open this review request",
+    "view_all_pending": "View All Pending"
+  },
+  "fallback_name": "there",
+  "common": {
+    "loading": "Loading"
   }
 }

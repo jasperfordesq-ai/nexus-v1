@@ -49,7 +49,8 @@
     "offer": "Offer",
     "request": "Request",
     "empty": "Brak niedawnych ofert",
-    "create_first": "Utwórz swoją pierwszą ofertę"
+    "create_first": "Utwórz swoją pierwszą ofertę",
+    "user_fallback": "User"
   },
   "activity": {
     "action_listing": "podzielił się ofertą",
@@ -96,6 +97,12 @@
     "sent": "Wysłano {{amount}}h",
     "received": "Otrzymano {{amount}}h",
     "review": "Review",
-    "none_pending": "Brak oczekujących recenzji"
+    "none_pending": "Brak oczekujących recenzji",
+    "pending_subtitle": "Open this review request",
+    "view_all_pending": "View All Pending"
+  },
+  "fallback_name": "there",
+  "common": {
+    "loading": "Loading"
   }
 }

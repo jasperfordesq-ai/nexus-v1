@@ -49,7 +49,8 @@
     "offer": "Angebot",
     "request": "Gesuch",
     "empty": "Keine aktuellen Inserate",
-    "create_first": "Erstellen Sie Ihr erstes Inserat"
+    "create_first": "Erstellen Sie Ihr erstes Inserat",
+    "user_fallback": "User"
   },
   "activity": {
     "action_listing": "hat ein Inserat geteilt",
@@ -96,6 +97,12 @@
     "sent": "Gesendet {{amount}}h",
     "received": "Erhalten {{amount}}h",
     "review": "Bewertung",
-    "none_pending": "Keine ausstehenden Bewertungen"
+    "none_pending": "Keine ausstehenden Bewertungen",
+    "pending_subtitle": "Open this review request",
+    "view_all_pending": "View All Pending"
+  },
+  "fallback_name": "there",
+  "common": {
+    "loading": "Loading"
   }
 }
