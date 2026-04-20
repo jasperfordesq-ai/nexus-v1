@@ -463,6 +463,9 @@ jobs:
       - name: "BLOCKING: Prevent non-admin translation-gap regressions"
         run: npm run check:i18n:baseline
 
+      - name: "BLOCKING: Prevent stub placeholder translation values"
+        run: node scripts/check-i18n-stubs.mjs
+
       - name: "INFO: Audit non-admin English fallback gaps"
         run: npm run check:i18n:gaps
 
