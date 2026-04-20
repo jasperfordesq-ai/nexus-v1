@@ -595,6 +595,20 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
     [sections],
   );
 
+  // ── href → current translated label (for re-resolving stale localStorage entries) ──
+  const hrefToLabel = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const section of sections) {
+      if (section.href) map.set(section.href, section.label);
+      for (const item of section.items ?? []) {
+        map.set(item.href, item.label);
+        const base = item.href.split('?')[0];
+        if (base && !map.has(base)) map.set(base, item.label);
+      }
+    }
+    return map;
+  }, [sections]);
+
   // ── Toggle a section (accordion within zone) ─────────────────────────────
   const toggleSection = (key: string, zoneKey: NavZoneKey | null) => {
     setExpandedSections((prev) => {
@@ -895,7 +909,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
                       }`}
                     >
                       <Clock size={14} className="shrink-0 text-default-400" />
-                      <span className="truncate">{page.label}</span>
+                      <span className="truncate">{hrefToLabel.get(page.href) ?? hrefToLabel.get(page.href.split('?')[0] ?? page.href) ?? page.label}</span>
                     </Link>
                   </li>
                 ))}
