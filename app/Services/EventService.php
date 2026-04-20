@@ -243,7 +243,7 @@ class EventService
                 ->first();
 
             if ($creator && !empty($creator->email)) {
-                $firstName  = $creator->first_name ?? $creator->name ?? 'there';
+                $firstName  = $creator->first_name ?? $creator->name ?? __('emails.common.fallback_name');
                 $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
                 $eventUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/events/' . $event->id;
                 $eventTitle = $event->title ?? '';

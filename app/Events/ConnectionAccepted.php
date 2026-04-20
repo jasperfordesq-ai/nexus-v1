@@ -63,7 +63,7 @@ class ConnectionAccepted implements ShouldBroadcast, ShouldRescue
             'acceptor_id'  => $this->acceptor->id,
             'acceptor_name' => trim(
                 ($this->acceptor->first_name ?? '') . ' ' . ($this->acceptor->last_name ?? '')
-            ) ?: ($this->acceptor->name ?? 'Someone'),
+            ) ?: ($this->acceptor->name ?? __('emails.common.fallback_someone')),
             'created_at'   => $this->connectionModel->created_at?->toISOString(),
         ];
     }

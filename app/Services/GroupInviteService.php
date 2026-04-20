@@ -93,7 +93,7 @@ class GroupInviteService
         }
 
         $inviter = DB::table('users')->where('id', $inviterId)->first();
-        $inviterName = $inviter->name ?? 'A member';
+        $inviterName = $inviter->name ?? __('emails.common.fallback_member_name');
 
         $results = [];
         foreach ($emails as $email) {

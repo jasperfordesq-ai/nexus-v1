@@ -33,7 +33,7 @@ class NotifyConnectionRequest implements ShouldQueue
             // Ensure tenant context is set (required when running via async queue)
             TenantContext::setById($event->tenantId);
 
-            $requesterName = $event->requester->first_name ?? $event->requester->name ?? 'Someone';
+            $requesterName = $event->requester->first_name ?? $event->requester->name ?? __('emails.common.fallback_someone');
             $targetUserId = $event->target->id;
             $content = __('emails_misc.social.connection_request', ['name' => $requesterName]);
             $link = '/connections';

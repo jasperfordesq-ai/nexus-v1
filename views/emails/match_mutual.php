@@ -109,7 +109,7 @@ $matchScore = (int)($match['match_score'] ?? 75);
 
     <!-- Preview text -->
     <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">
-        Perfect exchange opportunity with <?= htmlspecialchars($posterName) ?>! You can both help each other - <?= $matchScore ?>% compatibility.
+        <?= __('emails.match_mutual.preview', ['name' => htmlspecialchars($posterName), 'score' => $matchScore]) ?>
         &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847;
     </div>
 
@@ -263,7 +263,7 @@ $matchScore = (int)($match['match_score'] ?? 75);
                                 <tr>
                                     <td style="padding: 0 40px 35px; text-align: center;" class="mobile-padding">
                                         <p style="margin: 0; font-size: 14px; color: <?= $textMuted ?>;" class="text-secondary">
-                                            or <a href="<?= $matchesUrl ?>" style="color: <?= $primaryColor ?>; font-weight: 600;"><?= __('emails.match_mutual.view_all_mutual') ?></a>
+                                            <?= __('emails.common.or_separator') ?> <a href="<?= $matchesUrl ?>" style="color: <?= $primaryColor ?>; font-weight: 600;"><?= __('emails.match_mutual.view_all_mutual') ?></a>
                                         </p>
                                     </td>
                                 </tr>

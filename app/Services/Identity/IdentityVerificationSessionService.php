@@ -179,7 +179,7 @@ class IdentityVerificationSessionService
         // Set tenant context so Mailer + URL helpers resolve correctly
         TenantContext::setById((int) $row->tenant_id);
 
-        $firstName  = $row->first_name ?? $row->name ?? 'there';
+        $firstName  = $row->first_name ?? $row->name ?? __('emails.common.fallback_name');
         $baseUrl    = TenantContext::getFrontendUrl();
         $basePath   = TenantContext::getSlugPrefix();
 

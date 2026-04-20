@@ -179,7 +179,7 @@ class RegistrationService
                 // Use default
             }
 
-            $firstName = $user->first_name ?? 'there';
+            $firstName = $user->first_name ?? __('emails.common.fallback_name');
 
             $html = \App\Core\EmailTemplateBuilder::make()
                 ->theme('brand')

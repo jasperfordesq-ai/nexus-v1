@@ -44,7 +44,7 @@ class SocialNotificationService
                 ->where('tenant_id', $tenantId)
                 ->select(['name', 'avatar_url'])
                 ->first();
-            $likerName = $liker->name ?? 'Someone';
+            $likerName = $liker->name ?? __('emails.common.fallback_someone');
 
             $owner = DB::table('users')
                 ->where('id', $contentOwnerId)
@@ -91,7 +91,7 @@ class SocialNotificationService
                 ->where('tenant_id', $tenantId)
                 ->select(['name', 'avatar_url'])
                 ->first();
-            $commenterName = $commenter->name ?? 'Someone';
+            $commenterName = $commenter->name ?? __('emails.common.fallback_someone');
 
             $owner = DB::table('users')
                 ->where('id', $contentOwnerId)
@@ -139,7 +139,7 @@ class SocialNotificationService
                 ->where('tenant_id', $tenantId)
                 ->select(['name'])
                 ->first();
-            $sharerName = $sharer->name ?? 'Someone';
+            $sharerName = $sharer->name ?? __('emails.common.fallback_someone');
 
             $owner = DB::table('users')
                 ->where('id', $contentOwnerId)
@@ -241,7 +241,7 @@ class SocialNotificationService
             $tenantName = $tenant['name'] ?? 'Project NEXUS';
             $fullLink = TenantContext::getFrontendUrl() . $link;
 
-            $likerName = $liker->name ?? 'Someone';
+            $likerName = $liker->name ?? __('emails.common.fallback_someone');
             $contentLabel = self::getContentLabel($contentType);
 
             $title = __('notifications.email_new_like_title', ['content_type' => ucfirst($contentLabel)]);
@@ -273,7 +273,7 @@ class SocialNotificationService
             $tenantName = $tenant['name'] ?? 'Project NEXUS';
             $fullLink = TenantContext::getFrontendUrl() . $link;
 
-            $commenterName = $commenter->name ?? 'Someone';
+            $commenterName = $commenter->name ?? __('emails.common.fallback_someone');
             $contentLabel = self::getContentLabel($contentType);
 
             $title = __('notifications.email_new_comment_title', ['content_type' => ucfirst($contentLabel)]);
@@ -305,7 +305,7 @@ class SocialNotificationService
             $tenantName = $tenant['name'] ?? 'Project NEXUS';
             $fullLink = TenantContext::getFrontendUrl() . $link;
 
-            $sharerName = $sharer->name ?? 'Someone';
+            $sharerName = $sharer->name ?? __('emails.common.fallback_someone');
             $contentLabel = self::getContentLabel($contentType);
 
             $title = __('notifications.email_shared_title', ['content_type' => ucfirst($contentLabel)]);

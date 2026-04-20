@@ -90,7 +90,7 @@ class AdminListingsService
                 TenantContext::setById($tenantId);
                 $user = DB::table('users')->where('id', $listing->user_id)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
                 if ($user && !empty($user->email)) {
-                    $firstName = $user->first_name ?? $user->name ?? 'there';
+                    $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                     $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/listings/{$listingId}";
                     $html = EmailTemplateBuilder::make()
                         ->title(__('emails_misc.listing_moderation.approved_title'))
@@ -164,7 +164,7 @@ class AdminListingsService
                 TenantContext::setById($tenantId);
                 $user = DB::table('users')->where('id', $listing->user_id)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
                 if ($user && !empty($user->email)) {
-                    $firstName = $user->first_name ?? $user->name ?? 'there';
+                    $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                     $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/listings";
                     $builder   = EmailTemplateBuilder::make()
                         ->title(__('emails_misc.listing_moderation.rejected_title'))

@@ -153,10 +153,10 @@ class IdentityVerificationPaymentService
             $userId   = (int) ($session['user_id'] ?? 0);
             $tenantId = (int) ($session['tenant_id'] ?? 0);
             if ($userId && $tenantId) {
-                TenantContext::setId($tenantId);
+                TenantContext::setById($tenantId);
                 $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
                 if ($user && !empty($user->email)) {
-                    $firstName = $user->first_name ?? $user->name ?? 'there';
+                    $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                     $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
                     $html = EmailTemplateBuilder::make()
                         ->title(__('emails_misc.identity_payment.success_title'))
@@ -196,10 +196,10 @@ class IdentityVerificationPaymentService
             $userId   = (int) ($session['user_id'] ?? 0);
             $tenantId = (int) ($session['tenant_id'] ?? 0);
             if ($userId && $tenantId) {
-                TenantContext::setId($tenantId);
+                TenantContext::setById($tenantId);
                 $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
                 if ($user && !empty($user->email)) {
-                    $firstName = $user->first_name ?? $user->name ?? 'there';
+                    $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                     $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
                     $html = EmailTemplateBuilder::make()
                         ->theme('warning')

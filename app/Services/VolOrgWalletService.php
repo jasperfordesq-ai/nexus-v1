@@ -239,7 +239,7 @@ class VolOrgWalletService
                     $orgNameSafe  = htmlspecialchars($result['_org_name'] ?? '', ENT_QUOTES, 'UTF-8');
                     $amount       = (int) ($result['_amount'] ?? 0);
                     $walletUrl    = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/wallet';
-                    $firstName    = $depositor->first_name ?? $depositor->name ?? 'there';
+                    $firstName    = $depositor->first_name ?? $depositor->name ?? __('emails.common.fallback_name');
 
                     $html = EmailTemplateBuilder::make()
                         ->title(__('emails_misc.vol_org_wallet.deposit_title'))
@@ -356,7 +356,7 @@ class VolOrgWalletService
                     $orgNameSafe = htmlspecialchars($result['_org_name'] ?? '', ENT_QUOTES, 'UTF-8');
                     $amount      = (int) ($result['_amount'] ?? 0);
                     $walletUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/wallet';
-                    $firstName   = $volunteer->first_name ?? $volunteer->name ?? 'there';
+                    $firstName   = $volunteer->first_name ?? $volunteer->name ?? __('emails.common.fallback_name');
 
                     $html = EmailTemplateBuilder::make()
                         ->theme('success')

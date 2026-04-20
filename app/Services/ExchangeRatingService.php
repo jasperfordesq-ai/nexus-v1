@@ -94,7 +94,7 @@ class ExchangeRatingService
         try {
             $user = DB::table('users')->where('id', $ratedId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
             if ($user && !empty($user->email)) {
-                $firstName = $user->first_name ?? $user->name ?? 'there';
+                $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/exchanges/' . $exchangeId;
                 $html = EmailTemplateBuilder::make()
                     ->title(__('emails_misc.exchange_rating.received_title'))

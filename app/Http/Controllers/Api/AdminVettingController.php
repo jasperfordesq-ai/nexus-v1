@@ -545,7 +545,7 @@ class AdminVettingController extends BaseApiController
                 ->first();
 
             if ($user && !empty($user->email)) {
-                $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? 'there', ENT_QUOTES, 'UTF-8');
+                $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
                 $tenantName = htmlspecialchars(TenantContext::getSetting('site_name', 'Project NEXUS'), ENT_QUOTES, 'UTF-8');
                 $baseUrl = TenantContext::getFrontendUrl();
                 $basePath = TenantContext::getSlugPrefix();

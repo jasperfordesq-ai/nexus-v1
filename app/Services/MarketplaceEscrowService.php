@@ -179,7 +179,7 @@ class MarketplaceEscrowService
         foreach ($escrows as $escrow) {
             try {
                 // Set tenant context before any scoped operations
-                TenantContext::setId($escrow->tenant_id);
+                TenantContext::setById($escrow->tenant_id);
 
                 // Check for open disputes on this order
                 $hasDispute = DB::table('marketplace_disputes')

@@ -127,7 +127,7 @@ class MatchApprovalWorkflowService
                 foreach ($brokerIds as $brokerId) {
                     NotificationDispatcher::dispatchMatchApprovalRequest(
                         (int) $brokerId,
-                        trim($userName ?? 'A member'),
+                        trim($userName ?? __('emails.common.fallback_member_name')),
                         $listingTitle ?? 'a listing',
                         (int) $id
                     );
@@ -144,7 +144,7 @@ class MatchApprovalWorkflowService
                 try {
                     $matchInfo = [
                         'id' => $listingId,
-                        'user_name' => trim($userName ?? 'Someone'),
+                        'user_name' => trim($userName ?? __('emails.common.fallback_someone')),
                     ];
                     $reciprocalInfo = [
                         'they_offer' => $matchData['matched_listing'] ?? 'a skill you need',
@@ -165,7 +165,7 @@ class MatchApprovalWorkflowService
 
                     $reverseMatchInfo = [
                         'id' => $listingId,
-                        'user_name' => trim($ownerName ?? 'Someone'),
+                        'user_name' => trim($ownerName ?? __('emails.common.fallback_someone')),
                     ];
                     $reverseReciprocalInfo = [
                         'they_offer' => $listingTitle ?? 'a skill you need',

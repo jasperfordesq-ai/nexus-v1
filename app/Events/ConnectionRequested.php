@@ -65,7 +65,7 @@ class ConnectionRequested implements ShouldBroadcast, ShouldRescue
             'requester_id' => $this->requester->id,
             'requester_name' => trim(
                 ($this->requester->first_name ?? '') . ' ' . ($this->requester->last_name ?? '')
-            ) ?: ($this->requester->name ?? 'Someone'),
+            ) ?: ($this->requester->name ?? __('emails.common.fallback_someone')),
             'created_at'   => $this->connectionModel->created_at?->toISOString(),
         ];
     }

@@ -263,7 +263,7 @@ class ReviewService
                 $tenantId = TenantContext::getId();
                 $receiver = DB::table('users')->where('id', $receiverId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
                 if ($receiver && !empty($receiver->email)) {
-                    $firstName = $receiver->first_name ?? $receiver->name ?? 'there';
+                    $firstName = $receiver->first_name ?? $receiver->name ?? __('emails.common.fallback_name');
                     $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/profile/' . $receiverId . '/reviews';
                     $html = EmailTemplateBuilder::make()
                         ->title(__('emails_misc.review.received_title'))

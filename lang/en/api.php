@@ -1578,6 +1578,19 @@ return [
         'gdpr_request_submitted' => 'Your request has been submitted and will be processed within 30 days.',
     ],
 
+    // Generic validation & error messages (hardcoded-string audit — 2026-04-20)
+    'amount_invalid'           => 'Invalid amount',
+    'amount_out_of_range'      => 'Amount is out of range',
+    'failed_to_read_file'      => 'Failed to read the uploaded file',
+    'feature_disabled'         => 'This feature is not enabled for your community',
+    'invalid_file_upload'      => 'Invalid file upload',
+    'invalid_input'            => 'Invalid input',
+    'invalid_json'             => 'Invalid JSON',
+    'invalid_menu_item_type'   => 'Invalid menu item type',
+    'partnership_reactivated'  => 'Partnership reactivated',
+    'purge_failed'             => 'Purge operation failed',
+    'value_out_of_range'       => 'Value must be between :min and :max',
+
     // ============================================
     // SERVICE-LAYER i18n CONVERSION (2026-04-14)
     // EventService, GroupService, IdeationChallengeService

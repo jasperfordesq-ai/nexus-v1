@@ -589,7 +589,7 @@ class AdminUsersController extends BaseApiController
 
         try {
             $tenant = $this->resolveUserTenant($user);
-            $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+            $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
             $tenantName = $tenant['name'];
 
             $html = EmailTemplateBuilder::make()
@@ -641,7 +641,7 @@ class AdminUsersController extends BaseApiController
         // Notify the banned user (email only — they can't log in at all)
         try {
             $tenant = $this->resolveUserTenant($user);
-            $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+            $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
             $tenantName = $tenant['name'];
 
             $html = EmailTemplateBuilder::make()
@@ -714,7 +714,7 @@ class AdminUsersController extends BaseApiController
         // Send deletion email BEFORE the actual deletion (user record must still exist)
         try {
             $tenant = $this->resolveUserTenant($user);
-            $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+            $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
             $tenantName = $tenant['name'];
 
             $html = EmailTemplateBuilder::make()
@@ -786,7 +786,7 @@ class AdminUsersController extends BaseApiController
 
         try {
             $tenant = $this->resolveUserTenant($user);
-            $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+            $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
             $tenantName = $tenant['name'];
             $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
 
@@ -990,7 +990,7 @@ class AdminUsersController extends BaseApiController
         // CRITICAL: Do NOT include the new password in the email
         try {
             $tenant = $this->resolveUserTenant($user);
-            $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+            $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
             $tenantName = $tenant['name'];
             $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
 
@@ -1667,7 +1667,7 @@ class AdminUsersController extends BaseApiController
     {
         try {
             $tenant = $this->resolveUserTenant($user);
-            $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+            $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
             $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
             $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
 
@@ -1764,7 +1764,7 @@ class AdminUsersController extends BaseApiController
     {
         try {
             $tenant = $this->resolveUserTenant($user);
-            $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+            $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
             $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
             $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
 

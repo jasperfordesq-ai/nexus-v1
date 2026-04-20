@@ -119,7 +119,7 @@ $remainingCount = max(0, $totalCount - 5);
 
     <!-- Preview text -->
     <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">
-        <?= $totalCount ?> new match<?= $totalCount !== 1 ? 'es' : '' ?> this <?= $periodLabel ?>!<?= $hotCount > 0 ? " Including {$hotCount} hot match" . ($hotCount !== 1 ? 'es' : '') . "." : '' ?><?= $mutualCount > 0 ? " {$mutualCount} mutual match" . ($mutualCount !== 1 ? 'es' : '') . "!" : '' ?>
+        <?= __('emails.match_digest.preview_new_matches', ['count' => $totalCount, 'period' => $periodLabel]) ?><?= $hotCount > 0 ? ' ' . __('emails.match_digest.preview_hot', ['count' => $hotCount]) : '' ?><?= $mutualCount > 0 ? ' ' . __('emails.match_digest.preview_mutual', ['count' => $mutualCount]) : '' ?>
         &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847;
     </div>
 

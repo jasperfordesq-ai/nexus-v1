@@ -931,7 +931,7 @@ class SafeguardingService
 
                 if ($reporter && !empty($reporter->email)) {
                     TenantContext::setById($tenantId);
-                    $firstName = $reporter->first_name ?? $reporter->name ?? 'there';
+                    $firstName = $reporter->first_name ?? $reporter->name ?? __('emails.common.fallback_name');
                     $safeLabel = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
 
                     $html = \App\Core\EmailTemplateBuilder::make()

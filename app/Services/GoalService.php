@@ -169,7 +169,7 @@ class GoalService
                 ->first();
 
             if ($user && !empty($user->email)) {
-                $firstName = $user->first_name ?? $user->name ?? 'there';
+                $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $goalTitle = htmlspecialchars($goal->title ?? '', ENT_QUOTES, 'UTF-8');
                 $goalUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/goals/' . $goal->id;
                 $community = TenantContext::getName();
@@ -242,7 +242,7 @@ class GoalService
                     ->first();
 
                 if ($user && !empty($user->email)) {
-                    $firstName     = $user->first_name ?? $user->name ?? 'there';
+                    $firstName     = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                     $safeTitle     = htmlspecialchars($goalTitle, ENT_QUOTES, 'UTF-8');
                     $newGoalUrl    = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/goals';
                     $community     = TenantContext::getName();
@@ -339,7 +339,7 @@ class GoalService
                 ->first();
 
             if ($user && !empty($user->email)) {
-                $firstName = $user->first_name ?? $user->name ?? 'there';
+                $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $goalTitle = htmlspecialchars($goal->title ?? '', ENT_QUOTES, 'UTF-8');
                 $goalUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/goals/' . $goal->id;
                 $community = TenantContext::getName();

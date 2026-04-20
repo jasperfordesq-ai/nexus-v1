@@ -833,7 +833,7 @@ class TenantBillingService
             return;
         }
 
-        $firstName = $admin->first_name ?? $admin->name ?? 'there';
+        $firstName = $admin->first_name ?? $admin->name ?? __('emails.common.fallback_name');
         $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
         $html = EmailTemplateBuilder::make()

@@ -139,7 +139,7 @@ class OnboardingNurtureService
         $frontendUrl = TenantContext::getFrontendUrl();
         $basePath = TenantContext::getSlugPrefix();
 
-        $userName = htmlspecialchars($user->first_name ?? $user->name ?? 'there', ENT_QUOTES, 'UTF-8');
+        $userName = htmlspecialchars($user->first_name ?? $user->name ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
 
         $subject  = __("emails.onboarding_nurture.day{$day}_subject", [':community' => $tenantName]);
         $title    = __("emails.onboarding_nurture.day{$day}_title");

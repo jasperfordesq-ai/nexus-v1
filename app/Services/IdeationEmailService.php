@@ -64,7 +64,7 @@ class IdeationEmailService
                 return;
             }
 
-            $firstName    = $author->first_name ?? $author->name ?? 'there';
+            $firstName    = $author->first_name ?? $author->name ?? __('emails.common.fallback_name');
             $ideaTitle    = $idea->title ?? '';
             $challengeTitle = $challenge->title ?? '';
             $tenantName   = TenantContext::getSetting('site_name', 'Project NEXUS');
@@ -136,9 +136,9 @@ class IdeationEmailService
                 [$voterId, $tenantId]
             );
 
-            $firstName  = $author->first_name ?? $author->name ?? 'there';
+            $firstName  = $author->first_name ?? $author->name ?? __('emails.common.fallback_name');
             $ideaTitle  = $idea->title ?? '';
-            $voterName  = $voter->name ?? 'Someone';
+            $voterName  = $voter->name ?? __('emails.common.fallback_someone');
             $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
             $ideaUrl    = TenantContext::getFrontendUrl()
                 . TenantContext::getSlugPrefix()
@@ -210,9 +210,9 @@ class IdeationEmailService
                 [$commenterId, $tenantId]
             );
 
-            $firstName     = $author->first_name ?? $author->name ?? 'there';
+            $firstName     = $author->first_name ?? $author->name ?? __('emails.common.fallback_name');
             $ideaTitle     = $idea->title ?? '';
-            $commenterName = $commenter->name ?? 'Someone';
+            $commenterName = $commenter->name ?? __('emails.common.fallback_someone');
             $tenantName    = TenantContext::getSetting('site_name', 'Project NEXUS');
             $shortPreview  = strlen($commentPreview) > 120 ? substr($commentPreview, 0, 120) . '...' : $commentPreview;
             $commentUrl    = TenantContext::getFrontendUrl()
@@ -276,7 +276,7 @@ class IdeationEmailService
                 return;
             }
 
-            $firstName  = $author->first_name ?? $author->name ?? 'there';
+            $firstName  = $author->first_name ?? $author->name ?? __('emails.common.fallback_name');
             $ideaTitle  = $idea->title ?? '';
             $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
             $ideaUrl    = TenantContext::getFrontendUrl()
@@ -348,7 +348,7 @@ class IdeationEmailService
                 return;
             }
 
-            $firstName  = $author->first_name ?? $author->name ?? 'there';
+            $firstName  = $author->first_name ?? $author->name ?? __('emails.common.fallback_name');
             $ideaTitle  = $idea->title ?? '';
             $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
             $ideaUrl    = TenantContext::getFrontendUrl()

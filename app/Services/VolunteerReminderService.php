@@ -131,7 +131,7 @@ class VolunteerReminderService
 
                         if ($user && !empty($user->email)) {
                             try {
-                                $firstName = $user->first_name ?? $user->name ?? 'there';
+                                $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                                 $shiftTime = $shift->start_time
                                     ? date('D, d M Y H:i', strtotime($shift->start_time))
                                     : '';
@@ -476,9 +476,9 @@ class VolunteerReminderService
 
                                 if ($user && !empty($user->email)) {
                                     // Set tenant context so Mailer and translations use the right tenant
-                                    TenantContext::setId($tenantId);
+                                    TenantContext::setById($tenantId);
 
-                                    $firstName    = $user->first_name ?? $user->name ?? 'there';
+                                    $firstName    = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                                     $shiftTime    = $shift->start_time
                                         ? date('D, d M Y H:i', strtotime($shift->start_time))
                                         : '';
@@ -643,9 +643,9 @@ class VolunteerReminderService
                                     ->first(['email', 'first_name', 'name']);
 
                                 if ($user && !empty($user->email)) {
-                                    TenantContext::setId($tenantId);
+                                    TenantContext::setById($tenantId);
 
-                                    $firstName  = $user->first_name ?? $user->name ?? 'there';
+                                    $firstName  = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                                     $logHoursUrl = TenantContext::getFrontendUrl()
                                         . TenantContext::getSlugPrefix()
                                         . '/volunteering/opportunities/' . $shift->opportunity_id;

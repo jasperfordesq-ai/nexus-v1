@@ -107,7 +107,7 @@ class MentionService
             ->select(['name', 'first_name'])
             ->first();
 
-        $mentionerName = $mentioner->name ?? $mentioner->first_name ?? 'Someone';
+        $mentionerName = $mentioner->name ?? $mentioner->first_name ?? __('emails.common.fallback_someone');
 
         foreach ($mentionedUserIds as $mentionedUserId) {
             // Don't notify yourself

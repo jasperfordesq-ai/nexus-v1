@@ -254,7 +254,7 @@ class NotificationDispatcher
     {
         $listingTitle = $match['title'] ?? 'New Listing';
         $matchScore = (int) ($match['match_score'] ?? 85);
-        $userName = $match['user_name'] ?? 'Someone';
+        $userName = $match['user_name'] ?? __('emails.common.fallback_someone');
         $distance = $match['distance_km'] ?? null;
         $listingId = $match['id'] ?? 0;
 
@@ -287,7 +287,7 @@ class NotificationDispatcher
      */
     public static function dispatchMutualMatch($userId, $match, $reciprocalInfo = []): void
     {
-        $userName = $match['user_name'] ?? 'Someone';
+        $userName = $match['user_name'] ?? __('emails.common.fallback_someone');
         $theyOffer = $reciprocalInfo['they_offer'] ?? 'a skill you need';
         $youOffer = $reciprocalInfo['you_offer'] ?? 'something they need';
         $listingId = $match['id'] ?? 0;
@@ -451,7 +451,7 @@ class NotificationDispatcher
                 return;
             }
 
-            $recipientName = $user->first_name ?? $user->name ?? 'there';
+            $recipientName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
             $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
             $baseUrl = TenantContext::getFrontendUrl();
             $basePath = TenantContext::getSlugPrefix();
@@ -493,7 +493,7 @@ class NotificationDispatcher
                 return;
             }
 
-            $senderFirstName = $user->first_name ?? $user->name ?? 'there';
+            $senderFirstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
             $tenantName      = TenantContext::getSetting('site_name', 'Project NEXUS');
             $baseUrl         = TenantContext::getFrontendUrl();
             $basePath        = TenantContext::getSlugPrefix();
@@ -565,7 +565,7 @@ class NotificationDispatcher
                 ]);
             }
 
-            $firstName  = $user->first_name ?? $user->name ?? 'there';
+            $firstName  = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
             $baseUrl    = TenantContext::getFrontendUrl();
             $basePath   = TenantContext::getSlugPrefix();
             $reviewUrl  = $baseUrl . $basePath . '/reviews/create?transaction_id=' . $transactionId;
@@ -604,7 +604,7 @@ class NotificationDispatcher
                 return;
             }
 
-            $recipientName = $user->first_name ?? $user->name ?? 'there';
+            $recipientName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
             $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
             $baseUrl = TenantContext::getFrontendUrl();
             $basePath = TenantContext::getSlugPrefix();
@@ -654,7 +654,7 @@ class NotificationDispatcher
         $baseUrl    = TenantContext::getFrontendUrl();
         $basePath   = TenantContext::getSlugPrefix();
         $statusUrl  = $baseUrl . $basePath . '/verify-identity';
-        $firstName  = $user->first_name ?? 'there';
+        $firstName  = $user->first_name ?? __('emails.common.fallback_name');
 
         $html = \App\Core\EmailTemplateBuilder::make()
             ->theme('brand')
@@ -698,7 +698,7 @@ class NotificationDispatcher
             $baseUrl    = TenantContext::getFrontendUrl();
             $basePath   = TenantContext::getSlugPrefix();
             $profileUrl = $baseUrl . $basePath . '/profile/' . $userId;
-            $firstName  = $user->first_name ?? 'there';
+            $firstName  = $user->first_name ?? __('emails.common.fallback_name');
 
             $html = \App\Core\EmailTemplateBuilder::make()
                 ->theme('success')
@@ -745,7 +745,7 @@ class NotificationDispatcher
             $baseUrl    = TenantContext::getFrontendUrl();
             $basePath   = TenantContext::getSlugPrefix();
             $retryUrl   = $baseUrl . $basePath . '/verify-identity';
-            $firstName  = $user->first_name ?? 'there';
+            $firstName  = $user->first_name ?? __('emails.common.fallback_name');
 
             $builder = \App\Core\EmailTemplateBuilder::make()
                 ->theme('danger')
@@ -882,7 +882,7 @@ HTML;
                 $title = $data['listing_title'] ?? 'Listing';
                 return __('notifications.listing_risk_tagged', ['title' => $title, 'level' => $level]);
             case 'credit_received':
-                $senderName = $data['sender_name'] ?? 'Someone';
+                $senderName = $data['sender_name'] ?? __('emails.common.fallback_someone');
                 $amount = $data['amount'] ?? 0;
                 return __('notifications.credit_received', ['name' => $senderName, 'amount' => $amount]);
             default:
@@ -949,10 +949,10 @@ HTML;
             $mailer = Mailer::forCurrentTenant();
 
             if ($type === 'credit_received') {
-                $senderName = htmlspecialchars($data['sender_name'] ?? 'A member');
+                $senderName = htmlspecialchars($data['sender_name'] ?? __('emails.common.fallback_member_name'));
                 $amount = (float) ($data['amount'] ?? 0);
                 $description = htmlspecialchars($data['description'] ?? '');
-                $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? 'there');
+                $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? __('emails.common.fallback_name'));
                 $tenantName = htmlspecialchars(TenantContext::getSetting('site_name', 'Project NEXUS'));
 
                 $amountDisplay = $amount . ' hour' . ($amount != 1 ? 's' : '');
@@ -1034,7 +1034,7 @@ HTML;
                 ->select(['name', 'first_name'])
                 ->first();
         }
-        $userName = $user->name ?? $user->first_name ?? 'there';
+        $userName = $user->name ?? $user->first_name ?? __('emails.common.fallback_name');
 
         $tenant = TenantContext::get();
         $tenantName = $tenant['name'] ?? 'Community';
@@ -1047,7 +1047,7 @@ HTML;
         }
 
         $title = htmlspecialchars($match['title'] ?? 'New Listing');
-        $posterName = htmlspecialchars($match['user_name'] ?? 'Someone');
+        $posterName = htmlspecialchars($match['user_name'] ?? __('emails.common.fallback_someone'));
         $distance = $match['distance_km'] ?? null;
         $distanceLabel = $distance !== null ? __('emails_notifications.hot_match.km_away', ['distance' => $distance]) : '';
         $distanceHtml = $distance !== null ? "<p style='color: #10b981;'>📍 {$distanceLabel}</p>" : '';
@@ -1083,7 +1083,7 @@ HTML;
                 ->select(['name', 'first_name'])
                 ->first();
         }
-        $userName = $user->name ?? $user->first_name ?? 'there';
+        $userName = $user->name ?? $user->first_name ?? __('emails.common.fallback_name');
 
         $tenant = TenantContext::get();
         $tenantName = $tenant['name'] ?? 'Community';
@@ -1095,7 +1095,7 @@ HTML;
             return ob_get_clean();
         }
 
-        $posterName = htmlspecialchars($match['user_name'] ?? 'Someone');
+        $posterName = htmlspecialchars($match['user_name'] ?? __('emails.common.fallback_someone'));
         $theyOffer = htmlspecialchars($reciprocalInfo['they_offer'] ?? 'a skill you need');
         $youOffer = htmlspecialchars($reciprocalInfo['you_offer'] ?? 'something they need');
 
@@ -1467,11 +1467,11 @@ HTML;
         $tenant = TenantContext::get();
         $tenantName = htmlspecialchars($tenant['name'] ?? 'Community', ENT_QUOTES, 'UTF-8');
 
-        $userName = htmlspecialchars($user['first_name'] ?? $user['name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+        $userName = htmlspecialchars($user['first_name'] ?? $user['name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
         $listingTitle = htmlspecialchars($details['listing_title'] ?? 'Service Exchange', ENT_QUOTES, 'UTF-8');
         $listingType = $details['listing_type'] ?? 'offer';
         $proposedHours = $details['proposed_hours'] ?? $data['hours'] ?? 0;
-        $requesterName = htmlspecialchars($details['requester_first_name'] ?? $details['requester_name'] ?? 'A member', ENT_QUOTES, 'UTF-8');
+        $requesterName = htmlspecialchars($details['requester_first_name'] ?? $details['requester_name'] ?? __('emails.common.fallback_member_name'), ENT_QUOTES, 'UTF-8');
         $providerName = htmlspecialchars($details['provider_first_name'] ?? $details['provider_name'] ?? 'Provider', ENT_QUOTES, 'UTF-8');
 
         $emailConfig = self::getExchangeEmailConfig($type, $data, $details);
@@ -1584,7 +1584,7 @@ HTML;
         $finalHours = $details['final_hours'] ?? $data['hours'] ?? $hours;
         $reason = $data['reason'] ?? '';
         $listingType = $details['listing_type'] ?? 'offer';
-        $requesterName = $details['requester_first_name'] ?? $details['requester_name'] ?? 'A member';
+        $requesterName = $details['requester_first_name'] ?? $details['requester_name'] ?? __('emails.common.fallback_member_name');
         $providerName = $details['provider_first_name'] ?? $details['provider_name'] ?? 'the provider';
 
         $typeColor = $listingType === 'offer' ? '#dcfce7' : '#fef3c7';

@@ -350,7 +350,7 @@ class AdminVolunteerController extends BaseApiController
                 );
 
                 if ($volDetail && !empty($volDetail->email)) {
-                    $firstName = $volDetail->first_name ?? $volDetail->name ?? 'there';
+                    $firstName = $volDetail->first_name ?? $volDetail->name ?? __('emails.common.fallback_name');
                     $oppTitle = htmlspecialchars($volDetail->opportunity_title ?? 'your volunteering', ENT_QUOTES, 'UTF-8');
                     $url = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/volunteering';
                     $emailKey = $newStatus === 'approved' ? 'hours_approved' : 'hours_declined';
@@ -619,7 +619,7 @@ class AdminVolunteerController extends BaseApiController
                 $oppTitle = htmlspecialchars($app->opportunity_title ?? 'the opportunity', ENT_QUOTES, 'UTF-8');
 
                 if ($applicant && !empty($applicant->email)) {
-                    $firstName = $applicant->first_name ?? $applicant->name ?? 'there';
+                    $firstName = $applicant->first_name ?? $applicant->name ?? __('emails.common.fallback_name');
                     $url = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/volunteering';
 
                     $html = \App\Core\EmailTemplateBuilder::make()

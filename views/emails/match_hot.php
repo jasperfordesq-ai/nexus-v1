@@ -122,7 +122,7 @@ if ($distance !== null) {
 
     <!-- Preview text -->
     <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">
-        <?= $matchScore ?>% match found! <?= htmlspecialchars($posterName) ?> posted "<?= htmlspecialchars($listingTitle) ?>" <?= $distance !== null ? "- {$distanceLabel}" : '' ?>
+        <?= __('emails.match_hot.preview', ['score' => $matchScore, 'name' => htmlspecialchars($posterName), 'title' => htmlspecialchars($listingTitle)]) ?><?= $distance !== null ? ' - ' . $distanceLabel : '' ?>
         &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847;
     </div>
 
@@ -251,7 +251,7 @@ if ($distance !== null) {
                                 <tr>
                                     <td style="padding: 0 40px 35px; text-align: center;" class="mobile-padding">
                                         <p style="margin: 0; font-size: 14px; color: <?= $textMuted ?>;" class="text-secondary">
-                                            or <a href="<?= $matchesUrl ?>" style="color: <?= $primaryColor ?>; font-weight: 600;"><?= __('emails.match_hot.view_all_matches') ?></a>
+                                            <?= __('emails.common.or_separator') ?> <a href="<?= $matchesUrl ?>" style="color: <?= $primaryColor ?>; font-weight: 600;"><?= __('emails.match_hot.view_all_matches') ?></a>
                                         </p>
                                     </td>
                                 </tr>

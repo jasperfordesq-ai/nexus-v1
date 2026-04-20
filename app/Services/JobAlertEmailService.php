@@ -57,7 +57,7 @@ class JobAlertEmailService
      */
     public static function buildAlertEmailHtml(User $recipient, array $vacancies): string
     {
-        $name     = htmlspecialchars($recipient->first_name ?? 'there');
+        $name     = htmlspecialchars($recipient->first_name ?? __('emails.common.fallback_name'));
         $jobItems = '';
 
         foreach ($vacancies as $v) {

@@ -43,7 +43,7 @@ class NotifyAdminOfNewVolunteerOpportunity implements ShouldQueue
                     ->first();
                 if ($poster) {
                     $posterName = trim(($poster->first_name ?? '') . ' ' . ($poster->last_name ?? ''))
-                        ?: ($poster->name ?? 'A member');
+                        ?: ($poster->name ?? __('emails.common.fallback_member_name'));
                 }
             }
 

@@ -372,7 +372,7 @@ class JobVacanciesController extends BaseApiController
             );
             if ($job && (int) $job->user_id !== $userId) {
                 $applicant = \App\Models\User::find($userId);
-                $applicantName = $applicant->first_name ?? $applicant->name ?? 'Someone';
+                $applicantName = $applicant->first_name ?? $applicant->name ?? __('emails.common.fallback_someone');
                 \App\Models\Notification::createNotification(
                     (int) $job->user_id,
                     "{$applicantName} applied for your job: \"{$job->title}\"",
@@ -397,7 +397,7 @@ class JobVacanciesController extends BaseApiController
                     ->select(['email', 'first_name', 'name'])
                     ->first();
                 if ($applicantUser && !empty($applicantUser->email)) {
-                    $firstName = $applicantUser->first_name ?? $applicantUser->name ?? 'there';
+                    $firstName = $applicantUser->first_name ?? $applicantUser->name ?? __('emails.common.fallback_name');
                     $community = TenantContext::getName();
                     $jobTitle  = htmlspecialchars($job->title, ENT_QUOTES, 'UTF-8');
                     $appUrl    = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/jobs/' . $id;
@@ -429,12 +429,12 @@ class JobVacanciesController extends BaseApiController
                     ->select(['email', 'first_name', 'name'])
                     ->first();
                 if ($posterUser && !empty($posterUser->email)) {
-                    $posterFirst   = $posterUser->first_name ?? $posterUser->name ?? 'there';
+                    $posterFirst   = $posterUser->first_name ?? $posterUser->name ?? __('emails.common.fallback_name');
                     $community     = TenantContext::getName();
                     $jobTitle      = htmlspecialchars($job->title, ENT_QUOTES, 'UTF-8');
                     $applicant     = $applicant ?? \App\Models\User::find($userId);
                     $applicantName = $applicant
-                        ? trim(($applicant->first_name ?? '') . ' ' . ($applicant->last_name ?? '')) ?: ($applicant->name ?? 'Someone')
+                        ? trim(($applicant->first_name ?? '') . ' ' . ($applicant->last_name ?? '')) ?: ($applicant->name ?? __('emails.common.fallback_someone'))
                         : 'Someone';
                     $reviewUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/jobs/' . $id . '/applications';
                     $html = EmailTemplateBuilder::make()

@@ -517,7 +517,7 @@ class CronJobRunner
 
         $freqLabel = ucfirst($frequency);
         $digestTitle = __('emails.digest.title', ['frequency' => $freqLabel]);
-        $userName = htmlspecialchars($user['name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+        $userName = htmlspecialchars($user['name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
         $digestGreeting = __('emails.digest.greeting', ['name' => $userName]);
         $digestIntro = __('emails.digest.intro');
         $digestOptedIn = __('emails.digest.opted_in_notice', ['frequency' => $frequency]);

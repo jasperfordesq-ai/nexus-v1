@@ -202,7 +202,7 @@ class GroupReportingService
 
                 $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
                 $subject = __('emails.group_digest.subject', ['group' => $group->name]);
-                $body = self::buildDigestEmailBody($name, $stats, $tenant->name ?? 'your community');
+                $body = self::buildDigestEmailBody($name, $stats, $tenant->name ?? __('emails.common.fallback_tenant_name'));
 
                 $success = $emailService->send($user->email, $subject, $body);
 

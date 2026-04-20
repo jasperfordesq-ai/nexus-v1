@@ -82,7 +82,7 @@ class JobExpiryNotificationService
 
     private static function sendExpiryEmail(User $user, object $vacancy, int $daysLeft): void
     {
-        $name      = htmlspecialchars($user->first_name ?? 'there');
+        $name      = htmlspecialchars($user->first_name ?? __('emails.common.fallback_name'));
         $title     = htmlspecialchars($vacancy->title);
         $renewUrl  = TenantContext::getFrontendUrl("/jobs/{$vacancy->id}");
         $deadline  = $vacancy->deadline?->format('d M Y') ?? 'soon';

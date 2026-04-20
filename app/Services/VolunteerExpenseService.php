@@ -250,7 +250,7 @@ class VolunteerExpenseService
                     $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
                     $user = DB::table('users')->where('id', $expense->user_id)->where('tenant_id', TenantContext::getId())->select(['email', 'first_name', 'name'])->first();
                     if ($user && !empty($user->email)) {
-                        $firstName = $user->first_name ?? $user->name ?? 'there';
+                        $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                         $builder = EmailTemplateBuilder::make()
                             ->title(__($titleKey))
                             ->greeting($firstName)
@@ -297,7 +297,7 @@ class VolunteerExpenseService
                     $tenantId  = TenantContext::getId();
                     $user      = DB::table('users')->where('id', $expense->user_id)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
                     if ($user && !empty($user->email)) {
-                        $firstName = $user->first_name ?? $user->name ?? 'there';
+                        $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                         $params    = [
                             'amount'   => number_format((float) $expense->amount, 2),
                             'currency' => $expense->currency ?? 'EUR',

@@ -116,7 +116,15 @@
   "common": {
     "greeting": "Hi {{name}},",
     "button_fallback": "If the button above doesn't work, copy and paste this link into your browser:",
-    "button_fallback_short": "If the button doesn't work, copy this link:"
+    "button_fallback_short": "If the button doesn't work, copy this link:",
+    "fallback_name": "there",
+    "fallback_member_name": "A member",
+    "fallback_someone": "Someone",
+    "fallback_tenant_name": "your community",
+    "fallback_federation_member": "A federation member",
+    "fallback_partner_community": "a partner community",
+    "fallback_federation_level": "Level {{level}}",
+    "or_separator": "or"
   },
   "footer": {
     "unsubscribe": "Unsubscribe from these emails",

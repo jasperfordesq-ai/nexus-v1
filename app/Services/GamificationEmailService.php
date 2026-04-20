@@ -112,7 +112,7 @@ class GamificationEmailService
 
                         $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
                         $subject = __('emails.gamification_digest.subject');
-                        $body = $this->buildDigestEmailBody($name, $digest, $tenant->name ?? 'your community');
+                        $body = $this->buildDigestEmailBody($name, $digest, $tenant->name ?? __('emails.common.fallback_tenant_name'));
 
                         $success = $emailService->send($user->email, $subject, $body);
 

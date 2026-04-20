@@ -43,7 +43,7 @@ class NotifyAdminOfNewCommunityEvent implements ShouldQueue
                     ->first();
                 if ($creator) {
                     $creatorName = trim(($creator->first_name ?? '') . ' ' . ($creator->last_name ?? ''))
-                        ?: ($creator->name ?? 'A member');
+                        ?: ($creator->name ?? __('emails.common.fallback_member_name'));
                 }
             }
 

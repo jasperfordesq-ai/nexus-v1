@@ -181,7 +181,7 @@ class ConnectionsController extends BaseApiController
         try {
             $requesterId = $connection->requester_id;
             $accepter = User::find($userId);
-            $accepterName = $accepter->first_name ?? $accepter->name ?? 'Someone';
+            $accepterName = $accepter->first_name ?? $accepter->name ?? __('emails.common.fallback_someone');
 
             NotificationDispatcher::dispatch(
                 $requesterId,
@@ -239,7 +239,7 @@ class ConnectionsController extends BaseApiController
             try {
                 $decliner    = User::find($userId);
                 $declinerName = trim(($decliner->first_name ?? '') . ' ' . ($decliner->last_name ?? ''))
-                    ?: ($decliner->name ?? 'Someone');
+                    ?: ($decliner->name ?? __('emails.common.fallback_someone'));
                 $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
 
                 // Bell notification

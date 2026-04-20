@@ -156,7 +156,7 @@ class VolunteerCertificateService
         try {
             $userRow = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
             if ($userRow && !empty($userRow->email)) {
-                $firstName = $userRow->first_name ?? $userRow->name ?? 'there';
+                $firstName = $userRow->first_name ?? $userRow->name ?? __('emails.common.fallback_name');
                 $certUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/volunteering/certificates/' . $id;
                 $html = EmailTemplateBuilder::make()
                     ->title(__('emails_misc.vol_certificate.ready_title'))

@@ -1,5 +1,10 @@
 {
     "active": "Active",
+    "label_active_members": "Active Members",
+    "label_new_this_month": "New This Month",
+    "label_pending_approvals": "Pending Approvals",
+    "label_retention_rate": "Retention Rate",
+    "label_total_members": "Total Members",
     "activity": {
         "card_title": "Card",
         "empty": "No activity found",

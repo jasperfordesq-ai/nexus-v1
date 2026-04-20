@@ -230,7 +230,7 @@ class AdminListingsController extends BaseApiController
                 ->select(['email', 'first_name', 'name'])
                 ->first();
             if ($owner && !empty($owner->email)) {
-                $firstName  = $owner->first_name ?? $owner->name ?? 'there';
+                $firstName  = $owner->first_name ?? $owner->name ?? __('emails.common.fallback_name');
                 $safeTitle  = htmlspecialchars($item->title ?? '', ENT_QUOTES, 'UTF-8');
                 $listingUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/listings/{$id}";
                 $html = \App\Core\EmailTemplateBuilder::make()
@@ -301,7 +301,7 @@ class AdminListingsController extends BaseApiController
                 ->select(['email', 'first_name', 'name'])
                 ->first();
             if ($user && !empty($user->email)) {
-                $firstName = $user->first_name ?? $user->name ?? 'there';
+                $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/listings';
                 $html = \App\Core\EmailTemplateBuilder::make()
                     ->title(__('emails_listings.listings.removed.email_title'))

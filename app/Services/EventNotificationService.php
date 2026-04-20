@@ -510,7 +510,7 @@ class EventNotificationService
     public function notifyEventCreated(int $tenantId, int $eventId, int $organizerId, bool $notifyInitialAttendees = false): void
     {
         try {
-            TenantContext::setId($tenantId);
+            TenantContext::setById($tenantId);
 
             $event = DB::table('events')
                 ->where('id', $eventId)
@@ -758,7 +758,7 @@ class EventNotificationService
      */
     private function buildDefaultEventEmailHtml(string $subject, string $content, string $link, object $user): string
     {
-        $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? 'there', ENT_QUOTES, 'UTF-8');
+        $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
         $safeSubject = htmlspecialchars($subject, ENT_QUOTES, 'UTF-8');
         $safeContent = htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
         $tenantName = htmlspecialchars(TenantContext::getSetting('site_name', 'Project NEXUS'), ENT_QUOTES, 'UTF-8');
@@ -790,7 +790,7 @@ HTML;
      */
     private function buildRsvpEmailHtml(object $event, object $rsvpUser, string $status, object $organizer): string
     {
-        $organizerName = htmlspecialchars($organizer->first_name ?? $organizer->name ?? 'there', ENT_QUOTES, 'UTF-8');
+        $organizerName = htmlspecialchars($organizer->first_name ?? $organizer->name ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
         $rsvpUserName = htmlspecialchars($rsvpUser->name ?? trim(($rsvpUser->first_name ?? '') . ' ' . ($rsvpUser->last_name ?? '')), ENT_QUOTES, 'UTF-8');
         $eventTitle = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
         $statusLabel = $status === 'going'
@@ -837,7 +837,7 @@ HTML;
      */
     private function buildCancellationEmailHtml(object $event, ?string $reason, object $user): string
     {
-        $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? 'there', ENT_QUOTES, 'UTF-8');
+        $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
         $eventTitle = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
         $tenantName = htmlspecialchars(TenantContext::getSetting('site_name', 'Project NEXUS'), ENT_QUOTES, 'UTF-8');
         $baseUrl = TenantContext::getFrontendUrl();
@@ -894,7 +894,7 @@ HTML;
      */
     private function buildUpdateEmailHtml(object $event, array $changes, object $user): string
     {
-        $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? 'there', ENT_QUOTES, 'UTF-8');
+        $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
         $eventTitle = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
         $tenantName = htmlspecialchars(TenantContext::getSetting('site_name', 'Project NEXUS'), ENT_QUOTES, 'UTF-8');
         $baseUrl = TenantContext::getFrontendUrl();
@@ -952,7 +952,7 @@ HTML;
      */
     private function buildEventCreatedEmailHtml(object $event, object $organizer): string
     {
-        $organizerName = htmlspecialchars($organizer->first_name ?? $organizer->name ?? 'there', ENT_QUOTES, 'UTF-8');
+        $organizerName = htmlspecialchars($organizer->first_name ?? $organizer->name ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
         $eventTitle = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
         $tenantName = htmlspecialchars(TenantContext::getSetting('site_name', 'Project NEXUS'), ENT_QUOTES, 'UTF-8');
         $baseUrl = TenantContext::getFrontendUrl();
@@ -1011,7 +1011,7 @@ HTML;
      */
     private function buildReminderEmailHtml(object $event, string $reminderType, object $user): string
     {
-        $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? 'there', ENT_QUOTES, 'UTF-8');
+        $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
         $eventTitle = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
         $tenantName = htmlspecialchars(TenantContext::getSetting('site_name', 'Project NEXUS'), ENT_QUOTES, 'UTF-8');
         $baseUrl = TenantContext::getFrontendUrl();

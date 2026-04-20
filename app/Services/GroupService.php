@@ -306,7 +306,7 @@ class GroupService
                 ->first();
 
             if ($creator && !empty($creator->email)) {
-                $firstName  = $creator->first_name ?? $creator->name ?? 'there';
+                $firstName  = $creator->first_name ?? $creator->name ?? __('emails.common.fallback_name');
                 $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
                 $groupUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups/' . $group->id;
                 $groupName  = $group->name ?? '';
@@ -719,7 +719,7 @@ class GroupService
                     ->select(['email', 'first_name', 'name'])
                     ->first();
                 if ($member && !empty($member->email)) {
-                    $firstName  = $member->first_name ?? $member->name ?? 'there';
+                    $firstName  = $member->first_name ?? $member->name ?? __('emails.common.fallback_name');
                     $community  = TenantContext::getName();
                     $groupName  = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
                     $roleLabel  = ucfirst($role);
@@ -791,7 +791,7 @@ class GroupService
                 ->select(['email', 'first_name', 'name'])
                 ->first();
             if ($member && !empty($member->email)) {
-                $firstName = $member->first_name ?? $member->name ?? 'there';
+                $firstName = $member->first_name ?? $member->name ?? __('emails.common.fallback_name');
                 $community = TenantContext::getName();
                 $groupName = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
                 $browseUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups';

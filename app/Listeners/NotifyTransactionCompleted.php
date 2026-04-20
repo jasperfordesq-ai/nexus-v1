@@ -38,7 +38,7 @@ class NotifyTransactionCompleted implements ShouldQueue
             $receiver = $event->receiver;
             $transaction = $event->transaction;
 
-            $senderName = $sender->first_name ?? $sender->name ?? 'Someone';
+            $senderName = $sender->first_name ?? $sender->name ?? __('emails.common.fallback_someone');
             $amount = (float) $transaction->amount;
             $description = $transaction->description ?? '';
 

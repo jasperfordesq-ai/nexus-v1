@@ -402,7 +402,7 @@ class SafeguardingPreferenceService
         try {
             $revoker = \App\Models\User::find($userId);
             $revokerName = $revoker
-                ? (trim(($revoker->first_name ?? '') . ' ' . ($revoker->last_name ?? '')) ?: ($revoker->name ?? 'A member'))
+                ? (trim(($revoker->first_name ?? '') . ' ' . ($revoker->last_name ?? '')) ?: ($revoker->name ?? __('emails.common.fallback_member_name')))
                 : 'A member';
 
             $staffUsers = DB::select(

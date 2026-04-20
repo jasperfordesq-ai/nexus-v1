@@ -481,7 +481,7 @@ class UsersController extends BaseApiController
 
         // Capture contact details before anonymization
         $userEmail = $userRow->email;
-        $userName  = $userRow->first_name ?? $userRow->name ?? 'there';
+        $userName  = $userRow->first_name ?? $userRow->name ?? __('emails.common.fallback_name');
 
         $success = $this->userService->deleteAccount($userId);
 

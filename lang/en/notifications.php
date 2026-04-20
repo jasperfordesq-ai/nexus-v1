@@ -341,4 +341,12 @@ return [
     'label_action_needed'            => 'Action needed:',
     'label_why_approval'             => 'Why approval?',
     'label_under_review'             => 'Under review:',
+
+    // Event + ideation notifications (hardcoded-string audit — 2026-04-20)
+    'event_created_confirmation'     => ':title has been created',
+    'event_attendee_confirmation'    => 'You are confirmed for :title',
+    'ideation_status_under_review'   => 'under review',
+    'ideation_status_approved'       => 'approved',
+    'ideation_status_rejected'       => 'rejected',
+    'ideation_status_implemented'    => 'implemented',
 ];

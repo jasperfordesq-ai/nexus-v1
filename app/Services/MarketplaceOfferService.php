@@ -434,7 +434,7 @@ class MarketplaceOfferService
             return;
         }
 
-        $firstName = $user->first_name ?? $user->name ?? 'there';
+        $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
         $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
         $html = EmailTemplateBuilder::make()
@@ -456,7 +456,7 @@ class MarketplaceOfferService
             return 'A member';
         }
         $full = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
-        return $full ?: ($user->name ?? 'A member');
+        return $full ?: ($user->name ?? __('emails.common.fallback_member_name'));
     }
 
     private static function assertSellerOwns(MarketplaceOffer $offer, int $sellerId): void

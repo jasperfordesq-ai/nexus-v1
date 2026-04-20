@@ -67,7 +67,7 @@ class AdminUsersService
         if ($affected > 0 && $user && !empty($user->email)) {
             try {
                 TenantContext::setById($tenantId);
-                $firstName = $user->first_name ?? $user->name ?? 'there';
+                $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $community = TenantContext::getName();
                 $builder = EmailTemplateBuilder::make()
                     ->theme('danger')
@@ -105,7 +105,7 @@ class AdminUsersService
         if ($affected > 0 && $user && !empty($user->email)) {
             try {
                 TenantContext::setById($tenantId);
-                $firstName = $user->first_name ?? $user->name ?? 'there';
+                $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $community = TenantContext::getName();
                 $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
                 $html = EmailTemplateBuilder::make()

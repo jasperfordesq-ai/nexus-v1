@@ -541,7 +541,7 @@ class ListingsController extends BaseApiController
                 if ($saver) {
                     $saverName = trim(($saver->first_name ?? '') . ' ' . ($saver->last_name ?? ''));
                     if (empty($saverName)) {
-                        $saverName = $saver->name ?? 'Someone';
+                        $saverName = $saver->name ?? __('emails.common.fallback_someone');
                     }
                 }
 

@@ -40,8 +40,8 @@ class FederationEmailService
             $sender = self::getUserBasicInfo($senderUserId, $senderTenantId);
             $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
 
-            $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : 'A federation member';
-            $tenantName = $senderTenant->name ?? 'a partner community';
+            $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : __('emails.common.fallback_federation_member');
+            $tenantName = $senderTenant->name ?? __('emails.common.fallback_partner_community');
             $preview = mb_substr(strip_tags($messagePreview), 0, 200);
 
             $recipientName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
@@ -94,8 +94,8 @@ class FederationEmailService
             $sender = self::getUserBasicInfo($senderUserId, $senderTenantId);
             $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
 
-            $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : 'A federation member';
-            $tenantName = $senderTenant->name ?? 'a partner community';
+            $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : __('emails.common.fallback_federation_member');
+            $tenantName = $senderTenant->name ?? __('emails.common.fallback_partner_community');
 
             $recipientName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
             $safeSenderName = htmlspecialchars($senderName, ENT_QUOTES, 'UTF-8');
@@ -142,8 +142,8 @@ class FederationEmailService
             $recipient = self::getUserBasicInfo($recipientUserId, $recipientTenantId);
             $recipientTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$recipientTenantId]);
 
-            $recipientName = $recipient ? trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) : 'a federation member';
-            $tenantName = $recipientTenant->name ?? 'a partner community';
+            $recipientName = $recipient ? trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) : __('emails.common.fallback_federation_member');
+            $tenantName = $recipientTenant->name ?? __('emails.common.fallback_partner_community');
 
             $senderName = trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? ''));
             $safeRecipientName = htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8');
@@ -193,7 +193,7 @@ class FederationEmailService
             }
 
             $tenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$tenantId]);
-            $tenantName = $tenant->name ?? 'your community';
+            $tenantName = $tenant->name ?? __('emails.common.fallback_tenant_name');
 
             // Gather stats for the week
             $messageCount = (int) (DB::selectOne(
@@ -263,7 +263,7 @@ class FederationEmailService
                 3 => __('emails.federation.level_economic'),
                 4 => __('emails.federation.level_integrated'),
             ];
-            $levelName = $levelNames[$requestedLevel] ?? 'Level ' . $requestedLevel;
+            $levelName = $levelNames[$requestedLevel] ?? __('emails.common.fallback_federation_level', ['level' => $requestedLevel]);
 
             // Get admin users for target tenant
             $admins = DB::select(
@@ -340,8 +340,8 @@ class FederationEmailService
             $sender = self::getUserBasicInfo($senderUserId, $senderTenantId);
             $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
 
-            $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : 'A federation member';
-            $tenantName = $senderTenant->name ?? 'a partner community';
+            $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : __('emails.common.fallback_federation_member');
+            $tenantName = $senderTenant->name ?? __('emails.common.fallback_partner_community');
 
             $recipientName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
             $safeSenderName = htmlspecialchars($senderName, ENT_QUOTES, 'UTF-8');
@@ -389,8 +389,8 @@ class FederationEmailService
             $recipient = self::getUserBasicInfo($recipientUserId, $recipientTenantId);
             $recipientTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$recipientTenantId]);
 
-            $recipientName = $recipient ? trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) : 'A federation member';
-            $tenantName = $recipientTenant->name ?? 'a partner community';
+            $recipientName = $recipient ? trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) : __('emails.common.fallback_federation_member');
+            $tenantName = $recipientTenant->name ?? __('emails.common.fallback_partner_community');
 
             $senderName = trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? ''));
             $safeRecipientName = htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8');

@@ -570,7 +570,7 @@ class MarketplacePaymentService
                     return;
                 }
 
-                $firstName = $user->first_name ?? $user->name ?? 'there';
+                $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
                 $html = EmailTemplateBuilder::make()
@@ -688,7 +688,7 @@ class MarketplacePaymentService
         }
 
         // Set tenant context from our trusted DB record (never from Stripe metadata)
-        TenantContext::setId($tenantId);
+        TenantContext::setById($tenantId);
 
         try {
             self::confirmPayment($piId);
@@ -762,7 +762,7 @@ class MarketplacePaymentService
 
                 $buyer = DB::table('users')->where('id', $order->buyer_id)->select(['email', 'first_name', 'name'])->first();
                 if ($buyer && !empty($buyer->email)) {
-                    $firstName = $buyer->first_name ?? $buyer->name ?? 'there';
+                    $firstName = $buyer->first_name ?? $buyer->name ?? __('emails.common.fallback_name');
                     $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/marketplace/orders/' . $order->id;
                     $html = EmailTemplateBuilder::make()
                         ->title(__($emailTitleKey))

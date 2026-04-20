@@ -186,7 +186,7 @@ class VolunteerController extends BaseApiController
             }
             if ($opportunity && $opportunity->created_by && $opportunity->created_by !== $userId) {
                 $volunteer = User::find($userId);
-                $volunteerName = $volunteer->name ?? 'Someone';
+                $volunteerName = $volunteer->name ?? __('emails.common.fallback_someone');
                 $notifContent = "{$volunteerName} applied for your volunteer opportunity: {$opportunity->title}";
                 $orgId = $opportunity->organization_id;
                 $notifLink = "/volunteering/org/{$orgId}/dashboard?tab=applications";
@@ -352,7 +352,7 @@ class VolunteerController extends BaseApiController
             }
             if ($shift && $shift->opportunity && $shift->opportunity->created_by && $shift->opportunity->created_by !== $userId) {
                 $volunteer = User::find($userId);
-                $volunteerName = $volunteer->name ?? 'Someone';
+                $volunteerName = $volunteer->name ?? __('emails.common.fallback_someone');
                 Notification::createNotification(
                     (int) $shift->opportunity->created_by,
                     "{$volunteerName} signed up for a shift",

@@ -55,7 +55,7 @@ class WalletAlertService
             return;
         }
 
-        $firstName = $user->first_name ?? $user->name ?? 'there';
+        $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
         $balanceFormatted = number_format($newBalance, 1);
         $baseUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
 

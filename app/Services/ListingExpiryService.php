@@ -82,7 +82,7 @@ class ListingExpiryService
                             ->select(['first_name', 'name'])
                             ->first();
 
-                        $ownerName = htmlspecialchars($ownerRow->first_name ?? $ownerRow->name ?? 'there', ENT_QUOTES, 'UTF-8');
+                        $ownerName = htmlspecialchars($ownerRow->first_name ?? $ownerRow->name ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
                         $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
                         $frontendUrl = TenantContext::getFrontendUrl();
                         $basePath = TenantContext::getSlugPrefix();

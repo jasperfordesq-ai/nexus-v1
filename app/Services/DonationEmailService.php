@@ -36,11 +36,11 @@ class DonationEmailService
         float $amount,
         ?string $message
     ): void {
-        $donorName     = $donor->first_name ?? $donor->name ?? 'there';
-        $recipientName = $recipient->first_name ?? $recipient->name ?? 'there';
+        $donorName     = $donor->first_name ?? $donor->name ?? __('emails.common.fallback_name');
+        $recipientName = $recipient->first_name ?? $recipient->name ?? __('emails.common.fallback_name');
 
-        $donorFullName     = trim(($donor->first_name ?? '') . ' ' . ($donor->last_name ?? '')) ?: ($donor->name ?? 'A member');
-        $recipientFullName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) ?: ($recipient->name ?? 'A member');
+        $donorFullName     = trim(($donor->first_name ?? '') . ' ' . ($donor->last_name ?? '')) ?: ($donor->name ?? __('emails.common.fallback_member_name'));
+        $recipientFullName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) ?: ($recipient->name ?? __('emails.common.fallback_member_name'));
 
         $walletUrl = EmailTemplateBuilder::tenantUrl('/wallet');
 

@@ -1677,7 +1677,7 @@ EOT;
         if ($offerCount > 0) {
             foreach ($data['recent_offers'] as $offer) {
                 $title = htmlspecialchars($offer['title'] ?? 'Untitled');
-                $name = htmlspecialchars($offer['user_name'] ?? 'A member');
+                $name = htmlspecialchars($offer['user_name'] ?? __('emails.common.fallback_member_name'));
                 $output .= "- \"{$title}\" offered by {$name}\n";
             }
         } else {
@@ -1690,7 +1690,7 @@ EOT;
         if ($requestCount > 0) {
             foreach ($data['recent_requests'] as $request) {
                 $title = htmlspecialchars($request['title'] ?? 'Untitled');
-                $name = htmlspecialchars($request['user_name'] ?? 'A member');
+                $name = htmlspecialchars($request['user_name'] ?? __('emails.common.fallback_member_name'));
                 $output .= "- \"{$title}\" requested by {$name}\n";
             }
         } else {

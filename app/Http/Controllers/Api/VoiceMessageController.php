@@ -132,7 +132,7 @@ class VoiceMessageController extends BaseApiController
                 $replyLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/messages/" . $senderId;
 
                 $durationFormatted = gmdate("i:s", $audioResult['duration']);
-                $senderName = htmlspecialchars($sender->name ?? 'Someone', ENT_QUOTES, 'UTF-8');
+                $senderName = htmlspecialchars($sender->name ?? __('emails.common.fallback_someone'), ENT_QUOTES, 'UTF-8');
 
                 $emailHtml = EmailTemplateBuilder::make()
                     ->title(__('emails_misc.voice_message.email_title'))

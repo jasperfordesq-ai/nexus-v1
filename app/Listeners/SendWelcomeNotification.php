@@ -52,7 +52,7 @@ class SendWelcomeNotification implements ShouldQueue
 
             // Send email
             $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-            $userName = $event->user->first_name ?? $event->user->name ?? 'there';
+            $userName = $event->user->first_name ?? $event->user->name ?? __('emails.common.fallback_name');
             $userEmail = $event->user->email ?? null;
 
             if (!$userEmail) {

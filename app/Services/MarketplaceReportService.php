@@ -438,6 +438,10 @@ class MarketplaceReportService
             $report->save();
             $count++;
 
+            // Set tenant context per-report so sendReportEmail uses the correct
+            // tenant's mailer, URLs, and translations.
+            TenantContext::setById((int) $report->tenant_id);
+
             // Notify reporter their report is now under review
             try {
                 self::sendReportEmail(
@@ -492,7 +496,7 @@ class MarketplaceReportService
             return;
         }
 
-        $firstName = $user->first_name ?? $user->name ?? 'there';
+        $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
         $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
         $builder = EmailTemplateBuilder::make()

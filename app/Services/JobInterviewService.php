@@ -489,7 +489,7 @@ class JobInterviewService
                 return;
             }
 
-            $firstName  = $user->first_name ?? $user->name ?? 'there';
+            $firstName  = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
             $bodyText   = __($messageKey, $params);
             $subject    = __($subjectKey, $params);
             $fullUrl    = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $jobLink;

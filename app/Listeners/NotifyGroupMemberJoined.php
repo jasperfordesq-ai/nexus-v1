@@ -60,7 +60,7 @@ class NotifyGroupMemberJoined implements ShouldQueue
             }
 
             $joinerName = trim(($joiner->first_name ?? '') . ' ' . ($joiner->last_name ?? ''))
-                ?: ($joiner->name ?? 'Someone');
+                ?: ($joiner->name ?? __('emails.common.fallback_someone'));
 
             $groupName = $group->name ?? '';
             $content = __('notifications.group_new_member', ['name' => $joinerName, 'group' => $groupName]);

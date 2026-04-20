@@ -167,7 +167,7 @@ class EventReminderService
                                 : 'notifications.event_reminder_subject_1h';
                             $subject  = __($subjectKey, ['title' => $title]);
                             $eventUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
-                            $name     = $attendee->first_name ?? $attendee->name ?? 'there';
+                            $name     = $attendee->first_name ?? $attendee->name ?? __('emails.common.fallback_name');
 
                             $html = EmailTemplateBuilder::make()
                                 ->title(__('emails_misc.events.reminder_email_title'))

@@ -356,7 +356,7 @@ class CommunityProjectService
             $proposedBy = (int) $project->proposed_by;
             $user = DB::table('users')->where('id', $proposedBy)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
             if ($user && !empty($user->email)) {
-                $firstName  = $user->first_name ?? $user->name ?? 'there';
+                $firstName  = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $safeTitle  = htmlspecialchars($project->title ?? '', ENT_QUOTES, 'UTF-8');
                 $prefix     = match ($status) {
                     'approved'     => 'approved',

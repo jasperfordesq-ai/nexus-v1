@@ -445,7 +445,7 @@ class MarketplaceOrderService
             return;
         }
 
-        $firstName = $user->first_name ?? $user->name ?? 'there';
+        $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
         $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
         $html = EmailTemplateBuilder::make()

@@ -234,7 +234,7 @@ class GoalsController extends BaseApiController
             $mentorId = $goal->mentor_id ? (int) $goal->mentor_id : null;
             if ($mentorId && $mentorId !== $userId) {
                 $owner = User::find($userId);
-                $ownerName = $owner->name ?? 'Someone';
+                $ownerName = $owner->name ?? __('emails.common.fallback_someone');
                 $goalTitle = $goal->title ?? 'their goal';
 
                 // If progress caused auto-completion, send completion message
@@ -318,7 +318,7 @@ class GoalsController extends BaseApiController
             $mentorId = $goal->mentor_id ? (int) $goal->mentor_id : null;
             if ($mentorId && $mentorId !== $userId) {
                 $owner = User::find($userId);
-                $ownerName = $owner->name ?? 'Someone';
+                $ownerName = $owner->name ?? __('emails.common.fallback_someone');
                 Notification::createNotification(
                     $mentorId,
                     __('api_controllers_3.goals.completed_mentor', ['name' => $ownerName, 'title' => $goal->title]),
@@ -412,7 +412,7 @@ class GoalsController extends BaseApiController
             $goalOwnerId = (int) $goal->user_id;
             if ($goalOwnerId !== $userId) {
                 $buddy = User::find($userId);
-                $buddyName = $buddy->name ?? 'Someone';
+                $buddyName = $buddy->name ?? __('emails.common.fallback_someone');
                 Notification::createNotification(
                     $goalOwnerId,
                     "{$buddyName} has become a buddy for your goal: {$goal->title}",
@@ -451,7 +451,7 @@ class GoalsController extends BaseApiController
             $mentorId = $goal->mentor_id ? (int) $goal->mentor_id : null;
             if ($mentorId && $mentorId !== $userId) {
                 $owner = User::find($userId);
-                $ownerName = $owner->name ?? 'Someone';
+                $ownerName = $owner->name ?? __('emails.common.fallback_someone');
                 Notification::createNotification(
                     $mentorId,
                     "{$ownerName} checked in on their goal: {$goal->title}",

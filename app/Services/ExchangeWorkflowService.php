@@ -801,7 +801,7 @@ class ExchangeWorkflowService
                         ->theme('warning')
                         ->title(__('emails.exchange_dispute.title'))
                         ->previewText(__('emails.exchange_dispute.preview'))
-                        ->greeting($party['name'] ?? 'there')
+                        ->greeting($party['name'] ?? __('emails.common.fallback_name'))
                         ->paragraph(__('emails.exchange_dispute.body'))
                         ->paragraph(__('emails.exchange_dispute.next_steps'))
                         ->button(__('emails.exchange_dispute.cta'), $frontendUrl . $link)
@@ -916,12 +916,12 @@ class ExchangeWorkflowService
 
         $requester = User::find($exchange->requester_id);
         if ($requester && !empty($requester->email)) {
-            $parties[] = ['email' => $requester->email, 'name' => $requester->first_name ?? $requester->name ?? 'there'];
+            $parties[] = ['email' => $requester->email, 'name' => $requester->first_name ?? $requester->name ?? __('emails.common.fallback_name')];
         }
 
         $provider = User::find($exchange->provider_id);
         if ($provider && !empty($provider->email)) {
-            $parties[] = ['email' => $provider->email, 'name' => $provider->first_name ?? $provider->name ?? 'there'];
+            $parties[] = ['email' => $provider->email, 'name' => $provider->first_name ?? $provider->name ?? __('emails.common.fallback_name')];
         }
 
         foreach ($parties as $party) {

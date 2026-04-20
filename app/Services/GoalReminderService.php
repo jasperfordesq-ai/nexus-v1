@@ -103,7 +103,7 @@ class GoalReminderService
         foreach ($reminders as $reminder) {
             try {
                 $goalTitle = htmlspecialchars($reminder->goal_title ?? 'your goal', ENT_QUOTES, 'UTF-8');
-                $firstName = $reminder->first_name ?? $reminder->user_name ?? 'there';
+                $firstName = $reminder->first_name ?? $reminder->user_name ?? __('emails.common.fallback_name');
                 $link = '/goals/' . $reminder->goal_id;
 
                 // In-app notification

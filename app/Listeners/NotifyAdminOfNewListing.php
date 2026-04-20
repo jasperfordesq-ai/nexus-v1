@@ -33,7 +33,7 @@ class NotifyAdminOfNewListing implements ShouldQueue
             $listingUrl = $baseUrl . $basePath . '/listings/' . $listing->id;
 
             $posterName   = trim(($poster->first_name ?? '') . ' ' . ($poster->last_name ?? ''))
-                ?: ($poster->name ?? 'A member');
+                ?: ($poster->name ?? __('emails.common.fallback_member_name'));
             $listingTitle = $listing->title ?? 'Untitled';
             $listingType  = ucfirst($listing->type ?? 'listing');
 

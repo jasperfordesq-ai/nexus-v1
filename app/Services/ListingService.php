@@ -1003,7 +1003,7 @@ class ListingService
                 ->first();
 
             if ($creator && !empty($creator->email)) {
-                $firstName   = $creator->first_name ?? $creator->name ?? 'there';
+                $firstName   = $creator->first_name ?? $creator->name ?? __('emails.common.fallback_name');
                 $tenantName  = TenantContext::getSetting('site_name', 'Project NEXUS');
                 $listingUrl  = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/listings/' . $listing->id;
                 $listingTitle = $listing->title ?? '';
@@ -1100,7 +1100,7 @@ class ListingService
 
                 foreach ($savedUsers as $savedUser) {
                     try {
-                        $firstName = $savedUser->first_name ?? $savedUser->name ?? 'there';
+                        $firstName = $savedUser->first_name ?? $savedUser->name ?? __('emails.common.fallback_name');
 
                         $html = EmailTemplateBuilder::make()
                             ->theme('brand')

@@ -226,7 +226,7 @@ class InactiveMemberService
 
             foreach ($users as $user) {
                 try {
-                    $firstName = $user->first_name ?? $user->name ?? 'there';
+                    $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
                     $html = EmailTemplateBuilder::make()
                         ->title(__('emails_misc.inactive_member.title'))

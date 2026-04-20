@@ -159,7 +159,7 @@ class ReviewsController extends BaseApiController
             $receiverId = (int) ($review['receiver_id'] ?? 0);
             if ($receiverId > 0 && $receiverId !== $userId) {
                 $reviewer = \App\Models\User::find($userId);
-                $reviewerName = $reviewer->first_name ?? $reviewer->name ?? 'Someone';
+                $reviewerName = $reviewer->first_name ?? $reviewer->name ?? __('emails.common.fallback_someone');
                 $rating = (int) ($review['rating'] ?? 5);
 
                 // In-app notification

@@ -41,7 +41,7 @@ class NotifyConnectionAccepted implements ShouldQueue
             }
 
             $receiverName = trim(($receiver->first_name ?? '') . ' ' . ($receiver->last_name ?? ''))
-                ?: ($receiver->name ?? 'Someone');
+                ?: ($receiver->name ?? __('emails.common.fallback_someone'));
 
             $content = __('emails_misc.social.connection_accepted', ['name' => $receiverName]);
             $link    = '/connections';

@@ -1123,7 +1123,7 @@ class IdeationChallengeService
                 ->where('tenant_id', $tenantId)
                 ->select(['name', 'email'])
                 ->first();
-            $submitterName = $submitter->name ?? 'Someone';
+            $submitterName = $submitter->name ?? __('emails.common.fallback_someone');
 
             $owner = DB::table('users')
                 ->where('id', $challenge->user_id)
@@ -1146,7 +1146,7 @@ class IdeationChallengeService
             if ($owner->email) {
                 try {
                     $tenantName  = TenantContext::getSetting('site_name', 'Project NEXUS');
-                    $firstName   = $owner->first_name ?? $owner->name ?? 'there';
+                    $firstName   = $owner->first_name ?? $owner->name ?? __('emails.common.fallback_name');
                     $challengeTitle = $challenge->title ?? '';
                     $ideaUrl     = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/ideation/' . $challengeId . '/ideas/' . $ideaId;
 
@@ -1188,7 +1188,7 @@ class IdeationChallengeService
                 ->where('tenant_id', $tenantId)
                 ->select(['name'])
                 ->first();
-            $voterName = $voter->name ?? 'Someone';
+            $voterName = $voter->name ?? __('emails.common.fallback_someone');
 
             $owner = DB::table('users')
                 ->where('id', $ideaAuthorId)
@@ -1239,7 +1239,7 @@ class IdeationChallengeService
                 ->where('tenant_id', $tenantId)
                 ->select(['name'])
                 ->first();
-            $commenterName = $commenter->name ?? 'Someone';
+            $commenterName = $commenter->name ?? __('emails.common.fallback_someone');
 
             $owner = DB::table('users')
                 ->where('id', $ideaAuthorId)
@@ -1265,7 +1265,7 @@ class IdeationChallengeService
             if ($owner->email) {
                 try {
                     $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
-                    $firstName  = $owner->first_name ?? $owner->name ?? 'there';
+                    $firstName  = $owner->first_name ?? $owner->name ?? __('emails.common.fallback_name');
                     $ideaTitle  = $idea->title ?? '';
                     $commentUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
