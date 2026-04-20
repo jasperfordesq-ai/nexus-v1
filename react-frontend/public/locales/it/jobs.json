@@ -621,7 +621,12 @@
     "posted_by": "Pubblicato da {{name}}",
     "submitted": "Inviato {{date}}",
     "spam_score": "Punteggio Spam: {{score}}",
-    "spam_flags_label": "Segnalazioni Rilevate"
+    "spam_flags_label": "Segnalazioni Rilevate",
+    "refresh": "Refresh",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "no_description": "No description",
+    "no_flags": "No flags"
   },
   "spam": {
     "title": "Rilevamento Spam",

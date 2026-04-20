@@ -165,5 +165,10 @@
   "search_nav": "Search admin...",
   "no_results": "No results found",
   "recent": "Recent",
-  "broker_panel": "Broker Panel"
+  "broker_panel": "Broker Panel",
+  "zone_members": "People",
+  "zone_community": "Community",
+  "zone_safety": "Safety",
+  "zone_growth": "Growth",
+  "zone_platform": "Platform"
 }

@@ -621,7 +621,12 @@
     "posted_by": "Geplaatst door {{name}}",
     "submitted": "Ingediend {{date}}",
     "spam_score": "Spam Score: {{score}}",
-    "spam_flags_label": "Detectie Vlaggen"
+    "spam_flags_label": "Detectie Vlaggen",
+    "refresh": "Refresh",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "no_description": "No description",
+    "no_flags": "No flags"
   },
   "spam": {
     "title": "Spam Detectie",

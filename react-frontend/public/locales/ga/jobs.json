@@ -621,7 +621,12 @@
     "posted_by": "Postáilte ag {{name}}",
     "submitted": "Curtha isteach {{date}}",
     "spam_score": "Scór Turscair: {{score}}",
-    "spam_flags_label": "Bratacha Braite"
+    "spam_flags_label": "Bratacha Braite",
+    "refresh": "Refresh",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "no_description": "No description",
+    "no_flags": "No flags"
   },
   "spam": {
     "title": "Braiteacht Turscair",

@@ -621,7 +621,12 @@
     "posted_by": "تم النشر بواسطة {{name}}",
     "submitted": "تم تقديمه {{date}}",
     "spam_score": "درجة البريد المزعج: {{score}}",
-    "spam_flags_label": "علامات الكشف"
+    "spam_flags_label": "علامات الكشف",
+    "refresh": "Refresh",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "no_description": "No description",
+    "no_flags": "No flags"
   },
   "spam": {
     "title": "كشف البريد المزعج",

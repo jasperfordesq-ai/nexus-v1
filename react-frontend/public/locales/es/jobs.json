@@ -621,7 +621,12 @@
     "posted_by": "Publicado por {{name}}",
     "submitted": "Enviado {{date}}",
     "spam_score": "Puntuación de Spam: {{score}}",
-    "spam_flags_label": "Indicadores de Detección"
+    "spam_flags_label": "Indicadores de Detección",
+    "refresh": "Refresh",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "no_description": "No description",
+    "no_flags": "No flags"
   },
   "spam": {
     "title": "Detección de Spam",

@@ -2677,7 +2677,11 @@
     "status_all": "All",
     "status_open": "Open",
     "status_closed": "Closed",
-    "status_expired": "Expired"
+    "status_expired": "Expired",
+    "bias_page_description": "Analyse rejection rates, timing, and source effectiveness to surface hiring bias patterns.",
+    "templates_page_description": "Reusable templates to speed up creating new job listings.",
+    "moderation_page_title": "Job Moderation Queue",
+    "moderation_page_description": "Review and approve job postings before they go live"
   },
   "last_checked": "Last checked: {{time}}",
   "listings": {
