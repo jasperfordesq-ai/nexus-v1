@@ -466,6 +466,9 @@ jobs:
       - name: "BLOCKING: Prevent stub placeholder translation values"
         run: node scripts/check-i18n-stubs.mjs
 
+      - name: "BLOCKING: Prevent hardcoded English breadcrumbs"
+        run: node scripts/check-admin-breadcrumbs.mjs
+
       - name: "INFO: Audit non-admin English fallback gaps"
         run: npm run check:i18n:gaps
 

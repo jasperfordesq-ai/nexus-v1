@@ -78,6 +78,7 @@ CLAUDE.md
 !/scripts/generate-announcement-pdf.mjs
 !/scripts/check-i18n-drift.mjs
 !/scripts/check-i18n-stubs.mjs
+!/scripts/check-admin-breadcrumbs.mjs
 !/scripts/translate-i18n-gaps.mjs
 !/scripts/recache-prerender.sh
 !/scripts/prerender-tenants.sh

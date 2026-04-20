@@ -209,6 +209,49 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
   hierarchy: 'breadcrumbs.hierarchy',
   bulk: 'breadcrumbs.bulk',
   'audit-log': 'breadcrumbs.audit_log',
+
+  // Jobs sub-pages
+  pipeline: 'breadcrumbs.pipeline',
+  'bias-audit': 'breadcrumbs.bias_audit',
+
+  // Marketplace
+  marketplace: 'breadcrumbs.marketplace',
+  sellers: 'breadcrumbs.sellers',
+
+  // Billing
+  billing: 'breadcrumbs.billing',
+  invoices: 'breadcrumbs.invoices',
+  revenue: 'breadcrumbs.revenue',
+  'checkout-return': 'breadcrumbs.checkout_return',
+
+  // Config / Setup
+  'api-docs': 'breadcrumbs.api_docs',
+  'badge-config': 'breadcrumbs.badge_config',
+  'cc-config': 'breadcrumbs.cc_config',
+  'consent-types': 'breadcrumbs.consent_types',
+  'feed-algorithm': 'breadcrumbs.feed_algorithm',
+  'landing-page': 'breadcrumbs.landing_page',
+  requirements: 'breadcrumbs.requirements',
+  tenant: 'breadcrumbs.tenant',
+  webhooks: 'breadcrumbs.webhooks',
+  login: 'breadcrumbs.login',
+
+  // Groups / Community
+  'external-partners': 'breadcrumbs.external_partners',
+  'geocode-groups': 'breadcrumbs.geocode_groups',
+  'group-locations': 'breadcrumbs.group_locations',
+  'group-ranking': 'breadcrumbs.group_ranking',
+  'group-types': 'breadcrumbs.group_types',
+
+  // Impact / Reporting
+  'giving-days': 'breadcrumbs.giving_days',
+  'social-value': 'breadcrumbs.social_value',
+  projects: 'breadcrumbs.projects',
+  training: 'breadcrumbs.training',
+  expenses: 'breadcrumbs.expenses',
+
+  // Logs
+  'log-files': 'breadcrumbs.log_files',
 };
 
 export function AdminBreadcrumbs({ items }: AdminBreadcrumbsProps) {
