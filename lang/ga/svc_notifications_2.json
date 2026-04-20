@@ -92,5 +92,8 @@
   "event.rsvp_confirmed_interested": "You've shown interest in \"{{title}}\"",
   "volunteer.shift_signup_confirmed": "You're signed up for a volunteer shift on {{date}}",
   "volunteer.shift_signup_cancelled": "Your volunteer shift signup has been cancelled",
-  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled"
+  "volunteer.opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled",
+  "federation": {
+    "notify_partnership_reactivated": "Partnership reactivated with {{partner}}."
+  }
 }

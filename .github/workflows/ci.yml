@@ -475,6 +475,9 @@ jobs:
       - name: "BLOCKING: Variable-name mismatches between t() args and {{placeholders}}"
         run: node scripts/check-i18n-vars.mjs
 
+      - name: "BLOCKING: PHP __() key coverage (emails, notifications, services)"
+        run: node scripts/check-php-i18n-coverage.mjs
+
       - name: "INFO: Audit non-admin English fallback gaps"
         run: npm run check:i18n:gaps
 
