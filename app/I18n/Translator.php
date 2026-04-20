@@ -136,7 +136,12 @@ class Translator
             return $value;
         }
         foreach ($params as $k => $v) {
+            // Handle both {{var}} (i18next format, used in most lang JSON files)
+            // and :var (Laravel format, used in some lang values that were
+            // written Laravel-style). Without handling both, emails show the
+            // raw placeholder.
             $value = str_replace('{{' . $k . '}}', (string) $v, $value);
+            $value = str_replace(':' . $k, (string) $v, $value);
         }
         return $value;
     }

@@ -1475,6 +1475,10 @@ class FeedService
      */
     public function publishScheduledPosts(): int
     {
+        // Cross-tenant query: explicitly iterate tenants and set context per-post
+        // so MentionService::processText and downstream tenant-scoped code uses
+        // the correct tenant. Without this, posts from tenant A could trigger
+        // mention processing under tenant B.
         $posts = FeedPost::where('publish_status', 'scheduled')
             ->where('scheduled_at', '<=', now())
             ->get();
@@ -1483,6 +1487,8 @@ class FeedService
 
         foreach ($posts as $post) {
             try {
+                TenantContext::setById((int) $post->tenant_id);
+
                 $post->update([
                     'publish_status' => 'published',
                     'created_at'     => now(), // Set created_at to publish time so it appears fresh in feed
