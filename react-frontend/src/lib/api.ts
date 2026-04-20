@@ -630,6 +630,12 @@ class ApiClient {
    * Concurrent identical GET requests will return the same promise
    */
   async get<T>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+    // Abortable GET requests should not share an in-flight promise, because one caller
+    // cancelling its request would poison every other caller that reused the same promise.
+    if (options?.signal) {
+      return this.request<T>(endpoint, { ...options, method: 'GET' });
+    }
+
     const cacheKey = this.getCacheKey(endpoint, { ...options, method: 'GET' });
 
     // Check for in-flight request

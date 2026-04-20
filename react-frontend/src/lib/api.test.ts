@@ -235,6 +235,24 @@ describe('API Client', () => {
 
       expect(fetch).toHaveBeenCalledTimes(2);
     });
+
+    it('does not deduplicate abortable GET requests', async () => {
+      vi.mocked(fetch).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ data: { id: 1 } }),
+      } as Response);
+
+      const controllerA = new AbortController();
+      const controllerB = new AbortController();
+
+      await Promise.all([
+        api.get('/v2/test', { signal: controllerA.signal }),
+        api.get('/v2/test', { signal: controllerB.signal }),
+      ]);
+
+      expect(fetch).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('POST requests', () => {

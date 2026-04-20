@@ -8,16 +8,37 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@/test/test-utils';
+import { render, screen, waitFor } from '@/test/test-utils';
 
-const { mockUseFeature } = vi.hoisted(() => ({
-  mockUseFeature: vi.fn(() => true),
+const {
+  featureFlags,
+  mockApiGet,
+  mockUseFeature,
+  mockUseModule,
+  moduleFlags,
+} = vi.hoisted(() => ({
+  featureFlags: {
+    connections: true,
+    events: true,
+    gamification: true,
+    groups: true,
+  } as Record<string, boolean>,
+  moduleFlags: {
+    feed: true,
+    listings: true,
+    messages: true,
+    profile: true,
+    wallet: true,
+  } as Record<string, boolean>,
+  mockApiGet: vi.fn(),
+  mockUseFeature: vi.fn((feature: string) => featureFlags[feature] ?? true),
+  mockUseModule: vi.fn((module: string) => moduleFlags[module] ?? true),
 }));
 
 // Mock dependencies
 vi.mock('@/lib/api', () => ({
   api: {
-    get: vi.fn().mockResolvedValue({ success: true, data: [] }),
+    get: mockApiGet,
     post: vi.fn().mockResolvedValue({ success: true }),
   },
   tokenManager: { getTenantId: vi.fn() },
@@ -36,7 +57,7 @@ vi.mock('@/contexts', () => ({
     hasModule: vi.fn(() => true),
   })),
   useFeature: mockUseFeature,
-  useModule: vi.fn(() => true),
+  useModule: mockUseModule,
   useNotifications: vi.fn(() => ({
     counts: { messages: 3, notifications: 5 },
   })),
@@ -76,10 +97,71 @@ vi.mock('framer-motion', () => {  const motionProps = new Set(['variants', 'init
 
 import { DashboardPage } from './DashboardPage';
 
+function buildApiResponse(endpoint: string) {
+  switch (endpoint) {
+    case '/v2/wallet/balance':
+      return { success: true, data: { balance: 12 } };
+    case '/v2/wallet/pending-count':
+      return { success: true, data: { count: 4 } };
+    case '/v2/listings?user_id=1&per_page=5':
+      return {
+        success: true,
+        data: [{ id: 11, title: 'Garden help', description: 'Need help weeding', type: 'request', author_name: 'Pat' }],
+        meta: { total_items: 1 },
+      };
+    case '/v2/listings?per_page=4':
+      return {
+        success: true,
+        data: [{ id: 12, title: 'Dog walking', type: 'offer', author_name: 'Alex' }],
+      };
+    case '/v2/feed?per_page=5':
+      return { success: true, data: [] };
+    case '/v2/groups?user_id=1&per_page=3':
+      return { success: true, data: [] };
+    case '/v2/gamification/profile':
+      return { success: true, data: { level: 2, xp: 150, level_progress: 45, badges_count: 3 } };
+    case '/v2/events?when=upcoming&per_page=3':
+      return { success: true, data: [] };
+    case '/v2/members/1/endorsements':
+      return { success: true, data: { endorsements: [] } };
+    case '/v2/reviews/pending':
+      return {
+        success: true,
+        data: [
+          {
+            exchange_id: 21,
+            exchange_title: 'Garden exchange',
+            receiver_id: 2,
+            receiver_name: 'Morgan',
+            receiver_avatar: null,
+            completed_at: '2026-04-20T09:00:00Z',
+          },
+        ],
+      };
+    default:
+      return { success: true, data: [] };
+  }
+}
+
 describe('DashboardPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseFeature.mockReturnValue(true);
+    Object.assign(featureFlags, {
+      connections: true,
+      events: true,
+      gamification: true,
+      groups: true,
+    });
+    Object.assign(moduleFlags, {
+      feed: true,
+      listings: true,
+      messages: true,
+      profile: true,
+      wallet: true,
+    });
+    mockUseFeature.mockImplementation((feature: string) => featureFlags[feature] ?? true);
+    mockUseModule.mockImplementation((module: string) => moduleFlags[module] ?? true);
+    mockApiGet.mockImplementation((endpoint: string) => Promise.resolve(buildApiResponse(endpoint)));
   });
 
   it('renders without crashing', () => {
@@ -136,11 +218,49 @@ describe('DashboardPage', () => {
   });
 
   it('hides Find Members quick action when connections feature is disabled', () => {
-    mockUseFeature.mockImplementation((feature: string) => feature !== 'connections');
+    featureFlags.connections = false;
 
     render(<DashboardPage />);
 
     expect(screen.queryByText('Find Members')).not.toBeInTheDocument();
     expect(screen.getByText('Create Listing')).toBeInTheDocument();
+  });
+
+  it('renders pending reviews from the direct array payload', async () => {
+    render(<DashboardPage />);
+
+    expect(await screen.findByText('Morgan')).toBeInTheDocument();
+    expect(screen.getByText('Garden exchange')).toBeInTheDocument();
+    expect(screen.getByText('View All Pending')).toBeInTheDocument();
+  });
+
+  it('keeps core dashboard sections available when optional modules are disabled', async () => {
+    Object.assign(featureFlags, {
+      connections: false,
+      events: false,
+      gamification: false,
+      groups: false,
+    });
+    Object.assign(moduleFlags, {
+      feed: false,
+      listings: false,
+      messages: false,
+      profile: false,
+      wallet: false,
+    });
+
+    render(<DashboardPage />);
+
+    await waitFor(() => {
+      expect(mockApiGet).toHaveBeenCalledWith('/v2/wallet/balance');
+    });
+
+    expect(screen.getByText('Balance')).toBeInTheDocument();
+    expect(screen.getByText('Active Listings')).toBeInTheDocument();
+    expect(screen.getByText('Recent Listings')).toBeInTheDocument();
+    expect(screen.getByText('New Listing')).toBeInTheDocument();
+    expect(screen.getByText('Create Listing')).toBeInTheDocument();
+    expect(screen.getByText('View Wallet')).toBeInTheDocument();
+    expect(screen.queryByText('Find Members')).not.toBeInTheDocument();
   });
 });

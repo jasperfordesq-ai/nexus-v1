@@ -131,6 +131,7 @@ export function DashboardPage() {
   const hasConnections = useFeature('connections');
   const hasFeedModule = useModule('feed');
   const hasListingsModule = useModule('listings');
+  const hasProfileModule = useModule('profile');
 
   const [stats, setStats] = useState<DashboardStats>({
     walletBalance: null, recentListings: [], activeListingsCount: 0, pendingTransactions: 0,
@@ -144,17 +145,11 @@ export function DashboardPage() {
   const [groupsLoading, setGroupsLoading] = useState(true);
   const [eventsLoading, setEventsLoading] = useState(true);
 
-  // AbortController ref to cancel stale requests
-  const abortRef = useRef<AbortController | null>(null);
-
   // Stable ref for t — avoids re-creating callbacks when i18n namespace loads
   const tRef = useRef(t);
   tRef.current = t;
 
   const loadDashboardData = useCallback(async () => {
-    abortRef.current?.abort();
-    const controller = new AbortController();
-    abortRef.current = controller;
     try {
       setError(null); setIsLoading(true); setActivityLoading(true);
       setSuggestedLoading(true); setGroupsLoading(true); setEventsLoading(true);
@@ -170,13 +165,11 @@ export function DashboardPage() {
       if (hasFeedModule) optionalRequests.push({ key: 'activity', promise: api.get<FeedActivityItem[]>('/v2/feed?per_page=5').catch(() => null) });
       if (hasListingsModule) optionalRequests.push({ key: 'suggested', promise: api.get<Listing[]>('/v2/listings?per_page=4').catch(() => null) });
       if (hasGroups) optionalRequests.push({ key: 'groups', promise: api.get<Group[]>(`/v2/groups?user_id=${user?.id}&per_page=3`).catch(() => null) });
-      if (user?.id) optionalRequests.push({ key: 'endorsements', promise: api.get(`/v2/members/${user.id}/endorsements`).catch(() => null) });
+      if (hasProfileModule && user?.id) optionalRequests.push({ key: 'endorsements', promise: api.get(`/v2/members/${user.id}/endorsements`).catch(() => null) });
       if (hasEvents) optionalRequests.push({ key: 'events', promise: api.get<Event[]>('/v2/events?when=upcoming&per_page=3').catch(() => null) });
 
       const allPromises = [...coreRequests, ...optionalRequests.map((r) => r.promise)];
       const results = await Promise.allSettled(allPromises);
-
-      if (controller.signal.aborted) return;
 
       const walletRes = results[0]?.status === 'fulfilled' ? results[0].value : null;
       const listingsRes = results[1]?.status === 'fulfilled' ? results[1].value : null;
@@ -219,14 +212,13 @@ export function DashboardPage() {
         myGroups: groupsData, upcomingEvents: eventsData, myEndorsements: endorsementsData,
       });
     } catch (err) {
-      if (controller.signal.aborted) return;
       logError('Failed to load dashboard data', err);
       setError(tRef.current('unable_to_load'));
     } finally {
       setIsLoading(false); setActivityLoading(false); setSuggestedLoading(false);
       setGroupsLoading(false); setEventsLoading(false);
     }
-  }, [hasGamification, hasFeedModule, hasListingsModule, hasGroups, hasEvents, user?.id]);
+  }, [hasEvents, hasFeedModule, hasGamification, hasGroups, hasListingsModule, hasProfileModule, user?.id]);
 
   useEffect(() => { loadDashboardData(); }, [loadDashboardData]);
 
@@ -276,7 +268,7 @@ export function DashboardPage() {
           <GlassCard className="p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-theme-primary">{t('welcome_back', { name: user?.first_name || user?.name?.split(' ')[0] || 'there' })}</h1>
+                <h1 className="text-2xl font-bold text-theme-primary">{t('welcome_back', { name: user?.first_name || user?.name?.split(' ')[0] || t('fallback_name') })}</h1>
                 <p className="text-theme-muted mt-1">{t('community_activity', { community: branding.name })}</p>
               </div>
               <div className="flex gap-3">
@@ -311,9 +303,9 @@ export function DashboardPage() {
                 <div className="divide-y divide-[var(--glass-border)]">
                   {stats.recentListings.map((listing) => (
                     <article key={listing.id}>
-                      <Link to={tenantPath(`/listings/${listing.id}`)} className="flex items-start justify-between gap-4 py-3 first:pt-0 last:pb-0 group" aria-label={`${listing.title} - ${listing.type === 'offer' ? 'Offering' : 'Requesting'}`}>
+                      <Link to={tenantPath(`/listings/${listing.id}`)} className="flex items-start justify-between gap-4 py-3 first:pt-0 last:pb-0 group" aria-label={`${listing.title} - ${listing.type === 'offer' ? t('listings.offering') : t('listings.requesting')}`}>
                         <div className="flex items-start gap-3 min-w-0">
-                          <Avatar src={resolveAvatarUrl(listing.author_avatar ?? listing.user?.avatar)} name={listing.author_name ?? listing.user?.name ?? 'User'} size="sm" className="shrink-0" />
+                          <Avatar src={resolveAvatarUrl(listing.author_avatar ?? listing.user?.avatar)} name={listing.author_name ?? listing.user?.name ?? t('listings.user_fallback')} size="sm" className="shrink-0" />
                           <div className="min-w-0">
                             <h3 className="font-medium text-theme-primary truncate group-hover:text-[var(--color-primary)] transition-colors">{listing.title}</h3>
                             <p className="text-sm text-theme-muted line-clamp-1">{listing.description}</p>
@@ -545,7 +537,7 @@ export function DashboardPage() {
           {(isLoading || stats.myEndorsements.length > 0) && (
             <motion.div variants={itemVariants} className="md:col-span-1">
               <GlassCard className="p-6 h-full">
-                <SectionHeader icon={<ThumbsUp className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />} iconColor="indigo" title={t('sections.endorsements', 'Endorsements')} linkTo={tenantPath(`/profile/${user?.id}`)} linkText={t('view_all')} />
+                <SectionHeader icon={<ThumbsUp className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />} iconColor="indigo" title={t('sections.endorsements')} linkTo={tenantPath(`/profile/${user?.id}`)} linkText={t('view_all')} />
                 {isLoading ? (
                   <div aria-label={t('aria.loading_endorsements')} aria-busy="true" className="space-y-2">
                     {Array.from({ length: 3 }).map((_, i) => (<div key={i} className="flex items-center justify-between p-2"><Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-2/3" /></Skeleton><Skeleton className="rounded-full"><div className="h-5 w-8 rounded-full bg-default-300" /></Skeleton></div>))}
@@ -605,6 +597,7 @@ const statGlowColors = {
 
 function StatCard({ icon, label, value, color, href, isLoading }: StatCardProps) {
   const { tenantPath } = useTenant();
+  const { t } = useTranslation('dashboard');
   const colorClasses = {
     indigo: 'from-indigo-500/20 to-purple-500/20 text-indigo-600 dark:text-indigo-400',
     emerald: 'from-emerald-500/20 to-teal-500/20 text-emerald-600 dark:text-emerald-400',
@@ -612,7 +605,7 @@ function StatCard({ icon, label, value, color, href, isLoading }: StatCardProps)
     rose: 'from-rose-500/20 to-pink-500/20 text-rose-600 dark:text-rose-400',
   };
   return (
-    <Link to={tenantPath(href)} aria-label={`${label}: ${isLoading ? 'Loading' : value}`}>
+    <Link to={tenantPath(href)} aria-label={`${label}: ${isLoading ? t('common.loading') : value}`}>
       <GlassCard className={`p-4 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 ${statGlowColors[color]}`}>
         <div className={`inline-flex p-2.5 rounded-xl bg-gradient-to-br ${colorClasses[color]} mb-3`}>{icon}</div>
         <div className="text-theme-muted text-sm">{label}</div>
@@ -636,8 +629,13 @@ function QuickActionLink({ to, icon, label }: QuickActionLinkProps) {
 // Pending Reviews Card
 
 interface PendingReview {
-  id: number; amount: number; description: string; created_at: string;
-  direction: 'sent' | 'received'; other_party_name: string; other_party_id: number;
+  exchange_id: number;
+  exchange_title?: string | null;
+  receiver_id: number;
+  receiver_name: string;
+  receiver_avatar?: string | null;
+  transaction_id?: number | null;
+  completed_at?: string | null;
 }
 
 function PendingReviewsCard() {
@@ -649,8 +647,8 @@ function PendingReviewsCard() {
   useEffect(() => {
     const fetchPending = async () => {
       try {
-        const response = await api.get<{ local: PendingReview[]; federated: PendingReview[]; total_pending: number }>('/v2/reviews/pending');
-        if (response.data?.local) setPending(response.data.local.slice(0, 3));
+        const response = await api.get<PendingReview[]>('/v2/reviews/pending');
+        setPending(Array.isArray(response.data) ? response.data.slice(0, 3) : []);
       } catch (error) {
         logError('Failed to fetch pending reviews', { error });
       } finally { setLoading(false); }
@@ -681,7 +679,7 @@ function PendingReviewsCard() {
         </div>
         <div className="text-center py-6 text-theme-subtle">
           <Star className="w-10 h-10 mx-auto mb-2 opacity-50" aria-hidden="true" />
-          <p className="text-sm">{t('reviews.none_pending', 'No pending reviews')}</p>
+          <p className="text-sm">{t('reviews.none_pending')}</p>
         </div>
       </GlassCard>
     );
@@ -696,21 +694,27 @@ function PendingReviewsCard() {
       </div>
       <div className="divide-y divide-[var(--glass-border)]">
         {pending.map((review) => (
-          <Link key={review.id} to={tenantPath(`/profile/${review.other_party_id}`)} className="block py-3 first:pt-0 last:pb-0 group">
+          <Link key={review.exchange_id} to={tenantPath('/reviews')} className="block py-3 first:pt-0 last:pb-0 group">
             <div className="flex items-center justify-between gap-2 mb-1">
-              <span className="text-sm font-medium text-theme-primary group-hover:text-[var(--color-primary)] transition-colors">{review.other_party_name}</span>
-              <span className="text-xs text-theme-subtle">{formatRelativeTime(review.created_at)}</span>
+              <span className="text-sm font-medium text-theme-primary group-hover:text-[var(--color-primary)] transition-colors">{review.receiver_name}</span>
+              {review.completed_at && <span className="text-xs text-theme-subtle">{formatRelativeTime(review.completed_at)}</span>}
             </div>
-            <p className="text-xs text-theme-subtle line-clamp-1">{review.description}</p>
-            <div className="flex items-center gap-1 mt-2">
-              <Chip size="sm" variant="flat" color={review.direction === 'sent' ? 'primary' : 'success'} className="text-[10px]">{review.direction === 'sent' ? t('reviews.sent', { amount: review.amount }) : t('reviews.received', { amount: review.amount })}</Chip>
-              <span className="text-xs text-amber-600 dark:text-amber-400 ml-auto flex items-center gap-1"><Star className="w-3 h-3" aria-hidden="true" />{t('reviews.review')}</span>
+            <div className="flex items-center gap-3 mt-2">
+              <Avatar src={resolveAvatarUrl(review.receiver_avatar) ?? undefined} name={review.receiver_name} size="sm" className="w-7 h-7 shrink-0" />
+              <div className="min-w-0 flex-1">
+                {review.exchange_title ? (
+                  <p className="text-xs text-theme-subtle line-clamp-1">{review.exchange_title}</p>
+                ) : (
+                  <p className="text-xs text-theme-subtle">{t('reviews.pending_subtitle')}</p>
+                )}
+              </div>
+              <span className="text-xs text-amber-600 dark:text-amber-400 ml-auto flex items-center gap-1 shrink-0"><Star className="w-3 h-3" aria-hidden="true" />{t('reviews.review')}</span>
             </div>
           </Link>
         ))}
       </div>
-      <Link to={tenantPath('/wallet')} className="block mt-4 text-center text-[var(--color-primary)] hover:opacity-80 text-sm transition-opacity">
-        {t('view_all_transactions')} <ArrowRight className="w-3.5 h-3.5 inline-block ml-1" aria-hidden="true" />
+      <Link to={tenantPath('/reviews')} className="block mt-4 text-center text-[var(--color-primary)] hover:opacity-80 text-sm transition-opacity">
+        {t('reviews.view_all_pending')} <ArrowRight className="w-3.5 h-3.5 inline-block ml-1" aria-hidden="true" />
       </Link>
     </GlassCard>
   );
