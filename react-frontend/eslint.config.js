@@ -6,12 +6,13 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import reactHooks from 'eslint-plugin-react-hooks';
+import i18next from 'eslint-plugin-i18next';
 
 export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    plugins: { 'react-hooks': reactHooks },
+    plugins: { 'react-hooks': reactHooks, i18next },
     rules: {
       // React Hooks — violations here are real runtime bugs, keep as errors
       'react-hooks/rules-of-hooks': 'error',
@@ -33,6 +34,10 @@ export default tseslint.config(
 
       // JS — warn only
       'no-empty': 'warn',
+
+      // i18n — catch hardcoded strings in JSX markup (between tags and in common attributes)
+      // markupOnly: true limits scope to JSX text nodes — won't flag JS constants or config strings
+      'i18next/no-literal-string': ['warn', { markupOnly: true }],
     },
   },
   {
@@ -42,6 +47,11 @@ export default tseslint.config(
       '*.config.js',
       '*.config.ts',
       'src/test/',
+      'src/**/__mocks__/**',
+      'src/**/*.test.ts',
+      'src/**/*.test.tsx',
+      'src/**/*.spec.ts',
+      'src/**/*.spec.tsx',
       'public/locales/translate*',
       'scripts/',
       'lighthouserc.cjs',

@@ -143,7 +143,7 @@ export function PlanForm() {
       if (!check.value) continue;
       const n = Number(check.value);
       if (Number.isNaN(n) || n < 0) {
-        toast.error(`${check.label} must be a valid non-negative number`);
+        toast.error(t('content.plan_invalid_number', { label: check.label }));
         return;
       }
     }
@@ -156,7 +156,7 @@ export function PlanForm() {
           toast.success(t('content.plan_updated', 'Plan updated'));
           navigate(tenantPath('/admin/plans'));
         } else {
-          toast.error('Failed to update plan');
+          toast.error(t('content.plan_update_failed'));
         }
       } else {
         const res = await adminPlans.create(buildPayload());
@@ -164,7 +164,7 @@ export function PlanForm() {
           toast.success(t('content.plan_created', 'Plan created'));
           navigate(tenantPath('/admin/plans'));
         } else {
-          toast.error('Failed to create plan');
+          toast.error(t('content.plan_create_failed'));
         }
       }
     } catch {
@@ -186,12 +186,12 @@ export function PlanForm() {
           stripe_price_id_monthly: d.stripe_price_id_monthly,
           stripe_price_id_yearly: d.stripe_price_id_yearly,
         });
-        toast.success('Synced to Stripe');
+        toast.success(t('content.stripe_synced_success'));
       } else {
-        toast.error('Stripe sync failed');
+        toast.error(t('content.stripe_sync_failed'));
       }
     } catch {
-      toast.error('Stripe sync failed — ensure STRIPE_SECRET_KEY is configured');
+      toast.error(t('content.stripe_sync_failed_key_missing'));
     } finally {
       setSyncing(false);
     }

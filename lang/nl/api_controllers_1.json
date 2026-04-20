@@ -190,7 +190,8 @@
     "enabled_successfully": "Federation enabled successfully.",
     "disabled_successfully": "Federation disabled successfully.",
     "signature_verified": "Signature verified successfully",
-    "settings_updated": "Settings updated successfully."
+    "settings_updated": "Settings updated successfully.",
+    "webhook_service_unavailable": "Service temporarily unavailable"
   },
   "federation_v2": {
     "receiver_id_required": "receiver_id is required.",

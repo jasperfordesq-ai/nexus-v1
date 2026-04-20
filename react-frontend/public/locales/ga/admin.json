@@ -1537,7 +1537,14 @@
     "label_slug": "Slug",
     "max_users": "Max Users",
     "select_page": "Select Page",
-    "select_route": "Select Route"
+    "select_route": "Select Route",
+    "plan_create_failed": "Failed to create plan",
+    "plan_invalid_number": "{{label}} must be a valid non-negative number",
+    "plan_update_failed": "Failed to update plan",
+    "stripe_plan_synced": "{{name}} synced to Stripe",
+    "stripe_sync_failed": "Stripe sync failed",
+    "stripe_sync_failed_key_missing": "Stripe sync failed — ensure STRIPE_SECRET_KEY is configured",
+    "stripe_synced_success": "Synced to Stripe"
   },
   "crm": {
     "action_cancel": "Cancel",

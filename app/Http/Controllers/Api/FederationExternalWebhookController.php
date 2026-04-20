@@ -127,7 +127,7 @@ class FederationExternalWebhookController extends BaseApiController
                 // A temporarily unavailable DB is safer to reject than to silently
                 // bypass the only defence against replayed signed requests.
                 Log::error('[FederationExternalWebhook] Nonce store unavailable — rejecting request', ['error' => $e->getMessage()]);
-                return response()->json(['error' => 'Service temporarily unavailable'], 503);
+                return response()->json(['error' => __('api_controllers_1.federation.webhook_service_unavailable')], 503);
             }
         }
 
