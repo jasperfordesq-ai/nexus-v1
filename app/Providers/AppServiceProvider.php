@@ -1093,27 +1093,38 @@ class AppServiceProvider extends ServiceProvider
     private function loadJsonTranslations(): void
     {
         try {
-            $locale = app()->getLocale();
-            $langPath = lang_path($locale);
-
-            if (!is_dir($langPath)) return;
-
             $translator = app('translator');
+            $basePath = lang_path();
 
-            foreach (glob($langPath . '/*.json') as $file) {
-                $namespace = pathinfo($file, PATHINFO_FILENAME); // e.g. 'emails'
-                $data = json_decode(file_get_contents($file), true);
-                if (!is_array($data)) continue;
+            if (!is_dir($basePath)) return;
 
-                // Flatten nested arrays into dot-notation and add to the translator.
-                // Convert {{var}} placeholders (i18next format used in JSON) to
-                // :var (Laravel format) so __() parameter substitution works.
-                $flattened = \Illuminate\Support\Arr::dot($data);
-                foreach ($flattened as $key => $value) {
-                    if (is_string($value)) {
-                        $value = preg_replace('/\{\{(\w+)\}\}/', ':$1', $value);
+            // Load nested JSON translations for EVERY locale directory, not just
+            // the current one. Critical for queued jobs: the queue worker boots
+            // once with a default locale, but each job may run for a different
+            // tenant/recipient locale. Loading all locales up-front means
+            // __() works regardless of mid-request setLocale() calls.
+            foreach (scandir($basePath) as $entry) {
+                if ($entry === '.' || $entry === '..') continue;
+                $langPath = $basePath . DIRECTORY_SEPARATOR . $entry;
+                if (!is_dir($langPath)) continue;
+                $locale = $entry;
+
+                foreach (glob($langPath . '/*.json') as $file) {
+                    $namespace = pathinfo($file, PATHINFO_FILENAME); // e.g. 'emails_misc'
+                    $data = json_decode(file_get_contents($file), true);
+                    if (!is_array($data)) continue;
+
+                    // Flatten nested arrays into dot-notation and register with the
+                    // translator. Convert {{var}} placeholders (i18next format used
+                    // in JSON) to :var (Laravel format) so __() parameter
+                    // substitution works.
+                    $flattened = \Illuminate\Support\Arr::dot($data);
+                    foreach ($flattened as $key => $value) {
+                        if (is_string($value)) {
+                            $value = preg_replace('/\{\{(\w+)\}\}/', ':$1', $value);
+                        }
+                        $translator->addLines([$namespace . '.' . $key => $value], $locale);
                     }
-                    $translator->addLines([$namespace . '.' . $key => $value], $locale);
                 }
             }
         } catch (\Throwable $e) {
