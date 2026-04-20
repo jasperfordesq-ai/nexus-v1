@@ -110,10 +110,10 @@ i18n
       backends: [LocalStorageBackend, HttpBackend],
       backendOptions: [
         {
-          // Cache translations in localStorage for 1 hour — avoids re-fetching
-          // 52 namespaces × 11 languages on every view. Cache busts automatically
-          // after TTL, so new strings propagate within an hour of deploy.
-          expirationTime: 60 * 60 * 1000,
+          // Dev: expirationTime=0 forces a fresh fetch every session so newly-added
+          // keys are picked up without having to clear localStorage manually.
+          // Prod: 1-hour cache avoids re-fetching 52 namespaces × 11 languages per view.
+          expirationTime: import.meta.env.DEV ? 0 : 60 * 60 * 1000,
         },
         {
           loadPath: '/locales/{{lng}}/{{ns}}.json',

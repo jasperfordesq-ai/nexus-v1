@@ -3,14 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-/**
- * CategoryChips - Horizontal scrollable category pills
- *
- * Renders a scrollable row of category chips with an "All" option.
- * The active category is highlighted with the primary color.
- */
-
-import { Chip } from '@heroui/react';
+import { Chip, ScrollShadow } from '@heroui/react';
 import { LayoutGrid } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { MarketplaceCategory } from '@/types/marketplace';
@@ -25,42 +18,43 @@ export function CategoryChips({ categories, activeId, onSelect }: CategoryChipsP
   const { t } = useTranslation('marketplace');
 
   return (
-    <div className="w-full overflow-x-auto scrollbar-hide">
-    <div
-      className="flex items-center gap-2 pb-2 flex-nowrap"
+    <ScrollShadow
+      orientation="horizontal"
+      hideScrollBar
+      className="w-full"
       role="listbox"
       aria-label={t('categories.label', 'Filter by category')}
     >
-      {/* "All" chip */}
-      <Chip
-        as="button"
-        variant={activeId == null ? 'solid' : 'flat'}
-        color={activeId == null ? 'primary' : 'default'}
-        className="shrink-0 cursor-pointer"
-        startContent={<LayoutGrid className="w-3.5 h-3.5" aria-hidden="true" />}
-        onClick={() => onSelect(null)}
-        role="option"
-        aria-selected={activeId == null}
-      >
-        {t('categories.all', 'All')}
-      </Chip>
-
-      {categories.map((category) => (
+      <div className="flex items-center gap-2 pb-1 w-max">
         <Chip
-          key={category.id}
           as="button"
-          variant={activeId === category.id ? 'solid' : 'flat'}
-          color={activeId === category.id ? 'primary' : 'default'}
-          className="shrink-0 cursor-pointer"
-          onClick={() => onSelect(category.id)}
+          variant={activeId == null ? 'solid' : 'flat'}
+          color={activeId == null ? 'primary' : 'default'}
+          className="cursor-pointer shrink-0"
+          startContent={<LayoutGrid className="w-3.5 h-3.5" aria-hidden="true" />}
+          onClick={() => onSelect(null)}
           role="option"
-          aria-selected={activeId === category.id}
+          aria-selected={activeId == null}
         >
-          {category.name}
+          {t('categories.all', 'All')}
         </Chip>
-      ))}
-    </div>
-    </div>
+
+        {categories.map((category) => (
+          <Chip
+            key={category.id}
+            as="button"
+            variant={activeId === category.id ? 'solid' : 'flat'}
+            color={activeId === category.id ? 'primary' : 'default'}
+            className="cursor-pointer shrink-0"
+            onClick={() => onSelect(category.id)}
+            role="option"
+            aria-selected={activeId === category.id}
+          >
+            {category.name}
+          </Chip>
+        ))}
+      </div>
+    </ScrollShadow>
   );
 }
 
