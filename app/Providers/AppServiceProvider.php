@@ -6,6 +6,7 @@
 
 namespace App\Providers;
 
+use App\I18n\Translator;
 use App\Models\Category;
 use App\Models\Connection;
 use App\Models\Event;
@@ -1020,6 +1021,11 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Initialise the custom JSON translator so __() resolves lang/{locale}/*.json
+        // for ALL contexts (HTTP requests and artisan/cron jobs). Without this,
+        // $langDir stays '' and every __() call returns the raw key as fallback.
+        Translator::init(lang_path());
+
         // Load JSON translation files from lang/{locale}/ subdirectories.
         // Laravel only loads lang/{locale}.json by default. Our email translations
         // are in lang/en/emails.json, lang/en/emails_listings.json, etc.

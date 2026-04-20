@@ -183,6 +183,10 @@ class FederationEmailService
     public static function sendWeeklyDigest(int $userId, int $tenantId): bool
     {
         try {
+            // Must set tenant context before any tenant-specific call (mailer, URLs, branding).
+            // Without this, whatever tenant was last active bleeds into this email.
+            TenantContext::setById($tenantId);
+
             $user = self::getUserWithEmail($userId, $tenantId);
             if (!$user || empty($user->email)) {
                 return false;
