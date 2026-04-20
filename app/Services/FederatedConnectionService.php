@@ -88,8 +88,8 @@ class FederatedConnectionService
                     "SELECT name FROM tenants WHERE id = ?",
                     [$requesterTenantId]
                 );
-                $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : 'Someone';
-                $communityName = $community->name ?? 'a partner community';
+                $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : __('emails.common.fallback_someone');
+                $communityName = $community->name ?? __('emails.common.fallback_partner_community');
 
                 Notification::createNotification(
                     $receiverId,
@@ -144,7 +144,7 @@ class FederatedConnectionService
                     "SELECT first_name, last_name FROM users WHERE id = ?",
                     [$userId]
                 );
-                $accepterName = $accepter ? trim(($accepter->first_name ?? '') . ' ' . ($accepter->last_name ?? '')) : 'Someone';
+                $accepterName = $accepter ? trim(($accepter->first_name ?? '') . ' ' . ($accepter->last_name ?? '')) : __('emails.common.fallback_someone');
 
                 Notification::createNotification(
                     (int) $connection->requester_user_id,

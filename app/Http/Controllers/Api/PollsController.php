@@ -210,7 +210,7 @@ class PollsController extends BaseApiController
             }
             if ($pollModel && (int) $pollModel->user_id !== $userId) {
                 $voter = User::find($userId);
-                $voterName = $voter ? trim(($voter->first_name ?? '') . ' ' . ($voter->last_name ?? '')) : 'Someone';
+                $voterName = $voter ? trim(($voter->first_name ?? '') . ' ' . ($voter->last_name ?? '')) : __('emails.common.fallback_someone');
                 $pollTitle = $pollModel->question ?? 'your poll';
                 $message = __('api_controllers_3.polls.vote_received', ['name' => $voterName, 'title' => $pollTitle]);
                 Notification::createNotification((int) $pollModel->user_id, $message, "/polls/{$id}", 'poll_vote');
@@ -250,7 +250,7 @@ class PollsController extends BaseApiController
             $pollModel = Poll::find($id);
             if ($pollModel && (int) $pollModel->user_id !== $userId) {
                 $ranker = User::find($userId);
-                $rankerName = $ranker ? trim(($ranker->first_name ?? '') . ' ' . ($ranker->last_name ?? '')) : 'Someone';
+                $rankerName = $ranker ? trim(($ranker->first_name ?? '') . ' ' . ($ranker->last_name ?? '')) : __('emails.common.fallback_someone');
                 $pollTitle = $pollModel->question ?? 'your poll';
                 $message = __('api_controllers_3.polls.ranking_received', ['name' => $rankerName, 'title' => $pollTitle]);
                 Notification::createNotification((int) $pollModel->user_id, $message, "/polls/{$id}", 'poll_vote');

@@ -71,7 +71,7 @@ class JobInterviewService
 
             // Notify the candidate
             try {
-                $jobTitle = $application->vacancy->title ?? 'a job';
+                $jobTitle = $application->vacancy->title ?? __('emails.common.fallback_job');
                 $candidateId = (int) $application->user_id;
                 $interviewMsg = __('emails_misc.jobs.interview_requested', ['title' => $jobTitle]);
                 Notification::createNotification(
@@ -140,7 +140,7 @@ class JobInterviewService
 
             // Notify the job poster
             try {
-                $jobTitle = $interview->application->vacancy->title ?? 'a job';
+                $jobTitle = $interview->application->vacancy->title ?? __('emails.common.fallback_job');
                 $posterId = $interview->application->vacancy->user_id ?? null;
                 if ($posterId) {
                     $acceptMsg = __('emails_misc.jobs.interview_accepted', ['title' => $jobTitle]);
@@ -211,7 +211,7 @@ class JobInterviewService
 
             // Notify the job poster
             try {
-                $jobTitle = $interview->application->vacancy->title ?? 'a job';
+                $jobTitle = $interview->application->vacancy->title ?? __('emails.common.fallback_job');
                 $posterId = $interview->application->vacancy->user_id ?? null;
                 if ($posterId) {
                     $declineMsg = __('emails_misc.jobs.interview_declined', ['title' => $jobTitle]);
@@ -326,7 +326,7 @@ class JobInterviewService
 
             // Notify the candidate
             try {
-                $jobTitle = $interview->application->vacancy->title ?? 'a job';
+                $jobTitle = $interview->application->vacancy->title ?? __('emails.common.fallback_job');
                 $candidateId = $interview->application->user_id ?? null;
                 if ($candidateId) {
                     $cancelMsg = __('emails_misc.jobs.interview_cancelled', ['title' => $jobTitle]);
@@ -392,7 +392,7 @@ class JobInterviewService
                     // Set tenant context for this interview
                     TenantContext::setById((int) $interview->tenant_id);
 
-                    $jobTitle = $interview->vacancy->title ?? 'a job';
+                    $jobTitle = $interview->vacancy->title ?? __('emails.common.fallback_job');
                     $scheduledAt = $interview->scheduled_at->format('M j, g:i A');
                     $hoursUntil = (int) $now->diffInHours($interview->scheduled_at);
 

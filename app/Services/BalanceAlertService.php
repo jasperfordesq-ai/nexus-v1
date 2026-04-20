@@ -93,7 +93,7 @@ class BalanceAlertService
                 ->where('id', $organizationId)
                 ->where('tenant_id', $tenantId)
                 ->first();
-            $orgName = $org->name ?? 'Organization';
+            $orgName = $org->name ?? __('emails.common.fallback_organization');
         }
 
         $thresholds = $this->getThresholds($organizationId);
@@ -278,7 +278,7 @@ class BalanceAlertService
 
     private function sendBalanceAlertEmail(object $owner, string $orgName, float $balance, string $alertType): void
     {
-        $ownerName       = $owner->first_name ?? $owner->name ?? 'Manager';
+        $ownerName       = $owner->first_name ?? $owner->name ?? __('emails.common.fallback_manager');
         $balanceFormatted = number_format($balance, 2);
         $orgLink         = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/volunteer-org/wallet';
         $safeOrgName     = htmlspecialchars($orgName, ENT_QUOTES, 'UTF-8');

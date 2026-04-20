@@ -815,7 +815,7 @@ class JobVacancyService
 
             // Notify the applicant about their status change
             try {
-                $jobTitle = $application->vacancy->title ?? 'a job';
+                $jobTitle = $application->vacancy->title ?? __('emails.common.fallback_job');
                 $applicantId = (int) $application->user_id;
 
                 $message = match ($status) {

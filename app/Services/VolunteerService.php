@@ -1139,7 +1139,7 @@ class VolunteerService
         try {
             $hours = (float) $log->hours;
             $volunteerId = (int) $log->user_id;
-            $orgName = $org->name ?? 'Organization';
+            $orgName = $org->name ?? __('emails.common.fallback_organization');
             $paymentResult = null;
 
             // DB transaction for data mutations only — notifications sent AFTER commit

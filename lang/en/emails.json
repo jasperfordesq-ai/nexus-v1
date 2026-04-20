@@ -124,6 +124,9 @@
     "fallback_federation_member": "A federation member",
     "fallback_partner_community": "a partner community",
     "fallback_federation_level": "Level {{level}}",
+    "fallback_job": "a job",
+    "fallback_manager": "Manager",
+    "fallback_organization": "Organization",
     "or_separator": "or"
   },
   "footer": {

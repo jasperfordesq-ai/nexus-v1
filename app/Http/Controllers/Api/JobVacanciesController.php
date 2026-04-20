@@ -435,7 +435,7 @@ class JobVacanciesController extends BaseApiController
                     $applicant     = $applicant ?? \App\Models\User::find($userId);
                     $applicantName = $applicant
                         ? trim(($applicant->first_name ?? '') . ' ' . ($applicant->last_name ?? '')) ?: ($applicant->name ?? __('emails.common.fallback_someone'))
-                        : 'Someone';
+                        : __('emails.common.fallback_someone');
                     $reviewUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/jobs/' . $id . '/applications';
                     $html = EmailTemplateBuilder::make()
                         ->theme('federation')

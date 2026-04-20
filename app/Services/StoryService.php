@@ -416,7 +416,7 @@ class StoryService
                     'SELECT first_name, last_name FROM users WHERE id = ? AND tenant_id = ?',
                     [$userId, $tenantId]
                 );
-                $reactorName = $reactor ? trim($reactor->first_name . ' ' . $reactor->last_name) : 'Someone';
+                $reactorName = $reactor ? trim($reactor->first_name . ' ' . $reactor->last_name) : __('emails.common.fallback_someone');
 
                 $emojiMap = [
                     'heart' => "\u{2764}\u{FE0F}",

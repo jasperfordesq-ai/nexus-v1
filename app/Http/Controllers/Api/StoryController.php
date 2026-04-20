@@ -265,7 +265,7 @@ class StoryController extends BaseApiController
                     );
                     $reactorName = $reactor
                         ? trim($reactor->first_name . ' ' . $reactor->last_name)
-                        : 'Someone';
+                        : __('emails.common.fallback_someone');
 
                     Notification::createNotification(
                         (int) $story->user_id,
@@ -470,7 +470,7 @@ class StoryController extends BaseApiController
                     );
                     $replierName = $replier
                         ? trim($replier->first_name . ' ' . $replier->last_name)
-                        : 'Someone';
+                        : __('emails.common.fallback_someone');
 
                     Notification::createNotification(
                         (int) $story->user_id,

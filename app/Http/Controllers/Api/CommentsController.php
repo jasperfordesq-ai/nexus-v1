@@ -184,7 +184,7 @@ class CommentsController extends BaseApiController
                 $comment = Comment::find($id);
                 if ($comment && (int) $comment->tenant_id === TenantContext::getId() && (int) $comment->user_id !== $userId) {
                     $reactor = User::find($userId);
-                    $reactorName = $reactor ? trim(($reactor->first_name ?? '') . ' ' . ($reactor->last_name ?? '')) : 'Someone';
+                    $reactorName = $reactor ? trim(($reactor->first_name ?? '') . ' ' . ($reactor->last_name ?? '')) : __('emails.common.fallback_someone');
                     $link = $comment->target_type && $comment->target_id
                         ? "/{$comment->target_type}s/{$comment->target_id}"
                         : null;

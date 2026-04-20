@@ -71,7 +71,7 @@ class JobOfferService
 
             // Notify the candidate
             try {
-                $jobTitle = $application->vacancy->title ?? 'a job';
+                $jobTitle = $application->vacancy->title ?? __('emails.common.fallback_job');
                 $candidateId = (int) $application->user_id;
                 Notification::createNotification(
                     $candidateId,
@@ -196,7 +196,7 @@ class JobOfferService
 
             // Notify the job poster
             try {
-                $jobTitle = $offer->application->vacancy->title ?? 'a job';
+                $jobTitle = $offer->application->vacancy->title ?? __('emails.common.fallback_job');
                 $posterId = $offer->application->vacancy->user_id ?? null;
                 if ($posterId) {
                     Notification::createNotification(
@@ -271,7 +271,7 @@ class JobOfferService
 
             // Notify the job poster
             try {
-                $jobTitle = $offer->application->vacancy->title ?? 'a job';
+                $jobTitle = $offer->application->vacancy->title ?? __('emails.common.fallback_job');
                 $posterId = $offer->application->vacancy->user_id ?? null;
                 if ($posterId) {
                     Notification::createNotification(
@@ -331,7 +331,7 @@ class JobOfferService
 
             // Notify the candidate
             try {
-                $jobTitle = $offer->application->vacancy->title ?? 'a job';
+                $jobTitle = $offer->application->vacancy->title ?? __('emails.common.fallback_job');
                 $candidateId = $offer->application->user_id ?? null;
                 if ($candidateId) {
                     Notification::createNotification(
