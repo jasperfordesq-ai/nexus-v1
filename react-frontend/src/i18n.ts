@@ -6,7 +6,10 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import ChainedBackend from 'i18next-chained-backend';
 import HttpBackend from 'i18next-http-backend';
+import LocalStorageBackend from 'i18next-localstorage-backend';
+import { captureMessage } from '@sentry/react';
 
 export const SUPPORTED_LOCALE_CODES = [
   'ar',
@@ -25,6 +28,7 @@ export const SUPPORTED_LOCALE_CODES = [
 const DEV_MISSING_KEY_PREFIX = '[missing]';
 const loggedMissingKeys = new Set<string>();
 const thrownMissingKeys = new Set<string>();
+const sentryReportedKeys = new Set<string>();
 const STRICT_MISSING_KEY_STORAGE_KEY = 'nexus_i18n_strict_missing_keys';
 
 const isStrictMissingKeyMode = () => {
@@ -50,6 +54,12 @@ const reportMissingKey = (identifier: string) => {
       throw new Error(`[i18n] Missing translation key: ${identifier}`);
     });
   }
+
+  // Production: report to Sentry once per session so missing keys surface as alerts
+  if (!import.meta.env.DEV && !sentryReportedKeys.has(identifier)) {
+    sentryReportedKeys.add(identifier);
+    captureMessage(`[i18n] Missing translation key: ${identifier}`, 'warning');
+  }
 };
 
 const formatMissingKey = (key: string) => {
@@ -57,7 +67,7 @@ const formatMissingKey = (key: string) => {
 };
 
 i18n
-  .use(HttpBackend)
+  .use(ChainedBackend)
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
@@ -97,7 +107,18 @@ i18n
     },
 
     backend: {
-      loadPath: '/locales/{{lng}}/{{ns}}.json',
+      backends: [LocalStorageBackend, HttpBackend],
+      backendOptions: [
+        {
+          // Cache translations in localStorage for 1 hour — avoids re-fetching
+          // 52 namespaces × 11 languages on every view. Cache busts automatically
+          // after TTL, so new strings propagate within an hour of deploy.
+          expirationTime: 60 * 60 * 1000,
+        },
+        {
+          loadPath: '/locales/{{lng}}/{{ns}}.json',
+        },
+      ],
     },
 
     detection: {
