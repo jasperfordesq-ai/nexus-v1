@@ -96,23 +96,21 @@ class ConnectionSuggestionController extends BaseApiController
             : '';
 
         // Query candidates with scoring
-        // Mutual connections: count of shared connections
+        // Mutual connections: count of shared connections (correlated subquery — no derived table,
+        // so u.id is accessible from the outer query)
         $mutualSubQuery = '';
         $mutualParams = [];
         if (!empty($connectedIds)) {
             $mutualSubQuery = "(
-                SELECT COUNT(DISTINCT mutual_conn)
-                FROM (
-                    SELECT CASE
-                        WHEN c2.requester_id = u.id THEN c2.receiver_id
-                        ELSE c2.requester_id
-                    END AS mutual_conn
-                    FROM connections c2
-                    WHERE c2.tenant_id = ?
-                    AND c2.status = 'accepted'
-                    AND (c2.requester_id = u.id OR c2.receiver_id = u.id)
-                ) mc
-                WHERE mc.mutual_conn IN ({$connectedPlaceholders})
+                SELECT COUNT(DISTINCT
+                    CASE WHEN c2.requester_id = u.id THEN c2.receiver_id ELSE c2.requester_id END
+                )
+                FROM connections c2
+                WHERE c2.tenant_id = ?
+                AND c2.status = 'accepted'
+                AND (c2.requester_id = u.id OR c2.receiver_id = u.id)
+                AND CASE WHEN c2.requester_id = u.id THEN c2.receiver_id ELSE c2.requester_id END
+                    IN ({$connectedPlaceholders})
             )";
             $mutualParams = array_merge([$tenantId], $connectedIds);
         } else {
@@ -156,7 +154,8 @@ class ConnectionSuggestionController extends BaseApiController
         $params = array_merge(
             $mutualParams,
             $sharedGroupsParams,
-            $mutualParams, // for the second mutual reference in score
+            $mutualParams,        // score: mutual part
+            $sharedGroupsParams,  // score: shared_groups part (was missing — caused HY093 mismatch)
             [$tenantId],
             $excludeIds,
             [$limit]
