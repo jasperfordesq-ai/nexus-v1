@@ -421,7 +421,8 @@
     "timebanking": "Banco de tiempo",
     "users": "Usuarios",
     "crm": "CRM",
-    "funnel": "Onboarding Funnel"
+    "funnel": "Onboarding Funnel",
+    "registration_policy": "Registration Policy"
   },
   "broker": {
     "a_reason_is_required": "A Reason is Required",
@@ -4136,5 +4137,27 @@
     "group_features": "Features",
     "group_gamification": "Gamification",
     "group_info": "Info"
+  },
+  "verification": {
+    "approve": "Approve",
+    "approve_confirm_prefix": "Are you sure you want to",
+    "approve_confirm_suffix": "? This will grant them verified status.",
+    "approve_user": "Approve User",
+    "audit_log_aria": "Verification audit log",
+    "audit_log_title": "Verification Audit Log",
+    "filter_all_events": "Filter events...",
+    "n_pending": "{{count}} pending",
+    "no_events": "No audit events found.",
+    "no_pending_reviews": "No pending reviews.",
+    "page_of": "Page {{page}} of {{total}}",
+    "pending_reviews_aria": "Pending verification reviews",
+    "pending_reviews_title": "Pending Reviews",
+    "refresh_aria": "Refresh audit log",
+    "refresh_pending_reviews_aria": "Refresh pending reviews",
+    "reject": "Reject",
+    "reject_confirm_prefix": "Are you sure you want to",
+    "reject_confirm_suffix": "? This will deny their verification request.",
+    "reject_user": "Reject User",
+    "total_events": "{{count}} events"
   }
 }
