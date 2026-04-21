@@ -13,6 +13,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
+/** @phpstan-type BookmarkWithTitle array{id:int,bookmarkable_type:string,bookmarkable_id:int,collection_id:int|null,created_at:mixed,title:string|null} */
+
 class BookmarkService
 {
     private const VALID_TYPES = ['post', 'listing', 'event', 'job', 'blog', 'discussion'];
@@ -61,8 +63,19 @@ class BookmarkService
         return ['bookmarked' => true, 'count' => $count];
     }
 
+    /** Table and title column for each bookmarkable type. */
+    private const TYPE_TABLE_MAP = [
+        'post'       => ['table' => 'posts',            'col' => 'title'],
+        'listing'    => ['table' => 'listings',         'col' => 'title'],
+        'event'      => ['table' => 'events',           'col' => 'title'],
+        'job'        => ['table' => 'job_vacancies',    'col' => 'title'],
+        'blog'       => ['table' => 'pages',            'col' => 'title'],
+        'discussion' => ['table' => 'group_discussions','col' => 'title'],
+    ];
+
     /**
      * Get paginated bookmarks for a user, optionally filtered by type and/or collection.
+     * Each bookmark has a `title` field resolved from the bookmarked item.
      */
     public function getUserBookmarks(int $userId, ?string $type = null, ?int $collectionId = null, int $page = 1, int $perPage = 20): LengthAwarePaginator
     {
@@ -78,7 +91,47 @@ class BookmarkService
             $query->where('collection_id', $collectionId);
         }
 
-        return $query->paginate($perPage, ['*'], 'page', $page);
+        $paginator = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $this->attachTitles($paginator->items());
+
+        return $paginator;
+    }
+
+    /**
+     * Batch-fetch titles for a list of Bookmark models and attach them as `title`.
+     * Groups by type and runs one query per type — no N+1.
+     *
+     * @param Bookmark[] $bookmarks
+     */
+    private function attachTitles(array $bookmarks): void
+    {
+        // Group IDs by type
+        $grouped = [];
+        foreach ($bookmarks as $bookmark) {
+            $grouped[$bookmark->bookmarkable_type][] = $bookmark->bookmarkable_id;
+        }
+
+        // Fetch titles per type
+        $titles = [];
+        foreach ($grouped as $type => $ids) {
+            $map = self::TYPE_TABLE_MAP[$type] ?? null;
+            if ($map === null) {
+                continue;
+            }
+            $rows = DB::table($map['table'])
+                ->whereIn('id', array_unique($ids))
+                ->pluck($map['col'], 'id');
+
+            foreach ($rows as $id => $title) {
+                $titles[$type][$id] = $title;
+            }
+        }
+
+        // Attach to bookmark models
+        foreach ($bookmarks as $bookmark) {
+            $bookmark->title = $titles[$bookmark->bookmarkable_type][$bookmark->bookmarkable_id] ?? null;
+        }
     }
 
     /**

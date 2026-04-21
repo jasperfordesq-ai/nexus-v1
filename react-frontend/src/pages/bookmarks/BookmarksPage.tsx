@@ -58,6 +58,7 @@ interface BookmarkItem {
   bookmarkable_id: number;
   collection_id: number | null;
   created_at: string;
+  title: string | null;
 }
 
 interface BookmarkCollectionData {
@@ -384,7 +385,7 @@ export default function BookmarksPage() {
                       to={tenantPath(getDetailPath(bookmark))}
                       className="text-sm font-medium text-[var(--text-primary)] hover:text-[var(--color-primary)] transition-colors truncate"
                     >
-                      {getTypeLabel(bookmark.bookmarkable_type)} #{bookmark.bookmarkable_id}
+                      {bookmark.title ?? `${getTypeLabel(bookmark.bookmarkable_type)} #${bookmark.bookmarkable_id}`}
                     </Link>
                     <span className="text-xs text-[var(--text-subtle)] shrink-0">
                       {formatRelativeTime(bookmark.created_at)}
