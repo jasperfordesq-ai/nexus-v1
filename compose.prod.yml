@@ -47,6 +47,9 @@ services:
       - ./app:/var/www/html/app:ro
       - ./composer.json:/var/www/html/composer.json:ro
       - ./database:/var/www/html/database:ro
+      # Laravel translation files (used by __() in emails + API responses).
+      # Without this mount, every __('emails_misc.…') call returns the raw key.
+      - ./lang:/var/www/html/lang:ro
       # Writable uploads directory
       - nexus-php-uploads:/var/www/html/httpdocs/uploads
       # Writable logs
@@ -251,6 +254,9 @@ services:
       - ./routes:/var/www/html/routes:ro
       - ./database:/var/www/html/database:ro
       - ./composer.json:/var/www/html/composer.json:ro
+      # Laravel translation files — must be mounted here too so queued jobs
+      # (safeguarding emails, notifications) resolve __() keys correctly.
+      - ./lang:/var/www/html/lang:ro
       - nexus-php-storage:/var/www/html/storage
       - nexus-php-bootstrap-cache:/var/www/html/bootstrap/cache
     env_file:
