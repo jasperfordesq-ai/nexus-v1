@@ -793,12 +793,12 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-40 h-screen border-r border-divider bg-content1 transition-all duration-300 ${
+      className={`fixed left-0 top-0 z-40 flex h-screen flex-col border-r border-divider bg-content1 transition-all duration-300 ${
         collapsed ? 'w-16' : 'w-64'
       }`}
     >
       {/* Header */}
-      <div className="flex h-16 items-center justify-between border-b border-divider px-4">
+      <div className="flex h-16 shrink-0 items-center justify-between border-b border-divider px-4">
         {!collapsed && (
           <Link to={tenantPath('/admin')} className="text-lg font-bold text-foreground">
             {t('admin')}
@@ -817,7 +817,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
 
       {/* Search bar — hidden in icon-only mode */}
       {!collapsed && (
-        <div className="px-2 py-2 border-b border-divider">
+        <div className="shrink-0 px-2 py-2 border-b border-divider">
           <Input
             size="sm"
             variant="flat"
@@ -846,7 +846,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
       )}
 
       {/* Navigation */}
-      <nav className="h-[calc(100vh-4rem)] overflow-y-auto px-2 py-3">
+      <nav className="flex-1 min-h-0 overflow-y-auto px-2 py-3">
 
         {/* ── Search results view ──────────────────────────────────────────── */}
         {searchQuery.trim() ? (
