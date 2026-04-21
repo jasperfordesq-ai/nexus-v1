@@ -538,5 +538,12 @@
       "withdrawal": "Withdrawal",
       "admin_adjustment": "Admin Adjustment"
     }
-  }
+  },
+  "my_organisations": "My Organisations",
+  "my_organisations_title": "My Organisations",
+  "my_organisations_subtitle": "Manage your volunteer organisations, review applications, and pay volunteers.",
+  "my_organisations_none": "No Organisations Yet",
+  "my_organisations_none_desc": "Register a volunteer organisation to start posting opportunities, managing volunteers, and awarding time credits.",
+  "my_organisations_pending": "Pending Approval",
+  "my_organisations_pending_desc": "Awaiting admin approval"
 }
