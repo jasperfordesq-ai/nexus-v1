@@ -90,4 +90,161 @@ class VettingServiceTest extends TestCase
         $this->assertEquals(0, $result['total']);
         $this->assertEmpty($result['by_status']);
     }
+
+    // =========================================================================
+    // userHasValidVetting
+    // =========================================================================
+
+    public function test_userHasValidVetting_returns_false_for_nonpositive_user_id(): void
+    {
+        // No DB calls expected — early return
+        $this->assertFalse($this->service->userHasValidVetting(0, 'garda_vetting'));
+        $this->assertFalse($this->service->userHasValidVetting(-5, 'garda_vetting'));
+    }
+
+    public function test_userHasValidVetting_returns_false_for_empty_type(): void
+    {
+        $this->assertFalse($this->service->userHasValidVetting(42, ''));
+    }
+
+    public function test_userHasValidVetting_returns_true_when_verified_record_exists(): void
+    {
+        DB::shouldReceive('table')->with('vetting_records')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereNull')->andReturnSelf();
+        DB::shouldReceive('exists')->andReturn(true);
+
+        $this->assertTrue($this->service->userHasValidVetting(42, 'garda_vetting'));
+    }
+
+    public function test_userHasValidVetting_returns_false_when_no_record(): void
+    {
+        DB::shouldReceive('table')->with('vetting_records')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereNull')->andReturnSelf();
+        DB::shouldReceive('exists')->andReturn(false);
+
+        $this->assertFalse($this->service->userHasValidVetting(42, 'garda_vetting'));
+    }
+
+    public function test_userHasValidVetting_fails_closed_on_db_error(): void
+    {
+        DB::shouldReceive('table')->andThrow(new \Exception('DB error'));
+
+        $this->assertFalse($this->service->userHasValidVetting(42, 'garda_vetting'));
+    }
+
+    // =========================================================================
+    // userHasAllValidVettings
+    // =========================================================================
+
+    public function test_userHasAllValidVettings_returns_true_for_empty_input(): void
+    {
+        // No DB calls expected — empty requirement means no block
+        $this->assertTrue($this->service->userHasAllValidVettings(42, []));
+    }
+
+    public function test_userHasAllValidVettings_returns_true_for_input_of_only_empty_strings(): void
+    {
+        // array_filter removes empties, leaving no requirements
+        $this->assertTrue($this->service->userHasAllValidVettings(42, ['', null, false]));
+    }
+
+    public function test_userHasAllValidVettings_returns_false_for_nonpositive_user_id(): void
+    {
+        $this->assertFalse($this->service->userHasAllValidVettings(0, ['garda_vetting']));
+        $this->assertFalse($this->service->userHasAllValidVettings(-1, ['garda_vetting']));
+    }
+
+    public function test_userHasAllValidVettings_returns_true_when_all_types_present(): void
+    {
+        DB::shouldReceive('table')->with('vetting_records')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereIn')->andReturnSelf();
+        DB::shouldReceive('whereNull')->andReturnSelf();
+        DB::shouldReceive('distinct')->andReturnSelf();
+        // Two unique types, DB reports two distinct vetting_type values present
+        DB::shouldReceive('count')->with('vetting_type')->andReturn(2);
+
+        $this->assertTrue($this->service->userHasAllValidVettings(
+            42,
+            ['garda_vetting', 'dbs_enhanced']
+        ));
+    }
+
+    public function test_userHasAllValidVettings_returns_false_when_one_type_missing(): void
+    {
+        DB::shouldReceive('table')->with('vetting_records')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereIn')->andReturnSelf();
+        DB::shouldReceive('whereNull')->andReturnSelf();
+        DB::shouldReceive('distinct')->andReturnSelf();
+        // Two unique types required, only one present
+        DB::shouldReceive('count')->with('vetting_type')->andReturn(1);
+
+        $this->assertFalse($this->service->userHasAllValidVettings(
+            42,
+            ['garda_vetting', 'dbs_enhanced']
+        ));
+    }
+
+    public function test_userHasAllValidVettings_dedupes_input(): void
+    {
+        DB::shouldReceive('table')->with('vetting_records')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereIn')->andReturnSelf();
+        DB::shouldReceive('whereNull')->andReturnSelf();
+        DB::shouldReceive('distinct')->andReturnSelf();
+        // Input has duplicates but unique count is 1 — one matching record passes
+        DB::shouldReceive('count')->with('vetting_type')->andReturn(1);
+
+        $this->assertTrue($this->service->userHasAllValidVettings(
+            42,
+            ['garda_vetting', 'garda_vetting', 'garda_vetting']
+        ));
+    }
+
+    public function test_userHasAllValidVettings_fails_closed_on_db_error(): void
+    {
+        DB::shouldReceive('table')->andThrow(new \Exception('DB error'));
+
+        $this->assertFalse($this->service->userHasAllValidVettings(42, ['garda_vetting']));
+    }
+
+    // =========================================================================
+    // isSafeguardingStaff
+    // =========================================================================
+
+    public function test_isSafeguardingStaff_returns_true_for_staff_role(): void
+    {
+        DB::shouldReceive('table')->with('users')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereIn')->andReturnSelf();
+        DB::shouldReceive('exists')->andReturn(true);
+
+        $this->assertTrue($this->service->isSafeguardingStaff(42));
+    }
+
+    public function test_isSafeguardingStaff_returns_false_for_member_role(): void
+    {
+        DB::shouldReceive('table')->with('users')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereIn')->andReturnSelf();
+        DB::shouldReceive('exists')->andReturn(false);
+
+        $this->assertFalse($this->service->isSafeguardingStaff(42));
+    }
+
+    public function test_isSafeguardingStaff_returns_false_for_nonpositive_user_id(): void
+    {
+        $this->assertFalse($this->service->isSafeguardingStaff(0));
+        $this->assertFalse($this->service->isSafeguardingStaff(-1));
+    }
+
+    public function test_isSafeguardingStaff_fails_closed_on_db_error(): void
+    {
+        DB::shouldReceive('table')->andThrow(new \Exception('DB error'));
+
+        $this->assertFalse($this->service->isSafeguardingStaff(42));
+    }
 }

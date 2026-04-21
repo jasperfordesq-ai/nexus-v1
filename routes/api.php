@@ -1602,7 +1602,22 @@ Route::post('/v2/admin/safeguarding/assignments', [\App\Http\Controllers\Api\Adm
 Route::delete('/v2/admin/safeguarding/assignments/{id}', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'deleteAssignment']);
 Route::get('/v2/admin/safeguarding/member-preferences', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'memberPreferences']);
 
+// Tier 2a — tenant-level safeguarding declaration (Tusla / Children First Act 2015)
+Route::get('/v2/admin/safeguarding/statement', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'getStatement']);
+Route::post('/v2/admin/safeguarding/statement', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'uploadStatement']);
+Route::get('/v2/admin/safeguarding/statement/download', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'downloadStatement']);
+
+// Tier 3c — per-member audit trail (activity log + message copies + assignments)
+Route::get('/v2/admin/safeguarding/members/{userId}/activity', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'memberActivity']);
+Route::get('/v2/admin/safeguarding/members/{userId}/activity.csv', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'memberActivityCsv']);
+
 }); // End Route::middleware(['auth:sanctum', 'admin'])
+
+// Tier 3b — member self-service safeguarding endpoints (tenant-authenticated)
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/v2/safeguarding/my-preferences', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'myPreferences']);
+    Route::post('/v2/safeguarding/revoke', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'revoke']);
+});
 
 // ============================================
 // Super Admin routes — Sanctum auth + super-admin middleware

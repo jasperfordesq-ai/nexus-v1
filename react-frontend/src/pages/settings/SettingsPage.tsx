@@ -63,6 +63,7 @@ import { SecurityTab } from './tabs/SecurityTab';
 import type { SessionInfo, TwoFactorSetup } from './tabs/SecurityTab';
 import { SkillsTab } from './tabs/SkillsTab';
 import { LinkedAccountsTab } from './tabs/LinkedAccountsTab';
+import { SafeguardingTab } from './tabs/SafeguardingTab';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
@@ -76,7 +77,7 @@ export function SettingsPage() {
   const { user, logout, refreshUser } = useAuth();
   const { tenantPath, tenant, hasFeature } = useTenant();
   const toast = useToast();
-  const validTabs = ['profile', 'notifications', 'privacy', 'security', 'skills', 'availability', 'linked-accounts'];
+  const validTabs = ['profile', 'notifications', 'privacy', 'security', 'skills', 'availability', 'linked-accounts', 'safeguarding'];
   const initialTab = validTabs.includes(searchParams.get('tab') || '') ? searchParams.get('tab')! : 'profile';
   const [activeTab, setActiveTab] = useState(initialTab);
   const [isDirty, setIsDirty] = useState(false);
@@ -907,6 +908,15 @@ export function SettingsPage() {
               </span>
             }
           />
+          <Tab
+            key="safeguarding"
+            title={
+              <span className="flex items-center gap-2">
+                <Shield className="w-4 h-4" aria-hidden="true" />
+                {t("tabs.safeguarding")}
+              </span>
+            }
+          />
         </Tabs>
       </motion.div>
 
@@ -1047,6 +1057,9 @@ export function SettingsPage() {
 
         {/* LINKED ACCOUNTS TAB */}
         {activeTab === 'linked-accounts' && <LinkedAccountsTab />}
+
+        {/* SAFEGUARDING TAB */}
+        {activeTab === 'safeguarding' && <SafeguardingTab />}
       </motion.div>
 
       {/* Marketing Consent Confirmation Modal */}

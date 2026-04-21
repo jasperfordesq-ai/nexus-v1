@@ -62,6 +62,7 @@ import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
 import { PageHeader } from '../../components';
 import { StatCard } from '../../components';
+import { SafeguardingHelp } from './SafeguardingHelp';
 
 import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
@@ -738,6 +739,9 @@ export function SafeguardingDashboard() {
           </CardBody>
         </Card>
       )}
+
+      {/* Collapsible guidance panel — title always visible, body in accordion sections */}
+      <SafeguardingHelp />
 
       {/* Review Modal */}
       <Modal

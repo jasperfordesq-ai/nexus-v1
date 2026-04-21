@@ -233,7 +233,8 @@
     "security": "Sécurité",
     "skills": "Compétences",
     "availability": "Disponibilité",
-    "linked": "Lié"
+    "linked": "Lié",
+    "safeguarding": "Safeguarding"
   },
   "header": {
     "title": "Paramètres",
@@ -510,5 +511,21 @@
     "message": "You have unsaved changes. If you leave, your changes will be lost.",
     "leave": "Leave Anyway",
     "stay": "Stay"
+  },
+  "safeguarding": {
+    "page_title": "Safeguarding preferences",
+    "intro": "Review or revoke the safeguarding preferences you set during onboarding. Your coordinators can see these but other members cannot.",
+    "no_preferences": "You have no active safeguarding preferences. You can set these at any time from the safeguarding help page.",
+    "selected_on": "Selected on {{date}}",
+    "revoke_button": "Revoke",
+    "revoke_confirm_title": "Revoke this preference?",
+    "revoke_confirm_body": "This preference will no longer apply to your account. Your coordinators will be notified of the change.",
+    "revoke_confirm_yes": "Yes, revoke",
+    "revoke_confirm_no": "Keep it",
+    "revoked_toast": "Preference revoked.",
+    "revoke_error_toast": "Something went wrong. Please try again.",
+    "chip_broker_review": "Broker review",
+    "chip_match_approval": "Match approval",
+    "chip_vetted_only": "Vetted contacts only"
   }
 }

@@ -12,6 +12,11 @@ use App\Services\EmailService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * AdminSafeguardingController -- Admin safeguarding module endpoints.
@@ -739,6 +744,533 @@ class AdminSafeguardingController extends BaseApiController
             }
             throw $e;
         }
+    }
+
+    // ============================================
+    // MEMBER AUDIT TRAIL (TIER 3c)
+    // ============================================
+
+    /**
+     * GET /v2/admin/safeguarding/members/{userId}/activity
+     *
+     * Returns the combined audit trail for a single member:
+     *   - Safeguarding-type activity_log entries (trigger activations, option
+     *     selections, consent revocations, admin views)
+     *   - Broker message copies where the member is sender or receiver
+     *   - Safeguarding assignments where the member is ward or guardian
+     *
+     * Each row is ordered newest-first and carries an `event` discriminator
+     * for the frontend to render appropriately.
+     */
+    public function memberActivity(Request $request, int $userId): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $member = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select(['id', 'first_name', 'last_name', 'name', 'avatar_url', 'email'])
+            ->first();
+        if (!$member) {
+            return $this->respondWithError('NOT_FOUND', __('api.member_not_found'), null, 404);
+        }
+
+        $events = $this->collectMemberAuditEvents($tenantId, $userId);
+
+        // Audit-log this access (spec requirement: every admin view of a
+        // member's safeguarding data is itself recorded).
+        DB::table('activity_log')->insert([
+            'tenant_id' => $tenantId,
+            'user_id' => $adminId,
+            'action' => 'safeguarding_member_activity_viewed',
+            'action_type' => 'safeguarding',
+            'entity_type' => 'user',
+            'entity_id' => $userId,
+            'details' => json_encode(['events_count' => count($events)]),
+            'ip_address' => request()?->ip(),
+            'created_at' => now(),
+        ]);
+
+        return $this->respondWithData([
+            'member' => [
+                'id' => (int) $member->id,
+                'name' => trim(($member->first_name ?? '') . ' ' . ($member->last_name ?? ''))
+                    ?: ($member->name ?? ''),
+                'avatar_url' => $member->avatar_url,
+                'email' => $member->email,
+            ],
+            'events' => $events,
+            'event_count' => count($events),
+        ]);
+    }
+
+    /**
+     * GET /v2/admin/safeguarding/members/{userId}/activity.csv
+     *
+     * CSV export of the same data as memberActivity. Tenant-scoped; audit-logged.
+     */
+    public function memberActivityCsv(Request $request, int $userId)
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $member = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select(['id', 'first_name', 'last_name', 'name'])
+            ->first();
+        if (!$member) {
+            return $this->respondWithError('NOT_FOUND', __('api.member_not_found'), null, 404);
+        }
+
+        $events = $this->collectMemberAuditEvents($tenantId, $userId);
+
+        DB::table('activity_log')->insert([
+            'tenant_id' => $tenantId,
+            'user_id' => $adminId,
+            'action' => 'safeguarding_member_activity_exported',
+            'action_type' => 'safeguarding',
+            'entity_type' => 'user',
+            'entity_id' => $userId,
+            'details' => json_encode(['events_count' => count($events), 'format' => 'csv']),
+            'ip_address' => request()?->ip(),
+            'created_at' => now(),
+        ]);
+
+        $memberLabel = trim(($member->first_name ?? '') . ' ' . ($member->last_name ?? ''))
+            ?: ($member->name ?? "member-{$userId}");
+        $slug = preg_replace('/[^a-z0-9_-]+/i', '-', strtolower($memberLabel));
+        $filename = "safeguarding-activity-{$slug}-" . now()->format('Y-m-d') . '.csv';
+
+        $response = new StreamedResponse(function () use ($events) {
+            $out = fopen('php://output', 'w');
+            // UTF-8 BOM for Excel
+            fwrite($out, "\xEF\xBB\xBF");
+            fputcsv($out, ['occurred_at', 'event', 'actor', 'details']);
+            foreach ($events as $event) {
+                fputcsv($out, [
+                    $event['occurred_at'] ?? '',
+                    $event['event'] ?? '',
+                    $event['actor_name'] ?? '',
+                    is_array($event['details'] ?? null)
+                        ? json_encode($event['details'])
+                        : (string) ($event['details'] ?? ''),
+                ]);
+            }
+            fclose($out);
+        });
+
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
+
+        return $response;
+    }
+
+    /**
+     * Collect audit events for a member across the three sources: activity_log,
+     * broker_message_copies, and safeguarding_assignments. Returns a flat array
+     * ordered newest-first.
+     *
+     * @return array<int, array{occurred_at: ?string, event: string, actor_name: ?string, details: mixed}>
+     */
+    private function collectMemberAuditEvents(int $tenantId, int $userId): array
+    {
+        $events = [];
+
+        // 1) activity_log entries where action_type='safeguarding' AND (user_id=member OR entity targets this user)
+        try {
+            $logRows = DB::table('activity_log as al')
+                ->leftJoin('users as actor', 'actor.id', '=', 'al.user_id')
+                ->where('al.tenant_id', $tenantId)
+                ->where('al.action_type', 'safeguarding')
+                ->where(function ($q) use ($userId) {
+                    $q->where('al.user_id', $userId)
+                      ->orWhere(function ($q2) use ($userId) {
+                          $q2->where('al.entity_type', 'user')->where('al.entity_id', $userId);
+                      });
+                })
+                ->select([
+                    'al.action',
+                    'al.entity_type',
+                    'al.entity_id',
+                    'al.details',
+                    'al.created_at',
+                    'al.user_id as actor_id',
+                    'actor.first_name as actor_first',
+                    'actor.last_name as actor_last',
+                    'actor.name as actor_name',
+                ])
+                ->orderByDesc('al.created_at')
+                ->limit(500)
+                ->get();
+
+            foreach ($logRows as $row) {
+                $events[] = [
+                    'occurred_at' => $row->created_at,
+                    'event' => 'activity_log:' . $row->action,
+                    'actor_name' => $this->composeName($row->actor_first, $row->actor_last, $row->actor_name),
+                    'details' => is_string($row->details) ? (json_decode($row->details, true) ?: $row->details) : $row->details,
+                ];
+            }
+        } catch (\Illuminate\Database\QueryException $e) {
+            if (!$this->isTableNotFound($e)) {
+                Log::warning('AdminSafeguardingController::memberActivity activity_log query failed', [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        // 2) broker_message_copies where member is sender or receiver
+        try {
+            $copies = DB::table('broker_message_copies as bmc')
+                ->leftJoin('users as sender', 'sender.id', '=', 'bmc.sender_id')
+                ->leftJoin('users as receiver', 'receiver.id', '=', 'bmc.receiver_id')
+                ->where('bmc.tenant_id', $tenantId)
+                ->where(function ($q) use ($userId) {
+                    $q->where('bmc.sender_id', $userId)->orWhere('bmc.receiver_id', $userId);
+                })
+                ->select([
+                    'bmc.id',
+                    'bmc.sender_id',
+                    'bmc.receiver_id',
+                    'bmc.copy_reason',
+                    'bmc.flagged',
+                    'bmc.reviewed_at',
+                    'bmc.created_at',
+                    DB::raw("COALESCE(sender.name, CONCAT(COALESCE(sender.first_name, ''), ' ', COALESCE(sender.last_name, ''))) as sender_name"),
+                    DB::raw("COALESCE(receiver.name, CONCAT(COALESCE(receiver.first_name, ''), ' ', COALESCE(receiver.last_name, ''))) as receiver_name"),
+                ])
+                ->orderByDesc('bmc.created_at')
+                ->limit(500)
+                ->get();
+
+            foreach ($copies as $row) {
+                $role = ((int) $row->sender_id === $userId) ? 'sender' : 'recipient';
+                $events[] = [
+                    'occurred_at' => $row->created_at,
+                    'event' => 'message_copied',
+                    'actor_name' => null,
+                    'details' => [
+                        'copy_id' => (int) $row->id,
+                        'member_role' => $role,
+                        'sender_name' => trim($row->sender_name ?? ''),
+                        'receiver_name' => trim($row->receiver_name ?? ''),
+                        'copy_reason' => $row->copy_reason,
+                        'flagged' => (bool) $row->flagged,
+                        'reviewed_at' => $row->reviewed_at,
+                    ],
+                ];
+            }
+        } catch (\Illuminate\Database\QueryException $e) {
+            if (!$this->isTableNotFound($e)) {
+                Log::warning('AdminSafeguardingController::memberActivity broker_message_copies query failed', [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        // 3) safeguarding_assignments where member is ward or guardian
+        try {
+            $assignments = DB::table('safeguarding_assignments as sa')
+                ->leftJoin('users as ward', 'ward.id', '=', 'sa.ward_user_id')
+                ->leftJoin('users as guardian', 'guardian.id', '=', 'sa.guardian_user_id')
+                ->where('sa.tenant_id', $tenantId)
+                ->where(function ($q) use ($userId) {
+                    $q->where('sa.ward_user_id', $userId)->orWhere('sa.guardian_user_id', $userId);
+                })
+                ->select([
+                    'sa.id',
+                    'sa.ward_user_id',
+                    'sa.guardian_user_id',
+                    'sa.consent_given_at',
+                    'sa.revoked_at',
+                    'sa.assigned_at',
+                    'sa.notes',
+                    DB::raw("COALESCE(ward.name, CONCAT(COALESCE(ward.first_name, ''), ' ', COALESCE(ward.last_name, ''))) as ward_name"),
+                    DB::raw("COALESCE(guardian.name, CONCAT(COALESCE(guardian.first_name, ''), ' ', COALESCE(guardian.last_name, ''))) as guardian_name"),
+                ])
+                ->orderByDesc('sa.assigned_at')
+                ->get();
+
+            foreach ($assignments as $row) {
+                $role = ((int) $row->ward_user_id === $userId) ? 'ward' : 'guardian';
+                $events[] = [
+                    'occurred_at' => $row->assigned_at,
+                    'event' => 'assignment_created',
+                    'actor_name' => null,
+                    'details' => [
+                        'assignment_id' => (int) $row->id,
+                        'member_role' => $role,
+                        'ward_name' => trim($row->ward_name ?? ''),
+                        'guardian_name' => trim($row->guardian_name ?? ''),
+                        'consent_given_at' => $row->consent_given_at,
+                        'notes' => $row->notes,
+                    ],
+                ];
+                if ($row->revoked_at) {
+                    $events[] = [
+                        'occurred_at' => $row->revoked_at,
+                        'event' => 'assignment_revoked',
+                        'actor_name' => null,
+                        'details' => [
+                            'assignment_id' => (int) $row->id,
+                            'member_role' => $role,
+                        ],
+                    ];
+                }
+            }
+        } catch (\Illuminate\Database\QueryException $e) {
+            if (!$this->isTableNotFound($e)) {
+                Log::warning('AdminSafeguardingController::memberActivity safeguarding_assignments query failed', [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        // Sort newest-first across all three sources
+        usort($events, function ($a, $b) {
+            return strcmp((string) ($b['occurred_at'] ?? ''), (string) ($a['occurred_at'] ?? ''));
+        });
+
+        return $events;
+    }
+
+    private function composeName(?string $first, ?string $last, ?string $fallback): ?string
+    {
+        $composed = trim(($first ?? '') . ' ' . ($last ?? ''));
+        return $composed !== '' ? $composed : ($fallback ?: null);
+    }
+
+    // ============================================
+    // TENANT SAFEGUARDING STATEMENT (TIER 2a — GOVERNANCE)
+    // ============================================
+    //
+    // Tusla / Children First Act 2015 (Ireland) and equivalent UK/NI
+    // safeguarding legislation require any organisation working with children
+    // or vulnerable adults to publish a Child Safeguarding Statement / equivalent
+    // policy. When a tenant declares it works with these groups, the statement
+    // PDF MUST be uploaded before the tenant can be activated.
+
+    /**
+     * GET /v2/admin/safeguarding/statement
+     *
+     * Returns the current tenant's safeguarding declaration flags and statement
+     * metadata (not the file itself — use /statement/download for that).
+     */
+    public function getStatement(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $tenant = DB::table('tenants')
+            ->where('id', $tenantId)
+            ->select([
+                'id',
+                'is_active',
+                'works_with_children',
+                'works_with_vulnerable_adults',
+                'safeguarding_statement_path',
+                'safeguarding_statement_original_name',
+                'safeguarding_statement_uploaded_at',
+                'safeguarding_statement_uploaded_by',
+            ])
+            ->first();
+
+        if (!$tenant) {
+            return $this->respondWithError('NOT_FOUND', __('api.tenant_not_found'), null, 404);
+        }
+
+        $hasStatement = !empty($tenant->safeguarding_statement_path);
+        $requiresStatement = (bool) $tenant->works_with_children || (bool) $tenant->works_with_vulnerable_adults;
+
+        return $this->respondWithData([
+            'works_with_children' => (bool) $tenant->works_with_children,
+            'works_with_vulnerable_adults' => (bool) $tenant->works_with_vulnerable_adults,
+            'has_statement' => $hasStatement,
+            'requires_statement' => $requiresStatement,
+            'is_compliant' => !$requiresStatement || $hasStatement,
+            'is_active' => (bool) $tenant->is_active,
+            'statement_original_name' => $tenant->safeguarding_statement_original_name,
+            'statement_uploaded_at' => $tenant->safeguarding_statement_uploaded_at,
+            'statement_uploaded_by' => $tenant->safeguarding_statement_uploaded_by
+                ? (int) $tenant->safeguarding_statement_uploaded_by
+                : null,
+        ]);
+    }
+
+    /**
+     * POST /v2/admin/safeguarding/statement
+     *
+     * Upload or replace the tenant's Child Safeguarding Statement PDF and/or
+     * toggle the works_with_* flags. If either flag is true after the update
+     * and no statement is on file (and none being uploaded), returns 422.
+     *
+     * Accepts multipart/form-data with:
+     *   - file (PDF, optional — required if toggling a flag on without prior file)
+     *   - works_with_children (0|1, optional)
+     *   - works_with_vulnerable_adults (0|1, optional)
+     */
+    public function uploadStatement(Request $request): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $tenant = DB::table('tenants')->where('id', $tenantId)->first();
+        if (!$tenant) {
+            return $this->respondWithError('NOT_FOUND', __('api.tenant_not_found'), null, 404);
+        }
+
+        $worksWithChildren = $request->has('works_with_children')
+            ? (bool) $request->input('works_with_children')
+            : (bool) $tenant->works_with_children;
+        $worksWithVulnerableAdults = $request->has('works_with_vulnerable_adults')
+            ? (bool) $request->input('works_with_vulnerable_adults')
+            : (bool) $tenant->works_with_vulnerable_adults;
+
+        $requiresStatement = $worksWithChildren || $worksWithVulnerableAdults;
+        $alreadyHasStatement = !empty($tenant->safeguarding_statement_path);
+        $hasUploadedFile = $request->hasFile('file');
+
+        // Governance gate: flags set to true without a statement on file (and no
+        // new upload in this request) → block.
+        if ($requiresStatement && !$alreadyHasStatement && !$hasUploadedFile) {
+            return $this->respondWithError(
+                'SAFEGUARDING_STATEMENT_REQUIRED',
+                __('safeguarding.errors.statement_required'),
+                'file',
+                422
+            );
+        }
+
+        $storedPath = $tenant->safeguarding_statement_path;
+        $storedOriginalName = $tenant->safeguarding_statement_original_name;
+        $uploadedAt = $tenant->safeguarding_statement_uploaded_at;
+        $uploadedBy = $tenant->safeguarding_statement_uploaded_by;
+
+        if ($hasUploadedFile) {
+            $file = $request->file('file');
+            if (!$file->isValid()) {
+                return $this->respondWithError('INVALID_FILE', __('safeguarding.errors.invalid_file'), 'file', 422);
+            }
+            if (strtolower($file->getClientOriginalExtension()) !== 'pdf'
+                || $file->getMimeType() !== 'application/pdf') {
+                return $this->respondWithError('INVALID_FILE_TYPE', __('safeguarding.errors.pdf_required'), 'file', 422);
+            }
+            if ($file->getSize() > 10 * 1024 * 1024) { // 10MB cap
+                return $this->respondWithError('FILE_TOO_LARGE', __('safeguarding.errors.file_too_large'), 'file', 422);
+            }
+
+            // Store in uploads/tenants/{tenantId}/safeguarding/
+            $filename = 'statement-' . Str::uuid()->toString() . '.pdf';
+            $relativePath = "tenants/{$tenantId}/safeguarding/{$filename}";
+
+            try {
+                Storage::disk('local')->putFileAs(
+                    "tenants/{$tenantId}/safeguarding",
+                    $file,
+                    $filename
+                );
+            } catch (\Throwable $e) {
+                Log::error('AdminSafeguardingController::uploadStatement storage failed', [
+                    'tenant_id' => $tenantId,
+                    'error' => $e->getMessage(),
+                ]);
+                return $this->respondWithError('STORAGE_FAILED', __('safeguarding.errors.storage_failed'), null, 500);
+            }
+
+            // Delete the old file if one existed
+            if (!empty($tenant->safeguarding_statement_path)) {
+                try {
+                    Storage::disk('local')->delete($tenant->safeguarding_statement_path);
+                } catch (\Throwable $e) {
+                    Log::warning('AdminSafeguardingController::uploadStatement old file cleanup failed', [
+                        'tenant_id' => $tenantId,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            $storedPath = $relativePath;
+            $storedOriginalName = mb_substr((string) $file->getClientOriginalName(), 0, 255);
+            $uploadedAt = now();
+            $uploadedBy = $adminId;
+        }
+
+        DB::table('tenants')->where('id', $tenantId)->update([
+            'works_with_children' => $worksWithChildren ? 1 : 0,
+            'works_with_vulnerable_adults' => $worksWithVulnerableAdults ? 1 : 0,
+            'safeguarding_statement_path' => $storedPath,
+            'safeguarding_statement_original_name' => $storedOriginalName,
+            'safeguarding_statement_uploaded_at' => $uploadedAt,
+            'safeguarding_statement_uploaded_by' => $uploadedBy,
+            'updated_at' => now(),
+        ]);
+
+        DB::table('activity_log')->insert([
+            'tenant_id' => $tenantId,
+            'user_id' => $adminId,
+            'action' => $hasUploadedFile
+                ? 'safeguarding_statement_uploaded'
+                : 'safeguarding_declaration_updated',
+            'action_type' => 'safeguarding',
+            'entity_type' => 'tenant',
+            'entity_id' => $tenantId,
+            'details' => json_encode([
+                'works_with_children' => $worksWithChildren,
+                'works_with_vulnerable_adults' => $worksWithVulnerableAdults,
+                'statement_uploaded' => $hasUploadedFile,
+            ]),
+            'ip_address' => request()?->ip(),
+            'created_at' => now(),
+        ]);
+
+        return $this->respondWithData([
+            'works_with_children' => $worksWithChildren,
+            'works_with_vulnerable_adults' => $worksWithVulnerableAdults,
+            'has_statement' => !empty($storedPath),
+            'statement_uploaded_at' => $uploadedAt,
+            'statement_original_name' => $storedOriginalName,
+            'is_compliant' => !$requiresStatement || !empty($storedPath),
+        ]);
+    }
+
+    /**
+     * GET /v2/admin/safeguarding/statement/download
+     *
+     * Stream the tenant's Child Safeguarding Statement PDF to an admin.
+     * Tenant-scoped — the download is authorised by the admin's tenant context
+     * and the stored path never leaves the server.
+     */
+    public function downloadStatement()
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $tenant = DB::table('tenants')
+            ->where('id', $tenantId)
+            ->select(['safeguarding_statement_path', 'safeguarding_statement_original_name'])
+            ->first();
+
+        if (!$tenant || empty($tenant->safeguarding_statement_path)) {
+            return $this->respondWithError('NOT_FOUND', __('safeguarding.errors.statement_missing'), null, 404);
+        }
+
+        if (!Storage::disk('local')->exists($tenant->safeguarding_statement_path)) {
+            Log::warning('AdminSafeguardingController::downloadStatement path in DB but file missing', [
+                'tenant_id' => $tenantId,
+                'path' => $tenant->safeguarding_statement_path,
+            ]);
+            return $this->respondWithError('FILE_MISSING', __('safeguarding.errors.file_missing'), null, 410);
+        }
+
+        $absolutePath = Storage::disk('local')->path($tenant->safeguarding_statement_path);
+        $downloadName = $tenant->safeguarding_statement_original_name ?: 'safeguarding-statement.pdf';
+
+        return response()->download($absolutePath, $downloadName, [
+            'Content-Type' => 'application/pdf',
+        ]);
     }
 
     // ============================================

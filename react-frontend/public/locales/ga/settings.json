@@ -191,7 +191,8 @@
     "security": "Slándáil",
     "skills": "Scileanna",
     "availability": "Infhaighteacht",
-    "linked": "Nasctha"
+    "linked": "Nasctha",
+    "safeguarding": "Cosaint"
   },
   "header": {
     "title": "Socruithe",
@@ -510,5 +511,21 @@
     "message": "You have unsaved changes. If you leave, your changes will be lost.",
     "leave": "Leave Anyway",
     "stay": "Stay"
+  },
+  "safeguarding": {
+    "page_title": "Sainroghanna cosanta",
+    "intro": "Athbhreithnigh nó cúlghair na sainroghanna cosanta a shocraigh tú le linn an dul isteach. Feiceann na comhordaitheoirí iad seo ach ní fheiceann baill eile iad.",
+    "no_preferences": "Níl aon sainroghanna cosanta gníomhacha agat. Is féidir leat iad seo a shocrú aon uair ó leathanach cabhrach na cosanta.",
+    "selected_on": "Roghnaithe ar {{date}}",
+    "revoke_button": "Cúlghair",
+    "revoke_confirm_title": "Cúlghair an rogha seo?",
+    "revoke_confirm_body": "Ní bheidh feidhm ag an rogha seo a thuilleadh ar do chuntas. Cuirfear do chomhordaitheoirí ar an eolas faoin athrú.",
+    "revoke_confirm_yes": "Tá, cúlghair",
+    "revoke_confirm_no": "Coinnigh í",
+    "revoked_toast": "Cúlghaireadh an rogha.",
+    "revoke_error_toast": "Chuaigh rud éigin amú. Bain triail eile as.",
+    "chip_broker_review": "Athbhreithniú idirghabhálaí",
+    "chip_match_approval": "Ceadú meaitseála",
+    "chip_vetted_only": "Teagmhálaithe grinnfhiosraithe amháin"
   }
 }

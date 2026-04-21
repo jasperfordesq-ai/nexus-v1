@@ -10,6 +10,8 @@ use App\Core\TenantContext;
 use App\Events\MessageSent;
 use App\Models\Message;
 use App\Models\User;
+use App\Services\SafeguardingTriggerService;
+use App\Services\VettingService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -278,6 +280,31 @@ class MessageService
         if ($isDisabled) {
             self::$errors = [['code' => 'MESSAGING_DISABLED', 'message' => 'Your messaging has been restricted by an administrator']];
             return [];
+        }
+
+        // Vetting gate — National Vetting Bureau Acts 2012–2016 / DBS / PVG / AccessNI.
+        // If the recipient's safeguarding preferences require vetting types the sender
+        // does not hold, block with VETTING_REQUIRED. One-directional: we protect the
+        // flagged recipient but do not restrict the flagged sender's outbound autonomy.
+        $recipientVettingTypes = [];
+        try {
+            $recipientVettingTypes = SafeguardingTriggerService::getRequiredVettingTypes($receiverId, $tenantId);
+        } catch (\Throwable $e) {
+            // Lookup failure is not fatal — other safeguarding gates remain in place.
+            Log::warning('MessageService::send safeguarding lookup failed (continuing)', [
+                'error' => $e->getMessage(),
+                'receiver_id' => $receiverId,
+            ]);
+        }
+        if (!empty($recipientVettingTypes)) {
+            if (!app(VettingService::class)->userHasAllValidVettings($senderId, $recipientVettingTypes)) {
+                self::$errors = [[
+                    'code' => 'VETTING_REQUIRED',
+                    'message' => __('safeguarding.errors.vetting_required'),
+                    'required_vetting_types' => array_values($recipientVettingTypes),
+                ]];
+                return [];
+            }
         }
 
         // Check if either user has blocked the other

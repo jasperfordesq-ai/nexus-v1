@@ -7,6 +7,8 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Services\SafeguardingTriggerService;
+use App\Services\VettingService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -58,6 +60,7 @@ class SmartMatchingEngine
 
     public function __construct(
         private readonly EmbeddingService $embeddingService,
+        private readonly VettingService $vettingService,
     ) {}
 
     /**
@@ -177,6 +180,19 @@ class SmartMatchingEngine
                 $tenantId, $userId, $targetType, $uniqueCatIds,
                 $categoryFilter, $userData['latitude'], $userData['longitude'], $maxDistance
             );
+        }
+
+        // Safeguarding: strip candidates whose owners require vetting types the
+        // searcher does not hold. Staff roles bypass this at discovery — they
+        // still need the full pool for coordination and assignment purposes.
+        // National Vetting Bureau Acts 2012–2016 / DBS / PVG / AccessNI.
+        foreach ($candidatesByTargetType as $targetType => $list) {
+            if (!empty($list)) {
+                $candidatesByTargetType[$targetType] = $this->filterCandidatesByVettingRequirements(
+                    $list,
+                    $userId
+                );
+            }
         }
 
         foreach ($userListings as $myListing) {
@@ -833,7 +849,10 @@ class SmartMatchingEngine
         }
 
         // Slightly larger cap since we're servicing multiple source listings.
-        $sql .= " LIMIT 200";
+        // 400 (not 200) to give the post-scoring safeguarding filter headroom:
+        // in a tenant where 30–50% of members are flagged, 200 would leave too
+        // few viable candidates after filtering to satisfy the user's $limit.
+        $sql .= " LIMIT 400";
 
         return array_map(fn ($row) => (array) $row, DB::select($sql, $params));
     }
@@ -886,6 +905,11 @@ class SmartMatchingEngine
 
         $results = array_map(fn ($row) => (array) $row, DB::select($sql, $params));
 
+        // Safeguarding filter — same rule as the main match path. Applied after
+        // LIMIT here (cold-start users typically request small result sets, so
+        // we accept the occasional short result rather than expanding LIMIT).
+        $results = $this->filterCandidatesByVettingRequirements($results, $userId);
+
         foreach ($results as &$listing) {
             $coldScore = 35;
             $descLen = strlen($listing['description'] ?? '');
@@ -901,5 +925,117 @@ class SmartMatchingEngine
         }
 
         return $results;
+    }
+
+    // =========================================================================
+    // SAFEGUARDING FILTER
+    // =========================================================================
+
+    /**
+     * Remove candidates whose owners require safeguarding vetting types the
+     * searcher does not hold. Used by both the main match path and cold-start.
+     *
+     * Staff roles (admin, tenant_admin, broker, super_admin) bypass this —
+     * they need the full pool for coordinator assignments and safeguarding
+     * oversight. Discovery bypass only; the downstream messaging, match
+     * submission and group exchange gates still enforce vetting for staff.
+     *
+     * Fail-open on error: if the filter itself errors, returns the candidate
+     * list unchanged. Downstream gates (MessageService, MatchApprovalWorkflow,
+     * GroupExchangeService) remain fail-closed, so a flagged user still can't
+     * be interacted with even if discovery briefly leaks them during a blip.
+     *
+     * @param array<int, array> $candidates
+     * @param int $searcherId The user ID performing the discovery/match request
+     * @return array<int, array>
+     */
+    public function filterCandidatesByVettingRequirements(array $candidates, int $searcherId): array
+    {
+        if (empty($candidates) || $searcherId <= 0) {
+            return $candidates;
+        }
+
+        // Staff bypass — admins/brokers see the full pool for coordination.
+        try {
+            if ($this->vettingService->isSafeguardingStaff($searcherId)) {
+                return $candidates;
+            }
+        } catch (\Throwable $e) {
+            // Staff lookup failure falls through to apply the filter — safer
+            // default (treat as non-staff).
+            Log::debug('[SmartMatchingEngine] staff bypass lookup failed', [
+                'error' => $e->getMessage(),
+                'searcher_id' => $searcherId,
+            ]);
+        }
+
+        try {
+            // Collect unique candidate owner IDs.
+            $ownerIds = [];
+            foreach ($candidates as $cand) {
+                $owner = (int) ($cand['user_id'] ?? 0);
+                if ($owner > 0 && $owner !== $searcherId) {
+                    $ownerIds[$owner] = true;
+                }
+            }
+            if (empty($ownerIds)) {
+                return $candidates;
+            }
+
+            $requiredByUser = SafeguardingTriggerService::getRequiredVettingTypesForUsers(
+                array_keys($ownerIds),
+                TenantContext::getId()
+            );
+
+            // Fast path: if nobody in this batch requires vetting, skip filtering.
+            $anyRequiresVetting = false;
+            foreach ($requiredByUser as $types) {
+                if (!empty($types)) {
+                    $anyRequiresVetting = true;
+                    break;
+                }
+            }
+            if (!$anyRequiresVetting) {
+                return $candidates;
+            }
+
+            // Cache searcher vetting checks by type-set signature so we don't
+            // re-query for each candidate when many share the same requirements.
+            $vettingCheckCache = [];
+            $filtered = [];
+
+            foreach ($candidates as $candidate) {
+                $owner = (int) ($candidate['user_id'] ?? 0);
+                $requiredTypes = $requiredByUser[$owner] ?? [];
+
+                if (empty($requiredTypes)) {
+                    $filtered[] = $candidate;
+                    continue;
+                }
+
+                $sortedTypes = $requiredTypes;
+                sort($sortedTypes);
+                $cacheKey = implode('|', $sortedTypes);
+
+                if (!array_key_exists($cacheKey, $vettingCheckCache)) {
+                    $vettingCheckCache[$cacheKey] = $this->vettingService
+                        ->userHasAllValidVettings($searcherId, $sortedTypes);
+                }
+
+                if ($vettingCheckCache[$cacheKey]) {
+                    $filtered[] = $candidate;
+                }
+                // else: silently drop the candidate from the searcher's view
+            }
+
+            return $filtered;
+        } catch (\Throwable $e) {
+            Log::warning('[SmartMatchingEngine] safeguarding filter failed (returning unfiltered)', [
+                'error' => $e->getMessage(),
+                'searcher_id' => $searcherId,
+                'candidate_count' => count($candidates),
+            ]);
+            return $candidates;
+        }
     }
 }

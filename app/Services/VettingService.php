@@ -437,6 +437,134 @@ class VettingService
         return $affected > 0;
     }
 
+    // =========================================================================
+    // Safeguarding gate checks — used by SmartMatchingEngine, MessageService,
+    // MatchApprovalWorkflowService and GroupExchangeService to enforce vetting
+    // requirements (National Vetting Bureau Acts 2012–2016 / DBS / PVG / AccessNI).
+    // =========================================================================
+
+    /**
+     * Check if a user holds a valid vetting record of the given type.
+     *
+     * "Valid" = status='verified' AND deleted_at IS NULL
+     *           AND (expiry_date IS NULL OR expiry_date >= today),
+     * scoped to the current tenant.
+     *
+     * Fail-closed: any DB exception returns false (treat as no vetting).
+     */
+    public function userHasValidVetting(int $userId, string $vettingType): bool
+    {
+        if ($userId <= 0 || $vettingType === '') {
+            return false;
+        }
+
+        try {
+            $tenantId = TenantContext::getId();
+            $today = now()->toDateString();
+
+            return DB::table('vetting_records')
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->where('vetting_type', $vettingType)
+                ->where('status', 'verified')
+                ->whereNull('deleted_at')
+                ->where(function ($q) use ($today) {
+                    $q->whereNull('expiry_date')
+                      ->orWhere('expiry_date', '>=', $today);
+                })
+                ->exists();
+        } catch (\Throwable $e) {
+            Log::error('VettingService::userHasValidVetting failed', [
+                'error' => $e->getMessage(),
+                'user_id' => $userId,
+                'vetting_type' => $vettingType,
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Check if a user holds valid vetting records for ALL specified types.
+     *
+     * Empty input array returns true (no requirement = no block).
+     * Input is deduped before counting, so duplicate types are not re-counted.
+     *
+     * Fail-closed: any DB exception returns false.
+     */
+    public function userHasAllValidVettings(int $userId, array $vettingTypes): bool
+    {
+        $uniqueTypes = array_values(array_unique(array_filter(
+            $vettingTypes,
+            fn ($t) => is_string($t) && $t !== ''
+        )));
+
+        if (empty($uniqueTypes)) {
+            return true;
+        }
+
+        if ($userId <= 0) {
+            return false;
+        }
+
+        try {
+            $tenantId = TenantContext::getId();
+            $today = now()->toDateString();
+
+            $validCount = DB::table('vetting_records')
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->whereIn('vetting_type', $uniqueTypes)
+                ->where('status', 'verified')
+                ->whereNull('deleted_at')
+                ->where(function ($q) use ($today) {
+                    $q->whereNull('expiry_date')
+                      ->orWhere('expiry_date', '>=', $today);
+                })
+                ->distinct()
+                ->count('vetting_type');
+
+            return $validCount >= count($uniqueTypes);
+        } catch (\Throwable $e) {
+            Log::error('VettingService::userHasAllValidVettings failed', [
+                'error' => $e->getMessage(),
+                'user_id' => $userId,
+                'vetting_types' => $vettingTypes,
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Whether the user holds a staff role that bypasses discovery-level
+     * vetting gates (admin/tenant_admin/broker/super_admin).
+     *
+     * Staff still flow through broker-review copies and message-level checks
+     * on their own outgoing actions — this only relaxes discovery filtering
+     * so coordinators can see the full member pool for assignment purposes.
+     */
+    public function isSafeguardingStaff(int $userId): bool
+    {
+        if ($userId <= 0) {
+            return false;
+        }
+
+        try {
+            $tenantId = TenantContext::getId();
+
+            return DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->whereIn('role', ['admin', 'tenant_admin', 'broker', 'super_admin'])
+                ->exists();
+        } catch (\Throwable $e) {
+            Log::error('VettingService::isSafeguardingStaff failed', [
+                'error' => $e->getMessage(),
+                'user_id' => $userId,
+            ]);
+            return false;
+        }
+    }
+
     /**
      * Sync the user's vetting_status and vetting_expires_at columns
      * based on their most recent vetting record.

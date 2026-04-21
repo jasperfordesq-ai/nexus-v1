@@ -48,6 +48,14 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('safeguarding-purge-message-copies');
 
+        // Tier 2b governance — annual review of safeguarding preferences.
+        // Runs monthly on the 1st at 06:00 (tenant-local is ambiguous for cross-
+        // timezone platforms, so we pick a quiet server-time slot).
+        $schedule->command('safeguarding:review-flags')
+            ->monthlyOn(1, '06:00')
+            ->withoutOverlapping()
+            ->name('safeguarding-review-flags');
+
         $schedule->command('federation:sync-partners')
             ->hourly()
             ->withoutOverlapping()

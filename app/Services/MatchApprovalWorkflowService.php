@@ -7,6 +7,8 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Services\SafeguardingTriggerService;
+use App\Services\VettingService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -79,6 +81,47 @@ class MatchApprovalWorkflowService
                     'listing_id' => $listingId,
                 ]);
                 return null;
+            }
+
+            // Vetting gate — bidirectional. Sits ALONGSIDE the existing monitoring
+            // check above (does not replace it). If either party is flagged and
+            // requires vetting types, the other party must hold valid records of
+            // ALL those types. Looked up per-user via SafeguardingTriggerService
+            // (cached 5 min per user) — this is a one-off gate, so per-user calls
+            // are fine; the bulk variant is reserved for SmartMatchingEngine.
+            try {
+                $userRequiredTypes = SafeguardingTriggerService::getRequiredVettingTypes($userId, $tenantId);
+                $ownerRequiredTypes = SafeguardingTriggerService::getRequiredVettingTypes($listingOwnerId, $tenantId);
+
+                if (!empty($userRequiredTypes) || !empty($ownerRequiredTypes)) {
+                    $vettingService = app(VettingService::class);
+
+                    if (!empty($userRequiredTypes)
+                        && !$vettingService->userHasAllValidVettings($listingOwnerId, $userRequiredTypes)) {
+                        Log::info('[MatchApprovalWorkflow] Blocked: listing owner lacks required vetting', [
+                            'user_id' => $userId,
+                            'listing_owner_id' => $listingOwnerId,
+                            'required_types' => $userRequiredTypes,
+                        ]);
+                        return null;
+                    }
+                    if (!empty($ownerRequiredTypes)
+                        && !$vettingService->userHasAllValidVettings($userId, $ownerRequiredTypes)) {
+                        Log::info('[MatchApprovalWorkflow] Blocked: match user lacks required vetting', [
+                            'user_id' => $userId,
+                            'listing_owner_id' => $listingOwnerId,
+                            'required_types' => $ownerRequiredTypes,
+                        ]);
+                        return null;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Lookup failure is not fatal — monitoring gate above already ran.
+                Log::warning('[MatchApprovalWorkflow] Vetting lookup failed (continuing)', [
+                    'error' => $e->getMessage(),
+                    'user_id' => $userId,
+                    'listing_owner_id' => $listingOwnerId,
+                ]);
             }
 
             $matchType = $matchData['match_type'] ?? $matchData['type'] ?? 'one_way';

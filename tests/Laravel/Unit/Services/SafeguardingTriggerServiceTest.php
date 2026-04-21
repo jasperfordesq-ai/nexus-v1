@@ -202,4 +202,154 @@ class SafeguardingTriggerServiceTest extends TestCase
 
         $this->assertTrue($result);
     }
+
+    // =========================================================================
+    // getRequiredVettingTypesForUsers (bulk variant)
+    // =========================================================================
+
+    public function test_getRequiredVettingTypesForUsers_returnsEmptyArrayForEmptyInput(): void
+    {
+        // No DB calls expected — early return
+        $result = SafeguardingTriggerService::getRequiredVettingTypesForUsers([], $this->testTenantId);
+
+        $this->assertSame([], $result);
+    }
+
+    public function test_getRequiredVettingTypesForUsers_returnsEmptyArraysForUsersWithNoPreferences(): void
+    {
+        DB::shouldReceive('table')->with('user_safeguarding_preferences as p')->andReturnSelf();
+        DB::shouldReceive('join')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereIn')->andReturnSelf();
+        DB::shouldReceive('whereNull')->andReturnSelf();
+        DB::shouldReceive('select')->andReturnSelf();
+        DB::shouldReceive('get')->andReturn(collect([]));
+
+        $result = SafeguardingTriggerService::getRequiredVettingTypesForUsers(
+            [5, 10, 15],
+            $this->testTenantId
+        );
+
+        $this->assertSame([5 => [], 10 => [], 15 => []], $result);
+    }
+
+    public function test_getRequiredVettingTypesForUsers_aggregatesVettingTypesPerUser(): void
+    {
+        // Simulated rows: user 5 has two options, one with garda_vetting and one with dbs_enhanced.
+        // user 10 has one option with garda_vetting. user 15 has an option with no vetting_type.
+        $rows = collect([
+            (object) ['user_id' => 5, 'triggers' => json_encode(['vetting_type_required' => 'garda_vetting'])],
+            (object) ['user_id' => 5, 'triggers' => json_encode(['vetting_type_required' => 'dbs_enhanced'])],
+            (object) ['user_id' => 5, 'triggers' => json_encode(['vetting_type_required' => 'garda_vetting'])], // duplicate — should dedupe
+            (object) ['user_id' => 10, 'triggers' => json_encode(['vetting_type_required' => 'garda_vetting'])],
+            (object) ['user_id' => 15, 'triggers' => json_encode(['requires_broker_approval' => true])],
+        ]);
+
+        DB::shouldReceive('table')->with('user_safeguarding_preferences as p')->andReturnSelf();
+        DB::shouldReceive('join')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereIn')->andReturnSelf();
+        DB::shouldReceive('whereNull')->andReturnSelf();
+        DB::shouldReceive('select')->andReturnSelf();
+        DB::shouldReceive('get')->andReturn($rows);
+
+        $result = SafeguardingTriggerService::getRequiredVettingTypesForUsers(
+            [5, 10, 15],
+            $this->testTenantId
+        );
+
+        $this->assertArrayHasKey(5, $result);
+        $this->assertArrayHasKey(10, $result);
+        $this->assertArrayHasKey(15, $result);
+
+        // User 5 — two unique vetting types, deduplicated
+        $this->assertCount(2, $result[5]);
+        $this->assertContains('garda_vetting', $result[5]);
+        $this->assertContains('dbs_enhanced', $result[5]);
+
+        // User 10 — single type
+        $this->assertSame(['garda_vetting'], $result[10]);
+
+        // User 15 — no vetting_type_required in triggers
+        $this->assertSame([], $result[15]);
+    }
+
+    public function test_getRequiredVettingTypesForUsers_dedupesInputIds(): void
+    {
+        DB::shouldReceive('table')->with('user_safeguarding_preferences as p')->andReturnSelf();
+        DB::shouldReceive('join')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereIn')->andReturnSelf();
+        DB::shouldReceive('whereNull')->andReturnSelf();
+        DB::shouldReceive('select')->andReturnSelf();
+        DB::shouldReceive('get')->andReturn(collect([]));
+
+        $result = SafeguardingTriggerService::getRequiredVettingTypesForUsers(
+            [5, 5, 5, 10, 10],
+            $this->testTenantId
+        );
+
+        $this->assertCount(2, $result);
+        $this->assertArrayHasKey(5, $result);
+        $this->assertArrayHasKey(10, $result);
+    }
+
+    public function test_getRequiredVettingTypesForUsers_filtersInvalidIds(): void
+    {
+        DB::shouldReceive('table')->with('user_safeguarding_preferences as p')->andReturnSelf();
+        DB::shouldReceive('join')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereIn')->andReturnSelf();
+        DB::shouldReceive('whereNull')->andReturnSelf();
+        DB::shouldReceive('select')->andReturnSelf();
+        DB::shouldReceive('get')->andReturn(collect([]));
+
+        $result = SafeguardingTriggerService::getRequiredVettingTypesForUsers(
+            [5, 0, -1, 10],
+            $this->testTenantId
+        );
+
+        $this->assertCount(2, $result);
+        $this->assertArrayHasKey(5, $result);
+        $this->assertArrayHasKey(10, $result);
+        $this->assertArrayNotHasKey(0, $result);
+        $this->assertArrayNotHasKey(-1, $result);
+    }
+
+    public function test_getRequiredVettingTypesForUsers_handlesArrayTriggersColumn(): void
+    {
+        // Some rows may return triggers as a decoded array rather than a JSON string,
+        // depending on the driver / Eloquent casting. Both paths must work.
+        $rows = collect([
+            (object) ['user_id' => 5, 'triggers' => ['vetting_type_required' => 'garda_vetting']],
+        ]);
+
+        DB::shouldReceive('table')->with('user_safeguarding_preferences as p')->andReturnSelf();
+        DB::shouldReceive('join')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereIn')->andReturnSelf();
+        DB::shouldReceive('whereNull')->andReturnSelf();
+        DB::shouldReceive('select')->andReturnSelf();
+        DB::shouldReceive('get')->andReturn($rows);
+
+        $result = SafeguardingTriggerService::getRequiredVettingTypesForUsers(
+            [5],
+            $this->testTenantId
+        );
+
+        $this->assertSame(['garda_vetting'], $result[5]);
+    }
+
+    public function test_getRequiredVettingTypesForUsers_returnsEmptyMapOnDbError(): void
+    {
+        DB::shouldReceive('table')->andThrow(new \Exception('DB error'));
+
+        $result = SafeguardingTriggerService::getRequiredVettingTypesForUsers(
+            [5, 10],
+            $this->testTenantId
+        );
+
+        // Keys still present (initialised before try/catch) but values are empty arrays
+        $this->assertSame([5 => [], 10 => []], $result);
+    }
 }

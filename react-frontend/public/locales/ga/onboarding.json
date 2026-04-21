@@ -99,7 +99,26 @@
     "empty": "Níl aon roghanna cosanta cumraithe don phobal seo.",
     "save_failed": "Theip ar shábháil",
     "save_continue": "Sábháil & Lean ar aghaidh",
-    "required_fields": "Réimsí riachtanacha"
+    "required_fields": "Réimsí riachtanacha",
+    "select_option": "Roghnaigh rogha",
+    "confirmation": {
+      "title": "Sábháladh do shainroghanna cosanta",
+      "intro": "Go raibh maith agat as an eolas seo a roinnt. Seo achoimre ar do rogha, cé a fheiceann é, agus cad a thosaíonn mar thoradh air.",
+      "your_selections": "Do roghanna",
+      "no_selections": "Níor roghnaigh tú aon rogha cosanta.",
+      "who_can_see_heading": "Cé a fheiceann é",
+      "who_can_see_body": "Ní fheiceann ach comhordaitheoirí agus riarthóirí an phobail na sainroghanna seo. Ní fheiceann baill eile iad. Déantar gach rochtain a logáil.",
+      "what_activates_heading": "Cad a thosaíonn mar thoradh air",
+      "activation_broker_review": "Déanfaidh comhordaitheoir athbhreithniú ar theachtaireachtaí a sheolann tú agus a fhaigheann tú.",
+      "activation_match_approval": "Ceadóidh comhordaitheoir meaitseálacha a bhaineann leat sula moltar don bhall eile iad.",
+      "activation_discovery_hidden": "Beidh tú i bhfolach ó fhionnachtain ag baill nach bhfuil an grinnfhiosrúchán riachtanach acu.",
+      "activation_notification": "Cuireadh comhordaitheoir ar an eolas agus rachaidh sé/sí i dteagmháil leat chun plé a dhéanamh ar conas is féidir linn cabhrú.",
+      "activation_none": "Ní thosaíonn aon chosaint uathoibríoch ó na roghanna seo. Cuirtear do shainroghanna ar taifead d'fheasacht an chomhordaitheora.",
+      "revoke_heading": "Conas iad seo a athrú nó a chúlghairm aon uair",
+      "revoke_body": "Is féidir leat aon cheann de na sainroghanna seo a athbhreithniú nó a chúlghairm aon uair ó do shocruithe próifíle. Ní gá duit iarraidh ar riarthóir é seo a dhéanamh.",
+      "revoke_cta": "Téigh go socruithe cosanta",
+      "continue_cta": "Lean ar aghaidh"
+    }
   },
   "page_meta": {
     "title": "Onboarding"

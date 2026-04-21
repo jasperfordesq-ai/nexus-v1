@@ -7,7 +7,10 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Services\SafeguardingTriggerService;
+use App\Services\VettingService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * GroupExchangeService — Native Laravel implementation for group time exchanges.
@@ -185,7 +188,7 @@ class GroupExchangeService
 
         // Safeguarding: block adding participants who require broker approval
         // (set when a vulnerable person ticks safeguarding checkboxes during onboarding)
-        $tenantId = \App\Core\TenantContext::getId();
+        $tenantId = TenantContext::getId();
         $hasSafeguardingRestriction = DB::table('user_messaging_restrictions')
             ->where('tenant_id', $tenantId)
             ->where('user_id', $userId)
@@ -197,11 +200,60 @@ class GroupExchangeService
             ->exists();
 
         if ($hasSafeguardingRestriction) {
-            \Illuminate\Support\Facades\Log::info('[GroupExchange] Blocked: participant has safeguarding restrictions', [
+            Log::info('[GroupExchange] Blocked: participant has safeguarding restrictions', [
                 'exchange_id' => $exchangeId,
                 'user_id' => $userId,
             ]);
             return false;
+        }
+
+        // Vetting gate — bidirectional. If the organizer or the participant has
+        // safeguarding preferences requiring vetting types, the other party must
+        // hold valid records of all those types. National Vetting Bureau Acts
+        // 2012–2016 / DBS / PVG / AccessNI. Sits alongside the existing monitoring
+        // gate above.
+        try {
+            $organizerId = (int) DB::table('group_exchanges')
+                ->where('id', $exchangeId)
+                ->where('tenant_id', $tenantId)
+                ->value('organizer_id');
+
+            if ($organizerId > 0 && $organizerId !== $userId) {
+                $participantRequiredTypes = SafeguardingTriggerService::getRequiredVettingTypes($userId, $tenantId);
+                $organizerRequiredTypes = SafeguardingTriggerService::getRequiredVettingTypes($organizerId, $tenantId);
+
+                if (!empty($participantRequiredTypes) || !empty($organizerRequiredTypes)) {
+                    $vettingService = app(VettingService::class);
+
+                    if (!empty($participantRequiredTypes)
+                        && !$vettingService->userHasAllValidVettings($organizerId, $participantRequiredTypes)) {
+                        Log::info('[GroupExchange] Blocked: organizer lacks required vetting', [
+                            'exchange_id' => $exchangeId,
+                            'user_id' => $userId,
+                            'organizer_id' => $organizerId,
+                            'required_types' => $participantRequiredTypes,
+                        ]);
+                        return false;
+                    }
+                    if (!empty($organizerRequiredTypes)
+                        && !$vettingService->userHasAllValidVettings($userId, $organizerRequiredTypes)) {
+                        Log::info('[GroupExchange] Blocked: participant lacks required vetting', [
+                            'exchange_id' => $exchangeId,
+                            'user_id' => $userId,
+                            'organizer_id' => $organizerId,
+                            'required_types' => $organizerRequiredTypes,
+                        ]);
+                        return false;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // Lookup failure is not fatal — the monitoring gate above already ran.
+            Log::warning('[GroupExchange] Vetting lookup failed (continuing)', [
+                'error' => $e->getMessage(),
+                'exchange_id' => $exchangeId,
+                'user_id' => $userId,
+            ]);
         }
 
         DB::table('group_exchange_participants')->insert([

@@ -249,6 +249,77 @@ class SafeguardingTriggerService
     }
 
     /**
+     * Bulk variant of getRequiredVettingTypes — resolves required vetting types
+     * for many users in a single query. Designed for SmartMatchingEngine's
+     * post-filter loop where 200–400 candidates are checked per match request
+     * and 200 per-user Cache::remember calls would add measurable latency.
+     *
+     * Returns a map keyed by user_id with a (possibly empty) array of vetting
+     * types each user requires. Every input user_id is present in the output,
+     * even users with no safeguarding preferences (empty array).
+     *
+     * Does NOT populate the per-user getActiveTriggers cache — that cache holds
+     * the full merged trigger map (boolean flags + vetting types), and warming
+     * it from this method would require fetching all trigger fields. Callers
+     * that need the full trigger map should still call getActiveTriggers() per
+     * user; the bulk method is specifically for discovery-time gating where
+     * only the vetting-type list is needed.
+     *
+     * @param int[] $userIds
+     * @return array<int, string[]> user_id => vetting_type[]
+     */
+    public static function getRequiredVettingTypesForUsers(array $userIds, ?int $tenantId = null): array
+    {
+        if (empty($userIds)) {
+            return [];
+        }
+
+        $tenantId = $tenantId ?? TenantContext::getId();
+        $uniqueIds = array_values(array_unique(array_map('intval', $userIds)));
+        $uniqueIds = array_filter($uniqueIds, fn ($id) => $id > 0);
+
+        $result = array_fill_keys($uniqueIds, []);
+
+        if (empty($uniqueIds)) {
+            return $result;
+        }
+
+        try {
+            $rows = DB::table('user_safeguarding_preferences as p')
+                ->join('tenant_safeguarding_options as o', function ($join) {
+                    $join->on('o.id', '=', 'p.option_id')
+                         ->where('o.is_active', 1);
+                })
+                ->where('p.tenant_id', $tenantId)
+                ->whereIn('p.user_id', $uniqueIds)
+                ->whereNull('p.revoked_at')
+                ->select('p.user_id', 'o.triggers')
+                ->get();
+
+            foreach ($rows as $row) {
+                $userId = (int) $row->user_id;
+                $triggers = is_string($row->triggers)
+                    ? (json_decode($row->triggers, true) ?: [])
+                    : (array) ($row->triggers ?? []);
+
+                $vettingType = $triggers['vetting_type_required'] ?? null;
+                if (is_string($vettingType) && $vettingType !== ''
+                    && !in_array($vettingType, $result[$userId], true)) {
+                    $result[$userId][] = $vettingType;
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error('SafeguardingTriggerService::getRequiredVettingTypesForUsers failed', [
+                'error' => $e->getMessage(),
+                'tenant_id' => $tenantId,
+                'user_count' => count($uniqueIds),
+            ]);
+        }
+
+        return $result;
+    }
+
+    /**
      * Invalidate the trigger cache for a user (called when preferences change).
      */
     public static function invalidateCache(int $userId, ?int $tenantId = null): void

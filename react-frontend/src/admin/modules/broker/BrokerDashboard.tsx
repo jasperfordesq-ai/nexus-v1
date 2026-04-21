@@ -30,6 +30,7 @@ import { useTenant, useToast } from '@/contexts';
 import { adminBroker } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { BrokerDashboardStats, BrokerActivityEntry } from '../../api/types';
+import { BrokerControlsHelp } from './BrokerControlsHelp';
 
 import { useTranslation } from 'react-i18next';
 
@@ -280,6 +281,9 @@ export function BrokerDashboard() {
           </CardBody>
         </Card>
       )}
+
+      {/* Collapsible guidance panel — title visible, body tucked into accordion sections */}
+      <BrokerControlsHelp />
     </div>
   );
 }
