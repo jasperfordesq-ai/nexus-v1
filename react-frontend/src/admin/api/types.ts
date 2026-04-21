@@ -711,6 +711,12 @@ export interface SystemHealth {
   uptime: string;
   server_time: string;
   os: string;
+  sys_memory?: {
+    total: string;
+    available: string;
+    used: string;
+    used_pct: number;
+  };
 }
 
 export interface HealthCheckResult {

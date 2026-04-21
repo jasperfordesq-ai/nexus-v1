@@ -515,6 +515,10 @@ class AdminEnterpriseController extends BaseApiController
         $this->requireAdmin();
         $memUsage = memory_get_usage(true);
 
+        // Real DB connectivity check (never hardcode true)
+        $dbConnected = false;
+        try { DB::select("SELECT 1"); $dbConnected = true; } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] DB ping failed: ' . $e->getMessage()); }
+
         $dbSize = '0 MB';
         try { $dbName = getenv('DB_NAME') ?: 'nexus'; $row = DB::selectOne("SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS size_mb FROM information_schema.tables WHERE table_schema = ?", [$dbName]); $dbSize = ($row->size_mb ?? '0') . ' MB'; } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] DB size query failed: ' . $e->getMessage()); }
 
@@ -524,11 +528,39 @@ class AdminEnterpriseController extends BaseApiController
         $redisConnected = false; $redisMemory = 'N/A';
         try { $stats = app(\App\Services\RedisCache::class)->getStats(); $redisConnected = !empty($stats['enabled']); if ($redisConnected) { $redisMemory = $stats['memory_used'] ?? 'N/A'; } } catch (\Throwable $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
+        // System memory from /proc/meminfo (Linux containers)
+        $sysMem = ['total' => 'N/A', 'available' => 'N/A', 'used' => 'N/A'];
+        try {
+            $meminfo = @file_get_contents('/proc/meminfo');
+            if ($meminfo) {
+                preg_match('/MemTotal:\s+(\d+)\s+kB/', $meminfo, $totalM);
+                preg_match('/MemAvailable:\s+(\d+)\s+kB/', $meminfo, $availM);
+                if (!empty($totalM[1]) && !empty($availM[1])) {
+                    $totalKb  = (int) $totalM[1];
+                    $availKb  = (int) $availM[1];
+                    $usedKb   = $totalKb - $availKb;
+                    $sysMem   = [
+                        'total'     => $this->formatBytes($totalKb * 1024),
+                        'available' => $this->formatBytes($availKb * 1024),
+                        'used'      => $this->formatBytes($usedKb  * 1024),
+                        'used_pct'  => $totalKb > 0 ? round(($usedKb / $totalKb) * 100, 1) : 0,
+                    ];
+                }
+            }
+        } catch (\Throwable $e) { /* non-fatal */ }
+
         return $this->respondWithData([
-            'php_version' => PHP_VERSION, 'memory_usage' => $this->formatBytes($memUsage),
-            'memory_limit' => ini_get('memory_limit'), 'db_connected' => true, 'db_size' => $dbSize,
-            'redis_connected' => $redisConnected, 'redis_memory' => $redisMemory,
-            'uptime' => $uptime, 'server_time' => date('Y-m-d H:i:s T'), 'os' => PHP_OS,
+            'php_version' => PHP_VERSION,
+            'memory_usage' => $this->formatBytes($memUsage),
+            'memory_limit' => ini_get('memory_limit'),
+            'db_connected' => $dbConnected,
+            'db_size' => $dbSize,
+            'redis_connected' => $redisConnected,
+            'redis_memory' => $redisMemory,
+            'uptime' => $uptime,
+            'server_time' => date('Y-m-d H:i:s T'),
+            'os' => PHP_OS,
+            'sys_memory' => $sysMem,
         ]);
     }
 

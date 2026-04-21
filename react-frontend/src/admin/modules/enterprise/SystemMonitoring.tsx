@@ -193,32 +193,65 @@ export function SystemMonitoring() {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Memory Usage Progress Bar */}
-          {memoryPct !== null && (
-            <Card shadow="sm">
-              <CardBody className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <Server size={18} className="text-warning" />
-                    <span className="text-sm font-semibold text-foreground">
-                      {t('enterprise.metric_memory_usage')}
+          {/* Memory Cards */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {/* PHP Process Memory */}
+            {memoryPct !== null && (
+              <Card shadow="sm">
+                <CardBody className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Server size={18} className="text-warning" />
+                      <span className="text-sm font-semibold text-foreground">
+                        {t('enterprise.metric_memory_usage')} (PHP request)
+                      </span>
+                    </div>
+                    <span className="text-sm text-default-500">
+                      {health?.memory_usage} / {health?.memory_limit}
                     </span>
                   </div>
-                  <span className="text-sm text-default-500">
-                    {health?.memory_usage} / {health?.memory_limit}
-                  </span>
-                </div>
-                <Progress
-                  size="md"
-                  value={memoryPct}
-                  color={memoryProgressColor(memoryPct)}
-                  showValueLabel
-                  aria-label="Memory usage"
-                  className="max-w-full"
-                />
-              </CardBody>
-            </Card>
-          )}
+                  <Progress
+                    size="md"
+                    value={memoryPct}
+                    color={memoryProgressColor(memoryPct)}
+                    showValueLabel
+                    aria-label="PHP memory usage"
+                    className="max-w-full"
+                  />
+                </CardBody>
+              </Card>
+            )}
+
+            {/* System / VM Memory */}
+            {health?.sys_memory && (
+              <Card shadow="sm">
+                <CardBody className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Cpu size={18} className="text-primary" />
+                      <span className="text-sm font-semibold text-foreground">
+                        VM Memory
+                      </span>
+                    </div>
+                    <span className="text-sm text-default-500">
+                      {health.sys_memory.used} / {health.sys_memory.total}
+                    </span>
+                  </div>
+                  <Progress
+                    size="md"
+                    value={health.sys_memory.used_pct}
+                    color={memoryProgressColor(health.sys_memory.used_pct)}
+                    showValueLabel
+                    aria-label="VM memory usage"
+                    className="max-w-full"
+                  />
+                  <p className="text-xs text-default-400 mt-1">
+                    {health.sys_memory.available} available
+                  </p>
+                </CardBody>
+              </Card>
+            )}
+          </div>
 
           {/* Server Stats Grid */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

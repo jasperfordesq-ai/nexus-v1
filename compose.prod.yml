@@ -84,12 +84,12 @@ services:
     deploy:
       resources:
         limits:
-          # PHP memory_limit is 512M (aligned across Dockerfile and Dockerfile.prod
-          # per CLAUDE.md rule); 768M container limit allows Apache mpm_prefork
-          # workers + OPcache + request overhead without OOM-kills.
-          memory: 768M
+          # PHP memory_limit is 1G (per php.ini); 2G container limit gives
+          # Apache mpm_prefork workers, OPcache (256M), and request peaks
+          # generous headroom on the 16GB VM.
+          memory: 2G
         reservations:
-          memory: 384M
+          memory: 512M
 
   # ---------------------------------------------------------------------------
   # React Frontend (Nginx serving static build)
@@ -125,9 +125,9 @@ services:
     deploy:
       resources:
         limits:
-          memory: 128M
+          memory: 256M
         reservations:
-          memory: 64M
+          memory: 128M
 
   # ---------------------------------------------------------------------------
   # MariaDB 10.11 Database
@@ -139,9 +139,9 @@ services:
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
-      - --innodb-buffer-pool-size=256M
-      - --innodb-log-file-size=64M
-      - --max-connections=100
+      - --innodb-buffer-pool-size=1G
+      - --innodb-log-file-size=256M
+      - --max-connections=150
     environment:
       MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MARIADB_DATABASE: ${DB_NAME:-nexus}
@@ -161,9 +161,9 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 2G
         reservations:
-          memory: 256M
+          memory: 512M
 
   # ---------------------------------------------------------------------------
   # Redis 7 (Sessions & Cache)
@@ -175,7 +175,7 @@ services:
     command: >
       redis-server
       --appendonly yes
-      --maxmemory 128mb
+      --maxmemory 400mb
       --maxmemory-policy allkeys-lru
       --save 900 1
       --save 300 10
@@ -192,9 +192,9 @@ services:
     deploy:
       resources:
         limits:
-          memory: 192M
+          memory: 512M
         reservations:
-          memory: 64M
+          memory: 128M
 
   # ---------------------------------------------------------------------------
   # Meilisearch v1 (Full-text + semantic search engine)
@@ -220,9 +220,9 @@ services:
     deploy:
       resources:
         limits:
-          memory: 256M
+          memory: 512M
         reservations:
-          memory: 128M
+          memory: 256M
 
   # ---------------------------------------------------------------------------
   # Queue Worker (Laravel queue:work — processes async jobs via Redis)
@@ -274,9 +274,9 @@ services:
     deploy:
       resources:
         limits:
-          memory: 256M
+          memory: 1G
         reservations:
-          memory: 128M
+          memory: 256M
 
   # ---------------------------------------------------------------------------
   # Sales Site (project-nexus.ie) - Marketing/Landing Page
@@ -299,9 +299,9 @@ services:
     deploy:
       resources:
         limits:
-          memory: 64M
+          memory: 128M
         reservations:
-          memory: 32M
+          memory: 64M
 
 # =============================================================================
 # Networks

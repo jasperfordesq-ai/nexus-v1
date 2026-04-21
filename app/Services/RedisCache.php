@@ -173,40 +173,52 @@ class RedisCache
      */
     public function getStats(): array
     {
-        try {
-            $redis = Redis::connection();
-            $info = $redis->info();
-
-            // phpredis returns info as a flat associative array
-            $memoryUsed = $info['used_memory_human'] ?? 'N/A';
-            $connectedClients = $info['connected_clients'] ?? 0;
-            $uptimeSeconds = $info['uptime_in_seconds'] ?? 0;
-            $totalKeys = $info['db0']['keys'] ?? ($info['keyspace_hits'] ?? 'N/A');
-            $version = $info['redis_version'] ?? 'unknown';
-
-            // Try to get a more accurate key count from db0
-            if (isset($info['db0']) && is_string($info['db0'])) {
-                // phpredis may return "keys=123,expires=45,avg_ttl=6789"
-                if (preg_match('/keys=(\d+)/', $info['db0'], $m)) {
-                    $totalKeys = (int) $m[1];
+        // Retry once on DNS/connection failure — handles the Docker startup race
+        // condition where the container's internal DNS hasn't propagated yet.
+        $attempts = 0;
+        $lastError = null;
+        while ($attempts < 2) {
+            try {
+                // Force a fresh connection on retry to avoid a cached failed state.
+                if ($attempts > 0) {
+                    usleep(250000); // 250ms
                 }
-            }
+                $redis = Redis::connection();
+                $info = $redis->info();
 
-            return [
-                'enabled' => true,
-                'memory_used' => $memoryUsed,
-                'connected_clients' => (int) $connectedClients,
-                'uptime_seconds' => (int) $uptimeSeconds,
-                'total_keys' => $totalKeys,
-                'version' => $version,
-            ];
-        } catch (\Throwable $e) {
-            Log::warning('[RedisCache] getStats failed: ' . $e->getMessage());
-            return [
-                'enabled' => false,
-                'error' => $e->getMessage(),
-            ];
+                // phpredis returns info as a flat associative array
+                $memoryUsed = $info['used_memory_human'] ?? 'N/A';
+                $connectedClients = $info['connected_clients'] ?? 0;
+                $uptimeSeconds = $info['uptime_in_seconds'] ?? 0;
+                $totalKeys = $info['db0']['keys'] ?? ($info['keyspace_hits'] ?? 'N/A');
+                $version = $info['redis_version'] ?? 'unknown';
+
+                // Try to get a more accurate key count from db0
+                if (isset($info['db0']) && is_string($info['db0'])) {
+                    // phpredis may return "keys=123,expires=45,avg_ttl=6789"
+                    if (preg_match('/keys=(\d+)/', $info['db0'], $m)) {
+                        $totalKeys = (int) $m[1];
+                    }
+                }
+
+                return [
+                    'enabled' => true,
+                    'memory_used' => $memoryUsed,
+                    'connected_clients' => (int) $connectedClients,
+                    'uptime_seconds' => (int) $uptimeSeconds,
+                    'total_keys' => $totalKeys,
+                    'version' => $version,
+                ];
+            } catch (\Throwable $e) {
+                $lastError = $e;
+                $attempts++;
+            }
         }
+        Log::warning('[RedisCache] getStats failed after 2 attempts: ' . $lastError->getMessage());
+        return [
+            'enabled' => false,
+            'error' => $lastError->getMessage(),
+        ];
     }
 
     // ─────────────────────────────────────────────────────────────────────────
