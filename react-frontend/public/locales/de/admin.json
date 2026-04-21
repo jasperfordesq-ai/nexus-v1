@@ -5122,7 +5122,19 @@
     "vetting_garda": "Vetting Garda",
     "vetting_international": "Vetting International",
     "vetting_other": "Vetting Other",
-    "vetting_pvg_scotland": "Vetting Pvg Scotland"
+    "vetting_pvg_scotland": "Vetting Pvg Scotland",
+    "cta_view_unreviewed": "View unreviewed flags",
+    "cta_view_critical": "View critical and high-severity flags",
+    "cta_view_active_assignments": "View active guardian assignments",
+    "cta_view_consented": "View assignments with consent given",
+    "cta_view_month_flags": "View flags raised this month",
+    "filter_showing": "Showing",
+    "filter_clear": "Clear filter",
+    "filter_label_unreviewed": "Unreviewed flags",
+    "filter_label_critical": "Critical and high-severity flags",
+    "filter_label_reviewed": "Reviewed flags",
+    "filter_label_active": "Active assignments",
+    "filter_label_consented": "Assignments with consent given"
   },
   "stats": {
     "active_listings": "Active Listings",

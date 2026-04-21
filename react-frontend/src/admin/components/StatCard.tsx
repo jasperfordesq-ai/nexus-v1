@@ -5,11 +5,14 @@
 
 /**
  * Admin Stat Card
- * Displays a key metric with label, value, and optional trend indicator
+ * Displays a key metric with label, value, and optional trend indicator.
+ * When `to` is provided, the whole card becomes a clickable link that
+ * drills into the relevant filtered view — a chevron hint is shown on hover.
  */
 
 import { Card, CardBody } from '@heroui/react';
-import { TrendingUp, TrendingDown, type LucideIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ChevronRight, TrendingUp, TrendingDown, type LucideIcon } from 'lucide-react';
 
 interface StatCardProps {
   label: string;
@@ -20,6 +23,10 @@ interface StatCardProps {
   description?: string;
   color?: 'primary' | 'success' | 'warning' | 'danger' | 'secondary' | 'default';
   loading?: boolean;
+  /** When set, the card acts as a react-router Link to this path. */
+  to?: string;
+  /** Accessible hint shown to screen readers when the card is a link. */
+  linkAriaLabel?: string;
 }
 
 const colorMap = {
@@ -40,44 +47,68 @@ export function StatCard({
   description,
   color = 'primary',
   loading = false,
+  to,
+  linkAriaLabel,
 }: StatCardProps) {
-  return (
-    <Card shadow="sm">
-      <CardBody className="flex flex-row items-center gap-4 p-4">
-        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${colorMap[color]}`}>
-          <Icon size={24} />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm text-default-500">{label}</p>
-          {loading ? (
-            <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
-          ) : (
-            <p className="text-2xl font-bold text-foreground">
-              {typeof value === 'number' ? value.toLocaleString() : value}
-            </p>
-          )}
-          {description && (
-            <p className="mt-0.5 text-xs text-default-400">{description}</p>
-          )}
-          {trend !== undefined && (
-            <div className="mt-0.5 flex items-center gap-1">
-              {trend >= 0 ? (
-                <TrendingUp size={14} className="text-success" />
-              ) : (
-                <TrendingDown size={14} className="text-danger" />
-              )}
-              <span className={`text-xs font-medium ${trend >= 0 ? 'text-success' : 'text-danger'}`}>
-                {trend > 0 ? '+' : ''}{trend}%
-              </span>
-              {trendLabel && (
-                <span className="text-xs text-default-400">{trendLabel}</span>
-              )}
-            </div>
-          )}
-        </div>
-      </CardBody>
-    </Card>
+  const body = (
+    <CardBody className="flex flex-row items-center gap-4 p-4">
+      <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${colorMap[color]}`}>
+        <Icon size={24} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm text-default-500">{label}</p>
+        {loading ? (
+          <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
+        ) : (
+          <p className="text-2xl font-bold text-foreground">
+            {typeof value === 'number' ? value.toLocaleString() : value}
+          </p>
+        )}
+        {description && (
+          <p className="mt-0.5 text-xs text-default-400">{description}</p>
+        )}
+        {trend !== undefined && (
+          <div className="mt-0.5 flex items-center gap-1">
+            {trend >= 0 ? (
+              <TrendingUp size={14} className="text-success" />
+            ) : (
+              <TrendingDown size={14} className="text-danger" />
+            )}
+            <span className={`text-xs font-medium ${trend >= 0 ? 'text-success' : 'text-danger'}`}>
+              {trend > 0 ? '+' : ''}{trend}%
+            </span>
+            {trendLabel && (
+              <span className="text-xs text-default-400">{trendLabel}</span>
+            )}
+          </div>
+        )}
+      </div>
+      {to && (
+        <ChevronRight
+          size={18}
+          className="shrink-0 text-default-300 transition-transform group-hover:translate-x-0.5 group-hover:text-default-500"
+          aria-hidden="true"
+        />
+      )}
+    </CardBody>
   );
+
+  if (to) {
+    return (
+      <Card
+        shadow="sm"
+        isPressable
+        as={Link}
+        to={to}
+        aria-label={linkAriaLabel ?? label}
+        className="group text-left transition-shadow hover:shadow-md"
+      >
+        {body}
+      </Card>
+    );
+  }
+
+  return <Card shadow="sm">{body}</Card>;
 }
 
 export default StatCard;

@@ -145,7 +145,8 @@ export function BrokerDashboard() {
         }
       />
 
-      {/* Stats Grid */}
+      {/* Stats Grid — each tile deep-links into the relevant management page
+          with the filter already applied, so admins triage in one click. */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
           label={t('broker.label_pending_exchanges')}
@@ -153,6 +154,7 @@ export function BrokerDashboard() {
           icon={ArrowLeftRight}
           color="primary"
           loading={loading}
+          to={tenantPath('/admin/broker-controls/exchanges?status=pending_broker')}
         />
         <StatCard
           label={t('broker.label_unreviewed_messages')}
@@ -160,6 +162,7 @@ export function BrokerDashboard() {
           icon={MessageSquareWarning}
           color="warning"
           loading={loading}
+          to={tenantPath('/admin/broker-controls/messages?status=unreviewed')}
         />
         <StatCard
           label={t('broker.label_high_risk_listings')}
@@ -167,6 +170,7 @@ export function BrokerDashboard() {
           icon={ShieldAlert}
           color="danger"
           loading={loading}
+          to={tenantPath('/admin/broker-controls/risk-tags?level=high')}
         />
         <StatCard
           label={t('broker.label_monitored_users')}
@@ -174,6 +178,7 @@ export function BrokerDashboard() {
           icon={Eye}
           color="secondary"
           loading={loading}
+          to={tenantPath('/admin/broker-controls/monitoring')}
         />
         <StatCard
           label={t('broker.label_vetting_pending')}
@@ -181,6 +186,7 @@ export function BrokerDashboard() {
           icon={ShieldCheck}
           color="success"
           loading={loading}
+          to={tenantPath('/admin/broker-controls/vetting?status=pending')}
         />
         <StatCard
           label={t('broker.label_expiring_soon')}
@@ -188,6 +194,7 @@ export function BrokerDashboard() {
           icon={Clock}
           color="warning"
           loading={loading}
+          to={tenantPath('/admin/broker-controls/vetting?status=expiring_soon')}
         />
         <StatCard
           label={t('broker.label_safeguarding_alerts')}
@@ -195,6 +202,7 @@ export function BrokerDashboard() {
           icon={AlertTriangle}
           color="danger"
           loading={loading}
+          to={tenantPath('/admin/safeguarding?filter=critical')}
         />
         <StatCard
           label={t('broker.label_onboarding_flags')}
@@ -202,6 +210,7 @@ export function BrokerDashboard() {
           icon={ShieldAlert}
           color="warning"
           loading={loading}
+          to={tenantPath('/admin/safeguarding?tab=preferences')}
         />
       </div>
 

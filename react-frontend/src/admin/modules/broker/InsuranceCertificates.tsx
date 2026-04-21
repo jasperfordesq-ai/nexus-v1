@@ -10,7 +10,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   Tabs,
   Tab,
@@ -87,11 +87,38 @@ export function InsuranceCertificates() {
   const toast = useToast();
 
   // List state
+  // Status filter is mirrored to `?status=` so stat-card deep-links and
+  // browser back/forward work correctly.
+  const INSURANCE_STATUSES = [
+    'all', 'pending', 'submitted', 'verified', 'expired', 'expiring_soon', 'rejected',
+  ] as const;
+  type InsuranceStatus = (typeof INSURANCE_STATUSES)[number];
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlStatus = searchParams.get('status') as InsuranceStatus | null;
+  const statusFilter: InsuranceStatus =
+    urlStatus && INSURANCE_STATUSES.includes(urlStatus) ? urlStatus : 'all';
+  const setStatusFilter = useCallback(
+    (next: InsuranceStatus) => {
+      setSearchParams(
+        (prev) => {
+          const params = new URLSearchParams(prev);
+          if (next === 'all') {
+            params.delete('status');
+          } else {
+            params.set('status', next);
+          }
+          return params;
+        },
+        { replace: true }
+      );
+    },
+    [setSearchParams]
+  );
+
   const [items, setItems] = useState<InsuranceCertificate[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -651,7 +678,7 @@ export function InsuranceCertificates() {
       <div className="mb-4">
         <Tabs
           selectedKey={statusFilter}
-          onSelectionChange={(key) => { setStatusFilter(key as string); setPage(1); }}
+          onSelectionChange={(key) => { setStatusFilter(key as InsuranceStatus); setPage(1); }}
           variant="underlined"
           size="sm"
         >

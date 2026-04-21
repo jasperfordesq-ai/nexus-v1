@@ -9,7 +9,9 @@
  * and monitoring safeguarding of vulnerable users (wards).
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { useTenant } from '@/contexts';
 import {
   Card,
   CardBody,
@@ -146,8 +148,31 @@ export function SafeguardingDashboard() {
   const { t } = useTranslation('admin');
   usePageTitle(t('safeguarding.page_title'));
   const toast = useToast();
+  const { tenantPath } = useTenant();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState('flagged');
+  // Tab is driven by the URL so stat cards can deep-link into a specific view
+  // and browser back/forward works intuitively. Valid tab keys are the three
+  // sections rendered below.
+  const rawTab = searchParams.get('tab');
+  const activeTab = rawTab === 'assignments' || rawTab === 'preferences' ? rawTab : 'flagged';
+  const setActiveTab = useCallback(
+    (next: string) => {
+      setSearchParams(
+        (prev) => {
+          const params = new URLSearchParams(prev);
+          if (next === 'flagged') {
+            params.delete('tab');
+          } else {
+            params.set('tab', next);
+          }
+          return params;
+        },
+        { replace: true }
+      );
+    },
+    [setSearchParams]
+  );
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [flaggedMessages, setFlaggedMessages] = useState<FlaggedMessage[]>([]);
@@ -276,13 +301,63 @@ export function SafeguardingDashboard() {
   }, [toast, t])
 
   // ─── Filtered items ───
-  const filteredFlags = searchQuery
-    ? flaggedMessages.filter((m) =>
-        m.message_content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.sender.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.recipient.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : flaggedMessages;
+  const flaggedFilter = searchParams.get('filter'); // unreviewed | reviewed | critical | null
+  const filteredFlags = useMemo(() => {
+    let list = flaggedMessages;
+    if (flaggedFilter === 'unreviewed') {
+      list = list.filter((m) => !m.is_reviewed);
+    } else if (flaggedFilter === 'reviewed') {
+      list = list.filter((m) => m.is_reviewed);
+    } else if (flaggedFilter === 'critical') {
+      list = list.filter((m) => !m.is_reviewed && (m.severity === 'critical' || m.severity === 'high'));
+    }
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (m) =>
+          m.message_content.toLowerCase().includes(q) ||
+          m.sender.name.toLowerCase().includes(q) ||
+          m.recipient.name.toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }, [flaggedMessages, flaggedFilter, searchQuery]);
+
+  const assignmentFilter = searchParams.get('filter'); // active | consented | null (assignments tab)
+  const filteredAssignments = useMemo(() => {
+    if (activeTab !== 'assignments') return assignments;
+    if (assignmentFilter === 'active') return assignments.filter((a) => a.status === 'active');
+    if (assignmentFilter === 'consented') {
+      return assignments.filter((a) => a.status === 'active' && a.consent_given_at);
+    }
+    return assignments;
+  }, [assignments, assignmentFilter, activeTab]);
+
+  // Friendly label for the active drill-down filter, shown above the table so
+  // the admin knows which stat they clicked (and can clear it).
+  const activeFilterLabel = useMemo(() => {
+    if (activeTab === 'flagged') {
+      if (flaggedFilter === 'unreviewed') return t('safeguarding.filter_label_unreviewed');
+      if (flaggedFilter === 'critical') return t('safeguarding.filter_label_critical');
+      if (flaggedFilter === 'reviewed') return t('safeguarding.filter_label_reviewed');
+    }
+    if (activeTab === 'assignments') {
+      if (assignmentFilter === 'active') return t('safeguarding.filter_label_active');
+      if (assignmentFilter === 'consented') return t('safeguarding.filter_label_consented');
+    }
+    return null;
+  }, [activeTab, flaggedFilter, assignmentFilter, t]);
+
+  const clearFilter = useCallback(() => {
+    setSearchParams(
+      (prev) => {
+        const params = new URLSearchParams(prev);
+        params.delete('filter');
+        return params;
+      },
+      { replace: true }
+    );
+  }, [setSearchParams]);
 
   // ─── Render ───
   if (loading) {
@@ -323,7 +398,7 @@ export function SafeguardingDashboard() {
         }
       />
 
-      {/* Stats */}
+      {/* Stats — each card deep-links to the matching tab/filter combination */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <StatCard
@@ -331,11 +406,56 @@ export function SafeguardingDashboard() {
             value={stats.unreviewed_flags}
             icon={ShieldAlert}
             color={stats.unreviewed_flags > 0 ? 'danger' : 'success'}
+            to={tenantPath('/admin/safeguarding?filter=unreviewed')}
+            linkAriaLabel={t('safeguarding.cta_view_unreviewed')}
           />
-          <StatCard label={t('safeguarding.label_critical_flags')} value={stats.critical_flags} icon={AlertTriangle} color="warning" />
-          <StatCard label={t('safeguarding.label_active_assignments')} value={stats.active_assignments} icon={Shield} color="primary" />
-          <StatCard label={t('safeguarding.label_consented_wards')} value={stats.consented_wards} icon={ShieldCheck} color="success" />
-          <StatCard label={t('safeguarding.label_flags_this_month')} value={stats.total_flags_this_month} icon={Flag} color="secondary" />
+          <StatCard
+            label={t('safeguarding.label_critical_flags')}
+            value={stats.critical_flags}
+            icon={AlertTriangle}
+            color="warning"
+            to={tenantPath('/admin/safeguarding?filter=critical')}
+            linkAriaLabel={t('safeguarding.cta_view_critical')}
+          />
+          <StatCard
+            label={t('safeguarding.label_active_assignments')}
+            value={stats.active_assignments}
+            icon={Shield}
+            color="primary"
+            to={tenantPath('/admin/safeguarding?tab=assignments&filter=active')}
+            linkAriaLabel={t('safeguarding.cta_view_active_assignments')}
+          />
+          <StatCard
+            label={t('safeguarding.label_consented_wards')}
+            value={stats.consented_wards}
+            icon={ShieldCheck}
+            color="success"
+            to={tenantPath('/admin/safeguarding?tab=assignments&filter=consented')}
+            linkAriaLabel={t('safeguarding.cta_view_consented')}
+          />
+          <StatCard
+            label={t('safeguarding.label_flags_this_month')}
+            value={stats.total_flags_this_month}
+            icon={Flag}
+            color="secondary"
+            to={tenantPath('/admin/safeguarding?filter=unreviewed')}
+            linkAriaLabel={t('safeguarding.cta_view_month_flags')}
+          />
+        </div>
+      )}
+
+      {/* Active filter banner — tells the admin what they drilled into */}
+      {activeFilterLabel && (
+        <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 px-4 py-2">
+          <div className="flex items-center gap-2 text-sm">
+            <Flag size={14} className="text-primary" />
+            <span className="text-default-600">
+              {t('safeguarding.filter_showing')} <strong className="text-foreground">{activeFilterLabel}</strong>
+            </span>
+          </div>
+          <Button size="sm" variant="light" onPress={clearFilter}>
+            {t('safeguarding.filter_clear')}
+          </Button>
         </div>
       )}
 
@@ -493,7 +613,7 @@ export function SafeguardingDashboard() {
                 <TableColumn>{t('safeguarding.col_actions')}</TableColumn>
               </TableHeader>
               <TableBody emptyContent={t('safeguarding.no_guardian_assignments')}>
-                {assignments.map((assignment) => (
+                {filteredAssignments.map((assignment) => (
                   <TableRow key={assignment.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">

@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Input } from '@heroui/react';
 import { useAuth, useTenant } from '@/contexts';
 import { adminBroker } from '../api/adminApi';
+import { api } from '@/lib/api';
 import {
   LayoutDashboard,
   Users,
@@ -328,6 +329,7 @@ function useAdminNav(): NavSection[] {
           { label: t('insurance_certificates'), href: '/admin/broker-controls/insurance', icon: FileCheck },
           { label: t('review_archive'), href: '/admin/broker-controls/archives', icon: Archive },
           { label: t('safeguarding'), href: '/admin/safeguarding', icon: ShieldCheck },
+          { label: t('member_safeguarding'), href: '/admin/safeguarding?tab=preferences', icon: Users },
           { label: t('safeguarding_options'), href: '/admin/safeguarding-options', icon: Shield },
         ],
       },
@@ -571,6 +573,8 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
 
   // ── Dynamic unreviewed message count for sidebar badge ──────────────────
   const [unreviewedCount, setUnreviewedCount] = useState(0);
+  // ── Dynamic unreviewed safeguarding flag count ──────────────────────────
+  const [safeguardingFlagCount, setSafeguardingFlagCount] = useState(0);
 
   const fetchUnreviewedCount = useCallback(async () => {
     try {
@@ -583,11 +587,32 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
     }
   }, []);
 
+  // Fetch the safeguarding dashboard summary so the Safeguarding nav item can
+  // show a live red badge when there are unreviewed flags waiting. Failure is
+  // silent — this endpoint 404s for tenants that haven't enabled the feature.
+  const fetchSafeguardingFlags = useCallback(async () => {
+    try {
+      const res = await api.get<{ unreviewed_flags?: number } | { data: { unreviewed_flags?: number } }>(
+        '/v2/admin/safeguarding/dashboard'
+      );
+      if (res.success && res.data) {
+        const payload = 'data' in res.data ? res.data.data : res.data;
+        setSafeguardingFlagCount(Number(payload?.unreviewed_flags ?? 0));
+      }
+    } catch {
+      // Silent — feature not enabled on this tenant
+    }
+  }, []);
+
   useEffect(() => {
     fetchUnreviewedCount();
-    const interval = setInterval(fetchUnreviewedCount, 60000);
+    fetchSafeguardingFlags();
+    const interval = setInterval(() => {
+      fetchUnreviewedCount();
+      fetchSafeguardingFlags();
+    }, 60000);
     return () => clearInterval(interval);
-  }, [fetchUnreviewedCount]);
+  }, [fetchUnreviewedCount, fetchSafeguardingFlags]);
 
   // ── Section map for O(1) zone lookup ────────────────────────────────────
   const sectionMap = useMemo(
@@ -688,8 +713,17 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
   const renderNavItem = (item: NavItem) => {
     const ItemIcon = item.icon;
     const isMessageReview = item.href === '/admin/broker-controls/messages';
-    const dynamicBadge =
-      isMessageReview && unreviewedCount > 0 ? String(unreviewedCount) : item.badge;
+    // Safeguarding root link carries a red live-count badge for unreviewed
+    // flags (excluding the query-scoped Member Safeguarding child link).
+    const isSafeguardingRoot = item.href === '/admin/safeguarding';
+    const showSafeguardingBadge = isSafeguardingRoot && safeguardingFlagCount > 0;
+    const showMessageBadge = isMessageReview && unreviewedCount > 0;
+    const dynamicBadge = showMessageBadge
+      ? String(unreviewedCount)
+      : showSafeguardingBadge
+      ? String(safeguardingFlagCount)
+      : item.badge;
+    const isUrgentBadge = showMessageBadge || showSafeguardingBadge;
 
     return (
       <li key={item.href}>
@@ -707,7 +741,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
           {dynamicBadge && (
             <span
               className={`ml-auto rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                isMessageReview && unreviewedCount > 0
+                isUrgentBadge
                   ? 'bg-danger text-danger-foreground'
                   : 'bg-primary text-primary-foreground'
               }`}

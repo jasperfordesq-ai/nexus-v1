@@ -10,7 +10,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   Tabs,
   Tab,
@@ -90,12 +90,40 @@ export function VettingRecords() {
   const { tenantPath } = useTenant();
   const toast = useToast();
 
+  // Status filter is mirrored to the `?status=` URL param so the broker
+  // dashboard stat cards can deep-link straight into a filtered view and
+  // the browser back button round-trips correctly.
+  const VETTING_STATUSES = [
+    'all', 'pending', 'submitted', 'verified', 'expired', 'expiring_soon', 'rejected',
+  ] as const;
+  type VettingStatus = (typeof VETTING_STATUSES)[number];
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlStatus = searchParams.get('status') as VettingStatus | null;
+  const statusFilter: VettingStatus =
+    urlStatus && VETTING_STATUSES.includes(urlStatus) ? urlStatus : 'all';
+  const setStatusFilter = useCallback(
+    (next: VettingStatus) => {
+      setSearchParams(
+        (prev) => {
+          const params = new URLSearchParams(prev);
+          if (next === 'all') {
+            params.delete('status');
+          } else {
+            params.set('status', next);
+          }
+          return params;
+        },
+        { replace: true }
+      );
+    },
+    [setSearchParams]
+  );
+
   // List state
   const [items, setItems] = useState<VettingRecord[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Stats
@@ -710,7 +738,7 @@ export function VettingRecords() {
       <div className="mb-4">
         <Tabs
           selectedKey={statusFilter}
-          onSelectionChange={(key) => { setStatusFilter(key as string); setPage(1); }}
+          onSelectionChange={(key) => { setStatusFilter(key as VettingStatus); setPage(1); }}
           variant="underlined"
           size="sm"
         >

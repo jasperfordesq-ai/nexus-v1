@@ -10,7 +10,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   Tabs, Tab, Button, Chip,
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
@@ -77,9 +77,33 @@ export function RiskTagsPage() {
   const { tenantPath } = useTenant();
   const toast = useToast();
 
+  // Risk level filter is mirrored to `?level=` so stat-card deep-links work.
+  const RISK_LEVELS = ['all', 'critical', 'high', 'medium', 'low'] as const;
+  type RiskLevel = (typeof RISK_LEVELS)[number];
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlLevel = searchParams.get('level') as RiskLevel | null;
+  const riskLevel: RiskLevel =
+    urlLevel && RISK_LEVELS.includes(urlLevel) ? urlLevel : 'all';
+  const setRiskLevel = useCallback(
+    (next: RiskLevel) => {
+      setSearchParams(
+        (prev) => {
+          const params = new URLSearchParams(prev);
+          if (next === 'all') {
+            params.delete('level');
+          } else {
+            params.set('level', next);
+          }
+          return params;
+        },
+        { replace: true }
+      );
+    },
+    [setSearchParams]
+  );
+
   const [items, setItems] = useState<RiskTag[]>([]);
   const [loading, setLoading] = useState(true);
-  const [riskLevel, setRiskLevel] = useState('all');
   const [tableSearch, setTableSearch] = useState('');
 
   // Modal state
@@ -410,7 +434,7 @@ export function RiskTagsPage() {
       <div className="mb-4">
         <Tabs
           selectedKey={riskLevel}
-          onSelectionChange={(key) => setRiskLevel(key as string)}
+          onSelectionChange={(key) => setRiskLevel(key as RiskLevel)}
           variant="underlined"
           size="sm"
         >

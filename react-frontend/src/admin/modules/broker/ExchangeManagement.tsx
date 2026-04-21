@@ -10,7 +10,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   Tabs,
   Tab,
@@ -38,11 +38,38 @@ export function ExchangeManagement() {
   const { tenantPath } = useTenant();
   const toast = useToast();
 
+  // Status filter is mirrored to `?status=` so stat-card deep-links and
+  // browser back/forward work as expected.
+  const EXCHANGE_STATUSES = [
+    'all', 'pending_broker', 'accepted', 'in_progress', 'completed', 'cancelled', 'disputed',
+  ] as const;
+  type ExchangeStatus = (typeof EXCHANGE_STATUSES)[number];
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlStatus = searchParams.get('status') as ExchangeStatus | null;
+  const status: ExchangeStatus =
+    urlStatus && EXCHANGE_STATUSES.includes(urlStatus) ? urlStatus : 'all';
+  const setStatus = useCallback(
+    (next: ExchangeStatus) => {
+      setSearchParams(
+        (prev) => {
+          const params = new URLSearchParams(prev);
+          if (next === 'all') {
+            params.delete('status');
+          } else {
+            params.set('status', next);
+          }
+          return params;
+        },
+        { replace: true }
+      );
+    },
+    [setSearchParams]
+  );
+
   const [items, setItems] = useState<ExchangeRequest[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [status, setStatus] = useState('all');
 
   // Action modal state
   const [actionModal, setActionModal] = useState<{
@@ -229,7 +256,7 @@ export function ExchangeManagement() {
       <div className="mb-4">
         <Tabs
           selectedKey={status}
-          onSelectionChange={(key) => { setStatus(key as string); setPage(1); }}
+          onSelectionChange={(key) => { setStatus(key as ExchangeStatus); setPage(1); }}
           variant="underlined"
           size="sm"
         >

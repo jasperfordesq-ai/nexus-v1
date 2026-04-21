@@ -10,7 +10,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   Tabs,
   Tab,
@@ -39,11 +39,37 @@ export function MessageReview() {
   const { tenantPath } = useTenant();
   const toast = useToast();
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // The active tab is driven by the URL so deep-links from the broker
+  // dashboard stat cards land on the right filter.
+  const ALLOWED_FILTERS = ['unreviewed', 'flagged', 'reviewed', 'all'] as const;
+  type MessageFilter = (typeof ALLOWED_FILTERS)[number];
+  const urlStatus = searchParams.get('status') as MessageFilter | null;
+  const filter: MessageFilter =
+    urlStatus && ALLOWED_FILTERS.includes(urlStatus) ? urlStatus : 'unreviewed';
+  const setFilter = useCallback(
+    (next: MessageFilter) => {
+      setSearchParams(
+        (prev) => {
+          const params = new URLSearchParams(prev);
+          if (next === 'unreviewed') {
+            params.delete('status');
+          } else {
+            params.set('status', next);
+          }
+          return params;
+        },
+        { replace: true }
+      );
+    },
+    [setSearchParams]
+  );
+
   const [items, setItems] = useState<BrokerMessage[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [filter, setFilter] = useState('unreviewed');
   const [reviewingId, setReviewingId] = useState<number | null>(null);
 
   // Flag modal state
@@ -269,7 +295,7 @@ export function MessageReview() {
       <div className="mb-4">
         <Tabs
           selectedKey={filter}
-          onSelectionChange={(key) => { setFilter(key as string); setPage(1); }}
+          onSelectionChange={(key) => { setFilter(key as MessageFilter); setPage(1); }}
           variant="underlined"
           size="sm"
         >
