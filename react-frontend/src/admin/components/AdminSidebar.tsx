@@ -892,6 +892,27 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
               return dashboard ? renderSection(dashboard, null) : null;
             })()}
 
+            {/* Broker Panel — pinned at top for visibility */}
+            <li>
+              {collapsed ? (
+                <Link
+                  to={tenantPath('/broker')}
+                  className="flex items-center justify-center rounded-lg px-2 py-2 text-primary hover:bg-primary/10 transition-colors"
+                  title={t('broker_panel')}
+                >
+                  <ShieldCheck size={18} />
+                </Link>
+              ) : (
+                <Link
+                  to={tenantPath('/broker')}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
+                >
+                  <ShieldCheck size={18} className="shrink-0" />
+                  <span>{t('broker_panel')}</span>
+                </Link>
+              )}
+            </li>
+
             {/* Recent pages — shown if 2+ visits and sidebar is expanded */}
             {showRecent && (
               <>
@@ -972,26 +993,6 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
           </ul>
         )}
 
-        {/* Quick link to simplified Broker Panel */}
-        <div className="mt-4 border-t border-divider pt-3">
-          {collapsed ? (
-            <Link
-              to={tenantPath('/broker')}
-              className="flex items-center justify-center rounded-lg px-2 py-2 text-default-400 hover:bg-default-100 hover:text-foreground transition-colors"
-              title={t('broker_panel')}
-            >
-              <ShieldCheck size={18} />
-            </Link>
-          ) : (
-            <Link
-              to={tenantPath('/broker')}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-default-400 hover:bg-default-100 hover:text-foreground transition-colors"
-            >
-              <ShieldCheck size={18} />
-              <span>{t('broker_panel')}</span>
-            </Link>
-          )}
-        </div>
       </nav>
     </aside>
   );
