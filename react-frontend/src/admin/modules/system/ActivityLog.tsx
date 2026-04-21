@@ -140,11 +140,18 @@ export function ActivityLog() {
       key: 'action',
       label: t('system.col_action'),
       sortable: true,
-      render: (entry) => (
-        <Chip size="sm" variant="flat" color={getActionColor(entry.action)}>
-          {t(`system.action.${entry.action}`, { defaultValue: entry.action })}
-        </Chip>
-      ),
+      render: (entry) => {
+        const key = `system.action.${entry.action}`;
+        const translated = t(key);
+        const label = translated === key
+          ? entry.action.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+          : translated;
+        return (
+          <Chip size="sm" variant="flat" color={getActionColor(entry.action)}>
+            {label}
+          </Chip>
+        );
+      },
     },
     {
       key: 'description',

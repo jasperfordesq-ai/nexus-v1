@@ -226,7 +226,7 @@ class AdminDashboardController extends BaseApiController
                 'user_email' => $row->email ?? '',
                 'user_avatar' => $row->avatar_url ?? null,
                 'action' => $row->action ?? '',
-                'description' => $row->description ?? '',
+                'description' => $row->details ?? '',
                 'ip_address' => $row->ip_address ?? null,
                 'created_at' => $row->created_at ?? '',
             ];
