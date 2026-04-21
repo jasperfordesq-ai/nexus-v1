@@ -75,7 +75,15 @@ class ExploreService
 
         // ─── Personalized sections — cached per user ───
         $userKey = "nexus:explore:{$tenantId}:{$userId}";
-        $userData = Cache::get($userKey);
+        $userData = null;
+        try {
+            $userData = Cache::get($userKey);
+            if (!is_array($userData)) {
+                $userData = null;
+            }
+        } catch (\Throwable $e) {
+            Log::debug('[ExploreService] Cache::get (user) failed: ' . $e->getMessage());
+        }
 
         if ($userData === null) {
             $userData = [
@@ -83,7 +91,11 @@ class ExploreService
                 'near_you_listings' => $this->getNearYouListings($tenantId, $userId),
                 'suggested_connections' => $this->getSuggestedConnections($tenantId, $userId),
             ];
-            Cache::put($userKey, $userData, self::CACHE_TTL_SECONDS);
+            try {
+                Cache::put($userKey, $userData, self::CACHE_TTL_SECONDS);
+            } catch (\Throwable $e) {
+                Log::debug('[ExploreService] Cache::put (user) failed: ' . $e->getMessage());
+            }
         }
 
         return array_merge($globalData, $userData);
@@ -96,12 +108,20 @@ class ExploreService
     private function cachedSection(int $tenantId, string $section, callable $compute, int $ttl = self::CACHE_TTL_SECONDS): array
     {
         $key = "nexus:explore:{$tenantId}:{$section}";
-        $cached = Cache::get($key);
-        if ($cached !== null) {
-            return $cached;
+        try {
+            $cached = Cache::get($key);
+            if (is_array($cached)) {
+                return $cached;
+            }
+        } catch (\Throwable $e) {
+            Log::debug("[ExploreService] Cache::get failed for section '{$section}': " . $e->getMessage());
         }
         $data = $compute();
-        Cache::put($key, $data, $ttl);
+        try {
+            Cache::put($key, $data, $ttl);
+        } catch (\Throwable $e) {
+            Log::debug("[ExploreService] Cache::put failed for section '{$section}': " . $e->getMessage());
+        }
         return $data;
     }
 
@@ -1265,7 +1285,7 @@ class ExploreService
 
             $rows = DB::select("
                 SELECT
-                    p.id, p.question, p.description, p.created_at, p.expires_at,
+                    p.id, p.question, p.description, p.created_at, p.end_date,
                     COALESCE(u.first_name, '') AS author_first_name,
                     COALESCE(u.last_name, '') AS author_last_name,
                     (SELECT COUNT(*) FROM poll_options po WHERE po.poll_id = p.id) AS option_count,
@@ -1274,7 +1294,7 @@ class ExploreService
                 JOIN users u ON u.id = p.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE p.tenant_id = ?
                     AND p.is_active = 1
-                    AND (p.expires_at IS NULL OR p.expires_at > NOW())
+                    AND (p.end_date IS NULL OR p.end_date > NOW())
                 ORDER BY vote_count DESC, p.created_at DESC
                 LIMIT 4
             ", [$tenantId, $tenantId]);
@@ -1286,7 +1306,7 @@ class ExploreService
                 'author_name' => trim($row->author_first_name . ' ' . $row->author_last_name),
                 'option_count' => (int) $row->option_count,
                 'vote_count' => (int) $row->vote_count,
-                'closes_at' => $row->expires_at,
+                'closes_at' => $row->end_date,
                 'created_at' => $row->created_at,
             ], $rows);
         } catch (\Throwable $e) {
