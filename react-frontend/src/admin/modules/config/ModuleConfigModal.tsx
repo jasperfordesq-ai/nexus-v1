@@ -39,12 +39,12 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
   const toast = useToast();
   const navigate = useNavigate();
 
-  const nameKey = `config.module_name_${module.id}`;
-  const descKey = `config.module_desc_${module.id}`;
+  const nameKey = module ? `config.module_name_${module.id}` : '';
+  const descKey = module ? `config.module_desc_${module.id}` : '';
   const translatedName = t(nameKey);
   const translatedDesc = t(descKey);
-  const moduleName = translatedName === nameKey ? module.name : translatedName;
-  const moduleDesc = translatedDesc === descKey ? module.description : translatedDesc;
+  const moduleName = module ? (translatedName === nameKey ? module.name : translatedName) : '';
+  const moduleDesc = module ? (translatedDesc === descKey ? module.description : translatedDesc) : '';
   const { tenantPath, refreshTenant } = useTenant();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
