@@ -86,8 +86,9 @@ export function getUserInitials(user: Pick<User, 'first_name' | 'last_name'>): s
 /**
  * Format a date string to a relative time string
  */
-export function formatRelativeTime(dateString: string): string {
+export function formatRelativeTime(dateString: string | null | undefined): string {
   const date = toDateValue(dateString);
+  if (isNaN(date.getTime())) return '—';
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffSecs = Math.floor(diffMs / 1000);
@@ -110,23 +111,22 @@ export function formatRelativeTime(dateString: string): string {
 /**
  * Normalize date-like values before formatting.
  */
-function toDateValue(value: DateValue): Date {
-  if (value instanceof Date) {
-    return value;
-  }
-
+function toDateValue(value: DateValue | null | undefined): Date {
+  if (value instanceof Date) return value;
+  if (value === null || value === undefined || value === '') return new Date(NaN);
   if (typeof value === 'string' && value.includes(' ') && !value.includes('T')) {
     return new Date(value.replace(' ', 'T'));
   }
-
-  return new Date(value);
+  return new Date(value as string | number);
 }
 
 /**
  * Format a date-like value for display.
  */
-export function formatDateValue(value: DateValue, options?: Intl.DateTimeFormatOptions): string {
-  return toDateValue(value).toLocaleDateString(i18n.language, options ?? {
+export function formatDateValue(value: DateValue | null | undefined, options?: Intl.DateTimeFormatOptions): string {
+  const date = toDateValue(value);
+  if (isNaN(date.getTime())) return '—';
+  return date.toLocaleDateString(i18n.language, options ?? {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
