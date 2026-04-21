@@ -298,6 +298,23 @@
     "empty_title": "まだスポットライトはありません",
     "empty_description": "コミュニティが交換を始めると、アクティブメンバーがここに表示されます。"
   },
+  "nexus_score": {
+    "title": "NexusScore",
+    "subtitle": "Your community reputation score",
+    "points_to_next": "{{count}} points to {{tier}}",
+    "max_tier": "You have reached the highest tier!",
+    "breakdown_title": "Score Breakdown",
+    "insights_title": "How to improve",
+    "remaining": "remaining",
+    "view_leaderboard": "View Leaderboard",
+    "my_profile": "My Profile",
+    "load_error": "Could not load your NexusScore. Please try again.",
+    "refresh_error": "Refresh failed"
+  },
+  "common": {
+    "refresh": "Refresh",
+    "try_again": "Try Again"
+  },
   "page_meta": {
     "leaderboard": {
       "description": "コミュニティリーダーボード — トップ貢献者と最もアクティブなメンバーを確認しましょう。",

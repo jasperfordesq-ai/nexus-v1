@@ -95,9 +95,9 @@
     "admin_pending_approval": "New user {{name}} ({{email}}) requires approval"
   },
   "nexus_score": {
-    "strength_title": "{{name}} is your strongest area!",
-    "strength_message": "You're in the top tier with {{percentage}}% in {{name}}.",
-    "improvement_title": "Grow your {{name}} score",
+    "strength_title": ":name is your strongest area!",
+    "strength_message": "You're in the top tier with :percentage% in :name.",
+    "improvement_title": "Grow your :name score",
     "tip_engagement": "Try sending and receiving time credits with different community members.",
     "tip_quality": "Focus on completing transactions successfully and earning positive reviews.",
     "tip_volunteer": "Log your volunteer hours regularly and maintain consistency.",

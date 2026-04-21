@@ -298,6 +298,23 @@
     "empty_title": "Sin destacados aún",
     "empty_description": "Los miembros activos aparecerán aquí una vez que la comunidad comience a intercambiar."
   },
+  "nexus_score": {
+    "title": "NexusScore",
+    "subtitle": "Your community reputation score",
+    "points_to_next": "{{count}} points to {{tier}}",
+    "max_tier": "You have reached the highest tier!",
+    "breakdown_title": "Score Breakdown",
+    "insights_title": "How to improve",
+    "remaining": "remaining",
+    "view_leaderboard": "View Leaderboard",
+    "my_profile": "My Profile",
+    "load_error": "Could not load your NexusScore. Please try again.",
+    "refresh_error": "Refresh failed"
+  },
+  "common": {
+    "refresh": "Refresh",
+    "try_again": "Try Again"
+  },
   "page_meta": {
     "leaderboard": {
       "description": "Tabla de clasificación de la comunidad — ve a los principales contribuyentes y miembros más activos.",
