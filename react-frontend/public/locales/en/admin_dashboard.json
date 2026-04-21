@@ -29,6 +29,11 @@
     "hours_suffix": "hrs",
     "no_data": "No trend data available"
   },
+  "safeguarding_banner": {
+    "title": "Safeguarding step is OFF in your onboarding wizard",
+    "body": "Members cannot declare vulnerability or vetting needs when they join. Admin alerts are not firing. Enable the safeguarding step and apply a country preset so your community is protected.",
+    "cta": "Enable safeguarding"
+  },
   "alerts": {
     "pending_approvals": "Members awaiting approval",
     "pending_listings": "Listings awaiting moderation",

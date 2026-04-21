@@ -45,10 +45,12 @@ import {
   Settings,
   Rocket,
   ChevronRight,
+  ShieldAlert,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
+import { useOnboardingConfig } from '@/hooks/useOnboardingConfig';
 import { adminDashboard } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { AdminDashboardStats, ActivityLogEntry, MonthlyTrend } from '../../api/types';
@@ -74,6 +76,14 @@ export function AdminDashboard() {
   const [activity, setActivity] = useState<ActivityLogEntry[]>([]);
   const [trends, setTrends] = useState<MonthlyTrend[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Surface a prominent banner when the onboarding safeguarding step is off.
+  // Without it, members cannot declare vulnerability or vetting needs during
+  // onboarding, and admins never get the safeguarding alerts that would
+  // otherwise fire on self-declaration.
+  const { config: onboardingConfig, isLoading: onboardingLoading } = useOnboardingConfig();
+  const showSafeguardingBanner =
+    !onboardingLoading && onboardingConfig.step_safeguarding_enabled === false;
 
   const loadDashboard = useCallback(async () => {
     setLoading(true);
@@ -125,6 +135,38 @@ export function AdminDashboard() {
           </Button>
         }
       />
+
+      {showSafeguardingBanner && (
+        <Card
+          shadow="sm"
+          className="mb-6 border-l-4 border-l-danger bg-danger/5"
+          data-testid="safeguarding-disabled-banner"
+        >
+          <CardBody className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-danger/10">
+              <ShieldAlert size={22} className="text-danger" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-danger">
+                {t('safeguarding_banner.title')}
+              </p>
+              <p className="mt-0.5 text-sm text-default-600">
+                {t('safeguarding_banner.body')}
+              </p>
+            </div>
+            <Button
+              as={Link}
+              to={tenantPath('/admin/onboarding-settings')}
+              color="danger"
+              size="sm"
+              variant="solid"
+              className="shrink-0"
+            >
+              {t('safeguarding_banner.cta')}
+            </Button>
+          </CardBody>
+        </Card>
+      )}
 
       {/* Stats Grid - Row 1: Core Metrics */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-4">

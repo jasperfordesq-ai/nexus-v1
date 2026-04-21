@@ -62,7 +62,7 @@ const DEFAULT_CONFIG: OnboardingConfig = {
   step_interests_required: false,
   step_skills_enabled: true,
   step_skills_required: false,
-  step_safeguarding_enabled: false,
+  step_safeguarding_enabled: true,
   step_safeguarding_required: false,
   step_confirm_enabled: true,
   avatar_required: true,

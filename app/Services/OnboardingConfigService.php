@@ -32,7 +32,7 @@ class OnboardingConfigService
         'onboarding.step_interests_required' => '0',
         'onboarding.step_skills_enabled' => '1',
         'onboarding.step_skills_required' => '0',
-        'onboarding.step_safeguarding_enabled' => '0',
+        'onboarding.step_safeguarding_enabled' => '1',
         'onboarding.step_safeguarding_required' => '0',
         'onboarding.step_confirm_enabled' => '1',
         'onboarding.avatar_required' => '1',

@@ -559,9 +559,20 @@ class TenantHierarchyService
      */
     private static function seedTenantDefaults(int $tenantId): void
     {
+        // Re-read the tenant row so we can derive the country preset without
+        // threading extra arguments through the call chain.
+        $tenant = DB::table('tenants')->where('id', $tenantId)->first();
+        $countryCode = strtoupper((string) ($tenant->country_code ?? ''));
+        $presetKey = self::mapCountryCodeToPreset($countryCode);
+
         // 1. Seed secure default tenant_settings
         //    admin_approval=true and email_verification=true ensure new signups
         //    require admin review and verified email — secure by default.
+        //
+        //    Safeguarding is ON by default — every new community gets the step
+        //    enabled and the matching country preset auto-applied below, so that
+        //    vulnerable-adult self-declarations and vetting needs surface in the
+        //    wizard from day one.
         $defaultSettings = [
             ['tenant_id' => $tenantId, 'setting_key' => 'general.registration_mode', 'setting_value' => 'open', 'setting_type' => 'string'],
             ['tenant_id' => $tenantId, 'setting_key' => 'general.admin_approval', 'setting_value' => 'true', 'setting_type' => 'boolean'],
@@ -572,10 +583,29 @@ class TenantHierarchyService
             ['tenant_id' => $tenantId, 'setting_key' => 'seo_canonical_urls', 'setting_value' => '1', 'setting_type' => 'boolean'],
             ['tenant_id' => $tenantId, 'setting_key' => 'seo_open_graph', 'setting_value' => '1', 'setting_type' => 'boolean'],
             ['tenant_id' => $tenantId, 'setting_key' => 'seo_twitter_cards', 'setting_value' => '1', 'setting_type' => 'boolean'],
+            // Onboarding defaults — safeguarding step ON by default so new
+            // communities surface vulnerability/vetting declarations to members.
+            ['tenant_id' => $tenantId, 'setting_key' => 'onboarding.step_safeguarding_enabled', 'setting_value' => '1', 'setting_type' => 'boolean'],
+            ['tenant_id' => $tenantId, 'setting_key' => 'onboarding.step_safeguarding_required', 'setting_value' => '0', 'setting_type' => 'boolean'],
+            ['tenant_id' => $tenantId, 'setting_key' => 'onboarding.country_preset', 'setting_value' => $presetKey, 'setting_type' => 'string'],
         ];
 
         foreach ($defaultSettings as $setting) {
             DB::table('tenant_settings')->insertOrIgnore($setting);
+        }
+
+        // Auto-apply country preset (seeds tenant_safeguarding_options rows).
+        // applyCountryPreset uses insert-if-not-exists, so re-runs are safe.
+        if ($presetKey !== 'custom') {
+            try {
+                SafeguardingPreferenceService::applyCountryPreset($tenantId, $presetKey);
+            } catch (\Throwable $e) {
+                Log::warning('TenantHierarchyService: applyCountryPreset failed during seed', [
+                    'tenant_id' => $tenantId,
+                    'preset' => $presetKey,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
         // 2. Seed default categories (universal set for any timebank)
@@ -622,6 +652,19 @@ class TenantHierarchyService
                 'updated_at'  => now(),
             ]);
         }
+    }
+
+    /**
+     * Map an ISO-3166 alpha-2 country code to the matching safeguarding preset.
+     * Unrecognised / empty codes fall back to 'custom' (no preset applied).
+     */
+    private static function mapCountryCodeToPreset(string $countryCode): string
+    {
+        return match ($countryCode) {
+            'IE' => 'ireland',
+            'GB', 'UK' => 'england_wales',
+            default => 'custom',
+        };
     }
 
     /**
