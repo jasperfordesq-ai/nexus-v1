@@ -935,15 +935,17 @@ const FeedCard = React.memo(function FeedCard({
                             {t('card.edit_post', 'Edit Post')}
                           </DropdownItem>
                         )}
-                        <DropdownItem
-                          key="delete"
-                          startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
-                          className="text-danger"
-                          color="danger"
-                          onPress={() => onDeletePost(item)}
-                        >
-                          {t('card.delete_post')}
-                        </DropdownItem>
+                        {item.type === 'post' && (
+                          <DropdownItem
+                            key="delete"
+                            startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
+                            className="text-danger"
+                            color="danger"
+                            onPress={() => onDeletePost(item)}
+                          >
+                            {t('card.delete_post')}
+                          </DropdownItem>
+                        )}
                       </>
                     ) : (
                       <>
@@ -1040,14 +1042,16 @@ const FeedCard = React.memo(function FeedCard({
                           {t('card.edit_post', 'Edit Post')}
                         </Button>
                       )}
-                      <Button
-                        variant="light"
-                        className="justify-start text-danger"
-                        startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
-                        onPress={() => { setIsOptionsSheetOpen(false); onDeletePost(item); }}
-                      >
-                        {t('card.delete_post')}
-                      </Button>
+                      {item.type === 'post' && (
+                        <Button
+                          variant="light"
+                          className="justify-start text-danger"
+                          startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
+                          onPress={() => { setIsOptionsSheetOpen(false); onDeletePost(item); }}
+                        >
+                          {t('card.delete_post')}
+                        </Button>
+                      )}
                     </>
                   ) : (
                     <>

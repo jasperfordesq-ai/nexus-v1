@@ -565,6 +565,7 @@ export function FeedPage() {
   }, [reportPostId, reportReason, onReportClose]);
 
   const handleDeletePost = useCallback(async (item: FeedItem) => {
+    if (item.type !== 'post') return;
     try {
       await api.post(`/v2/feed/posts/${item.id}/delete`);
       setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
