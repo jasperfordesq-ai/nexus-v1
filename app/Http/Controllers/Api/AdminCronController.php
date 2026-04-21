@@ -90,7 +90,7 @@ class AdminCronController extends BaseApiController
 
         $logsArray = array_map(fn($log) => $this->mapCronLogRow($log), $logs);
 
-        return $this->success(['data' => $logsArray, 'meta' => ['total' => $total, 'limit' => $limit, 'offset' => $offset]]);
+        return $this->success($logsArray, ['total' => $total, 'limit' => $limit, 'offset' => $offset]);
     }
 
     /** GET /api/v2/admin/cron/logs/{logId} */
