@@ -87,11 +87,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    # Container memory limit — keep above PHP memory_limit (512M, set in Dockerfile)
-    # to leave headroom for Apache workers, opcache, and OS overhead. Matches the
-    # pattern in compose.prod.yml. For heavy artisan tasks that need more, override
-    # at invocation time: `docker exec -e PHP_MEMORY_LIMIT=-1 ...` (see docs/DOCKER.md).
-    mem_limit: 768m
+    # Container memory limit — must be above PHP memory_limit (1G, set in Dockerfile)
+    # to leave headroom for Apache workers, OPcache (256M), and OS overhead.
+    mem_limit: 2g
     mem_reservation: 512m
 
   # ---------------------------------------------------------------------------
