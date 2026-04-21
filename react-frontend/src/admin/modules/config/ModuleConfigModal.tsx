@@ -38,6 +38,13 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
   const { t } = useTranslation('admin');
   const toast = useToast();
   const navigate = useNavigate();
+
+  const nameKey = `config.module_name_${module.id}`;
+  const descKey = `config.module_desc_${module.id}`;
+  const translatedName = t(nameKey);
+  const translatedDesc = t(descKey);
+  const moduleName = translatedName === nameKey ? module.name : translatedName;
+  const moduleDesc = translatedDesc === descKey ? module.description : translatedDesc;
   const { tenantPath, refreshTenant } = useTenant();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -361,14 +368,14 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span>{t('config.modal_title', { name: t(`config.module_name_${module.id}`, module.name) })}</span>
+              <span>{t('config.modal_title', { name: moduleName })}</span>
               {!isEditable && (
                 <Chip size="sm" variant="flat" color="warning" startContent={<Construction size={12} />}>
                   {t('config.beta')}
                 </Chip>
               )}
             </div>
-            <p className="text-sm font-normal text-default-500">{t(`config.module_desc_${module.id}`, module.description)}</p>
+            <p className="text-sm font-normal text-default-500">{moduleDesc}</p>
           </div>
         </ModalHeader>
 

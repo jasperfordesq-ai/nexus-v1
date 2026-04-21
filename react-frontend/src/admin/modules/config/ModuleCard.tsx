@@ -27,6 +27,13 @@ export default function ModuleCard({ module, enabled, onToggle, onConfigure, tog
   const optionCount = module.configOptions.length;
   const liveCount = module.configOptions.filter(o => !o.comingSoon).length;
 
+  const nameKey = `config.module_name_${module.id}`;
+  const descKey = `config.module_desc_${module.id}`;
+  const translatedName = t(nameKey);
+  const translatedDesc = t(descKey);
+  const moduleName = translatedName === nameKey ? module.name : translatedName;
+  const moduleDesc = translatedDesc === descKey ? module.description : translatedDesc;
+
   return (
     <Card shadow="sm" className="h-full">
       <CardBody className={`p-4 flex flex-col gap-3 ${!enabled ? 'opacity-60' : ''}`}>
@@ -43,17 +50,17 @@ export default function ModuleCard({ module, enabled, onToggle, onConfigure, tog
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
-              <h3 className="text-sm font-semibold truncate">{t(`config.module_name_${module.id}`, module.name)}</h3>
+              <h3 className="text-sm font-semibold truncate">{moduleName}</h3>
               <Switch
                 size="sm"
                 isSelected={enabled}
                 isDisabled={toggling}
                 onValueChange={(val) => onToggle(module.id, val)}
-                aria-label={t('config.toggle_module', { name: t(`config.module_name_${module.id}`, module.name) })}
+                aria-label={t('config.toggle_module', { name: moduleName })}
                 className="flex-shrink-0"
               />
             </div>
-            <p className="text-xs text-default-500 line-clamp-2 mt-0.5">{t(`config.module_desc_${module.id}`, module.description)}</p>
+            <p className="text-xs text-default-500 line-clamp-2 mt-0.5">{moduleDesc}</p>
           </div>
         </div>
 
