@@ -82,9 +82,9 @@ export function SystemRequirements() {
 
   const status = computeStatus();
   const statusConfig = {
-    pass: { color: 'success' as const, label: 'All checks passed', icon: CheckCircle, bg: 'bg-success/10' },
-    warning: { color: 'warning' as const, label: 'Some warnings detected', icon: AlertTriangle, bg: 'bg-warning/10' },
-    fail: { color: 'danger' as const, label: 'Critical issues found', icon: XCircle, bg: 'bg-danger/10' },
+    pass: { color: 'success' as const, label: t('system.all_checks_passed'), icon: CheckCircle, bg: 'bg-success/10' },
+    warning: { color: 'warning' as const, label: t('system.some_warnings_detected'), icon: AlertTriangle, bg: 'bg-warning/10' },
+    fail: { color: 'danger' as const, label: t('system.critical_issues_found'), icon: XCircle, bg: 'bg-danger/10' },
   };
 
   const filteredExtensions = data?.extensions.filter((ext) =>
@@ -95,6 +95,15 @@ export function SystemRequirements() {
   const requiredCount = data?.extensions.filter((ext) => ext.required).length ?? 0;
 
   const iniEntries = data?.ini_settings ? Object.entries(data.ini_settings) : [];
+
+  const iniLabels: Record<string, string> = {
+    memory_limit: t('system.ini_memory_limit'),
+    max_execution_time: t('system.ini_max_execution_time'),
+    max_input_time: t('system.ini_max_input_time'),
+    max_input_vars: t('system.ini_max_input_vars'),
+    upload_max_filesize: t('system.ini_upload_max_filesize'),
+    post_max_size: t('system.ini_post_max_size'),
+  };
 
   return (
     <div>
@@ -153,7 +162,7 @@ export function SystemRequirements() {
                   color={data.php.meets_minimum ? 'success' : 'danger'}
                   startContent={data.php.meets_minimum ? <CheckCircle size={12} /> : <XCircle size={12} />}
                 >
-                  {data.php.meets_minimum ? 'Meets minimum (8.2+)' : 'Below minimum (requires 8.2+)'}
+                  {data.php.meets_minimum ? t('system.meets_minimum_version') : t('system.below_minimum_version')}
                 </Chip>
               </div>
             </CardBody>
@@ -166,11 +175,11 @@ export function SystemRequirements() {
                 <Puzzle size={18} className="text-secondary" />
                 <h3 className="text-base font-semibold">{t('system.php_extensions')}</h3>
                 <Chip size="sm" variant="flat" color="default">
-                  {loadedCount} of {data.extensions.length} loaded ({requiredCount} required)
+                  {t('system.extensions_summary', { loaded: loadedCount, total: data.extensions.length, required: requiredCount })}
                 </Chip>
               </div>
               <Input
-                placeholder="Search extensions..."
+                placeholder={t('system.search_extensions_placeholder')}
                 startContent={<Search size={14} className="text-default-400" />}
                 value={extSearch}
                 onValueChange={setExtSearch}
@@ -220,7 +229,7 @@ export function SystemRequirements() {
                     )}
                     <span className="font-mono text-sm text-foreground">{dir.path}</span>
                     <Chip size="sm" variant="flat" color={dir.writable ? 'success' : 'danger'}>
-                      {dir.writable ? 'Writable' : 'Not writable'}
+                      {dir.writable ? t('system.writable_status') : t('system.not_writable_status')}
                     </Chip>
                   </div>
                 ))}
@@ -245,7 +254,7 @@ export function SystemRequirements() {
                     )}
                     <span className="text-sm font-medium text-foreground">{svc.name}</span>
                     <Chip size="sm" variant="flat" color={svc.status === 'ok' ? 'success' : 'danger'}>
-                      {svc.status === 'ok' ? 'OK' : 'FAIL'}
+                      {svc.status === 'ok' ? t('system.status_ok') : t('system.status_fail')}
                     </Chip>
                   </div>
                 ))}
@@ -264,7 +273,7 @@ export function SystemRequirements() {
                 <div className="divide-y divide-divider">
                   {iniEntries.map(([key, value]) => (
                     <div key={key} className="flex items-center justify-between py-2">
-                      <span className="text-sm text-default-600">{key}</span>
+                      <span className="text-sm text-default-600">{iniLabels[key] ?? key}</span>
                       <span className="font-mono text-sm text-foreground">{value}</span>
                     </div>
                   ))}

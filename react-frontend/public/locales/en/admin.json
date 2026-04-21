@@ -2520,7 +2520,12 @@
     "unknown": "Unknown",
     "version_prefix": "Version Prefix",
     "version_published": "Version Published",
-    "view_details": "View Details"
+    "view_details": "View Details",
+    "col_latency": "Latency",
+    "col_timestamp": "Timestamp",
+    "feature_flags": "Feature Flags",
+    "last_n_checks": "Last {{count}} checks",
+    "metric_memory_usage_php_request": "PHP Process Memory"
   },
   "events": {
     "an_unexpected_error_occurred": "An unexpected error occurred",
@@ -6105,7 +6110,24 @@
     "webp_all_converted": "WebP All Converted",
     "webp_conversion_complete": "WebP Conversion Complete",
     "webp_conversion_error": "WebP Conversion error",
-    "writable_directories": "Writable Directories"
+    "writable_directories": "Writable Directories",
+    "all_checks_passed": "All checks passed",
+    "below_minimum_version": "Below minimum (requires 8.2+)",
+    "critical_issues_found": "Critical issues found",
+    "extensions_summary": "{{loaded}} of {{total}} loaded ({{required}} required)",
+    "ini_max_execution_time": "Max Execution Time",
+    "ini_max_input_time": "Max Input Time",
+    "ini_max_input_vars": "Max Input Variables",
+    "ini_memory_limit": "Memory Limit",
+    "ini_post_max_size": "Post Max Size",
+    "ini_upload_max_filesize": "Upload Max File Size",
+    "meets_minimum_version": "Meets minimum (8.2+)",
+    "not_writable_status": "Not writable",
+    "search_extensions_placeholder": "Search extensions...",
+    "some_warnings_detected": "Some warnings detected",
+    "status_fail": "FAIL",
+    "status_ok": "OK",
+    "writable_status": "Writable"
   },
   "timebanking": {
     "a_reason_is_required_for_balance_adjustm": "A reason is required for balance adjustments",
@@ -7837,7 +7859,9 @@
     "log_files": "Log Files",
     "log_files_desc": "Log Files.",
     "system_requirements": "System Requirements",
-    "system_requirements_desc": "System Requirements."
+    "system_requirements_desc": "System Requirements.",
+    "memory_available": "{{available}} available",
+    "vm_memory": "VM Memory"
   },
   "template_form": {
     "active": "Active",

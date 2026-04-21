@@ -154,7 +154,7 @@ export function SystemMonitoring() {
               size="sm"
               endContent={<ToggleLeft size={14} />}
             >
-              Feature Flags
+              {t('enterprise.feature_flags')}
             </Button>
             <Button
               variant="flat"
@@ -203,7 +203,7 @@ export function SystemMonitoring() {
                     <div className="flex items-center gap-2">
                       <Server size={18} className="text-warning" />
                       <span className="text-sm font-semibold text-foreground">
-                        {t('enterprise.metric_memory_usage')} (PHP request)
+                        {t('enterprise.metric_memory_usage_php_request')}
                       </span>
                     </div>
                     <span className="text-sm text-default-500">
@@ -230,7 +230,7 @@ export function SystemMonitoring() {
                     <div className="flex items-center gap-2">
                       <Cpu size={18} className="text-primary" />
                       <span className="text-sm font-semibold text-foreground">
-                        VM Memory
+                        {t('system_monitoring.vm_memory')}
                       </span>
                     </div>
                     <span className="text-sm text-default-500">
@@ -246,7 +246,7 @@ export function SystemMonitoring() {
                     className="max-w-full"
                   />
                   <p className="text-xs text-default-400 mt-1">
-                    {health.sys_memory.available} available
+                    {t('system_monitoring.memory_available', { available: health.sys_memory.available })}
                   </p>
                 </CardBody>
               </Card>

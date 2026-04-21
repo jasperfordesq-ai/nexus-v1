@@ -175,7 +175,7 @@ export function HealthCheck() {
                     variant="flat"
                     color={check.status === 'ok' ? 'success' : 'danger'}
                   >
-                    {check.status === 'ok' ? 'OK' : 'FAIL'}
+                    {check.status === 'ok' ? t('system.status_ok') : t('system.status_fail')}
                   </Chip>
                 </CardBody>
               </Card>
@@ -188,7 +188,7 @@ export function HealthCheck() {
               <History size={18} className="text-default-500" />
               <h3 className="text-base font-semibold">{t('shared.history')}</h3>
               <Chip size="sm" variant="flat" color="default">
-                Last {history.length} checks
+                {t('enterprise.last_n_checks', { count: history.length })}
               </Chip>
             </CardHeader>
             <Divider className="mt-3" />
@@ -204,9 +204,9 @@ export function HealthCheck() {
               ) : (
                 <Table aria-label="Health check history" removeWrapper>
                   <TableHeader>
-                    <TableColumn>STATUS</TableColumn>
-                    <TableColumn>LATENCY</TableColumn>
-                    <TableColumn>TIMESTAMP</TableColumn>
+                    <TableColumn>{t('enterprise.col_status')}</TableColumn>
+                    <TableColumn>{t('enterprise.col_latency')}</TableColumn>
+                    <TableColumn>{t('enterprise.col_timestamp')}</TableColumn>
                   </TableHeader>
                   <TableBody>
                     {history.map((entry) => {
