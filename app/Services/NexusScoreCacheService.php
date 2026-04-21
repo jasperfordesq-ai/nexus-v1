@@ -94,6 +94,7 @@ class NexusScoreCacheService
     public function warmCache(int $tenantId): int
     {
         $userIds = $this->user->newQuery()
+            ->where('tenant_id', $tenantId)
             ->where('is_approved', true)
             ->pluck('id');
 
@@ -116,8 +117,9 @@ class NexusScoreCacheService
     public function getScore(int $userId, int $tenantId, bool $forceRecalculate = false): array
     {
         if (! $forceRecalculate) {
-            $cached = $this->getCachedScore($userId);
+            $cached = $this->getCachedScore($userId, $tenantId);
             if ($cached !== null) {
+                $cached['percentile'] = $this->calculateRealPercentile($userId, $tenantId, $cached['total_score']);
                 return $cached;
             }
         }
@@ -127,6 +129,9 @@ class NexusScoreCacheService
 
         // Cache it
         $this->cacheScore($userId, $tenantId, $scoreData);
+
+        // Override percentile with real community data from cache table
+        $scoreData['percentile'] = $this->calculateRealPercentile($userId, $tenantId, $scoreData['total_score']);
 
         return $scoreData;
     }
@@ -235,7 +240,7 @@ class NexusScoreCacheService
     /**
      * Get cached score data if fresh (within 1 hour).
      */
-    private function getCachedScore(int $userId): ?array
+    private function getCachedScore(int $userId, int $tenantId): ?array
     {
         try {
             if (! $this->cacheTableExists()) {
@@ -244,6 +249,7 @@ class NexusScoreCacheService
 
             $cached = $this->cache->newQuery()
                 ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
                 ->where('calculated_at', '>', now()->subHour())
                 ->first();
 
@@ -251,27 +257,65 @@ class NexusScoreCacheService
                 return null;
             }
 
-            // Reconstruct score data from cache
+            // Reconstruct breakdown arrays (details are empty but percentage/score are accurate)
+            $breakdown = [
+                'engagement' => ['score' => (float) $cached->engagement_score, 'max' => 250, 'percentage' => round(($cached->engagement_score / 250) * 100, 1), 'details' => []],
+                'quality'    => ['score' => (float) $cached->quality_score,    'max' => 200, 'percentage' => round(($cached->quality_score    / 200) * 100, 1), 'details' => []],
+                'volunteer'  => ['score' => (float) $cached->volunteer_score,  'max' => 200, 'percentage' => round(($cached->volunteer_score  / 200) * 100, 1), 'details' => []],
+                'activity'   => ['score' => (float) $cached->activity_score,   'max' => 150, 'percentage' => round(($cached->activity_score   / 150) * 100, 1), 'details' => []],
+                'badges'     => ['score' => (float) $cached->badge_score,      'max' => 100, 'percentage' => round(($cached->badge_score      / 100) * 100, 1), 'details' => []],
+                'impact'     => ['score' => (float) $cached->impact_score,     'max' => 100, 'percentage' => round(($cached->impact_score     / 100) * 100, 1), 'details' => []],
+            ];
+
             return [
-                'total_score' => (float) $cached->total_score,
-                'max_score'   => 1000,
-                'percentage'  => round(($cached->total_score / 1000) * 100, 1),
-                'percentile'  => (int) $cached->percentile,
-                'tier'        => $this->scoreService->calculateTier($cached->total_score),
-                'breakdown'   => [
-                    'engagement' => ['score' => (float) $cached->engagement_score, 'max' => 250, 'percentage' => round(($cached->engagement_score / 250) * 100, 1), 'details' => []],
-                    'quality'    => ['score' => (float) $cached->quality_score, 'max' => 200, 'percentage' => round(($cached->quality_score / 200) * 100, 1), 'details' => []],
-                    'volunteer'  => ['score' => (float) $cached->volunteer_score, 'max' => 200, 'percentage' => round(($cached->volunteer_score / 200) * 100, 1), 'details' => []],
-                    'activity'   => ['score' => (float) $cached->activity_score, 'max' => 150, 'percentage' => round(($cached->activity_score / 150) * 100, 1), 'details' => []],
-                    'badges'     => ['score' => (float) $cached->badge_score, 'max' => 100, 'percentage' => round(($cached->badge_score / 100) * 100, 1), 'details' => []],
-                    'impact'     => ['score' => (float) $cached->impact_score, 'max' => 100, 'percentage' => round(($cached->impact_score / 100) * 100, 1), 'details' => []],
-                ],
-                'cached'    => true,
-                'cached_at' => $cached->calculated_at?->toIso8601String(),
+                'total_score'    => (float) $cached->total_score,
+                'max_score'      => 1000,
+                'percentage'     => round(($cached->total_score / 1000) * 100, 1),
+                'percentile'     => (int) $cached->percentile,
+                'tier'           => $this->scoreService->calculateTier($cached->total_score),
+                'breakdown'      => $breakdown,
+                'insights'       => $this->scoreService->generateInsights(
+                    $breakdown['engagement'], $breakdown['quality'], $breakdown['volunteer'],
+                    $breakdown['activity'], $breakdown['badges'], $breakdown['impact']
+                ),
+                'next_milestone' => $this->scoreService->getNextMilestone($cached->total_score),
+                'cached'         => true,
+                'cached_at'      => $cached->calculated_at?->toIso8601String(),
             ];
         } catch (\Throwable $e) {
             Log::debug('[NexusScoreCache] getCachedScore failed: ' . $e->getMessage());
             return null;
+        }
+    }
+
+    /**
+     * Calculate real percentile from community scores in cache.
+     */
+    private function calculateRealPercentile(int $userId, int $tenantId, float $userScore): int
+    {
+        try {
+            if (! $this->cacheTableExists()) {
+                return 50;
+            }
+
+            $totalOthers = $this->cache->newQuery()
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', '!=', $userId)
+                ->count();
+
+            if ($totalOthers < 2) {
+                return 50;
+            }
+
+            $lowerCount = $this->cache->newQuery()
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', '!=', $userId)
+                ->where('total_score', '<', $userScore)
+                ->count();
+
+            return (int) round(($lowerCount / $totalOthers) * 100);
+        } catch (\Throwable $e) {
+            return 50;
         }
     }
 
@@ -314,6 +358,7 @@ class NexusScoreCacheService
     {
         try {
             $users = $this->user->newQuery()
+                ->where('tenant_id', $tenantId)
                 ->where('is_approved', true)
                 ->select(['id', 'first_name', 'last_name', 'avatar_url'])
                 ->limit(100)
@@ -368,6 +413,7 @@ class NexusScoreCacheService
             $userScore = $userScoreData['total_score'];
 
             $users = $this->user->newQuery()
+                ->where('tenant_id', $tenantId)
                 ->where('is_approved', true)
                 ->limit(100)
                 ->pluck('id');

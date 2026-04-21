@@ -635,8 +635,10 @@ class GamificationV2Controller extends BaseApiController
 
         $this->rateLimit('nexus_score', 30, 60);
 
+        $force = request()->boolean('force', false);
+
         try {
-            $scoreData = $this->nexusScoreCacheService->getScore($userId, $tenantId);
+            $scoreData = $this->nexusScoreCacheService->getScore($userId, $tenantId, $force);
 
             $tier = $scoreData['tier'];
             if (is_array($tier)) {

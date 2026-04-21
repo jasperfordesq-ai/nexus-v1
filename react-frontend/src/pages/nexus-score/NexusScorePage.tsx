@@ -177,17 +177,18 @@ export default function NexusScorePage() {
   // AbortController ref for stale request cancellation
   const abortRef = useRef<AbortController | null>(null);
 
-  const load = useCallback(async (silent = false) => {
+  const load = useCallback(async (force = false) => {
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
 
-    if (!silent) setLoading(true);
+    if (!force) setLoading(true);
     else setRefreshing(true);
     setError(null);
 
     try {
-      const res = await api.get<NexusScoreData>('/v2/gamification/nexus-score');
+      const url = force ? '/v2/gamification/nexus-score?force=true' : '/v2/gamification/nexus-score';
+      const res = await api.get<NexusScoreData>(url);
       if (controller.signal.aborted) return;
       if (res.success && res.data) {
         setData(res.data);
@@ -198,7 +199,7 @@ export default function NexusScorePage() {
       if (controller.signal.aborted) return;
       logError('NexusScorePage.load', err);
       setError(tRef.current('nexus_score.load_error', 'Could not load your NexusScore. Please try again.'));
-      if (silent) toastRef.current.error(tRef.current('nexus_score.refresh_error', 'Refresh failed'));
+      if (force) toastRef.current.error(tRef.current('nexus_score.refresh_error', 'Refresh failed'));
     } finally {
       if (!controller.signal.aborted) {
         setLoading(false);

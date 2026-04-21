@@ -474,7 +474,7 @@ class NexusScoreService
     /**
      * Generate personalized insights.
      */
-    private function generateInsights(array $engagement, array $quality, array $volunteer, array $activity, array $badges, array $impact): array
+    public function generateInsights(array $engagement, array $quality, array $volunteer, array $activity, array $badges, array $impact): array
     {
         $insights = [];
         $categories = [
@@ -539,7 +539,7 @@ class NexusScoreService
     /**
      * Get next milestone.
      */
-    private function getNextMilestone(float $currentScore): array
+    public function getNextMilestone(float $currentScore): array
     {
         $milestones = [
             ['score' => 200, 'name' => 'Beginner', 'reward' => 'Unlock profile customization'],
