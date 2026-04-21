@@ -15,6 +15,7 @@ use App\Models\Listing;
 use App\Models\Review;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\VolLog;
 use App\Models\UserBadge;
 use App\Models\UserStreak;
 use Illuminate\Support\Facades\DB;
@@ -294,18 +295,18 @@ class NexusScoreService
      */
     private function calculateVolunteerScore(int $userId, int $tenantId): array
     {
-        $totalHours = (float) Transaction::where('sender_id', $userId)
+        $totalHours = (float) VolLog::where('user_id', $userId)
             ->where('tenant_id', $tenantId)
-            ->where('status', 'completed')->sum('amount');
-        $volunteerDays = (int) Transaction::where('sender_id', $userId)
+            ->where('status', 'approved')->sum('hours');
+        $volunteerDays = (int) VolLog::where('user_id', $userId)
             ->where('tenant_id', $tenantId)
-            ->where('status', 'completed')
-            ->selectRaw('COUNT(DISTINCT DATE(created_at)) as cnt')
+            ->where('status', 'approved')
+            ->selectRaw('COUNT(DISTINCT date_logged) as cnt')
             ->value('cnt');
-        $daysSpan = (int) Transaction::where('sender_id', $userId)
+        $daysSpan = (int) VolLog::where('user_id', $userId)
             ->where('tenant_id', $tenantId)
-            ->where('status', 'completed')
-            ->selectRaw('DATEDIFF(MAX(created_at), MIN(created_at)) + 1 as span')
+            ->where('status', 'approved')
+            ->selectRaw('DATEDIFF(MAX(date_logged), MIN(date_logged)) + 1 as span')
             ->value('span');
 
         $hoursScore = min(150, ($totalHours / 250) * 150);
