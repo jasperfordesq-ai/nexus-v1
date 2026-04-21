@@ -62,9 +62,21 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   };
 
   handleGoHome = () => {
-    // Use stored tenant slug from localStorage — resilient even when the URL
-    // has lost the slug prefix (e.g., after a redirect stripped it).
-    // Validate the slug before using it to prevent open-redirect via a
+    // On custom domains (e.g. hour-timebank.ie) the domain IS the tenant identifier —
+    // the slug must NOT appear in the path. Only prepend slug on shared hosts where
+    // path-based routing is required (localhost, app.project-nexus.ie).
+    const hostname = window.location.hostname;
+    const isSharedHost =
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname === 'app.project-nexus.ie';
+
+    if (!isSharedHost) {
+      window.location.href = '/';
+      return;
+    }
+
+    // Validate stored slug before using it to prevent open-redirect via a
     // poisoned localStorage value (must be alphanumeric/hyphens, 2–50 chars,
     // and not a reserved path segment).
     const storedSlug = localStorage.getItem('nexus_tenant_slug');
