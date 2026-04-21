@@ -110,7 +110,9 @@
     "delete_confirm": "Scrios",
     "aria_move_up": "Bog suas",
     "aria_move_down": "Bog síos",
-    "aria_upload_progress": "Dul chun cinn uaslódála"
+    "aria_upload_progress": "Dul chun cinn uaslódála",
+    "download": "Download",
+    "download_failed": "Download failed"
   },
   "not_found": {
     "page_title": "Leathanach Gan Aimsiú",

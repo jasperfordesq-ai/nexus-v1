@@ -110,7 +110,9 @@
     "delete_confirm": "Delete",
     "aria_move_up": "上に移動",
     "aria_move_down": "下に移動",
-    "aria_upload_progress": "アップロードの進行状況"
+    "aria_upload_progress": "アップロードの進行状況",
+    "download": "Download",
+    "download_failed": "Download failed"
   },
   "not_found": {
     "page_title": "ページが見つかりません",

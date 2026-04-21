@@ -110,7 +110,9 @@
     "delete_confirm": "Löschen",
     "aria_move_up": "Nach oben verschieben",
     "aria_move_down": "Nach unten verschieben",
-    "aria_upload_progress": "Upload-Fortschritt"
+    "aria_upload_progress": "Upload-Fortschritt",
+    "download": "Download",
+    "download_failed": "Download failed"
   },
   "not_found": {
     "page_title": "Seite nicht gefunden",

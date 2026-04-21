@@ -110,7 +110,9 @@
     "delete_confirm": "Delete",
     "aria_move_up": "Omhoog verplaatsen",
     "aria_move_down": "Omlaag verplaatsen",
-    "aria_upload_progress": "Upload voortgang"
+    "aria_upload_progress": "Upload voortgang",
+    "download": "Download",
+    "download_failed": "Download failed"
   },
   "not_found": {
     "page_title": "Pagina Niet Gevonden",
