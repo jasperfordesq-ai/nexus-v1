@@ -112,7 +112,7 @@ class AdminCronController extends BaseApiController
                 l.tenant_id
              {$this->getCronLogJoinSql()}
              WHERE l.id = ? AND {$this->getCronLogVisibilityClause()}",
-            [$tenantId, $logId, $tenantId, $tenantId]
+            [$tenantId, $logId, $tenantId]
         );
 
         if (!$log) {
@@ -285,7 +285,7 @@ class AdminCronController extends BaseApiController
              WHERE {$visibilityClause}
                AND l.status = 'error'
                AND l.executed_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)",
-            [$tenantId, $tenantId, $tenantId]
+            [$tenantId, $tenantId]
         )->count;
 
         $recentFailures = DB::select(
@@ -294,7 +294,7 @@ class AdminCronController extends BaseApiController
              WHERE {$visibilityClause}
                AND l.status = 'error'
              ORDER BY l.executed_at DESC LIMIT 5",
-            [$tenantId, $tenantId, $tenantId]
+            [$tenantId, $tenantId]
         );
 
         $rateData = DB::selectOne(
@@ -302,7 +302,7 @@ class AdminCronController extends BaseApiController
              {$joinSql}
              WHERE {$visibilityClause}
                AND l.executed_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
-            [$tenantId, $tenantId, $tenantId]
+            [$tenantId, $tenantId]
         );
         $avgSuccessRate7d = ($rateData->total ?? 0) > 0
             ? round(($rateData->successes ?? 0) / $rateData->total, 2)
@@ -341,7 +341,11 @@ class AdminCronController extends BaseApiController
 
     private function getCronLogVisibilityClause(): string
     {
-        return "(l.tenant_id = ? OR (l.tenant_id IS NULL AND j.id IS NOT NULL))";
+        // Platform-wide logs (tenant_id IS NULL) are produced by shared schedulers
+        // like process-queue and process-newsletters. They're system-level and
+        // visible to all tenant admins. cron_jobs-join gating was broken because
+        // cron_jobs is empty in practice.
+        return "(l.tenant_id = ? OR l.tenant_id IS NULL)";
     }
 
     private function mapCronLogRow(object $log): array
