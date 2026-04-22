@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -62,7 +63,7 @@ class EventNotificationService
                 ->where('r.event_id', $eventId)
                 ->where('r.tenant_id', $tenantId)
                 ->whereIn('r.status', ['going', 'interested'])
-                ->select(['r.user_id', 'u.email', 'u.name', 'u.first_name'])
+                ->select(['r.user_id', 'u.email', 'u.name', 'u.first_name', 'u.preferred_language'])
                 ->distinct()
                 ->get();
 
@@ -89,15 +90,20 @@ class EventNotificationService
                     'created_at' => now(),
                 ]);
 
-                // Send email notification
+                // Send email notification — switch Laravel locale to the recipient's
+                // preferred_language so subject + body render in THEIR language, not
+                // the caller's. Every nested __() call inside sendEventEmail and its
+                // HTML builder picks up the switched locale.
                 try {
-                    $this->sendEventEmail(
-                        $attendee,
-                        __('emails.events.update_subject', ['title' => $eventTitle]),
-                        $message,
-                        $path,
-                        'event_update'
-                    );
+                    LocaleContext::withLocale($attendee, function () use ($attendee, $eventTitle, $message, $path) {
+                        $this->sendEventEmail(
+                            $attendee,
+                            __('emails.events.update_subject', ['title' => $eventTitle]),
+                            $message,
+                            $path,
+                            'event_update'
+                        );
+                    });
                 } catch (\Throwable $e) {
                     Log::warning("[EventNotificationService] Email failed for user {$attendeeId}: " . $e->getMessage());
                 }
