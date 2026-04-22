@@ -238,7 +238,7 @@ function fuzzyMatch(query: string, target: string): boolean {
 // Sub-item labels also use top-level keys: "All Users", "Blog Posts", etc.
 function useAdminNav(): NavSection[] {
   const { t } = useTranslation('admin_nav');
-  const { hasFeature } = useTenant();
+  const { hasFeature, hasModule } = useTenant();
   const { user } = useAuth();
 
   const userRecord = user as Record<string, unknown> | null;
@@ -251,6 +251,101 @@ function useAdminNav(): NavSection[] {
     userRecord?.is_super_admin === true;
 
   return useMemo(() => {
+    // ── Community items — each sub-feature gated independently ───────────
+    const communityItems = [
+      ...(hasFeature('groups') ? [
+        { label: "Groups", href: '/admin/groups', icon: Users },
+        { label: "Group Types", href: '/admin/groups/types', icon: FolderTree },
+        { label: "Group Recommendations", href: '/admin/groups/recommendations', icon: Brain },
+        { label: "Group Ranking", href: '/admin/groups/ranking', icon: Trophy },
+      ] : []),
+      ...(hasFeature('events') ? [
+        { label: "Events", href: '/admin/events', icon: Calendar },
+      ] : []),
+      ...(hasFeature('polls') ? [
+        { label: "Polls", href: '/admin/polls', icon: BarChart2 },
+      ] : []),
+      ...(hasFeature('goals') ? [
+        { label: "Goals", href: '/admin/goals', icon: Target },
+      ] : []),
+      ...(hasFeature('ideation_challenges') ? [
+        { label: "Ideation Challenges", href: '/admin/ideation', icon: Lightbulb },
+      ] : []),
+      ...(hasFeature('volunteering') ? [
+        { label: "Volunteering", href: '/admin/volunteering', icon: Heart },
+      ] : []),
+    ];
+
+    // ── Matching items — broker/exchange gated; safeguarding always shown ─
+    const matchingItems = [
+      ...(hasFeature('exchange_workflow') ? [
+        { label: "Smart Matching", href: '/admin/smart-matching', icon: Brain },
+        { label: "Match Approvals", href: '/admin/match-approvals', icon: UserCheck, badge: 'NEW' },
+        { label: "Broker Controls", href: '/admin/broker-controls', icon: Shield },
+        { label: "Message Review", href: '/admin/broker-controls/messages', icon: MessageSquareWarning },
+        { label: "User Monitoring", href: '/admin/broker-controls/monitoring', icon: Eye },
+        { label: "Vetting Records", href: '/admin/broker-controls/vetting', icon: ShieldCheck },
+        { label: "Insurance Certificates", href: '/admin/broker-controls/insurance', icon: FileCheck },
+        { label: "Review Archive", href: '/admin/broker-controls/archives', icon: Archive },
+      ] : []),
+      { label: "Safeguarding", href: '/admin/safeguarding', icon: ShieldCheck },
+      { label: "Member Safeguarding", href: '/admin/safeguarding?tab=preferences', icon: Users },
+      { label: "Safeguarding Options", href: '/admin/safeguarding-options', icon: Shield },
+    ];
+
+    // ── Moderation items — feed posts and reviews gated ──────────────────
+    const moderationItems = [
+      { label: "Content Queue", href: '/admin/moderation/queue', icon: Shield, badge: 'NEW' },
+      ...(hasModule('feed') ? [
+        { label: "Feed Posts", href: '/admin/moderation/feed', icon: MessageSquare },
+      ] : []),
+      { label: "Comments", href: '/admin/moderation/comments', icon: MessageCircle },
+      ...(hasFeature('reviews') ? [
+        { label: "Reviews", href: '/admin/moderation/reviews', icon: Star },
+      ] : []),
+      { label: "Reports", href: '/admin/moderation/reports', icon: Flag },
+    ];
+
+    // ── Content items — blog and resources gated ─────────────────────────
+    const contentItems = [
+      ...(hasFeature('blog') ? [
+        { label: "Blog Posts", href: '/admin/blog', icon: FileText },
+      ] : []),
+      ...(hasFeature('resources') ? [
+        { label: "Resources", href: '/admin/resources', icon: BookOpen },
+      ] : []),
+      { label: "Pages", href: '/admin/pages', icon: FileText },
+      { label: "Landing Page", href: '/admin/landing-page', icon: Palette },
+      { label: "Menus", href: '/admin/menus', icon: Menu },
+      { label: "Categories", href: '/admin/categories', icon: FolderTree },
+      { label: "Attributes", href: '/admin/attributes', icon: Tags },
+    ];
+
+    // ── Financial items — timebanking gated behind wallet module ─────────
+    const financialItems = [
+      ...(hasModule('wallet') ? [
+        { label: "Timebanking", href: '/admin/timebanking', icon: Clock },
+        { label: "Fraud Alerts", href: '/admin/timebanking/alerts', icon: AlertTriangle },
+        { label: "Organisation Wallets", href: '/admin/timebanking/org-wallets', icon: Wallet },
+        { label: "Starting Balances", href: '/admin/timebanking/starting-balances', icon: Wallet },
+      ] : []),
+      { label: "Plans & Pricing", href: '/admin/plans', icon: CreditCard },
+      { label: "Billing", href: '/admin/billing', icon: CreditCard },
+    ];
+
+    // ── Advanced items — AI settings gated ───────────────────────────────
+    const advancedItems = [
+      ...(hasFeature('ai_chat') ? [
+        { label: "AI Settings", href: '/admin/ai-settings', icon: Brain },
+      ] : []),
+      { label: "Email Settings", href: '/admin/email-settings', icon: Mail },
+      { label: "Algorithm Settings", href: '/admin/algorithm-settings', icon: Cpu },
+      { label: "SEO Overview", href: '/admin/seo', icon: Search },
+      { label: "404 Error Tracking", href: '/admin/404-errors', icon: AlertTriangle },
+      { label: "Diagnostics", href: '/admin/matching-diagnostic', icon: Stethoscope },
+      { label: "Match Debug Panel", href: '/admin/match-debug', icon: Target },
+    ];
+
     const sections: NavSection[] = [
       {
         key: 'dashboard',
@@ -280,29 +375,24 @@ function useAdminNav(): NavSection[] {
           { label: "Onboarding Funnel", href: '/admin/crm/funnel', icon: Filter },
         ],
       },
-      {
+      // Listings — only when module is enabled
+      ...(hasModule('listings') ? [{
         key: 'listings',
         label: "Listings",
         icon: ListChecks,
         items: [
           { label: "All Content", href: '/admin/listings', icon: ListChecks },
         ],
-      },
+      }] as NavSection[] : []),
+      // Content — always has core items (Pages, Menus, etc.)
       {
         key: 'content',
         label: "Content",
         icon: Newspaper,
-        items: [
-          { label: "Blog Posts", href: '/admin/blog', icon: FileText },
-          { label: "Resources", href: '/admin/resources', icon: BookOpen },
-          { label: "Pages", href: '/admin/pages', icon: FileText },
-          { label: "Landing Page", href: '/admin/landing-page', icon: Palette },
-          { label: "Menus", href: '/admin/menus', icon: Menu },
-          { label: "Categories", href: '/admin/categories', icon: FolderTree },
-          { label: "Attributes", href: '/admin/attributes', icon: Tags },
-        ],
+        items: contentItems,
       },
-      {
+      // Engagement — entirely gamification, hidden when feature is off
+      ...(hasFeature('gamification') ? [{
         key: 'engagement',
         label: "Engagement",
         icon: Trophy,
@@ -312,53 +402,29 @@ function useAdminNav(): NavSection[] {
           { label: "Custom Badges", href: '/admin/custom-badges', icon: Medal },
           { label: "Analytics", href: '/admin/gamification/analytics', icon: BarChart3 },
         ],
-      },
+      }] as NavSection[] : []),
+      // Matching & Safety — broker items gated, safeguarding always present
       {
         key: 'matching',
         label: "Matching & Safety",
         icon: Zap,
-        items: [
-          { label: "Smart Matching", href: '/admin/smart-matching', icon: Brain },
-          { label: "Match Approvals", href: '/admin/match-approvals', icon: UserCheck, badge: 'NEW' },
-          { label: "Broker Controls", href: '/admin/broker-controls', icon: Shield },
-          { label: "Message Review", href: '/admin/broker-controls/messages', icon: MessageSquareWarning },
-          { label: "User Monitoring", href: '/admin/broker-controls/monitoring', icon: Eye },
-          { label: "Vetting Records", href: '/admin/broker-controls/vetting', icon: ShieldCheck },
-          { label: "Insurance Certificates", href: '/admin/broker-controls/insurance', icon: FileCheck },
-          { label: "Review Archive", href: '/admin/broker-controls/archives', icon: Archive },
-          { label: "Safeguarding", href: '/admin/safeguarding', icon: ShieldCheck },
-          { label: "Member Safeguarding", href: '/admin/safeguarding?tab=preferences', icon: Users },
-          { label: "Safeguarding Options", href: '/admin/safeguarding-options', icon: Shield },
-        ],
+        items: matchingItems,
       },
+      // Moderation — always has core items
       {
         key: 'moderation',
         label: "Moderation",
         icon: Shield,
-        items: [
-          { label: "Content Queue", href: '/admin/moderation/queue', icon: Shield, badge: 'NEW' },
-          { label: "Feed Posts", href: '/admin/moderation/feed', icon: MessageSquare },
-          { label: "Comments", href: '/admin/moderation/comments', icon: MessageCircle },
-          { label: "Reviews", href: '/admin/moderation/reviews', icon: Star },
-          { label: "Reports", href: '/admin/moderation/reports', icon: Flag },
-        ],
+        items: moderationItems,
       },
-      {
+      // Community — hidden entirely if all sub-features are disabled
+      ...(communityItems.length > 0 ? [{
         key: 'community',
         label: "Community",
         icon: Users,
-        items: [
-          { label: "Groups", href: '/admin/groups', icon: Users },
-          { label: "Group Types", href: '/admin/groups/types', icon: FolderTree },
-          { label: "Group Recommendations", href: '/admin/groups/recommendations', icon: Brain },
-          { label: "Group Ranking", href: '/admin/groups/ranking', icon: Trophy },
-          { label: "Events", href: '/admin/events', icon: Calendar },
-          { label: "Polls", href: '/admin/polls', icon: BarChart2 },
-          { label: "Goals", href: '/admin/goals', icon: Target },
-          { label: "Ideation Challenges", href: '/admin/ideation', icon: Lightbulb },
-          { label: "Volunteering", href: '/admin/volunteering', icon: Heart },
-        ],
-      },
+        items: communityItems,
+      }] as NavSection[] : []),
+      // Jobs — gated by job_vacancies feature
       ...(hasFeature('job_vacancies') ? [{
         key: 'jobs',
         label: "Job Vacancies",
@@ -370,7 +436,8 @@ function useAdminNav(): NavSection[] {
           { label: "Bias Audit", href: '/admin/jobs/bias-audit', icon: BarChart3 },
           { label: "Templates", href: '/admin/jobs/templates', icon: FileText },
         ],
-      }] : []),
+      }] as NavSection[] : []),
+      // Marketplace — gated by marketplace feature
       ...(hasFeature('marketplace') ? [{
         key: 'marketplace',
         label: "Marketplace",
@@ -403,7 +470,9 @@ function useAdminNav(): NavSection[] {
           { label: "Community Analytics", href: '/admin/community-analytics', icon: BarChart3 },
           { label: "Impact Report", href: '/admin/impact-report', icon: FileText },
           { label: "Member Reports", href: '/admin/reports/members', icon: Users },
-          { label: "Hours Reports", href: '/admin/reports/hours', icon: Clock },
+          ...(hasModule('wallet') ? [
+            { label: "Hours Reports", href: '/admin/reports/hours', icon: Clock },
+          ] : []),
           { label: "Inactive Members", href: '/admin/reports/inactive-members', icon: UserX },
         ],
       },
@@ -411,28 +480,13 @@ function useAdminNav(): NavSection[] {
         key: 'advanced',
         label: "Advanced",
         icon: Sparkles,
-        items: [
-          { label: "AI Settings", href: '/admin/ai-settings', icon: Brain },
-          { label: "Email Settings", href: '/admin/email-settings', icon: Mail },
-          { label: "Algorithm Settings", href: '/admin/algorithm-settings', icon: Cpu },
-          { label: "SEO Overview", href: '/admin/seo', icon: Search },
-          { label: "404 Error Tracking", href: '/admin/404-errors', icon: AlertTriangle },
-          { label: "Diagnostics", href: '/admin/matching-diagnostic', icon: Stethoscope },
-          { label: "Match Debug Panel", href: '/admin/match-debug', icon: Target },
-        ],
+        items: advancedItems,
       },
       {
         key: 'financial',
         label: "Financial",
         icon: Coins,
-        items: [
-          { label: "Timebanking", href: '/admin/timebanking', icon: Clock },
-          { label: "Fraud Alerts", href: '/admin/timebanking/alerts', icon: AlertTriangle },
-          { label: "Organisation Wallets", href: '/admin/timebanking/org-wallets', icon: Wallet },
-          { label: "Starting Balances", href: '/admin/timebanking/starting-balances', icon: Wallet },
-          { label: "Plans & Pricing", href: '/admin/plans', icon: CreditCard },
-          { label: "Billing", href: '/admin/billing', icon: CreditCard },
-        ],
+        items: financialItems,
       },
       {
         key: 'enterprise',
@@ -517,7 +571,7 @@ function useAdminNav(): NavSection[] {
     }
 
     return sections;
-  }, [hasFeature, isPlatformSuperAdmin, isSuperAdmin])
+  }, [hasFeature, hasModule, isPlatformSuperAdmin, isSuperAdmin])
 
 }
 
