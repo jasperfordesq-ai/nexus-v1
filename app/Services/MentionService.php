@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -109,6 +110,20 @@ class MentionService
 
         $mentionerName = $mentioner->name ?? $mentioner->first_name ?? __('emails.common.fallback_someone');
 
+        // Batch-load preferred_language for every mentioned user so we can render
+        // each recipient's bell text in their own locale.
+        $recipientLocales = [];
+        if (!empty($mentionedUserIds)) {
+            $recipientRows = DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('id', $mentionedUserIds)
+                ->select(['id', 'preferred_language'])
+                ->get();
+            foreach ($recipientRows as $row) {
+                $recipientLocales[(int) $row->id] = $row->preferred_language ?? null;
+            }
+        }
+
         foreach ($mentionedUserIds as $mentionedUserId) {
             // Don't notify yourself
             if ($mentionedUserId === $mentionerId) {
@@ -129,26 +144,29 @@ class MentionService
                     'created_at'        => now(),
                 ]);
 
-                // Build notification
+                // Build notification — render under the mentioned user's preferred locale.
                 $shortPreview = mb_strlen($textPreview) > 100
                     ? mb_substr($textPreview, 0, 100) . '...'
                     : $textPreview;
 
-                $entityLabel = self::getEntityLabel($entityType);
-                if ($shortPreview) {
-                    $message = __('svc_notifications.mention.mentioned_in_with_preview', ['name' => $mentionerName, 'entity' => $entityLabel, 'preview' => $shortPreview]);
-                } else {
-                    $message = __('svc_notifications.mention.mentioned_in', ['name' => $mentionerName, 'entity' => $entityLabel]);
-                }
-
                 $link = self::getEntityLink($entityType, $entityId);
+                $recipientLocale = $recipientLocales[(int) $mentionedUserId] ?? null;
 
-                Notification::createNotification(
-                    $mentionedUserId,
-                    $message,
-                    $link,
-                    'mention'
-                );
+                LocaleContext::withLocale($recipientLocale, function () use ($entityType, $mentionerName, $shortPreview, $mentionedUserId, $link) {
+                    $entityLabel = self::getEntityLabel($entityType);
+                    if ($shortPreview) {
+                        $message = __('svc_notifications.mention.mentioned_in_with_preview', ['name' => $mentionerName, 'entity' => $entityLabel, 'preview' => $shortPreview]);
+                    } else {
+                        $message = __('svc_notifications.mention.mentioned_in', ['name' => $mentionerName, 'entity' => $entityLabel]);
+                    }
+
+                    Notification::createNotification(
+                        $mentionedUserId,
+                        $message,
+                        $link,
+                        'mention'
+                    );
+                });
             } catch (\Exception $e) {
                 // Ignore duplicate mention errors, log others
                 Log::debug("MentionService::createMentions error: " . $e->getMessage());

@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplate;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -49,26 +50,29 @@ class SocialNotificationService
             $owner = DB::table('users')
                 ->where('id', $contentOwnerId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name'])
+                ->select(['email', 'name', 'first_name', 'preferred_language'])
                 ->first();
             if (!$owner) {
                 return;
             }
 
             $ownerEmail = $owner->email ?? null;
-
-            $contentLabel = self::getContentLabel($contentType);
-            $message = __('notifications.liked_your_content', ['name' => $likerName, 'content_type' => $contentLabel]);
             $link = self::getContentLink($contentType, $contentId);
 
-            // 1. Create platform notification (bell)
-            Notification::createNotification((int) $contentOwnerId, $message, $link, 'like');
+            // Render bell text + email content under the recipient's preferred locale.
+            LocaleContext::withLocale($owner, function () use ($owner, $contentOwnerId, $liker, $likerName, $contentType, $contentId, $contentPreview, $ownerEmail, $link) {
+                $contentLabel = self::getContentLabel($contentType);
+                $message = __('notifications.liked_your_content', ['name' => $likerName, 'content_type' => $contentLabel]);
 
-            // 2. Send email notification (if user has email and hasn't opted out)
-            if ($ownerEmail && self::shouldSendEmail($contentOwnerId, 'like')) {
-                $emailLink = TenantContext::getSlugPrefix() . $link;
-                self::sendLikeEmail($owner, $liker, $contentType, $contentId, $contentPreview, $emailLink);
-            }
+                // 1. Create platform notification (bell)
+                Notification::createNotification((int) $contentOwnerId, $message, $link, 'like');
+
+                // 2. Send email notification (if user has email and hasn't opted out)
+                if ($ownerEmail && self::shouldSendEmail($contentOwnerId, 'like')) {
+                    $emailLink = TenantContext::getSlugPrefix() . $link;
+                    self::sendLikeEmail($owner, $liker, $contentType, $contentId, $contentPreview, $emailLink);
+                }
+            });
         } catch (\Throwable $e) {
             Log::warning("SocialNotificationService::notifyLike error: " . $e->getMessage());
         }
@@ -96,27 +100,30 @@ class SocialNotificationService
             $owner = DB::table('users')
                 ->where('id', $contentOwnerId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name'])
+                ->select(['email', 'name', 'first_name', 'preferred_language'])
                 ->first();
             if (!$owner) {
                 return;
             }
 
             $ownerEmail = $owner->email ?? null;
-
-            $contentLabel = self::getContentLabel($contentType);
-            $shortComment = strlen($commentText) > 50 ? substr($commentText, 0, 50) . '...' : $commentText;
-            $message = __('notifications.commented_on_your_content', ['name' => $commenterName, 'content_type' => $contentLabel, 'comment' => $shortComment]);
             $link = self::getContentLink($contentType, $contentId);
+            $shortComment = strlen($commentText) > 50 ? substr($commentText, 0, 50) . '...' : $commentText;
 
-            // 1. Create platform notification (bell)
-            Notification::createNotification((int) $contentOwnerId, $message, $link, 'comment');
+            // Render bell text + email content under the recipient's preferred locale.
+            LocaleContext::withLocale($owner, function () use ($owner, $contentOwnerId, $commenter, $commenterName, $contentType, $contentId, $commentText, $shortComment, $ownerEmail, $link) {
+                $contentLabel = self::getContentLabel($contentType);
+                $message = __('notifications.commented_on_your_content', ['name' => $commenterName, 'content_type' => $contentLabel, 'comment' => $shortComment]);
 
-            // 2. Send email notification (if user has email and hasn't opted out)
-            if ($ownerEmail && self::shouldSendEmail($contentOwnerId, 'comment')) {
-                $emailLink = TenantContext::getSlugPrefix() . $link;
-                self::sendCommentEmail($owner, $commenter, $contentType, $contentId, $commentText, $emailLink);
-            }
+                // 1. Create platform notification (bell)
+                Notification::createNotification((int) $contentOwnerId, $message, $link, 'comment');
+
+                // 2. Send email notification (if user has email and hasn't opted out)
+                if ($ownerEmail && self::shouldSendEmail($contentOwnerId, 'comment')) {
+                    $emailLink = TenantContext::getSlugPrefix() . $link;
+                    self::sendCommentEmail($owner, $commenter, $contentType, $contentId, $commentText, $emailLink);
+                }
+            });
         } catch (\Throwable $e) {
             Log::warning("SocialNotificationService::notifyComment error: " . $e->getMessage());
         }
@@ -144,26 +151,29 @@ class SocialNotificationService
             $owner = DB::table('users')
                 ->where('id', $contentOwnerId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name'])
+                ->select(['email', 'name', 'first_name', 'preferred_language'])
                 ->first();
             if (!$owner) {
                 return;
             }
 
             $ownerEmail = $owner->email ?? null;
-
-            $contentLabel = self::getContentLabel($contentType);
-            $message = __('notifications.shared_your_content', ['name' => $sharerName, 'content_type' => $contentLabel]);
             $link = self::getContentLink($contentType, $contentId);
 
-            // 1. Create platform notification (bell)
-            Notification::createNotification((int) $contentOwnerId, $message, $link, 'share');
+            // Render bell text + email content under the recipient's preferred locale.
+            LocaleContext::withLocale($owner, function () use ($owner, $contentOwnerId, $sharer, $sharerName, $contentType, $contentId, $ownerEmail, $link) {
+                $contentLabel = self::getContentLabel($contentType);
+                $message = __('notifications.shared_your_content', ['name' => $sharerName, 'content_type' => $contentLabel]);
 
-            // 2. Send email notification (if user has email and hasn't opted out)
-            if ($ownerEmail && self::shouldSendEmail($contentOwnerId, 'share')) {
-                $emailLink = TenantContext::getSlugPrefix() . $link;
-                self::sendShareEmail($owner, $sharer, $contentType, $contentId, $emailLink);
-            }
+                // 1. Create platform notification (bell)
+                Notification::createNotification((int) $contentOwnerId, $message, $link, 'share');
+
+                // 2. Send email notification (if user has email and hasn't opted out)
+                if ($ownerEmail && self::shouldSendEmail($contentOwnerId, 'share')) {
+                    $emailLink = TenantContext::getSlugPrefix() . $link;
+                    self::sendShareEmail($owner, $sharer, $contentType, $contentId, $emailLink);
+                }
+            });
         } catch (\Throwable $e) {
             Log::warning("SocialNotificationService::notifyShare error: " . $e->getMessage());
         }

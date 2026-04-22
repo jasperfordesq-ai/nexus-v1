@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -252,17 +253,7 @@ class NotificationDispatcher
      */
     public static function dispatchHotMatch($userId, $match): void
     {
-        $listingTitle = $match['title'] ?? 'New Listing';
-        $matchScore = (int) ($match['match_score'] ?? 85);
-        $userName = $match['user_name'] ?? __('emails.common.fallback_someone');
-        $distance = $match['distance_km'] ?? null;
-        $listingId = $match['id'] ?? 0;
-
-        $distanceText = $distance !== null ? " ({$distance}km away)" : '';
-        $content = __('notifications.hot_match_content', ['name' => $userName, 'title' => $listingTitle, 'score' => $matchScore, 'distance' => $distanceText]);
-        $link = "/listings/{$listingId}";
-
-        // Check user's match notification preferences
+        // Check user's match notification preferences (cheap DB miss exit first)
         $prefs = \App\Services\MatchingService::getPreferencesStatic($userId);
         if (empty($prefs['notify_hot_matches'])) {
             return;
@@ -276,10 +267,30 @@ class NotificationDispatcher
         // Normalize frequency: map 'fortnightly' to 'weekly' for queue ENUM compatibility
         $queueFrequency = $frequency === 'fortnightly' ? 'weekly' : $frequency;
 
-        Notification::createNotification((int) $userId, $content, $link, 'hot_match');
+        // Lookup recipient so bell + email render in their preferred locale.
+        $tenantId = TenantContext::getId();
+        $recipient = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select(['preferred_language'])
+            ->first();
 
-        $htmlContent = self::buildHotMatchEmail($match, $matchScore);
-        self::queueNotification($userId, 'hot_match', $content, $link, $queueFrequency, $htmlContent);
+        LocaleContext::withLocale($recipient, function () use ($userId, $match, $queueFrequency) {
+            $listingTitle = $match['title'] ?? 'New Listing';
+            $matchScore = (int) ($match['match_score'] ?? 85);
+            $userName = $match['user_name'] ?? __('emails.common.fallback_someone');
+            $distance = $match['distance_km'] ?? null;
+            $listingId = $match['id'] ?? 0;
+
+            $distanceText = $distance !== null ? " ({$distance}km away)" : '';
+            $content = __('notifications.hot_match_content', ['name' => $userName, 'title' => $listingTitle, 'score' => $matchScore, 'distance' => $distanceText]);
+            $link = "/listings/{$listingId}";
+
+            Notification::createNotification((int) $userId, $content, $link, 'hot_match');
+
+            $htmlContent = self::buildHotMatchEmail($match, $matchScore);
+            self::queueNotification($userId, 'hot_match', $content, $link, $queueFrequency, $htmlContent);
+        });
     }
 
     /**
@@ -287,14 +298,6 @@ class NotificationDispatcher
      */
     public static function dispatchMutualMatch($userId, $match, $reciprocalInfo = []): void
     {
-        $userName = $match['user_name'] ?? __('emails.common.fallback_someone');
-        $theyOffer = $reciprocalInfo['they_offer'] ?? 'a skill you need';
-        $youOffer = $reciprocalInfo['you_offer'] ?? 'something they need';
-        $listingId = $match['id'] ?? 0;
-
-        $content = __('notifications.mutual_match_content', ['name' => $userName, 'they_offer' => $theyOffer, 'you_offer' => $youOffer]);
-        $link = "/listings/{$listingId}";
-
         $prefs = \App\Services\MatchingService::getPreferencesStatic($userId);
         if (empty($prefs['notify_mutual_matches'])) {
             return;
@@ -308,10 +311,28 @@ class NotificationDispatcher
         // Normalize frequency: map 'fortnightly' to 'weekly' for queue ENUM compatibility
         $queueFrequency = $frequency === 'fortnightly' ? 'weekly' : $frequency;
 
-        Notification::createNotification((int) $userId, $content, $link, 'mutual_match');
+        // Lookup recipient so bell + email render in their preferred locale.
+        $tenantId = TenantContext::getId();
+        $recipient = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select(['preferred_language'])
+            ->first();
 
-        $htmlContent = self::buildMutualMatchEmail($match, $reciprocalInfo);
-        self::queueNotification($userId, 'mutual_match', $content, $link, $queueFrequency, $htmlContent);
+        LocaleContext::withLocale($recipient, function () use ($userId, $match, $reciprocalInfo, $queueFrequency) {
+            $userName = $match['user_name'] ?? __('emails.common.fallback_someone');
+            $theyOffer = $reciprocalInfo['they_offer'] ?? 'a skill you need';
+            $youOffer = $reciprocalInfo['you_offer'] ?? 'something they need';
+            $listingId = $match['id'] ?? 0;
+
+            $content = __('notifications.mutual_match_content', ['name' => $userName, 'they_offer' => $theyOffer, 'you_offer' => $youOffer]);
+            $link = "/listings/{$listingId}";
+
+            Notification::createNotification((int) $userId, $content, $link, 'mutual_match');
+
+            $htmlContent = self::buildMutualMatchEmail($match, $reciprocalInfo);
+            self::queueNotification($userId, 'mutual_match', $content, $link, $queueFrequency, $htmlContent);
+        });
     }
 
     /**
@@ -323,24 +344,34 @@ class NotificationDispatcher
             return;
         }
 
-        $count = count($matches);
-        $hotCount = count(array_filter($matches, fn($m) => ($m['match_score'] ?? 0) >= 85));
-        $mutualCount = count(array_filter($matches, fn($m) => ($m['match_type'] ?? '') === 'mutual'));
+        // Lookup recipient so bell + email render in their preferred locale.
+        $tenantId = TenantContext::getId();
+        $recipient = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select(['preferred_language'])
+            ->first();
 
-        $content = __('notifications.match_digest_content', ['period' => $period, 'count' => $count]);
-        if ($hotCount > 0) {
-            $content .= __('notifications.match_digest_hot', ['count' => $hotCount]);
-        }
-        if ($mutualCount > 0) {
-            $content .= __('notifications.match_digest_mutual', ['count' => $mutualCount]);
-        }
+        LocaleContext::withLocale($recipient, function () use ($userId, $matches, $period) {
+            $count = count($matches);
+            $hotCount = count(array_filter($matches, fn($m) => ($m['match_score'] ?? 0) >= 85));
+            $mutualCount = count(array_filter($matches, fn($m) => ($m['match_type'] ?? '') === 'mutual'));
 
-        $link = "/matches";
+            $content = __('notifications.match_digest_content', ['period' => $period, 'count' => $count]);
+            if ($hotCount > 0) {
+                $content .= __('notifications.match_digest_hot', ['count' => $hotCount]);
+            }
+            if ($mutualCount > 0) {
+                $content .= __('notifications.match_digest_mutual', ['count' => $mutualCount]);
+            }
 
-        Notification::createNotification((int) $userId, $content, $link, 'match_digest');
+            $link = "/matches";
 
-        $htmlContent = self::buildMatchDigestEmail($matches, $period, $hotCount, $mutualCount);
-        self::queueNotification($userId, 'match_digest', $content, $link, 'instant', $htmlContent);
+            Notification::createNotification((int) $userId, $content, $link, 'match_digest');
+
+            $htmlContent = self::buildMatchDigestEmail($matches, $period, $hotCount, $mutualCount);
+            self::queueNotification($userId, 'match_digest', $content, $link, 'instant', $htmlContent);
+        });
     }
 
     // =========================================================================
@@ -352,13 +383,23 @@ class NotificationDispatcher
      */
     public static function dispatchMatchApprovalRequest($brokerId, $userName, $listingTitle, $requestId): void
     {
-        $content = __('notifications.match_approval_request', ['name' => $userName, 'title' => $listingTitle]);
-        $link = "/admin/match-approvals";
+        // Lookup broker so bell + email render in the broker's preferred locale.
+        $tenantId = TenantContext::getId();
+        $broker = DB::table('users')
+            ->where('id', $brokerId)
+            ->where('tenant_id', $tenantId)
+            ->select(['preferred_language'])
+            ->first();
 
-        Notification::createNotification((int) $brokerId, $content, $link, 'match_approval_request');
+        LocaleContext::withLocale($broker, function () use ($brokerId, $userName, $listingTitle, $requestId) {
+            $content = __('notifications.match_approval_request', ['name' => $userName, 'title' => $listingTitle]);
+            $link = "/admin/match-approvals";
 
-        $htmlContent = self::buildMatchApprovalRequestEmail($userName, $listingTitle, $requestId);
-        self::queueNotification($brokerId, 'match_approval_request', $content, $link, 'instant', $htmlContent);
+            Notification::createNotification((int) $brokerId, $content, $link, 'match_approval_request');
+
+            $htmlContent = self::buildMatchApprovalRequestEmail($userName, $listingTitle, $requestId);
+            self::queueNotification($brokerId, 'match_approval_request', $content, $link, 'instant', $htmlContent);
+        });
     }
 
     /**
@@ -366,13 +407,23 @@ class NotificationDispatcher
      */
     public static function dispatchMatchApproved($userId, $listingTitle, $listingId, $matchScore = 0): void
     {
-        $content = __('notifications.match_approved', ['title' => $listingTitle]);
-        $link = "/listings/{$listingId}";
+        // Lookup recipient so bell + email render in their preferred locale.
+        $tenantId = TenantContext::getId();
+        $recipient = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select(['preferred_language'])
+            ->first();
 
-        Notification::createNotification((int) $userId, $content, $link, 'match_approved');
+        LocaleContext::withLocale($recipient, function () use ($userId, $listingTitle, $listingId, $matchScore) {
+            $content = __('notifications.match_approved', ['title' => $listingTitle]);
+            $link = "/listings/{$listingId}";
 
-        $htmlContent = self::buildMatchApprovedEmail($listingTitle, $listingId, $matchScore);
-        self::queueNotification($userId, 'match_approved', $content, $link, 'instant', $htmlContent);
+            Notification::createNotification((int) $userId, $content, $link, 'match_approved');
+
+            $htmlContent = self::buildMatchApprovedEmail($listingTitle, $listingId, $matchScore);
+            self::queueNotification($userId, 'match_approved', $content, $link, 'instant', $htmlContent);
+        });
     }
 
     /**
@@ -380,16 +431,26 @@ class NotificationDispatcher
      */
     public static function dispatchMatchRejected($userId, $listingTitle, $reason = ''): void
     {
-        $content = __('notifications.match_rejected', ['title' => $listingTitle]);
-        if (!empty($reason)) {
-            $content .= __('notifications.match_rejected_reason', ['reason' => $reason]);
-        }
-        $link = "/matches";
+        // Lookup recipient so bell + email render in their preferred locale.
+        $tenantId = TenantContext::getId();
+        $recipient = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select(['preferred_language'])
+            ->first();
 
-        Notification::createNotification((int) $userId, $content, $link, 'match_rejected');
+        LocaleContext::withLocale($recipient, function () use ($userId, $listingTitle, $reason) {
+            $content = __('notifications.match_rejected', ['title' => $listingTitle]);
+            if (!empty($reason)) {
+                $content .= __('notifications.match_rejected_reason', ['reason' => $reason]);
+            }
+            $link = "/matches";
 
-        $htmlContent = self::buildMatchRejectedEmail($listingTitle, $reason);
-        self::queueNotification($userId, 'match_rejected', $content, $link, 'instant', $htmlContent);
+            Notification::createNotification((int) $userId, $content, $link, 'match_rejected');
+
+            $htmlContent = self::buildMatchRejectedEmail($listingTitle, $reason);
+            self::queueNotification($userId, 'match_rejected', $content, $link, 'instant', $htmlContent);
+        });
     }
 
     // =========================================================================
@@ -401,13 +462,23 @@ class NotificationDispatcher
      */
     public static function send(int $userId, string $type, array $data = []): void
     {
-        $content = self::buildNotificationContent($type, $data);
-        $link = self::buildNotificationLink($type, $data);
+        // Lookup recipient so bell text + email all render in the recipient's locale.
+        $tenantId = TenantContext::getId();
+        $recipient = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select(['preferred_language'])
+            ->first();
 
-        Notification::createNotification($userId, $content, $link, $type);
+        LocaleContext::withLocale($recipient, function () use ($userId, $type, $data) {
+            $content = self::buildNotificationContent($type, $data);
+            $link = self::buildNotificationLink($type, $data);
 
-        // Send email immediately for exchange notifications
-        self::sendExchangeEmailImmediately($userId, $type, $data, $content, $link);
+            Notification::createNotification($userId, $content, $link, $type);
+
+            // Send email immediately for exchange notifications
+            self::sendExchangeEmailImmediately($userId, $type, $data, $content, $link);
+        });
     }
 
     /**
@@ -421,15 +492,19 @@ class NotificationDispatcher
             ->where('tenant_id', $tenantId)
             ->whereIn('role', ['admin', 'broker', 'coordinator'])
             ->where('status', 'active')
-            ->pluck('id');
+            ->select(['id', 'preferred_language'])
+            ->get();
 
-        foreach ($admins as $adminId) {
-            $content = $message ?: self::buildNotificationContent($type, $data);
-            $link = self::buildNotificationLink($type, $data);
+        foreach ($admins as $admin) {
+            // Render bell text + email per-admin under their preferred locale.
+            LocaleContext::withLocale($admin, function () use ($admin, $type, $data, $message) {
+                $content = $message ?: self::buildNotificationContent($type, $data);
+                $link = self::buildNotificationLink($type, $data);
 
-            Notification::createNotification((int) $adminId, $content, $link, $type);
+                Notification::createNotification((int) $admin->id, $content, $link, $type);
 
-            self::sendExchangeEmailImmediately((int) $adminId, $type, $data, $content, $link);
+                self::sendExchangeEmailImmediately((int) $admin->id, $type, $data, $content, $link);
+            });
         }
     }
 
@@ -444,32 +519,35 @@ class NotificationDispatcher
             $user = DB::table('users')
                 ->where('id', $recipientUserId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name'])
+                ->select(['email', 'name', 'first_name', 'preferred_language'])
                 ->first();
 
             if (!$user || empty($user->email)) {
                 return;
             }
 
-            $recipientName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-            $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
-            $baseUrl = TenantContext::getFrontendUrl();
-            $basePath = TenantContext::getSlugPrefix();
-            $walletUrl = $baseUrl . $basePath . '/wallet';
+            // Render subject + body under the recipient's preferred locale.
+            LocaleContext::withLocale($user, function () use ($user, $senderName, $amount, $description) {
+                $recipientName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
+                $baseUrl = TenantContext::getFrontendUrl();
+                $basePath = TenantContext::getSlugPrefix();
+                $walletUrl = $baseUrl . $basePath . '/wallet';
 
-            $amountDisplay = $amount . ' hour' . ($amount != 1 ? 's' : '');
-            $subject = __('emails.notification.credit_received_subject', ['sender' => htmlspecialchars($senderName), 'amount' => $amountDisplay, 'community' => $tenantName]);
-            $emailBody = self::buildCreditReceivedEmail(
-                htmlspecialchars($recipientName),
-                htmlspecialchars($senderName),
-                $amount,
-                htmlspecialchars($description),
-                $walletUrl,
-                htmlspecialchars($tenantName)
-            );
+                $amountDisplay = $amount . ' hour' . ($amount != 1 ? 's' : '');
+                $subject = __('emails.notification.credit_received_subject', ['sender' => htmlspecialchars($senderName), 'amount' => $amountDisplay, 'community' => $tenantName]);
+                $emailBody = self::buildCreditReceivedEmail(
+                    htmlspecialchars($recipientName),
+                    htmlspecialchars($senderName),
+                    $amount,
+                    htmlspecialchars($description),
+                    $walletUrl,
+                    htmlspecialchars($tenantName)
+                );
 
-            $mailer = Mailer::forCurrentTenant();
-            $mailer->send($user->email, $subject, $emailBody);
+                $mailer = Mailer::forCurrentTenant();
+                $mailer->send($user->email, $subject, $emailBody);
+            });
         } catch (\Exception $e) {
             Log::warning("NotificationDispatcher::sendCreditEmail failed: " . $e->getMessage());
         }
@@ -486,45 +564,48 @@ class NotificationDispatcher
             $user = DB::table('users')
                 ->where('id', $senderUserId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name'])
+                ->select(['email', 'name', 'first_name', 'preferred_language'])
                 ->first();
 
             if (!$user || empty($user->email)) {
                 return;
             }
 
-            $senderFirstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-            $tenantName      = TenantContext::getSetting('site_name', 'Project NEXUS');
-            $baseUrl         = TenantContext::getFrontendUrl();
-            $basePath        = TenantContext::getSlugPrefix();
-            $walletUrl       = $baseUrl . $basePath . '/wallet';
-            $amountDisplay   = $amount . ' hour' . ($amount != 1 ? 's' : '');
+            // The "sender" is the recipient of this confirmation email — render in their locale.
+            LocaleContext::withLocale($user, function () use ($user, $recipientName, $amount, $description) {
+                $senderFirstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                $tenantName      = TenantContext::getSetting('site_name', 'Project NEXUS');
+                $baseUrl         = TenantContext::getFrontendUrl();
+                $basePath        = TenantContext::getSlugPrefix();
+                $walletUrl       = $baseUrl . $basePath . '/wallet';
+                $amountDisplay   = $amount . ' hour' . ($amount != 1 ? 's' : '');
 
-            $infoCard = [
-                __('emails_created.credits_sent.label_amount')    => $amountDisplay,
-                __('emails_created.credits_sent.label_recipient') => htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8'),
-            ];
-            if ($description !== '') {
-                $infoCard[__('emails_created.credits_sent.label_description')] = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
-            }
+                $infoCard = [
+                    __('emails_created.credits_sent.label_amount')    => $amountDisplay,
+                    __('emails_created.credits_sent.label_recipient') => htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8'),
+                ];
+                if ($description !== '') {
+                    $infoCard[__('emails_created.credits_sent.label_description')] = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
+                }
 
-            $html = EmailTemplateBuilder::make()
-                ->theme('success')
-                ->title(__('emails_created.credits_sent.title'))
-                ->previewText(__('emails_created.credits_sent.preview', ['amount' => $amountDisplay, 'recipient' => htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8'), 'community' => $tenantName]))
-                ->greeting($senderFirstName)
-                ->paragraph(__('emails_created.credits_sent.body', ['recipient' => htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8')]))
-                ->infoCard($infoCard)
-                ->button(__('emails_created.credits_sent.cta'), $walletUrl)
-                ->render();
+                $html = EmailTemplateBuilder::make()
+                    ->theme('success')
+                    ->title(__('emails_created.credits_sent.title'))
+                    ->previewText(__('emails_created.credits_sent.preview', ['amount' => $amountDisplay, 'recipient' => htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8'), 'community' => $tenantName]))
+                    ->greeting($senderFirstName)
+                    ->paragraph(__('emails_created.credits_sent.body', ['recipient' => htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8')]))
+                    ->infoCard($infoCard)
+                    ->button(__('emails_created.credits_sent.cta'), $walletUrl)
+                    ->render();
 
-            $subject = __('emails_created.credits_sent.subject', [
-                'amount'    => $amountDisplay,
-                'recipient' => htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8'),
-                'community' => $tenantName,
-            ]);
+                $subject = __('emails_created.credits_sent.subject', [
+                    'amount'    => $amountDisplay,
+                    'recipient' => htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8'),
+                    'community' => $tenantName,
+                ]);
 
-            Mailer::forCurrentTenant()->send($user->email, $subject, $html);
+                Mailer::forCurrentTenant()->send($user->email, $subject, $html);
+            });
         } catch (\Exception $e) {
             Log::warning("NotificationDispatcher::sendCreditSentEmail failed: " . $e->getMessage());
         }
@@ -545,7 +626,7 @@ class NotificationDispatcher
             $user = DB::table('users')
                 ->where('id', $userId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name'])
+                ->select(['email', 'name', 'first_name', 'preferred_language'])
                 ->first();
 
             if (!$user || empty($user->email)) {
@@ -565,22 +646,25 @@ class NotificationDispatcher
                 ]);
             }
 
-            $firstName  = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-            $baseUrl    = TenantContext::getFrontendUrl();
-            $basePath   = TenantContext::getSlugPrefix();
-            $reviewUrl  = $baseUrl . $basePath . '/reviews/create?transaction_id=' . $transactionId;
+            // Render subject + body under the recipient's preferred locale.
+            LocaleContext::withLocale($user, function () use ($user, $otherPersonName, $transactionId) {
+                $firstName  = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                $baseUrl    = TenantContext::getFrontendUrl();
+                $basePath   = TenantContext::getSlugPrefix();
+                $reviewUrl  = $baseUrl . $basePath . '/reviews/create?transaction_id=' . $transactionId;
 
-            $subject = __('emails.review_request.subject', ['name' => htmlspecialchars($otherPersonName, ENT_QUOTES, 'UTF-8')]);
+                $subject = __('emails.review_request.subject', ['name' => htmlspecialchars($otherPersonName, ENT_QUOTES, 'UTF-8')]);
 
-            $html = EmailTemplateBuilder::make()
-                ->theme('brand')
-                ->title(__('emails.review_request.subject', ['name' => htmlspecialchars($otherPersonName, ENT_QUOTES, 'UTF-8')]))
-                ->greeting($firstName)
-                ->paragraph(__('emails.review_request.body', ['name' => htmlspecialchars($otherPersonName, ENT_QUOTES, 'UTF-8')]))
-                ->button(__('emails.review_request.cta'), $reviewUrl)
-                ->render();
+                $html = EmailTemplateBuilder::make()
+                    ->theme('brand')
+                    ->title(__('emails.review_request.subject', ['name' => htmlspecialchars($otherPersonName, ENT_QUOTES, 'UTF-8')]))
+                    ->greeting($firstName)
+                    ->paragraph(__('emails.review_request.body', ['name' => htmlspecialchars($otherPersonName, ENT_QUOTES, 'UTF-8')]))
+                    ->button(__('emails.review_request.cta'), $reviewUrl)
+                    ->render();
 
-            Mailer::forCurrentTenant()->send($user->email, $subject, $html);
+                Mailer::forCurrentTenant()->send($user->email, $subject, $html);
+            });
         } catch (\Exception $e) {
             Log::warning('NotificationDispatcher::sendReviewRequestEmail failed: ' . $e->getMessage());
         }
@@ -597,33 +681,36 @@ class NotificationDispatcher
             $user = DB::table('users')
                 ->where('id', $receiverUserId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name'])
+                ->select(['email', 'name', 'first_name', 'preferred_language'])
                 ->first();
 
             if (!$user || empty($user->email)) {
                 return;
             }
 
-            $recipientName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-            $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
-            $baseUrl = TenantContext::getFrontendUrl();
-            $basePath = TenantContext::getSlugPrefix();
-            $profileUrl = $baseUrl . $basePath . '/profile/' . $receiverUserId;
+            // Render subject + body under the receiver's preferred locale.
+            LocaleContext::withLocale($user, function () use ($user, $receiverUserId, $reviewerName, $rating, $comment, $isAnonymous) {
+                $recipientName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
+                $baseUrl = TenantContext::getFrontendUrl();
+                $basePath = TenantContext::getSlugPrefix();
+                $profileUrl = $baseUrl . $basePath . '/profile/' . $receiverUserId;
 
-            $displayName = $isAnonymous ? __('emails.notification.someone') : htmlspecialchars($reviewerName);
-            $subject = __('emails.notification.review_subject', ['reviewer' => $displayName, 'rating' => $rating, 'community' => $tenantName]);
+                $displayName = $isAnonymous ? __('emails.notification.someone') : htmlspecialchars($reviewerName);
+                $subject = __('emails.notification.review_subject', ['reviewer' => $displayName, 'rating' => $rating, 'community' => $tenantName]);
 
-            $emailBody = self::buildReviewReceivedEmail(
-                htmlspecialchars($recipientName),
-                $displayName,
-                $rating,
-                $comment ? htmlspecialchars($comment) : null,
-                $profileUrl,
-                htmlspecialchars($tenantName)
-            );
+                $emailBody = self::buildReviewReceivedEmail(
+                    htmlspecialchars($recipientName),
+                    $displayName,
+                    $rating,
+                    $comment ? htmlspecialchars($comment) : null,
+                    $profileUrl,
+                    htmlspecialchars($tenantName)
+                );
 
-            $mailer = Mailer::forCurrentTenant();
-            $mailer->send($user->email, $subject, $emailBody);
+                $mailer = Mailer::forCurrentTenant();
+                $mailer->send($user->email, $subject, $emailBody);
+            });
         } catch (\Exception $e) {
             Log::warning("NotificationDispatcher::sendReviewEmail failed: " . $e->getMessage());
         }
@@ -643,133 +730,142 @@ class NotificationDispatcher
         $user = DB::table('users')
             ->where('id', $userId)
             ->where('tenant_id', $tenantId)
-            ->select(['first_name', 'email'])
+            ->select(['first_name', 'email', 'preferred_language'])
             ->first();
 
         if (!$user || empty($user->email)) {
             return;
         }
 
-        $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
-        $baseUrl    = TenantContext::getFrontendUrl();
-        $basePath   = TenantContext::getSlugPrefix();
-        $statusUrl  = $baseUrl . $basePath . '/verify-identity';
-        $firstName  = $user->first_name ?? __('emails.common.fallback_name');
+        // Render + send under the recipient's preferred locale.
+        LocaleContext::withLocale($user, function () use ($user) {
+            $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
+            $baseUrl    = TenantContext::getFrontendUrl();
+            $basePath   = TenantContext::getSlugPrefix();
+            $statusUrl  = $baseUrl . $basePath . '/verify-identity';
+            $firstName  = $user->first_name ?? __('emails.common.fallback_name');
 
-        $html = \App\Core\EmailTemplateBuilder::make()
-            ->theme('brand')
-            ->title(__('emails_identity.started.title'))
-            ->previewText(__('emails_identity.started.preview'))
-            ->greeting($firstName)
-            ->paragraph(__('emails_identity.started.body', ['community' => $tenantName]))
-            ->paragraph(__('emails_identity.started.next_steps'))
-            ->paragraph('<em>' . __('emails_identity.started.note') . '</em>')
-            ->button(__('emails_identity.started.cta'), $statusUrl)
-            ->render();
+            $html = \App\Core\EmailTemplateBuilder::make()
+                ->theme('brand')
+                ->title(__('emails_identity.started.title'))
+                ->previewText(__('emails_identity.started.preview'))
+                ->greeting($firstName)
+                ->paragraph(__('emails_identity.started.body', ['community' => $tenantName]))
+                ->paragraph(__('emails_identity.started.next_steps'))
+                ->paragraph('<em>' . __('emails_identity.started.note') . '</em>')
+                ->button(__('emails_identity.started.cta'), $statusUrl)
+                ->render();
 
-        try {
-            $subject = __('emails_identity.started.subject', ['community' => $tenantName]);
-            Mailer::forCurrentTenant()->send($user->email, $subject, $html);
-        } catch (\Throwable $e) {
-            Log::warning('[IdentityVerification] started email failed: ' . $e->getMessage());
-        }
+            try {
+                $subject = __('emails_identity.started.subject', ['community' => $tenantName]);
+                Mailer::forCurrentTenant()->send($user->email, $subject, $html);
+            } catch (\Throwable $e) {
+                Log::warning('[IdentityVerification] started email failed: ' . $e->getMessage());
+            }
+        });
     }
 
     public static function dispatchVerificationPassed(int $userId): void
     {
-        $content = __('notifications.verification_passed');
-        $link = "/dashboard";
-
-        Notification::createNotification($userId, $content, $link, 'verification_passed');
-        $htmlContent = self::buildVerificationPassedEmail();
-        self::queueNotification($userId, 'verification_passed', $content, $link, 'instant', $htmlContent);
-
-        // Also send a direct email immediately (queue may have delays)
+        // Lookup recipient first so the bell, queue, and direct email all render
+        // in the recipient's preferred locale (not the caller / worker default).
         $tenantId = TenantContext::getId();
-
         $user = DB::table('users')
             ->where('id', $userId)
             ->where('tenant_id', $tenantId)
-            ->select(['first_name', 'email'])
+            ->select(['first_name', 'email', 'preferred_language'])
             ->first();
 
-        if ($user && !empty($user->email)) {
-            $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
-            $baseUrl    = TenantContext::getFrontendUrl();
-            $basePath   = TenantContext::getSlugPrefix();
-            $profileUrl = $baseUrl . $basePath . '/profile/' . $userId;
-            $firstName  = $user->first_name ?? __('emails.common.fallback_name');
+        LocaleContext::withLocale($user, function () use ($userId, $user) {
+            $link = "/dashboard";
+            $content = __('notifications.verification_passed');
 
-            $html = \App\Core\EmailTemplateBuilder::make()
-                ->theme('success')
-                ->title(__('emails_identity.passed.title'))
-                ->previewText(__('emails_identity.passed.preview'))
-                ->greeting($firstName)
-                ->paragraph(__('emails_identity.passed.body', ['community' => $tenantName]))
-                ->highlight(__('emails_identity.passed.highlight'))
-                ->paragraph(__('emails_identity.passed.badge_note'))
-                ->button(__('emails_identity.passed.cta'), $profileUrl)
-                ->render();
+            Notification::createNotification($userId, $content, $link, 'verification_passed');
+            $htmlContent = self::buildVerificationPassedEmail();
+            self::queueNotification($userId, 'verification_passed', $content, $link, 'instant', $htmlContent);
 
-            try {
-                $subject = __('emails_identity.passed.subject', ['community' => $tenantName]);
-                Mailer::forCurrentTenant()->send($user->email, $subject, $html);
-            } catch (\Throwable $e) {
-                Log::warning('[IdentityVerification] passed email failed: ' . $e->getMessage());
+            // Also send a direct email immediately (queue may have delays)
+            if ($user && !empty($user->email)) {
+                $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
+                $baseUrl    = TenantContext::getFrontendUrl();
+                $basePath   = TenantContext::getSlugPrefix();
+                $profileUrl = $baseUrl . $basePath . '/profile/' . $userId;
+                $firstName  = $user->first_name ?? __('emails.common.fallback_name');
+
+                $html = \App\Core\EmailTemplateBuilder::make()
+                    ->theme('success')
+                    ->title(__('emails_identity.passed.title'))
+                    ->previewText(__('emails_identity.passed.preview'))
+                    ->greeting($firstName)
+                    ->paragraph(__('emails_identity.passed.body', ['community' => $tenantName]))
+                    ->highlight(__('emails_identity.passed.highlight'))
+                    ->paragraph(__('emails_identity.passed.badge_note'))
+                    ->button(__('emails_identity.passed.cta'), $profileUrl)
+                    ->render();
+
+                try {
+                    $subject = __('emails_identity.passed.subject', ['community' => $tenantName]);
+                    Mailer::forCurrentTenant()->send($user->email, $subject, $html);
+                } catch (\Throwable $e) {
+                    Log::warning('[IdentityVerification] passed email failed: ' . $e->getMessage());
+                }
             }
-        }
+        });
     }
 
     public static function dispatchVerificationFailed(int $userId, string $reason = ''): void
     {
-        $content = !empty($reason)
-            ? __('notifications.verification_failed_reason', ['reason' => $reason])
-            : __('notifications.verification_failed');
-        $link = "/verify-identity";
-
-        Notification::createNotification($userId, $content, $link, 'verification_failed');
-        $htmlContent = self::buildVerificationFailedEmail($reason);
-        self::queueNotification($userId, 'verification_failed', $content, $link, 'instant', $htmlContent);
-
-        // Also send a direct email immediately (queue may have delays)
+        // Lookup recipient first so the bell, queue, and direct email all render
+        // in the recipient's preferred locale (not the caller / worker default).
         $tenantId = TenantContext::getId();
-
         $user = DB::table('users')
             ->where('id', $userId)
             ->where('tenant_id', $tenantId)
-            ->select(['first_name', 'email'])
+            ->select(['first_name', 'email', 'preferred_language'])
             ->first();
 
-        if ($user && !empty($user->email)) {
-            $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
-            $baseUrl    = TenantContext::getFrontendUrl();
-            $basePath   = TenantContext::getSlugPrefix();
-            $retryUrl   = $baseUrl . $basePath . '/verify-identity';
-            $firstName  = $user->first_name ?? __('emails.common.fallback_name');
+        LocaleContext::withLocale($user, function () use ($userId, $user, $reason) {
+            $link = "/verify-identity";
+            $content = !empty($reason)
+                ? __('notifications.verification_failed_reason', ['reason' => $reason])
+                : __('notifications.verification_failed');
 
-            $builder = \App\Core\EmailTemplateBuilder::make()
-                ->theme('danger')
-                ->title(__('emails_identity.failed.title'))
-                ->previewText(__('emails_identity.failed.preview'))
-                ->greeting($firstName)
-                ->paragraph(__('emails_identity.failed.body', ['community' => $tenantName]));
+            Notification::createNotification($userId, $content, $link, 'verification_failed');
+            $htmlContent = self::buildVerificationFailedEmail($reason);
+            self::queueNotification($userId, 'verification_failed', $content, $link, 'instant', $htmlContent);
 
-            if (!empty($reason)) {
-                $builder->paragraph('<strong>' . __('emails_identity.failed.reason_label') . '</strong> ' . htmlspecialchars($reason));
+            // Also send a direct email immediately (queue may have delays)
+            if ($user && !empty($user->email)) {
+                $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
+                $baseUrl    = TenantContext::getFrontendUrl();
+                $basePath   = TenantContext::getSlugPrefix();
+                $retryUrl   = $baseUrl . $basePath . '/verify-identity';
+                $firstName  = $user->first_name ?? __('emails.common.fallback_name');
+
+                $builder = \App\Core\EmailTemplateBuilder::make()
+                    ->theme('danger')
+                    ->title(__('emails_identity.failed.title'))
+                    ->previewText(__('emails_identity.failed.preview'))
+                    ->greeting($firstName)
+                    ->paragraph(__('emails_identity.failed.body', ['community' => $tenantName]));
+
+                if (!empty($reason)) {
+                    $builder->paragraph('<strong>' . __('emails_identity.failed.reason_label') . '</strong> ' . htmlspecialchars($reason));
+                }
+
+                $html = $builder
+                    ->paragraph(__('emails_identity.failed.retry_note'))
+                    ->button(__('emails_identity.failed.cta'), $retryUrl)
+                    ->render();
+
+                try {
+                    $subject = __('emails_identity.failed.subject', ['community' => $tenantName]);
+                    Mailer::forCurrentTenant()->send($user->email, $subject, $html);
+                } catch (\Throwable $e) {
+                    Log::warning('[IdentityVerification] failed email failed: ' . $e->getMessage());
+                }
             }
-
-            $html = $builder
-                ->paragraph(__('emails_identity.failed.retry_note'))
-                ->button(__('emails_identity.failed.cta'), $retryUrl)
-                ->render();
-
-            try {
-                $subject = __('emails_identity.failed.subject', ['community' => $tenantName]);
-                Mailer::forCurrentTenant()->send($user->email, $subject, $html);
-            } catch (\Throwable $e) {
-                Log::warning('[IdentityVerification] failed email failed: ' . $e->getMessage());
-            }
-        }
+        });
     }
 
     public static function dispatchVerificationCompletedToAdmins(int $userId, string $status): void
@@ -789,25 +885,38 @@ class NotificationDispatcher
         $userName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
         $email = $user->email ?? '';
         $isPassed = $status === 'passed';
-
-        $content = $isPassed
-            ? __('notifications.verification_passed_admin', ['name' => $userName, 'email' => $email])
-            : __('notifications.verification_failed_admin', ['name' => $userName, 'email' => $email]);
         $link = "/admin/members";
 
         $admins = DB::table('users')
             ->where('tenant_id', $tenantId)
             ->whereIn('role', ['admin', 'super_admin'])
             ->where('status', 'active')
-            ->pluck('id');
+            ->select(['id', 'preferred_language'])
+            ->get();
 
-        foreach ($admins as $adminId) {
-            Notification::createNotification((int) $adminId, $content, $link, 'admin_verification_update');
+        foreach ($admins as $admin) {
+            // Render bell text per-admin under their preferred locale.
+            LocaleContext::withLocale($admin, function () use ($admin, $isPassed, $userName, $email, $link) {
+                $content = $isPassed
+                    ? __('notifications.verification_passed_admin', ['name' => $userName, 'email' => $email])
+                    : __('notifications.verification_failed_admin', ['name' => $userName, 'email' => $email]);
+                Notification::createNotification((int) $admin->id, $content, $link, 'admin_verification_update');
+            });
         }
     }
 
     public static function dispatchVerificationReminder(int $userId): void
     {
+        // Lookup recipient's preferred_language so bell + queued email render
+        // under the recipient's locale, not the caller/worker locale.
+        $tenantId = TenantContext::getId();
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select(['preferred_language'])
+            ->first();
+
+        LocaleContext::withLocale($user, function () use ($userId) {
         $content = __('notifications.verification_reminder');
         $link = "/verify-identity";
 
@@ -838,6 +947,7 @@ class NotificationDispatcher
 HTML;
 
         self::queueNotification($userId, 'verification_reminder', $content, $link, 'instant', $htmlContent);
+        });
     }
 
     // =========================================================================
@@ -935,37 +1045,40 @@ HTML;
             $user = DB::table('users')
                 ->where('id', $userId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name'])
+                ->select(['email', 'name', 'first_name', 'preferred_language'])
                 ->first();
 
             if (!$user || empty($user->email)) {
                 return;
             }
 
-            $baseUrl = TenantContext::getFrontendUrl();
-            $slugPrefix = TenantContext::getSlugPrefix();
-            $fullUrl = $baseUrl . $slugPrefix . $link;
+            // Render subject + body under the recipient's preferred locale.
+            LocaleContext::withLocale($user, function () use ($user, $type, $data, $link) {
+                $baseUrl = TenantContext::getFrontendUrl();
+                $slugPrefix = TenantContext::getSlugPrefix();
+                $fullUrl = $baseUrl . $slugPrefix . $link;
 
-            $mailer = Mailer::forCurrentTenant();
+                $mailer = Mailer::forCurrentTenant();
 
-            if ($type === 'credit_received') {
-                $senderName = htmlspecialchars($data['sender_name'] ?? __('emails.common.fallback_member_name'));
-                $amount = (float) ($data['amount'] ?? 0);
-                $description = htmlspecialchars($data['description'] ?? '');
-                $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? __('emails.common.fallback_name'));
-                $tenantName = htmlspecialchars(TenantContext::getSetting('site_name', 'Project NEXUS'));
+                if ($type === 'credit_received') {
+                    $senderName = htmlspecialchars($data['sender_name'] ?? __('emails.common.fallback_member_name'));
+                    $amount = (float) ($data['amount'] ?? 0);
+                    $description = htmlspecialchars($data['description'] ?? '');
+                    $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? __('emails.common.fallback_name'));
+                    $tenantName = htmlspecialchars(TenantContext::getSetting('site_name', 'Project NEXUS'));
 
-                $amountDisplay = $amount . ' hour' . ($amount != 1 ? 's' : '');
-                $subject = __('emails.notification.credit_received_subject', ['sender' => $senderName, 'amount' => $amountDisplay, 'community' => $tenantName]);
-                $emailBody = self::buildCreditReceivedEmail($recipientName, $senderName, $amount, $description, $fullUrl, $tenantName);
-                $mailer->send($user->email, $subject, $emailBody);
-            } else {
-                $exchangeDetails = self::getExchangeDetailsForEmail($data['exchange_id'] ?? 0);
-                $userArr = ['email' => $user->email, 'name' => $user->name, 'first_name' => $user->first_name];
-                $emailBody = self::buildRichExchangeEmail($type, $data, $userArr, $exchangeDetails, $fullUrl);
-                $subject = self::getExchangeEmailSubject($type, $exchangeDetails);
-                $mailer->send($user->email, $subject, $emailBody);
-            }
+                    $amountDisplay = $amount . ' hour' . ($amount != 1 ? 's' : '');
+                    $subject = __('emails.notification.credit_received_subject', ['sender' => $senderName, 'amount' => $amountDisplay, 'community' => $tenantName]);
+                    $emailBody = self::buildCreditReceivedEmail($recipientName, $senderName, $amount, $description, $fullUrl, $tenantName);
+                    $mailer->send($user->email, $subject, $emailBody);
+                } else {
+                    $exchangeDetails = self::getExchangeDetailsForEmail($data['exchange_id'] ?? 0);
+                    $userArr = ['email' => $user->email, 'name' => $user->name, 'first_name' => $user->first_name];
+                    $emailBody = self::buildRichExchangeEmail($type, $data, $userArr, $exchangeDetails, $fullUrl);
+                    $subject = self::getExchangeEmailSubject($type, $exchangeDetails);
+                    $mailer->send($user->email, $subject, $emailBody);
+                }
+            });
         } catch (\Exception $e) {
             Log::warning("NotificationDispatcher: Failed to send exchange email - " . $e->getMessage());
         }

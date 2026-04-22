@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -91,14 +92,23 @@ class FederatedConnectionService
                 $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : __('emails.common.fallback_someone');
                 $communityName = $community->name ?? __('emails.common.fallback_partner_community');
 
-                Notification::createNotification(
-                    $receiverId,
-                    __('svc_notifications.federation.connection_request', ['sender' => $senderName, 'community' => $communityName]),
-                    '/connections',
-                    'federation_connection',
-                    true,
-                    $receiverTenantId
+                // Render the bell message in the RECEIVER's preferred locale
+                // (cross-tenant: look up their preferred_language by id+tenant).
+                $receiver = DB::selectOne(
+                    "SELECT preferred_language FROM users WHERE id = ? AND tenant_id = ?",
+                    [$receiverId, $receiverTenantId]
                 );
+
+                LocaleContext::withLocale($receiver, function () use ($receiverId, $senderName, $communityName, $receiverTenantId) {
+                    Notification::createNotification(
+                        $receiverId,
+                        __('svc_notifications.federation.connection_request', ['sender' => $senderName, 'community' => $communityName]),
+                        '/connections',
+                        'federation_connection',
+                        true,
+                        $receiverTenantId
+                    );
+                });
             } catch (\Exception $notifEx) {
                 Log::warning('[FederatedConnection] sendRequest notification failed', [
                     'error' => $notifEx->getMessage(),
@@ -146,14 +156,23 @@ class FederatedConnectionService
                 );
                 $accepterName = $accepter ? trim(($accepter->first_name ?? '') . ' ' . ($accepter->last_name ?? '')) : __('emails.common.fallback_someone');
 
-                Notification::createNotification(
-                    (int) $connection->requester_user_id,
-                    __('svc_notifications.federation.connection_accepted', ['name' => $accepterName]),
-                    '/connections',
-                    'federation_connection',
-                    false,
-                    (int) $connection->requester_tenant_id
+                // Render the bell message in the ORIGINAL REQUESTER's preferred locale
+                // (cross-tenant: they live on connection->requester_tenant_id).
+                $requester = DB::selectOne(
+                    "SELECT preferred_language FROM users WHERE id = ? AND tenant_id = ?",
+                    [(int) $connection->requester_user_id, (int) $connection->requester_tenant_id]
                 );
+
+                LocaleContext::withLocale($requester, function () use ($connection, $accepterName) {
+                    Notification::createNotification(
+                        (int) $connection->requester_user_id,
+                        __('svc_notifications.federation.connection_accepted', ['name' => $accepterName]),
+                        '/connections',
+                        'federation_connection',
+                        false,
+                        (int) $connection->requester_tenant_id
+                    );
+                });
             } catch (\Exception $notifEx) {
                 Log::warning('[FederatedConnection] acceptRequest notification failed', [
                     'error' => $notifEx->getMessage(),
@@ -195,14 +214,23 @@ class FederatedConnectionService
 
             // Notify the original requester (cross-tenant bell notification)
             try {
-                Notification::createNotification(
-                    (int) $connection->requester_user_id,
-                    __('svc_notifications.federation.connection_declined'),
-                    '/connections',
-                    'federation_connection',
-                    false,
-                    (int) $connection->requester_tenant_id
+                // Render the bell message in the ORIGINAL REQUESTER's preferred locale
+                // (cross-tenant: they live on connection->requester_tenant_id).
+                $requester = DB::selectOne(
+                    "SELECT preferred_language FROM users WHERE id = ? AND tenant_id = ?",
+                    [(int) $connection->requester_user_id, (int) $connection->requester_tenant_id]
                 );
+
+                LocaleContext::withLocale($requester, function () use ($connection) {
+                    Notification::createNotification(
+                        (int) $connection->requester_user_id,
+                        __('svc_notifications.federation.connection_declined'),
+                        '/connections',
+                        'federation_connection',
+                        false,
+                        (int) $connection->requester_tenant_id
+                    );
+                });
             } catch (\Exception $notifEx) {
                 Log::warning('[FederatedConnection] rejectRequest notification failed', [
                     'error' => $notifEx->getMessage(),

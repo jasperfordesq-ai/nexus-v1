@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Services\MessageService;
 use App\Services\NotificationDispatcher;
@@ -428,11 +429,19 @@ class StoryService
                 ];
                 $emoji = $emojiMap[$reactionType] ?? $reactionType;
 
-                RealtimeService::broadcastNotification($story->user_id, [
-                    'type'    => 'story_reaction',
-                    'message' => __('svc_notifications.story.reaction', ['name' => $reactorName, 'emoji' => $emoji]),
-                    'link'    => '/feed',
-                ]);
+                // Render the story-owner-facing message in the owner's preferred locale.
+                $storyOwner = DB::selectOne(
+                    'SELECT preferred_language FROM users WHERE id = ? AND tenant_id = ?',
+                    [(int) $story->user_id, $tenantId]
+                );
+
+                LocaleContext::withLocale($storyOwner, function () use ($story, $reactorName, $emoji) {
+                    RealtimeService::broadcastNotification($story->user_id, [
+                        'type'    => 'story_reaction',
+                        'message' => __('svc_notifications.story.reaction', ['name' => $reactorName, 'emoji' => $emoji]),
+                        'link'    => '/feed',
+                    ]);
+                });
             } catch (\Throwable $e) {
                 \Log::warning('Failed to broadcast story reaction', [
                     'story_id' => $storyId,
@@ -1199,42 +1208,50 @@ class StoryService
 
         $userName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
 
-        // Get all accepted connections for this user (tenant-scoped)
+        // Get all accepted connections for this user (tenant-scoped) with their preferred_language
+        // so the notification body renders in each recipient's own locale.
         $connections = DB::select(
-            'SELECT CASE WHEN requester_id = ? THEN receiver_id ELSE requester_id END as friend_id
-             FROM connections
-             WHERE (requester_id = ? OR receiver_id = ?)
-               AND status = ?
-               AND tenant_id = ?',
-            [$userId, $userId, $userId, 'accepted', $tenantId]
+            "SELECT CASE WHEN c.requester_id = ? THEN c.receiver_id ELSE c.requester_id END as friend_id,
+                    u.preferred_language
+             FROM connections c
+             JOIN users u ON u.id = CASE WHEN c.requester_id = ? THEN c.receiver_id ELSE c.requester_id END
+             WHERE (c.requester_id = ? OR c.receiver_id = ?)
+               AND c.status = ?
+               AND c.tenant_id = ?",
+            [$userId, $userId, $userId, $userId, 'accepted', $tenantId]
         );
 
-        $content = __('emails_misc.stories.new_story_notification', ['name' => $userName]);
         $link = '/feed';
 
         foreach ($connections as $connection) {
             $friendId = (int) $connection->friend_id;
 
             try {
-                // In-app notification + email routing
-                NotificationDispatcher::dispatch(
-                    $friendId,
-                    'global',
-                    null,
-                    'new_story',
-                    $content,
-                    $link,
-                    null
-                );
+                // Render per-friend under their preferred locale — both the bell-dispatched
+                // text and the realtime broadcast body.
+                LocaleContext::withLocale($connection->preferred_language ?? null, function () use ($friendId, $userName, $link, $storyId, $userId) {
+                    $content = __('emails_misc.stories.new_story_notification', ['name' => $userName]);
 
-                // Real-time push via Pusher
-                RealtimeService::broadcastNotification($friendId, [
-                    'type' => 'new_story',
-                    'message' => $content,
-                    'link' => $link,
-                    'story_id' => $storyId,
-                    'user_id' => $userId,
-                ]);
+                    // In-app notification + email routing
+                    NotificationDispatcher::dispatch(
+                        $friendId,
+                        'global',
+                        null,
+                        'new_story',
+                        $content,
+                        $link,
+                        null
+                    );
+
+                    // Real-time push via Pusher
+                    RealtimeService::broadcastNotification($friendId, [
+                        'type' => 'new_story',
+                        'message' => $content,
+                        'link' => $link,
+                        'story_id' => $storyId,
+                        'user_id' => $userId,
+                    ]);
+                });
             } catch (\Throwable $e) {
                 Log::warning('StoryService: Failed to notify connection of new story', [
                     'story_id' => $storyId,

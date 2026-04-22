@@ -10,6 +10,7 @@ use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\ReviewCreated;
+use App\I18n\LocaleContext;
 use App\Models\Review;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -261,19 +262,22 @@ class ReviewService
         if (empty($review->is_anonymous)) {
             try {
                 $tenantId = TenantContext::getId();
-                $receiver = DB::table('users')->where('id', $receiverId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+                $receiver = DB::table('users')->where('id', $receiverId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
                 if ($receiver && !empty($receiver->email)) {
-                    $firstName = $receiver->first_name ?? $receiver->name ?? __('emails.common.fallback_name');
-                    $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/profile/' . $receiverId . '/reviews';
-                    $html = EmailTemplateBuilder::make()
-                        ->title(__('emails_misc.review.received_title'))
-                        ->greeting($firstName)
-                        ->paragraph(__('emails_misc.review.received_body', ['rating' => (int) $review->rating]))
-                        ->button(__('emails_misc.review.received_cta'), $fullUrl)
-                        ->render();
-                    if (!Mailer::forCurrentTenant()->send($receiver->email, __('emails_misc.review.received_subject'), $html)) {
-                        Log::warning('[ReviewService] create email failed', ['receiver_id' => $receiverId]);
-                    }
+                    // Render subject + body under the receiver's preferred locale.
+                    LocaleContext::withLocale($receiver, function () use ($receiver, $receiverId, $review) {
+                        $firstName = $receiver->first_name ?? $receiver->name ?? __('emails.common.fallback_name');
+                        $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/profile/' . $receiverId . '/reviews';
+                        $html = EmailTemplateBuilder::make()
+                            ->title(__('emails_misc.review.received_title'))
+                            ->greeting($firstName)
+                            ->paragraph(__('emails_misc.review.received_body', ['rating' => (int) $review->rating]))
+                            ->button(__('emails_misc.review.received_cta'), $fullUrl)
+                            ->render();
+                        if (!Mailer::forCurrentTenant()->send($receiver->email, __('emails_misc.review.received_subject'), $html)) {
+                            Log::warning('[ReviewService] create email failed', ['receiver_id' => $receiverId]);
+                        }
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('[ReviewService] create email error: ' . $e->getMessage());
