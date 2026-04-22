@@ -9,6 +9,7 @@ namespace App\Listeners;
 use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\Events\UserRegistered;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
@@ -39,81 +40,85 @@ class SendWelcomeNotification implements ShouldQueue
             // on the `created` event — no direct indexUser() call here.
             TenantContext::setById($event->tenantId);
 
-            // Create in-app welcome notification
-            Notification::create([
-                'tenant_id'  => $event->tenantId,
-                'user_id'    => $event->user->id,
-                'type'       => 'welcome',
-                'message'    => __('emails.welcome.in_app_message'),
-                'link'       => '/feed',
-                'is_read'    => false,
-                'created_at' => now(),
-            ]);
+            // The ENTIRE welcome flow renders in the new user's language
+            // (from UserRegistered event payload).
+            LocaleContext::withLocale($event->user, function () use ($event) {
+                // Create in-app welcome notification
+                Notification::create([
+                    'tenant_id'  => $event->tenantId,
+                    'user_id'    => $event->user->id,
+                    'type'       => 'welcome',
+                    'message'    => __('emails.welcome.in_app_message'),
+                    'link'       => '/feed',
+                    'is_read'    => false,
+                    'created_at' => now(),
+                ]);
 
-            // Send email
-            $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-            $userName = $event->user->first_name ?? $event->user->name ?? __('emails.common.fallback_name');
-            $userEmail = $event->user->email ?? null;
+                // Send email
+                $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+                $userName = $event->user->first_name ?? $event->user->name ?? __('emails.common.fallback_name');
+                $userEmail = $event->user->email ?? null;
 
-            if (!$userEmail) {
-                return;
-            }
-
-            $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
-            $safeUserName = htmlspecialchars($userName, ENT_QUOTES, 'UTF-8');
-
-            // For pending users: send combined welcome + verification email
-            $isPending = ($event->user->status ?? '') === 'pending'
-                      || empty($event->user->email_verified_at);
-
-            if ($isPending) {
-                $verifyUrl = $this->generateVerificationToken($event->user->id, $event->tenantId);
-
-                $html = EmailTemplateBuilder::make()
-                    ->theme('success')
-                    ->title(__('emails.welcome.title', ['community' => $safeTenantName]))
-                    ->previewText(__('emails.welcome.pending_preview', ['community' => $safeTenantName]))
-                    ->greeting($safeUserName)
-                    ->paragraph(__('emails.welcome.pending_intro', ['community' => $safeTenantName]))
-                    ->paragraph(__('emails.welcome.pending_verify_instruction'))
-                    ->button(__('emails.welcome.pending_button'), $verifyUrl)
-                    ->paragraph(__('emails.welcome.pending_once_verified'))
-                    ->bulletList([
-                        __('emails.welcome.pending_bullet_profile'),
-                        __('emails.welcome.pending_bullet_listings'),
-                        __('emails.welcome.pending_bullet_connections'),
-                    ])
-                    ->paragraph(__('emails.welcome.pending_ignore'))
-                    ->render();
-
-                $mailer = \App\Core\Mailer::forCurrentTenant();
-                if (!$mailer->send($userEmail, __('emails.welcome.pending_subject', ['community' => $tenantName]), $html)) {
-                    Log::warning('SendWelcomeNotification: pending welcome email failed to send', ['user_email' => $userEmail]);
+                if (!$userEmail) {
+                    return;
                 }
-            } else {
-                // Already active user (admin-created) — generic welcome only
-                $html = EmailTemplateBuilder::make()
-                    ->theme('success')
-                    ->title(__('emails.welcome.title', ['community' => $safeTenantName]))
-                    ->previewText(__('emails.welcome.active_preview', ['name' => $safeUserName]))
-                    ->greeting($safeUserName)
-                    ->paragraph(__('emails.welcome.active_intro', ['community' => $safeTenantName]))
-                    ->highlight(__('emails.welcome.active_get_started'), '✨')
-                    ->bulletList([
-                        __('emails.welcome.active_bullet_profile'),
-                        __('emails.welcome.active_bullet_listings'),
-                        __('emails.welcome.active_bullet_connections'),
-                        __('emails.welcome.active_bullet_events'),
-                    ])
-                    ->paragraph(__('emails.welcome.active_help'))
-                    ->button(__('emails.welcome.active_button'), EmailTemplateBuilder::tenantUrl('/feed'))
-                    ->render();
 
-                $mailer = \App\Core\Mailer::forCurrentTenant();
-                if (!$mailer->send($userEmail, __('emails.welcome.subject', ['community' => $tenantName]), $html)) {
-                    Log::warning('SendWelcomeNotification: welcome email failed to send', ['user_email' => $userEmail]);
+                $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
+                $safeUserName = htmlspecialchars($userName, ENT_QUOTES, 'UTF-8');
+
+                // For pending users: send combined welcome + verification email
+                $isPending = ($event->user->status ?? '') === 'pending'
+                          || empty($event->user->email_verified_at);
+
+                if ($isPending) {
+                    $verifyUrl = $this->generateVerificationToken($event->user->id, $event->tenantId);
+
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('success')
+                        ->title(__('emails.welcome.title', ['community' => $safeTenantName]))
+                        ->previewText(__('emails.welcome.pending_preview', ['community' => $safeTenantName]))
+                        ->greeting($safeUserName)
+                        ->paragraph(__('emails.welcome.pending_intro', ['community' => $safeTenantName]))
+                        ->paragraph(__('emails.welcome.pending_verify_instruction'))
+                        ->button(__('emails.welcome.pending_button'), $verifyUrl)
+                        ->paragraph(__('emails.welcome.pending_once_verified'))
+                        ->bulletList([
+                            __('emails.welcome.pending_bullet_profile'),
+                            __('emails.welcome.pending_bullet_listings'),
+                            __('emails.welcome.pending_bullet_connections'),
+                        ])
+                        ->paragraph(__('emails.welcome.pending_ignore'))
+                        ->render();
+
+                    $mailer = \App\Core\Mailer::forCurrentTenant();
+                    if (!$mailer->send($userEmail, __('emails.welcome.pending_subject', ['community' => $tenantName]), $html)) {
+                        Log::warning('SendWelcomeNotification: pending welcome email failed to send', ['user_email' => $userEmail]);
+                    }
+                } else {
+                    // Already active user (admin-created) — generic welcome only
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('success')
+                        ->title(__('emails.welcome.title', ['community' => $safeTenantName]))
+                        ->previewText(__('emails.welcome.active_preview', ['name' => $safeUserName]))
+                        ->greeting($safeUserName)
+                        ->paragraph(__('emails.welcome.active_intro', ['community' => $safeTenantName]))
+                        ->highlight(__('emails.welcome.active_get_started'), '✨')
+                        ->bulletList([
+                            __('emails.welcome.active_bullet_profile'),
+                            __('emails.welcome.active_bullet_listings'),
+                            __('emails.welcome.active_bullet_connections'),
+                            __('emails.welcome.active_bullet_events'),
+                        ])
+                        ->paragraph(__('emails.welcome.active_help'))
+                        ->button(__('emails.welcome.active_button'), EmailTemplateBuilder::tenantUrl('/feed'))
+                        ->render();
+
+                    $mailer = \App\Core\Mailer::forCurrentTenant();
+                    if (!$mailer->send($userEmail, __('emails.welcome.subject', ['community' => $tenantName]), $html)) {
+                        Log::warning('SendWelcomeNotification: welcome email failed to send', ['user_email' => $userEmail]);
+                    }
                 }
-            }
+            });
         } catch (\Throwable $e) {
             Log::error('SendWelcomeNotification listener failed', [
                 'user_id' => $event->user->id ?? null,

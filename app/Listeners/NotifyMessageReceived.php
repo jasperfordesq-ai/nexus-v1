@@ -9,6 +9,7 @@ namespace App\Listeners;
 use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\Events\MessageSent;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationDispatcher;
@@ -59,40 +60,45 @@ class NotifyMessageReceived implements ShouldQueue
                 return;
             }
 
-            $senderName = $event->sender->first_name ?? $event->sender->name ?? __('emails.message.fallback_sender_name');
-            $link = '/messages/' . $senderId;
-            $content = __('emails.message.in_app_content', ['sender' => $senderName]);
+            // Resolve recipient locale once — bell copy, subject, body, and dispatcher
+            // all need to render in the recipient's language.
+            $recipientLocale = \Illuminate\Support\Facades\DB::table('users')
+                ->where('id', $recipientId)
+                ->where('tenant_id', $event->tenantId)
+                ->value('preferred_language');
 
-            // Build a rich HTML email body using EmailTemplateBuilder
-            $htmlContent = $this->buildMessageEmailHtml($event, $senderName, $link);
+            LocaleContext::withLocale($recipientLocale, function () use ($event, $senderId, $recipientId) {
+                $senderName = $event->sender->first_name ?? $event->sender->name ?? __('emails.message.fallback_sender_name');
+                $link = '/messages/' . $senderId;
+                $content = __('emails.message.in_app_content', ['sender' => $senderName]);
 
-            // Check email_messages preference — default to sending (opt-out model)
-            $emailEnabled = true;
-            try {
-                $prefs = User::getNotificationPreferences($recipientId);
-                $emailEnabled = (bool) ($prefs['email_messages'] ?? true);
-            } catch (\Throwable $prefError) {
-                Log::debug('NotifyMessageReceived: could not read email_messages pref', [
-                    'user_id' => $recipientId,
-                    'error' => $prefError->getMessage(),
-                ]);
-            }
+                $htmlContent = $this->buildMessageEmailHtml($event, $senderName, $link);
 
-            if ($emailEnabled) {
-                // Bell + email (via dispatcher) — pass the rich HTML body
-                NotificationDispatcher::dispatch(
-                    $recipientId,
-                    'global',
-                    null,
-                    'new_message',
-                    $content,
-                    $link,
-                    $htmlContent
-                );
-            } else {
-                // Bell only — user opted out of message emails
-                Notification::createNotification($recipientId, $content, $link, 'new_message');
-            }
+                $emailEnabled = true;
+                try {
+                    $prefs = User::getNotificationPreferences($recipientId);
+                    $emailEnabled = (bool) ($prefs['email_messages'] ?? true);
+                } catch (\Throwable $prefError) {
+                    Log::debug('NotifyMessageReceived: could not read email_messages pref', [
+                        'user_id' => $recipientId,
+                        'error' => $prefError->getMessage(),
+                    ]);
+                }
+
+                if ($emailEnabled) {
+                    NotificationDispatcher::dispatch(
+                        $recipientId,
+                        'global',
+                        null,
+                        'new_message',
+                        $content,
+                        $link,
+                        $htmlContent
+                    );
+                } else {
+                    Notification::createNotification($recipientId, $content, $link, 'new_message');
+                }
+            });
         } catch (\Throwable $e) {
             Log::error('NotifyMessageReceived listener failed', [
                 'message_id' => $event->message->id ?? null,

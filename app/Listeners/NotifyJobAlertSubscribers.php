@@ -8,6 +8,7 @@ namespace App\Listeners;
 
 use App\Core\TenantContext;
 use App\Events\JobVacancyCreated;
+use App\I18n\LocaleContext;
 use App\Models\JobAlert;
 use App\Models\Notification;
 use App\Services\RealtimeService;
@@ -50,29 +51,33 @@ class NotifyJobAlertSubscribers implements ShouldQueue
 
                 try {
                     $alertUserId = (int) $alert->user_id;
-                    Notification::createNotification(
-                        $alertUserId,
-                        __('svc_notifications.job_alert.match_bell', ['title' => $vacancy->title]),
-                        "/jobs/{$vacancy->id}",
-                        'job_application'
-                    );
-                    RealtimeService::broadcastAndPush($alertUserId, __('svc_notifications.job_alert.match_push_title'), [
-                        'type'      => 'job_alert_match',
-                        'job_id'    => (int) $vacancy->id,
-                        'job_title' => $vacancy->title,
-                        'message'   => __('svc_notifications.job_alert.match_push_message', ['title' => $vacancy->title]),
-                        'url'       => "/jobs/{$vacancy->id}",
-                    ]);
+                    $user = \App\Models\User::find($alert->user_id);
 
-                    // Send email alert
-                    try {
-                        $user = \App\Models\User::find($alert->user_id);
-                        if ($user && $user->email) {
-                            \App\Services\JobAlertEmailService::sendImmediateAlert($user, $vacancy, $alert);
+                    // Bell + push + email all render in the subscriber's language.
+                    LocaleContext::withLocale($user, function () use ($alertUserId, $vacancy, $user, $alert) {
+                        Notification::createNotification(
+                            $alertUserId,
+                            __('svc_notifications.job_alert.match_bell', ['title' => $vacancy->title]),
+                            "/jobs/{$vacancy->id}",
+                            'job_application'
+                        );
+                        RealtimeService::broadcastAndPush($alertUserId, __('svc_notifications.job_alert.match_push_title'), [
+                            'type'      => 'job_alert_match',
+                            'job_id'    => (int) $vacancy->id,
+                            'job_title' => $vacancy->title,
+                            'message'   => __('svc_notifications.job_alert.match_push_message', ['title' => $vacancy->title]),
+                            'url'       => "/jobs/{$vacancy->id}",
+                        ]);
+
+                        // Send email alert
+                        try {
+                            if ($user && $user->email) {
+                                \App\Services\JobAlertEmailService::sendImmediateAlert($user, $vacancy, $alert);
+                            }
+                        } catch (\Throwable $e) {
+                            \Illuminate\Support\Facades\Log::warning('NotifyJobAlertSubscribers: email dispatch failed: ' . $e->getMessage());
                         }
-                    } catch (\Throwable $e) {
-                        \Illuminate\Support\Facades\Log::warning('NotifyJobAlertSubscribers: email dispatch failed: ' . $e->getMessage());
-                    }
+                    });
 
                     $alert->update(['last_notified_at' => now()]);
                 } catch (\Throwable $e) {

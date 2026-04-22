@@ -8,6 +8,7 @@ namespace App\Listeners;
 
 use App\Core\TenantContext;
 use App\Events\TransactionCompleted;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationDispatcher;
@@ -38,71 +39,80 @@ class NotifyTransactionCompleted implements ShouldQueue
             $receiver = $event->receiver;
             $transaction = $event->transaction;
 
-            $senderName = $sender->first_name ?? $sender->name ?? __('emails.common.fallback_someone');
             $amount = (float) $transaction->amount;
             $description = $transaction->description ?? '';
 
-            // 1. Create in-app notification (bell icon) for receiver
-            $content = __('notifications.credit_received', ['name' => $senderName, 'amount' => $amount]);
-            if ($description !== '') {
-                $content .= ' ' . __('notifications.credit_received_for', ['description' => $description]);
-            }
+            // 1. RECEIVER-side: bell notification + email (render in receiver's locale).
+            LocaleContext::withLocale($receiver, function () use ($sender, $receiver, $amount, $description) {
+                $senderName = $sender->first_name ?? $sender->name ?? __('emails.common.fallback_someone');
 
-            Notification::createNotification(
-                $receiver->id,
-                $content,
-                '/wallet',
-                'transaction'
-            );
+                $content = __('notifications.credit_received', ['name' => $senderName, 'amount' => $amount]);
+                if ($description !== '') {
+                    $content .= ' ' . __('notifications.credit_received_for', ['description' => $description]);
+                }
 
-            // 2. Send email if user has email_transactions enabled
-            $emailEnabled = true;
-            try {
-                $prefs = User::getNotificationPreferences($receiver->id);
-                $emailEnabled = (bool) ($prefs['email_transactions'] ?? true);
-            } catch (\Throwable $prefError) {
-                Log::debug('NotifyTransactionCompleted: could not read email_transactions pref', [
-                    'user_id' => $receiver->id,
-                    'error' => $prefError->getMessage(),
-                ]);
-            }
-
-            if ($emailEnabled) {
-                NotificationDispatcher::sendCreditEmail(
+                Notification::createNotification(
                     $receiver->id,
-                    $senderName,
-                    $amount,
-                    $description
+                    $content,
+                    '/wallet',
+                    'transaction'
                 );
-            }
 
-            // 3. Send confirmation email to the SENDER
-            $senderEmailEnabled = true;
+                $emailEnabled = true;
+                try {
+                    $prefs = User::getNotificationPreferences($receiver->id);
+                    $emailEnabled = (bool) ($prefs['email_transactions'] ?? true);
+                } catch (\Throwable $prefError) {
+                    Log::debug('NotifyTransactionCompleted: could not read email_transactions pref', [
+                        'user_id' => $receiver->id,
+                        'error' => $prefError->getMessage(),
+                    ]);
+                }
+
+                if ($emailEnabled) {
+                    NotificationDispatcher::sendCreditEmail(
+                        $receiver->id,
+                        $senderName,
+                        $amount,
+                        $description
+                    );
+                }
+            });
+
+            // 2. SENDER-side: confirmation email (render in sender's locale).
+            LocaleContext::withLocale($sender, function () use ($sender, $receiver, $amount, $description) {
+                $senderEmailEnabled = true;
+                try {
+                    $senderPrefs = \App\Models\User::getNotificationPreferences($sender->id);
+                    $senderEmailEnabled = (bool) ($senderPrefs['email_transactions'] ?? true);
+                } catch (\Throwable $prefError) {
+                    Log::debug('NotifyTransactionCompleted: could not read sender email_transactions pref', [
+                        'user_id' => $sender->id,
+                        'error' => $prefError->getMessage(),
+                    ]);
+                }
+
+                if ($senderEmailEnabled) {
+                    $recipientName = $receiver->first_name ?? $receiver->name ?? 'someone';
+                    NotificationDispatcher::sendCreditSentEmail(
+                        $sender->id,
+                        $recipientName,
+                        $amount,
+                        $description
+                    );
+                }
+            });
+
+            // 3. Review requests — each party gets one in THEIR language.
             try {
-                $senderPrefs = \App\Models\User::getNotificationPreferences($sender->id);
-                $senderEmailEnabled = (bool) ($senderPrefs['email_transactions'] ?? true);
-            } catch (\Throwable $prefError) {
-                Log::debug('NotifyTransactionCompleted: could not read sender email_transactions pref', [
-                    'user_id' => $sender->id,
-                    'error' => $prefError->getMessage(),
-                ]);
-            }
-
-            if ($senderEmailEnabled) {
-                $recipientName = $receiver->first_name ?? $receiver->name ?? 'someone';
-                NotificationDispatcher::sendCreditSentEmail(
-                    $sender->id,
-                    $recipientName,
-                    $amount,
-                    $description
-                );
-            }
-
-            // 4. Queue review request for both parties
-            try {
+                $senderName = $sender->first_name ?? $sender->name ?? __('emails.common.fallback_someone');
                 $recipientNameForReview = $receiver->first_name ?? $receiver->name ?? 'someone';
-                NotificationDispatcher::sendReviewRequestEmail($receiver->id, $senderName, $transaction->id);
-                NotificationDispatcher::sendReviewRequestEmail($sender->id, $recipientNameForReview, $transaction->id);
+                LocaleContext::withLocale($receiver, fn () =>
+                    NotificationDispatcher::sendReviewRequestEmail($receiver->id, $senderName, $transaction->id)
+                );
+                LocaleContext::withLocale($sender, fn () =>
+                    NotificationDispatcher::sendReviewRequestEmail($sender->id, $recipientNameForReview, $transaction->id)
+                );
             } catch (\Throwable $reviewError) {
                 Log::warning('NotifyTransactionCompleted: sendReviewRequestEmail failed', [
                     'transaction_id' => $transaction->id ?? null,

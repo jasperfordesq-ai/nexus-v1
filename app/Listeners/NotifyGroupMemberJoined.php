@@ -8,6 +8,7 @@ namespace App\Listeners;
 
 use App\Core\TenantContext;
 use App\Events\GroupMemberJoined;
+use App\I18n\LocaleContext;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -59,24 +60,32 @@ class NotifyGroupMemberJoined implements ShouldQueue
                 return;
             }
 
-            $joinerName = trim(($joiner->first_name ?? '') . ' ' . ($joiner->last_name ?? ''))
-                ?: ($joiner->name ?? __('emails.common.fallback_someone'));
+            // Resolve owner's preferred language (they're the notification recipient).
+            $ownerLocale = DB::table('users')
+                ->where('id', $ownerId)
+                ->where('tenant_id', $event->tenantId)
+                ->value('preferred_language');
 
-            $groupName = $group->name ?? '';
-            $content = __('notifications.group_new_member', ['name' => $joinerName, 'group' => $groupName]);
-            $link = '/groups/' . $event->groupId;
+            LocaleContext::withLocale($ownerLocale, function () use ($joiner, $group, $event, $ownerId) {
+                $joinerName = trim(($joiner->first_name ?? '') . ' ' . ($joiner->last_name ?? ''))
+                    ?: ($joiner->name ?? __('emails.common.fallback_someone'));
 
-            // dispatch() creates the in-app bell notification AND queues the email
-            // (respects the owner's global notification frequency preference)
-            \App\Services\NotificationDispatcher::dispatch(
-                $ownerId,
-                'global',
-                null,
-                'group_member_joined',
-                $content,
-                $link,
-                null
-            );
+                $groupName = $group->name ?? '';
+                $content = __('notifications.group_new_member', ['name' => $joinerName, 'group' => $groupName]);
+                $link = '/groups/' . $event->groupId;
+
+                // dispatch() creates the in-app bell notification AND queues the email
+                // (respects the owner's global notification frequency preference)
+                \App\Services\NotificationDispatcher::dispatch(
+                    $ownerId,
+                    'global',
+                    null,
+                    'group_member_joined',
+                    $content,
+                    $link,
+                    null
+                );
+            });
         } catch (\Throwable $e) {
             Log::error('NotifyGroupMemberJoined listener failed', [
                 'group_id'  => $event->groupId,
