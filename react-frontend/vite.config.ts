@@ -49,7 +49,8 @@ export default defineConfig(({ command }) => ({
         });
       },
     },
-    VitePWA({
+    // PWA plugin only in production builds — no service worker overhead in dev.
+    ...(command === 'build' ? [VitePWA({
       registerType: 'prompt',
       // Don't inject SW registration into index.html automatically —
       // we handle it in main.tsx so it only fires in production builds
@@ -76,7 +77,7 @@ export default defineConfig(({ command }) => ({
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//, /^\/admin-legacy\//, /^\/health\.php/],
       },
-    }),
+    })] : []),
     // Image optimizer only runs during build — skip in dev for faster startup.
     // Some local environments end up with an incomplete sharp install, which
     // makes vite-plugin-image-optimizer log asset errors despite a successful build.
@@ -122,6 +123,18 @@ export default defineConfig(({ command }) => ({
   server: {
     port: 5173,
     host: '0.0.0.0', // Required for Docker
+    // Pre-transform the eagerly-loaded modules before the browser requests them.
+    // Hides Windows NTFS I/O latency on first page load without blocking startup.
+    warmup: {
+      clientFiles: [
+        './src/main.tsx',
+        './src/App.tsx',
+        './src/contexts/index.ts',
+        './src/lib/api.ts',
+        './src/components/layout/Layout.tsx',
+        './src/components/layout/Navbar.tsx',
+      ],
+    },
     watch: {
       // Polling is only needed inside Docker on Windows (bind mounts don't trigger inotify).
       // Native Windows dev uses efficient fs events instead.
