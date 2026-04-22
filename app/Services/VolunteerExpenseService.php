@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\VolExpense;
 use App\Models\VolExpensePolicy;
 use Illuminate\Support\Facades\DB;
@@ -248,20 +249,22 @@ class VolunteerExpenseService
 
                     $link    = '/volunteering/expenses/' . $id;
                     $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
-                    $user = DB::table('users')->where('id', $expense->user_id)->where('tenant_id', TenantContext::getId())->select(['email', 'first_name', 'name'])->first();
+                    $user = DB::table('users')->where('id', $expense->user_id)->where('tenant_id', TenantContext::getId())->select(['email', 'first_name', 'name', 'preferred_language'])->first();
                     if ($user && !empty($user->email)) {
-                        $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-                        $builder = EmailTemplateBuilder::make()
-                            ->title(__($titleKey))
-                            ->greeting($firstName)
-                            ->paragraph(__($bodyKey, $params));
-                        if (!$isApproved && !empty($notes)) {
-                            $builder->paragraph('<strong>' . __('emails_misc.expense.rejected_notes_label') . ':</strong> ' . htmlspecialchars($notes, ENT_QUOTES, 'UTF-8'));
-                        }
-                        $renderedHtml = $builder->button(__('emails_misc.expense.' . ($isApproved ? 'approved' : 'rejected') . '_cta'), $fullUrl)->render();
-                        if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $params), $renderedHtml)) {
-                            Log::warning('[VolunteerExpenseService] reviewExpense email failed', ['user_id' => $expense->user_id]);
-                        }
+                        LocaleContext::withLocale($user, function () use ($user, $expense, $isApproved, $subjectKey, $titleKey, $bodyKey, $params, $fullUrl, $notes) {
+                            $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                            $builder = EmailTemplateBuilder::make()
+                                ->title(__($titleKey))
+                                ->greeting($firstName)
+                                ->paragraph(__($bodyKey, $params));
+                            if (!$isApproved && !empty($notes)) {
+                                $builder->paragraph('<strong>' . __('emails_misc.expense.rejected_notes_label') . ':</strong> ' . htmlspecialchars($notes, ENT_QUOTES, 'UTF-8'));
+                            }
+                            $renderedHtml = $builder->button(__('emails_misc.expense.' . ($isApproved ? 'approved' : 'rejected') . '_cta'), $fullUrl)->render();
+                            if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $params), $renderedHtml)) {
+                                Log::warning('[VolunteerExpenseService] reviewExpense email failed', ['user_id' => $expense->user_id]);
+                            }
+                        });
                     }
                 }
             } catch (\Throwable $e) {
@@ -295,31 +298,33 @@ class VolunteerExpenseService
                 $expense = VolExpense::find($id);
                 if ($expense) {
                     $tenantId  = TenantContext::getId();
-                    $user      = DB::table('users')->where('id', $expense->user_id)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+                    $user      = DB::table('users')->where('id', $expense->user_id)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
                     if ($user && !empty($user->email)) {
-                        $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-                        $params    = [
-                            'amount'   => number_format((float) $expense->amount, 2),
-                            'currency' => $expense->currency ?? 'EUR',
-                            'type'     => $expense->expense_type,
-                        ];
-                        $link    = '/volunteering/expenses/' . $id;
-                        $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+                        LocaleContext::withLocale($user, function () use ($user, $expense, $id, $paymentReference) {
+                            $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                            $params    = [
+                                'amount'   => number_format((float) $expense->amount, 2),
+                                'currency' => $expense->currency ?? 'EUR',
+                                'type'     => $expense->expense_type,
+                            ];
+                            $link    = '/volunteering/expenses/' . $id;
+                            $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
-                        $builder = EmailTemplateBuilder::make()
-                            ->title(__('emails_misc.expense.paid_title'))
-                            ->greeting($firstName)
-                            ->paragraph(__('emails_misc.expense.paid_body', $params));
+                            $builder = EmailTemplateBuilder::make()
+                                ->title(__('emails_misc.expense.paid_title'))
+                                ->greeting($firstName)
+                                ->paragraph(__('emails_misc.expense.paid_body', $params));
 
-                        if (!empty($paymentReference)) {
-                            $builder->paragraph('<strong>' . __('emails_misc.expense.paid_ref_label') . ':</strong> ' . htmlspecialchars($paymentReference, ENT_QUOTES, 'UTF-8'));
-                        }
+                            if (!empty($paymentReference)) {
+                                $builder->paragraph('<strong>' . __('emails_misc.expense.paid_ref_label') . ':</strong> ' . htmlspecialchars($paymentReference, ENT_QUOTES, 'UTF-8'));
+                            }
 
-                        $html = $builder->button(__('emails_misc.expense.paid_cta'), $fullUrl)->render();
+                            $html = $builder->button(__('emails_misc.expense.paid_cta'), $fullUrl)->render();
 
-                        if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.expense.paid_subject', $params), $html)) {
-                            Log::warning('[VolunteerExpenseService] markPaid email failed', ['user_id' => $expense->user_id]);
-                        }
+                            if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.expense.paid_subject', $params), $html)) {
+                                Log::warning('[VolunteerExpenseService] markPaid email failed', ['user_id' => $expense->user_id]);
+                            }
+                        });
                     }
                 }
             } catch (\Throwable $e) {

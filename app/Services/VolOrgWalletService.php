@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -234,25 +235,27 @@ class VolOrgWalletService
         // Send deposit confirmation email (outside transaction)
         if (!empty($result['success'])) {
             try {
-                $depositor = DB::table('users')->where('id', $userId)->where('tenant_id', TenantContext::getId())->select(['email', 'first_name', 'name'])->first();
+                $depositor = DB::table('users')->where('id', $userId)->where('tenant_id', TenantContext::getId())->select(['email', 'first_name', 'name', 'preferred_language'])->first();
                 if ($depositor && !empty($depositor->email)) {
-                    $orgNameSafe  = htmlspecialchars($result['_org_name'] ?? '', ENT_QUOTES, 'UTF-8');
-                    $amount       = (int) ($result['_amount'] ?? 0);
-                    $walletUrl    = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/wallet';
-                    $firstName    = $depositor->first_name ?? $depositor->name ?? __('emails.common.fallback_name');
+                    LocaleContext::withLocale($depositor, function () use ($depositor, $result, $userId) {
+                        $orgNameSafe  = htmlspecialchars($result['_org_name'] ?? '', ENT_QUOTES, 'UTF-8');
+                        $amount       = (int) ($result['_amount'] ?? 0);
+                        $walletUrl    = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/wallet';
+                        $firstName    = $depositor->first_name ?? $depositor->name ?? __('emails.common.fallback_name');
 
-                    $html = EmailTemplateBuilder::make()
-                        ->title(__('emails_misc.vol_org_wallet.deposit_title'))
-                        ->previewText(__('emails_misc.vol_org_wallet.deposit_preview', ['amount' => $amount]))
-                        ->greeting($firstName)
-                        ->paragraph(__('emails_misc.vol_org_wallet.deposit_body', ['amount' => $amount, 'org' => $orgNameSafe]))
-                        ->button(__('emails_misc.vol_org_wallet.deposit_cta'), $walletUrl)
-                        ->render();
+                        $html = EmailTemplateBuilder::make()
+                            ->title(__('emails_misc.vol_org_wallet.deposit_title'))
+                            ->previewText(__('emails_misc.vol_org_wallet.deposit_preview', ['amount' => $amount]))
+                            ->greeting($firstName)
+                            ->paragraph(__('emails_misc.vol_org_wallet.deposit_body', ['amount' => $amount, 'org' => $orgNameSafe]))
+                            ->button(__('emails_misc.vol_org_wallet.deposit_cta'), $walletUrl)
+                            ->render();
 
-                    $subject = __('emails_misc.vol_org_wallet.deposit_subject', ['org' => $result['_org_name'] ?? '']);
-                    if (!Mailer::forCurrentTenant()->send($depositor->email, $subject, $html)) {
-                        Log::warning('[VolOrgWalletService] Deposit confirmation email failed', ['user_id' => $userId]);
-                    }
+                        $subject = __('emails_misc.vol_org_wallet.deposit_subject', ['org' => $result['_org_name'] ?? '']);
+                        if (!Mailer::forCurrentTenant()->send($depositor->email, $subject, $html)) {
+                            Log::warning('[VolOrgWalletService] Deposit confirmation email failed', ['user_id' => $userId]);
+                        }
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('[VolOrgWalletService] depositFromUser email error: ' . $e->getMessage());
@@ -351,26 +354,28 @@ class VolOrgWalletService
         // Send payment confirmation email to volunteer (outside transaction)
         if (!empty($result['success'])) {
             try {
-                $volunteer = DB::table('users')->where('id', $volunteerId)->where('tenant_id', TenantContext::getId())->select(['email', 'first_name', 'name'])->first();
+                $volunteer = DB::table('users')->where('id', $volunteerId)->where('tenant_id', TenantContext::getId())->select(['email', 'first_name', 'name', 'preferred_language'])->first();
                 if ($volunteer && !empty($volunteer->email)) {
-                    $orgNameSafe = htmlspecialchars($result['_org_name'] ?? '', ENT_QUOTES, 'UTF-8');
-                    $amount      = (int) ($result['_amount'] ?? 0);
-                    $walletUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/wallet';
-                    $firstName   = $volunteer->first_name ?? $volunteer->name ?? __('emails.common.fallback_name');
+                    LocaleContext::withLocale($volunteer, function () use ($volunteer, $result, $volunteerId) {
+                        $orgNameSafe = htmlspecialchars($result['_org_name'] ?? '', ENT_QUOTES, 'UTF-8');
+                        $amount      = (int) ($result['_amount'] ?? 0);
+                        $walletUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/wallet';
+                        $firstName   = $volunteer->first_name ?? $volunteer->name ?? __('emails.common.fallback_name');
 
-                    $html = EmailTemplateBuilder::make()
-                        ->theme('success')
-                        ->title(__('emails_misc.vol_org_wallet.payment_title'))
-                        ->previewText(__('emails_misc.vol_org_wallet.payment_preview', ['amount' => $amount]))
-                        ->greeting($firstName)
-                        ->paragraph(__('emails_misc.vol_org_wallet.payment_body', ['amount' => $amount, 'org' => $orgNameSafe]))
-                        ->button(__('emails_misc.vol_org_wallet.payment_cta'), $walletUrl)
-                        ->render();
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('success')
+                            ->title(__('emails_misc.vol_org_wallet.payment_title'))
+                            ->previewText(__('emails_misc.vol_org_wallet.payment_preview', ['amount' => $amount]))
+                            ->greeting($firstName)
+                            ->paragraph(__('emails_misc.vol_org_wallet.payment_body', ['amount' => $amount, 'org' => $orgNameSafe]))
+                            ->button(__('emails_misc.vol_org_wallet.payment_cta'), $walletUrl)
+                            ->render();
 
-                    $subject = __('emails_misc.vol_org_wallet.payment_subject', ['org' => $result['_org_name'] ?? '']);
-                    if (!Mailer::forCurrentTenant()->send($volunteer->email, $subject, $html)) {
-                        Log::warning('[VolOrgWalletService] Payment confirmation email failed', ['volunteer_id' => $volunteerId]);
-                    }
+                        $subject = __('emails_misc.vol_org_wallet.payment_subject', ['org' => $result['_org_name'] ?? '']);
+                        if (!Mailer::forCurrentTenant()->send($volunteer->email, $subject, $html)) {
+                            Log::warning('[VolOrgWalletService] Payment confirmation email failed', ['volunteer_id' => $volunteerId]);
+                        }
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('[VolOrgWalletService] payVolunteer email error: ' . $e->getMessage());

@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -154,17 +155,19 @@ class VolunteerCertificateService
 
         // Send confirmation email to volunteer
         try {
-            $userRow = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+            $userRow = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
             if ($userRow && !empty($userRow->email)) {
-                $firstName = $userRow->first_name ?? $userRow->name ?? __('emails.common.fallback_name');
-                $certUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/volunteering/certificates/' . $id;
-                $html = EmailTemplateBuilder::make()
-                    ->title(__('emails_misc.vol_certificate.ready_title'))
-                    ->greeting($firstName)
-                    ->paragraph(__('emails_misc.vol_certificate.ready_body', ['hours' => round($totalHours, 2)]))
-                    ->button(__('emails_misc.vol_certificate.ready_cta'), $certUrl)
-                    ->render();
-                Mailer::forCurrentTenant()->send($userRow->email, __('emails_misc.vol_certificate.ready_subject'), $html);
+                LocaleContext::withLocale($userRow, function () use ($userRow, $id, $totalHours) {
+                    $firstName = $userRow->first_name ?? $userRow->name ?? __('emails.common.fallback_name');
+                    $certUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/volunteering/certificates/' . $id;
+                    $html = EmailTemplateBuilder::make()
+                        ->title(__('emails_misc.vol_certificate.ready_title'))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_misc.vol_certificate.ready_body', ['hours' => round($totalHours, 2)]))
+                        ->button(__('emails_misc.vol_certificate.ready_cta'), $certUrl)
+                        ->render();
+                    Mailer::forCurrentTenant()->send($userRow->email, __('emails_misc.vol_certificate.ready_subject'), $html);
+                });
             }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('[VolunteerCertificateService] certificate ready email failed: ' . $e->getMessage());

@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\TenantContext;
 use App\Events\VolunteerOpportunityCreated;
 use App\Events\VolunteerOpportunityUpdated;
+use App\I18n\LocaleContext;
 use App\Models\VolApplication;
 use App\Models\VolLog;
 use App\Models\VolOpportunity;
@@ -546,16 +547,22 @@ class VolunteerService
             try {
                 $oppTitle = $opp->title ?? '';
                 $signedUpUsers = DB::select(
-                    "SELECT DISTINCT user_id FROM vol_applications WHERE opportunity_id = ? AND status = 'approved' AND tenant_id = ?",
+                    "SELECT DISTINCT va.user_id, u.preferred_language
+                     FROM vol_applications va
+                     JOIN users u ON u.id = va.user_id AND u.tenant_id = va.tenant_id
+                     WHERE va.opportunity_id = ? AND va.status = 'approved' AND va.tenant_id = ?",
                     [$id, $tenantId]
                 );
                 foreach ($signedUpUsers as $row) {
-                    \App\Models\Notification::createNotification(
-                        (int) $row->user_id,
-                        __('api_controllers_3.volunteer.opportunity_cancelled', ['title' => $oppTitle]),
-                        '/volunteering',
-                        'volunteer_opportunity'
-                    );
+                    $recipientId = (int) $row->user_id;
+                    LocaleContext::withLocale($row, function () use ($recipientId, $oppTitle) {
+                        \App\Models\Notification::createNotification(
+                            $recipientId,
+                            __('api_controllers_3.volunteer.opportunity_cancelled', ['title' => $oppTitle]),
+                            '/volunteering',
+                            'volunteer_opportunity'
+                        );
+                    });
                 }
             } catch (\Throwable $notifErr) {
                 Log::warning('VolunteerService::deleteOpportunity notification failed', ['error' => $notifErr->getMessage()]);
@@ -817,7 +824,7 @@ class VolunteerService
 
         // Atomic capacity check + signup inside a transaction with row lock
         try {
-            return DB::transaction(function () use ($shiftId, $tenantId, $app) {
+            return DB::transaction(function () use ($shiftId, $tenantId, $app, $userId, $shift) {
                 // Lock the shift row to prevent concurrent signups from exceeding capacity
                 $lockedShift = DB::selectOne(
                     "SELECT * FROM vol_shifts WHERE id = ? AND tenant_id = ? FOR UPDATE",
@@ -850,12 +857,19 @@ class VolunteerService
                     $shiftDate = isset($lockedShift->start_time)
                         ? date('d M Y H:i', strtotime($lockedShift->start_time))
                         : date('d M Y', strtotime($shift->start_time));
-                    \App\Models\Notification::createNotification(
-                        $userId,
-                        __('api_controllers_3.volunteer.shift_signup_confirmed', ['date' => $shiftDate]),
-                        '/volunteering',
-                        'volunteer_shift'
-                    );
+                    $recipient = DB::table('users')
+                        ->where('id', $userId)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['id', 'preferred_language'])
+                        ->first();
+                    LocaleContext::withLocale($recipient, function () use ($userId, $shiftDate) {
+                        \App\Models\Notification::createNotification(
+                            $userId,
+                            __('api_controllers_3.volunteer.shift_signup_confirmed', ['date' => $shiftDate]),
+                            '/volunteering',
+                            'volunteer_shift'
+                        );
+                    });
                 } catch (\Throwable $notifErr) {
                     Log::warning('VolunteerService::signUpForShift notification failed', ['error' => $notifErr->getMessage()]);
                 }
@@ -901,12 +915,19 @@ class VolunteerService
 
             // Notify volunteer of cancellation
             try {
-                \App\Models\Notification::createNotification(
-                    $userId,
-                    __('api_controllers_3.volunteer.shift_signup_cancelled'),
-                    '/volunteering',
-                    'volunteer_shift'
-                );
+                $recipient = DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['id', 'preferred_language'])
+                    ->first();
+                LocaleContext::withLocale($recipient, function () use ($userId) {
+                    \App\Models\Notification::createNotification(
+                        $userId,
+                        __('api_controllers_3.volunteer.shift_signup_cancelled'),
+                        '/volunteering',
+                        'volunteer_shift'
+                    );
+                });
             } catch (\Throwable $notifErr) {
                 Log::warning('VolunteerService::cancelShiftSignup notification failed', ['error' => $notifErr->getMessage()]);
             }
@@ -1194,40 +1215,64 @@ class VolunteerService
 
             // 3. Send notifications AFTER transaction committed successfully
             try {
+                // Fetch volunteer preferred_language so the dispatched bell/push/email
+                // render in the volunteer's locale, not the reviewing admin's.
+                $volunteerRow = DB::table('users')
+                    ->where('id', $volunteerId)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['id', 'preferred_language'])
+                    ->first();
+
                 if ($action === 'approve' && $paymentResult === 'paid') {
-                    NotificationDispatcher::dispatch(
-                        $volunteerId, 'global', 0, 'vol_hours_approved',
-                        "Your {$hours}h were approved and {$hours} time credits added to your wallet!",
-                        '/wallet',
-                        NotificationDispatcher::buildVolHoursApprovedPaidEmail($hours, $orgName)
-                    );
+                    LocaleContext::withLocale($volunteerRow, function () use ($volunteerId, $hours, $orgName) {
+                        NotificationDispatcher::dispatch(
+                            $volunteerId, 'global', 0, 'vol_hours_approved',
+                            "Your {$hours}h were approved and {$hours} time credits added to your wallet!",
+                            '/wallet',
+                            NotificationDispatcher::buildVolHoursApprovedPaidEmail($hours, $orgName)
+                        );
+                    });
                 } elseif ($action === 'approve' && $paymentResult === 'insufficient_balance') {
-                    NotificationDispatcher::dispatch(
-                        $volunteerId, 'global', 0, 'vol_hours_approved',
-                        "Your {$hours}h were approved! Time credits will be paid when the organization funds their wallet.",
-                        '/volunteering?tab=hours',
-                        NotificationDispatcher::buildVolHoursApprovedEmail($hours, $orgName)
-                    );
-                    NotificationDispatcher::dispatch(
-                        (int) $org->user_id, 'global', 0, 'vol_hours_approved',
-                        "Approved {$hours}h for a volunteer but your org wallet has insufficient balance. Please fund your wallet.",
-                        '/volunteering/org/' . (int) $org->id . '/dashboard?tab=wallet',
-                        null
-                    );
+                    LocaleContext::withLocale($volunteerRow, function () use ($volunteerId, $hours, $orgName) {
+                        NotificationDispatcher::dispatch(
+                            $volunteerId, 'global', 0, 'vol_hours_approved',
+                            "Your {$hours}h were approved! Time credits will be paid when the organization funds their wallet.",
+                            '/volunteering?tab=hours',
+                            NotificationDispatcher::buildVolHoursApprovedEmail($hours, $orgName)
+                        );
+                    });
+                    $ownerId = (int) $org->user_id;
+                    $ownerRow = DB::table('users')
+                        ->where('id', $ownerId)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['id', 'preferred_language'])
+                        ->first();
+                    LocaleContext::withLocale($ownerRow, function () use ($ownerId, $hours, $org) {
+                        NotificationDispatcher::dispatch(
+                            $ownerId, 'global', 0, 'vol_hours_approved',
+                            "Approved {$hours}h for a volunteer but your org wallet has insufficient balance. Please fund your wallet.",
+                            '/volunteering/org/' . (int) $org->id . '/dashboard?tab=wallet',
+                            null
+                        );
+                    });
                 } elseif ($action === 'approve') {
-                    NotificationDispatcher::dispatch(
-                        $volunteerId, 'global', 0, 'vol_hours_approved',
-                        "Your {$hours}h of volunteering were approved!",
-                        '/volunteering?tab=hours',
-                        NotificationDispatcher::buildVolHoursApprovedEmail($hours, $orgName)
-                    );
+                    LocaleContext::withLocale($volunteerRow, function () use ($volunteerId, $hours, $orgName) {
+                        NotificationDispatcher::dispatch(
+                            $volunteerId, 'global', 0, 'vol_hours_approved',
+                            "Your {$hours}h of volunteering were approved!",
+                            '/volunteering?tab=hours',
+                            NotificationDispatcher::buildVolHoursApprovedEmail($hours, $orgName)
+                        );
+                    });
                 } else {
-                    NotificationDispatcher::dispatch(
-                        $volunteerId, 'global', 0, 'vol_hours_declined',
-                        "Your {$hours}h volunteering log was declined.",
-                        '/volunteering?tab=hours',
-                        NotificationDispatcher::buildVolHoursDeclinedEmail($hours, $orgName)
-                    );
+                    LocaleContext::withLocale($volunteerRow, function () use ($volunteerId, $hours, $orgName) {
+                        NotificationDispatcher::dispatch(
+                            $volunteerId, 'global', 0, 'vol_hours_declined',
+                            "Your {$hours}h volunteering log was declined.",
+                            '/volunteering?tab=hours',
+                            NotificationDispatcher::buildVolHoursDeclinedEmail($hours, $orgName)
+                        );
+                    });
                 }
             } catch (\Throwable $e) {
                 // Notification failure must not affect the already-committed transaction
