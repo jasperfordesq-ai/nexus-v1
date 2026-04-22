@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\JobVacancy;
 use App\Models\Notification;
 use App\Models\User;
@@ -41,7 +42,7 @@ class JobExpiryNotificationService
             foreach ($tenants as $tenant) {
                 TenantContext::setById($tenant->id);
 
-                $vacancies = JobVacancy::with(['creator:id,first_name,last_name,email'])
+                $vacancies = JobVacancy::with(['creator:id,first_name,last_name,email,preferred_language'])
                     ->where('status', 'open')
                     ->whereNotNull('deadline')
                     ->whereBetween('deadline', [now(), now()->addDays(7)])
@@ -52,20 +53,24 @@ class JobExpiryNotificationService
                     try {
                         $daysLeft = (int) now()->diffInDays($vacancy->deadline);
 
-                        // In-app notification
-                        if ($vacancy->user_id) {
-                            Notification::createNotification(
-                                (int) $vacancy->user_id,
-                                __('notifications.job_expiring_soon', ['title' => $vacancy->title, 'days' => $daysLeft]),
-                                "/jobs/{$vacancy->id}",
-                                'job_expiry'
-                            );
-                        }
+                        // Render notification + email in the RECIPIENT's language, not
+                        // the cron worker's default (which is always 'en' in queue context).
+                        LocaleContext::withLocale($vacancy->creator, function () use ($vacancy, $daysLeft) {
+                            // In-app notification
+                            if ($vacancy->user_id) {
+                                Notification::createNotification(
+                                    (int) $vacancy->user_id,
+                                    __('notifications.job_expiring_soon', ['title' => $vacancy->title, 'days' => $daysLeft]),
+                                    "/jobs/{$vacancy->id}",
+                                    'job_expiry'
+                                );
+                            }
 
-                        // Email notification
-                        if ($vacancy->creator && $vacancy->creator->email) {
-                            self::sendExpiryEmail($vacancy->creator, $vacancy, $daysLeft);
-                        }
+                            // Email notification
+                            if ($vacancy->creator && $vacancy->creator->email) {
+                                self::sendExpiryEmail($vacancy->creator, $vacancy, $daysLeft);
+                            }
+                        });
 
                         $notified++;
                     } catch (\Throwable $e) {

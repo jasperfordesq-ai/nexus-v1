@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -127,48 +128,51 @@ class VolunteerReminderService
                         $user = DB::table('users')
                             ->where('id', $userId)
                             ->where('tenant_id', $tenantId)
-                            ->first(['email', 'first_name', 'name']);
+                            ->first(['email', 'first_name', 'name', 'preferred_language']);
 
                         if ($user && !empty($user->email)) {
                             try {
-                                $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-                                $shiftTime = $shift->start_time
-                                    ? date('D, d M Y H:i', strtotime($shift->start_time))
-                                    : '';
-                                $shiftUrl = TenantContext::getFrontendUrl()
-                                    . TenantContext::getSlugPrefix()
-                                    . '/volunteering/opportunities/' . $shift->opportunity_id;
-                                $communityName = TenantContext::getName();
+                                // Cron → render in recipient's language, not 'en' default.
+                                LocaleContext::withLocale($user, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $userId) {
+                                    $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                                    $shiftTime = $shift->start_time
+                                        ? date('D, d M Y H:i', strtotime($shift->start_time))
+                                        : '';
+                                    $shiftUrl = TenantContext::getFrontendUrl()
+                                        . TenantContext::getSlugPrefix()
+                                        . '/volunteering/opportunities/' . $shift->opportunity_id;
+                                    $communityName = TenantContext::getName();
 
-                                $infoCard = [__('emails_volunteer.shift_reminder.label_opportunity') => $opportunityTitle];
-                                if ($shiftTime) {
-                                    $infoCard[__('emails_volunteer.shift_reminder.label_when')] = $shiftTime;
-                                }
-                                if ($opportunityLocation) {
-                                    $infoCard[__('emails_volunteer.shift_reminder.label_location')] = $opportunityLocation;
-                                }
+                                    $infoCard = [__('emails_volunteer.shift_reminder.label_opportunity') => $opportunityTitle];
+                                    if ($shiftTime) {
+                                        $infoCard[__('emails_volunteer.shift_reminder.label_when')] = $shiftTime;
+                                    }
+                                    if ($opportunityLocation) {
+                                        $infoCard[__('emails_volunteer.shift_reminder.label_location')] = $opportunityLocation;
+                                    }
 
-                                $html = EmailTemplateBuilder::make()
-                                    ->theme('info')
-                                    ->title(__('emails_volunteer.shift_reminder.title'))
-                                    ->previewText(__('emails_volunteer.shift_reminder.preview', ['title' => $opportunityTitle]))
-                                    ->greeting($firstName)
-                                    ->paragraph(__('emails_volunteer.shift_reminder.body'))
-                                    ->infoCard($infoCard)
-                                    ->button(__('emails_volunteer.shift_reminder.cta'), $shiftUrl)
-                                    ->render();
+                                    $html = EmailTemplateBuilder::make()
+                                        ->theme('info')
+                                        ->title(__('emails_volunteer.shift_reminder.title'))
+                                        ->previewText(__('emails_volunteer.shift_reminder.preview', ['title' => $opportunityTitle]))
+                                        ->greeting($firstName)
+                                        ->paragraph(__('emails_volunteer.shift_reminder.body'))
+                                        ->infoCard($infoCard)
+                                        ->button(__('emails_volunteer.shift_reminder.cta'), $shiftUrl)
+                                        ->render();
 
-                                $subject = __('emails_volunteer.shift_reminder.subject', [
-                                    'title'     => $opportunityTitle,
-                                    'community' => $communityName,
-                                ]);
-
-                                if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
-                                    Log::warning('[VolunteerReminderService] sendReminders email failed', [
-                                        'user_id' => $userId,
-                                        'shift_id' => $shift->id,
+                                    $subject = __('emails_volunteer.shift_reminder.subject', [
+                                        'title'     => $opportunityTitle,
+                                        'community' => $communityName,
                                     ]);
-                                }
+
+                                    if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
+                                        Log::warning('[VolunteerReminderService] sendReminders email failed', [
+                                            'user_id' => $userId,
+                                            'shift_id' => $shift->id,
+                                        ]);
+                                    }
+                                });
                             } catch (\Throwable $e) {
                                 Log::warning('[VolunteerReminderService] sendReminders email exception: ' . $e->getMessage(), [
                                     'user_id' => $userId,
@@ -472,48 +476,49 @@ class VolunteerReminderService
                                 $user = DB::table('users')
                                     ->where('id', $userId)
                                     ->where('tenant_id', $tenantId)
-                                    ->first(['email', 'first_name', 'name']);
+                                    ->first(['email', 'first_name', 'name', 'preferred_language']);
 
                                 if ($user && !empty($user->email)) {
                                     // Set tenant context so Mailer and translations use the right tenant
                                     TenantContext::setById($tenantId);
 
-                                    $firstName    = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-                                    $shiftTime    = $shift->start_time
-                                        ? date('D, d M Y H:i', strtotime($shift->start_time))
-                                        : '';
-                                    $shiftUrl     = TenantContext::getFrontendUrl()
-                                        . TenantContext::getSlugPrefix()
-                                        . '/volunteering/opportunities/' . $shift->opportunity_id;
-                                    $communityName = TenantContext::getName();
+                                    LocaleContext::withLocale($user, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $tenantId, $userId) {
+                                        $firstName    = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                                        $shiftTime    = $shift->start_time
+                                            ? date('D, d M Y H:i', strtotime($shift->start_time))
+                                            : '';
+                                        $shiftUrl     = TenantContext::getFrontendUrl()
+                                            . TenantContext::getSlugPrefix()
+                                            . '/volunteering/opportunities/' . $shift->opportunity_id;
 
-                                    $infoCard = [__('emails_volunteer.shift_starting_soon.title') => $opportunityTitle];
-                                    if ($shiftTime) {
-                                        $infoCard[__('emails_volunteer.shift_reminder.label_when')] = $shiftTime;
-                                    }
-                                    if ($opportunityLocation) {
-                                        $infoCard[__('emails_volunteer.shift_reminder.label_location')] = $opportunityLocation;
-                                    }
+                                        $infoCard = [__('emails_volunteer.shift_starting_soon.title') => $opportunityTitle];
+                                        if ($shiftTime) {
+                                            $infoCard[__('emails_volunteer.shift_reminder.label_when')] = $shiftTime;
+                                        }
+                                        if ($opportunityLocation) {
+                                            $infoCard[__('emails_volunteer.shift_reminder.label_location')] = $opportunityLocation;
+                                        }
 
-                                    $html = EmailTemplateBuilder::make()
-                                        ->theme('info')
-                                        ->title(__('emails_volunteer.shift_starting_soon.title'))
-                                        ->previewText(__('emails_volunteer.shift_starting_soon.preview', ['title' => $opportunityTitle]))
-                                        ->greeting($firstName)
-                                        ->paragraph(__('emails_volunteer.shift_starting_soon.body'))
-                                        ->infoCard($infoCard)
-                                        ->button(__('emails_volunteer.shift_starting_soon.cta'), $shiftUrl)
-                                        ->render();
+                                        $html = EmailTemplateBuilder::make()
+                                            ->theme('info')
+                                            ->title(__('emails_volunteer.shift_starting_soon.title'))
+                                            ->previewText(__('emails_volunteer.shift_starting_soon.preview', ['title' => $opportunityTitle]))
+                                            ->greeting($firstName)
+                                            ->paragraph(__('emails_volunteer.shift_starting_soon.body'))
+                                            ->infoCard($infoCard)
+                                            ->button(__('emails_volunteer.shift_starting_soon.cta'), $shiftUrl)
+                                            ->render();
 
-                                    $subject = __('emails_volunteer.shift_starting_soon.subject', ['title' => $opportunityTitle]);
+                                        $subject = __('emails_volunteer.shift_starting_soon.subject', ['title' => $opportunityTitle]);
 
-                                    if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
-                                        Log::warning('[VolunteerReminderService] sendPreShiftReminders email failed', [
-                                            'tenant_id' => $tenantId,
-                                            'user_id'   => $userId,
-                                            'shift_id'  => $shift->id,
-                                        ]);
-                                    }
+                                        if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
+                                            Log::warning('[VolunteerReminderService] sendPreShiftReminders email failed', [
+                                                'tenant_id' => $tenantId,
+                                                'user_id'   => $userId,
+                                                'shift_id'  => $shift->id,
+                                            ]);
+                                        }
+                                    });
                                 }
                             }
 
@@ -640,35 +645,37 @@ class VolunteerReminderService
                                 $user = DB::table('users')
                                     ->where('id', $userId)
                                     ->where('tenant_id', $tenantId)
-                                    ->first(['email', 'first_name', 'name']);
+                                    ->first(['email', 'first_name', 'name', 'preferred_language']);
 
                                 if ($user && !empty($user->email)) {
                                     TenantContext::setById($tenantId);
 
-                                    $firstName  = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-                                    $logHoursUrl = TenantContext::getFrontendUrl()
-                                        . TenantContext::getSlugPrefix()
-                                        . '/volunteering/opportunities/' . $shift->opportunity_id;
+                                    LocaleContext::withLocale($user, function () use ($user, $shift, $opportunityTitle, $tenantId, $userId) {
+                                        $firstName  = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                                        $logHoursUrl = TenantContext::getFrontendUrl()
+                                            . TenantContext::getSlugPrefix()
+                                            . '/volunteering/opportunities/' . $shift->opportunity_id;
 
-                                    $html = EmailTemplateBuilder::make()
-                                        ->theme('success')
-                                        ->title(__('emails_volunteer.post_shift_feedback.title'))
-                                        ->previewText(__('emails_volunteer.post_shift_feedback.preview', ['title' => $opportunityTitle]))
-                                        ->greeting($firstName)
-                                        ->paragraph(__('emails_volunteer.post_shift_feedback.body', ['title' => $opportunityTitle]))
-                                        ->paragraph(__('emails_volunteer.post_shift_feedback.log_hours_prompt'))
-                                        ->button(__('emails_volunteer.post_shift_feedback.cta'), $logHoursUrl)
-                                        ->render();
+                                        $html = EmailTemplateBuilder::make()
+                                            ->theme('success')
+                                            ->title(__('emails_volunteer.post_shift_feedback.title'))
+                                            ->previewText(__('emails_volunteer.post_shift_feedback.preview', ['title' => $opportunityTitle]))
+                                            ->greeting($firstName)
+                                            ->paragraph(__('emails_volunteer.post_shift_feedback.body', ['title' => $opportunityTitle]))
+                                            ->paragraph(__('emails_volunteer.post_shift_feedback.log_hours_prompt'))
+                                            ->button(__('emails_volunteer.post_shift_feedback.cta'), $logHoursUrl)
+                                            ->render();
 
-                                    $subject = __('emails_volunteer.post_shift_feedback.subject', ['title' => $opportunityTitle]);
+                                        $subject = __('emails_volunteer.post_shift_feedback.subject', ['title' => $opportunityTitle]);
 
-                                    if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
-                                        Log::warning('[VolunteerReminderService] sendPostShiftFeedback email failed', [
-                                            'tenant_id' => $tenantId,
-                                            'user_id'   => $userId,
-                                            'shift_id'  => $shift->id,
-                                        ]);
-                                    }
+                                        if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
+                                            Log::warning('[VolunteerReminderService] sendPostShiftFeedback email failed', [
+                                                'tenant_id' => $tenantId,
+                                                'user_id'   => $userId,
+                                                'shift_id'  => $shift->id,
+                                            ]);
+                                        }
+                                    });
                                 }
                             }
 

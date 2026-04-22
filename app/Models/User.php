@@ -172,7 +172,7 @@ class User extends Authenticatable
             END as name"),
             'organization_name', 'email', 'role', 'profile_type', 'balance', 'bio', 'tagline',
             'location', 'latitude', 'longitude', 'skills', 'phone', 'avatar_url',
-            'created_at', 'tenant_id', 'is_approved',
+            'created_at', 'tenant_id', 'is_approved', 'preferred_language',
             'privacy_profile', 'privacy_search', 'privacy_contact',
             'is_super_admin', 'is_god', 'is_tenant_super_admin', 'onboarding_completed',
             DB::raw('COALESCE(xp, 0) as xp'),

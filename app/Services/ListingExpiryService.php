@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplate;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
 use App\Models\Listing;
 use App\Models\Notification;
@@ -60,52 +61,50 @@ class ListingExpiryService
                 $title = htmlspecialchars($listing->title, ENT_QUOTES, 'UTF-8');
                 $listingLink = "/listings/{$listing->id}";
 
-                Notification::create([
-                    'user_id' => $listing->user_id,
-                    'message' => __('emails_listings.listings.expired.notification', ['title' => $title]),
-                    'link' => $listingLink,
-                    'type' => 'listing_expired',
-                    'created_at' => now(),
-                ]);
+                // Fetch owner once including preferred_language so notification + email
+                // both render in the owner's language (cron default = 'en' otherwise).
+                $ownerRow = DB::table('users')
+                    ->where('id', $listing->user_id)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['first_name', 'name', 'email', 'preferred_language'])
+                    ->first();
 
-                // Send email notification to listing owner
-                try {
-                    $ownerEmail = DB::table('users')
-                        ->where('id', $listing->user_id)
-                        ->where('tenant_id', $tenantId)
-                        ->value('email');
+                LocaleContext::withLocale($ownerRow, function () use ($listing, $title, $listingLink, $ownerRow) {
+                    Notification::create([
+                        'user_id' => $listing->user_id,
+                        'message' => __('emails_listings.listings.expired.notification', ['title' => $title]),
+                        'link' => $listingLink,
+                        'type' => 'listing_expired',
+                        'created_at' => now(),
+                    ]);
 
-                    if (!empty($ownerEmail) && filter_var($ownerEmail, FILTER_VALIDATE_EMAIL)) {
-                        $ownerRow = DB::table('users')
-                            ->where('id', $listing->user_id)
-                            ->where('tenant_id', $tenantId)
-                            ->select(['first_name', 'name'])
-                            ->first();
+                    // Send email notification to listing owner
+                    try {
+                        if ($ownerRow && !empty($ownerRow->email) && filter_var($ownerRow->email, FILTER_VALIDATE_EMAIL)) {
+                            $ownerName = htmlspecialchars($ownerRow->first_name ?? $ownerRow->name ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
+                            $frontendUrl = TenantContext::getFrontendUrl();
+                            $basePath = TenantContext::getSlugPrefix();
+                            $listingUrl = $frontendUrl . $basePath . $listingLink;
 
-                        $ownerName = htmlspecialchars($ownerRow->first_name ?? $ownerRow->name ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
-                        $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-                        $frontendUrl = TenantContext::getFrontendUrl();
-                        $basePath = TenantContext::getSlugPrefix();
-                        $listingUrl = $frontendUrl . $basePath . $listingLink;
+                            $body = "<p>" . __('emails.common.greeting', ['name' => $ownerName]) . "</p>"
+                                . "<p>" . __('emails_listings.listings.expired.body_expired', ['title' => $title]) . "</p>"
+                                . "<p>" . __('emails_listings.listings.expired.body_renew') . "</p>";
 
-                        $body = "<p>" . __('emails.common.greeting', ['name' => $ownerName]) . "</p>"
-                            . "<p>" . __('emails_listings.listings.expired.body_expired', ['title' => $title]) . "</p>"
-                            . "<p>" . __('emails_listings.listings.expired.body_renew') . "</p>";
+                            $html = \App\Core\EmailTemplateBuilder::make()
+                                ->theme('brand')
+                                ->title(__('emails_listings.listings.expired.heading'))
+                                ->paragraph(__('emails_listings.listings.expired.subheading'))
+                                ->paragraph($body)
+                                ->button(__('emails_listings.listings.expired.cta'), $listingUrl)
+                                ->render();
 
-                        $html = \App\Core\EmailTemplateBuilder::make()
-                            ->theme('brand')
-                            ->title(__('emails_listings.listings.expired.heading'))
-                            ->paragraph(__('emails_listings.listings.expired.subheading'))
-                            ->paragraph($body)
-                            ->button(__('emails_listings.listings.expired.cta'), $listingUrl)
-                            ->render();
-
-                        $mailer = Mailer::forCurrentTenant();
-                        $mailer->send($ownerEmail, __('emails_listings.listings.expired.subject'), $html);
+                            $mailer = Mailer::forCurrentTenant();
+                            $mailer->send($ownerRow->email, __('emails_listings.listings.expired.subject'), $html);
+                        }
+                    } catch (\Exception $e) {
+                        Log::warning("[ListingExpiryService] Email send failed for user={$listing->user_id}, listing={$listing->id}: " . $e->getMessage());
                     }
-                } catch (\Exception $e) {
-                    Log::warning("[ListingExpiryService] Email send failed for user={$listing->user_id}, listing={$listing->id}: " . $e->getMessage());
-                }
+                });
 
                 $expired++;
             } catch (\Exception $e) {

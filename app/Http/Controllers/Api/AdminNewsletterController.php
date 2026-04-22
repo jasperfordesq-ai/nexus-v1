@@ -2406,7 +2406,7 @@ class AdminNewsletterController extends BaseApiController
             }
 
             $admin = DB::selectOne(
-                "SELECT email, first_name, last_name FROM users WHERE id = ? AND tenant_id = ?",
+                "SELECT email, first_name, last_name, preferred_language FROM users WHERE id = ? AND tenant_id = ?",
                 [$userId, $tenantId]
             );
 
@@ -2423,14 +2423,16 @@ class AdminNewsletterController extends BaseApiController
                 'name' => trim(($admin->first_name ?? '') . ' ' . ($admin->last_name ?? '')),
             ];
 
-            $html = $this->newsletterService->renderEmail(
-                (array)$newsletter,
-                $tenantName,
-                'test-unsubscribe-token',
-                $sampleRecipient
-            );
-
-            $subject = __('emails.newsletter.test_prefix') . ' ' . ($newsletter->subject ?? __('emails.newsletter.no_subject'));
+            // Test email is sent to the admin themselves — render in their preferred language.
+            [$html, $subject] = \App\I18n\LocaleContext::withLocale($admin, fn () => [
+                $this->newsletterService->renderEmail(
+                    (array)$newsletter,
+                    $tenantName,
+                    'test-unsubscribe-token',
+                    $sampleRecipient
+                ),
+                __('emails.newsletter.test_prefix') . ' ' . ($newsletter->subject ?? __('emails.newsletter.no_subject')),
+            ]);
 
             $sent = (new \App\Core\Mailer($tenantId))->send($admin->email, $subject, $html);
 

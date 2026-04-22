@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Newsletter;
 use App\Models\NewsletterSegment;
 use Illuminate\Support\Facades\DB;
@@ -263,10 +264,14 @@ class NewsletterService
                 break;
             }
 
-            $pending = DB::table('newsletter_queue')
-                ->where('newsletter_id', $newsletterId)
-                ->where('status', 'processing')
+            // Join with users so we can render emails in the subscriber's preferred_language.
+            // Unregistered subscribers (user_id NULL) fall back to app default locale.
+            $pending = DB::table('newsletter_queue as nq')
+                ->leftJoin('users as u', 'nq.user_id', '=', 'u.id')
+                ->where('nq.newsletter_id', $newsletterId)
+                ->where('nq.status', 'processing')
                 ->limit($batchSize)
+                ->select('nq.*', 'u.preferred_language as subscriber_locale')
                 ->get();
 
             foreach ($pending as $item) {
@@ -280,12 +285,19 @@ class NewsletterService
 
                     $unsubscribeToken = $item->unsubscribe_token ?? null;
                     $trackingToken = $item->tracking_token ?? null;
-                    $emailHtml = self::renderEmail(
-                        (array) $newsletter->getAttributes(),
-                        $tenantName,
-                        $unsubscribeToken,
-                        $recipientData,
-                        $trackingToken
+
+                    // Render email body (footer/unsubscribe links use __()) in the
+                    // subscriber's language. For non-user subscribers, $subscriber_locale
+                    // is NULL — LocaleContext::withLocale treats that as no-op.
+                    $emailHtml = LocaleContext::withLocale(
+                        $item->subscriber_locale ?? null,
+                        fn () => self::renderEmail(
+                            (array) $newsletter->getAttributes(),
+                            $tenantName,
+                            $unsubscribeToken,
+                            $recipientData,
+                            $trackingToken
+                        )
                     );
 
                     $subject = $newsletter->subject;

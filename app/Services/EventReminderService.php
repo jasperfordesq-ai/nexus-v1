@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -124,7 +125,7 @@ class EventReminderService
 
             // Get attendees who haven't been reminded yet
             $attendees = DB::select(
-                "SELECT r.user_id, u.name, u.first_name, u.last_name, u.email, r.status
+                "SELECT r.user_id, u.name, u.first_name, u.last_name, u.email, u.preferred_language, r.status
                  FROM event_rsvps r
                  JOIN users u ON r.user_id = u.id AND u.tenant_id = ?
                  LEFT JOIN event_reminder_sent ers
@@ -142,54 +143,58 @@ class EventReminderService
                 $userId = (int) $attendee->user_id;
 
                 try {
-                    $title = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
-                    $when = date('l, M j \\a\\t g:i A', strtotime($event->start_time));
+                    // Render notification + email in the RECIPIENT's language — cron
+                    // workers default to config('app.locale') = 'en' otherwise.
+                    LocaleContext::withLocale($attendee, function () use ($tenantId, $eventId, $reminderType, $event, $attendee, $userId, &$sent) {
+                        $title = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
+                        $when = date('l, M j \\a\\t g:i A', strtotime($event->start_time));
 
-                    if ($reminderType === '24h') {
-                        $message = __('svc_notifications_2.event.reminder_tomorrow', ['title' => $title, 'when' => $when]);
-                    } else {
-                        $message = __('svc_notifications_2.event.reminder_1h', ['title' => $title, 'when' => $when]);
-                    }
-
-                    $link = "/events/{$eventId}";
-
-                    // Create in-app notification
-                    DB::insert(
-                        "INSERT INTO notifications (user_id, tenant_id, message, link, type, created_at) VALUES (?, ?, ?, ?, 'event_reminder', NOW())",
-                        [$userId, $tenantId, $message, $link]
-                    );
-
-                    // Email notification
-                    if (!empty($attendee->email)) {
-                        try {
-                            $subjectKey = $reminderType === '24h'
-                                ? 'notifications.event_reminder_subject_24h'
-                                : 'notifications.event_reminder_subject_1h';
-                            $subject  = __($subjectKey, ['title' => $title]);
-                            $eventUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
-                            $name     = $attendee->first_name ?? $attendee->name ?? __('emails.common.fallback_name');
-
-                            $html = EmailTemplateBuilder::make()
-                                ->title(__('emails_misc.events.reminder_email_title'))
-                                ->previewText($message)
-                                ->greeting($name)
-                                ->paragraph($message)
-                                ->button(__('emails_misc.events.reminder_email_cta'), $eventUrl)
-                                ->render();
-
-                            Mailer::forCurrentTenant()->send($attendee->email, $subject, $html);
-                        } catch (\Exception $emailEx) {
-                            \Illuminate\Support\Facades\Log::warning("[EventReminderService] Email failed: event={$eventId}, user={$userId}: " . $emailEx->getMessage());
+                        if ($reminderType === '24h') {
+                            $message = __('svc_notifications_2.event.reminder_tomorrow', ['title' => $title, 'when' => $when]);
+                        } else {
+                            $message = __('svc_notifications_2.event.reminder_1h', ['title' => $title, 'when' => $when]);
                         }
-                    }
 
-                    // Mark reminder as sent
-                    DB::statement(
-                        "INSERT IGNORE INTO event_reminder_sent (tenant_id, event_id, user_id, reminder_type, sent_at) VALUES (?, ?, ?, ?, NOW())",
-                        [$tenantId, $eventId, $userId, $reminderType]
-                    );
+                        $link = "/events/{$eventId}";
 
-                    $sent++;
+                        // Create in-app notification
+                        DB::insert(
+                            "INSERT INTO notifications (user_id, tenant_id, message, link, type, created_at) VALUES (?, ?, ?, ?, 'event_reminder', NOW())",
+                            [$userId, $tenantId, $message, $link]
+                        );
+
+                        // Email notification
+                        if (!empty($attendee->email)) {
+                            try {
+                                $subjectKey = $reminderType === '24h'
+                                    ? 'notifications.event_reminder_subject_24h'
+                                    : 'notifications.event_reminder_subject_1h';
+                                $subject  = __($subjectKey, ['title' => $title]);
+                                $eventUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+                                $name     = $attendee->first_name ?? $attendee->name ?? __('emails.common.fallback_name');
+
+                                $html = EmailTemplateBuilder::make()
+                                    ->title(__('emails_misc.events.reminder_email_title'))
+                                    ->previewText($message)
+                                    ->greeting($name)
+                                    ->paragraph($message)
+                                    ->button(__('emails_misc.events.reminder_email_cta'), $eventUrl)
+                                    ->render();
+
+                                Mailer::forCurrentTenant()->send($attendee->email, $subject, $html);
+                            } catch (\Exception $emailEx) {
+                                \Illuminate\Support\Facades\Log::warning("[EventReminderService] Email failed: event={$eventId}, user={$userId}: " . $emailEx->getMessage());
+                            }
+                        }
+
+                        // Mark reminder as sent
+                        DB::statement(
+                            "INSERT IGNORE INTO event_reminder_sent (tenant_id, event_id, user_id, reminder_type, sent_at) VALUES (?, ?, ?, ?, NOW())",
+                            [$tenantId, $eventId, $userId, $reminderType]
+                        );
+
+                        $sent++;
+                    });
                 } catch (\Exception $e) {
                     \Illuminate\Support\Facades\Log::warning("[EventReminderService] Failed: event={$eventId}, user={$userId}: " . $e->getMessage());
                     $errors++;

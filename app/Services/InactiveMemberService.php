@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -216,7 +217,7 @@ class InactiveMemberService
                 ->whereIn('id', $userIds)
                 ->where('status', 'active')
                 ->whereNotNull('email')
-                ->select(['id', 'email', 'first_name', 'name'])
+                ->select(['id', 'email', 'first_name', 'name', 'preferred_language'])
                 ->get();
 
             $communityName  = TenantContext::getSetting('site_name', 'Project NEXUS');
@@ -226,20 +227,23 @@ class InactiveMemberService
 
             foreach ($users as $user) {
                 try {
-                    $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                    // Re-engagement emails are cron-dispatched → render in recipient's language.
+                    LocaleContext::withLocale($user, function () use ($user, $safeCommunity, $communityName, $feedUrl, $mailer) {
+                        $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
-                    $html = EmailTemplateBuilder::make()
-                        ->title(__('emails_misc.inactive_member.title'))
-                        ->previewText(__('emails_misc.inactive_member.preview'))
-                        ->greeting($firstName)
-                        ->paragraph(__('emails_misc.inactive_member.body', ['community' => $safeCommunity]))
-                        ->button(__('emails_misc.inactive_member.cta'), $feedUrl)
-                        ->render();
+                        $html = EmailTemplateBuilder::make()
+                            ->title(__('emails_misc.inactive_member.title'))
+                            ->previewText(__('emails_misc.inactive_member.preview'))
+                            ->greeting($firstName)
+                            ->paragraph(__('emails_misc.inactive_member.body', ['community' => $safeCommunity]))
+                            ->button(__('emails_misc.inactive_member.cta'), $feedUrl)
+                            ->render();
 
-                    $subject = __('emails_misc.inactive_member.subject', ['community' => $communityName]);
-                    if (!$mailer->send($user->email, $subject, $html)) {
-                        Log::warning('[InactiveMemberService] Re-engagement email failed', ['user_id' => $user->id]);
-                    }
+                        $subject = __('emails_misc.inactive_member.subject', ['community' => $communityName]);
+                        if (!$mailer->send($user->email, $subject, $html)) {
+                            Log::warning('[InactiveMemberService] Re-engagement email failed', ['user_id' => $user->id]);
+                        }
+                    });
                 } catch (\Throwable $e) {
                     Log::warning('[InactiveMemberService] markNotified email error for user ' . $user->id . ': ' . $e->getMessage());
                 }

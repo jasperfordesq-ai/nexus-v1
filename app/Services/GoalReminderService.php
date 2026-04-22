@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -94,7 +95,7 @@ class GoalReminderService
             ->select([
                 'gr.id', 'gr.goal_id', 'gr.user_id', 'gr.frequency',
                 'g.title as goal_title',
-                'u.email', 'u.name as user_name', 'u.first_name',
+                'u.email', 'u.name as user_name', 'u.first_name', 'u.preferred_language',
             ])
             ->get();
 
@@ -102,45 +103,48 @@ class GoalReminderService
 
         foreach ($reminders as $reminder) {
             try {
-                $goalTitle = htmlspecialchars($reminder->goal_title ?? 'your goal', ENT_QUOTES, 'UTF-8');
-                $firstName = $reminder->first_name ?? $reminder->user_name ?? __('emails.common.fallback_name');
-                $link = '/goals/' . $reminder->goal_id;
+                // Render notification + email in the recipient's language (cron default = 'en').
+                LocaleContext::withLocale($reminder, function () use ($reminder, $tenantId, &$sent) {
+                    $goalTitle = htmlspecialchars($reminder->goal_title ?? 'your goal', ENT_QUOTES, 'UTF-8');
+                    $firstName = $reminder->first_name ?? $reminder->user_name ?? __('emails.common.fallback_name');
+                    $link = '/goals/' . $reminder->goal_id;
 
-                // In-app notification
-                DB::insert(
-                    "INSERT INTO notifications (user_id, tenant_id, message, link, type, created_at) VALUES (?, ?, ?, ?, 'goal_reminder', NOW())",
-                    [$reminder->user_id, $tenantId, __('svc_notifications.goal.reminder_bell', ['title' => $goalTitle]), $link]
-                );
+                    // In-app notification
+                    DB::insert(
+                        "INSERT INTO notifications (user_id, tenant_id, message, link, type, created_at) VALUES (?, ?, ?, ?, 'goal_reminder', NOW())",
+                        [$reminder->user_id, $tenantId, __('svc_notifications.goal.reminder_bell', ['title' => $goalTitle]), $link]
+                    );
 
-                // Email notification
-                if (!empty($reminder->email)) {
-                    $goalUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+                    // Email notification
+                    if (!empty($reminder->email)) {
+                        $goalUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
-                    $html = EmailTemplateBuilder::make()
-                        ->title(__('emails_misc.goals.reminder_title'))
-                        ->previewText(__('emails_misc.goals.reminder_preview', ['title' => $goalTitle]))
-                        ->greeting($firstName)
-                        ->paragraph(__('emails_misc.goals.reminder_body'))
-                        ->highlight($goalTitle)
-                        ->button(__('emails_misc.goals.reminder_cta'), $goalUrl)
-                        ->render();
+                        $html = EmailTemplateBuilder::make()
+                            ->title(__('emails_misc.goals.reminder_title'))
+                            ->previewText(__('emails_misc.goals.reminder_preview', ['title' => $goalTitle]))
+                            ->greeting($firstName)
+                            ->paragraph(__('emails_misc.goals.reminder_body'))
+                            ->highlight($goalTitle)
+                            ->button(__('emails_misc.goals.reminder_cta'), $goalUrl)
+                            ->render();
 
-                    $subject = __('emails_misc.goals.reminder_subject', ['title' => $goalTitle]);
-                    if (!Mailer::forCurrentTenant()->send($reminder->email, $subject, $html)) {
-                        Log::warning('[GoalReminderService] Email failed', ['user_id' => $reminder->user_id, 'reminder_id' => $reminder->id]);
+                        $subject = __('emails_misc.goals.reminder_subject', ['title' => $goalTitle]);
+                        if (!Mailer::forCurrentTenant()->send($reminder->email, $subject, $html)) {
+                            Log::warning('[GoalReminderService] Email failed', ['user_id' => $reminder->user_id, 'reminder_id' => $reminder->id]);
+                        }
                     }
-                }
 
-                // Advance next_reminder_at
-                DB::table('goal_reminders')
-                    ->where('id', $reminder->id)
-                    ->update([
-                        'last_sent_at'    => now(),
-                        'next_reminder_at' => static::nextReminderAt($reminder->frequency),
-                        'updated_at'      => now(),
-                    ]);
+                    // Advance next_reminder_at
+                    DB::table('goal_reminders')
+                        ->where('id', $reminder->id)
+                        ->update([
+                            'last_sent_at'    => now(),
+                            'next_reminder_at' => static::nextReminderAt($reminder->frequency),
+                            'updated_at'      => now(),
+                        ]);
 
-                $sent++;
+                    $sent++;
+                });
             } catch (\Throwable $e) {
                 Log::warning('[GoalReminderService] Failed reminder id=' . $reminder->id . ': ' . $e->getMessage());
             }

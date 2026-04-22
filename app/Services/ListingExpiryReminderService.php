@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplate;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Listing;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
@@ -85,7 +86,7 @@ class ListingExpiryReminderService
                 ->whereNull('lers.id')
                 ->select([
                     'l.id', 'l.title', 'l.type', 'l.user_id', 'l.expires_at',
-                    'u.name', 'u.first_name', 'u.last_name', 'u.email',
+                    'u.name', 'u.first_name', 'u.last_name', 'u.email', 'u.preferred_language',
                 ])
                 ->get();
         } catch (\Exception $e) {
@@ -98,8 +99,11 @@ class ListingExpiryReminderService
             $listingId = (int) $listing->id;
 
             try {
-                $this->sendReminder($userId, $listing, $daysBefore);
-                $this->markReminderSent($tenantId, $listingId, $userId, $daysBefore);
+                // Cron default is 'en' — switch to the owner's preferred_language.
+                LocaleContext::withLocale($listing, function () use ($userId, $listing, $daysBefore, $tenantId, $listingId) {
+                    $this->sendReminder($userId, $listing, $daysBefore);
+                    $this->markReminderSent($tenantId, $listingId, $userId, $daysBefore);
+                });
                 $sent++;
             } catch (\Exception $e) {
                 Log::error("[ListingExpiryReminderService] Failed: listing={$listingId}, user={$userId}, window={$daysBefore}: " . $e->getMessage());
@@ -140,7 +144,7 @@ class ListingExpiryReminderService
                 ->whereNull('lers.id')
                 ->select([
                     'l.id', 'l.title', 'l.type', 'l.user_id', 'l.expires_at',
-                    'u.name', 'u.first_name', 'u.last_name', 'u.email',
+                    'u.name', 'u.first_name', 'u.last_name', 'u.email', 'u.preferred_language',
                 ])
                 ->get();
         } catch (\Exception $e) {
@@ -153,8 +157,10 @@ class ListingExpiryReminderService
             $listingId = (int) $listing->id;
 
             try {
-                $this->sendExpiredNotification($userId, $listing);
-                $this->markReminderSent($tenantId, $listingId, $userId, 0);
+                LocaleContext::withLocale($listing, function () use ($userId, $listing, $tenantId, $listingId) {
+                    $this->sendExpiredNotification($userId, $listing);
+                    $this->markReminderSent($tenantId, $listingId, $userId, 0);
+                });
                 $sent++;
             } catch (\Exception $e) {
                 Log::error("[ListingExpiryReminderService] Expired notify failed: listing={$listingId}, user={$userId}: " . $e->getMessage());

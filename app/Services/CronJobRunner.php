@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use App\Core\Mailer;
 use App\Core\Env;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\User;
 use App\Services\NewsletterService;
 use App\Services\MatchingService;
@@ -332,9 +333,15 @@ class CronJobRunner
                          ORDER BY created_at ASC";
             $items = array_map(fn($r) => (array) $r, DB::select($itemsSql, [$userId, $frequency]));
 
-            // Generate Email Body
-            $subject = __('emails.digest.subject', ['frequency' => $frequency]);
-            $body = $this->generateEmailHtml($user, $items, $frequency);
+            // Render digest in the RECIPIENT's preferred language — cron workers
+            // default to config('app.locale') = 'en' otherwise.
+            [$subject, $body] = LocaleContext::withLocale(
+                $user['preferred_language'] ?? null,
+                fn () => [
+                    __('emails.digest.subject', ['frequency' => $frequency]),
+                    $this->generateEmailHtml($user, $items, $frequency),
+                ]
+            );
 
             // Create mailer with tenant context for correct SMTP credentials
             $mailer = Mailer::forCurrentTenant();
@@ -399,7 +406,7 @@ class CronJobRunner
             } else {
                 // Fetch ONLY items we just claimed (status=processing) — use a batch marker
                 // to avoid picking up stale items from crashed previous runs
-                $sql = "SELECT q.*, u.email, u.name, u.tenant_id as user_tenant_id
+                $sql = "SELECT q.*, u.email, u.name, u.tenant_id as user_tenant_id, u.preferred_language
                         FROM notification_queue q
                         JOIN users u ON q.user_id = u.id
                         WHERE q.frequency = 'instant' AND q.status = 'processing'
@@ -418,8 +425,12 @@ class CronJobRunner
 
                         echo "Sending Instant ID {$item['id']} to {$item['email']}... ";
 
-                        // Reconstruct subject
-                        $subject = self::resolveEmailSubject($item['activity_type'], $item['content_snippet'] ?? '');
+                        // Subject rendering must use recipient's preferred language
+                        // (cron default is 'en'). resolveEmailSubject calls __() internally.
+                        $subject = LocaleContext::withLocale(
+                            $item['preferred_language'] ?? null,
+                            fn () => self::resolveEmailSubject($item['activity_type'], $item['content_snippet'] ?? '')
+                        );
 
                         $body = $item['email_body'] ?? nl2br($item['content_snippet']);
 

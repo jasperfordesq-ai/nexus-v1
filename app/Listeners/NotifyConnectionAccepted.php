@@ -8,6 +8,7 @@ namespace App\Listeners;
 
 use App\Core\TenantContext;
 use App\Events\ConnectionAccepted;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationDispatcher;
@@ -40,11 +41,18 @@ class NotifyConnectionAccepted implements ShouldQueue
                 return;
             }
 
-            $receiverName = trim(($receiver->first_name ?? '') . ' ' . ($receiver->last_name ?? ''))
-                ?: ($receiver->name ?? __('emails.common.fallback_someone'));
+            // Fetch REQUESTER's preferred_language — they're the notification recipient.
+            $requesterLocale = DB::table('users')
+                ->where('id', $requesterId)
+                ->where('tenant_id', $event->tenantId)
+                ->value('preferred_language');
 
-            $content = __('emails_misc.social.connection_accepted', ['name' => $receiverName]);
-            $link    = '/connections';
+            $content = LocaleContext::withLocale($requesterLocale, function () use ($receiver) {
+                $receiverName = trim(($receiver->first_name ?? '') . ' ' . ($receiver->last_name ?? ''))
+                    ?: ($receiver->name ?? __('emails.common.fallback_someone'));
+                return __('emails_misc.social.connection_accepted', ['name' => $receiverName]);
+            });
+            $link = '/connections';
 
             // Respect email_connections opt-out preference
             $emailEnabled = true;
@@ -55,20 +63,22 @@ class NotifyConnectionAccepted implements ShouldQueue
                 // Default to sending if preference lookup fails
             }
 
-            if ($emailEnabled) {
-                NotificationDispatcher::dispatch(
-                    $requesterId,
-                    'global',
-                    null,
-                    'connection_accepted',
-                    $content,
-                    $link,
-                    null
-                );
-            } else {
-                // Bell notification only — user opted out of connection emails
-                Notification::createNotification($requesterId, $content, $link, 'connection_accepted');
-            }
+            LocaleContext::withLocale($requesterLocale, function () use ($emailEnabled, $requesterId, $content, $link) {
+                if ($emailEnabled) {
+                    NotificationDispatcher::dispatch(
+                        $requesterId,
+                        'global',
+                        null,
+                        'connection_accepted',
+                        $content,
+                        $link,
+                        null
+                    );
+                } else {
+                    // Bell notification only — user opted out of connection emails
+                    Notification::createNotification($requesterId, $content, $link, 'connection_accepted');
+                }
+            });
         } catch (\Throwable $e) {
             Log::error('NotifyConnectionAccepted listener failed', [
                 'connection_id' => $event->connectionModel->id ?? null,
