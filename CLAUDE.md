@@ -214,6 +214,41 @@ The Laravel migration has been **merged to `main`** (2026-03-19) and is live in 
 
 ---
 
+### 🔴 EMAIL & NOTIFICATION LOCALE — MUST WRAP IN LocaleContext (CRITICAL)
+
+Every user-facing `__('emails...')`, `__('notifications...')`, or `__('svc_notifications...')` call MUST render in the **recipient's** `preferred_language` — not the HTTP caller's locale, not the queue worker's default, not `config('app.locale')`. Without the wrap, Laravel's `__()` resolves against `App::getLocale()` at call time, so emails dispatched from cron/queues go out in English regardless of what the recipient chose.
+
+**Rules:**
+- Every service/listener/job that renders a notification MUST wrap the render + send block in `App\I18n\LocaleContext::withLocale($recipient, fn () => {...})`
+- Every user SELECT / eager-load feeding a notification MUST include `preferred_language` (or use `User::findByIdSelectColumns`, which already returns it)
+- **Admin fanouts / attendee loops:** wrap INSIDE the per-recipient loop — the subject line must also render in each admin's language, not just the body
+- **Queue jobs:** pass `preferred_language` into the job payload and wrap the `handle()` body — queue workers boot once with a default locale and never change it otherwise
+- `LocaleContext::withLocale()` accepts a string locale code, a User-like object with `->preferred_language`, or null (no-op). It restores the prior locale in a `finally` block, so exceptions can't leak the switched locale
+
+**Before (leaks caller locale to recipient):**
+```php
+foreach ($admins as $admin) {
+    $subject = __('emails.report.subject'); // renders in caller's locale
+    $mailer->send($admin->email, $subject, $body);
+}
+```
+
+**After (renders in each admin's `preferred_language`):**
+```php
+use App\I18n\LocaleContext;
+
+foreach ($admins as $admin) {
+    LocaleContext::withLocale($admin, function () use ($admin, $mailer, $body) {
+        $subject = __('emails.report.subject');
+        $mailer->send($admin->email, $subject, $body);
+    });
+}
+```
+
+**Violations cause recipients to receive emails/notifications in the wrong language** — the exact bug this rollout fixed across ~113 files. See [memory/project_recipient_locale_rollout.md](../../Users/jaspe/.claude/projects/C--platforms-htdocs-staging/memory/project_recipient_locale_rollout.md) for the canonical pattern, completed commits, and audit command. Regression test: `tests/Laravel/Feature/I18n/EmailLocaleIntegrationTest.php`.
+
+---
+
 ### 🔴 GLOBAL PLATFORM — NO LOCALE-SPECIFIC VALIDATION (CRITICAL)
 
 Project NEXUS is a **global platform** serving timebanks worldwide. It is NOT an Irish-only product.
