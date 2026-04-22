@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\GoalService;
@@ -234,25 +235,28 @@ class GoalsController extends BaseApiController
             $mentorId = $goal->mentor_id ? (int) $goal->mentor_id : null;
             if ($mentorId && $mentorId !== $userId) {
                 $owner = User::find($userId);
-                $ownerName = $owner->name ?? __('emails.common.fallback_someone');
-                $goalTitle = $goal->title ?? 'their goal';
+                $mentor = User::find($mentorId);
+                LocaleContext::withLocale($mentor, function () use ($owner, $goal, $mentorId, $id) {
+                    $ownerName = $owner->name ?? __('emails.common.fallback_someone');
+                    $goalTitle = $goal->title ?? 'their goal';
 
-                // If progress caused auto-completion, send completion message
-                if ($goal->status === 'completed') {
-                    Notification::createNotification(
-                        $mentorId,
-                        __('api_controllers_3.goals.completed_mentor', ['name' => $ownerName, 'title' => $goalTitle]),
-                        "/goals/{$id}",
-                        'goal_completed'
-                    );
-                } else {
-                    Notification::createNotification(
-                        $mentorId,
-                        __('api_controllers_3.goals.progress_mentor', ['name' => $ownerName, 'title' => $goalTitle]),
-                        "/goals/{$id}",
-                        'goal_progress'
-                    );
-                }
+                    // If progress caused auto-completion, send completion message
+                    if ($goal->status === 'completed') {
+                        Notification::createNotification(
+                            $mentorId,
+                            __('api_controllers_3.goals.completed_mentor', ['name' => $ownerName, 'title' => $goalTitle]),
+                            "/goals/{$id}",
+                            'goal_completed'
+                        );
+                    } else {
+                        Notification::createNotification(
+                            $mentorId,
+                            __('api_controllers_3.goals.progress_mentor', ['name' => $ownerName, 'title' => $goalTitle]),
+                            "/goals/{$id}",
+                            'goal_progress'
+                        );
+                    }
+                });
             }
         } catch (\Throwable $e) {
             \Log::warning('Goal progress notification failed', ['goal' => $id, 'error' => $e->getMessage()]);
@@ -318,13 +322,16 @@ class GoalsController extends BaseApiController
             $mentorId = $goal->mentor_id ? (int) $goal->mentor_id : null;
             if ($mentorId && $mentorId !== $userId) {
                 $owner = User::find($userId);
-                $ownerName = $owner->name ?? __('emails.common.fallback_someone');
-                Notification::createNotification(
-                    $mentorId,
-                    __('api_controllers_3.goals.completed_mentor', ['name' => $ownerName, 'title' => $goal->title]),
-                    "/goals/{$id}",
-                    'goal_completed'
-                );
+                $mentor = User::find($mentorId);
+                LocaleContext::withLocale($mentor, function () use ($owner, $goal, $mentorId, $id) {
+                    $ownerName = $owner->name ?? __('emails.common.fallback_someone');
+                    Notification::createNotification(
+                        $mentorId,
+                        __('api_controllers_3.goals.completed_mentor', ['name' => $ownerName, 'title' => $goal->title]),
+                        "/goals/{$id}",
+                        'goal_completed'
+                    );
+                });
             }
         } catch (\Throwable $e) {
             \Log::warning('Goal buddy completion notification failed', ['goal' => $id, 'error' => $e->getMessage()]);
@@ -412,13 +419,16 @@ class GoalsController extends BaseApiController
             $goalOwnerId = (int) $goal->user_id;
             if ($goalOwnerId !== $userId) {
                 $buddy = User::find($userId);
-                $buddyName = $buddy->name ?? __('emails.common.fallback_someone');
-                Notification::createNotification(
-                    $goalOwnerId,
-                    "{$buddyName} has become a buddy for your goal: {$goal->title}",
-                    "/goals/{$id}",
-                    'goal_buddy'
-                );
+                $goalOwner = User::find($goalOwnerId);
+                LocaleContext::withLocale($goalOwner, function () use ($buddy, $goal, $goalOwnerId, $id) {
+                    $buddyName = $buddy->name ?? __('emails.common.fallback_someone');
+                    Notification::createNotification(
+                        $goalOwnerId,
+                        "{$buddyName} has become a buddy for your goal: {$goal->title}",
+                        "/goals/{$id}",
+                        'goal_buddy'
+                    );
+                });
             }
         } catch (\Throwable $e) {
             \Log::warning('Goal buddy notification failed', ['goal' => $id, 'error' => $e->getMessage()]);
@@ -451,13 +461,16 @@ class GoalsController extends BaseApiController
             $mentorId = $goal->mentor_id ? (int) $goal->mentor_id : null;
             if ($mentorId && $mentorId !== $userId) {
                 $owner = User::find($userId);
-                $ownerName = $owner->name ?? __('emails.common.fallback_someone');
-                Notification::createNotification(
-                    $mentorId,
-                    "{$ownerName} checked in on their goal: {$goal->title}",
-                    "/goals/{$id}",
-                    'goal_checkin'
-                );
+                $mentor = User::find($mentorId);
+                LocaleContext::withLocale($mentor, function () use ($owner, $goal, $mentorId, $id) {
+                    $ownerName = $owner->name ?? __('emails.common.fallback_someone');
+                    Notification::createNotification(
+                        $mentorId,
+                        "{$ownerName} checked in on their goal: {$goal->title}",
+                        "/goals/{$id}",
+                        'goal_checkin'
+                    );
+                });
             }
         } catch (\Throwable $e) {
             \Log::warning('Goal check-in notification failed', ['goal' => $id, 'error' => $e->getMessage()]);

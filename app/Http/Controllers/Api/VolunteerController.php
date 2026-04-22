@@ -19,6 +19,7 @@ use App\Http\Requests\Volunteering\VerifyHoursRequest;
 use App\Services\VolunteerService;
 use App\Services\VolunteerMatchingService;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationDispatcher;
@@ -186,26 +187,29 @@ class VolunteerController extends BaseApiController
             }
             if ($opportunity && $opportunity->created_by && $opportunity->created_by !== $userId) {
                 $volunteer = User::find($userId);
-                $volunteerName = $volunteer->name ?? __('emails.common.fallback_someone');
-                $notifContent = "{$volunteerName} applied for your volunteer opportunity: {$opportunity->title}";
-                $orgId = $opportunity->organization_id;
-                $notifLink = "/volunteering/org/{$orgId}/dashboard?tab=applications";
+                $organizer = User::find((int) $opportunity->created_by);
+                LocaleContext::withLocale($organizer, function () use ($volunteer, $opportunity) {
+                    $volunteerName = $volunteer->name ?? __('emails.common.fallback_someone');
+                    $notifContent = "{$volunteerName} applied for your volunteer opportunity: {$opportunity->title}";
+                    $orgId = $opportunity->organization_id;
+                    $notifLink = "/volunteering/org/{$orgId}/dashboard?tab=applications";
 
-                $htmlContent = NotificationDispatcher::buildVolApplicationReceivedEmail(
-                    $volunteerName,
-                    $opportunity->title,
-                    (int) $orgId
-                );
+                    $htmlContent = NotificationDispatcher::buildVolApplicationReceivedEmail(
+                        $volunteerName,
+                        $opportunity->title,
+                        (int) $orgId
+                    );
 
-                NotificationDispatcher::dispatch(
-                    (int) $opportunity->created_by,
-                    'global',
-                    0,
-                    'vol_application_received',
-                    $notifContent,
-                    $notifLink,
-                    $htmlContent
-                );
+                    NotificationDispatcher::dispatch(
+                        (int) $opportunity->created_by,
+                        'global',
+                        0,
+                        'vol_application_received',
+                        $notifContent,
+                        $notifLink,
+                        $htmlContent
+                    );
+                });
             }
         } catch (\Throwable $e) {
             // Notification failure must not break the main flow
@@ -268,27 +272,30 @@ class VolunteerController extends BaseApiController
             if ($application && $application->user_id) {
                 $opportunityId = $application->opportunity_id;
                 $opportunity = VolOpportunity::find($opportunityId);
-                $oppTitle = $opportunity->title ?? 'a volunteer opportunity';
+                $applicant = User::find((int) $application->user_id);
+                LocaleContext::withLocale($applicant, function () use ($application, $opportunity, $opportunityId, $action) {
+                    $oppTitle = $opportunity->title ?? 'a volunteer opportunity';
 
-                if ($action === 'approve') {
-                    $message = "Your volunteer application for \"{$oppTitle}\" was accepted!";
-                    $notifType = 'vol_application_approved';
-                    $htmlContent = NotificationDispatcher::buildVolApplicationApprovedEmail($oppTitle, $opportunityId);
-                } else {
-                    $message = "Your volunteer application for \"{$oppTitle}\" was not accepted";
-                    $notifType = 'vol_application_declined';
-                    $htmlContent = NotificationDispatcher::buildVolApplicationDeclinedEmail($oppTitle);
-                }
+                    if ($action === 'approve') {
+                        $message = "Your volunteer application for \"{$oppTitle}\" was accepted!";
+                        $notifType = 'vol_application_approved';
+                        $htmlContent = NotificationDispatcher::buildVolApplicationApprovedEmail($oppTitle, $opportunityId);
+                    } else {
+                        $message = "Your volunteer application for \"{$oppTitle}\" was not accepted";
+                        $notifType = 'vol_application_declined';
+                        $htmlContent = NotificationDispatcher::buildVolApplicationDeclinedEmail($oppTitle);
+                    }
 
-                NotificationDispatcher::dispatch(
-                    (int) $application->user_id,
-                    'global',
-                    0,
-                    $notifType,
-                    $message,
-                    "/volunteering/opportunities/{$opportunityId}",
-                    $htmlContent
-                );
+                    NotificationDispatcher::dispatch(
+                        (int) $application->user_id,
+                        'global',
+                        0,
+                        $notifType,
+                        $message,
+                        "/volunteering/opportunities/{$opportunityId}",
+                        $htmlContent
+                    );
+                });
             }
         } catch (\Throwable $e) {
             // Notification failure must not break the main flow
@@ -352,13 +359,16 @@ class VolunteerController extends BaseApiController
             }
             if ($shift && $shift->opportunity && $shift->opportunity->created_by && $shift->opportunity->created_by !== $userId) {
                 $volunteer = User::find($userId);
-                $volunteerName = $volunteer->name ?? __('emails.common.fallback_someone');
-                Notification::createNotification(
-                    (int) $shift->opportunity->created_by,
-                    "{$volunteerName} signed up for a shift",
-                    "/volunteering/opportunities/{$shift->opportunity_id}",
-                    'volunteering'
-                );
+                $organizer = User::find((int) $shift->opportunity->created_by);
+                LocaleContext::withLocale($organizer, function () use ($volunteer, $shift) {
+                    $volunteerName = $volunteer->name ?? __('emails.common.fallback_someone');
+                    Notification::createNotification(
+                        (int) $shift->opportunity->created_by,
+                        "{$volunteerName} signed up for a shift",
+                        "/volunteering/opportunities/{$shift->opportunity_id}",
+                        'volunteering'
+                    );
+                });
             }
         } catch (\Throwable $e) {
             // Notification failure must not break the main flow

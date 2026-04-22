@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\User;
 use App\Services\ConnectionService;
 use App\Services\NotificationDispatcher;
@@ -181,17 +182,20 @@ class ConnectionsController extends BaseApiController
         try {
             $requesterId = $connection->requester_id;
             $accepter = User::find($userId);
-            $accepterName = $accepter->first_name ?? $accepter->name ?? __('emails.common.fallback_someone');
+            $requester = User::find($requesterId);
+            LocaleContext::withLocale($requester, function () use ($accepter, $requesterId, $userId) {
+                $accepterName = $accepter->first_name ?? $accepter->name ?? __('emails.common.fallback_someone');
 
-            NotificationDispatcher::dispatch(
-                $requesterId,
-                'global',
-                null,
-                'connection_accepted',
-                "{$accepterName} accepted your connection request",
-                '/members/' . $userId,
-                null
-            );
+                NotificationDispatcher::dispatch(
+                    $requesterId,
+                    'global',
+                    null,
+                    'connection_accepted',
+                    "{$accepterName} accepted your connection request",
+                    '/members/' . $userId,
+                    null
+                );
+            });
         } catch (\Throwable $e) {
             \Log::warning('Connection accepted notification failed', [
                 'accepter' => $userId,
@@ -237,45 +241,48 @@ class ConnectionsController extends BaseApiController
         // Notify the requester that their connection request was not accepted
         if ($requesterId) {
             try {
-                $decliner    = User::find($userId);
-                $declinerName = trim(($decliner->first_name ?? '') . ' ' . ($decliner->last_name ?? ''))
-                    ?: ($decliner->name ?? __('emails.common.fallback_someone'));
+                $decliner  = User::find($userId);
+                $requester = User::find($requesterId);
                 $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
 
-                // Bell notification
-                NotificationDispatcher::dispatch(
-                    $requesterId,
-                    'global',
-                    null,
-                    'connection_declined',
-                    __('emails_misc.social.connection_declined', ['name' => $declinerName]),
-                    '/members',
-                    null
-                );
+                LocaleContext::withLocale($requester, function () use ($decliner, $requester, $requesterId, $tenantName) {
+                    $declinerName = trim(($decliner->first_name ?? '') . ' ' . ($decliner->last_name ?? ''))
+                        ?: ($decliner->name ?? __('emails.common.fallback_someone'));
 
-                // Email notification
-                $requester = User::find($requesterId);
-                if ($requester && $requester->email) {
-                    $requesterName = $requester->first_name ?? $requester->name ?? '';
+                    // Bell notification
+                    NotificationDispatcher::dispatch(
+                        $requesterId,
+                        'global',
+                        null,
+                        'connection_declined',
+                        __('emails_misc.social.connection_declined', ['name' => $declinerName]),
+                        '/members',
+                        null
+                    );
 
-                    $html = EmailTemplateBuilder::make()
-                        ->theme('brand')
-                        ->title(__('emails_security_alerts.connection_declined.title'))
-                        ->previewText(__('emails_security_alerts.connection_declined.preview', ['name' => $declinerName]))
-                        ->greeting($requesterName)
-                        ->paragraph(__('emails_security_alerts.connection_declined.body', ['name' => $declinerName, 'community' => $tenantName]))
-                        ->paragraph(__('emails_security_alerts.connection_declined.suggestion'))
-                        ->button(__('emails_security_alerts.connection_declined.cta'), '/members')
-                        ->render();
+                    // Email notification
+                    if ($requester && $requester->email) {
+                        $requesterName = $requester->first_name ?? $requester->name ?? '';
 
-                    $subject = __('emails_security_alerts.connection_declined.subject', ['community' => $tenantName]);
-                    $mailer  = Mailer::forCurrentTenant();
-                    if (!$mailer->send($requester->email, $subject, $html)) {
-                        Log::warning('[ConnectionsController] connection declined email failed to send', [
-                            'requester_id' => $requesterId,
-                        ]);
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('brand')
+                            ->title(__('emails_security_alerts.connection_declined.title'))
+                            ->previewText(__('emails_security_alerts.connection_declined.preview', ['name' => $declinerName]))
+                            ->greeting($requesterName)
+                            ->paragraph(__('emails_security_alerts.connection_declined.body', ['name' => $declinerName, 'community' => $tenantName]))
+                            ->paragraph(__('emails_security_alerts.connection_declined.suggestion'))
+                            ->button(__('emails_security_alerts.connection_declined.cta'), '/members')
+                            ->render();
+
+                        $subject = __('emails_security_alerts.connection_declined.subject', ['community' => $tenantName]);
+                        $mailer  = Mailer::forCurrentTenant();
+                        if (!$mailer->send($requester->email, $subject, $html)) {
+                            Log::warning('[ConnectionsController] connection declined email failed to send', [
+                                'requester_id' => $requesterId,
+                            ]);
+                        }
                     }
-                }
+                });
             } catch (\Throwable $e) {
                 Log::warning('[ConnectionsController] connection declined notification failed', [
                     'connection_id' => $id,

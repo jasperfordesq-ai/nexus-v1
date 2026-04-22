@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use App\I18n\LocaleContext;
 use App\Services\StoryService;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
@@ -263,16 +264,23 @@ class StoryController extends BaseApiController
                         'SELECT first_name, last_name FROM users WHERE id = ? AND tenant_id = ?',
                         [$userId, $tenantId]
                     );
-                    $reactorName = $reactor
-                        ? trim($reactor->first_name . ' ' . $reactor->last_name)
-                        : __('emails.common.fallback_someone');
-
-                    Notification::createNotification(
-                        (int) $story->user_id,
-                        "{$reactorName} reacted to your story",
-                        '/feed',
-                        'story_reaction'
+                    $recipient = DB::selectOne(
+                        'SELECT preferred_language FROM users WHERE id = ? AND tenant_id = ?',
+                        [(int) $story->user_id, $tenantId]
                     );
+
+                    LocaleContext::withLocale($recipient, function () use ($reactor, $story) {
+                        $reactorName = $reactor
+                            ? trim($reactor->first_name . ' ' . $reactor->last_name)
+                            : __('emails.common.fallback_someone');
+
+                        Notification::createNotification(
+                            (int) $story->user_id,
+                            "{$reactorName} reacted to your story",
+                            '/feed',
+                            'story_reaction'
+                        );
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('Story reaction notification failed', [
@@ -468,16 +476,23 @@ class StoryController extends BaseApiController
                         'SELECT first_name, last_name FROM users WHERE id = ? AND tenant_id = ?',
                         [$userId, $tenantId]
                     );
-                    $replierName = $replier
-                        ? trim($replier->first_name . ' ' . $replier->last_name)
-                        : __('emails.common.fallback_someone');
-
-                    Notification::createNotification(
-                        (int) $story->user_id,
-                        "{$replierName} replied to your story",
-                        '/feed',
-                        'story_reply'
+                    $recipient = DB::selectOne(
+                        'SELECT preferred_language FROM users WHERE id = ? AND tenant_id = ?',
+                        [(int) $story->user_id, $tenantId]
                     );
+
+                    LocaleContext::withLocale($recipient, function () use ($replier, $story) {
+                        $replierName = $replier
+                            ? trim($replier->first_name . ' ' . $replier->last_name)
+                            : __('emails.common.fallback_someone');
+
+                        Notification::createNotification(
+                            (int) $story->user_id,
+                            "{$replierName} replied to your story",
+                            '/feed',
+                            'story_reply'
+                        );
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('Story reply notification failed', [

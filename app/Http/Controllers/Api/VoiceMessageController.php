@@ -12,6 +12,7 @@ use App\Core\EmailTemplate;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Message;
 use App\Services\TranscriptionService;
 use Illuminate\Support\Facades\DB;
@@ -126,29 +127,31 @@ class VoiceMessageController extends BaseApiController
 
             // Send email notification for voice message
             $sender = DB::table('users')->where('id', $senderId)->where('tenant_id', \App\Core\TenantContext::getId())->select('name')->first();
-            $receiver = DB::table('users')->where('id', $receiverId)->where('tenant_id', \App\Core\TenantContext::getId())->select('name', 'email')->first();
+            $receiver = DB::table('users')->where('id', $receiverId)->where('tenant_id', \App\Core\TenantContext::getId())->select('name', 'email', 'preferred_language')->first();
 
             if ($receiver && $receiver->email) {
-                $replyLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/messages/" . $senderId;
+                LocaleContext::withLocale($receiver, function () use ($sender, $receiver, $receiverId, $senderId, $audioResult) {
+                    $replyLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/messages/" . $senderId;
 
-                $durationFormatted = gmdate("i:s", $audioResult['duration']);
-                $senderName = htmlspecialchars($sender->name ?? __('emails.common.fallback_someone'), ENT_QUOTES, 'UTF-8');
+                    $durationFormatted = gmdate("i:s", $audioResult['duration']);
+                    $senderName = htmlspecialchars($sender->name ?? __('emails.common.fallback_someone'), ENT_QUOTES, 'UTF-8');
 
-                $emailHtml = EmailTemplateBuilder::make()
-                    ->title(__('emails_misc.voice_message.email_title'))
-                    ->greeting(__('emails_misc.voice_message.email_greeting', ['sender' => $senderName]))
-                    ->paragraph(__('emails_misc.voice_message.email_body', ['duration' => $durationFormatted]))
-                    ->button(__('emails_misc.voice_message.email_cta'), $replyLink)
-                    ->render();
+                    $emailHtml = EmailTemplateBuilder::make()
+                        ->title(__('emails_misc.voice_message.email_title'))
+                        ->greeting(__('emails_misc.voice_message.email_greeting', ['sender' => $senderName]))
+                        ->paragraph(__('emails_misc.voice_message.email_body', ['duration' => $durationFormatted]))
+                        ->button(__('emails_misc.voice_message.email_cta'), $replyLink)
+                        ->render();
 
-                try {
-                    $mailer = Mailer::forCurrentTenant();
-                    if (!$mailer->send($receiver->email, __('emails_misc.voice_message.email_subject', ['sender' => $senderName]), $emailHtml)) {
-                        Log::warning('[VoiceMessage] Email notification failed to send', ['receiver_id' => $receiverId]);
+                    try {
+                        $mailer = Mailer::forCurrentTenant();
+                        if (!$mailer->send($receiver->email, __('emails_misc.voice_message.email_subject', ['sender' => $senderName]), $emailHtml)) {
+                            Log::warning('[VoiceMessage] Email notification failed to send', ['receiver_id' => $receiverId]);
+                        }
+                    } catch (\Throwable $e) {
+                        Log::warning('[VoiceMessage] Email notification failed: ' . $e->getMessage(), ['receiver_id' => $receiverId]);
                     }
-                } catch (\Throwable $e) {
-                    Log::warning('[VoiceMessage] Email notification failed: ' . $e->getMessage(), ['receiver_id' => $receiverId]);
-                }
+                });
             }
 
             return $this->respondWithData([

@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\Poll;
 use App\Models\User;
@@ -210,10 +211,13 @@ class PollsController extends BaseApiController
             }
             if ($pollModel && (int) $pollModel->user_id !== $userId) {
                 $voter = User::find($userId);
-                $voterName = $voter ? trim(($voter->first_name ?? '') . ' ' . ($voter->last_name ?? '')) : __('emails.common.fallback_someone');
-                $pollTitle = $pollModel->question ?? 'your poll';
-                $message = __('api_controllers_3.polls.vote_received', ['name' => $voterName, 'title' => $pollTitle]);
-                Notification::createNotification((int) $pollModel->user_id, $message, "/polls/{$id}", 'poll_vote');
+                $recipient = User::find((int) $pollModel->user_id);
+                LocaleContext::withLocale($recipient, function () use ($voter, $pollModel, $id) {
+                    $voterName = $voter ? trim(($voter->first_name ?? '') . ' ' . ($voter->last_name ?? '')) : __('emails.common.fallback_someone');
+                    $pollTitle = $pollModel->question ?? 'your poll';
+                    $message = __('api_controllers_3.polls.vote_received', ['name' => $voterName, 'title' => $pollTitle]);
+                    Notification::createNotification((int) $pollModel->user_id, $message, "/polls/{$id}", 'poll_vote');
+                });
             }
         } catch (\Throwable $e) {
             \Log::warning('Poll vote notification failed', ['poll' => $id, 'voter' => $userId, 'error' => $e->getMessage()]);
@@ -250,10 +254,13 @@ class PollsController extends BaseApiController
             $pollModel = Poll::find($id);
             if ($pollModel && (int) $pollModel->user_id !== $userId) {
                 $ranker = User::find($userId);
-                $rankerName = $ranker ? trim(($ranker->first_name ?? '') . ' ' . ($ranker->last_name ?? '')) : __('emails.common.fallback_someone');
-                $pollTitle = $pollModel->question ?? 'your poll';
-                $message = __('api_controllers_3.polls.ranking_received', ['name' => $rankerName, 'title' => $pollTitle]);
-                Notification::createNotification((int) $pollModel->user_id, $message, "/polls/{$id}", 'poll_vote');
+                $recipient = User::find((int) $pollModel->user_id);
+                LocaleContext::withLocale($recipient, function () use ($ranker, $pollModel, $id) {
+                    $rankerName = $ranker ? trim(($ranker->first_name ?? '') . ' ' . ($ranker->last_name ?? '')) : __('emails.common.fallback_someone');
+                    $pollTitle = $pollModel->question ?? 'your poll';
+                    $message = __('api_controllers_3.polls.ranking_received', ['name' => $rankerName, 'title' => $pollTitle]);
+                    Notification::createNotification((int) $pollModel->user_id, $message, "/polls/{$id}", 'poll_vote');
+                });
             }
         } catch (\Throwable $e) {
             \Log::warning('Poll ranking notification failed', ['poll' => $id, 'ranker' => $userId, 'error' => $e->getMessage()]);

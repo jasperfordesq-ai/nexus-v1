@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
 use App\Models\Notification;
 use App\Services\VettingService;
@@ -239,16 +240,16 @@ class AdminVettingController extends BaseApiController
             $this->vettingService->verify($id, $adminId);
             ActivityLog::log($adminId, 'vetting_record_verified', "Verified vetting record #{$id} for {$existing['first_name']} {$existing['last_name']}", false, null, 'admin', 'vetting_record', $id);
 
-            // Notify the user: bell + email
+            // Notify the user: bell + email (rendered per-recipient locale)
             $this->sendVettingNotification(
                 (int) $existing['user_id'],
-                __('svc_notifications.vetting_approved_title'),
+                'svc_notifications.vetting_approved_title',
                 '/dashboard',
-                __('svc_notifications.vetting_approved_heading'),
-                __('svc_notifications.vetting_approved_body'),
+                'svc_notifications.vetting_approved_heading',
+                'svc_notifications.vetting_approved_body',
                 '#22c55e',
                 '#16a34a',
-                __('svc_notifications.vetting_go_to_dashboard'),
+                'svc_notifications.vetting_go_to_dashboard',
                 '/dashboard'
             );
 
@@ -278,16 +279,16 @@ class AdminVettingController extends BaseApiController
             $this->vettingService->reject($id, $adminId, $reason);
             ActivityLog::log($adminId, 'vetting_record_rejected', "Rejected vetting record #{$id}: {$reason}", false, null, 'admin', 'vetting_record', $id);
 
-            // Notify the user: bell + email
+            // Notify the user: bell + email (rendered per-recipient locale)
             $this->sendVettingNotification(
                 (int) $existing['user_id'],
-                __('svc_notifications.vetting_rejected_title'),
+                'svc_notifications.vetting_rejected_title',
                 '/help',
-                __('svc_notifications.vetting_rejected_heading'),
-                __('svc_notifications.vetting_rejected_body'),
+                'svc_notifications.vetting_rejected_heading',
+                'svc_notifications.vetting_rejected_body',
                 '#ef4444',
                 '#dc2626',
-                __('svc_notifications.vetting_contact_support'),
+                'svc_notifications.vetting_contact_support',
                 '/help'
             );
 
@@ -316,13 +317,20 @@ class AdminVettingController extends BaseApiController
             try {
                 $userId = (int) $existing['user_id'];
                 if ($userId) {
-                    Notification::createNotification(
-                        $userId,
-                        __('api_controllers_3.admin_bells.vetting_removed'),
-                        null,
-                        'moderation',
-                        false
-                    );
+                    $recipient = DB::table('users')
+                        ->where('id', $userId)
+                        ->where('tenant_id', TenantContext::getId())
+                        ->select(['preferred_language'])
+                        ->first();
+                    LocaleContext::withLocale($recipient, function () use ($userId) {
+                        Notification::createNotification(
+                            $userId,
+                            __('api_controllers_3.admin_bells.vetting_removed'),
+                            null,
+                            'moderation',
+                            false
+                        );
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning("AdminVettingController::destroy notification failed: " . $e->getMessage());
@@ -400,25 +408,44 @@ class AdminVettingController extends BaseApiController
             }
         }
 
-        // Send notifications after processing (bell only for bulk — emails would be too heavy)
+        // Send notifications after processing (bell only for bulk — emails would be too heavy).
+        // Wrap each per-recipient to render in that user's preferred_language.
         try {
+            $tenantId = TenantContext::getId();
+            $allRecipients = array_unique(array_merge($notifyVerified, $notifyRejected, $notifyDeleted));
+            $localeByUser = [];
+            if (!empty($allRecipients)) {
+                $rows = DB::table('users')
+                    ->whereIn('id', $allRecipients)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['id', 'preferred_language'])
+                    ->get();
+                foreach ($rows as $r) {
+                    $localeByUser[(int) $r->id] = $r->preferred_language;
+                }
+            }
+
             foreach ($notifyVerified as $userId) {
-                Notification::createNotification(
-                    $userId,
-                    __('api_controllers_3.admin_bells.vetting_approved'),
-                    '/dashboard',
-                    'moderation',
-                    true
-                );
+                LocaleContext::withLocale($localeByUser[$userId] ?? null, function () use ($userId) {
+                    Notification::createNotification(
+                        $userId,
+                        __('api_controllers_3.admin_bells.vetting_approved'),
+                        '/dashboard',
+                        'moderation',
+                        true
+                    );
+                });
             }
             foreach ($notifyRejected as $userId) {
-                Notification::createNotification(
-                    $userId,
-                    __('api_controllers_3.admin_bells.vetting_rejected'),
-                    '/help',
-                    'moderation',
-                    true
-                );
+                LocaleContext::withLocale($localeByUser[$userId] ?? null, function () use ($userId) {
+                    Notification::createNotification(
+                        $userId,
+                        __('api_controllers_3.admin_bells.vetting_rejected'),
+                        '/help',
+                        'moderation',
+                        true
+                    );
+                });
             }
             foreach ($notifyDeleted as $userId) {
                 Notification::createNotification(
@@ -513,48 +540,57 @@ class AdminVettingController extends BaseApiController
     /**
      * Send a vetting-related bell notification + email to a user.
      *
+     * Takes translation KEYS (not pre-rendered strings) for the bell message,
+     * email heading, body, and CTA label so they can be resolved under the
+     * recipient's preferred_language via LocaleContext. If the recipient has
+     * no preferred_language, falls back to the app default 'en'.
+     *
      * Wrapped in try/catch so notification failures never break the admin action.
      */
     private function sendVettingNotification(
         int $userId,
-        string $bellMessage,
+        string $bellMessageKey,
         ?string $bellLink,
-        string $emailHeading,
-        string $emailBody,
+        string $emailHeadingKey,
+        string $emailBodyKey,
         string $gradientFrom,
         string $gradientTo,
-        string $ctaLabel,
+        string $ctaLabelKey,
         string $ctaPath
     ): void {
         try {
-            // Bell notification
-            Notification::createNotification(
-                $userId,
-                $bellMessage,
-                $bellLink,
-                'moderation',
-                true
-            );
-
-            // Email notification
             $tenantId = TenantContext::getId();
             $user = DB::table('users')
                 ->where('id', $userId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name'])
+                ->select(['email', 'name', 'first_name', 'preferred_language'])
                 ->first();
 
-            if ($user && !empty($user->email)) {
-                $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
-                $tenantName = htmlspecialchars(TenantContext::getSetting('site_name', 'Project NEXUS'), ENT_QUOTES, 'UTF-8');
-                $baseUrl = TenantContext::getFrontendUrl();
-                $basePath = TenantContext::getSlugPrefix();
-                $fullCtaUrl = $baseUrl . $basePath . $ctaPath;
-                $safeEmailBody = htmlspecialchars($emailBody, ENT_QUOTES, 'UTF-8');
-                $greeting = __('emails.common.greeting', ['name' => $recipientName]);
-                $subject = __('emails.vetting.subject', ['heading' => $emailHeading, 'tenant' => $tenantName]);
+            LocaleContext::withLocale($user, function () use ($user, $userId, $bellMessageKey, $bellLink, $emailHeadingKey, $emailBodyKey, $gradientFrom, $gradientTo, $ctaLabelKey, $ctaPath) {
+                // Bell notification
+                Notification::createNotification(
+                    $userId,
+                    __($bellMessageKey),
+                    $bellLink,
+                    'moderation',
+                    true
+                );
 
-                $html = <<<HTML
+                // Email notification
+                if ($user && !empty($user->email)) {
+                    $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
+                    $tenantName = htmlspecialchars(TenantContext::getSetting('site_name', 'Project NEXUS'), ENT_QUOTES, 'UTF-8');
+                    $baseUrl = TenantContext::getFrontendUrl();
+                    $basePath = TenantContext::getSlugPrefix();
+                    $fullCtaUrl = $baseUrl . $basePath . $ctaPath;
+                    $emailHeading = __($emailHeadingKey);
+                    $emailBody = __($emailBodyKey);
+                    $ctaLabel = __($ctaLabelKey);
+                    $safeEmailBody = htmlspecialchars($emailBody, ENT_QUOTES, 'UTF-8');
+                    $greeting = __('emails.common.greeting', ['name' => $recipientName]);
+                    $subject = __('emails.vetting.subject', ['heading' => $emailHeading, 'tenant' => $tenantName]);
+
+                    $html = <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, {$gradientFrom}, {$gradientTo}); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
         <h1 style="color: white; margin: 0; font-size: 24px;">{$emailHeading}</h1>
@@ -569,9 +605,10 @@ class AdminVettingController extends BaseApiController
     </div>
 </div>
 HTML;
-                $mailer = Mailer::forCurrentTenant();
-                $mailer->send($user->email, $subject, $html);
-            }
+                    $mailer = Mailer::forCurrentTenant();
+                    $mailer->send($user->email, $subject, $html);
+                }
+            });
         } catch (\Throwable $e) {
             Log::warning("AdminVettingController::sendVettingNotification failed for user {$userId}: " . $e->getMessage());
         }

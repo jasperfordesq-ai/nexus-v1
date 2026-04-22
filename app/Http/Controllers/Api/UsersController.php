@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -472,16 +473,16 @@ class UsersController extends BaseApiController
         $userRow = DB::table('users')
             ->where('id', $userId)
             ->where('tenant_id', $tenantId)
-            ->select(['password_hash', 'email', 'first_name', 'name'])
+            ->select(['password_hash', 'email', 'first_name', 'name', 'preferred_language'])
             ->first();
 
         if (!$userRow || !password_verify($password, $userRow->password_hash)) {
             return $this->respondWithError('INVALID_PASSWORD', __('api.user_invalid_password'), 'password', 403);
         }
 
-        // Capture contact details before anonymization
-        $userEmail = $userRow->email;
-        $userName  = $userRow->first_name ?? $userRow->name ?? __('emails.common.fallback_name');
+        // Capture contact details (and preferred locale) before anonymization
+        $userEmail  = $userRow->email;
+        $userLocale = $userRow->preferred_language ?? null;
 
         $success = $this->userService->deleteAccount($userId);
 
@@ -491,21 +492,26 @@ class UsersController extends BaseApiController
         }
 
         // Send farewell confirmation to the now-anonymized account's original email
+        // (render in the user's pre-deletion preferred locale, since the account is
+        // anonymized by this point and has no locale we can query).
         try {
             if (!empty($userEmail) && filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
-                $community = TenantContext::getName();
-                $html = EmailTemplateBuilder::make()
-                    ->theme('warning')
-                    ->title(__('emails_misc.admin_actions.self_deletion_title'))
-                    ->greeting(__('emails_misc.admin_actions.self_deletion_greeting', ['name' => $userName]))
-                    ->paragraph(__('emails_misc.admin_actions.self_deletion_body', ['community' => $community]))
-                    ->paragraph(__('emails_misc.admin_actions.self_deletion_body_contact'))
-                    ->render();
-                Mailer::forCurrentTenant()->send(
-                    $userEmail,
-                    __('emails_misc.admin_actions.self_deletion_subject', ['community' => $community]),
-                    $html
-                );
+                LocaleContext::withLocale($userLocale, function () use ($userRow, $userEmail) {
+                    $userName = $userRow->first_name ?? $userRow->name ?? __('emails.common.fallback_name');
+                    $community = TenantContext::getName();
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('warning')
+                        ->title(__('emails_misc.admin_actions.self_deletion_title'))
+                        ->greeting(__('emails_misc.admin_actions.self_deletion_greeting', ['name' => $userName]))
+                        ->paragraph(__('emails_misc.admin_actions.self_deletion_body', ['community' => $community]))
+                        ->paragraph(__('emails_misc.admin_actions.self_deletion_body_contact'))
+                        ->render();
+                    Mailer::forCurrentTenant()->send(
+                        $userEmail,
+                        __('emails_misc.admin_actions.self_deletion_subject', ['community' => $community]),
+                        $html
+                    );
+                });
             }
         } catch (\Throwable $e) {
             Log::warning('[UsersController] deleteAccount farewell email failed', ['user_id' => $userId, 'error' => $e->getMessage()]);

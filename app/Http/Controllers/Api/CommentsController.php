@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Comment;
 use App\Models\Notification;
 use App\Models\User;
@@ -184,12 +185,15 @@ class CommentsController extends BaseApiController
                 $comment = Comment::find($id);
                 if ($comment && (int) $comment->tenant_id === TenantContext::getId() && (int) $comment->user_id !== $userId) {
                     $reactor = User::find($userId);
-                    $reactorName = $reactor ? trim(($reactor->first_name ?? '') . ' ' . ($reactor->last_name ?? '')) : __('emails.common.fallback_someone');
-                    $link = $comment->target_type && $comment->target_id
-                        ? "/{$comment->target_type}s/{$comment->target_id}"
-                        : null;
-                    $message = __('api_controllers_3.comments.reaction', ['name' => $reactorName]);
-                    Notification::createNotification((int) $comment->user_id, $message, $link, 'reaction');
+                    $recipient = User::find((int) $comment->user_id);
+                    LocaleContext::withLocale($recipient, function () use ($reactor, $comment) {
+                        $reactorName = $reactor ? trim(($reactor->first_name ?? '') . ' ' . ($reactor->last_name ?? '')) : __('emails.common.fallback_someone');
+                        $link = $comment->target_type && $comment->target_id
+                            ? "/{$comment->target_type}s/{$comment->target_id}"
+                            : null;
+                        $message = __('api_controllers_3.comments.reaction', ['name' => $reactorName]);
+                        Notification::createNotification((int) $comment->user_id, $message, $link, 'reaction');
+                    });
                 }
             } catch (\Throwable $e) {
                 \Log::warning('Comment reaction notification failed', ['comment' => $id, 'reactor' => $userId, 'error' => $e->getMessage()]);

@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\I18n\LocaleContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -149,13 +150,16 @@ class DeliverableController extends BaseApiController
             );
             if ($owner && (int) $owner->user_id !== $userId) {
                 $commenter = \App\Models\User::find($userId);
-                $commenterName = $commenter->first_name ?? $commenter->name ?? __('emails.common.fallback_someone');
-                \App\Models\Notification::createNotification(
-                    (int) $owner->user_id,
-                    __('api_controllers_3.deliverable_comment.posted', ['name' => $commenterName, 'title' => $owner->title]),
-                    "/deliverables/{$id}",
-                    'comment'
-                );
+                $ownerUser = \App\Models\User::find((int) $owner->user_id);
+                LocaleContext::withLocale($ownerUser, function () use ($commenter, $owner, $id) {
+                    $commenterName = $commenter->first_name ?? $commenter->name ?? __('emails.common.fallback_someone');
+                    \App\Models\Notification::createNotification(
+                        (int) $owner->user_id,
+                        __('api_controllers_3.deliverable_comment.posted', ['name' => $commenterName, 'title' => $owner->title]),
+                        "/deliverables/{$id}",
+                        'comment'
+                    );
+                });
             }
         } catch (\Throwable $e) {
             \Log::warning('Deliverable comment notification failed', ['deliverable_id' => $id, 'error' => $e->getMessage()]);

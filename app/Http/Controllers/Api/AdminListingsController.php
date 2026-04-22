@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
 use App\Models\Notification;
 use App\Services\ListingFeaturedService;
@@ -208,43 +209,50 @@ class AdminListingsController extends BaseApiController
 
         ActivityLog::log($adminId, 'admin_approve_listing', "Approved listing #{$id}: {$item->title}");
 
-        // Notify listing owner
+        // Load the owner once with preferred_language so both the bell and the
+        // email render under the owner's locale.
+        $owner = DB::table('users')
+            ->where('id', $item->user_id)
+            ->where('tenant_id', $tenantId)
+            ->select(['email', 'first_name', 'name', 'preferred_language'])
+            ->first();
+
+        // Notify listing owner (bell)
         try {
-            $title = htmlspecialchars($item->title ?? '', ENT_QUOTES, 'UTF-8');
-            Notification::create([
-                'user_id' => (int) $item->user_id,
-                'message' => __('emails_listings.listings.approved.notification_short', ['title' => $title]),
-                'link' => "/listings/{$id}",
-                'type' => 'listing_approved',
-                'created_at' => now(),
-            ]);
+            LocaleContext::withLocale($owner, function () use ($item, $id) {
+                $title = htmlspecialchars($item->title ?? '', ENT_QUOTES, 'UTF-8');
+                Notification::create([
+                    'user_id' => (int) $item->user_id,
+                    'message' => __('emails_listings.listings.approved.notification_short', ['title' => $title]),
+                    'link' => "/listings/{$id}",
+                    'type' => 'listing_approved',
+                    'created_at' => now(),
+                ]);
+            });
         } catch (\Exception $e) {
             Log::warning("[AdminListingsController] approve notification failed for listing #{$id}: " . $e->getMessage());
         }
 
         // Send approval email to listing creator
         try {
-            $owner = DB::table('users')
-                ->where('id', $item->user_id)
-                ->where('tenant_id', $tenantId)
-                ->select(['email', 'first_name', 'name'])
-                ->first();
             if ($owner && !empty($owner->email)) {
-                $firstName  = $owner->first_name ?? $owner->name ?? __('emails.common.fallback_name');
-                $safeTitle  = htmlspecialchars($item->title ?? '', ENT_QUOTES, 'UTF-8');
-                $listingUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/listings/{$id}";
-                $html = \App\Core\EmailTemplateBuilder::make()
-                    ->theme('success')
-                    ->title(__('emails_listings.listings.approved.email_title'))
-                    ->greeting($firstName)
-                    ->paragraph(__('emails_listings.listings.approved.email_body', ['title' => $safeTitle]))
-                    ->button(__('emails_listings.listings.approved.email_cta'), $listingUrl)
-                    ->render();
-                \App\Core\Mailer::forCurrentTenant()->send(
-                    $owner->email,
-                    __('emails_listings.listings.approved.email_subject', ['title' => $safeTitle]),
-                    $html
-                );
+                LocaleContext::withLocale($owner, function () use ($owner, $item, $id) {
+                    $firstName  = $owner->first_name ?? $owner->name ?? __('emails.common.fallback_name');
+                    $safeTitle  = htmlspecialchars($item->title ?? '', ENT_QUOTES, 'UTF-8');
+                    $listingUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/listings/{$id}";
+                    $html = \App\Core\EmailTemplateBuilder::make()
+                        ->theme('success')
+                        ->title(__('emails_listings.listings.approved.email_title'))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_listings.listings.approved.email_body', ['title' => $safeTitle]))
+                        ->button(__('emails_listings.listings.approved.email_cta'), $listingUrl)
+                        ->render();
+                    \App\Core\Mailer::forCurrentTenant()->send(
+                        $owner->email,
+                        __('emails_listings.listings.approved.email_subject', ['title' => $safeTitle]),
+                        $html
+                    );
+                });
             }
         } catch (\Exception $e) {
             Log::warning("[AdminListingsController] approve email failed for listing #{$id}: " . $e->getMessage());
@@ -284,37 +292,42 @@ class AdminListingsController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
         }
 
-        // Notify listing owner BEFORE delete so the data still exists
+        // Notify listing owner BEFORE delete so the data still exists.
+        // Load once with preferred_language so both the bell and the email render
+        // under the owner's locale.
         try {
-            $title = htmlspecialchars($item->title ?? '', ENT_QUOTES, 'UTF-8');
-            Notification::create([
-                'user_id' => (int) $item->user_id,
-                'message' => __('emails_listings.listings.removed.notification', ['title' => $title]),
-                'link' => '/listings',
-                'type' => 'listing_removed',
-                'created_at' => now(),
-            ]);
-            // Email notification
             $user = DB::table('users')
                 ->where('id', $item->user_id)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'first_name', 'name'])
+                ->select(['email', 'first_name', 'name', 'preferred_language'])
                 ->first();
-            if ($user && !empty($user->email)) {
-                $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-                $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/listings';
-                $html = \App\Core\EmailTemplateBuilder::make()
-                    ->title(__('emails_listings.listings.removed.email_title'))
-                    ->greeting($firstName)
-                    ->paragraph(__('emails_listings.listings.removed.email_body', ['title' => $title]))
-                    ->button(__('emails_listings.listings.removed.email_cta'), $fullUrl)
-                    ->render();
-                \App\Core\Mailer::forCurrentTenant()->send(
-                    $user->email,
-                    __('emails_listings.listings.removed.email_subject', ['title' => $title]),
-                    $html
-                );
-            }
+
+            LocaleContext::withLocale($user, function () use ($user, $item, $id) {
+                $title = htmlspecialchars($item->title ?? '', ENT_QUOTES, 'UTF-8');
+                Notification::create([
+                    'user_id' => (int) $item->user_id,
+                    'message' => __('emails_listings.listings.removed.notification', ['title' => $title]),
+                    'link' => '/listings',
+                    'type' => 'listing_removed',
+                    'created_at' => now(),
+                ]);
+                // Email notification
+                if ($user && !empty($user->email)) {
+                    $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                    $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/listings';
+                    $html = \App\Core\EmailTemplateBuilder::make()
+                        ->title(__('emails_listings.listings.removed.email_title'))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_listings.listings.removed.email_body', ['title' => $title]))
+                        ->button(__('emails_listings.listings.removed.email_cta'), $fullUrl)
+                        ->render();
+                    \App\Core\Mailer::forCurrentTenant()->send(
+                        $user->email,
+                        __('emails_listings.listings.removed.email_subject', ['title' => $title]),
+                        $html
+                    );
+                }
+            });
         } catch (\Exception $e) {
             Log::warning("[AdminListingsController] destroy notification failed for listing #{$id}: " . $e->getMessage());
         }

@@ -30,6 +30,7 @@ use App\Services\JobInterviewSchedulingService;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Http\Requests\Jobs\ListJobVacanciesRequest;
 use App\Models\JobVacancy;
 use App\Models\Review;
@@ -372,13 +373,16 @@ class JobVacanciesController extends BaseApiController
             );
             if ($job && (int) $job->user_id !== $userId) {
                 $applicant = \App\Models\User::find($userId);
-                $applicantName = $applicant->first_name ?? $applicant->name ?? __('emails.common.fallback_someone');
-                \App\Models\Notification::createNotification(
-                    (int) $job->user_id,
-                    "{$applicantName} applied for your job: \"{$job->title}\"",
-                    "/jobs/{$id}/applications",
-                    'job_application'
-                );
+                $jobOwner = \App\Models\User::find((int) $job->user_id);
+                LocaleContext::withLocale($jobOwner, function () use ($applicant, $job, $id) {
+                    $applicantName = $applicant->first_name ?? $applicant->name ?? __('emails.common.fallback_someone');
+                    \App\Models\Notification::createNotification(
+                        (int) $job->user_id,
+                        "{$applicantName} applied for your job: \"{$job->title}\"",
+                        "/jobs/{$id}/applications",
+                        'job_application'
+                    );
+                });
             }
         } catch (\Throwable $e) {
             \Log::warning('Job application notification failed', ['vacancy_id' => $id, 'error' => $e->getMessage()]);
@@ -394,26 +398,28 @@ class JobVacanciesController extends BaseApiController
                 $applicantUser = DB::table('users')
                     ->where('id', $userId)
                     ->where('tenant_id', $tenantId)
-                    ->select(['email', 'first_name', 'name'])
+                    ->select(['email', 'first_name', 'name', 'preferred_language'])
                     ->first();
                 if ($applicantUser && !empty($applicantUser->email)) {
-                    $firstName = $applicantUser->first_name ?? $applicantUser->name ?? __('emails.common.fallback_name');
-                    $community = TenantContext::getName();
-                    $jobTitle  = htmlspecialchars($job->title, ENT_QUOTES, 'UTF-8');
-                    $appUrl    = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/jobs/' . $id;
-                    $html = EmailTemplateBuilder::make()
-                        ->theme('brand')
-                        ->title(__('emails_commerce.job_application_applicant.title'))
-                        ->greeting($firstName)
-                        ->paragraph(__('emails_commerce.job_application_applicant.body', ['job_title' => $jobTitle]))
-                        ->paragraph(__('emails_commerce.job_application_applicant.next_steps'))
-                        ->button(__('emails_commerce.job_application_applicant.cta'), $appUrl)
-                        ->render();
-                    Mailer::forCurrentTenant()->send(
-                        $applicantUser->email,
-                        __('emails_commerce.job_application_applicant.subject', ['job_title' => $jobTitle, 'community' => $community]),
-                        $html
-                    );
+                    LocaleContext::withLocale($applicantUser, function () use ($applicantUser, $job, $id) {
+                        $firstName = $applicantUser->first_name ?? $applicantUser->name ?? __('emails.common.fallback_name');
+                        $community = TenantContext::getName();
+                        $jobTitle  = htmlspecialchars($job->title, ENT_QUOTES, 'UTF-8');
+                        $appUrl    = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/jobs/' . $id;
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('brand')
+                            ->title(__('emails_commerce.job_application_applicant.title'))
+                            ->greeting($firstName)
+                            ->paragraph(__('emails_commerce.job_application_applicant.body', ['job_title' => $jobTitle]))
+                            ->paragraph(__('emails_commerce.job_application_applicant.next_steps'))
+                            ->button(__('emails_commerce.job_application_applicant.cta'), $appUrl)
+                            ->render();
+                        Mailer::forCurrentTenant()->send(
+                            $applicantUser->email,
+                            __('emails_commerce.job_application_applicant.subject', ['job_title' => $jobTitle, 'community' => $community]),
+                            $html
+                        );
+                    });
                 }
             }
         } catch (\Throwable $e) {
@@ -426,29 +432,31 @@ class JobVacanciesController extends BaseApiController
                 $posterUser = DB::table('users')
                     ->where('id', $job->user_id)
                     ->where('tenant_id', $tenantId)
-                    ->select(['email', 'first_name', 'name'])
+                    ->select(['email', 'first_name', 'name', 'preferred_language'])
                     ->first();
                 if ($posterUser && !empty($posterUser->email)) {
-                    $posterFirst   = $posterUser->first_name ?? $posterUser->name ?? __('emails.common.fallback_name');
-                    $community     = TenantContext::getName();
-                    $jobTitle      = htmlspecialchars($job->title, ENT_QUOTES, 'UTF-8');
-                    $applicant     = $applicant ?? \App\Models\User::find($userId);
-                    $applicantName = $applicant
-                        ? trim(($applicant->first_name ?? '') . ' ' . ($applicant->last_name ?? '')) ?: ($applicant->name ?? __('emails.common.fallback_someone'))
-                        : __('emails.common.fallback_someone');
-                    $reviewUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/jobs/' . $id . '/applications';
-                    $html = EmailTemplateBuilder::make()
-                        ->theme('federation')
-                        ->title(__('emails_commerce.job_application_employer.title'))
-                        ->greeting($posterFirst)
-                        ->paragraph(__('emails_commerce.job_application_employer.body', ['applicant_name' => htmlspecialchars($applicantName, ENT_QUOTES, 'UTF-8'), 'job_title' => $jobTitle]))
-                        ->button(__('emails_commerce.job_application_employer.cta'), $reviewUrl)
-                        ->render();
-                    Mailer::forCurrentTenant()->send(
-                        $posterUser->email,
-                        __('emails_commerce.job_application_employer.subject', ['job_title' => $jobTitle, 'community' => $community]),
-                        $html
-                    );
+                    $applicant = $applicant ?? \App\Models\User::find($userId);
+                    LocaleContext::withLocale($posterUser, function () use ($posterUser, $applicant, $job, $id) {
+                        $posterFirst   = $posterUser->first_name ?? $posterUser->name ?? __('emails.common.fallback_name');
+                        $community     = TenantContext::getName();
+                        $jobTitle      = htmlspecialchars($job->title, ENT_QUOTES, 'UTF-8');
+                        $applicantName = $applicant
+                            ? trim(($applicant->first_name ?? '') . ' ' . ($applicant->last_name ?? '')) ?: ($applicant->name ?? __('emails.common.fallback_someone'))
+                            : __('emails.common.fallback_someone');
+                        $reviewUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/jobs/' . $id . '/applications';
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('federation')
+                            ->title(__('emails_commerce.job_application_employer.title'))
+                            ->greeting($posterFirst)
+                            ->paragraph(__('emails_commerce.job_application_employer.body', ['applicant_name' => htmlspecialchars($applicantName, ENT_QUOTES, 'UTF-8'), 'job_title' => $jobTitle]))
+                            ->button(__('emails_commerce.job_application_employer.cta'), $reviewUrl)
+                            ->render();
+                        Mailer::forCurrentTenant()->send(
+                            $posterUser->email,
+                            __('emails_commerce.job_application_employer.subject', ['job_title' => $jobTitle, 'community' => $community]),
+                            $html
+                        );
+                    });
                 }
             }
         } catch (\Throwable $e) {

@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\User;
 use App\Models\Notification;
 use App\Models\ActivityLog;
@@ -348,22 +349,27 @@ class AdminUsersController extends BaseApiController
         // (The dedicated suspend()/ban() endpoints have their own richer notifications)
         if (isset($input['status']) && $input['status'] !== $oldStatus) {
             try {
+                $recipientLocale = $user['preferred_language'] ?? null;
                 if ($input['status'] === 'suspended') {
-                    Notification::createNotification(
-                        $id,
-                        __('api_controllers_3.admin_bells.account_suspended'),
-                        null,
-                        'system',
-                        true
-                    );
+                    LocaleContext::withLocale($recipientLocale, function () use ($id) {
+                        Notification::createNotification(
+                            $id,
+                            __('api_controllers_3.admin_bells.account_suspended'),
+                            null,
+                            'system',
+                            true
+                        );
+                    });
                 } elseif ($input['status'] === 'banned') {
-                    Notification::createNotification(
-                        $id,
-                        __('api_controllers_3.admin_bells.account_banned'),
-                        null,
-                        'system',
-                        true
-                    );
+                    LocaleContext::withLocale($recipientLocale, function () use ($id) {
+                        Notification::createNotification(
+                            $id,
+                            __('api_controllers_3.admin_bells.account_banned'),
+                            null,
+                            'system',
+                            true
+                        );
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning("AdminUsersController::update status notification failed for user #{$id}: " . $e->getMessage());
@@ -463,30 +469,36 @@ class AdminUsersController extends BaseApiController
             Log::warning('[AdminUsers] GDPR consent recording failed for admin-created user: ' . $e->getMessage());
         }
 
-        // Send welcome email if requested
+        // Send welcome email if requested. The newly-created user has no
+        // preferred_language preference yet, so this renders in the app default
+        // (English). Locale-switch to the new user's row for consistency so future
+        // preference changes flow through automatically via findById.
         $sendWelcomeEmail = !empty($input['send_welcome_email']);
         if ($sendWelcomeEmail) {
             try {
-                $tenant = TenantContext::get();
-                $tenantName = $tenant['name'] ?? 'Project NEXUS';
-                $loginLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/login";
+                $newUser = User::findById($newUserId, true);
+                LocaleContext::withLocale($newUser['preferred_language'] ?? null, function () use ($email, $password) {
+                    $tenant = TenantContext::get();
+                    $tenantName = $tenant['name'] ?? 'Project NEXUS';
+                    $loginLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/login";
 
-                $html = EmailTemplateBuilder::make()
-                    ->title(__('emails_misc.admin_actions.welcome_created_title'))
-                    ->previewText(__('emails_misc.admin_actions.welcome_created_preview'))
-                    ->greeting(__('emails_misc.admin_actions.welcome_created_greeting', ['community' => $tenantName]))
-                    ->paragraph(__('emails_misc.admin_actions.welcome_created_body_intro', ['community' => $tenantName]))
-                    ->paragraph(__('emails_misc.admin_actions.welcome_created_body_credentials'))
-                    ->infoCard([
-                        __('emails_misc.admin_actions.welcome_created_info_email')    => htmlspecialchars($email, ENT_QUOTES, 'UTF-8'),
-                        __('emails_misc.admin_actions.welcome_created_info_password') => htmlspecialchars($password, ENT_QUOTES, 'UTF-8'),
-                    ])
-                    ->paragraph(__('emails_misc.admin_actions.welcome_created_body_change_pass'))
-                    ->button(__('emails_misc.admin_actions.welcome_created_cta'), $loginLink)
-                    ->render();
+                    $html = EmailTemplateBuilder::make()
+                        ->title(__('emails_misc.admin_actions.welcome_created_title'))
+                        ->previewText(__('emails_misc.admin_actions.welcome_created_preview'))
+                        ->greeting(__('emails_misc.admin_actions.welcome_created_greeting', ['community' => $tenantName]))
+                        ->paragraph(__('emails_misc.admin_actions.welcome_created_body_intro', ['community' => $tenantName]))
+                        ->paragraph(__('emails_misc.admin_actions.welcome_created_body_credentials'))
+                        ->infoCard([
+                            __('emails_misc.admin_actions.welcome_created_info_email')    => htmlspecialchars($email, ENT_QUOTES, 'UTF-8'),
+                            __('emails_misc.admin_actions.welcome_created_info_password') => htmlspecialchars($password, ENT_QUOTES, 'UTF-8'),
+                        ])
+                        ->paragraph(__('emails_misc.admin_actions.welcome_created_body_change_pass'))
+                        ->button(__('emails_misc.admin_actions.welcome_created_cta'), $loginLink)
+                        ->render();
 
-                $mailer = \App\Core\Mailer::forCurrentTenant();
-                $mailer->send($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html);
+                    $mailer = \App\Core\Mailer::forCurrentTenant();
+                    $mailer->send($email, __('emails_misc.admin_actions.welcome_created_subject', ['community' => $tenantName]), $html);
+                });
             } catch (\Throwable $e) {
                 Log::warning('[AdminUsers] Welcome email failed for admin-created user: ' . $e->getMessage());
             }
@@ -575,35 +587,40 @@ class AdminUsersController extends BaseApiController
         $this->auditLogService->logUserSuspended($adminId, $id, $reason);
 
         // Notify the suspended user (bell + email — they may not be able to log in)
+        $recipientLocale = $user['preferred_language'] ?? null;
         try {
-            Notification::createNotification(
-                $id,
-                __('emails_misc.admin_actions.suspension_bell'),
-                null,
-                'system',
-                true
-            );
+            LocaleContext::withLocale($recipientLocale, function () use ($id) {
+                Notification::createNotification(
+                    $id,
+                    __('emails_misc.admin_actions.suspension_bell'),
+                    null,
+                    'system',
+                    true
+                );
+            });
         } catch (\Throwable $e) {
             Log::warning("[AdminUsers] Failed to create suspension bell notification for user #{$id}: " . $e->getMessage());
         }
 
         try {
-            $tenant = $this->resolveUserTenant($user);
-            $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
-            $tenantName = $tenant['name'];
+            LocaleContext::withLocale($recipientLocale, function () use ($user, $id) {
+                $tenant = $this->resolveUserTenant($user);
+                $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
+                $tenantName = $tenant['name'];
 
-            $html = EmailTemplateBuilder::make()
-                ->theme('warning')
-                ->greeting(__('emails_misc.admin_actions.suspension_greeting', ['name' => $firstName]))
-                ->paragraph(__('emails_misc.admin_actions.suspension_body', ['community' => $tenantName]))
-                ->paragraph(__('emails_misc.admin_actions.suspension_help'))
-                ->render();
+                $html = EmailTemplateBuilder::make()
+                    ->theme('warning')
+                    ->greeting(__('emails_misc.admin_actions.suspension_greeting', ['name' => $firstName]))
+                    ->paragraph(__('emails_misc.admin_actions.suspension_body', ['community' => $tenantName]))
+                    ->paragraph(__('emails_misc.admin_actions.suspension_help'))
+                    ->render();
 
-            (\App\Core\Mailer::forCurrentTenant())->send(
-                $user['email'],
-                __('emails_misc.admin_actions.suspension_subject', ['community' => $tenantName]),
-                $html
-            );
+                (\App\Core\Mailer::forCurrentTenant())->send(
+                    $user['email'],
+                    __('emails_misc.admin_actions.suspension_subject', ['community' => $tenantName]),
+                    $html
+                );
+            });
         } catch (\Throwable $e) {
             Log::warning("[AdminUsers] Failed to send suspension email to user #{$id}: " . $e->getMessage());
         }
@@ -640,22 +657,24 @@ class AdminUsersController extends BaseApiController
 
         // Notify the banned user (email only — they can't log in at all)
         try {
-            $tenant = $this->resolveUserTenant($user);
-            $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
-            $tenantName = $tenant['name'];
+            LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user, $id) {
+                $tenant = $this->resolveUserTenant($user);
+                $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
+                $tenantName = $tenant['name'];
 
-            $html = EmailTemplateBuilder::make()
-                ->theme('danger')
-                ->greeting(__('emails_misc.admin_actions.ban_greeting', ['name' => $firstName]))
-                ->paragraph(__('emails_misc.admin_actions.ban_body', ['community' => $tenantName]))
-                ->paragraph(__('emails_misc.admin_actions.ban_help'))
-                ->render();
+                $html = EmailTemplateBuilder::make()
+                    ->theme('danger')
+                    ->greeting(__('emails_misc.admin_actions.ban_greeting', ['name' => $firstName]))
+                    ->paragraph(__('emails_misc.admin_actions.ban_body', ['community' => $tenantName]))
+                    ->paragraph(__('emails_misc.admin_actions.ban_help'))
+                    ->render();
 
-            (\App\Core\Mailer::forCurrentTenant())->send(
-                $user['email'],
-                __('emails_misc.admin_actions.ban_subject', ['community' => $tenantName]),
-                $html
-            );
+                (\App\Core\Mailer::forCurrentTenant())->send(
+                    $user['email'],
+                    __('emails_misc.admin_actions.ban_subject', ['community' => $tenantName]),
+                    $html
+                );
+            });
         } catch (\Throwable $e) {
             Log::warning("[AdminUsers] Failed to send ban email to user #{$id}: " . $e->getMessage());
         }
@@ -713,22 +732,24 @@ class AdminUsersController extends BaseApiController
 
         // Send deletion email BEFORE the actual deletion (user record must still exist)
         try {
-            $tenant = $this->resolveUserTenant($user);
-            $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
-            $tenantName = $tenant['name'];
+            LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user, $id) {
+                $tenant = $this->resolveUserTenant($user);
+                $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
+                $tenantName = $tenant['name'];
 
-            $html = EmailTemplateBuilder::make()
-                ->theme('warning')
-                ->greeting(__('emails_misc.admin_actions.deletion_greeting', ['name' => $firstName]))
-                ->paragraph(__('emails_misc.admin_actions.deletion_body', ['community' => $tenantName]))
-                ->paragraph(__('emails_misc.admin_actions.deletion_help'))
-                ->render();
+                $html = EmailTemplateBuilder::make()
+                    ->theme('warning')
+                    ->greeting(__('emails_misc.admin_actions.deletion_greeting', ['name' => $firstName]))
+                    ->paragraph(__('emails_misc.admin_actions.deletion_body', ['community' => $tenantName]))
+                    ->paragraph(__('emails_misc.admin_actions.deletion_help'))
+                    ->render();
 
-            (\App\Core\Mailer::forCurrentTenant())->send(
-                $user['email'],
-                __('emails_misc.admin_actions.deletion_subject', ['community' => $tenantName]),
-                $html
-            );
+                (\App\Core\Mailer::forCurrentTenant())->send(
+                    $user['email'],
+                    __('emails_misc.admin_actions.deletion_subject', ['community' => $tenantName]),
+                    $html
+                );
+            });
         } catch (\Throwable $e) {
             Log::warning("[AdminUsers] Failed to send deletion email to user #{$id}: " . $e->getMessage());
         }
@@ -772,40 +793,45 @@ class AdminUsersController extends BaseApiController
         $this->auditLogService->log2faReset($adminId, $id, $reason);
 
         // Notify the user (bell + email — security-critical action)
+        $recipientLocale = $user['preferred_language'] ?? null;
         try {
-            Notification::createNotification(
-                $id,
-                __('emails_misc.admin_actions.reset_2fa_bell'),
-                '/settings/security',
-                'security',
-                true
-            );
+            LocaleContext::withLocale($recipientLocale, function () use ($id) {
+                Notification::createNotification(
+                    $id,
+                    __('emails_misc.admin_actions.reset_2fa_bell'),
+                    '/settings/security',
+                    'security',
+                    true
+                );
+            });
         } catch (\Throwable $e) {
             Log::warning("[AdminUsers] Failed to create 2FA reset bell notification for user #{$id}: " . $e->getMessage());
         }
 
         try {
-            $tenant = $this->resolveUserTenant($user);
-            $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
-            $tenantName = $tenant['name'];
-            $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
+            LocaleContext::withLocale($recipientLocale, function () use ($user, $id) {
+                $tenant = $this->resolveUserTenant($user);
+                $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
+                $tenantName = $tenant['name'];
+                $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
 
-            $html = EmailTemplateBuilder::make()
-                ->theme('warning')
-                ->title(__('emails_misc.admin_actions.reset_2fa_title'))
-                ->previewText(__('emails_misc.admin_actions.reset_2fa_preview'))
-                ->greeting(__('emails_misc.admin_actions.reset_2fa_greeting', ['name' => $firstName]))
-                ->paragraph(__('emails_misc.admin_actions.reset_2fa_body', ['community' => $tenantName]))
-                ->paragraph(__('emails_misc.admin_actions.reset_2fa_body_reenable'))
-                ->paragraph(__('emails_misc.admin_actions.reset_2fa_body_contact'))
-                ->button(__('emails_misc.admin_actions.reset_2fa_cta'), $loginUrl)
-                ->render();
+                $html = EmailTemplateBuilder::make()
+                    ->theme('warning')
+                    ->title(__('emails_misc.admin_actions.reset_2fa_title'))
+                    ->previewText(__('emails_misc.admin_actions.reset_2fa_preview'))
+                    ->greeting(__('emails_misc.admin_actions.reset_2fa_greeting', ['name' => $firstName]))
+                    ->paragraph(__('emails_misc.admin_actions.reset_2fa_body', ['community' => $tenantName]))
+                    ->paragraph(__('emails_misc.admin_actions.reset_2fa_body_reenable'))
+                    ->paragraph(__('emails_misc.admin_actions.reset_2fa_body_contact'))
+                    ->button(__('emails_misc.admin_actions.reset_2fa_cta'), $loginUrl)
+                    ->render();
 
-            (\App\Core\Mailer::forCurrentTenant())->send(
-                $user['email'],
-                __('emails_misc.admin_actions.reset_2fa_subject', ['community' => $tenantName]),
-                $html
-            );
+                (\App\Core\Mailer::forCurrentTenant())->send(
+                    $user['email'],
+                    __('emails_misc.admin_actions.reset_2fa_subject', ['community' => $tenantName]),
+                    $html
+                );
+            });
         } catch (\Throwable $e) {
             Log::warning("[AdminUsers] Failed to send 2FA reset email to user #{$id}: " . $e->getMessage());
         }
@@ -989,25 +1015,27 @@ class AdminUsersController extends BaseApiController
         // Notify the user (email only — they need to know their old password no longer works)
         // CRITICAL: Do NOT include the new password in the email
         try {
-            $tenant = $this->resolveUserTenant($user);
-            $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
-            $tenantName = $tenant['name'];
-            $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
+            LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user, $id) {
+                $tenant = $this->resolveUserTenant($user);
+                $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
+                $tenantName = $tenant['name'];
+                $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
 
-            $html = EmailTemplateBuilder::make()
-                ->theme('warning')
-                ->greeting(__('emails_misc.admin_actions.set_password_greeting', ['name' => $firstName]))
-                ->paragraph(__('emails_misc.admin_actions.set_password_body', ['community' => $tenantName]))
-                ->paragraph(__('emails_misc.admin_actions.set_password_body_old_pass'))
-                ->paragraph(__('emails_misc.admin_actions.set_password_body_contact'))
-                ->button(__('emails_misc.admin_actions.set_password_cta'), $loginUrl)
-                ->render();
+                $html = EmailTemplateBuilder::make()
+                    ->theme('warning')
+                    ->greeting(__('emails_misc.admin_actions.set_password_greeting', ['name' => $firstName]))
+                    ->paragraph(__('emails_misc.admin_actions.set_password_body', ['community' => $tenantName]))
+                    ->paragraph(__('emails_misc.admin_actions.set_password_body_old_pass'))
+                    ->paragraph(__('emails_misc.admin_actions.set_password_body_contact'))
+                    ->button(__('emails_misc.admin_actions.set_password_cta'), $loginUrl)
+                    ->render();
 
-            (\App\Core\Mailer::forCurrentTenant())->send(
-                $user['email'],
-                __('emails_misc.admin_actions.set_password_subject', ['community' => $tenantName]),
-                $html
-            );
+                (\App\Core\Mailer::forCurrentTenant())->send(
+                    $user['email'],
+                    __('emails_misc.admin_actions.set_password_subject', ['community' => $tenantName]),
+                    $html
+                );
+            });
         } catch (\Throwable $e) {
             Log::warning("[AdminUsers] Failed to send password reset email to user #{$id}: " . $e->getMessage());
         }
@@ -1115,18 +1143,25 @@ class AdminUsersController extends BaseApiController
             ActivityLog::log($adminId, $action, ($grant ? 'Granted' : 'Revoked') . " tenant super admin for user #{$id}: {$user->email} (tenant {$user->tenant_id})");
             $this->auditLogService->logAdminAction($action, $adminId, $id, ['email' => $user->email]);
 
-            // Notify the user of role change (bell notification)
+            // Notify the user of role change (bell notification, in recipient's locale)
             try {
-                $message = $grant
-                    ? __('api_controllers_3.admin_bells.super_admin_granted')
-                    : __('api_controllers_3.admin_bells.super_admin_revoked');
-                Notification::createNotification(
-                    $id,
-                    $message,
-                    null,
-                    'system',
-                    true
-                );
+                $recipient = DB::table('users')
+                    ->where('id', $id)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['preferred_language'])
+                    ->first();
+                LocaleContext::withLocale($recipient, function () use ($id, $grant) {
+                    $message = $grant
+                        ? __('api_controllers_3.admin_bells.super_admin_granted')
+                        : __('api_controllers_3.admin_bells.super_admin_revoked');
+                    Notification::createNotification(
+                        $id,
+                        $message,
+                        null,
+                        'system',
+                        true
+                    );
+                });
             } catch (\Throwable $e) {
                 Log::warning("[AdminUsers] Failed to create super admin role change notification for user #{$id}: " . $e->getMessage());
             }
@@ -1182,18 +1217,25 @@ class AdminUsersController extends BaseApiController
             ActivityLog::log($adminId, $action, ($grant ? 'Granted' : 'Revoked') . " global super admin for user #{$id}: {$user->email} (tenant {$user->tenant_id})");
             $this->auditLogService->logAdminAction($action, $adminId, $id, ['email' => $user->email]);
 
-            // Notify the user of role change (bell notification)
+            // Notify the user of role change (bell notification, in recipient's locale)
             try {
-                $message = $grant
-                    ? 'You have been granted Global Super Admin privileges.'
-                    : 'Your Global Super Admin privileges have been removed.';
-                Notification::createNotification(
-                    $id,
-                    $message,
-                    null,
-                    'system',
-                    true
-                );
+                $recipient = DB::table('users')
+                    ->where('id', $id)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['preferred_language'])
+                    ->first();
+                LocaleContext::withLocale($recipient, function () use ($id, $grant) {
+                    $message = $grant
+                        ? 'You have been granted Global Super Admin privileges.'
+                        : 'Your Global Super Admin privileges have been removed.';
+                    Notification::createNotification(
+                        $id,
+                        $message,
+                        null,
+                        'system',
+                        true
+                    );
+                });
             } catch (\Throwable $e) {
                 Log::warning("[AdminUsers] Failed to create global super admin role change notification for user #{$id}: " . $e->getMessage());
             }
@@ -1236,36 +1278,38 @@ class AdminUsersController extends BaseApiController
                 [$user['email'], $hashedToken]
             );
 
-            $tenant = $this->resolveUserTenant($user);
-            $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
+            LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user, $adminId, $id, $token) {
+                $tenant = $this->resolveUserTenant($user);
+                $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
 
-            // Build frontend URL with defensive fallback
-            $appUrl = TenantContext::getFrontendUrl();
-            if (!$appUrl || str_contains($appUrl, 'api.')) {
-                $appUrl = \App\Core\Env::get('APP_URL', 'https://app.project-nexus.ie');
-                if (str_contains($appUrl, 'api.')) {
-                    $appUrl = str_replace('api.', 'app.', $appUrl);
+                // Build frontend URL with defensive fallback
+                $appUrl = TenantContext::getFrontendUrl();
+                if (!$appUrl || str_contains($appUrl, 'api.')) {
+                    $appUrl = \App\Core\Env::get('APP_URL', 'https://app.project-nexus.ie');
+                    if (str_contains($appUrl, 'api.')) {
+                        $appUrl = str_replace('api.', 'app.', $appUrl);
+                    }
                 }
-            }
-            $resetLink = $appUrl . $tenant['slug_prefix'] . "/password/reset?token={$token}";
+                $resetLink = $appUrl . $tenant['slug_prefix'] . "/password/reset?token={$token}";
 
-            $firstName = htmlspecialchars($user['first_name'] ?? '', ENT_QUOTES, 'UTF-8');
-            $html = \App\Core\EmailTemplateBuilder::make()
-                ->theme('warning')
-                ->title(__('emails_misc.admin_actions.password_reset_title'))
-                ->greeting(__('emails_misc.admin_actions.password_reset_greeting', ['name' => $firstName]))
-                ->paragraph(__('emails_misc.admin_actions.password_reset_body'))
-                ->button(__('emails_misc.admin_actions.password_reset_cta'), $resetLink)
-                ->render();
+                $firstName = htmlspecialchars($user['first_name'] ?? '', ENT_QUOTES, 'UTF-8');
+                $html = \App\Core\EmailTemplateBuilder::make()
+                    ->theme('warning')
+                    ->title(__('emails_misc.admin_actions.password_reset_title'))
+                    ->greeting(__('emails_misc.admin_actions.password_reset_greeting', ['name' => $firstName]))
+                    ->paragraph(__('emails_misc.admin_actions.password_reset_body'))
+                    ->button(__('emails_misc.admin_actions.password_reset_cta'), $resetLink)
+                    ->render();
 
-            $mailer = \App\Core\Mailer::forCurrentTenant();
-            $mailer->send(
-                $user['email'],
-                __('emails_misc.admin_actions.password_reset_subject', ['community' => $tenantNameSafe]),
-                $html
-            );
+                $mailer = \App\Core\Mailer::forCurrentTenant();
+                $mailer->send(
+                    $user['email'],
+                    __('emails_misc.admin_actions.password_reset_subject', ['community' => $tenantNameSafe]),
+                    $html
+                );
 
-            ActivityLog::log($adminId, 'admin_send_password_reset', "Sent password reset email to user #{$id} ({$user['email']})");
+                ActivityLog::log($adminId, 'admin_send_password_reset', "Sent password reset email to user #{$id} ({$user['email']})");
+            });
 
             return $this->respondWithData(['sent' => true, 'id' => $id]);
         } catch (\Throwable $e) {
@@ -1287,46 +1331,48 @@ class AdminUsersController extends BaseApiController
         }
 
         try {
-            // Resolve tenant from the USER's tenant_id
-            $resolvedTenant = $this->resolveUserTenant($user);
-            $userTenantId = $resolvedTenant['tenant_id'];
-            $tenantName = $resolvedTenant['name'];
-            $tenantNameSafe = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
+            LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user, $adminId, $id) {
+                // Resolve tenant from the USER's tenant_id
+                $resolvedTenant = $this->resolveUserTenant($user);
+                $userTenantId = $resolvedTenant['tenant_id'];
+                $tenantName = $resolvedTenant['name'];
+                $tenantNameSafe = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
 
-            // Read tenant configuration for custom welcome email content
-            $tenantRow = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$userTenantId]);
-            $config = json_decode($tenantRow->configuration ?? '{}', true);
-            $welcomeConfig = $config['welcome_email'] ?? [];
+                // Read tenant configuration for custom welcome email content
+                $tenantRow = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$userTenantId]);
+                $config = json_decode($tenantRow->configuration ?? '{}', true);
+                $welcomeConfig = $config['welcome_email'] ?? [];
 
-            $subject = !empty($welcomeConfig['subject']) ? $welcomeConfig['subject'] : __('emails_misc.admin_actions.welcome_resend_subject', ['community' => $tenantNameSafe]);
+                $subject = !empty($welcomeConfig['subject']) ? $welcomeConfig['subject'] : __('emails_misc.admin_actions.welcome_resend_subject', ['community' => $tenantNameSafe]);
 
-            $firstName = htmlspecialchars($user['first_name'] ?? '', ENT_QUOTES, 'UTF-8');
+                $firstName = htmlspecialchars($user['first_name'] ?? '', ENT_QUOTES, 'UTF-8');
 
-            if (!empty($welcomeConfig['body'])) {
-                $mainMessage = $welcomeConfig['body'];
-            } else {
-                $mainMessage = "<p>Hello <strong>{$firstName}</strong>,</p>
-                <p>Welcome to {$tenantNameSafe}! Your account is ready to use.</p>
-                <p>Log in to start connecting with your community, browse available services, and offer your own skills.</p>";
-            }
+                if (!empty($welcomeConfig['body'])) {
+                    $mainMessage = $welcomeConfig['body'];
+                } else {
+                    $mainMessage = "<p>Hello <strong>{$firstName}</strong>,</p>
+                    <p>Welcome to {$tenantNameSafe}! Your account is ready to use.</p>
+                    <p>Log in to start connecting with your community, browse available services, and offer your own skills.</p>";
+                }
 
-            $loginLink = TenantContext::getFrontendUrl() . $resolvedTenant['slug_prefix'] . "/login";
+                $loginLink = TenantContext::getFrontendUrl() . $resolvedTenant['slug_prefix'] . "/login";
 
-            if (stripos($mainMessage, '<!DOCTYPE') !== false || stripos($mainMessage, '<html') !== false) {
-                $html = $mainMessage;
-            } else {
-                $html = \App\Core\EmailTemplateBuilder::make()
-                    ->theme('brand')
-                    ->title(__('emails_misc.admin_actions.welcome_resend_title'))
-                    ->paragraph($mainMessage)
-                    ->button(__('emails_misc.admin_actions.welcome_resend_cta'), $loginLink)
-                    ->render();
-            }
+                if (stripos($mainMessage, '<!DOCTYPE') !== false || stripos($mainMessage, '<html') !== false) {
+                    $html = $mainMessage;
+                } else {
+                    $html = \App\Core\EmailTemplateBuilder::make()
+                        ->theme('brand')
+                        ->title(__('emails_misc.admin_actions.welcome_resend_title'))
+                        ->paragraph($mainMessage)
+                        ->button(__('emails_misc.admin_actions.welcome_resend_cta'), $loginLink)
+                        ->render();
+                }
 
-            $mailer = \App\Core\Mailer::forCurrentTenant();
-            $mailer->send($user['email'], $subject, $html);
+                $mailer = \App\Core\Mailer::forCurrentTenant();
+                $mailer->send($user['email'], $subject, $html);
 
-            ActivityLog::log($adminId, 'admin_resend_welcome', "Resent welcome email to user #{$id} ({$user['email']})");
+                ActivityLog::log($adminId, 'admin_resend_welcome', "Resent welcome email to user #{$id} ({$user['email']})");
+            });
 
             return $this->respondWithData(['sent' => true, 'id' => $id]);
         } catch (\Throwable $e) {
@@ -1666,53 +1712,55 @@ class AdminUsersController extends BaseApiController
     private function sendApprovalWelcomeEmail(array $user, int $creditsAwarded): bool
     {
         try {
-            $tenant = $this->resolveUserTenant($user);
-            $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
-            $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
-            $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
+            return LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user, $creditsAwarded) {
+                $tenant = $this->resolveUserTenant($user);
+                $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
+                $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
+                $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
 
-            $plural = $creditsAwarded !== 1 ? 's' : '';
+                $plural = $creditsAwarded !== 1 ? 's' : '';
 
-            $builder = \App\Core\EmailTemplateBuilder::make()
-                ->theme('success')
-                ->title(__('emails_misc.admin_actions.approval_title'))
-                ->greeting(__('emails_misc.admin_actions.approval_greeting', ['name' => $firstName]))
-                ->paragraph(__('emails_misc.admin_actions.approval_body_intro', ['community' => $tenantNameSafe]));
+                $builder = \App\Core\EmailTemplateBuilder::make()
+                    ->theme('success')
+                    ->title(__('emails_misc.admin_actions.approval_title'))
+                    ->greeting(__('emails_misc.admin_actions.approval_greeting', ['name' => $firstName]))
+                    ->paragraph(__('emails_misc.admin_actions.approval_body_intro', ['community' => $tenantNameSafe]));
 
-            if ($creditsAwarded > 0) {
-                $builder->paragraph(__('emails_misc.admin_actions.approval_body_credits', [
-                    'credits' => $creditsAwarded,
-                    'plural'  => $plural,
-                ]));
-            }
+                if ($creditsAwarded > 0) {
+                    $builder->paragraph(__('emails_misc.admin_actions.approval_body_credits', [
+                        'credits' => $creditsAwarded,
+                        'plural'  => $plural,
+                    ]));
+                }
 
-            $stepsHtml = '<p>' . __('emails_misc.admin_actions.approval_body_next_steps') . '</p>'
-                . '<ul style="padding-left: 20px; margin: 10px 0;">'
-                . '<li style="margin-bottom: 8px;">' . __('emails_misc.admin_actions.approval_list_browse') . '</li>'
-                . '<li style="margin-bottom: 8px;">' . __('emails_misc.admin_actions.approval_list_create_listing') . '</li>'
-                . '<li style="margin-bottom: 8px;">' . __('emails_misc.admin_actions.approval_list_connect') . '</li>'
-                . '<li style="margin-bottom: 8px;">' . __('emails_misc.admin_actions.approval_list_events') . '</li>'
-                . '</ul>';
+                $stepsHtml = '<p>' . __('emails_misc.admin_actions.approval_body_next_steps') . '</p>'
+                    . '<ul style="padding-left: 20px; margin: 10px 0;">'
+                    . '<li style="margin-bottom: 8px;">' . __('emails_misc.admin_actions.approval_list_browse') . '</li>'
+                    . '<li style="margin-bottom: 8px;">' . __('emails_misc.admin_actions.approval_list_create_listing') . '</li>'
+                    . '<li style="margin-bottom: 8px;">' . __('emails_misc.admin_actions.approval_list_connect') . '</li>'
+                    . '<li style="margin-bottom: 8px;">' . __('emails_misc.admin_actions.approval_list_events') . '</li>'
+                    . '</ul>';
 
-            $html = $builder
-                ->paragraph($stepsHtml)
-                ->paragraph(__('emails_misc.admin_actions.approval_body_closing'))
-                ->button(__('emails_misc.admin_actions.approval_cta'), $loginUrl)
-                ->render();
+                $html = $builder
+                    ->paragraph($stepsHtml)
+                    ->paragraph(__('emails_misc.admin_actions.approval_body_closing'))
+                    ->button(__('emails_misc.admin_actions.approval_cta'), $loginUrl)
+                    ->render();
 
-            $subject = $creditsAwarded > 0
-                ? __('emails_misc.admin_actions.approval_subject_credits', ['community' => $tenantNameSafe, 'credits' => $creditsAwarded])
-                : __('emails_misc.admin_actions.approval_subject_approved', ['community' => $tenantNameSafe]);
+                $subject = $creditsAwarded > 0
+                    ? __('emails_misc.admin_actions.approval_subject_credits', ['community' => $tenantNameSafe, 'credits' => $creditsAwarded])
+                    : __('emails_misc.admin_actions.approval_subject_approved', ['community' => $tenantNameSafe]);
 
-            $result = (\App\Core\Mailer::forCurrentTenant())->send($user['email'], $subject, $html);
+                $result = (\App\Core\Mailer::forCurrentTenant())->send($user['email'], $subject, $html);
 
-            if ($result) {
-                \Illuminate\Support\Facades\Log::info("[AdminUsers] Welcome email sent to user #{$user['id']} (credits: {$creditsAwarded})");
-            } else {
-                \Illuminate\Support\Facades\Log::warning("[AdminUsers] Mailer returned false for welcome email to user #{$user['id']} — check SMTP/Gmail config");
-            }
+                if ($result) {
+                    \Illuminate\Support\Facades\Log::info("[AdminUsers] Welcome email sent to user #{$user['id']} (credits: {$creditsAwarded})");
+                } else {
+                    \Illuminate\Support\Facades\Log::warning("[AdminUsers] Mailer returned false for welcome email to user #{$user['id']} — check SMTP/Gmail config");
+                }
 
-            return (bool) $result;
+                return (bool) $result;
+            });
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to send welcome email to user #{$user['id']}: " . $e->getMessage());
             return false;
@@ -1728,27 +1776,29 @@ class AdminUsersController extends BaseApiController
     private function sendApprovalInAppNotification(array $user, int $creditsAwarded = 0): void
     {
         try {
-            $tenant = $this->resolveUserTenant($user);
+            LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user, $creditsAwarded) {
+                $tenant = $this->resolveUserTenant($user);
 
-            if ($creditsAwarded > 0) {
-                $plural = $creditsAwarded !== 1 ? 's' : '';
-                $message = __('emails_misc.admin_actions.approval_bell_credits', [
-                    'community' => $tenant['name'],
-                    'credits'   => $creditsAwarded,
-                    'plural'    => $plural,
-                ]);
-            } else {
-                $message = __('emails_misc.admin_actions.approval_bell', ['community' => $tenant['name']]);
-            }
+                if ($creditsAwarded > 0) {
+                    $plural = $creditsAwarded !== 1 ? 's' : '';
+                    $message = __('emails_misc.admin_actions.approval_bell_credits', [
+                        'community' => $tenant['name'],
+                        'credits'   => $creditsAwarded,
+                        'plural'    => $plural,
+                    ]);
+                } else {
+                    $message = __('emails_misc.admin_actions.approval_bell', ['community' => $tenant['name']]);
+                }
 
-            Notification::createNotification(
-                (int) $user['id'],
-                $message,
-                '/dashboard',
-                'system',
-                true,
-                $tenant['tenant_id']
-            );
+                Notification::createNotification(
+                    (int) $user['id'],
+                    $message,
+                    '/dashboard',
+                    'system',
+                    true,
+                    $tenant['tenant_id']
+                );
+            });
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to create approval notification for user #{$user['id']}: " . $e->getMessage());
         }
@@ -1763,33 +1813,35 @@ class AdminUsersController extends BaseApiController
     private function sendReactivationNotificationEmail(array $user): bool
     {
         try {
-            $tenant = $this->resolveUserTenant($user);
-            $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
-            $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
-            $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
+            return LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user) {
+                $tenant = $this->resolveUserTenant($user);
+                $firstName = htmlspecialchars($user['first_name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
+                $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
+                $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
 
-            $html = \App\Core\EmailTemplateBuilder::make()
-                ->theme('brand')
-                ->title(__('svc_notifications.account_reactivated_title'))
-                ->greeting(__('emails_misc.admin_actions.reactivation_greeting', ['name' => $firstName]))
-                ->paragraph(__('emails_misc.admin_actions.reactivation_body', ['community' => $tenantNameSafe]))
-                ->paragraph(__('emails_misc.admin_actions.reactivation_body_access'))
-                ->button(__('emails_misc.admin_actions.reactivation_cta'), $loginUrl)
-                ->render();
+                $html = \App\Core\EmailTemplateBuilder::make()
+                    ->theme('brand')
+                    ->title(__('svc_notifications.account_reactivated_title'))
+                    ->greeting(__('emails_misc.admin_actions.reactivation_greeting', ['name' => $firstName]))
+                    ->paragraph(__('emails_misc.admin_actions.reactivation_body', ['community' => $tenantNameSafe]))
+                    ->paragraph(__('emails_misc.admin_actions.reactivation_body_access'))
+                    ->button(__('emails_misc.admin_actions.reactivation_cta'), $loginUrl)
+                    ->render();
 
-            $result = (\App\Core\Mailer::forCurrentTenant())->send(
-                $user['email'],
-                __('emails_misc.admin_actions.reactivation_subject', ['community' => $tenantNameSafe]),
-                $html
-            );
+                $result = (\App\Core\Mailer::forCurrentTenant())->send(
+                    $user['email'],
+                    __('emails_misc.admin_actions.reactivation_subject', ['community' => $tenantNameSafe]),
+                    $html
+                );
 
-            if ($result) {
-                \Illuminate\Support\Facades\Log::info("[AdminUsers] Reactivation email sent to user #{$user['id']}");
-            } else {
-                \Illuminate\Support\Facades\Log::warning("[AdminUsers] Mailer returned false for reactivation email to user #{$user['id']} — check SMTP/Gmail config");
-            }
+                if ($result) {
+                    \Illuminate\Support\Facades\Log::info("[AdminUsers] Reactivation email sent to user #{$user['id']}");
+                } else {
+                    \Illuminate\Support\Facades\Log::warning("[AdminUsers] Mailer returned false for reactivation email to user #{$user['id']} — check SMTP/Gmail config");
+                }
 
-            return (bool) $result;
+                return (bool) $result;
+            });
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to send reactivation email to user #{$user['id']}: " . $e->getMessage());
             return false;
@@ -1804,16 +1856,18 @@ class AdminUsersController extends BaseApiController
     private function sendReactivationInAppNotification(array $user): void
     {
         try {
-            $tenant = $this->resolveUserTenant($user);
+            LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user) {
+                $tenant = $this->resolveUserTenant($user);
 
-            Notification::createNotification(
-                (int) $user['id'],
-                "Your account has been reactivated. Welcome back to {$tenant['name']}!",
-                '/dashboard',
-                'system',
-                true,
-                $tenant['tenant_id']
-            );
+                Notification::createNotification(
+                    (int) $user['id'],
+                    "Your account has been reactivated. Welcome back to {$tenant['name']}!",
+                    '/dashboard',
+                    'system',
+                    true,
+                    $tenant['tenant_id']
+                );
+            });
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to create reactivation notification for user #{$user['id']}: " . $e->getMessage());
         }

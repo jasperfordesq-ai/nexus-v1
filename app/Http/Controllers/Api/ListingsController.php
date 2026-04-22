@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Http\Requests\Listings\ListListingsRequest;
 use App\Models\ListingImage;
 use App\Models\Notification;
@@ -537,24 +538,32 @@ class ListingsController extends BaseApiController
                     ->select(['first_name', 'last_name', 'name'])
                     ->first();
 
-                $saverName = 'Someone';
-                if ($saver) {
-                    $saverName = trim(($saver->first_name ?? '') . ' ' . ($saver->last_name ?? ''));
-                    if (empty($saverName)) {
-                        $saverName = $saver->name ?? __('emails.common.fallback_someone');
+                $owner = DB::table('users')
+                    ->where('id', (int) $listing->user_id)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['preferred_language'])
+                    ->first();
+
+                LocaleContext::withLocale($owner, function () use ($saver, $listing, $id) {
+                    $saverName = 'Someone';
+                    if ($saver) {
+                        $saverName = trim(($saver->first_name ?? '') . ' ' . ($saver->last_name ?? ''));
+                        if (empty($saverName)) {
+                            $saverName = $saver->name ?? __('emails.common.fallback_someone');
+                        }
                     }
-                }
 
-                $saverName = htmlspecialchars($saverName, ENT_QUOTES, 'UTF-8');
-                $title = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
+                    $saverName = htmlspecialchars($saverName, ENT_QUOTES, 'UTF-8');
+                    $title = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
 
-                Notification::create([
-                    'user_id' => (int) $listing->user_id,
-                    'message' => __('api_controllers_3.listings.listing_saved_notification', ['saver_name' => $saverName, 'title' => $title]),
-                    'link' => "/listings/{$id}",
-                    'type' => 'listing_saved',
-                    'created_at' => now(),
-                ]);
+                    Notification::create([
+                        'user_id' => (int) $listing->user_id,
+                        'message' => __('api_controllers_3.listings.listing_saved_notification', ['saver_name' => $saverName, 'title' => $title]),
+                        'link' => "/listings/{$id}",
+                        'type' => 'listing_saved',
+                        'created_at' => now(),
+                    ]);
+                });
             }
         } catch (\Exception $e) {
             Log::warning("[ListingsController] saveListing notification failed for listing #{$id}: " . $e->getMessage());
