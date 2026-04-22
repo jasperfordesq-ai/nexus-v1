@@ -960,8 +960,8 @@ HTML;
         $eventUrl = $baseUrl . $basePath . '/events/' . $event->id;
 
         $heading = htmlspecialchars(__('emails_misc.events.created_heading'), ENT_QUOTES, 'UTF-8');
-        $greeting = htmlspecialchars(__('emails_misc.events.created_greeting', [':name' => $organizerName]), ENT_QUOTES, 'UTF-8');
-        $body = __('emails_misc.events.created_body', [':title' => $eventTitle]);
+        $greeting = htmlspecialchars(__('emails_misc.events.created_greeting', ['name' => $organizerName]), ENT_QUOTES, 'UTF-8');
+        $body = __('emails_misc.events.created_body', ['title' => $eventTitle]);
         $detailsLabel = htmlspecialchars(__('emails_misc.events.created_details_label'), ENT_QUOTES, 'UTF-8');
         $ctaLabel = htmlspecialchars(__('emails_misc.events.created_cta'), ENT_QUOTES, 'UTF-8');
 
