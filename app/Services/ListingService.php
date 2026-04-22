@@ -11,6 +11,7 @@ use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\ListingCreated;
 use App\Events\ListingUpdated;
+use App\I18n\LocaleContext;
 use App\Models\Listing;
 use App\Models\User;
 use App\Services\SearchService;
@@ -999,30 +1000,32 @@ class ListingService
             $creator = DB::table('users')
                 ->where('id', $userId)
                 ->where('tenant_id', TenantContext::getId())
-                ->select(['email', 'first_name', 'name'])
+                ->select(['email', 'first_name', 'name', 'preferred_language'])
                 ->first();
 
             if ($creator && !empty($creator->email)) {
-                $firstName   = $creator->first_name ?? $creator->name ?? __('emails.common.fallback_name');
-                $tenantName  = TenantContext::getSetting('site_name', 'Project NEXUS');
-                $listingUrl  = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/listings/' . $listing->id;
-                $listingTitle = $listing->title ?? '';
+                LocaleContext::withLocale($creator, function () use ($creator, $listing) {
+                    $firstName   = $creator->first_name ?? $creator->name ?? __('emails.common.fallback_name');
+                    $tenantName  = TenantContext::getSetting('site_name', 'Project NEXUS');
+                    $listingUrl  = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/listings/' . $listing->id;
+                    $listingTitle = $listing->title ?? '';
 
-                $html = EmailTemplateBuilder::make()
-                    ->theme('success')
-                    ->title(__('emails_created.listing.title'))
-                    ->previewText(__('emails_created.listing.preview', ['title' => $listingTitle, 'community' => $tenantName]))
-                    ->greeting($firstName)
-                    ->paragraph(__('emails_created.listing.body', ['community' => $tenantName]))
-                    ->highlight($listingTitle)
-                    ->button(__('emails_created.listing.cta'), $listingUrl)
-                    ->render();
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('success')
+                        ->title(__('emails_created.listing.title'))
+                        ->previewText(__('emails_created.listing.preview', ['title' => $listingTitle, 'community' => $tenantName]))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_created.listing.body', ['community' => $tenantName]))
+                        ->highlight($listingTitle)
+                        ->button(__('emails_created.listing.cta'), $listingUrl)
+                        ->render();
 
-                Mailer::forCurrentTenant()->send(
-                    $creator->email,
-                    __('emails_created.listing.subject', ['title' => $listingTitle, 'community' => $tenantName]),
-                    $html
-                );
+                    Mailer::forCurrentTenant()->send(
+                        $creator->email,
+                        __('emails_created.listing.subject', ['title' => $listingTitle, 'community' => $tenantName]),
+                        $html
+                    );
+                });
             }
         } catch (\Throwable $e) {
             Log::warning('[ListingService] creation email failed: ' . $e->getMessage());
@@ -1090,7 +1093,7 @@ class ListingService
                 ->where('u.tenant_id', $tenantId)
                 ->whereNotNull('u.email')
                 ->when($listingOwner > 0, fn ($q) => $q->where('usl.user_id', '!=', $listingOwner))
-                ->select(['u.email', 'u.first_name', 'u.name'])
+                ->select(['u.email', 'u.first_name', 'u.name', 'u.preferred_language'])
                 ->limit(50)
                 ->get();
 
@@ -1100,22 +1103,24 @@ class ListingService
 
                 foreach ($savedUsers as $savedUser) {
                     try {
-                        $firstName = $savedUser->first_name ?? $savedUser->name ?? __('emails.common.fallback_name');
+                        LocaleContext::withLocale($savedUser, function () use ($savedUser, $listingTitle, $tenantName, $listingUrl) {
+                            $firstName = $savedUser->first_name ?? $savedUser->name ?? __('emails.common.fallback_name');
 
-                        $html = EmailTemplateBuilder::make()
-                            ->theme('brand')
-                            ->title(__('emails_created.listing_updated.title'))
-                            ->previewText(__('emails_created.listing_updated.preview', ['title' => $listingTitle, 'community' => $tenantName]))
-                            ->greeting($firstName)
-                            ->paragraph(__('emails_created.listing_updated.body', ['title' => $listingTitle, 'community' => $tenantName]))
-                            ->button(__('emails_created.listing_updated.cta'), $listingUrl)
-                            ->render();
+                            $html = EmailTemplateBuilder::make()
+                                ->theme('brand')
+                                ->title(__('emails_created.listing_updated.title'))
+                                ->previewText(__('emails_created.listing_updated.preview', ['title' => $listingTitle, 'community' => $tenantName]))
+                                ->greeting($firstName)
+                                ->paragraph(__('emails_created.listing_updated.body', ['title' => $listingTitle, 'community' => $tenantName]))
+                                ->button(__('emails_created.listing_updated.cta'), $listingUrl)
+                                ->render();
 
-                        Mailer::forCurrentTenant()->send(
-                            $savedUser->email,
-                            __('emails_created.listing_updated.subject', ['community' => $tenantName]),
-                            $html
-                        );
+                            Mailer::forCurrentTenant()->send(
+                                $savedUser->email,
+                                __('emails_created.listing_updated.subject', ['community' => $tenantName]),
+                                $html
+                            );
+                        });
                     } catch (\Throwable $e) {
                         Log::warning('[ListingService] listing updated email failed for user: ' . $e->getMessage());
                     }

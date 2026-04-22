@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplate;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
 use App\Models\Listing;
 use App\Models\Notification;
@@ -109,15 +110,21 @@ class ListingModerationService
             Log::warning("ListingModerationService::approve feed_activity failed: " . $e->getMessage());
         }
 
-        // Notify owner
+        // Notify owner — render bell message in owner's locale
         $title = htmlspecialchars($listing->title, ENT_QUOTES, 'UTF-8');
-        Notification::create([
-            'user_id' => $listing->user_id,
-            'message' => __('emails_listings.listings.approved.notification', ['title' => $title]),
-            'link' => "/listings/{$listingId}",
-            'type' => 'listing_approved',
-            'created_at' => now(),
-        ]);
+        $ownerLang = DB::table('users')
+            ->where('id', $listing->user_id)
+            ->where('tenant_id', $tenantId)
+            ->value('preferred_language');
+        LocaleContext::withLocale($ownerLang, function () use ($listing, $title, $listingId) {
+            Notification::create([
+                'user_id' => $listing->user_id,
+                'message' => __('emails_listings.listings.approved.notification', ['title' => $title]),
+                'link' => "/listings/{$listingId}",
+                'type' => 'listing_approved',
+                'created_at' => now(),
+            ]);
+        });
 
         ActivityLog::log($adminId, 'listing_moderation_approve', "Approved listing #{$listingId}: {$listing->title}");
 
@@ -154,52 +161,51 @@ class ListingModerationService
             'rejection_reason' => $reason,
         ]);
 
-        // Notify owner (bell)
+        // Notify owner (bell) — render message in owner's locale
         $title = htmlspecialchars($listing->title, ENT_QUOTES, 'UTF-8');
         $safeReason = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
-        Notification::create([
-            'user_id' => $listing->user_id,
-            'message' => __('emails_listings.listings.rejected.notification', ['title' => $title, 'reason' => $safeReason]),
-            'link' => "/listings/{$listingId}",
-            'type' => 'listing_rejected',
-            'created_at' => now(),
-        ]);
+        $owner = DB::table('users')
+            ->where('id', $listing->user_id)
+            ->where('tenant_id', $tenantId)
+            ->select(['email', 'first_name', 'name', 'preferred_language'])
+            ->first();
 
-        // Send email notification to listing owner
+        LocaleContext::withLocale($owner, function () use ($listing, $title, $safeReason, $listingId) {
+            Notification::create([
+                'user_id' => $listing->user_id,
+                'message' => __('emails_listings.listings.rejected.notification', ['title' => $title, 'reason' => $safeReason]),
+                'link' => "/listings/{$listingId}",
+                'type' => 'listing_rejected',
+                'created_at' => now(),
+            ]);
+        });
+
+        // Send email notification to listing owner — render in owner's locale
         try {
-            $ownerEmail = DB::table('users')
-                ->where('id', $listing->user_id)
-                ->where('tenant_id', $tenantId)
-                ->value('email');
+            if ($owner && !empty($owner->email) && filter_var($owner->email, FILTER_VALIDATE_EMAIL)) {
+                LocaleContext::withLocale($owner, function () use ($owner, $listingId, $title, $safeReason) {
+                    $ownerName = htmlspecialchars($owner->first_name ?? $owner->name ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
+                    $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+                    $frontendUrl = TenantContext::getFrontendUrl();
+                    $basePath = TenantContext::getSlugPrefix();
+                    $listingUrl = $frontendUrl . $basePath . "/listings/{$listingId}";
 
-            if (!empty($ownerEmail) && filter_var($ownerEmail, FILTER_VALIDATE_EMAIL)) {
-                $ownerRow = DB::table('users')
-                    ->where('id', $listing->user_id)
-                    ->where('tenant_id', $tenantId)
-                    ->select(['first_name', 'name'])
-                    ->first();
+                    $body = "<p>" . __('emails.common.greeting', ['name' => $ownerName]) . "</p>"
+                        . "<p>" . __('emails_listings.listings.rejected.body_not_approved', ['title' => $title]) . "</p>"
+                        . "<p>" . __('emails_listings.listings.rejected.body_reason', ['reason' => $safeReason]) . "</p>"
+                        . "<p>" . __('emails_listings.listings.rejected.body_resubmit') . "</p>";
 
-                $ownerName = htmlspecialchars($ownerRow->first_name ?? $ownerRow->name ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
-                $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
-                $frontendUrl = TenantContext::getFrontendUrl();
-                $basePath = TenantContext::getSlugPrefix();
-                $listingUrl = $frontendUrl . $basePath . "/listings/{$listingId}";
+                    $html = \App\Core\EmailTemplateBuilder::make()
+                        ->theme('warning')
+                        ->title(__('emails_listings.listings.rejected.heading'))
+                        ->paragraph(__('emails_listings.listings.rejected.subheading'))
+                        ->paragraph($body)
+                        ->button(__('emails_listings.listings.rejected.cta'), $listingUrl)
+                        ->render();
 
-                $body = "<p>" . __('emails.common.greeting', ['name' => $ownerName]) . "</p>"
-                    . "<p>" . __('emails_listings.listings.rejected.body_not_approved', ['title' => $title]) . "</p>"
-                    . "<p>" . __('emails_listings.listings.rejected.body_reason', ['reason' => $safeReason]) . "</p>"
-                    . "<p>" . __('emails_listings.listings.rejected.body_resubmit') . "</p>";
-
-                $html = \App\Core\EmailTemplateBuilder::make()
-                    ->theme('warning')
-                    ->title(__('emails_listings.listings.rejected.heading'))
-                    ->paragraph(__('emails_listings.listings.rejected.subheading'))
-                    ->paragraph($body)
-                    ->button(__('emails_listings.listings.rejected.cta'), $listingUrl)
-                    ->render();
-
-                $mailer = Mailer::forCurrentTenant();
-                $mailer->send($ownerEmail, __('emails_listings.listings.rejected.subject'), $html);
+                    $mailer = Mailer::forCurrentTenant();
+                    $mailer->send($owner->email, __('emails_listings.listings.rejected.subject'), $html);
+                });
             }
         } catch (\Exception $e) {
             Log::warning("[ListingModerationService] reject email failed for user={$listing->user_id}, listing={$listingId}: " . $e->getMessage());
