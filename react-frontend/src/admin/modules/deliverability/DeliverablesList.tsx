@@ -63,7 +63,8 @@ export function DeliverablesList() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => {
     fetchData();

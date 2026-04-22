@@ -267,7 +267,8 @@ export function SegmentForm() {
       setErrors({ form: "Failed to save segment" });
     }
     setSaving(false);
-  }, [name, description, isActive, matchType, rules, isEdit, id, navigate, tenantPath, t]);
+  }, [name, description, isActive, matchType, rules, isEdit, id, navigate, tenantPath]);
+
 
   // ── Apply Suggestion ──
 

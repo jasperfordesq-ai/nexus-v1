@@ -187,7 +187,8 @@ export function NewsletterStats() {
       setError("Failed to Load Stats error");
     }
     setLoading(false);
-  }, [id, t])
+  }, [id])
+
 
   useEffect(() => { loadStats(); }, [loadStats]);
 

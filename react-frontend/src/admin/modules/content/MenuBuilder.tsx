@@ -473,7 +473,8 @@ export function MenuBuilder() {
     } finally {
       setLoading(false);
     }
-  }, [id, isEdit, flattenItems, toast, t]);
+  }, [id, isEdit, flattenItems, toast]);
+
 
   useEffect(() => { loadMenu(); }, [loadMenu]);
 
@@ -752,7 +753,7 @@ export function MenuBuilder() {
 
   const LOCATION_OPTIONS = getLocationOptions(t as TFunction);
   const TYPE_OPTIONS = getTypeOptions(t as TFunction);
-  const APP_ROUTES = useMemo(() => getAppRoutes(t as TFunction), [t]);
+  const APP_ROUTES = useMemo(() => getAppRoutes(t as TFunction), []);
 
   const parentOptions = menuItems
     .filter((i) => i.type === 'dropdown' && i.id !== selectedItemId)

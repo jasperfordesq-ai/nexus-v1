@@ -57,7 +57,7 @@ export function InvoiceHistory() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t]);
+  }, [toast]);
 
   useEffect(() => {
     loadInvoices();

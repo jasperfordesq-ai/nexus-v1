@@ -55,7 +55,8 @@ export function BlogRestore() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     fetchBackups();
@@ -83,7 +84,8 @@ export function BlogRestore() {
     } finally {
       setRestoringId(null);
     }
-  }, [confirmBackup, toast, fetchBackups, t])
+  }, [confirmBackup, toast, fetchBackups])
+
 
   if (loading) {
     return (

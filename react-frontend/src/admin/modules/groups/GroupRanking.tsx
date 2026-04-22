@@ -28,7 +28,8 @@ export default function GroupRanking() {
     } finally {
       setLoading(false);
     }
-  }, [error, t])
+  }, [error])
+
 
   useEffect(() => {
     loadGroups();

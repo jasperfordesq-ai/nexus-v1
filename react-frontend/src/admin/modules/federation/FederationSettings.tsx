@@ -55,7 +55,8 @@ export function FederationSettings() {
       setData(null);
     }
     setLoading(false);
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -93,7 +94,8 @@ export function FederationSettings() {
     } finally {
       setSaving(false);
     }
-  }, [data, toast, t])
+  }, [data, toast])
+
 
   if (loading) {
     return (

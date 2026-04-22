@@ -50,7 +50,7 @@ export default function ExchangeDetail() {
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     if (!id) return;

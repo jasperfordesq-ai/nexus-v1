@@ -66,7 +66,8 @@ export default function LegalDocComplianceDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [error, t])
+  }, [error])
+
 
   useEffect(() => {
     loadStats();

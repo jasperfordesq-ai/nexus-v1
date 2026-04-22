@@ -78,7 +78,8 @@ export function VolunteerApprovals() {
     }
     setLoading(false);
     setSelectedIds(new Set());
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => { loadData(); }, [loadData]);
 

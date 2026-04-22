@@ -94,7 +94,8 @@ export function MessageReview() {
     } finally {
       setLoading(false);
     }
-  }, [page, filter, toast, t])
+  }, [page, filter, toast])
+
 
   useEffect(() => {
     loadItems();

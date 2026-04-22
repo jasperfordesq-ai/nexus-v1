@@ -98,7 +98,8 @@ export function JobTemplatesAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, toast, t]);
+  }, [page, search, toast]);
+
 
   useEffect(() => {
     loadItems();

@@ -83,7 +83,8 @@ export function GroupList() {
     } finally {
       setLoading(false);
     }
-  }, [page, status, search, toast, t])
+  }, [page, status, search, toast])
+
 
   useEffect(() => {
     loadItems();

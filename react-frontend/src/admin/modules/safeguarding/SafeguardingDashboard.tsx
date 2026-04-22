@@ -232,7 +232,8 @@ export function SafeguardingDashboard() {
       toast.error("Failed to load safeguarding data");
     }
     setLoading(false);
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -260,7 +261,8 @@ export function SafeguardingDashboard() {
       toast.error("Failed to review message");
     }
     setReviewing(false);
-  }, [reviewTarget, reviewNotes, toast, reviewModal, loadData, t])
+  }, [reviewTarget, reviewNotes, toast, reviewModal, loadData])
+
 
   // ─── Create guardian assignment ───
   const handleCreateAssignment = useCallback(async () => {
@@ -283,7 +285,8 @@ export function SafeguardingDashboard() {
       toast.error("Failed to create assignment");
     }
     setCreating(false);
-  }, [wardEmail, guardianEmail, toast, assignModal, loadData, t])
+  }, [wardEmail, guardianEmail, toast, assignModal, loadData])
+
 
   // ─── Revoke assignment ───
   const handleRevokeAssignment = useCallback(async (assignmentId: number) => {
@@ -297,7 +300,8 @@ export function SafeguardingDashboard() {
       logError('SafeguardingDashboard.revoke', err);
       toast.error("Failed to revoke assignment");
     }
-  }, [toast, t])
+  }, [toast])
+
 
   // ─── Filtered items ───
   const flaggedFilter = searchParams.get('filter'); // unreviewed | reviewed | critical | null
@@ -345,7 +349,8 @@ export function SafeguardingDashboard() {
       if (assignmentFilter === 'consented') return "Assignments with consent given";
     }
     return null;
-  }, [activeTab, flaggedFilter, assignmentFilter, t]);
+  }, [activeTab, flaggedFilter, assignmentFilter]);
+
 
   const clearFilter = useCallback(() => {
     setSearchParams(

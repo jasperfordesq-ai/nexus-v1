@@ -153,7 +153,8 @@ export default function VolunteerGivingDays() {
       setGivingDays([]);
     }
     setLoading(false);
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -273,7 +274,8 @@ export default function VolunteerGivingDays() {
       toast.error(t('volunteering.failed_to_load_donors', 'Failed to load donors'));
     }
     setDonorsLoading(false);
-  }, [toast, t]);
+  }, [toast]);
+
 
   const loadTrends = useCallback(async (givingDayId: number) => {
     setTrendsLoading(true);

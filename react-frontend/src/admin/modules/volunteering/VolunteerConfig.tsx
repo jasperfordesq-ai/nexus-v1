@@ -358,7 +358,8 @@ function CustomFieldsTab() {
       setFields([]);
     }
     setLoading(false);
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -1051,7 +1052,8 @@ function WebhooksTab() {
       setWebhooks([]);
     }
     setLoading(false);
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => { loadData(); }, [loadData]);
 

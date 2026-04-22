@@ -40,7 +40,8 @@ export function WebpConverter() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     fetchStats();

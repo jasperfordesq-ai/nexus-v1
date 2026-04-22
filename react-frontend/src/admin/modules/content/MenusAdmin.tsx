@@ -77,7 +77,8 @@ export function MenusAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => {
     fetchData();

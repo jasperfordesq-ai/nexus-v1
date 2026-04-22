@@ -60,7 +60,8 @@ export function SuperUserList() {
       toast.error(`${"Users error"}: ${err instanceof Error ? err.message : "Unknown error"}`);
     }
     setLoading(false);
-  }, [page, search, tenantFilter, roleFilter, superAdminsOnly, toast, t])
+  }, [page, search, tenantFilter, roleFilter, superAdminsOnly, toast])
+
 
   const loadTenants = useCallback(async () => {
     try {

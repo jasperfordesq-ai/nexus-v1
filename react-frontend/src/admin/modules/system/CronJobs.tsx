@@ -71,7 +71,7 @@ export function CronJobs() {
       hour: '2-digit',
       minute: '2-digit',
     });
-  }, [t]);
+  }, []);
 
   const timeAgo = useCallback((dateStr: string | null): string => {
     if (!dateStr) return "Never";
@@ -85,7 +85,7 @@ export function CronJobs() {
     if (diffHours < 24) return `${diffHours}h ago`;
     const diffDays = Math.floor(diffHours / 24);
     return `${diffDays}d ago`;
-  }, [t]);
+  }, []);
 
   const loadJobs = useCallback(async () => {
     setLoading(true);

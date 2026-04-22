@@ -92,7 +92,8 @@ export function MatchingAnalytics() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     loadStats();

@@ -149,7 +149,8 @@ export function VolunteerOrganizations() {
       setItems([]);
     }
     setLoading(false);
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -226,7 +227,8 @@ export function VolunteerOrganizations() {
       toast.error(t('volunteering.failed_load_transactions', 'Failed to load transactions'));
     }
     setTxLoading(false);
-  }, [txModal, toast, t]);
+  }, [txModal, toast]);
+
 
   const loadMoreTx = useCallback(async () => {
     if (!txOrg || !txCursor) return;
@@ -246,7 +248,8 @@ export function VolunteerOrganizations() {
       toast.error(t('volunteering.failed_load_transactions', 'Failed to load transactions'));
     }
     setTxLoading(false);
-  }, [txOrg, txCursor, toast, t]);
+  }, [txOrg, txCursor, toast]);
+
 
   // --- Status Toggle ---
   const handleStatusToggle = useCallback(async (org: VolOrg) => {
@@ -323,7 +326,8 @@ export function VolunteerOrganizations() {
       toast.error(t('volunteering.failed_load_members', 'Failed to load members'));
     }
     setMembersLoading(false);
-  }, [membersModal, toast, t]);
+  }, [membersModal, toast]);
+
 
   // --- Create Organization ---
   const openCreateModal = useCallback(() => {
@@ -488,7 +492,7 @@ export function VolunteerOrganizations() {
         <SelectItem key="pending">{t('common.pending', 'Pending')}</SelectItem>
       </Select>
     </div>
-  ), [searchQuery, statusFilter, t]);
+  ), [searchQuery, statusFilter);
 
   if (!loading && items.length === 0) {
     return (

@@ -153,7 +153,7 @@ export function DataTable<T extends Record<string, any>>({
         {topContent}
       </div>
     ),
-    [searchable, searchPlaceholder, searchValue, handleSearchChange, onRefresh, topContent, t]
+    [searchable, searchPlaceholder, searchValue, handleSearchChange, onRefresh, topContent
   );
 
   // Bottom content (pagination)

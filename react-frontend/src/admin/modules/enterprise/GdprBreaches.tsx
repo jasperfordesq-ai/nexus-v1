@@ -61,7 +61,8 @@ export function GdprBreaches() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     loadData();

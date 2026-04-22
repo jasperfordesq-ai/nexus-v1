@@ -63,7 +63,7 @@ export function DataManagement() {
       toast.error(t('federation.export_failed', 'Export failed'));
     }
     setExporting(false);
-  }, [t, toast]);
+  }, [toast]);
 
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];

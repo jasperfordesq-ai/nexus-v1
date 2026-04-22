@@ -119,7 +119,8 @@ export function MarketplaceSellerAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [page, filter, search, toast, t])
+  }, [page, filter, search, toast])
+
 
   useEffect(() => {
     loadSellers();

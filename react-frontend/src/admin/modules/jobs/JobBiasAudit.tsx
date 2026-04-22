@@ -100,7 +100,8 @@ function JobBiasAudit() {
     } finally {
       setLoading(false);
     }
-  }, [dateFrom, dateTo, jobId, toast, t]);
+  }, [dateFrom, dateTo, jobId, toast]);
+
 
   useEffect(() => {
     fetchReport();

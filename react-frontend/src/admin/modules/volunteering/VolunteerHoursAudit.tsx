@@ -166,7 +166,8 @@ export function VolunteerHoursAudit() {
       }
     }
     setLoading(false);
-  }, [statusFilter, toast, t]);
+  }, [statusFilter, toast]);
+
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -223,7 +224,8 @@ export function VolunteerHoursAudit() {
     return Array.from(map.entries())
       .map(([name, data]) => ({ name, ...data }))
       .sort((a, b) => (b.approved + b.pending) - (a.approved + a.pending));
-  }, [filteredItems, t]);
+  }, [filteredItems]);
+
 
   // ── Payment reconciliation data ─────────────────────────────────────────────
   const paidEntries = useMemo(() => {
@@ -335,7 +337,7 @@ export function VolunteerHoursAudit() {
         );
       },
     },
-  ], [t, actionInProgress, handleVerify]);
+  ], [actionInProgress, handleVerify]);
 
   const topContent = useMemo(() => (
     <div className="flex flex-col gap-3">

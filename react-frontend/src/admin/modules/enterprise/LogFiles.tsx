@@ -75,7 +75,8 @@ export function LogFiles() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     loadData();

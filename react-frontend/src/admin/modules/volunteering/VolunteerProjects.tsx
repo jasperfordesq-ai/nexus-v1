@@ -89,7 +89,8 @@ export default function VolunteerProjects() {
       setProjects([]);
     }
     setLoading(false);
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => { loadData(); }, [loadData]);
 

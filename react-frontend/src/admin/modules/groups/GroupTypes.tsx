@@ -56,7 +56,8 @@ export default function GroupTypes() {
     } finally {
       setLoading(false);
     }
-  }, [error, t])
+  }, [error])
+
 
   useEffect(() => {
     loadTypes();

@@ -57,7 +57,8 @@ export function SystemRequirements() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     loadData();

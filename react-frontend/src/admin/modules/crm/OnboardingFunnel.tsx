@@ -237,7 +237,8 @@ export default function OnboardingFunnel() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => {
     fetchData();

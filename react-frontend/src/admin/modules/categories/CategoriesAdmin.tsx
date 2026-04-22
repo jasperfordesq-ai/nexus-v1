@@ -126,7 +126,8 @@ export function CategoriesAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [typeFilter, toast, t]);
+  }, [typeFilter, toast]);
+
 
   useEffect(() => {
     loadCategories();

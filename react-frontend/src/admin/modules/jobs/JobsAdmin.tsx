@@ -133,7 +133,8 @@ export function JobsAdmin() {
       }
     } catch { toast.error("Failed to load jobs"); }
     finally { setLoading(false); }
-  }, [page, status, search, toast, t]);
+  }, [page, status, search, toast]);
+
 
   useEffect(() => { loadJobs(); }, [loadJobs]);
 
@@ -145,7 +146,7 @@ export function JobsAdmin() {
       else { setAppsError((res as { error?: string }).error ?? "Failed to load applications"); }
     } catch { setAppsError("Failed to load applications"); }
     finally { setAppsLoading(false); }
-  }, [t]);
+  }, []);
 
   const handleSelectJob = useCallback((job: Job) => { setSelectedJob(job); loadApplications(job); }, [loadApplications]);
 
@@ -158,7 +159,8 @@ export function JobsAdmin() {
         loadJobs();
       } else { toast.error((res as { error?: string }).error ?? "Failed to update application"); }
     } catch { toast.error("Unexpected error"); }
-  }, [toast, loadJobs, t]);
+  }, [toast, loadJobs]);
+
 
   const handleFeatureToggle = async (job: Job) => {
     try {

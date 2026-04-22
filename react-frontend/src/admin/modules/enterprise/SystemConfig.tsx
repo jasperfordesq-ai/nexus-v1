@@ -348,7 +348,8 @@ export function SystemConfig() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => {
     loadData();

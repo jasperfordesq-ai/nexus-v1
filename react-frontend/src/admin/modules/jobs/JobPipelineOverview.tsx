@@ -145,7 +145,8 @@ export function JobPipelineOverview() {
     } finally {
       setInterviewsLoading(false);
     }
-  }, [interviewsPage, interviewsStatus, toast, t]);
+  }, [interviewsPage, interviewsStatus, toast]);
+
 
   // ── Fetch offers ────────────────────────────────────────────────────────
   const loadOffers = useCallback(async () => {
@@ -170,7 +171,8 @@ export function JobPipelineOverview() {
     } finally {
       setOffersLoading(false);
     }
-  }, [offersPage, offersStatus, toast, t]);
+  }, [offersPage, offersStatus, toast]);
+
 
   // ── Effects ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -254,7 +256,7 @@ export function JobPipelineOverview() {
         ),
       },
     ],
-    [t]
+    []
   );
 
   // ── Offer columns ─────────────────────────────────────────────────────
@@ -332,7 +334,7 @@ export function JobPipelineOverview() {
             : '—',
       },
     ],
-    [t]
+    []
   );
 
   // ── Render ──────────────────────────────────────────────────────────────

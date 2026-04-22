@@ -51,7 +51,8 @@ export function GamificationHub() {
       toast.error("Failed to load gamification stats");
     }
     setLoading(false);
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     loadStats();

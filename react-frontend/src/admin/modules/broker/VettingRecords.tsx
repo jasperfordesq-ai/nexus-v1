@@ -262,7 +262,8 @@ export function VettingRecords() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, searchQuery, toast, t])
+  }, [page, statusFilter, searchQuery, toast])
+
 
   useEffect(() => {
     loadStats();

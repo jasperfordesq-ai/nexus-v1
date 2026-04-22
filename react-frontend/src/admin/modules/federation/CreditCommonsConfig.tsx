@@ -85,7 +85,8 @@ export function CreditCommonsConfig() {
       toast.error(t('federation.cc_config_load_failed', 'Failed to load CC configuration'));
     }
     setLoading(false);
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => {
     loadConfig();

@@ -834,7 +834,8 @@ export function LandingPageBuilder() {
       setLoading(false);
       initialLoadDone.current = true;
     }
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => {
     fetchConfig();

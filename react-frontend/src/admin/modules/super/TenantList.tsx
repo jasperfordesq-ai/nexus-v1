@@ -76,7 +76,8 @@ export function TenantList() {
       toast.error(`${"Tenants error"}: ${err instanceof Error ? err.message : "Unknown error"}`);
     }
     setLoading(false);
-  }, [filter, search, toast, t])
+  }, [filter, search, toast])
+
 
   useEffect(() => {
     loadTenants();

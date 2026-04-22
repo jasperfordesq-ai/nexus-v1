@@ -194,7 +194,8 @@ export function TenantShow() {
       toast.error(err instanceof Error ? err.message : "An error occurred");
     }
     setLoading(false);
-  }, [id, toast, t])
+  }, [id, toast])
+
 
   const handleAddAdmin = async () => {
     if (!tenant) return;

@@ -94,7 +94,8 @@ export function MatchDetail() {
       setError(res.error || "Failed to load match approval");
     }
     setLoading(false);
-  }, [id, t]);
+  }, [id]);
+
 
   useEffect(() => {
     loadItem();

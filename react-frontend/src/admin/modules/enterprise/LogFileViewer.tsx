@@ -98,7 +98,8 @@ export function LogFileViewer() {
     } finally {
       setLoading(false);
     }
-  }, [filename, lines, level, toast, t])
+  }, [filename, lines, level, toast])
+
 
   useEffect(() => {
     setLoading(true);

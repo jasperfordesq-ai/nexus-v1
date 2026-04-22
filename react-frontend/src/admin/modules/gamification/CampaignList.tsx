@@ -52,7 +52,8 @@ export function CampaignList() {
       toast.error("Failed to load campaigns");
     }
     setLoading(false);
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     loadCampaigns();

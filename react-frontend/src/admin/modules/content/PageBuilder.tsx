@@ -103,7 +103,8 @@ export function PageBuilder() {
         .catch(() => toast.error("Failed to load pages"))
         .finally(() => setLoading(false));
     }
-  }, [id, isEdit, toast, t])
+  }, [id, isEdit, toast])
+
 
   const handleChange = (field: keyof PageFormData, value: string | boolean | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));

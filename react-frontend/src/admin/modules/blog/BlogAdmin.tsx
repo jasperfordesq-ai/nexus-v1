@@ -83,7 +83,8 @@ export function BlogAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [page, status, search, toast, t])
+  }, [page, status, search, toast])
+
 
   useEffect(() => {
     loadItems();

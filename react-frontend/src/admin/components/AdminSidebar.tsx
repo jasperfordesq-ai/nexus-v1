@@ -519,7 +519,8 @@ function useAdminNav(): NavSection[] {
     }
 
     return sections;
-  }, [hasFeature, isPlatformSuperAdmin, isSuperAdmin, t])
+  }, [hasFeature, isPlatformSuperAdmin, isSuperAdmin])
+
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

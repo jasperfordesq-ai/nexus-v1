@@ -61,7 +61,8 @@ export default function VolunteerConsents() {
       setConsents([]);
     }
     setLoading(false);
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => { loadData(); }, [loadData]);
 

@@ -148,7 +148,8 @@ export function GoalsAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, toast, t])
+  }, [page, search, toast])
+
 
   useEffect(() => {
     loadGoals();

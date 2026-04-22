@@ -161,7 +161,8 @@ export function RevenueDashboard() {
       })
       .catch(() => setError("Failed to load"))
       .finally(() => setLoading(false));
-  }, [user, t]);
+  }, [user]);
+
 
   if (!user?.is_god) return null;
 

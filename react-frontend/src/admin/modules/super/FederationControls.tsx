@@ -62,7 +62,7 @@ export function FederationControls() {
       toastRef.current.error(`Federation error`);
     }
     setLoading(false);
-  }, [t])
+  }, [])
 
   useEffect(() => { loadData(); }, [loadData]);
 

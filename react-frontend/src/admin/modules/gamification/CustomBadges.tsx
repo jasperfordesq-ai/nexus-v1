@@ -48,7 +48,8 @@ export function CustomBadges() {
       toast.error("Failed to load badges");
     }
     setLoading(false);
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     loadBadges();

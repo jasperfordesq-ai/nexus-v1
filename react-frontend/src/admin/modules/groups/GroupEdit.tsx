@@ -95,7 +95,8 @@ export function GroupEdit() {
     }
 
     setLoading(false);
-  }, [id, t]);
+  }, [id]);
+
 
   useEffect(() => { loadGroup(); }, [loadGroup]);
 

@@ -98,7 +98,8 @@ export default function GroupPolicies({
     } finally {
       setLoading(false);
     }
-  }, [typeId, error, t]);
+  }, [typeId, error]);
+
 
   useEffect(() => {
     if (isOpen) {

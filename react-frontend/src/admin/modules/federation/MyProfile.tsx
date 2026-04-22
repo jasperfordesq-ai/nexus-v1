@@ -104,7 +104,8 @@ export function MyProfile() {
       setProfile(null);
     }
     setLoading(false);
-  }, [toast, populateForm, t]);
+  }, [toast, populateForm]);
+
 
   const loadTopics = useCallback(async () => {
     setTopicsLoading(true);
@@ -202,7 +203,8 @@ export function MyProfile() {
     } finally {
       setSaving(false);
     }
-  }, [profile, name, description, contactEmail, website, toast, loadData, t]);
+  }, [profile, name, description, contactEmail, website, toast, loadData]);
+
 
   const handleSaveTopics = useCallback(async () => {
     setTopicsSaving(true);
@@ -222,7 +224,8 @@ export function MyProfile() {
     } finally {
       setTopicsSaving(false);
     }
-  }, [selectedTopicIds, primaryTopicIds, toast, t]);
+  }, [selectedTopicIds, primaryTopicIds, toast]);
+
 
   // Group all topics by category
   const topicsByCategory = allTopics.reduce<Record<string, FedTopic[]>>((acc, topic) => {

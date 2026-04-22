@@ -60,7 +60,8 @@ export function PagesAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     fetchData();

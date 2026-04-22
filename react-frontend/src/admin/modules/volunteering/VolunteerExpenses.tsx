@@ -163,7 +163,8 @@ export function VolunteerExpenses() {
       setStats(null);
     }
     setLoading(false);
-  }, [toast, t]);
+  }, [toast]);
+
 
   const loadPolicies = useCallback(async () => {
     setPoliciesLoading(true);
@@ -177,7 +178,8 @@ export function VolunteerExpenses() {
       toast.error(t('volunteering.failed_to_load_policies', 'Failed to load expense policies'));
     }
     setPoliciesLoading(false);
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => { loadData(); loadPolicies(); }, [loadData, loadPolicies]);
 
@@ -215,7 +217,8 @@ export function VolunteerExpenses() {
     return Array.from(map.entries())
       .map(([name, data]) => ({ name, ...data }))
       .sort((a, b) => b.total - a.total);
-  }, [filteredExpenses, t]);
+  }, [filteredExpenses]);
+
 
   // ── Actions ────────────────────────────────────────────────────────────────
 

@@ -225,7 +225,8 @@ export function CreditAgreements() {
       toast.error("Failed to load credit agreements");
     }
     setLoading(false);
-  }, [toast, t]);
+  }, [toast]);
+
 
   const loadBalances = useCallback(async () => {
     setBalancesLoading(true);
@@ -286,7 +287,8 @@ export function CreditAgreements() {
       toast.error("Failed to create agreement");
     }
     setCreating(false);
-  }, [selectedPartner, exchangeRate, monthlyLimit, toast, createModal, loadData, t]);
+  }, [selectedPartner, exchangeRate, monthlyLimit, toast, createModal, loadData]);
+
 
   // ─── Status change ───
   const handleStatusChange = useCallback(async (agreementId: number, action: 'approve' | 'suspend' | 'terminate' | 'reactivate') => {
@@ -300,7 +302,8 @@ export function CreditAgreements() {
       logError('CreditAgreements.statusChange', err);
       toast.error(`Agreement action failed`);
     }
-  }, [toast, loadData, t]);
+  }, [toast, loadData]);
+
 
   // ─── Detail modal ───
   const openDetail = async (agreement: CreditAgreement) => {

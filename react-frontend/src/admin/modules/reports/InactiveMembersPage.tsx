@@ -201,7 +201,8 @@ export function InactiveMembersPage() {
     } finally {
       setLoading(false);
     }
-  }, [days, flagType, page, toast, t]);
+  }, [days, flagType, page, toast]);
+
 
   useEffect(() => {
     setPage(1);

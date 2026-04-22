@@ -175,7 +175,8 @@ export function OnboardingSettings() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => { fetchConfig(); }, [fetchConfig]);
 
@@ -197,7 +198,8 @@ export function OnboardingSettings() {
     } finally {
       setSaving(false);
     }
-  }, [config, toast, t]);
+  }, [config, toast]);
+
 
   // ── Apply preset handler ─────────────────────────────────────────────────
 
@@ -226,7 +228,8 @@ export function OnboardingSettings() {
     } finally {
       setApplyingPreset(false);
     }
-  }, [config, toast, fetchConfig, presetModal, t]);
+  }, [config, toast, fetchConfig, presetModal]);
+
 
   // ── Helpers ──────────────────────────────────────────────────────────────
 

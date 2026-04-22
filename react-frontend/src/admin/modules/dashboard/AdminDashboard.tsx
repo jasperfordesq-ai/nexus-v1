@@ -109,7 +109,7 @@ export function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
 
   useEffect(() => {
     loadDashboard();

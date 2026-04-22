@@ -190,7 +190,8 @@ export function MatchDebugPanel() {
     } finally {
       setMatchesLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   // ─── Reload for current user ─────────────────────────────────────────────
 

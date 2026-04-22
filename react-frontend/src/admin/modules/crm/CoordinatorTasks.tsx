@@ -163,7 +163,8 @@ export default function CoordinatorTasks() {
       setTasks([]);
     }
     setLoading(false);
-  }, [page, statusFilter, priorityFilter, searchQuery, toast, t])
+  }, [page, statusFilter, priorityFilter, searchQuery, toast])
+
 
   const loadAdmins = useCallback(async () => {
     if (adminsLoaded) return;
@@ -248,7 +249,8 @@ export default function CoordinatorTasks() {
       toast.error(editingTask ? "Failed to update task" : "Failed to create task");
     }
     setSaving(false);
-  }, [formTitle, formDescription, formPriority, formAssignedTo, formUserId, formDueDate, editingTask, createModal, resetForm, loadTasks, toast, t])
+  }, [formTitle, formDescription, formPriority, formAssignedTo, formUserId, formDueDate, editingTask, createModal, resetForm, loadTasks, toast])
+
 
   const handleDelete = useCallback(async () => {
     if (!deletingTask) return;
@@ -263,7 +265,8 @@ export default function CoordinatorTasks() {
       toast.error("Failed to delete task");
     }
     setDeleting(false);
-  }, [deletingTask, deleteModal, loadTasks, toast, t])
+  }, [deletingTask, deleteModal, loadTasks, toast])
+
 
   const handleStatusChange = useCallback(async (task: Task, newStatus: Task['status']) => {
     try {
@@ -273,7 +276,8 @@ export default function CoordinatorTasks() {
     } catch {
       toast.error("Failed to update task status");
     }
-  }, [loadTasks, toast, t])
+  }, [loadTasks, toast])
+
 
   const handleQuickComplete = useCallback(async (task: Task) => {
     const newStatus = task.status === 'completed' ? 'pending' : 'completed';

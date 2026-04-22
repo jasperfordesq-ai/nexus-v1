@@ -50,7 +50,8 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
     } finally {
       setLoading(false);
     }
-  }, [templateId, t]);
+  }, [templateId]);
+
 
   useEffect(() => {
     if (isOpen) {

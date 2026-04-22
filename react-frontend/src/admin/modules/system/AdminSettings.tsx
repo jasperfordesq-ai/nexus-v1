@@ -94,7 +94,8 @@ export function AdminSettings() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     fetchSettings();

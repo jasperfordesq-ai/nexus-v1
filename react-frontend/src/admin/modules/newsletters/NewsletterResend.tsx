@@ -50,7 +50,8 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
     };
 
     loadInfo();
-  }, [isOpen, newsletterId, toast, t])
+  }, [isOpen, newsletterId, toast])
+
 
   const handleResend = async () => {
     if (!info) return;

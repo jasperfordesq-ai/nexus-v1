@@ -148,7 +148,8 @@ export function VolunteeringOverview() {
       setOpportunities([]);
     }
     setLoading(false);
-  }, [toast, t]);
+  }, [toast]);
+
 
   const loadTrends = useCallback(async (period: string) => {
     setTrendsLoading(true);

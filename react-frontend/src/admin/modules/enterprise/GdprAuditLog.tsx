@@ -128,7 +128,8 @@ export function GdprAuditLog() {
     } finally {
       setLoading(false);
     }
-  }, [page, appliedFilters, toast, t]);
+  }, [page, appliedFilters, toast]);
+
 
   useEffect(() => {
     loadData();
@@ -220,7 +221,7 @@ export function GdprAuditLog() {
         ),
       },
     ],
-    [t, handleViewEntry]
+    [handleViewEntry]
   );
 
   // ─── Render ─────────────────────────────────────────────────────────

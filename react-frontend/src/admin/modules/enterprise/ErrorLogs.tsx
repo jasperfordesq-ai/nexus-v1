@@ -47,7 +47,8 @@ export function ErrorLogs() {
     } finally {
       setLoading(false);
     }
-  }, [page, toast, t])
+  }, [page, toast])
+
 
   useEffect(() => {
     loadData();

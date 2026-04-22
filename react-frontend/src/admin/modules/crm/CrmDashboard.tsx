@@ -75,7 +75,8 @@ export function CrmDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   const handleExport = useCallback(async (type: 'dashboard' | 'notes' | 'tasks') => {
     try {
@@ -86,7 +87,8 @@ export function CrmDashboard() {
     } catch {
       toast.error(`Export Failed`);
     }
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => {
     loadDashboard();

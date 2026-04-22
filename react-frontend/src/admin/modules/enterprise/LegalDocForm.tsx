@@ -83,7 +83,8 @@ export function LegalDocForm() {
     } finally {
       setLoading(false);
     }
-  }, [id, isEdit, toast, t])
+  }, [id, isEdit, toast])
+
 
   useEffect(() => {
     loadData();

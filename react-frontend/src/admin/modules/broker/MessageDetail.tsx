@@ -89,7 +89,8 @@ export function MessageDetail() {
     } finally {
       setLoading(false);
     }
-  }, [id, t])
+  }, [id])
+
 
   useEffect(() => {
     loadDetail();

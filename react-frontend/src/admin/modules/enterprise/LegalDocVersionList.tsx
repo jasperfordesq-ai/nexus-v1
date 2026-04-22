@@ -89,7 +89,8 @@ export default function LegalDocVersionList() {
     } finally {
       setLoading(false);
     }
-  }, [documentId, error, t])
+  }, [documentId, error])
+
 
   useEffect(() => {
     loadVersions();

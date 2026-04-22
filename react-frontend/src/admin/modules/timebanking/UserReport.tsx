@@ -227,7 +227,7 @@ export function UserReport() {
         ),
       },
     ],
-    [tenantPath, downloadingId, handleDownloadStatement, t]
+    [tenantPath, downloadingId, handleDownloadStatement
   );
 
   return (

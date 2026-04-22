@@ -106,7 +106,8 @@ export function FeatureFlags() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     loadData();

@@ -40,7 +40,8 @@ export function FeedAlgorithm() {
       })
       .catch(() => toast.error("Failed to load feed algorithm settings"))
       .finally(() => setLoading(false));
-  }, [toast, t])
+  }, [toast])
+
 
   const handleSave = async () => {
     // Validate numeric weights before sending to API

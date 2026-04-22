@@ -82,7 +82,8 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   const loadGroupConfig = useCallback(async () => {
     setLoading(true);
@@ -96,7 +97,8 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   const loadListingConfig = useCallback(async () => {
     setLoading(true);
@@ -110,7 +112,8 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   const loadVolunteeringConfig = useCallback(async () => {
     setLoading(true);
@@ -124,7 +127,8 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   const loadJobConfig = useCallback(async () => {
     setLoading(true);
@@ -138,7 +142,8 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   const loadIdentityConfig = useCallback(async () => {
     setLoading(true);
@@ -152,7 +157,8 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     if (!isOpen || !module) {

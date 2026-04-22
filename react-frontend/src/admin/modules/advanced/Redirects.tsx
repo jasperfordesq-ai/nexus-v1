@@ -61,7 +61,8 @@ export function Redirects() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     fetchRedirects();

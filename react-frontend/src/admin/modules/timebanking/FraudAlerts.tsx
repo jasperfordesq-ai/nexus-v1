@@ -81,7 +81,8 @@ export function FraudAlerts() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, toast, t])
+  }, [page, statusFilter, toast])
+
 
   useEffect(() => {
     loadAlerts();
@@ -101,7 +102,7 @@ export function FraudAlerts() {
         toast.error("Failed to update alert status");
       }
     },
-    [loadAlerts, toast, t]
+    [loadAlerts, toast
   );
 
   const handleTabChange = useCallback((key: React.Key) => {
@@ -202,7 +203,7 @@ export function FraudAlerts() {
         ),
       },
     ],
-    [tenantPath, handleStatusChange, t]
+    [tenantPath, handleStatusChange
   );
 
   return (

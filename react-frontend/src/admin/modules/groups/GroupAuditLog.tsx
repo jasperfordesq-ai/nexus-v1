@@ -135,7 +135,8 @@ export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
     } finally {
       setLoading(false);
     }
-  }, [groupId, actionFilter, toast, t]);
+  }, [groupId, actionFilter, toast]);
+
 
   useEffect(() => {
     loadAuditLog();

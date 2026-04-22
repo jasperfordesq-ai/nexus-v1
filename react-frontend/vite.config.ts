@@ -138,7 +138,6 @@ export default defineConfig(({ command }) => ({
         proxyTimeout: 120000,
         configure: (proxy) => {
           proxy.on('error', (err) => { console.error('[vite-proxy] error:', err.message); });
-          proxy.on('proxyReq', (proxyReq, req) => { console.log('[vite-proxy]', req.method, req.url); });
         },
         headers: {
           // Ensure headers are forwarded

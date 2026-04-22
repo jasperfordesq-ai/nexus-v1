@@ -170,7 +170,8 @@ export function TenantHierarchy() {
       toast.error("Failed to load hierarchy");
     }
     setLoading(false);
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     loadHierarchy();

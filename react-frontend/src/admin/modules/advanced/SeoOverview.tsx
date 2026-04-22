@@ -110,7 +110,8 @@ export function SeoOverview() {
       })
       .catch(() => toast.error("Failed to load sitemap stats"))
       .finally(() => setSitemapLoading(false));
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     loadSitemapStats();

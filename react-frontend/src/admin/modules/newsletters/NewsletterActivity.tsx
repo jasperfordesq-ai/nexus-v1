@@ -197,7 +197,8 @@ export function NewsletterActivity() {
       toast.error("Failed to load data");
     }
     setLoading(false);
-  }, [id, activeTab, page, activityFilter, toast, t])
+  }, [id, activeTab, page, activityFilter, toast])
+
 
   useEffect(() => { loadData(); }, [loadData]);
 

@@ -47,7 +47,8 @@ export function UserPermissions() {
       }
     })();
     return () => { cancelled = true; };
-  }, [id, toast, t]);
+  }, [id, toast]);
+
 
   const roleColorFor = (role?: string): 'primary' | 'secondary' | 'success' | 'warning' | 'default' => {
     switch (role) {

@@ -153,7 +153,8 @@ export function VolunteerSafeguarding() {
       setStats(null);
     }
     setLoading(false);
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => { loadData(); }, [loadData]);
 

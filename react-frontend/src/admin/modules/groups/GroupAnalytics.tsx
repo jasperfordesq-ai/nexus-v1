@@ -39,7 +39,8 @@ export function GroupAnalytics() {
       }
     };
     load();
-  }, [toast, t])
+  }, [toast])
+
 
   if (loading) {
     return (

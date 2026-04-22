@@ -135,7 +135,8 @@ export function JobModerationQueue() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t]);
+  }, [toast]);
+
 
   // Load stats
   const loadStats = useCallback(async () => {

@@ -154,7 +154,8 @@ export function UserEdit() {
     } finally {
       setLoading(false);
     }
-  }, [id, t])
+  }, [id])
+
 
   const loadConsents = useCallback(async () => {
     if (!id) return;

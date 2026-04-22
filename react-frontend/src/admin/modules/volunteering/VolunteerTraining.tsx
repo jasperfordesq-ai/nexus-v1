@@ -116,7 +116,8 @@ export function VolunteerTraining() {
       setStats(null);
     }
     setLoading(false);
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => { loadData(); }, [loadData]);
 

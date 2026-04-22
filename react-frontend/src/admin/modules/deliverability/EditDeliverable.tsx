@@ -78,7 +78,8 @@ export function EditDeliverable() {
       }
     })();
     return () => { cancelled = true; };
-  }, [id, toast, t]);
+  }, [id, toast]);
+
 
   const handleChange = (field: keyof DeliverableFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));

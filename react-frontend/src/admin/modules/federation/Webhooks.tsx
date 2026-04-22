@@ -192,7 +192,8 @@ export function Webhooks() {
       toast.error(t('federation.webhooks_load_failed', 'Failed to load webhooks'));
     }
     setLoading(false);
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => {
     loadData();

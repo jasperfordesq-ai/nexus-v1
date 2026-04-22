@@ -71,7 +71,8 @@ export default function BrokerConfiguration() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     loadConfig();

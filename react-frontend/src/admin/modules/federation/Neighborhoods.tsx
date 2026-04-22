@@ -132,7 +132,7 @@ export function Neighborhoods() {
       toast.error("Failed to load neighborhoods");
     }
     setLoading(false);
-  }, [t, toast]);
+  }, [toast]);
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -157,7 +157,7 @@ export function Neighborhoods() {
       toast.error("Failed to create neighborhood");
     }
     setCreating(false);
-  }, [t, newName, newDescription, toast, createModal, loadData]);
+  }, [newName, newDescription, toast, createModal, loadData]);
 
   // ─── Add tenant to neighborhood ───
   const handleAddTenant = useCallback(async () => {
@@ -179,7 +179,7 @@ export function Neighborhoods() {
       toast.error("Failed to add tenant");
     }
     setAddingTenant(false);
-  }, [t, addToNeighborhood, selectedTenantId, toast, addTenantModal, loadData]);
+  }, [addToNeighborhood, selectedTenantId, toast, addTenantModal, loadData]);
 
   // ─── Remove tenant from neighborhood ───
   const confirmRemoveTenant = useCallback(async () => {
@@ -198,7 +198,7 @@ export function Neighborhoods() {
       toast.error("Failed to remove tenant");
     }
     setRemoveTenantTarget(null);
-  }, [t, toast, loadData, removeTenantTarget]);
+  }, [toast, loadData, removeTenantTarget]);
 
   // ─── Delete neighborhood ───
   const confirmDelete = useCallback(async () => {
@@ -216,7 +216,7 @@ export function Neighborhoods() {
       toast.error("Failed to delete neighborhood");
     }
     setDeleteTarget(null);
-  }, [t, toast, loadData, deleteTarget]);
+  }, [toast, loadData, deleteTarget]);
 
   // ─── Stats ───
   const totalNeighborhoods = neighborhoods.length;

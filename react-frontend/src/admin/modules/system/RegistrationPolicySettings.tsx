@@ -160,7 +160,8 @@ export function RegistrationPolicySettings() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   const fetchInviteCodes = useCallback(async () => {
     setInviteCodesLoading(true);

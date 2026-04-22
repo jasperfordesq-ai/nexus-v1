@@ -99,7 +99,8 @@ export function CronJobSettingsPage() {
       toast.error("Failed to load job settings");
     }
     setLoadingJobSettings(false);
-  }, [toast, t])
+  }, [toast])
+
 
   // Load global settings
   const loadGlobalSettings = useCallback(async () => {
@@ -113,7 +114,8 @@ export function CronJobSettingsPage() {
       toast.error("Failed to load global settings");
     }
     setLoadingGlobalSettings(false);
-  }, [toast, t])
+  }, [toast])
+
 
   // Save job settings
   const handleSaveJobSettings = async () => {

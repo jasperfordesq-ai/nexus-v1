@@ -535,7 +535,8 @@ function LegalNoticePlugin() {
       },
       COMMAND_PRIORITY_NORMAL,
     );
-  }, [editor, t]);
+  }, [editor]);
+
 
   return null;
 }
@@ -652,7 +653,7 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
       summary_of_changes: null,
       has_previous_versions: false,
     }),
-    [currentHtml, t],
+    [currentHtml,
   );
 
   return (

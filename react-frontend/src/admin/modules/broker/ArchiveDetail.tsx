@@ -51,7 +51,7 @@ export function ArchiveDetail() {
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     if (!id) return;

@@ -61,7 +61,8 @@ export function BadgeConfiguration() {
       toast.error("Failed to load badge configuration");
     }
     setLoading(false);
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     loadBadges();

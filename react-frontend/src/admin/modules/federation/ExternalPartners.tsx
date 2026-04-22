@@ -220,7 +220,8 @@ export function ExternalPartners() {
       toast.error(t('federation.failed_to_load_external_partners', 'Failed to load external partners'));
     }
     setLoading(false);
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => {
     loadData();

@@ -252,7 +252,8 @@ export function InsuranceCertificates() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, debouncedSearch, toast, t])
+  }, [page, statusFilter, debouncedSearch, toast])
+
 
   useEffect(() => { loadStats(); }, [loadStats]);
   useEffect(() => { loadItems(); }, [loadItems]);

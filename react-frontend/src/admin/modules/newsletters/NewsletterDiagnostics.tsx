@@ -43,7 +43,8 @@ export function NewsletterDiagnostics() {
       toast.error("Failed to load diagnostics");
     }
     setLoading(false);
-  }, [toast, t]);
+  }, [toast]);
+
 
   const handleRepairQueue = useCallback(() => {
     navigate(tenantPath('/admin/newsletters/bounces'));

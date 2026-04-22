@@ -49,7 +49,8 @@ export function GroupApprovals() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   useEffect(() => {
     loadItems();

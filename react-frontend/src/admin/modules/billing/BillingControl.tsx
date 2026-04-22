@@ -158,7 +158,8 @@ export function BillingControl() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t]);
+  }, [toast]);
+
 
   useEffect(() => {
     void fetchSnapshot();

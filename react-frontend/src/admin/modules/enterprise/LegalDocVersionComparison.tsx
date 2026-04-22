@@ -51,7 +51,8 @@ export default function LegalDocVersionComparison({
     } finally {
       setLoading(false);
     }
-  }, [documentId, version1Id, version2Id, error, t]);
+  }, [documentId, version1Id, version2Id, error]);
+
 
   useEffect(() => {
     loadComparison();

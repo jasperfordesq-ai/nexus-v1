@@ -100,7 +100,8 @@ export function SeoAudit() {
     } finally {
       setRunning(false);
     }
-  }, [toast, t])
+  }, [toast])
+
 
   const passCount = checks.filter(c => c.status === 'pass').length;
   const warnCount = checks.filter(c => c.status === 'warning').length;

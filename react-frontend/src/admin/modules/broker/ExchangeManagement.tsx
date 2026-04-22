@@ -94,7 +94,8 @@ export function ExchangeManagement() {
     } finally {
       setLoading(false);
     }
-  }, [page, status, toast, t])
+  }, [page, status, toast])
+
 
   useEffect(() => {
     loadItems();

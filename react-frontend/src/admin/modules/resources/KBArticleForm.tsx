@@ -213,7 +213,8 @@ export function KBArticleForm() {
     } finally {
       setLoading(false);
     }
-  }, [id, t]);
+  }, [id]);
+
 
   useEffect(() => {
     if (isEdit) loadArticle();
