@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -36,39 +37,38 @@ class DonationEmailService
         float $amount,
         ?string $message
     ): void {
-        $donorName     = $donor->first_name ?? $donor->name ?? __('emails.common.fallback_name');
-        $recipientName = $recipient->first_name ?? $recipient->name ?? __('emails.common.fallback_name');
-
-        $donorFullName     = trim(($donor->first_name ?? '') . ' ' . ($donor->last_name ?? '')) ?: ($donor->name ?? __('emails.common.fallback_member_name'));
-        $recipientFullName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) ?: ($recipient->name ?? __('emails.common.fallback_member_name'));
-
         $walletUrl = EmailTemplateBuilder::tenantUrl('/wallet');
 
-        // ── Donor confirmation ──────────────────────────────────────────────
+        // ── Donor confirmation — render in donor's preferred_language ──────
         try {
             if (!empty($donor->email)) {
-                $subject = __('emails.donation.sent_subject', ['amount' => $amount]);
+                LocaleContext::withLocale($donor, function () use ($donor, $recipient, $amount, $message, $walletUrl) {
+                    $donorName         = $donor->first_name ?? $donor->name ?? __('emails.common.fallback_name');
+                    $recipientFullName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) ?: ($recipient->name ?? __('emails.common.fallback_member_name'));
 
-                $builder = EmailTemplateBuilder::make()
-                    ->theme('success')
-                    ->title(__('emails.donation.sent_title'))
-                    ->previewText(__('emails.donation.sent_preview', ['amount' => $amount, 'recipient' => $recipientFullName]))
-                    ->greeting($donorName)
-                    ->paragraph(__('emails.donation.sent_greeting'))
-                    ->paragraph(__('emails.donation.sent_body', ['amount' => $amount, 'recipient' => $recipientFullName]));
+                    $subject = __('emails.donation.sent_subject', ['amount' => $amount]);
 
-                $infoCard = [
-                    __('emails.donation.sent_message_label') => $message ?: '—',
-                ];
-                $builder->infoCard($infoCard);
+                    $builder = EmailTemplateBuilder::make()
+                        ->theme('success')
+                        ->title(__('emails.donation.sent_title'))
+                        ->previewText(__('emails.donation.sent_preview', ['amount' => $amount, 'recipient' => $recipientFullName]))
+                        ->greeting($donorName)
+                        ->paragraph(__('emails.donation.sent_greeting'))
+                        ->paragraph(__('emails.donation.sent_body', ['amount' => $amount, 'recipient' => $recipientFullName]));
 
-                $html = $builder
-                    ->button(__('emails.donation.sent_cta'), $walletUrl)
-                    ->render();
+                    $infoCard = [
+                        __('emails.donation.sent_message_label') => $message ?: '—',
+                    ];
+                    $builder->infoCard($infoCard);
 
-                /** @var EmailService $emailService */
-                $emailService = app(EmailService::class);
-                $emailService->send($donor->email, $subject, $html);
+                    $html = $builder
+                        ->button(__('emails.donation.sent_cta'), $walletUrl)
+                        ->render();
+
+                    /** @var EmailService $emailService */
+                    $emailService = app(EmailService::class);
+                    $emailService->send($donor->email, $subject, $html);
+                });
             }
         } catch (\Throwable $e) {
             Log::warning('DonationEmailService: failed to send donor confirmation', [
@@ -78,31 +78,36 @@ class DonationEmailService
             ]);
         }
 
-        // ── Recipient notification ──────────────────────────────────────────
+        // ── Recipient notification — render in recipient's preferred_language ──
         try {
             if (!empty($recipient->email)) {
-                $subject = __('emails.donation.received_subject', ['amount' => $amount, 'donor' => $donorFullName]);
+                LocaleContext::withLocale($recipient, function () use ($donor, $recipient, $amount, $message, $walletUrl) {
+                    $recipientName = $recipient->first_name ?? $recipient->name ?? __('emails.common.fallback_name');
+                    $donorFullName = trim(($donor->first_name ?? '') . ' ' . ($donor->last_name ?? '')) ?: ($donor->name ?? __('emails.common.fallback_member_name'));
 
-                $builder = EmailTemplateBuilder::make()
-                    ->theme('success')
-                    ->title(__('emails.donation.received_title'))
-                    ->previewText(__('emails.donation.received_preview', ['donor' => $donorFullName, 'amount' => $amount]))
-                    ->greeting($recipientName)
-                    ->paragraph(__('emails.donation.received_greeting'))
-                    ->paragraph(__('emails.donation.received_body', ['donor' => $donorFullName, 'amount' => $amount]));
+                    $subject = __('emails.donation.received_subject', ['amount' => $amount, 'donor' => $donorFullName]);
 
-                $infoCard = [
-                    __('emails.donation.received_message_label') => $message ?: '—',
-                ];
-                $builder->infoCard($infoCard);
+                    $builder = EmailTemplateBuilder::make()
+                        ->theme('success')
+                        ->title(__('emails.donation.received_title'))
+                        ->previewText(__('emails.donation.received_preview', ['donor' => $donorFullName, 'amount' => $amount]))
+                        ->greeting($recipientName)
+                        ->paragraph(__('emails.donation.received_greeting'))
+                        ->paragraph(__('emails.donation.received_body', ['donor' => $donorFullName, 'amount' => $amount]));
 
-                $html = $builder
-                    ->button(__('emails.donation.received_cta'), $walletUrl)
-                    ->render();
+                    $infoCard = [
+                        __('emails.donation.received_message_label') => $message ?: '—',
+                    ];
+                    $builder->infoCard($infoCard);
 
-                /** @var EmailService $emailService */
-                $emailService = app(EmailService::class);
-                $emailService->send($recipient->email, $subject, $html);
+                    $html = $builder
+                        ->button(__('emails.donation.received_cta'), $walletUrl)
+                        ->render();
+
+                    /** @var EmailService $emailService */
+                    $emailService = app(EmailService::class);
+                    $emailService->send($recipient->email, $subject, $html);
+                });
             }
         } catch (\Throwable $e) {
             Log::warning('DonationEmailService: failed to send recipient notification', [

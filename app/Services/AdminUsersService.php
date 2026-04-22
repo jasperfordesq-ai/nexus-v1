@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -57,7 +58,7 @@ class AdminUsersService
      */
     public function ban(int $userId, int $tenantId, ?string $reason = null): bool
     {
-        $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+        $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
 
         $affected = $this->user->newQuery()
             ->where('id', $userId)
@@ -67,20 +68,22 @@ class AdminUsersService
         if ($affected > 0 && $user && !empty($user->email)) {
             try {
                 TenantContext::setById($tenantId);
-                $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-                $community = TenantContext::getName();
-                $builder = EmailTemplateBuilder::make()
-                    ->theme('danger')
-                    ->title(__('emails_misc.user_ban.banned_title'))
-                    ->greeting($firstName)
-                    ->paragraph(__('emails_misc.user_ban.banned_body', ['community' => htmlspecialchars($community, ENT_QUOTES, 'UTF-8')]));
-                if (!empty($reason)) {
-                    $builder->paragraph('<strong>' . __('emails_misc.user_ban.banned_reason_label') . ':</strong> ' . htmlspecialchars($reason, ENT_QUOTES, 'UTF-8'));
-                }
-                $html = $builder->render();
-                if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.user_ban.banned_subject'), $html)) {
-                    Log::warning('[AdminUsersService] ban email failed', ['user_id' => $userId]);
-                }
+                LocaleContext::withLocale($user, function () use ($user, $reason, $userId) {
+                    $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                    $community = TenantContext::getName();
+                    $builder = EmailTemplateBuilder::make()
+                        ->theme('danger')
+                        ->title(__('emails_misc.user_ban.banned_title'))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_misc.user_ban.banned_body', ['community' => htmlspecialchars($community, ENT_QUOTES, 'UTF-8')]));
+                    if (!empty($reason)) {
+                        $builder->paragraph('<strong>' . __('emails_misc.user_ban.banned_reason_label') . ':</strong> ' . htmlspecialchars($reason, ENT_QUOTES, 'UTF-8'));
+                    }
+                    $html = $builder->render();
+                    if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.user_ban.banned_subject'), $html)) {
+                        Log::warning('[AdminUsersService] ban email failed', ['user_id' => $userId]);
+                    }
+                });
             } catch (\Throwable $e) {
                 Log::warning('[AdminUsersService] ban email error: ' . $e->getMessage());
             }
@@ -94,7 +97,7 @@ class AdminUsersService
      */
     public function unban(int $userId, int $tenantId): bool
     {
-        $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+        $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
 
         $affected = $this->user->newQuery()
             ->where('id', $userId)
@@ -105,17 +108,19 @@ class AdminUsersService
         if ($affected > 0 && $user && !empty($user->email)) {
             try {
                 TenantContext::setById($tenantId);
-                $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-                $community = TenantContext::getName();
-                $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
-                $html = EmailTemplateBuilder::make()
-                    ->title(__('emails_misc.user_ban.unbanned_title'))
-                    ->greeting($firstName)
-                    ->paragraph(__('emails_misc.user_ban.unbanned_body', ['community' => htmlspecialchars($community, ENT_QUOTES, 'UTF-8')]))
-                    ->render();
-                if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.user_ban.unbanned_subject'), $html)) {
-                    Log::warning('[AdminUsersService] unban email failed', ['user_id' => $userId]);
-                }
+                LocaleContext::withLocale($user, function () use ($user, $userId) {
+                    $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                    $community = TenantContext::getName();
+                    $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
+                    $html = EmailTemplateBuilder::make()
+                        ->title(__('emails_misc.user_ban.unbanned_title'))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_misc.user_ban.unbanned_body', ['community' => htmlspecialchars($community, ENT_QUOTES, 'UTF-8')]))
+                        ->render();
+                    if (!Mailer::forCurrentTenant()->send($user->email, __('emails_misc.user_ban.unbanned_subject'), $html)) {
+                        Log::warning('[AdminUsersService] unban email failed', ['user_id' => $userId]);
+                    }
+                });
             } catch (\Throwable $e) {
                 Log::warning('[AdminUsersService] unban email error: ' . $e->getMessage());
             }

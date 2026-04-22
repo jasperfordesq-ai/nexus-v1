@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\User;
 use App\Models\UserBadge;
 use App\Models\UserStreak;
@@ -84,7 +85,7 @@ class GamificationEmailService
                     ->where('status', 'active')
                     ->whereNotNull('email')
                     ->where('email', '!=', '')
-                    ->get(['id', 'email', 'first_name', 'last_name']);
+                    ->get(['id', 'email', 'first_name', 'last_name', 'preferred_language']);
 
                 foreach ($users as $user) {
                     try {
@@ -110,11 +111,13 @@ class GamificationEmailService
                             continue;
                         }
 
-                        $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
-                        $subject = __('emails.gamification_digest.subject');
-                        $body = $this->buildDigestEmailBody($name, $digest, $tenant->name ?? __('emails.common.fallback_tenant_name'));
+                        $success = LocaleContext::withLocale($user, function () use ($user, $digest, $tenant, $emailService) {
+                            $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+                            $subject = __('emails.gamification_digest.subject');
+                            $body = $this->buildDigestEmailBody($name, $digest, $tenant->name ?? __('emails.common.fallback_tenant_name'));
 
-                        $success = $emailService->send($user->email, $subject, $body);
+                            return $emailService->send($user->email, $subject, $body);
+                        });
 
                         if ($success) {
                             $sent++;
@@ -236,19 +239,21 @@ class GamificationEmailService
                 // Default to sending on error
             }
 
-            $user = User::find($userId, ['id', 'email', 'first_name', 'last_name']);
+            $user = User::find($userId, ['id', 'email', 'first_name', 'last_name', 'preferred_language']);
 
             if (!$user || empty($user->email)) {
                 return false;
             }
 
-            $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
-            [$subject, $body] = $this->buildMilestoneEmail($name, $type, $data);
+            return LocaleContext::withLocale($user, function () use ($user, $type, $data) {
+                $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+                [$subject, $body] = $this->buildMilestoneEmail($name, $type, $data);
 
-            /** @var EmailService $emailService */
-            $emailService = app(EmailService::class);
+                /** @var EmailService $emailService */
+                $emailService = app(EmailService::class);
 
-            return $emailService->send($user->email, $subject, $body);
+                return $emailService->send($user->email, $subject, $body);
+            });
         } catch (\Throwable $e) {
             Log::error('GamificationEmailService: Failed to send milestone email', [
                 'user_id' => $userId,

@@ -11,6 +11,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -40,33 +41,35 @@ class FederationEmailService
             $sender = self::getUserBasicInfo($senderUserId, $senderTenantId);
             $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
 
-            $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : __('emails.common.fallback_federation_member');
-            $tenantName = $senderTenant->name ?? __('emails.common.fallback_partner_community');
-            $preview = mb_substr(strip_tags($messagePreview), 0, 200);
+            LocaleContext::withLocale($recipient, function () use ($recipient, $sender, $senderTenant, $messagePreview) {
+                $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : __('emails.common.fallback_federation_member');
+                $tenantName = $senderTenant->name ?? __('emails.common.fallback_partner_community');
+                $preview = mb_substr(strip_tags($messagePreview), 0, 200);
 
-            $recipientName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
-            $safeSenderName = htmlspecialchars($senderName, ENT_QUOTES, 'UTF-8');
-            $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
-            $safePreview = htmlspecialchars($preview, ENT_QUOTES, 'UTF-8');
+                $recipientName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
+                $safeSenderName = htmlspecialchars($senderName, ENT_QUOTES, 'UTF-8');
+                $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
+                $safePreview = htmlspecialchars($preview, ENT_QUOTES, 'UTF-8');
 
-            $subject = __('emails.federation.message_subject', ['sender' => $senderName]);
+                $subject = __('emails.federation.message_subject', ['sender' => $senderName]);
 
-            $html = EmailTemplateBuilder::make()
-                ->theme('federation')
-                ->title(__('emails.federation.message_title'))
-                ->previewText(__('emails.federation.message_preview', ['sender' => $senderName, 'community' => $tenantName]))
-                ->greeting($recipientName)
-                ->paragraph(__('emails.federation.message_body', ['sender' => $safeSenderName, 'community' => $safeTenantName]))
-                ->infoCard([
-                    __('emails.federation.label_from') => $safeSenderName,
-                    __('emails.federation.label_community') => $safeTenantName,
-                ])
-                ->blockquote($safePreview)
-                ->button(__('emails.federation.read_reply'), EmailTemplateBuilder::tenantUrl('/messages'))
-                ->render();
+                $html = EmailTemplateBuilder::make()
+                    ->theme('federation')
+                    ->title(__('emails.federation.message_title'))
+                    ->previewText(__('emails.federation.message_preview', ['sender' => $senderName, 'community' => $tenantName]))
+                    ->greeting($recipientName)
+                    ->paragraph(__('emails.federation.message_body', ['sender' => $safeSenderName, 'community' => $safeTenantName]))
+                    ->infoCard([
+                        __('emails.federation.label_from') => $safeSenderName,
+                        __('emails.federation.label_community') => $safeTenantName,
+                    ])
+                    ->blockquote($safePreview)
+                    ->button(__('emails.federation.read_reply'), EmailTemplateBuilder::tenantUrl('/messages'))
+                    ->render();
 
-            $mailer = Mailer::forCurrentTenant();
-            $mailer->send($recipient->email, $subject, $html);
+                $mailer = Mailer::forCurrentTenant();
+                $mailer->send($recipient->email, $subject, $html);
+            });
 
             Log::info('[FederationEmail] Message notification sent', [
                 'recipient' => $recipientUserId,
@@ -94,32 +97,34 @@ class FederationEmailService
             $sender = self::getUserBasicInfo($senderUserId, $senderTenantId);
             $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
 
-            $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : __('emails.common.fallback_federation_member');
-            $tenantName = $senderTenant->name ?? __('emails.common.fallback_partner_community');
+            LocaleContext::withLocale($recipient, function () use ($recipient, $sender, $senderTenant, $amount, $description) {
+                $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : __('emails.common.fallback_federation_member');
+                $tenantName = $senderTenant->name ?? __('emails.common.fallback_partner_community');
 
-            $recipientName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
-            $safeSenderName = htmlspecialchars($senderName, ENT_QUOTES, 'UTF-8');
-            $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
-            $safeDescription = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
+                $recipientName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
+                $safeSenderName = htmlspecialchars($senderName, ENT_QUOTES, 'UTF-8');
+                $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
+                $safeDescription = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
 
-            $subject = __('emails.federation.transaction_received_subject', ['amount' => $amount]);
+                $subject = __('emails.federation.transaction_received_subject', ['amount' => $amount]);
 
-            $html = EmailTemplateBuilder::make()
-                ->theme('success')
-                ->title(__('emails.federation.transaction_received_title'))
-                ->previewText(__('emails.federation.transaction_received_preview', ['amount' => $amount, 'sender' => $senderName]))
-                ->greeting($recipientName)
-                ->paragraph(__('emails.federation.transaction_received_body', ['sender' => $safeSenderName, 'community' => $safeTenantName]))
-                ->infoCard([
-                    __('emails.federation.label_from') => "{$safeSenderName} ({$safeTenantName})",
-                    __('emails.federation.label_amount') => __('emails.federation.hours', ['amount' => $amount]),
-                    __('emails.federation.label_description') => $safeDescription,
-                ])
-                ->button(__('emails.federation.view_wallet'), EmailTemplateBuilder::tenantUrl('/wallet'))
-                ->render();
+                $html = EmailTemplateBuilder::make()
+                    ->theme('success')
+                    ->title(__('emails.federation.transaction_received_title'))
+                    ->previewText(__('emails.federation.transaction_received_preview', ['amount' => $amount, 'sender' => $senderName]))
+                    ->greeting($recipientName)
+                    ->paragraph(__('emails.federation.transaction_received_body', ['sender' => $safeSenderName, 'community' => $safeTenantName]))
+                    ->infoCard([
+                        __('emails.federation.label_from') => "{$safeSenderName} ({$safeTenantName})",
+                        __('emails.federation.label_amount') => __('emails.federation.hours', ['amount' => $amount]),
+                        __('emails.federation.label_description') => $safeDescription,
+                    ])
+                    ->button(__('emails.federation.view_wallet'), EmailTemplateBuilder::tenantUrl('/wallet'))
+                    ->render();
 
-            $mailer = Mailer::forCurrentTenant();
-            $mailer->send($recipient->email, $subject, $html);
+                $mailer = Mailer::forCurrentTenant();
+                $mailer->send($recipient->email, $subject, $html);
+            });
 
             return true;
         } catch (\Exception $e) {
@@ -142,33 +147,35 @@ class FederationEmailService
             $recipient = self::getUserBasicInfo($recipientUserId, $recipientTenantId);
             $recipientTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$recipientTenantId]);
 
-            $recipientName = $recipient ? trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) : __('emails.common.fallback_federation_member');
-            $tenantName = $recipientTenant->name ?? __('emails.common.fallback_partner_community');
+            LocaleContext::withLocale($sender, function () use ($sender, $recipient, $recipientTenant, $amount, $description, $newBalance) {
+                $recipientName = $recipient ? trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) : __('emails.common.fallback_federation_member');
+                $tenantName = $recipientTenant->name ?? __('emails.common.fallback_partner_community');
 
-            $senderName = trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? ''));
-            $safeRecipientName = htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8');
-            $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
-            $safeDescription = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
+                $senderName = trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? ''));
+                $safeRecipientName = htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8');
+                $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
+                $safeDescription = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
 
-            $subject = __('emails.federation.transaction_confirmed_subject', ['amount' => $amount]);
+                $subject = __('emails.federation.transaction_confirmed_subject', ['amount' => $amount]);
 
-            $html = EmailTemplateBuilder::make()
-                ->theme('success')
-                ->title(__('emails.federation.transaction_confirmed_title'))
-                ->previewText(__('emails.federation.transaction_confirmed_preview', ['amount' => $amount, 'recipient' => $recipientName]))
-                ->greeting($senderName)
-                ->paragraph(__('emails.federation.transaction_confirmed_body'))
-                ->infoCard([
-                    __('emails.federation.label_to') => "{$safeRecipientName} ({$safeTenantName})",
-                    __('emails.federation.label_amount') => __('emails.federation.hours', ['amount' => $amount]),
-                    __('emails.federation.label_description') => $safeDescription,
-                    __('emails.federation.label_new_balance') => __('emails.federation.hours', ['amount' => $newBalance]),
-                ])
-                ->button(__('emails.federation.view_wallet'), EmailTemplateBuilder::tenantUrl('/wallet'))
-                ->render();
+                $html = EmailTemplateBuilder::make()
+                    ->theme('success')
+                    ->title(__('emails.federation.transaction_confirmed_title'))
+                    ->previewText(__('emails.federation.transaction_confirmed_preview', ['amount' => $amount, 'recipient' => $recipientName]))
+                    ->greeting($senderName)
+                    ->paragraph(__('emails.federation.transaction_confirmed_body'))
+                    ->infoCard([
+                        __('emails.federation.label_to') => "{$safeRecipientName} ({$safeTenantName})",
+                        __('emails.federation.label_amount') => __('emails.federation.hours', ['amount' => $amount]),
+                        __('emails.federation.label_description') => $safeDescription,
+                        __('emails.federation.label_new_balance') => __('emails.federation.hours', ['amount' => $newBalance]),
+                    ])
+                    ->button(__('emails.federation.view_wallet'), EmailTemplateBuilder::tenantUrl('/wallet'))
+                    ->render();
 
-            $mailer = Mailer::forCurrentTenant();
-            $mailer->send($sender->email, $subject, $html);
+                $mailer = Mailer::forCurrentTenant();
+                $mailer->send($sender->email, $subject, $html);
+            });
 
             return true;
         } catch (\Exception $e) {
@@ -217,32 +224,34 @@ class FederationEmailService
                 [$tenantId, $tenantId]
             )->cnt ?? 0);
 
-            $userName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+            LocaleContext::withLocale($user, function () use ($user, $tenantName, $messageCount, $transactionCount, $connectionCount) {
+                $userName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
 
-            $subject = __('emails.federation.digest_subject', ['community' => $tenantName]);
+                $subject = __('emails.federation.digest_subject', ['community' => $tenantName]);
 
-            $builder = EmailTemplateBuilder::make()
-                ->theme('federation')
-                ->title(__('emails.federation.digest_title'))
-                ->previewText(__('emails.federation.digest_preview', ['community' => $tenantName]))
-                ->greeting($userName)
-                ->paragraph(__('emails.federation.digest_body'))
-                ->statCards([
-                    ['value' => (string) $messageCount, 'label' => __('emails.federation.label_messages'), 'icon' => "\xF0\x9F\x92\xAC"],
-                    ['value' => (string) $transactionCount, 'label' => __('emails.federation.label_transactions'), 'icon' => "\xF0\x9F\x92\xB0"],
-                    ['value' => (string) $connectionCount, 'label' => __('emails.federation.label_connections'), 'icon' => "\xF0\x9F\xA4\x9D"],
-                ]);
+                $builder = EmailTemplateBuilder::make()
+                    ->theme('federation')
+                    ->title(__('emails.federation.digest_title'))
+                    ->previewText(__('emails.federation.digest_preview', ['community' => $tenantName]))
+                    ->greeting($userName)
+                    ->paragraph(__('emails.federation.digest_body'))
+                    ->statCards([
+                        ['value' => (string) $messageCount, 'label' => __('emails.federation.label_messages'), 'icon' => "\xF0\x9F\x92\xAC"],
+                        ['value' => (string) $transactionCount, 'label' => __('emails.federation.label_transactions'), 'icon' => "\xF0\x9F\x92\xB0"],
+                        ['value' => (string) $connectionCount, 'label' => __('emails.federation.label_connections'), 'icon' => "\xF0\x9F\xA4\x9D"],
+                    ]);
 
-            if ($messageCount === 0 && $transactionCount === 0 && $connectionCount === 0) {
-                $builder->paragraph(__('emails.federation.digest_quiet'));
-            }
+                if ($messageCount === 0 && $transactionCount === 0 && $connectionCount === 0) {
+                    $builder->paragraph(__('emails.federation.digest_quiet'));
+                }
 
-            $html = $builder
-                ->button(__('emails.federation.explore_federation'), EmailTemplateBuilder::tenantUrl('/federation'))
-                ->render();
+                $html = $builder
+                    ->button(__('emails.federation.explore_federation'), EmailTemplateBuilder::tenantUrl('/federation'))
+                    ->render();
 
-            $mailer = Mailer::forCurrentTenant();
-            $mailer->send($user->email, $subject, $html);
+                $mailer = Mailer::forCurrentTenant();
+                $mailer->send($user->email, $subject, $html);
+            });
 
             return true;
         } catch (\Exception $e) {
@@ -257,17 +266,11 @@ class FederationEmailService
     public static function sendPartnershipRequestNotification(int $targetTenantId, int $requestingTenantId, string $requestingTenantName, int $requestedLevel, ?string $notes = null): bool
     {
         try {
-            $levelNames = [
-                1 => __('emails.federation.level_discovery'),
-                2 => __('emails.federation.level_social'),
-                3 => __('emails.federation.level_economic'),
-                4 => __('emails.federation.level_integrated'),
-            ];
-            $levelName = $levelNames[$requestedLevel] ?? __('emails.common.fallback_federation_level', ['level' => $requestedLevel]);
-
-            // Get admin users for target tenant
+            // Get admin users for target tenant — include preferred_language so each admin's
+            // notification renders in their own locale rather than whoever's last touched
+            // the app locale.
             $admins = DB::select(
-                "SELECT id, email, first_name, last_name FROM users
+                "SELECT id, email, first_name, last_name, preferred_language FROM users
                  WHERE tenant_id = ? AND role IN ('admin', 'super_admin') AND status = 'active' AND email IS NOT NULL
                  LIMIT 5",
                 [$targetTenantId]
@@ -283,34 +286,45 @@ class FederationEmailService
             $safeRequestingName = htmlspecialchars($requestingTenantName, ENT_QUOTES, 'UTF-8');
 
             foreach ($admins as $admin) {
-                $adminName = trim(($admin->first_name ?? '') . ' ' . ($admin->last_name ?? ''));
+                // Level names and fallbacks must render per-admin so they pick up the admin's locale.
+                LocaleContext::withLocale($admin, function () use ($admin, $requestingTenantName, $safeRequestingName, $requestedLevel, $notes) {
+                    $levelNames = [
+                        1 => __('emails.federation.level_discovery'),
+                        2 => __('emails.federation.level_social'),
+                        3 => __('emails.federation.level_economic'),
+                        4 => __('emails.federation.level_integrated'),
+                    ];
+                    $levelName = $levelNames[$requestedLevel] ?? __('emails.common.fallback_federation_level', ['level' => $requestedLevel]);
 
-                $subject = __('emails.federation.partnership_subject', ['community' => $requestingTenantName]);
+                    $adminName = trim(($admin->first_name ?? '') . ' ' . ($admin->last_name ?? ''));
 
-                $builder = EmailTemplateBuilder::make()
-                    ->theme('federation')
-                    ->title(__('emails.federation.partnership_title'))
-                    ->previewText(__('emails.federation.partnership_preview', ['community' => $requestingTenantName]))
-                    ->greeting($adminName)
-                    ->paragraph(__('emails.federation.partnership_body', ['community' => $safeRequestingName]))
-                    ->infoCard([
-                        __('emails.federation.label_from_community') => $safeRequestingName,
-                        __('emails.federation.label_requested_level') => htmlspecialchars($levelName, ENT_QUOTES, 'UTF-8'),
-                    ]);
+                    $subject = __('emails.federation.partnership_subject', ['community' => $requestingTenantName]);
 
-                if ($notes !== null && $notes !== '') {
-                    $builder->blockquote(
-                        htmlspecialchars($notes, ENT_QUOTES, 'UTF-8'),
-                        $safeRequestingName
-                    );
-                }
+                    $builder = EmailTemplateBuilder::make()
+                        ->theme('federation')
+                        ->title(__('emails.federation.partnership_title'))
+                        ->previewText(__('emails.federation.partnership_preview', ['community' => $requestingTenantName]))
+                        ->greeting($adminName)
+                        ->paragraph(__('emails.federation.partnership_body', ['community' => $safeRequestingName]))
+                        ->infoCard([
+                            __('emails.federation.label_from_community') => $safeRequestingName,
+                            __('emails.federation.label_requested_level') => htmlspecialchars($levelName, ENT_QUOTES, 'UTF-8'),
+                        ]);
 
-                $html = $builder
-                    ->button(__('emails.federation.review_request'), EmailTemplateBuilder::tenantUrl('/admin/federation'))
-                    ->render();
+                    if ($notes !== null && $notes !== '') {
+                        $builder->blockquote(
+                            htmlspecialchars($notes, ENT_QUOTES, 'UTF-8'),
+                            $safeRequestingName
+                        );
+                    }
 
-                $mailer = Mailer::forCurrentTenant();
-                $mailer->send($admin->email, $subject, $html);
+                    $html = $builder
+                        ->button(__('emails.federation.review_request'), EmailTemplateBuilder::tenantUrl('/admin/federation'))
+                        ->render();
+
+                    $mailer = Mailer::forCurrentTenant();
+                    $mailer->send($admin->email, $subject, $html);
+                });
             }
 
             Log::info('[FederationEmail] Partnership notification sent', [
@@ -340,27 +354,29 @@ class FederationEmailService
             $sender = self::getUserBasicInfo($senderUserId, $senderTenantId);
             $senderTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$senderTenantId]);
 
-            $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : __('emails.common.fallback_federation_member');
-            $tenantName = $senderTenant->name ?? __('emails.common.fallback_partner_community');
+            LocaleContext::withLocale($recipient, function () use ($recipient, $sender, $senderTenant, $senderUserId) {
+                $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : __('emails.common.fallback_federation_member');
+                $tenantName = $senderTenant->name ?? __('emails.common.fallback_partner_community');
 
-            $recipientName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
-            $safeSenderName = htmlspecialchars($senderName, ENT_QUOTES, 'UTF-8');
-            $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
+                $recipientName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
+                $safeSenderName = htmlspecialchars($senderName, ENT_QUOTES, 'UTF-8');
+                $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
 
-            $subject = __('emails.federation.connection_request_subject', ['community' => $tenantName]);
+                $subject = __('emails.federation.connection_request_subject', ['community' => $tenantName]);
 
-            $html = EmailTemplateBuilder::make()
-                ->theme('federation')
-                ->title(__('emails.federation.connection_request_heading'))
-                ->previewText(__('emails.federation.connection_request_body', ['name' => $senderName, 'community' => $tenantName]))
-                ->greeting($recipientName)
-                ->paragraph(__('emails.federation.connection_request_body', ['name' => $safeSenderName, 'community' => $safeTenantName]))
-                ->button(__('emails.federation.connection_request_cta'), EmailTemplateBuilder::tenantUrl('/profile/' . $senderUserId))
-                ->render();
+                $html = EmailTemplateBuilder::make()
+                    ->theme('federation')
+                    ->title(__('emails.federation.connection_request_heading'))
+                    ->previewText(__('emails.federation.connection_request_body', ['name' => $senderName, 'community' => $tenantName]))
+                    ->greeting($recipientName)
+                    ->paragraph(__('emails.federation.connection_request_body', ['name' => $safeSenderName, 'community' => $safeTenantName]))
+                    ->button(__('emails.federation.connection_request_cta'), EmailTemplateBuilder::tenantUrl('/profile/' . $senderUserId))
+                    ->render();
 
-            TenantContext::setById(TenantContext::getId());
-            $mailer = Mailer::forCurrentTenant();
-            $mailer->send($recipient->email, $subject, $html);
+                TenantContext::setById(TenantContext::getId());
+                $mailer = Mailer::forCurrentTenant();
+                $mailer->send($recipient->email, $subject, $html);
+            });
 
             Log::info('[FederationEmail] Connection request notification sent', [
                 'recipient' => $recipientUserId,
@@ -389,27 +405,29 @@ class FederationEmailService
             $recipient = self::getUserBasicInfo($recipientUserId, $recipientTenantId);
             $recipientTenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$recipientTenantId]);
 
-            $recipientName = $recipient ? trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) : __('emails.common.fallback_federation_member');
-            $tenantName = $recipientTenant->name ?? __('emails.common.fallback_partner_community');
+            LocaleContext::withLocale($sender, function () use ($sender, $recipient, $recipientTenant, $recipientUserId) {
+                $recipientName = $recipient ? trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) : __('emails.common.fallback_federation_member');
+                $tenantName = $recipientTenant->name ?? __('emails.common.fallback_partner_community');
 
-            $senderName = trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? ''));
-            $safeRecipientName = htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8');
-            $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
+                $senderName = trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? ''));
+                $safeRecipientName = htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8');
+                $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
 
-            $subject = __('emails.federation.connection_accepted_subject', ['name' => $recipientName]);
+                $subject = __('emails.federation.connection_accepted_subject', ['name' => $recipientName]);
 
-            $html = EmailTemplateBuilder::make()
-                ->theme('federation')
-                ->title(__('emails.federation.connection_accepted_heading'))
-                ->previewText(__('emails.federation.connection_accepted_body', ['name' => $recipientName, 'community' => $tenantName]))
-                ->greeting($senderName)
-                ->paragraph(__('emails.federation.connection_accepted_body', ['name' => $safeRecipientName, 'community' => $safeTenantName]))
-                ->button(__('emails.federation.connection_accepted_cta'), EmailTemplateBuilder::tenantUrl('/profile/' . $recipientUserId))
-                ->render();
+                $html = EmailTemplateBuilder::make()
+                    ->theme('federation')
+                    ->title(__('emails.federation.connection_accepted_heading'))
+                    ->previewText(__('emails.federation.connection_accepted_body', ['name' => $recipientName, 'community' => $tenantName]))
+                    ->greeting($senderName)
+                    ->paragraph(__('emails.federation.connection_accepted_body', ['name' => $safeRecipientName, 'community' => $safeTenantName]))
+                    ->button(__('emails.federation.connection_accepted_cta'), EmailTemplateBuilder::tenantUrl('/profile/' . $recipientUserId))
+                    ->render();
 
-            TenantContext::setById(TenantContext::getId());
-            $mailer = Mailer::forCurrentTenant();
-            $mailer->send($sender->email, $subject, $html);
+                TenantContext::setById(TenantContext::getId());
+                $mailer = Mailer::forCurrentTenant();
+                $mailer->send($sender->email, $subject, $html);
+            });
 
             Log::info('[FederationEmail] Connection accepted notification sent', [
                 'sender' => $senderUserId,
@@ -430,7 +448,7 @@ class FederationEmailService
     private static function getUserWithEmail(int $userId, int $tenantId): ?object
     {
         return DB::selectOne(
-            "SELECT id, email, first_name, last_name FROM users WHERE id = ? AND tenant_id = ? AND email IS NOT NULL",
+            "SELECT id, email, first_name, last_name, preferred_language FROM users WHERE id = ? AND tenant_id = ? AND email IS NOT NULL",
             [$userId, $tenantId]
         );
     }

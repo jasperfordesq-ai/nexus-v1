@@ -10,6 +10,7 @@ use App\Core\EmailTemplate;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -1123,52 +1124,55 @@ class IdeationChallengeService
                 ->where('tenant_id', $tenantId)
                 ->select(['name', 'email'])
                 ->first();
-            $submitterName = $submitter->name ?? __('emails.common.fallback_someone');
 
             $owner = DB::table('users')
                 ->where('id', $challenge->user_id)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name'])
+                ->select(['email', 'name', 'first_name', 'preferred_language'])
                 ->first();
             if (! $owner) {
                 return;
             }
 
-            $message = __('notifications.ideation_idea_submitted', [
-                'name' => $submitterName,
-                'title' => strlen($ideaTitle) > 50 ? substr($ideaTitle, 0, 50) . '...' : $ideaTitle,
-                'challenge' => $challenge->title ?? '',
-            ]);
-            $link = '/ideation/' . $challengeId;
+            LocaleContext::withLocale($owner, function () use ($owner, $submitter, $challenge, $challengeId, $ideaId, $ideaTitle) {
+                $submitterName = $submitter->name ?? __('emails.common.fallback_someone');
 
-            Notification::createNotification((int) $challenge->user_id, $message, $link, 'ideation_idea_submitted');
+                $message = __('notifications.ideation_idea_submitted', [
+                    'name' => $submitterName,
+                    'title' => strlen($ideaTitle) > 50 ? substr($ideaTitle, 0, 50) . '...' : $ideaTitle,
+                    'challenge' => $challenge->title ?? '',
+                ]);
+                $link = '/ideation/' . $challengeId;
 
-            if ($owner->email) {
-                try {
-                    $tenantName  = TenantContext::getSetting('site_name', 'Project NEXUS');
-                    $firstName   = $owner->first_name ?? $owner->name ?? __('emails.common.fallback_name');
-                    $challengeTitle = $challenge->title ?? '';
-                    $ideaUrl     = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/ideation/' . $challengeId . '/ideas/' . $ideaId;
+                Notification::createNotification((int) $challenge->user_id, $message, $link, 'ideation_idea_submitted');
 
-                    $html = EmailTemplateBuilder::make()
-                        ->theme('brand')
-                        ->title(__('emails_ideation.new_idea.title'))
-                        ->previewText(__('emails_ideation.new_idea.preview', ['submitter' => $submitterName, 'challenge' => $challengeTitle]))
-                        ->greeting($firstName)
-                        ->paragraph(__('emails_ideation.new_idea.body', ['submitter' => $submitterName, 'challenge' => $challengeTitle]))
-                        ->highlight($ideaTitle)
-                        ->button(__('emails_ideation.new_idea.cta'), $ideaUrl)
-                        ->render();
+                if ($owner->email) {
+                    try {
+                        $tenantName  = TenantContext::getSetting('site_name', 'Project NEXUS');
+                        $firstName   = $owner->first_name ?? $owner->name ?? __('emails.common.fallback_name');
+                        $challengeTitle = $challenge->title ?? '';
+                        $ideaUrl     = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/ideation/' . $challengeId . '/ideas/' . $ideaId;
 
-                    Mailer::forCurrentTenant()->send(
-                        $owner->email,
-                        __('emails_ideation.new_idea.subject', ['challenge' => $challengeTitle, 'community' => $tenantName]),
-                        $html
-                    );
-                } catch (\Throwable $emailEx) {
-                    Log::warning('[IdeationChallengeService] idea submitted email failed: ' . $emailEx->getMessage());
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('brand')
+                            ->title(__('emails_ideation.new_idea.title'))
+                            ->previewText(__('emails_ideation.new_idea.preview', ['submitter' => $submitterName, 'challenge' => $challengeTitle]))
+                            ->greeting($firstName)
+                            ->paragraph(__('emails_ideation.new_idea.body', ['submitter' => $submitterName, 'challenge' => $challengeTitle]))
+                            ->highlight($ideaTitle)
+                            ->button(__('emails_ideation.new_idea.cta'), $ideaUrl)
+                            ->render();
+
+                        Mailer::forCurrentTenant()->send(
+                            $owner->email,
+                            __('emails_ideation.new_idea.subject', ['challenge' => $challengeTitle, 'community' => $tenantName]),
+                            $html
+                        );
+                    } catch (\Throwable $emailEx) {
+                        Log::warning('[IdeationChallengeService] idea submitted email failed: ' . $emailEx->getMessage());
+                    }
                 }
-            }
+            });
         } catch (\Throwable $e) {
             Log::warning("IdeationChallengeService::notifyIdeaSubmitted error: " . $e->getMessage());
         }
@@ -1188,12 +1192,11 @@ class IdeationChallengeService
                 ->where('tenant_id', $tenantId)
                 ->select(['name'])
                 ->first();
-            $voterName = $voter->name ?? __('emails.common.fallback_someone');
 
             $owner = DB::table('users')
                 ->where('id', $ideaAuthorId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name'])
+                ->select(['email', 'name', 'first_name', 'preferred_language'])
                 ->first();
             if (! $owner) {
                 return;
@@ -1202,24 +1205,28 @@ class IdeationChallengeService
             $idea = DB::table('challenge_ideas')->where('id', $ideaId)->first();
             $challengeId = $idea->challenge_id ?? 0;
 
-            $message = __('notifications.ideation_idea_voted', [
-                'name' => $voterName,
-                'title' => strlen($ideaTitle) > 50 ? substr($ideaTitle, 0, 50) . '...' : $ideaTitle,
-            ]);
-            $link = '/ideation/' . $challengeId;
+            LocaleContext::withLocale($owner, function () use ($owner, $voter, $ideaAuthorId, $ideaTitle, $challengeId) {
+                $voterName = $voter->name ?? __('emails.common.fallback_someone');
 
-            Notification::createNotification($ideaAuthorId, $message, $link, 'ideation_idea_voted');
+                $message = __('notifications.ideation_idea_voted', [
+                    'name' => $voterName,
+                    'title' => strlen($ideaTitle) > 50 ? substr($ideaTitle, 0, 50) . '...' : $ideaTitle,
+                ]);
+                $link = '/ideation/' . $challengeId;
 
-            if ($owner->email) {
-                $this->sendIdeationEmail(
-                    $owner,
-                    __('notifications.ideation_email_idea_voted_title'),
-                    __('notifications.ideation_email_idea_voted_subtitle', ['name' => $voterName]),
-                    '"' . htmlspecialchars($ideaTitle) . '"',
-                    __('notifications.ideation_email_view_idea'),
-                    $link
-                );
-            }
+                Notification::createNotification($ideaAuthorId, $message, $link, 'ideation_idea_voted');
+
+                if ($owner->email) {
+                    $this->sendIdeationEmail(
+                        $owner,
+                        __('notifications.ideation_email_idea_voted_title'),
+                        __('notifications.ideation_email_idea_voted_subtitle', ['name' => $voterName]),
+                        '"' . htmlspecialchars($ideaTitle) . '"',
+                        __('notifications.ideation_email_view_idea'),
+                        $link
+                    );
+                }
+            });
         } catch (\Throwable $e) {
             Log::warning("IdeationChallengeService::notifyIdeaVoted error: " . $e->getMessage());
         }
@@ -1239,12 +1246,11 @@ class IdeationChallengeService
                 ->where('tenant_id', $tenantId)
                 ->select(['name'])
                 ->first();
-            $commenterName = $commenter->name ?? __('emails.common.fallback_someone');
 
             $owner = DB::table('users')
                 ->where('id', $ideaAuthorId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name'])
+                ->select(['email', 'name', 'first_name', 'preferred_language'])
                 ->first();
             if (! $owner) {
                 return;
@@ -1253,41 +1259,45 @@ class IdeationChallengeService
             $idea = DB::table('challenge_ideas')->where('id', $ideaId)->first();
             $challengeId = $idea->challenge_id ?? 0;
 
-            $shortComment = strlen($commentText) > 50 ? substr($commentText, 0, 50) . '...' : $commentText;
-            $message = __('notifications.ideation_idea_commented', [
-                'name' => $commenterName,
-                'comment' => $shortComment,
-            ]);
-            $link = '/ideation/' . $challengeId;
+            LocaleContext::withLocale($owner, function () use ($owner, $commenter, $idea, $ideaAuthorId, $commentText, $challengeId) {
+                $commenterName = $commenter->name ?? __('emails.common.fallback_someone');
 
-            Notification::createNotification($ideaAuthorId, $message, $link, 'ideation_idea_commented');
+                $shortComment = strlen($commentText) > 50 ? substr($commentText, 0, 50) . '...' : $commentText;
+                $message = __('notifications.ideation_idea_commented', [
+                    'name' => $commenterName,
+                    'comment' => $shortComment,
+                ]);
+                $link = '/ideation/' . $challengeId;
 
-            if ($owner->email) {
-                try {
-                    $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
-                    $firstName  = $owner->first_name ?? $owner->name ?? __('emails.common.fallback_name');
-                    $ideaTitle  = $idea->title ?? '';
-                    $commentUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+                Notification::createNotification($ideaAuthorId, $message, $link, 'ideation_idea_commented');
 
-                    $html = EmailTemplateBuilder::make()
-                        ->theme('brand')
-                        ->title(__('emails_ideation.idea_commented.title'))
-                        ->previewText(__('emails_ideation.idea_commented.preview', ['commenter' => $commenterName]))
-                        ->greeting($firstName)
-                        ->paragraph(__('emails_ideation.idea_commented.body', ['commenter' => $commenterName, 'title' => $ideaTitle]))
-                        ->highlight($shortComment)
-                        ->button(__('emails_ideation.idea_commented.cta'), $commentUrl)
-                        ->render();
+                if ($owner->email) {
+                    try {
+                        $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
+                        $firstName  = $owner->first_name ?? $owner->name ?? __('emails.common.fallback_name');
+                        $ideaTitle  = $idea->title ?? '';
+                        $commentUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
-                    Mailer::forCurrentTenant()->send(
-                        $owner->email,
-                        __('emails_ideation.idea_commented.subject', ['community' => $tenantName]),
-                        $html
-                    );
-                } catch (\Throwable $emailEx) {
-                    Log::warning('[IdeationChallengeService] idea commented email failed: ' . $emailEx->getMessage());
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('brand')
+                            ->title(__('emails_ideation.idea_commented.title'))
+                            ->previewText(__('emails_ideation.idea_commented.preview', ['commenter' => $commenterName]))
+                            ->greeting($firstName)
+                            ->paragraph(__('emails_ideation.idea_commented.body', ['commenter' => $commenterName, 'title' => $ideaTitle]))
+                            ->highlight($shortComment)
+                            ->button(__('emails_ideation.idea_commented.cta'), $commentUrl)
+                            ->render();
+
+                        Mailer::forCurrentTenant()->send(
+                            $owner->email,
+                            __('emails_ideation.idea_commented.subject', ['community' => $tenantName]),
+                            $html
+                        );
+                    } catch (\Throwable $emailEx) {
+                        Log::warning('[IdeationChallengeService] idea commented email failed: ' . $emailEx->getMessage());
+                    }
                 }
-            }
+            });
         } catch (\Throwable $e) {
             Log::warning("IdeationChallengeService::notifyIdeaCommented error: " . $e->getMessage());
         }
@@ -1301,7 +1311,7 @@ class IdeationChallengeService
             $owner = DB::table('users')
                 ->where('id', $ideaAuthorId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name'])
+                ->select(['email', 'name', 'first_name', 'preferred_language'])
                 ->first();
             if (! $owner) {
                 return;
@@ -1310,36 +1320,38 @@ class IdeationChallengeService
             $idea = DB::table('challenge_ideas')->where('id', $ideaId)->first();
             $challengeId = $idea->challenge_id ?? 0;
 
-            $statusLabel = match ($newStatus) {
-                'shortlisted' => __('notifications.ideation_status_shortlisted'),
-                'winner' => __('notifications.ideation_status_winner'),
-                'withdrawn' => __('notifications.ideation_status_withdrawn'),
-                default => $newStatus,
-            };
+            LocaleContext::withLocale($owner, function () use ($owner, $ideaAuthorId, $newStatus, $ideaTitle, $challengeId) {
+                $statusLabel = match ($newStatus) {
+                    'shortlisted' => __('notifications.ideation_status_shortlisted'),
+                    'winner' => __('notifications.ideation_status_winner'),
+                    'withdrawn' => __('notifications.ideation_status_withdrawn'),
+                    default => $newStatus,
+                };
 
-            $message = __('notifications.ideation_idea_status_changed', [
-                'title' => strlen($ideaTitle) > 50 ? substr($ideaTitle, 0, 50) . '...' : $ideaTitle,
-                'status' => $statusLabel,
-            ]);
-            $link = '/ideation/' . $challengeId;
+                $message = __('notifications.ideation_idea_status_changed', [
+                    'title' => strlen($ideaTitle) > 50 ? substr($ideaTitle, 0, 50) . '...' : $ideaTitle,
+                    'status' => $statusLabel,
+                ]);
+                $link = '/ideation/' . $challengeId;
 
-            $type = $newStatus === 'winner' ? 'ideation_idea_won' : 'ideation_idea_status';
-            Notification::createNotification($ideaAuthorId, $message, $link, $type);
+                $type = $newStatus === 'winner' ? 'ideation_idea_won' : 'ideation_idea_status';
+                Notification::createNotification($ideaAuthorId, $message, $link, $type);
 
-            if ($owner->email) {
-                $emailTitle = $newStatus === 'winner'
-                    ? __('notifications.ideation_email_idea_won_title')
-                    : __('notifications.ideation_email_idea_status_title');
+                if ($owner->email) {
+                    $emailTitle = $newStatus === 'winner'
+                        ? __('notifications.ideation_email_idea_won_title')
+                        : __('notifications.ideation_email_idea_status_title');
 
-                $this->sendIdeationEmail(
-                    $owner,
-                    $emailTitle,
-                    __('notifications.ideation_email_idea_status_subtitle', ['status' => $statusLabel]),
-                    '"' . htmlspecialchars($ideaTitle) . '"',
-                    __('notifications.ideation_email_view_idea'),
-                    $link
-                );
-            }
+                    $this->sendIdeationEmail(
+                        $owner,
+                        $emailTitle,
+                        __('notifications.ideation_email_idea_status_subtitle', ['status' => $statusLabel]),
+                        '"' . htmlspecialchars($ideaTitle) . '"',
+                        __('notifications.ideation_email_view_idea'),
+                        $link
+                    );
+                }
+            });
         } catch (\Throwable $e) {
             Log::warning("IdeationChallengeService::notifyIdeaStatusChanged error: " . $e->getMessage());
         }
