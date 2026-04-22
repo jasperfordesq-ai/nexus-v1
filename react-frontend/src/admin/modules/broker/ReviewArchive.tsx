@@ -20,10 +20,8 @@ import { adminBroker } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { BrokerArchive } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 export function ReviewArchive() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('broker.page_title'));
+  usePageTitle("Broker Controls");
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -48,7 +46,7 @@ export function ReviewArchive() {
         setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
       }
     } catch {
-      toast.error(t('broker.failed_to_load_archives'));
+      toast.error("Failed to load archives");
     } finally {
       setLoading(false);
     }
@@ -71,7 +69,7 @@ export function ReviewArchive() {
   const columns: Column<BrokerArchive>[] = [
     {
       key: 'sender_name',
-      label: t('broker.col_sender'),
+      label: "Sender",
       sortable: true,
       render: (item) => (
         <Link
@@ -84,7 +82,7 @@ export function ReviewArchive() {
     },
     {
       key: 'receiver_name',
-      label: t('broker.col_receiver'),
+      label: "Receiver",
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.receiver_name}</span>
@@ -92,7 +90,7 @@ export function ReviewArchive() {
     },
     {
       key: 'listing_title',
-      label: t('broker.col_listing'),
+      label: "Listing",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">
@@ -102,7 +100,7 @@ export function ReviewArchive() {
     },
     {
       key: 'copy_reason',
-      label: t('broker.col_copy_reason'),
+      label: "Copy Reason",
       render: (item) => (
         <Chip size="sm" variant="flat" color="default" className="capitalize">
           {item.copy_reason.replace(/_/g, ' ')}
@@ -111,7 +109,7 @@ export function ReviewArchive() {
     },
     {
       key: 'decision',
-      label: t('broker.col_decision'),
+      label: "Decision",
       render: (item) => {
         const isApproved = item.decision === 'approved';
         return (
@@ -129,7 +127,7 @@ export function ReviewArchive() {
     },
     {
       key: 'decided_by_name',
-      label: t('broker.col_decided_by'),
+      label: "Decided by",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-foreground">{item.decided_by_name}</span>
@@ -137,7 +135,7 @@ export function ReviewArchive() {
     },
     {
       key: 'decided_at',
-      label: t('broker.col_date'),
+      label: "Date",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -150,8 +148,8 @@ export function ReviewArchive() {
   return (
     <div>
       <PageHeader
-        title={t('broker.review_archive_title')}
-        description={t('broker.review_archive_desc')}
+        title={"Review Archive"}
+        description={"Browse the archive of previously reviewed and resolved messages"}
         actions={
           <Button
             as={Link}
@@ -160,7 +158,7 @@ export function ReviewArchive() {
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
-            {t('common.back')}
+            {"Back"}
           </Button>
         }
       />
@@ -172,15 +170,15 @@ export function ReviewArchive() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={t('broker.tab_all')} />
-          <Tab key="approved" title={t('broker.tab_approved')} />
-          <Tab key="flagged" title={t('broker.tab_flagged')} />
+          <Tab key="all" title={"All"} />
+          <Tab key="approved" title={"Approved"} />
+          <Tab key="flagged" title={"Flagged"} />
         </Tabs>
 
         <Input
           className="w-full sm:max-w-xs"
-          placeholder={t('broker.placeholder_search_sender_or_receiver')}
-          aria-label={t('broker.label_search_review_archive')}
+          placeholder={"Search Sender or Receiver..."}
+          aria-label={"Search Review Archive"}
           startContent={<Search size={16} className="text-default-400" />}
           value={search}
           onValueChange={handleSearchChange}
@@ -201,7 +199,7 @@ export function ReviewArchive() {
         page={page}
         pageSize={20}
         onPageChange={setPage}
-        emptyContent={t('broker.no_archive_records_found')}
+        emptyContent={"No archive records found found"}
       />
     </div>
   );

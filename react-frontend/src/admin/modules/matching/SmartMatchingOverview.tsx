@@ -59,7 +59,7 @@ const WEIGHT_META: Array<{
 
 export function SmartMatchingOverview() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('matching.page_title'));
+  usePageTitle("Matching");
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -100,14 +100,14 @@ export function SmartMatchingOverview() {
       const res = await adminMatching.clearCache();
       if (res.success) {
         const cleared = (res.data as { entries_cleared?: number })?.entries_cleared ?? 0;
-        toast.success(t('matching.cache_cleared', { count: cleared }));
+        toast.success(`Cache Cleared`);
         setClearModalOpen(false);
         loadData();
       } else {
-        toast.error(t('matching.failed_to_clear_cache'));
+        toast.error("Failed to clear cache");
       }
     } catch {
-      toast.error(t('matching.failed_to_clear_cache'));
+      toast.error("Failed to clear cache");
     } finally {
       setClearing(false);
     }
@@ -118,8 +118,8 @@ export function SmartMatchingOverview() {
   return (
     <div>
       <PageHeader
-        title={t('matching.smart_matching_overview_title')}
-        description={t('matching.smart_matching_overview_desc')}
+        title={"Smart Matching Overview"}
+        description={"Overview of smart matching activity, approvals, and match scores"}
         actions={
           <Button
             variant="flat"
@@ -128,7 +128,7 @@ export function SmartMatchingOverview() {
             isLoading={loading}
             size="sm"
           >
-            {t('matching.refresh')}
+            {"Refresh"}
           </Button>
         }
       />
@@ -136,21 +136,21 @@ export function SmartMatchingOverview() {
       {/* Stats Row */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label={t('matching.label_active_matches')}
+          label={"Active Matches"}
           value={overview?.active_users_matching ?? '---'}
           icon={Target}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label={t('matching.label_cache_size')}
+          label={"Cache Size"}
           value={overview?.cache_entries ?? '---'}
           icon={Database}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label={t('matching.label_avg_score')}
+          label={"Avg Score"}
           value={overview?.avg_match_score !== undefined
             ? `${overview.avg_match_score}%`
             : '---'}
@@ -159,8 +159,8 @@ export function SmartMatchingOverview() {
           loading={loading}
         />
         <StatCard
-          label={t('matching.label_broker_approval')}
-          value={stats?.broker_approval_enabled ? t('matching.enabled') : t('matching.disabled')}
+          label={"Broker Approval"}
+          value={stats?.broker_approval_enabled ? "Enabled" : "Disabled"}
           icon={ShieldCheck}
           color={stats?.broker_approval_enabled ? 'success' : 'warning'}
           loading={loading}
@@ -174,7 +174,7 @@ export function SmartMatchingOverview() {
           <CardHeader className="flex items-center justify-between px-4 pt-4 pb-0">
             <div className="flex items-center gap-2">
               <Zap size={18} className="text-primary" />
-              <h3 className="font-semibold">{t('matching.algorithm_weights')}</h3>
+              <h3 className="font-semibold">{"Algorithm Weights"}</h3>
             </div>
             {config && (
               <Chip
@@ -182,7 +182,7 @@ export function SmartMatchingOverview() {
                 variant="flat"
                 color={config.enabled ? 'success' : 'default'}
               >
-                {config.enabled ? t('matching.active') : t('matching.inactive')}
+                {config.enabled ? "Active" : "Inactive"}
               </Chip>
             )}
           </CardHeader>
@@ -216,7 +216,7 @@ export function SmartMatchingOverview() {
                 })}
                 <Divider className="my-2" />
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-default-500">{t('matching.total')}</span>
+                  <span className="text-default-500">{"Total"}</span>
                   <span className="font-semibold">
                     {Math.round(
                       ((config.category_weight ?? 0) +
@@ -231,7 +231,7 @@ export function SmartMatchingOverview() {
               </div>
             ) : (
               <p className="py-8 text-center text-sm text-default-400">
-                {t('matching.no_configuration_loaded')}
+                {"No configuration loaded"}
               </p>
             )}
           </CardBody>
@@ -241,7 +241,7 @@ export function SmartMatchingOverview() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Settings size={18} className="text-primary" />
-            <h3 className="font-semibold">{t('matching.quick_actions')}</h3>
+            <h3 className="font-semibold">{"Quick Actions"}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             <div className="space-y-3">
@@ -254,7 +254,7 @@ export function SmartMatchingOverview() {
                 startContent={<Settings size={16} />}
                 className="justify-start"
               >
-                {t('matching.configure_algorithm')}
+                {"Configure Algorithm"}
               </Button>
               <Button
                 as={Link}
@@ -265,7 +265,7 @@ export function SmartMatchingOverview() {
                 startContent={<BarChart3 size={16} />}
                 className="justify-start"
               >
-                {t('matching.view_analytics')}
+                {"View Analytics"}
               </Button>
               <Button
                 fullWidth
@@ -275,7 +275,7 @@ export function SmartMatchingOverview() {
                 className="justify-start"
                 onPress={() => setClearModalOpen(true)}
               >
-                {t('matching.clear_match_cache')}
+                {"Clear Match Cache"}
               </Button>
               <Divider className="my-2" />
               <Button
@@ -287,7 +287,7 @@ export function SmartMatchingOverview() {
                 startContent={<ShieldCheck size={16} />}
                 className="justify-start"
               >
-                {t('matching.broker_approvals')}
+                {"Broker Approvals"}
                 {stats?.pending_approvals ? (
                   <Chip size="sm" color="warning" variant="solid" className="ml-auto">
                     {stats.pending_approvals}
@@ -302,7 +302,7 @@ export function SmartMatchingOverview() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Users size={18} className="text-primary" />
-            <h3 className="font-semibold">{t('matching.matching_activity')}</h3>
+            <h3 className="font-semibold">{"Matching Activity"}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
@@ -315,42 +315,42 @@ export function SmartMatchingOverview() {
                   <p className="text-2xl font-bold text-foreground">
                     {overview.total_matches_today}
                   </p>
-                  <p className="text-xs text-default-500">{t('matching.matches_today')}</p>
+                  <p className="text-xs text-default-500">{"Matches Today"}</p>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-default-50">
                   <p className="text-2xl font-bold text-foreground">
                     {overview.total_matches_week}
                   </p>
-                  <p className="text-xs text-default-500">{t('matching.this_week')}</p>
+                  <p className="text-xs text-default-500">{"This Week"}</p>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-default-50">
                   <p className="text-2xl font-bold text-foreground">
                     {overview.total_matches_month}
                   </p>
-                  <p className="text-xs text-default-500">{t('matching.this_month')}</p>
+                  <p className="text-xs text-default-500">{"This Month"}</p>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-default-50">
                   <p className="text-2xl font-bold text-foreground">
                     {overview.active_users_matching}
                   </p>
-                  <p className="text-xs text-default-500">{t('matching.active_users')}</p>
+                  <p className="text-xs text-default-500">{"Active Users"}</p>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-default-50">
                   <p className="text-2xl font-bold text-foreground">
                     {overview.hot_matches_count}
                   </p>
-                  <p className="text-xs text-default-500">{t('matching.hot_matches')}</p>
+                  <p className="text-xs text-default-500">{"Hot Matches"}</p>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-default-50">
                   <p className="text-2xl font-bold text-foreground">
                     {overview.mutual_matches_count}
                   </p>
-                  <p className="text-xs text-default-500">{t('matching.mutual')}</p>
+                  <p className="text-xs text-default-500">{"Mutual"}</p>
                 </div>
               </div>
             ) : (
               <p className="py-8 text-center text-sm text-default-400">
-                {t('matching.no_matching_data')}
+                {"No matching data"}
               </p>
             )}
           </CardBody>
@@ -360,7 +360,7 @@ export function SmartMatchingOverview() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <ShieldCheck size={18} className="text-primary" />
-            <h3 className="font-semibold">{t('matching.approval_summary')}</h3>
+            <h3 className="font-semibold">{"Approval Summary"}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
@@ -374,24 +374,24 @@ export function SmartMatchingOverview() {
                     <p className="text-xl font-bold text-warning">
                       {stats.pending_approvals}
                     </p>
-                    <p className="text-xs text-default-500">{t('matching.tab_pending')}</p>
+                    <p className="text-xs text-default-500">{"Pending"}</p>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-success/10">
                     <p className="text-xl font-bold text-success">
                       {stats.approved_count}
                     </p>
-                    <p className="text-xs text-default-500">{t('matching.tab_approved')}</p>
+                    <p className="text-xs text-default-500">{"Approved"}</p>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-danger/10">
                     <p className="text-xl font-bold text-danger">
                       {stats.rejected_count}
                     </p>
-                    <p className="text-xs text-default-500">{t('matching.tab_rejected')}</p>
+                    <p className="text-xs text-default-500">{"Rejected"}</p>
                   </div>
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-default-600">{t('matching.label_approval_rate')}</span>
+                    <span className="text-sm text-default-600">{"Approval Rate"}</span>
                     <span className="text-sm font-medium">{stats.approval_rate}%</span>
                   </div>
                   <Progress
@@ -404,7 +404,7 @@ export function SmartMatchingOverview() {
               </div>
             ) : (
               <p className="py-8 text-center text-sm text-default-400">
-                {t('matching.no_approval_data')}
+                {"No approval data"}
               </p>
             )}
           </CardBody>
@@ -416,9 +416,9 @@ export function SmartMatchingOverview() {
         isOpen={clearModalOpen}
         onClose={() => setClearModalOpen(false)}
         onConfirm={handleClearCache}
-        title={t('matching.clear_match_cache')}
-        message={t('matching.clear_cache_confirm_with_count', { count: overview?.cache_entries ?? 0 })}
-        confirmLabel={t('matching.clear_cache_btn')}
+        title={"Clear Match Cache"}
+        message={`Are you sure you want to clear ${overview?.cache_entries ?? 0} cached matches?`}
+        confirmLabel={"Clear Cache"}
         confirmColor="danger"
         isLoading={clearing}
       />

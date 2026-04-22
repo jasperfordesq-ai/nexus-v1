@@ -48,7 +48,6 @@ import {
   Tooltip as ReTooltip,
   CartesianGrid,
 } from 'recharts';
-import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts/ToastContext';
 import { adminFederation } from '../../api/adminApi';
@@ -81,8 +80,7 @@ interface AnalyticsOverview {
 }
 
 export function FederationAnalytics() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('federation.federation_analytics_title'));
+  usePageTitle("Federation Analytics");
   const toast = useToast();
   const [data, setData] = useState<AnalyticsOverview | null>(null);
   const [loading, setLoading] = useState(true);
@@ -100,12 +98,12 @@ export function FederationAnalytics() {
         setData(res.data);
       } else {
         setData(null);
-        toast.error(res.error || t('federation.failed_to_load_analytics'));
+        toast.error(res.error || "Failed to load analytics");
       }
     } catch {
       if (!abortRef.current?.signal.aborted) {
         setData(null);
-        toast.error(t('federation.failed_to_load_analytics'));
+        toast.error("Failed to load analytics");
       }
     }
     setLoading(false);
@@ -123,12 +121,12 @@ export function FederationAnalytics() {
   return (
     <div>
       <PageHeader
-        title={t('federation.federation_analytics_title')}
-        description={t('federation.federation_analytics_desc')}
+        title={"Federation Analytics"}
+        description={"View analytics for cross-community activity and partnership health"}
         actions={
           <div className="flex items-center gap-2">
             <Select
-              aria-label={t('federation.analytics_range_label')}
+              aria-label={"Analytics Range"}
               size="sm"
               selectedKeys={[range]}
               onSelectionChange={(keys) => {
@@ -137,9 +135,9 @@ export function FederationAnalytics() {
               }}
               className="w-36"
             >
-              <SelectItem key="7d">{t('federation.analytics_range_7d')}</SelectItem>
-              <SelectItem key="30d">{t('federation.analytics_range_30d')}</SelectItem>
-              <SelectItem key="90d">{t('federation.analytics_range_90d')}</SelectItem>
+              <SelectItem key="7d">{"Analytics Range 7d"}</SelectItem>
+              <SelectItem key="30d">{"Analytics Range 30d"}</SelectItem>
+              <SelectItem key="90d">{"Analytics Range 90d"}</SelectItem>
             </Select>
             <Button
               variant="flat"
@@ -147,7 +145,7 @@ export function FederationAnalytics() {
               onPress={loadData}
               isLoading={loading}
             >
-              {t('federation.refresh')}
+              {"Refresh"}
             </Button>
           </div>
         }
@@ -156,58 +154,58 @@ export function FederationAnalytics() {
       {/* KPI cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label={t('federation.kpi_total_partnerships')}
+          label={"KPI Total Partnerships"}
           value={kpis?.total_partnerships ?? 0}
           icon={Handshake}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label={t('federation.kpi_active_partnerships')}
+          label={"KPI Active Partnerships"}
           value={kpis?.active_partnerships ?? 0}
           icon={Handshake}
           color="success"
           loading={loading}
         />
         <StatCard
-          label={t('federation.kpi_pending_partnerships')}
+          label={"KPI Pending Partnerships"}
           value={kpis?.pending_partnerships ?? 0}
           icon={Clock}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label={t('federation.kpi_external_partners')}
+          label={"KPI External Partners"}
           value={kpis?.external_partners ?? 0}
           icon={Globe}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label={t('federation.kpi_federated_transactions')}
+          label={"KPI Federated Transactions"}
           value={kpis?.federated_transactions ?? 0}
           icon={ArrowRightLeft}
           color="primary"
           loading={loading}
-          description={t('federation.kpi_window', { days: data?.range_days ?? 30 })}
+          description={`KPI Window`}
         />
         <StatCard
-          label={t('federation.kpi_federated_messages')}
+          label={"KPI Federated Messages"}
           value={kpis?.federated_messages ?? 0}
           icon={MessageSquare}
           color="primary"
           loading={loading}
-          description={t('federation.kpi_window', { days: data?.range_days ?? 30 })}
+          description={`KPI Window`}
         />
         <StatCard
-          label={t('federation.kpi_federated_listings')}
+          label={"KPI Federated Listings"}
           value={kpis?.federated_listings ?? 0}
           icon={Package}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label={t('federation.kpi_inbound_reviews')}
+          label={"KPI Inbound Reviews"}
           value={kpis?.inbound_reviews ?? 0}
           icon={Star}
           color="warning"
@@ -220,7 +218,7 @@ export function FederationAnalytics() {
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold">
-              {t('federation.chart_daily_calls_title')}
+              {"Chart Daily Calls"}
             </h3>
           </CardHeader>
           <CardBody>
@@ -252,7 +250,7 @@ export function FederationAnalytics() {
           <CardHeader className="flex items-center gap-2">
             <Users size={18} />
             <h3 className="text-lg font-semibold">
-              {t('federation.chart_top_partners_title')}
+              {"Chart Top Partners"}
             </h3>
           </CardHeader>
           <CardBody>
@@ -274,7 +272,7 @@ export function FederationAnalytics() {
                 </ResponsiveContainer>
               ) : (
                 <div className="flex h-full items-center justify-center text-default-400">
-                  {t('federation.no_partner_activity')}
+                  {"No partner activity found"}
                 </div>
               )}
             </div>
@@ -287,24 +285,24 @@ export function FederationAnalytics() {
         <CardHeader className="flex items-center gap-2">
           <AlertTriangle size={18} className="text-warning" />
           <h3 className="text-lg font-semibold">
-            {t('federation.recent_errors_title')}
+            {"Recent Errors"}
           </h3>
         </CardHeader>
         <CardBody>
           <Table
-            aria-label={t('federation.recent_errors_title')}
+            aria-label={"Recent Errors"}
             removeWrapper
             isCompact
           >
             <TableHeader>
-              <TableColumn>{t('federation.col_time')}</TableColumn>
-              <TableColumn>{t('federation.col_method')}</TableColumn>
-              <TableColumn>{t('federation.col_endpoint')}</TableColumn>
-              <TableColumn>{t('federation.col_status')}</TableColumn>
-              <TableColumn>{t('federation.col_ip')}</TableColumn>
+              <TableColumn>{"Time"}</TableColumn>
+              <TableColumn>{"Method"}</TableColumn>
+              <TableColumn>{"Endpoint"}</TableColumn>
+              <TableColumn>{"Status"}</TableColumn>
+              <TableColumn>{"IP"}</TableColumn>
             </TableHeader>
             <TableBody
-              emptyContent={t('federation.no_recent_errors')}
+              emptyContent={"No recent errors found"}
               items={data?.recent_errors ?? []}
             >
               {(row) => (

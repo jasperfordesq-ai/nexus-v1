@@ -471,14 +471,14 @@ function LegalDocToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
       <Divider orientation="vertical" className="h-5 mx-1" />
 
       {/* Notice Box — amber when cursor is inside a legal-notice block */}
-      <Tooltip content={t('enterprise.version_form.notice_box')} size="sm" delay={500}>
+      <Tooltip content={"Notice Box"} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
           variant={isInsideLegalNotice ? 'flat' : 'light'}
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(INSERT_LEGAL_NOTICE_COMMAND, undefined)}
-          aria-label={t('enterprise.version_form.notice_box')}
+          aria-label={"Notice Box"}
           className={`min-w-8 w-8 h-8 ${isInsideLegalNotice ? 'text-amber-500 bg-amber-500/10' : ''}`}
         >
           <Megaphone size={15} />
@@ -506,11 +506,11 @@ function LegalNoticePlugin() {
         const noticeNode = $createLegalNoticeNode();
         const heading = $createHeadingNode('h4');
         heading.append(
-          $createTextNode(t('enterprise.version_form.notice_title_placeholder')),
+          $createTextNode("Enter notice title..."),
         );
         const paragraph = $createParagraphNode();
         paragraph.append(
-          $createTextNode(t('enterprise.version_form.notice_body_placeholder')),
+          $createTextNode("Enter notice body..."),
         );
         noticeNode.append(heading, paragraph);
 
@@ -645,7 +645,7 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
       id: 0,
       document_id: 0,
       type: 'terms',
-      title: t('enterprise.version_form.preview_title_placeholder'),
+      title: "Enter preview title...",
       content: currentHtml,
       version_number: '–',
       effective_date: '',
@@ -660,13 +660,13 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
       {/* Label row with preview toggle */}
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium text-foreground">
-          {t('enterprise.version_form.label_content_html')}
+          {"Content HTML"}
           <span className="text-danger ml-0.5">*</span>
         </label>
         <Tooltip
           content={showPreview
-            ? t('enterprise.version_form.editor_only')
-            : t('enterprise.version_form.split_view')}
+            ? "Editor Only"
+            : "Split View"}
           size="sm"
           delay={300}
         >
@@ -676,8 +676,8 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
             variant="light"
             onPress={() => setShowPreview((v) => !v)}
             aria-label={showPreview
-              ? t('enterprise.version_form.editor_only')
-              : t('enterprise.version_form.split_view')}
+              ? "Editor Only"
+              : "Split View"}
             className="min-w-8 w-8 h-8"
           >
             {showPreview ? <EyeOff size={15} /> : <Eye size={15} />}
@@ -705,12 +705,12 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
                   contentEditable={
                     <ContentEditable
                       className="min-h-[400px] px-4 py-3 outline-none text-foreground"
-                      aria-label={t('enterprise.version_form.label_content_html')}
+                      aria-label={"Content HTML"}
                     />
                   }
                   placeholder={
                     <div className="pointer-events-none absolute top-3 left-4 text-default-400">
-                      {t('enterprise.version_form.placeholder_content')}
+                      {"Content..."}
                     </div>
                   }
                   ErrorBoundary={LexicalErrorBoundary}
@@ -735,7 +735,7 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
         {showPreview && (
           <div className="w-1/2 overflow-y-auto max-h-[600px] rounded-lg border border-default-200 dark:border-default-100 bg-[var(--color-surface)] px-4 pt-3 pb-6">
             <p className="text-[0.7rem] font-semibold text-default-400 uppercase tracking-wider mb-4 sticky top-0 bg-[var(--color-surface)] py-1">
-              {t('enterprise.version_form.preview_label')}
+              {"Preview"}
             </p>
             {currentHtml ? (
               <div className="pointer-events-none">
@@ -743,7 +743,7 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
               </div>
             ) : (
               <p className="text-sm text-default-400 italic">
-                {t('enterprise.version_form.placeholder_content')}
+                {"Content..."}
               </p>
             )}
           </div>
@@ -757,7 +757,7 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
 
       {/* Helper description */}
       <p className="text-xs text-default-400">
-        {t('enterprise.version_form.content_description')}
+        {"Content"}
       </p>
     </div>
   );

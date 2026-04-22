@@ -9,7 +9,6 @@ import {
   Card, CardBody, CardHeader, Button, Input, Select, SelectItem, Switch, Divider,
 } from '@heroui/react';
 import { Save, ArrowLeft, ArrowRightLeft, Crown } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
@@ -17,10 +16,9 @@ import { PageHeader } from '../../components';
 import type { SuperAdminUserDetail, SuperAdminTenant } from '../../api/types';
 
 export function SuperUserForm() {
-  const { t } = useTranslation('admin');
   const { id } = useParams();
   const isEditing = !!id;
-  usePageTitle(isEditing ? t('super_user_form.page_title_edit') : t('super_user_form.page_title_create'));
+  usePageTitle(isEditing ? "Title Edit" : "Title Create");
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -86,7 +84,7 @@ export function SuperUserForm() {
       });
     }
     if (res?.success) {
-      toast.success(isEditing ? t('super_user_form.user_updated') : t('super_user_form.user_created'));
+      toast.success(isEditing ? "User updated" : "User created");
       if (isEditing) {
         navigate(tenantPath(`/admin/super/users/${id}`));
       } else {
@@ -94,7 +92,7 @@ export function SuperUserForm() {
         navigate(tenantPath(newId ? `/admin/super/users/${newId}` : '/admin/super/users'));
       }
     } else {
-      toast.error(res?.error || t('super_user_form.failed_to_save_user'));
+      toast.error(res?.error || "Failed to save user");
     }
     setSaving(false);
   };
@@ -104,11 +102,11 @@ export function SuperUserForm() {
     setMoveLoading(true);
     const res = await adminSuper.moveUserTenant(Number(id), Number(moveTargetTenant));
     if (res?.success) {
-      toast.success(t('super_user_form.user_moved_to_new_tenant'));
+      toast.success("User Moved to New Tenant");
       setMoveTargetTenant('');
       loadUser();
     } else {
-      toast.error(res?.error || t('super_user_form.failed_to_move_user'));
+      toast.error(res?.error || "Failed to move user");
     }
     setMoveLoading(false);
   };
@@ -118,18 +116,18 @@ export function SuperUserForm() {
     setPromoteLoading(true);
     const res = await adminSuper.moveAndPromote(Number(id), Number(promoteTargetTenant));
     if (res?.success) {
-      toast.success(t('super_user_form.user_moved_and_promoted'));
+      toast.success("User Moved and Promoted");
       setPromoteTargetTenant('');
       loadUser();
     } else {
-      toast.error(res?.error || t('super_user_form.failed_to_move_and_promote'));
+      toast.error(res?.error || "Failed to move and promote");
     }
     setPromoteLoading(false);
   };
 
   const update = (field: string, value: unknown) => setForm(prev => ({ ...prev, [field]: value }));
 
-  if (loading) return <div className="p-8 text-center text-default-400">{t('super_user_form.loading')}</div>;
+  if (loading) return <div className="p-8 text-center text-default-400">{"Loading"}</div>;
 
   // Hub tenants for promote
   const hubTenants = tenants.filter(t => t.allows_subtenants === true);
@@ -141,15 +139,15 @@ export function SuperUserForm() {
         <span>/</span>
         <Link to={tenantPath('/admin/super/users')} className="hover:text-primary">Users</Link>
         <span>/</span>
-        <span className="text-foreground">{isEditing ? t('super_user_form.breadcrumb_edit') : t('super_user_form.breadcrumb_create')}</span>
+        <span className="text-foreground">{isEditing ? "Breadcrumb Edit" : "Breadcrumb Create"}</span>
       </nav>
       <PageHeader
-        title={isEditing ? t('super_user_form.title_edit') : t('super_user_form.title_create')}
-        description={isEditing ? t('super_user_form.desc_edit') : t('super_user_form.desc_create')}
+        title={isEditing ? "Edit" : "Create"}
+        description={isEditing ? "Edit." : "Create."}
         actions={
           <Button variant="light" startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath(isEditing ? `/admin/super/users/${id}` : '/admin/super/users'))}>
-            {t('super_user_form.back')}
+            {"Back"}
           </Button>
         }
       />
@@ -159,29 +157,29 @@ export function SuperUserForm() {
         <Card className="max-w-2xl">
           <CardBody>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <Select label={t('super_user_form.label_tenant')} isRequired selectedKeys={form.tenant_id ? [form.tenant_id] : []}
+              <Select label={"Tenant"} isRequired selectedKeys={form.tenant_id ? [form.tenant_id] : []}
                 onSelectionChange={(keys) => update('tenant_id', Array.from(keys)[0])}>
                 {tenants.map((t) => <SelectItem key={String(t.id)}>{t.name}</SelectItem>)}
               </Select>
               <div className="grid grid-cols-2 gap-4">
-                <Input label={t('super_user_form.label_first_name')} isRequired value={form.first_name}
+                <Input label={"First Name"} isRequired value={form.first_name}
                   onValueChange={(v) => update('first_name', v)} />
-                <Input label={t('super_user_form.label_last_name')} value={form.last_name}
+                <Input label={"Last Name"} value={form.last_name}
                   onValueChange={(v) => update('last_name', v)} />
               </div>
-              <Input label={t('super_user_form.label_email')} type="email" isRequired value={form.email}
+              <Input label={"Email"} type="email" isRequired value={form.email}
                 onValueChange={(v) => update('email', v)} />
-              <Input label={t('super_user_form.label_password')} type="password" isRequired value={form.password}
+              <Input label={"Password"} type="password" isRequired value={form.password}
                 onValueChange={(v) => update('password', v)} />
-              <Select label={t('super_user_form.label_role')} selectedKeys={[form.role]}
+              <Select label={"Role"} selectedKeys={[form.role]}
                 onSelectionChange={(keys) => update('role', Array.from(keys)[0])}>
-                <SelectItem key="member">{t('super_user_form.role_member')}</SelectItem>
-                <SelectItem key="admin">{t('super_user_form.role_admin')}</SelectItem>
-                <SelectItem key="tenant_admin">{t('super_user_form.role_tenant_admin')}</SelectItem>
+                <SelectItem key="member">{"Role Member"}</SelectItem>
+                <SelectItem key="admin">{"Role Admin"}</SelectItem>
+                <SelectItem key="tenant_admin">{"Role Tenant Admin"}</SelectItem>
               </Select>
               <div className="grid grid-cols-2 gap-4">
-                <Input label={t('super_user_form.label_location')} value={form.location} onValueChange={(v) => update('location', v)} />
-                <Input label={t('super_user_form.label_phone')} value={form.phone} onValueChange={(v) => update('phone', v)} />
+                <Input label={"Location"} value={form.location} onValueChange={(v) => update('location', v)} />
+                <Input label={"Phone"} value={form.phone} onValueChange={(v) => update('phone', v)} />
               </div>
               <Divider />
               <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg p-4">
@@ -193,14 +191,14 @@ export function SuperUserForm() {
                   }}
                 >
                   <div>
-                    <p className="font-medium">{t('super_user_form.grant_tenant_super_admin')}</p>
-                    <p className="text-xs text-default-500 mt-0.5">{t('super_user_form.grant_tenant_super_admin_desc')}</p>
+                    <p className="font-medium">{"Grant Tenant Super Admin"}</p>
+                    <p className="text-xs text-default-500 mt-0.5">{"Grant Tenant Super Admin."}</p>
                   </div>
                 </Switch>
               </div>
               <Button type="submit" color="primary" startContent={<Save size={16} />}
                 isLoading={saving}>
-                {t('super_user_form.create_user')}
+                {"Create User"}
               </Button>
             </form>
           </CardBody>
@@ -214,31 +212,31 @@ export function SuperUserForm() {
           <div className="lg:col-span-2 flex flex-col gap-6">
             {/* User Details Form */}
             <Card>
-              <CardHeader className="font-semibold text-lg">{t('super_user_form.user_details')}</CardHeader>
+              <CardHeader className="font-semibold text-lg">{"User Details"}</CardHeader>
               <Divider />
               <CardBody>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <Input label={t('super_user_form.label_first_name')} isRequired value={form.first_name}
+                    <Input label={"First Name"} isRequired value={form.first_name}
                       onValueChange={(v) => update('first_name', v)} />
-                    <Input label={t('super_user_form.label_last_name')} value={form.last_name}
+                    <Input label={"Last Name"} value={form.last_name}
                       onValueChange={(v) => update('last_name', v)} />
                   </div>
-                  <Input label={t('super_user_form.label_email')} type="email" isRequired value={form.email}
+                  <Input label={"Email"} type="email" isRequired value={form.email}
                     onValueChange={(v) => update('email', v)} />
-                  <Select label={t('super_user_form.label_role')} selectedKeys={[form.role]}
+                  <Select label={"Role"} selectedKeys={[form.role]}
                     onSelectionChange={(keys) => update('role', Array.from(keys)[0])}>
-                    <SelectItem key="member">{t('super_user_form.role_member')}</SelectItem>
-                    <SelectItem key="admin">{t('super_user_form.role_admin')}</SelectItem>
-                    <SelectItem key="tenant_admin">{t('super_user_form.role_tenant_admin')}</SelectItem>
+                    <SelectItem key="member">{"Role Member"}</SelectItem>
+                    <SelectItem key="admin">{"Role Admin"}</SelectItem>
+                    <SelectItem key="tenant_admin">{"Role Tenant Admin"}</SelectItem>
                   </Select>
                   <div className="grid grid-cols-2 gap-4">
-                    <Input label={t('super_user_form.label_location')} value={form.location} onValueChange={(v) => update('location', v)} />
-                    <Input label={t('super_user_form.label_phone')} value={form.phone} onValueChange={(v) => update('phone', v)} />
+                    <Input label={"Location"} value={form.location} onValueChange={(v) => update('location', v)} />
+                    <Input label={"Phone"} value={form.phone} onValueChange={(v) => update('phone', v)} />
                   </div>
                   <Button type="submit" color="primary" startContent={<Save size={16} />}
                     isLoading={saving}>
-                    {t('super_user_form.update_user')}
+                    {"Update User"}
                   </Button>
                 </form>
               </CardBody>
@@ -248,22 +246,22 @@ export function SuperUserForm() {
             <Card>
               <CardHeader className="font-semibold text-lg flex items-center gap-2">
                 <ArrowRightLeft size={18} />
-                {t('super_user_form.move_to_tenant')}
+                {"Move to Tenant"}
               </CardHeader>
               <Divider />
               <CardBody className="flex flex-col gap-4">
                 <div className="bg-primary-50 border border-primary-200 text-primary-700 rounded-medium p-3">
-                  <p className="text-sm font-medium mb-2">{t('super_user_form.how_it_works')}</p>
+                  <p className="text-sm font-medium mb-2">{"How IT Works"}</p>
                   <ol className="text-xs opacity-90 space-y-1 list-decimal list-inside">
-                    <li>{t('super_user_form.move_step_1')}</li>
-                    <li>{t('super_user_form.move_step_2')}</li>
-                    <li>{t('super_user_form.move_step_3')}</li>
-                    <li>{t('super_user_form.move_step_4')}</li>
+                    <li>{"Move Step 1"}</li>
+                    <li>{"Move Step 2"}</li>
+                    <li>{"Move Step 3"}</li>
+                    <li>{"Move Step 4"}</li>
                   </ol>
                 </div>
                 <Select
-                  label={t('super_user_form.label_target_tenant')}
-                  placeholder={t('super_user_form.select_tenant_placeholder')}
+                  label={"Target Tenant"}
+                  placeholder={"Enter select tenant..."}
                   selectedKeys={moveTargetTenant ? [moveTargetTenant] : []}
                   onSelectionChange={(keys) => setMoveTargetTenant(String(Array.from(keys)[0] || ''))}
                 >
@@ -279,7 +277,7 @@ export function SuperUserForm() {
                   isLoading={moveLoading}
                   isDisabled={!moveTargetTenant}
                 >
-                  {t('super_user_form.move_user')}
+                  {"Move User"}
                 </Button>
               </CardBody>
             </Card>
@@ -288,25 +286,25 @@ export function SuperUserForm() {
             <Card>
               <CardHeader className="font-semibold text-lg flex items-center gap-2">
                 <Crown size={18} className="text-secondary" />
-                {t('super_user_form.move_and_promote_to_regional_sa')}
+                {"Move and Promote to Regional Sa"}
               </CardHeader>
               <Divider />
               <CardBody className="flex flex-col gap-4">
                 <div className="bg-purple-50 dark:bg-purple-50/10 border border-purple-200 dark:border-purple-200/20 rounded-lg p-3">
-                  <p className="text-sm text-purple-700 dark:text-purple-400 font-medium mb-2">{t('super_user_form.four_step_workflow')}</p>
+                  <p className="text-sm text-purple-700 dark:text-purple-400 font-medium mb-2">{"Four Step Workflow"}</p>
                   <ol className="text-xs text-purple-600 dark:text-purple-300 space-y-1 list-decimal list-inside">
-                    <li>{t('super_user_form.promote_step_1')}</li>
-                    <li>{t('super_user_form.promote_step_2')}</li>
-                    <li>{t('super_user_form.promote_step_3')}</li>
-                    <li>{t('super_user_form.promote_step_4')}</li>
+                    <li>{"Promote Step 1"}</li>
+                    <li>{"Promote Step 2"}</li>
+                    <li>{"Promote Step 3"}</li>
+                    <li>{"Promote Step 4"}</li>
                   </ol>
                   <p className="text-xs text-purple-600 dark:text-purple-300 mt-2 font-medium">
-                    {t('super_user_form.hub_tenants_note')}
+                    {"Hub Tenants"}
                   </p>
                 </div>
                 <Select
-                  label={t('super_user_form.label_target_hub_tenant')}
-                  placeholder={t('super_user_form.select_hub_tenant_placeholder')}
+                  label={"Target Hub Tenant"}
+                  placeholder={"Enter select hub tenant..."}
                   selectedKeys={promoteTargetTenant ? [promoteTargetTenant] : []}
                   onSelectionChange={(keys) => setPromoteTargetTenant(String(Array.from(keys)[0] || ''))}
                 >
@@ -315,7 +313,7 @@ export function SuperUserForm() {
                     .map(t => <SelectItem key={String(t.id)}>{t.name}</SelectItem>)}
                 </Select>
                 {hubTenants.filter(t => t.id !== user.tenant_id).length === 0 && (
-                  <p className="text-xs text-default-400">{t('super_user_form.no_hub_tenants')}</p>
+                  <p className="text-xs text-default-400">{"No hub tenants found"}</p>
                 )}
                 <Button
                   color="secondary"
@@ -325,7 +323,7 @@ export function SuperUserForm() {
                   isLoading={promoteLoading}
                   isDisabled={!promoteTargetTenant}
                 >
-                  {t('super_user_form.move_and_promote')}
+                  {"Move and Promote"}
                 </Button>
               </CardBody>
             </Card>
@@ -335,22 +333,22 @@ export function SuperUserForm() {
           <div className="flex flex-col gap-6">
             {/* Status Card */}
             <Card>
-              <CardHeader className="font-semibold text-lg">{t('super_user_form.status')}</CardHeader>
+              <CardHeader className="font-semibold text-lg">{"Status"}</CardHeader>
               <Divider />
               <CardBody>
                 <div className="flex flex-col gap-3">
                   <div>
-                    <p className="text-xs text-default-400">{t('super_user_form.account_status')}</p>
+                    <p className="text-xs text-default-400">{"Account Status"}</p>
                     <p className="text-sm font-medium capitalize">{user.status}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-default-400">{t('super_user_form.label_tenant')}</p>
+                    <p className="text-xs text-default-400">{"Tenant"}</p>
                     <Link to={tenantPath(`/admin/super/tenants/${user.tenant_id}`)} className="text-sm text-primary hover:underline">
                       {user.tenant_name || `Tenant ${user.tenant_id}`}
                     </Link>
                   </div>
                   <div>
-                    <p className="text-xs text-default-400">{t('super_user_form.member_since')}</p>
+                    <p className="text-xs text-default-400">{"Member Since"}</p>
                     <p className="text-sm">{new Date(user.created_at).toLocaleDateString()}</p>
                   </div>
                 </div>
@@ -359,33 +357,33 @@ export function SuperUserForm() {
 
             {/* Super Admin Privileges */}
             <Card className="bg-gradient-to-br from-purple-500/5 to-pink-500/5 border border-purple-500/20">
-              <CardHeader className="font-semibold text-lg">{t('super_user_form.super_admin_privileges')}</CardHeader>
+              <CardHeader className="font-semibold text-lg">{"Super Admin Privileges"}</CardHeader>
               <Divider />
               <CardBody className="flex flex-col gap-3">
                 <div>
-                  <p className="text-xs text-default-400 mb-1">{t('super_user_form.tenant_super_admin')}</p>
+                  <p className="text-xs text-default-400 mb-1">{"Tenant Super Admin"}</p>
                   <p className="text-sm">
                     {user.is_tenant_super_admin ? (
-                      <span className="text-success">{t('super_user_form.granted')}</span>
+                      <span className="text-success">{"Granted"}</span>
                     ) : (
-                      <span className="text-default-500">{t('super_user_form.not_granted')}</span>
+                      <span className="text-default-500">{"Not Granted"}</span>
                     )}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-default-400 mb-1">{t('super_user_form.global_super_admin')}</p>
+                  <p className="text-xs text-default-400 mb-1">{"Global Super Admin"}</p>
                   <p className="text-sm">
                     {user.is_super_admin ? (
-                      <span className="text-danger">{t('super_user_form.granted_god_level')}</span>
+                      <span className="text-danger">{"Granted God Level"}</span>
                     ) : (
-                      <span className="text-default-500">{t('super_user_form.not_granted')}</span>
+                      <span className="text-default-500">{"Not Granted"}</span>
                     )}
                   </p>
                 </div>
                 <p className="text-xs text-default-400 mt-2">
-                  {t('super_user_form.manage_sa_from')}{' '}
+                  {"Manage Sa From"}{' '}
                   <Link to={tenantPath(`/admin/super/users/${id}`)} className="text-primary hover:underline">
-                    {t('super_user_form.user_detail_page')}
+                    {"User Detail Page"}
                   </Link>
                 </p>
               </CardBody>
@@ -393,7 +391,7 @@ export function SuperUserForm() {
 
             {/* Quick Links */}
             <Card>
-              <CardHeader className="font-semibold text-lg">{t('super_user_form.quick_links')}</CardHeader>
+              <CardHeader className="font-semibold text-lg">{"Quick Links"}</CardHeader>
               <Divider />
               <CardBody className="flex flex-col gap-2">
                 <Button
@@ -401,14 +399,14 @@ export function SuperUserForm() {
                   fullWidth
                   onPress={() => navigate(tenantPath(`/admin/super/users/${id}`))}
                 >
-                  {t('super_user_form.view_full_details')}
+                  {"View Full Details"}
                 </Button>
                 <Button
                   variant="light"
                   fullWidth
                   onPress={() => navigate(tenantPath('/admin/super/users'))}
                 >
-                  {t('super_user_form.back_to_users')}
+                  {"Back to Users"}
                 </Button>
               </CardBody>
             </Card>

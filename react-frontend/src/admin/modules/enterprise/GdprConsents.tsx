@@ -18,10 +18,8 @@ import { PageHeader, DataTable } from '../../components';
 import type { Column } from '../../components';
 import type { GdprConsent } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 export function GdprConsents() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('enterprise.page_title'));
+  usePageTitle("Enterprise");
   const toast = useToast();
 
   const [consents, setConsents] = useState<GdprConsent[]>([]);
@@ -36,7 +34,7 @@ export function GdprConsents() {
         setConsents(Array.isArray(data) ? data : []);
       }
     } catch {
-      toast.error(t('enterprise.failed_to_load_consent_records'));
+      toast.error("Failed to load consent records");
     } finally {
       setLoading(false);
     }
@@ -47,11 +45,11 @@ export function GdprConsents() {
   }, [loadData]);
 
   const columns: Column<GdprConsent>[] = [
-    { key: 'id', label: t('enterprise.col_id'), sortable: true },
-    { key: 'user_name', label: t('enterprise.col_user'), sortable: true },
+    { key: 'id', label: "ID", sortable: true },
+    { key: 'user_name', label: "User", sortable: true },
     {
       key: 'consent_type',
-      label: t('enterprise.col_type'),
+      label: "Type",
       sortable: true,
       render: (c) => (
         <Chip size="sm" variant="flat" color="primary" className="capitalize">
@@ -61,23 +59,23 @@ export function GdprConsents() {
     },
     {
       key: 'consented',
-      label: t('enterprise.col_consented'),
+      label: "Consented",
       render: (c) =>
         c.consented ? (
           <div className="flex items-center gap-1 text-success">
             <CheckCircle size={14} />
-            <span className="text-sm">{t('enterprise.yes')}</span>
+            <span className="text-sm">{"Yes"}</span>
           </div>
         ) : (
           <div className="flex items-center gap-1 text-danger">
             <XCircle size={14} />
-            <span className="text-sm">{t('enterprise.no')}</span>
+            <span className="text-sm">{"No"}</span>
           </div>
         ),
     },
     {
       key: 'created_at',
-      label: t('enterprise.col_date'),
+      label: "Date",
       sortable: true,
       render: (c) => new Date(c.consented_at || c.created_at).toLocaleDateString(),
     },
@@ -86,8 +84,8 @@ export function GdprConsents() {
   return (
     <div>
       <PageHeader
-        title={t('enterprise.gdpr_consents_title')}
-        description={t('enterprise.gdpr_consents_desc')}
+        title={"GDPR Consents"}
+        description={"View member consent records for all legal documents"}
         actions={
           <Button
             variant="flat"
@@ -96,7 +94,7 @@ export function GdprConsents() {
             isLoading={loading}
             size="sm"
           >
-            {t('common.refresh')}
+            {"Refresh"}
           </Button>
         }
       />
@@ -106,7 +104,7 @@ export function GdprConsents() {
         data={consents}
         isLoading={loading}
         searchable={false}
-        emptyContent={t('enterprise.no_consent_records')}
+        emptyContent={"No consent records"}
       />
     </div>
   );

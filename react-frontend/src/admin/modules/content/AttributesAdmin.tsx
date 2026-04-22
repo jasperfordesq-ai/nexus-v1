@@ -54,7 +54,7 @@ const ATTRIBUTE_TYPES = [
 
 export function AttributesAdmin() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('content.page_title'));
+  usePageTitle("Content");
   const toast = useToast();
 
   // Data state
@@ -137,7 +137,7 @@ export function AttributesAdmin() {
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      toast.error(t('content.attribute_name_is_required'));
+      toast.error("Attribute name is required");
       return;
     }
 
@@ -152,13 +152,13 @@ export function AttributesAdmin() {
       });
 
       if (res.success) {
-        toast.success(t('content.item_updated'));
+        toast.success("Item Updated");
         closeModal();
         loadData();
       } else {
         const errorMsg = (res as { error?: string }).error
           || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
-          || t('content.an_unexpected_error_occurred');
+          || "An unexpected error occurred";
         toast.error(errorMsg);
       }
     } else {
@@ -169,13 +169,13 @@ export function AttributesAdmin() {
       });
 
       if (res.success) {
-        toast.success(t('content.item_added'));
+        toast.success("Item Added");
         closeModal();
         loadData();
       } else {
         const errorMsg = (res as { error?: string }).error
           || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
-          || t('content.an_unexpected_error_occurred');
+          || "An unexpected error occurred";
         toast.error(errorMsg);
       }
     }
@@ -191,11 +191,11 @@ export function AttributesAdmin() {
 
     const res = await adminAttributes.delete(deleteTarget.id);
     if (res.success) {
-      toast.success(t('content.item_deleted'));
+      toast.success("Item Deleted");
       setDeleteTarget(null);
       loadData();
     } else {
-      toast.error(t('content.failed_to_delete_attribute'));
+      toast.error("Failed to delete attribute");
     }
 
     setDeleting(false);
@@ -218,16 +218,16 @@ export function AttributesAdmin() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label={t('content.label_attribute_actions')}>
+          <Button isIconOnly size="sm" variant="light" aria-label={"Attribute Actions"}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
-        <DropdownMenu aria-label={t('content.label_attribute_actions')} onAction={handleMenuAction}>
+        <DropdownMenu aria-label={"Attribute Actions"} onAction={handleMenuAction}>
           <DropdownItem key="edit" startContent={<Edit size={14} />}>
-            {t('breadcrumbs.edit')}
+            {"Edit"}
           </DropdownItem>
           <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
-            {t('common.delete')}
+            {"Delete"}
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
@@ -239,14 +239,14 @@ export function AttributesAdmin() {
   const columns: Column<AdminAttribute>[] = [
     {
       key: 'name',
-      label: t('content.label_name'),
+      label: "Name",
       sortable: true,
       render: (item) => <span className="font-medium text-foreground">{item.name}</span>,
     },
-    { key: 'slug', label: t('content.label_slug'), render: (item) => <span className="text-sm text-default-500 font-mono">{item.slug}</span> },
+    { key: 'slug', label: "Slug", render: (item) => <span className="text-sm text-default-500 font-mono">{item.slug}</span> },
     {
       key: 'type',
-      label: t('content.label_type'),
+      label: "Type",
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat" color="primary">
@@ -256,7 +256,7 @@ export function AttributesAdmin() {
     },
     {
       key: 'category_name',
-      label: t('breadcrumbs.categories'),
+      label: "Categories",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">{item.category_name || '--'}</span>
@@ -264,16 +264,16 @@ export function AttributesAdmin() {
     },
     {
       key: 'is_active',
-      label: t('listings.status'),
+      label: "Status",
       render: (item) => (
         <Chip size="sm" variant="flat" color={item.is_active ? 'success' : 'default'}>
-          {item.is_active ? t('content.label_active') : t('reports.label_inactive', 'Inactive')}
+          {item.is_active ? "Active" : t('reports.label_inactive', 'Inactive')}
         </Chip>
       ),
     },
     {
       key: 'actions',
-      label: t('listings.actions'),
+      label: "Actions",
       render: (item) => <AttributeActionsMenu item={item} />,
     },
   ];
@@ -283,12 +283,12 @@ export function AttributesAdmin() {
   return (
     <div>
       <PageHeader
-        title={t('content.attributes_admin_title')}
-        description={t('content.attributes_admin_desc')}
+        title={"Attributes Admin"}
+        description={"Create custom profile attributes to collect extra information from members"}
         actions={
           <div className="flex gap-2">
-            <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('common.refresh')}</Button>
-            <Button color="primary" startContent={<Plus size={16} />} onPress={openCreateModal}>{t('breadcrumbs.create')} {t('breadcrumbs.attributes')}</Button>
+            <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{"Refresh"}</Button>
+            <Button color="primary" startContent={<Plus size={16} />} onPress={openCreateModal}>{"Create"} {"Attributes"}</Button>
           </div>
         }
       />
@@ -296,9 +296,9 @@ export function AttributesAdmin() {
       {items.length === 0 && !loading ? (
         <EmptyState
           icon={Tags}
-          title={t('no_data')}
-          description={t('content.desc_create_custom_attributes_to_add_extra_fi')}
-          actionLabel={`${t('breadcrumbs.create')} ${t('breadcrumbs.attributes')}`}
+          title={"No data available"}
+          description={"Create custom attributes to add extra fields to your content"}
+          actionLabel={`${"Create"} ${"Attributes"}`}
           onAction={openCreateModal}
         />
       ) : (
@@ -308,7 +308,7 @@ export function AttributesAdmin() {
           isLoading={loading}
           searchPlaceholder={t('data_table.search', 'Search attributes...')}
           onRefresh={loadData}
-          emptyContent={t('no_data')}
+          emptyContent={"No data available"}
         />
       )}
 
@@ -317,12 +317,12 @@ export function AttributesAdmin() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Tags size={20} />
-            {editingItem ? `${t('breadcrumbs.edit')} ${t('breadcrumbs.attributes')}` : `${t('breadcrumbs.create')} ${t('breadcrumbs.attributes')}`}
+            {editingItem ? `${"Edit"} ${"Attributes"}` : `${"Create"} ${"Attributes"}`}
           </ModalHeader>
           <ModalBody className="gap-4">
             <Input
-              label={t('content.label_name')}
-              placeholder={t('content.placeholder_eg_skill_level')}
+              label={"Name"}
+              placeholder={"e.g. Skill Level..."}
               value={formData.name}
               onValueChange={(v) => setFormData((prev) => ({ ...prev, name: v }))}
               isRequired
@@ -331,7 +331,7 @@ export function AttributesAdmin() {
             />
 
             <Select
-              label={t('content.label_input_type')}
+              label={"Input Type"}
               selectedKeys={new Set([formData.type])}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
@@ -345,7 +345,7 @@ export function AttributesAdmin() {
             </Select>
 
             <Select
-              label={`${t('breadcrumbs.categories')} (${t('content.placeholder_optional')})`}
+              label={`${"Categories"} (${"Optional..."})`}
               selectedKeys={formData.category_id ? new Set([formData.category_id]) : new Set()}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string | undefined;
@@ -361,23 +361,23 @@ export function AttributesAdmin() {
             {editingItem && (
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">{t('content.label_active')}</p>
+                  <p className="font-medium">{"Active"}</p>
                   <p className="text-sm text-default-500">{t('content.label_active_desc', 'Whether this attribute is available for use')}</p>
                 </div>
                 <Switch
                   isSelected={formData.is_active}
                   onValueChange={(v) => setFormData((prev) => ({ ...prev, is_active: v }))}
-                  aria-label={t('content.label_active')}
+                  aria-label={"Active"}
                 />
               </div>
             )}
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={closeModal} isDisabled={saving}>
-              {t('cancel')}
+              {"Cancel"}
             </Button>
             <Button color="primary" onPress={handleSave} isLoading={saving} isDisabled={saving}>
-              {editingItem ? t('federation.save_changes') : `${t('breadcrumbs.create')} ${t('breadcrumbs.attributes')}`}
+              {editingItem ? "Save Changes" : `${"Create"} ${"Attributes"}`}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -389,9 +389,9 @@ export function AttributesAdmin() {
           isOpen={!!deleteTarget}
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
-          title={`${t('common.delete')} ${t('breadcrumbs.attributes')}`}
-          message={t('gamification.confirm_delete_campaign', { name: deleteTarget.name })}
-          confirmLabel={t('common.delete')}
+          title={`${"Delete"} ${"Attributes"}`}
+          message={`Delete Campaign`}
+          confirmLabel={"Delete"}
           confirmColor="danger"
           isLoading={deleting}
         />

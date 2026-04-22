@@ -9,7 +9,6 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
 import { Button, Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
 import { ArrowLeft, Bell, LogOut, Menu, User } from 'lucide-react';
@@ -21,7 +20,6 @@ interface AdminHeaderProps {
 }
 
 export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderProps) {
-  const { t } = useTranslation('admin');
   const { user, logout } = useAuth();
   const { tenantPath, tenant } = useTenant();
   const navigate = useNavigate();
@@ -42,7 +40,7 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
             size="sm"
             onPress={onSidebarToggle}
             className="text-default-500 md:hidden"
-            aria-label={t('header.toggle_sidebar')}
+            aria-label={"Toggle sidebar"}
           >
             <Menu size={20} />
           </Button>
@@ -54,7 +52,7 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
           startContent={<ArrowLeft size={16} />}
           className="text-default-500"
         >
-          <span className="hidden sm:inline">{t('header.back_to_site')}</span>
+          <span className="hidden sm:inline">{"Back to site"}</span>
         </Button>
         {tenant?.name && (
           <span className="text-sm font-medium text-default-400">
@@ -70,7 +68,7 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
           variant="light"
           size="sm"
           onPress={() => navigate(tenantPath('/notifications'))}
-          aria-label={t('header.notifications')}
+          aria-label={"Notifications"}
         >
           <Bell size={18} />
         </Button>
@@ -90,7 +88,7 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
             </Button>
           </DropdownTrigger>
           <DropdownMenu
-            aria-label={t('header.admin_menu')}
+            aria-label={"Admin menu"}
             onAction={(key) => {
               if (key === 'profile') navigate(tenantPath('/profile'));
               if (key === 'logout') logout();
@@ -100,7 +98,7 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
               key="profile"
               startContent={<User size={16} />}
             >
-              {t('header.my_profile')}
+              {"My Profile"}
             </DropdownItem>
             <DropdownItem
               key="logout"
@@ -108,7 +106,7 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
               className="text-danger"
               color="danger"
             >
-              {t('header.sign_out')}
+              {"Sign Out"}
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>

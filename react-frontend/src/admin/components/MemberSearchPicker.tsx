@@ -6,7 +6,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Avatar, Button, Input, Spinner } from '@heroui/react';
 import { Search } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { adminUsers } from '../api/adminApi';
 import type { AdminUser } from '../api/types';
 
@@ -69,7 +68,6 @@ export function MemberSearchPicker({
   size = 'md',
   className,
 }: MemberSearchPickerProps) {
-  const { t } = useTranslation('admin');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<MemberSearchMember[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -210,7 +208,7 @@ export function MemberSearchPicker({
             </div>
           </div>
           <Button size={size} variant="flat" onPress={handleClear}>
-            {t('clear')}
+            {"Clear"}
           </Button>
         </div>
       </div>

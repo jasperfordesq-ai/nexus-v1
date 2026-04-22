@@ -13,7 +13,6 @@ import { useEffect, useState } from 'react';
 import { Card, CardBody, CardHeader, Input, Textarea, Select, SelectItem, Button, Spinner } from '@heroui/react';
 import { Target, ArrowLeft, Save } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminDeliverability } from '../../api/adminApi';
@@ -29,8 +28,7 @@ interface DeliverableFormData {
 }
 
 export function EditDeliverable() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('deliverability.edit_title'));
+  usePageTitle("Edit");
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();
@@ -71,10 +69,10 @@ export function EditDeliverable() {
             assigned_to: d.assigned_to !== undefined && d.assigned_to !== null ? String(d.assigned_to) : '',
           });
         } else if (!cancelled) {
-          toast.error(t('deliverability.failed_to_load_deliverables'));
+          toast.error("Failed to load deliverables");
         }
       } catch {
-        if (!cancelled) toast.error(t('deliverability.failed_to_load_deliverables'));
+        if (!cancelled) toast.error("Failed to load deliverables");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -89,7 +87,7 @@ export function EditDeliverable() {
   const handleSave = async () => {
     if (!id) return;
     if (!formData.title.trim()) {
-      toast.warning(t('deliverability.title_required'));
+      toast.warning("Title is required");
       return;
     }
     setSaving(true);
@@ -103,13 +101,13 @@ export function EditDeliverable() {
         assigned_to: formData.assigned_to || undefined,
       });
       if (res?.success) {
-        toast.success(t('deliverability.updated_success'));
+        toast.success("Updated succeeded");
         navigate(tenantPath('/admin/deliverability/list'));
       } else {
-        toast.error(t('deliverability.update_failed'));
+        toast.error("Update failed");
       }
     } catch {
-      toast.error(t('common.an_unexpected_error'));
+      toast.error("An unexpected error occurred");
     } finally {
       setSaving(false);
     }
@@ -118,7 +116,7 @@ export function EditDeliverable() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('deliverability.edit_title')} description={t('deliverability.edit_description')} />
+        <PageHeader title={"Edit"} description={"Edit."} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -127,32 +125,32 @@ export function EditDeliverable() {
   return (
     <div>
       <PageHeader
-        title={t('deliverability.edit_title')}
-        description={t('deliverability.edit_description')}
-        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>{t('common.back')}</Button>}
+        title={"Edit"}
+        description={"Edit."}
+        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>{"Back"}</Button>}
       />
 
       <Card shadow="sm">
-        <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Target size={20} /> {t('deliverability.details_heading')}</h3></CardHeader>
+        <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Target size={20} /> {"Details"}</h3></CardHeader>
         <CardBody className="gap-4">
           <Input
-            label={t('deliverability.title_label')}
-            placeholder={t('deliverability.title_placeholder')}
+            label={"Title"}
+            placeholder={"Deliverable title..."}
             isRequired
             variant="bordered"
             value={formData.title}
             onValueChange={(v) => handleChange('title', v)}
           />
           <Textarea
-            label={t('deliverability.label_description')}
-            placeholder={t('deliverability.placeholder_describe_the_deliverable')}
+            label={"Description"}
+            placeholder={"Describe the Deliverable..."}
             variant="bordered"
             minRows={3}
             value={formData.description}
             onValueChange={(v) => handleChange('description', v)}
           />
           <Select
-            label={t('deliverability.priority_label')}
+            label={"Priority"}
             variant="bordered"
             selectedKeys={[formData.priority]}
             onSelectionChange={(keys) => {
@@ -160,13 +158,13 @@ export function EditDeliverable() {
               if (selected) handleChange('priority', selected);
             }}
           >
-            <SelectItem key="low">{t('common.low')}</SelectItem>
-            <SelectItem key="medium">{t('common.medium')}</SelectItem>
-            <SelectItem key="high">{t('common.high')}</SelectItem>
-            <SelectItem key="critical">{t('common.critical')}</SelectItem>
+            <SelectItem key="low">{"Low"}</SelectItem>
+            <SelectItem key="medium">{"Medium"}</SelectItem>
+            <SelectItem key="high">{"High"}</SelectItem>
+            <SelectItem key="critical">{"Critical"}</SelectItem>
           </Select>
           <Select
-            label={t('deliverability.status_label')}
+            label={"Status"}
             variant="bordered"
             selectedKeys={[formData.status]}
             onSelectionChange={(keys) => {
@@ -174,27 +172,27 @@ export function EditDeliverable() {
               if (selected) handleChange('status', selected);
             }}
           >
-            <SelectItem key="planned">{t('common.planned')}</SelectItem>
-            <SelectItem key="in_progress">{t('common.in_progress')}</SelectItem>
-            <SelectItem key="review">{t('common.in_review')}</SelectItem>
-            <SelectItem key="completed">{t('completed')}</SelectItem>
+            <SelectItem key="planned">{"Planned"}</SelectItem>
+            <SelectItem key="in_progress">{"In Progress"}</SelectItem>
+            <SelectItem key="review">{"In Review"}</SelectItem>
+            <SelectItem key="completed">{"Completed"}</SelectItem>
           </Select>
           <Input
-            label={t('deliverability.due_date_label')}
+            label={"Due Date"}
             type="date"
             variant="bordered"
             value={formData.due_date}
             onValueChange={(v) => handleChange('due_date', v)}
           />
           <Input
-            label={t('deliverability.assigned_to_label')}
-            placeholder={t('deliverability.assigned_to_placeholder')}
+            label={"Assigned to"}
+            placeholder={"Assigned to..."}
             variant="bordered"
             value={formData.assigned_to}
             onValueChange={(v) => handleChange('assigned_to', v)}
           />
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>{t('common.cancel')}</Button>
+            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>{"Cancel"}</Button>
             <Button
               color="primary"
               startContent={<Save size={16} />}
@@ -202,7 +200,7 @@ export function EditDeliverable() {
               isLoading={saving}
               isDisabled={saving}
             >
-              {t('deliverability.save_deliverable')}
+              {"Save Deliverable"}
             </Button>
           </div>
         </CardBody>

@@ -107,7 +107,7 @@ const partnershipStatusConfig: Record<string, { color: 'success' | 'warning' | '
 
 export function PartnerDirectory() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('federation.page_title'));
+  usePageTitle("Federation");
   const toast = useToast();
 
   const [communities, setCommunities] = useState<Community[]>([]);
@@ -170,16 +170,16 @@ export function PartnerDirectory() {
     try {
       const res = await adminFederation.requestPartnership(requestTarget.id, requestNotes || undefined);
       if (res.success) {
-        toast.success(t('federation.partnership_request_sent', { name: requestTarget.name }));
+        toast.success(`Partnership request sent`);
         setRequestTarget(null);
         setRequestNotes('');
         loadData({ search, region: regionFilter, category: categoryFilter, topic: topicFilter, exclude_partnered: hidePartnered });
       } else {
         const errorData = res.data as { error?: string } | undefined;
-        toast.error(errorData?.error || t('federation.failed_to_send_partnership_request'));
+        toast.error(errorData?.error || "Failed to send partnership request");
       }
     } catch {
-      toast.error(t('federation.failed_to_send_partnership_request'));
+      toast.error("Failed to send partnership request");
     } finally {
       setRequestLoading(false);
     }
@@ -187,12 +187,12 @@ export function PartnerDirectory() {
 
   const enabledFeatures = (community: Community): string[] => {
     const features: string[] = [];
-    if (community.profiles_enabled) features.push(t('federation.feature_profiles'));
-    if (community.listings_enabled) features.push(t('federation.feature_listings'));
-    if (community.messaging_enabled) features.push(t('federation.feature_messages'));
-    if (community.transactions_enabled) features.push(t('federation.feature_transactions'));
-    if (community.events_enabled) features.push(t('federation.feature_events'));
-    if (community.groups_enabled) features.push(t('federation.feature_groups'));
+    if (community.profiles_enabled) features.push("Feature Profiles");
+    if (community.listings_enabled) features.push("Feature Listings");
+    if (community.messaging_enabled) features.push("Feature Messages");
+    if (community.transactions_enabled) features.push("Feature Transactions");
+    if (community.events_enabled) features.push("Feature Events");
+    if (community.groups_enabled) features.push("Feature Groups");
     return features;
   };
 
@@ -217,8 +217,8 @@ export function PartnerDirectory() {
   return (
     <div>
       <PageHeader
-        title={t('federation.partner_directory_title')}
-        description={t('federation.partner_directory_desc')}
+        title={"Partner Directory"}
+        description={"Browse the directory of communities available to partner with"}
         actions={
           <Button
             variant="flat"
@@ -226,7 +226,7 @@ export function PartnerDirectory() {
             onPress={() => loadData({ search, region: regionFilter, category: categoryFilter, topic: topicFilter, exclude_partnered: hidePartnered })}
             isLoading={loading}
           >
-            {t('federation.refresh')}
+            {"Refresh"}
           </Button>
         }
       />
@@ -237,8 +237,8 @@ export function PartnerDirectory() {
           <div className="flex flex-col md:flex-row gap-3">
             <Input
               className="flex-1"
-              placeholder={t('federation.search_communities_placeholder')}
-              aria-label={t('federation.label_search_partner_communities')}
+              placeholder={"Search communities..."}
+              aria-label={"Search Partner Communities"}
               startContent={<Search size={16} className="text-default-400" />}
               value={search}
               onValueChange={setSearch}
@@ -248,7 +248,7 @@ export function PartnerDirectory() {
             {regions.length > 0 && (
               <Select
                 className="w-full md:w-48"
-                placeholder={t('federation.placeholder_all_regions')}
+                placeholder={"All Regions..."}
                 size="sm"
                 variant="bordered"
                 selectedKeys={regionFilter ? [regionFilter] : []}
@@ -265,7 +265,7 @@ export function PartnerDirectory() {
             {categories.length > 0 && (
               <Select
                 className="w-full md:w-48"
-                placeholder={t('federation.placeholder_all_categories')}
+                placeholder={"All Categories..."}
                 size="sm"
                 variant="bordered"
                 selectedKeys={categoryFilter ? [categoryFilter] : []}
@@ -309,16 +309,16 @@ export function PartnerDirectory() {
                 startContent={<Filter size={14} />}
                 onPress={() => setHidePartnered(!hidePartnered)}
               >
-                {t('federation.hide_partnered')}
+                {"Hide Partnered"}
               </Button>
               {activeFilters > 0 && (
                 <Button variant="light" size="sm" onPress={clearFilters}>
-                  {t('federation.clear_filters', { count: activeFilters })}
+                  {`Clear Filters`}
                 </Button>
               )}
             </div>
             <span className="text-sm text-default-400">
-              {loading ? t('federation.loading') : t('federation.communities_found', { count: communities.length })}
+              {loading ? "Loading federation..." : `Communities Found`}
             </span>
           </div>
         </CardBody>
@@ -353,10 +353,10 @@ export function PartnerDirectory() {
       {!loading && communities.length === 0 && (
         <EmptyState
           icon={Globe}
-          title={t('federation.no_communities_found')}
+          title={"No communities found"}
           description={activeFilters > 0
-            ? t('federation.no_communities_match_filters')
-            : t('federation.directory_empty')
+            ? "No communities match filters"
+            : "No directory found"
           }
         />
       )}
@@ -416,7 +416,7 @@ export function PartnerDirectory() {
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-default-400">
                     {community.member_count != null && (
                       <span className="flex items-center gap-1">
-                        <Users size={12} /> {t('federation.members_count', { count: Number(community.member_count) })}
+                        <Users size={12} /> {`Members`}
                       </span>
                     )}
                     {community.region && (
@@ -426,7 +426,7 @@ export function PartnerDirectory() {
                     )}
                     {community.contact_email && (
                       <span className="flex items-center gap-1">
-                        <Mail size={12} /> {community.contact_name || t('federation.contact')}
+                        <Mail size={12} /> {community.contact_name || "Contact"}
                       </span>
                     )}
                   </div>
@@ -446,7 +446,7 @@ export function PartnerDirectory() {
                       ))}
                       {communityTopics.length > 5 && (
                         <Chip size="sm" variant="flat" color="default">
-                          {t('federation.more_count', { count: communityTopics.length - 5 })}
+                          {`More`}
                         </Chip>
                       )}
                     </div>
@@ -474,7 +474,7 @@ export function PartnerDirectory() {
                       size="sm"
                       startContent={<ExternalLink size={14} />}
                     >
-                      {t('federation.visit')}
+                      {"Visit"}
                     </Button>
                   )}
 
@@ -486,7 +486,7 @@ export function PartnerDirectory() {
                       startContent={<Handshake size={14} />}
                       onPress={() => setRequestTarget(community)}
                     >
-                      {t('federation.request_partnership')}
+                      {"Request Partnership"}
                     </Button>
                   )}
                   {status === 'active' && (
@@ -497,7 +497,7 @@ export function PartnerDirectory() {
                       isDisabled
                       startContent={<CheckCircle size={14} />}
                     >
-                      {t('federation.active_partner')}
+                      {"Active Partner"}
                     </Button>
                   )}
                   {status === 'pending' && (
@@ -508,7 +508,7 @@ export function PartnerDirectory() {
                       isDisabled
                       startContent={<Clock size={14} />}
                     >
-                      {t('federation.request_pending')}
+                      {"Request Pending"}
                     </Button>
                   )}
                 </CardFooter>
@@ -523,7 +523,7 @@ export function PartnerDirectory() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Handshake size={20} />
-            {t('federation.request_partnership')}
+            {"Request Partnership"}
           </ModalHeader>
           <ModalBody>
             {requestTarget && (
@@ -544,11 +544,11 @@ export function PartnerDirectory() {
                   </div>
                 </div>
                 <p className="text-sm text-default-500">
-                  {t('federation.partnership_request_description')}
+                  {"Partnership Request"}
                 </p>
                 <Textarea
-                  label={t('federation.message_optional')}
-                  placeholder={t('federation.partnership_message_placeholder')}
+                  label={"Message Optional"}
+                  placeholder={"Optional message to the partner community..."}
                   value={requestNotes}
                   onValueChange={setRequestNotes}
                   variant="bordered"
@@ -560,7 +560,7 @@ export function PartnerDirectory() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => { setRequestTarget(null); setRequestNotes(''); }}>
-              {t('federation.cancel')}
+              {"Cancel"}
             </Button>
             <Button
               color="primary"
@@ -568,7 +568,7 @@ export function PartnerDirectory() {
               onPress={handleRequestPartnership}
               isLoading={requestLoading}
             >
-              {t('federation.send_request')}
+              {"Send Request"}
             </Button>
           </ModalFooter>
         </ModalContent>

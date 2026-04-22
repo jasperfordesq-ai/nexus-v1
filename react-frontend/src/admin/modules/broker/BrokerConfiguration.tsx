@@ -19,10 +19,8 @@ import type { BrokerConfig } from '../../api/types';
 import { PageHeader } from '../../components/PageHeader';
 import { useTenant, useToast } from '@/contexts';
 
-import { useTranslation } from 'react-i18next';
 export default function BrokerConfiguration() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('broker.page_title'));
+  usePageTitle("Broker Controls");
   const { tenantPath } = useTenant();
   const toast = useToast();
   const [loading, setLoading] = useState(true);
@@ -69,7 +67,7 @@ export default function BrokerConfiguration() {
         setConfig(res.data);
       }
     } catch {
-      toast.error(t('broker.failed_to_load_broker_configuration'));
+      toast.error("Failed to load broker configuration");
     } finally {
       setLoading(false);
     }
@@ -84,12 +82,12 @@ export default function BrokerConfiguration() {
     try {
       const res = await adminBroker.saveConfiguration(config);
       if (res.success) {
-        toast.success(t('broker.configuration_saved'));
+        toast.success("Configuration Saved");
       } else {
-        toast.error(t('broker.failed_to_save_configuration'));
+        toast.error("Failed to save configuration");
       }
     } catch {
-      toast.error(t('broker.failed_to_save_configuration'));
+      toast.error("Failed to save configuration");
     } finally {
       setSaving(false);
     }
@@ -110,8 +108,8 @@ export default function BrokerConfiguration() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t('broker.broker_configuration_title')}
-        description={t('broker.broker_configuration_desc')}
+        title={"Broker Configuration"}
+        description={"Configure broker settings, thresholds, and notification preferences"}
         actions={
           <div className="flex gap-2">
             <Button
@@ -121,7 +119,7 @@ export default function BrokerConfiguration() {
               startContent={<ArrowLeft className="w-4 h-4" />}
               size="sm"
             >
-              {t('broker.btn_back')}
+              {"Back"}
             </Button>
             <Button
               color="primary"
@@ -130,7 +128,7 @@ export default function BrokerConfiguration() {
               isLoading={saving}
               size="sm"
             >
-              {t('broker.btn_save_changes')}
+              {"Save Changes"}
             </Button>
           </div>
         }
@@ -139,14 +137,14 @@ export default function BrokerConfiguration() {
       {/* Messaging Settings */}
       <Card shadow="sm">
         <CardHeader>
-          <h3 className="text-lg font-semibold">{t('broker.messaging_oversight_heading')}</h3>
+          <h3 className="text-lg font-semibold">{"Messaging Oversight"}</h3>
         </CardHeader>
         <Divider />
         <CardBody className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.enable_broker_messaging')}</p>
-              <p className="text-sm text-default-500">{t('broker.enable_broker_messaging_desc')}</p>
+              <p className="font-medium">{"Enable Broker Messaging"}</p>
+              <p className="text-sm text-default-500">{"Enable Broker Messaging."}</p>
             </div>
             <Switch
               isSelected={config.broker_messaging_enabled}
@@ -156,8 +154,8 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.copy_all_messages')}</p>
-              <p className="text-sm text-default-500">{t('broker.copy_all_messages_desc')}</p>
+              <p className="font-medium">{"Copy All Messages"}</p>
+              <p className="text-sm text-default-500">{"Copy All Messages."}</p>
             </div>
             <Switch
               isSelected={config.broker_copy_all_messages}
@@ -167,12 +165,12 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.copy_threshold_hours')}</p>
-              <p className="text-sm text-default-500">{t('broker.copy_threshold_hours_desc')}</p>
+              <p className="font-medium">{"Copy Threshold Hours"}</p>
+              <p className="text-sm text-default-500">{"Copy Threshold Hours."}</p>
             </div>
             <Input
               type="number"
-              aria-label={t('broker.label_copy_threshold_hours')}
+              aria-label={"Copy Threshold Hours"}
               value={String(config.broker_copy_threshold_hours)}
               onValueChange={v => updateConfig('broker_copy_threshold_hours', parseInt(v) || 0)}
               className="w-24"
@@ -184,12 +182,12 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.new_member_monitoring_days')}</p>
-              <p className="text-sm text-default-500">{t('broker.new_member_monitoring_days_desc')}</p>
+              <p className="font-medium">{"New Member Monitoring Days"}</p>
+              <p className="text-sm text-default-500">{"New Member Monitoring Days."}</p>
             </div>
             <Input
               type="number"
-              aria-label={t('broker.label_new_member_monitoring_days')}
+              aria-label={"New Member Monitoring Days"}
               value={String(config.new_member_monitoring_days)}
               onValueChange={v => updateConfig('new_member_monitoring_days', parseInt(v) || 0)}
               className="w-24"
@@ -201,8 +199,8 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.require_exchange_for_listings')}</p>
-              <p className="text-sm text-default-500">{t('broker.require_exchange_for_listings_desc')}</p>
+              <p className="font-medium">{"Require Exchange for Listings"}</p>
+              <p className="text-sm text-default-500">{"Require Exchange for Listings."}</p>
             </div>
             <Switch
               isSelected={config.require_exchange_for_listings}
@@ -215,14 +213,14 @@ export default function BrokerConfiguration() {
       {/* Risk Tagging Settings */}
       <Card shadow="sm">
         <CardHeader>
-          <h3 className="text-lg font-semibold">{t('broker.risk_tagging_heading')}</h3>
+          <h3 className="text-lg font-semibold">{"Risk Tagging"}</h3>
         </CardHeader>
         <Divider />
         <CardBody className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.enable_risk_tagging')}</p>
-              <p className="text-sm text-default-500">{t('broker.enable_risk_tagging_desc')}</p>
+              <p className="font-medium">{"Enable Risk Tagging"}</p>
+              <p className="text-sm text-default-500">{"Enable Risk Tagging."}</p>
             </div>
             <Switch
               isSelected={config.risk_tagging_enabled}
@@ -232,8 +230,8 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.auto_flag_high_risk')}</p>
-              <p className="text-sm text-default-500">{t('broker.auto_flag_high_risk_desc')}</p>
+              <p className="font-medium">{"Auto Flag High Risk"}</p>
+              <p className="text-sm text-default-500">{"Auto Flag High Risk."}</p>
             </div>
             <Switch
               isSelected={config.auto_flag_high_risk}
@@ -243,8 +241,8 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.require_approval_high_risk')}</p>
-              <p className="text-sm text-default-500">{t('broker.require_approval_high_risk_desc')}</p>
+              <p className="font-medium">{"Require Approval High Risk"}</p>
+              <p className="text-sm text-default-500">{"Require Approval High Risk."}</p>
             </div>
             <Switch
               isSelected={config.require_approval_high_risk}
@@ -254,8 +252,8 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.notify_on_high_risk_match')}</p>
-              <p className="text-sm text-default-500">{t('broker.notify_on_high_risk_match_desc')}</p>
+              <p className="font-medium">{"Notify on High Risk Match"}</p>
+              <p className="text-sm text-default-500">{"Notify on High Risk Match."}</p>
             </div>
             <Switch
               isSelected={config.notify_on_high_risk_match}
@@ -268,14 +266,14 @@ export default function BrokerConfiguration() {
       {/* Exchange Workflow Settings */}
       <Card shadow="sm">
         <CardHeader>
-          <h3 className="text-lg font-semibold">{t('broker.exchange_workflow_heading')}</h3>
+          <h3 className="text-lg font-semibold">{"Exchange Workflow"}</h3>
         </CardHeader>
         <Divider />
         <CardBody className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.broker_approval_required')}</p>
-              <p className="text-sm text-default-500">{t('broker.broker_approval_required_desc')}</p>
+              <p className="font-medium">{"Broker Approval Required"}</p>
+              <p className="text-sm text-default-500">{"Broker Approval Required."}</p>
             </div>
             <Switch
               isSelected={config.broker_approval_required}
@@ -285,8 +283,8 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.auto_approve_low_risk')}</p>
-              <p className="text-sm text-default-500">{t('broker.auto_approve_low_risk_desc')}</p>
+              <p className="font-medium">{"Auto Approve Low Risk"}</p>
+              <p className="text-sm text-default-500">{"Auto Approve Low Risk."}</p>
             </div>
             <Switch
               isSelected={config.auto_approve_low_risk}
@@ -296,12 +294,12 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.exchange_timeout_days')}</p>
-              <p className="text-sm text-default-500">{t('broker.exchange_timeout_days_desc')}</p>
+              <p className="font-medium">{"Exchange Timeout Days"}</p>
+              <p className="text-sm text-default-500">{"Exchange Timeout Days."}</p>
             </div>
             <Input
               type="number"
-              aria-label={t('broker.label_exchange_timeout_days')}
+              aria-label={"Exchange Timeout Days"}
               value={String(config.exchange_timeout_days)}
               onValueChange={v => updateConfig('exchange_timeout_days', parseInt(v) || 7)}
               className="w-24"
@@ -313,12 +311,12 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.max_hours_without_approval')}</p>
-              <p className="text-sm text-default-500">{t('broker.max_hours_without_approval_desc')}</p>
+              <p className="font-medium">{"Max Hours Without Approval"}</p>
+              <p className="text-sm text-default-500">{"Max Hours Without Approval."}</p>
             </div>
             <Input
               type="number"
-              aria-label={t('broker.label_max_hours_without_approval')}
+              aria-label={"Max Hours Without Approval"}
               value={String(config.max_hours_without_approval)}
               onValueChange={v => updateConfig('max_hours_without_approval', v === '' ? 0 : parseFloat(v))}
               className="w-24"
@@ -331,12 +329,12 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.confirmation_deadline_hours')}</p>
-              <p className="text-sm text-default-500">{t('broker.confirmation_deadline_hours_desc')}</p>
+              <p className="font-medium">{"Confirmation Deadline Hours"}</p>
+              <p className="text-sm text-default-500">{"Confirmation Deadline Hours."}</p>
             </div>
             <Input
               type="number"
-              aria-label={t('broker.label_confirmation_deadline_hours')}
+              aria-label={"Confirmation Deadline Hours"}
               value={String(config.confirmation_deadline_hours)}
               onValueChange={v => updateConfig('confirmation_deadline_hours', parseInt(v) || 48)}
               className="w-24"
@@ -348,12 +346,12 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.request_expiry_hours')}</p>
-              <p className="text-sm text-default-500">{t('broker.request_expiry_hours_desc')}</p>
+              <p className="font-medium">{"Request Expiry Hours"}</p>
+              <p className="text-sm text-default-500">{"Request Expiry Hours."}</p>
             </div>
             <Input
               type="number"
-              aria-label={t('broker.label_expiry_hours')}
+              aria-label={"Expiry Hours"}
               value={String(config.expiry_hours)}
               onValueChange={v => updateConfig('expiry_hours', parseInt(v) || 168)}
               className="w-24"
@@ -365,8 +363,8 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.allow_hour_adjustment')}</p>
-              <p className="text-sm text-default-500">{t('broker.allow_hour_adjustment_desc')}</p>
+              <p className="font-medium">{"Allow Hour Adjustment"}</p>
+              <p className="text-sm text-default-500">{"Allow Hour Adjustment."}</p>
             </div>
             <Switch
               isSelected={config.allow_hour_adjustment}
@@ -378,12 +376,12 @@ export default function BrokerConfiguration() {
               <Divider />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">{t('broker.max_hour_variance_percent')}</p>
-                  <p className="text-sm text-default-500">{t('broker.max_hour_variance_percent_desc')}</p>
+                  <p className="font-medium">{"Max Hour Variance Percent"}</p>
+                  <p className="text-sm text-default-500">{"Max Hour Variance Percent."}</p>
                 </div>
                 <Input
                   type="number"
-                  aria-label={t('broker.label_max_hour_variance_percent')}
+                  aria-label={"Max Hour Variance Percent"}
                   value={String(config.max_hour_variance_percent)}
                   onValueChange={v => updateConfig('max_hour_variance_percent', parseInt(v) || 0)}
                   className="w-24"
@@ -400,14 +398,14 @@ export default function BrokerConfiguration() {
       {/* Broker Visibility Settings */}
       <Card shadow="sm">
         <CardHeader>
-          <h3 className="text-lg font-semibold">{t('broker.broker_visibility_heading')}</h3>
+          <h3 className="text-lg font-semibold">{"Broker Visibility"}</h3>
         </CardHeader>
         <Divider />
         <CardBody className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.visible_to_members')}</p>
-              <p className="text-sm text-default-500">{t('broker.visible_to_members_desc')}</p>
+              <p className="font-medium">{"Visible to Members"}</p>
+              <p className="text-sm text-default-500">{"Visible to Members."}</p>
             </div>
             <Switch
               isSelected={config.broker_visible_to_members}
@@ -417,8 +415,8 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.show_broker_name')}</p>
-              <p className="text-sm text-default-500">{t('broker.show_broker_name_desc')}</p>
+              <p className="font-medium">{"Show Broker Name"}</p>
+              <p className="text-sm text-default-500">{"Show Broker Name."}</p>
             </div>
             <Switch
               isSelected={config.show_broker_name}
@@ -428,12 +426,12 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.broker_contact_email')}</p>
-              <p className="text-sm text-default-500">{t('broker.broker_contact_email_desc')}</p>
+              <p className="font-medium">{"Broker Contact Email"}</p>
+              <p className="text-sm text-default-500">{"Broker Contact Email."}</p>
             </div>
             <Input
               type="email"
-              aria-label={t('broker.label_broker_contact_email')}
+              aria-label={"Broker Contact Email"}
               value={config.broker_contact_email}
               onValueChange={v => updateConfig('broker_contact_email', v)}
               placeholder="broker@example.com"
@@ -447,14 +445,14 @@ export default function BrokerConfiguration() {
       {/* Message Copy Rules */}
       <Card shadow="sm">
         <CardHeader>
-          <h3 className="text-lg font-semibold">{t('broker.message_copy_rules_heading')}</h3>
+          <h3 className="text-lg font-semibold">{"Message Copy Rules"}</h3>
         </CardHeader>
         <Divider />
         <CardBody className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.copy_first_contact')}</p>
-              <p className="text-sm text-default-500">{t('broker.copy_first_contact_desc')}</p>
+              <p className="font-medium">{"Copy First Contact"}</p>
+              <p className="text-sm text-default-500">{"Copy First Contact."}</p>
             </div>
             <Switch
               isSelected={config.copy_first_contact}
@@ -464,8 +462,8 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.copy_new_member_messages')}</p>
-              <p className="text-sm text-default-500">{t('broker.copy_new_member_messages_desc')}</p>
+              <p className="font-medium">{"Copy New Member Messages"}</p>
+              <p className="text-sm text-default-500">{"Copy New Member Messages."}</p>
             </div>
             <Switch
               isSelected={config.copy_new_member_messages}
@@ -475,8 +473,8 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.copy_high_risk_listing_messages')}</p>
-              <p className="text-sm text-default-500">{t('broker.copy_high_risk_listing_messages_desc')}</p>
+              <p className="font-medium">{"Copy High Risk Listing Messages"}</p>
+              <p className="text-sm text-default-500">{"Copy High Risk Listing Messages."}</p>
             </div>
             <Switch
               isSelected={config.copy_high_risk_listing_messages}
@@ -486,12 +484,12 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.random_sample_percent')}</p>
-              <p className="text-sm text-default-500">{t('broker.random_sample_percent_desc')}</p>
+              <p className="font-medium">{"Random Sample Percent"}</p>
+              <p className="text-sm text-default-500">{"Random Sample Percent."}</p>
             </div>
             <Input
               type="number"
-              aria-label={t('broker.label_random_sample_percentage')}
+              aria-label={"Random Sample Percentage"}
               value={String(config.random_sample_percentage)}
               onValueChange={v => updateConfig('random_sample_percentage', parseInt(v) || 0)}
               className="w-24"
@@ -503,12 +501,12 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{t('broker.retention_days')}</p>
-              <p className="text-sm text-default-500">{t('broker.retention_days_desc')}</p>
+              <p className="font-medium">{"Retention Days"}</p>
+              <p className="text-sm text-default-500">{"Retention Days."}</p>
             </div>
             <Input
               type="number"
-              aria-label={t('broker.label_retention_days')}
+              aria-label={"Retention Days"}
               value={String(config.retention_days)}
               onValueChange={v => updateConfig('retention_days', parseInt(v) || 90)}
               className="w-24"
@@ -523,14 +521,14 @@ export default function BrokerConfiguration() {
       {/* Compliance & Safeguarding */}
       <Card shadow="sm">
         <CardHeader>
-          <h3 className="text-lg font-semibold">{t('broker.compliance_safeguarding_heading')}</h3>
+          <h3 className="text-lg font-semibold">{"Compliance Safeguarding"}</h3>
         </CardHeader>
         <Divider />
         <CardBody className="gap-4">
           <div className="flex justify-between items-center">
             <div>
-              <p className="font-medium">{t('broker.enable_vetting_system')}</p>
-              <p className="text-sm text-default-400">{t('broker.enable_vetting_system_desc')}</p>
+              <p className="font-medium">{"Enable Vetting System"}</p>
+              <p className="text-sm text-default-400">{"Enable Vetting System."}</p>
             </div>
             <Switch
               isSelected={config.vetting_enabled}
@@ -540,8 +538,8 @@ export default function BrokerConfiguration() {
           </div>
           <div className="flex justify-between items-center">
             <div>
-              <p className="font-medium">{t('broker.enable_insurance_certificates')}</p>
-              <p className="text-sm text-default-400">{t('broker.enable_insurance_certificates_desc')}</p>
+              <p className="font-medium">{"Enable Insurance Certificates"}</p>
+              <p className="text-sm text-default-400">{"Enable Insurance Certificates."}</p>
             </div>
             <Switch
               isSelected={config.insurance_enabled}
@@ -552,8 +550,8 @@ export default function BrokerConfiguration() {
           <Divider />
           <div className="flex justify-between items-center">
             <div>
-              <p className="font-medium">{t('broker.enforce_vetting_on_exchanges')}</p>
-              <p className="text-sm text-default-400">{t('broker.enforce_vetting_on_exchanges_desc')}</p>
+              <p className="font-medium">{"Enforce Vetting on Exchanges"}</p>
+              <p className="text-sm text-default-400">{"Enforce Vetting on Exchanges."}</p>
             </div>
             <Switch
               isSelected={config.enforce_vetting_on_exchanges}
@@ -564,8 +562,8 @@ export default function BrokerConfiguration() {
           </div>
           <div className="flex justify-between items-center">
             <div>
-              <p className="font-medium">{t('broker.enforce_insurance_on_exchanges')}</p>
-              <p className="text-sm text-default-400">{t('broker.enforce_insurance_on_exchanges_desc')}</p>
+              <p className="font-medium">{"Enforce Insurance on Exchanges"}</p>
+              <p className="text-sm text-default-400">{"Enforce Insurance on Exchanges."}</p>
             </div>
             <Switch
               isSelected={config.enforce_insurance_on_exchanges}
@@ -576,11 +574,11 @@ export default function BrokerConfiguration() {
           </div>
           <Divider />
           <div className="flex items-center gap-3">
-            <p className="text-sm text-default-600">{t('broker.vetting_expiry_warning_days')}:</p>
+            <p className="text-sm text-default-600">{"Vetting Expiry Warning Days"}:</p>
             <Input
               type="number"
               variant="bordered"
-              aria-label={t('broker.label_vetting_expiry_warning_days')}
+              aria-label={"Vetting Expiry Warning Days"}
               value={String(config.vetting_expiry_warning_days)}
               onValueChange={v => updateConfig('vetting_expiry_warning_days', parseInt(v) || 30)}
               className="w-24"
@@ -591,11 +589,11 @@ export default function BrokerConfiguration() {
             />
           </div>
           <div className="flex items-center gap-3">
-            <p className="text-sm text-default-600">{t('broker.insurance_expiry_warning_days')}:</p>
+            <p className="text-sm text-default-600">{"Insurance Expiry Warning Days"}:</p>
             <Input
               type="number"
               variant="bordered"
-              aria-label={t('broker.label_insurance_expiry_warning_days')}
+              aria-label={"Insurance Expiry Warning Days"}
               value={String(config.insurance_expiry_warning_days)}
               onValueChange={v => updateConfig('insurance_expiry_warning_days', parseInt(v) || 30)}
               className="w-24"

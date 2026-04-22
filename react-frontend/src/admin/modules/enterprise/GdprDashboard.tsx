@@ -28,8 +28,6 @@ import { adminEnterprise } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { GdprDashboardStats, GdprStatistics, GdprTrendData } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
-
 function ComplianceScoreRing({ score, size = 120, scoreLabel }: { score: number; size?: number; scoreLabel?: string }) {
   const radius = (size - 16) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -70,8 +68,7 @@ function ComplianceScoreRing({ score, size = 120, scoreLabel }: { score: number;
 }
 
 export function GdprDashboard() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('enterprise.page_title'));
+  usePageTitle("Enterprise");
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
 
@@ -131,17 +128,17 @@ export function GdprDashboard() {
     : undefined;
 
   const links = [
-    { label: t('enterprise.link_data_requests'), href: tenantPath('/admin/enterprise/gdpr/requests'), icon: FileWarning, description: t('enterprise.link_data_requests_desc') },
-    { label: t('enterprise.link_consent_records'), href: tenantPath('/admin/enterprise/gdpr/consents'), icon: UserCheck, description: t('enterprise.link_consent_records_desc') },
-    { label: t('enterprise.link_data_breaches'), href: tenantPath('/admin/enterprise/gdpr/breaches'), icon: AlertTriangle, description: t('enterprise.link_data_breaches_desc') },
-    { label: t('enterprise.link_gdpr_audit_log'), href: tenantPath('/admin/enterprise/gdpr/audit'), icon: ClipboardList, description: t('enterprise.link_gdpr_audit_log_desc') },
+    { label: "Data Requests", href: tenantPath('/admin/enterprise/gdpr/requests'), icon: FileWarning, description: "View and manage GDPR data requests" },
+    { label: "Consent Records", href: tenantPath('/admin/enterprise/gdpr/consents'), icon: UserCheck, description: "View all member consent records" },
+    { label: "Data Breaches", href: tenantPath('/admin/enterprise/gdpr/breaches'), icon: AlertTriangle, description: "View and manage reported data breaches" },
+    { label: "Link GDPR Audit Log", href: tenantPath('/admin/enterprise/gdpr/audit'), icon: ClipboardList, description: "View the GDPR audit log" },
   ];
 
   return (
     <div>
       <PageHeader
-        title={t('enterprise.gdpr_dashboard_title')}
-        description={t('enterprise.gdpr_dashboard_desc')}
+        title={"GDPR Dashboard"}
+        description={"GDPR compliance overview including requests, consents, and breaches"}
         actions={
           <div className="flex gap-2">
             <Button
@@ -151,7 +148,7 @@ export function GdprDashboard() {
               isLoading={loading}
               size="sm"
             >
-              {t('common.refresh')}
+              {"Refresh"}
             </Button>
           </div>
         }
@@ -163,9 +160,9 @@ export function GdprDashboard() {
           <ShieldAlert size={24} className="text-danger shrink-0" />
           <div className="flex-1">
             <p className="font-semibold text-danger">
-              {t('enterprise.gdpr_active_breaches_alert', { count: activeBreaches })}
+              {`GDPR Active Breaches Alert`}
             </p>
-            <p className="text-sm text-danger-600">{t('enterprise.gdpr_review_breaches_immediately')}</p>
+            <p className="text-sm text-danger-600">{"GDPR Review Breaches Immediately"}</p>
           </div>
           <Button
             size="sm"
@@ -173,7 +170,7 @@ export function GdprDashboard() {
             variant="flat"
             onPress={() => navigate(tenantPath('/admin/enterprise/gdpr/breaches'))}
           >
-            {t('enterprise.gdpr_view_breaches')}
+            {"GDPR View Breaches"}
           </Button>
         </div>
       )}
@@ -183,40 +180,40 @@ export function GdprDashboard() {
         {/* Compliance Score */}
         <Card shadow="sm" className="lg:col-span-1">
           <CardBody className="flex flex-col items-center justify-center p-4 gap-2">
-            <p className="text-sm font-medium text-default-500">{t('enterprise.gdpr_compliance_score')}</p>
-            <ComplianceScoreRing score={complianceScore} scoreLabel={t('enterprise.gdpr_score')} />
+            <p className="text-sm font-medium text-default-500">{"GDPR Compliance Score"}</p>
+            <ComplianceScoreRing score={complianceScore} scoreLabel={"GDPR Score"} />
           </CardBody>
         </Card>
 
         {/* Mini Stats Grid */}
         <div className="lg:col-span-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
-            label={t('enterprise.label_pending_requests')}
+            label={"Pending Requests"}
             value={stats?.pending_requests ?? 0}
             icon={FileWarning}
             color="warning"
             loading={loading}
             trend={requestsTrend}
-            trendLabel={t('enterprise.gdpr_vs_last_month')}
+            trendLabel={"GDPR vs Last Month"}
           />
           <StatCard
-            label={t('enterprise.gdpr_completed_this_month')}
+            label={"GDPR Completed This Month"}
             value={statistics?.requests_by_status?.completed ?? 0}
             icon={UserCheck}
             color="success"
             loading={loading}
             trend={completedTrend}
-            trendLabel={t('enterprise.gdpr_vs_last_month')}
+            trendLabel={"GDPR vs Last Month"}
           />
           <StatCard
-            label={t('enterprise.gdpr_consent_coverage')}
+            label={"GDPR Consent Coverage"}
             value={`${consentCoverage.toFixed(0)}%`}
             icon={UserCheck}
             color="primary"
             loading={loading}
           />
           <StatCard
-            label={t('enterprise.label_data_breaches')}
+            label={"Data Breaches"}
             value={activeBreaches}
             icon={AlertTriangle}
             color="danger"
@@ -229,15 +226,15 @@ export function GdprDashboard() {
       {trends && chartData.length > 0 && (
         <Card shadow="sm" className="mb-6">
           <CardBody className="p-4">
-            <p className="text-sm font-semibold text-default-700 mb-4">{t('enterprise.gdpr_requests_breaches_chart')}</p>
+            <p className="text-sm font-semibold text-default-700 mb-4">{"GDPR Requests Breaches Chart"}</p>
             <ResponsiveContainer width="100%" height={250}>
               <AreaChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-divider, #e5e7eb)" />
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                 <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
                 <Tooltip />
-                <Area type="monotone" dataKey="requests" stackId="1" stroke="hsl(var(--heroui-primary))" fill="hsl(var(--heroui-primary))" fillOpacity={0.2} name={t('enterprise.gdpr_chart_requests')} />
-                <Area type="monotone" dataKey="breaches" stackId="2" stroke="hsl(var(--heroui-danger))" fill="hsl(var(--heroui-danger))" fillOpacity={0.2} name={t('enterprise.gdpr_chart_breaches')} />
+                <Area type="monotone" dataKey="requests" stackId="1" stroke="hsl(var(--heroui-primary))" fill="hsl(var(--heroui-primary))" fillOpacity={0.2} name={"GDPR Chart Requests"} />
+                <Area type="monotone" dataKey="breaches" stackId="2" stroke="hsl(var(--heroui-danger))" fill="hsl(var(--heroui-danger))" fillOpacity={0.2} name={"GDPR Chart Breaches"} />
               </AreaChart>
             </ResponsiveContainer>
           </CardBody>
@@ -250,7 +247,7 @@ export function GdprDashboard() {
           {/* Request Type Breakdown */}
           <Card shadow="sm">
             <CardBody className="p-4">
-              <p className="text-sm font-semibold text-default-700 mb-3">{t('enterprise.gdpr_requests_by_type')}</p>
+              <p className="text-sm font-semibold text-default-700 mb-3">{"Requests by Type"}</p>
               <div className="flex flex-wrap gap-2">
                 {Object.entries(statistics.requests_by_type || {}).map(([type, count]) => (
                   <Chip key={type} size="sm" variant="flat" color="primary" className="capitalize">
@@ -258,7 +255,7 @@ export function GdprDashboard() {
                   </Chip>
                 ))}
                 {Object.keys(statistics.requests_by_type || {}).length === 0 && (
-                  <span className="text-sm text-default-400">{t('enterprise.gdpr_no_requests_yet')}</span>
+                  <span className="text-sm text-default-400">{"GDPR No Requests yet"}</span>
                 )}
               </div>
             </CardBody>
@@ -271,11 +268,11 @@ export function GdprDashboard() {
                 <div className="p-3 rounded-lg bg-danger-50 border border-danger-200 flex items-center gap-2">
                   <AlertTriangle size={16} className="text-danger shrink-0" />
                   <span className="text-sm text-danger font-medium">
-                    {t('enterprise.gdpr_overdue_requests', { count: overdueCount })}
+                    {`GDPR Overdue Requests`}
                   </span>
                 </div>
               )}
-              <p className="text-sm font-semibold text-default-700">{t('enterprise.gdpr_quick_actions')}</p>
+              <p className="text-sm font-semibold text-default-700">{"GDPR Quick Actions"}</p>
               <div className="flex gap-2">
                 <Button
                   size="sm"
@@ -285,7 +282,7 @@ export function GdprDashboard() {
                   as={Link}
                   to={tenantPath('/admin/enterprise/gdpr/requests/create')}
                 >
-                  {t('enterprise.gdpr_new_request')}
+                  {"GDPR New Request"}
                 </Button>
                 <Button
                   size="sm"
@@ -295,7 +292,7 @@ export function GdprDashboard() {
                   as={Link}
                   to={tenantPath('/admin/enterprise/gdpr/breaches')}
                 >
-                  {t('enterprise.gdpr_report_breach')}
+                  {"GDPR Report Breach"}
                 </Button>
               </div>
             </CardBody>

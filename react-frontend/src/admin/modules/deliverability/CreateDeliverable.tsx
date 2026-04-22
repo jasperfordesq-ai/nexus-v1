@@ -13,7 +13,6 @@ import { useState } from 'react';
 import { Card, CardBody, CardHeader, Input, Textarea, Select, SelectItem, Button } from '@heroui/react';
 import { Target, ArrowLeft, Save } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminDeliverability } from '../../api/adminApi';
@@ -29,8 +28,7 @@ interface DeliverableFormData {
 }
 
 export function CreateDeliverable() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('deliverability.create_title'));
+  usePageTitle("Create");
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -51,7 +49,7 @@ export function CreateDeliverable() {
 
   const handleSave = async () => {
     if (!formData.title.trim()) {
-      toast.warning(t('deliverability.title_required'));
+      toast.warning("Title is required");
       return;
     }
     setSaving(true);
@@ -64,13 +62,13 @@ export function CreateDeliverable() {
         due_date: formData.due_date || undefined,
       });
       if (res?.success) {
-        toast.success(t('deliverability.created_success'));
+        toast.success("Created successfully");
         navigate(tenantPath('/admin/deliverability/list'));
       } else {
-        toast.error(t('deliverability.create_failed'));
+        toast.error("Create Failed");
       }
     } catch {
-      toast.error(t('common.an_unexpected_error'));
+      toast.error("An unexpected error occurred");
     } finally {
       setSaving(false);
     }
@@ -79,32 +77,32 @@ export function CreateDeliverable() {
   return (
     <div>
       <PageHeader
-        title={t("deliverability.create_title")}
-        description={t("deliverability.create_description")}
-        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>{t("common.back")}</Button>}
+        title={"Create"}
+        description={"Create"}
+        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>{"Back"}</Button>}
       />
 
       <Card shadow="sm">
-        <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Target size={20} /> {t("deliverability.details_heading")}</h3></CardHeader>
+        <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Target size={20} /> {"Details"}</h3></CardHeader>
         <CardBody className="gap-4">
           <Input
-            label={t("deliverability.title_label")}
-            placeholder={t("deliverability.title_placeholder")}
+            label={"Title"}
+            placeholder={"Deliverable title..."}
             isRequired
             variant="bordered"
             value={formData.title}
             onValueChange={(v) => handleChange('title', v)}
           />
           <Textarea
-            label={t('deliverability.label_description')}
-            placeholder={t('deliverability.placeholder_describe_the_deliverable')}
+            label={"Description"}
+            placeholder={"Describe the Deliverable..."}
             variant="bordered"
             minRows={3}
             value={formData.description}
             onValueChange={(v) => handleChange('description', v)}
           />
           <Select
-            label={t("deliverability.priority_label")}
+            label={"Priority"}
             variant="bordered"
             selectedKeys={[formData.priority]}
             onSelectionChange={(keys) => {
@@ -112,13 +110,13 @@ export function CreateDeliverable() {
               if (selected) handleChange('priority', selected);
             }}
           >
-            <SelectItem key="low">{t("common.low")}</SelectItem>
-            <SelectItem key="medium">{t("common.medium")}</SelectItem>
-            <SelectItem key="high">{t("common.high")}</SelectItem>
-            <SelectItem key="critical">{t("common.critical")}</SelectItem>
+            <SelectItem key="low">{"Low"}</SelectItem>
+            <SelectItem key="medium">{"Medium"}</SelectItem>
+            <SelectItem key="high">{"High"}</SelectItem>
+            <SelectItem key="critical">{"Critical"}</SelectItem>
           </Select>
           <Select
-            label={t("deliverability.status_label")}
+            label={"Status"}
             variant="bordered"
             selectedKeys={[formData.status]}
             onSelectionChange={(keys) => {
@@ -126,27 +124,27 @@ export function CreateDeliverable() {
               if (selected) handleChange('status', selected);
             }}
           >
-            <SelectItem key="planned">{t("common.planned")}</SelectItem>
-            <SelectItem key="in_progress">{t("common.in_progress")}</SelectItem>
-            <SelectItem key="review">{t("common.in_review")}</SelectItem>
-            <SelectItem key="completed">{t("completed")}</SelectItem>
+            <SelectItem key="planned">{"Planned"}</SelectItem>
+            <SelectItem key="in_progress">{"In Progress"}</SelectItem>
+            <SelectItem key="review">{"In Review"}</SelectItem>
+            <SelectItem key="completed">{"Completed"}</SelectItem>
           </Select>
           <Input
-            label={t("deliverability.due_date_label")}
+            label={"Due Date"}
             type="date"
             variant="bordered"
             value={formData.due_date}
             onValueChange={(v) => handleChange('due_date', v)}
           />
           <Input
-            label={t("deliverability.assigned_to_label")}
-            placeholder={t("deliverability.assigned_to_placeholder")}
+            label={"Assigned to"}
+            placeholder={"Assigned to..."}
             variant="bordered"
             value={formData.assigned_to}
             onValueChange={(v) => handleChange('assigned_to', v)}
           />
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>{t("common.cancel")}</Button>
+            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>{"Cancel"}</Button>
             <Button
               color="primary"
               startContent={<Save size={16} />}
@@ -154,7 +152,7 @@ export function CreateDeliverable() {
               isLoading={saving}
               isDisabled={saving}
             >
-              {t('deliverability.save_deliverable')}
+              {"Save Deliverable"}
             </Button>
           </div>
         </CardBody>

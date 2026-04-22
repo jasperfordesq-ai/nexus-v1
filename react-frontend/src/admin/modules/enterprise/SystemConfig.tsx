@@ -85,88 +85,88 @@ function buildConfigSchema(t: (key: string) => string): ConfigGroup[] {
   return [
     {
       key: 'general',
-      label: t('enterprise.system_config.general_label'),
-      description: t('enterprise.system_config.general_desc'),
+      label: "General",
+      description: "General.",
       icon: <Settings2 size={18} />,
       settings: [
-        { key: 'site_name', label: t('enterprise.system_config.setting_site_name_label'), description: t('enterprise.system_config.setting_site_name_desc'), type: 'text', default: '' },
-        { key: 'site_description', label: t('enterprise.system_config.setting_site_description_label'), description: t('enterprise.system_config.setting_site_description_desc'), type: 'textarea', default: '' },
-        { key: 'contact_email', label: t('enterprise.system_config.setting_contact_email_label'), description: t('enterprise.system_config.setting_contact_email_desc'), type: 'email', default: '' },
-        { key: 'contact_phone', label: t('enterprise.system_config.setting_contact_phone_label'), description: t('enterprise.system_config.setting_contact_phone_desc'), type: 'text', default: '' },
-        { key: 'timezone', label: t('enterprise.system_config.setting_timezone_label'), description: t('enterprise.system_config.setting_timezone_desc'), type: 'text', default: 'UTC' },
-        { key: 'footer_text', label: t('enterprise.system_config.setting_footer_text_label'), description: t('enterprise.system_config.setting_footer_text_desc'), type: 'textarea', default: '' },
+        { key: 'site_name', label: "Setting Site Name", description: "Setting Site Name.", type: 'text', default: '' },
+        { key: 'site_description', label: "Setting Site Description", description: "Setting Site Description.", type: 'textarea', default: '' },
+        { key: 'contact_email', label: "Setting Contact Email", description: "Setting Contact Email.", type: 'email', default: '' },
+        { key: 'contact_phone', label: "Setting Contact Phone", description: "Setting Contact Phone.", type: 'text', default: '' },
+        { key: 'timezone', label: "Setting Timezone", description: "Setting Timezone.", type: 'text', default: 'UTC' },
+        { key: 'footer_text', label: "Setting Footer Text", description: "Setting Footer Text.", type: 'textarea', default: '' },
         {
-          key: 'locale', label: t('enterprise.system_config.setting_locale_label'), description: t('enterprise.system_config.setting_locale_desc'), type: 'select', default: 'en',
+          key: 'locale', label: "Setting Locale", description: "Setting Locale.", type: 'select', default: 'en',
           options: SUPPORTED_LOCALE_CODES.map((code) => ({ label: code, value: code })),
         },
       ],
     },
     {
       key: 'registration',
-      label: t('enterprise.system_config.registration_label'),
-      description: t('enterprise.system_config.registration_desc'),
+      label: "Registration",
+      description: "Registration.",
       icon: <UserPlus size={18} />,
       settings: [
-        { key: 'registration_enabled', label: t('enterprise.system_config.setting_registration_enabled_label'), description: t('enterprise.system_config.setting_registration_enabled_desc'), type: 'boolean', default: true },
-        { key: 'require_approval', label: t('enterprise.system_config.setting_require_approval_label'), description: t('enterprise.system_config.setting_require_approval_desc'), type: 'boolean', default: false },
-        { key: 'require_email_verification', label: t('enterprise.system_config.setting_require_email_verification_label'), description: t('enterprise.system_config.setting_require_email_verification_desc'), type: 'boolean', default: true },
-        { key: 'maintenance_mode', label: t('enterprise.system_config.setting_maintenance_mode_label'), description: t('enterprise.system_config.setting_maintenance_mode_desc'), type: 'boolean', default: false },
-        { key: 'onboarding_enabled', label: t('enterprise.system_config.setting_onboarding_enabled_label'), description: t('enterprise.system_config.setting_onboarding_enabled_desc'), type: 'boolean', default: true },
-        { key: 'welcome_message', label: t('enterprise.system_config.setting_welcome_message_label'), description: t('enterprise.system_config.setting_welcome_message_desc'), type: 'textarea', default: '' },
+        { key: 'registration_enabled', label: "Setting Registration Enabled", description: "Setting Registration Enabled.", type: 'boolean', default: true },
+        { key: 'require_approval', label: "Setting Require Approval", description: "Setting Require Approval.", type: 'boolean', default: false },
+        { key: 'require_email_verification', label: "Setting Require Email Verification", description: "Setting Require Email Verification.", type: 'boolean', default: true },
+        { key: 'maintenance_mode', label: "Setting Maintenance Mode", description: "Setting Maintenance Mode.", type: 'boolean', default: false },
+        { key: 'onboarding_enabled', label: "Setting Onboarding Enabled", description: "Setting Onboarding Enabled.", type: 'boolean', default: true },
+        { key: 'welcome_message', label: "Setting Welcome Message", description: "Setting Welcome Message.", type: 'textarea', default: '' },
       ],
     },
     {
       key: 'wallet',
-      label: t('enterprise.system_config.wallet_label'),
-      description: t('enterprise.system_config.wallet_desc'),
+      label: "Wallet",
+      description: "Wallet.",
       icon: <Wallet size={18} />,
       settings: [
-        { key: 'starting_balance', label: t('enterprise.system_config.setting_starting_balance_label'), description: t('enterprise.system_config.setting_starting_balance_desc'), type: 'number', default: 0, validation: { min: 0 } },
-        { key: 'max_transaction', label: t('enterprise.system_config.setting_max_transaction_label'), description: t('enterprise.system_config.setting_max_transaction_desc'), type: 'number', default: 0, validation: { min: 0 } },
-        { key: 'currency_name', label: t('enterprise.system_config.setting_currency_name_label'), description: t('enterprise.system_config.setting_currency_name_desc'), type: 'text', default: 'Hours' },
-        { key: 'currency_symbol', label: t('enterprise.system_config.setting_currency_symbol_label'), description: t('enterprise.system_config.setting_currency_symbol_desc'), type: 'text', default: 'h' },
+        { key: 'starting_balance', label: "Setting Starting Balance", description: "Setting Starting Balance.", type: 'number', default: 0, validation: { min: 0 } },
+        { key: 'max_transaction', label: "Setting Max Transaction", description: "Setting Max Transaction.", type: 'number', default: 0, validation: { min: 0 } },
+        { key: 'currency_name', label: "Setting Currency Name", description: "Setting Currency Name.", type: 'text', default: 'Hours' },
+        { key: 'currency_symbol', label: "Setting Currency Symbol", description: "Setting Currency Symbol.", type: 'text', default: 'h' },
       ],
     },
     {
       key: 'content',
-      label: t('enterprise.system_config.content_label'),
-      description: t('enterprise.system_config.content_desc'),
+      label: "Content",
+      description: "Content.",
       icon: <Shield size={18} />,
       settings: [
-        { key: 'auto_approve_listings', label: t('enterprise.system_config.setting_auto_approve_listings_label'), description: t('enterprise.system_config.setting_auto_approve_listings_desc'), type: 'boolean', default: true },
-        { key: 'auto_approve_blog', label: t('enterprise.system_config.setting_auto_approve_blog_label'), description: t('enterprise.system_config.setting_auto_approve_blog_desc'), type: 'boolean', default: false },
-        { key: 'max_listing_images', label: t('enterprise.system_config.setting_max_listing_images_label'), description: t('enterprise.system_config.setting_max_listing_images_desc'), type: 'number', default: 5, validation: { min: 1, max: 20 } },
-        { key: 'profanity_filter', label: t('enterprise.system_config.setting_profanity_filter_label'), description: t('enterprise.system_config.setting_profanity_filter_desc'), type: 'boolean', default: false },
+        { key: 'auto_approve_listings', label: "Setting Auto Approve Listings", description: "Setting Auto Approve Listings.", type: 'boolean', default: true },
+        { key: 'auto_approve_blog', label: "Setting Auto Approve Blog", description: "Setting Auto Approve Blog.", type: 'boolean', default: false },
+        { key: 'max_listing_images', label: "Setting Max Listing Images", description: "Setting Max Listing Images.", type: 'number', default: 5, validation: { min: 1, max: 20 } },
+        { key: 'profanity_filter', label: "Setting Profanity Filter", description: "Setting Profanity Filter.", type: 'boolean', default: false },
       ],
     },
     {
       key: 'notifications',
-      label: t('enterprise.system_config.notifications_label'),
-      description: t('enterprise.system_config.notifications_desc'),
+      label: "Notifications",
+      description: "Notifications.",
       icon: <Bell size={18} />,
       settings: [
-        { key: 'email_notifications_enabled', label: t('enterprise.system_config.setting_email_notifications_enabled_label'), description: t('enterprise.system_config.setting_email_notifications_enabled_desc'), type: 'boolean', default: true },
-        { key: 'push_notifications_enabled', label: t('enterprise.system_config.setting_push_notifications_enabled_label'), description: t('enterprise.system_config.setting_push_notifications_enabled_desc'), type: 'boolean', default: true },
+        { key: 'email_notifications_enabled', label: "Setting Email Notifications Enabled", description: "Setting Email Notifications Enabled.", type: 'boolean', default: true },
+        { key: 'push_notifications_enabled', label: "Setting Push Notifications Enabled", description: "Setting Push Notifications Enabled.", type: 'boolean', default: true },
         {
-          key: 'digest_frequency', label: t('enterprise.system_config.setting_digest_frequency_label'), description: t('enterprise.system_config.setting_digest_frequency_desc'), type: 'select', default: 'weekly',
+          key: 'digest_frequency', label: "Setting Digest Frequency", description: "Setting Digest Frequency.", type: 'select', default: 'weekly',
           options: [
-            { label: t('enterprise.system_config.digest_daily'), value: 'daily' },
-            { label: t('enterprise.system_config.digest_weekly'), value: 'weekly' },
-            { label: t('enterprise.system_config.digest_monthly'), value: 'monthly' },
-            { label: t('enterprise.system_config.digest_never'), value: 'never' },
+            { label: "Digest Daily", value: 'daily' },
+            { label: "Digest Weekly", value: 'weekly' },
+            { label: "Digest Monthly", value: 'monthly' },
+            { label: "Digest Never", value: 'never' },
           ],
         },
       ],
     },
     {
       key: 'limits',
-      label: t('enterprise.system_config.limits_label'),
-      description: t('enterprise.system_config.limits_desc'),
+      label: "Limits",
+      description: "Limits.",
       icon: <Gauge size={18} />,
       settings: [
-        { key: 'max_listings_per_user', label: t('enterprise.system_config.setting_max_listings_per_user_label'), description: t('enterprise.system_config.setting_max_listings_per_user_desc'), type: 'number', default: 0, validation: { min: 0 } },
-        { key: 'max_groups_per_user', label: t('enterprise.system_config.setting_max_groups_per_user_label'), description: t('enterprise.system_config.setting_max_groups_per_user_desc'), type: 'number', default: 0, validation: { min: 0 } },
-        { key: 'max_file_upload_mb', label: t('enterprise.system_config.setting_max_file_upload_mb_label'), description: t('enterprise.system_config.setting_max_file_upload_mb_desc'), type: 'number', default: 10, validation: { min: 1, max: 100 } },
+        { key: 'max_listings_per_user', label: "Setting Max Listings Per User", description: "Setting Max Listings Per User.", type: 'number', default: 0, validation: { min: 0 } },
+        { key: 'max_groups_per_user', label: "Setting Max Groups Per User", description: "Setting Max Groups Per User.", type: 'number', default: 0, validation: { min: 0 } },
+        { key: 'max_file_upload_mb', label: "Setting Max File Upload Mb", description: "Setting Max File Upload Mb.", type: 'number', default: 10, validation: { min: 1, max: 100 } },
       ],
     },
   ];
@@ -265,31 +265,31 @@ function validateSetting(def: ConfigSettingDef, value: unknown, t: (key: string,
   const str = String(value ?? '');
 
   if (def.validation?.required && str.trim() === '') {
-    return t('enterprise.system_config.validation_required', { label: def.label });
+    return `Validation Required`;
   }
 
   if (def.type === 'email' && str.trim() !== '' && !EMAIL_RE.test(str)) {
-    return t('enterprise.system_config.validation_invalid_email');
+    return "Validation Invalid Email";
   }
 
   if (def.type === 'url' && str.trim() !== '' && !URL_RE.test(str)) {
-    return t('enterprise.system_config.validation_invalid_url');
+    return "Validation Invalid URL";
   }
 
   if (def.type === 'number' && str.trim() !== '') {
     const num = Number(str);
-    if (isNaN(num)) return t('enterprise.system_config.validation_must_be_number');
+    if (isNaN(num)) return "Validation Must Be Number";
     if (def.validation?.min !== undefined && num < def.validation.min) {
-      return t('enterprise.system_config.validation_min_value', { min: def.validation.min });
+      return `Validation Min Value`;
     }
     if (def.validation?.max !== undefined && num > def.validation.max) {
-      return t('enterprise.system_config.validation_max_value', { max: def.validation.max });
+      return `Validation Max Value`;
     }
   }
 
   if (def.validation?.pattern && str.trim() !== '') {
     const re = new RegExp(def.validation.pattern);
-    if (!re.test(str)) return t('enterprise.system_config.validation_invalid_format');
+    if (!re.test(str)) return "Validation Invalid Format";
   }
 
   return null;
@@ -301,7 +301,7 @@ function validateSetting(def: ConfigSettingDef, value: unknown, t: (key: string,
 
 export function SystemConfig() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('enterprise.page_title'));
+  usePageTitle("Enterprise");
   const toast = useToast();
 
   const [config, setConfig] = useState<Record<string, unknown>>({});
@@ -333,7 +333,7 @@ export function SystemConfig() {
     try {
       const res = await adminEnterprise.getConfig();
       if (!res.success || !res.data) {
-        toast.error(res.error || t('enterprise.failed_to_load_configuration'));
+        toast.error(res.error || "Failed to load configuration");
         setLoadError(true);
         return;
       }
@@ -343,7 +343,7 @@ export function SystemConfig() {
       setEdited({ ...data });
       setErrors({});
     } catch {
-      toast.error(t('enterprise.failed_to_load_configuration'));
+      toast.error("Failed to load configuration");
       setLoadError(true);
     } finally {
       setLoading(false);
@@ -387,7 +387,7 @@ export function SystemConfig() {
 
   async function handleSave() {
     if (loadError) {
-      toast.error(t('enterprise.cannot_save_config_not_loaded'));
+      toast.error("Cannot Save Config Not Loaded");
       return;
     }
     // Validate all schema fields
@@ -400,7 +400,7 @@ export function SystemConfig() {
     }
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) {
-      toast.error(t('enterprise.fix_validation_errors'));
+      toast.error("Fix Validation Errors");
       return;
     }
 
@@ -417,15 +417,15 @@ export function SystemConfig() {
         }
       }
       if (Object.keys(payload).length === 0) {
-        toast.error(t('enterprise.no_changes_to_save'));
+        toast.error("No changes to save found");
         setSaving(false);
         return;
       }
       await adminEnterprise.updateConfig(payload);
-      toast.success(t('enterprise.configuration_saved'));
+      toast.success("Configuration Saved");
       await loadData();
     } catch {
-      toast.error(t('enterprise.failed_to_save_configuration'));
+      toast.error("Failed to save configuration");
     } finally {
       setSaving(false);
     }
@@ -437,11 +437,11 @@ export function SystemConfig() {
     setResetting(true);
     try {
       await adminEnterprise.resetConfig();
-      toast.success(t('enterprise.configuration_reset_to_defaults'));
+      toast.success("Configuration Reset to Defaults");
       setShowResetModal(false);
       await loadData();
     } catch {
-      toast.error(t('enterprise.failed_to_reset_configuration'));
+      toast.error("Failed to reset configuration");
     } finally {
       setResetting(false);
     }
@@ -593,7 +593,7 @@ export function SystemConfig() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('enterprise.system_config_title')} description={t('enterprise.system_config_desc')} />
+        <PageHeader title={"System Config"} description={"View and manage system configuration keys"} />
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
@@ -604,13 +604,13 @@ export function SystemConfig() {
   if (loadError) {
     return (
       <div>
-        <PageHeader title={t('enterprise.system_config_title')} description={t('enterprise.system_config_desc')} />
+        <PageHeader title={"System Config"} description={"View and manage system configuration keys"} />
         <Card shadow="sm" className="border-danger-200 bg-danger-50">
           <CardBody className="text-center py-12">
-            <p className="text-danger font-medium mb-3">{t('enterprise.failed_to_load_configuration')}</p>
-            <p className="text-sm text-default-500 mb-4">{t('enterprise.server_error_config_warning')}</p>
+            <p className="text-danger font-medium mb-3">{"Failed to load configuration"}</p>
+            <p className="text-sm text-default-500 mb-4">{"Server Error Config Warning"}</p>
             <Button color="primary" variant="flat" onPress={loadData} startContent={<RefreshCw size={16} />}>
-              {t('enterprise.retry')}
+              {"Retry"}
             </Button>
           </CardBody>
         </Card>
@@ -625,8 +625,8 @@ export function SystemConfig() {
   return (
     <div>
       <PageHeader
-        title={t('enterprise.system_config_title')}
-        description={t('enterprise.system_config_desc')}
+        title={"System Config"}
+        description={"View and manage system configuration keys"}
         actions={
           <div className="flex gap-2">
             <Button
@@ -635,7 +635,7 @@ export function SystemConfig() {
               onPress={loadData}
               size="sm"
             >
-              {t('enterprise.reload')}
+              {"Reload"}
             </Button>
             <Button
               variant="flat"
@@ -644,7 +644,7 @@ export function SystemConfig() {
               onPress={() => setShowResetModal(true)}
               size="sm"
             >
-              {t('enterprise.reset_to_defaults')}
+              {"Reset to Defaults"}
             </Button>
             <Button
               color="primary"
@@ -654,7 +654,7 @@ export function SystemConfig() {
               isDisabled={!hasChanges || Object.keys(errors).length > 0}
               size="sm"
             >
-              {t('enterprise.save_changes')}
+              {"Save Changes"}
             </Button>
           </div>
         }
@@ -688,9 +688,9 @@ export function SystemConfig() {
                 <Settings2 size={18} />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-base font-semibold text-foreground">{t('system.advanced_custom_settings')}</h3>
+                <h3 className="text-base font-semibold text-foreground">{"Advanced Custom Settings"}</h3>
                 <p className="text-xs text-default-400">
-                  {t('enterprise.system_config.custom_settings_desc')}
+                  {"Custom Settings."}
                 </p>
               </div>
             </CardHeader>
@@ -712,7 +712,7 @@ export function SystemConfig() {
                       variant="bordered"
                       size="sm"
                       className="flex-1"
-                      description={t('enterprise.system_config.managed_by_other_pages')}
+                      description={"Managed by Other Pages"}
                     />
                   </div>
                 );
@@ -728,16 +728,16 @@ export function SystemConfig() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {t('enterprise.reset_configuration')}
+                {"Reset Configuration"}
               </ModalHeader>
               <ModalBody>
                 <p className="text-sm text-default-600">
-                  {t('enterprise.reset_config_confirm')}
+                  {"Reset Config Confirm"}
                 </p>
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose} size="sm">
-                  {t('enterprise.cancel')}
+                  {"Cancel"}
                 </Button>
                 <Button
                   color="danger"
@@ -745,7 +745,7 @@ export function SystemConfig() {
                   isLoading={resetting}
                   size="sm"
                 >
-                  {t('enterprise.reset_all')}
+                  {"Reset All"}
                 </Button>
               </ModalFooter>
             </>

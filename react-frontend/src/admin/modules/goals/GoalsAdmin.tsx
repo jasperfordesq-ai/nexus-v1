@@ -33,7 +33,6 @@ import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader, ConfirmModal } from '../../components';
 
-import { useTranslation } from 'react-i18next';
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -107,8 +106,7 @@ function normalizeGoal(item: RawGoal): Goal {
 // ---------------------------------------------------------------------------
 
 export function GoalsAdmin() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('goals.page_title'));
+  usePageTitle("Goals");
   const toast = useToast();
   const { tenantPath } = useTenant();
 
@@ -146,7 +144,7 @@ export function GoalsAdmin() {
         });
       }
     } catch {
-      toast.error(t('goals.failed_to_load_goals'));
+      toast.error("Failed to load goals");
     } finally {
       setLoading(false);
     }
@@ -179,13 +177,13 @@ export function GoalsAdmin() {
     try {
       const res = await api.delete(`/v2/admin/goals/${confirmDelete.id}`);
       if (res?.success) {
-        toast.success(t('goals.goal_deleted', { title: confirmDelete.title }));
+        toast.success(`Goal Deleted`);
         loadGoals();
       } else {
-        toast.error(res?.error || t('goals.failed_to_delete_goal'));
+        toast.error(res?.error || "Failed to delete goal");
       }
     } catch {
-      toast.error(t('goals.an_unexpected_error_occurred'));
+      toast.error("An unexpected error occurred");
     } finally {
       setDeleteLoading(false);
       setConfirmDelete(null);
@@ -211,8 +209,8 @@ export function GoalsAdmin() {
   return (
     <div>
       <PageHeader
-        title={t('goals.goals_admin_title')}
-        description={t('goals.goals_admin_desc')}
+        title={"Goals Admin"}
+        description={"View and manage member goals"}
         actions={
           <Button
             variant="flat"
@@ -220,7 +218,7 @@ export function GoalsAdmin() {
             onPress={loadGoals}
             isDisabled={loading}
           >
-            {t('common.refresh')}
+            {"Refresh"}
           </Button>
         }
       />
@@ -228,8 +226,8 @@ export function GoalsAdmin() {
       {/* Search bar */}
       <div className="mb-4 flex items-center gap-2">
         <Input
-          placeholder={t('goals.placeholder_search_goals_by_title_or_member')}
-          aria-label={t('goals.label_search_goals')}
+          placeholder={"Search Goals by Title or Member..."}
+          aria-label={"Search Goals"}
           value={searchInput}
           onValueChange={setSearchInput}
           onKeyDown={handleSearchKeyDown}
@@ -239,7 +237,7 @@ export function GoalsAdmin() {
           className="max-w-md"
         />
         <Button color="primary" variant="flat" onPress={handleSearch}>
-          {t('goals.search')}
+          {"Search"}
         </Button>
       </div>
 
@@ -248,31 +246,31 @@ export function GoalsAdmin() {
         <CardBody className="p-0">
           {loading ? (
             <div className="flex items-center justify-center py-16">
-              <Spinner size="lg" label={t('goals.loading_goals')} />
+              <Spinner size="lg" label={"Loading Goals"} />
             </div>
           ) : goals.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-3 py-16 text-default-400">
               <Target size={48} />
-              <p className="text-lg font-medium">{t('goals.no_goals_found')}</p>
+              <p className="text-lg font-medium">{"No goals found"}</p>
               <p className="text-sm">
-                {search ? t('goals.try_adjusting_search') : t('goals.no_goals_created_yet')}
+                {search ? "Try adjusting your search" : "No goals created yet"}
               </p>
             </div>
           ) : (
             <Table
-              aria-label={t('goals.label_goals_administration_table')}
+              aria-label={"Goals Administration Table"}
               removeWrapper
               isStriped
             >
               <TableHeader>
-                <TableColumn>{t('goals.col_title')}</TableColumn>
-                <TableColumn>{t('goals.col_member')}</TableColumn>
-                <TableColumn>{t('goals.col_target')}</TableColumn>
-                <TableColumn>{t('goals.col_progress')}</TableColumn>
-                <TableColumn>{t('goals.col_status')}</TableColumn>
-                <TableColumn>{t('goals.col_buddy')}</TableColumn>
-                <TableColumn>{t('goals.col_created')}</TableColumn>
-                <TableColumn>{t('goals.col_actions')}</TableColumn>
+                <TableColumn>{"Title"}</TableColumn>
+                <TableColumn>{"Member"}</TableColumn>
+                <TableColumn>{"Target"}</TableColumn>
+                <TableColumn>{"Progress"}</TableColumn>
+                <TableColumn>{"Status"}</TableColumn>
+                <TableColumn>{"Buddy"}</TableColumn>
+                <TableColumn>{"Created"}</TableColumn>
+                <TableColumn>{"Actions"}</TableColumn>
               </TableHeader>
               <TableBody>
                 {goals.map((goal) => (
@@ -316,7 +314,7 @@ export function GoalsAdmin() {
                         variant="flat"
                         color={goal.has_buddy ? 'success' : 'default'}
                       >
-                        {goal.has_buddy ? t('goals.yes') : t('goals.no')}
+                        {goal.has_buddy ? "Yes" : "No"}
                       </Chip>
                     </TableCell>
                     <TableCell>
@@ -329,7 +327,7 @@ export function GoalsAdmin() {
                           size="sm"
                           variant="flat"
                           color="primary"
-                          aria-label={t('goals.label_view_goal')}
+                          aria-label={"View Goal"}
                           onPress={() => window.open(tenantPath(`/goals/${goal.id}`), '_blank')}
                         >
                           <Eye size={14} />
@@ -339,7 +337,7 @@ export function GoalsAdmin() {
                           size="sm"
                           variant="flat"
                           color="danger"
-                          aria-label={t('goals.label_delete_goal')}
+                          aria-label={"Delete Goal"}
                           onPress={() => setConfirmDelete(goal)}
                         >
                           <Trash2 size={14} />
@@ -358,7 +356,7 @@ export function GoalsAdmin() {
       {meta.total_pages > 1 && (
         <div className="mt-4 flex items-center justify-between">
           <span className="text-sm text-default-500">
-            {t('goals.showing_of_total', { count: goals.length, total: meta.total })}
+            {`Showing ${goals.length} of ${meta.total}`}
           </span>
           <Pagination
             total={meta.total_pages}
@@ -375,9 +373,9 @@ export function GoalsAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title={t('goals.delete_goal')}
-          message={t('goals.confirm_delete_goal', { title: confirmDelete.title })}
-          confirmLabel={t('common.delete')}
+          title={"Delete Goal"}
+          message={`Delete Goal`}
+          confirmLabel={"Delete"}
           confirmColor="danger"
           isLoading={deleteLoading}
         />

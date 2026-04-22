@@ -63,7 +63,7 @@ const DEFAULT_CONFIG: SmartMatchingConfig = {
 
 export function MatchingConfig() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('matching.page_title'));
+  usePageTitle("Matching");
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -85,7 +85,7 @@ export function MatchingConfig() {
         setDirty(false);
       }
     } catch {
-      toast.error(t('matching.failed_to_load_matching_configuration'));
+      toast.error("Failed to load matching configuration");
     } finally {
       setLoading(false);
     }
@@ -135,7 +135,7 @@ export function MatchingConfig() {
   /** Save config to API */
   const handleSave = useCallback(async () => {
     if (!totalValid) {
-      toast.error(t('matching.weights_must_sum_to_100', { pct: totalPct }));
+      toast.error(`Weights must sum to 100`);
       return;
     }
 
@@ -143,13 +143,13 @@ export function MatchingConfig() {
     try {
       const res = await adminMatching.updateConfig(config);
       if (res.success) {
-        toast.success(t('matching.matching_configuration_saved_successfull'));
+        toast.success("Matching configuration saved successfully");
         setDirty(false);
       } else {
-        toast.error(t('matching.failed_to_save_configuration'));
+        toast.error("Failed to save configuration");
       }
     } catch {
-      toast.error(t('matching.failed_to_save_configuration'));
+      toast.error("Failed to save configuration");
     } finally {
       setSaving(false);
     }
@@ -162,13 +162,13 @@ export function MatchingConfig() {
       const res = await adminMatching.clearCache();
       if (res.success) {
         const cleared = (res.data as { entries_cleared?: number })?.entries_cleared ?? 0;
-        toast.success(t('matching.cache_cleared', { count: cleared }));
+        toast.success(`Cache Cleared`);
         setClearModalOpen(false);
       } else {
-        toast.error(t('matching.failed_to_clear_cache'));
+        toast.error("Failed to clear cache");
       }
     } catch {
-      toast.error(t('matching.failed_to_clear_cache'));
+      toast.error("Failed to clear cache");
     } finally {
       setClearing(false);
     }
@@ -179,15 +179,15 @@ export function MatchingConfig() {
     setConfig(DEFAULT_CONFIG);
     setDirty(true);
     setResetModalOpen(false);
-    toast.info(t('matching.configuration_reset_to_defaults_save_to'));
+    toast.info("Configuration reset to defaults. Save to apply.");
   }, [toast, t])
 
   if (loading) {
     return (
       <div>
         <PageHeader
-          title={t('matching.matching_config_title')}
-          description={t('matching.matching_config_desc')}
+          title={"Matching Config"}
+          description={"Configure algorithm weights and settings for the smart matching engine"}
         />
         <div className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
@@ -199,8 +199,8 @@ export function MatchingConfig() {
   return (
     <div>
       <PageHeader
-        title={t('matching.matching_config_title')}
-        description={t('matching.matching_config_desc')}
+        title={"Matching Config"}
+        description={"Configure algorithm weights and settings for the smart matching engine"}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -209,7 +209,7 @@ export function MatchingConfig() {
               onPress={() => navigate(tenantPath('/admin/smart-matching'))}
               size="sm"
             >
-              {t('matching.back')}
+              {"Back"}
             </Button>
             <Button
               color="primary"
@@ -219,7 +219,7 @@ export function MatchingConfig() {
               isDisabled={!dirty}
               size="sm"
             >
-              {t('matching.save_changes')}
+              {"Save Changes"}
             </Button>
           </div>
         }
@@ -229,15 +229,15 @@ export function MatchingConfig() {
         {/* Algorithm Toggles */}
         <Card shadow="sm">
           <CardHeader className="px-4 pt-4 pb-0">
-            <h3 className="font-semibold">{t('matching.algorithm_settings')}</h3>
+            <h3 className="font-semibold">{"Algorithm Settings"}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium">{t('matching.smart_matching_enabled')}</p>
+                  <p className="text-sm font-medium">{"Smart Matching Enabled"}</p>
                   <p className="text-xs text-default-500">
-                    {t('matching.smart_matching_enabled_desc')}
+                    {"Enable or disable the smart matching engine for this tenant"}
                   </p>
                 </div>
                 <Switch
@@ -246,15 +246,15 @@ export function MatchingConfig() {
                     setConfig((prev) => ({ ...prev, enabled: val }));
                     setDirty(true);
                   }}
-                  aria-label={t('matching.label_toggle_smart_matching')}
+                  aria-label={"Toggle Smart Matching"}
                 />
               </div>
               <Divider />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium">{t('matching.broker_approval_required')}</p>
+                  <p className="text-sm font-medium">{"Broker Approval Required"}</p>
                   <p className="text-xs text-default-500">
-                    {t('matching.broker_approval_required_desc')}
+                    {"Require broker approval before matches are shown to members"}
                   </p>
                 </div>
                 <Switch
@@ -263,14 +263,14 @@ export function MatchingConfig() {
                     setConfig((prev) => ({ ...prev, broker_approval_enabled: val }));
                     setDirty(true);
                   }}
-                  aria-label={t('matching.label_toggle_broker_approval')}
+                  aria-label={"Toggle Broker Approval"}
                 />
               </div>
               <Divider />
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <Input
                   type="number"
-                  label={t('matching.label_max_distance')}
+                  label={"Max Distance"}
                   value={String(config.max_distance_km ?? 50)}
                   onValueChange={(val) => {
                     setConfig((prev) => ({ ...prev, max_distance_km: parseInt(val) || 50 }));
@@ -281,7 +281,7 @@ export function MatchingConfig() {
                 />
                 <Input
                   type="number"
-                  label={t('matching.label_min_match_score')}
+                  label={"Min Match Score"}
                   value={String(config.min_match_score ?? 40)}
                   onValueChange={(val) => {
                     setConfig((prev) => ({ ...prev, min_match_score: parseInt(val) || 40 }));
@@ -292,7 +292,7 @@ export function MatchingConfig() {
                 />
                 <Input
                   type="number"
-                  label={t('matching.label_hot_match_threshold')}
+                  label={"Hot Match Threshold"}
                   value={String(config.hot_match_threshold ?? 80)}
                   onValueChange={(val) => {
                     setConfig((prev) => ({ ...prev, hot_match_threshold: parseInt(val) || 80 }));
@@ -309,57 +309,57 @@ export function MatchingConfig() {
         {/* Algorithm Weights */}
         <Card shadow="sm">
           <CardHeader className="flex items-center justify-between px-4 pt-4 pb-0">
-            <h3 className="font-semibold">{t('matching.algorithm_weights')}</h3>
+            <h3 className="font-semibold">{"Algorithm Weights"}</h3>
             <span
               className={`text-sm font-medium ${
                 totalValid ? 'text-success' : 'text-danger'
               }`}
             >
-              {t('matching.total')}: {totalPct}%
-              {!totalValid && ` (${t('matching.should_be_100')})`}
+              {"Total"}: {totalPct}%
+              {!totalValid && ` (${"Weights should sum to 100"})`}
             </span>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             <div className="space-y-6">
               {/* Category Weight */}
               <WeightSlider
-                label={t('matching.label_category_weight')}
-                description={t('matching.desc_weight_for_category_match_alignment')}
+                label={"Category Weight"}
+                description={"Weight for category match alignment between listings"}
                 value={config.category_weight}
                 onChange={(v) => updateWeight('category_weight', v)}
               />
               {/* Skill Weight */}
               <WeightSlider
-                label={t('matching.label_skill_weight')}
-                description={t('matching.desc_weight_for_skill_complementarity')}
+                label={"Skill Weight"}
+                description={"Weight for skill complementarity between member listings"}
                 value={config.skill_weight}
                 onChange={(v) => updateWeight('skill_weight', v)}
               />
               {/* Proximity Weight */}
               <WeightSlider
-                label={t('matching.label_proximity_weight')}
-                description={t('matching.desc_weight_for_geographic_proximity')}
+                label={"Proximity Weight"}
+                description={"Weight for geographic proximity between members"}
                 value={config.proximity_weight}
                 onChange={(v) => updateWeight('proximity_weight', v)}
               />
               {/* Freshness Weight */}
               <WeightSlider
-                label={t('matching.label_freshness_weight')}
-                description={t('matching.desc_weight_for_listing_recency')}
+                label={"Freshness Weight"}
+                description={"Weight for how recently the listing was posted"}
                 value={config.freshness_weight}
                 onChange={(v) => updateWeight('freshness_weight', v)}
               />
               {/* Reciprocity Weight */}
               <WeightSlider
-                label={t('matching.label_reciprocity_weight')}
-                description={t('matching.desc_weight_for_mutual_exchange_potential')}
+                label={"Reciprocity Weight"}
+                description={"Weight for mutual exchange potential between members"}
                 value={config.reciprocity_weight}
                 onChange={(v) => updateWeight('reciprocity_weight', v)}
               />
               {/* Quality Weight */}
               <WeightSlider
-                label={t('matching.label_quality_weight')}
-                description={t('matching.desc_weight_for_profile_completeness_and_rati')}
+                label={"Quality Weight"}
+                description={"Weight for profile completeness and rating quality in the matching algorithm"}
                 value={config.quality_weight}
                 onChange={(v) => updateWeight('quality_weight', v)}
               />
@@ -370,21 +370,21 @@ export function MatchingConfig() {
         {/* Proximity Bands */}
         <Card shadow="sm">
           <CardHeader className="px-4 pt-4 pb-0">
-            <h3 className="font-semibold">{t('matching.proximity_bands')}</h3>
+            <h3 className="font-semibold">{"Proximity Bands"}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             <p className="text-sm text-default-500 mb-4">
-              {t('matching.proximity_bands_desc')}
+              {"Define distance bands used to score geographic proximity between members"}
             </p>
             <Table
-              aria-label={t('matching.label_proximity_bands_configuration')}
+              aria-label={"Proximity Bands Configuration"}
               removeWrapper
               isCompact
             >
               <TableHeader>
-                <TableColumn>{t('matching.col_band')}</TableColumn>
-                <TableColumn>{t('matching.col_distance_km')}</TableColumn>
-                <TableColumn>{t('matching.col_score')}</TableColumn>
+                <TableColumn>{"Band"}</TableColumn>
+                <TableColumn>{"Distance Km"}</TableColumn>
+                <TableColumn>{"Score"}</TableColumn>
               </TableHeader>
               <TableBody>
                 {(config.proximity_bands || []).map((band, i) => (
@@ -433,7 +433,7 @@ export function MatchingConfig() {
         {/* Cache Management & Actions */}
         <Card shadow="sm">
           <CardHeader className="px-4 pt-4 pb-0">
-            <h3 className="font-semibold">{t('matching.cache_management')}</h3>
+            <h3 className="font-semibold">{"Cache Management"}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             <div className="flex flex-wrap gap-3">
@@ -443,7 +443,7 @@ export function MatchingConfig() {
                 startContent={<Trash2 size={16} />}
                 onPress={() => setClearModalOpen(true)}
               >
-                {t('matching.clear_match_cache')}
+                {"Clear Match Cache"}
               </Button>
               <Button
                 color="warning"
@@ -451,7 +451,7 @@ export function MatchingConfig() {
                 startContent={<RotateCcw size={16} />}
                 onPress={() => setResetModalOpen(true)}
               >
-                {t('matching.reset_to_defaults')}
+                {"Reset to Defaults"}
               </Button>
             </div>
           </CardBody>
@@ -463,9 +463,9 @@ export function MatchingConfig() {
         isOpen={clearModalOpen}
         onClose={() => setClearModalOpen(false)}
         onConfirm={handleClearCache}
-        title={t('matching.clear_match_cache')}
-        message={t('matching.clear_cache_confirm')}
-        confirmLabel={t('matching.clear_cache_btn')}
+        title={"Clear Match Cache"}
+        message={"Are you sure you want to clear the match cache?"}
+        confirmLabel={"Clear Cache"}
         confirmColor="danger"
         isLoading={clearing}
       />
@@ -475,9 +475,9 @@ export function MatchingConfig() {
         isOpen={resetModalOpen}
         onClose={() => setResetModalOpen(false)}
         onConfirm={handleReset}
-        title={t('matching.reset_to_defaults')}
-        message={t('matching.reset_defaults_confirm')}
-        confirmLabel={t('matching.reset_btn')}
+        title={"Reset to Defaults"}
+        message={"Are you sure you want to reset all weights to their default values?"}
+        confirmLabel={"Reset"}
         confirmColor="warning"
       />
     </div>

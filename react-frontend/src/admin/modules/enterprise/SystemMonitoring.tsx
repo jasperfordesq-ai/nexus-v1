@@ -29,8 +29,6 @@ import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { SystemHealth } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
-
 /**
  * Parse a memory string like "24 MB" or "256M" to bytes.
  */
@@ -61,8 +59,7 @@ function memoryProgressColor(pct: number): 'success' | 'warning' | 'danger' {
 }
 
 export function SystemMonitoring() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('enterprise.page_title'));
+  usePageTitle("Enterprise");
   const { tenantPath } = useTenant();
 
   const [health, setHealth] = useState<SystemHealth | null>(null);
@@ -95,20 +92,20 @@ export function SystemMonitoring() {
 
   const metrics = health
     ? [
-        { label: t('enterprise.metric_php_version'), value: health.php_version, icon: Cpu, color: 'primary' },
-        { label: t('enterprise.metric_database_size'), value: health.db_size, icon: Database, color: 'success' },
-        { label: t('enterprise.metric_redis_memory'), value: health.redis_memory, icon: HardDrive, color: 'secondary' },
-        { label: t('enterprise.metric_db_uptime'), value: health.uptime, icon: Clock, color: 'primary' },
-        { label: t('enterprise.metric_server_time'), value: health.server_time, icon: Clock, color: 'default' },
-        { label: t('enterprise.metric_operating_system'), value: health.os, icon: Cpu, color: 'default' },
+        { label: "Metric PHP Version", value: health.php_version, icon: Cpu, color: 'primary' },
+        { label: "Database Size", value: health.db_size, icon: Database, color: 'success' },
+        { label: "Redis Memory", value: health.redis_memory, icon: HardDrive, color: 'secondary' },
+        { label: "Metric DB Uptime", value: health.uptime, icon: Clock, color: 'primary' },
+        { label: "Server Time", value: health.server_time, icon: Clock, color: 'default' },
+        { label: "Operating System", value: health.os, icon: Cpu, color: 'default' },
       ]
     : [];
 
   return (
     <div>
       <PageHeader
-        title={t('enterprise.system_monitoring_title')}
-        description={t('enterprise.system_monitoring_desc')}
+        title={"System Monitoring"}
+        description={"Monitor system health, uptime, and performance metrics"}
         actions={
           <div className="flex gap-2">
             <Button
@@ -118,7 +115,7 @@ export function SystemMonitoring() {
               size="sm"
               endContent={<ArrowRight size={14} />}
             >
-              {t('enterprise.health_check')}
+              {"Health Check"}
             </Button>
             <Button
               as={Link}
@@ -127,7 +124,7 @@ export function SystemMonitoring() {
               size="sm"
               endContent={<ArrowRight size={14} />}
             >
-              {t('enterprise.error_logs')}
+              {"Error Logs"}
             </Button>
             <Button
               as={Link}
@@ -136,7 +133,7 @@ export function SystemMonitoring() {
               size="sm"
               endContent={<ArrowRight size={14} />}
             >
-              {t('enterprise.log_files')}
+              {"Log Files"}
             </Button>
             <Button
               as={Link}
@@ -145,7 +142,7 @@ export function SystemMonitoring() {
               size="sm"
               endContent={<ArrowRight size={14} />}
             >
-              {t('enterprise.requirements')}
+              {"Requirements"}
             </Button>
             <Button
               as={Link}
@@ -154,7 +151,7 @@ export function SystemMonitoring() {
               size="sm"
               endContent={<ToggleLeft size={14} />}
             >
-              {t('enterprise.feature_flags')}
+              {"Feature Flags"}
             </Button>
             <Button
               variant="flat"
@@ -163,7 +160,7 @@ export function SystemMonitoring() {
               isLoading={loading}
               size="sm"
             >
-              {t('common.refresh')}
+              {"Refresh"}
             </Button>
           </div>
         }
@@ -176,14 +173,14 @@ export function SystemMonitoring() {
           variant="flat"
           color={health?.db_connected ? 'success' : 'danger'}
         >
-          {t('enterprise.database')}: {health?.db_connected ? t('enterprise.connected') : t('enterprise.disconnected')}
+          {"Database"}: {health?.db_connected ? "Connected" : "Disconnected"}
         </Chip>
         <Chip
           size="sm"
           variant="flat"
           color={health?.redis_connected ? 'success' : 'danger'}
         >
-          {t('enterprise.redis')}: {health?.redis_connected ? t('enterprise.connected') : t('enterprise.disconnected')}
+          {"Redis"}: {health?.redis_connected ? "Connected" : "Disconnected"}
         </Chip>
       </div>
 
@@ -203,7 +200,7 @@ export function SystemMonitoring() {
                     <div className="flex items-center gap-2">
                       <Server size={18} className="text-warning" />
                       <span className="text-sm font-semibold text-foreground">
-                        {t('enterprise.metric_memory_usage_php_request')}
+                        {"PHP Process Memory"}
                       </span>
                     </div>
                     <span className="text-sm text-default-500">
@@ -230,7 +227,7 @@ export function SystemMonitoring() {
                     <div className="flex items-center gap-2">
                       <Cpu size={18} className="text-primary" />
                       <span className="text-sm font-semibold text-foreground">
-                        {t('system_monitoring.vm_memory')}
+                        {"VM Memory"}
                       </span>
                     </div>
                     <span className="text-sm text-default-500">
@@ -246,7 +243,7 @@ export function SystemMonitoring() {
                     className="max-w-full"
                   />
                   <p className="text-xs text-default-400 mt-1">
-                    {t('system_monitoring.memory_available', { available: health.sys_memory.available })}
+                    {`${health.sys_memory.available} available`}
                   </p>
                 </CardBody>
               </Card>
@@ -276,8 +273,8 @@ export function SystemMonitoring() {
               <CardBody className="flex flex-row items-center gap-3 p-4">
                 <FileText size={20} className="text-primary" />
                 <div>
-                  <p className="text-sm font-semibold text-foreground">{t('system_monitoring.log_files')}</p>
-                  <p className="text-xs text-default-500">{t('system_monitoring.log_files_desc')}</p>
+                  <p className="text-sm font-semibold text-foreground">{"Log Files"}</p>
+                  <p className="text-xs text-default-500">{"Log Files."}</p>
                 </div>
               </CardBody>
             </Card>
@@ -285,8 +282,8 @@ export function SystemMonitoring() {
               <CardBody className="flex flex-row items-center gap-3 p-4">
                 <Settings size={20} className="text-warning" />
                 <div>
-                  <p className="text-sm font-semibold text-foreground">{t('system_monitoring.system_requirements')}</p>
-                  <p className="text-xs text-default-500">{t('system_monitoring.system_requirements_desc')}</p>
+                  <p className="text-sm font-semibold text-foreground">{"System Requirements"}</p>
+                  <p className="text-xs text-default-500">{"System Requirements."}</p>
                 </div>
               </CardBody>
             </Card>
@@ -294,8 +291,8 @@ export function SystemMonitoring() {
               <CardBody className="flex flex-row items-center gap-3 p-4">
                 <ToggleLeft size={20} className="text-success" />
                 <div>
-                  <p className="text-sm font-semibold text-foreground">{t('system_monitoring.feature_flags')}</p>
-                  <p className="text-xs text-default-500">{t('enterprise.toggle_features_modules')}</p>
+                  <p className="text-sm font-semibold text-foreground">{"Feature Flags"}</p>
+                  <p className="text-xs text-default-500">{"Toggle Features Modules"}</p>
                 </div>
               </CardBody>
             </Card>

@@ -73,7 +73,7 @@ interface FormData {
 
 export function CreateBadge() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('gamification.page_title'));
+  usePageTitle("Gamification");
   const toast = useToast();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
@@ -106,7 +106,7 @@ export function CreateBadge() {
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      toast.error(t('gamification.badge_name_is_required'));
+      toast.error("Badge Name is Required");
       return;
     }
 
@@ -123,12 +123,12 @@ export function CreateBadge() {
     });
 
     if (res.success) {
-      toast.success(t('gamification.badge_created', { name: formData.name.trim() }));
+      toast.success(`Badge Created`);
       navigate(tenantPath('/admin/custom-badges'));
     } else {
       const errorMsg = (res as { error?: string }).error
         || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
-        || t('gamification.failed_to_create_badge');
+        || "Failed to create badge";
       toast.error(errorMsg);
     }
 
@@ -138,12 +138,12 @@ export function CreateBadge() {
   return (
     <div>
       <PageHeader
-        title={t('gamification.create_badge_title')}
-        description={t('gamification.create_badge_desc')}
+        title={"Create Badge"}
+        description={"Create a new custom badge to award to community members"}
         actions={
           <Link to={tenantPath("/admin/custom-badges")}>
             <Button variant="flat" startContent={<ArrowLeft size={16} />}>
-              {t('gamification.back_to_badges')}
+              {"Back to Badges"}
             </Button>
           </Link>
         }
@@ -152,12 +152,12 @@ export function CreateBadge() {
       <Card shadow="sm" className="max-w-2xl">
         <CardHeader className="flex items-center gap-2 pb-0">
           <Award size={20} className="text-success" />
-          <h3 className="text-lg font-semibold text-foreground">{t('gamification.badge_details')}</h3>
+          <h3 className="text-lg font-semibold text-foreground">{"Badge Details"}</h3>
         </CardHeader>
         <CardBody className="gap-4">
           <Input
-            label={t('gamification.label_name')}
-            placeholder={t('gamification.placeholder_eg_community_champion')}
+            label={"Name"}
+            placeholder={"Eg Community Champion..."}
             value={formData.name}
             onValueChange={(v) => updateField('name', v)}
             isRequired
@@ -166,18 +166,18 @@ export function CreateBadge() {
           />
 
           <Input
-            label={t('gamification.label_slug')}
-            placeholder={t('gamification.placeholder_auto_generated')}
+            label={"Slug"}
+            placeholder={"Auto Generated..."}
             value={formData.slug}
             onValueChange={(v) => setFormData((prev) => ({ ...prev, slug: v }))}
             variant="bordered"
-            description={t('gamification.desc_slug')}
+            description={"Slug"}
             classNames={{ input: 'font-mono text-sm' }}
           />
 
           <Textarea
-            label={t('gamification.label_description')}
-            placeholder={t('gamification.placeholder_describe_what_this_badge_is_awarded_for')}
+            label={"Description"}
+            placeholder={"Describe What This Badge is Awarded for..."}
             value={formData.description}
             onValueChange={(v) => updateField('description', v)}
             variant="bordered"
@@ -186,7 +186,7 @@ export function CreateBadge() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Select
-              label={t('gamification.label_icon')}
+              label={"Icon"}
               selectedKeys={new Set([formData.icon])}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
@@ -200,7 +200,7 @@ export function CreateBadge() {
             </Select>
 
             <Select
-              label={t('gamification.label_category')}
+              label={"Category"}
               selectedKeys={new Set([formData.category])}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
@@ -216,7 +216,7 @@ export function CreateBadge() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              label={t('gamification.label_x_p_value')}
+              label={"XP Value"}
               type="number"
               placeholder="0"
               value={String(formData.xp)}
@@ -224,12 +224,12 @@ export function CreateBadge() {
               variant="bordered"
               min={0}
               max={10000}
-              description={t('gamification.desc_x_p_awarded_when_this_badge_is_earned')}
+              description={"XP awarded when this badge is earned"}
             />
             <div className="flex items-center justify-between p-3 rounded-lg border border-default-200">
               <div>
-                <p className="text-sm font-medium">{t('gamification.active')}</p>
-                <p className="text-xs text-default-400">{t('gamification.active_badge_desc')}</p>
+                <p className="text-sm font-medium">{"Active"}</p>
+                <p className="text-xs text-default-400">{"This badge is active and can be awarded to members"}</p>
               </div>
               <Switch
                 isSelected={formData.is_active}
@@ -241,21 +241,21 @@ export function CreateBadge() {
 
           {/* Preview */}
           <div className="rounded-lg border border-default-200 p-4">
-            <p className="text-xs text-default-500 mb-2 uppercase tracking-wider font-semibold">{t('gamification.preview')}</p>
+            <p className="text-xs text-default-500 mb-2 uppercase tracking-wider font-semibold">{"Preview"}</p>
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-success/10 text-success">
                 <Award size={24} />
               </div>
               <div>
-                <p className="font-semibold text-foreground">{formData.name || t('gamification.badge_name_placeholder')}</p>
-                <p className="text-sm text-default-500">{formData.description || t('gamification.badge_desc_placeholder')}</p>
+                <p className="font-semibold text-foreground">{formData.name || "Badge name..."}</p>
+                <p className="text-sm text-default-500">{formData.description || "Describe what this badge is awarded for..."}</p>
               </div>
             </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
             <Link to={tenantPath("/admin/custom-badges")}>
-              <Button variant="flat" isDisabled={saving}>{t('gamification.cancel')}</Button>
+              <Button variant="flat" isDisabled={saving}>{"Cancel"}</Button>
             </Link>
             <Button
               color="primary"
@@ -263,7 +263,7 @@ export function CreateBadge() {
               onPress={handleSave}
               isLoading={saving}
             >
-              {t('gamification.create_badge')}
+              {"Create Badge"}
             </Button>
           </div>
         </CardBody>

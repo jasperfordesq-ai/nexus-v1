@@ -11,10 +11,8 @@ import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';
 import type { GroupRecommendation } from '@/admin/api/types';
 
-import { useTranslation } from 'react-i18next';
 export default function GroupRecommendations() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('groups.page_title'));
+  usePageTitle("Groups");
   const { error } = useToast();
   const [recommendations, setRecommendations] = useState<GroupRecommendation[]>([]);
   const [stats, setStats] = useState({ total: 0, avg_score: 0, join_rate: 0 });
@@ -28,7 +26,7 @@ export default function GroupRecommendations() {
       setRecommendations(data?.recommendations || []);
       setStats(data?.stats || { total: 0, avg_score: 0, join_rate: 0 });
     } catch {
-      error(t('groups.failed_to_load_recommendations'));
+      error("Failed to load recommendations");
     } finally {
       setLoading(false);
     }
@@ -41,9 +39,9 @@ export default function GroupRecommendations() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">{t('groups.group_recommendations_title')}</h1>
+        <h1 className="text-2xl font-bold">{"Group Recommendations"}</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          {t('groups.group_recommendations_desc')}
+          {"View recently generated group recommendations for members"}
         </p>
       </div>
 
@@ -54,7 +52,7 @@ export default function GroupRecommendations() {
               <TrendingUp className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <div className="text-sm text-gray-500">{t('groups.total_recommendations')}</div>
+              <div className="text-sm text-gray-500">{"Total Recommendations"}</div>
               <div className="text-2xl font-bold mt-1">{stats.total}</div>
             </div>
           </div>
@@ -66,7 +64,7 @@ export default function GroupRecommendations() {
               <Target className="w-6 h-6 text-success" />
             </div>
             <div>
-              <div className="text-sm text-gray-500">{t('groups.avg_match_score')}</div>
+              <div className="text-sm text-gray-500">{"Avg Match Score"}</div>
               <div className="text-2xl font-bold mt-1">{stats.avg_score.toFixed(2)}</div>
             </div>
           </div>
@@ -78,7 +76,7 @@ export default function GroupRecommendations() {
               <Users className="w-6 h-6 text-warning" />
             </div>
             <div>
-              <div className="text-sm text-gray-500">{t('groups.join_rate')}</div>
+              <div className="text-sm text-gray-500">{"Join Rate"}</div>
               <div className="text-2xl font-bold mt-1">{stats.join_rate}%</div>
             </div>
           </div>
@@ -86,17 +84,17 @@ export default function GroupRecommendations() {
       </div>
 
       <Card className="p-4">
-        <h2 className="text-lg font-semibold mb-4">{t('groups.recent_recommendations')}</h2>
-        <Table aria-label={t('groups.label_recommendations_table')}>
+        <h2 className="text-lg font-semibold mb-4">{"Recent Recommendations"}</h2>
+        <Table aria-label={"Recommendations Table"}>
           <TableHeader>
-            <TableColumn>{t('groups.col_user')}</TableColumn>
-            <TableColumn>{t('groups.col_group')}</TableColumn>
-            <TableColumn>{t('groups.col_score')}</TableColumn>
-            <TableColumn>{t('groups.col_status')}</TableColumn>
-            <TableColumn>{t('groups.col_date')}</TableColumn>
+            <TableColumn>{"User"}</TableColumn>
+            <TableColumn>{"Group"}</TableColumn>
+            <TableColumn>{"Score"}</TableColumn>
+            <TableColumn>{"Status"}</TableColumn>
+            <TableColumn>{"Date"}</TableColumn>
           </TableHeader>
           <TableBody
-            emptyContent={loading ? t('groups.loading') : t('groups.no_recommendations_found')}
+            emptyContent={loading ? "Loading groups..." : "No recommendations found"}
             items={recommendations}
           >
             {(rec) => (
@@ -116,7 +114,7 @@ export default function GroupRecommendations() {
                 </TableCell>
                 <TableCell>
                   <Chip size="sm" color={rec.joined ? 'success' : 'default'}>
-                    {rec.joined ? t('groups.joined') : t('groups.pending')}
+                    {rec.joined ? "Joined" : "Pending"}
                   </Chip>
                 </TableCell>
                 <TableCell>{new Date(rec.created_at).toLocaleDateString()}</TableCell>

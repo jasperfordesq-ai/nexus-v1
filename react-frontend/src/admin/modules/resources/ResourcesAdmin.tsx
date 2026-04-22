@@ -54,7 +54,7 @@ const PAGE_SIZE = 50;
 
 export function ResourcesAdmin() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('resources.page_title'));
+  usePageTitle("Resources");
   const toast = useToast();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
@@ -87,7 +87,7 @@ export function ResourcesAdmin() {
         setTotal(payload.meta?.total || 0);
       }
     } catch {
-      toast.error(t('resources.failed_to_load_resources'));
+      toast.error("Failed to load resources");
     } finally {
       setLoading(false);
     }
@@ -106,13 +106,13 @@ export function ResourcesAdmin() {
     try {
       const res = await api.delete(`/v2/admin/resources/${confirmDelete.id}`);
       if (res?.success) {
-        toast.success(t('resources.resource_deleted_successfully'));
+        toast.success("Resource deleted successfully");
         loadItems();
       } else {
-        toast.error(res?.error || t('resources.an_unexpected_error_occurred'));
+        toast.error(res?.error || "An unexpected error occurred");
       }
     } catch {
-      toast.error(t('resources.an_unexpected_error_occurred'));
+      toast.error("An unexpected error occurred");
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -124,7 +124,7 @@ export function ResourcesAdmin() {
   const columns: Column<Resource>[] = [
     {
       key: 'title',
-      label: t('content.label_name'),
+      label: "Name",
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.title}</span>
@@ -132,7 +132,7 @@ export function ResourcesAdmin() {
     },
     {
       key: 'category',
-      label: t('breadcrumbs.categories'),
+      label: "Categories",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">{item.category || '--'}</span>
@@ -140,7 +140,7 @@ export function ResourcesAdmin() {
     },
     {
       key: 'author_name',
-      label: t('listings.author'),
+      label: "Author",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">{item.author_name || t('resources.unknown', 'Unknown')}</span>
@@ -170,7 +170,7 @@ export function ResourcesAdmin() {
     },
     {
       key: 'status',
-      label: t('listings.status'),
+      label: "Status",
       sortable: true,
       render: (item) => (
         <Chip
@@ -195,7 +195,7 @@ export function ResourcesAdmin() {
     },
     {
       key: 'actions',
-      label: t('listings.actions'),
+      label: "Actions",
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -217,7 +217,7 @@ export function ResourcesAdmin() {
             href={tenantPath(`/kb/${item.id}`)}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={t('resources.label_view_resource')}
+            aria-label={"View Resource"}
           >
             <Eye size={14} />
           </Button>
@@ -227,7 +227,7 @@ export function ResourcesAdmin() {
             variant="flat"
             color="danger"
             onPress={() => setConfirmDelete(item)}
-            aria-label={t('resources.label_delete_resource')}
+            aria-label={"Delete Resource"}
           >
             <Trash2 size={14} />
           </Button>
@@ -241,8 +241,8 @@ export function ResourcesAdmin() {
   return (
     <div>
       <PageHeader
-        title={t('resources.resources_admin_title')}
-        description={t('resources.resources_admin_desc')}
+        title={"Resources Admin"}
+        description={"View and manage resource listings shared by community members"}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -270,7 +270,7 @@ export function ResourcesAdmin() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={t('listings.filter_all')} />
+          <Tab key="all" title={"All"} />
           <Tab key="published" title={t('content.published', 'Published')} />
           <Tab key="draft" title={t('content.draft', 'Draft')} />
         </Tabs>
@@ -290,8 +290,8 @@ export function ResourcesAdmin() {
         emptyContent={
           <EmptyState
             icon={BookOpen}
-            title={t('no_data')}
-            description={t('resources.resources_admin_desc')}
+            title={"No data available"}
+            description={"View and manage resource listings shared by community members"}
           />
         }
       />
@@ -301,9 +301,9 @@ export function ResourcesAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title={`${t('common.delete')} ${t('resources.page_title')}`}
-          message={t('gamification.confirm_delete_campaign', { name: confirmDelete.title })}
-          confirmLabel={t('common.delete')}
+          title={`${"Delete"} ${"Resources"}`}
+          message={`Delete Campaign`}
+          confirmLabel={"Delete"}
           confirmColor="danger"
           isLoading={actionLoading}
         />

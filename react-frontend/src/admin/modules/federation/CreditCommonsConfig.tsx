@@ -119,7 +119,7 @@ export function CreditCommonsConfig() {
         toast.success(t('federation.cc_config_saved', 'Credit Commons configuration saved'));
         loadConfig();
       } else {
-        const errorMsg = (res as { error?: string }).error || t('federation.cc_config_save_failed');
+        const errorMsg = (res as { error?: string }).error || "Cc Config Save failed";
         toast.error(errorMsg);
       }
     } catch (err) {

@@ -17,10 +17,8 @@ import { adminGroups } from '../../api/adminApi';
 import { DataTable, PageHeader, ConfirmModal, EmptyState, type Column } from '../../components';
 import type { GroupApproval } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 export function GroupApprovals() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('groups.page_title'));
+  usePageTitle("Groups");
   const toast = useToast();
 
   const [items, setItems] = useState<GroupApproval[]>([]);
@@ -47,7 +45,7 @@ export function GroupApprovals() {
         }
       }
     } catch {
-      toast.error(t('groups.failed_to_load_approvals'));
+      toast.error("Failed to load approvals");
     } finally {
       setLoading(false);
     }
@@ -62,13 +60,13 @@ export function GroupApprovals() {
     try {
       const res = await adminGroups.approveMember(item.id);
       if (res?.success) {
-        toast.success(t('groups.approved_member', { user: item.user_name, group: item.group_name }));
+        toast.success(`Approved Member`);
         loadItems();
       } else {
-        toast.error(res?.error || t('groups.failed_to_approve_membership'));
+        toast.error(res?.error || "Failed to approve membership");
       }
     } catch {
-      toast.error(t('groups.an_unexpected_error_occurred'));
+      toast.error("An unexpected error occurred");
     } finally {
       setActionLoading(null);
     }
@@ -80,13 +78,13 @@ export function GroupApprovals() {
     try {
       const res = await adminGroups.rejectMember(confirmReject.id);
       if (res?.success) {
-        toast.success(t('groups.rejected_member', { user: confirmReject.user_name, group: confirmReject.group_name }));
+        toast.success(`Rejected Member`);
         loadItems();
       } else {
-        toast.error(res?.error || t('groups.failed_to_reject_membership'));
+        toast.error(res?.error || "Failed to reject membership");
       }
     } catch {
-      toast.error(t('groups.an_unexpected_error_occurred'));
+      toast.error("An unexpected error occurred");
     } finally {
       setActionLoading(null);
       setConfirmReject(null);
@@ -96,7 +94,7 @@ export function GroupApprovals() {
   const columns: Column<GroupApproval>[] = [
     {
       key: 'user_name',
-      label: t('groups.col_user'),
+      label: "User",
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.user_name}</span>
@@ -104,7 +102,7 @@ export function GroupApprovals() {
     },
     {
       key: 'group_name',
-      label: t('groups.col_group'),
+      label: "Group",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">{item.group_name}</span>
@@ -112,16 +110,16 @@ export function GroupApprovals() {
     },
     {
       key: 'status',
-      label: t('groups.col_status'),
+      label: "Status",
       render: () => (
         <Chip size="sm" variant="flat" color="warning" className="capitalize">
-          {t('groups.pending')}
+          {"Pending"}
         </Chip>
       ),
     },
     {
       key: 'created_at',
-      label: t('groups.col_requested'),
+      label: "Requested",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -131,7 +129,7 @@ export function GroupApprovals() {
     },
     {
       key: 'actions',
-      label: t('groups.col_actions'),
+      label: "Actions",
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -141,7 +139,7 @@ export function GroupApprovals() {
             color="success"
             isLoading={actionLoading === item.id}
             onPress={() => handleApprove(item)}
-            aria-label={t('groups.label_approve_membership')}
+            aria-label={"Approve Membership"}
           >
             <Check size={14} />
           </Button>
@@ -152,7 +150,7 @@ export function GroupApprovals() {
             color="danger"
             isDisabled={actionLoading === item.id}
             onPress={() => setConfirmReject(item)}
-            aria-label={t('groups.label_reject_membership')}
+            aria-label={"Reject Membership"}
           >
             <X size={14} />
           </Button>
@@ -164,7 +162,7 @@ export function GroupApprovals() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('groups.group_approvals_title')} description={t('groups.group_approvals_desc')} />
+        <PageHeader title={"Group Approvals"} description={"Review and approve pending membership requests for private groups"} />
         <div className="flex items-center justify-center py-20">
           <Spinner size="lg" />
         </div>
@@ -174,20 +172,20 @@ export function GroupApprovals() {
 
   return (
     <div>
-      <PageHeader title={t('groups.group_approvals_title')} description={t('groups.group_approvals_desc')} />
+      <PageHeader title={"Group Approvals"} description={"Review and approve pending membership requests for private groups"} />
 
       {items.length === 0 ? (
         <EmptyState
           icon={UserPlus}
-          title={t('groups.no_pending_approvals')}
-          description={t('groups.desc_all_membership_requests_have_been_review')}
+          title={"No pending approvals"}
+          description={"All membership requests have been reviewed"}
         />
       ) : (
         <DataTable
           columns={columns}
           data={items}
           isLoading={loading}
-          searchPlaceholder={t('groups.search_approvals_placeholder')}
+          searchPlaceholder={"Search approvals..."}
           onRefresh={loadItems}
         />
       )}
@@ -197,9 +195,9 @@ export function GroupApprovals() {
           isOpen={!!confirmReject}
           onClose={() => setConfirmReject(null)}
           onConfirm={handleReject}
-          title={t('groups.reject_membership')}
-          message={t('groups.confirm_reject_membership', { user: confirmReject.user_name, group: confirmReject.group_name })}
-          confirmLabel={t('groups.reject')}
+          title={"Reject Membership"}
+          message={`Reject Membership`}
+          confirmLabel={"Reject"}
           confirmColor="danger"
           isLoading={actionLoading === confirmReject.id}
         />

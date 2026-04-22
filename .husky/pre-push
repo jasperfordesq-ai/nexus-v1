@@ -27,9 +27,10 @@ if [ -z "$CHANGED_FILES" ]; then
   exit 0
 fi
 
-echo "$CHANGED_FILES" | grep -Eq '^(react-frontend/src/|react-frontend/public/locales/|react-frontend/i18next\.config\.ts|react-frontend/package\.json|lang/|scripts/check-i18n-drift\.mjs|scripts/check-admin-i18n\.mjs|\.husky/pre-push|package\.json)' || exit 0
+echo "$CHANGED_FILES" | grep -Eq '^(react-frontend/src/|react-frontend/public/locales/|react-frontend/i18next\.config\.ts|react-frontend/package\.json|lang/|scripts/check-i18n-drift\.mjs|\.husky/pre-push|package\.json)' || exit 0
 
 echo "Running local i18n guardrails before push..."
-npm run check:admin-i18n
+# check:admin-i18n REMOVED 2026-04-22 — admin panel is English-only, no i18n audit needed.
+# See memory/feedback_admin_english_only.md.
 npm run check:i18n:drift
 npm run check:i18n:baseline

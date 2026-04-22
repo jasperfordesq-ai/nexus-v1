@@ -31,10 +31,10 @@ type ConfirmActionType =
   | 'revoke-global';
 
 function getPrivilegeLevel(user: SuperAdminUserDetail, t: (key: string) => string) {
-  if (user.is_super_admin) return { label: t('super.privilege_global_super_admin'), color: 'danger' as const, level: 4 };
-  if (user.is_tenant_super_admin) return { label: t('super.privilege_tenant_super_admin'), color: 'secondary' as const, level: 3 };
-  if (user.role === 'admin' || user.role === 'tenant_admin') return { label: t('super.privilege_admin'), color: 'primary' as const, level: 2 };
-  return { label: t('super.privilege_regular_member'), color: 'default' as const, level: 1 };
+  if (user.is_super_admin) return { label: "Privilege Global Super Admin", color: 'danger' as const, level: 4 };
+  if (user.is_tenant_super_admin) return { label: "Privilege Tenant Super Admin", color: 'secondary' as const, level: 3 };
+  if (user.role === 'admin' || user.role === 'tenant_admin') return { label: "Privilege Admin", color: 'primary' as const, level: 2 };
+  return { label: "Privilege Regular Member", color: 'default' as const, level: 1 };
 }
 
 function formatDate(dateStr: string | null | undefined, neverLabel = 'Never'): string {
@@ -46,7 +46,7 @@ function formatDate(dateStr: string | null | undefined, neverLabel = 'Never'): s
 
 export function UserShow() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('super.page_title'));
+  usePageTitle("Super Admin");
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -110,10 +110,10 @@ export function UserShow() {
       case 'revoke-global': res = await adminSuper.revokeGlobalSuperAdmin(user.id); break;
     }
     if (res?.success) {
-      toast.success(t('super.user_updated_successfully'));
+      toast.success("User updated successfully");
       loadUser();
     } else {
-      toast.error(res?.error || t('super.action_failed'));
+      toast.error(res?.error || "Failed");
     }
     setActionLoading(false);
     setConfirmAction(null);
@@ -124,12 +124,12 @@ export function UserShow() {
     setMoveLoading(true);
     const res = await adminSuper.moveUserTenant(user.id, Number(moveTargetTenant));
     if (res?.success) {
-      toast.success(t('super.user_moved_to_new_tenant'));
+      toast.success("User Moved to New Tenant");
       setMoveModalOpen(false);
       setMoveTargetTenant('');
       loadUser();
     } else {
-      toast.error(res?.error || t('super.failed_to_move_user'));
+      toast.error(res?.error || "Failed to move user");
     }
     setMoveLoading(false);
   };
@@ -139,12 +139,12 @@ export function UserShow() {
     setPromoteLoading(true);
     const res = await adminSuper.moveAndPromote(user.id, Number(promoteTargetTenant));
     if (res?.success) {
-      toast.success(t('super.user_moved_and_promoted_to_tenant_super_'));
+      toast.success("User moved and promoted to tenant super admin");
       setPromoteModalOpen(false);
       setPromoteTargetTenant('');
       loadUser();
     } else {
-      toast.error(res?.error || t('super.failed_to_move_and_promote'));
+      toast.error(res?.error || "Failed to move and promote");
     }
     setPromoteLoading(false);
   };
@@ -175,27 +175,27 @@ export function UserShow() {
 
   const confirmMessages: Record<ConfirmActionType, { title: string; message: string; label: string; color: 'danger' | 'warning' | 'primary' }> = {
     'grant-sa': {
-      title: t('super.confirm_grant_sa_title'),
-      message: t('super.confirm_grant_sa_message_detail', { name: user?.name || 'this user' }),
-      label: t('super.grant_tenant_sa'),
+      title: "Are you sure you want to grant sa title?",
+      message: `Are you sure you want to grant sa message detail?`,
+      label: "Grant Tenant Sa",
       color: 'primary',
     },
     'revoke-sa': {
-      title: t('super.confirm_revoke_sa_title'),
-      message: t('super.confirm_revoke_sa_message_detail', { name: user?.name || 'this user' }),
-      label: t('super.revoke_tenant_sa'),
+      title: "Are you sure you want to revoke sa title?",
+      message: `Are you sure you want to revoke sa message detail?`,
+      label: "Revoke Tenant Sa",
       color: 'danger',
     },
     'grant-global': {
-      title: t('super.confirm_grant_global_title'),
-      message: t('super.confirm_grant_global_message_detail', { name: user?.name || 'this user' }),
-      label: t('super.grant_global_sa'),
+      title: "Are you sure you want to grant global title?",
+      message: `Are you sure you want to grant global message detail?`,
+      label: "Grant Global Sa",
       color: 'danger',
     },
     'revoke-global': {
-      title: t('super.confirm_revoke_global_title'),
-      message: t('super.confirm_revoke_global_message_detail', { name: user?.name || 'this user' }),
-      label: t('super.revoke_global_sa'),
+      title: "Are you sure you want to revoke global title?",
+      message: `Are you sure you want to revoke global message detail?`,
+      label: "Revoke Global Sa",
       color: 'danger',
     },
   };
@@ -206,7 +206,7 @@ export function UserShow() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Spinner size="lg" label={t('super.loading_user_details')} />
+        <Spinner size="lg" label={"Loading user details..."} />
       </div>
     );
   }
@@ -214,9 +214,9 @@ export function UserShow() {
   if (!user) {
     return (
       <div className="p-8 text-center">
-        <p className="text-default-500">{t('super.user_not_found')}</p>
+        <p className="text-default-500">{"User Not Found"}</p>
         <Button className="mt-4" variant="flat" onPress={() => navigate(tenantPath('/admin/super/users'))}>
-          {t('super.back_to_users')}
+          {"Back to Users"}
         </Button>
       </div>
     );
@@ -228,7 +228,7 @@ export function UserShow() {
     <div>
       <PageHeader
         title={user.name}
-        description={t('super.cross_tenant_user_details', { email: user.email })}
+        description={`Cross Tenant User Details`}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -236,14 +236,14 @@ export function UserShow() {
               startContent={<Edit size={16} />}
               onPress={() => navigate(tenantPath(`/admin/super/users/${user.id}/edit`))}
             >
-              {t('super.edit')}
+              {"Edit"}
             </Button>
             <Button
               variant="light"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/super/users'))}
             >
-              {t('super.back_to_users')}
+              {"Back to Users"}
             </Button>
           </div>
         }
@@ -256,7 +256,7 @@ export function UserShow() {
           <Card>
             <CardHeader className="font-semibold text-lg flex items-center gap-2">
               <User size={18} />
-              {t('super.user_information')}
+              {"User Information"}
             </CardHeader>
             <Divider />
             <CardBody>
@@ -285,12 +285,12 @@ export function UserShow() {
                     </Chip>
                     {user.is_super_admin && (
                       <Chip size="sm" variant="flat" color="danger" startContent={<ShieldAlert size={12} />}>
-                        {t('super.privilege_global_super_admin')}
+                        {"Privilege Global Super Admin"}
                       </Chip>
                     )}
                     {user.is_tenant_super_admin && (
                       <Chip size="sm" variant="flat" color="secondary" startContent={<Shield size={12} />}>
-                        {t('super.privilege_tenant_super_admin')}
+                        {"Privilege Tenant Super Admin"}
                       </Chip>
                     )}
                   </div>
@@ -301,44 +301,44 @@ export function UserShow() {
 
           {/* Profile Info */}
           <Card>
-            <CardHeader className="font-semibold text-lg">{t('super.profile_info')}</CardHeader>
+            <CardHeader className="font-semibold text-lg">{"Profile Info"}</CardHeader>
             <Divider />
             <CardBody>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
                   <MapPin size={16} className="text-default-400 shrink-0" />
                   <div>
-                    <p className="text-xs text-default-400">{t('super.label_location')}</p>
-                    <p className="text-sm text-foreground">{user.location || t('super.not_set')}</p>
+                    <p className="text-xs text-default-400">{"Location"}</p>
+                    <p className="text-sm text-foreground">{user.location || "Not Set"}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Phone size={16} className="text-default-400 shrink-0" />
                   <div>
-                    <p className="text-xs text-default-400">{t('super.label_phone')}</p>
-                    <p className="text-sm text-foreground">{user.phone || t('super.not_set')}</p>
+                    <p className="text-xs text-default-400">{"Phone"}</p>
+                    <p className="text-sm text-foreground">{user.phone || "Not Set"}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <CalendarDays size={16} className="text-default-400 shrink-0" />
                   <div>
-                    <p className="text-xs text-default-400">{t('super.label_member_since')}</p>
-                    <p className="text-sm text-foreground">{formatDate(user.created_at, t('super.never'))}</p>
+                    <p className="text-xs text-default-400">{"Member Since"}</p>
+                    <p className="text-sm text-foreground">{formatDate(user.created_at, "Never")}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Clock size={16} className="text-default-400 shrink-0" />
                   <div>
-                    <p className="text-xs text-default-400">{t('super.label_last_login')}</p>
-                    <p className="text-sm text-foreground">{formatDate(user.last_login_at, t('super.never'))}</p>
+                    <p className="text-xs text-default-400">{"Last Login"}</p>
+                    <p className="text-sm text-foreground">{formatDate(user.last_login_at, "Never")}</p>
                   </div>
                 </div>
                 {user.balance !== undefined && (
                   <div className="flex items-center gap-3">
                     <Wallet size={16} className="text-default-400 shrink-0" />
                     <div>
-                      <p className="text-xs text-default-400">{t('super.label_time_balance')}</p>
-                      <p className="text-sm font-medium text-foreground">{user.balance} {t('super.hours')}</p>
+                      <p className="text-xs text-default-400">{"Time Balance"}</p>
+                      <p className="text-sm font-medium text-foreground">{user.balance} {"Hours"}</p>
                     </div>
                   </div>
                 )}
@@ -350,13 +350,13 @@ export function UserShow() {
           <Card>
             <CardHeader className="font-semibold text-lg flex items-center gap-2">
               <Building2 size={18} />
-              {t('super.tenant_association')}
+              {"Tenant Association"}
             </CardHeader>
             <Divider />
             <CardBody className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <div>
-                  <p className="text-xs text-default-400">{t('super.label_current_tenant')}</p>
+                  <p className="text-xs text-default-400">{"Current Tenant"}</p>
                   <Link
                     to={tenantPath(`/admin/super/tenants/${user.tenant_id}`)}
                     className="text-sm font-medium text-primary hover:underline"
@@ -365,7 +365,7 @@ export function UserShow() {
                   </Link>
                 </div>
                 <div>
-                  <p className="text-xs text-default-400">{t('super.label_tenant_i_d')}</p>
+                  <p className="text-xs text-default-400">{"Tenant I D"}</p>
                   <p className="text-sm text-foreground">{user.tenant_id}</p>
                 </div>
               </div>
@@ -377,7 +377,7 @@ export function UserShow() {
                   startContent={<ArrowRightLeft size={16} />}
                   onPress={() => setMoveModalOpen(true)}
                 >
-                  {t('super.move_to_different_tenant')}
+                  {"Move to Different Tenant"}
                 </Button>
                 <Button
                   variant="flat"
@@ -385,7 +385,7 @@ export function UserShow() {
                   startContent={<Crown size={16} />}
                   onPress={() => setPromoteModalOpen(true)}
                 >
-                  {t('super.move_and_promote_to_hub')}
+                  {"Move and Promote to Hub"}
                 </Button>
               </div>
             </CardBody>
@@ -399,13 +399,13 @@ export function UserShow() {
             <CardHeader className="font-semibold text-lg flex items-center gap-2">
               <ShieldAlert size={18} className="text-purple-600 dark:text-purple-400" />
               <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                {t('super.god_level_access')}
+                {"God Level Access"}
               </span>
             </CardHeader>
             <Divider className="bg-purple-500/20" />
             <CardBody className="flex flex-col gap-3">
               <p className="text-xs text-default-600">
-                {t('super.god_level_desc')}
+                {"God Level."}
               </p>
               {user.is_super_admin ? (
                 <Button
@@ -415,7 +415,7 @@ export function UserShow() {
                   onPress={() => setConfirmAction('revoke-global')}
                 >
                   <span className="bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent font-medium">
-                    {t('super.revoke_global_sa')}
+                    {"Revoke Global Sa"}
                   </span>
                 </Button>
               ) : (
@@ -427,11 +427,11 @@ export function UserShow() {
                     onPress={() => setConfirmAction('grant-global')}
                   >
                     <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-semibold">
-                      {t('super.grant_global_sa')}
+                      {"Grant Global Sa"}
                     </span>
                   </Button>
                   <p className="text-[10px] text-purple-700 dark:text-purple-400 mt-2 text-center font-medium">
-                    {t('super.god_level_caution')}
+                    {"God Level Caution"}
                   </p>
                 </div>
               )}
@@ -442,12 +442,12 @@ export function UserShow() {
           <Card>
             <CardHeader className="font-semibold text-lg flex items-center gap-2">
               <Shield size={18} />
-              {t('super.tenant_super_admin')}
+              {"Tenant Super Admin"}
             </CardHeader>
             <Divider />
             <CardBody className="flex flex-col gap-3">
               <p className="text-xs text-default-600">
-                {t('super.tenant_sa_desc')}
+                {"Tenant Sa."}
               </p>
               {user.is_tenant_super_admin ? (
                 <Button
@@ -456,7 +456,7 @@ export function UserShow() {
                   startContent={<ShieldOff size={16} />}
                   onPress={() => setConfirmAction('revoke-sa')}
                 >
-                  {t('super.revoke_tenant_sa')}
+                  {"Revoke Tenant Sa"}
                 </Button>
               ) : (
                 <Button
@@ -465,7 +465,7 @@ export function UserShow() {
                   startContent={<Shield size={16} />}
                   onPress={() => setConfirmAction('grant-sa')}
                 >
-                  {t('super.grant_tenant_sa')}
+                  {"Grant Tenant Sa"}
                 </Button>
               )}
             </CardBody>
@@ -473,7 +473,7 @@ export function UserShow() {
 
           {/* Privilege Level */}
           <Card>
-            <CardHeader className="font-semibold text-lg">{t('super.privilege_level')}</CardHeader>
+            <CardHeader className="font-semibold text-lg">{"Privilege Level"}</CardHeader>
             <Divider />
             <CardBody>
               <div className="flex flex-col items-center gap-3 py-2">
@@ -513,10 +513,10 @@ export function UserShow() {
                   ))}
                 </div>
                 <div className="flex justify-between w-full text-[10px] text-default-400">
-                  <span>{t('super.privilege_member_short')}</span>
-                  <span>{t('super.privilege_admin_short')}</span>
-                  <span>{t('super.privilege_tsa_short')}</span>
-                  <span>{t('super.privilege_gsa_short')}</span>
+                  <span>{"Privilege Member Short"}</span>
+                  <span>{"Privilege Admin Short"}</span>
+                  <span>{"Privilege Tsa Short"}</span>
+                  <span>{"Privilege Gsa Short"}</span>
                 </div>
               </div>
             </CardBody>
@@ -524,7 +524,7 @@ export function UserShow() {
 
           {/* Quick Actions */}
           <Card>
-            <CardHeader className="font-semibold text-lg">{t('super.quick_actions')}</CardHeader>
+            <CardHeader className="font-semibold text-lg">{"Quick Actions"}</CardHeader>
             <Divider />
             <CardBody>
               <div className="flex flex-col gap-2">
@@ -535,7 +535,7 @@ export function UserShow() {
                   fullWidth
                   onPress={() => navigate(tenantPath(`/admin/super/users/${user.id}/edit`))}
                 >
-                  {t('super.edit_user')}
+                  {"Edit User"}
                 </Button>
                 {isCurrentSuperAdmin && (
                   <Button
@@ -554,7 +554,7 @@ export function UserShow() {
                   fullWidth
                   onPress={() => navigate(tenantPath('/admin/super/users'))}
                 >
-                  {t('super.back_to_users')}
+                  {"Back to Users"}
                 </Button>
               </div>
             </CardBody>
@@ -579,13 +579,13 @@ export function UserShow() {
       {/* Move to Tenant Modal */}
       <Modal isOpen={moveModalOpen} onClose={() => { setMoveModalOpen(false); setMoveTargetTenant(''); }} size="md">
         <ModalContent>
-          <ModalHeader>{t('super.move_user_to_tenant')}</ModalHeader>
+          <ModalHeader>{"Move User to Tenant"}</ModalHeader>
           <ModalBody>
-            <p className="text-sm text-default-600 mb-3" dangerouslySetInnerHTML={{ __html: sanitizeInline(t('super.move_user_desc', { name: user.name })) }} />
+            <p className="text-sm text-default-600 mb-3" dangerouslySetInnerHTML={{ __html: sanitizeInline(`Move User.`) }} />
 
             <Select
-              label={t('super.label_target_tenant')}
-              placeholder={t('super.placeholder_select_a_tenant')}
+              label={"Target Tenant"}
+              placeholder={"Select a Tenant..."}
               selectedKeys={moveTargetTenant ? [moveTargetTenant] : []}
               onSelectionChange={(keys) => setMoveTargetTenant(String(Array.from(keys)[0] || ''))}
             >
@@ -596,7 +596,7 @@ export function UserShow() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => { setMoveModalOpen(false); setMoveTargetTenant(''); }} isDisabled={moveLoading}>
-              {t('super.cancel')}
+              {"Cancel"}
             </Button>
             <Button
               color="primary"
@@ -604,7 +604,7 @@ export function UserShow() {
               isLoading={moveLoading}
               isDisabled={!moveTargetTenant}
             >
-              {t('super.move_user')}
+              {"Move User"}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -644,7 +644,7 @@ export function UserShow() {
               onPress={() => setImpersonateModalOpen(false)}
               isDisabled={impersonateLoading}
             >
-              {t('super.cancel')}
+              {"Cancel"}
             </Button>
             <Button
               color="warning"
@@ -663,18 +663,18 @@ export function UserShow() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Crown size={20} className="text-secondary" />
-            {t('super.move_and_promote')}
+            {"Move and Promote"}
           </ModalHeader>
           <ModalBody>
-            <p className="text-sm text-default-600 mb-3" dangerouslySetInnerHTML={{ __html: sanitizeInline(t('super.move_and_promote_desc', { name: user.name })) }} />
+            <p className="text-sm text-default-600 mb-3" dangerouslySetInnerHTML={{ __html: sanitizeInline(`Move and Promote.`) }} />
             <div className="bg-warning-50 dark:bg-warning-50/10 border border-warning-200 dark:border-warning-200/20 rounded-lg p-3 mb-3">
               <p className="text-xs text-warning-700 dark:text-warning-400">
-                {t('super.move_and_promote_warning')}
+                {"Move and Promote Warning"}
               </p>
             </div>
             <Select
-              label={t('super.label_target_hub_tenant')}
-              placeholder={t('super.placeholder_select_a_hub_tenant')}
+              label={"Target Hub Tenant"}
+              placeholder={"Select a Hub Tenant..."}
               selectedKeys={promoteTargetTenant ? [promoteTargetTenant] : []}
               onSelectionChange={(keys) => setPromoteTargetTenant(String(Array.from(keys)[0] || ''))}
             >
@@ -683,12 +683,12 @@ export function UserShow() {
                 .map(t => <SelectItem key={String(t.id)}>{t.name}</SelectItem>)}
             </Select>
             {hubTenants.filter(t => t.id !== user.tenant_id).length === 0 && (
-              <p className="text-xs text-default-400 mt-1">{t('super.no_hub_tenants')}</p>
+              <p className="text-xs text-default-400 mt-1">{"No hub tenants found"}</p>
             )}
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => { setPromoteModalOpen(false); setPromoteTargetTenant(''); }} isDisabled={promoteLoading}>
-              {t('super.cancel')}
+              {"Cancel"}
             </Button>
             <Button
               color="secondary"
@@ -696,7 +696,7 @@ export function UserShow() {
               isLoading={promoteLoading}
               isDisabled={!promoteTargetTenant}
             >
-              {t('super.move_and_promote')}
+              {"Move and Promote"}
             </Button>
           </ModalFooter>
         </ModalContent>

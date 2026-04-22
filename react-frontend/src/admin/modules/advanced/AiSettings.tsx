@@ -131,7 +131,7 @@ const DEFAULT_FORM: FormState = {
 
 export function AiSettings() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('advanced.page_title'));
+  usePageTitle("Advanced");
   const toast = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -187,7 +187,7 @@ export function AiSettings() {
           );
         }
       })
-      .catch(() => toast.error(t('advanced.failed_to_load_a_i_settings')))
+      .catch(() => toast.error("Failed to load AI settings"))
       .finally(() => setLoading(false));
   }, [toast, t, mapResponseToForm]);
 
@@ -240,7 +240,7 @@ export function AiSettings() {
       const res = await adminSettings.updateAiConfig(payload);
 
       if (res.success) {
-        toast.success(t('advanced.a_i_settings_saved_successfully'));
+        toast.success("AI Settings Saved Successfully");
         // Refresh to get updated masked keys & key-set status
         const refreshed = await adminSettings.getAiConfig();
         if (refreshed.data) {
@@ -255,11 +255,11 @@ export function AiSettings() {
           setDirtyKeys(new Set());
         }
       } else {
-        const error = (res as { error?: string }).error || t('advanced.save_failed');
+        const error = (res as { error?: string }).error || "Save failed";
         toast.error(error);
       }
     } catch (err) {
-      toast.error(t('advanced.failed_to_save_a_i_settings'));
+      toast.error("Failed to save AI settings");
     } finally {
       setSaving(false);
     }
@@ -276,38 +276,38 @@ export function AiSettings() {
 
   return (
     <div>
-      <PageHeader title={t('advanced.ai_settings_title')} description={t('advanced.ai_settings_desc')} />
+      <PageHeader title={"AI Settings"} description={"Configure AI provider, API key, and features for your platform"} />
 
       <div className="space-y-4">
         {/* Master Enable + Provider Selection */}
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Bot size={20} /> {t('advanced.ai_integration_heading')}
+              <Bot size={20} /> {"AI Integration"}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('advanced.enable_ai_features')}</p>
-                <p className="text-sm text-default-500">{t('advanced.enable_ai_features_desc')}</p>
+                <p className="font-medium">{"Enable AI Features"}</p>
+                <p className="text-sm text-default-500">{"Enable or disable AI-powered features across the platform"}</p>
               </div>
               <Switch
                 isSelected={form.ai_enabled}
                 onValueChange={(v) => updateField('ai_enabled', v)}
-                aria-label={t('advanced.label_enable_a_i')}
+                aria-label={"Enable AI"}
               />
             </div>
 
             <Select
-              label={t('advanced.label_a_i_provider')}
+              label={"AI Provider"}
               selectedKeys={[form.ai_provider]}
               onSelectionChange={(keys) => {
                 const v = Array.from(keys)[0];
                 if (v) updateField('ai_provider', String(v));
               }}
               variant="bordered"
-              description={t('advanced.desc_select_ai_provider')}
+              description={"Select AI Provider."}
             >
               {PROVIDERS.map(p => (
                 <SelectItem key={p.key}>{t(p.labelKey)}</SelectItem>
@@ -320,7 +320,7 @@ export function AiSettings() {
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Key size={20} /> {t('advanced.provider_configuration_heading')}
+              <Key size={20} /> {"Provider Configuration"}
             </h3>
           </CardHeader>
           <CardBody className="gap-6">
@@ -336,46 +336,46 @@ export function AiSettings() {
                 <div key={provider.key} className="space-y-3">
                   <div className="flex items-center gap-2">
                     <p className="font-medium">{t(provider.labelKey)}</p>
-                    {isActive && <Chip size="sm" color="primary" variant="flat">{t('advanced.chip_active')}</Chip>}
+                    {isActive && <Chip size="sm" color="primary" variant="flat">{"Active"}</Chip>}
                     {!isOllama && hasKeySet && !userTyped && (
-                      <Chip size="sm" color="success" variant="flat">{t('advanced.chip_key_configured')}</Chip>
+                      <Chip size="sm" color="success" variant="flat">{"Key Configured"}</Chip>
                     )}
                   </div>
 
                   {!isOllama ? (
                     <Input
-                      label={t('advanced.label_api_key')}
+                      label={"API Key"}
                       type="password"
-                      placeholder={hasKeySet ? `${t('advanced.placeholder_current')}: ${masked}` : t('advanced.placeholder_enter_api_key')}
+                      placeholder={hasKeySet ? `${"Enter current..."}: ${masked}` : "Enter API key..."}
                       variant="bordered"
                       description={
                         hasKeySet
-                          ? t('advanced.desc_api_key_replace')
-                          : t('advanced.desc_api_key_new')
+                          ? "API Key Replace."
+                          : "API Key New."
                       }
                       value={form[apiKeyField] as string}
                       onValueChange={(v) => updateApiKey(apiKeyField, v)}
                     />
                   ) : (
                     <Input
-                      label={t('advanced.label_ollama_host_url')}
+                      label={"Ollama Host URL"}
                       placeholder="http://localhost:11434"
                       variant="bordered"
-                      description={t('advanced.desc_ollama_host')}
+                      description={"Ollama Host."}
                       value={form.ollama_host}
                       onValueChange={(v) => updateField('ollama_host', v)}
                     />
                   )}
 
                   <Select
-                    label={t('advanced.label_model')}
+                    label={"Model"}
                     selectedKeys={[form[provider.modelField] as string]}
                     onSelectionChange={(keys) => {
                       const v = Array.from(keys)[0];
                       if (v) updateField(provider.modelField, String(v));
                     }}
                     variant="bordered"
-                    description={t('advanced.desc_select_model')}
+                    description={"Select Model."}
                   >
                     {MODEL_SUGGESTIONS[provider.key].map(m => (
                       <SelectItem key={m}>{m}</SelectItem>
@@ -393,7 +393,7 @@ export function AiSettings() {
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Cpu size={20} /> {t('advanced.ai_features_heading')}
+              <Cpu size={20} /> {"AI Features"}
             </h3>
           </CardHeader>
           <CardBody className="space-y-3">
@@ -418,25 +418,25 @@ export function AiSettings() {
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Sliders size={20} /> {t('advanced.usage_limits_heading')}
+              <Sliders size={20} /> {"Usage Limits"}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={t('advanced.label_default_daily_limit')}
+              label={"Default Daily Limit"}
               type="number"
               placeholder="50"
               variant="bordered"
-              description={t('advanced.desc_default_daily_limit')}
+              description={"Default Daily Limit."}
               value={form.default_daily_limit}
               onValueChange={(v) => updateField('default_daily_limit', v)}
             />
             <Input
-              label={t('advanced.label_default_monthly_limit')}
+              label={"Default Monthly Limit"}
               type="number"
               placeholder="1000"
               variant="bordered"
-              description={t('advanced.desc_default_monthly_limit')}
+              description={"Default Monthly Limit."}
               value={form.default_monthly_limit}
               onValueChange={(v) => updateField('default_monthly_limit', v)}
             />
@@ -449,9 +449,9 @@ export function AiSettings() {
             <div className="flex items-start gap-3">
               <Shield size={20} className="text-default-400 mt-0.5 shrink-0" />
               <div>
-                <p className="text-sm font-medium">{t('advanced.security_heading')}</p>
+                <p className="text-sm font-medium">{"Security"}</p>
                 <p className="text-xs text-default-400">
-                  {t('advanced.security_note')}
+                  {"Security"}
                 </p>
               </div>
             </div>
@@ -467,7 +467,7 @@ export function AiSettings() {
             isLoading={saving}
             isDisabled={saving}
           >
-            {t('advanced.save_settings')}
+            {"Save Settings"}
           </Button>
         </div>
       </div>

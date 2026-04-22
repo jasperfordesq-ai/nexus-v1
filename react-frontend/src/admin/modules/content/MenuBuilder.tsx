@@ -62,8 +62,6 @@ import { DynamicIcon } from '@/components/ui';
 import { adminMenus, adminPages } from '../../api/adminApi';
 import { PageHeader, IconPicker, VisibilityRulesEditor, ConfirmModal } from '../../components';
 import type { MenuItemType, MenuLocation, VisibilityRules } from '@/types/menu';
-import { useTranslation } from 'react-i18next';
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
@@ -108,27 +106,27 @@ type TFunction = (key: string, options?: Record<string, unknown>) => string;
 
 /** Route picker — labels from existing nav.* keys via cross-namespace lookup */
 const getAppRoutes = (t: TFunction): { value: string; label: string; group: string }[] => [
-  { value: '/dashboard', label: t('common:nav.dashboard'), group: t('menu_builder.group_core') },
-  { value: '/feed', label: t('common:nav.feed'), group: t('menu_builder.group_core') },
-  { value: '/listings', label: t('common:nav.listings'), group: t('menu_builder.group_core') },
-  { value: '/messages', label: t('common:nav.messages'), group: t('menu_builder.group_core') },
-  { value: '/wallet', label: t('common:nav.wallet'), group: t('menu_builder.group_core') },
-  { value: '/members', label: t('common:nav.members'), group: t('menu_builder.group_community') },
-  { value: '/groups', label: t('common:nav.groups'), group: t('menu_builder.group_community') },
-  { value: '/events', label: t('common:nav.events'), group: t('menu_builder.group_community') },
-  { value: '/connections', label: t('common:nav.connections'), group: t('menu_builder.group_community') },
-  { value: '/volunteering', label: t('common:nav.volunteering'), group: t('menu_builder.group_features') },
-  { value: '/organisations', label: t('common:nav.organisations'), group: t('menu_builder.group_features') },
-  { value: '/goals', label: t('common:nav.goals'), group: t('menu_builder.group_features') },
-  { value: '/blog', label: t('common:nav.blog'), group: t('menu_builder.group_features') },
-  { value: '/resources', label: t('common:nav.resources'), group: t('menu_builder.group_features') },
-  { value: '/jobs', label: t('common:nav.jobs'), group: t('menu_builder.group_features') },
-  { value: '/marketplace', label: t('common:nav.marketplace'), group: t('menu_builder.group_features') },
-  { value: '/leaderboard', label: t('common:nav.leaderboard'), group: t('menu_builder.group_gamification') },
-  { value: '/achievements', label: t('common:nav.achievements'), group: t('menu_builder.group_gamification') },
-  { value: '/about', label: t('common:nav.about'), group: t('menu_builder.group_info') },
-  { value: '/faq', label: t('common:nav.faq'), group: t('menu_builder.group_info') },
-  { value: '/explore', label: t('common:nav.explore'), group: t('menu_builder.group_info') },
+  { value: '/dashboard', label: "Dashboard", group: "Core" },
+  { value: '/feed', label: "Feed", group: "Core" },
+  { value: '/listings', label: "Listings", group: "Core" },
+  { value: '/messages', label: "Messages", group: "Core" },
+  { value: '/wallet', label: "Wallet", group: "Core" },
+  { value: '/members', label: "Members", group: "Community" },
+  { value: '/groups', label: "Groups", group: "Community" },
+  { value: '/events', label: "Events", group: "Community" },
+  { value: '/connections', label: "Connections", group: "Community" },
+  { value: '/volunteering', label: "Volunteering", group: "Features" },
+  { value: '/organisations', label: "Organisations", group: "Features" },
+  { value: '/goals', label: "Goals", group: "Features" },
+  { value: '/blog', label: "Blog", group: "Features" },
+  { value: '/resources', label: "Resources", group: "Features" },
+  { value: '/jobs', label: "Jobs", group: "Features" },
+  { value: '/marketplace', label: "Marketplace", group: "Features" },
+  { value: '/leaderboard', label: "Leaderboard", group: "Gamification" },
+  { value: '/achievements', label: "Achievements", group: "Gamification" },
+  { value: '/about', label: "About", group: "Info" },
+  { value: '/faq', label: "FAQ", group: "Info" },
+  { value: '/explore', label: "Explore", group: "Info" },
 ];
 
 /**
@@ -142,47 +140,47 @@ function getDefaultItems(t: TFunction): MenuItemData[] {
   const communityId = next();
   return [
     {
-      id: next(), label: t('common:nav.feed'), url: '/feed', type: 'link',
+      id: next(), label: "Feed", url: '/feed', type: 'link',
       icon: 'Newspaper', target: '_self', sort_order: 0, parent_id: null,
       visibility_rules: null, is_active: 1, css_class: null,
     },
     {
-      id: next(), label: t('common:nav.explore'), url: '/explore', type: 'link',
+      id: next(), label: "Explore", url: '/explore', type: 'link',
       icon: 'Compass', target: '_self', sort_order: 1, parent_id: null,
       visibility_rules: null, is_active: 1, css_class: null,
     },
     {
-      id: next(), label: t('common:nav.listings'), url: '/listings', type: 'link',
+      id: next(), label: "Listings", url: '/listings', type: 'link',
       icon: 'ListTodo', target: '_self', sort_order: 2, parent_id: null,
       visibility_rules: null, is_active: 1, css_class: null,
     },
     {
-      id: communityId, label: t('common:nav.community'), url: null, type: 'dropdown',
+      id: communityId, label: "Community", url: null, type: 'dropdown',
       icon: 'Users', target: '_self', sort_order: 3, parent_id: null,
       visibility_rules: null, is_active: 1, css_class: null,
     },
     {
-      id: next(), label: t('common:nav.members'), url: '/members', type: 'link',
+      id: next(), label: "Members", url: '/members', type: 'link',
       icon: 'Users', target: '_self', sort_order: 4, parent_id: communityId,
       visibility_rules: null, is_active: 1, css_class: null,
     },
     {
-      id: next(), label: t('common:nav.events'), url: '/events', type: 'link',
+      id: next(), label: "Events", url: '/events', type: 'link',
       icon: 'Calendar', target: '_self', sort_order: 5, parent_id: communityId,
       visibility_rules: null, is_active: 1, css_class: null,
     },
     {
-      id: next(), label: t('common:nav.groups'), url: '/groups', type: 'link',
+      id: next(), label: "Groups", url: '/groups', type: 'link',
       icon: 'Users', target: '_self', sort_order: 6, parent_id: communityId,
       visibility_rules: null, is_active: 1, css_class: null,
     },
     {
-      id: next(), label: t('common:nav.volunteering'), url: '/volunteering', type: 'link',
+      id: next(), label: "Volunteering", url: '/volunteering', type: 'link',
       icon: 'Heart', target: '_self', sort_order: 7, parent_id: communityId,
       visibility_rules: null, is_active: 1, css_class: null,
     },
     {
-      id: next(), label: t('common:nav.resources'), url: '/resources', type: 'link',
+      id: next(), label: "Resources", url: '/resources', type: 'link',
       icon: 'FolderOpen', target: '_self', sort_order: 8, parent_id: communityId,
       visibility_rules: null, is_active: 1, css_class: null,
     },
@@ -190,20 +188,20 @@ function getDefaultItems(t: TFunction): MenuItemData[] {
 }
 
 const getLocationOptions = (t: TFunction): { key: MenuLocation; label: string }[] => [
-  { key: 'header-main', label: t('menu_builder.location_header_main') },
-  { key: 'header-secondary', label: t('menu_builder.location_header_secondary') },
-  { key: 'footer', label: t('menu_builder.location_footer') },
-  { key: 'sidebar', label: t('menu_builder.location_sidebar') },
-  { key: 'mobile', label: t('menu_builder.location_mobile') },
+  { key: 'header-main', label: "Main Header" },
+  { key: 'header-secondary', label: "Secondary Header" },
+  { key: 'footer', label: "Footer" },
+  { key: 'sidebar', label: "Sidebar" },
+  { key: 'mobile', label: "Mobile" },
 ];
 
 const getTypeOptions = (t: TFunction): { key: MenuItemType; label: string; description: string }[] => [
-  { key: 'link', label: t('menu_builder.type_link_label'), description: t('menu_builder.type_link_desc') },
-  { key: 'external', label: t('menu_builder.type_external_label'), description: t('menu_builder.type_external_desc') },
-  { key: 'dropdown', label: t('menu_builder.type_dropdown_label'), description: t('menu_builder.type_dropdown_desc') },
-  { key: 'page', label: t('menu_builder.type_page_label'), description: t('menu_builder.type_page_desc') },
-  { key: 'route', label: t('menu_builder.type_route_label'), description: t('menu_builder.type_route_desc') },
-  { key: 'divider', label: t('menu_builder.type_divider_label'), description: t('menu_builder.type_divider_desc') },
+  { key: 'link', label: "Internal Link", description: "Link to a page within this platform" },
+  { key: 'external', label: "External Link", description: "Link to an external website" },
+  { key: 'dropdown', label: "Dropdown", description: "A dropdown menu containing child items" },
+  { key: 'page', label: "Custom Page", description: "Link to a custom page on this platform" },
+  { key: 'route', label: "Named Route", description: "Link using a named application route" },
+  { key: 'divider', label: "Divider", description: "A visual separator between menu items" },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -211,7 +209,6 @@ const getTypeOptions = (t: TFunction): { key: MenuItemType; label: string; descr
 // ─────────────────────────────────────────────────────────────────────────────
 
 function LivePreview({ items }: { items: MenuItemData[] }) {
-  const { t } = useTranslation('admin');
   const topLevel = items.filter((i) => !i.parent_id && i.is_active);
 
   return (
@@ -219,16 +216,16 @@ function LivePreview({ items }: { items: MenuItemData[] }) {
       <CardHeader className="pb-2">
         <h3 className="text-sm font-semibold flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
           <Eye size={15} />
-          {t('content.live_preview')}
+          {"Live Preview"}
           <Chip size="sm" variant="flat" color="secondary" className="text-[10px]">
-            {t('content.preview')}
+            {"Preview"}
           </Chip>
         </h3>
       </CardHeader>
       <CardBody className="pt-0">
         <div className="flex items-center gap-1 min-h-[40px] px-3 py-2 rounded-lg bg-[var(--color-surface,#f9fafb)] dark:bg-default-800/50 flex-wrap border border-dashed border-default-200">
           {topLevel.length === 0 ? (
-            <p className="text-xs text-default-400">{t('no_data')}</p>
+            <p className="text-xs text-default-400">{"No data available"}</p>
           ) : (
             topLevel.map((item) => {
               const children = items.filter((i) => i.parent_id === item.id && i.is_active);
@@ -268,7 +265,7 @@ function LivePreview({ items }: { items: MenuItemData[] }) {
             })
           )}
         </div>
-        <p className="text-[10px] text-default-400 mt-1.5">{t('menu_builder.drag_hint')}</p>
+        <p className="text-[10px] text-default-400 mt-1.5">{"Drag items to reorder"}</p>
       </CardBody>
     </Card>
   );
@@ -287,7 +284,6 @@ interface SortableItemProps {
 }
 
 function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: SortableItemProps) {
-  const { t } = useTranslation('admin');
   const {
     attributes,
     listeners,
@@ -322,7 +318,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: Sorta
         className="cursor-grab active:cursor-grabbing text-default-300 hover:text-default-500 p-0.5 min-w-0 h-auto shrink-0"
         {...attributes}
         {...listeners}
-        aria-label={t('content.drag_to_reorder')}
+        aria-label={"Drag to Reorder"}
         onClick={(e) => e.stopPropagation()}
       >
         <GripVertical size={16} />
@@ -345,7 +341,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: Sorta
 
       {item.children && item.children.length > 0 && (
         <Chip size="sm" variant="flat" color="secondary" className="text-[10px] shrink-0">
-          {t('menu_builder.sub_items', { count: item.children.length })}
+          {`${item.children.length} sub-item(s)`}
         </Chip>
       )}
 
@@ -354,7 +350,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: Sorta
         size="sm"
         variant="light"
         onPress={onSelect}
-        aria-label={t('content.label_edit_item')}
+        aria-label={"Edit Item"}
         onClick={(e) => e.stopPropagation()}
       >
         <Pencil size={13} />
@@ -366,7 +362,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: Sorta
         variant="light"
         color="danger"
         onPress={() => onDelete()}
-        aria-label={t('content.label_delete_item')}
+        aria-label={"Delete Item"}
         onClick={(e) => e.stopPropagation()}
       >
         <Trash2 size={13} />
@@ -394,10 +390,9 @@ function DragItemCard({ item }: { item: MenuItemData }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MenuBuilder() {
-  const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const isEdit = id !== undefined && id !== 'new';
-  usePageTitle(t('content.page_title'));
+  usePageTitle("Content");
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -474,7 +469,7 @@ export function MenuBuilder() {
         setMenuItems(flattenItems(items as MenuItemData[]));
       }
     } catch {
-      toast.error(t('content.failed_to_load_menu'));
+      toast.error("Failed to load menu");
     } finally {
       setLoading(false);
     }
@@ -509,11 +504,11 @@ export function MenuBuilder() {
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      toast.warning(t('content.menu_name_is_required'));
+      toast.warning("Menu name is required");
       return;
     }
     if (!formData.location) {
-      toast.warning(t('content.menu_location_is_required'));
+      toast.warning("Menu location is required");
       return;
     }
     setSaving(true);
@@ -526,9 +521,9 @@ export function MenuBuilder() {
           is_active: formData.is_active ? 1 : 0,
         });
         if (res?.success) {
-          toast.success(t('content.menu_updated'));
+          toast.success("Menu Updated");
         } else {
-          toast.error(t('content.failed_to_update_menu'));
+          toast.error("Failed to update menu");
         }
       } else {
         const res = await adminMenus.create({
@@ -553,15 +548,15 @@ export function MenuBuilder() {
               });
             }
           }
-          toast.success(t('content.menu_created'));
+          toast.success("Menu Created");
           navigate(tenantPath('/admin/menus'));
           return;
         } else {
-          toast.error(t('content.failed_to_create_menu'));
+          toast.error("Failed to create menu");
         }
       }
     } catch {
-      toast.error(t('content.an_unexpected_error_occurred'));
+      toast.error("An unexpected error occurred");
     } finally {
       setSaving(false);
     }
@@ -597,7 +592,7 @@ export function MenuBuilder() {
 
   const handleAddItem = async () => {
     const newItem: Partial<MenuItemData> = {
-      label: t('menu_builder.new_item_default'),
+      label: "New Item",
       url: '/',
       type: 'link',
       icon: null,
@@ -613,15 +608,15 @@ export function MenuBuilder() {
       try {
         const res = await adminMenus.createItem(Number(id), newItem);
         if (res?.success) {
-          toast.success(t('content.item_added'));
+          toast.success("Item Added");
           await loadMenu();
           const created = res.data as MenuItemData | undefined;
           if (created?.id) selectItem(created);
         } else {
-          toast.error(t('content.failed_to_add_item'));
+          toast.error("Failed to add item");
         }
       } catch {
-        toast.error(t('content.an_unexpected_error_occurred'));
+        toast.error("An unexpected error occurred");
       }
     } else {
       const localItem: MenuItemData = { ...newItem as MenuItemData, id: Date.now() };
@@ -641,13 +636,13 @@ export function MenuBuilder() {
         }
         const res = await adminMenus.updateItem(selectedItemId, payload);
         if (res?.success) {
-          toast.success(t('content.item_updated'));
+          toast.success("Item Updated");
           await loadMenu();
         } else {
-          toast.error(t('content.failed_to_update_item'));
+          toast.error("Failed to update item");
         }
       } catch {
-        toast.error(t('content.an_unexpected_error_occurred'));
+        toast.error("An unexpected error occurred");
       }
     } else {
       setMenuItems((prev) =>
@@ -655,7 +650,7 @@ export function MenuBuilder() {
           item.id === selectedItemId ? { ...item, ...editForm } as MenuItemData : item
         )
       );
-      toast.success(t('content.item_updated'));
+      toast.success("Item Updated");
     }
   };
 
@@ -664,14 +659,14 @@ export function MenuBuilder() {
       try {
         const res = await adminMenus.deleteItem(itemId);
         if (res?.success) {
-          toast.success(t('content.item_deleted'));
+          toast.success("Item Deleted");
           if (selectedItemId === itemId) clearSelection();
           await loadMenu();
         } else {
-          toast.error(t('content.failed_to_delete_item'));
+          toast.error("Failed to delete item");
         }
       } catch {
-        toast.error(t('content.an_unexpected_error_occurred'));
+        toast.error("An unexpected error occurred");
       }
     } else {
       setMenuItems((prev) => prev.filter((i) => i.id !== itemId));
@@ -739,7 +734,7 @@ export function MenuBuilder() {
           })),
         );
       } catch {
-        toast.error(t('content.failed_to_save_reorder'));
+        toast.error("Failed to save reorder");
         await loadMenu();
       }
     }
@@ -768,7 +763,7 @@ export function MenuBuilder() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('content.menu_builder_title')} description={t('content.menu_builder_desc')} />
+        <PageHeader title={"Menu Builder"} description={"Build and manage custom navigation menus for your platform"} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -777,8 +772,8 @@ export function MenuBuilder() {
   return (
     <div>
       <PageHeader
-        title={isEdit ? t('content.edit_menu_title') : t('content.create_menu_title')}
-        description={t('content.menu_builder_desc')}
+        title={isEdit ? "Edit Menu" : "Create Menu"}
+        description={"Build and manage custom navigation menus for your platform"}
         actions={
           <div className="flex gap-2">
             <Button
@@ -787,14 +782,14 @@ export function MenuBuilder() {
               startContent={showPreview ? <EyeOff size={15} /> : <Eye size={15} />}
               onPress={() => setShowPreview((v) => !v)}
             >
-              {showPreview ? t('content.hide_preview') : t('content.live_preview')}
+              {showPreview ? "Hide Preview" : "Live Preview"}
             </Button>
             <Button
               variant="flat"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/menus'))}
             >
-              {t('common.back')}
+              {"Back"}
             </Button>
             <Button
               color="primary"
@@ -802,7 +797,7 @@ export function MenuBuilder() {
               onPress={handleSave}
               isLoading={saving}
             >
-              {isEdit ? t('federation.save_changes') : t('content.create_menu_title')}
+              {isEdit ? "Save Changes" : "Create Menu"}
             </Button>
           </div>
         }
@@ -813,15 +808,15 @@ export function MenuBuilder() {
         <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Input
-              label={t('content.label_menu_name')}
-              placeholder={t('content.placeholder_menu_item_text')}
+              label={"Menu Name"}
+              placeholder={"Menu Item Text..."}
               isRequired
               variant="bordered"
               value={formData.name}
               onValueChange={(v) => handleChange('name', v)}
             />
             <Select
-              label={t('content.label_location')}
+              label={"Location"}
               isRequired
               variant="bordered"
               selectedKeys={formData.location ? [formData.location] : []}
@@ -836,8 +831,8 @@ export function MenuBuilder() {
             </Select>
             <div className="flex items-end gap-4">
               <Input
-                label={t('content.label_description')}
-                placeholder={t('content.placeholder_optional')}
+                label={"Description"}
+                placeholder={"Optional..."}
                 variant="bordered"
                 value={formData.description}
                 onValueChange={(v) => handleChange('description', v)}
@@ -848,7 +843,7 @@ export function MenuBuilder() {
                 onValueChange={(v) => handleChange('is_active', v)}
                 size="sm"
               >
-                <span className="text-sm">{t('content.label_active')}</span>
+                <span className="text-sm">{"Active"}</span>
               </Switch>
             </div>
           </div>
@@ -864,7 +859,7 @@ export function MenuBuilder() {
           <Card shadow="sm">
             <CardHeader className="flex items-center justify-between">
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Menu size={20} /> {t('content.menu_builder_title')}
+                <Menu size={20} /> {"Menu Builder"}
                 <Chip size="sm" variant="flat">{menuItems.length}</Chip>
               </h3>
               <Button
@@ -874,14 +869,14 @@ export function MenuBuilder() {
                 startContent={<Plus size={14} />}
                 onPress={handleAddItem}
               >
-                {t('federation.add')}
+                {"Add"}
               </Button>
             </CardHeader>
             <CardBody>
               {menuItems.length === 0 ? (
                 <div className="flex flex-col items-center py-12 text-default-400 gap-3">
                   <Menu size={40} />
-                  <p className="text-sm">{t('no_data')}</p>
+                  <p className="text-sm">{"No data available"}</p>
                   <div className="flex gap-2 flex-wrap justify-center">
                     <Button
                       size="sm"
@@ -889,7 +884,7 @@ export function MenuBuilder() {
                       startContent={<Plus size={14} />}
                       onPress={handleAddItem}
                     >
-                      {t('federation.add')}
+                      {"Add"}
                     </Button>
                     <Button
                       size="sm"
@@ -897,10 +892,10 @@ export function MenuBuilder() {
                       startContent={<Eye size={14} />}
                       onPress={() => setMenuItems(getDefaultItems(t as TFunction))}
                     >
-                      {t('content.load_defaults')}
+                      {"Load Defaults"}
                     </Button>
                   </div>
-                  <p className="text-[11px] text-default-400">{t('content.load_defaults_desc')}</p>
+                  <p className="text-[11px] text-default-400">{"Load the default menu structure as a starting point"}</p>
                 </div>
               ) : (
                 <>
@@ -932,7 +927,7 @@ export function MenuBuilder() {
                     </DragOverlay>
                   </DndContext>
                   <p className="text-[11px] text-default-400 mt-3 text-center">
-                    {t('menu_builder.drag_hint')}
+                    {"Drag items to reorder"}
                   </p>
                 </>
               )}
@@ -945,21 +940,21 @@ export function MenuBuilder() {
           <Card shadow="sm" className="sticky top-20">
             <CardHeader>
               <h3 className="text-lg font-semibold">
-                {selectedItemId ? t('content.label_edit_item') : t('content.menu_builder_title')}
+                {selectedItemId ? "Edit Item" : "Menu Builder"}
               </h3>
             </CardHeader>
             <CardBody className="gap-3">
               {!selectedItemId ? (
                 <div className="flex flex-col items-center py-8 text-default-400">
                   <Pencil size={32} className="mb-3" />
-                  <p className="text-sm">{t('content.menu_builder_desc')}</p>
+                  <p className="text-sm">{"Build and manage custom navigation menus for your platform"}</p>
                 </div>
               ) : (
                 <>
                   {/* Label */}
                   <Input
-                    label={t('content.label_label')}
-                    placeholder={t('content.placeholder_menu_item_text')}
+                    label={"Label"}
+                    placeholder={"Menu Item Text..."}
                     isRequired
                     variant="bordered"
                     size="sm"
@@ -969,7 +964,7 @@ export function MenuBuilder() {
 
                   {/* Type */}
                   <Select
-                    label={t('content.label_type')}
+                    label={"Type"}
                     variant="bordered"
                     size="sm"
                     selectedKeys={editForm.type ? [editForm.type] : ['link']}
@@ -998,7 +993,7 @@ export function MenuBuilder() {
                   {/* URL field for link / external */}
                   {(editForm.type === 'link' || editForm.type === 'external' || !editForm.type) && (
                     <Input
-                      label={t('content.label_u_r_l')}
+                      label={"URL"}
                       placeholder={editForm.type === 'external' ? 'https://example.com' : '/dashboard'}
                       variant="bordered"
                       size="sm"
@@ -1010,7 +1005,7 @@ export function MenuBuilder() {
                   {/* Page picker */}
                   {editForm.type === 'page' && (
                     <Select
-                      label={t('content.select_page')}
+                      label={"Select Page"}
                       variant="bordered"
                       size="sm"
                       isLoading={!pagesLoaded}
@@ -1041,7 +1036,7 @@ export function MenuBuilder() {
                   {/* Route picker */}
                   {editForm.type === 'route' && (
                     <Select
-                      label={t('content.select_route')}
+                      label={"Select Route"}
                       variant="bordered"
                       size="sm"
                       selectedKeys={editForm.url ? [editForm.url] : []}
@@ -1079,7 +1074,7 @@ export function MenuBuilder() {
                   {/* Target */}
                   {editForm.type !== 'divider' && editForm.type !== 'dropdown' && (
                     <Select
-                      label={t('content.label_open_in')}
+                      label={"Open in"}
                       variant="bordered"
                       size="sm"
                       selectedKeys={[editForm.target || '_self']}
@@ -1088,15 +1083,15 @@ export function MenuBuilder() {
                         if (sel) setEditForm((f) => ({ ...f, target: sel }));
                       }}
                     >
-                      <SelectItem key="_self">{t('content.same_window')}</SelectItem>
-                      <SelectItem key="_blank">{t('content.new_tab')}</SelectItem>
+                      <SelectItem key="_self">{"Same Window"}</SelectItem>
+                      <SelectItem key="_blank">{"New Tab"}</SelectItem>
                     </Select>
                   )}
 
                   {/* Parent (nest under dropdown) */}
                   {editForm.type !== 'dropdown' && parentOptions.length > 0 && (
                     <Select
-                      label={t('content.label_parent_item')}
+                      label={"Parent Item"}
                       variant="bordered"
                       size="sm"
                       selectedKeys={editForm.parent_id ? [String(editForm.parent_id)] : ['']}
@@ -1106,7 +1101,7 @@ export function MenuBuilder() {
                       }}
                     >
                       {[
-                        { key: '', label: t('content.none_top_level') },
+                        { key: '', label: "None (top-level item)" },
                         ...parentOptions,
                       ].map((opt) => (
                         <SelectItem key={opt.key}>{opt.label}</SelectItem>
@@ -1122,7 +1117,7 @@ export function MenuBuilder() {
                   >
                     <span className="text-sm flex items-center gap-1.5">
                       {editForm.is_active ? <Eye size={14} /> : <EyeOff size={14} />}
-                      {editForm.is_active ? t('moderation.visible') : t('moderation.hidden')}
+                      {editForm.is_active ? "Visible" : "Hidden"}
                     </span>
                   </Switch>
 
@@ -1135,14 +1130,14 @@ export function MenuBuilder() {
                     onPress={() => setShowAdvanced(!showAdvanced)}
                   >
                     {showAdvanced ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                    {t('content.advanced_options')}
+                    {"Advanced Options"}
                   </Button>
 
                   {showAdvanced && (
                     <div className="space-y-3 pl-2 border-l-2 border-default-100">
                       <Input
-                        label={t('content.label_c_s_s_class')}
-                        placeholder={t('menu_builder.placeholder_css')}
+                        label={"CSS Class"}
+                        placeholder={"Enter css..."}
                         variant="bordered"
                         size="sm"
                         value={editForm.css_class || ''}
@@ -1164,14 +1159,14 @@ export function MenuBuilder() {
                       className="flex-1"
                       onPress={handleUpdateItem}
                     >
-                      {t('federation.save_changes')}
+                      {"Save Changes"}
                     </Button>
                     <Button
                       variant="flat"
                       size="sm"
                       onPress={clearSelection}
                     >
-                      {t('cancel')}
+                      {"Cancel"}
                     </Button>
                   </div>
                 </>
@@ -1190,9 +1185,9 @@ export function MenuBuilder() {
             setDeleteTarget(null);
           }
         }}
-        title={t('content.delete_item_title')}
-        message={t('content.delete_item_message')}
-        confirmLabel={t('common.delete')}
+        title={"Delete Item"}
+        message={"Delete Item"}
+        confirmLabel={"Delete"}
         confirmColor="danger"
       />
     </div>

@@ -192,8 +192,8 @@ function HeroEditor({
   return (
     <div className="flex flex-col gap-4">
       <Input
-        label={t('content.landing_label_badge_text')}
-        placeholder={t('content.landing_placeholder_badge_text')}
+        label={"Badge text"}
+        placeholder={"e.g. Welcome to our community"}
         value={content.badge_text || ''}
         onValueChange={(v) => update('badge_text', v)}
         variant="bordered"
@@ -201,16 +201,16 @@ function HeroEditor({
       />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
-          label={t('content.landing_label_headline_line_1')}
-          placeholder={t('content.landing_placeholder_headline_1')}
+          label={"Headline line 1"}
+          placeholder={"Main headline"}
           value={content.headline_1 || ''}
           onValueChange={(v) => update('headline_1', v)}
           variant="bordered"
           size="sm"
         />
         <Input
-          label={t('content.landing_label_headline_line_2')}
-          placeholder={t('content.landing_placeholder_headline_2')}
+          label={"Headline line 2"}
+          placeholder={"Supporting headline"}
           value={content.headline_2 || ''}
           onValueChange={(v) => update('headline_2', v)}
           variant="bordered"
@@ -218,8 +218,8 @@ function HeroEditor({
         />
       </div>
       <Textarea
-        label={t('content.landing_label_subheadline')}
-        placeholder={t('content.landing_placeholder_subheadline')}
+        label={"Subheadline"}
+        placeholder={"A short paragraph introducing your community"}
         value={content.subheadline || ''}
         onValueChange={(v) => update('subheadline', v)}
         variant="bordered"
@@ -227,38 +227,38 @@ function HeroEditor({
         minRows={2}
       />
       <Divider />
-      <p className="text-sm font-medium text-default-600">{t('content.landing_primary_cta')}</p>
+      <p className="text-sm font-medium text-default-600">{"Primary call-to-action"}</p>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
-          label={t('content.landing_label_button_text')}
-          placeholder={t('content.landing_placeholder_button_text_get_started')}
+          label={"Button text"}
+          placeholder={"Get started"}
           value={content.cta_primary_text || ''}
           onValueChange={(v) => update('cta_primary_text', v)}
           variant="bordered"
           size="sm"
         />
         <Input
-          label={t('content.landing_label_button_link')}
-          placeholder={t('content.landing_placeholder_button_link_register')}
+          label={"Button link"}
+          placeholder={"/register"}
           value={content.cta_primary_link || ''}
           onValueChange={(v) => update('cta_primary_link', v)}
           variant="bordered"
           size="sm"
         />
       </div>
-      <p className="text-sm font-medium text-default-600">{t('content.landing_secondary_cta')}</p>
+      <p className="text-sm font-medium text-default-600">{"Secondary call-to-action"}</p>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
-          label={t('content.landing_label_button_text')}
-          placeholder={t('content.landing_placeholder_button_text_learn_more')}
+          label={"Button text"}
+          placeholder={"Learn more"}
           value={content.cta_secondary_text || ''}
           onValueChange={(v) => update('cta_secondary_text', v)}
           variant="bordered"
           size="sm"
         />
         <Input
-          label={t('content.landing_label_button_link')}
-          placeholder={t('content.landing_placeholder_button_link_about')}
+          label={"Button link"}
+          placeholder={"/about"}
           value={content.cta_secondary_link || ''}
           onValueChange={(v) => update('cta_secondary_link', v)}
           variant="bordered"
@@ -312,7 +312,7 @@ function FeaturePillsEditor({
           <CardBody className="flex flex-col gap-3 p-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-default-600">
-                {t('content.landing_item_number', { number: i + 1 })}
+                {`Item ${i + 1}`}
               </span>
               <Button
                 size="sm"
@@ -321,25 +321,25 @@ function FeaturePillsEditor({
                 startContent={<Trash2 size={14} />}
                 onPress={() => removeItem(i)}
               >
-                {t('content.landing_remove')}
+                {"Remove"}
               </Button>
             </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               <IconSelect
                 value={item.icon}
                 onChange={(val) => updateItemIcon(i, val)}
-                label={t('content.landing_label_icon')}
-                placeholder={t('content.landing_placeholder_select_icon')}
+                label={"Icon"}
+                placeholder={"Select an icon"}
               />
               <Input
-                label={t('content.landing_label_title')}
+                label={"Title"}
                 value={item.title}
                 onValueChange={(v) => updateItem(i, 'title', v)}
                 variant="bordered"
                 size="sm"
               />
               <Input
-                label={t('content.landing_label_description')}
+                label={"Description"}
                 value={item.description}
                 onValueChange={(v) => updateItem(i, 'description', v)}
                 variant="bordered"
@@ -357,7 +357,7 @@ function FeaturePillsEditor({
           onPress={addItem}
           className="self-start"
         >
-          {t('content.landing_add_item')}
+          {"Add item"}
         </Button>
       )}
       <p className="text-xs text-default-400">{t(HELPER_TEXT_KEY)}</p>
@@ -380,10 +380,10 @@ function StatsEditor({
         onValueChange={(val) => onChange({ ...content, show_live_stats: val })}
         size="sm"
       >
-        {t('content.landing_show_live_stats')}
+        {"Show live community stats"}
       </Switch>
       <p className="text-xs text-default-400">
-        {t('content.landing_show_live_stats_desc')}
+        {"Display real-time member and exchange counts"}
       </p>
     </div>
   );
@@ -426,16 +426,16 @@ function HowItWorksEditor({
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
-          label={t('content.landing_label_section_title')}
-          placeholder={t('content.landing_placeholder_section_title_how_it_works')}
+          label={"Section title"}
+          placeholder={"How it works"}
           value={content.title || ''}
           onValueChange={(v) => onChange({ ...content, title: v })}
           variant="bordered"
           size="sm"
         />
         <Input
-          label={t('content.landing_label_section_subtitle')}
-          placeholder={t('content.landing_placeholder_section_subtitle_how_it_works')}
+          label={"Section subtitle"}
+          placeholder={"Three simple steps to get started"}
           value={content.subtitle || ''}
           onValueChange={(v) => onChange({ ...content, subtitle: v })}
           variant="bordered"
@@ -448,7 +448,7 @@ function HowItWorksEditor({
           <CardBody className="flex flex-col gap-3 p-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-default-600">
-                {t('content.landing_step_number', { number: i + 1 })}
+                {`Step ${i + 1}`}
               </span>
               <Button
                 size="sm"
@@ -457,25 +457,25 @@ function HowItWorksEditor({
                 startContent={<Trash2 size={14} />}
                 onPress={() => removeStep(i)}
               >
-                {t('content.landing_remove')}
+                {"Remove"}
               </Button>
             </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               <IconSelect
                 value={step.icon}
                 onChange={(val) => updateStepIcon(i, val)}
-                label={t('content.landing_label_icon')}
-                placeholder={t('content.landing_placeholder_select_icon')}
+                label={"Icon"}
+                placeholder={"Select an icon"}
               />
               <Input
-                label={t('content.landing_label_title')}
+                label={"Title"}
                 value={step.title}
                 onValueChange={(v) => updateStep(i, 'title', v)}
                 variant="bordered"
                 size="sm"
               />
               <Input
-                label={t('content.landing_label_description')}
+                label={"Description"}
                 value={step.description}
                 onValueChange={(v) => updateStep(i, 'description', v)}
                 variant="bordered"
@@ -492,7 +492,7 @@ function HowItWorksEditor({
         onPress={addStep}
         className="self-start"
       >
-        {t('content.landing_add_step')}
+        {"Add step"}
       </Button>
       <p className="text-xs text-default-400">{t(HELPER_TEXT_KEY)}</p>
     </div>
@@ -530,16 +530,16 @@ function CoreValuesEditor({
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
-          label={t('content.landing_label_section_title')}
-          placeholder={t('content.landing_placeholder_section_title_core_values')}
+          label={"Section title"}
+          placeholder={"Our values"}
           value={content.title || ''}
           onValueChange={(v) => onChange({ ...content, title: v })}
           variant="bordered"
           size="sm"
         />
         <Input
-          label={t('content.landing_label_section_subtitle')}
-          placeholder={t('content.landing_placeholder_section_subtitle_core_values')}
+          label={"Section subtitle"}
+          placeholder={"What we stand for as a community"}
           value={content.subtitle || ''}
           onValueChange={(v) => onChange({ ...content, subtitle: v })}
           variant="bordered"
@@ -552,7 +552,7 @@ function CoreValuesEditor({
           <CardBody className="flex flex-col gap-3 p-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-default-600">
-                {t('content.landing_value_number', { number: i + 1 })}
+                {`Value ${i + 1}`}
               </span>
               <Button
                 size="sm"
@@ -561,18 +561,18 @@ function CoreValuesEditor({
                 startContent={<Trash2 size={14} />}
                 onPress={() => removeValue(i)}
               >
-                {t('content.landing_remove')}
+                {"Remove"}
               </Button>
             </div>
             <Input
-              label={t('content.landing_label_title')}
+              label={"Title"}
               value={val.title}
               onValueChange={(v) => updateValue(i, 'title', v)}
               variant="bordered"
               size="sm"
             />
             <Textarea
-              label={t('content.landing_label_description')}
+              label={"Description"}
               value={val.description}
               onValueChange={(v) => updateValue(i, 'description', v)}
               variant="bordered"
@@ -589,7 +589,7 @@ function CoreValuesEditor({
         onPress={addValue}
         className="self-start"
       >
-        {t('content.landing_add_value')}
+        {"Add value"}
       </Button>
       <p className="text-xs text-default-400">{t(HELPER_TEXT_KEY)}</p>
     </div>
@@ -610,16 +610,16 @@ function CtaEditor({
   return (
     <div className="flex flex-col gap-4">
       <Input
-        label={t('content.landing_label_title')}
-        placeholder={t('content.landing_placeholder_cta_title')}
+        label={"Title"}
+        placeholder={"Ready to join?"}
         value={content.title || ''}
         onValueChange={(v) => update('title', v)}
         variant="bordered"
         size="sm"
       />
       <Textarea
-        label={t('content.landing_label_description')}
-        placeholder={t('content.landing_placeholder_cta_description')}
+        label={"Description"}
+        placeholder={"Become a member and start exchanging today"}
         value={content.description || ''}
         onValueChange={(v) => update('description', v)}
         variant="bordered"
@@ -628,16 +628,16 @@ function CtaEditor({
       />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
-          label={t('content.landing_label_button_text')}
-          placeholder={t('content.landing_placeholder_button_text_join_now')}
+          label={"Button text"}
+          placeholder={"Join now"}
           value={content.button_text || ''}
           onValueChange={(v) => update('button_text', v)}
           variant="bordered"
           size="sm"
         />
         <Input
-          label={t('content.landing_label_button_link')}
-          placeholder={t('content.landing_placeholder_button_link_register')}
+          label={"Button link"}
+          placeholder={"/register"}
           value={content.button_link || ''}
           onValueChange={(v) => update('button_link', v)}
           variant="bordered"
@@ -724,7 +724,7 @@ function SectionCard({
           />
         );
       default:
-        return <p className="text-sm text-default-400">{t('content.landing_no_editor_available')}</p>;
+        return <p className="text-sm text-default-400">{"No editor available for this section"}</p>;
     }
   };
 
@@ -747,7 +747,7 @@ function SectionCard({
           <div>
             <p className="text-sm font-semibold">{label}</p>
             <p className="text-xs text-default-400">
-              {section.enabled ? t('content.landing_visible') : t('content.landing_hidden')}
+              {section.enabled ? "Visible" : "Hidden"}
             </p>
           </div>
         </div>
@@ -756,7 +756,7 @@ function SectionCard({
             size="sm"
             isSelected={section.enabled}
             onValueChange={onToggleEnabled}
-            aria-label={t('content.landing_toggle_section', { section: label })}
+            aria-label={`Toggle ${label}`}
           />
           <Button
             isIconOnly
@@ -764,7 +764,7 @@ function SectionCard({
             variant="light"
             isDisabled={isFirst}
             onPress={onMoveUp}
-            aria-label={t('content.landing_move_up', { section: label })}
+            aria-label={`Move ${label} up`}
           >
             <ChevronUp size={16} />
           </Button>
@@ -774,7 +774,7 @@ function SectionCard({
             variant="light"
             isDisabled={isLast}
             onPress={onMoveDown}
-            aria-label={t('content.landing_move_down', { section: label })}
+            aria-label={`Move ${label} down`}
           >
             <ChevronDown size={16} />
           </Button>
@@ -796,7 +796,7 @@ function SectionCard({
 
 export function LandingPageBuilder() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('content.landing_page_title'));
+  usePageTitle("Landing Page Builder");
   const toast = useToast();
 
   // State
@@ -829,7 +829,7 @@ export function LandingPageBuilder() {
         }
       }
     } catch {
-      toast.error(t('content.landing_failed_to_load'));
+      toast.error("Failed to load landing page configuration");
     } finally {
       setLoading(false);
       initialLoadDone.current = true;
@@ -868,14 +868,14 @@ export function LandingPageBuilder() {
       const cleaned = cleanConfig(config);
       const res = await adminLandingPage.update(cleaned);
       if (res.success) {
-        toast.success(t('content.landing_saved'));
+        toast.success("Landing page saved");
         setSavedConfig(cloneConfig(config));
         setIsDirty(false);
       } else {
-        toast.error(t('content.landing_failed_to_save'));
+        toast.error("Failed to save landing page");
       }
     } catch {
-      toast.error(t('content.landing_failed_to_save'));
+      toast.error("Failed to save landing page");
     } finally {
       setSaving(false);
     }
@@ -892,12 +892,12 @@ export function LandingPageBuilder() {
         setSavedConfig(null);
         setIsDirty(false);
         setExpandedSections(new Set());
-        toast.success(t('content.landing_reset_success'));
+        toast.success("Landing page reset to defaults");
       } else {
-        toast.error(t('content.landing_failed_to_reset'));
+        toast.error("Failed to reset landing page");
       }
     } catch {
-      toast.error(t('content.landing_failed_to_reset'));
+      toast.error("Failed to reset landing page");
     } finally {
       setSaving(false);
       setConfirmReset(false);
@@ -961,7 +961,7 @@ export function LandingPageBuilder() {
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <Spinner size="lg" label={t('content.landing_loading')} />
+        <Spinner size="lg" label={"Loading landing page"} />
       </div>
     );
   }
@@ -969,13 +969,13 @@ export function LandingPageBuilder() {
   return (
     <div className="mx-auto max-w-4xl">
       <PageHeader
-        title={t('content.landing_builder_title')}
-        description={t('content.landing_builder_description')}
+        title={"Landing Page Builder"}
+        description={"Design the public landing page for your community"}
         actions={
           <div className="flex items-center gap-2">
             {confirmReset ? (
               <>
-                <span className="text-sm text-danger">{t('content.landing_reset_confirm_prompt')}</span>
+                <span className="text-sm text-danger">{"Reset all sections to defaults?"}</span>
                 <Button
                   size="sm"
                   color="danger"
@@ -983,7 +983,7 @@ export function LandingPageBuilder() {
                   onPress={handleReset}
                   isLoading={saving}
                 >
-                  {t('content.landing_confirm_reset')}
+                  {"Yes, reset"}
                 </Button>
                 <Button
                   size="sm"
@@ -991,7 +991,7 @@ export function LandingPageBuilder() {
                   onPress={() => setConfirmReset(false)}
                   isDisabled={saving}
                 >
-                  {t('content.landing_cancel')}
+                  {"Cancel"}
                 </Button>
               </>
             ) : (
@@ -1002,7 +1002,7 @@ export function LandingPageBuilder() {
                 onPress={() => setConfirmReset(true)}
                 isDisabled={saving}
               >
-                {t('content.landing_reset_to_defaults')}
+                {"Reset to defaults"}
               </Button>
             )}
             <Button
@@ -1013,7 +1013,7 @@ export function LandingPageBuilder() {
               isDisabled={!isDirty || saving}
               isLoading={saving}
             >
-              {t('content.landing_save_changes')}
+              {"Save changes"}
             </Button>
           </div>
         }
@@ -1023,7 +1023,7 @@ export function LandingPageBuilder() {
       <div className="mb-4 flex items-center gap-2 rounded-lg border border-default-200 bg-default-50 px-4 py-3">
         <Layers size={16} className="text-default-400" />
         <p className="text-sm text-default-500">
-          {t('content.landing_ordering_info')}
+          {"Drag sections using the arrows to reorder. Toggle to show or hide each section on the public page."}
         </p>
       </div>
 
@@ -1049,7 +1049,7 @@ export function LandingPageBuilder() {
       {isDirty && (
         <div className="mt-4 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3">
           <p className="text-sm text-warning-700">
-            {t('content.landing_unsaved_changes')}
+            {"You have unsaved changes"}
           </p>
         </div>
       )}

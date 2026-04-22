@@ -16,10 +16,8 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 
-import { useTranslation } from 'react-i18next';
 export function NativeApp() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('system.page_title'));
+  usePageTitle("System");
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -42,7 +40,7 @@ export function NativeApp() {
           setFormData(prev => ({ ...prev, ...res.data }));
         }
       })
-      .catch(() => toast.error(t('system.failed_to_load_native_app_settings')))
+      .catch(() => toast.error("Failed to load native app settings"))
       .finally(() => setLoading(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps -- load once on mount
   }, []);
@@ -51,9 +49,9 @@ export function NativeApp() {
     setSaving(true);
     try {
       await adminSettings.updateNativeAppSettings(formData);
-      toast.success(t('system.native_app_settings_saved_successfully'));
+      toast.success("Native app settings saved successfully");
     } catch {
-      toast.error(t('system.failed_to_save_native_app_settings'));
+      toast.error("Failed to save native app settings");
     } finally {
       setSaving(false);
     }
@@ -73,32 +71,32 @@ export function NativeApp() {
 
   return (
     <div>
-      <PageHeader title={t('system.native_app_title')} description={t('system.native_app_desc')} />
+      <PageHeader title={"Native App"} description={"Configure native mobile app settings including FCM and APNs credentials"} />
 
       <div className="space-y-4">
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Smartphone size={20} /> {t('system.app_configuration_heading')}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Smartphone size={20} /> {"App Configuration"}</h3></CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={t('system.label_app_name')}
+              label={"App Name"}
               variant="bordered"
               value={String(formData.app_name || '')}
               onValueChange={(v) => updateField('app_name', v)}
             />
             <Input
-              label={t('system.label_bundle_id')}
+              label={"Bundle ID"}
               variant="bordered"
               value={String(formData.bundle_id || '')}
               onValueChange={(v) => updateField('bundle_id', v)}
             />
             <Input
-              label={t('system.label_package_name')}
+              label={"Package Name"}
               variant="bordered"
               value={String(formData.package_name || '')}
               onValueChange={(v) => updateField('package_name', v)}
             />
             <Input
-              label={t('system.label_app_version')}
+              label={"App Version"}
               variant="bordered"
               value={String(formData.app_version || '')}
               onValueChange={(v) => updateField('app_version', v)}
@@ -107,30 +105,30 @@ export function NativeApp() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{t('system.push_notifications_heading')}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{"Push Notifications"}</h3></CardHeader>
           <CardBody className="gap-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('system.enable_push_notifications')}</p>
-                <p className="text-sm text-default-500">{t('system.enable_push_notifications_desc')}</p>
+                <p className="font-medium">{"Enable Push Notifications"}</p>
+                <p className="text-sm text-default-500">{"Enable Push Notifications."}</p>
               </div>
-              <Switch isSelected={!!formData.push_enabled} onValueChange={(v) => updateField('push_enabled', v)} aria-label={t('system.label_push_notifications')} />
+              <Switch isSelected={!!formData.push_enabled} onValueChange={(v) => updateField('push_enabled', v)} aria-label={"Push Notifications"} />
             </div>
             <Input
-              label={t('system.label_f_c_m_server_key')}
+              label={"FCM Server Key"}
               type="password"
-              placeholder={t('system.placeholder_a_iza')}
+              placeholder={"e.g. AIza..."}
               variant="bordered"
-              description={t('system.desc_firebase_cloud_messaging_server_key')}
+              description={"Firebase Cloud Messaging server key for Android push notifications"}
               value={String(formData.fcm_server_key || '')}
               onValueChange={(v) => updateField('fcm_server_key', v)}
             />
             <Input
-              label={t('system.label_a_p_n_s_key_i_d')}
+              label={"APNs Key ID"}
               type="password"
               placeholder="..."
               variant="bordered"
-              description={t('system.desc_apple_push_notification_service_key')}
+              description={"Apple Push Notification Service (APNs) private key for iOS push notifications"}
               value={String(formData.apns_key_id || '')}
               onValueChange={(v) => updateField('apns_key_id', v)}
             />
@@ -138,27 +136,27 @@ export function NativeApp() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{t('system.pwa_settings_heading')}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{"Pwa Settings"}</h3></CardHeader>
           <CardBody className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('system.service_worker_enabled')}</p>
-                <p className="text-sm text-default-500">{t('system.service_worker_enabled_desc')}</p>
+                <p className="font-medium">{"Service Worker Enabled"}</p>
+                <p className="text-sm text-default-500">{"Service Worker Enabled."}</p>
               </div>
-              <Switch isSelected={!!formData.service_worker_enabled} onValueChange={(v) => updateField('service_worker_enabled', v)} aria-label={t('system.label_service_worker')} />
+              <Switch isSelected={!!formData.service_worker_enabled} onValueChange={(v) => updateField('service_worker_enabled', v)} aria-label={"Service Worker"} />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('system.install_prompt')}</p>
-                <p className="text-sm text-default-500">{t('system.install_prompt_desc')}</p>
+                <p className="font-medium">{"Install Prompt"}</p>
+                <p className="text-sm text-default-500">{"Install Prompt."}</p>
               </div>
-              <Switch isSelected={!!formData.install_prompt_enabled} onValueChange={(v) => updateField('install_prompt_enabled', v)} aria-label={t('system.label_install_prompt')} />
+              <Switch isSelected={!!formData.install_prompt_enabled} onValueChange={(v) => updateField('install_prompt_enabled', v)} aria-label={"Install Prompt"} />
             </div>
           </CardBody>
         </Card>
 
         <div className="flex justify-end">
-          <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving}>{t('system.save_settings')}</Button>
+          <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving}>{"Save Settings"}</Button>
         </div>
       </div>
     </div>

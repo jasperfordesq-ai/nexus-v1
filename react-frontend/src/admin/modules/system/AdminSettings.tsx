@@ -18,7 +18,6 @@ import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 import type { AdminSettingsResponse } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 // Field names match the backend's TENANT_DIRECT_COLUMNS and GENERAL_SETTING_KEYS exactly
 interface SettingsForm {
   name: string;               // tenants.name
@@ -56,8 +55,7 @@ const DEFAULT_SETTINGS: SettingsForm = {
 };
 
 export function AdminSettings() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('system.page_title'));
+  usePageTitle("System");
   const toast = useToast();
   const { tenant, tenantPath } = useTenant();
 
@@ -92,7 +90,7 @@ export function AdminSettings() {
         setOriginalForm(loaded);
       }
     } catch {
-      toast.error(t('system.failed_to_load_settings'));
+      toast.error("Failed to load settings");
     } finally {
       setLoading(false);
     }
@@ -119,14 +117,14 @@ export function AdminSettings() {
       if (form.default_currency !== originalForm.default_currency) changes.default_currency = form.default_currency;
 
       if (Object.keys(changes).length === 0) {
-        toast.error(t('system.no_changes_to_save'));
+        toast.error("No changes to save");
         setSaving(false);
         return;
       }
       const res = await adminSettings.update(changes);
 
       if (res.success) {
-        toast.success(t('system.settings_saved'));
+        toast.success("Settings Saved");
         // Reload settings to confirm persistence
         fetchSettings();
       } else {
@@ -134,7 +132,7 @@ export function AdminSettings() {
         toast.error(error);
       }
     } catch (err) {
-      toast.error(t('system.failed_to_save_settings'));
+      toast.error("Failed to save settings");
       console.error('Settings save error:', err);
     } finally {
       setSaving(false);
@@ -144,7 +142,7 @@ export function AdminSettings() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('system.admin_settings_title')} description={t('system.admin_settings_desc', { name: tenant?.name || t('system.your_community') })} />
+        <PageHeader title={"Admin Settings"} description={`Manage platform-wide settings for ${tenant?.name || "your community"}`} />
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
@@ -154,48 +152,48 @@ export function AdminSettings() {
 
   return (
     <div>
-      <PageHeader title={t('system.admin_settings_title')} description={t('system.admin_settings_desc', { name: tenant?.name || t('system.your_community') })} />
+      <PageHeader title={"Admin Settings"} description={`Manage platform-wide settings for ${tenant?.name || "your community"}`} />
 
       <div className="space-y-4">
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Settings size={20} /> {t('system.section_general')}
+              <Settings size={20} /> {"General"}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={t('system.label_site_name')}
-              placeholder={t('system.placeholder_project_n_e_x_u_s')}
+              label={"Site Name"}
+              placeholder={"Project NEXUS..."}
               variant="bordered"
               value={form.name}
               onValueChange={(val) => setForm(prev => ({ ...prev, name: val }))}
             />
             <Textarea
-              label={t('system.label_site_description')}
-              placeholder={t('system.placeholder_community_timebanking_platform')}
+              label={"Site Description"}
+              placeholder={"Community Timebanking Platform..."}
               variant="bordered"
               minRows={2}
               value={form.description}
               onValueChange={(val) => setForm(prev => ({ ...prev, description: val }))}
             />
             <Input
-              label={t('system.label_support_email')}
+              label={"Support Email"}
               placeholder="support@project-nexus.ie"
               variant="bordered"
               value={form.contact_email}
               onValueChange={(val) => setForm(prev => ({ ...prev, contact_email: val }))}
             />
             <Input
-              label={t('system.label_contact_phone')}
+              label={"Contact Phone"}
               placeholder="+1 555 123 4567"
               variant="bordered"
               value={form.contact_phone}
               onValueChange={(val) => setForm(prev => ({ ...prev, contact_phone: val }))}
             />
             <Select
-              label={t('system.label_default_currency')}
-              description={t('system.desc_default_currency')}
+              label={"Default currency"}
+              description={"Used for subscription and marketplace pricing"}
               variant="bordered"
               selectedKeys={[form.default_currency]}
               onSelectionChange={(keys) => {
@@ -213,13 +211,13 @@ export function AdminSettings() {
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Scale size={20} /> {t('system.section_branding_legal')}
+              <Scale size={20} /> {"Branding & Legal"}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Textarea
-              label={t('system.label_footer_legal_text')}
-              description={t('system.desc_displayed_in_the_site_footer_and_legal_h')}
+              label={"Footer Legal Text"}
+              description={"Displayed in the site footer and on legal/about pages"}
               placeholder="e.g. hOUR Timebank CLG. Registered Charity No. 20204862. Company No. 705275."
               variant="bordered"
               minRows={2}
@@ -231,56 +229,56 @@ export function AdminSettings() {
 
         <Card shadow="sm">
           <CardHeader className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">{t('system.section_registration_access')}</h3>
+            <h3 className="text-lg font-semibold">{"Registration & Access"}</h3>
             <Link to={tenantPath("/admin/settings/registration-policy")}>
               <Button size="sm" variant="flat" color="primary" startContent={<ShieldCheck size={14} />}>
-                {t('system.btn_advanced_policy')}
+                {"Advanced policy"}
               </Button>
             </Link>
           </CardHeader>
           <CardBody className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('system.open_registration')}</p>
-                <p className="text-sm text-default-500">{t('system.desc_open_registration')}</p>
+                <p className="font-medium">{"Open registration"}</p>
+                <p className="text-sm text-default-500">{"Allow anyone to register an account"}</p>
               </div>
               <Switch
                 isSelected={form.registration_mode === 'open'}
                 onValueChange={(val) => setForm(prev => ({ ...prev, registration_mode: val ? 'open' : 'closed' }))}
-                aria-label={t('system.label_open_registration')}
+                aria-label={"Open Registration"}
               />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('system.require_email_verification')}</p>
-                <p className="text-sm text-default-500">{t('system.desc_email_verification')}</p>
+                <p className="font-medium">{"Require email verification"}</p>
+                <p className="text-sm text-default-500">{"Members must verify their email before accessing the platform"}</p>
               </div>
               <Switch
                 isSelected={form.email_verification}
                 onValueChange={(val) => setForm(prev => ({ ...prev, email_verification: val }))}
-                aria-label={t('system.label_email_verification')}
+                aria-label={"Email Verification"}
               />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('system.admin_approval_required')}</p>
-                <p className="text-sm text-default-500">{t('system.admin_approval_required_desc')}</p>
+                <p className="font-medium">{"Admin approval required"}</p>
+                <p className="text-sm text-default-500">{"New accounts must be approved by an admin before activation"}</p>
               </div>
               <Switch
                 isSelected={form.admin_approval}
                 onValueChange={(val) => setForm(prev => ({ ...prev, admin_approval: val }))}
-                aria-label={t('system.label_admin_approval')}
+                aria-label={"Admin Approval"}
               />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-default-400">{t('system.section_maintenance_mode_readonly')}</p>
+                <p className="font-medium text-default-400">{"Maintenance mode (read only)"}</p>
                 <p className="text-sm text-default-500">Use CLI: <code className="text-xs bg-default-100 px-1 rounded">sudo bash scripts/maintenance.sh on|off</code></p>
               </div>
               <Switch
                 isSelected={form.maintenance_mode}
                 isDisabled
-                aria-label={t('system.label_maintenance_mode')}
+                aria-label={"Maintenance Mode"}
               />
             </div>
           </CardBody>
@@ -293,7 +291,7 @@ export function AdminSettings() {
             onPress={handleSave}
             isLoading={saving}
           >
-            {t('system.btn_save_settings')}
+            {"Save settings"}
           </Button>
         </div>
       </div>

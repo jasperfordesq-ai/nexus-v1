@@ -16,7 +16,6 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminTools } from '../../api/adminApi';
 
-import { useTranslation } from 'react-i18next';
 interface WebpStats {
   total_images: number;
   webp_images: number;
@@ -24,8 +23,7 @@ interface WebpStats {
 }
 
 export function WebpConverter() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('system.page_title'));
+  usePageTitle("System");
   const toast = useToast();
 
   const [stats, setStats] = useState<WebpStats | null>(null);
@@ -38,7 +36,7 @@ export function WebpConverter() {
       const res = await adminTools.getWebpStats();
       setStats(res.data ?? null);
     } catch {
-      toast.error(t('system.failed_to_load_web_p_stats'));
+      toast.error("Failed to load WebP stats");
     } finally {
       setLoading(false);
     }
@@ -52,10 +50,10 @@ export function WebpConverter() {
     setConverting(true);
     try {
       await adminTools.runWebpConversion();
-      toast.success(t('system.webp_conversion_complete'), t('system.webp_all_converted'));
+      toast.success("WebP Conversion Complete", "WebP All Converted");
       await fetchStats();
     } catch {
-      toast.error(t('system.conversion_failed'), t('system.webp_conversion_error'));
+      toast.error("Conversion failed", "WebP Conversion error");
     } finally {
       setConverting(false);
     }
@@ -64,8 +62,8 @@ export function WebpConverter() {
   return (
     <div>
       <PageHeader
-        title={t('system.webp_converter_title')}
-        description={t('system.webp_converter_desc')}
+        title={"WebP Converter"}
+        description={"Convert uploaded images to WebP format for better performance"}
         actions={
           <Button
             color="primary"
@@ -96,19 +94,19 @@ export function WebpConverter() {
                   <p className="text-2xl font-bold text-foreground">
                     {stats?.total_images?.toLocaleString() ?? '--'}
                   </p>
-                  <p className="text-sm text-default-500">{t('webp_converter.total_images')}</p>
+                  <p className="text-sm text-default-500">{"Total Images"}</p>
                 </div>
                 <div className="rounded-lg border border-default-200 p-4 text-center">
                   <p className="text-2xl font-bold text-success">
                     {stats?.webp_images?.toLocaleString() ?? '--'}
                   </p>
-                  <p className="text-sm text-default-500">{t('webp_converter.already_webp')}</p>
+                  <p className="text-sm text-default-500">{"Already WebP"}</p>
                 </div>
                 <div className="rounded-lg border border-default-200 p-4 text-center">
                   <p className="text-2xl font-bold text-warning">
                     {stats?.pending_conversion?.toLocaleString() ?? '--'}
                   </p>
-                  <p className="text-sm text-default-500">{t('webp_converter.pending_conversion')}</p>
+                  <p className="text-sm text-default-500">{"Pending Conversion"}</p>
                 </div>
               </div>
               <p className="text-sm text-default-400">

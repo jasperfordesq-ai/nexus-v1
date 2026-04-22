@@ -18,10 +18,8 @@ import { PageHeader, DataTable } from '../../components';
 import type { Column } from '../../components';
 import type { ErrorLogEntry } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 export function ErrorLogs() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('enterprise.page_title'));
+  usePageTitle("Enterprise");
   const toast = useToast();
 
   const [logs, setLogs] = useState<ErrorLogEntry[]>([]);
@@ -45,7 +43,7 @@ export function ErrorLogs() {
         }
       }
     } catch {
-      toast.error(t('enterprise.failed_to_load_error_logs'));
+      toast.error("Failed to load error logs");
     } finally {
       setLoading(false);
     }
@@ -56,10 +54,10 @@ export function ErrorLogs() {
   }, [loadData]);
 
   const columns: Column<ErrorLogEntry>[] = [
-    { key: 'id', label: t('enterprise.col_id'), sortable: true },
+    { key: 'id', label: "ID", sortable: true },
     {
       key: 'action',
-      label: t('enterprise.col_action'),
+      label: "Action",
       sortable: true,
       render: (entry) => (
         <Chip size="sm" variant="flat" color="danger">
@@ -67,22 +65,22 @@ export function ErrorLogs() {
         </Chip>
       ),
     },
-    { key: 'description', label: t('enterprise.col_description') },
+    { key: 'description', label: "Description" },
     {
       key: 'user_name',
-      label: t('enterprise.col_user'),
+      label: "User",
       render: (entry) => entry.user_name || '---',
     },
     {
       key: 'ip_address',
-      label: t('enterprise.col_ip'),
+      label: "IP",
       render: (entry) => (
         <span className="text-xs font-mono">{entry.ip_address || '---'}</span>
       ),
     },
     {
       key: 'created_at',
-      label: t('enterprise.col_date'),
+      label: "Date",
       sortable: true,
       render: (entry) => new Date(entry.created_at).toLocaleString(),
     },
@@ -91,8 +89,8 @@ export function ErrorLogs() {
   return (
     <div>
       <PageHeader
-        title={t('enterprise.error_logs_title')}
-        description={t('enterprise.error_logs_desc')}
+        title={"Error Logs"}
+        description={"View and manage system error logs"}
         actions={
           <Button
             variant="flat"
@@ -101,7 +99,7 @@ export function ErrorLogs() {
             isLoading={loading}
             size="sm"
           >
-            {t('common.refresh')}
+            {"Refresh"}
           </Button>
         }
       />
@@ -114,7 +112,7 @@ export function ErrorLogs() {
         page={page}
         onPageChange={setPage}
         searchable={false}
-        emptyContent={t('enterprise.no_error_logs')}
+        emptyContent={"No error logs"}
       />
     </div>
   );

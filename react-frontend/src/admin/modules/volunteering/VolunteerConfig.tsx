@@ -485,7 +485,7 @@ function CustomFieldsTab() {
               isIconOnly
               isDisabled={idx <= 0}
               onPress={() => moveField(idx, 'up')}
-              aria-label={t('volunteering.aria_move_up')}
+              aria-label={"Move up"}
             >
               <ArrowUp size={14} />
             </Button>
@@ -495,14 +495,14 @@ function CustomFieldsTab() {
               isIconOnly
               isDisabled={idx >= sortedFields.length - 1}
               onPress={() => moveField(idx, 'down')}
-              aria-label={t('volunteering.aria_move_down')}
+              aria-label={"Move Down"}
             >
               <ArrowDown size={14} />
             </Button>
-            <Button size="sm" variant="flat" isIconOnly onPress={() => openPreview(row)} aria-label={t('volunteering.aria_preview')}>
+            <Button size="sm" variant="flat" isIconOnly onPress={() => openPreview(row)} aria-label={"Preview"}>
               <Eye size={14} />
             </Button>
-            <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label={t('volunteering.aria_edit')}>
+            <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label={"Edit"}>
               <Edit2 size={14} />
             </Button>
             <Button
@@ -511,7 +511,7 @@ function CustomFieldsTab() {
               color="danger"
               isIconOnly
               onPress={() => { setDeleteId(row.id); onDeleteOpen(); }}
-              aria-label={t('volunteering.aria_delete')}
+              aria-label={"Delete"}
             >
               <Trash2 size={14} />
             </Button>
@@ -910,12 +910,12 @@ function RemindersTab() {
               loadDeliveryLogs(val, deliveryFilterChannel);
             }}
           >
-            <SelectItem key="">{t('volunteering.filter_all')}</SelectItem>
-            <SelectItem key="pre_shift">{t('volunteering.filter_pre_shift')}</SelectItem>
-            <SelectItem key="post_shift_feedback">{t('volunteering.filter_post_shift_feedback')}</SelectItem>
-            <SelectItem key="lapsed_volunteer">{t('volunteering.filter_lapsed_volunteer')}</SelectItem>
-            <SelectItem key="credential_expiry">{t('volunteering.filter_credential_expiry')}</SelectItem>
-            <SelectItem key="training_expiry">{t('volunteering.filter_training_expiry')}</SelectItem>
+            <SelectItem key="">{"All"}</SelectItem>
+            <SelectItem key="pre_shift">{"Pre Shift"}</SelectItem>
+            <SelectItem key="post_shift_feedback">{"Post Shift Feedback"}</SelectItem>
+            <SelectItem key="lapsed_volunteer">{"Lapsed Volunteer"}</SelectItem>
+            <SelectItem key="credential_expiry">{"Credential Expiry"}</SelectItem>
+            <SelectItem key="training_expiry">{"Training Expiry"}</SelectItem>
           </Select>
           <Select
             label={t('volunteering.filter_channel', 'Channel')}
@@ -929,10 +929,10 @@ function RemindersTab() {
               loadDeliveryLogs(deliveryFilterType, val);
             }}
           >
-            <SelectItem key="">{t('volunteering.filter_all')}</SelectItem>
-            <SelectItem key="email">{t('volunteering.filter_email')}</SelectItem>
-            <SelectItem key="push">{t('volunteering.filter_push')}</SelectItem>
-            <SelectItem key="sms">{t('volunteering.filter_sms')}</SelectItem>
+            <SelectItem key="">{"All"}</SelectItem>
+            <SelectItem key="email">{"Email"}</SelectItem>
+            <SelectItem key="push">{"Push"}</SelectItem>
+            <SelectItem key="sms">{"SMS"}</SelectItem>
           </Select>
         </div>
 
@@ -1206,7 +1206,7 @@ function WebhooksTab() {
       label: t('common.actions', 'Actions'),
       render: (row) => (
         <div className="flex items-center gap-1">
-          <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label={t('volunteering.aria_edit')}>
+          <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label={"Edit"}>
             <Edit2 size={14} />
           </Button>
           <Button
@@ -1216,7 +1216,7 @@ function WebhooksTab() {
             isIconOnly
             isLoading={testingId === row.id}
             onPress={() => handleTest(row.id)}
-            aria-label={t('volunteering.aria_test')}
+            aria-label={"Test"}
           >
             <Play size={14} />
           </Button>
@@ -1228,7 +1228,7 @@ function WebhooksTab() {
               isIconOnly
               isLoading={retryingId === row.id}
               onPress={() => handleRetry(row.id)}
-              aria-label={t('volunteering.aria_retry')}
+              aria-label={"Retry"}
             >
               <RotateCcw size={14} />
             </Button>
@@ -1238,7 +1238,7 @@ function WebhooksTab() {
             variant="flat"
             isIconOnly
             onPress={() => handleViewLogs(row.id)}
-            aria-label={t('volunteering.aria_view_logs')}
+            aria-label={"View Logs"}
           >
             <FileText size={14} />
           </Button>
@@ -1248,7 +1248,7 @@ function WebhooksTab() {
             color="danger"
             isIconOnly
             onPress={() => { setDeleteId(row.id); onDeleteOpen(); }}
-            aria-label={t('volunteering.aria_delete')}
+            aria-label={"Delete"}
           >
             <Trash2 size={14} />
           </Button>

@@ -17,10 +17,8 @@ import { adminGroups } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, StatusBadge, type Column } from '../../components';
 import type { GroupModerationItem } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 export function GroupModeration() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('groups.page_title'));
+  usePageTitle("Groups");
   const toast = useToast();
 
   const [items, setItems] = useState<GroupModerationItem[]>([]);
@@ -45,7 +43,7 @@ export function GroupModeration() {
         }
       }
     } catch {
-      toast.error(t('groups.failed_to_load_moderation_data'));
+      toast.error("Failed to load moderation data");
     } finally {
       setLoading(false);
     }
@@ -58,7 +56,7 @@ export function GroupModeration() {
   const columns: Column<GroupModerationItem>[] = [
     {
       key: 'name',
-      label: t('groups.col_group'),
+      label: "Group",
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.name}</span>
@@ -66,13 +64,13 @@ export function GroupModeration() {
     },
     {
       key: 'status',
-      label: t('groups.col_status'),
+      label: "Status",
       sortable: true,
       render: (item) => <StatusBadge status={item.status} />,
     },
     {
       key: 'report_count',
-      label: t('groups.col_reports'),
+      label: "Reports",
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-1.5">
@@ -83,17 +81,17 @@ export function GroupModeration() {
               color="danger"
               startContent={<Flag size={12} />}
             >
-              {t('groups.report_count', { count: item.report_count })}
+              {`Report`}
             </Chip>
           ) : (
-            <span className="text-sm text-default-400">{t('groups.none')}</span>
+            <span className="text-sm text-default-400">{"None"}</span>
           )}
         </div>
       ),
     },
     {
       key: 'created_at',
-      label: t('groups.col_created'),
+      label: "Created",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -106,7 +104,7 @@ export function GroupModeration() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('groups.group_moderation_title')} description={t('groups.group_moderation_desc')} />
+        <PageHeader title={"Group Moderation"} description={"Review flagged content and reports within groups"} />
         <div className="flex items-center justify-center py-20">
           <Spinner size="lg" />
         </div>
@@ -116,20 +114,20 @@ export function GroupModeration() {
 
   return (
     <div>
-      <PageHeader title={t('groups.group_moderation_title')} description={t('groups.group_moderation_desc')} />
+      <PageHeader title={"Group Moderation"} description={"Review flagged content and reports within groups"} />
 
       {items.length === 0 ? (
         <EmptyState
           icon={ShieldAlert}
-          title={t('groups.no_flagged_content')}
-          description={t('groups.desc_there_are_no_groups_with_reported_or_fla')}
+          title={"No flagged content"}
+          description={"There are no groups with reported or flagged content"}
         />
       ) : (
         <DataTable
           columns={columns}
           data={items}
           isLoading={loading}
-          searchPlaceholder={t('groups.search_flagged_placeholder')}
+          searchPlaceholder={"Search flagged content..."}
           onRefresh={loadItems}
         />
       )}

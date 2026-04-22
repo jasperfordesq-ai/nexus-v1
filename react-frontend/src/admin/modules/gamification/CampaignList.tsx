@@ -25,14 +25,12 @@ import { adminGamification } from '../../api/adminApi';
 import { DataTable, PageHeader, ConfirmModal, StatusBadge, EmptyState, type Column } from '../../components';
 import type { Campaign } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CampaignList() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('gamification.page_title'));
+  usePageTitle("Gamification");
   const toast = useToast();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
@@ -51,7 +49,7 @@ export function CampaignList() {
       // res.data is already unwrapped by the API client — never double-unwrap
       setCampaigns(Array.isArray(res.data) ? res.data : []);
     } else {
-      toast.error(t('gamification.failed_to_load_campaigns'));
+      toast.error("Failed to load campaigns");
     }
     setLoading(false);
   }, [toast, t])
@@ -66,11 +64,11 @@ export function CampaignList() {
 
     const res = await adminGamification.deleteCampaign(deleteTarget.id);
     if (res.success) {
-      toast.success(t('gamification.campaign_deleted', { name: deleteTarget.name }));
+      toast.success(`Campaign Deleted`);
       setDeleteTarget(null);
       loadCampaigns();
     } else {
-      toast.error(t('gamification.failed_to_delete_campaign'));
+      toast.error("Failed to delete campaign");
     }
 
     setDeleting(false);
@@ -79,10 +77,10 @@ export function CampaignList() {
   const handleStatusChange = async (campaign: Campaign, newStatus: Campaign['status']) => {
     const res = await adminGamification.updateCampaign(campaign.id, { status: newStatus });
     if (res.success) {
-      toast.success(t('gamification.campaign_status_changed', { name: campaign.name }));
+      toast.success(`Campaign status changed`);
       loadCampaigns();
     } else {
-      toast.error(t('gamification.failed_to_update_status'));
+      toast.error("Failed to update status");
     }
   };
 
@@ -108,13 +106,13 @@ export function CampaignList() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label={t('gamification.label_campaign_actions')}>
+          <Button isIconOnly size="sm" variant="light" aria-label={"Campaign Actions"}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
-        <DropdownMenu aria-label={t('gamification.label_campaign_actions')} onAction={handleAction}>
+        <DropdownMenu aria-label={"Campaign Actions"} onAction={handleAction}>
           <DropdownItem key="edit" startContent={<Edit size={14} />}>
-            {t('gamification.edit')}
+            {"Edit"}
           </DropdownItem>
           <DropdownItem
             key="activate"
@@ -122,7 +120,7 @@ export function CampaignList() {
             color="success"
             className={campaign.status === 'draft' ? 'text-success' : 'hidden'}
           >
-            {t('gamification.activate')}
+            {"Activate"}
           </DropdownItem>
           <DropdownItem
             key="pause"
@@ -130,7 +128,7 @@ export function CampaignList() {
             color="warning"
             className={campaign.status === 'active' ? 'text-warning' : 'hidden'}
           >
-            {t('gamification.pause')}
+            {"Pause"}
           </DropdownItem>
           <DropdownItem
             key="resume"
@@ -138,10 +136,10 @@ export function CampaignList() {
             color="success"
             className={campaign.status === 'paused' ? 'text-success' : 'hidden'}
           >
-            {t('gamification.resume')}
+            {"Resume"}
           </DropdownItem>
           <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
-            {t('gamification.delete')}
+            {"Delete"}
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
@@ -151,7 +149,7 @@ export function CampaignList() {
   const columns: Column<Campaign>[] = [
     {
       key: 'name',
-      label: t('gamification.col_name'),
+      label: "Name",
       sortable: true,
       render: (c) => (
         <span className="font-medium text-foreground">{c.name}</span>
@@ -159,20 +157,20 @@ export function CampaignList() {
     },
     {
       key: 'status',
-      label: t('gamification.col_status'),
+      label: "Status",
       sortable: true,
       render: (c) => <StatusBadge status={c.status} />,
     },
     {
       key: 'badge_name',
-      label: t('gamification.col_badge'),
+      label: "Badge",
       render: (c) => (
         <span className="text-sm text-default-600">{c.badge_name || c.badge_key || '—'}</span>
       ),
     },
     {
       key: 'target_audience',
-      label: t('gamification.col_target'),
+      label: "Target",
       render: (c) => (
         <span className="text-sm text-default-600 capitalize">
           {(c.target_audience || '').replace(/_/g, ' ')}
@@ -181,7 +179,7 @@ export function CampaignList() {
     },
     {
       key: 'total_awards',
-      label: t('gamification.col_awards'),
+      label: "Awards",
       sortable: true,
       render: (c) => (
         <span className="text-sm text-foreground">{c.total_awards ?? 0}</span>
@@ -189,7 +187,7 @@ export function CampaignList() {
     },
     {
       key: 'created_at',
-      label: t('gamification.col_created'),
+      label: "Created",
       sortable: true,
       render: (c) => (
         <span className="text-sm text-default-500">
@@ -199,7 +197,7 @@ export function CampaignList() {
     },
     {
       key: 'actions',
-      label: t('gamification.col_actions'),
+      label: "Actions",
       render: (c) => <CampaignActions campaign={c} />,
     },
   ];
@@ -207,12 +205,12 @@ export function CampaignList() {
   return (
     <div>
       <PageHeader
-        title={t('gamification.campaign_list_title')}
-        description={t('gamification.campaign_list_desc')}
+        title={"Campaign List"}
+        description={"View and manage all badge campaigns"}
         actions={
           <Link to={tenantPath("/admin/gamification/campaigns/create")}>
             <Button color="primary" startContent={<Plus size={16} />}>
-              {t('gamification.create_campaign')}
+              {"Create Campaign"}
             </Button>
           </Link>
         }
@@ -221,9 +219,9 @@ export function CampaignList() {
       {campaigns.length === 0 && !loading ? (
         <EmptyState
           icon={Megaphone}
-          title={t('gamification.no_campaigns_yet')}
-          description={t('gamification.desc_create_your_first_campaign_to_start_awar')}
-          actionLabel={t('gamification.create_campaign')}
+          title={"No campaigns yet"}
+          description={"Create your first campaign to start awarding badges and rewards"}
+          actionLabel={"Create Campaign"}
           onAction={() => navigate(tenantPath('/admin/gamification/campaigns/create'))}
         />
       ) : (
@@ -231,9 +229,9 @@ export function CampaignList() {
           columns={columns}
           data={campaigns}
           isLoading={loading}
-          searchPlaceholder={t('gamification.search_campaigns')}
+          searchPlaceholder={"Search Campaigns"}
           onRefresh={loadCampaigns}
-          emptyContent={t('gamification.no_campaigns_match_search')}
+          emptyContent={"No campaigns match search"}
         />
       )}
 
@@ -243,9 +241,9 @@ export function CampaignList() {
           isOpen={!!deleteTarget}
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
-          title={t('gamification.delete_campaign')}
-          message={t('gamification.confirm_delete_campaign', { name: deleteTarget.name })}
-          confirmLabel={t('gamification.delete')}
+          title={"Delete Campaign"}
+          message={`Delete Campaign`}
+          confirmLabel={"Delete"}
           confirmColor="danger"
           isLoading={deleting}
         />

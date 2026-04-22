@@ -15,7 +15,6 @@ import {
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure,
 } from '@heroui/react';
 import { ClipboardCheck, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 
@@ -47,7 +46,6 @@ const STATUS_COLORS: Record<string, 'default' | 'primary' | 'warning' | 'success
 };
 
 export function VerificationReviewQueue() {
-  const { t } = useTranslation('admin');
   const toast = useToast();
   const [sessions, setSessions] = useState<PendingSession[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,16 +91,16 @@ export function VerificationReviewQueue() {
       if (res.success) {
         toast.success(
           selectedAction === 'approve'
-            ? t('system.user_approved_activated')
-            : t('system.user_verification_rejected')
+            ? "User Approved Activated"
+            : "User Verification Rejected"
         );
         confirmModal.onClose();
         fetchSessions();
       } else {
-        toast.error(res.error || t('system.failed_to_action_verification', { action: selectedAction }));
+        toast.error(res.error || `Failed to action verification`);
       }
     } catch {
-      toast.error(t('system.failed_to_action_verification_session', { action: selectedAction }));
+      toast.error(`Failed to action verification session`);
     } finally {
       setActionLoading(false);
     }
@@ -136,10 +134,10 @@ export function VerificationReviewQueue() {
         <CardHeader className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center px-6 pt-5 pb-0">
           <div className="flex items-center gap-2">
             <ClipboardCheck className="w-5 h-5 text-amber-500" />
-            <h3 className="text-lg font-semibold">{t('verification.pending_reviews_title')}</h3>
+            <h3 className="text-lg font-semibold">{"Pending Reviews"}</h3>
             {sessions.length > 0 && (
               <Chip size="sm" color="warning" variant="flat">
-                {t('verification.n_pending', { count: sessions.length })}
+                {`${sessions.length} pending`}
               </Chip>
             )}
           </div>
@@ -148,7 +146,7 @@ export function VerificationReviewQueue() {
             size="sm"
             variant="flat"
             onPress={fetchSessions}
-            aria-label={t('verification.refresh_pending_reviews_aria')}
+            aria-label={"Refresh pending reviews"}
           >
             <RefreshCw className="w-4 h-4" />
           </Button>
@@ -160,17 +158,17 @@ export function VerificationReviewQueue() {
             </div>
           ) : sessions.length === 0 ? (
             <p className="text-center py-8 text-theme-muted">
-              {t('verification.no_pending_reviews')}
+              {"No pending reviews."}
             </p>
           ) : (
-            <Table aria-label={t('verification.pending_reviews_aria')} removeWrapper>
+            <Table aria-label={"Pending verification reviews"} removeWrapper>
               <TableHeader>
-                <TableColumn>{t('system.col_user')}</TableColumn>
-                <TableColumn>{t('system.col_provider')}</TableColumn>
-                <TableColumn>{t('system.col_level')}</TableColumn>
-                <TableColumn>{t('system.col_status')}</TableColumn>
-                <TableColumn>{t('system.col_created')}</TableColumn>
-                <TableColumn>{t('system.col_actions')}</TableColumn>
+                <TableColumn>{"User"}</TableColumn>
+                <TableColumn>{"Provider"}</TableColumn>
+                <TableColumn>{"Level"}</TableColumn>
+                <TableColumn>{"Status"}</TableColumn>
+                <TableColumn>{"Created"}</TableColumn>
+                <TableColumn>{"Actions"}</TableColumn>
               </TableHeader>
               <TableBody>
                 {sessions.map((session) => (
@@ -208,7 +206,7 @@ export function VerificationReviewQueue() {
                           startContent={<CheckCircle className="w-3.5 h-3.5" />}
                           onPress={() => openConfirmation(session, 'approve')}
                         >
-                          {t('verification.approve')}
+                          {"Approve"}
                         </Button>
                         <Button
                           size="sm"
@@ -217,7 +215,7 @@ export function VerificationReviewQueue() {
                           startContent={<XCircle className="w-3.5 h-3.5" />}
                           onPress={() => openConfirmation(session, 'reject')}
                         >
-                          {t('verification.reject')}
+                          {"Reject"}
                         </Button>
                       </div>
                     </TableCell>
@@ -233,7 +231,7 @@ export function VerificationReviewQueue() {
       <Modal isOpen={confirmModal.isOpen} onOpenChange={confirmModal.onOpenChange} size="sm">
         <ModalContent>
           <ModalHeader>
-            {selectedAction === 'approve' ? t('verification.approve_user') : t('verification.reject_user')}
+            {selectedAction === 'approve' ? "Approve User" : "Reject User"}
           </ModalHeader>
           <ModalBody>
             {selectedSession && (
@@ -241,15 +239,15 @@ export function VerificationReviewQueue() {
                 <p className="text-sm">
                   {selectedAction === 'approve' ? (
                     <>
-                      {t('verification.approve_confirm_prefix')}{' '}
-                      <strong className="text-success">{t('verification.approve')}</strong>{' '}
-                      <strong>{getUserName(selectedSession)}</strong>{t('verification.approve_confirm_suffix')}
+                      {"Are you sure you want to"}{' '}
+                      <strong className="text-success">{"Approve"}</strong>{' '}
+                      <strong>{getUserName(selectedSession)}</strong>{"? This will grant them verified status."}
                     </>
                   ) : (
                     <>
-                      {t('verification.reject_confirm_prefix')}{' '}
-                      <strong className="text-danger">{t('verification.reject')}</strong>{' '}
-                      <strong>{getUserName(selectedSession)}</strong>{t('verification.reject_confirm_suffix')}
+                      {"Are you sure you want to"}{' '}
+                      <strong className="text-danger">{"Reject"}</strong>{' '}
+                      <strong>{getUserName(selectedSession)}</strong>{"? This will deny their verification request."}
                     </>
                   )}
                 </p>
@@ -261,7 +259,7 @@ export function VerificationReviewQueue() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={confirmModal.onClose} isDisabled={actionLoading}>
-              {t('common.cancel')}
+              {"Cancel"}
             </Button>
             <Button
               color={selectedAction === 'approve' ? 'success' : 'danger'}
@@ -275,7 +273,7 @@ export function VerificationReviewQueue() {
                   : undefined
               }
             >
-              {selectedAction === 'approve' ? t('verification.approve') : t('verification.reject')}
+              {selectedAction === 'approve' ? "Approve" : "Reject"}
             </Button>
           </ModalFooter>
         </ModalContent>

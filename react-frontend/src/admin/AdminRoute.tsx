@@ -10,18 +10,16 @@
  */
 
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
 import { LoadingScreen } from '@/components/feedback';
 
 export function AdminRoute() {
-  const { t } = useTranslation('admin');
   const { user, isAuthenticated, isLoading, status } = useAuth();
   const { tenantPath } = useTenant();
   const location = useLocation();
 
   if (isLoading || status === 'loading') {
-    return <LoadingScreen message={t('checking_permissions')} />;
+    return <LoadingScreen message={"Checking Permissions"} />;
   }
 
   if (!isAuthenticated) {

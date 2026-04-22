@@ -17,12 +17,10 @@ import { useTenant, useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
-import { useTranslation } from 'react-i18next';
 export function RoleForm() {
-  const { t } = useTranslation('admin');
   const { id } = useParams();
   const isEdit = !!id;
-  usePageTitle(isEdit ? t('enterprise.page_title_edit_role') : t('enterprise.page_title_create_role'));
+  usePageTitle(isEdit ? "Edit Role" : "Create Role");
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -54,7 +52,7 @@ export function RoleForm() {
         }
       }
     } catch {
-      toast.error(t('enterprise.failed_to_load_data'));
+      toast.error("Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -92,7 +90,7 @@ export function RoleForm() {
 
   const handleSubmit = async () => {
     if (!name.trim()) {
-      toast.error(t('enterprise.name_is_required'));
+      toast.error("Name is Required");
       return;
     }
 
@@ -112,14 +110,14 @@ export function RoleForm() {
       }
 
       if (res.success) {
-        toast.success(isEdit ? t('enterprise.role_updated') : t('enterprise.role_created'));
+        toast.success(isEdit ? "Role Updated" : "Role Created");
         navigate(tenantPath('/admin/enterprise/roles'));
       } else {
-        const error = (res as { error?: string }).error || t('enterprise.save_failed');
+        const error = (res as { error?: string }).error || "Save Failed";
         toast.error(error);
       }
     } catch (err) {
-      toast.error(isEdit ? t('enterprise.failed_to_update_role') : t('enterprise.failed_to_create_role'));
+      toast.error(isEdit ? "Failed to update role" : "Failed to create role");
       console.error('Role save error:', err);
     } finally {
       setSaving(false);
@@ -137,8 +135,8 @@ export function RoleForm() {
   return (
     <div>
       <PageHeader
-        title={isEdit ? t('enterprise.edit_role') : t('enterprise.create_role')}
-        description={isEdit ? t('enterprise.edit_role_desc') : t('enterprise.create_role_desc')}
+        title={isEdit ? "Edit Role" : "Create Role"}
+        description={isEdit ? "Update the name, description, and permissions for this role" : "Define a new custom role with specific permissions"}
         actions={
           <Button
             variant="flat"
@@ -146,7 +144,7 @@ export function RoleForm() {
             onPress={() => navigate(tenantPath('/admin/enterprise/roles'))}
             size="sm"
           >
-            {t('enterprise.back_to_roles')}
+            {"Back to Roles"}
           </Button>
         }
       />
@@ -155,21 +153,21 @@ export function RoleForm() {
         {/* Basic Info */}
         <Card shadow="sm">
           <CardBody className="p-4 space-y-4">
-            <h3 className="text-lg font-semibold">{t('enterprise.basic_information')}</h3>
+            <h3 className="text-lg font-semibold">{"Basic Information"}</h3>
             <Input
-              label={t('enterprise.label_role_name')}
+              label={"Role Name"}
               value={name}
               onValueChange={setName}
               variant="bordered"
               isRequired
-              placeholder={t('enterprise.placeholder_role_name')}
+              placeholder={"Role Name..."}
             />
             <Textarea
-              label={t('enterprise.col_description')}
+              label={"Description"}
               value={description}
               onValueChange={setDescription}
               variant="bordered"
-              placeholder={t('enterprise.placeholder_role_description')}
+              placeholder={"Role description..."}
               minRows={2}
             />
           </CardBody>
@@ -178,7 +176,7 @@ export function RoleForm() {
         {/* Permissions */}
         <Card shadow="sm">
           <CardBody className="p-4">
-            <h3 className="text-lg font-semibold mb-4">{t('enterprise.col_permissions')}</h3>
+            <h3 className="text-lg font-semibold mb-4">{"Permissions"}</h3>
             <div className="space-y-6">
               {Object.entries(allPermissions).map(([category, perms]) => (
                 <div key={category}>
@@ -218,7 +216,7 @@ export function RoleForm() {
             variant="flat"
             onPress={() => navigate(tenantPath('/admin/enterprise/roles'))}
           >
-            {t('cancel')}
+            {"Cancel"}
           </Button>
           <Button
             color="primary"
@@ -226,7 +224,7 @@ export function RoleForm() {
             onPress={handleSubmit}
             isLoading={saving}
           >
-            {isEdit ? t('enterprise.update_role') : t('enterprise.create_role')}
+            {isEdit ? "Update Role" : "Create Role"}
           </Button>
         </div>
       </div>

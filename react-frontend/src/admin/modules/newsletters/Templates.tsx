@@ -43,7 +43,6 @@ import {
 } from '../../components';
 import { TemplatePreview } from './TemplatePreview';
 
-import { useTranslation } from 'react-i18next';
 interface Template {
   id: number;
   name: string;
@@ -66,13 +65,12 @@ const CATEGORY_COLORS: Record<string, 'primary' | 'secondary' | 'success' | 'war
 };
 
 export function Templates() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('newsletters.page_title'));
+  usePageTitle("Newsletters");
 
   const CATEGORY_LABELS: Record<string, string> = {
-    starter: t('template_form.category_starter'),
-    saved: t('template_form.category_saved'),
-    custom: t('template_form.category_custom'),
+    starter: "Category Starter",
+    saved: "Category saved",
+    custom: "Category Custom",
   };
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
@@ -120,13 +118,13 @@ export function Templates() {
     try {
       const res = await adminNewsletters.duplicateTemplate(template.id);
       if (res.success) {
-        toast.success(t('newsletters.template_duplicated_as', { name: `${template.name} (Copy)` }));
+        toast.success(`Template Duplicated as`);
         loadData();
       } else {
-        toast.error(res.error || t('newsletters.failed_to_duplicate_template'));
+        toast.error(res.error || "Failed to duplicate template");
       }
     } catch {
-      toast.error(t('newsletters.an_unexpected_error_occurred'));
+      toast.error("An unexpected error occurred");
     }
   }
 
@@ -136,14 +134,14 @@ export function Templates() {
     try {
       const res = await adminNewsletters.deleteTemplate(deleteTarget.id);
       if (res.success) {
-        toast.success(t('newsletters.template_deleted', { name: deleteTarget.name }));
+        toast.success(`Template deleted`);
         setDeleteTarget(null);
         loadData();
       } else {
-        toast.error(res.error || t('newsletters.failed_to_delete_template'));
+        toast.error(res.error || "Failed to delete template");
       }
     } catch {
-      toast.error(t('newsletters.an_unexpected_error_occurred'));
+      toast.error("An unexpected error occurred");
     } finally {
       setDeleting(false);
     }
@@ -153,12 +151,12 @@ export function Templates() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label={t('newsletters.label_template_actions')}>
+          <Button isIconOnly size="sm" variant="light" aria-label={"Actions"}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
         <DropdownMenu
-          aria-label={t('newsletters.label_template_actions')}
+          aria-label={"Actions"}
           onAction={(key) => {
             switch (key) {
               case 'edit':
@@ -177,13 +175,13 @@ export function Templates() {
           }}
         >
           <DropdownItem key="edit" startContent={<Pencil size={14} />}>
-            {t('newsletters.action_edit')}
+            {"Edit"}
           </DropdownItem>
           <DropdownItem key="duplicate" startContent={<Copy size={14} />}>
-            {t('newsletters.action_duplicate')}
+            {"Duplicate"}
           </DropdownItem>
           <DropdownItem key="preview" startContent={<Eye size={14} />}>
-            {t('newsletters.action_preview')}
+            {"Preview"}
           </DropdownItem>
           <DropdownItem
             key="delete"
@@ -191,7 +189,7 @@ export function Templates() {
             className="text-danger"
             color="danger"
           >
-            {t('newsletters.action_delete')}
+            {"Delete"}
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
@@ -201,7 +199,7 @@ export function Templates() {
   const columns: Column<Template>[] = [
     {
       key: 'name',
-      label: t('newsletters.col_template_name'),
+      label: "Template Name",
       sortable: true,
       render: (item) => (
         <div>
@@ -214,7 +212,7 @@ export function Templates() {
     },
     {
       key: 'category',
-      label: t('newsletters.col_category'),
+      label: "Category",
       render: (item) => (
         <Chip
           size="sm"
@@ -227,7 +225,7 @@ export function Templates() {
     },
     {
       key: 'subject',
-      label: t('newsletters.col_default_subject'),
+      label: "Default Subject",
       render: (item) => (
         <span className="text-sm text-default-600 line-clamp-1">
           {item.subject || '--'}
@@ -236,20 +234,20 @@ export function Templates() {
     },
     {
       key: 'is_active',
-      label: t('newsletters.col_status'),
+      label: "Status",
       render: (item) => (
         <Chip
           size="sm"
           variant="dot"
           color={item.is_active ? 'success' : 'default'}
         >
-          {item.is_active ? t('newsletters.status_active') : t('newsletters.status_inactive')}
+          {item.is_active ? "Active" : "Inactive"}
         </Chip>
       ),
     },
     {
       key: 'created_at',
-      label: t('newsletters.col_created'),
+      label: "Created",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -277,23 +275,23 @@ export function Templates() {
     return (
       <div>
         <PageHeader
-          title={t('newsletters.templates_title')}
-          description={t('newsletters.templates_desc')}
+          title={"Templates"}
+          description={"Create and manage reusable email templates"}
           actions={
             <Button
               color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters/templates/create'))}
             >
-              {t('newsletters.create_template')}
+              {"Create Template"}
             </Button>
           }
         />
         <EmptyState
           icon={FileText}
-          title={t('newsletters.no_templates_created')}
-          description={t('newsletters.desc_create_reusable_email_templates_to_speed')}
-          actionLabel={t('newsletters.create_template')}
+          title={"No Templates created"}
+          description={"Create reusable email templates to speed up campaign creation"}
+          actionLabel={"Create Template"}
           onAction={() => navigate(tenantPath('/admin/newsletters/templates/create'))}
         />
       </div>
@@ -303,8 +301,8 @@ export function Templates() {
   return (
     <div>
       <PageHeader
-        title={t('newsletters.templates_title')}
-        description={t('newsletters.templates_desc')}
+        title={"Templates"}
+        description={"Create and manage reusable email templates"}
         actions={
           <div className="flex gap-2">
             <Button
@@ -313,14 +311,14 @@ export function Templates() {
               onPress={loadData}
               isLoading={loading}
             >
-              {t('newsletters.refresh')}
+              {"Refresh"}
             </Button>
             <Button
               color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters/templates/create'))}
             >
-              {t('newsletters.create_template')}
+              {"Create Template"}
             </Button>
           </div>
         }
@@ -334,7 +332,7 @@ export function Templates() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={t('newsletters.tab_all', { count: items.length })} />
+          <Tab key="all" title={`All`} />
           {Object.entries(categoryCounts).map(([cat, count]) => (
             <Tab key={cat} title={`${CATEGORY_LABELS[cat] || cat} (${count})`} />
           ))}
@@ -353,9 +351,9 @@ export function Templates() {
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title={t('newsletters.delete_template')}
-        message={t('newsletters.delete_template_confirm', { name: deleteTarget?.name })}
-        confirmLabel={t('newsletters.confirm_delete_label')}
+        title={"Delete Template"}
+        message={`Delete Template Confirm`}
+        confirmLabel={"Confirm Delete"}
         confirmColor="danger"
         isLoading={deleting}
       />

@@ -29,7 +29,6 @@ import { adminSuper } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { TenantHierarchyNode } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 interface TreeNodeProps {
   node: TenantHierarchyNode;
   depth: number;
@@ -113,8 +112,7 @@ function TreeNode({ node, depth, onNavigate, expandedIds, onToggle }: TreeNodePr
 }
 
 export function TenantHierarchy() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('super.page_title'));
+  usePageTitle("Super Admin");
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -169,7 +167,7 @@ export function TenantHierarchy() {
         setExpandedIds(new Set(initialIds));
       }
     } catch {
-      toast.error(t('super.failed_to_load_hierarchy'));
+      toast.error("Failed to load hierarchy");
     }
     setLoading(false);
   }, [toast, t])
@@ -189,11 +187,11 @@ export function TenantHierarchy() {
         <span>/</span>
         <Link to={tenantPath('/admin/super/tenants')} className="hover:text-primary">Tenants</Link>
         <span>/</span>
-        <span className="text-foreground">{t('super_controls.hierarchy')}</span>
+        <span className="text-foreground">{"Hierarchy"}</span>
       </nav>
       <PageHeader
-        title={t('super.tenant_hierarchy_title')}
-        description={t('super.tenant_hierarchy_desc')}
+        title={"Tenant Hierarchy"}
+        description={"View the hierarchical structure of tenants and their relationships"}
         actions={
           <div className="flex items-center gap-2">
             <Button

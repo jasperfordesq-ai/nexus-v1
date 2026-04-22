@@ -48,7 +48,7 @@ const PLATFORM_LANGUAGES = [
 
 export function TenantFeatures() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('config.page_title'));
+  usePageTitle("Config");
   const toast = useToast();
   const { refreshTenant, supportedLanguages, defaultLanguage } = useTenant();
 
@@ -100,11 +100,11 @@ export function TenantFeatures() {
       setConfig((prev) =>
         prev ? { ...prev, features: { ...prev.features, [feature]: enabled } } : prev
       );
-      toast.success(t('config.feature_toggled', { name: t(`tenant_features.label_${feature}`, { defaultValue: feature }), status: enabled ? t('config.enabled') : t('config.disabled') }));
+      toast.success(`${t(`tenant_features.label_${feature}`, { defaultValue: feature })} ${enabled ? "enabled" : "disabled"}`);
       // Refresh TenantContext so nav items update immediately
       refreshTenant();
     } else {
-      toast.error(res.error || t('config.failed_to_update_feature'));
+      toast.error(res.error || "Failed to update feature");
     }
     setToggling(null);
   };
@@ -116,11 +116,11 @@ export function TenantFeatures() {
       setConfig((prev) =>
         prev ? { ...prev, modules: { ...prev.modules, [module]: enabled } } : prev
       );
-      toast.success(t('config.module_toggled', { name: t(`tenant_features.label_${module}`, { defaultValue: module }), status: enabled ? t('config.enabled') : t('config.disabled') }));
+      toast.success(`${t(`tenant_features.label_${module}`, { defaultValue: module })} ${enabled ? "enabled" : "disabled"}`);
       // Refresh TenantContext so nav items update immediately
       refreshTenant();
     } else {
-      toast.error(res.error || t('config.failed_to_update_module'));
+      toast.error(res.error || "Failed to update module");
     }
     setToggling(null);
   };
@@ -128,23 +128,23 @@ export function TenantFeatures() {
   const handleClearCache = async () => {
     const res = await adminConfig.clearCache('tenant');
     if (res.success) {
-      toast.success(t('config.cache_cleared_successfully'));
+      toast.success("Cache cleared successfully");
       // Refresh cache stats
       const statsRes = await adminConfig.getCacheStats();
       if (statsRes.success && statsRes.data) {
         setCacheStats(statsRes.data);
       }
     } else {
-      toast.error(t('config.failed_to_clear_cache'));
+      toast.error("Failed to clear cache");
     }
   };
 
   const handleRunJob = async (jobId: string) => {
     const res = await adminConfig.runJob(jobId);
     if (res.success) {
-      toast.success(t('config.job_triggered_successfully'));
+      toast.success("Job triggered successfully");
     } else {
-      toast.error(t('config.failed_to_trigger_job'));
+      toast.error("Failed to trigger job");
     }
   };
 
@@ -167,10 +167,10 @@ export function TenantFeatures() {
       supported_languages: langSupported,
     });
     if (res.success) {
-      toast.success(t('config.language_settings_saved'));
+      toast.success("Language settings saved");
       refreshTenant();
     } else {
-      toast.error(res.error || t('config.failed_to_save_language_settings'));
+      toast.error(res.error || "Failed to save language settings");
     }
     setSavingLang(false);
   };
@@ -186,8 +186,8 @@ export function TenantFeatures() {
   return (
     <div>
       <PageHeader
-        title={t('config.tenant_features_title')}
-        description={t('config.tenant_features_desc')}
+        title={"Tenant Features"}
+        description={"Enable or disable platform features and modules for this tenant"}
         actions={
           <Button
             variant="flat"
@@ -195,7 +195,7 @@ export function TenantFeatures() {
             onPress={loadConfig}
             size="sm"
           >
-            {t('tenant_features.refresh')}
+            {"Refresh"}
           </Button>
         }
       />
@@ -207,16 +207,16 @@ export function TenantFeatures() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
               <Globe size={18} className="text-primary" />
-              <h3 className="font-semibold">{t('tenant_features.language_localisation_heading')}</h3>
+              <h3 className="font-semibold">{"Language & Localisation"}</h3>
             </CardHeader>
             <CardBody className="px-4 pb-4 space-y-4">
               <div>
-                <p className="text-sm font-medium mb-1">{t('tenant_features.default_language')}</p>
+                <p className="text-sm font-medium mb-1">{"Default language"}</p>
                 <p className="text-xs text-default-400 mb-2">
-                  {t('tenant_features.default_language_hint')}
+                  {"The language users see by default on this platform"}
                 </p>
                 <Select
-                  aria-label={t('config.label_default_language')}
+                  aria-label={"Default Language"}
                   selectedKeys={[langDefault]}
                   onSelectionChange={(keys) => {
                     const val = Array.from(keys)[0] as string;
@@ -236,9 +236,9 @@ export function TenantFeatures() {
               </div>
               <Divider />
               <div>
-                <p className="text-sm font-medium mb-1">{t('tenant_features.available_languages')}</p>
+                <p className="text-sm font-medium mb-1">{"Available languages"}</p>
                 <p className="text-xs text-default-400 mb-3">
-                  {t('tenant_features.available_languages_hint')}
+                  {"Choose which languages members can switch to"}
                 </p>
                 <div className="space-y-2">
                   {PLATFORM_LANGUAGES.map((lang) => (
@@ -251,7 +251,7 @@ export function TenantFeatures() {
                       <span className="text-sm">
                         {lang.label} ({lang.short})
                         {lang.code === 'en' && (
-                          <span className="ml-2 text-xs text-default-400">{t('tenant_features.always_enabled')}</span>
+                          <span className="ml-2 text-xs text-default-400">{"(always enabled)"}</span>
                         )}
                       </span>
                     </Checkbox>
@@ -266,7 +266,7 @@ export function TenantFeatures() {
                   isDisabled={savingLang}
                   onPress={handleSaveLanguages}
                 >
-                  {t('tenant_features.save_changes')}
+                  {"Save changes"}
                 </Button>
               </div>
             </CardBody>
@@ -275,8 +275,8 @@ export function TenantFeatures() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
               <Zap size={18} className="text-primary" />
-              <h3 className="font-semibold">{t('tenant_features.section_features')}</h3>
-              <span className="text-sm text-default-400">{t('tenant_features.optional_addons')}</span>
+              <h3 className="font-semibold">{"Features"}</h3>
+              <span className="text-sm text-default-400">{"Optional add-ons"}</span>
             </CardHeader>
             <CardBody className="divide-y divide-divider px-4">
               {Object.entries(config?.features || {}).map(([key, enabled]) => (
@@ -299,8 +299,8 @@ export function TenantFeatures() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
               <Cog size={18} className="text-secondary" />
-              <h3 className="font-semibold">{t('tenant_features.section_core_modules')}</h3>
-              <span className="text-sm text-default-400">{t('tenant_features.section_core_modules_desc')}</span>
+              <h3 className="font-semibold">{"Core modules"}</h3>
+              <span className="text-sm text-default-400">{"Core platform modules"}</span>
             </CardHeader>
             <CardBody className="divide-y divide-divider px-4">
               {Object.entries(config?.modules || {}).map(([key, enabled]) => (
@@ -327,21 +327,21 @@ export function TenantFeatures() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
               <Database size={18} className="text-warning" />
-              <h3 className="font-semibold">{t('tenant_features.section_cache')}</h3>
+              <h3 className="font-semibold">{"Cache"}</h3>
             </CardHeader>
             <CardBody className="px-4 pb-4 space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-default-500">{t('tenant_features.section_redis')}</span>
+                <span className="text-default-500">{"Redis"}</span>
                 <span className={cacheStats?.redis_connected ? 'text-success' : 'text-danger'}>
-                  {cacheStats?.redis_connected ? t('tenant_features.connected') : t('tenant_features.disconnected')}
+                  {cacheStats?.redis_connected ? "Connected" : "Disconnected"}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-default-500">{t('tenant_features.section_memory_used')}</span>
+                <span className="text-default-500">{"Memory used"}</span>
                 <span>{cacheStats?.redis_memory_used || '—'}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-default-500">{t('tenant_features.section_keys')}</span>
+                <span className="text-default-500">{"Keys"}</span>
                 <span>{cacheStats?.redis_keys_count ?? '—'}</span>
               </div>
               <Divider />
@@ -353,7 +353,7 @@ export function TenantFeatures() {
                 onPress={handleClearCache}
                 size="sm"
               >
-                {t('tenant_features.clear_tenant_cache')}
+                {"Clear tenant cache"}
               </Button>
             </CardBody>
           </Card>
@@ -362,7 +362,7 @@ export function TenantFeatures() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
               <Timer size={18} className="text-secondary" />
-              <h3 className="font-semibold">{t('tenant_features.section_background_jobs')}</h3>
+              <h3 className="font-semibold">{"Background jobs"}</h3>
             </CardHeader>
             <CardBody className="px-4 pb-4 space-y-3">
               {jobs.length > 0 ? jobs.map((job) => (
@@ -370,7 +370,7 @@ export function TenantFeatures() {
                   <div>
                     <p className="text-sm font-medium">{job.name}</p>
                     <p className="text-xs text-default-400">
-                      {job.last_run_at ? t('tenant_features.job_last_run', { time: new Date(job.last_run_at).toLocaleString() }) : t('tenant_features.job_never_run')}
+                      {job.last_run_at ? `Last run: ${new Date(job.last_run_at).toLocaleString()}` : "Never run"}
                     </p>
                   </div>
                   <Button
@@ -378,13 +378,13 @@ export function TenantFeatures() {
                     size="sm"
                     variant="flat"
                     onPress={() => handleRunJob(job.id)}
-                    aria-label={t('tenant_features.run_job_aria', { name: job.name })}
+                    aria-label={`Run ${job.name}`}
                   >
                     <Play size={14} />
                   </Button>
                 </div>
               )) : (
-                <p className="text-sm text-default-400">{t('tenant_features.no_jobs_configured')}</p>
+                <p className="text-sm text-default-400">{"No background jobs configured"}</p>
               )}
             </CardBody>
           </Card>

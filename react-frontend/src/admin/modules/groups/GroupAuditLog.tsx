@@ -87,7 +87,7 @@ function ExpandableDetails({ details }: { details: Record<string, unknown> | str
         onPress={() => setExpanded((prev) => !prev)}
       >
         {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-        {expanded ? t('common.collapse') : t('common.expand')}
+        {expanded ? "Collapse" : "Expand"}
       </Button>
       {expanded && (
         <pre className="mt-1 text-xs text-default-500 font-mono bg-default-100 p-2 rounded-md overflow-x-auto max-h-48 whitespace-pre-wrap break-all">

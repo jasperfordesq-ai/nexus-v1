@@ -10,17 +10,15 @@
  */
 
 import { Navigate, Outlet } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
 import { LoadingScreen } from '@/components/feedback';
 
 export function SuperAdminRoute() {
-  const { t } = useTranslation('admin');
   const { user, isLoading, status } = useAuth();
   const { tenantPath } = useTenant();
 
   if (isLoading || status === 'loading') {
-    return <LoadingScreen message={t('checking_permissions')} />;
+    return <LoadingScreen message={"Checking Permissions"} />;
   }
 
   const userRecord = user as Record<string, unknown> | null;

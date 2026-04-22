@@ -16,7 +16,6 @@ import {
   Activity, CheckCircle, XCircle, Clock, AlertTriangle, Shield, Wifi, WifiOff,
 } from 'lucide-react';
 import { useToast } from '@/contexts';
-import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { api } from '@/lib/api';
 
@@ -59,25 +58,25 @@ interface ProviderHealth {
  * Format a date string as relative time (e.g., "2 hours ago").
  */
 function formatRelativeTime(dateStr: string | null, t: TFunction): string {
-  if (!dateStr) return t('system.never');
+  if (!dateStr) return "Never";
 
   const date = new Date(dateStr);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffSec = Math.floor(diffMs / 1000);
 
-  if (diffSec < 60) return t('system.just_now');
+  if (diffSec < 60) return "Just now";
   if (diffSec < 3600) {
     const mins = Math.floor(diffSec / 60);
-    return t('system.n_minutes_ago', { count: mins });
+    return `N Minutes Ago`;
   }
   if (diffSec < 86400) {
     const hours = Math.floor(diffSec / 3600);
-    return t('system.n_hours_ago', { count: hours });
+    return `N Hours Ago`;
   }
   if (diffSec < 604800) {
     const days = Math.floor(diffSec / 86400);
-    return t('system.n_days_ago', { count: days });
+    return `N Days Ago`;
   }
 
   return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
@@ -95,7 +94,6 @@ function formatLevel(level: string): string {
 
 export function ProviderHealthDashboard() {
   const toast = useToast();
-  const { t } = useTranslation('admin');
   const [providers, setProviders] = useState<ProviderHealth[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -107,7 +105,7 @@ export function ProviderHealthDashboard() {
         setProviders(Array.isArray(res.data) ? res.data : []);
       }
     } catch {
-      toast.error(t('system.failed_to_load_provider_health'));
+      toast.error("Failed to load provider health");
     } finally {
       setLoading(false);
     }
@@ -122,7 +120,7 @@ export function ProviderHealthDashboard() {
       <Card shadow="sm">
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Activity size={20} /> {t('system.provider_health_title')}
+            <Activity size={20} /> {"Provider Health"}
           </h3>
         </CardHeader>
         <CardBody>
@@ -139,12 +137,12 @@ export function ProviderHealthDashboard() {
       <Card shadow="sm">
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Activity size={20} /> {t('system.provider_health_title')}
+            <Activity size={20} /> {"Provider Health"}
           </h3>
         </CardHeader>
         <CardBody>
           <p className="text-sm text-default-500 text-center py-4">
-            {t('system.no_identity_providers')}
+            {"No identity providers found"}
           </p>
         </CardBody>
       </Card>
@@ -155,7 +153,7 @@ export function ProviderHealthDashboard() {
     <Card shadow="sm">
       <CardHeader>
         <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Activity size={20} /> {t('system.provider_health_title')}
+          <Activity size={20} /> {"Provider Health"}
         </h3>
       </CardHeader>
       <CardBody>
@@ -170,7 +168,6 @@ export function ProviderHealthDashboard() {
 }
 
 function ProviderCard({ provider }: { provider: ProviderHealth }) {
-  const { t } = useTranslation('admin');
   const { stats, recent_24h, last_webhook } = provider;
   const successColor = stats.success_rate === null
     ? 'default'
@@ -190,15 +187,15 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
             <span className="font-semibold text-base">{provider.name}</span>
           </div>
           {provider.available ? (
-            <Tooltip content={t('system.tooltip_provider_available')}>
+            <Tooltip content={"Provider Available"}>
               <Chip size="sm" color="success" variant="flat" startContent={<Wifi size={12} />}>
-                {t('system.provider_available')}
+                {"Provider Available"}
               </Chip>
             </Tooltip>
           ) : (
-            <Tooltip content={t('system.tooltip_provider_unavailable')}>
+            <Tooltip content={"Provider Unavailable"}>
               <Chip size="sm" color="danger" variant="flat" startContent={<WifiOff size={12} />}>
-                {t('system.provider_unavailable')}
+                {"Provider Unavailable"}
               </Chip>
             </Tooltip>
           )}
@@ -215,17 +212,17 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
 
         {/* Latency metrics */}
         <div className="flex items-center gap-3 text-sm">
-          <Tooltip content={t('system.tooltip_api_latency')}>
+          <Tooltip content={"API Latency"}>
             <Chip size="sm" variant="flat" color={provider.latency_ms !== null && provider.latency_ms < 500 ? 'success' : provider.latency_ms !== null && provider.latency_ms < 2000 ? 'warning' : 'default'} className="text-xs">
-              {provider.latency_ms !== null ? t('system.latency_ms', { ms: provider.latency_ms }) : t('system.n_a')}
+              {provider.latency_ms !== null ? `Latency Ms` : "N a"}
             </Chip>
           </Tooltip>
           {provider.avg_completion_seconds !== null && (
-            <Tooltip content={t('system.tooltip_avg_completion')}>
+            <Tooltip content={"Avg Completion"}>
               <Chip size="sm" variant="flat" color="default" className="text-xs">
                 {provider.avg_completion_seconds < 60
-                  ? t('system.avg_completion_seconds', { s: provider.avg_completion_seconds })
-                  : t('system.avg_completion_minutes', { m: Math.round(provider.avg_completion_seconds / 60) })}
+                  ? `Avg Completion Seconds`
+                  : `Avg Completion Minutes`}
               </Chip>
             </Tooltip>
           )}
@@ -234,9 +231,9 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
         {/* Success rate */}
         <div className="space-y-1">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-default-500">{t('system.success_rate_label')}</span>
+            <span className="text-default-500">{"Success Rate"}</span>
             <span className="font-medium">
-              {stats.success_rate !== null ? `${stats.success_rate}%` : t('system.n_a')}
+              {stats.success_rate !== null ? `${stats.success_rate}%` : "N a"}
             </span>
           </div>
           <Progress
@@ -244,7 +241,7 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
             value={stats.success_rate ?? 0}
             maxValue={100}
             color={successColor}
-            aria-label={t('provider_health.aria_success_rate')}
+            aria-label={"Success Rate"}
           />
         </div>
 
@@ -252,27 +249,27 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
         <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
           <div className="flex items-center gap-1.5">
             <Activity size={14} className="text-default-400" />
-            <span className="text-default-500">{t('system.stat_total')}</span>
+            <span className="text-default-500">{"Stat Total"}</span>
             <span className="ml-auto font-medium">{stats.total_sessions}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <CheckCircle size={14} className="text-success" />
-            <span className="text-default-500">{t('system.stat_passed')}</span>
+            <span className="text-default-500">{"Stat Passed"}</span>
             <span className="ml-auto font-medium">{stats.passed}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <XCircle size={14} className="text-danger" />
-            <span className="text-default-500">{t('system.stat_failed')}</span>
+            <span className="text-default-500">{"Stat failed"}</span>
             <span className="ml-auto font-medium">{stats.failed}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Clock size={14} className="text-warning" />
-            <span className="text-default-500">{t('system.stat_pending')}</span>
+            <span className="text-default-500">{"Stat Pending"}</span>
             <span className="ml-auto font-medium">{stats.pending}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <AlertTriangle size={14} className="text-default-400" />
-            <span className="text-default-500">{t('system.stat_expired')}</span>
+            <span className="text-default-500">{"Stat Expired"}</span>
             <span className="ml-auto font-medium">{stats.expired}</span>
           </div>
         </div>
@@ -280,39 +277,39 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
         {/* 24h stats */}
         {recent_24h.total > 0 && (
           <div className="rounded-lg bg-default-100 dark:bg-default-50 p-2">
-            <p className="text-xs font-medium text-default-500 mb-1">{t('system.last_24h_label')}</p>
+            <p className="text-xs font-medium text-default-500 mb-1">{"Last 24h"}</p>
             <div className="flex items-center gap-3 text-sm">
-              <span>{t('system.n_sessions', { count: recent_24h.total })}</span>
-              <span className="text-success">{recent_24h.passed} {t('system.stat_passed').toLowerCase()}</span>
-              <span className="text-danger">{recent_24h.failed} {t('system.stat_failed').toLowerCase()}</span>
+              <span>{`N Sessions`}</span>
+              <span className="text-success">{recent_24h.passed} {"Stat Passed".toLowerCase()}</span>
+              <span className="text-danger">{recent_24h.failed} {"Stat failed".toLowerCase()}</span>
             </div>
           </div>
         )}
 
         {/* Timestamps */}
         <div className="space-y-1 text-xs text-default-400 pt-1 border-t border-default-100">
-          <Tooltip content={stats.last_session_at || t('system.no_sessions_yet')}>
+          <Tooltip content={stats.last_session_at || "No sessions yet found"}>
             <div className="flex items-center justify-between">
-              <span>{t('system.last_session_label')}</span>
+              <span>{"Last Session"}</span>
               <span>{formatRelativeTime(stats.last_session_at, t)}</span>
             </div>
           </Tooltip>
-          <Tooltip content={stats.last_success_at || t('system.no_successful_sessions')}>
+          <Tooltip content={stats.last_success_at || "No successful sessions found"}>
             <div className="flex items-center justify-between">
-              <span>{t('system.last_success_label')}</span>
+              <span>{"Last Success"}</span>
               <span>{formatRelativeTime(stats.last_success_at, t)}</span>
             </div>
           </Tooltip>
-          <Tooltip content={stats.last_failure_at || t('system.no_failed_sessions')}>
+          <Tooltip content={stats.last_failure_at || "No failed sessions found"}>
             <div className="flex items-center justify-between">
-              <span>{t('system.last_failure_label')}</span>
+              <span>{"Last Failure"}</span>
               <span>{formatRelativeTime(stats.last_failure_at, t)}</span>
             </div>
           </Tooltip>
           {last_webhook && (
-            <Tooltip content={t('system.tooltip_last_webhook_event', { type: last_webhook.type, at: last_webhook.at })}>
+            <Tooltip content={`Last Webhook Event`}>
               <div className="flex items-center justify-between">
-                <span>{t('system.last_webhook_label')}</span>
+                <span>{"Last Webhook"}</span>
                 <span>{formatRelativeTime(last_webhook.at, t)}</span>
               </div>
             </Tooltip>

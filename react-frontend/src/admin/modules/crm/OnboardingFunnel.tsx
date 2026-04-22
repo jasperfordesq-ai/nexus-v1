@@ -215,7 +215,7 @@ function SnapshotCard({ eyebrow, value, body, accentClassName }: SnapshotCardPro
 
 export default function OnboardingFunnel() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('crm.page_title'));
+  usePageTitle("CRM");
 
   const toast = useToast();
   const { tenantPath } = useTenant();
@@ -232,8 +232,8 @@ export default function OnboardingFunnel() {
       const res = await adminCrm.getFunnel();
       setData(res.data as FunnelData);
     } catch {
-      setError(t('crm.failed_to_load_onboarding_funnel_data'));
-      toast.error(t('crm.failed_to_load_onboarding_funnel_data'));
+      setError("Failed to load onboarding funnel data");
+      toast.error("Failed to load onboarding funnel data");
     } finally {
       setLoading(false);
     }
@@ -339,7 +339,7 @@ export default function OnboardingFunnel() {
   if (loading) {
     return (
       <div className="flex min-h-[420px] items-center justify-center">
-        <Spinner size="lg" label={t('crm.loading_funnel')} />
+        <Spinner size="lg" label={"Loading Funnel"} />
       </div>
     );
   }
@@ -354,13 +354,13 @@ export default function OnboardingFunnel() {
             </div>
             <div className="space-y-2">
               <h1 className="text-2xl font-semibold text-foreground">
-                {t('crm.onboarding_funnel_title')}
+                {"Onboarding Funnel"}
               </h1>
-              <p className="text-default-500">{error || t('crm.no_data_available')}</p>
+              <p className="text-default-500">{error || "No data available"}</p>
             </div>
             <div className="flex flex-wrap gap-3">
               <Button color="primary" onPress={fetchData} startContent={<RefreshCw size={16} />}>
-                {t('crm.refresh')}
+                {"Refresh"}
               </Button>
               <Button
                 as={Link}
@@ -368,7 +368,7 @@ export default function OnboardingFunnel() {
                 variant="flat"
                 endContent={<ChevronRight size={16} />}
               >
-                {t('crm.crm_dashboard_title')}
+                {"CRM Dashboard"}
               </Button>
             </div>
           </CardBody>
@@ -393,15 +393,15 @@ export default function OnboardingFunnel() {
 
   const heroStats = [
     {
-      label: t('crm.entry_stage'),
+      label: "Entry Stage",
       value: entryStage?.count.toLocaleString() ?? '0',
     },
     {
-      label: t('crm.overall_conversion'),
+      label: "Overall Conversion",
       value: formatPercent(overallConversion),
     },
     {
-      label: t('crm.latest_month'),
+      label: "Latest Month",
       value: latestMonth ? latestMonth.count.toLocaleString() : '0',
     },
   ];
@@ -409,36 +409,36 @@ export default function OnboardingFunnel() {
   const guideCards: GuideCardProps[] = [
     {
       icon: Filter,
-      title: t('crm.guide_stage_width_title'),
-      body: t('crm.guide_stage_width_body'),
+      title: "Stage Width",
+      body: "Wider stage bars mean more members from the original entry group are still active at that point in the journey.",
       accentClassName: 'bg-primary/10 text-primary',
     },
     {
       icon: ArrowDownRight,
-      title: t('crm.guide_conversion_title'),
-      body: t('crm.guide_conversion_body'),
+      title: "Conversion Rate",
+      body: "Each conversion percentage compares a stage only to the stage immediately before it, not to the original starting group.",
       accentClassName: 'bg-warning/10 text-warning',
     },
     {
       icon: TrendingDown,
-      title: t('crm.guide_dropoff_title'),
-      body: t('crm.guide_dropoff_body'),
+      title: "Drop-off",
+      body: "Drop-off counts show how many members were lost before reaching the next step, helping you spot where follow-up may matter most.",
       accentClassName: 'bg-danger/10 text-danger',
     },
   ];
 
   const snapshotCards: SnapshotCardProps[] = [
     {
-      eyebrow: t('crm.snapshot_conversion_title'),
+      eyebrow: "End-to-end conversion",
       value: formatPercent(overallConversion),
       body: t('crm.snapshot_conversion_body', {
         members: finalStage?.count.toLocaleString() ?? '0',
-        stage: finalStage?.name ?? t('crm.no_stages_available'),
+        stage: finalStage?.name ?? "No stages available",
       }),
       accentClassName: 'bg-success/10 text-success',
     },
     {
-      eyebrow: t('crm.snapshot_volume_title'),
+      eyebrow: "Recent acquisition",
       value: latestMonth?.count.toLocaleString() ?? '0',
       body: latestMonth
         ? `${t('crm.snapshot_volume_body', {
@@ -451,20 +451,20 @@ export default function OnboardingFunnel() {
                 })}`
               : ''
           }`
-        : t('crm.no_registration_data'),
+        : "No registration data",
       accentClassName: 'bg-secondary/10 text-secondary',
     },
     {
-      eyebrow: t('crm.snapshot_priority_title'),
+      eyebrow: "Primary intervention point",
       value: biggestDropoff
         ? `${biggestDropoff.from.name} -> ${biggestDropoff.to.name}`
-        : t('crm.not_enough_stages'),
+        : "Not enough stages",
       body: biggestDropoff
         ? t('crm.snapshot_priority_body', {
             loss: biggestDropoff.loss.toLocaleString(),
             rate: formatPercent(biggestDropoff.rate),
           })
-        : t('crm.no_stages_available'),
+        : "No stages available",
       accentClassName: 'bg-danger/10 text-danger',
     },
   ];
@@ -487,15 +487,15 @@ export default function OnboardingFunnel() {
               variant="flat"
               className="border border-primary/15 bg-primary/10 px-3 text-primary"
             >
-              {t('crm.page_title')}
+              {"CRM"}
             </Chip>
 
             <div className="space-y-3">
               <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                {t('crm.onboarding_funnel_title')}
+                {"Onboarding Funnel"}
               </h1>
               <p className="max-w-2xl text-base leading-7 text-default-600 dark:text-default-400">
-                {t('crm.onboarding_funnel_desc')}
+                {"Track where members stall between registration and meaningful participation so follow-up work lands where it matters."}
               </p>
             </div>
 
@@ -521,7 +521,7 @@ export default function OnboardingFunnel() {
               isLoading={loading}
               startContent={<RefreshCw size={16} />}
             >
-              {t('crm.refresh')}
+              {"Refresh"}
             </Button>
             <Button
               as={Link}
@@ -529,7 +529,7 @@ export default function OnboardingFunnel() {
               variant="flat"
               endContent={<ChevronRight size={16} />}
             >
-              {t('crm.crm_dashboard_title')}
+              {"CRM Dashboard"}
             </Button>
             <Button
               as={Link}
@@ -537,7 +537,7 @@ export default function OnboardingFunnel() {
               variant="flat"
               endContent={<ChevronRight size={16} />}
             >
-              {t('crm.qa_all_members')}
+              {"All Members"}
             </Button>
             <Button
               as={Link}
@@ -545,7 +545,7 @@ export default function OnboardingFunnel() {
               variant="flat"
               endContent={<ChevronRight size={16} />}
             >
-              {t('crm.qa_crm_tasks')}
+              {"CRM Tasks"}
             </Button>
           </div>
         </div>
@@ -554,39 +554,39 @@ export default function OnboardingFunnel() {
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           icon={Users}
-          label={t('crm.entry_stage')}
+          label={"Entry Stage"}
           value={entryStage?.count.toLocaleString() ?? '0'}
-          caption={entryStage?.name ?? t('crm.no_stages_available')}
+          caption={entryStage?.name ?? "No stages available"}
           accentClassName="bg-primary/10 text-primary"
         />
         <MetricCard
           icon={Target}
-          label={t('crm.completed_journey')}
+          label={"Completed Journey"}
           value={finalStage?.count.toLocaleString() ?? '0'}
-          caption={finalStage?.name ?? t('crm.no_stages_available')}
+          caption={finalStage?.name ?? "No stages available"}
           accentClassName="bg-success/10 text-success"
         />
         <MetricCard
           icon={TrendingDown}
-          label={t('crm.biggest_dropoff')}
+          label={"Biggest Drop-off"}
           value={biggestDropoff?.loss.toLocaleString() ?? '0'}
           caption={
             biggestDropoff
               ? `${biggestDropoff.from.name} -> ${biggestDropoff.to.name}`
-              : t('crm.not_enough_stages')
+              : "Not enough stages"
           }
           accentClassName="bg-danger/10 text-danger"
         />
         <MetricCard
           icon={CalendarDays}
-          label={t('crm.latest_month')}
+          label={"Latest Month"}
           value={latestMonth?.count.toLocaleString() ?? '0'}
           caption={
             latestMonth
               ? previousMonth && monthOverMonthChange !== null
-                ? `${formatSignedPercent(monthOverMonthChange)} ${t('crm.change_from_previous_month')}`
+                ? `${formatSignedPercent(monthOverMonthChange)} ${"from previous month"}`
                 : formatMonthLabel(latestMonth.month)
-              : t('crm.no_registration_data')
+              : "No registration data"
           }
           accentClassName="bg-secondary/10 text-secondary"
         />
@@ -594,8 +594,8 @@ export default function OnboardingFunnel() {
 
       <Card className="border border-default-200/70 bg-content1/90 shadow-sm">
         <CardHeader className="flex flex-col items-start gap-2 px-6 pb-0 pt-6">
-          <h2 className="text-lg font-semibold text-foreground">{t('crm.reading_guide_title')}</h2>
-          <p className="text-sm text-default-500">{t('crm.reading_guide_desc')}</p>
+          <h2 className="text-lg font-semibold text-foreground">{"How to Read This Page"}</h2>
+          <p className="text-sm text-default-500">{"A quick reference so the bars, percentages, and drop-off panels are easier to interpret at a glance."}</p>
         </CardHeader>
         <CardBody className="grid gap-4 px-6 pb-6 pt-5 md:grid-cols-3">
           {guideCards.map((card) => (
@@ -606,8 +606,8 @@ export default function OnboardingFunnel() {
 
       <Card className="border border-default-200/70 bg-content1/90 shadow-sm">
         <CardHeader className="flex flex-col items-start gap-2 px-6 pb-0 pt-6">
-          <h2 className="text-lg font-semibold text-foreground">{t('crm.snapshot_title')}</h2>
-          <p className="text-sm text-default-500">{t('crm.snapshot_desc')}</p>
+          <h2 className="text-lg font-semibold text-foreground">{"What This Funnel Says Right Now"}</h2>
+          <p className="text-sm text-default-500">{"A short readout of what the funnel is saying right now, before you dive into the detail below."}</p>
         </CardHeader>
         <CardBody className="grid gap-4 px-6 pb-6 pt-5 lg:grid-cols-3">
           {snapshotCards.map((card) => (
@@ -624,8 +624,8 @@ export default function OnboardingFunnel() {
                 <Filter size={20} />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-foreground">{t('crm.member_funnel_title')}</h2>
-                <p className="text-sm text-default-500">{t('crm.member_funnel_desc')}</p>
+                <h2 className="text-xl font-semibold text-foreground">{"Member Journey"}</h2>
+                <p className="text-sm text-default-500">{"A stage-by-stage view of how many entrants are still moving toward first exchange."}</p>
               </div>
             </div>
           </CardHeader>
@@ -635,7 +635,7 @@ export default function OnboardingFunnel() {
               <>
                 <div className="rounded-[28px] border border-primary/10 bg-primary/5 p-4 sm:p-5">
                   <p className="text-sm leading-7 text-default-600 dark:text-default-400">
-                    {t('crm.member_funnel_help')}
+                    {"Each stage bar shows how much of the original entry group is still present. The badge on the bar shows share of entrants for the first stage, then conversion from the previous stage for each later step."}
                   </p>
                 </div>
 
@@ -661,7 +661,7 @@ export default function OnboardingFunnel() {
                                 {formatPercent(stage.conversionFromPrevious ?? 0)}
                               </Chip>
                             </div>
-                            <span>{t('crm.loss_between_stages', { count: stage.lossFromPrevious })}</span>
+                            <span>{`${stage.lossFromPrevious} lost between stages`}</span>
                           </div>
                         )}
 
@@ -669,23 +669,23 @@ export default function OnboardingFunnel() {
                           <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                             <div className="space-y-2">
                               <Chip size="sm" variant="flat" className="w-fit">
-                                {t('crm.stage_number', { number: index + 1 })}
+                                {`Stage ${index + 1}`}
                               </Chip>
                               <p className="text-lg font-semibold text-foreground">{stage.name}</p>
                               <p className="text-sm text-default-500">
-                                {formatPercent(stage.shareOfEntry)} {t('crm.stage_share_label')}
+                                {formatPercent(stage.shareOfEntry)} {"Share of entrants"}
                               </p>
                             </div>
                             <div className="space-y-2 text-right">
                               {index > 0 && (
                                 <Chip size="sm" color="danger" variant="flat" className="font-medium">
-                                  {stage.lossFromPrevious.toLocaleString()} {t('crm.lost_since_previous')}
+                                  {stage.lossFromPrevious.toLocaleString()} {"lost since previous stage"}
                                 </Chip>
                               )}
                               <p className="text-2xl font-semibold tracking-tight text-foreground">
                                 {stage.count.toLocaleString()}
                               </p>
-                              <p className="text-sm text-default-500">{t('crm.members_count')}</p>
+                              <p className="text-sm text-default-500">{"Members"}</p>
                             </div>
                           </div>
 
@@ -705,8 +705,8 @@ export default function OnboardingFunnel() {
                             <div className="relative flex items-center justify-between gap-4">
                               <span className="text-sm font-medium text-white/85">
                                 {index === 0
-                                  ? t('crm.entry_stage')
-                                  : t('crm.conversion_from_previous')}
+                                  ? "Entry Stage"
+                                  : "Conversion from previous stage"}
                               </span>
                               <span className="rounded-full bg-black/20 px-3 py-1 text-sm font-semibold text-white">
                                 {index === 0
@@ -724,7 +724,7 @@ export default function OnboardingFunnel() {
                 {entryStage && finalStage && (
                   <div className="flex flex-wrap items-center justify-between gap-4 rounded-[28px] border border-primary/10 bg-primary/5 px-5 py-4">
                     <div className="space-y-1">
-                      <p className="text-sm font-medium text-default-500">{t('crm.overall_conversion')}</p>
+                      <p className="text-sm font-medium text-default-500">{"Overall Conversion"}</p>
                       <div className="flex items-center gap-2 text-sm text-default-600 dark:text-default-400">
                         <span>{entryStage.name}</span>
                         <ArrowRight size={14} />
@@ -736,7 +736,7 @@ export default function OnboardingFunnel() {
                 )}
               </>
             ) : (
-              <p className="py-10 text-center text-sm text-default-400">{t('crm.no_stages_available')}</p>
+              <p className="py-10 text-center text-sm text-default-400">{"No stages available"}</p>
             )}
           </CardBody>
         </Card>
@@ -749,8 +749,8 @@ export default function OnboardingFunnel() {
                   <TrendingDown size={18} />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-foreground">{t('crm.funnel_focus_title')}</h2>
-                  <p className="text-sm text-default-500">{t('crm.funnel_focus_desc')}</p>
+                  <h2 className="text-lg font-semibold text-foreground">{"Attention Needed"}</h2>
+                  <p className="text-sm text-default-500">{"The handoffs most likely to benefit from coordinator attention right now."}</p>
                 </div>
               </div>
             </CardHeader>
@@ -759,7 +759,7 @@ export default function OnboardingFunnel() {
               <div className="rounded-2xl border border-danger/10 bg-danger/5 p-4">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm font-medium text-default-600 dark:text-default-300">
-                    {t('crm.biggest_dropoff')}
+                    {"Biggest Drop-off"}
                   </p>
                   <Chip color="danger" variant="flat">
                     {biggestDropoff?.loss.toLocaleString() ?? '0'}
@@ -768,17 +768,17 @@ export default function OnboardingFunnel() {
                 <p className="mt-3 text-base font-semibold text-foreground">
                   {biggestDropoff
                     ? `${biggestDropoff.from.name} -> ${biggestDropoff.to.name}`
-                    : t('crm.not_enough_stages')}
+                    : "Not enough stages"}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-default-500">
-                  {t('crm.biggest_dropoff_help')}
+                  {"This is the point in the journey where the highest number of members stop before reaching the next stage."}
                 </p>
               </div>
 
               <div className="rounded-2xl border border-warning/10 bg-warning/5 p-4">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm font-medium text-default-600 dark:text-default-300">
-                    {t('crm.weakest_handoff')}
+                    {"Weakest Handoff"}
                   </p>
                   <Chip
                     color={weakestHandoff ? getRateTone(weakestHandoff.rate).chipColor : 'default'}
@@ -790,27 +790,27 @@ export default function OnboardingFunnel() {
                 <p className="mt-3 text-base font-semibold text-foreground">
                   {weakestHandoff
                     ? `${weakestHandoff.from.name} -> ${weakestHandoff.to.name}`
-                    : t('crm.not_enough_stages')}
+                    : "Not enough stages"}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-default-500">
-                  {t('crm.weakest_handoff_help')}
+                  {"This is the lowest stage-to-stage conversion rate in the current funnel, even if another stage has a larger raw loss count."}
                 </p>
               </div>
 
               <div className="rounded-2xl border border-success/10 bg-success/5 p-4">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm font-medium text-default-600 dark:text-default-300">
-                    {t('crm.overall_conversion')}
+                    {"Overall Conversion"}
                   </p>
                   <Chip color="success" variant="flat">
                     {formatPercent(overallConversion)}
                   </Chip>
                 </div>
                 <p className="mt-3 text-base font-semibold text-foreground">
-                  {finalStage?.name ?? t('crm.no_stages_available')}
+                  {finalStage?.name ?? "No stages available"}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-default-500">
-                  {t('crm.overall_conversion_help')}
+                  {"This is the percentage of members who make it from the first recorded stage all the way to the final stage shown on this page."}
                 </p>
               </div>
             </CardBody>
@@ -824,9 +824,9 @@ export default function OnboardingFunnel() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-foreground">
-                    {t('crm.stage_conversion_title')}
+                    {"Stage Conversion"}
                   </h2>
-                  <p className="text-sm text-default-500">{t('crm.stage_conversion_desc')}</p>
+                  <p className="text-sm text-default-500">{"Stage-by-stage handoff quality across the full onboarding journey."}</p>
                 </div>
               </div>
             </CardHeader>
@@ -835,7 +835,7 @@ export default function OnboardingFunnel() {
               {transitions.length > 0 ? (
                 <>
                   <p className="text-sm leading-7 text-default-500">
-                    {t('crm.stage_conversion_help')}
+                    {"These cards compare each stage directly to the next one. A weaker percentage here usually means the next action, approval, or reminder needs attention."}
                   </p>
 
                   {transitions.map((transition) => {
@@ -860,9 +860,9 @@ export default function OnboardingFunnel() {
                         </div>
 
                         <div className="mb-3 flex items-center justify-between gap-3 text-sm text-default-500">
-                          <span>{t('crm.transition_loss_detail', { members: transition.loss.toLocaleString() })}</span>
+                          <span>{`${transition.loss.toLocaleString()} members are lost at this step.`}</span>
                           <Chip size="sm" color={tone.chipColor} variant="flat">
-                            {transition.loss.toLocaleString()} {t('crm.dropped_off')}
+                            {transition.loss.toLocaleString()} {"Dropped Off"}
                           </Chip>
                         </div>
 
@@ -880,7 +880,7 @@ export default function OnboardingFunnel() {
                   })}
                 </>
               ) : (
-                <p className="py-6 text-center text-sm text-default-400">{t('crm.not_enough_stages')}</p>
+                <p className="py-6 text-center text-sm text-default-400">{"Not enough stages"}</p>
               )}
             </CardBody>
           </Card>
@@ -896,9 +896,9 @@ export default function OnboardingFunnel() {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-foreground">
-                  {t('crm.monthly_registrations_title')}
+                  {"Monthly Registrations"}
                 </h2>
-                <p className="text-sm text-default-500">{t('crm.monthly_registrations_desc')}</p>
+                <p className="text-sm text-default-500">{"Recent registration volume with month-over-month context."}</p>
               </div>
             </div>
           </CardHeader>
@@ -906,26 +906,26 @@ export default function OnboardingFunnel() {
           <CardBody className="gap-5 px-6 pb-6 pt-6">
             {monthlyRegistrations.length > 0 ? (
               <>
-                <p className="text-sm leading-7 text-default-500">{t('crm.monthly_registrations_help')}</p>
+                <p className="text-sm leading-7 text-default-500">{"Use this trend to tell whether funnel changes are coming from weaker conversion, lower incoming registrations, or both at the same time."}</p>
 
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="rounded-2xl border border-default-200/70 bg-default-50/70 p-4 dark:border-white/10 dark:bg-white/[0.03]">
-                    <p className="text-sm font-medium text-default-500">{t('crm.latest_month')}</p>
+                    <p className="text-sm font-medium text-default-500">{"Latest Month"}</p>
                     <p className="mt-2 text-2xl font-semibold text-foreground">
                       {latestMonth?.count.toLocaleString() ?? '0'}
                     </p>
                     <p className="mt-1 text-sm text-default-500">
-                      {latestMonth ? formatMonthLabel(latestMonth.month) : t('crm.no_registration_data')}
+                      {latestMonth ? formatMonthLabel(latestMonth.month) : "No registration data"}
                     </p>
                   </div>
 
                   <div className="rounded-2xl border border-default-200/70 bg-default-50/70 p-4 dark:border-white/10 dark:bg-white/[0.03]">
-                    <p className="text-sm font-medium text-default-500">{t('crm.change_from_previous_month')}</p>
+                    <p className="text-sm font-medium text-default-500">{"from previous month"}</p>
                     <p className="mt-2 text-2xl font-semibold text-foreground">
                       {monthOverMonthChange !== null ? formatSignedPercent(monthOverMonthChange) : '0%'}
                     </p>
                     <p className="mt-1 text-sm text-default-500">
-                      {previousMonth ? formatMonthLabel(previousMonth.month) : t('crm.no_registration_data')}
+                      {previousMonth ? formatMonthLabel(previousMonth.month) : "No registration data"}
                     </p>
                   </div>
                 </div>
@@ -952,7 +952,7 @@ export default function OnboardingFunnel() {
                         labelFormatter={(value) => formatMonthLabel(String(value))}
                         formatter={(value: number | string | undefined) => [
                           Number(value ?? 0).toLocaleString(),
-                          t('crm.members_count'),
+                          "Members",
                         ]}
                         contentStyle={{
                           borderRadius: '16px',
@@ -975,7 +975,7 @@ export default function OnboardingFunnel() {
                 </div>
               </>
             ) : (
-              <p className="py-10 text-center text-sm text-default-400">{t('crm.no_registration_data')}</p>
+              <p className="py-10 text-center text-sm text-default-400">{"No registration data"}</p>
             )}
           </CardBody>
         </Card>
@@ -988,9 +988,9 @@ export default function OnboardingFunnel() {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-foreground">
-                  {t('crm.transition_health_title')}
+                  {"Stage Health"}
                 </h2>
-                <p className="text-sm text-default-500">{t('crm.transition_health_desc')}</p>
+                <p className="text-sm text-default-500">{"Volume and conversion strength for every stage in one glance."}</p>
               </div>
             </div>
           </CardHeader>
@@ -998,7 +998,7 @@ export default function OnboardingFunnel() {
           <CardBody className="gap-5 px-6 pb-6 pt-6">
             {stageInsights.length > 0 ? (
               <>
-                <p className="text-sm leading-7 text-default-500">{t('crm.transition_health_help')}</p>
+                <p className="text-sm leading-7 text-default-500">{"Share of entrants tells you how much of the original cohort remains. Conversion from previous stage tells you how efficiently members move through the immediate handoff."}</p>
 
                 {stageInsights.map((stage, index) => {
                   const tone =
@@ -1028,7 +1028,7 @@ export default function OnboardingFunnel() {
                       <div className="space-y-3">
                         <div className="space-y-1">
                           <div className="flex items-center justify-between text-xs font-medium uppercase tracking-[0.18em] text-default-500">
-                            <span>{t('crm.stage_share_label')}</span>
+                            <span>{"Share of entrants"}</span>
                             <span>{formatPercent(stage.shareOfEntry)}</span>
                           </div>
                           <Progress
@@ -1045,7 +1045,7 @@ export default function OnboardingFunnel() {
                         {index > 0 && (
                           <div className="space-y-1">
                             <div className="flex items-center justify-between text-xs font-medium uppercase tracking-[0.18em] text-default-500">
-                              <span>{t('crm.conversion_from_previous')}</span>
+                              <span>{"Conversion from previous stage"}</span>
                               <span className={tone.textClassName}>
                                 {formatPercent(stage.conversionFromPrevious ?? 0)}
                               </span>
@@ -1067,7 +1067,7 @@ export default function OnboardingFunnel() {
                 })}
               </>
             ) : (
-              <p className="py-10 text-center text-sm text-default-400">{t('crm.no_stages_available')}</p>
+              <p className="py-10 text-center text-sm text-default-400">{"No stages available"}</p>
             )}
           </CardBody>
         </Card>

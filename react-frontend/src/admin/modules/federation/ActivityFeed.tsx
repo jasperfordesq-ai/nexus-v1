@@ -159,9 +159,9 @@ function TimelineItem({ item }: { item: ActivityItem }) {
   if (item.actor_name && item.partner_tenant_name) {
     desc = `${item.actor_name} - ${item.description}`;
     if (item.direction === 'inbound') {
-      desc += ` (${t('federation.direction_from', { name: item.partner_tenant_name })})`;
+      desc += ` (${`Incoming`})`;
     } else {
-      desc += ` (${t('federation.direction_to', { name: item.partner_tenant_name })})`;
+      desc += ` (${`Outgoing`})`;
     }
   } else if (item.actor_name) {
     desc = `${item.actor_name} - ${item.description}`;
@@ -190,16 +190,16 @@ function TimelineItem({ item }: { item: ActivityItem }) {
             variant="flat"
             color={item.direction === 'inbound' ? 'primary' : 'secondary'}
           >
-            {item.direction === 'inbound' ? t('federation.inbound') : t('federation.outbound')}
+            {item.direction === 'inbound' ? "Inbound" : "Outbound"}
           </Chip>
           {item.level === 'critical' && (
             <Chip size="sm" variant="flat" color="danger">
-              {t('federation.level_critical')}
+              {"Critical"}
             </Chip>
           )}
           {item.level === 'warning' && (
             <Chip size="sm" variant="flat" color="warning">
-              {t('federation.level_warning')}
+              {"Warning"}
             </Chip>
           )}
         </div>
@@ -237,7 +237,7 @@ function TimelineItem({ item }: { item: ActivityItem }) {
 
 export function ActivityFeed() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('federation.page_title'));
+  usePageTitle("Federation");
 
   // Data
   const [items, setItems] = useState<ActivityItem[]>([]);
@@ -410,15 +410,15 @@ export function ActivityFeed() {
   const exportCsv = () => {
     if (items.length === 0) return;
     const headers = [
-      t('federation.csv_id'),
-      t('federation.csv_timestamp'),
-      t('federation.csv_type'),
-      t('federation.csv_category'),
-      t('federation.csv_level'),
-      t('federation.csv_direction'),
-      t('federation.csv_description'),
-      t('federation.csv_actor'),
-      t('federation.csv_partner_community'),
+      "CSV ID",
+      "CSV Timestamp",
+      "CSV",
+      "CSV Category",
+      "CSV Level",
+      "CSV Direction",
+      "CSV.",
+      "CSV Actor",
+      "CSV Partner Community",
     ];
     const csvEscape = (val: string | number | null | undefined): string => {
       const s = String(val ?? '');

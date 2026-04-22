@@ -34,7 +34,7 @@ const SEVERITY_KEYS = ['low', 'medium', 'high', 'critical'] as const;
 
 export function GdprBreaches() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('enterprise.page_title'));
+  usePageTitle("Enterprise");
   const toast = useToast();
 
   const [breaches, setBreaches] = useState<GdprBreach[]>([]);
@@ -57,7 +57,7 @@ export function GdprBreaches() {
         setBreaches(Array.isArray(data) ? data : []);
       }
     } catch {
-      toast.error(t('enterprise.failed_to_load_breaches'));
+      toast.error("Failed to load breaches");
     } finally {
       setLoading(false);
     }
@@ -77,7 +77,7 @@ export function GdprBreaches() {
 
   const handleReportBreach = async () => {
     if (!breachTitle.trim()) {
-      toast.error(t('enterprise.title_is_required'));
+      toast.error("Title is Required");
       return;
     }
     setReportLoading(true);
@@ -89,25 +89,25 @@ export function GdprBreaches() {
         affected_users: affectedUsers ? parseInt(affectedUsers, 10) : 0,
       });
       if (res.success) {
-        toast.success(t('enterprise.breach_reported_successfully'));
+        toast.success("Breach reported successfully");
         setReportOpen(false);
         loadData();
       } else {
-        toast.error(t('enterprise.failed_to_report_breach'));
+        toast.error("Failed to report breach");
       }
     } catch {
-      toast.error(t('enterprise.failed_to_report_breach'));
+      toast.error("Failed to report breach");
     } finally {
       setReportLoading(false);
     }
   };
 
   const columns: Column<GdprBreach>[] = [
-    { key: 'id', label: t('enterprise.col_id'), sortable: true },
-    { key: 'title', label: t('enterprise.label_title'), sortable: true },
+    { key: 'id', label: "ID", sortable: true },
+    { key: 'title', label: "Title", sortable: true },
     {
       key: 'severity',
-      label: t('enterprise.label_severity'),
+      label: "Severity",
       sortable: true,
       render: (b) => (
         <Chip size="sm" variant="flat" color={severityColorMap[b.severity] || 'default'} className="capitalize">
@@ -117,14 +117,14 @@ export function GdprBreaches() {
     },
     {
       key: 'status',
-      label: t('enterprise.col_status'),
+      label: "Status",
       sortable: true,
       render: (b) => <StatusBadge status={b.status} />,
     },
-    { key: 'description', label: t('enterprise.col_description') },
+    { key: 'description', label: "Description" },
     {
       key: 'reported_at',
-      label: t('enterprise.col_reported'),
+      label: "Reported",
       sortable: true,
       render: (b) => b.reported_at ? new Date(b.reported_at).toLocaleDateString() : '---',
     },
@@ -133,8 +133,8 @@ export function GdprBreaches() {
   return (
     <div>
       <PageHeader
-        title={t('enterprise.gdpr_breaches_title')}
-        description={t('enterprise.gdpr_breaches_desc')}
+        title={"GDPR Breaches"}
+        description={"Record and manage data breach reports in accordance with GDPR"}
         actions={
           <div className="flex gap-2">
             <Button
@@ -144,7 +144,7 @@ export function GdprBreaches() {
               isLoading={loading}
               size="sm"
             >
-              {t('common.refresh')}
+              {"Refresh"}
             </Button>
             <Button
               color="danger"
@@ -152,7 +152,7 @@ export function GdprBreaches() {
               onPress={openReportModal}
               size="sm"
             >
-              {t('enterprise.report_breach')}
+              {"Report Breach"}
             </Button>
           </div>
         }
@@ -163,27 +163,27 @@ export function GdprBreaches() {
         data={breaches}
         isLoading={loading}
         searchable={false}
-        emptyContent={t('enterprise.no_data_breaches')}
+        emptyContent={"No data breaches"}
       />
 
       <Modal isOpen={reportOpen} onClose={() => setReportOpen(false)} size="lg">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <AlertTriangle size={20} className="text-danger" />
-            {t('enterprise.report_data_breach')}
+            {"Report Data Breach"}
           </ModalHeader>
           <ModalBody className="gap-4">
             <Input
-              label={t('enterprise.label_title')}
-              placeholder={t('enterprise.placeholder_brief_description_of_the_breach')}
+              label={"Title"}
+              placeholder={"Brief Description of the Breach..."}
               value={breachTitle}
               onValueChange={setBreachTitle}
               variant="bordered"
               isRequired
             />
             <Textarea
-              label={t('enterprise.label_description')}
-              placeholder={t('enterprise.placeholder_breach_description')}
+              label={"Description"}
+              placeholder={"Describe the breach..."}
               value={breachDescription}
               onValueChange={setBreachDescription}
               variant="bordered"
@@ -191,7 +191,7 @@ export function GdprBreaches() {
             />
             <div className="grid grid-cols-2 gap-4">
               <Select
-                label={t('enterprise.label_severity')}
+                label={"Severity"}
                 selectedKeys={[breachSeverity]}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as string;
@@ -204,7 +204,7 @@ export function GdprBreaches() {
                 ))}
               </Select>
               <Input
-                label={t('enterprise.label_affected_users')}
+                label={"Affected Users"}
                 placeholder="0"
                 type="number"
                 value={affectedUsers}
@@ -215,10 +215,10 @@ export function GdprBreaches() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setReportOpen(false)} isDisabled={reportLoading}>
-              {t('cancel')}
+              {"Cancel"}
             </Button>
             <Button color="danger" onPress={handleReportBreach} isLoading={reportLoading} isDisabled={reportLoading}>
-              {t('enterprise.report_breach')}
+              {"Report Breach"}
             </Button>
           </ModalFooter>
         </ModalContent>

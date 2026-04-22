@@ -70,7 +70,7 @@ const ITEMS_PER_PAGE = 20;
 
 export function MemberNotes() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('crm.page_title'));
+  usePageTitle("CRM");
   const { tenantPath } = useTenant();
   const toast = useToast();
   const [searchParams] = useSearchParams();
@@ -156,7 +156,7 @@ export function MemberNotes() {
 
   const handleSave = async () => {
     if (!formContent.trim()) {
-      toast.error(t('crm.note_content_is_required'));
+      toast.error("Note content is required");
       return;
     }
     setSaving(true);
@@ -168,15 +168,15 @@ export function MemberNotes() {
           is_pinned: formPinned,
         });
         if (res.success) {
-          toast.success(t('crm.note_updated'));
+          toast.success("Note Updated");
           formModal.onClose();
           loadNotes();
         } else {
-          toast.error(t('crm.failed_to_update_note'));
+          toast.error("Failed to update note");
         }
       } else {
         if (!formUserId || isNaN(Number(formUserId))) {
-          toast.error(t('crm.valid_user_i_d_is_required'));
+          toast.error("A valid user ID is required");
           setSaving(false);
           return;
         }
@@ -187,15 +187,15 @@ export function MemberNotes() {
           is_pinned: formPinned,
         });
         if (res.success) {
-          toast.success(t('crm.note_created'));
+          toast.success("Note Created");
           formModal.onClose();
           loadNotes();
         } else {
-          toast.error(t('crm.failed_to_create_note'));
+          toast.error("Failed to create note");
         }
       }
     } catch {
-      toast.error(t('crm.failed_to_save_note'));
+      toast.error("Failed to save note");
     }
     setSaving(false);
   };
@@ -210,13 +210,13 @@ export function MemberNotes() {
         is_pinned: note.is_pinned !== 1,
       });
       if (res.success) {
-        toast.success(note.is_pinned === 1 ? t('crm.note_unpinned') : t('crm.note_pinned'));
+        toast.success(note.is_pinned === 1 ? "Note Unpinned" : "Note Pinned");
         loadNotes();
       } else {
-        toast.error(t('crm.failed_to_update_pin_status'));
+        toast.error("Failed to update pin status");
       }
     } catch {
-      toast.error(t('crm.failed_to_update_pin_status'));
+      toast.error("Failed to update pin status");
     }
   };
 
@@ -228,14 +228,14 @@ export function MemberNotes() {
     try {
       const res = await adminCrm.deleteNote(deleteTarget.id);
       if (res.success) {
-        toast.success(t('crm.note_deleted'));
+        toast.success("Note Deleted");
         setDeleteTarget(null);
         loadNotes();
       } else {
-        toast.error(t('crm.failed_to_delete_note'));
+        toast.error("Failed to delete note");
       }
     } catch {
-      toast.error(t('crm.failed_to_delete_note'));
+      toast.error("Failed to delete note");
     }
     setDeleting(false);
   };
@@ -263,11 +263,11 @@ export function MemberNotes() {
   return (
     <div className="max-w-6xl mx-auto">
       <PageHeader
-        title={t('crm.member_notes_title')}
-        description={t('crm.member_notes_desc')}
+        title={"Member Notes"}
+        description={"Add, view, and manage private coordinator notes for this member"}
         actions={
           <Button color="primary" startContent={<Plus size={16} />} onPress={openCreateModal}>
-            {t('crm.add_note')}
+            {"Add Note"}
           </Button>
         }
       />
@@ -275,8 +275,8 @@ export function MemberNotes() {
       {/* Filters */}
       <div className="flex flex-wrap items-end gap-3 mb-6">
         <Input
-          label={t('crm.label_search')}
-          placeholder={t('crm.placeholder_search_notes')}
+          label={"Search"}
+          placeholder={"Search Notes..."}
           className="w-56"
           size="sm"
           startContent={<Search size={14} />}
@@ -290,8 +290,8 @@ export function MemberNotes() {
         />
 
         <Select
-          label={t('crm.label_category')}
-          placeholder={t('crm.placeholder_all_categories')}
+          label={"Category"}
+          placeholder={"All Categories..."}
           className="w-48"
           size="sm"
           startContent={<Filter size={14} />}
@@ -308,9 +308,9 @@ export function MemberNotes() {
         </Select>
 
         <MemberSearchPicker
-          label={t('broker.label_search_member')}
-          placeholder={t('broker.placeholder_type_a_name_or_email_to_search')}
-          noResultsText={t('shared.no_members_found')}
+          label={"Search Member"}
+          placeholder={"Type a Name or Email to Search..."}
+          noResultsText={"No members found found"}
           className="w-full sm:w-72"
           size="sm"
           value={filterUserId}
@@ -334,7 +334,7 @@ export function MemberNotes() {
               setPage(1);
             }}
           >
-            {t('crm.clear_filters')}
+            {"Clear Filters"}
           </Button>
         )}
       </div>
@@ -342,17 +342,17 @@ export function MemberNotes() {
       {/* Content */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <Spinner size="lg" label={t('crm.loading_notes')} />
+          <Spinner size="lg" label={"Loading Notes"} />
         </div>
       ) : notes.length === 0 ? (
         <Card>
           <CardBody className="flex flex-col items-center py-16 text-center">
             <StickyNote size={48} className="text-default-300 mb-4" />
-            <p className="text-default-500 text-lg font-medium">{t('crm.no_notes_found')}</p>
+            <p className="text-default-500 text-lg font-medium">{"No notes found"}</p>
             <p className="text-default-400 text-sm mt-1">
               {filterCategory || filterUserId
-                ? t('crm.no_notes_hint_filtered')
-                : t('crm.no_notes_hint_default')}
+                ? "No notes match your current filters"
+                : "No notes have been added yet. Add one above."}
             </p>
           </CardBody>
         </Card>
@@ -392,12 +392,12 @@ export function MemberNotes() {
                 </div>
                 <Dropdown>
                   <DropdownTrigger>
-                    <Button isIconOnly size="sm" variant="light" aria-label={t('crm.label_note_actions')}>
+                    <Button isIconOnly size="sm" variant="light" aria-label={"Note Actions"}>
                       <MoreVertical size={16} />
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu
-                    aria-label={t('crm.label_note_actions')}
+                    aria-label={"Note Actions"}
                     onAction={(key) => {
                       if (key === 'edit') openEditModal(note);
                       else if (key === 'pin') handleTogglePin(note);
@@ -405,10 +405,10 @@ export function MemberNotes() {
                     }}
                   >
                     <DropdownItem key="edit" startContent={<Edit3 size={14} />}>
-                      {t('crm.note_action_edit')}
+                      {"Edit note"}
                     </DropdownItem>
                     <DropdownItem key="pin" startContent={<Pin size={14} />}>
-                      {note.is_pinned === 1 ? t('crm.note_action_unpin') : t('crm.note_action_pin')}
+                      {note.is_pinned === 1 ? "Unpin note" : "Pin note"}
                     </DropdownItem>
                     <DropdownItem
                       key="delete"
@@ -416,7 +416,7 @@ export function MemberNotes() {
                       className="text-danger"
                       color="danger"
                     >
-                      {t('crm.note_action_delete')}
+                      {"Delete note"}
                     </DropdownItem>
                   </DropdownMenu>
                 </Dropdown>
@@ -424,13 +424,13 @@ export function MemberNotes() {
               <CardBody className="pt-0">
                 <p className="text-default-700 whitespace-pre-wrap">{note.content}</p>
                 <div className="flex items-center gap-2 mt-3 text-xs text-default-400">
-                  <span>{t('crm.note_by')} {note.author_name}</span>
+                  <span>{"Note by"} {note.author_name}</span>
                   <span>·</span>
                   <span>{formatDate(note.created_at)}</span>
                   {note.updated_at !== note.created_at && (
                     <>
                       <span>·</span>
-                      <span>{t('crm.note_edited')} {formatDate(note.updated_at)}</span>
+                      <span>{"Note Edited"} {formatDate(note.updated_at)}</span>
                     </>
                   )}
                 </div>
@@ -457,14 +457,14 @@ export function MemberNotes() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <StickyNote size={20} />
-            {editingNote ? t('crm.edit_note_title') : t('crm.add_note_title')}
+            {editingNote ? "Edit Note" : "Add Note"}
           </ModalHeader>
           <ModalBody className="flex flex-col gap-4">
             {!editingNote && (
               <MemberSearchPicker
-                label={t('broker.label_search_member')}
-                placeholder={t('broker.placeholder_type_a_name_or_email_to_search')}
-                noResultsText={t('shared.no_members_found')}
+                label={"Search Member"}
+                placeholder={"Type a Name or Email to Search..."}
+                noResultsText={"No members found found"}
                 isRequired
                 value={formUserId}
                 selectedMember={formMember}
@@ -473,8 +473,8 @@ export function MemberNotes() {
               />
             )}
             <Textarea
-              label={t('crm.label_content')}
-              placeholder={t('crm.placeholder_write_your_note_about_this_member')}
+              label={"Content"}
+              placeholder={"Write Your Note About This Member..."}
               isRequired
               minRows={4}
               maxRows={10}
@@ -482,7 +482,7 @@ export function MemberNotes() {
               onValueChange={setFormContent}
             />
             <Select
-              label={t('crm.label_category')}
+              label={"Category"}
               selectedKeys={[formCategory]}
               onSelectionChange={(keys) => {
                 const val = Array.from(keys)[0] as CategoryKey;
@@ -501,16 +501,16 @@ export function MemberNotes() {
                 startContent={<Pin size={14} />}
                 onPress={() => setFormPinned(!formPinned)}
               >
-                {formPinned ? t('crm.pin_button_pinned') : t('crm.pin_button_unpin')}
+                {formPinned ? "Pinned" : "Unpin"}
               </Button>
             </div>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={formModal.onClose} isDisabled={saving}>
-              {t('crm.cancel_button')}
+              {"Cancel"}
             </Button>
             <Button color="primary" onPress={handleSave} isLoading={saving} isDisabled={saving}>
-              {editingNote ? t('crm.update_note') : t('crm.create_note')}
+              {editingNote ? "Update Note" : "Create Note"}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -521,9 +521,9 @@ export function MemberNotes() {
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title={t('crm.delete_note_title')}
-        message={t('crm.delete_note_confirm', { name: deleteTarget?.user_name || 'this member' })}
-        confirmLabel={t('crm.delete_button')}
+        title={"Delete Note"}
+        message={`Are you sure you want to delete this note? This cannot be undone.`}
+        confirmLabel={"Delete"}
         confirmColor="danger"
         isLoading={deleting}
       />

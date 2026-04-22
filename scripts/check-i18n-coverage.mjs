@@ -71,6 +71,9 @@ function walkTsx(dir, out = []) {
     const p = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       if (entry.name === '__tests__' || entry.name === 'node_modules') continue;
+      // Admin panel is English-only by design — skip coverage check here.
+      // See memory/feedback_admin_english_only.md (2026-04-22).
+      if (entry.name === 'admin' && dir.endsWith('src')) continue;
       walkTsx(p, out);
     } else if (entry.isFile() && /\.tsx?$/.test(entry.name) && !entry.name.endsWith('.test.tsx') && !entry.name.endsWith('.test.ts')) {
       out.push(p);

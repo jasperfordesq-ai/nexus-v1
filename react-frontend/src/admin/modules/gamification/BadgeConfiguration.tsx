@@ -44,7 +44,7 @@ type FilterTab = 'all' | 'core' | 'template' | 'custom' | 'quality';
 
 export function BadgeConfiguration() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('badge_configuration.page_title'));
+  usePageTitle("Page");
   const toast = useToast();
 
   const [badges, setBadges] = useState<BadgeConfigEntry[]>([]);
@@ -58,7 +58,7 @@ export function BadgeConfiguration() {
     if (res.success && res.data) {
       setBadges(res.data as BadgeConfigEntry[]);
     } else {
-      toast.error(t('gamification.failed_to_load_badge_configuration'));
+      toast.error("Failed to load badge configuration");
     }
     setLoading(false);
   }, [toast, t])
@@ -75,9 +75,9 @@ export function BadgeConfiguration() {
       setBadges((prev) =>
         prev.map((b) => (b.key === badge.key ? { ...b, is_enabled: enabled } : b)),
       );
-      toast.success(t('gamification.badge_toggled', { name: badge.name, status: enabled ? t('gamification.enabled') : t('gamification.disabled') }));
+      toast.success(`Toggled`);
     } else {
-      toast.error(t('gamification.failed_to_update_badge'));
+      toast.error("Failed to update badge");
     }
     setUpdating(null);
   };
@@ -86,10 +86,10 @@ export function BadgeConfiguration() {
     setUpdating(badge.key);
     const res = await adminGamification.resetBadgeConfig(badge.key);
     if (res.success) {
-      toast.success(t('gamification.badge_reset_to_defaults', { name: badge.name }));
+      toast.success(`Reset to Defaults`);
       loadBadges();
     } else {
-      toast.error(t('gamification.failed_to_reset_badge'));
+      toast.error("Failed to reset badge");
     }
     setUpdating(null);
   };
@@ -112,7 +112,7 @@ export function BadgeConfiguration() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('badge_configuration.page_title')} description={t('badge_configuration.description')} />
+        <PageHeader title={"Page"} description={"Description"} />
         <div className="flex items-center justify-center py-24">
           <Spinner size="lg" />
         </div>
@@ -123,28 +123,28 @@ export function BadgeConfiguration() {
   return (
     <div>
       <PageHeader
-        title={t('badge_configuration.page_title')}
-        description={t('badge_configuration.description')}
+        title={"Page"}
+        description={"Description"}
       />
 
       <Tabs
-        aria-label={t('badge_configuration.aria_badge_filter')}
+        aria-label={"Badge Filter"}
         selectedKey={filter}
         onSelectionChange={(key) => setFilter(key as FilterTab)}
         className="mb-6"
       >
-        <Tab key="all" title={t('badge_configuration.tab_all', { count: badges.length })} />
-        <Tab key="core" title={t('badge_configuration.tab_core', { count: badges.filter((b) => b.badge_tier === 'core').length })} />
-        <Tab key="template" title={t('badge_configuration.tab_template', { count: badges.filter((b) => b.badge_tier === 'template').length })} />
-        <Tab key="custom" title={t('badge_configuration.tab_custom', { count: badges.filter((b) => b.badge_tier === 'custom').length })} />
-        <Tab key="quality" title={t('badge_configuration.tab_quality', { count: badges.filter((b) => b.badge_class === 'quality').length })} />
+        <Tab key="all" title={`All`} />
+        <Tab key="core" title={`Core`} />
+        <Tab key="template" title={`Template`} />
+        <Tab key="custom" title={`Custom`} />
+        <Tab key="quality" title={`Quality`} />
       </Tabs>
 
       {filtered.length === 0 ? (
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center justify-center py-12">
             <Award size={40} className="text-default-300 mb-2" />
-            <p className="text-default-500">{t('badge_configuration.no_badges_for_filter')}</p>
+            <p className="text-default-500">{"No badges for filter found"}</p>
           </CardBody>
         </Card>
       ) : (
@@ -158,8 +158,8 @@ export function BadgeConfiguration() {
                 </Chip>
                 <span className="text-default-400 text-sm font-normal">
                   {(grouped[tier] ?? []).length !== 1
-                    ? t('badge_configuration.badge_count_plural', { count: (grouped[tier] ?? []).length })
-                    : t('badge_configuration.badge_count', { count: (grouped[tier] ?? []).length })}
+                    ? `Count Plural`
+                    : `Count`}
                 </span>
               </h2>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -197,17 +197,17 @@ export function BadgeConfiguration() {
                           </Chip>
                           {badge.threshold > 0 && (
                             <Chip size="sm" variant="flat" color="default">
-                              {t('badge_configuration.chip_threshold', { value: badge.threshold })}
+                              {`Threshold`}
                             </Chip>
                           )}
                           {badge.xp_value > 0 && (
                             <Chip size="sm" variant="flat" color="warning">
-                              {t('badge_configuration.chip_xp', { value: badge.xp_value })}
+                              {`XP`}
                             </Chip>
                           )}
                           {badge.has_override && (
                             <Chip size="sm" variant="dot" color="secondary">
-                              {t('badge_configuration.chip_customized')}
+                              {"Customized"}
                             </Chip>
                           )}
                         </div>
@@ -221,7 +221,7 @@ export function BadgeConfiguration() {
                             onPress={() => handleReset(badge)}
                             className="self-end"
                           >
-                            {t('badge_configuration.btn_reset_to_default')}
+                            {"Reset to Default"}
                           </Button>
                         )}
                       </CardBody>

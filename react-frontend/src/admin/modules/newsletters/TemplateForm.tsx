@@ -33,7 +33,6 @@ import {
   Lightbulb,
   BarChart3,
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
@@ -68,15 +67,14 @@ interface TemplateData {
 }
 
 export function TemplateForm() {
-  const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const { tenantPath } = useTenant();
 
   const CATEGORIES = [
-    { key: 'custom', label: t('template_form.category_custom') },
-    { key: 'saved', label: t('template_form.category_saved') },
-    { key: 'starter', label: t('template_form.category_starter') },
+    { key: 'custom', label: "Category Custom" },
+    { key: 'saved', label: "Category saved" },
+    { key: 'starter', label: "Category Starter" },
   ];
   const toast = useToast();
   const navigate = useNavigate();
@@ -104,8 +102,8 @@ export function TemplateForm() {
   // Dynamic page title
   usePageTitle(
     isEdit && template
-      ? t('template_form.edit_template_name', { name: template.name })
-      : t('template_form.create_template'),
+      ? `Edit Template Name`
+      : "Create Template",
   );
 
   // Load template for edit mode
@@ -131,10 +129,10 @@ export function TemplateForm() {
         setPreviewText(data.preview_text || '');
         setContent(data.content || '');
       } else {
-        setLoadError(res.error || t('template_form.failed_to_load_template'));
+        setLoadError(res.error || "Failed to load template");
       }
     } catch {
-      setLoadError(t('template_form.unexpected_error_loading'));
+      setLoadError("Unexpected Error Loading");
     } finally {
       setLoading(false);
     }
@@ -150,7 +148,7 @@ export function TemplateForm() {
     const newErrors: Record<string, string> = {};
 
     if (!name.trim()) {
-      newErrors.name = t('template_form.name_required');
+      newErrors.name = "Name Required";
     }
 
     setErrors(newErrors);
@@ -181,14 +179,14 @@ export function TemplateForm() {
 
       if (res.success) {
         toast.success(
-          isEdit ? t('newsletters.template_updated') : t('newsletters.template_created'),
+          isEdit ? "Template updated" : "Template created",
         );
         navigate(tenantPath('/admin/newsletters/templates'));
       } else {
-        toast.error(res.error || t('newsletters.failed_to_save_template'));
+        toast.error(res.error || "Failed to save template");
       }
     } catch {
-      toast.error(t('newsletters.an_unexpected_error_occurred'));
+      toast.error("An unexpected error occurred");
     } finally {
       setSubmitting(false);
     }
@@ -199,21 +197,21 @@ export function TemplateForm() {
     try {
       const res = await adminNewsletters.duplicateTemplate(Number(id));
       if (res.success) {
-        toast.success(t('newsletters.template_duplicated'));
+        toast.success("Template Duplicated");
         navigate(tenantPath('/admin/newsletters/templates'));
       } else {
-        toast.error(res.error || t('newsletters.failed_to_duplicate_template'));
+        toast.error(res.error || "Failed to duplicate template");
       }
     } catch {
-      toast.error(t('newsletters.an_unexpected_error_occurred'));
+      toast.error("An unexpected error occurred");
     }
   }
 
   function copyToClipboard(text: string) {
     navigator.clipboard.writeText(text).then(() => {
-      toast.success(t('newsletters.copied_to_clipboard', { text }));
+      toast.success(`Copied to Clipboard`);
     }).catch(() => {
-      toast.error(t('newsletters.failed_to_copy_to_clipboard'));
+      toast.error("Failed to copy to clipboard");
     });
   }
 
@@ -221,7 +219,7 @@ export function TemplateForm() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" label={t('template_form.loading_template')} />
+        <Spinner size="lg" label={"Loading template..."} />
       </div>
     );
   }
@@ -231,28 +229,28 @@ export function TemplateForm() {
     return (
       <div>
         <PageHeader
-          title={t('template_form.edit_template')}
+          title={"Edit Template"}
           actions={
             <Button
               variant="flat"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters/templates'))}
             >
-              {t('template_form.back_to_templates')}
+              {"Back to Templates"}
             </Button>
           }
         />
         <Card className="max-w-2xl">
           <CardBody className="p-6">
             <p className="text-center text-danger">
-              {loadError || t('template_form.template_not_found')}
+              {loadError || "Template Not Found"}
             </p>
             <div className="mt-4 flex justify-center">
               <Button
                 variant="flat"
                 onPress={() => navigate(tenantPath('/admin/newsletters/templates'))}
               >
-                {t('template_form.return_to_templates')}
+                {"Return to Templates"}
               </Button>
             </div>
           </CardBody>
@@ -264,14 +262,14 @@ export function TemplateForm() {
   return (
     <div>
       <PageHeader
-        title={isEdit ? t('template_form.edit_template_name', { name: template?.name }) : t('template_form.create_template')}
+        title={isEdit ? `Edit Template Name` : "Create Template"}
         actions={
           <Button
             variant="flat"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/newsletters/templates'))}
           >
-            {t('template_form.back_to_templates')}
+            {"Back to Templates"}
           </Button>
         }
       />
@@ -283,11 +281,11 @@ export function TemplateForm() {
             {/* Template Details */}
             <Card>
               <CardHeader>
-                <h3 className="text-lg font-semibold">{t('newsletter_template_form.template_details')}</h3>
+                <h3 className="text-lg font-semibold">{"Template Details"}</h3>
               </CardHeader>
               <CardBody className="gap-4">
                 <Input
-                  label={t('template_form.label_name')}
+                  label={"Name"}
                   placeholder="e.g. Monthly Newsletter"
                   value={name}
                   onValueChange={setName}
@@ -297,8 +295,8 @@ export function TemplateForm() {
                   isDisabled={submitting}
                 />
                 <Textarea
-                  label={t('template_form.label_description')}
-                  placeholder={t('template_form.description_placeholder')}
+                  label={"Description"}
+                  placeholder={"Enter description..."}
                   value={description}
                   onValueChange={setDescription}
                   minRows={2}
@@ -307,8 +305,8 @@ export function TemplateForm() {
                 />
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <Select
-                    label={t('template_form.label_category')}
-                    placeholder={t('template_form.category_placeholder')}
+                    label={"Category"}
+                    placeholder={"Enter category..."}
                     selectedKeys={category ? [category] : []}
                     onSelectionChange={(keys) => {
                       const selected = Array.from(keys)[0] as string;
@@ -327,7 +325,7 @@ export function TemplateForm() {
                       isDisabled={submitting}
                     />
                     <span className="text-sm">
-                      {isActive ? t('template_form.active') : t('template_form.inactive')}
+                      {isActive ? "Active" : "Inactive"}
                     </span>
                   </div>
                 </div>
@@ -337,23 +335,23 @@ export function TemplateForm() {
             {/* Email Settings */}
             <Card>
               <CardHeader>
-                <h3 className="text-lg font-semibold">{t('newsletter_template_form.email_settings')}</h3>
+                <h3 className="text-lg font-semibold">{"Email Settings"}</h3>
               </CardHeader>
               <CardBody className="gap-4">
                 <Input
-                  label={t('template_form.label_default_subject_line')}
+                  label={"Default Subject Line"}
                   placeholder="e.g. Your Monthly Community Update"
                   value={subject}
                   onValueChange={setSubject}
                   isDisabled={submitting}
                 />
                 <Input
-                  label={t('template_form.label_preview_text')}
-                  placeholder={t('template_form.preview_text_placeholder')}
+                  label={"Preview Text"}
+                  placeholder={"Enter preview text..."}
                   value={previewText}
                   onValueChange={setPreviewText}
                   isDisabled={submitting}
-                  description={t('newsletters.desc_preview_text')}
+                  description={"Preview Text."}
                 />
               </CardBody>
             </Card>
@@ -361,13 +359,13 @@ export function TemplateForm() {
             {/* Content Editor */}
             <Card>
               <CardHeader>
-                <h3 className="text-lg font-semibold">{t('newsletter_template_form.content')}</h3>
+                <h3 className="text-lg font-semibold">{"Content"}</h3>
               </CardHeader>
               <CardBody className="gap-4">
                 <Suspense fallback={<Spinner size="sm" className="m-4" />}>
                   <RichTextEditor
-                    label={t('template_form.label_template_content')}
-                    placeholder={t('newsletters.placeholder_design_your_email_template_content')}
+                    label={"Template Content"}
+                    placeholder={"Enter design your email template content..."}
                     value={content}
                     onChange={setContent}
                     isDisabled={submitting}
@@ -379,10 +377,10 @@ export function TemplateForm() {
                 {/* Merge variables */}
                 <div>
                   <p className="mb-2 text-sm font-medium text-default-700">
-                    {t('template_form.available_merge_variables')}
+                    {"Available Merge Variables"}
                   </p>
                   <p className="mb-3 text-xs text-default-500">
-                    {t('template_form.merge_variables_hint')}
+                    {"Merge Variables."}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {MERGE_VARIABLES.map((variable) => (
@@ -415,7 +413,7 @@ export function TemplateForm() {
                   startContent={<Save size={16} />}
                   isLoading={submitting}
                 >
-                  {isEdit ? t('template_form.update_template') : t('template_form.save_template')}
+                  {isEdit ? "Update Template" : "Save Template"}
                 </Button>
 
                 {isEdit && (
@@ -426,7 +424,7 @@ export function TemplateForm() {
                     onPress={handleDuplicate}
                     isDisabled={submitting}
                   >
-                    {t('template_form.duplicate_template')}
+                    {"Duplicate Template"}
                   </Button>
                 )}
 
@@ -436,7 +434,7 @@ export function TemplateForm() {
                   onPress={() => navigate(tenantPath('/admin/newsletters/templates'))}
                   isDisabled={submitting}
                 >
-                  {t('template_form.cancel')}
+                  {"Cancel"}
                 </Button>
               </CardBody>
             </Card>
@@ -447,15 +445,15 @@ export function TemplateForm() {
                 <div className="flex items-center gap-2">
                   <Lightbulb size={16} className="text-success-600" />
                   <span className="text-sm font-semibold text-success-700 dark:text-success-400">
-                    {t('template_form.email_template_tips_heading')}
+                    {"Email Template Tips"}
                   </span>
                 </div>
                 <ul className="list-inside list-disc space-y-1 text-xs text-success-700 dark:text-success-400">
-                  <li>{t('template_form.tip_inline_css')}</li>
-                  <li>{t('template_form.tip_content_width')}</li>
-                  <li>{t('newsletter_template_form.test_tip_clients')}</li>
-                  <li>{t('newsletter_template_form.test_tip_unsubscribe')}</li>
-                  <li>{t('template_form.tip_web_safe_fonts')}</li>
+                  <li>{"Tip Inline CSS"}</li>
+                  <li>{"Tip Content Width"}</li>
+                  <li>{"Test Tip Clients"}</li>
+                  <li>{"Test Tip Unsubscribe"}</li>
+                  <li>{"Tip Web Safe Fonts"}</li>
                 </ul>
               </CardBody>
             </Card>
@@ -466,7 +464,7 @@ export function TemplateForm() {
                 <CardBody className="gap-2">
                   <div className="flex items-center gap-2">
                     <BarChart3 size={16} className="text-default-500" />
-                    <span className="text-sm font-semibold">{t('newsletter_template_form.usage_stats')}</span>
+                    <span className="text-sm font-semibold">{"Usage Stats"}</span>
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="text-3xl font-bold">
@@ -474,8 +472,8 @@ export function TemplateForm() {
                     </span>
                     <span className="text-sm text-default-500">
                       {(template.usage_count ?? 0) !== 1
-                        ? t('template_form.usage_stats_sent_plural')
-                        : t('template_form.usage_stats_sent')}
+                        ? "Usage Stats Sent Plural"
+                        : "Usage Stats sent"}
                     </span>
                   </div>
                 </CardBody>

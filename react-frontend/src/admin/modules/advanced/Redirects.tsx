@@ -26,7 +26,6 @@ import { useToast } from '@/contexts';
 import { PageHeader, EmptyState, DataTable, ConfirmModal, type Column } from '../../components';
 import { adminTools } from '../../api/adminApi';
 
-import { useTranslation } from 'react-i18next';
 interface Redirect {
   id: number;
   source_url: string;
@@ -36,8 +35,7 @@ interface Redirect {
 }
 
 export function Redirects() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('advanced.page_title'));
+  usePageTitle("Advanced");
   const toast = useToast();
 
   const [redirects, setRedirects] = useState<Redirect[]>([]);
@@ -59,7 +57,7 @@ export function Redirects() {
       const res = await adminTools.getRedirects();
       setRedirects(res.data ?? []);
     } catch {
-      toast.error(t('advanced.failed_to_load_redirects'));
+      toast.error("Failed to load redirects");
     } finally {
       setLoading(false);
     }
@@ -71,7 +69,7 @@ export function Redirects() {
 
   const handleAdd = async () => {
     if (!fromUrl.trim() || !toUrl.trim()) {
-      toast.warning(t('advanced.both_from_u_r_l_and_to_u_r_l_are_required'));
+      toast.warning("Both from URL and to URL are Required");
       return;
     }
     setSaving(true);
@@ -82,17 +80,17 @@ export function Redirects() {
       });
 
       if (res.success) {
-        toast.success(t('advanced.redirect_created'));
+        toast.success("Redirect created");
         setFromUrl('');
         setToUrl('');
         onAddClose();
         await fetchRedirects();
       } else {
-        const error = (res as { error?: string }).error || t('advanced.failed_to_create_redirect');
+        const error = (res as { error?: string }).error || "Failed to create redirect";
         toast.error(error);
       }
     } catch (err) {
-      toast.error(t('advanced.failed_to_create_redirect'));
+      toast.error("Failed to create redirect");
     } finally {
       setSaving(false);
     }
@@ -105,27 +103,27 @@ export function Redirects() {
       const res = await adminTools.deleteRedirect(deleteTarget.id);
 
       if (res.success) {
-        toast.success(t('advanced.redirect_deleted'));
+        toast.success("Redirect deleted");
         setDeleteTarget(null);
         await fetchRedirects();
       } else {
-        const error = (res as { error?: string }).error || t('advanced.failed_to_delete_redirect');
+        const error = (res as { error?: string }).error || "Failed to delete redirect";
         toast.error(error);
       }
     } catch (err) {
-      toast.error(t('advanced.failed_to_delete_redirect'));
+      toast.error("Failed to delete redirect");
     } finally {
       setDeleting(false);
     }
   };
 
   const columns: Column<Redirect>[] = [
-    { key: 'source_url', label: t('advanced.col_from_url'), sortable: true },
-    { key: 'destination_url', label: t('advanced.col_to_url'), sortable: true },
-    { key: 'hits', label: t('advanced.col_hits'), sortable: true },
+    { key: 'source_url', label: "From URL", sortable: true },
+    { key: 'destination_url', label: "To URL", sortable: true },
+    { key: 'hits', label: "Hits", sortable: true },
     {
       key: 'created_at',
-      label: t('advanced.col_created'),
+      label: "Created",
       sortable: true,
       render: (item) => new Date(item.created_at).toLocaleDateString(),
     },
@@ -139,7 +137,7 @@ export function Redirects() {
           color="danger"
           size="sm"
           onPress={() => setDeleteTarget(item)}
-          aria-label={t('advanced.label_delete_redirect')}
+          aria-label={"Delete Redirect"}
         >
           <Trash2 size={16} />
         </Button>
@@ -150,7 +148,7 @@ export function Redirects() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('advanced.redirects_title')} description={t('advanced.redirects_desc')} />
+        <PageHeader title={"Redirects"} description={"Manage URL redirects to send visitors from old URLs to new ones"} />
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
@@ -161,11 +159,11 @@ export function Redirects() {
   return (
     <div>
       <PageHeader
-        title={t('advanced.redirects_title')}
-        description={t('advanced.redirects_desc')}
+        title={"Redirects"}
+        description={"Manage URL redirects to send visitors from old URLs to new ones"}
         actions={
           <Button color="primary" startContent={<Plus size={16} />} onPress={onAddOpen}>
-            {t('advanced.add_redirect')}
+            {"Add Redirect"}
           </Button>
         }
       />
@@ -173,9 +171,9 @@ export function Redirects() {
       {redirects.length === 0 ? (
         <EmptyState
           icon={ArrowRightLeft}
-          title={t('advanced.no_redirects')}
-          description={t('advanced.no_redirects_desc')}
-          actionLabel={t('advanced.add_redirect')}
+          title={"No redirects configured"}
+          description={"No redirects have been set up yet. Add one above."}
+          actionLabel={"Add Redirect"}
           onAction={onAddOpen}
         />
       ) : (
@@ -190,31 +188,31 @@ export function Redirects() {
       {/* Add Redirect Modal */}
       <Modal isOpen={isAddOpen} onClose={onAddClose} size="lg">
         <ModalContent>
-          <ModalHeader>{t('advanced.add_redirect')}</ModalHeader>
+          <ModalHeader>{"Add Redirect"}</ModalHeader>
           <ModalBody className="gap-4">
             <Input
-              label={t('advanced.label_from_u_r_l')}
+              label={"From URL"}
               placeholder="/old-page"
               variant="bordered"
               value={fromUrl}
               onValueChange={setFromUrl}
-              description={t('advanced.desc_the_u_r_l_path_to_redirect_from')}
+              description={"The URL path to redirect from"}
             />
             <Input
-              label={t('advanced.label_to_u_r_l')}
+              label={"To URL"}
               placeholder="/new-page"
               variant="bordered"
               value={toUrl}
               onValueChange={setToUrl}
-              description={t('advanced.desc_the_destination_u_r_l_path')}
+              description={"The destination URL path to redirect to"}
             />
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onAddClose} isDisabled={saving}>
-              {t('advanced.cancel')}
+              {"Cancel"}
             </Button>
             <Button color="primary" onPress={handleAdd} isLoading={saving} isDisabled={saving}>
-              {t('advanced.create_redirect')}
+              {"Create Redirect"}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -225,9 +223,9 @@ export function Redirects() {
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title={t('advanced.delete_redirect_title')}
-        message={t('advanced.delete_redirect_message', { url: deleteTarget?.source_url })}
-        confirmLabel={t('advanced.delete')}
+        title={"Delete Redirect"}
+        message={`Delete Redirect`}
+        confirmLabel={"Delete"}
         confirmColor="danger"
         isLoading={deleting}
       />

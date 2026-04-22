@@ -77,7 +77,7 @@ function categorizeSecret(key: string): string {
 
 export function SecretsVault() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('enterprise.page_title'));
+  usePageTitle("Enterprise");
   const toast = useToast();
 
   const [secrets, setSecrets] = useState<SecretEntry[]>([]);
@@ -126,13 +126,13 @@ export function SecretsVault() {
     try {
       const res = await adminEnterprise.rotateSecret(key);
       if (res.success) {
-        setRotateMessage(res.data?.message || t('enterprise.secret_rotation_manual_update'));
+        setRotateMessage(res.data?.message || "Secret Rotation Manual Update");
         setRotateModalOpen(true);
       } else {
-        toast.error(t('enterprise.failed_to_rotate_secret'));
+        toast.error("Failed to rotate secret");
       }
     } catch {
-      toast.error(t('enterprise.failed_to_rotate_secret'));
+      toast.error("Failed to rotate secret");
     } finally {
       setRotatingKey(null);
     }
@@ -146,10 +146,10 @@ export function SecretsVault() {
         setTestResults((res.data as unknown as { services: Record<string, boolean> }).services);
         setTestModalOpen(true);
       } else {
-        toast.error(t('enterprise.connection_test_failed'));
+        toast.error("Connection Test failed");
       }
     } catch {
-      toast.error(t('enterprise.connection_test_failed'));
+      toast.error("Connection Test failed");
     } finally {
       setTestingConnection(false);
     }
@@ -172,8 +172,8 @@ export function SecretsVault() {
   return (
     <div>
       <PageHeader
-        title={t('enterprise.secrets_vault_title')}
-        description={t('enterprise.secrets_vault_desc', { configured: setCount, total: secrets.length })}
+        title={"Secrets Vault"}
+        description={`Manage stored secrets and API credentials`}
         actions={
           <div className="flex gap-2">
             <Button
@@ -183,7 +183,7 @@ export function SecretsVault() {
               isLoading={testingConnection}
               size="sm"
             >
-              {t('enterprise.btn_test_connection')}
+              {"Test Connection"}
             </Button>
             <Button
               variant="flat"
@@ -192,7 +192,7 @@ export function SecretsVault() {
               isLoading={loading}
               size="sm"
             >
-              {t('common.refresh')}
+              {"Refresh"}
             </Button>
           </div>
         }
@@ -226,7 +226,7 @@ export function SecretsVault() {
                     <CategoryIcon size={18} className={catConfig.color} />
                     <h3 className="text-base font-semibold">{t(`enterprise.category_${cat}`)}</h3>
                     <Chip size="sm" variant="flat" color={catSetCount === catSecrets.length ? 'success' : 'warning'}>
-                      {t('enterprise.secrets_n_of_m_set', { n: catSetCount, m: catSecrets.length })}
+                      {`Secrets N of M Set`}
                     </Chip>
                   </div>
                 </CardHeader>
@@ -247,11 +247,11 @@ export function SecretsVault() {
                           </span>
                           {secret.is_set ? (
                             <Chip size="sm" variant="flat" color="success" startContent={<CheckCircle size={12} />}>
-                              {t('enterprise.set')}
+                              {"Set"}
                             </Chip>
                           ) : (
                             <Chip size="sm" variant="flat" color="danger" startContent={<XCircle size={12} />}>
-                              {t('enterprise.missing')}
+                              {"Missing"}
                             </Chip>
                           )}
                           <Button
@@ -262,7 +262,7 @@ export function SecretsVault() {
                             isLoading={rotatingKey === secret.key}
                             isDisabled={!secret.is_set}
                           >
-                            {t('enterprise.btn_rotate')}
+                            {"Rotate"}
                           </Button>
                         </div>
                       ))}
@@ -278,13 +278,13 @@ export function SecretsVault() {
       {/* Rotate Result Modal */}
       <Modal isOpen={rotateModalOpen} onClose={() => setRotateModalOpen(false)}>
         <ModalContent>
-          <ModalHeader>{t('enterprise.secret_rotation_title')}</ModalHeader>
+          <ModalHeader>{"Secret Rotation"}</ModalHeader>
           <ModalBody>
             <p className="text-default-600">{rotateMessage}</p>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setRotateModalOpen(false)}>
-              {t('common.ok')}
+              {"OK"}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -293,7 +293,7 @@ export function SecretsVault() {
       {/* Test Connection Results Modal */}
       <Modal isOpen={testModalOpen} onClose={() => setTestModalOpen(false)}>
         <ModalContent>
-          <ModalHeader>{t('enterprise.connection_test_title')}</ModalHeader>
+          <ModalHeader>{"Connection Test"}</ModalHeader>
           <ModalBody>
             {testResults && (
               <div className="space-y-3">
@@ -306,7 +306,7 @@ export function SecretsVault() {
                     )}
                     <span className="text-sm font-medium text-foreground">{service}</span>
                     <Chip size="sm" variant="flat" color={ok ? 'success' : 'danger'}>
-                      {ok ? t('enterprise.connected') : t('enterprise.failed')}
+                      {ok ? "Connected" : "Failed"}
                     </Chip>
                   </div>
                 ))}
@@ -315,7 +315,7 @@ export function SecretsVault() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setTestModalOpen(false)}>
-              {t('common.close')}
+              {"Close"}
             </Button>
           </ModalFooter>
         </ModalContent>

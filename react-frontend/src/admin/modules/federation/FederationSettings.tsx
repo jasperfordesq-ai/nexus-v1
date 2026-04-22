@@ -17,7 +17,6 @@ import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
-import { useTranslation } from 'react-i18next';
 interface FedSettings {
   federation_enabled: boolean;
   tenant_id: number;
@@ -30,8 +29,7 @@ interface FedSettings {
 }
 
 export function FederationSettings() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('federation.page_title'));
+  usePageTitle("Federation");
   const toast = useToast();
 
   const [data, setData] = useState<FedSettings | null>(null);
@@ -53,7 +51,7 @@ export function FederationSettings() {
         setDirty(false);
       }
     } catch {
-      toast.error(t('federation.failed_to_load_federation_settings'));
+      toast.error("Failed to load federation settings");
       setData(null);
     }
     setLoading(false);
@@ -84,14 +82,14 @@ export function FederationSettings() {
         settings: data.settings,
       });
       if (res.success) {
-        toast.success(t('federation.federation_settings_saved_successfully'));
+        toast.success("Federation settings saved successfully");
         setDirty(false);
       } else {
-        const error = (res as { error?: string }).error || t('federation.save_failed');
+        const error = (res as { error?: string }).error || "Save failed";
         toast.error(error);
       }
     } catch {
-      toast.error(t('federation.failed_to_save_federation_settings'));
+      toast.error("Failed to save federation settings");
     } finally {
       setSaving(false);
     }
@@ -101,8 +99,8 @@ export function FederationSettings() {
     return (
       <div>
         <PageHeader
-          title={t('federation.federation_settings_title')}
-          description={t('federation.federation_settings_desc')}
+          title={"Federation Settings"}
+          description={"Configure federation settings including profile, limits, and permissions"}
         />
         <div className="space-y-6">
           <Card shadow="sm">
@@ -139,19 +137,19 @@ export function FederationSettings() {
     return (
       <div>
         <PageHeader
-          title={t('federation.federation_settings_title')}
-          description={t('federation.federation_settings_desc')}
+          title={"Federation Settings"}
+          description={"Configure federation settings including profile, limits, and permissions"}
           actions={
             <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData}>
-              {t('federation.refresh')}
+              {"Refresh"}
             </Button>
           }
         />
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center py-8 text-default-400">
             <Network size={40} className="mb-2" />
-            <p>{t('federation.not_enabled_for_tenant')}</p>
-            <p className="text-xs">{t('federation.enable_from_tenant_features')}</p>
+            <p>{"Not Enabled for Tenant"}</p>
+            <p className="text-xs">{"Enable from Tenant Features"}</p>
           </CardBody>
         </Card>
       </div>
@@ -161,8 +159,8 @@ export function FederationSettings() {
   return (
     <div>
       <PageHeader
-        title={t('federation.federation_settings_title')}
-        description={t('federation.federation_settings_desc')}
+        title={"Federation Settings"}
+        description={"Configure federation settings including profile, limits, and permissions"}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -171,7 +169,7 @@ export function FederationSettings() {
               onPress={loadData}
               size="sm"
             >
-              {t('federation.refresh')}
+              {"Refresh"}
             </Button>
             <Button
               color="primary"
@@ -181,7 +179,7 @@ export function FederationSettings() {
               isDisabled={!dirty}
               size="sm"
             >
-              {t('federation.save_changes')}
+              {"Save Changes"}
             </Button>
           </div>
         }
@@ -210,53 +208,53 @@ export function FederationSettings() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{t('federation.federation_status')}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{"Federation Status"}</h3></CardHeader>
           <CardBody>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('federation.federation_enabled')}</p>
-                <p className="text-sm text-default-500">{t('federation.federation_enabled_desc')}</p>
+                <p className="font-medium">{"Federation Enabled"}</p>
+                <p className="text-sm text-default-500">{"Enable federation to allow this community to partner with others"}</p>
               </div>
               <Switch
                 isSelected={data.federation_enabled}
                 onValueChange={(val) => updateField('federation_enabled', val)}
-                aria-label={t('federation.label_federation_enabled')}
+                aria-label={"Federation Enabled"}
               />
             </div>
           </CardBody>
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{t('federation.partnership_preferences')}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{"Partnership Preferences"}</h3></CardHeader>
           <CardBody className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('federation.allow_inbound_partnerships')}</p>
-                <p className="text-sm text-default-500">{t('federation.allow_inbound_partnerships_desc')}</p>
+                <p className="font-medium">{"Allow Inbound Partnerships"}</p>
+                <p className="text-sm text-default-500">{"Allow other communities to send partnership requests to this community"}</p>
               </div>
               <Switch
                 isSelected={data.settings?.allow_inbound_partnerships ?? true}
                 onValueChange={(val) => updateField('allow_inbound_partnerships', val)}
-                aria-label={t('federation.label_allow_inbound_partnerships')}
+                aria-label={"Allow Inbound Partnerships"}
               />
             </div>
             <Divider />
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('federation.auto_approve_partners')}</p>
-                <p className="text-sm text-default-500">{t('federation.auto_approve_partners_desc')}</p>
+                <p className="font-medium">{"Auto Approve Partners"}</p>
+                <p className="text-sm text-default-500">{"Automatically approve incoming partnership requests without manual review"}</p>
               </div>
               <Switch
                 isSelected={data.settings?.auto_approve_partners ?? false}
                 onValueChange={(val) => updateField('auto_approve_partners', val)}
-                aria-label={t('federation.label_auto_approve_partners')}
+                aria-label={"Auto Approve Partners"}
               />
             </div>
             <Divider />
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="font-medium">{t('federation.max_partnerships')}</p>
-                <p className="text-sm text-default-500">{t('federation.max_partnerships_desc')}</p>
+                <p className="font-medium">{"Max Partnerships"}</p>
+                <p className="text-sm text-default-500">{"Maximum number of active partnerships this community can maintain"}</p>
               </div>
               <Input
                 type="number"
@@ -267,7 +265,7 @@ export function FederationSettings() {
                 className="w-24"
                 min={1}
                 max={100}
-                aria-label={t('federation.label_max_partnerships')}
+                aria-label={"Max Partnerships"}
               />
             </div>
           </CardBody>

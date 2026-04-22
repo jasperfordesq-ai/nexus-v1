@@ -46,7 +46,6 @@ import { LocationMap } from '@/components/location';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { StatCard, PageHeader } from '../../components';
 
-import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -109,8 +108,7 @@ const PIE_COLORS = CHART_COLORS;
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CommunityAnalytics() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('analytics.page_title'));
+  usePageTitle("Analytics");
 
   const [data, setData] = useState<CommunityAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -168,8 +166,8 @@ export function CommunityAnalytics() {
   return (
     <div>
       <PageHeader
-        title={t('analytics.community_analytics_title')}
-        description={t('analytics.community_analytics_desc')}
+        title={"Community Analytics"}
+        description={"View graphs and statistics for member growth, exchanges, and community health"}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -178,7 +176,7 @@ export function CommunityAnalytics() {
               onPress={handleExport}
               size="sm"
             >
-              {t('analytics.export_csv')}
+              {"Export CSV"}
             </Button>
             <Button
               variant="flat"
@@ -188,7 +186,7 @@ export function CommunityAnalytics() {
               isDisabled={loading}
               size="sm"
             >
-              {t('analytics.refresh')}
+              {"Refresh"}
             </Button>
           </div>
         }
@@ -197,7 +195,7 @@ export function CommunityAnalytics() {
       {/* Stat Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label={t('analytics.label_hours_exchanged_30d')}
+          label={"Hours Exchanged 30d"}
           value={
             data
               ? Number(data.overview.transaction_volume_30d).toFixed(1)
@@ -208,21 +206,21 @@ export function CommunityAnalytics() {
           loading={loading}
         />
         <StatCard
-          label={t('analytics.label_active_traders_30d')}
+          label={"Active Traders 30d"}
           value={data?.overview.active_traders_30d ?? '—'}
           icon={Users}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label={t('analytics.label_new_users_30d')}
+          label={"New Users 30d"}
           value={data?.overview.new_users_30d ?? '—'}
           icon={TrendingUp}
           color="success"
           loading={loading}
         />
         <StatCard
-          label={t('analytics.label_engagement_rate')}
+          label={"Engagement Rate"}
           value={
             data
               ? `${(data.engagement_rate * 100).toFixed(1)}%`
@@ -238,7 +236,7 @@ export function CommunityAnalytics() {
       <Card shadow="sm" className="mb-6">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <BarChart3 size={18} className="text-primary" />
-          <h3 className="font-semibold">{t('analytics.exchange_trends_title')}</h3>
+          <h3 className="font-semibold">{"Exchange Trends"}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
           {loading ? (
@@ -279,7 +277,7 @@ export function CommunityAnalytics() {
                   tick={{ fontSize: 12 }}
                   className="text-default-500"
                   label={{
-                    value: t('analytics.chart_hours'),
+                    value: "Hours",
                     angle: -90,
                     position: 'insideLeft',
                     style: { fontSize: 12 },
@@ -291,7 +289,7 @@ export function CommunityAnalytics() {
                   tick={{ fontSize: 12 }}
                   className="text-default-500"
                   label={{
-                    value: t('analytics.chart_transactions'),
+                    value: "Transactions",
                     angle: 90,
                     position: 'insideRight',
                     style: { fontSize: 12 },
@@ -311,7 +309,7 @@ export function CommunityAnalytics() {
                   yAxisId="volume"
                   type="monotone"
                   dataKey="total_volume"
-                  name={t('analytics.chart_hours_exchanged')}
+                  name={"Hours Exchanged"}
                   stroke={CHART_COLOR_MAP.primary}
                   fill="url(#volumeGradient)"
                   strokeWidth={2}
@@ -320,7 +318,7 @@ export function CommunityAnalytics() {
                   yAxisId="count"
                   type="monotone"
                   dataKey="transaction_count"
-                  name={t('analytics.chart_transactions')}
+                  name={"Transactions"}
                   stroke={CHART_COLOR_MAP.success}
                   strokeWidth={2}
                   dot={{ r: 3 }}
@@ -330,7 +328,7 @@ export function CommunityAnalytics() {
             </ResponsiveContainer>
           ) : (
             <p className="flex h-[350px] items-center justify-center text-sm text-default-400">
-              {t('analytics.no_exchange_trend_data')}
+              {"No exchange trend data"}
             </p>
           )}
         </CardBody>
@@ -342,7 +340,7 @@ export function CommunityAnalytics() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Users size={18} className="text-success" />
-            <h3 className="font-semibold">{t('analytics.member_growth_title')}</h3>
+            <h3 className="font-semibold">{"Member Growth"}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
@@ -380,7 +378,7 @@ export function CommunityAnalytics() {
                   />
                   <Bar
                     dataKey="new_users"
-                    name={t('analytics.chart_new_users')}
+                    name={"New Users"}
                     fill={CHART_COLOR_MAP.success}
                     radius={[4, 4, 0, 0]}
                     fillOpacity={0.8}
@@ -389,7 +387,7 @@ export function CommunityAnalytics() {
               </ResponsiveContainer>
             ) : (
               <p className="flex h-[300px] items-center justify-center text-sm text-default-400">
-                {t('analytics.no_member_growth_data')}
+                {"No member growth data"}
               </p>
             )}
           </CardBody>
@@ -399,7 +397,7 @@ export function CommunityAnalytics() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <PieChartIcon size={18} className="text-secondary" />
-            <h3 className="font-semibold">{t('analytics.category_demand_title')}</h3>
+            <h3 className="font-semibold">{"Category Demand"}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
@@ -443,14 +441,14 @@ export function CommunityAnalytics() {
                       color: 'hsl(var(--heroui-foreground))',
                     }}
                     formatter={(value: number | undefined, name: string | undefined): [string, string] =>
-                      [t('analytics.listings_count', { count: value ?? 0 }), name ?? '']
+                      [`Listings`, name ?? '']
                     }
                   />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
               <p className="flex h-[300px] items-center justify-center text-sm text-default-400">
-                {t('analytics.no_category_data')}
+                {"No category data"}
               </p>
             )}
           </CardBody>
@@ -463,17 +461,17 @@ export function CommunityAnalytics() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <TrendingUp size={18} className="text-success" />
-            <h3 className="font-semibold">{t('analytics.top_earners_title')}</h3>
+            <h3 className="font-semibold">{"Top Earners"}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
-            <Table aria-label={t('analytics.label_top_earners')} shadow="sm" isStriped>
+            <Table aria-label={"Top Earners"} shadow="sm" isStriped>
               <TableHeader>
-                <TableColumn>{t('analytics.col_rank')}</TableColumn>
-                <TableColumn>{t('analytics.col_name')}</TableColumn>
-                <TableColumn className="text-right">{t('analytics.col_hours_earned')}</TableColumn>
+                <TableColumn>{"Rank"}</TableColumn>
+                <TableColumn>{"Name"}</TableColumn>
+                <TableColumn className="text-right">{"Hours Earned"}</TableColumn>
               </TableHeader>
               <TableBody
-                emptyContent={t('analytics.no_earner_data')}
+                emptyContent={"No earner data"}
                 isLoading={loading}
                 loadingContent={<Spinner />}
               >
@@ -493,17 +491,17 @@ export function CommunityAnalytics() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Clock size={18} className="text-warning" />
-            <h3 className="font-semibold">{t('analytics.top_spenders_title')}</h3>
+            <h3 className="font-semibold">{"Top Spenders"}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
-            <Table aria-label={t('analytics.label_top_spenders')} shadow="sm" isStriped>
+            <Table aria-label={"Top Spenders"} shadow="sm" isStriped>
               <TableHeader>
-                <TableColumn>{t('analytics.col_rank')}</TableColumn>
-                <TableColumn>{t('analytics.col_name')}</TableColumn>
-                <TableColumn className="text-right">{t('analytics.col_hours_spent')}</TableColumn>
+                <TableColumn>{"Rank"}</TableColumn>
+                <TableColumn>{"Name"}</TableColumn>
+                <TableColumn className="text-right">{"Hours Spent"}</TableColumn>
               </TableHeader>
               <TableBody
-                emptyContent={t('analytics.no_spender_data')}
+                emptyContent={"No spender data"}
                 isLoading={loading}
                 loadingContent={<Spinner />}
               >
@@ -525,7 +523,7 @@ export function CommunityAnalytics() {
         <Card shadow="sm" className="mt-6">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Globe size={18} className="text-primary" />
-            <h3 className="font-semibold">{t('analytics.geographic_distribution_title')}</h3>
+            <h3 className="font-semibold">{"Geographic Distribution"}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {geoLoading ? (
@@ -537,19 +535,19 @@ export function CommunityAnalytics() {
                 {/* Stats row */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-6">
                   <StatCard
-                    label={t('analytics.label_members_with_location')}
+                    label={"Members with Location"}
                     value={`${geoData.total_with_location} / ${geoData.total_members}`}
                     icon={MapPin}
                     color="primary"
                   />
                   <StatCard
-                    label={t('analytics.label_location_coverage')}
+                    label={"Location Coverage"}
                     value={`${geoData.coverage_percentage}%`}
                     icon={Globe}
                     color={geoData.coverage_percentage > 50 ? 'success' : 'warning'}
                   />
                   <StatCard
-                    label={t('analytics.label_top_area')}
+                    label={"Top Area"}
                     value={geoData.top_areas[0]?.area || 'N/A'}
                     icon={MapPin}
                     color="secondary"
@@ -583,7 +581,7 @@ export function CommunityAnalytics() {
                 {/* Top Areas list */}
                 {geoData.top_areas.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-semibold text-foreground mb-3">{t('analytics.top_areas_title')}</h4>
+                    <h4 className="text-sm font-semibold text-foreground mb-3">{"Top Areas"}</h4>
                     <div className="space-y-2">
                       {geoData.top_areas.map((area, i) => (
                         <div key={area.area} className="flex items-center gap-3">
@@ -606,13 +604,13 @@ export function CommunityAnalytics() {
 
                 {geoData.member_locations.length === 0 && geoData.top_areas.length === 0 && (
                   <p className="py-8 text-center text-sm text-default-400">
-                    {t('analytics.no_location_data')}
+                    {"No location data"}
                   </p>
                 )}
               </>
             ) : (
               <p className="py-8 text-center text-sm text-default-400">
-                {t('analytics.geographic_data_unavailable')}
+                {"Geographic data unavailable"}
               </p>
             )}
           </CardBody>

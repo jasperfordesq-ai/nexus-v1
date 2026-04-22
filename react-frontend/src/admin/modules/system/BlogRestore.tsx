@@ -17,7 +17,6 @@ import { useToast } from '@/contexts';
 import { PageHeader, EmptyState, ConfirmModal } from '../../components';
 import { adminTools } from '../../api/adminApi';
 
-import { useTranslation } from 'react-i18next';
 interface BlogBackup {
   id: number;
   filename: string;
@@ -26,8 +25,7 @@ interface BlogBackup {
 }
 
 export function BlogRestore() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('system.page_title'));
+  usePageTitle("System");
   const toast = useToast();
 
   const [backups, setBackups] = useState<BlogBackup[]>([]);
@@ -53,7 +51,7 @@ export function BlogRestore() {
         setBackups([]);
       }
     } catch {
-      toast.error(t('system.failed_to_load_blog_backups'));
+      toast.error("Failed to load blog backups");
     } finally {
       setLoading(false);
     }
@@ -74,14 +72,14 @@ export function BlogRestore() {
         const message = restored !== undefined
           ? `${restored} blog post${restored !== 1 ? 's' : ''} restored from ${confirmBackup.filename}`
           : `Blog data restored from ${confirmBackup.filename}`;
-        toast.success(t('system.restore_complete'), message);
+        toast.success("Restore Complete", message);
         // Refresh the backup list in case status changed
         await fetchBackups();
       } else {
-        toast.error(t('system.restore_failed'), t('system.restore_server_error'));
+        toast.error("Restore failed", "Restore Server error");
       }
     } catch {
-      toast.error(t('system.restore_failed'), t('system.restore_error_occurred'));
+      toast.error("Restore failed", "Restore Error Occurred");
     } finally {
       setRestoringId(null);
     }
@@ -90,7 +88,7 @@ export function BlogRestore() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('system.blog_restore_title')} description={t('system.blog_restore_desc')} />
+        <PageHeader title={"Blog Restore"} description={"Restore blog posts from automatic backups"} />
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
@@ -100,21 +98,21 @@ export function BlogRestore() {
 
   return (
     <div>
-      <PageHeader title={t('system.blog_restore_title')} description={t('system.blog_restore_desc')} />
+      <PageHeader title={"Blog Restore"} description={"Restore blog posts from automatic backups"} />
 
       <div className="rounded-lg border border-warning-200 bg-warning-50 p-4 mb-4 flex items-start gap-3">
         <AlertTriangle size={20} className="text-warning shrink-0 mt-0.5" />
         <div>
-          <p className="font-medium text-warning-700">{t('system.use_with_caution')}</p>
-          <p className="text-sm text-warning-600">{t('system.blog_restore_warning')}</p>
+          <p className="font-medium text-warning-700">{"Use With Caution"}</p>
+          <p className="text-sm text-warning-600">{"Blog Restore Warning"}</p>
         </div>
       </div>
 
       {backups.length === 0 ? (
         <EmptyState
           icon={RotateCcw}
-          title={t('system.no_backups_available')}
-          description={t('system.desc_blog_post_backups_will_appear_here_when_')}
+          title={"No backups available found"}
+          description={"Blog post backups will appear here when auto-backup is enabled"}
         />
       ) : (
         <Card shadow="sm">
@@ -163,13 +161,13 @@ export function BlogRestore() {
         isOpen={confirmBackup !== null}
         onClose={() => setConfirmBackup(null)}
         onConfirm={handleRestoreConfirm}
-        title={t('system.restore_blog_backup')}
+        title={"Restore Blog Backup"}
         message={
           confirmBackup
-            ? t('system.restore_blog_confirm', { filename: confirmBackup.filename })
+            ? `Restore Blog Confirm`
             : ''
         }
-        confirmLabel={t('system.restore_backup')}
+        confirmLabel={"Restore Backup"}
         confirmColor="warning"
         isLoading={restoringId !== null}
       />

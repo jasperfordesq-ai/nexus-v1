@@ -21,7 +21,6 @@ import {
   Switch,
 } from '@heroui/react';
 import { ArrowLeft, Save } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminUsers } from '../../api/adminApi';
@@ -29,8 +28,7 @@ import { PageHeader } from '../../components';
 import type { CreateUserPayload } from '../../api/types';
 
 export function UserCreate() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('user_create.page_title'));
+  usePageTitle("Create User");
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -53,21 +51,21 @@ export function UserCreate() {
     const newErrors: Record<string, string> = {};
 
     if (!firstName.trim()) {
-      newErrors.first_name = t('user_create.first_name_required');
+      newErrors.first_name = "First name is required";
     }
     if (!lastName.trim()) {
-      newErrors.last_name = t('user_create.last_name_required');
+      newErrors.last_name = "Last name is required";
     }
     if (!email.trim()) {
-      newErrors.email = t('user_create.email_required');
+      newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = t('user_create.email_invalid');
+      newErrors.email = "Please enter a valid email address";
     }
     if (!role) {
-      newErrors.role = t('user_create.role_required');
+      newErrors.role = "Role is required";
     }
     if (password.trim() && password.trim().length < 8) {
-      newErrors.password = t('user_create.password_min_length');
+      newErrors.password = "Password must be at least 8 characters";
     }
 
     setErrors(newErrors);
@@ -102,13 +100,13 @@ export function UserCreate() {
       const res = await adminUsers.create(payload);
 
       if (res.success) {
-        toast.success(t('user_create.create_success'));
+        toast.success("Create successfully");
         navigate(tenantPath('/admin/users'));
       } else {
-        toast.error(res.error || t('user_create.create_failed'));
+        toast.error(res.error || "Failed to create user");
       }
     } catch {
-      toast.error(t('error_occurred'));
+      toast.error("Occurred error");
     } finally {
       setSubmitting(false);
     }
@@ -117,14 +115,14 @@ export function UserCreate() {
   return (
     <div>
       <PageHeader
-        title={t('user_create.title')}
+        title={"Create User"}
         actions={
           <Button
             variant="flat"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/users'))}
           >
-            {t('user_create.back_to_users')}
+            {"Back to Users"}
           </Button>
         }
       />
@@ -135,8 +133,8 @@ export function UserCreate() {
             {/* Name Fields */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input
-                label={t('user_create.first_name')}
-                placeholder={t('user_create.first_name_placeholder')}
+                label={"First Name"}
+                placeholder={"First name..."}
                 value={firstName}
                 onValueChange={setFirstName}
                 isRequired
@@ -145,8 +143,8 @@ export function UserCreate() {
                 isDisabled={submitting}
               />
               <Input
-                label={t('user_create.last_name')}
-                placeholder={t('user_create.last_name_placeholder')}
+                label={"Last Name"}
+                placeholder={"Last name..."}
                 value={lastName}
                 onValueChange={setLastName}
                 isRequired
@@ -158,9 +156,9 @@ export function UserCreate() {
 
             {/* Email */}
             <Input
-              label={t('user_create.email')}
+              label={"Email"}
               type="email"
-              placeholder={t('user_create.email_placeholder')}
+              placeholder={"email@example.com"}
               value={email}
               onValueChange={setEmail}
               isRequired
@@ -171,9 +169,9 @@ export function UserCreate() {
 
             {/* Phone */}
             <Input
-              label={t('user_create.phone')}
+              label={"Phone"}
               type="tel"
-              placeholder={t('user_create.phone_placeholder')}
+              placeholder={"+1 555 123 4567"}
               value={phone}
               onValueChange={setPhone}
               isDisabled={submitting}
@@ -182,8 +180,8 @@ export function UserCreate() {
             {/* Role & Status */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Select
-                label={t('user_create.role')}
-                placeholder={t('user_create.role_placeholder')}
+                label={"Role"}
+                placeholder={"Select a role..."}
                 selectedKeys={role ? [role] : []}
                 onSelectionChange={(keys) => setRole(Array.from(keys)[0] as string)}
                 isRequired
@@ -191,32 +189,32 @@ export function UserCreate() {
                 errorMessage={errors.role}
                 isDisabled={submitting}
               >
-                <SelectItem key="member">{t('user_create.role_member')}</SelectItem>
-                <SelectItem key="broker">{t('user_create.role_broker')}</SelectItem>
-                <SelectItem key="moderator">{t('user_create.role_moderator')}</SelectItem>
-                <SelectItem key="newsletter_admin">{t('user_create.role_newsletter_admin')}</SelectItem>
-                <SelectItem key="tenant_admin">{t('user_create.role_tenant_admin')}</SelectItem>
-                <SelectItem key="admin">{t('user_create.role_admin')}</SelectItem>
+                <SelectItem key="member">{"Member"}</SelectItem>
+                <SelectItem key="broker">{"Broker"}</SelectItem>
+                <SelectItem key="moderator">{"Moderator"}</SelectItem>
+                <SelectItem key="newsletter_admin">{"Newsletter Admin"}</SelectItem>
+                <SelectItem key="tenant_admin">{"Tenant Admin"}</SelectItem>
+                <SelectItem key="admin">{"Admin"}</SelectItem>
               </Select>
 
               <Select
-                label={t('user_create.status')}
-                placeholder={t('user_create.status_placeholder')}
+                label={"Status"}
+                placeholder={"Select a status..."}
                 selectedKeys={[status]}
                 onSelectionChange={(keys) => setStatus(Array.from(keys)[0] as string)}
                 isDisabled={submitting}
               >
-                <SelectItem key="active">{t('user_create.status_active')}</SelectItem>
-                <SelectItem key="pending">{t('user_create.status_pending')}</SelectItem>
+                <SelectItem key="active">{"Active"}</SelectItem>
+                <SelectItem key="pending">{"Pending"}</SelectItem>
               </Select>
             </div>
 
             {/* Password */}
             <Input
-              label={t('user_create.password')}
+              label={"Password"}
               type="password"
-              placeholder={t('user_create.password_placeholder')}
-              description={t('user_create.password_description')}
+              placeholder={"Password..."}
+              description={"Set an initial password for this user"}
               value={password}
               onValueChange={setPassword}
               isDisabled={submitting}
@@ -227,16 +225,16 @@ export function UserCreate() {
             {/* Send Welcome Email */}
             <div className="flex items-center justify-between rounded-lg border border-default-200 p-4">
               <div>
-                <p className="text-sm font-medium text-foreground">{t('user_create.send_welcome_email')}</p>
+                <p className="text-sm font-medium text-foreground">{"Send Welcome Email"}</p>
                 <p className="text-xs text-default-500">
-                  {t('user_create.send_welcome_email_description')}
+                  {"Send a welcome email with login instructions to the new user"}
                 </p>
               </div>
               <Switch
                 isSelected={sendWelcomeEmail}
                 onValueChange={setSendWelcomeEmail}
                 isDisabled={submitting}
-                aria-label={t('user_create.send_welcome_email')}
+                aria-label={"Send Welcome Email"}
               />
             </div>
 
@@ -247,7 +245,7 @@ export function UserCreate() {
                 onPress={() => navigate(tenantPath('/admin/users'))}
                 isDisabled={submitting}
               >
-                {t('cancel')}
+                {"Cancel"}
               </Button>
               <Button
                 type="submit"
@@ -255,7 +253,7 @@ export function UserCreate() {
                 startContent={!submitting ? <Save size={16} /> : undefined}
                 isLoading={submitting}
               >
-                {t('user_create.create_button')}
+                {"Create User"}
               </Button>
             </div>
           </CardBody>

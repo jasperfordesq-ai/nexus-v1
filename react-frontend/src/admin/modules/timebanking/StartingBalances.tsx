@@ -27,13 +27,11 @@ import { adminUsers, adminTimebanking } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { AdminUser, WalletGrant } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Member Search + Grant Form
 // ─────────────────────────────────────────────────────────────────────────────
 
 function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
-  const { t } = useTranslation('admin');
   const toast = useToast();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -77,16 +75,16 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
 
   const handleGrant = async () => {
     if (!selectedUser) {
-      toast.error(t('timebanking.please_select_a_member'));
+      toast.error("Please Select a Member");
       return;
     }
     const parsedAmount = parseFloat(amount);
     if (!parsedAmount || parsedAmount <= 0) {
-      toast.error(t('timebanking.please_enter_a_valid_credit_amount_great'));
+      toast.error("Please enter a valid credit amount greater than zero");
       return;
     }
     if (!reason.trim()) {
-      toast.error(t('timebanking.please_provide_a_reason_for_this_grant'));
+      toast.error("Please Provide a Reason for This Grant");
       return;
     }
 
@@ -99,16 +97,16 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
       });
 
       if (res?.success) {
-        toast.success(t('timebanking.granted_credits', { amount: parsedAmount, name: selectedUser.name }));
+        toast.success(`Granted Credits`);
         setSelectedUser(null);
         setAmount('');
         setReason('');
         onGranted();
       } else {
-        toast.error(res?.error || t('timebanking.failed_to_grant_credits'));
+        toast.error(res?.error || "Failed to grant credits");
       }
     } catch {
-      toast.error(t('timebanking.an_unexpected_error_occurred'));
+      toast.error("An unexpected error occurred");
     } finally {
       setGranting(false);
     }
@@ -118,15 +116,15 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
     <Card shadow="sm">
       <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
         <Plus size={18} className="text-primary" />
-        <h3 className="font-semibold">{t('timebanking.grant_starting_credits')}</h3>
+        <h3 className="font-semibold">{"Grant Starting Credits"}</h3>
       </CardHeader>
       <CardBody className="px-4 pb-4 space-y-4">
         {/* Member search */}
         {!selectedUser ? (
           <div>
             <Input
-              label={t('timebanking.label_search_member')}
-              placeholder={t('timebanking.placeholder_search_by_name_or_email')}
+              label={"Search Member"}
+              placeholder={"Search by Name or Email..."}
               startContent={<Search size={16} className="text-default-400" />}
               value={searchQuery}
               onValueChange={handleSearch}
@@ -156,7 +154,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
                       </p>
                     </div>
                     <div className="text-right shrink-0 ml-3">
-                      <p className="text-xs text-default-500">{t('timebanking.col_balance')}</p>
+                      <p className="text-xs text-default-500">{"Balance"}</p>
                       <p className="text-sm font-semibold text-foreground">
                         {user.balance}h
                       </p>
@@ -167,7 +165,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
             )}
             {searchQuery.length >= 2 && !searching && searchResults.length === 0 && (
               <p className="text-sm text-default-400 text-center py-2 mt-2">
-                {t('timebanking.no_members_found', { query: searchQuery })}
+                {`No members found`}
               </p>
             )}
           </div>
@@ -182,7 +180,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
                   {selectedUser.name}
                 </p>
                 <p className="text-xs text-default-500">
-                  {selectedUser.email} &middot; {t('timebanking.current_balance')}: {selectedUser.balance}h
+                  {selectedUser.email} &middot; {"Current Balance"}: {selectedUser.balance}h
                 </p>
               </div>
             </div>
@@ -191,15 +189,15 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
               variant="flat"
               onPress={() => setSelectedUser(null)}
             >
-              {t('timebanking.change')}
+              {"Change"}
             </Button>
           </div>
         )}
 
         {/* Amount input */}
         <Input
-          label={t('timebanking.label_credit_amount')}
-          placeholder={t('timebanking.placeholder_credit_amount')}
+          label={"Credit Amount"}
+          placeholder={"e.g. 10"}
           type="number"
           min="0.25"
           step="0.25"
@@ -210,20 +208,20 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
           startContent={
             <Wallet size={16} className="text-default-400" />
           }
-          description={t('timebanking.desc_amount_of_time_credits_to_grant_in_hours')}
+          description={"Amount of time credits to grant, in hours"}
         />
 
         {/* Reason */}
         <Textarea
-          label={t('timebanking.label_reason')}
-          placeholder={t('timebanking.placeholder_grant_reason')}
+          label={"Reason"}
+          placeholder={"Grant Reason..."}
           value={reason}
           onValueChange={setReason}
           size="sm"
           variant="bordered"
           minRows={2}
           maxRows={4}
-          description={t('timebanking.desc_required_this_will_be_recorded_in_the_g')}
+          description={"Required. This will be recorded in the general ledger"}
         />
 
         {/* Submit */}
@@ -235,7 +233,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
           isDisabled={!selectedUser || !amount || !reason.trim()}
           className="w-full sm:w-auto"
         >
-          {t('timebanking.grant_credits')}
+          {"Grant Credits"}
         </Button>
       </CardBody>
     </Card>
@@ -247,7 +245,6 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function GrantHistory({ refreshKey }: { refreshKey: number }) {
-  const { t } = useTranslation('admin');
   const toast = useToast();
 
   const [grants, setGrants] = useState<WalletGrant[]>([]);
@@ -276,7 +273,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
         }
       }
     } catch {
-      toast.error(t('timebanking.failed_to_load_grant_history'));
+      toast.error("Failed to load grant history");
     } finally {
       setLoading(false);
     }
@@ -290,7 +287,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
   const columns: Column<WalletGrant>[] = [
     {
       key: 'user_name',
-      label: t('timebanking.col_member'),
+      label: "Member",
       sortable: true,
       render: (item) => (
         <div>
@@ -301,7 +298,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
     },
     {
       key: 'amount',
-      label: t('timebanking.col_amount'),
+      label: "Amount",
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat" color="success">
@@ -311,7 +308,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
     },
     {
       key: 'reason',
-      label: t('timebanking.label_reason'),
+      label: "Reason",
       render: (item) => (
         <span className="text-sm text-default-600 line-clamp-2">
           {item.reason}
@@ -320,7 +317,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
     },
     {
       key: 'granted_by',
-      label: t('timebanking.col_granted_by'),
+      label: "Granted by",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -330,7 +327,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
     },
     {
       key: 'created_at',
-      label: t('timebanking.col_date'),
+      label: "Date",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -344,20 +341,20 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
     <div>
       <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
         <History size={16} className="text-secondary" />
-        {t('timebanking.grant_history')}
+        {"Grant History"}
       </h3>
       <DataTable
         columns={columns}
         data={grants}
         isLoading={loading}
-        searchPlaceholder={t('timebanking.search_grants_placeholder')}
+        searchPlaceholder={"Search grants..."}
         onSearch={(q) => { setSearch(q); setPage(1); }}
         onRefresh={loadGrants}
         totalItems={total}
         page={page}
         pageSize={20}
         onPageChange={setPage}
-        emptyContent={t('timebanking.no_credit_grants')}
+        emptyContent={"No credit grants"}
       />
     </div>
   );
@@ -368,8 +365,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function StartingBalances() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('timebanking.page_title'));
+  usePageTitle("Timebanking");
 
   // Key to trigger grant history refresh after new grant
   const [refreshKey, setRefreshKey] = useState(0);
@@ -381,8 +377,8 @@ export function StartingBalances() {
   return (
     <div>
       <PageHeader
-        title={t('timebanking.starting_balances_title')}
-        description={t('timebanking.starting_balances_desc')}
+        title={"Starting Balances"}
+        description={"Grant starting time credit balances to new or existing members"}
       />
 
       <div className="space-y-6">

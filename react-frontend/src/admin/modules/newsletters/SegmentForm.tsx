@@ -115,7 +115,7 @@ export function SegmentForm() {
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
-  usePageTitle(isEdit ? t('segment_form.title_edit') : t('segment_form.title_create'));
+  usePageTitle(isEdit ? "Edit" : "Create");
 
   // Form state
   const [name, setName] = useState('');
@@ -236,7 +236,7 @@ export function SegmentForm() {
   const handleSave = useCallback(async () => {
     // Validate
     const newErrors: Record<string, string> = {};
-    if (!name.trim()) newErrors.name = t('segment_form.name_required');
+    if (!name.trim()) newErrors.name = "Name Required";
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -264,7 +264,7 @@ export function SegmentForm() {
       }
       navigate(tenantPath('/admin/newsletters/segments'));
     } catch {
-      setErrors({ form: t('newsletters.failed_to_save_segment') });
+      setErrors({ form: "Failed to save segment" });
     }
     setSaving(false);
   }, [name, description, isActive, matchType, rules, isEdit, id, navigate, tenantPath, t]);
@@ -299,7 +299,7 @@ export function SegmentForm() {
       return (
         <Select
           size="sm"
-          label={t('segment_form.label_value')}
+          label={"Value"}
           selectedKeys={rule.value ? [rule.value] : []}
           onSelectionChange={(keys) => {
             const val = Array.from(keys)[0] as string;
@@ -307,8 +307,8 @@ export function SegmentForm() {
           }}
           className="min-w-[120px]"
         >
-          <SelectItem key="1">{t('segment_form.value_yes')}</SelectItem>
-          <SelectItem key="0">{t('segment_form.value_no')}</SelectItem>
+          <SelectItem key="1">{"Value Yes"}</SelectItem>
+          <SelectItem key="0">{"Value No"}</SelectItem>
         </Select>
       );
     }
@@ -317,7 +317,7 @@ export function SegmentForm() {
       return (
         <Select
           size="sm"
-          label={t('segment_form.label_value')}
+          label={"Value"}
           selectedKeys={rule.value ? [rule.value] : []}
           onSelectionChange={(keys) => {
             const val = Array.from(keys)[0] as string;
@@ -337,7 +337,7 @@ export function SegmentForm() {
         <Input
           size="sm"
           type="date"
-          label={t('segment_form.label_value')}
+          label={"Value"}
           value={rule.value}
           onValueChange={(val) => updateRule(rule.id, 'value', val)}
           className="min-w-[160px]"
@@ -349,8 +349,8 @@ export function SegmentForm() {
       <Input
         size="sm"
         type={fieldConfig.type === 'number' ? 'number' : 'text'}
-        label={t('segment_form.label_value')}
-        placeholder={fieldConfig.type === 'number' ? '0' : t('segment_form.placeholder_enter_value')}
+        label={"Value"}
+        placeholder={fieldConfig.type === 'number' ? '0' : "Enter value..."}
         value={rule.value}
         onValueChange={(val) => updateRule(rule.id, 'value', val)}
         className="min-w-[160px]"
@@ -361,7 +361,7 @@ export function SegmentForm() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" label={t('segment_form.loading_segment')} />
+        <Spinner size="lg" label={"Loading segment..."} />
       </div>
     );
   }
@@ -369,15 +369,15 @@ export function SegmentForm() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={isEdit ? t('segment_form.title_edit') : t('segment_form.title_create')}
-        description={isEdit ? t('segment_form.desc_edit') : t('segment_form.desc_create')}
+        title={isEdit ? "Edit" : "Create"}
+        description={isEdit ? "Edit." : "Create."}
         actions={
           <Button
             variant="flat"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/newsletters/segments'))}
           >
-            {t('segment_form.btn_back_to_segments')}
+            {"Back to Segments"}
           </Button>
         }
       />
@@ -393,12 +393,12 @@ export function SegmentForm() {
       {/* Segment Details */}
       <Card shadow="sm">
         <CardHeader className="pb-0">
-          <h3 className="text-lg font-semibold">{t('segment_form.section_segment_details')}</h3>
+          <h3 className="text-lg font-semibold">{"Segment Details"}</h3>
         </CardHeader>
         <CardBody className="space-y-4">
           <Input
-            label={t('segment_form.label_segment_name')}
-            placeholder={t('segment_form.placeholder_segment_name')}
+            label={"Segment Name"}
+            placeholder={"Enter segment name..."}
             value={name}
             onValueChange={setName}
             isRequired
@@ -406,8 +406,8 @@ export function SegmentForm() {
             errorMessage={errors.name}
           />
           <Input
-            label={t('segment_form.label_description')}
-            placeholder={t('newsletters.placeholder_describe_what_this_segment_targets')}
+            label={"Description"}
+            placeholder={"Enter describe what this segment targets..."}
             value={description}
             onValueChange={setDescription}
           />
@@ -418,7 +418,7 @@ export function SegmentForm() {
               size="sm"
             />
             <span className="text-sm text-foreground">
-              {isActive ? t('segment_form.status_active') : t('segment_form.status_inactive')} -- {isActive ? t('segment_form.status_active_hint') : t('segment_form.status_inactive_hint')}
+              {isActive ? "Active" : "Inactive"} -- {isActive ? "Active Hint" : "Inactive Hint"}
             </span>
           </div>
         </CardBody>
@@ -427,10 +427,10 @@ export function SegmentForm() {
       {/* Rule Builder */}
       <Card shadow="sm">
         <CardHeader className="flex justify-between items-center pb-0">
-          <h3 className="text-lg font-semibold">{t('segment_form.section_targeting_rules')}</h3>
+          <h3 className="text-lg font-semibold">{"Targeting Rules"}</h3>
           <Select
             size="sm"
-            label={t('segment_form.label_match_logic')}
+            label={"Match Logic"}
             selectedKeys={[matchType]}
             onSelectionChange={(keys) => {
               const val = Array.from(keys)[0] as string;
@@ -438,15 +438,15 @@ export function SegmentForm() {
             }}
             className="max-w-[200px]"
           >
-            <SelectItem key="all">{t('segment_form.match_all_and')}</SelectItem>
-            <SelectItem key="any">{t('segment_form.match_any_or')}</SelectItem>
+            <SelectItem key="all">{"Match All and"}</SelectItem>
+            <SelectItem key="any">{"Match Any or"}</SelectItem>
           </Select>
         </CardHeader>
         <CardBody className="space-y-3">
           <p className="text-sm text-default-500">
             {matchType === 'all'
-              ? t('segment_form.match_all_description')
-              : t('segment_form.match_any_description')}
+              ? "Match All."
+              : "Match Any."}
           </p>
 
           <Divider />
@@ -455,13 +455,13 @@ export function SegmentForm() {
             <div key={rule.id} className="flex flex-wrap items-end gap-2">
               {index > 0 && (
                 <Chip size="sm" variant="flat" color="primary" className="mb-1">
-                  {matchType === 'all' ? t('segment_form.chip_and') : t('segment_form.chip_or')}
+                  {matchType === 'all' ? "And" : "Or"}
                 </Chip>
               )}
 
               <Select
                 size="sm"
-                label={t('segment_form.label_field')}
+                label={"Field"}
                 selectedKeys={rule.field ? [rule.field] : []}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as string;
@@ -477,7 +477,7 @@ export function SegmentForm() {
               {rule.field && (
                 <Select
                   size="sm"
-                  label={t('segment_form.label_operator')}
+                  label={"Operator"}
                   selectedKeys={rule.operator ? [rule.operator] : []}
                   onSelectionChange={(keys) => {
                     const val = Array.from(keys)[0] as string;
@@ -493,7 +493,7 @@ export function SegmentForm() {
 
               {rule.field && rule.operator && renderValueInput(rule)}
 
-              <Tooltip content={t('segment_form.remove_rule_tooltip')}>
+              <Tooltip content={"Remove Rule"}>
                 <Button
                   isIconOnly
                   size="sm"
@@ -501,7 +501,7 @@ export function SegmentForm() {
                   color="danger"
                   onPress={() => removeRule(rule.id)}
                   isDisabled={rules.length === 1}
-                  aria-label={t('segment_form.remove_rule_aria')}
+                  aria-label={"Remove Rule"}
                 >
                   <Trash2 size={14} />
                 </Button>
@@ -516,7 +516,7 @@ export function SegmentForm() {
               startContent={<Plus size={14} />}
               onPress={addRule}
             >
-              {t('segment_form.btn_add_rule')}
+              {"Add Rule"}
             </Button>
           </div>
         </CardBody>
@@ -525,7 +525,7 @@ export function SegmentForm() {
       {/* Preview */}
       <Card shadow="sm">
         <CardHeader className="pb-0">
-          <h3 className="text-lg font-semibold">{t('segment_form.section_preview')}</h3>
+          <h3 className="text-lg font-semibold">{"Preview"}</h3>
         </CardHeader>
         <CardBody>
           <div className="flex items-center gap-4">
@@ -536,7 +536,7 @@ export function SegmentForm() {
               onPress={handlePreview}
               isLoading={previewing}
             >
-              {t('segment_form.btn_preview_members')}
+              {"Preview Members"}
             </Button>
 
             {previewCount !== null && (
@@ -546,7 +546,7 @@ export function SegmentForm() {
                   {previewCount.toLocaleString()}
                 </span>
                 <span className="text-sm text-default-500">
-                  {t('segment_form.members_match', { count: previewCount })}
+                  {`Members Match`}
                 </span>
               </div>
             )}
@@ -559,17 +559,17 @@ export function SegmentForm() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 pb-0">
             <Sparkles size={18} className="text-warning" />
-            <h3 className="text-lg font-semibold">{t('segment_form.section_smart_suggestions')}</h3>
+            <h3 className="text-lg font-semibold">{"Smart Suggestions"}</h3>
           </CardHeader>
           <CardBody>
             {loadingSuggestions ? (
               <div className="flex items-center gap-2 py-4">
                 <Spinner size="sm" />
-                <span className="text-sm text-default-500">{t('segment_form.analyzing_member_data')}</span>
+                <span className="text-sm text-default-500">{"Analyzing Member Data"}</span>
               </div>
             ) : suggestions.length === 0 ? (
               <p className="text-sm text-default-400 py-2">
-                {t('segment_form.no_suggestions')}
+                {"No suggestions found"}
               </p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -586,7 +586,7 @@ export function SegmentForm() {
                         <p className="font-medium text-foreground text-sm">{suggestion.name}</p>
                         <p className="text-xs text-default-500 mt-1 line-clamp-2">{suggestion.description}</p>
                         <Chip size="sm" variant="flat" color="primary" className="mt-2">
-                          {t('segment_form.approx_members', { count: suggestion.estimated_count })}
+                          {`Approx Members`}
                         </Chip>
                       </div>
                     </div>
@@ -604,7 +604,7 @@ export function SegmentForm() {
           variant="flat"
           onPress={() => navigate(tenantPath('/admin/newsletters/segments'))}
         >
-          {t('segment_form.btn_cancel')}
+          {"Cancel"}
         </Button>
         <Button
           color="primary"
@@ -612,7 +612,7 @@ export function SegmentForm() {
           onPress={handleSave}
           isLoading={saving}
         >
-          {isEdit ? t('segment_form.btn_update_segment') : t('segment_form.btn_create_segment')}
+          {isEdit ? "Update Segment" : "Create Segment"}
         </Button>
       </div>
     </div>

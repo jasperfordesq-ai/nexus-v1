@@ -32,7 +32,7 @@ interface SubscriptionItem {
 
 export function Subscriptions() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('content.page_title'));
+  usePageTitle("Content");
   const toast = useToast();
 
   const [data, setData] = useState<SubscriptionItem[]>([]);
@@ -52,7 +52,7 @@ export function Subscriptions() {
         }
       }
     } catch {
-      toast.error(t('content.failed_to_load_subscriptions'));
+      toast.error("Failed to load subscriptions");
     } finally {
       setLoading(false);
     }
@@ -71,13 +71,13 @@ export function Subscriptions() {
     },
     {
       key: 'plan_name',
-      label: t('breadcrumbs.plans'),
+      label: "Plans",
       sortable: true,
       render: (item) => <span className="text-sm text-default-600">{item.plan_name || '--'}</span>,
     },
     {
       key: 'status',
-      label: t('listings.status'),
+      label: "Status",
       sortable: true,
       render: (item) => <StatusBadge status={item.status || 'inactive'} />,
     },
@@ -132,7 +132,7 @@ export function Subscriptions() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('content.subscriptions_title')} description={t('content.subscriptions_desc')} />
+        <PageHeader title={"Subscriptions"} description={"View and manage active member subscriptions"} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -140,13 +140,13 @@ export function Subscriptions() {
 
   return (
     <div>
-      <PageHeader title={t('content.subscriptions_title')} description={t('content.subscriptions_desc')} />
+      <PageHeader title={"Subscriptions"} description={"View and manage active member subscriptions"} />
 
       {data.length === 0 ? (
         <EmptyState
           icon={CreditCard}
-          title={t('no_data')}
-          description={t('content.desc_subscriptions_will_appear_here_once_memb')}
+          title={"No data available"}
+          description={"Subscriptions will appear here once members start joining plans"}
         />
       ) : (
         <DataTable

@@ -178,7 +178,7 @@ const EMPTY_FORM: PartnerFormData = {
 
 export function ExternalPartners() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('federation.page_title'));
+  usePageTitle("Federation");
   const toast = useToast();
 
   const formModal = useDisclosure();
@@ -306,7 +306,7 @@ export function ExternalPartners() {
         formModal.onClose();
         loadData();
       } else {
-        const errorMsg = (res as { error?: string }).error || t('federation.failed_to_save_partner');
+        const errorMsg = (res as { error?: string }).error || "Failed to save partner";
         toast.error(errorMsg);
       }
     } catch (err) {
@@ -323,7 +323,7 @@ export function ExternalPartners() {
     try {
       const res = await api.delete(`/v2/admin/federation/external-partners/${deleteTarget.id}`);
       if (res.success) {
-        toast.success(t('federation.partner_deleted', { name: deleteTarget.name }));
+        toast.success(`Partner Deleted`);
         setDeleteTarget(null);
         loadData();
       } else {
@@ -360,12 +360,12 @@ export function ExternalPartners() {
         }
         loadData();
       } else {
-        const errorMsg = (res as { error?: string }).error || t('federation.health_check_error');
-        toast.error(t('federation.health_check_partner_error', { name: partner.name, error: errorMsg }));
+        const errorMsg = (res as { error?: string }).error || "Health Check error";
+        toast.error(`Health Check Partner error`);
       }
     } catch (err) {
       logError('ExternalPartners.healthCheck', err);
-      toast.error(t('federation.health_check_failed', { name: partner.name }) || `${partner.name}: Health check failed`);
+      toast.error(`Health check failed` || `${partner.name}: Health check failed`);
     }
     setHealthCheckLoading(null);
   }, [toast, t, loadData]);
@@ -418,7 +418,7 @@ export function ExternalPartners() {
         actions={
           <div className="flex items-center gap-2">
             <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={() => loadData()} isLoading={loading}>
-              {t('federation.refresh')}
+              {"Refresh"}
             </Button>
             <Button color="primary" size="sm" startContent={<Plus size={16} />} onPress={openCreate}>
               {t('federation.add_partner', 'Add Partner')}

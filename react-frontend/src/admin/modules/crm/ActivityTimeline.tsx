@@ -121,16 +121,16 @@ function formatRelativeTime(dateStr: string, t: (key: string, opts?: Record<stri
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return t('crm.just_now');
-  if (diffMins < 60) return t('crm.minutes_ago', { count: diffMins });
-  if (diffHours < 24) return t('crm.hours_ago', { count: diffHours });
-  if (diffDays < 7) return t('crm.days_ago', { count: diffDays });
+  if (diffMins < 1) return "Just Now";
+  if (diffMins < 60) return `Minutes Ago`;
+  if (diffHours < 24) return `Hours Ago`;
+  if (diffDays < 7) return `Days Ago`;
   return formatDateTime(dateStr);
 }
 
 export function ActivityTimeline() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('crm.page_title'));
+  usePageTitle("CRM");
   const { tenantPath } = useTenant();
   const [searchParams] = useSearchParams();
 
@@ -191,8 +191,8 @@ export function ActivityTimeline() {
   return (
     <div className="max-w-6xl mx-auto">
       <PageHeader
-        title={t('crm.activity_timeline_title')}
-        description={t('crm.activity_timeline_desc')}
+        title={"Activity Timeline"}
+        description={"Chronological timeline of member actions and coordinator interactions"}
         actions={
           <Button
             variant="flat"
@@ -200,7 +200,7 @@ export function ActivityTimeline() {
             onPress={() => loadTimeline()}
             isDisabled={loading}
           >
-            {t('crm.refresh')}
+            {"Refresh"}
           </Button>
         }
       />
@@ -208,9 +208,9 @@ export function ActivityTimeline() {
       {/* Filters */}
       <div className="flex flex-wrap items-end gap-3 mb-6">
         <MemberSearchPicker
-          label={t('broker.label_search_member')}
-          placeholder={t('broker.placeholder_type_a_name_or_email_to_search')}
-          noResultsText={t('shared.no_members_found')}
+          label={"Search Member"}
+          placeholder={"Type a Name or Email to Search..."}
+          noResultsText={"No members found found"}
           className="w-full sm:w-72"
           size="sm"
           value={filterUserId}
@@ -223,8 +223,8 @@ export function ActivityTimeline() {
         />
 
         <Select
-          label={t('crm.label_activity_type')}
-          placeholder={t('crm.placeholder_all_types')}
+          label={"Activity Type"}
+          placeholder={"All Types..."}
           className="w-52"
           size="sm"
           startContent={<Filter size={14} />}
@@ -241,7 +241,7 @@ export function ActivityTimeline() {
         </Select>
 
         <Select
-          label={t('crm.label_date_range')}
+          label={"Date Range"}
           className="w-44"
           size="sm"
           selectedKeys={[filterDays]}
@@ -262,7 +262,7 @@ export function ActivityTimeline() {
             variant="flat"
             onPress={handleClearFilters}
           >
-            {t('crm.clear_filters')}
+            {"Clear Filters"}
           </Button>
         )}
       </div>
@@ -270,17 +270,17 @@ export function ActivityTimeline() {
       {/* Content */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <Spinner size="lg" label={t('crm.loading_activity')} />
+          <Spinner size="lg" label={"Loading Activity"} />
         </div>
       ) : entries.length === 0 ? (
         <Card>
           <CardBody className="flex flex-col items-center py-16 text-center">
             <Activity size={48} className="text-default-300 mb-4" />
-            <p className="text-default-500 text-lg font-medium">{t('crm.no_activity_found')}</p>
+            <p className="text-default-500 text-lg font-medium">{"No activity found"}</p>
             <p className="text-default-400 text-sm mt-1">
               {hasActiveFilters
-                ? t('crm.no_activity_hint_filtered')
-                : t('crm.no_activity_hint_default')}
+                ? "No activity matches your current filters"
+                : "No activity has been recorded yet"}
             </p>
           </CardBody>
         </Card>

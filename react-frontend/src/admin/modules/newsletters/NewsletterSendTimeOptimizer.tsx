@@ -18,10 +18,8 @@ import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { SendTimeData } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 export function NewsletterSendTimeOptimizer() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('newsletters.page_title'));
+  usePageTitle("Newsletters");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<SendTimeData | null>(null);
   const [days, setDays] = useState(30);
@@ -84,21 +82,21 @@ export function NewsletterSendTimeOptimizer() {
   return (
     <div>
       <PageHeader
-        title={t('newsletters.newsletter_send_time_optimizer_title')}
-        description={t('newsletters.newsletter_send_time_optimizer_desc')}
+        title={"Send Time Optimiser"}
+        description={"Find the best time to send to maximise open rates"}
         actions={
           <div className="flex gap-2">
             <Select
-              label={t('newsletters.label_time_period')}
+              label={"Time Period"}
               selectedKeys={[String(days)]}
               onSelectionChange={(keys) => setDays(Number(Array.from(keys)[0]))}
               className="w-32"
               size="sm"
             >
-              <SelectItem key="7">{t('newsletters.days_7')}</SelectItem>
-              <SelectItem key="30">{t('newsletters.days_30')}</SelectItem>
-              <SelectItem key="60">{t('newsletters.days_60')}</SelectItem>
-              <SelectItem key="90">{t('newsletters.days_90')}</SelectItem>
+              <SelectItem key="7">{"Days 7"}</SelectItem>
+              <SelectItem key="30">{"Days 30"}</SelectItem>
+              <SelectItem key="60">{"Days 60"}</SelectItem>
+              <SelectItem key="90">{"Days 90"}</SelectItem>
             </Select>
             <Button
               variant="flat"
@@ -118,7 +116,7 @@ export function NewsletterSendTimeOptimizer() {
           <Card>
             <CardHeader className="flex gap-2 items-center">
               <TrendingUp size={20} className="text-success" />
-              <span>{t('newsletter_send_time.top_recommended')}</span>
+              <span>{"Top Recommended"}</span>
             </CardHeader>
             <CardBody>
               <div className="grid gap-3 md:grid-cols-3">
@@ -147,7 +145,7 @@ export function NewsletterSendTimeOptimizer() {
         <Card>
           <CardHeader className="flex gap-2 items-center">
             <Clock size={20} />
-            <span>{t('newsletter_send_time.engagement_heatmap')}</span>
+            <span>{"Engagement Heatmap"}</span>
           </CardHeader>
           <CardBody>
             {loading ? (
@@ -194,7 +192,7 @@ export function NewsletterSendTimeOptimizer() {
 
                   {/* Legend */}
                   <div className="flex items-center gap-2 mt-6 justify-center">
-                    <span className="text-sm text-default-500">{t('newsletter_send_time.low')}</span>
+                    <span className="text-sm text-default-500">{"Low"}</span>
                     <div className="flex gap-1">
                       <div className="w-4 h-4 rounded bg-default-100 dark:bg-default-50"></div>
                       <div className="w-4 h-4 rounded bg-success-100"></div>
@@ -202,7 +200,7 @@ export function NewsletterSendTimeOptimizer() {
                       <div className="w-4 h-4 rounded bg-success-300"></div>
                       <div className="w-4 h-4 rounded bg-success-500"></div>
                     </div>
-                    <span className="text-sm text-default-500">{t('newsletter_send_time.high')}</span>
+                    <span className="text-sm text-default-500">{"High"}</span>
                   </div>
                 </div>
               </div>

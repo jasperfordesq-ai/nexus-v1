@@ -27,8 +27,6 @@ import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { LogFile } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
-
 type FilterType = 'all' | 'errors' | 'application' | 'cron';
 
 function getFileIcon(name: string) {
@@ -55,8 +53,7 @@ function matchesFilter(name: string, filter: FilterType): boolean {
 }
 
 export function LogFiles() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('enterprise.page_title'));
+  usePageTitle("Enterprise");
   const toast = useToast();
   const { tenantPath } = useTenant();
 
@@ -74,7 +71,7 @@ export function LogFiles() {
         setFiles(Array.isArray(data) ? data : []);
       }
     } catch {
-      toast.error(t('enterprise.failed_to_load_log_files'));
+      toast.error("Failed to load log files");
     } finally {
       setLoading(false);
     }
@@ -97,17 +94,17 @@ export function LogFiles() {
   };
 
   const filters: { key: FilterType; label: string }[] = [
-    { key: 'all', label: t('log_files_labels.filter_all') },
-    { key: 'errors', label: t('log_files_labels.filter_errors') },
-    { key: 'application', label: t('log_files_labels.filter_application') },
-    { key: 'cron', label: t('log_files_labels.filter_cron') },
+    { key: 'all', label: "All" },
+    { key: 'errors', label: "Errors" },
+    { key: 'application', label: "Application" },
+    { key: 'cron', label: "Cron" },
   ];
 
   return (
     <div>
       <PageHeader
-        title={t('system.log_files_title')}
-        description={t('system.log_files_desc')}
+        title={"Log Files"}
+        description={"Log Files."}
         actions={
           <Button
             variant="flat"
@@ -116,7 +113,7 @@ export function LogFiles() {
             isLoading={loading}
             size="sm"
           >
-            {t('common.refresh')}
+            {"Refresh"}
           </Button>
         }
       />
@@ -127,7 +124,7 @@ export function LogFiles() {
           <CardBody className="flex flex-row items-center gap-3 p-4">
             <Files size={20} className="text-primary" />
             <div>
-              <p className="text-xs text-default-500">{t('log_files_labels.total_files')}</p>
+              <p className="text-xs text-default-500">{"Total Files"}</p>
               <p className="text-lg font-bold text-foreground">{files.length}</p>
             </div>
           </CardBody>
@@ -136,7 +133,7 @@ export function LogFiles() {
           <CardBody className="flex flex-row items-center gap-3 p-4">
             <HardDrive size={20} className="text-warning" />
             <div>
-              <p className="text-xs text-default-500">{t('log_files_labels.total_size')}</p>
+              <p className="text-xs text-default-500">{"Total Size"}</p>
               <p className="text-lg font-bold text-foreground">{formatBytes(totalSize)}</p>
             </div>
           </CardBody>
@@ -146,7 +143,7 @@ export function LogFiles() {
       {/* Search & Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <Input
-          placeholder={t('log_files_labels.search_placeholder')}
+          placeholder={"Enter search..."}
           startContent={<Search size={16} className="text-default-400" />}
           value={search}
           onValueChange={setSearch}
@@ -176,7 +173,7 @@ export function LogFiles() {
       ) : filtered.length === 0 ? (
         <Card shadow="sm">
           <CardBody className="py-16 text-center">
-            <p className="text-default-500">{t('system.no_log_files')}</p>
+            <p className="text-default-500">{"No log files found"}</p>
           </CardBody>
         </Card>
       ) : (
@@ -201,7 +198,7 @@ export function LogFiles() {
                           {file.size}
                         </Chip>
                         <span className="text-xs text-default-400">
-                          {t('log_files_labels.lines_count', { count: file.line_count })}
+                          {`Lines Count`}
                         </span>
                       </div>
                       <p className="text-xs text-default-400 mt-1">
@@ -212,7 +209,7 @@ export function LogFiles() {
                       size="sm"
                       variant="flat"
                       isIconOnly
-                      aria-label={t('log_files_labels.download')}
+                      aria-label={"Download"}
                       onPress={() => window.open(`/v2/admin/enterprise/monitoring/log-files/${file.name}?download=1`, '_blank')}
                     >
                       <Download size={14} />

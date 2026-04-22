@@ -77,7 +77,7 @@ export function TenantForm() {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const isEdit = !!id;
-  usePageTitle(isEdit ? t('tenant_form.page_title_edit') : t('tenant_form.page_title_create'));
+  usePageTitle(isEdit ? "Title Edit" : "Title Create");
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -195,7 +195,7 @@ export function TenantForm() {
         });
       }
     } catch {
-      toast.error(t('tenant_form.failed_to_load_tenant'));
+      toast.error("Failed to load tenant");
     }
     setLoading(false);
   }, [id, toast, t])
@@ -228,11 +228,11 @@ export function TenantForm() {
 
   const handleSubmit = async () => {
     if (!form.name.trim()) {
-      toast.error(t('tenant_form.name_required'));
+      toast.error("Name Required");
       return;
     }
     if (!isEdit && !form.slug.trim()) {
-      toast.error(t('tenant_form.slug_required'));
+      toast.error("Slug Required");
       return;
     }
 
@@ -276,7 +276,7 @@ export function TenantForm() {
       }
 
       if (res.success) {
-        toast.success(isEdit ? t('tenant_form.tenant_updated') : t('tenant_form.tenant_created'));
+        toast.success(isEdit ? "Tenant updated" : "Tenant created");
         if (isEdit) {
           navigate(tenantPath(`/admin/super/tenants/${id}`));
         } else {
@@ -285,10 +285,10 @@ export function TenantForm() {
           navigate(tenantPath(newId ? `/admin/super/tenants/${newId}` : '/admin/super/tenants'));
         }
       } else {
-        toast.error(res.error || (isEdit ? t('tenant_form.failed_to_update_tenant') : t('tenant_form.failed_to_create_tenant')));
+        toast.error(res.error || (isEdit ? "Failed to update tenant" : "Failed to create tenant"));
       }
     } catch {
-      toast.error(t('tenant_form.an_error_occurred'));
+      toast.error("An Error Occurred");
     }
     setSaving(false);
   };
@@ -304,15 +304,15 @@ export function TenantForm() {
   return (
     <div>
       <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('tenant_form.breadcrumb_super_admin')}</Link>
+        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{"Breadcrumb Super Admin"}</Link>
         <span>/</span>
-        <Link to={tenantPath('/admin/super/tenants')} className="hover:text-primary">{t('tenant_form.breadcrumb_tenants')}</Link>
+        <Link to={tenantPath('/admin/super/tenants')} className="hover:text-primary">{"Breadcrumb Tenants"}</Link>
         <span>/</span>
-        <span className="text-foreground">{isEdit ? t('tenant_form.breadcrumb_edit') : t('tenant_form.breadcrumb_create')}</span>
+        <span className="text-foreground">{isEdit ? "Breadcrumb Edit" : "Breadcrumb Create"}</span>
       </nav>
       <PageHeader
-        title={isEdit ? t('tenant_form.title_edit', { name: form.name }) : t('tenant_form.title_create')}
-        description={isEdit ? t('tenant_form.desc_edit') : t('tenant_form.desc_create')}
+        title={isEdit ? `Edit` : "Create"}
+        description={isEdit ? "Edit." : "Create."}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -320,7 +320,7 @@ export function TenantForm() {
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath(isEdit ? `/admin/super/tenants/${id}` : '/admin/super/tenants'))}
             >
-              {t('tenant_form.back')}
+              {"Back"}
             </Button>
             <Button
               color="primary"
@@ -328,64 +328,64 @@ export function TenantForm() {
               onPress={handleSubmit}
               isLoading={saving}
             >
-              {isEdit ? t('tenant_form.save_changes') : t('tenant_form.create_tenant')}
+              {isEdit ? "Save Changes" : "Create Tenant"}
             </Button>
           </div>
         }
       />
 
       <Tabs variant="underlined" className="mb-4">
-        <Tab key="details" title={t('tenant_form.tab_details')}>
+        <Tab key="details" title={"Details"}>
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               <Input
-                label={t('tenant_form.name_label')}
-                placeholder={t('tenant_form.name_placeholder')}
+                label={"Name"}
+                placeholder={"Enter name..."}
                 value={form.name}
                 onValueChange={(v) => updateField('name', v)}
                 isRequired
                 startContent={<Building2 size={16} className="text-default-400" />}
               />
               <Input
-                label={t('tenant_form.slug_label')}
-                placeholder={t('tenant_form.slug_placeholder')}
+                label={"Slug"}
+                placeholder={"Enter slug..."}
                 value={form.slug}
                 onValueChange={(v) => {
                   setSlugAutoGen(false);
                   updateField('slug', v.toLowerCase().replace(/[^a-z0-9-]/g, ''));
                 }}
                 isRequired
-                description={slugAutoGen ? t('tenant_form.slug_auto_desc') : t('tenant_form.slug_manual_desc')}
+                description={slugAutoGen ? "Slug Auto." : "Slug Manual."}
               />
               <Input
-                label={t('tenant_form.domain_label')}
-                placeholder={t('tenant_form.domain_placeholder')}
+                label={"Domain"}
+                placeholder={"Enter domain..."}
                 value={form.domain}
                 onValueChange={(v) => updateField('domain', v)}
               />
               <Input
-                label={t('tenant_form.tagline_label')}
-                placeholder={t('tenant_form.tagline_placeholder')}
+                label={"Tagline"}
+                placeholder={"Enter tagline..."}
                 value={form.tagline}
                 onValueChange={(v) => updateField('tagline', v)}
               />
               <Textarea
-                label={t('tenant_form.description_label')}
-                placeholder={t('tenant_form.description_placeholder')}
+                label={"Description"}
+                placeholder={"Enter description..."}
                 value={form.description}
                 onValueChange={(v) => updateField('description', v)}
                 minRows={3}
               />
               <Select
-                label={t('tenant_form.parent_tenant_label')}
-                placeholder={t('tenant_form.parent_tenant_placeholder')}
+                label={"Parent Tenant"}
+                placeholder={"Enter parent tenant..."}
                 selectedKeys={form.parent_id ? [form.parent_id] : []}
                 onSelectionChange={(keys) => {
                   const arr = Array.from(keys);
                   updateField('parent_id', arr.length > 0 ? String(arr[0]) : '');
                 }}
                 isDisabled={isEdit}
-                description={isEdit ? t('tenant_form.parent_edit_desc') : undefined}
+                description={isEdit ? "Parent Edit." : undefined}
               >
                 {parentTenants
                   .filter((t) => String(t.id) !== id)
@@ -398,19 +398,19 @@ export function TenantForm() {
                   isSelected={form.is_active}
                   onValueChange={(v) => updateField('is_active', v)}
                 >
-                  {t('tenant_form.active')}
+                  {"Active"}
                 </Switch>
                 <Switch
                   isSelected={form.allows_subtenants}
                   onValueChange={(v) => updateField('allows_subtenants', v)}
                 >
-                  {t('tenant_form.allows_subtenants')}
+                  {"Allows Subtenants"}
                 </Switch>
               </div>
               {form.allows_subtenants && (
                 <Input
                   type="number"
-                  label={t('tenant_form.max_depth_label')}
+                  label={"Max Depth"}
                   value={String(form.max_depth)}
                   onValueChange={(v) => updateField('max_depth', Number(v) || 3)}
                   className="max-w-xs"
@@ -420,25 +420,25 @@ export function TenantForm() {
           </Card>
         </Tab>
 
-        <Tab key="contact" title={t('tenant_form.tab_contact')}>
+        <Tab key="contact" title={"Contact"}>
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               <Input
-                label={t('tenant_form.contact_email_label')}
+                label={"Contact Email"}
                 type="email"
                 placeholder="admin@example.com"
                 value={form.contact_email}
                 onValueChange={(v) => updateField('contact_email', v)}
               />
               <Input
-                label={t('tenant_form.contact_phone_label')}
+                label={"Contact Phone"}
                 placeholder="+1 555 123 4567"
                 value={form.contact_phone}
                 onValueChange={(v) => updateField('contact_phone', v)}
               />
               <Textarea
-                label={t('tenant_form.address_label')}
-                placeholder={t('tenant_form.address_placeholder')}
+                label={"Address"}
+                placeholder={"Enter address..."}
                 value={form.address}
                 onValueChange={(v) => updateField('address', v)}
                 minRows={2}
@@ -447,94 +447,94 @@ export function TenantForm() {
           </Card>
         </Tab>
 
-        <Tab key="seo" title={t('tenant_form.tab_seo')}>
+        <Tab key="seo" title={"SEO"}>
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               {/* Live SERP Preview */}
               <div className="rounded-lg border border-default-200 p-4 bg-white dark:bg-default-50">
                 <p className="text-xs font-medium uppercase text-default-400 mb-2 flex items-center gap-1">
-                  <Eye size={12} /> {t('tenant_form.google_search_preview')}
+                  <Eye size={12} /> {"Google Search Preview"}
                 </p>
                 <p className="text-lg text-blue-700 dark:text-primary truncate">
-                  {form.meta_title || form.name || t('tenant_form.page_title_fallback')}
+                  {form.meta_title || form.name || "Title Fallback"}
                 </p>
                 <p className="text-sm text-green-700 dark:text-success truncate">
                   {form.domain ? `https://${form.domain}` : `https://${form.slug || 'tenant'}.project-nexus.ie`}
                 </p>
                 <p className="text-sm text-default-600 line-clamp-2">
-                  {form.meta_description || t('tenant_form.no_description_set')}
+                  {form.meta_description || "No description set found"}
                 </p>
               </div>
               <Input
-                label={t('tenant_form.meta_title_label')}
-                placeholder={t('tenant_form.meta_title_placeholder')}
+                label={"Meta Title"}
+                placeholder={"Enter meta title..."}
                 value={form.meta_title}
                 onValueChange={(v) => updateField('meta_title', v)}
-                description={t('tenant_form.characters_count', { count: form.meta_title.length, max: 70 })}
+                description={`Characters Count`}
                 maxLength={70}
               />
               <Textarea
-                label={t('tenant_form.meta_description_label')}
-                placeholder={t('tenant_form.meta_description_placeholder')}
+                label={"Meta Description"}
+                placeholder={"Enter meta description..."}
                 value={form.meta_description}
                 onValueChange={(v) => updateField('meta_description', v)}
-                description={t('tenant_form.characters_count', { count: form.meta_description.length, max: 180 })}
+                description={`Characters Count`}
                 maxLength={180}
                 minRows={2}
               />
               <Input
-                label={t('tenant_form.h1_headline_label')}
-                placeholder={t('tenant_form.h1_headline_placeholder')}
+                label={"H1 Headline"}
+                placeholder={"Enter h1 headline..."}
                 value={form.h1_headline}
                 onValueChange={(v) => updateField('h1_headline', v)}
                 maxLength={100}
               />
               <Textarea
-                label={t('tenant_form.hero_intro_label')}
-                placeholder={t('tenant_form.hero_intro_placeholder')}
+                label={"Hero Intro"}
+                placeholder={"Enter hero intro..."}
                 value={form.hero_intro}
                 onValueChange={(v) => updateField('hero_intro', v)}
                 minRows={2}
               />
               <Input
-                label={t('tenant_form.og_image_url_label')}
+                label={"OG Image URL"}
                 placeholder="https://example.com/image.jpg"
                 value={form.og_image_url}
                 onValueChange={(v) => updateField('og_image_url', v)}
-                description={t('tenant_form.og_image_url_description')}
+                description={"OG Image URL."}
               />
               <Select
-                label={t('tenant_form.robots_directive_label')}
-                placeholder={t('tenant_form.robots_directive_placeholder')}
+                label={"Robots Directive"}
+                placeholder={"Enter robots directive..."}
                 selectedKeys={form.robots_directive ? [form.robots_directive] : []}
                 onSelectionChange={(keys) => {
                   const arr = Array.from(keys);
                   updateField('robots_directive', arr.length > 0 ? String(arr[0]) : '');
                 }}
                 className="max-w-xs"
-                description={t('tenant_form.robots_description')}
+                description={"Robots."}
               >
-                <SelectItem key="index, follow">{t('tenant_form.robots_index_follow')}</SelectItem>
-                <SelectItem key="noindex, follow">{t('tenant_form.robots.noindex_follow')}</SelectItem>
-                <SelectItem key="index, nofollow">{t('tenant_form.robots.index_nofollow')}</SelectItem>
-                <SelectItem key="noindex, nofollow">{t('tenant_form.robots.noindex_nofollow')}</SelectItem>
+                <SelectItem key="index, follow">{"Robots Index Follow"}</SelectItem>
+                <SelectItem key="noindex, follow">{"Noindex Follow"}</SelectItem>
+                <SelectItem key="index, nofollow">{"Index Nofollow"}</SelectItem>
+                <SelectItem key="noindex, nofollow">{"Noindex Nofollow"}</SelectItem>
               </Select>
             </CardBody>
           </Card>
         </Tab>
 
-        <Tab key="location" title={t('tenant_form.tab_location')}>
+        <Tab key="location" title={"Location"}>
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               <Input
-                label={t('tenant_form.location_name_label')}
-                placeholder={t('tenant_form.location_name_placeholder')}
+                label={"Location Name"}
+                placeholder={"Enter location name..."}
                 value={form.location_name}
                 onValueChange={(v) => updateField('location_name', v)}
               />
               <Select
-                label={t('tenant_form.country_label')}
-                placeholder={t('tenant_form.country_placeholder')}
+                label={"Country"}
+                placeholder={"Enter country..."}
                 selectedKeys={form.country_code ? [form.country_code] : []}
                 onSelectionChange={(keys) => {
                   const arr = Array.from(keys);
@@ -547,8 +547,8 @@ export function TenantForm() {
                 ))}
               </Select>
               <Select
-                label={t('tenant_form.service_area_label')}
-                placeholder={t('tenant_form.service_area_placeholder')}
+                label={"Service Area"}
+                placeholder={"Enter service area..."}
                 selectedKeys={form.service_area ? [form.service_area] : []}
                 onSelectionChange={(keys) => {
                   const arr = Array.from(keys);
@@ -562,13 +562,13 @@ export function TenantForm() {
               </Select>
               <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label={t('tenant_form.latitude_label')}
+                  label={"Latitude"}
                   placeholder="40.7128"
                   value={form.latitude}
                   onValueChange={(v) => updateField('latitude', v)}
                 />
                 <Input
-                  label={t('tenant_form.longitude_label')}
+                  label={"Longitude"}
                   placeholder="-74.0060"
                   value={form.longitude}
                   onValueChange={(v) => updateField('longitude', v)}
@@ -578,35 +578,35 @@ export function TenantForm() {
           </Card>
         </Tab>
 
-        <Tab key="social" title={t('tenant_form.tab_social')}>
+        <Tab key="social" title={"Social"}>
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               <Input
-                label={t('tenant_form.facebook_label')}
+                label={"Facebook"}
                 placeholder="https://facebook.com/..."
                 value={form.social_facebook}
                 onValueChange={(v) => updateField('social_facebook', v)}
               />
               <Input
-                label={t('tenant_form.twitter_label')}
+                label={"Twitter"}
                 placeholder="https://twitter.com/..."
                 value={form.social_twitter}
                 onValueChange={(v) => updateField('social_twitter', v)}
               />
               <Input
-                label={t('tenant_form.instagram_label')}
+                label={"Instagram"}
                 placeholder="https://instagram.com/..."
                 value={form.social_instagram}
                 onValueChange={(v) => updateField('social_instagram', v)}
               />
               <Input
-                label={t('tenant_form.linkedin_label')}
+                label={"Linkedin"}
                 placeholder="https://linkedin.com/..."
                 value={form.social_linkedin}
                 onValueChange={(v) => updateField('social_linkedin', v)}
               />
               <Input
-                label={t('tenant_form.youtube_label')}
+                label={"Youtube"}
                 placeholder="https://youtube.com/..."
                 value={form.social_youtube}
                 onValueChange={(v) => updateField('social_youtube', v)}
@@ -615,12 +615,12 @@ export function TenantForm() {
           </Card>
         </Tab>
 
-        <Tab key="languages" title={t('tenant_form.tab_languages')}>
+        <Tab key="languages" title={"Languages"}>
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               <Select
-                label={t('tenant_form.default_language_label')}
-                description={t('tenant_form.default_language_description')}
+                label={"Default Language"}
+                description={"Default Language."}
                 selectedKeys={[form.default_language]}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as string;
@@ -637,9 +637,9 @@ export function TenantForm() {
                 ))}
               </Select>
               <div>
-                <p className="text-sm font-medium mb-1">{t('tenant_form.available_languages')}</p>
+                <p className="text-sm font-medium mb-1">{"Available Languages"}</p>
                 <p className="text-xs text-default-400 mb-3">
-                  {t('tenant_form.available_languages_desc')}
+                  {"Available Languages."}
                 </p>
                 <div className="space-y-2">
                   {PLATFORM_LANGUAGES.map((lang) => (
@@ -661,7 +661,7 @@ export function TenantForm() {
                       <span className="text-sm">
                         {lang.label} ({lang.short})
                         {lang.code === 'en' && (
-                          <span className="ml-2 text-xs text-default-400">{t('tenant_form.always_enabled')}</span>
+                          <span className="ml-2 text-xs text-default-400">{"Always Enabled"}</span>
                         )}
                       </span>
                     </Checkbox>
@@ -672,11 +672,11 @@ export function TenantForm() {
           </Card>
         </Tab>
 
-        <Tab key="features" title={t('tenant_form.tab_features')}>
+        <Tab key="features" title={"Features"}>
           <Card shadow="sm">
             <CardBody className="p-6">
               <p className="text-sm text-default-500 mb-4">
-                {t('tenant_form.features_desc')}
+                {"Features."}
               </p>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {FEATURE_META.map(({ key, labelKey, descKey, icon: Icon }) => {
@@ -710,27 +710,27 @@ export function TenantForm() {
             </CardBody>
           </Card>
         </Tab>
-        <Tab key="legal" title={t('tenant_form.tab_legal')}>
+        <Tab key="legal" title={"Legal"}>
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               <p className="text-sm text-default-500 mb-2">
-                {t('tenant_form.legal_desc')}
+                {"Legal."}
               </p>
               <Textarea
-                label={t('tenant_form.privacy_override_label')}
-                placeholder={t('tenant_form.privacy_override_placeholder')}
+                label={"Privacy Override"}
+                placeholder={"Enter privacy override..."}
                 value={form.privacy_text}
                 onValueChange={(v) => updateField('privacy_text', v)}
                 minRows={4}
-                description={t('tenant_form.privacy_override_description')}
+                description={"Privacy Override."}
               />
               <Textarea
-                label={t('tenant_form.terms_override_label')}
-                placeholder={t('tenant_form.terms_override_placeholder')}
+                label={"Terms Override"}
+                placeholder={"Enter terms override..."}
                 value={form.terms_text}
                 onValueChange={(v) => updateField('terms_text', v)}
                 minRows={4}
-                description={t('tenant_form.terms_override_description')}
+                description={"Terms Override."}
               />
               {(form.privacy_text.trim() || form.terms_text.trim()) && (
                 <Button
@@ -742,7 +742,7 @@ export function TenantForm() {
                     updateField('terms_text', '');
                   }}
                 >
-                  {t('tenant_form.clear_all_use_defaults')}
+                  {"Clear All Use Defaults"}
                 </Button>
               )}
             </CardBody>

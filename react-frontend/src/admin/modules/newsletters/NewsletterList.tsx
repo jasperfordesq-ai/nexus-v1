@@ -21,7 +21,6 @@ import { adminNewsletters } from '../../api/adminApi';
 import { DataTable, PageHeader, StatusBadge, ConfirmModal, type Column } from '../../components';
 import { NewsletterResend } from './NewsletterResend';
 
-import { useTranslation } from 'react-i18next';
 interface NewsletterItem {
   id: number;
   name: string;
@@ -38,8 +37,7 @@ interface NewsletterItem {
 }
 
 export function NewsletterList() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('newsletters.page_title'));
+  usePageTitle("Newsletters");
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -82,14 +80,14 @@ export function NewsletterList() {
     try {
       const res = await adminNewsletters.delete(deleteTarget.id);
       if (res.success) {
-        toast.success(t('newsletters.newsletter_deleted', { name: deleteTarget.subject || deleteTarget.name }));
+        toast.success(`Newsletter deleted`);
         setDeleteTarget(null);
         loadData();
       } else {
-        toast.error(t('newsletters.failed_to_delete_newsletter'));
+        toast.error("Failed to delete newsletter");
       }
     } catch {
-      toast.error(t('newsletters.failed_to_delete_newsletter'));
+      toast.error("Failed to delete newsletter");
     }
     setDeleting(false);
   };
@@ -98,13 +96,13 @@ export function NewsletterList() {
     try {
       const res = await adminNewsletters.duplicateNewsletter(item.id);
       if (res.success) {
-        toast.success(t('newsletters.newsletter_duplicated_as_draft'));
+        toast.success("Newsletter Duplicated as Draft");
         loadData();
       } else {
-        toast.error(t('newsletters.failed_to_duplicate_newsletter'));
+        toast.error("Failed to duplicate newsletter");
       }
     } catch {
-      toast.error(t('newsletters.failed_to_duplicate_newsletter'));
+      toast.error("Failed to duplicate newsletter");
     }
   };
 
@@ -114,21 +112,21 @@ export function NewsletterList() {
     try {
       const res = await adminNewsletters.sendNewsletter(sendTarget.id);
       if (res.success) {
-        toast.success(res.data?.message || t('newsletters.newsletter_queued_for_sending'));
+        toast.success(res.data?.message || "Newsletter Queued for Sending");
         setSendTarget(null);
         loadData();
       } else {
-        toast.error((res as { error?: string }).error || t('newsletters.failed_to_send_newsletter'));
+        toast.error((res as { error?: string }).error || "Failed to send newsletter");
       }
     } catch {
-      toast.error(t('newsletters.failed_to_send_newsletter'));
+      toast.error("Failed to send newsletter");
     }
     setSendingId(null);
   };
 
   const columns: Column<NewsletterItem>[] = [
     {
-      key: 'subject', label: t('newsletters.col_subject'), sortable: true,
+      key: 'subject', label: "Subject", sortable: true,
       render: (item) => (
         <div className="min-w-0">
           <p className="font-medium truncate">{item.subject || item.name}</p>
@@ -140,23 +138,23 @@ export function NewsletterList() {
       ),
     },
     {
-      key: 'status', label: t('newsletters.col_status'), sortable: true,
+      key: 'status', label: "Status", sortable: true,
       render: (item) => <StatusBadge status={item.status} />,
     },
     {
-      key: 'recipients_count', label: t('newsletters.col_recipients'),
+      key: 'recipients_count', label: "Recipients",
       render: (item) => <span>{((item.total_recipients || item.recipients_count) || 0).toLocaleString()}</span>,
     },
     {
-      key: 'open_rate', label: t('newsletters.label_open_rate'),
+      key: 'open_rate', label: "Open Rate",
       render: (item) => <span>{item.open_rate ? `${item.open_rate}%` : '--'}</span>,
     },
     {
-      key: 'click_rate', label: t('newsletters.label_click_rate'),
+      key: 'click_rate', label: "Click Rate",
       render: (item) => <span>{item.click_rate ? `${item.click_rate}%` : '--'}</span>,
     },
     {
-      key: 'created_at', label: t('newsletters.col_date'), sortable: true,
+      key: 'created_at', label: "Date", sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
           {item.sent_at
@@ -168,13 +166,13 @@ export function NewsletterList() {
       ),
     },
     {
-      key: 'actions' as keyof NewsletterItem, label: t('newsletters.label_actions'),
+      key: 'actions' as keyof NewsletterItem, label: "Actions",
       render: (item) => (
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="light" aria-label={t('newsletters.label_newsletter_actions')}><MoreVertical size={16} /></Button>
+            <Button isIconOnly size="sm" variant="light" aria-label={"Actions"}><MoreVertical size={16} /></Button>
           </DropdownTrigger>
-          <DropdownMenu aria-label={t('newsletters.label_newsletter_actions')} onAction={(key) => {
+          <DropdownMenu aria-label={"Actions"} onAction={(key) => {
             if (key === 'edit') navigate(tenantPath(`/admin/newsletters/edit/${item.id}`));
             else if (key === 'stats') navigate(tenantPath(`/admin/newsletters/${item.id}/stats`));
             else if (key === 'activity') navigate(tenantPath(`/admin/newsletters/${item.id}/activity`));
@@ -183,37 +181,37 @@ export function NewsletterList() {
             else if (key === 'resend') setResendTarget(item.id);
             else if (key === 'delete') setDeleteTarget(item);
           }}>
-            <DropdownItem key="edit" startContent={<Edit size={14} />}>{t('newsletters.edit')}</DropdownItem>
+            <DropdownItem key="edit" startContent={<Edit size={14} />}>{"Edit"}</DropdownItem>
             <DropdownItem
               key="send"
               startContent={<Send size={14} />}
               className={item.status === 'draft' || item.status === 'scheduled' ? '' : 'hidden'}
             >
-              {t('newsletters.send_now')}
+              {"Send Now"}
             </DropdownItem>
             <DropdownItem
               key="stats"
               startContent={<BarChart3 size={14} />}
               className={item.status === 'sent' || item.status === 'sending' ? '' : 'hidden'}
             >
-              {t('newsletters.stats')}
+              {"Stats"}
             </DropdownItem>
             <DropdownItem
               key="activity"
               startContent={<Activity size={14} />}
               className={item.status === 'sent' ? '' : 'hidden'}
             >
-              {t('newsletters.activity_log')}
+              {"Activity Log"}
             </DropdownItem>
-            <DropdownItem key="duplicate" startContent={<Copy size={14} />}>{t('newsletters.duplicate')}</DropdownItem>
+            <DropdownItem key="duplicate" startContent={<Copy size={14} />}>{"Duplicate"}</DropdownItem>
             <DropdownItem
               key="resend"
               startContent={<Send size={14} />}
               className={item.status === 'sent' ? '' : 'hidden'}
             >
-              {t('newsletters.resend_to_non_openers')}
+              {"Resend to Non Openers"}
             </DropdownItem>
-            <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">{t('newsletters.delete')}</DropdownItem>
+            <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">{"Delete"}</DropdownItem>
           </DropdownMenu>
         </Dropdown>
       ),
@@ -223,12 +221,12 @@ export function NewsletterList() {
   return (
     <div>
       <PageHeader
-        title={t('newsletters.newsletter_list_title')}
-        description={t('newsletters.newsletter_list_desc')}
+        title={"Newsletter List"}
+        description={"View and manage all newsletter campaigns"}
         actions={
           <div className="flex gap-2">
-            <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('common.refresh')}</Button>
-            <Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/newsletters/create'))}>{t('newsletters.create_newsletter')}</Button>
+            <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{"Refresh"}</Button>
+            <Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/newsletters/create'))}>{"Create Newsletter"}</Button>
           </div>
         }
       />
@@ -236,7 +234,7 @@ export function NewsletterList() {
         columns={columns}
         data={items}
         isLoading={loading}
-        searchPlaceholder={t('newsletters.search_newsletters_placeholder')}
+        searchPlaceholder={"Enter search newsletters..."}
         totalItems={total}
         page={page}
         pageSize={20}
@@ -245,8 +243,8 @@ export function NewsletterList() {
         emptyContent={
           <div className="flex flex-col items-center gap-2 py-8 text-default-400">
             <Mail size={40} />
-            <p>{t('newsletters.no_newsletters_found')}</p>
-            <p className="text-xs">{t('newsletters.create_first_newsletter')}</p>
+            <p>{"No newsletters found found"}</p>
+            <p className="text-xs">{"Create First Newsletter"}</p>
           </div>
         }
       />
@@ -256,9 +254,9 @@ export function NewsletterList() {
           isOpen={!!deleteTarget}
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
-          title={t('newsletters.delete_newsletter')}
-          message={t('newsletters.confirm_delete_newsletter', { name: deleteTarget.subject || deleteTarget.name })}
-          confirmLabel={t('newsletters.delete')}
+          title={"Delete Newsletter"}
+          message={`Are you sure you want to delete newsletter?`}
+          confirmLabel={"Delete"}
           confirmColor="danger"
           isLoading={deleting}
         />
@@ -269,9 +267,9 @@ export function NewsletterList() {
           isOpen={!!sendTarget}
           onClose={() => setSendTarget(null)}
           onConfirm={handleSendNow}
-          title={t('newsletters.send_newsletter_now')}
-          message={t('newsletters.confirm_send_newsletter', { name: sendTarget.subject || sendTarget.name })}
-          confirmLabel={t('newsletters.send_now')}
+          title={"Send Newsletter Now"}
+          message={`Are you sure you want to send newsletter?`}
+          confirmLabel={"Send Now"}
           confirmColor="primary"
           isLoading={sendingId === sendTarget.id}
         />

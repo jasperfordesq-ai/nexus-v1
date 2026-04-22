@@ -93,13 +93,13 @@ export function VerificationAuditLog() {
       <CardHeader className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center px-6 pt-5 pb-0">
         <div className="flex items-center gap-2">
           <ScrollText className="w-5 h-5 text-indigo-500" />
-          <h3 className="text-lg font-semibold">{t('verification.audit_log_title')}</h3>
-          <Chip size="sm" variant="flat">{t('verification.total_events', { count: total })}</Chip>
+          <h3 className="text-lg font-semibold">{"Verification Audit Log"}</h3>
+          <Chip size="sm" variant="flat">{`${total} events`}</Chip>
         </div>
         <div className="flex items-center gap-2">
           <Select
             size="sm"
-            placeholder={t('verification.filter_all_events')}
+            placeholder={"Filter events..."}
             className="w-48"
             selectedKeys={filterType ? [filterType] : []}
             onSelectionChange={(keys) => {
@@ -114,7 +114,7 @@ export function VerificationAuditLog() {
               </SelectItem>
             ))}
           </Select>
-          <Button isIconOnly size="sm" variant="flat" onPress={fetchEvents} aria-label={t('verification.refresh_aria')}>
+          <Button isIconOnly size="sm" variant="flat" onPress={fetchEvents} aria-label={"Refresh audit log"}>
             <RefreshCw className="w-4 h-4" />
           </Button>
         </div>
@@ -125,17 +125,17 @@ export function VerificationAuditLog() {
             <Spinner size="lg" />
           </div>
         ) : events.length === 0 ? (
-          <p className="text-center py-8 text-theme-muted">{t('verification.no_events')}</p>
+          <p className="text-center py-8 text-theme-muted">{"No audit events found."}</p>
         ) : (
           <>
-            <Table aria-label={t('verification.audit_log_aria')} removeWrapper>
+            <Table aria-label={"Verification audit log"} removeWrapper>
               <TableHeader>
-                <TableColumn>{t('system.col_time')}</TableColumn>
-                <TableColumn>{t('system.col_user')}</TableColumn>
-                <TableColumn>{t('system.col_event')}</TableColumn>
-                <TableColumn>{t('system.col_actor')}</TableColumn>
-                <TableColumn>{t('system.col_ip')}</TableColumn>
-                <TableColumn>{t('system.col_details')}</TableColumn>
+                <TableColumn>{"Time"}</TableColumn>
+                <TableColumn>{"User"}</TableColumn>
+                <TableColumn>{"Event"}</TableColumn>
+                <TableColumn>{"Actor"}</TableColumn>
+                <TableColumn>{"IP"}</TableColumn>
+                <TableColumn>{"Details"}</TableColumn>
               </TableHeader>
               <TableBody>
                 {events.map((event) => {
@@ -187,7 +187,7 @@ export function VerificationAuditLog() {
             {totalPages > 1 && (
               <div className="flex justify-between items-center mt-4">
                 <span className="text-sm text-theme-muted">
-                  {t('verification.page_of', { page: page + 1, total: totalPages })}
+                  {`Page ${page + 1} of ${totalPages}`}
                 </span>
                 <div className="flex gap-2">
                   <Button
@@ -197,7 +197,7 @@ export function VerificationAuditLog() {
                     onPress={() => setPage((p) => p - 1)}
                     startContent={<ChevronLeft className="w-4 h-4" />}
                   >
-                    {t('common.previous')}
+                    {"Previous"}
                   </Button>
                   <Button
                     size="sm"
@@ -206,7 +206,7 @@ export function VerificationAuditLog() {
                     onPress={() => setPage((p) => p + 1)}
                     endContent={<ChevronRight className="w-4 h-4" />}
                   >
-                    {t('common.next')}
+                    {"Next"}
                   </Button>
                 </div>
               </div>

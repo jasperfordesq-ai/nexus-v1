@@ -19,7 +19,6 @@ import type { ExchangeDetail as ExchangeDetailType } from '../../api/types';
 import { PageHeader } from '../../components/PageHeader';
 import { useTenant } from '@/contexts';
 
-import { useTranslation } from 'react-i18next';
 const STATUS_COLORS: Record<string, 'warning' | 'success' | 'danger' | 'default' | 'primary'> = {
   pending_broker: 'warning',
   accepted: 'success',
@@ -30,8 +29,7 @@ const STATUS_COLORS: Record<string, 'warning' | 'success' | 'danger' | 'default'
 };
 
 export default function ExchangeDetail() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('broker.page_title'));
+  usePageTitle("Broker Controls");
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();
   const [data, setData] = useState<ExchangeDetailType | null>(null);
@@ -45,10 +43,10 @@ export default function ExchangeDetail() {
       if (res.success && res.data) {
         setData(res.data);
       } else {
-        setError(t('broker.exchange_not_found'));
+        setError("Exchange Not Found");
       }
     } catch {
-      setError(t('broker.failed_to_load_exchange'));
+      setError("Failed to load exchange");
     } finally {
       setLoading(false);
     }
@@ -70,7 +68,7 @@ export default function ExchangeDetail() {
   if (error || !data) {
     return (
       <div className="text-center py-12">
-        <p className="text-danger">{error || t('broker.exchange_not_found')}</p>
+        <p className="text-danger">{error || "Exchange Not Found"}</p>
         <Button
           as={Link}
           to={tenantPath('/admin/broker-controls/exchanges')}
@@ -78,7 +76,7 @@ export default function ExchangeDetail() {
           className="mt-4"
           startContent={<ArrowLeft className="w-4 h-4" />}
         >
-          {t('broker.back_to_exchanges')}
+          {"Back to Exchanges"}
         </Button>
       </div>
     );
@@ -91,7 +89,7 @@ export default function ExchangeDetail() {
     <div className="space-y-6">
       <PageHeader
         title={`Exchange #${exchange.id}`}
-        description={exchange.listing_title ?? t('broker.exchange_request')}
+        description={exchange.listing_title ?? "Exchange Request"}
         actions={
           <Button
             as={Link}
@@ -100,7 +98,7 @@ export default function ExchangeDetail() {
             startContent={<ArrowLeft className="w-4 h-4" />}
             size="sm"
           >
-            {t('common.back')}
+            {"Back"}
           </Button>
         }
       />
@@ -109,19 +107,19 @@ export default function ExchangeDetail() {
       <Card shadow="sm">
         <CardBody className="flex flex-row items-center justify-between">
           <div className="space-y-1">
-            <p className="text-sm text-default-500">{t('broker.status')}</p>
+            <p className="text-sm text-default-500">{"Status"}</p>
             <Chip color={statusColor} variant="flat" size="sm" className="capitalize">
               {exchange.status.replace(/_/g, ' ')}
             </Chip>
           </div>
           {exchange.final_hours !== undefined && exchange.final_hours !== null && (
             <div className="space-y-1 text-center">
-              <p className="text-sm text-default-500">{t('broker.hours')}</p>
+              <p className="text-sm text-default-500">{"Hours"}</p>
               <p className="text-sm font-semibold">{exchange.final_hours}h</p>
             </div>
           )}
           <div className="space-y-1 text-right">
-            <p className="text-sm text-default-500">{t('broker.created')}</p>
+            <p className="text-sm text-default-500">{"Created"}</p>
             <p className="text-sm">{new Date(exchange.created_at).toLocaleString()}</p>
           </div>
         </CardBody>
@@ -132,7 +130,7 @@ export default function ExchangeDetail() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
             <User className="w-4 h-4" />
-            <span className="font-semibold">{t('broker.requester')}</span>
+            <span className="font-semibold">{"Requester"}</span>
           </CardHeader>
           <Divider />
           <CardBody>
@@ -145,7 +143,7 @@ export default function ExchangeDetail() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
             <User className="w-4 h-4" />
-            <span className="font-semibold">{t('broker.provider')}</span>
+            <span className="font-semibold">{"Provider"}</span>
           </CardHeader>
           <Divider />
           <CardBody>
@@ -162,7 +160,7 @@ export default function ExchangeDetail() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
             <Shield className="w-4 h-4 text-warning" />
-            <span className="font-semibold">{t('broker.risk_tag')}</span>
+            <span className="font-semibold">{"Risk Tag"}</span>
           </CardHeader>
           <Divider />
           <CardBody>
@@ -182,13 +180,13 @@ export default function ExchangeDetail() {
             )}
             <div className="flex gap-3 mt-3">
               {risk_tag.requires_approval && (
-                <Chip size="sm" variant="dot" color="warning">{t('broker.approval_required')}</Chip>
+                <Chip size="sm" variant="dot" color="warning">{"Approval Required"}</Chip>
               )}
               {risk_tag.insurance_required && (
-                <Chip size="sm" variant="dot" color="warning">{t('broker.insurance_required')}</Chip>
+                <Chip size="sm" variant="dot" color="warning">{"Insurance Required"}</Chip>
               )}
               {risk_tag.dbs_required && (
-                <Chip size="sm" variant="dot" color="warning">{t('broker.dbs_required')}</Chip>
+                <Chip size="sm" variant="dot" color="warning">{"Dbs Required"}</Chip>
               )}
             </div>
           </CardBody>
@@ -198,7 +196,7 @@ export default function ExchangeDetail() {
       {/* Broker Notes */}
       {exchange.broker_notes && (
         <Card shadow="sm">
-          <CardHeader><span className="font-semibold">{t('broker.broker_notes')}</span></CardHeader>
+          <CardHeader><span className="font-semibold">{"Broker Notes"}</span></CardHeader>
           <Divider />
           <CardBody>
             <p className="text-sm">{exchange.broker_notes}</p>
@@ -209,7 +207,7 @@ export default function ExchangeDetail() {
       {/* Broker Conditions */}
       {exchange.broker_conditions && (
         <Card shadow="sm">
-          <CardHeader><span className="font-semibold">{t('broker.broker_conditions')}</span></CardHeader>
+          <CardHeader><span className="font-semibold">{"Broker Conditions"}</span></CardHeader>
           <Divider />
           <CardBody>
             <p className="text-sm">{exchange.broker_conditions}</p>
@@ -221,12 +219,12 @@ export default function ExchangeDetail() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
           <Clock className="w-4 h-4" />
-          <span className="font-semibold">{t('broker.history')}</span>
+          <span className="font-semibold">{"History"}</span>
         </CardHeader>
         <Divider />
         <CardBody>
           {history.length === 0 ? (
-            <p className="text-sm text-default-500">{t('broker.no_history_recorded')}</p>
+            <p className="text-sm text-default-500">{"No history recorded found"}</p>
           ) : (
             <div className="space-y-3">
               {history.map((entry) => (

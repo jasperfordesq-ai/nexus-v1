@@ -42,27 +42,27 @@ function SlaChip({ createdAt, t }: { createdAt: string; t: (key: string, opts?: 
     const days = Math.abs(daysRemaining);
     return (
       <Chip size="sm" variant="flat" color="danger">
-        {days === 1 ? t('enterprise.sla_overdue', { days }) : t('enterprise.sla_overdue_plural', { days })}
+        {days === 1 ? `SLA Overdue` : `SLA Overdue Plural`}
       </Chip>
     );
   }
   if (daysRemaining <= 7) {
     return (
       <Chip size="sm" variant="flat" color="warning">
-        {daysRemaining === 1 ? t('enterprise.sla_days_left', { days: daysRemaining }) : t('enterprise.sla_days_left_plural', { days: daysRemaining })}
+        {daysRemaining === 1 ? `SLA Days Left` : `SLA Days Left Plural`}
       </Chip>
     );
   }
   return (
     <Chip size="sm" variant="flat" color="success">
-      {t('enterprise.sla_days_left_plural', { days: daysRemaining })}
+      {`SLA Days Left Plural`}
     </Chip>
   );
 }
 
 export function GdprRequests() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('enterprise.page_title'));
+  usePageTitle("Enterprise");
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -92,7 +92,7 @@ export function GdprRequests() {
         }
       }
     } catch {
-      toast.error(t('enterprise.failed_to_load_g_d_p_r_requests'));
+      toast.error("Failed to load GDPR requests");
     } finally {
       setLoading(false);
     }
@@ -107,66 +107,66 @@ export function GdprRequests() {
       const res = await adminEnterprise.updateGdprRequest(id, { status: newStatus });
 
       if (res.success) {
-        toast.success(t('enterprise.request_updated', { status: newStatus }));
+        toast.success(`Request Updated`);
         loadData();
       } else {
-        const error = (res as { error?: string }).error || t('enterprise.update_failed');
+        const error = (res as { error?: string }).error || "Update Failed";
         toast.error(error);
       }
     } catch (err) {
-      toast.error(t('enterprise.failed_to_update_request'));
+      toast.error("Failed to update request");
       console.error('GDPR request update error:', err);
     }
   };
 
   const columns: Column<GdprRequest>[] = [
-    { key: 'id', label: t('enterprise.col_id'), sortable: true },
-    { key: 'user_name', label: t('enterprise.col_user'), sortable: true },
+    { key: 'id', label: "ID", sortable: true },
+    { key: 'user_name', label: "User", sortable: true },
     {
       key: 'type',
-      label: t('enterprise.col_type'),
+      label: "Type",
       sortable: true,
       render: (r) => <span className="capitalize">{r.type}</span>,
     },
     {
       key: 'status',
-      label: t('enterprise.col_status'),
+      label: "Status",
       sortable: true,
       render: (r) => <StatusBadge status={r.status} />,
     },
     {
       key: 'sla',
-      label: t('enterprise.col_sla'),
+      label: "SLA",
       render: (r) => <SlaChip createdAt={r.created_at} t={t} />,
     },
     {
       key: 'created_at',
-      label: t('enterprise.col_created'),
+      label: "Created",
       sortable: true,
       render: (r) => new Date(r.created_at).toLocaleDateString(),
     },
     {
       key: 'actions',
-      label: t('enterprise.col_actions'),
+      label: "Actions",
       render: (r) => (
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="light" aria-label={t('enterprise.label_actions')}>
+            <Button isIconOnly size="sm" variant="light" aria-label={"Actions"}>
               <MoreVertical size={14} />
             </Button>
           </DropdownTrigger>
-          <DropdownMenu aria-label={t('enterprise.label_request_actions')}>
+          <DropdownMenu aria-label={"Request Actions"}>
             <DropdownItem key="view" onPress={() => navigate(tenantPath(`/admin/enterprise/gdpr/requests/${r.id}`))}>
-              {t('enterprise.view_details')}
+              {"View Details"}
             </DropdownItem>
             <DropdownItem key="processing" onPress={() => handleStatusUpdate(r.id, 'processing')}>
-              {t('enterprise.mark_processing')}
+              {"Mark Processing"}
             </DropdownItem>
             <DropdownItem key="completed" onPress={() => handleStatusUpdate(r.id, 'completed')}>
-              {t('enterprise.mark_completed')}
+              {"Mark Completed"}
             </DropdownItem>
             <DropdownItem key="rejected" className="text-danger" color="danger" onPress={() => handleStatusUpdate(r.id, 'rejected')}>
-              {t('enterprise.reject')}
+              {"Reject"}
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>
@@ -177,8 +177,8 @@ export function GdprRequests() {
   return (
     <div>
       <PageHeader
-        title={t('enterprise.gdpr_requests_title')}
-        description={t('enterprise.gdpr_requests_desc')}
+        title={"GDPR Requests"}
+        description={"View and manage GDPR data requests (access, deletion, portability)"}
         actions={
           <div className="flex gap-2">
             <Button
@@ -188,7 +188,7 @@ export function GdprRequests() {
               isLoading={loading}
               size="sm"
             >
-              {t('common.refresh')}
+              {"Refresh"}
             </Button>
             <Button
               color="primary"
@@ -196,7 +196,7 @@ export function GdprRequests() {
               onPress={() => navigate(tenantPath('/admin/enterprise/gdpr/requests/create'))}
               size="sm"
             >
-              {t('enterprise.create_request')}
+              {"Create Request"}
             </Button>
           </div>
         }
@@ -204,7 +204,7 @@ export function GdprRequests() {
 
       <div className="mb-4">
         <Select
-          label={t('enterprise.label_filter_by_status')}
+          label={"Filter by Status"}
           selectedKeys={new Set([statusFilter])}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0] as string;
@@ -229,7 +229,7 @@ export function GdprRequests() {
         page={page}
         onPageChange={setPage}
         searchable={false}
-        emptyContent={t('enterprise.no_gdpr_requests')}
+        emptyContent={"No GDPR requests"}
       />
     </div>
   );

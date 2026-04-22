@@ -79,13 +79,13 @@ export function PlansAdmin() {
     try {
       const res = await adminPlans.syncStripe(plan.id);
       if (res.success) {
-        toast.success(t('content.stripe_plan_synced', { name: plan.name }));
+        toast.success(`${plan.name} synced to Stripe`);
         fetchData();
       } else {
-        toast.error(t('content.stripe_sync_failed'));
+        toast.error("Stripe sync failed");
       }
     } catch {
-      toast.error(t('content.stripe_sync_failed_key_missing'));
+      toast.error("Stripe sync failed — ensure STRIPE_SECRET_KEY is configured");
     } finally {
       setSyncingId(null);
     }

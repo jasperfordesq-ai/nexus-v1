@@ -125,7 +125,7 @@ const STEP_ICONS: Record<string, typeof Sparkles> = {
 
 export function OnboardingSettings() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('system.onboarding.page_title'));
+  usePageTitle("System");
   const toast = useToast();
   const { tenant, tenantPath } = useTenant();
   const navigate = useNavigate();
@@ -141,20 +141,20 @@ export function OnboardingSettings() {
   const presetModal = useDisclosure();
 
   const LISTING_MODES = [
-    { key: 'disabled', label: t('system.onboarding.listing_mode_disabled'), description: t('system.onboarding.listing_mode_disabled_desc') },
-    { key: 'suggestions_only', label: t('system.onboarding.listing_mode_suggestions'), description: t('system.onboarding.listing_mode_suggestions_desc') },
-    { key: 'draft', label: t('system.onboarding.listing_mode_draft'), description: t('system.onboarding.listing_mode_draft_desc') },
-    { key: 'pending_review', label: t('system.onboarding.listing_mode_pending'), description: t('system.onboarding.listing_mode_pending_desc') },
-    { key: 'active', label: t('system.onboarding.listing_mode_active'), description: t('system.onboarding.listing_mode_active_desc') },
+    { key: 'disabled', label: "Disabled (no listings during onboarding)", description: "Members cannot create listings during onboarding" },
+    { key: 'suggestions_only', label: "Suggestions (show templates)", description: "Members are shown suggested listing templates to choose from" },
+    { key: 'draft', label: "Draft (admin review required)", description: "New listings are saved as drafts for admin review" },
+    { key: 'pending_review', label: "Pending (awaiting approval)", description: "New listings are held as pending until approved by an admin" },
+    { key: 'active', label: "Active (published immediately)", description: "New listings are published immediately as active" },
   ];
 
   const STEPS_CONFIG = [
-    { key: 'welcome', label: t('system.onboarding.step_welcome'), description: t('system.onboarding.step_welcome_desc') },
-    { key: 'profile', label: t('system.onboarding.step_profile'), description: t('system.onboarding.step_profile_desc') },
-    { key: 'interests', label: t('system.onboarding.step_interests'), description: t('system.onboarding.step_interests_desc') },
-    { key: 'skills', label: t('system.onboarding.step_skills'), description: t('system.onboarding.step_skills_desc') },
-    { key: 'safeguarding', label: t('system.onboarding.step_safeguarding'), description: t('system.onboarding.step_safeguarding_desc') },
-    { key: 'confirm', label: t('system.onboarding.step_confirm'), description: t('system.onboarding.step_confirm_desc') },
+    { key: 'welcome', label: "Step Welcome", description: "Welcome step introducing members to the platform" },
+    { key: 'profile', label: "Step Profile", description: "Step where members fill in their profile information" },
+    { key: 'interests', label: "Step Interests", description: "Step where members choose their interests and categories" },
+    { key: 'skills', label: "Step Skills", description: "Step where members add their skills and what they can offer" },
+    { key: 'safeguarding', label: "Step Safeguarding", description: "Step where members complete safeguarding declarations" },
+    { key: 'confirm', label: "Step Confirm", description: "Final confirmation step where members review and submit their profile" },
   ];
 
   // ── Fetch config on mount ────────────────────────────────────────────────
@@ -171,7 +171,7 @@ export function OnboardingSettings() {
       }
     } catch (error) {
       logError('Failed to load onboarding config', error);
-      toast.error(t('system.onboarding.failed_to_load'), t('system.onboarding.please_try_again'));
+      toast.error("Failed to load", "Please try again");
     } finally {
       setLoading(false);
     }
@@ -187,13 +187,13 @@ export function OnboardingSettings() {
       setSaving(true);
       const res = await api.put('/v2/admin/config/onboarding', config);
       if (res.success) {
-        toast.success(t('system.onboarding.settings_saved'), t('system.onboarding.config_updated'));
+        toast.success("Settings Saved", "Config Updated");
       } else {
-        toast.error(t('system.onboarding.save_failed'), res.error || t('system.onboarding.please_try_again'));
+        toast.error("Save Failed", res.error || "Please try again");
       }
     } catch (error) {
       logError('Failed to save onboarding config', error);
-      toast.error(t('system.onboarding.save_failed'), t('system.onboarding.please_try_again'));
+      toast.error("Save Failed", "Please try again");
     } finally {
       setSaving(false);
     }
@@ -211,18 +211,18 @@ export function OnboardingSettings() {
       if (res.success) {
         const created = res.data?.options_created ?? [];
         if (created.length > 0) {
-          toast.success(t('system.onboarding.preset_applied'), t('system.onboarding.preset_created_options', { count: created.length }));
+          toast.success("Preset Applied", `Preset applied and options created`);
         } else {
-          toast.info(t('system.onboarding.no_changes'), t('system.onboarding.preset_already_exists'));
+          toast.info("No changes", "A preset with this name already exists");
         }
         presetModal.onClose();
         fetchConfig();
       } else {
-        toast.error(t('system.onboarding.failed_to_apply_preset'), res.error || t('system.onboarding.please_try_again'));
+        toast.error("Failed to apply preset", res.error || "Please try again");
       }
     } catch (error) {
       logError('Failed to apply preset', error);
-      toast.error(t('system.onboarding.failed_to_apply_preset'), t('system.onboarding.please_try_again'));
+      toast.error("Failed to apply preset", "Please try again");
     } finally {
       setApplyingPreset(false);
     }
@@ -249,8 +249,8 @@ export function OnboardingSettings() {
   return (
     <div>
       <PageHeader
-        title={t('system.onboarding.page_title')}
-        description={t('system.onboarding.page_description', { name: tenant?.name || t('system.onboarding.your_community') })}
+        title={"System"}
+        description={`Configure the onboarding flow for new members`}
       />
 
       <div className="space-y-6">
@@ -258,20 +258,20 @@ export function OnboardingSettings() {
         {/* Section 1: Module Control */}
         <Card shadow="sm">
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
-            <h3 className="text-lg font-semibold">{t('system.onboarding.module_control')}</h3>
-            <p className="text-sm text-theme-muted">{t('system.onboarding.module_control_desc')}</p>
+            <h3 className="text-lg font-semibold">{"Module Control"}</h3>
+            <p className="text-sm text-theme-muted">{"Control which modules are available during the onboarding flow"}</p>
           </CardHeader>
           <CardBody className="gap-4">
             <Switch isSelected={config.enabled} onValueChange={(v) => updateConfig('enabled', v)}>
               <div>
-                <p className="font-medium">{t('system.onboarding.onboarding_enabled')}</p>
-                <p className="text-xs text-theme-muted">{t('system.onboarding.onboarding_enabled_desc')}</p>
+                <p className="font-medium">{"Onboarding Enabled"}</p>
+                <p className="text-xs text-theme-muted">{"Enable or disable the guided onboarding flow for new members"}</p>
               </div>
             </Switch>
             <Switch isSelected={config.mandatory} onValueChange={(v) => updateConfig('mandatory', v)} isDisabled={!config.enabled}>
               <div>
-                <p className="font-medium">{t('system.onboarding.onboarding_mandatory')}</p>
-                <p className="text-xs text-theme-muted">{t('system.onboarding.onboarding_mandatory_desc')}</p>
+                <p className="font-medium">{"Onboarding Mandatory"}</p>
+                <p className="text-xs text-theme-muted">{"Require new members to complete onboarding before accessing the platform"}</p>
               </div>
             </Switch>
           </CardBody>
@@ -280,8 +280,8 @@ export function OnboardingSettings() {
         {/* Section 2: Step Configuration */}
         <Card shadow="sm">
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
-            <h3 className="text-lg font-semibold">{t('system.onboarding.step_configuration')}</h3>
-            <p className="text-sm text-theme-muted">{t('system.onboarding.step_configuration_desc')}</p>
+            <h3 className="text-lg font-semibold">{"Step Configuration"}</h3>
+            <p className="text-sm text-theme-muted">{"Configure the steps shown in the onboarding wizard"}</p>
           </CardHeader>
           <CardBody>
             <div className="space-y-3">
@@ -302,12 +302,12 @@ export function OnboardingSettings() {
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
-                      <Switch size="sm" isSelected={isEnabled} onValueChange={(v) => updateConfig(enabledKey, v)} aria-label={t('system.onboarding.enable_step', { step: step.label })}>
-                        <span className="text-xs">{t('system.onboarding.enabled')}</span>
+                      <Switch size="sm" isSelected={isEnabled} onValueChange={(v) => updateConfig(enabledKey, v)} aria-label={`Enable Step`}>
+                        <span className="text-xs">{"Enabled"}</span>
                       </Switch>
                       {hasRequired && (
-                        <Switch size="sm" isSelected={config[requiredKey] as boolean} onValueChange={(v) => updateConfig(requiredKey, v)} isDisabled={!isEnabled} aria-label={t('system.onboarding.require_step', { step: step.label })}>
-                          <span className="text-xs">{t('system.onboarding.required')}</span>
+                        <Switch size="sm" isSelected={config[requiredKey] as boolean} onValueChange={(v) => updateConfig(requiredKey, v)} isDisabled={!isEnabled} aria-label={`Require Step`}>
+                          <span className="text-xs">{"Required"}</span>
                         </Switch>
                       )}
                     </div>
@@ -321,23 +321,23 @@ export function OnboardingSettings() {
         {/* Section 3: Profile Requirements */}
         <Card shadow="sm">
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
-            <h3 className="text-lg font-semibold">{t('system.onboarding.profile_requirements')}</h3>
-            <p className="text-sm text-theme-muted">{t('system.onboarding.profile_requirements_desc')}</p>
+            <h3 className="text-lg font-semibold">{"Profile Requirements"}</h3>
+            <p className="text-sm text-theme-muted">{"Set the minimum profile requirements members must complete"}</p>
           </CardHeader>
           <CardBody className="gap-4">
             <Switch isSelected={config.avatar_required} onValueChange={(v) => updateConfig('avatar_required', v)}>
               <div>
-                <p className="font-medium">{t('system.onboarding.require_photo')}</p>
-                <p className="text-xs text-theme-muted">{t('system.onboarding.require_photo_desc')}</p>
+                <p className="font-medium">{"Require Photo"}</p>
+                <p className="text-xs text-theme-muted">{"Require members to upload a profile photo before continuing"}</p>
               </div>
             </Switch>
             <Switch isSelected={config.bio_required} onValueChange={(v) => updateConfig('bio_required', v)}>
               <div>
-                <p className="font-medium">{t('system.onboarding.require_bio')}</p>
-                <p className="text-xs text-theme-muted">{t('system.onboarding.require_bio_desc')}</p>
+                <p className="font-medium">{"Require Bio"}</p>
+                <p className="text-xs text-theme-muted">{"Require members to fill in their bio before continuing"}</p>
               </div>
             </Switch>
-            <Input type="number" label={t('system.onboarding.min_bio_length')} value={String(config.bio_min_length)} onValueChange={(v) => updateConfig('bio_min_length', parseInt(v) || 0)} variant="bordered" min={0} max={500} description={t('system.onboarding.min_bio_length_desc')} isDisabled={!config.bio_required} className="max-w-xs" />
+            <Input type="number" label={"Min Bio Length"} value={String(config.bio_min_length)} onValueChange={(v) => updateConfig('bio_min_length', parseInt(v) || 0)} variant="bordered" min={0} max={500} description={"Minimum number of characters required in the member bio"} isDisabled={!config.bio_required} className="max-w-xs" />
           </CardBody>
         </Card>
 
@@ -346,12 +346,12 @@ export function OnboardingSettings() {
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <ListChecks className="w-5 h-5" />
-              {t('system.onboarding.listing_creation')}
+              {"Listing Creation"}
             </h3>
-            <p className="text-sm text-theme-muted">{t('system.onboarding.listing_creation_desc')}</p>
+            <p className="text-sm text-theme-muted">{"Configure when and how new listings are published during onboarding"}</p>
           </CardHeader>
           <CardBody className="gap-4">
-            <Select label={t('system.onboarding.listing_creation_mode')} selectedKeys={[config.listing_creation_mode]} onSelectionChange={(keys) => { const key = Array.from(keys)[0] as string; updateConfig('listing_creation_mode', key); }} variant="bordered" description={LISTING_MODES.find(m => m.key === config.listing_creation_mode)?.description}>
+            <Select label={"Listing Creation Mode"} selectedKeys={[config.listing_creation_mode]} onSelectionChange={(keys) => { const key = Array.from(keys)[0] as string; updateConfig('listing_creation_mode', key); }} variant="bordered" description={LISTING_MODES.find(m => m.key === config.listing_creation_mode)?.description}>
               {LISTING_MODES.map((mode) => (
                 <SelectItem key={mode.key} textValue={mode.label}>
                   <div>
@@ -362,7 +362,7 @@ export function OnboardingSettings() {
               ))}
             </Select>
             {config.listing_creation_mode !== 'disabled' && config.listing_creation_mode !== 'suggestions_only' && (
-              <Input type="number" label={t('system.onboarding.max_auto_listings')} value={String(config.listing_max_auto)} onValueChange={(v) => updateConfig('listing_max_auto', Math.min(10, Math.max(0, parseInt(v) || 0)))} variant="bordered" min={0} max={10} description={t('system.onboarding.max_auto_listings_desc')} className="max-w-xs" />
+              <Input type="number" label={"Max Auto Listings"} value={String(config.listing_max_auto)} onValueChange={(v) => updateConfig('listing_max_auto', Math.min(10, Math.max(0, parseInt(v) || 0)))} variant="bordered" min={0} max={10} description={"Maximum number of listings that can be auto-created during onboarding"} className="max-w-xs" />
             )}
           </CardBody>
         </Card>
@@ -372,27 +372,27 @@ export function OnboardingSettings() {
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Eye className="w-5 h-5" />
-              {t('system.onboarding.visibility_gating')}
+              {"Visibility Gating"}
             </h3>
-            <p className="text-sm text-theme-muted">{t('system.onboarding.visibility_gating_desc')}</p>
+            <p className="text-sm text-theme-muted">{"Control what content members can see before completing onboarding"}</p>
           </CardHeader>
           <CardBody className="gap-4">
             <Switch isSelected={config.require_completion_for_visibility} onValueChange={(v) => updateConfig('require_completion_for_visibility', v)}>
               <div>
-                <p className="font-medium">{t('system.onboarding.require_completion')}</p>
-                <p className="text-xs text-theme-muted">{t('system.onboarding.require_completion_desc')}</p>
+                <p className="font-medium">{"Require Completion"}</p>
+                <p className="text-xs text-theme-muted">{"Require members to fully complete this step before proceeding"}</p>
               </div>
             </Switch>
             <Switch isSelected={config.require_avatar_for_visibility} onValueChange={(v) => updateConfig('require_avatar_for_visibility', v)}>
               <div>
-                <p className="font-medium">{t('system.onboarding.require_avatar_visibility')}</p>
-                <p className="text-xs text-theme-muted">{t('system.onboarding.require_avatar_visibility_desc')}</p>
+                <p className="font-medium">{"Require Avatar Visibility"}</p>
+                <p className="text-xs text-theme-muted">{"Require members to set their avatar visibility preference"}</p>
               </div>
             </Switch>
             <Switch isSelected={config.require_bio_for_visibility} onValueChange={(v) => updateConfig('require_bio_for_visibility', v)}>
               <div>
-                <p className="font-medium">{t('system.onboarding.require_bio_visibility')}</p>
-                <p className="text-xs text-theme-muted">{t('system.onboarding.require_bio_visibility_desc')}</p>
+                <p className="font-medium">{"Require Bio Visibility"}</p>
+                <p className="text-xs text-theme-muted">{"Require members to set their bio visibility preference"}</p>
               </div>
             </Switch>
           </CardBody>
@@ -403,13 +403,13 @@ export function OnboardingSettings() {
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Shield className="w-5 h-5" />
-              {t('system.onboarding.safeguarding_config')}
+              {"Safeguarding Config"}
             </h3>
-            <p className="text-sm text-theme-muted">{t('system.onboarding.safeguarding_config_desc')}</p>
+            <p className="text-sm text-theme-muted">{"Configure safeguarding questions and options shown during onboarding"}</p>
           </CardHeader>
           <CardBody className="gap-4">
             <div className="flex items-end gap-3">
-              <Select label={t('system.onboarding.country_preset')} selectedKeys={[config.country_preset]} onSelectionChange={(keys) => { const key = Array.from(keys)[0] as string; updateConfig('country_preset', key); }} variant="bordered" description={t('system.onboarding.country_preset_desc')} className="max-w-xs">
+              <Select label={"Country Preset"} selectedKeys={[config.country_preset]} onSelectionChange={(keys) => { const key = Array.from(keys)[0] as string; updateConfig('country_preset', key); }} variant="bordered" description={"Apply a country preset to pre-fill registration policy settings"} className="max-w-xs">
                 {Object.keys(COUNTRY_PRESET_LABEL_KEYS).map((key) => {
                   const label = getCountryPresetLabel(key);
                   return (
@@ -423,23 +423,23 @@ export function OnboardingSettings() {
                 })}
               </Select>
               <Button color="secondary" variant="flat" onPress={presetModal.onOpen} isDisabled={config.country_preset === 'custom'}>
-                {t('system.onboarding.apply_preset')}
+                {"Apply Preset"}
               </Button>
             </div>
 
             <div className="flex items-start gap-2 p-3 rounded-lg bg-warning-50 dark:bg-warning-950/20 border border-warning-200 dark:border-warning-800">
               <AlertTriangle className="w-5 h-5 text-warning-600 flex-shrink-0 mt-0.5" />
               <div className="text-sm">
-                <p className="font-medium text-warning-700 dark:text-warning-400">{t('system.onboarding.legal_notice')}</p>
-                <p className="text-warning-600 dark:text-warning-500 mt-1">{t('system.onboarding.legal_notice_desc')}</p>
+                <p className="font-medium text-warning-700 dark:text-warning-400">{"Legal Notice"}</p>
+                <p className="text-warning-600 dark:text-warning-500 mt-1">{"Legal notice text shown to members during this onboarding step"}</p>
               </div>
             </div>
 
             <div className="p-4 rounded-lg bg-theme-elevated">
               <div className="flex items-center justify-between mb-2">
-                <p className="font-medium text-sm">{t('system.onboarding.configured_options')}</p>
+                <p className="font-medium text-sm">{"Configured Options"}</p>
                 <Chip size="sm" variant="flat" color={activeOptionCount > 0 ? 'success' : 'default'}>
-                  {t('system.onboarding.n_active', { count: activeOptionCount })}
+                  {`${activeOptionCount} active`}
                 </Chip>
               </div>
               {safeguardingOptions.filter(o => o.is_active).length > 0 ? (
@@ -449,20 +449,20 @@ export function OnboardingSettings() {
                       <CheckCircle className="w-3.5 h-3.5 text-success-500" />
                       <span>{opt.label}</span>
                       {opt.triggers && Object.values(opt.triggers).some(Boolean) && (
-                        <Chip size="sm" variant="flat" color="warning" className="text-xs">{t('system.onboarding.has_triggers')}</Chip>
+                        <Chip size="sm" variant="flat" color="warning" className="text-xs">{"Has Triggers"}</Chip>
                       )}
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-theme-muted">{t('system.onboarding.no_options_configured')}</p>
+                <p className="text-sm text-theme-muted">{"No options configured"}</p>
               )}
               <Button size="sm" variant="light" color="primary" className="mt-3" onPress={() => { navigate(tenantPath('/admin/safeguarding-options')); }}>
-                {t('system.onboarding.manage_options')}
+                {"Manage Options"}
               </Button>
             </div>
 
-            <Textarea label={t('system.onboarding.safeguarding_intro')} value={config.safeguarding_intro_text || ''} onValueChange={(v) => updateConfig('safeguarding_intro_text', v || null)} variant="bordered" placeholder={t('system.onboarding.safeguarding_intro_placeholder')} description={t('system.onboarding.safeguarding_intro_desc')} minRows={2} maxRows={5} />
+            <Textarea label={"Safeguarding Intro"} value={config.safeguarding_intro_text || ''} onValueChange={(v) => updateConfig('safeguarding_intro_text', v || null)} variant="bordered" placeholder={"Safeguarding introduction..."} description={"Introductory text explaining safeguarding to new members"} minRows={2} maxRows={5} />
           </CardBody>
         </Card>
 
@@ -471,20 +471,20 @@ export function OnboardingSettings() {
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              {t('system.onboarding.custom_text')}
+              {"Custom Text"}
             </h3>
-            <p className="text-sm text-theme-muted">{t('system.onboarding.custom_text_desc')}</p>
+            <p className="text-sm text-theme-muted">{"Custom text to display to members during this onboarding step"}</p>
           </CardHeader>
           <CardBody className="gap-4">
-            <Textarea label={t('system.onboarding.welcome_text')} value={config.welcome_text || ''} onValueChange={(v) => updateConfig('welcome_text', v || null)} variant="bordered" placeholder={t('system.onboarding.welcome_text_placeholder')} description={t('system.onboarding.welcome_text_desc')} minRows={2} maxRows={4} />
-            <Textarea label={t('system.onboarding.help_text')} value={config.help_text || ''} onValueChange={(v) => updateConfig('help_text', v || null)} variant="bordered" placeholder={t('system.onboarding.help_text_placeholder')} description={t('system.onboarding.help_text_desc')} minRows={2} maxRows={4} />
+            <Textarea label={"Welcome Text"} value={config.welcome_text || ''} onValueChange={(v) => updateConfig('welcome_text', v || null)} variant="bordered" placeholder={"Welcome message..."} description={"Welcome message shown to new members at the start of onboarding"} minRows={2} maxRows={4} />
+            <Textarea label={"Help Text"} value={config.help_text || ''} onValueChange={(v) => updateConfig('help_text', v || null)} variant="bordered" placeholder={"Help text..."} description={"Help text shown below the input during this onboarding step"} minRows={2} maxRows={4} />
           </CardBody>
         </Card>
 
         {/* Save Button */}
         <div className="flex justify-end">
           <Button color="primary" size="lg" startContent={!saving ? <Save className="w-5 h-5" /> : undefined} onPress={handleSave} isLoading={saving} isDisabled={saving}>
-            {t('system.onboarding.save_settings')}
+            {"Save Settings"}
           </Button>
         </div>
       </div>
@@ -492,14 +492,14 @@ export function OnboardingSettings() {
       {/* Preset Confirmation Modal */}
       <Modal isOpen={presetModal.isOpen} onClose={presetModal.onClose}>
         <ModalContent>
-          <ModalHeader>{t('system.onboarding.apply_country_preset')}</ModalHeader>
+          <ModalHeader>{"Apply Country Preset"}</ModalHeader>
           <ModalBody>
-            <p>{t('system.onboarding.preset_confirm', { country: getCountryPresetLabel(config.country_preset) })}</p>
-            <p className="text-sm text-theme-muted mt-2">{t('system.onboarding.preset_note')}</p>
+            <p>{`Are you sure you want to apply this preset? It will overwrite current settings.`}</p>
+            <p className="text-sm text-theme-muted mt-2">{"Applying a preset will overwrite your current registration policy settings"}</p>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={presetModal.onClose}>{t('cancel')}</Button>
-            <Button color="primary" onPress={handleApplyPreset} isLoading={applyingPreset} isDisabled={applyingPreset}>{t('system.onboarding.apply_preset')}</Button>
+            <Button variant="light" onPress={presetModal.onClose}>{"Cancel"}</Button>
+            <Button color="primary" onPress={handleApplyPreset} isLoading={applyingPreset} isDisabled={applyingPreset}>{"Apply Preset"}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

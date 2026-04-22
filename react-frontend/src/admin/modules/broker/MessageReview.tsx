@@ -32,10 +32,8 @@ import { adminBroker } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { BrokerMessage } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 export function MessageReview() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('broker.page_title'));
+  usePageTitle("Broker Controls");
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -92,7 +90,7 @@ export function MessageReview() {
         setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
       }
     } catch {
-      toast.error(t('broker.failed_to_load_messages'));
+      toast.error("Failed to load messages");
     } finally {
       setLoading(false);
     }
@@ -107,13 +105,13 @@ export function MessageReview() {
     try {
       const res = await adminBroker.reviewMessage(id);
       if (res?.success) {
-        toast.success(t('broker.message_marked_as_reviewed'));
+        toast.success("Message marked as reviewed");
         loadItems();
       } else {
-        toast.error(res?.error || t('broker.failed_to_mark_message_as_reviewed'));
+        toast.error(res?.error || "Failed to mark message as reviewed");
       }
     } catch {
-      toast.error(t('broker.failed_to_mark_message_as_reviewed'));
+      toast.error("Failed to mark message as reviewed");
     } finally {
       setReviewingId(null);
     }
@@ -129,21 +127,21 @@ export function MessageReview() {
   const handleFlag = async () => {
     if (!selectedMessageId) return;
     if (!flagReason.trim()) {
-      toast.error(t('broker.a_reason_is_required_to_flag_a_message'));
+      toast.error("A reason is required to flag a message");
       return;
     }
     setFlagLoading(true);
     try {
       const res = await adminBroker.flagMessage(selectedMessageId, flagReason, flagSeverity);
       if (res?.success) {
-        toast.success(t('broker.message_flagged_successfully'));
+        toast.success("Message flagged successfully");
         setFlagModalOpen(false);
         loadItems();
       } else {
-        toast.error(res?.error || t('broker.failed_to_flag_message'));
+        toast.error(res?.error || "Failed to flag message");
       }
     } catch {
-      toast.error(t('broker.failed_to_flag_message'));
+      toast.error("Failed to flag message");
     } finally {
       setFlagLoading(false);
     }
@@ -152,7 +150,7 @@ export function MessageReview() {
   const columns: Column<BrokerMessage>[] = [
     {
       key: 'sender_name',
-      label: t('broker.col_sender'),
+      label: "Sender",
       sortable: true,
       render: (item) => (
         <Link
@@ -165,7 +163,7 @@ export function MessageReview() {
     },
     {
       key: 'receiver_name',
-      label: t('broker.col_receiver'),
+      label: "Receiver",
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.receiver_name}</span>
@@ -173,7 +171,7 @@ export function MessageReview() {
     },
     {
       key: 'message_body',
-      label: t('broker.col_preview'),
+      label: "Preview",
       render: (item) => (
         <span className="text-sm text-default-500 line-clamp-1 max-w-[200px]">
           {item.message_body ? item.message_body.substring(0, 80) + (item.message_body.length > 80 ? '…' : '') : '—'}
@@ -182,7 +180,7 @@ export function MessageReview() {
     },
     {
       key: 'copy_reason',
-      label: t('broker.col_reason'),
+      label: "Reason",
       render: (item) => (
         item.copy_reason ? (
           <Chip size="sm" variant="flat" color="default">
@@ -193,9 +191,9 @@ export function MessageReview() {
     },
     {
       key: 'flagged',
-      label: t('broker.col_flagged'),
+      label: "Flagged",
       render: (item) => {
-        if (!item.flagged) return <span className="text-sm text-default-400">{t('shared.no')}</span>;
+        if (!item.flagged) return <span className="text-sm text-default-400">{"No"}</span>;
         const severityColor = {
           info: 'default' as const,
           warning: 'warning' as const,
@@ -216,22 +214,22 @@ export function MessageReview() {
     },
     {
       key: 'reviewed_at',
-      label: t('broker.col_status'),
+      label: "Status",
       render: (item) => (
         item.reviewed_at ? (
           <Chip size="sm" variant="flat" color="success">
-            {t('broker.tab_reviewed')}
+            {"Reviewed"}
           </Chip>
         ) : (
           <Chip size="sm" variant="flat" color="warning">
-            {t('broker.tab_unreviewed')}
+            {"Unreviewed"}
           </Chip>
         )
       ),
     },
     {
       key: 'created_at',
-      label: t('broker.col_date'),
+      label: "Date",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -241,7 +239,7 @@ export function MessageReview() {
     },
     {
       key: 'actions',
-      label: t('broker.col_actions'),
+      label: "Actions",
       render: (item) => (
         <div className="flex gap-1">
           {!item.reviewed_at && (
@@ -252,9 +250,9 @@ export function MessageReview() {
               startContent={<CheckCircle size={14} />}
               onPress={() => handleReview(item.id)}
               isLoading={reviewingId === item.id}
-              aria-label={t('broker.label_mark_as_reviewed')}
+              aria-label={"Mark as Reviewed"}
             >
-              {t('broker.review')}
+              {"Review"}
             </Button>
           )}
           {!item.flagged && (
@@ -264,9 +262,9 @@ export function MessageReview() {
               color="warning"
               startContent={<Flag size={14} />}
               onPress={() => openFlagModal(item.id)}
-              aria-label={t('broker.label_flag_message')}
+              aria-label={"Flag Message"}
             >
-              {t('broker.flag')}
+              {"Flag"}
             </Button>
           )}
         </div>
@@ -277,8 +275,8 @@ export function MessageReview() {
   return (
     <div>
       <PageHeader
-        title={t('broker.message_review_title')}
-        description={t('broker.message_review_desc')}
+        title={"Message Review"}
+        description={"Review messages flagged for moderation or safeguarding concerns"}
         actions={
           <Button
             as={Link}
@@ -287,7 +285,7 @@ export function MessageReview() {
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
-            {t('common.back')}
+            {"Back"}
           </Button>
         }
       />
@@ -299,10 +297,10 @@ export function MessageReview() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="unreviewed" title={t('broker.tab_unreviewed')} />
-          <Tab key="flagged" title={t('broker.tab_flagged')} />
-          <Tab key="reviewed" title={t('broker.tab_reviewed')} />
-          <Tab key="all" title={t('broker.tab_all')} />
+          <Tab key="unreviewed" title={"Unreviewed"} />
+          <Tab key="flagged" title={"Flagged"} />
+          <Tab key="reviewed" title={"Reviewed"} />
+          <Tab key="all" title={"All"} />
         </Tabs>
       </div>
 
@@ -327,12 +325,12 @@ export function MessageReview() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Flag size={20} className="text-warning" />
-            {t('broker.flag_message')}
+            {"Flag"}
           </ModalHeader>
           <ModalBody>
             <Textarea
-              label={t('broker.label_reason_required')}
-              placeholder={t('broker.placeholder_describe_why_this_message_is_being_flagged')}
+              label={"Reason Required"}
+              placeholder={"Describe Why This Message is Being Flagged..."}
               value={flagReason}
               onValueChange={setFlagReason}
               minRows={3}
@@ -340,7 +338,7 @@ export function MessageReview() {
               isRequired
             />
             <Select
-              label={t('broker.label_severity')}
+              label={"Severity"}
               selectedKeys={[flagSeverity]}
               onSelectionChange={(keys) => {
                 const val = Array.from(keys)[0] as 'info' | 'warning' | 'concern' | 'urgent';
@@ -348,10 +346,10 @@ export function MessageReview() {
               }}
               variant="bordered"
             >
-              <SelectItem key="info">{t('broker.severity_info')}</SelectItem>
-              <SelectItem key="warning">{t('broker.severity_warning')}</SelectItem>
-              <SelectItem key="concern">{t('broker.severity_concern')}</SelectItem>
-              <SelectItem key="urgent">{t('broker.severity_urgent')}</SelectItem>
+              <SelectItem key="info">{"Severity Info"}</SelectItem>
+              <SelectItem key="warning">{"Severity Warning"}</SelectItem>
+              <SelectItem key="concern">{"Severity Concern"}</SelectItem>
+              <SelectItem key="urgent">{"Severity Urgent"}</SelectItem>
             </Select>
           </ModalBody>
           <ModalFooter>
@@ -360,7 +358,7 @@ export function MessageReview() {
               onPress={() => setFlagModalOpen(false)}
               isDisabled={flagLoading}
             >
-              {t('common.cancel')}
+              {"Cancel"}
             </Button>
             <Button
               color="warning"
@@ -368,7 +366,7 @@ export function MessageReview() {
               isLoading={flagLoading}
               startContent={!flagLoading && <Flag size={14} />}
             >
-              {t('broker.flag_message')}
+              {"Flag"}
             </Button>
           </ModalFooter>
         </ModalContent>

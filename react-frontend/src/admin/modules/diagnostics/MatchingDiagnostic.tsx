@@ -17,7 +17,6 @@ import { useToast } from '@/contexts';
 import { adminDiagnostics } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
-import { useTranslation } from 'react-i18next';
 interface DiagResult {
   [key: string]: unknown;
 }
@@ -32,8 +31,7 @@ interface EngineStatus {
 }
 
 export function MatchingDiagnostic() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('diagnostics.page_title'));
+  usePageTitle("Diagnostics");
   const toast = useToast();
 
   const [userId, setUserId] = useState('');
@@ -52,7 +50,7 @@ export function MatchingDiagnostic() {
           setEngineStatus(res.data as EngineStatus);
         }
       })
-      .catch(() => toast.error(t('diagnostics.failed_to_load_engine_status')))
+      .catch(() => toast.error("Failed to load engine status"))
       .finally(() => setLoadingEngine(false));
   }, [toast, t])
 
@@ -65,10 +63,10 @@ export function MatchingDiagnostic() {
       if (res.success && res.data) {
         setUserResult(res.data as DiagResult);
       } else {
-        toast.error(t('diagnostics.no_diagnostic_data_found_for_this_user'));
+        toast.error("No diagnostic data found for this user");
       }
     } catch {
-      toast.error(t('diagnostics.failed_to_diagnose_user'));
+      toast.error("Failed to diagnose user");
     } finally {
       setLoadingUser(false);
     }
@@ -83,10 +81,10 @@ export function MatchingDiagnostic() {
       if (res.success && res.data) {
         setListingResult(res.data as DiagResult);
       } else {
-        toast.error(t('diagnostics.no_diagnostic_data_found_for_this_listin'));
+        toast.error("No diagnostic data found for this listing");
       }
     } catch {
-      toast.error(t('diagnostics.failed_to_diagnose_listing'));
+      toast.error("Failed to diagnose listing");
     } finally {
       setLoadingListing(false);
     }
@@ -96,15 +94,15 @@ export function MatchingDiagnostic() {
 
   return (
     <div>
-      <PageHeader title={t('diagnostics.matching_diagnostic_title')} description={t('diagnostics.matching_diagnostic_desc')} />
+      <PageHeader title={"Matching Diagnostic"} description={"Run a diagnostic on specific users or listings to understand match scores"} />
 
       <div className="space-y-4">
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Stethoscope size={20} /> {t('diagnostics_matching.diagnose_user_matches')}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Stethoscope size={20} /> {"Diagnose User Matches"}</h3></CardHeader>
           <CardBody className="gap-4">
             <p className="text-sm text-default-500">Enter a user ID to see their match results, scores, and the factors contributing to each match.</p>
             <div className="flex gap-3">
-              <Input label={t('diagnostics.label_user_i_d')} placeholder="e.g., 42" type="number" value={userId} onValueChange={setUserId} variant="bordered" className="max-w-xs" />
+              <Input label={"User ID"} placeholder="e.g., 42" type="number" value={userId} onValueChange={setUserId} variant="bordered" className="max-w-xs" />
               <Button
                 color="primary"
                 startContent={loadingUser ? undefined : <Search size={16} />}
@@ -132,11 +130,11 @@ export function MatchingDiagnostic() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{t('diagnostics_matching.diagnose_listing_matches')}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{"Diagnose Listing Matches"}</h3></CardHeader>
           <CardBody className="gap-4">
             <p className="text-sm text-default-500">Enter a listing ID to see which users were matched and why.</p>
             <div className="flex gap-3">
-              <Input label={t('diagnostics.label_listing_i_d')} placeholder="e.g., 105" type="number" value={listingId} onValueChange={setListingId} variant="bordered" className="max-w-xs" />
+              <Input label={"Listing ID"} placeholder="e.g., 105" type="number" value={listingId} onValueChange={setListingId} variant="bordered" className="max-w-xs" />
               <Button
                 color="primary"
                 startContent={loadingListing ? undefined : <Search size={16} />}
@@ -161,22 +159,22 @@ export function MatchingDiagnostic() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{t('diagnostics_matching.engine_status')}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{"Engine Status"}</h3></CardHeader>
           <CardBody>
             {loadingEngine ? (
               <div className="flex justify-center py-4"><Spinner size="sm" /></div>
             ) : (
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div className="rounded-lg border border-default-200 p-3 text-center">
-                  <p className="text-sm text-default-500">{t('diagnostics_matching.matches_today')}</p>
+                  <p className="text-sm text-default-500">{"Matches Today"}</p>
                   <p className="font-medium">{overview?.total_matches_today ?? '--'}</p>
                 </div>
                 <div className="rounded-lg border border-default-200 p-3 text-center">
-                  <p className="text-sm text-default-500">{t('diagnostics_matching.cache_entries')}</p>
+                  <p className="text-sm text-default-500">{"Cache Entries"}</p>
                   <p className="font-medium">{overview?.cache_entries ?? '--'}</p>
                 </div>
                 <div className="rounded-lg border border-default-200 p-3 text-center">
-                  <p className="text-sm text-default-500">{t('diagnostics_matching.avg_match_score')}</p>
+                  <p className="text-sm text-default-500">{"Avg Match Score"}</p>
                   <p className="font-medium">
                     {overview?.avg_match_score !== undefined
                       ? `${Number(overview.avg_match_score).toFixed(1)}%`

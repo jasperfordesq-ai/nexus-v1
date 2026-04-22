@@ -38,43 +38,43 @@ type TFunction = (key: string) => string;
 
 const getQuickLinks = (t: TFunction) => [
   {
-    title: t('broker_dashboard.link_exchange_management_title'),
-    description: t('broker_dashboard.link_exchange_management_desc'),
+    title: "Link Exchange Management",
+    description: "Link Exchange Management.",
     icon: ArrowLeftRight,
     color: 'primary' as const,
     path: '/admin/broker-controls/exchanges',
   },
   {
-    title: t('broker_dashboard.link_risk_tags_title'),
-    description: t('broker_dashboard.link_risk_tags_desc'),
+    title: "Link Risk Tags",
+    description: "Link Risk Tags.",
     icon: ShieldAlert,
     color: 'danger' as const,
     path: '/admin/broker-controls/risk-tags',
   },
   {
-    title: t('broker_dashboard.link_message_review_title'),
-    description: t('broker_dashboard.link_message_review_desc'),
+    title: "Link Message Review",
+    description: "Link Message Review.",
     icon: MessageSquareWarning,
     color: 'warning' as const,
     path: '/admin/broker-controls/messages',
   },
   {
-    title: t('broker_dashboard.link_user_monitoring_title'),
-    description: t('broker_dashboard.link_user_monitoring_desc'),
+    title: "Link User Monitoring",
+    description: "Link User Monitoring.",
     icon: Eye,
     color: 'secondary' as const,
     path: '/admin/broker-controls/monitoring',
   },
   {
-    title: t('broker_dashboard.link_vetting_records_title'),
-    description: t('broker_dashboard.link_vetting_records_desc'),
+    title: "Link Vetting Records",
+    description: "Link Vetting Records.",
     icon: ShieldCheck,
     color: 'success' as const,
     path: '/admin/broker-controls/vetting',
   },
   {
-    title: t('broker_dashboard.link_configuration_title'),
-    description: t('broker_dashboard.link_configuration_desc'),
+    title: "Link Configuration",
+    description: "Link Configuration.",
     icon: Settings,
     color: 'default' as const,
     path: '/admin/broker-controls/configuration',
@@ -101,7 +101,7 @@ const quickLinkTextClass: Record<string, string> = {
 
 export function BrokerDashboard() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('broker.page_title'));
+  usePageTitle("Broker Controls");
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -118,7 +118,7 @@ export function BrokerDashboard() {
         setStats(res.data);
       }
     } catch {
-      toast.error(t('broker.failed_to_load_broker_dashboard'));
+      toast.error("Failed to load broker dashboard");
     } finally {
       setLoading(false);
     }
@@ -131,8 +131,8 @@ export function BrokerDashboard() {
   return (
     <div>
       <PageHeader
-        title={t('broker.broker_dashboard_title')}
-        description={t('broker.broker_dashboard_desc')}
+        title={"Broker Dashboard"}
+        description={"Overview of pending exchanges, insurance, vetting, and monitored users"}
         actions={
           <Button
             variant="flat"
@@ -141,7 +141,7 @@ export function BrokerDashboard() {
             isLoading={loading}
             size="sm"
           >
-            {t('broker.refresh')}
+            {"Refresh"}
           </Button>
         }
       />
@@ -150,7 +150,7 @@ export function BrokerDashboard() {
           with the filter already applied, so admins triage in one click. */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label={t('broker.label_pending_exchanges')}
+          label={"Pending Exchanges"}
           value={stats?.pending_exchanges ?? '—'}
           icon={ArrowLeftRight}
           color="primary"
@@ -158,7 +158,7 @@ export function BrokerDashboard() {
           to={tenantPath('/admin/broker-controls/exchanges?status=pending_broker')}
         />
         <StatCard
-          label={t('broker.label_unreviewed_messages')}
+          label={"Unreviewed Messages"}
           value={stats?.unreviewed_messages ?? '—'}
           icon={MessageSquareWarning}
           color="warning"
@@ -166,7 +166,7 @@ export function BrokerDashboard() {
           to={tenantPath('/admin/broker-controls/messages?status=unreviewed')}
         />
         <StatCard
-          label={t('broker.label_high_risk_listings')}
+          label={"High Risk Listings"}
           value={stats?.high_risk_listings ?? '—'}
           icon={ShieldAlert}
           color="danger"
@@ -174,7 +174,7 @@ export function BrokerDashboard() {
           to={tenantPath('/admin/broker-controls/risk-tags?level=high')}
         />
         <StatCard
-          label={t('broker.label_monitored_users')}
+          label={"Monitored Users"}
           value={stats?.monitored_users ?? '—'}
           icon={Eye}
           color="secondary"
@@ -182,7 +182,7 @@ export function BrokerDashboard() {
           to={tenantPath('/admin/broker-controls/monitoring')}
         />
         <StatCard
-          label={t('broker.label_vetting_pending')}
+          label={"Vetting Pending"}
           value={stats?.vetting_pending ?? '—'}
           icon={ShieldCheck}
           color="success"
@@ -190,7 +190,7 @@ export function BrokerDashboard() {
           to={tenantPath('/admin/broker-controls/vetting?status=pending')}
         />
         <StatCard
-          label={t('broker.label_expiring_soon')}
+          label={"Expiring Soon"}
           value={stats?.vetting_expiring ?? '—'}
           icon={Clock}
           color="warning"
@@ -198,7 +198,7 @@ export function BrokerDashboard() {
           to={tenantPath('/admin/broker-controls/vetting?status=expiring_soon')}
         />
         <StatCard
-          label={t('broker.label_safeguarding_alerts')}
+          label={"Safeguarding Alerts"}
           value={stats?.safeguarding_alerts ?? '—'}
           icon={AlertTriangle}
           color="danger"
@@ -206,7 +206,7 @@ export function BrokerDashboard() {
           to={tenantPath('/admin/safeguarding?filter=critical')}
         />
         <StatCard
-          label={t('broker.label_onboarding_flags')}
+          label={"Onboarding Flags"}
           value={stats?.onboarding_safeguarding_flags ?? '—'}
           icon={ShieldAlert}
           color="warning"
@@ -216,7 +216,7 @@ export function BrokerDashboard() {
       </div>
 
       {/* Quick Links */}
-      <h2 className="text-lg font-semibold text-foreground mb-4">{t('shared.quick_access')}</h2>
+      <h2 className="text-lg font-semibold text-foreground mb-4">{"Quick Access"}</h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {quickLinks.map((link) => {
           const Icon = link.icon;
@@ -238,7 +238,7 @@ export function BrokerDashboard() {
       </div>
 
       {/* Recent Activity */}
-      <h2 className="text-lg font-semibold text-foreground mb-4 mt-8">{t('shared.recent_activity')}</h2>
+      <h2 className="text-lg font-semibold text-foreground mb-4 mt-8">{"Recent Activity"}</h2>
       {loading && !stats ? (
         <div className="flex items-center justify-center py-12">
           <Spinner size="lg" />
@@ -247,7 +247,7 @@ export function BrokerDashboard() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 pb-0">
             <Activity size={18} className="text-default-500" />
-            <span className="text-sm font-semibold text-foreground">{t('shared.broker_actions')}</span>
+            <span className="text-sm font-semibold text-foreground">{"Broker Actions"}</span>
           </CardHeader>
           <Divider className="my-2" />
           <CardBody className="p-0">
@@ -276,8 +276,8 @@ export function BrokerDashboard() {
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center justify-center py-10 text-center">
             <Activity size={40} className="text-default-300 mb-3" />
-            <p className="text-default-500 font-medium">{t('shared.no_recent_broker_activity')}</p>
-            <p className="text-sm text-default-400 mt-1">{t('broker_dashboard.activity_empty_hint')}</p>
+            <p className="text-default-500 font-medium">{"No recent broker activity found"}</p>
+            <p className="text-sm text-default-400 mt-1">{"Activity Empty."}</p>
           </CardBody>
         </Card>
       )}
@@ -351,12 +351,12 @@ function formatTimeAgo(dateStr: string, t: TFunction): string {
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
-  if (diffMins < 1) return t('broker_dashboard.time_just_now');
-  if (diffMins < 60) return t('broker_dashboard.time_minutes_ago').replace('{{count}}', String(diffMins));
+  if (diffMins < 1) return "Time Just Now";
+  if (diffMins < 60) return "Time Minutes Ago".replace('{{count}}', String(diffMins));
   const diffHrs = Math.floor(diffMins / 60);
-  if (diffHrs < 24) return t('broker_dashboard.time_hours_ago').replace('{{count}}', String(diffHrs));
+  if (diffHrs < 24) return "Time Hours Ago".replace('{{count}}', String(diffHrs));
   const diffDays = Math.floor(diffHrs / 24);
-  if (diffDays < 7) return t('broker_dashboard.time_days_ago').replace('{{count}}', String(diffDays));
+  if (diffDays < 7) return "Time Days Ago".replace('{{count}}', String(diffDays));
   return date.toLocaleDateString();
 }
 

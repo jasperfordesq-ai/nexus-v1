@@ -11,7 +11,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardBody,
@@ -96,8 +95,7 @@ const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'>
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MarketplaceAdmin() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('marketplace.page_title'));
+  usePageTitle("Marketplace");
   const toast = useToast();
   const { tenantPath } = useTenant();
 
@@ -128,7 +126,7 @@ export function MarketplaceAdmin() {
         }
       }
     } catch {
-      toast.error(t('marketplace.failed_load_dashboard'));
+      toast.error("Failed to load dashboard");
     } finally {
       setLoading(false);
     }
@@ -141,15 +139,15 @@ export function MarketplaceAdmin() {
   return (
     <div>
       <PageHeader
-        title={t('marketplace.title')}
-        description={t('marketplace.description')}
+        title={"Marketplace"}
+        description={"Manage marketplace listings, sellers, and orders"}
         actions={
           <Button
             variant="flat"
             startContent={<RefreshCw size={16} />}
             onPress={loadDashboard}
           >
-            {t('marketplace.refresh')}
+            {"Refresh"}
           </Button>
         }
       />
@@ -157,35 +155,35 @@ export function MarketplaceAdmin() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
         <StatCard
-          label={t('marketplace.stat_total_listings')}
+          label={"Total Listings"}
           value={stats?.total_listings ?? 0}
           icon={ShoppingBag}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label={t('marketplace.stat_active_listings')}
+          label={"Active Listings"}
           value={stats?.active_listings ?? 0}
           icon={PackageCheck}
           color="success"
           loading={loading}
         />
         <StatCard
-          label={t('marketplace.stat_total_sellers')}
+          label={"Total Sellers"}
           value={stats?.total_sellers ?? 0}
           icon={Store}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label={t('marketplace.stat_pending_moderation')}
+          label={"Pending Review"}
           value={stats?.pending_moderation ?? 0}
           icon={Clock}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label={t('marketplace.stat_total_orders')}
+          label={"Total Orders"}
           value={stats?.total_orders ?? 0}
           icon={DollarSign}
           color="default"
@@ -202,9 +200,9 @@ export function MarketplaceAdmin() {
                 <Shield size={24} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-foreground">{t('marketplace.moderation_queue')}</p>
+                <p className="font-semibold text-foreground">{"Moderation Queue"}</p>
                 <p className="text-sm text-default-500">
-                  {t('marketplace.moderation_queue_desc')}
+                  {"Listings awaiting review"}
                 </p>
               </div>
               <ChevronRight size={20} className="text-default-400" />
@@ -218,9 +216,9 @@ export function MarketplaceAdmin() {
                 <Users size={24} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-foreground">{t('marketplace.seller_management')}</p>
+                <p className="font-semibold text-foreground">{"Seller Management"}</p>
                 <p className="text-sm text-default-500">
-                  {t('marketplace.seller_management_desc')}
+                  {"Manage and verify marketplace sellers"}
                 </p>
               </div>
               <ChevronRight size={20} className="text-default-400" />
@@ -232,32 +230,32 @@ export function MarketplaceAdmin() {
       {/* Recent Listings Table */}
       <Card shadow="sm">
         <CardHeader className="flex items-center justify-between px-4 pt-4">
-          <h3 className="text-lg font-semibold text-foreground">{t('marketplace.recent_listings')}</h3>
+          <h3 className="text-lg font-semibold text-foreground">{"Recent Listings"}</h3>
           <Link to={tenantPath('/admin/marketplace/moderation')}>
             <Button size="sm" variant="flat" color="primary">
-              {t('marketplace.view_all')}
+              {"View All"}
             </Button>
           </Link>
         </CardHeader>
         <CardBody className="px-4 pb-4">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <Spinner label={t('marketplace.loading_recent_listings')} />
+              <Spinner label={"Loading listings..."} />
             </div>
           ) : recentListings.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <ShoppingBag size={32} className="text-default-300 mb-2" />
-              <p className="text-sm text-default-500">{t('marketplace.no_listings_yet')}</p>
+              <p className="text-sm text-default-500">{"No listings yet"}</p>
             </div>
           ) : (
-            <Table aria-label={t('marketplace.recent_listings')} removeWrapper>
+            <Table aria-label={"Recent Listings"} removeWrapper>
               <TableHeader>
-                <TableColumn>{t('marketplace.col_title')}</TableColumn>
-                <TableColumn>{t('marketplace.col_seller')}</TableColumn>
-                <TableColumn>{t('marketplace.col_price')}</TableColumn>
-                <TableColumn>{t('marketplace.col_status')}</TableColumn>
-                <TableColumn>{t('marketplace.col_moderation')}</TableColumn>
-                <TableColumn>{t('marketplace.col_created')}</TableColumn>
+                <TableColumn>{"Title"}</TableColumn>
+                <TableColumn>{"Seller"}</TableColumn>
+                <TableColumn>{"Price"}</TableColumn>
+                <TableColumn>{"Status"}</TableColumn>
+                <TableColumn>{"Moderation"}</TableColumn>
+                <TableColumn>{"Created"}</TableColumn>
               </TableHeader>
               <TableBody>
                 {recentListings.map((listing) => (

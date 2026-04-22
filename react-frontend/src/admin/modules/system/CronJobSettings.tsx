@@ -31,14 +31,12 @@ import { adminCron, adminSystem } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { CronJob, CronJobSettings, GlobalCronSettings } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CronJobSettingsPage() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('system.cron_job_settings_title'));
+  usePageTitle("Cron Job Settings");
   const toast = useToast();
   const { user } = useAuth();
   const { tenantPath } = useTenant();
@@ -98,7 +96,7 @@ export function CronJobSettingsPage() {
         setJobSettings(res.data);
       }
     } catch {
-      toast.error(t('system.failed_to_load_job_settings'));
+      toast.error("Failed to load job settings");
     }
     setLoadingJobSettings(false);
   }, [toast, t])
@@ -112,7 +110,7 @@ export function CronJobSettingsPage() {
         setGlobalSettings(res.data);
       }
     } catch {
-      toast.error(t('system.failed_to_load_global_settings'));
+      toast.error("Failed to load global settings");
     }
     setLoadingGlobalSettings(false);
   }, [toast, t])
@@ -124,12 +122,12 @@ export function CronJobSettingsPage() {
     try {
       const res = await adminCron.updateJobSettings(selectedJobId, jobSettings);
       if (res.success) {
-        toast.success(t('system.job_settings_saved_successfully'));
+        toast.success("Job settings saved successfully");
       } else {
-        toast.error(res.error || t('system.failed_to_save_job_settings'));
+        toast.error(res.error || "Failed to save job settings");
       }
     } catch {
-      toast.error(t('system.failed_to_save_job_settings'));
+      toast.error("Failed to save job settings");
     }
     setSavingJobSettings(false);
   };
@@ -140,12 +138,12 @@ export function CronJobSettingsPage() {
     try {
       const res = await adminCron.updateGlobalSettings(globalSettings);
       if (res.success) {
-        toast.success(t('system.global_settings_saved_successfully'));
+        toast.success("Global settings saved successfully");
       } else {
-        toast.error(res.error || t('system.failed_to_save_global_settings'));
+        toast.error(res.error || "Failed to save global settings");
       }
     } catch {
-      toast.error(t('system.failed_to_save_global_settings'));
+      toast.error("Failed to save global settings");
     }
     setSavingGlobalSettings(false);
   };
@@ -168,8 +166,8 @@ export function CronJobSettingsPage() {
   return (
     <div>
       <PageHeader
-        title={t('system.cron_job_settings_title')}
-        description={t('system.cron_job_settings_desc')}
+        title={"Cron Job Settings"}
+        description={"Configure settings for background job execution"}
       />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -177,7 +175,7 @@ export function CronJobSettingsPage() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
             <Settings size={18} className="text-primary" />
-            <span className="text-lg font-semibold">{t('system.section_per_job_settings')}</span>
+            <span className="text-lg font-semibold">{"Per Job Settings"}</span>
           </CardHeader>
           <CardBody className="space-y-4">
             {loadingJobs ? (
@@ -187,8 +185,8 @@ export function CronJobSettingsPage() {
             ) : (
               <>
                 <Select
-                  label={t('system.label_select_job')}
-                  placeholder={t('system.placeholder_choose_a_job_to_configure')}
+                  label={"Select Job"}
+                  placeholder={"Choose a Job to Configure..."}
                   variant="bordered"
                   selectedKeys={selectedJobId ? [selectedJobId] : []}
                   onChange={(e) => setSelectedJobId(e.target.value)}
@@ -217,17 +215,17 @@ export function CronJobSettingsPage() {
                           }
                         >
                           <div className="flex flex-col gap-1">
-                            <span className="text-sm font-medium">{t('cron_settings.enable_job')}</span>
+                            <span className="text-sm font-medium">{"Enable Job"}</span>
                             <span className="text-xs text-default-400">
-                              {t('system.desc_job_will_run_when_enabled')}
+                              {"Job Will Run When Enabled."}
                             </span>
                           </div>
                         </Switch>
 
                         <Input
-                          label={t('system.label_custom_schedule')}
-                          placeholder={t('system.placeholder_cron_expression')}
-                          description={t('system.desc_cron_expression_leave_empty_to_use_defa')}
+                          label={"Custom Schedule"}
+                          placeholder={"Enter cron expression..."}
+                          description={"Cron expression for custom schedule. Leave empty to use the default."}
                           variant="bordered"
                           value={jobSettings.custom_schedule || ''}
                           onChange={(e) =>
@@ -252,19 +250,19 @@ export function CronJobSettingsPage() {
                         >
                           <div className="flex flex-col gap-1">
                             <span className="text-sm font-medium">
-                              {t('system.label_notify_on_failure')}
+                              {"Notify on Failure"}
                             </span>
                             <span className="text-xs text-default-400">
-                              {t('system.desc_notify_on_failure')}
+                              {"Notify on Failure."}
                             </span>
                           </div>
                         </Switch>
 
                         {jobSettings.notify_on_failure && (
                           <Textarea
-                            label={t('system.label_notification_emails')}
-                            placeholder={t('system.placeholder_notification_emails')}
-                            description={t('system.desc_comma_separated_emails')}
+                            label={"Notification Emails"}
+                            placeholder={"Enter notification emails..."}
+                            description={"Comma Separated Emails."}
                             variant="bordered"
                             minRows={2}
                             value={jobSettings.notify_emails || ''}
@@ -278,10 +276,10 @@ export function CronJobSettingsPage() {
                         )}
 
                         <Input
-                          label={t('system.label_max_retries')}
+                          label={"Max Retries"}
                           type="number"
-                          placeholder={t('system.placeholder_max_retries')}
-                          description={t('system.desc_number_of_times_to_retry_failed_jobs')}
+                          placeholder={"Enter max retries..."}
+                          description={"Number of times to retry failed jobs before giving up"}
                           variant="bordered"
                           value={jobSettings.max_retries.toString()}
                           onChange={(e) =>
@@ -293,10 +291,10 @@ export function CronJobSettingsPage() {
                         />
 
                         <Input
-                          label={t('system.label_timeout')}
+                          label={"Timeout"}
                           type="number"
-                          placeholder={t('system.placeholder_timeout_seconds')}
-                          description={t('system.desc_maximum_execution_time')}
+                          placeholder={"Enter timeout seconds..."}
+                          description={"Maximum time in seconds a job is allowed to run before being killed"}
                           variant="bordered"
                           value={jobSettings.timeout_seconds.toString()}
                           onChange={(e) =>
@@ -314,7 +312,7 @@ export function CronJobSettingsPage() {
                           isLoading={savingJobSettings}
                           className="w-full"
                         >
-                          {t('system.btn_save_job_settings')}
+                          {"Save Job Settings"}
                         </Button>
                       </div>
                     )}
@@ -324,7 +322,7 @@ export function CronJobSettingsPage() {
                 {!selectedJobId && (
                   <div className="flex flex-col items-center gap-2 py-8 text-default-400">
                     <AlertCircle size={32} />
-                    <p className="text-sm">{t('cron_settings.select_job')}</p>
+                    <p className="text-sm">{"Select Job"}</p>
                   </div>
                 )}
               </>
@@ -336,7 +334,7 @@ export function CronJobSettingsPage() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
             <Settings size={18} className="text-secondary" />
-            <span className="text-lg font-semibold">{t('cron_settings.global_settings')}</span>
+            <span className="text-lg font-semibold">{"Global Settings"}</span>
           </CardHeader>
           <CardBody className="space-y-4">
             {loadingGlobalSettings ? (
@@ -346,10 +344,10 @@ export function CronJobSettingsPage() {
             ) : (
               <>
                 <Input
-                  label={t('system.label_default_notification_email')}
+                  label={"Default Notification Email"}
                   type="email"
-                  placeholder={t('system.placeholder_default_notification_email')}
-                  description={t('system.desc_fallback_email_for_job_failure_notificat')}
+                  placeholder={"Enter default notification email..."}
+                  description={"Fallback email address for job failure notifications if no notification email is set"}
                   variant="bordered"
                   value={globalSettings.default_notify_email || ''}
                   onChange={(e) =>
@@ -361,10 +359,10 @@ export function CronJobSettingsPage() {
                 />
 
                 <Input
-                  label={t('system.label_log_retention')}
+                  label={"Log Retention"}
                   type="number"
-                  placeholder={t('system.placeholder_log_retention_days')}
-                  description={t('system.desc_how_long_to_keep_job_execution_logs')}
+                  placeholder={"Enter log retention days..."}
+                  description={"How long to keep job execution logs before automatic deletion"}
                   variant="bordered"
                   value={globalSettings.log_retention_days.toString()}
                   onChange={(e) =>
@@ -376,10 +374,10 @@ export function CronJobSettingsPage() {
                 />
 
                 <Input
-                  label={t('system.label_max_concurrent_jobs')}
+                  label={"Max Concurrent Jobs"}
                   type="number"
-                  placeholder={t('system.placeholder_max_concurrent_jobs')}
-                  description={t('system.desc_maximum_number_of_jobs_that_can_run_simu')}
+                  placeholder={"Enter max concurrent jobs..."}
+                  description={"Maximum number of jobs that can run simultaneously"}
                   variant="bordered"
                   value={globalSettings.max_concurrent_jobs.toString()}
                   onChange={(e) =>
@@ -397,7 +395,7 @@ export function CronJobSettingsPage() {
                   isLoading={savingGlobalSettings}
                   className="w-full"
                 >
-                  {t('system.btn_save_global_settings')}
+                  {"Save Global Settings"}
                 </Button>
               </>
             )}

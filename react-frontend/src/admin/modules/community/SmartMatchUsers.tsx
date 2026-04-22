@@ -18,10 +18,8 @@ import { adminMatching } from '../../api/adminApi';
 import { PageHeader, DataTable, StatusBadge, EmptyState, type Column } from '../../components';
 import type { MatchApproval } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 export function SmartMatchUsers() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('community.page_title'));
+  usePageTitle("Community");
   const toast = useToast();
 
   const [data, setData] = useState<MatchApproval[]>([]);
@@ -45,7 +43,7 @@ export function SmartMatchUsers() {
         }
       }
     } catch {
-      toast.error(t('community.failed_to_load_match_results'));
+      toast.error("Failed to load match results");
     } finally {
       setLoading(false);
     }
@@ -58,7 +56,7 @@ export function SmartMatchUsers() {
   const columns: Column<MatchApproval>[] = [
     {
       key: 'user_1_name',
-      label: t('community.col_user_1'),
+      label: "User 1",
       sortable: true,
       render: (item) => (
         <div>
@@ -69,7 +67,7 @@ export function SmartMatchUsers() {
     },
     {
       key: 'user_2_name',
-      label: t('community.col_user_2'),
+      label: "User 2",
       sortable: true,
       render: (item) => (
         <div>
@@ -80,14 +78,14 @@ export function SmartMatchUsers() {
     },
     {
       key: 'listing_title',
-      label: t('community.col_listing'),
+      label: "Listing",
       render: (item) => (
         <span className="text-sm text-default-500">{item.listing_title || '--'}</span>
       ),
     },
     {
       key: 'match_score',
-      label: t('community.col_score'),
+      label: "Score",
       sortable: true,
       render: (item) => (
         <Chip
@@ -101,13 +99,13 @@ export function SmartMatchUsers() {
     },
     {
       key: 'status',
-      label: t('community.col_status'),
+      label: "Status",
       sortable: true,
       render: (item) => <StatusBadge status={item.status} />,
     },
     {
       key: 'created_at',
-      label: t('community.col_date'),
+      label: "Date",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -120,7 +118,7 @@ export function SmartMatchUsers() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('community.smart_match_users_title')} description={t('community.smart_match_users_desc')} />
+        <PageHeader title={"Smart Match Users"} description={"View and manage users participating in the smart matching system"} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -128,19 +126,19 @@ export function SmartMatchUsers() {
 
   return (
     <div>
-      <PageHeader title={t('community.smart_match_users_title')} description={t('community.smart_match_users_desc')} />
+      <PageHeader title={"Smart Match Users"} description={"View and manage users participating in the smart matching system"} />
 
       {data.length === 0 ? (
         <EmptyState
           icon={Users}
-          title={t('community.no_match_results')}
-          description={t('community.desc_run_the_smart_matching_engine_to_generat')}
+          title={"No match results"}
+          description={"Run the Smart Matching Engine to generate new matches for your community"}
         />
       ) : (
         <DataTable
           columns={columns}
           data={data}
-          searchPlaceholder={t('community.search_matches_placeholder')}
+          searchPlaceholder={"Search matches..."}
           onRefresh={fetchData}
           totalItems={total}
           page={page}

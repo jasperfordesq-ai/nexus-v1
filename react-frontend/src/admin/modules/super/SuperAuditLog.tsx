@@ -19,12 +19,10 @@ import { adminSuper } from '../../api/adminApi';
 import { DataTable, PageHeader, StatusBadge, type Column } from '../../components';
 import type { SuperAuditEntry } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 const PAGE_SIZE = 25;
 
 export default function SuperAuditLog() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('super.page_title'));
+  usePageTitle("Super Admin");
   const { tenantPath } = useTenant();
 
   const [logs, setLogs] = useState<SuperAuditEntry[]>([]);
@@ -89,7 +87,7 @@ export default function SuperAuditLog() {
 
   const exportCsv = () => {
     if (logs.length === 0) return;
-    const headers = ['ID', t('super.col_action'), t('super.col_target'), t('super.col_target'), t('super.col_actor'), t('super.col_description'), t('super.col_date')];
+    const headers = ['ID', "Col", "Target", "Target", "Actor", "Description", "Date"];
     const rows = logs.map((entry) => [
       entry.id,
       entry.action_type,
@@ -111,11 +109,11 @@ export default function SuperAuditLog() {
 
   const columns: Column<SuperAuditEntry>[] = [
     {
-      key: 'action_type', label: t('super.col_action'), sortable: true,
+      key: 'action_type', label: "Col", sortable: true,
       render: (entry) => <StatusBadge status={entry.action_type} />,
     },
     {
-      key: 'target_label', label: t('super.col_target'), sortable: true,
+      key: 'target_label', label: "Target", sortable: true,
       render: (entry) => {
         const targetLink = entry.target_type === 'user' && entry.target_id
           ? tenantPath(`/admin/super/users/${entry.target_id}`)
@@ -137,21 +135,21 @@ export default function SuperAuditLog() {
       },
     },
     {
-      key: 'actor_name', label: t('super.col_actor'),
+      key: 'actor_name', label: "Actor",
       render: (entry) => entry.actor_id ? (
         <Link to={tenantPath(`/admin/super/users/${entry.actor_id}`)} className="hover:text-primary">
           {entry.actor_name || `User #${entry.actor_id}`}
         </Link>
       ) : (
-        <span>{entry.actor_name || t('super.system')}</span>
+        <span>{entry.actor_name || "System"}</span>
       ),
     },
     {
-      key: 'description', label: t('super.col_description'),
+      key: 'description', label: "Description",
       render: (entry) => <span className="text-sm text-default-500">{entry.description}</span>,
     },
     {
-      key: 'created_at', label: t('super.col_date'), sortable: true,
+      key: 'created_at', label: "Date", sortable: true,
       render: (entry) => (
         <span className="text-sm text-default-500">
           {new Date(entry.created_at).toLocaleString()}
@@ -163,13 +161,13 @@ export default function SuperAuditLog() {
   return (
     <div>
       <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('super.page_title')}</Link>
+        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{"Super Admin"}</Link>
         <span>/</span>
-        <span className="text-foreground">{t('super.audit_log')}</span>
+        <span className="text-foreground">{"Audit Log"}</span>
       </nav>
       <PageHeader
-        title={t('super.super_audit_log_title')}
-        description={t('super.super_audit_log_desc')}
+        title={"Super Audit Log"}
+        description={"View all super-admin actions taken across the platform"}
         actions={
           <Button
             variant="flat"
@@ -178,7 +176,7 @@ export default function SuperAuditLog() {
             onPress={exportCsv}
             isDisabled={logs.length === 0}
           >
-            {t('super.export_csv')}
+            {"Export CSV"}
           </Button>
         }
       />
@@ -186,7 +184,7 @@ export default function SuperAuditLog() {
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-4 items-end">
         <Select
-          label={t('super.label_action_type')}
+          label={"Action Type"}
           size="sm"
           className="max-w-[180px]"
           selectedKeys={actionType ? [actionType] : []}
@@ -195,18 +193,18 @@ export default function SuperAuditLog() {
             resetAndFilter();
           }}
         >
-          <SelectItem key="user_created">{t('super.event_user_created')}</SelectItem>
-          <SelectItem key="user_moved">{t('super.event_user_moved')}</SelectItem>
-          <SelectItem key="tenant_created">{t('super.event_tenant_created')}</SelectItem>
-          <SelectItem key="tenant_updated">{t('super.event_tenant_updated')}</SelectItem>
-          <SelectItem key="bulk_users_moved">{t('super.event_bulk_users_moved')}</SelectItem>
-          <SelectItem key="bulk_tenants_updated">{t('super.event_bulk_tenants_updated')}</SelectItem>
-          <SelectItem key="federation_lockdown">{t('super.event_federation_lockdown')}</SelectItem>
-          <SelectItem key="federation_updated">{t('super.event_federation_updated')}</SelectItem>
+          <SelectItem key="user_created">{"Event User created"}</SelectItem>
+          <SelectItem key="user_moved">{"Event User Moved"}</SelectItem>
+          <SelectItem key="tenant_created">{"Event Tenant created"}</SelectItem>
+          <SelectItem key="tenant_updated">{"Event Tenant updated"}</SelectItem>
+          <SelectItem key="bulk_users_moved">{"Event Bulk Users Moved"}</SelectItem>
+          <SelectItem key="bulk_tenants_updated">{"Event Bulk Tenants updated"}</SelectItem>
+          <SelectItem key="federation_lockdown">{"Event Federation Lockdown"}</SelectItem>
+          <SelectItem key="federation_updated">{"Event Federation updated"}</SelectItem>
         </Select>
 
         <Select
-          label={t('super.label_target_type')}
+          label={"Target Type"}
           size="sm"
           className="max-w-[160px]"
           selectedKeys={targetType ? [targetType] : []}
@@ -215,14 +213,14 @@ export default function SuperAuditLog() {
             resetAndFilter();
           }}
         >
-          <SelectItem key="user">{t('super.target_type_user')}</SelectItem>
-          <SelectItem key="tenant">{t('super.target_type_tenant')}</SelectItem>
-          <SelectItem key="bulk">{t('super.target_type_bulk')}</SelectItem>
-          <SelectItem key="federation">{t('super.target_type_federation')}</SelectItem>
+          <SelectItem key="user">{"Target Type User"}</SelectItem>
+          <SelectItem key="tenant">{"Target Type Tenant"}</SelectItem>
+          <SelectItem key="bulk">{"Target Type Bulk"}</SelectItem>
+          <SelectItem key="federation">{"Target Type Federation"}</SelectItem>
         </Select>
 
         <Input
-          label={t('super.label_from_date')}
+          label={"From Date"}
           type="date"
           size="sm"
           className="max-w-[170px]"
@@ -231,7 +229,7 @@ export default function SuperAuditLog() {
         />
 
         <Input
-          label={t('super.label_to_date')}
+          label={"To Date"}
           type="date"
           size="sm"
           className="max-w-[170px]"
@@ -240,7 +238,7 @@ export default function SuperAuditLog() {
         />
 
         <Input
-          label={t('super.label_search')}
+          label={"Search"}
           size="sm"
           className="max-w-[200px]"
           value={search}
@@ -257,7 +255,7 @@ export default function SuperAuditLog() {
             startContent={<X size={14} />}
             onPress={clearFilters}
           >
-            {t('super.clear_filters')}
+            {"Clear Filters"}
           </Button>
         )}
       </div>

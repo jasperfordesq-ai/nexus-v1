@@ -19,7 +19,6 @@ import {
   Spinner,
 } from '@heroui/react';
 import { X } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { adminNewsletters } from '../../api/adminApi';
 
 interface TemplatePreviewProps {
@@ -29,7 +28,6 @@ interface TemplatePreviewProps {
 }
 
 export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreviewProps) {
-  const { t } = useTranslation('admin');
   const [html, setHtml] = useState('');
   const [name, setName] = useState('');
   const [subject, setSubject] = useState('');
@@ -44,7 +42,7 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
       if (res.success && res.data) {
         const data = res.data as { html?: string; name?: string; subject?: string };
         setHtml(data.html || '');
-        setName(data.name || t('template_form.template_preview'));
+        setName(data.name || "Template Preview");
         setSubject(data.subject || '');
       }
     } catch {
@@ -64,27 +62,27 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
     if (loading) {
       return (
         <div className="flex items-center justify-center py-20">
-          <Spinner size="lg" label={t('template_form.loading_preview')} />
+          <Spinner size="lg" label={"Loading preview..."} />
         </div>
       );
     }
     if (loadError) {
       return (
         <div className="flex items-center justify-center py-20 text-danger">
-          {t('template_form.load_failed')}
+          {"Load failed"}
         </div>
       );
     }
     if (!html) {
       return (
         <div className="flex items-center justify-center py-20 text-default-400">
-          {t('template_form.no_content')}
+          {"No content found"}
         </div>
       );
     }
     return (
       <iframe
-        title={t('template_form.template_preview')}
+        title={"Template Preview"}
         sandbox="allow-same-origin"
         srcDoc={html}
         className="w-full border-0"
@@ -105,7 +103,7 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
           <span>{name}</span>
           {subject && (
             <span className="text-sm font-normal text-default-500">
-              {t('template_form.subject_label')} {subject}
+              {"Subject"} {subject}
             </span>
           )}
         </ModalHeader>
@@ -118,7 +116,7 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
             startContent={<X size={16} />}
             onPress={onClose}
           >
-            {t('template_form.close')}
+            {"Close"}
           </Button>
         </ModalFooter>
       </ModalContent>

@@ -24,7 +24,6 @@ import { api } from '@/lib/api';
 import { DataTable, PageHeader, ConfirmModal, type Column } from '../../components';
 import type { AdminGroup } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 import { resolveAssetUrl } from '@/lib/helpers';
 const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
   active: 'success',
@@ -41,8 +40,7 @@ const visibilityIcons: Record<string, typeof Eye> = {
 };
 
 export function GroupList() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('groups.page_title'));
+  usePageTitle("Groups");
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -81,7 +79,7 @@ export function GroupList() {
         }
       }
     } catch {
-      toast.error(t('groups.failed_to_load_groups'));
+      toast.error("Failed to load groups");
     } finally {
       setLoading(false);
     }
@@ -98,13 +96,13 @@ export function GroupList() {
     try {
       const res = await adminGroups.delete(confirmDelete.id);
       if (res?.success) {
-        toast.success(t('groups.group_deleted_successfully'));
+        toast.success("Group deleted successfully");
         loadItems();
       } else {
-        toast.error(res?.error || t('groups.failed_to_delete_group'));
+        toast.error(res?.error || "Failed to delete group");
       }
     } catch {
-      toast.error(t('groups.an_unexpected_error_occurred'));
+      toast.error("An unexpected error occurred");
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -116,13 +114,13 @@ export function GroupList() {
     try {
       const res = await adminGroups.updateStatus(item.id, newStatus);
       if (res?.success) {
-        toast.success(t('groups.group_status_changed', { name: item.name, status: newStatus }));
+        toast.success(`Group status changed`);
         loadItems();
       } else {
-        toast.error(t('groups.failed_to_update_group_status'));
+        toast.error("Failed to update group status");
       }
     } catch {
-      toast.error(t('groups.failed_to_update_group_status'));
+      toast.error("Failed to update group status");
     }
   };
 
@@ -131,11 +129,11 @@ export function GroupList() {
     try {
       const res = await api.post(`/v2/admin/groups/${item.id}/${action}`);
       if (res?.success) {
-        toast.success(t('groups.group_action_success', { action, name: item.name }));
+        toast.success(`Group Action succeeded`);
         loadItems();
       }
     } catch {
-      toast.error(t('groups.failed_to_action_group', { action }));
+      toast.error(`Failed to action group`);
     }
   };
 
@@ -150,13 +148,13 @@ export function GroupList() {
     try {
       const res = await api.post(`/v2/admin/groups/${cloneTarget.id}/clone`, { name: cloneName.trim(), clone_members: false });
       if (res?.success) {
-        toast.success(t('groups.group_cloned', { name: cloneName.trim() }));
+        toast.success(`Group Cloned`);
         setCloneTarget(null);
         setCloneName('');
         loadItems();
       }
     } catch {
-      toast.error(t('groups.failed_to_clone_group'));
+      toast.error("Failed to clone group");
     } finally {
       setCloneLoading(false);
     }
@@ -165,19 +163,19 @@ export function GroupList() {
   const handleBulkArchive = async () => {
     try {
       await api.post('/v2/admin/groups/bulk-archive', { group_ids: Array.from(selectedIds) });
-      toast.success(t('groups.groups_archived', { count: selectedIds.size }));
+      toast.success(`Groups Archived`);
       setSelectedIds(new Set());
       loadItems();
-    } catch { toast.error(t('groups.failed_to_archive_groups')); }
+    } catch { toast.error("Failed to archive groups"); }
   };
 
   const handleBulkDelete = async () => {
-    if (!confirm(t('groups.confirm_bulk_delete', { count: selectedIds.size }))) return;
+    if (!confirm(`Are you sure you want to bulk delete?`)) return;
     // Delete one by one (no bulk delete endpoint)
     for (const id of selectedIds) {
       try { await adminGroups.delete(id); } catch { /* skip failures */ }
     }
-    toast.success(t('groups.groups_deleted', { count: selectedIds.size }));
+    toast.success(`Groups deleted`);
     setSelectedIds(new Set());
     loadItems();
   };
@@ -195,7 +193,7 @@ export function GroupList() {
               setSelectedIds(new Set());
             }
           }}
-          aria-label={t('common.select_all')}
+          aria-label={"Select All"}
         />
       ),
       render: (item) => (
@@ -207,13 +205,13 @@ export function GroupList() {
             else next.delete(item.id);
             setSelectedIds(next);
           }}
-          aria-label={t('common.select_item', { name: item.name })}
+          aria-label={`Select Item`}
         />
       ),
     },
     {
       key: 'name',
-      label: t('groups.col_group'),
+      label: "Group",
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-3">
@@ -236,7 +234,7 @@ export function GroupList() {
     },
     {
       key: 'status',
-      label: t('groups.col_status'),
+      label: "Status",
       sortable: true,
       render: (item) => (
         <Chip
@@ -251,7 +249,7 @@ export function GroupList() {
     },
     {
       key: 'visibility',
-      label: t('groups.col_visibility'),
+      label: "Visibility",
       sortable: true,
       render: (item) => {
         const Icon = visibilityIcons[item.visibility] || Eye;
@@ -265,7 +263,7 @@ export function GroupList() {
     },
     {
       key: 'member_count',
-      label: t('groups.col_members'),
+      label: "Members",
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-1.5">
@@ -276,15 +274,15 @@ export function GroupList() {
     },
     {
       key: 'creator_name',
-      label: t('groups.col_creator'),
+      label: "Creator",
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.creator_name || t('groups.unknown')}</span>
+        <span className="text-sm text-default-600">{item.creator_name || "Unknown"}</span>
       ),
     },
     {
       key: 'created_at',
-      label: t('groups.col_created'),
+      label: "Created",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -294,16 +292,16 @@ export function GroupList() {
     },
     {
       key: 'actions',
-      label: t('groups.col_actions'),
+      label: "Actions",
       render: (item) => (
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="light" aria-label={t('groups.label_actions')}>
+            <Button isIconOnly size="sm" variant="light" aria-label={"Actions"}>
               <MoreVertical size={16} />
             </Button>
           </DropdownTrigger>
           <DropdownMenu
-            aria-label={t('groups.label_group_actions')}
+            aria-label={"Group Actions"}
             onAction={(key) => {
               if (key === 'view') navigate(tenantPath(`/groups/${item.id}`));
               else if (key === 'edit') navigate(tenantPath(`/admin/groups/${item.id}/edit`));
@@ -315,32 +313,32 @@ export function GroupList() {
             }}
           >
             <DropdownItem key="view" startContent={<Eye size={14} />}>
-              {t('groups.view_group')}
+              {"View Group"}
             </DropdownItem>
             <DropdownItem key="edit" startContent={<Pencil size={14} />}>
-              {t('groups.edit_group')}
+              {"Edit Group"}
             </DropdownItem>
             <DropdownItem
               key="toggle-status"
               startContent={item.status === 'active' ? <PowerOff size={14} /> : <Power size={14} />}
               className={item.status === 'active' ? 'text-warning' : 'text-success'}
             >
-              {item.status === 'active' ? t('groups.deactivate') : t('groups.activate')}
+              {item.status === 'active' ? "Deactivate" : "Activate"}
             </DropdownItem>
             <DropdownItem
               key="archive"
               startContent={<EyeOff size={14} />}
             >
-              {item.status === 'archived' ? t('groups.unarchive') : t('groups.archive')}
+              {item.status === 'archived' ? "Unarchive" : "Archive"}
             </DropdownItem>
             <DropdownItem key="clone" startContent={<Users size={14} />}>
-              {t('groups.clone_group')}
+              {"Clone Group"}
             </DropdownItem>
             <DropdownItem key="audit" startContent={<Eye size={14} />}>
-              {t('groups.audit_log')}
+              {"Audit Log"}
             </DropdownItem>
             <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
-              {t('common.delete')}
+              {"Delete"}
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>
@@ -351,8 +349,8 @@ export function GroupList() {
   return (
     <div>
       <PageHeader
-        title={t('groups.group_list_title')}
-        description={t('groups.group_list_desc')}
+        title={"Group List"}
+        description={"View and manage all community groups"}
         actions={
           <div className="flex gap-2">
             <Button
@@ -360,14 +358,14 @@ export function GroupList() {
               size="sm"
               onPress={() => navigate(tenantPath('/admin/groups/analytics'))}
             >
-              {t('groups.analytics')}
+              {"Analytics"}
             </Button>
             <Button
               variant="flat"
               size="sm"
               onPress={() => navigate(tenantPath('/admin/groups/approvals'))}
             >
-              {t('groups.approvals')}
+              {"Approvals"}
             </Button>
           </div>
         }
@@ -380,20 +378,20 @@ export function GroupList() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={t('groups.tab_all')} />
-          <Tab key="active" title={t('groups.tab_active')} />
-          <Tab key="pending" title={t('groups.tab_pending')} />
-          <Tab key="inactive" title={t('groups.tab_inactive')} />
-          <Tab key="archived" title={t('groups.tab_archived')} />
+          <Tab key="all" title={"All"} />
+          <Tab key="active" title={"Active"} />
+          <Tab key="pending" title={"Pending"} />
+          <Tab key="inactive" title={"Inactive"} />
+          <Tab key="archived" title={"Archived"} />
         </Tabs>
       </div>
 
       {selectedIds.size > 0 && (
         <div className="flex items-center gap-3 p-3 mb-4 bg-primary/10 rounded-lg">
-          <span className="text-sm font-medium">{t('groups.n_selected', { count: selectedIds.size })}</span>
-          <Button size="sm" variant="flat" onPress={handleBulkArchive}>{t('groups.archive')}</Button>
-          <Button size="sm" variant="flat" color="danger" onPress={handleBulkDelete}>{t('common.delete')}</Button>
-          <Button size="sm" variant="flat" onPress={() => setSelectedIds(new Set())}>{t('common.clear')}</Button>
+          <span className="text-sm font-medium">{`N Selected`}</span>
+          <Button size="sm" variant="flat" onPress={handleBulkArchive}>{"Archive"}</Button>
+          <Button size="sm" variant="flat" color="danger" onPress={handleBulkDelete}>{"Delete"}</Button>
+          <Button size="sm" variant="flat" onPress={() => setSelectedIds(new Set())}>{"Clear"}</Button>
         </div>
       )}
 
@@ -401,7 +399,7 @@ export function GroupList() {
         columns={columns}
         data={items}
         isLoading={loading}
-        searchPlaceholder={t('groups.search_groups_placeholder')}
+        searchPlaceholder={"Search groups..."}
         onSearch={(q) => { setSearch(q); setPage(1); }}
         onRefresh={loadItems}
         totalItems={total}
@@ -415,9 +413,9 @@ export function GroupList() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title={t('groups.delete_group')}
-          message={t('groups.confirm_delete_group', { name: confirmDelete.name })}
-          confirmLabel={t('common.delete')}
+          title={"Delete Group"}
+          message={`Delete Group`}
+          confirmLabel={"Delete"}
           confirmColor="danger"
           isLoading={actionLoading}
         />
@@ -430,10 +428,10 @@ export function GroupList() {
         size="sm"
       >
         <ModalContent>
-          <ModalHeader>{t('groups.clone_group_title')}</ModalHeader>
+          <ModalHeader>{"Clone Group"}</ModalHeader>
           <ModalBody>
             <Input
-              label={t('groups.clone_group_name_label')}
+              label={"Clone Group Name"}
               value={cloneName}
               onValueChange={setCloneName}
               variant="bordered"
@@ -442,10 +440,10 @@ export function GroupList() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => { setCloneTarget(null); setCloneName(''); }} isDisabled={cloneLoading}>
-              {t('common.cancel')}
+              {"Cancel"}
             </Button>
             <Button color="primary" onPress={handleCloneConfirm} isLoading={cloneLoading} isDisabled={!cloneName.trim()}>
-              {t('groups.clone_group_confirm')}
+              {"Clone Group Confirm"}
             </Button>
           </ModalFooter>
         </ModalContent>

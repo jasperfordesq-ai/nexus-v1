@@ -68,7 +68,6 @@ import { api, tokenManager } from '@/lib/api';
 import { CHART_COLORS, CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
 
-import { useTranslation } from 'react-i18next';
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -166,8 +165,7 @@ async function exportCsv(exportType: string, dateFrom?: string, dateTo?: string)
 // ---------------------------------------------------------------------------
 
 export function HoursReportsPage() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('reports.page_title'));
+  usePageTitle("Reports");
   const toast = useToast();
 
   const [groupBy, setGroupBy] = useState('category');
@@ -190,7 +188,7 @@ export function HoursReportsPage() {
         setSummary(res.data as HoursSummary);
       }
     } catch {
-      toast.error(t('reports.failed_to_load_summary_data'));
+      toast.error("Failed to load summary data");
     }
   }, [dateFrom, dateTo, toast, t])
 
@@ -206,7 +204,7 @@ export function HoursReportsPage() {
         setData(res.data);
       }
     } catch {
-      toast.error(t('reports.failed_to_load_report_data'));
+      toast.error("Failed to load report data");
     } finally {
       setLoading(false);
     }
@@ -231,28 +229,28 @@ export function HoursReportsPage() {
   const renderSummary = () => (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
       <StatCard
-        label={t('reports.label_total_hours')}
+        label={"Total Hours"}
         value={summary ? (summary.total_hours ?? 0).toFixed(1) : '\u2014'}
         icon={Clock}
         color="warning"
         loading={!summary}
       />
       <StatCard
-        label={t('reports.label_total_transactions')}
+        label={"Total Transactions"}
         value={summary?.total_transactions ?? '\u2014'}
         icon={ArrowLeftRight}
         color="primary"
         loading={!summary}
       />
       <StatCard
-        label={t('reports.label_unique_givers')}
+        label={"Unique Givers"}
         value={summary?.unique_givers ?? '\u2014'}
         icon={Users}
         color="success"
         loading={!summary}
       />
       <StatCard
-        label={t('reports.label_avg_hours_transaction')}
+        label={"Avg Hours Transaction"}
         value={summary ? (summary.avg_hours_per_transaction ?? 0).toFixed(1) : '\u2014'}
         icon={Activity}
         color="secondary"
@@ -274,7 +272,7 @@ export function HoursReportsPage() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <BarChart3 size={18} className="text-primary" />
-            <h3 className="font-semibold">{t('reports.chart_hours_by_category')}</h3>
+            <h3 className="font-semibold">{"Chart Hours by Category"}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
@@ -291,7 +289,7 @@ export function HoursReportsPage() {
               </ResponsiveContainer>
             ) : (
               <p className="flex h-[350px] items-center justify-center text-sm text-default-400">
-                {t('reports.no_category_data')}
+                {"No category data found"}
               </p>
             )}
           </CardBody>
@@ -301,7 +299,7 @@ export function HoursReportsPage() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <PieChartIcon size={18} className="text-secondary" />
-            <h3 className="font-semibold">{t('reports.chart_category_distribution')}</h3>
+            <h3 className="font-semibold">{"Chart Category Distribution"}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
@@ -339,7 +337,7 @@ export function HoursReportsPage() {
               </ResponsiveContainer>
             ) : (
               <p className="flex h-[350px] items-center justify-center text-sm text-default-400">
-                {t('reports.no_category_data')}
+                {"No category data found"}
               </p>
             )}
           </CardBody>
@@ -366,27 +364,27 @@ export function HoursReportsPage() {
               if (v) setSortBy(String(v));
             }}
             className="w-40"
-            aria-label={t('reports.label_sort_by')}
-            label={t('reports.label_sort_by')}
+            aria-label={"Sort by"}
+            label={"Sort by"}
           >
             {SORT_OPTIONS.map((opt) => (
               <SelectItem key={opt.key}>
-                {opt.key === 'total' ? t('reports.sort_total_hours') : opt.key === 'given' ? t('reports.sort_hours_given') : t('reports.sort_hours_received')}
+                {opt.key === 'total' ? "Sort Total Hours" : opt.key === 'given' ? "Sort Hours Given" : "Sort Hours Received"}
               </SelectItem>
             ))}
           </Select>
         </div>
 
-        <Table aria-label={t('reports.label_hours_by_member')} shadow="sm">
+        <Table aria-label={"Hours by Member"} shadow="sm">
           <TableHeader>
-            <TableColumn>{t('reports.col_member')}</TableColumn>
-            <TableColumn>{t('reports.col_hours_given')}</TableColumn>
-            <TableColumn>{t('reports.col_hours_received')}</TableColumn>
-            <TableColumn>{t('reports.col_total')}</TableColumn>
-            <TableColumn>{t('reports.col_balance')}</TableColumn>
+            <TableColumn>{"Member"}</TableColumn>
+            <TableColumn>{"Hours Given"}</TableColumn>
+            <TableColumn>{"Hours Received"}</TableColumn>
+            <TableColumn>{"Total"}</TableColumn>
+            <TableColumn>{"Balance"}</TableColumn>
           </TableHeader>
           <TableBody
-            emptyContent={t('reports.no_member_hours_data')}
+            emptyContent={"No member hours data found"}
             isLoading={loading}
             loadingContent={<Spinner />}
           >
@@ -429,7 +427,7 @@ export function HoursReportsPage() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <TrendingUp size={18} className="text-primary" />
-          <h3 className="font-semibold">{t('reports.chart_monthly_hours_trend')}</h3>
+          <h3 className="font-semibold">{"Chart Monthly Hours Trend"}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
           {loading ? (
@@ -455,7 +453,7 @@ export function HoursReportsPage() {
                 <Area
                   type="monotone"
                   dataKey="total_hours"
-                  name={t('reports.sort_total_hours') as string}
+                  name={"Sort Total Hours" as string}
                   stroke={CHART_COLOR_MAP.primary}
                   fill="url(#hrTotalGrad)"
                   strokeWidth={2}
@@ -463,7 +461,7 @@ export function HoursReportsPage() {
                 <Area
                   type="monotone"
                   dataKey="transaction_count"
-                  name={t('reports.label_transactions') as string}
+                  name={"Transactions" as string}
                   stroke={CHART_COLOR_MAP.success}
                   fill="url(#hrTxGrad)"
                   strokeWidth={2}
@@ -472,7 +470,7 @@ export function HoursReportsPage() {
             </ResponsiveContainer>
           ) : (
             <p className="flex h-[350px] items-center justify-center text-sm text-default-400">
-              {t('reports.no_period_data')}
+              {"No period data found"}
             </p>
           )}
         </CardBody>
@@ -487,8 +485,8 @@ export function HoursReportsPage() {
   return (
     <div>
       <PageHeader
-        title={t('reports.hours_reports_page_title')}
-        description={t('reports.hours_reports_page_desc')}
+        title={"Hours Reports Page"}
+        description={"View detailed reports on time credit exchanges and hours traded"}
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Input
@@ -496,7 +494,7 @@ export function HoursReportsPage() {
               size="sm"
               value={dateFrom}
               onValueChange={setDateFrom}
-              aria-label={t('reports.label_from_date')}
+              aria-label={"From Date"}
               className="w-36"
               variant="bordered"
             />
@@ -505,7 +503,7 @@ export function HoursReportsPage() {
               size="sm"
               value={dateTo}
               onValueChange={setDateTo}
-              aria-label={t('reports.label_to_date')}
+              aria-label={"To Date"}
               className="w-36"
               variant="bordered"
             />
@@ -513,11 +511,11 @@ export function HoursReportsPage() {
               variant="flat"
               startContent={<Download size={16} />}
               onPress={async () => {
-                try { await exportCsv(groupBy, dateFrom, dateTo); } catch { toast.error(t('reports.failed_to_export_c_s_v')); }
+                try { await exportCsv(groupBy, dateFrom, dateTo); } catch { toast.error("Failed to export CSV"); }
               }}
               size="sm"
             >
-              {t('reports.btn_export_csv')}
+              {"Export CSV"}
             </Button>
             <Button
               variant="flat"
@@ -527,7 +525,7 @@ export function HoursReportsPage() {
               isDisabled={loading}
               size="sm"
             >
-              {t('reports.btn_refresh')}
+              {"Refresh"}
             </Button>
           </div>
         }
@@ -542,9 +540,9 @@ export function HoursReportsPage() {
         color="primary"
         classNames={{ tabList: 'mb-4' }}
       >
-        <Tab key="category" title={<span className="flex items-center gap-1.5"><PieChartIcon size={14} /> {t('reports.tab_by_category')}</span>} />
-        <Tab key="member" title={<span className="flex items-center gap-1.5"><Users size={14} /> {t('reports.tab_by_member')}</span>} />
-        <Tab key="period" title={<span className="flex items-center gap-1.5"><TrendingUp size={14} /> {t('reports.tab_monthly_trend')}</span>} />
+        <Tab key="category" title={<span className="flex items-center gap-1.5"><PieChartIcon size={14} /> {"By Category"}</span>} />
+        <Tab key="member" title={<span className="flex items-center gap-1.5"><Users size={14} /> {"By Member"}</span>} />
+        <Tab key="period" title={<span className="flex items-center gap-1.5"><TrendingUp size={14} /> {"Monthly Trend"}</span>} />
       </Tabs>
 
       {groupBy === 'category' && renderCategory()}

@@ -32,7 +32,7 @@ interface PageItem {
 
 export function PagesAdmin() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('content.page_title'));
+  usePageTitle("Content");
   const { tenantPath, refreshTenant } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -56,7 +56,7 @@ export function PagesAdmin() {
         }
       }
     } catch {
-      toast.error(t('content.failed_to_load_pages'));
+      toast.error("Failed to load pages");
     } finally {
       setLoading(false);
     }
@@ -72,14 +72,14 @@ export function PagesAdmin() {
     try {
       const res = await adminPages.delete(confirmDelete.id);
       if (res?.success) {
-        toast.success(t('content.page_deleted_successfully'));
+        toast.success("Page deleted successfully");
         fetchData();
         refreshTenant();
       } else {
-        toast.error(t('content.failed_to_delete_page'));
+        toast.error("Failed to delete page");
       }
     } catch {
-      toast.error(t('content.an_unexpected_error_occurred'));
+      toast.error("An unexpected error occurred");
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -89,7 +89,7 @@ export function PagesAdmin() {
   const columns: Column<PageItem>[] = [
     {
       key: 'title',
-      label: t('content.label_name'),
+      label: "Name",
       sortable: true,
       render: (item) => (
         <Button
@@ -104,13 +104,13 @@ export function PagesAdmin() {
     },
     {
       key: 'slug',
-      label: t('federation.col_slug'),
+      label: "Slug",
       sortable: true,
       render: (item) => <span className="text-sm text-default-500">/{item.slug}</span>,
     },
     {
       key: 'status',
-      label: t('listings.status'),
+      label: "Status",
       sortable: true,
       render: (item) => <StatusBadge status={item.status || 'draft'} />,
     },
@@ -120,15 +120,15 @@ export function PagesAdmin() {
       sortable: true,
       render: (item) => item.show_in_menu ? (
         <Chip size="sm" variant="flat" color="primary">
-          {item.menu_location === 'footer' ? t('content.footer') : t('content.about')}
+          {item.menu_location === 'footer' ? "Footer" : "About"}
         </Chip>
       ) : (
-        <span className="text-sm text-default-400">{t('common.no')}</span>
+        <span className="text-sm text-default-400">{"No"}</span>
       ),
     },
     {
       key: 'created_at',
-      label: t('listings.created'),
+      label: "Created",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -138,7 +138,7 @@ export function PagesAdmin() {
     },
     {
       key: 'actions',
-      label: t('listings.actions'),
+      label: "Actions",
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -147,7 +147,7 @@ export function PagesAdmin() {
             variant="flat"
             color="primary"
             onPress={() => navigate(tenantPath(`/admin/pages/builder/${item.id}`))}
-            aria-label={t('content.label_edit_page')}
+            aria-label={"Edit Page"}
           >
             <Pencil size={14} />
           </Button>
@@ -157,7 +157,7 @@ export function PagesAdmin() {
             variant="flat"
             color="danger"
             onPress={() => setConfirmDelete(item)}
-            aria-label={t('content.label_delete_page')}
+            aria-label={"Delete Page"}
           >
             <Trash2 size={14} />
           </Button>
@@ -169,7 +169,7 @@ export function PagesAdmin() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('content.pages_admin_title')} description={t('content.pages_admin_desc')} />
+        <PageHeader title={"Pages Admin"} description={"Create and manage custom pages for your platform"} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -178,15 +178,15 @@ export function PagesAdmin() {
   return (
     <div>
       <PageHeader
-        title={t('content.pages_admin_title')}
-        description={t('content.pages_admin_desc')}
+        title={"Pages Admin"}
+        description={"Create and manage custom pages for your platform"}
         actions={
           <Button
             color="primary"
             startContent={<Plus size={16} />}
             onPress={() => navigate(tenantPath('/admin/pages/builder/new'))}
           >
-            {t('breadcrumbs.create')} {t('breadcrumbs.pages')}
+            {"Create"} {"Pages"}
           </Button>
         }
       />
@@ -194,9 +194,9 @@ export function PagesAdmin() {
       {data.length === 0 ? (
         <EmptyState
           icon={FileText}
-          title={t('no_data')}
-          description={t('content.pages_admin_desc')}
-          actionLabel={`${t('breadcrumbs.create')} ${t('breadcrumbs.pages')}`}
+          title={"No data available"}
+          description={"Create and manage custom pages for your platform"}
+          actionLabel={`${"Create"} ${"Pages"}`}
           onAction={() => navigate(tenantPath('/admin/pages/builder/new'))}
         />
       ) : (
@@ -213,9 +213,9 @@ export function PagesAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title={`${t('common.delete')} ${t('breadcrumbs.pages')}`}
-          message={t('gamification.confirm_delete_campaign', { name: confirmDelete.title })}
-          confirmLabel={t('common.delete')}
+          title={`${"Delete"} ${"Pages"}`}
+          message={`Delete Campaign`}
+          confirmLabel={"Delete"}
           confirmColor="danger"
           isLoading={actionLoading}
         />

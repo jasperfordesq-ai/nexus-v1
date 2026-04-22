@@ -25,7 +25,6 @@ import { useTenant } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, ConfirmModal, type Column } from '../../components';
 
-import { useTranslation } from 'react-i18next';
 interface Segment {
   id: number;
   name: string;
@@ -39,9 +38,8 @@ interface Segment {
 }
 
 export function Segments() {
-  const { t } = useTranslation('admin');
   const { tenantPath } = useTenant();
-  usePageTitle(t('newsletters.page_title'));
+  usePageTitle("Newsletters");
   const navigate = useNavigate();
   const [items, setItems] = useState<Segment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -147,11 +145,11 @@ export function Segments() {
         <div className="flex justify-end">
           <Dropdown>
             <DropdownTrigger>
-              <Button isIconOnly size="sm" variant="light" aria-label={t('newsletters.label_actions')}>
+              <Button isIconOnly size="sm" variant="light" aria-label={"Actions"}>
                 <MoreVertical size={16} />
               </Button>
             </DropdownTrigger>
-            <DropdownMenu aria-label={t('newsletters.label_segment_actions')}>
+            <DropdownMenu aria-label={"Actions"}>
               <DropdownItem
                 key="edit"
                 startContent={<Pencil size={14} />}
@@ -182,8 +180,8 @@ export function Segments() {
     return (
       <div>
         <PageHeader
-          title={t('newsletters.segments_title')}
-          description={t('newsletters.segments_desc')}
+          title={"Segments"}
+          description={"Create audience segments to target specific groups of members"}
           actions={
             <Button
               color="primary"
@@ -196,8 +194,8 @@ export function Segments() {
         />
         <EmptyState
           icon={Filter}
-          title={t('newsletters.no_segments_created')}
-          description={t('newsletters.desc_create_audience_segments_to_target_speci')}
+          title={"No Segments created"}
+          description={"Create audience segments to target specific groups of members"}
           actionLabel="Create Your First Segment"
           onAction={() => navigate(tenantPath('/admin/newsletters/segments/create'))}
         />
@@ -208,8 +206,8 @@ export function Segments() {
   return (
     <div>
       <PageHeader
-        title={t('newsletters.segments_title')}
-        description={t('newsletters.segments_desc')}
+        title={"Segments"}
+        description={"Create audience segments to target specific groups of members"}
         actions={
           <div className="flex gap-2">
             <Button
@@ -239,9 +237,9 @@ export function Segments() {
           setDeleteTarget(null);
         }}
         onConfirm={handleDelete}
-        title={t('newsletters.delete_segment')}
-        message={t('newsletters.delete_segment_confirm', { name: deleteTarget?.name })}
-        confirmLabel={t('newsletters.confirm_delete_segment_label')}
+        title={"Delete Segment"}
+        message={`Delete Segment Confirm`}
+        confirmLabel={"Confirm Delete Segment"}
         confirmColor="danger"
         isLoading={deleting}
       />

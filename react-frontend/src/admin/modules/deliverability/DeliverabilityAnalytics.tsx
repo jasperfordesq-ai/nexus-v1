@@ -17,7 +17,6 @@ import { useToast } from '@/contexts';
 import { adminDeliverability } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 
-import { useTranslation } from 'react-i18next';
 interface AnalyticsData {
   completion_trends: Array<{ date: string; count: number }>;
   priority_distribution: Record<string, number>;
@@ -26,8 +25,7 @@ interface AnalyticsData {
 }
 
 export function DeliverabilityAnalytics() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('deliverability.page_title'));
+  usePageTitle("Deliverability");
   const toast = useToast();
 
   const [data, setData] = useState<AnalyticsData | null>(null);
@@ -40,14 +38,14 @@ export function DeliverabilityAnalytics() {
           setData(res.data as AnalyticsData);
         }
       })
-      .catch(() => toast.error(t('deliverability.failed_to_load_analytics')))
+      .catch(() => toast.error("Failed to load analytics"))
       .finally(() => setLoading(false));
   }, [toast, t])
 
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('deliverability.deliverability_analytics_title')} description={t('deliverability.deliverability_analytics_desc')} />
+        <PageHeader title={"Deliverability Analytics"} description={"View analytics and progress for all deliverables"} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -56,13 +54,13 @@ export function DeliverabilityAnalytics() {
   if (!data) {
     return (
       <div>
-        <PageHeader title={t('deliverability.deliverability_analytics_title')} description={t('deliverability.deliverability_analytics_desc')} />
+        <PageHeader title={"Deliverability Analytics"} description={"View analytics and progress for all deliverables"} />
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center justify-center py-16 text-center">
             <BarChart3 size={48} className="text-default-300 mb-3" />
-            <h3 className="text-lg font-semibold text-foreground">{t('deliverability.no_analytics_data')}</h3>
+            <h3 className="text-lg font-semibold text-foreground">{"No analytics data"}</h3>
             <p className="mt-1 max-w-md text-sm text-default-500">
-              {t('deliverability.no_analytics_desc')}
+              {"No analytics data is available yet"}
             </p>
           </CardBody>
         </Card>
@@ -72,18 +70,18 @@ export function DeliverabilityAnalytics() {
 
   return (
     <div>
-      <PageHeader title={t('deliverability.deliverability_analytics_title')} description={t('deliverability.deliverability_analytics_desc')} />
+      <PageHeader title={"Deliverability Analytics"} description={"View analytics and progress for all deliverables"} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-        <StatCard label={t('deliverability.label_completions_30d')} value={data.completion_trends?.length ?? 0} icon={BarChart3} color="primary" />
-        <StatCard label={t('deliverability.label_avg_completion_days')} value={data.avg_days_to_complete ?? '--'} icon={Clock} color="warning" />
-        <StatCard label={t('deliverability.label_priority_levels')} value={Object.keys(data.priority_distribution || {}).length} icon={CheckCircle} color="success" />
-        <StatCard label={t('deliverability.label_risk_levels')} value={Object.keys(data.risk_distribution || {}).length} icon={TrendingUp} color="secondary" />
+        <StatCard label={"Completions 30d"} value={data.completion_trends?.length ?? 0} icon={BarChart3} color="primary" />
+        <StatCard label={"Avg Completion Days"} value={data.avg_days_to_complete ?? '--'} icon={Clock} color="warning" />
+        <StatCard label={"Priority Levels"} value={Object.keys(data.priority_distribution || {}).length} icon={CheckCircle} color="success" />
+        <StatCard label={"Risk Levels"} value={Object.keys(data.risk_distribution || {}).length} icon={TrendingUp} color="secondary" />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{t('deliverability.by_priority')}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{"By Priority"}</h3></CardHeader>
           <CardBody>
             {data.priority_distribution && Object.keys(data.priority_distribution).length > 0 ? (
               <div className="space-y-3">
@@ -95,13 +93,13 @@ export function DeliverabilityAnalytics() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-default-400 text-center py-4">{t('deliverability.no_priority_data')}</p>
+              <p className="text-sm text-default-400 text-center py-4">{"No priority data"}</p>
             )}
           </CardBody>
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{t('deliverability.by_risk_level')}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{"By Risk Level"}</h3></CardHeader>
           <CardBody>
             {data.risk_distribution && Object.keys(data.risk_distribution).length > 0 ? (
               <div className="space-y-3">
@@ -113,7 +111,7 @@ export function DeliverabilityAnalytics() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-default-400 text-center py-4">{t('deliverability.no_risk_data')}</p>
+              <p className="text-sm text-default-400 text-center py-4">{"No risk data"}</p>
             )}
           </CardBody>
         </Card>

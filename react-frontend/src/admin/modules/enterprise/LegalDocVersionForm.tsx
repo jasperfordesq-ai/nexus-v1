@@ -13,7 +13,6 @@ import {
   Textarea,
   Switch,
 } from '@heroui/react';
-import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts/ToastContext';
 import { adminLegalDocs } from '@/admin/api/adminApi';
 import type { LegalDocumentVersion } from '@/admin/api/types';
@@ -34,7 +33,6 @@ export default function LegalDocVersionForm({
   onSuccess,
   onCancel,
 }: LegalDocVersionFormProps) {
-  const { t } = useTranslation('admin');
   const { success, error } = useToast();
   const isEditMode = !!editVersion;
 
@@ -68,15 +66,15 @@ export default function LegalDocVersionForm({
     const newErrors: Record<string, string> = {};
 
     if (!formData.version_number.trim()) {
-      newErrors.version_number = t('enterprise.version_form.version_number_required');
+      newErrors.version_number = "Version number is required";
     }
 
     if (!formData.content.trim()) {
-      newErrors.content = t('enterprise.version_form.content_required');
+      newErrors.content = "Content Required";
     }
 
     if (!formData.effective_date) {
-      newErrors.effective_date = t('enterprise.version_form.effective_date_required');
+      newErrors.effective_date = "Effective date is required";
     }
 
     setErrors(newErrors);
@@ -112,13 +110,13 @@ export default function LegalDocVersionForm({
       }
 
       if (response.success) {
-        success(isEditMode ? t('enterprise.version_form.version_updated') : t('enterprise.version_form.version_created'));
+        success(isEditMode ? "Version Updated" : "Version Created");
         onSuccess();
       } else {
-        error(response.error || (isEditMode ? t('enterprise.version_form.failed_to_update') : t('enterprise.version_form.failed_to_create')));
+        error(response.error || (isEditMode ? "Failed to update" : "Failed to create"));
       }
     } catch {
-      error(isEditMode ? t('enterprise.version_form.failed_to_update') : t('enterprise.version_form.failed_to_create'));
+      error(isEditMode ? "Failed to update" : "Failed to create");
     } finally {
       setSubmitting(false);
     }
@@ -126,26 +124,26 @@ export default function LegalDocVersionForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <ModalHeader>{isEditMode ? t('enterprise.version_form.title_edit') : t('enterprise.version_form.title_create')}</ModalHeader>
+      <ModalHeader>{isEditMode ? "Title Edit" : "Title Create"}</ModalHeader>
       <ModalBody>
         <div className="space-y-4">
           {/* Info banner */}
           <div className="flex items-start gap-3 p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
             <AlertCircle size={20} className="text-primary shrink-0 mt-0.5" />
             <div className="text-sm">
-              <p className="font-medium mb-1">{t('enterprise.version_form.version_management')}</p>
+              <p className="font-medium mb-1">{"Version Management"}</p>
               <p className="text-[var(--color-text-secondary)]">
                 {isEditMode
-                  ? t('enterprise.version_form.edit_info')
-                  : t('enterprise.version_form.create_info')}
+                  ? "Edit Info"
+                  : "Create Info"}
               </p>
             </div>
           </div>
 
           {/* Version Number */}
           <Input
-            label={t('enterprise.version_form.label_version_number')}
-            placeholder={t('enterprise.version_form.placeholder_version_number')}
+            label={"Version Number"}
+            placeholder={"Version Number..."}
             value={formData.version_number}
             onChange={(e) => setFormData({ ...formData, version_number: e.target.value })}
             isInvalid={!!errors.version_number}
@@ -155,8 +153,8 @@ export default function LegalDocVersionForm({
 
           {/* Version Label */}
           <Input
-            label={t('enterprise.version_form.label_version_label')}
-            placeholder={t('enterprise.version_form.placeholder_version_label')}
+            label={"Version Label"}
+            placeholder={"Version Label..."}
             value={formData.version_label}
             onChange={(e) => setFormData({ ...formData, version_label: e.target.value })}
           />
@@ -164,7 +162,7 @@ export default function LegalDocVersionForm({
           {/* Effective Date */}
           <Input
             type="date"
-            label={t('enterprise.version_form.label_effective_date')}
+            label={"Effective Date"}
             value={formData.effective_date}
             onChange={(e) => setFormData({ ...formData, effective_date: e.target.value })}
             isInvalid={!!errors.effective_date}
@@ -174,8 +172,8 @@ export default function LegalDocVersionForm({
 
           {/* Summary of Changes */}
           <Textarea
-            label={t('enterprise.version_form.label_summary_of_changes')}
-            placeholder={t('enterprise.version_form.placeholder_summary')}
+            label={"Summary of Changes"}
+            placeholder={"Summary..."}
             value={formData.summary_of_changes}
             onChange={(e) => setFormData({ ...formData, summary_of_changes: e.target.value })}
             minRows={3}
@@ -193,9 +191,9 @@ export default function LegalDocVersionForm({
           {!isEditMode && (
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div>
-                <p className="font-medium">{t('enterprise.version_form.save_as_draft')}</p>
+                <p className="font-medium">{"Save as Draft"}</p>
                 <p className="text-sm text-[var(--color-text-secondary)]">
-                  {t('enterprise.version_form.draft_description')}
+                  {"Draft"}
                 </p>
               </div>
               <Switch
@@ -208,10 +206,10 @@ export default function LegalDocVersionForm({
       </ModalBody>
       <ModalFooter>
         <Button variant="flat" onPress={onCancel}>
-          {t('cancel')}
+          {"Cancel"}
         </Button>
         <Button color="primary" type="submit" isLoading={submitting} isDisabled={submitting}>
-          {isEditMode ? t('enterprise.version_form.btn_update') : t('enterprise.version_form.btn_create')}
+          {isEditMode ? "Update" : "Create"}
         </Button>
       </ModalFooter>
     </form>

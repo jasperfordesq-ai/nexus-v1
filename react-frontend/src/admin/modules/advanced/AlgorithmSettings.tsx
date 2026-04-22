@@ -127,7 +127,7 @@ const ALGORITHM_AREAS: Omit<AlgorithmArea, 'enabled' | 'weights'>[] = [
 
 export function AlgorithmSettings() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('advanced.page_title'));
+  usePageTitle("Advanced");
   const toast = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -157,7 +157,7 @@ export function AlgorithmSettings() {
         };
       }));
     } catch {
-      toast.error(t('advanced.failed_to_load_algorithm_settings'));
+      toast.error("Failed to load algorithm settings");
       // Initialise with defaults
       setAreas(ALGORITHM_AREAS.map(def => ({
         ...def,
@@ -228,12 +228,12 @@ export function AlgorithmSettings() {
       const payload = { enabled: areaData.enabled, ...areaData.weights };
       const res = await adminSettings.updateAlgorithmConfig(areaData.area, payload);
       if ((res as { success?: boolean }).success) {
-        toast.success(t('advanced.area_settings_saved', { area: t(areaData.label) }));
+        toast.success(`Area settings saved`);
       } else {
-        toast.error(t('advanced.save_failed'));
+        toast.error("Save failed");
       }
     } catch {
-      toast.error(t('advanced.failed_to_save_area', { area: t(areaData.label) }));
+      toast.error(`Failed to save area`);
     } finally {
       setSaving(null);
     }
@@ -250,8 +250,8 @@ export function AlgorithmSettings() {
   return (
     <div>
       <PageHeader
-        title={t('advanced.algorithm_settings_title')}
-        description={t('advanced.algorithm_settings_desc')}
+        title={"Algorithm Settings"}
+        description={"Configure algorithm weights and parameters for content ranking"}
       />
 
       <div className="space-y-6">
@@ -273,7 +273,7 @@ export function AlgorithmSettings() {
                 size="sm"
                 aria-label={`Enable ${t(areaData.label)}`}
               >
-                {areaData.enabled ? t('advanced.enabled') : t('advanced.disabled')}
+                {areaData.enabled ? "Enabled" : "Disabled"}
               </Switch>
             </CardHeader>
 
@@ -312,7 +312,7 @@ export function AlgorithmSettings() {
                     isLoading={saving === areaData.area}
                     isDisabled={saving === areaData.area}
                   >
-                    {t('advanced.save_area', { area: areaData.label })}
+                    {`Save Area`}
                   </Button>
                 </div>
               </CardBody>
@@ -321,7 +321,7 @@ export function AlgorithmSettings() {
             {!areaData.enabled && (
               <CardBody>
                 <p className="text-sm text-foreground-400 italic">
-                  {t('advanced.algorithm_disabled_msg')}
+                  {"The algorithm is currently disabled"}
                 </p>
                 <div className="flex justify-end mt-3">
                   <Button
@@ -332,7 +332,7 @@ export function AlgorithmSettings() {
                     isLoading={saving === areaData.area}
                     isDisabled={saving === areaData.area}
                   >
-                    {t('advanced.save_area', { area: areaData.label })}
+                    {`Save Area`}
                   </Button>
                 </div>
               </CardBody>
@@ -346,9 +346,9 @@ export function AlgorithmSettings() {
             <div className="flex items-center gap-3">
               <Activity size={20} className="text-primary" />
               <div>
-                <h3 className="text-base font-semibold">{t('advanced.algorithm_health_title')}</h3>
+                <h3 className="text-base font-semibold">{"Algorithm Health"}</h3>
                 <p className="text-sm text-foreground-500">
-                  {t('advanced.algorithm_health_desc')}
+                  {"View health status of the recommendation and matching algorithms"}
                 </p>
               </div>
             </div>
@@ -359,7 +359,7 @@ export function AlgorithmSettings() {
               onPress={loadHealth}
               isDisabled={healthLoading}
             >
-              {t('analytics.refresh')}
+              {"Refresh"}
             </Button>
           </CardHeader>
 
@@ -373,7 +373,7 @@ export function AlgorithmSettings() {
                 {/* FULLTEXT */}
                 <div>
                   <p className="text-sm font-semibold mb-2 flex items-center gap-2">
-                    <Database size={14} /> {t('advanced.fulltext_indexes_title')}
+                    <Database size={14} /> {"Fulltext Indexes"}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {([
@@ -404,21 +404,21 @@ export function AlgorithmSettings() {
                 {/* Collaborative Filtering */}
                 <div>
                   <p className="text-sm font-semibold mb-2 flex items-center gap-2">
-                    <Settings size={14} /> {t('advanced.collaborative_filtering_title')}
+                    <Settings size={14} /> {"Collaborative Filtering"}
                   </p>
                   <div className="flex flex-wrap gap-3 text-sm">
                     <span>
                       <span className="font-medium">{health.collaborative_filtering.listing_interactions.toLocaleString()}</span>
-                      <span className="text-foreground-500 ml-1">{t('advanced.listing_saves')}</span>
+                      <span className="text-foreground-500 ml-1">{"Listing Saves"}</span>
                     </span>
                     <span>
                       <span className="font-medium">{health.collaborative_filtering.member_interactions.toLocaleString()}</span>
-                      <span className="text-foreground-500 ml-1">{t('advanced.member_transactions')}</span>
+                      <span className="text-foreground-500 ml-1">{"Member Transactions"}</span>
                     </span>
                   </div>
                   {health.collaborative_filtering.listing_interactions < 10 && (
                     <p className="text-xs text-foreground-400 mt-1">
-                      {t('advanced.cf_min_hint')}
+                      {"Minimum collaborative filtering similarity threshold"}
                     </p>
                   )}
                 </div>
@@ -428,23 +428,23 @@ export function AlgorithmSettings() {
                 {/* Embeddings */}
                 <div>
                   <p className="text-sm font-semibold mb-2 flex items-center gap-2">
-                    <Cpu size={14} /> {t('advanced.semantic_embeddings_title')}
+                    <Cpu size={14} /> {"Semantic Embeddings"}
                   </p>
                   <div className="flex flex-wrap gap-3 text-sm">
                     <span>
                       <span className="font-medium">{health.embeddings.listing_count.toLocaleString()}</span>
-                      <span className="text-foreground-500 ml-1">{t('advanced.label_listings')}</span>
+                      <span className="text-foreground-500 ml-1">{"Listings"}</span>
                     </span>
                     <span>
                       <span className="font-medium">{health.embeddings.user_count.toLocaleString()}</span>
-                      <span className="text-foreground-500 ml-1">{t('advanced.label_users')}</span>
+                      <span className="text-foreground-500 ml-1">{"Users"}</span>
                     </span>
                     <Chip
                       size="sm"
                       color={health.embeddings.total > 0 ? 'success' : 'default'}
                       variant="flat"
                     >
-                      {t('advanced.total_count', { count: health.embeddings.total })}
+                      {`Total`}
                     </Chip>
                   </div>
                   {health.embeddings.total === 0 && (
@@ -459,7 +459,7 @@ export function AlgorithmSettings() {
                     <Divider />
                     <div>
                       <p className="text-sm font-semibold mb-2 flex items-center gap-2">
-                        <Search size={14} /> {t('advanced.search_engine_title')}
+                        <Search size={14} /> {"Search Engine"}
                       </p>
                       <div className="flex flex-wrap gap-2">
                         <Chip
@@ -468,7 +468,7 @@ export function AlgorithmSettings() {
                           variant="flat"
                           startContent={health.search.meilisearch_available ? <CheckCircle size={12} /> : <XCircle size={12} />}
                         >
-                          {health.search.meilisearch_available ? t('advanced.meilisearch_online') : t('advanced.meilisearch_offline')}
+                          {health.search.meilisearch_available ? "Meilisearch Online" : "Meilisearch Offline"}
                         </Chip>
                       </div>
                       {!health.search.meilisearch_available && (
@@ -483,7 +483,7 @@ export function AlgorithmSettings() {
             )}
 
             {!health && !healthLoading && (
-              <p className="text-sm text-foreground-400">{t('advanced.health_unavailable')}</p>
+              <p className="text-sm text-foreground-400">{"Health data unavailable"}</p>
             )}
           </CardBody>
         </Card>

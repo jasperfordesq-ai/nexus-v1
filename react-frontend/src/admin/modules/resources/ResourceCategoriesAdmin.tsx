@@ -211,7 +211,7 @@ export function ResourceCategoriesAdmin() {
   const columns: Column<ResourceCategory>[] = [
     {
       key: 'name',
-      label: t('content.label_name'),
+      label: "Name",
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.name}</span>
@@ -244,7 +244,7 @@ export function ResourceCategoriesAdmin() {
     },
     {
       key: 'actions',
-      label: t('listings.actions'),
+      label: "Actions",
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -325,7 +325,7 @@ export function ResourceCategoriesAdmin() {
           </ModalHeader>
           <ModalBody className="gap-4">
             <Input
-              label={t('content.label_name')}
+              label={"Name"}
               placeholder={t('resources.category_name_placeholder', 'Enter category name')}
               value={form.name}
               onValueChange={(val) => setForm((prev) => ({ ...prev, name: val }))}
@@ -387,7 +387,7 @@ export function ResourceCategoriesAdmin() {
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
           title={`${t('common.delete', 'Delete')} ${t('breadcrumbs.categories', 'Category')}`}
-          message={t('gamification.confirm_delete_campaign', { name: confirmDelete.name })}
+          message={`Delete Campaign`}
           confirmLabel={t('common.delete', 'Delete')}
           confirmColor="danger"
           isLoading={actionLoading}

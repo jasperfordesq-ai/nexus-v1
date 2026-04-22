@@ -82,7 +82,7 @@ interface UserSearchResult {
 
 export function InsuranceCertificates() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('broker.page_title'));
+  usePageTitle("Broker Controls");
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -248,7 +248,7 @@ export function InsuranceCertificates() {
         setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
       }
     } catch {
-      toast.error(t('broker.failed_to_load_insurance_certificates'));
+      toast.error("Failed to load insurance certificates");
     } finally {
       setLoading(false);
     }
@@ -297,14 +297,14 @@ export function InsuranceCertificates() {
     try {
       const res = await adminInsurance.verify(item.id);
       if (res?.success) {
-        toast.success(t('broker.insurance_certificate_verified', { name: `${item.first_name} ${item.last_name}` }));
+        toast.success(`Insurance Certificate Verified`);
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || t('broker.failed_to_verify_certificate'));
+        toast.error(res?.error || "Failed to verify certificate");
       }
     } catch {
-      toast.error(t('broker.failed_to_verify_certificate'));
+      toast.error("Failed to verify certificate");
     } finally {
       setVerifyingId(null);
     }
@@ -312,21 +312,21 @@ export function InsuranceCertificates() {
 
   const handleReject = async () => {
     if (!rejectModal || !rejectReason.trim()) {
-      toast.error(t('broker.a_reason_is_required_to_reject_an_insura'));
+      toast.error("A reason is required to reject an insurance certificate");
       return;
     }
     setRejectLoading(true);
     try {
       const res = await adminInsurance.reject(rejectModal.id, rejectReason);
       if (res?.success) {
-        toast.success(t('broker.insurance_certificate_rejected'));
+        toast.success("Insurance certificate rejected");
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || t('broker.failed_to_reject_certificate'));
+        toast.error(res?.error || "Failed to reject certificate");
       }
     } catch {
-      toast.error(t('broker.failed_to_reject_certificate'));
+      toast.error("Failed to reject certificate");
     } finally {
       setRejectLoading(false);
       setRejectModal(null);
@@ -340,14 +340,14 @@ export function InsuranceCertificates() {
     try {
       const res = await adminInsurance.destroy(deleteItem.id);
       if (res?.success) {
-        toast.success(t('broker.insurance_certificate_deleted'));
+        toast.success("Insurance certificate deleted");
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || t('broker.failed_to_delete_certificate'));
+        toast.error(res?.error || "Failed to delete certificate");
       }
     } catch {
-      toast.error(t('broker.failed_to_delete_certificate'));
+      toast.error("Failed to delete certificate");
     } finally {
       setDeleteLoading(false);
       setDeleteItem(null);
@@ -356,7 +356,7 @@ export function InsuranceCertificates() {
 
   const handleCreate = async () => {
     if (!createForm.user_id) {
-      toast.error(t('broker.please_select_a_member'));
+      toast.error("Please select a member");
       return;
     }
     setCreateLoading(true);
@@ -374,16 +374,16 @@ export function InsuranceCertificates() {
 
       const res = await adminInsurance.create(payload as Partial<InsuranceCertificate>);
       if (res?.success || res?.data) {
-        toast.success(t('broker.insurance_certificate_created'));
+        toast.success("Insurance certificate created");
         setCreateOpen(false);
         resetCreateForm();
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || t('broker.failed_to_create_certificate'));
+        toast.error(res?.error || "Failed to create certificate");
       }
     } catch {
-      toast.error(t('broker.failed_to_create_certificate'));
+      toast.error("Failed to create certificate");
     } finally {
       setCreateLoading(false);
     }
@@ -406,15 +406,15 @@ export function InsuranceCertificates() {
 
       const res = await adminInsurance.update(editItem.id, payload as Partial<InsuranceCertificate>);
       if (res?.success) {
-        toast.success(t('broker.insurance_certificate_updated'));
+        toast.success("Insurance certificate updated");
         setEditItem(null);
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || t('broker.failed_to_update_certificate'));
+        toast.error(res?.error || "Failed to update certificate");
       }
     } catch {
-      toast.error(t('broker.failed_to_update_certificate'));
+      toast.error("Failed to update certificate");
     } finally {
       setEditLoading(false);
     }
@@ -452,7 +452,7 @@ export function InsuranceCertificates() {
   const columns: Column<InsuranceCertificate>[] = [
     {
       key: 'member',
-      label: t('broker.col_member'),
+      label: "Member",
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-2">
@@ -473,7 +473,7 @@ export function InsuranceCertificates() {
     },
     {
       key: 'insurance_type',
-      label: t('broker.col_type'),
+      label: "Type",
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat" color="primary">
@@ -483,7 +483,7 @@ export function InsuranceCertificates() {
     },
     {
       key: 'status',
-      label: t('broker.col_status'),
+      label: "Status",
       sortable: true,
       render: (item) => (
         <Chip
@@ -498,7 +498,7 @@ export function InsuranceCertificates() {
     },
     {
       key: 'provider_name',
-      label: t('broker.col_provider'),
+      label: "Provider",
       render: (item) => (
         <span className="text-sm text-default-600">
           {item.provider_name || '\u2014'}
@@ -507,7 +507,7 @@ export function InsuranceCertificates() {
     },
     {
       key: 'policy_number',
-      label: t('broker.col_policy'),
+      label: "Policy",
       render: (item) => (
         <span className="text-sm text-default-600 font-mono">
           {item.policy_number || '\u2014'}
@@ -516,7 +516,7 @@ export function InsuranceCertificates() {
     },
     {
       key: 'expiry_date',
-      label: t('broker.col_expiry'),
+      label: "Expiry",
       sortable: true,
       render: (item) => {
         if (!item.expiry_date) return <span className="text-sm text-default-500">{'\u2014'}</span>;
@@ -536,7 +536,7 @@ export function InsuranceCertificates() {
     },
     {
       key: 'actions',
-      label: t('broker.col_actions'),
+      label: "Actions",
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -544,7 +544,7 @@ export function InsuranceCertificates() {
             size="sm"
             variant="flat"
             onPress={() => setViewItem(item)}
-            aria-label={t('broker.label_view_details')}
+            aria-label={"View Details"}
           >
             <Eye size={14} />
           </Button>
@@ -554,7 +554,7 @@ export function InsuranceCertificates() {
             size="sm"
             variant="flat"
             onPress={() => openEditModal(item)}
-            aria-label={t('broker.label_edit_certificate')}
+            aria-label={"Edit Certificate"}
           >
             <Pencil size={14} />
           </Button>
@@ -567,7 +567,7 @@ export function InsuranceCertificates() {
                 color="success"
                 isLoading={verifyingId === item.id}
                 onPress={() => handleVerify(item)}
-                aria-label={t('broker.label_verify_certificate')}
+                aria-label={"Verify Certificate"}
               >
                 <Check size={14} />
               </Button>
@@ -577,7 +577,7 @@ export function InsuranceCertificates() {
                 variant="flat"
                 color="danger"
                 onPress={() => { setRejectModal(item); setRejectReason(''); }}
-                aria-label={t('broker.label_reject_certificate')}
+                aria-label={"Reject Certificate"}
               >
                 <X size={14} />
               </Button>
@@ -589,7 +589,7 @@ export function InsuranceCertificates() {
             variant="flat"
             color="danger"
             onPress={() => setDeleteItem(item)}
-            aria-label={t('broker.label_delete_certificate')}
+            aria-label={"Delete Certificate"}
           >
             <Trash2 size={14} />
           </Button>
@@ -601,8 +601,8 @@ export function InsuranceCertificates() {
   return (
     <div>
       <PageHeader
-        title={t('broker.insurance_certificates_title')}
-        description={t('broker.insurance_certificates_desc')}
+        title={"Insurance Certificates"}
+        description={"Manage member insurance certificates and their expiry status"}
         actions={
           <div className="flex gap-2">
             <Button
@@ -611,7 +611,7 @@ export function InsuranceCertificates() {
               size="sm"
               onPress={() => { resetCreateForm(); setCreateOpen(true); }}
             >
-              {t('broker.add_certificate')}
+              {"Add Certificate"}
             </Button>
             <Button
               as={Link}
@@ -620,7 +620,7 @@ export function InsuranceCertificates() {
               startContent={<ArrowLeft size={16} />}
               size="sm"
             >
-              {t('broker.back')}
+              {"Back"}
             </Button>
           </div>
         }
@@ -629,28 +629,28 @@ export function InsuranceCertificates() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
-          label={t('broker.label_total_certificates')}
+          label={"Total Certificates"}
           value={stats?.total ?? 0}
           icon={FileText}
           color="primary"
           loading={statsLoading}
         />
         <StatCard
-          label={t('broker.label_pending_review')}
+          label={"Pending Review"}
           value={stats?.pending ?? 0}
           icon={Clock}
           color="warning"
           loading={statsLoading}
         />
         <StatCard
-          label={t('broker.label_verified')}
+          label={"Verified"}
           value={stats?.verified ?? 0}
           icon={ShieldCheck}
           color="success"
           loading={statsLoading}
         />
         <StatCard
-          label={t('broker.label_expiring_soon')}
+          label={"Expiring Soon"}
           value={stats?.expiring_soon ?? 0}
           icon={ShieldAlert}
           color="danger"
@@ -661,8 +661,8 @@ export function InsuranceCertificates() {
       {/* Search — #6: now debounced */}
       <div className="mb-4">
         <Input
-          placeholder={t('broker.placeholder_search_by_name_email_provider_or_policy_number')}
-          aria-label={t('broker.label_search_insurance_certificates')}
+          placeholder={"Enter search by name email provider or policy number..."}
+          aria-label={"Search Insurance Certificates"}
           value={searchQuery}
           onValueChange={setSearchQuery}
           startContent={<Search size={16} className="text-default-400" />}
@@ -682,13 +682,13 @@ export function InsuranceCertificates() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={t('broker.tab_all')} />
-          <Tab key="pending" title={t('broker.tab_pending')} />
-          <Tab key="submitted" title={t('broker.tab_submitted')} />
-          <Tab key="verified" title={t('broker.tab_verified')} />
-          <Tab key="expired" title={t('broker.tab_expired')} />
-          <Tab key="expiring_soon" title={t('broker.tab_expiring_soon')} />
-          <Tab key="rejected" title={t('broker.tab_rejected')} />
+          <Tab key="all" title={"All"} />
+          <Tab key="pending" title={"Pending"} />
+          <Tab key="submitted" title={"Submitted"} />
+          <Tab key="verified" title={"Verified"} />
+          <Tab key="expired" title={"Expired"} />
+          <Tab key="expiring_soon" title={"Expiring Soon"} />
+          <Tab key="rejected" title={"Rejected"} />
         </Tabs>
       </div>
 
@@ -706,8 +706,8 @@ export function InsuranceCertificates() {
         emptyContent={
           <EmptyState
             icon={Users}
-            title={t('broker.no_insurance_certificates_found')}
-            description={statusFilter !== 'all' ? t('broker.try_changing_filter') : t('broker.add_certificate_to_start')}
+            title={"No insurance certificates found found"}
+            description={statusFilter !== 'all' ? "Try Changing Filter" : "Add Certificate to Start"}
           />
         }
       />
@@ -722,7 +722,7 @@ export function InsuranceCertificates() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Plus size={20} className="text-primary" />
-            {t('broker.add_certificate_modal_title')}
+            {"Add Certificate Modal"}
           </ModalHeader>
           <ModalBody className="gap-4">
             {/* #9: Member search autocomplete */}
@@ -744,14 +744,14 @@ export function InsuranceCertificates() {
                     setUserSearchQuery('');
                   }}
                 >
-                  {t('broker.change')}
+                  {"Change"}
                 </Button>
               </div>
             ) : (
               <div>
                 <Input
-                  label={t('broker.label_search_member')}
-                  placeholder={t('broker.placeholder_type_a_name_or_email_to_search')}
+                  label={"Search Member"}
+                  placeholder={"Type a Name or Email to Search..."}
                   value={userSearchQuery}
                   onValueChange={setUserSearchQuery}
                   variant="bordered"
@@ -783,12 +783,12 @@ export function InsuranceCertificates() {
                   </div>
                 )}
                 {userSearchQuery.trim().length >= 2 && !userSearchLoading && userSearchResults.length === 0 && (
-                  <p className="text-xs text-default-400 mt-1">{t('shared.no_members_found')}</p>
+                  <p className="text-xs text-default-400 mt-1">{"No members found found"}</p>
                 )}
               </div>
             )}
             <Select
-              label={t('broker.label_insurance_type')}
+              label={"Insurance Type"}
               selectedKeys={[createForm.insurance_type]}
               onSelectionChange={(keys) => {
                 const val = Array.from(keys)[0] as InsuranceCertificate['insurance_type'];
@@ -802,23 +802,23 @@ export function InsuranceCertificates() {
               ))}
             </Select>
             <Input
-              label={t('broker.label_provider_name')}
-              placeholder={t('broker.placeholder_provider_name_example')}
+              label={"Provider Name"}
+              placeholder={"e.g., Aviva, Zurich"}
               value={createForm.provider_name}
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, provider_name: val }))}
               variant="bordered"
             />
             <Input
-              label={t('broker.label_policy_number')}
-              placeholder={t('broker.placeholder_policy_number_example')}
+              label={"Policy Number"}
+              placeholder={"e.g., PL-12345678"}
               value={createForm.policy_number}
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, policy_number: val }))}
               variant="bordered"
             />
             {/* #11: EUR instead of GBP */}
             <Input
-              label={t('broker.label_coverage_amount')}
-              placeholder={t('broker.placeholder_coverage_amount_example')}
+              label={"Coverage Amount"}
+              placeholder={"e.g., 1000000"}
               value={createForm.coverage_amount}
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, coverage_amount: val }))}
               variant="bordered"
@@ -827,14 +827,14 @@ export function InsuranceCertificates() {
             />
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label={t('broker.label_start_date')}
+                label={"Start Date"}
                 type="date"
                 value={createForm.start_date}
                 onValueChange={(val) => setCreateForm(prev => ({ ...prev, start_date: val }))}
                 variant="bordered"
               />
               <Input
-                label={t('broker.label_expiry_date')}
+                label={"Expiry Date"}
                 type="date"
                 value={createForm.expiry_date}
                 onValueChange={(val) => setCreateForm(prev => ({ ...prev, expiry_date: val }))}
@@ -842,8 +842,8 @@ export function InsuranceCertificates() {
               />
             </div>
             <Textarea
-              label={t('broker.label_notes')}
-              placeholder={t('broker.placeholder_additional_notes_about_this_certificate')}
+              label={"Notes"}
+              placeholder={"Additional Notes About This Certificate..."}
               value={createForm.notes}
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, notes: val }))}
               variant="bordered"
@@ -856,14 +856,14 @@ export function InsuranceCertificates() {
               onPress={() => setCreateOpen(false)}
               isDisabled={createLoading}
             >
-              {t('broker.cancel')}
+              {"Cancel"}
             </Button>
             <Button
               color="primary"
               onPress={handleCreate}
               isLoading={createLoading}
             >
-              {t('broker.add_certificate')}
+              {"Add Certificate"}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -880,7 +880,7 @@ export function InsuranceCertificates() {
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
               <Pencil size={20} className="text-primary" />
-              {t('broker.edit_certificate_modal_title')}
+              {"Edit Certificate Modal"}
             </ModalHeader>
             <ModalBody className="gap-4">
               <div className="flex items-center gap-2 p-3 rounded-lg border border-default-200 bg-default-50">
@@ -895,7 +895,7 @@ export function InsuranceCertificates() {
                 </div>
               </div>
               <Select
-                label={t('broker.label_insurance_type')}
+                label={"Insurance Type"}
                 selectedKeys={[editForm.insurance_type]}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as InsuranceCertificate['insurance_type'];
@@ -909,22 +909,22 @@ export function InsuranceCertificates() {
                 ))}
               </Select>
               <Input
-                label={t('broker.label_provider_name')}
-                placeholder={t('broker.placeholder_provider_name_example')}
+                label={"Provider Name"}
+                placeholder={"e.g., Aviva, Zurich"}
                 value={editForm.provider_name}
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, provider_name: val }))}
                 variant="bordered"
               />
               <Input
-                label={t('broker.label_policy_number')}
-                placeholder={t('broker.placeholder_policy_number_example')}
+                label={"Policy Number"}
+                placeholder={"e.g., PL-12345678"}
                 value={editForm.policy_number}
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, policy_number: val }))}
                 variant="bordered"
               />
               <Input
-                label={t('broker.label_coverage_amount')}
-                placeholder={t('broker.placeholder_coverage_amount_example')}
+                label={"Coverage Amount"}
+                placeholder={"e.g., 1000000"}
                 value={editForm.coverage_amount}
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, coverage_amount: val }))}
                 variant="bordered"
@@ -933,14 +933,14 @@ export function InsuranceCertificates() {
               />
               <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label={t('broker.label_start_date')}
+                  label={"Start Date"}
                   type="date"
                   value={editForm.start_date}
                   onValueChange={(val) => setEditForm(prev => ({ ...prev, start_date: val }))}
                   variant="bordered"
                 />
                 <Input
-                  label={t('broker.label_expiry_date')}
+                  label={"Expiry Date"}
                   type="date"
                   value={editForm.expiry_date}
                   onValueChange={(val) => setEditForm(prev => ({ ...prev, expiry_date: val }))}
@@ -948,8 +948,8 @@ export function InsuranceCertificates() {
                 />
               </div>
               <Textarea
-                label={t('broker.label_notes')}
-                placeholder={t('broker.placeholder_additional_notes_about_this_certificate')}
+                label={"Notes"}
+                placeholder={"Additional Notes About This Certificate..."}
                 value={editForm.notes}
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, notes: val }))}
                 variant="bordered"
@@ -962,14 +962,14 @@ export function InsuranceCertificates() {
                 onPress={() => setEditItem(null)}
                 isDisabled={editLoading}
               >
-                {t('broker.cancel')}
+                {"Cancel"}
               </Button>
               <Button
                 color="primary"
                 onPress={handleEdit}
                 isLoading={editLoading}
               >
-                {t('broker.save_changes')}
+                {"Save Changes"}
               </Button>
             </ModalFooter>
           </ModalContent>
@@ -986,15 +986,15 @@ export function InsuranceCertificates() {
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
               <X size={20} className="text-danger" />
-              {t('broker.reject_certificate_modal_title')}
+              {"Reject Certificate Modal"}
             </ModalHeader>
             <ModalBody>
               <p className="text-default-600 mb-3">
-                {t('broker.reject_certificate_confirm', { name: `${rejectModal.first_name} ${rejectModal.last_name}` })}
+                {`Reject Certificate Confirm`}
               </p>
               <Textarea
-                label={t('broker.label_reason_required')}
-                placeholder={t('broker.placeholder_provide_a_reason_for_rejection')}
+                label={"Reason Required"}
+                placeholder={"Provide a Reason for Rejection..."}
                 value={rejectReason}
                 onValueChange={setRejectReason}
                 minRows={3}
@@ -1008,14 +1008,14 @@ export function InsuranceCertificates() {
                 onPress={() => { setRejectModal(null); setRejectReason(''); }}
                 isDisabled={rejectLoading}
               >
-                {t('broker.cancel')}
+                {"Cancel"}
               </Button>
               <Button
                 color="danger"
                 onPress={handleReject}
                 isLoading={rejectLoading}
               >
-                {t('broker.reject')}
+                {"Reject"}
               </Button>
             </ModalFooter>
           </ModalContent>
@@ -1032,7 +1032,7 @@ export function InsuranceCertificates() {
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
               <FileCheck size={20} className="text-primary" />
-              {t('broker.view_certificate_modal_title')}
+              {"View Certificate Modal"}
             </ModalHeader>
             <ModalBody>
               <div className="flex items-center gap-3 mb-4">
@@ -1048,38 +1048,38 @@ export function InsuranceCertificates() {
               </div>
               <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
                 <div>
-                  <p className="text-default-400">{t('broker_certificates.type')}</p>
+                  <p className="text-default-400">{"Type"}</p>
                   <p className="font-medium">{t(`broker.insurance_type_${viewItem.insurance_type}`, { defaultValue: viewItem.insurance_type })}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">{t('broker_certificates.status')}</p>
+                  <p className="text-default-400">{"Status"}</p>
                   <Chip size="sm" variant="flat" color={STATUS_COLOR_MAP[viewItem.status] || 'default'} className="capitalize">
                     {viewItem.status}
                   </Chip>
                 </div>
                 <div>
-                  <p className="text-default-400">{t('broker_certificates.provider')}</p>
+                  <p className="text-default-400">{"Provider"}</p>
                   <p className="font-medium">{viewItem.provider_name || '\u2014'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">{t('broker_certificates.policy_number')}</p>
+                  <p className="text-default-400">{"Policy Number"}</p>
                   <p className="font-medium font-mono">{viewItem.policy_number || '\u2014'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">{t('broker_certificates.coverage_amount')}</p>
+                  <p className="text-default-400">{"Coverage Amount"}</p>
                   {/* #11: EUR instead of GBP */}
                   <p className="font-medium">{viewItem.coverage_amount ? `\u20AC${Number(viewItem.coverage_amount).toLocaleString()}` : '\u2014'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">{t('broker_certificates.start_date')}</p>
+                  <p className="text-default-400">{"Start Date"}</p>
                   <p className="font-medium">{viewItem.start_date ? new Date(viewItem.start_date).toLocaleDateString() : '\u2014'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">{t('broker_certificates.expiry_date')}</p>
+                  <p className="text-default-400">{"Expiry Date"}</p>
                   <p className="font-medium">{viewItem.expiry_date ? new Date(viewItem.expiry_date).toLocaleDateString() : '\u2014'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">{t('broker_certificates.verified_by')}</p>
+                  <p className="text-default-400">{"Verified by"}</p>
                   <p className="font-medium">
                     {viewItem.verifier_first_name
                       ? `${viewItem.verifier_first_name} ${viewItem.verifier_last_name}`
@@ -1087,18 +1087,18 @@ export function InsuranceCertificates() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-default-400">{t('broker_certificates.verified_at')}</p>
+                  <p className="text-default-400">{"Verified at"}</p>
                   <p className="font-medium">{viewItem.verified_at ? new Date(viewItem.verified_at).toLocaleString() : '\u2014'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">{t('broker_certificates.created')}</p>
+                  <p className="text-default-400">{"Created"}</p>
                   <p className="font-medium">{new Date(viewItem.created_at).toLocaleString()}</p>
                 </div>
               </div>
               {/* #1: Certificate file display/download */}
               {viewItem.certificate_file_path && (
                 <div className="mt-4">
-                  <p className="text-default-400 text-sm mb-1">{t('broker_certificates.certificate_file')}</p>
+                  <p className="text-default-400 text-sm mb-1">{"Certificate File"}</p>
                   <a
                     href={resolveAssetUrl(viewItem.certificate_file_path)}
                     target="_blank"
@@ -1106,21 +1106,21 @@ export function InsuranceCertificates() {
                     className="inline-flex items-center gap-2 text-sm text-primary hover:underline bg-primary-50 dark:bg-primary-50/10 px-3 py-2 rounded-lg"
                   >
                     <FileText size={16} />
-                    {t('broker.view_certificate_file')}
+                    {"View Certificate File"}
                     <ExternalLink size={14} />
                   </a>
                 </div>
               )}
               {viewItem.notes && (
                 <div className="mt-4">
-                  <p className="text-default-400 text-sm mb-1">{t('broker_certificates.notes')}</p>
+                  <p className="text-default-400 text-sm mb-1">{"Notes"}</p>
                   <p className="text-sm bg-default-100 p-3 rounded-lg">{viewItem.notes}</p>
                 </div>
               )}
             </ModalBody>
             <ModalFooter>
               <Button variant="flat" onPress={() => setViewItem(null)}>
-                {t('broker.close')}
+                {"Close"}
               </Button>
             </ModalFooter>
           </ModalContent>
@@ -1132,11 +1132,11 @@ export function InsuranceCertificates() {
         isOpen={!!deleteItem}
         onClose={() => setDeleteItem(null)}
         onConfirm={handleDelete}
-        title={t('broker.delete_insurance_certificate')}
+        title={"Delete Insurance Certificate"}
         message={deleteItem
-          ? t('broker.delete_insurance_certificate_confirm', { name: `${deleteItem.first_name} ${deleteItem.last_name}` })
+          ? `Delete Insurance Certificate Confirm`
           : ''}
-        confirmLabel={t('common.delete')}
+        confirmLabel={"Delete"}
         confirmColor="danger"
         isLoading={deleteLoading}
       />

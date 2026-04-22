@@ -28,10 +28,8 @@ import type { AdminGroup, GroupMember as GroupMemberType } from '@/admin/api/typ
 interface AdminGroupDetail extends AdminGroup {  stats?: { total_exchanges: number; total_hours: number; active_members: number; posts_count: number; events_count: number; activity_score: number };  latitude?: number;  longitude?: number;}
 import type { GroupMember } from '@/admin/api/types';
 
-import { useTranslation } from 'react-i18next';
 export default function GroupDetail() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('groups.page_title'));
+  usePageTitle("Groups");
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { success, error } = useToast();
@@ -55,7 +53,7 @@ export default function GroupDetail() {
         });
       }
     } catch {
-      error(t('groups.failed_to_load_groups'));
+      error("Failed to load groups");
     } finally {
       setLoading(false);
     }
@@ -68,7 +66,7 @@ export default function GroupDetail() {
         setMembers(response.data as GroupMemberType[]);
       }
     } catch {
-      error(t('groups.failed_to_load_members'));
+      error("Failed to load members");
     }
   }, [id, error, t])
 
@@ -82,76 +80,76 @@ export default function GroupDetail() {
   const handleSave = async () => {
     try {
       await adminGroups.updateGroup(Number(id), formData);
-      success(t('groups.group_updated'));
+      success("Group Updated");
       setEditMode(false);
       loadGroup();
     } catch {
-      error(t('groups.failed_to_update_group'));
+      error("Failed to update group");
     }
   };
 
   const handleGeocode = async () => {
     try {
       await adminGroups.geocodeGroup(Number(id));
-      success(t('groups.location_geocoded'));
+      success("Location Geocoded");
       loadGroup();
     } catch {
-      error(t('groups.failed_to_geocode_location'));
+      error("Failed to geocode location");
     }
   };
 
   const handlePromote = async (userId: number) => {
     try {
       await adminGroups.promoteMember(Number(id), userId);
-      success(t('groups.member_promoted'));
+      success("Member Promoted");
       loadMembers();
     } catch {
-      error(t('groups.failed_to_promote_member'));
+      error("Failed to promote member");
     }
   };
 
   const handleDemote = async (userId: number) => {
     try {
       await adminGroups.demoteMember(Number(id), userId);
-      success(t('groups.member_demoted'));
+      success("Member Demoted");
       loadMembers();
     } catch {
-      error(t('groups.failed_to_demote_member'));
+      error("Failed to demote member");
     }
   };
 
   const handleKick = async (userId: number) => {
-    if (!confirm(t('groups.confirm_remove_member'))) return;
+    if (!confirm("Remove Member")) return;
     try {
       await adminGroups.kickMember(Number(id), userId);
-      success(t('groups.member_removed'));
+      success("Member Removed");
       loadMembers();
     } catch {
-      error(t('groups.failed_to_remove_member'));
+      error("Failed to remove member");
     }
   };
 
   if (loading || !group) {
-    return <div className="p-6 text-center">{t('groups.loading')}</div>;
+    return <div className="p-6 text-center">{"Loading groups..."}</div>;
   }
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-4">
-        <Button isIconOnly variant="light" aria-label={t('groups.label_go_back')} onPress={() => navigate(-1)}>
+        <Button isIconOnly variant="light" aria-label={"Go Back"} onPress={() => navigate(-1)}>
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold">{group.name}</h1>
-          <p className="text-sm text-gray-500">{t('groups.group_id', { id: group.id })}</p>
+          <p className="text-sm text-gray-500">{`Group ID`}</p>
         </div>
         {editMode ? (
           <Button color="primary" startContent={<Save className="w-4 h-4" />} onPress={handleSave}>
-            {t('groups.save')}
+            {"Save"}
           </Button>
         ) : (
           <Button variant="flat" onPress={() => setEditMode(true)}>
-            {t('groups.edit')}
+            {"Edit"}
           </Button>
         )}
       </div>
@@ -162,7 +160,7 @@ export default function GroupDetail() {
             <Users className="w-8 h-8 text-primary" />
             <div>
               <div className="text-2xl font-bold">{group.member_count || 0}</div>
-              <div className="text-xs text-gray-500">{t('groups.members')}</div>
+              <div className="text-xs text-gray-500">{"Members"}</div>
             </div>
           </div>
         </Card>
@@ -171,7 +169,7 @@ export default function GroupDetail() {
             <FileText className="w-8 h-8 text-success" />
             <div>
               <div className="text-2xl font-bold">{group.stats?.posts_count || 0}</div>
-              <div className="text-xs text-gray-500">{t('groups.posts')}</div>
+              <div className="text-xs text-gray-500">{"Posts"}</div>
             </div>
           </div>
         </Card>
@@ -180,7 +178,7 @@ export default function GroupDetail() {
             <Calendar className="w-8 h-8 text-warning" />
             <div>
               <div className="text-2xl font-bold">{group.stats?.events_count || 0}</div>
-              <div className="text-xs text-gray-500">{t('groups.events')}</div>
+              <div className="text-xs text-gray-500">{"Events"}</div>
             </div>
           </div>
         </Card>
@@ -189,33 +187,33 @@ export default function GroupDetail() {
             <TrendingUp className="w-8 h-8 text-secondary" />
             <div>
               <div className="text-2xl font-bold">{group.stats?.activity_score || 0}</div>
-              <div className="text-xs text-gray-500">{t('groups.activity_score')}</div>
+              <div className="text-xs text-gray-500">{"Activity Score"}</div>
             </div>
           </div>
         </Card>
       </div>
 
       <Tabs>
-        <Tab key="overview" title={t('groups.overview')}>
+        <Tab key="overview" title={"Overview"}>
           <Card className="p-6 mt-4 space-y-4">
             {editMode ? (
               <>
-                <Input label={t('groups.label_name')} value={formData.name} onValueChange={(v) => setFormData({ ...formData, name: v })} />
-                <Textarea label={t('groups.label_description')} value={formData.description} onValueChange={(v) => setFormData({ ...formData, description: v })} />
-                <Input label={t('groups.label_location')} value={formData.location} onValueChange={(v) => setFormData({ ...formData, location: v })} />
+                <Input label={"Name"} value={formData.name} onValueChange={(v) => setFormData({ ...formData, name: v })} />
+                <Textarea label={"Description"} value={formData.description} onValueChange={(v) => setFormData({ ...formData, description: v })} />
+                <Input label={"Location"} value={formData.location} onValueChange={(v) => setFormData({ ...formData, location: v })} />
               </>
             ) : (
               <>
                 <div>
-                  <div className="text-sm text-gray-500">{t('groups.label_description')}</div>
-                  <div className="mt-1">{group.description || t('groups.no_description')}</div>
+                  <div className="text-sm text-gray-500">{"Description"}</div>
+                  <div className="mt-1">{group.description || "No description"}</div>
                 </div>
                 <div>
-                  <div className="text-sm text-gray-500">{t('groups.visibility')}</div>
+                  <div className="text-sm text-gray-500">{"Visibility"}</div>
                   <Chip className="mt-1" size="sm">{group.visibility}</Chip>
                 </div>
                 <div>
-                  <div className="text-sm text-gray-500">{t('groups.created')}</div>
+                  <div className="text-sm text-gray-500">{"Created"}</div>
                   <div className="mt-1">{new Date(group.created_at).toLocaleString()}</div>
                 </div>
               </>
@@ -223,16 +221,16 @@ export default function GroupDetail() {
           </Card>
         </Tab>
 
-        <Tab key="members" title={t('groups.members')}>
+        <Tab key="members" title={"Members"}>
           <Card className="p-4 mt-4">
-            <Table aria-label={t('groups.label_members_table')}>
+            <Table aria-label={"Members Table"}>
               <TableHeader>
-                <TableColumn>{t('groups.col_user')}</TableColumn>
-                <TableColumn>{t('groups.col_role')}</TableColumn>
-                <TableColumn>{t('groups.col_joined')}</TableColumn>
-                <TableColumn>{t('groups.col_actions')}</TableColumn>
+                <TableColumn>{"User"}</TableColumn>
+                <TableColumn>{"Role"}</TableColumn>
+                <TableColumn>{"Joined"}</TableColumn>
+                <TableColumn>{"Actions"}</TableColumn>
               </TableHeader>
-              <TableBody emptyContent={t('groups.no_members_found')}>
+              <TableBody emptyContent={"No members found"}>
                 {members.map((member) => (
                   <TableRow key={member.user_id}>
                     <TableCell>
@@ -245,14 +243,14 @@ export default function GroupDetail() {
                     <TableCell>{new Date(member.joined_at).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        {member.role === 'member' && <Button size="sm" variant="flat" onPress={() => handlePromote(member.user_id)}>{t('groups.promote')}</Button>}
+                        {member.role === 'member' && <Button size="sm" variant="flat" onPress={() => handlePromote(member.user_id)}>{"Promote"}</Button>}
                         {member.role === 'admin' && (
                           <>
-                            <Button size="sm" variant="flat" onPress={() => handlePromote(member.user_id)}>{t('groups.make_owner')}</Button>
-                            <Button size="sm" variant="flat" onPress={() => handleDemote(member.user_id)}>{t('groups.demote')}</Button>
+                            <Button size="sm" variant="flat" onPress={() => handlePromote(member.user_id)}>{"Make Owner"}</Button>
+                            <Button size="sm" variant="flat" onPress={() => handleDemote(member.user_id)}>{"Demote"}</Button>
                           </>
                         )}
-                        {member.role !== 'owner' && <Button size="sm" variant="flat" color="danger" onPress={() => handleKick(member.user_id)}>{t('groups.kick')}</Button>}
+                        {member.role !== 'owner' && <Button size="sm" variant="flat" color="danger" onPress={() => handleKick(member.user_id)}>{"Kick"}</Button>}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -262,15 +260,15 @@ export default function GroupDetail() {
           </Card>
         </Tab>
 
-        <Tab key="location" title={t('groups.location')}>
+        <Tab key="location" title={"Location"}>
           <Card className="p-6 mt-4 space-y-4">
             <div>
-              <div className="text-sm text-gray-500">{t('groups.address')}</div>
-              <div className="mt-1">{group.location || t('groups.no_location')}</div>
+              <div className="text-sm text-gray-500">{"Address"}</div>
+              <div className="mt-1">{group.location || "No location"}</div>
             </div>
             {group.latitude && group.longitude && (
               <div>
-                <div className="text-sm text-gray-500">{t('groups.coordinates')}</div>
+                <div className="text-sm text-gray-500">{"Coordinates"}</div>
                 <div className="mt-1">{group.latitude}, {group.longitude}</div>
               </div>
             )}
@@ -280,7 +278,7 @@ export default function GroupDetail() {
               onPress={handleGeocode}
               isDisabled={!group.location}
             >
-              {t('groups.geocode_location')}
+              {"Geocode Location"}
             </Button>
           </Card>
         </Tab>

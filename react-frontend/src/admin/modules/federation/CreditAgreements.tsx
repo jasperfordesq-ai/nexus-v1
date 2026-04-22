@@ -154,7 +154,7 @@ function getMonthlyLimit(agreement: CreditAgreement): number | null {
 
 export function CreditAgreements() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('federation.page_title'));
+  usePageTitle("Federation");
   const toast = useToast();
   const createModal = useDisclosure();
   const detailModal = useDisclosure();
@@ -222,7 +222,7 @@ export function CreditAgreements() {
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') return;
       logError('CreditAgreements.load', err);
-      toast.error(t('federation.failed_to_load_credit_agreements'));
+      toast.error("Failed to load credit agreements");
     }
     setLoading(false);
   }, [toast, t]);
@@ -259,11 +259,11 @@ export function CreditAgreements() {
     const rate = parseFloat(exchangeRate);
     const limit = parseInt(monthlyLimit);
     if (!rate || rate <= 0) {
-      toast.error(t('federation.exchange_rate_must_be_positive'));
+      toast.error("Exchange Rate Must Be Positive");
       return;
     }
     if (!limit || limit <= 0) {
-      toast.error(t('federation.monthly_limit_must_be_positive'));
+      toast.error("Monthly Limit Must Be Positive");
       return;
     }
     setCreating(true);
@@ -274,7 +274,7 @@ export function CreditAgreements() {
         monthly_limit: limit,
       });
       if (res.success) {
-        toast.success(t('federation.credit_agreement_created'));
+        toast.success("Credit agreement created");
         setSelectedPartner('');
         setExchangeRate('1.0');
         setMonthlyLimit('100');
@@ -283,7 +283,7 @@ export function CreditAgreements() {
       }
     } catch (err) {
       logError('CreditAgreements.create', err);
-      toast.error(t('federation.failed_to_create_agreement'));
+      toast.error("Failed to create agreement");
     }
     setCreating(false);
   }, [selectedPartner, exchangeRate, monthlyLimit, toast, createModal, loadData, t]);
@@ -293,12 +293,12 @@ export function CreditAgreements() {
     try {
       const res = await api.post(`/v2/admin/federation/credit-agreements/${agreementId}/${action}`);
       if (res.success) {
-        toast.success(t('federation.agreement_action_success', { action }));
+        toast.success(`Agreement Action successfully`);
         loadData();
       }
     } catch (err) {
       logError('CreditAgreements.statusChange', err);
-      toast.error(t('federation.agreement_action_failed', { action }));
+      toast.error(`Agreement action failed`);
     }
   }, [toast, loadData, t]);
 
@@ -340,7 +340,7 @@ export function CreditAgreements() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('federation.credit_agreements_title')} description={t('federation.credit_agreements_desc')} />
+        <PageHeader title={"Credit Agreements"} description={"Manage credit exchange agreements with partner communities"} />
         <div className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
         </div>
@@ -351,15 +351,15 @@ export function CreditAgreements() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t('federation.credit_agreements_title')}
-        description={t('federation.credit_agreements_desc')}
+        title={"Credit Agreements"}
+        description={"Manage credit exchange agreements with partner communities"}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={() => { loadData(); if (activeTab === 'balances') loadBalances(); }}>
-              {t('federation.refresh')}
+              {"Refresh"}
             </Button>
             <Button color="primary" size="sm" startContent={<Plus size={16} />} onPress={createModal.onOpen}>
-              {t('federation.new_agreement')}
+              {"New Agreement"}
             </Button>
           </div>
         }
@@ -367,10 +367,10 @@ export function CreditAgreements() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label={t('federation.label_active_agreements')} value={activeCount} icon={Handshake} color="success" />
-        <StatCard label={t('federation.label_pending_approval')} value={pendingCount} icon={AlertTriangle} color="warning" />
-        <StatCard label={t('federation.label_credits_sent')} value={totalSent} icon={ArrowRightLeft} color="primary" />
-        <StatCard label={t('federation.label_credits_received')} value={totalReceived} icon={TrendingUp} color="secondary" />
+        <StatCard label={"Active Agreements"} value={activeCount} icon={Handshake} color="success" />
+        <StatCard label={"Pending Approval"} value={pendingCount} icon={AlertTriangle} color="warning" />
+        <StatCard label={"Credits Sent"} value={totalSent} icon={ArrowRightLeft} color="primary" />
+        <StatCard label={"Credits Received"} value={totalReceived} icon={TrendingUp} color="secondary" />
       </div>
 
       {/* Tabs: Agreements / Balances */}
@@ -378,14 +378,14 @@ export function CreditAgreements() {
         selectedKey={activeTab}
         onSelectionChange={(key) => setActiveTab(String(key))}
         variant="underlined"
-        aria-label={t('federation.label_credit_tabs')}
+        aria-label={"Credit Tabs"}
       >
         <Tab
           key="agreements"
           title={
             <div className="flex items-center gap-2">
               <Handshake size={16} />
-              <span>{t('federation.tab_agreements')}</span>
+              <span>{"Agreements"}</span>
             </div>
           }
         />
@@ -394,7 +394,7 @@ export function CreditAgreements() {
           title={
             <div className="flex items-center gap-2">
               <Wallet size={16} />
-              <span>{t('federation.tab_balances')}</span>
+              <span>{"Balances"}</span>
             </div>
           }
         />
@@ -404,21 +404,21 @@ export function CreditAgreements() {
       {activeTab === 'agreements' && (
         <Card shadow="sm">
           <CardHeader>
-            <h3 className="text-lg font-semibold">{t('federation.all_agreements')}</h3>
+            <h3 className="text-lg font-semibold">{"All Agreements"}</h3>
           </CardHeader>
           <CardBody>
-            <Table aria-label={t('federation.label_credit_agreements')} removeWrapper>
+            <Table aria-label={"Credit Agreements"} removeWrapper>
               <TableHeader>
-                <TableColumn>{t('federation.col_partner')}</TableColumn>
-                <TableColumn>{t('federation.col_exchange_rate')}</TableColumn>
-                <TableColumn>{t('federation.col_monthly_limit')}</TableColumn>
-                <TableColumn>{t('federation.col_balance')}</TableColumn>
-                <TableColumn>{t('federation.col_sent_received')}</TableColumn>
-                <TableColumn>{t('federation.col_status')}</TableColumn>
-                <TableColumn>{t('federation.col_created')}</TableColumn>
-                <TableColumn>{t('federation.col_actions')}</TableColumn>
+                <TableColumn>{"Partner"}</TableColumn>
+                <TableColumn>{"Exchange Rate"}</TableColumn>
+                <TableColumn>{"Monthly Limit"}</TableColumn>
+                <TableColumn>{"Balance"}</TableColumn>
+                <TableColumn>{"Sent Received"}</TableColumn>
+                <TableColumn>{"Status"}</TableColumn>
+                <TableColumn>{"Created"}</TableColumn>
+                <TableColumn>{"Actions"}</TableColumn>
               </TableHeader>
-              <TableBody emptyContent={t('federation.no_credit_agreements')}>
+              <TableBody emptyContent={"No credit agreements"}>
                 {agreements.map((agreement) => (
                   <TableRow key={agreement.id} className="cursor-pointer hover:bg-default-50">
                     <TableCell>
@@ -433,8 +433,8 @@ export function CreditAgreements() {
                     <TableCell>
                       <span className="text-sm">
                         {getMonthlyLimit(agreement) !== null
-                          ? t('federation.credits_count', { count: getMonthlyLimit(agreement) as number })
-                          : t('federation.unlimited')
+                          ? `Credits`
+                          : "Unlimited"
                         }
                       </span>
                     </TableCell>
@@ -462,7 +462,7 @@ export function CreditAgreements() {
                           size="sm"
                           variant="flat"
                           isIconOnly
-                          aria-label={t('federation.label_view_detail')}
+                          aria-label={"View Detail"}
                           onPress={() => openDetail(agreement)}
                         >
                           <Eye size={14} />
@@ -473,7 +473,7 @@ export function CreditAgreements() {
                             variant="flat"
                             color="success"
                             isIconOnly
-                            aria-label={t('federation.label_approve')}
+                            aria-label={"Approve"}
                             onPress={() => handleStatusChange(agreement.id, 'approve')}
                           >
                             <CheckCircle size={14} />
@@ -485,7 +485,7 @@ export function CreditAgreements() {
                             variant="flat"
                             color="warning"
                             isIconOnly
-                            aria-label={t('federation.label_suspend')}
+                            aria-label={"Suspend"}
                             onPress={() => setPendingAction({ agreementId: agreement.id, action: 'suspend', partnerName: getPartnerName(agreement) })}
                           >
                             <Pause size={14} />
@@ -497,7 +497,7 @@ export function CreditAgreements() {
                             variant="flat"
                             color="success"
                             isIconOnly
-                            aria-label={t('federation.label_reactivate')}
+                            aria-label={"Reactivate"}
                             onPress={() => handleStatusChange(agreement.id, 'reactivate')}
                           >
                             <Play size={14} />
@@ -509,7 +509,7 @@ export function CreditAgreements() {
                             variant="flat"
                             color="danger"
                             isIconOnly
-                            aria-label={t('federation.label_terminate')}
+                            aria-label={"Terminate"}
                             onPress={() => setPendingAction({ agreementId: agreement.id, action: 'terminate', partnerName: getPartnerName(agreement) })}
                           >
                             <XCircle size={14} />
@@ -532,14 +532,14 @@ export function CreditAgreements() {
           <Card shadow="sm">
             <CardBody className="flex flex-row items-center justify-between p-6">
               <div>
-                <p className="text-sm text-default-400">{t('federation.net_balance_all_partners')}</p>
+                <p className="text-sm text-default-400">{"Net Balance (All Partners)"}</p>
                 <p className={`text-3xl font-bold ${netTotal >= 0 ? 'text-success' : 'text-danger'}`}>
                   {netTotal >= 0 ? '+' : ''}{netTotal.toFixed(1)}
                 </p>
                 <p className="text-xs text-default-400 mt-1">
                   {netTotal >= 0
-                    ? t('federation.balance_positive_desc')
-                    : t('federation.balance_negative_desc')
+                    ? "This community has a positive balance with its partner"
+                    : "This community owes time credits to its partner"
                   }
                 </p>
               </div>
@@ -555,7 +555,7 @@ export function CreditAgreements() {
           ) : balances.length === 0 ? (
             <Card shadow="sm">
               <CardBody className="py-8 text-center">
-                <p className="text-default-400">{t('federation.no_balances')}</p>
+                <p className="text-default-400">{"No balances"}</p>
               </CardBody>
             </Card>
           ) : (
@@ -576,18 +576,18 @@ export function CreditAgreements() {
                     </div>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <p className="text-default-400">{t('federation.credits_sent_label')}</p>
+                        <p className="text-default-400">{"Credits Sent"}</p>
                         <p className="font-medium text-danger">{balance.credits_sent.toFixed(1)}</p>
                       </div>
                       <div>
-                        <p className="text-default-400">{t('federation.credits_received_label')}</p>
+                        <p className="text-default-400">{"Credits Received"}</p>
                         <p className="font-medium text-success">{balance.credits_received.toFixed(1)}</p>
                       </div>
                     </div>
                     <p className="text-xs text-default-400">
                       {balance.net_balance >= 0
-                        ? t('federation.partner_owes_us')
-                        : t('federation.we_owe_partner')
+                        ? "Partner Owes Us"
+                        : "We Owe Partner"
                       }
                     </p>
                   </CardBody>
@@ -605,12 +605,12 @@ export function CreditAgreements() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <Handshake size={20} />
-                {t('federation.new_credit_agreement')}
+                {"New Credit Agreement"}
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Select
-                  label={t('federation.label_partner_community')}
-                  placeholder={t('federation.placeholder_select_a_partner')}
+                  label={"Partner Community"}
+                  placeholder={"Select a Partner..."}
                   selectedKeys={selectedPartner ? [selectedPartner] : []}
                   onSelectionChange={(keys) => {
                     const selected = Array.from(keys)[0];
@@ -624,8 +624,8 @@ export function CreditAgreements() {
 
                 <Input
                   type="number"
-                  label={t('federation.label_exchange_rate')}
-                  description={t('federation.exchange_rate_description')}
+                  label={"Exchange Rate"}
+                  description={"Exchange Rate"}
                   value={exchangeRate}
                   onChange={(e) => setExchangeRate(e.target.value)}
                   startContent={<ArrowRightLeft size={14} />}
@@ -635,8 +635,8 @@ export function CreditAgreements() {
 
                 <Input
                   type="number"
-                  label={t('federation.label_monthly_limit')}
-                  description={t('federation.desc_maximum_credits_that_can_be_exchanged_pe')}
+                  label={"Monthly Limit"}
+                  description={"Maximum credits that can be exchanged per month in federation agreements"}
                   value={monthlyLimit}
                   onChange={(e) => setMonthlyLimit(e.target.value)}
                   startContent={<Clock size={14} />}
@@ -644,14 +644,14 @@ export function CreditAgreements() {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('federation.cancel')}</Button>
+                <Button variant="flat" onPress={onClose}>{"Cancel"}</Button>
                 <Button
                   color="primary"
                   isLoading={creating}
                   isDisabled={!selectedPartner}
                   onPress={handleCreate}
                 >
-                  {t('federation.create_agreement')}
+                  {"Create Agreement"}
                 </Button>
               </ModalFooter>
             </>
@@ -667,8 +667,8 @@ export function CreditAgreements() {
               <ModalHeader className="flex items-center gap-2">
                 <Handshake size={20} />
                 {selectedAgreement
-                  ? t('federation.agreement_with', { name: getPartnerName(selectedAgreement) })
-                  : t('federation.agreement_detail')
+                  ? `Agreement`
+                  : "Agreement Detail"
                 }
               </ModalHeader>
               <ModalBody>
@@ -677,40 +677,40 @@ export function CreditAgreements() {
                     {/* Agreement terms */}
                     <Card shadow="none" className="border border-default-200">
                       <CardHeader>
-                        <p className="text-sm font-semibold">{t('federation.agreement_terms')}</p>
+                        <p className="text-sm font-semibold">{"Agreement Terms"}</p>
                       </CardHeader>
                       <CardBody>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                           <div>
-                            <p className="text-default-400">{t('federation.col_partner')}</p>
+                            <p className="text-default-400">{"Partner"}</p>
                             <p className="font-medium">{getPartnerName(selectedAgreement)}</p>
                           </div>
                           <div>
-                            <p className="text-default-400">{t('federation.col_status')}</p>
+                            <p className="text-default-400">{"Status"}</p>
                             <Chip size="sm" color={STATUS_COLORS[selectedAgreement.status]} variant="flat">
                               {t(`federation.status_${selectedAgreement.status}`, selectedAgreement.status.charAt(0).toUpperCase() + selectedAgreement.status.slice(1))}
                             </Chip>
                           </div>
                           <div>
-                            <p className="text-default-400">{t('federation.col_exchange_rate')}</p>
+                            <p className="text-default-400">{"Exchange Rate"}</p>
                             <p className="font-mono">{selectedAgreement.exchange_rate}:1</p>
                           </div>
                           <div>
-                            <p className="text-default-400">{t('federation.col_monthly_limit')}</p>
+                            <p className="text-default-400">{"Monthly Limit"}</p>
                             <p>
                               {getMonthlyLimit(selectedAgreement) !== null
-                                ? t('federation.credits_count', { count: getMonthlyLimit(selectedAgreement) as number })
-                                : t('federation.unlimited')
+                                ? `Credits`
+                                : "Unlimited"
                               }
                             </p>
                           </div>
                           <div>
-                            <p className="text-default-400">{t('federation.label_created')}</p>
+                            <p className="text-default-400">{"Created"}</p>
                             <p>{new Date(selectedAgreement.created_at).toLocaleDateString()}</p>
                           </div>
                           {selectedAgreement.updated_at && (
                             <div>
-                              <p className="text-default-400">{t('federation.label_last_updated')}</p>
+                              <p className="text-default-400">{"Last Updated"}</p>
                               <p>{new Date(selectedAgreement.updated_at).toLocaleDateString()}</p>
                             </div>
                           )}
@@ -722,11 +722,11 @@ export function CreditAgreements() {
                     {detailMonthlyLimit !== null && detailMonthlyLimit > 0 && (
                       <Card shadow="none" className="border border-default-200">
                         <CardHeader>
-                          <p className="text-sm font-semibold">{t('federation.usage_this_month')}</p>
+                          <p className="text-sm font-semibold">{"Usage This Month"}</p>
                         </CardHeader>
                         <CardBody className="gap-2">
                           <div className="flex items-center justify-between text-sm">
-                            <span>{detailMonthUsage.toFixed(1)} / {detailMonthlyLimit.toFixed(1)} {t('federation.credits')}</span>
+                            <span>{detailMonthUsage.toFixed(1)} / {detailMonthlyLimit.toFixed(1)} {"Credits"}</span>
                             <span className="text-default-400">
                               {((detailMonthUsage / detailMonthlyLimit) * 100).toFixed(0)}%
                             </span>
@@ -735,7 +735,7 @@ export function CreditAgreements() {
                             value={(detailMonthUsage / detailMonthlyLimit) * 100}
                             color={detailMonthUsage / detailMonthlyLimit > 0.9 ? 'danger' : detailMonthUsage / detailMonthlyLimit > 0.7 ? 'warning' : 'primary'}
                             size="md"
-                            aria-label={t('federation.label_monthly_usage')}
+                            aria-label={"Monthly Usage"}
                           />
                         </CardBody>
                       </Card>
@@ -744,7 +744,7 @@ export function CreditAgreements() {
                     {/* Transaction history */}
                     <Card shadow="none" className="border border-default-200">
                       <CardHeader>
-                        <p className="text-sm font-semibold">{t('federation.transaction_history')}</p>
+                        <p className="text-sm font-semibold">{"Transaction History"}</p>
                       </CardHeader>
                       <CardBody>
                         {detailLoading ? (
@@ -753,16 +753,16 @@ export function CreditAgreements() {
                           </div>
                         ) : detailTransactions.length === 0 ? (
                           <p className="text-sm text-default-400 text-center py-4">
-                            {t('federation.no_transactions')}
+                            {"No transactions"}
                           </p>
                         ) : (
-                          <Table aria-label={t('federation.label_transactions')} removeWrapper>
+                          <Table aria-label={"Transactions"} removeWrapper>
                             <TableHeader>
-                              <TableColumn>{t('federation.col_date')}</TableColumn>
-                              <TableColumn>{t('federation.col_direction')}</TableColumn>
-                              <TableColumn>{t('federation.col_amount')}</TableColumn>
-                              <TableColumn>{t('federation.col_description')}</TableColumn>
-                              <TableColumn>{t('federation.col_status')}</TableColumn>
+                              <TableColumn>{"Date"}</TableColumn>
+                              <TableColumn>{"Direction"}</TableColumn>
+                              <TableColumn>{"Amount"}</TableColumn>
+                              <TableColumn>{"Description"}</TableColumn>
+                              <TableColumn>{"Status"}</TableColumn>
                             </TableHeader>
                             <TableBody>
                               {detailTransactions.map((tx) => (
@@ -782,8 +782,8 @@ export function CreditAgreements() {
                                       }
                                     >
                                       {tx.sender_tenant_name === getPartnerName(selectedAgreement)
-                                        ? t('federation.received')
-                                        : t('federation.sent')
+                                        ? "Received"
+                                        : "Sent"
                                       }
                                     </Chip>
                                   </TableCell>
@@ -811,7 +811,7 @@ export function CreditAgreements() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('federation.close')}</Button>
+                <Button variant="flat" onPress={onClose}>{"Close"}</Button>
               </ModalFooter>
             </>
           )}

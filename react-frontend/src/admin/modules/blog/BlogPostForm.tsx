@@ -72,7 +72,7 @@ export function BlogPostForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Dynamic page title
-  usePageTitle(isEdit && post ? `Admin - ${t('breadcrumbs.edit')}: ${post.title}` : `Admin - ${t('breadcrumbs.create')} ${t('breadcrumbs.blog')}`);
+  usePageTitle(isEdit && post ? `Admin - ${"Edit"}: ${post.title}` : `Admin - ${"Create"} ${"Blog"}`);
 
   // Load categories
   useEffect(() => {
@@ -118,10 +118,10 @@ export function BlogPostForm() {
         setMetaDescription(postData.meta_description || '');
         setNoindex(postData.noindex || false);
       } else {
-        setLoadError(res.error || t('blog.failed_to_load_blog_posts'));
+        setLoadError(res.error || "Failed to load blog posts");
       }
     } catch {
-      setLoadError(t('blog.an_unexpected_error_occurred'));
+      setLoadError("An unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -184,10 +184,10 @@ export function BlogPostForm() {
         toast.success(isEdit ? t('blog.post_updated', 'Post updated successfully') : t('blog.post_created', 'Post created successfully'));
         navigate(tenantPath('/admin/blog'));
       } else {
-        toast.error(res.error || t('blog.an_unexpected_error_occurred'));
+        toast.error(res.error || "An unexpected error occurred");
       }
     } catch {
-      toast.error(t('blog.an_unexpected_error_occurred'));
+      toast.error("An unexpected error occurred");
     } finally {
       setSubmitting(false);
     }
@@ -197,7 +197,7 @@ export function BlogPostForm() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" label={t('federation.loading')} />
+        <Spinner size="lg" label={"Loading federation..."} />
       </div>
     );
   }
@@ -207,25 +207,25 @@ export function BlogPostForm() {
     return (
       <div>
         <PageHeader
-          title={`${t('breadcrumbs.edit')} ${t('breadcrumbs.blog')}`}
+          title={`${"Edit"} ${"Blog"}`}
           actions={
             <Button
               variant="flat"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/blog'))}
             >
-              {t('common.back')}
+              {"Back"}
             </Button>
           }
         />
         <Card className="max-w-2xl">
           <CardBody className="p-6">
             <p className="text-center text-danger">
-              {loadError || t('blog.failed_to_load_blog_posts')}
+              {loadError || "Failed to load blog posts"}
             </p>
             <div className="mt-4 flex justify-center">
               <Button variant="flat" onPress={() => navigate(tenantPath('/admin/blog'))}>
-                {t('common.back')}
+                {"Back"}
               </Button>
             </div>
           </CardBody>
@@ -237,14 +237,14 @@ export function BlogPostForm() {
   return (
     <div>
       <PageHeader
-        title={isEdit ? `${t('breadcrumbs.edit')}: ${post?.title}` : `${t('breadcrumbs.create')} ${t('breadcrumbs.blog')}`}
+        title={isEdit ? `${"Edit"}: ${post?.title}` : `${"Create"} ${"Blog"}`}
         actions={
           <Button
             variant="flat"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/blog'))}
           >
-            {t('common.back')}
+            {"Back"}
           </Button>
         }
       />
@@ -254,7 +254,7 @@ export function BlogPostForm() {
           <CardBody className="gap-5 p-6">
             {/* Title */}
             <Input
-              label={t('content.label_name')}
+              label={"Name"}
               placeholder={t('blog.placeholder_title', 'Enter post title')}
               value={title}
               onValueChange={setTitle}
@@ -266,7 +266,7 @@ export function BlogPostForm() {
 
             {/* Slug */}
             <Input
-              label={t('federation.col_slug')}
+              label={"Slug"}
               placeholder={t('blog.placeholder_slug', 'Auto-generated from title')}
               value={slug}
               onValueChange={setSlug}
@@ -277,7 +277,7 @@ export function BlogPostForm() {
             {/* Content */}
             <Suspense fallback={<Spinner size="sm" className="m-4" />}>
               <RichTextEditor
-                label={t('content.page_title')}
+                label={"Content"}
                 placeholder={t('blog.placeholder_content', 'Write the blog post content...')}
                 value={content}
                 onChange={setContent}
@@ -300,7 +300,7 @@ export function BlogPostForm() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {/* Status */}
               <Select
-                label={t('listings.status')}
+                label={"Status"}
                 placeholder={t('blog.placeholder_status', 'Select status')}
                 selectedKeys={status ? [status] : []}
                 onSelectionChange={(keys) => {
@@ -315,7 +315,7 @@ export function BlogPostForm() {
 
               {/* Category */}
               <Select
-                label={t('breadcrumbs.categories')}
+                label={"Categories"}
                 placeholder={t('blog.placeholder_category', 'Select a category')}
                 selectedKeys={categoryId ? [categoryId] : []}
                 onSelectionChange={(keys) => {
@@ -386,7 +386,7 @@ export function BlogPostForm() {
                 onPress={() => navigate(tenantPath('/admin/blog'))}
                 isDisabled={submitting}
               >
-                {t('cancel')}
+                {"Cancel"}
               </Button>
               <Button
                 type="submit"
@@ -395,7 +395,7 @@ export function BlogPostForm() {
                 isLoading={submitting}
                 isDisabled={submitting}
               >
-                {isEdit ? t('federation.save_changes') : `${t('breadcrumbs.create')} ${t('breadcrumbs.blog')}`}
+                {isEdit ? "Save Changes" : `${"Create"} ${"Blog"}`}
               </Button>
             </div>
           </CardBody>

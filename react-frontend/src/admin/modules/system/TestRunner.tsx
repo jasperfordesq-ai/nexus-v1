@@ -16,7 +16,6 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminTools } from '../../api/adminApi';
 
-import { useTranslation } from 'react-i18next';
 interface TestResult {
   name: string;
   status: 'pending' | 'running' | 'pass' | 'fail';
@@ -45,8 +44,7 @@ const statusIcon = (status: string) => {
 };
 
 export function TestRunner() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('system.page_title'));
+  usePageTitle("System");
   const toast = useToast();
   const [tests, setTests] = useState<TestResult[]>(INITIAL_TESTS);
   const [running, setRunning] = useState(false);
@@ -96,14 +94,14 @@ export function TestRunner() {
 
         const failCount = results.filter(r => r.status !== 'pass').length;
         if (failCount > 0) {
-          toast.warning(t('system.health_check_complete'), t('system.tests_failed', { count: failCount }));
+          toast.warning("Health Check Complete", `Tests failed`);
         } else {
-          toast.success(t('system.all_health_checks_passed'));
+          toast.success("All health checks passed");
         }
       } else {
         // API returned but no structured results; mark all as pass
         setTests(prev => prev.map(t => ({ ...t, status: 'pass' as const, duration: 0 })));
-        toast.success(t('system.health_checks_completed'));
+        toast.success("Health checks completed");
       }
     } catch {
       // On API error, mark all as failed
@@ -112,7 +110,7 @@ export function TestRunner() {
         status: 'fail' as const,
         error: 'Health check API unavailable',
       })));
-      toast.error(t('system.health_check_failed'), t('system.health_check_unreachable'));
+      toast.error("Health Check failed", "Health Check Unreachable");
     } finally {
       setRunning(false);
     }
@@ -124,8 +122,8 @@ export function TestRunner() {
   return (
     <div>
       <PageHeader
-        title={t('system.test_runner_title')}
-        description={t('system.test_runner_desc')}
+        title={"Test Runner"}
+        description={"Run automated tests to verify platform functionality"}
         actions={
           <Button color="primary" startContent={<Play size={16} />} onPress={runTests} isLoading={running}>
             Run All Tests

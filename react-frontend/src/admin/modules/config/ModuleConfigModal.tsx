@@ -78,7 +78,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setBrokerConfig(res.data);
       }
     } catch {
-      toast.error(t('config.modal_broker_load_failed'));
+      toast.error("Modal Broker Load failed");
     } finally {
       setLoading(false);
     }
@@ -92,7 +92,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setGroupConfig(res.data.config);
       }
     } catch {
-      toast.error(t('config.modal_group_load_failed'));
+      toast.error("Modal Group Load failed");
     } finally {
       setLoading(false);
     }
@@ -106,7 +106,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setListingConfig(res.data.config);
       }
     } catch {
-      toast.error(t('config.modal_listing_load_failed'));
+      toast.error("Modal Listing Load failed");
     } finally {
       setLoading(false);
     }
@@ -120,7 +120,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setVolunteeringConfig(res.data.config);
       }
     } catch {
-      toast.error(t('config.modal_volunteering_load_failed'));
+      toast.error("Modal Volunteering Load failed");
     } finally {
       setLoading(false);
     }
@@ -134,7 +134,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setJobConfig(res.data.config);
       }
     } catch {
-      toast.error(t('config.modal_job_load_failed'));
+      toast.error("Modal Job Load failed");
     } finally {
       setLoading(false);
     }
@@ -148,7 +148,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setIdentityConfig(res.data.config);
       }
     } catch {
-      toast.error(t('config.modal_identity_load_failed'));
+      toast.error("Modal Identity Load failed");
     } finally {
       setLoading(false);
     }
@@ -188,14 +188,14 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminBroker.saveConfiguration(brokerConfig);
       if (res.success) {
-        toast.success(t('config.modal_broker_saved'));
+        toast.success("Modal Broker saved");
         setHasChanges(false);
         onClose();
       } else {
-        toast.error(t('config.modal_save_failed'));
+        toast.error("Modal Save failed");
       }
     } catch {
-      toast.error(t('config.modal_save_failed'));
+      toast.error("Modal Save failed");
     } finally {
       setSaving(false);
     }
@@ -207,15 +207,15 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminConfig.updateGroupConfigBulk(groupConfig);
       if (res.success) {
-        toast.success(t('config.modal_group_saved'));
+        toast.success("Modal Group saved");
         setHasChanges(false);
         refreshTenant();
         onClose();
       } else {
-        toast.error(t('config.modal_save_failed'));
+        toast.error("Modal Save failed");
       }
     } catch {
-      toast.error(t('config.modal_save_failed'));
+      toast.error("Modal Save failed");
     } finally {
       setSaving(false);
     }
@@ -227,15 +227,15 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminConfig.updateListingConfigBulk(listingConfig);
       if (res.success) {
-        toast.success(t('config.modal_listing_saved'));
+        toast.success("Modal Listing saved");
         setHasChanges(false);
         refreshTenant();
         onClose();
       } else {
-        toast.error(t('config.modal_save_failed'));
+        toast.error("Modal Save failed");
       }
     } catch {
-      toast.error(t('config.modal_save_failed'));
+      toast.error("Modal Save failed");
     } finally {
       setSaving(false);
     }
@@ -247,15 +247,15 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminConfig.updateVolunteeringConfigBulk(volunteeringConfig);
       if (res.success) {
-        toast.success(t('config.modal_volunteering_saved'));
+        toast.success("Modal Volunteering saved");
         setHasChanges(false);
         refreshTenant();
         onClose();
       } else {
-        toast.error(t('config.modal_save_failed'));
+        toast.error("Modal Save failed");
       }
     } catch {
-      toast.error(t('config.modal_save_failed'));
+      toast.error("Modal Save failed");
     } finally {
       setSaving(false);
     }
@@ -267,15 +267,15 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminConfig.updateJobConfigBulk(jobConfig);
       if (res.success) {
-        toast.success(t('config.modal_job_saved'));
+        toast.success("Modal Job saved");
         setHasChanges(false);
         refreshTenant();
         onClose();
       } else {
-        toast.error(t('config.modal_save_failed'));
+        toast.error("Modal Save failed");
       }
     } catch {
-      toast.error(t('config.modal_save_failed'));
+      toast.error("Modal Save failed");
     } finally {
       setSaving(false);
     }
@@ -287,14 +287,14 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminConfig.updateIdentityConfigBulk(identityConfig);
       if (res.success) {
-        toast.success(t('config.modal_identity_saved'));
+        toast.success("Modal Identity saved");
         setHasChanges(false);
         refreshTenant();
       } else {
-        toast.error(t('config.modal_save_failed'));
+        toast.error("Modal Save failed");
       }
     } catch {
-      toast.error(t('config.modal_save_failed'));
+      toast.error("Modal Save failed");
     } finally {
       setSaving(false);
     }
@@ -368,10 +368,10 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span>{t('config.modal_title', { name: moduleName })}</span>
+              <span>{`Modal`}</span>
               {!isEditable && (
                 <Chip size="sm" variant="flat" color="warning" startContent={<Construction size={12} />}>
-                  {t('config.beta')}
+                  {"Beta"}
                 </Chip>
               )}
             </div>
@@ -394,7 +394,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
                 <Info size={40} className="text-default-400" />
                 <div className="text-center">
                   <p className="text-sm text-default-600">
-                    {t('config.modal_onboarding_desc')}
+                    {"Modal Onboarding."}
                   </p>
                 </div>
                 {module.detailPageUrl && (
@@ -404,7 +404,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
                     startContent={<ExternalLink size={16} />}
                     onPress={handleNavigateToDetail}
                   >
-                    {t('config.modal_go_to_onboarding')}
+                    {"Modal Go to Onboarding"}
                   </Button>
                 )}
               </CardBody>
@@ -417,7 +417,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
               <CardBody className="flex flex-row items-center gap-3 py-3">
                 <Construction size={18} className="text-warning flex-shrink-0" />
                 <p className="text-sm text-warning-700 dark:text-warning-400">
-                  {t('config.modal_coming_soon_notice')}
+                  {"Modal Coming Soon Notice"}
                 </p>
               </CardBody>
             </Card>
@@ -489,7 +489,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
                 startContent={<ExternalLink size={14} />}
                 onPress={handleNavigateToDetail}
               >
-                {t('config.modal_open_broker_page')}
+                {"Modal Open Broker Page"}
               </Button>
             </div>
           )}
@@ -497,7 +497,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
 
         <ModalFooter>
           <Button variant="flat" onPress={onClose}>
-            {isEditable && hasChanges ? t('config.cancel') : t('config.close')}
+            {isEditable && hasChanges ? "Cancel" : "Close"}
           </Button>
           {isEditable && (
             <Button
@@ -507,7 +507,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
               isDisabled={!hasChanges || (isBroker && !brokerConfig) || (isGroupConfig && !groupConfig) || (isListingConfig && !listingConfig) || (isVolunteeringConfig && !volunteeringConfig) || (isJobConfig && !jobConfig) || (isIdentityConfig && !identityConfig)}
               onPress={isBroker ? handleSaveBrokerConfig : isListingConfig ? handleSaveListingConfig : isVolunteeringConfig ? handleSaveVolunteeringConfig : isJobConfig ? handleSaveJobConfig : isIdentityConfig ? handleSaveIdentityConfig : handleSaveGroupConfig}
             >
-              {t('config.save_changes')}
+              {"Save Changes"}
             </Button>
           )}
         </ModalFooter>
@@ -535,7 +535,7 @@ function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowP
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm font-medium">{option.label}</span>
           {option.comingSoon && (
-            <Chip size="sm" variant="flat" color="warning">{t('config.coming_soon')}</Chip>
+            <Chip size="sm" variant="flat" color="warning">{"Coming Soon"}</Chip>
           )}
         </div>
         <p className="text-xs text-default-500 mt-1 leading-relaxed">{option.description}</p>

@@ -29,12 +29,10 @@ import { adminBroker } from '../../api/adminApi';
 import { DataTable, StatusBadge, PageHeader, type Column } from '../../components';
 import type { ExchangeRequest } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 type ActionType = 'approve' | 'reject';
 
 export function ExchangeManagement() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('broker.page_title'));
+  usePageTitle("Broker Controls");
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -92,7 +90,7 @@ export function ExchangeManagement() {
         setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
       }
     } catch {
-      toast.error(t('broker.failed_to_load_exchanges'));
+      toast.error("Failed to load exchanges");
     } finally {
       setLoading(false);
     }
@@ -107,7 +105,7 @@ export function ExchangeManagement() {
     const { type, item } = actionModal;
 
     if (type === 'reject' && !actionText.trim()) {
-      toast.error(t('broker.a_reason_is_required_to_reject_an_exchan'));
+      toast.error("A reason is required to reject an exchange");
       return;
     }
 
@@ -118,13 +116,13 @@ export function ExchangeManagement() {
         : await adminBroker.rejectExchange(item.id, actionText);
 
       if (res?.success) {
-        toast.success(t('broker.exchange_action_success', { type }));
+        toast.success(`Exchange Action succeeded`);
         loadItems();
       } else {
-        toast.error(res?.error || t('broker.exchange_action_failed', { type }));
+        toast.error(res?.error || `Exchange Action failed`);
       }
     } catch {
-      toast.error(t('broker.exchange_action_failed', { type }));
+      toast.error(`Exchange Action failed`);
     } finally {
       setActionLoading(false);
       setActionModal(null);
@@ -140,7 +138,7 @@ export function ExchangeManagement() {
   const columns: Column<ExchangeRequest>[] = [
     {
       key: 'requester_name',
-      label: t('broker.col_requester'),
+      label: "Requester",
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.requester_name}</span>
@@ -148,7 +146,7 @@ export function ExchangeManagement() {
     },
     {
       key: 'provider_name',
-      label: t('broker.col_provider'),
+      label: "Provider",
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.provider_name}</span>
@@ -156,7 +154,7 @@ export function ExchangeManagement() {
     },
     {
       key: 'listing_title',
-      label: t('broker.col_listing'),
+      label: "Listing",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">
@@ -166,13 +164,13 @@ export function ExchangeManagement() {
     },
     {
       key: 'status',
-      label: t('broker.col_status'),
+      label: "Status",
       sortable: true,
       render: (item) => <StatusBadge status={item.status} />,
     },
     {
       key: 'final_hours',
-      label: t('broker.col_hours'),
+      label: "Hours",
       sortable: true,
       render: (item) => (
         <span className="text-sm">
@@ -182,7 +180,7 @@ export function ExchangeManagement() {
     },
     {
       key: 'created_at',
-      label: t('broker.col_date'),
+      label: "Date",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -192,7 +190,7 @@ export function ExchangeManagement() {
     },
     {
       key: 'actions',
-      label: t('broker.col_actions'),
+      label: "Actions",
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -202,7 +200,7 @@ export function ExchangeManagement() {
             color="default"
             as={Link}
             to={tenantPath(`/admin/broker-controls/exchanges/${item.id}`)}
-            aria-label={t('broker.label_view_exchange_details')}
+            aria-label={"View Exchange Details"}
           >
             <Eye size={14} />
           </Button>
@@ -214,7 +212,7 @@ export function ExchangeManagement() {
                 variant="flat"
                 color="success"
                 onPress={() => openActionModal('approve', item)}
-                aria-label={t('broker.label_approve_exchange')}
+                aria-label={"Approve Exchange"}
               >
                 <CheckCircle size={14} />
               </Button>
@@ -224,7 +222,7 @@ export function ExchangeManagement() {
                 variant="flat"
                 color="danger"
                 onPress={() => openActionModal('reject', item)}
-                aria-label={t('broker.label_reject_exchange')}
+                aria-label={"Reject Exchange"}
               >
                 <XCircle size={14} />
               </Button>
@@ -238,8 +236,8 @@ export function ExchangeManagement() {
   return (
     <div>
       <PageHeader
-        title={t('broker.exchange_management_title')}
-        description={t('broker.exchange_management_desc')}
+        title={"Exchange Management"}
+        description={"Review and approve or reject exchanges flagged for broker attention"}
         actions={
           <Button
             as={Link}
@@ -248,7 +246,7 @@ export function ExchangeManagement() {
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
-            {t('common.back')}
+            {"Back"}
           </Button>
         }
       />
@@ -260,13 +258,13 @@ export function ExchangeManagement() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={t('broker.tab_all')} />
-          <Tab key="pending_broker" title={t('broker.tab_pending')} />
-          <Tab key="accepted" title={t('broker.tab_approved')} />
-          <Tab key="in_progress" title={t('broker.tab_in_progress')} />
-          <Tab key="completed" title={t('broker.tab_completed')} />
-          <Tab key="cancelled" title={t('broker.tab_cancelled')} />
-          <Tab key="disputed" title={t('broker.tab_disputed')} />
+          <Tab key="all" title={"All"} />
+          <Tab key="pending_broker" title={"Pending"} />
+          <Tab key="accepted" title={"Approved"} />
+          <Tab key="in_progress" title={"In Progress"} />
+          <Tab key="completed" title={"Completed"} />
+          <Tab key="cancelled" title={"Cancelled"} />
+          <Tab key="disputed" title={"Disputed"} />
         </Tabs>
       </div>
 
@@ -290,27 +288,27 @@ export function ExchangeManagement() {
               {actionModal.type === 'approve' ? (
                 <>
                   <CheckCircle size={20} className="text-success" />
-                  {t('broker.approve_exchange')}
+                  {"Approve Exchange"}
                 </>
               ) : (
                 <>
                   <XCircle size={20} className="text-danger" />
-                  {t('broker.reject_exchange')}
+                  {"Reject Exchange"}
                 </>
               )}
             </ModalHeader>
             <ModalBody>
               <p className="text-default-600 mb-3">
                 {actionModal.type === 'approve'
-                  ? t('broker.confirm_approve_exchange', { requester: actionModal.item.requester_name, provider: actionModal.item.provider_name })
-                  : t('broker.confirm_reject_exchange', { requester: actionModal.item.requester_name, provider: actionModal.item.provider_name })
+                  ? `Are you sure you want to approve exchange?`
+                  : `Are you sure you want to reject exchange?`
                 }
               </p>
               <Textarea
-                label={actionModal.type === 'approve' ? t('broker.label_notes_optional') : t('broker.label_reason_required')}
+                label={actionModal.type === 'approve' ? "Notes Optional" : "Reason Required"}
                 placeholder={actionModal.type === 'approve'
-                  ? t('broker.placeholder_approval_notes')
-                  : t('broker.placeholder_rejection_reason')
+                  ? "Enter approval notes..."
+                  : "Enter rejection reason..."
                 }
                 value={actionText}
                 onValueChange={setActionText}
@@ -325,14 +323,14 @@ export function ExchangeManagement() {
                 onPress={() => { setActionModal(null); setActionText(''); }}
                 isDisabled={actionLoading}
               >
-                {t('common.cancel')}
+                {"Cancel"}
               </Button>
               <Button
                 color={actionModal.type === 'approve' ? 'success' : 'danger'}
                 onPress={handleAction}
                 isLoading={actionLoading}
               >
-                {actionModal.type === 'approve' ? t('broker.approve') : t('broker.reject')}
+                {actionModal.type === 'approve' ? "Approve" : "Reject"}
               </Button>
             </ModalFooter>
           </ModalContent>

@@ -112,7 +112,7 @@ const SCORE_COMPONENTS: Array<{ key: keyof DebugScores; i18nKey: string }> = [
 
 export function MatchDebugPanel() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('advanced.page_title'));
+  usePageTitle("Advanced");
   const toast = useToast();
 
   // User search state
@@ -186,7 +186,7 @@ export function MatchDebugPanel() {
         setTotal(items.length);
       }
     } catch {
-      toast.error(t('advanced.failed_to_load_matches_for_this_user'));
+      toast.error("Failed to load matches for this user");
     } finally {
       setMatchesLoading(false);
     }
@@ -207,8 +207,8 @@ export function MatchDebugPanel() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t('advanced.match_debug_panel_title')}
-        description={t('advanced.match_debug_panel_desc')}
+        title={"Match Debug Panel"}
+        description={"Inspect match scores and reasoning for any two members"}
         actions={
           selectedUser ? (
             <Button
@@ -216,10 +216,10 @@ export function MatchDebugPanel() {
               isDisabled={matchesLoading}
               variant="flat"
               className="flex items-center gap-2"
-              aria-label={t('advanced.label_reload_matches')}
+              aria-label={"Reload Matches"}
               startContent={<RefreshCw className={`w-4 h-4 ${matchesLoading ? 'animate-spin' : ''}`} />}
             >
-              {t('advanced.reload')}
+              {"Reload"}
             </Button>
           ) : undefined
         }
@@ -232,8 +232,8 @@ export function MatchDebugPanel() {
             <Target className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-foreground">{t('advanced.select_a_user')}</p>
-            <p className="text-xs text-default-500">{t('advanced.select_a_user_desc')}</p>
+            <p className="text-sm font-semibold text-foreground">{"Select a User"}</p>
+            <p className="text-xs text-default-500">{"Search for a member to inspect their match scores"}</p>
           </div>
         </CardHeader>
         <CardBody>
@@ -241,8 +241,8 @@ export function MatchDebugPanel() {
             <Input
               value={searchQuery}
               onValueChange={handleSearchChange}
-              placeholder={t('advanced.placeholder_search_users_by_name_or_email')}
-              aria-label={t('advanced.label_search_users')}
+              placeholder={"Search Users by Name or Email..."}
+              aria-label={"Search Users"}
               startContent={
                 searchLoading
                   ? <Spinner size="sm" />
@@ -288,7 +288,7 @@ export function MatchDebugPanel() {
           {/* Selected user pill */}
           {selectedUser && (
             <div className="mt-4 flex items-center gap-2">
-              <span className="text-sm text-default-500">{t('advanced.inspecting')}</span>
+              <span className="text-sm text-default-500">{"Inspecting"}</span>
               <div className="flex items-center gap-2 bg-primary/10 rounded-full px-3 py-1">
                 <Avatar
                   src={resolveAvatarUrl(selectedUser.avatar_url)}
@@ -314,7 +314,7 @@ export function MatchDebugPanel() {
         <div className="flex justify-center py-16">
           <div className="flex flex-col items-center gap-3">
             <Spinner size="lg" />
-            <p className="text-sm text-default-500">{t('advanced.loading_match_scores')}</p>
+            <p className="text-sm text-default-500">{"Loading match scores..."}</p>
           </div>
         </div>
       )}
@@ -327,9 +327,9 @@ export function MatchDebugPanel() {
               <div className="p-4 rounded-full bg-default-100">
                 <Sparkles className="w-8 h-8 text-default-400" />
               </div>
-              <p className="font-semibold text-foreground">{t('advanced.no_matches_found')}</p>
+              <p className="font-semibold text-foreground">{"No matches found"}</p>
               <p className="text-sm text-default-500 max-w-sm">
-                {t('advanced.no_matches_desc')}
+                {"No matches found for the selected user"}
               </p>
             </div>
           </CardBody>
@@ -344,9 +344,9 @@ export function MatchDebugPanel() {
               <div className="p-4 rounded-full bg-default-100">
                 <User className="w-8 h-8 text-default-400" />
               </div>
-              <p className="font-semibold text-foreground">{t('advanced.no_user_selected')}</p>
+              <p className="font-semibold text-foreground">{"No user selected"}</p>
               <p className="text-sm text-default-500">
-                {t('advanced.no_user_selected_desc')}
+                {"Select a user above to see their match scores"}
               </p>
             </div>
           </CardBody>
@@ -428,7 +428,7 @@ export function MatchDebugPanel() {
                 {/* Overall score bar */}
                 <div>
                   <div className="flex justify-between text-xs text-default-500 mb-1">
-                    <span className="font-medium">{t('advanced.overall_match_score')}</span>
+                    <span className="font-medium">{"Overall Match Score"}</span>
                     <span>{match.match_score}%</span>
                   </div>
                   <Progress
@@ -442,7 +442,7 @@ export function MatchDebugPanel() {
                 {/* Per-component score breakdown */}
                 {match._debug_scores && (
                   <div>
-                    <p className="text-xs font-medium text-default-500 mb-2">{t('advanced.score_breakdown')}</p>
+                    <p className="text-xs font-medium text-default-500 mb-2">{"Score Breakdown"}</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                       {SCORE_COMPONENTS.map(({ key, i18nKey }) => {
                         const value = match._debug_scores![key] ?? 0;
@@ -475,14 +475,14 @@ export function MatchDebugPanel() {
                 {/* Debug scores not available notice */}
                 {!match._debug_scores && (
                   <p className="text-xs text-default-400 italic">
-                    {t('advanced.no_debug_scores')}
+                    {"No debug scores available"}
                   </p>
                 )}
 
                 {/* Match reasons */}
                 {match.reasons && match.reasons.length > 0 && (
                   <div>
-                    <p className="text-xs font-medium text-default-500 mb-2">{t('advanced.match_reasons')}</p>
+                    <p className="text-xs font-medium text-default-500 mb-2">{"Match Reasons"}</p>
                     <div className="flex flex-wrap gap-1.5">
                       {match.reasons.map((reason, i) => (
                         <Chip key={i} size="sm" variant="flat" color="primary" className="text-xs">

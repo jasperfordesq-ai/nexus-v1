@@ -26,8 +26,6 @@ import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader, StatusBadge } from '../../components';
 import type { GdprRequestDetail as GdprRequestDetailType, GdprTimelineEntry } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
-
 const typeColorMap: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'> = {
   access: 'primary',
   erasure: 'danger',
@@ -48,13 +46,12 @@ const actionColorMap: Record<string, 'default' | 'primary' | 'success' | 'warnin
 };
 
 export function GdprRequestDetail() {
-  const { t } = useTranslation('admin');
   const { id } = useParams();
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
 
-  usePageTitle(t('enterprise.gdpr_request_page_title', { id }));
+  usePageTitle(`GDPR Request Page`);
 
   const [request, setRequest] = useState<GdprRequestDetailType | null>(null);
   const [loading, setLoading] = useState(true);
@@ -87,7 +84,7 @@ export function GdprRequestDetail() {
         setRequest(res.data as unknown as GdprRequestDetailType);
       }
     } catch {
-      toast.error(t('enterprise.gdpr_failed_load_request'));
+      toast.error("GDPR Failed Load Request");
     } finally {
       setLoading(false);
     }
@@ -102,13 +99,13 @@ export function GdprRequestDetail() {
     try {
       const res = await adminEnterprise.updateGdprRequest(requestId, { status: newStatus });
       if (res.success) {
-        toast.success(t('enterprise.gdpr_request_status_updated', { status: newStatus }));
+        toast.success(`GDPR Request Status updated`);
         loadData();
       } else {
-        toast.error(t('enterprise.gdpr_failed_update_request_status'));
+        toast.error("GDPR Failed Update Request Status");
       }
     } catch {
-      toast.error(t('enterprise.gdpr_failed_update_request_status'));
+      toast.error("GDPR Failed Update Request Status");
     } finally {
       setActionLoading(false);
     }
@@ -116,22 +113,22 @@ export function GdprRequestDetail() {
 
   const handleAddNote = async () => {
     if (!noteText.trim()) {
-      toast.error(t('enterprise.gdpr_note_cannot_be_empty'));
+      toast.error("Note cannot be empty");
       return;
     }
     setNoteLoading(true);
     try {
       const res = await adminEnterprise.addGdprRequestNote(requestId, noteText.trim());
       if (res.success) {
-        toast.success(t('enterprise.gdpr_note_added'));
+        toast.success("GDPR Note Added");
         setNoteOpen(false);
         setNoteText('');
         loadData();
       } else {
-        toast.error(t('enterprise.gdpr_failed_add_note'));
+        toast.error("GDPR Failed Add");
       }
     } catch {
-      toast.error(t('enterprise.gdpr_failed_add_note'));
+      toast.error("GDPR Failed Add");
     } finally {
       setNoteLoading(false);
     }
@@ -140,22 +137,22 @@ export function GdprRequestDetail() {
   const handleAssign = async () => {
     const userId = parseInt(assignUserId, 10);
     if (!userId || isNaN(userId)) {
-      toast.error(t('enterprise.gdpr_enter_valid_user_id'));
+      toast.error("GDPR Enter Valid User ID");
       return;
     }
     setAssignLoading(true);
     try {
       const res = await adminEnterprise.assignGdprRequest(requestId, userId);
       if (res.success) {
-        toast.success(t('enterprise.gdpr_request_assigned'));
+        toast.success("GDPR Request Assigned");
         setAssignOpen(false);
         setAssignUserId('');
         loadData();
       } else {
-        toast.error(t('enterprise.gdpr_failed_assign_request'));
+        toast.error("GDPR Failed Assign Request");
       }
     } catch {
-      toast.error(t('enterprise.gdpr_failed_assign_request'));
+      toast.error("GDPR Failed Assign Request");
     } finally {
       setAssignLoading(false);
     }
@@ -163,7 +160,7 @@ export function GdprRequestDetail() {
 
   const handleReject = async () => {
     if (!rejectionReason.trim()) {
-      toast.error(t('enterprise.gdpr_rejection_reason_required'));
+      toast.error("GDPR Rejection Reason Required");
       return;
     }
     setRejectLoading(true);
@@ -173,15 +170,15 @@ export function GdprRequestDetail() {
         notes: rejectionReason.trim(),
       });
       if (res.success) {
-        toast.success(t('enterprise.gdpr_request_rejected'));
+        toast.success("GDPR Request Rejected");
         setRejectOpen(false);
         setRejectionReason('');
         loadData();
       } else {
-        toast.error(t('enterprise.gdpr_failed_reject_request'));
+        toast.error("GDPR Failed Reject Request");
       }
     } catch {
-      toast.error(t('enterprise.gdpr_failed_reject_request'));
+      toast.error("GDPR Failed Reject Request");
     } finally {
       setRejectLoading(false);
     }
@@ -192,13 +189,13 @@ export function GdprRequestDetail() {
     try {
       const res = await adminEnterprise.generateGdprExport(requestId);
       if (res.success) {
-        toast.success(t('enterprise.gdpr_export_generated'));
+        toast.success("GDPR Export Generated");
         loadData();
       } else {
-        toast.error(t('enterprise.gdpr_failed_generate_export'));
+        toast.error("GDPR Failed Generate Export");
       }
     } catch {
-      toast.error(t('enterprise.gdpr_failed_generate_export'));
+      toast.error("GDPR Failed Generate Export");
     } finally {
       setActionLoading(false);
     }
@@ -215,13 +212,13 @@ export function GdprRequestDetail() {
   if (!request) {
     return (
       <div className="text-center py-16">
-        <p className="text-default-500">{t('enterprise.gdpr_request_not_found')}</p>
+        <p className="text-default-500">{"GDPR Request Not Found"}</p>
         <Button
           variant="flat"
           className="mt-4"
           onPress={() => navigate(tenantPath('/admin/enterprise/gdpr/requests'))}
         >
-          {t('enterprise.gdpr_back_to_requests')}
+          {"GDPR Back to Requests"}
         </Button>
       </div>
     );
@@ -235,8 +232,8 @@ export function GdprRequestDetail() {
   return (
     <div>
       <PageHeader
-        title={t('enterprise.gdpr_request_detail_title', { id: request.id })}
-        description={t('enterprise.gdpr_request_detail_desc', { type: request.type, user: request.user_name })}
+        title={`GDPR Request Detail`}
+        description={`GDPR Request Detail.`}
         actions={
           <Button
             variant="flat"
@@ -244,7 +241,7 @@ export function GdprRequestDetail() {
             onPress={() => navigate(tenantPath('/admin/enterprise/gdpr/requests'))}
             size="sm"
           >
-            {t('enterprise.gdpr_back_to_requests')}
+            {"GDPR Back to Requests"}
           </Button>
         }
       />
@@ -255,7 +252,7 @@ export function GdprRequestDetail() {
           {/* Request Info Card */}
           <Card shadow="sm">
             <CardHeader className="px-4 pt-4 pb-0">
-              <h3 className="text-lg font-semibold">{t('enterprise.gdpr_request_information')}</h3>
+              <h3 className="text-lg font-semibold">{"GDPR Request Information"}</h3>
             </CardHeader>
             <CardBody className="p-4 space-y-4">
               <div className="flex flex-wrap gap-3">
@@ -270,30 +267,30 @@ export function GdprRequestDetail() {
                 <StatusBadge status={request.status} />
                 {request.priority && (
                   <Chip size="sm" variant="bordered" className="capitalize">
-                    {t('enterprise.gdpr_priority_label', { priority: request.priority })}
+                    {`GDPR Priority`}
                   </Chip>
                 )}
               </div>
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
-                  <p className="text-sm text-default-500">{t('enterprise.gdpr_user')}</p>
+                  <p className="text-sm text-default-500">{"GDPR User"}</p>
                   <p className="font-medium">{request.user_name}</p>
                   {request.user_email && (
                     <p className="text-sm text-default-400">{request.user_email}</p>
                   )}
                 </div>
                 <div>
-                  <p className="text-sm text-default-500">{t('enterprise.gdpr_user_id')}</p>
+                  <p className="text-sm text-default-500">{"GDPR User ID"}</p>
                   <p className="font-medium">{request.user_id}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-default-500">{t('enterprise.gdpr_created')}</p>
+                  <p className="text-sm text-default-500">{"GDPR created"}</p>
                   <p className="font-medium">{new Date(request.created_at).toLocaleString()}</p>
                 </div>
                 {request.completed_at && (
                   <div>
-                    <p className="text-sm text-default-500">{t('enterprise.gdpr_completed')}</p>
+                    <p className="text-sm text-default-500">{"GDPR Completed"}</p>
                     <p className="font-medium">{new Date(request.completed_at).toLocaleString()}</p>
                   </div>
                 )}
@@ -301,7 +298,7 @@ export function GdprRequestDetail() {
 
               {request.rejection_reason && (
                 <div className="p-3 rounded-lg bg-danger-50 border border-danger-200">
-                  <p className="text-sm font-medium text-danger">{t('enterprise.gdpr_rejection_reason')}</p>
+                  <p className="text-sm font-medium text-danger">{"GDPR Rejection Reason"}</p>
                   <p className="text-sm text-danger-700 mt-1">{request.rejection_reason}</p>
                 </div>
               )}
@@ -311,7 +308,7 @@ export function GdprRequestDetail() {
           {/* Notes Section Card */}
           <Card shadow="sm">
             <CardHeader className="px-4 pt-4 pb-0 flex justify-between items-center">
-              <h3 className="text-lg font-semibold">{t('enterprise.gdpr_notes')}</h3>
+              <h3 className="text-lg font-semibold">{"GDPR Notes"}</h3>
               <Button
                 size="sm"
                 color="primary"
@@ -319,7 +316,7 @@ export function GdprRequestDetail() {
                 startContent={<MessageSquarePlus size={14} />}
                 onPress={() => setNoteOpen(true)}
               >
-                {t('enterprise.gdpr_add_note')}
+                {"GDPR Add"}
               </Button>
             </CardHeader>
             <CardBody className="p-4">
@@ -328,7 +325,7 @@ export function GdprRequestDetail() {
                   {request.notes}
                 </div>
               ) : (
-                <p className="text-sm text-default-400 italic">{t('enterprise.gdpr_no_notes_yet')}</p>
+                <p className="text-sm text-default-400 italic">{"GDPR No Notes yet"}</p>
               )}
             </CardBody>
           </Card>
@@ -336,7 +333,7 @@ export function GdprRequestDetail() {
           {/* Activity Timeline Card */}
           <Card shadow="sm">
             <CardHeader className="px-4 pt-4 pb-0">
-              <h3 className="text-lg font-semibold">{t('enterprise.gdpr_activity_timeline')}</h3>
+              <h3 className="text-lg font-semibold">{"GDPR Activity Timeline"}</h3>
             </CardHeader>
             <CardBody className="p-4">
               {request.timeline && request.timeline.length > 0 ? (
@@ -363,7 +360,7 @@ export function GdprRequestDetail() {
                               {entry.action.replace(/_/g, ' ')}
                             </Chip>
                             {entry.user_name && (
-                              <span className="text-sm text-default-600">{t('enterprise.gdpr_by_user', { user: entry.user_name })}</span>
+                              <span className="text-sm text-default-600">{`GDPR by User`}</span>
                             )}
                           </div>
                           {(entry.old_value || entry.new_value) && (
@@ -378,7 +375,7 @@ export function GdprRequestDetail() {
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-default-400 italic">{t('enterprise.gdpr_no_activity_recorded')}</p>
+                <p className="text-sm text-default-400 italic">{"GDPR No Activity Recorded"}</p>
               )}
             </CardBody>
           </Card>
@@ -391,19 +388,19 @@ export function GdprRequestDetail() {
             <CardHeader className="px-4 pt-4 pb-0">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <Clock size={18} />
-                {t('enterprise.gdpr_sla_status')}
+                {"GDPR SLA Status"}
               </h3>
             </CardHeader>
             <CardBody className="p-4 space-y-3">
               <div>
-                <p className="text-sm text-default-500">{t('enterprise.gdpr_deadline')}</p>
+                <p className="text-sm text-default-500">{"GDPR Deadline"}</p>
                 <p className="font-medium">{slaDeadline.toLocaleDateString()}</p>
               </div>
               <div>
                 <p className="text-sm text-default-500 mb-1">
                   {request.sla_overdue
-                    ? t('enterprise.gdpr_sla_overdue_by', { days: Math.abs(request.sla_days_remaining) })
-                    : t('enterprise.gdpr_sla_days_remaining', { days: request.sla_days_remaining })}
+                    ? `Overdue By`
+                    : `GDPR SLA Days Remaining`}
                 </p>
                 <Progress
                   value={slaProgress}
@@ -414,7 +411,7 @@ export function GdprRequestDetail() {
               </div>
               {request.sla_overdue && (
                 <Chip size="sm" color="danger" variant="flat" startContent={<AlertTriangle size={12} />}>
-                  {t('enterprise.gdpr_sla_breached')}
+                  {"GDPR SLA Breached"}
                 </Chip>
               )}
             </CardBody>
@@ -425,14 +422,14 @@ export function GdprRequestDetail() {
             <CardHeader className="px-4 pt-4 pb-0">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <UserPlus size={18} />
-                {t('enterprise.gdpr_assignment')}
+                {"GDPR Assignment"}
               </h3>
             </CardHeader>
             <CardBody className="p-4 space-y-3">
               <div>
-                <p className="text-sm text-default-500">{t('enterprise.gdpr_assigned_to')}</p>
+                <p className="text-sm text-default-500">{"Assigned To"}</p>
                 <p className="font-medium">
-                  {request.assigned_to_name || t('enterprise.gdpr_unassigned')}
+                  {request.assigned_to_name || "GDPR Unassigned"}
                 </p>
               </div>
               <Button
@@ -443,7 +440,7 @@ export function GdprRequestDetail() {
                 onPress={() => setAssignOpen(true)}
                 className="w-full"
               >
-                {request.assigned_to ? t('enterprise.gdpr_reassign') : t('enterprise.gdpr_assign')}
+                {request.assigned_to ? "GDPR Reassign" : "GDPR Assign"}
               </Button>
             </CardBody>
           </Card>
@@ -451,7 +448,7 @@ export function GdprRequestDetail() {
           {/* Actions Card */}
           <Card shadow="sm">
             <CardHeader className="px-4 pt-4 pb-0">
-              <h3 className="text-lg font-semibold">{t('enterprise.gdpr_actions')}</h3>
+              <h3 className="text-lg font-semibold">{"GDPR Actions"}</h3>
             </CardHeader>
             <CardBody className="p-4 space-y-2">
               {request.status === 'pending' && (
@@ -464,7 +461,7 @@ export function GdprRequestDetail() {
                   className="w-full"
                   size="sm"
                 >
-                  {t('enterprise.gdpr_start_processing')}
+                  {"GDPR Start Processing"}
                 </Button>
               )}
               {request.status === 'processing' && (
@@ -478,7 +475,7 @@ export function GdprRequestDetail() {
                     className="w-full"
                     size="sm"
                   >
-                    {t('enterprise.gdpr_mark_complete')}
+                    {"GDPR Mark Complete"}
                   </Button>
                   <Button
                     color="danger"
@@ -488,7 +485,7 @@ export function GdprRequestDetail() {
                     className="w-full"
                     size="sm"
                   >
-                    {t('enterprise.gdpr_reject')}
+                    {"GDPR Reject"}
                   </Button>
                 </>
               )}
@@ -502,10 +499,10 @@ export function GdprRequestDetail() {
                 className="w-full"
                 size="sm"
               >
-                {t('enterprise.gdpr_generate_export')}
+                {"GDPR Generate Export"}
               </Button>
               {request.export_file_path && (
-                <p className="text-xs text-success text-center">{t('enterprise.gdpr_export_available')}</p>
+                <p className="text-xs text-success text-center">{"GDPR Export Available"}</p>
               )}
             </CardBody>
           </Card>
@@ -515,11 +512,11 @@ export function GdprRequestDetail() {
       {/* Add Note Modal */}
       <Modal isOpen={noteOpen} onClose={() => setNoteOpen(false)} size="lg">
         <ModalContent>
-          <ModalHeader>{t('enterprise.gdpr_add_note')}</ModalHeader>
+          <ModalHeader>{"GDPR Add"}</ModalHeader>
           <ModalBody>
             <Textarea
-              label={t('enterprise.gdpr_note')}
-              placeholder={t('enterprise.gdpr_note_placeholder')}
+              label={"GDPR"}
+              placeholder={"Enter a note..."}
               value={noteText}
               onValueChange={setNoteText}
               variant="bordered"
@@ -528,10 +525,10 @@ export function GdprRequestDetail() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setNoteOpen(false)} isDisabled={noteLoading}>
-              {t('enterprise.gdpr_cancel')}
+              {"GDPR Cancel"}
             </Button>
             <Button color="primary" onPress={handleAddNote} isLoading={noteLoading}>
-              {t('enterprise.gdpr_add_note')}
+              {"GDPR Add"}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -540,11 +537,11 @@ export function GdprRequestDetail() {
       {/* Assign Modal */}
       <Modal isOpen={assignOpen} onClose={() => setAssignOpen(false)}>
         <ModalContent>
-          <ModalHeader>{t('enterprise.gdpr_assign_request')}</ModalHeader>
+          <ModalHeader>{"GDPR Assign Request"}</ModalHeader>
           <ModalBody>
             <Input
-              label={t('enterprise.gdpr_user_id')}
-              placeholder={t('enterprise.gdpr_enter_user_id_placeholder')}
+              label={"GDPR User ID"}
+              placeholder={"Enter user ID..."}
               type="number"
               value={assignUserId}
               onValueChange={setAssignUserId}
@@ -553,10 +550,10 @@ export function GdprRequestDetail() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setAssignOpen(false)} isDisabled={assignLoading}>
-              {t('enterprise.gdpr_cancel')}
+              {"GDPR Cancel"}
             </Button>
             <Button color="primary" onPress={handleAssign} isLoading={assignLoading}>
-              {t('enterprise.gdpr_assign')}
+              {"GDPR Assign"}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -567,12 +564,12 @@ export function GdprRequestDetail() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <XCircle size={20} className="text-danger" />
-            {t('enterprise.gdpr_reject_request')}
+            {"GDPR Reject Request"}
           </ModalHeader>
           <ModalBody>
             <Textarea
-              label={t('enterprise.gdpr_rejection_reason')}
-              placeholder={t('enterprise.gdpr_rejection_reason_placeholder')}
+              label={"GDPR Rejection Reason"}
+              placeholder={"Enter rejection reason..."}
               value={rejectionReason}
               onValueChange={setRejectionReason}
               variant="bordered"
@@ -582,10 +579,10 @@ export function GdprRequestDetail() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setRejectOpen(false)} isDisabled={rejectLoading}>
-              {t('enterprise.gdpr_cancel')}
+              {"GDPR Cancel"}
             </Button>
             <Button color="danger" onPress={handleReject} isLoading={rejectLoading}>
-              {t('enterprise.gdpr_reject_request')}
+              {"GDPR Reject Request"}
             </Button>
           </ModalFooter>
         </ModalContent>

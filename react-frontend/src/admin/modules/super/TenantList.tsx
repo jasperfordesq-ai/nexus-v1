@@ -37,10 +37,8 @@ import { adminSuper } from '../../api/adminApi';
 import { DataTable, PageHeader, ConfirmModal, type Column } from '../../components';
 import type { SuperAdminTenant } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 export function TenantList() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('super.page_title'));
+  usePageTitle("Super Admin");
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -72,10 +70,10 @@ export function TenantList() {
         setTenants(Array.isArray(res.data) ? res.data : []);
         setLastRefreshed(new Date());
       } else if (!res.success) {
-        toast.error(`${t('super.tenants')}: ${res.error || t('super.failed_to_load_tenant_list')}`);
+        toast.error(`${"Tenants"}: ${res.error || "Failed to load tenant list"}`);
       }
     } catch (err) {
-      toast.error(`${t('super.tenants_error')}: ${err instanceof Error ? err.message : t('super.unknown_error')}`);
+      toast.error(`${"Tenants error"}: ${err instanceof Error ? err.message : "Unknown error"}`);
     }
     setLoading(false);
   }, [filter, search, toast, t])
@@ -107,10 +105,10 @@ export function TenantList() {
     }
 
     if (res?.success) {
-      toast.success(t('super.tenant_action_success', { action: type === 'toggle-hub' ? t('super.hub_toggled') : type }));
+      toast.success(`Tenant Action succeeded`);
       loadTenants();
     } else {
-      toast.error(res?.error || t('super.failed_to_action_tenant', { action: type }));
+      toast.error(res?.error || `Failed to action tenant`);
     }
 
     setActionLoading(false);
@@ -119,24 +117,24 @@ export function TenantList() {
 
   const confirmMessages: Record<string, { title: string; message: string; label: string }> = {
     delete: {
-      title: t('super.confirm_delete_title'),
-      message: t('super.confirm_delete_message'),
-      label: t('super.confirm_delete_label'),
+      title: "Are you sure you want to delete title?",
+      message: "Confirm Delete",
+      label: "Confirm Delete",
     },
     deactivate: {
-      title: t('super.confirm_deactivate_title'),
-      message: t('super.confirm_deactivate_message'),
-      label: t('super.confirm_deactivate_label'),
+      title: "Are you sure you want to deactivate title?",
+      message: "Confirm Deactivate",
+      label: "Confirm Deactivate",
     },
     reactivate: {
-      title: t('super.confirm_reactivate_title'),
-      message: t('super.confirm_reactivate_message'),
-      label: t('super.confirm_reactivate_label'),
+      title: "Are you sure you want to reactivate title?",
+      message: "Confirm Reactivate",
+      label: "Confirm Reactivate",
     },
     'toggle-hub': {
-      title: t('super.confirm_toggle_hub_title'),
-      message: t('super.confirm_toggle_hub_message'),
-      label: t('super.confirm_toggle_hub_label'),
+      title: "Are you sure you want to toggle hub title?",
+      message: "Confirm Toggle Hub",
+      label: "Confirm Toggle Hub",
     },
   };
 
@@ -157,31 +155,31 @@ export function TenantList() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label={t('super.label_tenant_actions')}>
+          <Button isIconOnly size="sm" variant="light" aria-label={"Tenant Actions"}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
-        <DropdownMenu aria-label={t('super.label_tenant_actions')} onAction={handleMenuAction}>
+        <DropdownMenu aria-label={"Tenant Actions"} onAction={handleMenuAction}>
           <DropdownItem key="view" startContent={<Eye size={14} />}>
-            {t('tenant_list.action_view')}
+            {"View"}
           </DropdownItem>
           <DropdownItem key="edit" startContent={<Edit size={14} />}>
-            {t('tenant_list.action_edit')}
+            {"Edit"}
           </DropdownItem>
           <DropdownItem key="toggle-hub" startContent={tenant.allows_subtenants ? <ToggleLeft size={14} /> : <ToggleRight size={14} />}>
-            {tenant.allows_subtenants ? t('tenant_list.disable_hub') : t('tenant_list.enable_hub')}
+            {tenant.allows_subtenants ? "Disable Hub" : "Enable Hub"}
           </DropdownItem>
           {tenant.is_active ? (
             <DropdownItem key="deactivate" startContent={<Shield size={14} />} className="text-warning" color="warning">
-              {t('tenant_list.deactivate')}
+              {"Deactivate"}
             </DropdownItem>
           ) : (
             <DropdownItem key="reactivate" startContent={<Shield size={14} />} className="text-success" color="success">
-              {t('tenant_list.reactivate')}
+              {"Reactivate"}
             </DropdownItem>
           )}
           <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
-            {t('tenant_list.action_delete')}
+            {"Delete"}
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
@@ -191,7 +189,7 @@ export function TenantList() {
   const columns: Column<SuperAdminTenant>[] = [
     {
       key: 'name',
-      label: t('tenant_list.col_tenant'),
+      label: "Tenant",
       sortable: true,
       render: (tenant) => (
         <div>
@@ -207,40 +205,40 @@ export function TenantList() {
     },
     {
       key: 'domain',
-      label: t('tenant_list.col_domain'),
+      label: "Domain",
       render: (tenant) => (
         <span className="text-sm text-default-500">{tenant.domain || '---'}</span>
       ),
     },
     {
       key: 'is_active',
-      label: t('tenant_list.col_status'),
+      label: "Status",
       sortable: true,
       render: (tenant) => (
         <Chip size="sm" variant="flat" color={tenant.is_active ? 'success' : 'default'}>
-          {tenant.is_active ? t('super.active_label') : t('super.inactive_label')}
+          {tenant.is_active ? "Active" : "Inactive"}
         </Chip>
       ),
     },
     {
       key: 'user_count',
-      label: t('tenant_list.col_users'),
+      label: "Users",
       sortable: true,
       render: (tenant) => <span>{tenant.user_count ?? 0}</span>,
     },
     {
       key: 'allows_subtenants',
-      label: t('tenant_list.col_hub'),
+      label: "Hub",
       render: (tenant) =>
         tenant.allows_subtenants ? (
-          <Chip size="sm" variant="flat" color="secondary">{t('super.hub')}</Chip>
+          <Chip size="sm" variant="flat" color="secondary">{"Hub"}</Chip>
         ) : (
           <span className="text-default-400">---</span>
         ),
     },
     {
       key: 'parent_name',
-      label: t('tenant_list.col_parent'),
+      label: "Parent",
       render: (tenant) => (
         <span className="text-sm text-default-500">
           {tenant.parent_name || '---'}
@@ -249,7 +247,7 @@ export function TenantList() {
     },
     {
       key: 'created_at',
-      label: t('tenant_list.col_created'),
+      label: "Created",
       sortable: true,
       render: (tenant) => (
         <span className="text-sm text-default-500">
@@ -259,7 +257,7 @@ export function TenantList() {
     },
     {
       key: 'actions',
-      label: t('tenant_list.col_actions'),
+      label: "Actions",
       render: (tenant) => <TenantActionsMenu tenant={tenant} />,
     },
   ];
@@ -267,13 +265,13 @@ export function TenantList() {
   return (
     <div>
       <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('super.page_title')}</Link>
+        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{"Super Admin"}</Link>
         <span>/</span>
-        <span className="text-foreground">{t('super.breadcrumb_tenants')}</span>
+        <span className="text-foreground">{"Breadcrumb Tenants"}</span>
       </nav>
       <PageHeader
-        title={t('super.tenant_list_title')}
-        description={t('super.tenant_list_desc')}
+        title={"Tenant List"}
+        description={"View and manage all tenants on the platform"}
         actions={
           <div className="flex items-center gap-2">
             {lastRefreshed && (
@@ -288,14 +286,14 @@ export function TenantList() {
               startContent={<Network size={16} />}
               size="sm"
             >
-              {t('tenant_list.view_hierarchy')}
+              {"View Hierarchy"}
             </Button>
             <Button
               color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/super/tenants/create'))}
             >
-              {t('tenant_list.create_tenant')}
+              {"Create Tenant"}
             </Button>
           </div>
         }
@@ -308,10 +306,10 @@ export function TenantList() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={t('tenant_list.tab_all')} />
-          <Tab key="active" title={t('tenant_list.tab_active')} />
-          <Tab key="inactive" title={t('tenant_list.tab_inactive')} />
-          <Tab key="hub" title={t('tenant_list.tab_hub')} />
+          <Tab key="all" title={"All"} />
+          <Tab key="active" title={"Active"} />
+          <Tab key="inactive" title={"Inactive"} />
+          <Tab key="hub" title={"Hub"} />
         </Tabs>
       </div>
 
@@ -319,7 +317,7 @@ export function TenantList() {
         columns={columns}
         data={tenants}
         isLoading={loading}
-        searchPlaceholder={t('super.search_tenants_placeholder')}
+        searchPlaceholder={"Enter search tenants..."}
         onSearch={(q) => setSearch(q)}
         onRefresh={loadTenants}
       />

@@ -36,8 +36,6 @@ import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { HealthCheckResult, HealthCheckHistoryEntry } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
-
 function statusBorderClass(status: string): string {
   switch (status) {
     case 'ok':
@@ -50,8 +48,7 @@ function statusBorderClass(status: string): string {
 }
 
 export function HealthCheck() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('enterprise.page_title'));
+  usePageTitle("Enterprise");
 
   const [result, setResult] = useState<HealthCheckResult | null>(null);
   const [history, setHistory] = useState<HealthCheckHistoryEntry[]>([]);
@@ -105,8 +102,8 @@ export function HealthCheck() {
   return (
     <div>
       <PageHeader
-        title={t('enterprise.health_check_title')}
-        description={t('enterprise.health_check_desc')}
+        title={"Health Check"}
+        description={"Run system health checks to verify database, Redis, and services"}
         actions={
           <Button
             variant="flat"
@@ -115,7 +112,7 @@ export function HealthCheck() {
             isLoading={loading}
             size="sm"
           >
-            {t('common.refresh')}
+            {"Refresh"}
           </Button>
         }
       />
@@ -133,7 +130,7 @@ export function HealthCheck() {
                 <HeartPulse size={28} className={`text-${statusColor}`} />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-foreground">{t('enterprise.system_status')}</h3>
+                <h3 className="text-lg font-bold text-foreground">{"System Status"}</h3>
                 <Chip size="sm" variant="flat" color={statusColor} className="mt-1 capitalize">
                   {result.status}
                 </Chip>
@@ -160,7 +157,7 @@ export function HealthCheck() {
                   <div className="min-w-0 flex-1">
                     <p className="text-base font-semibold text-foreground">{check.name}</p>
                     <p className="text-sm text-default-500">
-                      {check.status === 'ok' ? t('enterprise.operational') : t('enterprise.failed')}
+                      {check.status === 'ok' ? "Operational" : "Failed"}
                     </p>
                     {(check.free || check.total) && (
                       <p className="text-xs text-default-400 mt-1">
@@ -175,7 +172,7 @@ export function HealthCheck() {
                     variant="flat"
                     color={check.status === 'ok' ? 'success' : 'danger'}
                   >
-                    {check.status === 'ok' ? t('system.status_ok') : t('system.status_fail')}
+                    {check.status === 'ok' ? "OK" : "FAIL"}
                   </Chip>
                 </CardBody>
               </Card>
@@ -186,9 +183,9 @@ export function HealthCheck() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-6 pt-5 pb-0">
               <History size={18} className="text-default-500" />
-              <h3 className="text-base font-semibold">{t('shared.history')}</h3>
+              <h3 className="text-base font-semibold">{"History"}</h3>
               <Chip size="sm" variant="flat" color="default">
-                {t('enterprise.last_n_checks', { count: history.length })}
+                {`Last ${history.length} checks`}
               </Chip>
             </CardHeader>
             <Divider className="mt-3" />
@@ -199,14 +196,14 @@ export function HealthCheck() {
                 </div>
               ) : history.length === 0 ? (
                 <div className="py-8 text-center">
-                  <p className="text-default-500">{t('shared.no_history_available')}</p>
+                  <p className="text-default-500">{"No history available found"}</p>
                 </div>
               ) : (
                 <Table aria-label="Health check history" removeWrapper>
                   <TableHeader>
-                    <TableColumn>{t('enterprise.col_status')}</TableColumn>
-                    <TableColumn>{t('enterprise.col_latency')}</TableColumn>
-                    <TableColumn>{t('enterprise.col_timestamp')}</TableColumn>
+                    <TableColumn>{"Status"}</TableColumn>
+                    <TableColumn>{"Latency"}</TableColumn>
+                    <TableColumn>{"Timestamp"}</TableColumn>
                   </TableHeader>
                   <TableBody>
                     {history.map((entry) => {

@@ -29,8 +29,6 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings, adminTools } from '../../api/adminApi';
-import { useTranslation } from 'react-i18next';
-
 // Keys that map to the backend's seo_* tenant_settings rows
 const SEO_KEYS = [
   'seo_title_suffix', 'seo_meta_description', 'seo_meta_keywords',
@@ -62,8 +60,7 @@ interface ServerAuditResult {
 }
 
 export function SeoOverview() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('advanced.page_title'));
+  usePageTitle("Advanced");
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -99,7 +96,7 @@ export function SeoOverview() {
           setFormData(prev => ({ ...prev, ...seo }));
         }
       })
-      .catch(() => toast.error(t('advanced.failed_to_load_s_e_o_settings')))
+      .catch(() => toast.error("Failed to load SEO settings"))
       .finally(() => setLoading(false));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps -- load once on mount
 
@@ -111,7 +108,7 @@ export function SeoOverview() {
           setSitemapStats(res.data as unknown as SitemapStats);
         }
       })
-      .catch(() => toast.error(t('advanced.failed_to_load_sitemap_stats')))
+      .catch(() => toast.error("Failed to load sitemap stats"))
       .finally(() => setSitemapLoading(false));
   }, [toast, t])
 
@@ -141,10 +138,10 @@ export function SeoOverview() {
         if (freshRes.data) {
           setServerAudit(freshRes.data as unknown as ServerAuditResult);
         }
-        toast.success(t('advanced.seo_audit_completed'));
+        toast.success("SEO Audit Completed");
       }
     } catch {
-      toast.error(t('advanced.failed_to_run_seo_audit'));
+      toast.error("Failed to run SEO audit");
     } finally {
       setAuditRunning(false);
     }
@@ -154,10 +151,10 @@ export function SeoOverview() {
     setClearingCache(true);
     try {
       await adminSettings.clearSitemapCache();
-      toast.success(t('advanced.sitemap_cache_cleared'));
+      toast.success("Sitemap Cache Cleared");
       loadSitemapStats();
     } catch {
-      toast.error(t('advanced.failed_to_clear_sitemap_cache'));
+      toast.error("Failed to clear sitemap cache");
     } finally {
       setClearingCache(false);
     }
@@ -174,13 +171,13 @@ export function SeoOverview() {
       const res = await adminSettings.updateSeoSettings(payload);
 
       if (res.success) {
-        toast.success(t('advanced.s_e_o_settings_saved_successfully'));
+        toast.success("SEO Settings Saved Successfully");
       } else {
-        const error = (res as { error?: string }).error || t('advanced.save_failed');
+        const error = (res as { error?: string }).error || "Save failed";
         toast.error(error);
       }
     } catch (err) {
-      toast.error(t('advanced.failed_to_save_s_e_o_settings'));
+      toast.error("Failed to save SEO settings");
     } finally {
       setSaving(false);
     }
@@ -298,7 +295,7 @@ export function SeoOverview() {
 
   return (
     <div>
-      <PageHeader title={t('advanced.seo_overview_title')} description={t('advanced.seo_overview_desc')} />
+      <PageHeader title={"SEO Overview"} description={"Configure global SEO settings including meta tags and social sharing"} />
 
       <div className="space-y-4">
         {/* SEO Health Score */}
@@ -306,12 +303,12 @@ export function SeoOverview() {
           <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <BarChart3 size={20} />
-              {t('advanced.seo_health_check_heading')}
+              {"SEO Health Check"}
             </h3>
             <div className="flex items-center gap-2">
-              <Chip color="success" variant="flat" size="sm">{passCount} {t('advanced.chip_pass')}</Chip>
-              {warnCount > 0 && <Chip color="warning" variant="flat" size="sm">{warnCount} {t('advanced.chip_warning')}</Chip>}
-              {failCount > 0 && <Chip color="danger" variant="flat" size="sm">{failCount} {t('advanced.chip_fail')}</Chip>}
+              <Chip color="success" variant="flat" size="sm">{passCount} {"Pass"}</Chip>
+              {warnCount > 0 && <Chip color="warning" variant="flat" size="sm">{warnCount} {"Warning"}</Chip>}
+              {failCount > 0 && <Chip color="danger" variant="flat" size="sm">{failCount} {"Fail"}</Chip>}
             </div>
           </CardHeader>
           <CardBody>
@@ -336,37 +333,37 @@ export function SeoOverview() {
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Globe size={20} />
-              {t('advanced.tenant_meta_heading')}
+              {"Tenant Meta"}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={t('advanced.label_meta_title')}
-              placeholder={t('advanced.placeholder_your_timebank_name')}
+              label={"Meta Title"}
+              placeholder={"Your Timebank Name..."}
               variant="bordered"
               value={String(formData.tenant_meta_title || '')}
               onValueChange={(v) => updateField('tenant_meta_title', v)}
-              description={t('advanced.desc_meta_title')}
+              description={"Meta Title."}
             />
             <Input
-              label={t('advanced.label_meta_description')}
-              placeholder={t('advanced.placeholder_a_short_description_of_your_timebank')}
+              label={"Meta Description"}
+              placeholder={"A Short Description of Your Timebank..."}
               variant="bordered"
               value={String(formData.tenant_meta_description || '')}
               onValueChange={(v) => updateField('tenant_meta_description', v)}
-              description={`${String(formData.tenant_meta_description || '').length}/160 ${t('advanced.desc_meta_description_chars')}`}
+              description={`${String(formData.tenant_meta_description || '').length}/160 ${"Meta Description Chars."}`}
             />
             <Input
-              label={t('advanced.label_h1_headline')}
-              placeholder={t('advanced.placeholder_welcome_to_our_community')}
+              label={"H1 Headline"}
+              placeholder={"Welcome to Our Community..."}
               variant="bordered"
               value={String(formData.tenant_h1_headline || '')}
               onValueChange={(v) => updateField('tenant_h1_headline', v)}
-              description={t('advanced.desc_h1_headline')}
+              description={"H1 Headline."}
             />
             <Input
-              label={t('advanced.label_hero_intro_text')}
-              placeholder={t('advanced.placeholder_exchange_skills_and_time_with_your_community')}
+              label={"Hero Intro Text"}
+              placeholder={"Exchange Skills and Time with Your Community..."}
               variant="bordered"
               value={String(formData.tenant_hero_intro || '')}
               onValueChange={(v) => updateField('tenant_hero_intro', v)}
@@ -379,24 +376,24 @@ export function SeoOverview() {
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Image size={20} />
-              {t('advanced.social_sharing_image_heading')}
+              {"Social Sharing Image"}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={t('advanced.label_og_image_url')}
+              label={"OG Image URL"}
               placeholder="https://your-domain.com/images/og-default.png"
               variant="bordered"
               value={String(formData.seo_og_image_url || '')}
               onValueChange={(v) => updateField('seo_og_image_url', v)}
-              description={t('advanced.desc_og_image_url')}
+              description={"OG Image URL."}
             />
             {String(formData.seo_og_image_url || '') && (
               <div className="border border-default-200 rounded-lg p-3">
-                <p className="text-xs text-default-500 mb-2">{t('advanced.og_image_preview')}:</p>
+                <p className="text-xs text-default-500 mb-2">{"OG Image Preview"}:</p>
                 <img
                   src={String(formData.seo_og_image_url)}
-                  alt={t('advanced.og_image_preview')}
+                  alt={"OG Image Preview"}
                   className="max-w-xs rounded-md"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
@@ -410,33 +407,33 @@ export function SeoOverview() {
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Search size={20} />
-              {t('advanced.meta_tags_heading')}
+              {"Meta Tags"}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={t('advanced.label_default_title_suffix')}
+              label={"Default Title Suffix"}
               placeholder=" | My Timebank"
               variant="bordered"
               value={String(formData.seo_title_suffix || '')}
               onValueChange={(v) => updateField('seo_title_suffix', v)}
-              description={t('advanced.desc_title_suffix')}
+              description={"Title Suffix."}
             />
             <Input
-              label={t('advanced.label_global_meta_description')}
-              placeholder={t('advanced.placeholder_community_timebanking_platform')}
+              label={"Global Meta Description"}
+              placeholder={"Community Timebanking Platform..."}
               variant="bordered"
               value={String(formData.seo_meta_description || '')}
               onValueChange={(v) => updateField('seo_meta_description', v)}
-              description={`${String(formData.seo_meta_description || '').length}/160 ${t('advanced.desc_global_meta_description_chars')}`}
+              description={`${String(formData.seo_meta_description || '').length}/160 ${"Global Meta Description Chars."}`}
             />
             <Input
-              label={t('advanced.label_meta_keywords')}
+              label={"Meta Keywords"}
               placeholder="timebanking, community, exchange"
               variant="bordered"
               value={String(formData.seo_meta_keywords || '')}
               onValueChange={(v) => updateField('seo_meta_keywords', v)}
-              description={t('advanced.desc_meta_keywords')}
+              description={"Meta Keywords."}
             />
           </CardBody>
         </Card>
@@ -446,40 +443,40 @@ export function SeoOverview() {
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Share2 size={20} />
-              {t('advanced.seo_features_heading')}
+              {"SEO Features"}
             </h3>
           </CardHeader>
           <CardBody className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('advanced.auto_generate_sitemap')}</p>
-                <p className="text-sm text-default-500">{t('advanced.auto_generate_sitemap_desc')}</p>
+                <p className="font-medium">{"Auto-generate Sitemap"}</p>
+                <p className="text-sm text-default-500">{"Automatically generate an XML sitemap for search engines"}</p>
               </div>
-              <Switch isSelected={!!formData.seo_auto_sitemap} onValueChange={(v) => updateField('seo_auto_sitemap', v)} aria-label={t('advanced.label_auto_sitemap')} />
+              <Switch isSelected={!!formData.seo_auto_sitemap} onValueChange={(v) => updateField('seo_auto_sitemap', v)} aria-label={"Auto Sitemap"} />
             </div>
             <Divider />
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('advanced.canonical_urls')}</p>
-                <p className="text-sm text-default-500">{t('advanced.canonical_urls_desc')}</p>
+                <p className="font-medium">{"Canonical URLs"}</p>
+                <p className="text-sm text-default-500">{"Control canonical URL settings to avoid duplicate content"}</p>
               </div>
-              <Switch isSelected={!!formData.seo_canonical_urls} onValueChange={(v) => updateField('seo_canonical_urls', v)} aria-label={t('advanced.label_canonical_u_r_ls')} />
+              <Switch isSelected={!!formData.seo_canonical_urls} onValueChange={(v) => updateField('seo_canonical_urls', v)} aria-label={"Canonical URLs"} />
             </div>
             <Divider />
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('advanced.open_graph_tags')}</p>
-                <p className="text-sm text-default-500">{t('advanced.open_graph_tags_desc')}</p>
+                <p className="font-medium">{"Open Graph Tags"}</p>
+                <p className="text-sm text-default-500">{"Configure Open Graph meta tags for social sharing"}</p>
               </div>
-              <Switch isSelected={!!formData.seo_open_graph} onValueChange={(v) => updateField('seo_open_graph', v)} aria-label={t('advanced.label_open_graph')} />
+              <Switch isSelected={!!formData.seo_open_graph} onValueChange={(v) => updateField('seo_open_graph', v)} aria-label={"Open Graph"} />
             </div>
             <Divider />
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('advanced.twitter_cards')}</p>
-                <p className="text-sm text-default-500">{t('advanced.twitter_cards_desc')}</p>
+                <p className="font-medium">{"Twitter Cards"}</p>
+                <p className="text-sm text-default-500">{"Configure Twitter Card meta tags for rich link previews on Twitter"}</p>
               </div>
-              <Switch isSelected={!!formData.seo_twitter_cards} onValueChange={(v) => updateField('seo_twitter_cards', v)} aria-label={t('advanced.label_twitter_cards')} />
+              <Switch isSelected={!!formData.seo_twitter_cards} onValueChange={(v) => updateField('seo_twitter_cards', v)} aria-label={"Twitter Cards"} />
             </div>
           </CardBody>
         </Card>
@@ -489,32 +486,32 @@ export function SeoOverview() {
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <FileText size={20} />
-              {t('advanced.verification_robots_heading')}
+              {"Verification Robots"}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={t('advanced.label_google_search_console_verification')}
+              label={"Google Search Console Verification"}
               placeholder="google-site-verification=..."
               variant="bordered"
               value={String(formData.seo_google_verification || '')}
               onValueChange={(v) => updateField('seo_google_verification', v)}
             />
             <Input
-              label={t('advanced.label_bing_webmaster_verification')}
+              label={"Bing Webmaster Verification"}
               placeholder="msvalidate.01=..."
               variant="bordered"
               value={String(formData.seo_bing_verification || '')}
               onValueChange={(v) => updateField('seo_bing_verification', v)}
             />
             <Textarea
-              label={t('advanced.custom_robots_txt')}
+              label={"Custom Robots.txt"}
               placeholder={"User-agent: *\nDisallow: /admin/"}
               variant="bordered"
               minRows={4}
               value={String(formData.seo_robots_txt || '')}
               onValueChange={(v) => updateField('seo_robots_txt', v)}
-              description={t('advanced.desc_custom_robots_txt')}
+              description={"Custom Robots Txt."}
             />
           </CardBody>
         </Card>
@@ -524,7 +521,7 @@ export function SeoOverview() {
           <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <FileText size={20} />
-              {t('advanced.sitemap_heading')}
+              {"Sitemap"}
             </h3>
             <div className="flex items-center gap-2">
               <Button
@@ -534,7 +531,7 @@ export function SeoOverview() {
                 onPress={loadSitemapStats}
                 isLoading={sitemapLoading}
               >
-                {t('advanced.btn_refresh')}
+                {"Refresh"}
               </Button>
               <Button
                 size="sm"
@@ -543,7 +540,7 @@ export function SeoOverview() {
                 onPress={handleClearSitemapCache}
                 isLoading={clearingCache}
               >
-                {t('advanced.btn_clear_cache')}
+                {"Clear Cache"}
               </Button>
             </div>
           </CardHeader>
@@ -553,7 +550,7 @@ export function SeoOverview() {
             ) : sitemapStats ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{t('advanced.sitemap_url_label')}</span>
+                  <span className="text-sm font-medium">{"Sitemap URL"}</span>
                   <a
                     href={sitemapStats.sitemap_url}
                     target="_blank"
@@ -566,12 +563,12 @@ export function SeoOverview() {
                 </div>
                 <Divider />
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{t('advanced.sitemap_total_urls')}</span>
+                  <span className="text-sm font-medium">{"Total URLs"}</span>
                   <Chip color="primary" variant="flat">{sitemapStats.total_urls}</Chip>
                 </div>
                 <Divider />
                 <div>
-                  <p className="text-sm font-medium mb-2">{t('advanced.sitemap_urls_by_type')}</p>
+                  <p className="text-sm font-medium mb-2">{"URLs by Type"}</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {Object.entries(sitemapStats.content_types).map(([type, count]) => (
                       <div key={type} className="flex items-center justify-between bg-default-100 rounded-lg px-3 py-2">
@@ -583,7 +580,7 @@ export function SeoOverview() {
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-default-500">{t('advanced.unable_to_load_sitemap_stats')}</p>
+              <p className="text-sm text-default-500">{"Unable to Load Sitemap Stats"}</p>
             )}
           </CardBody>
         </Card>
@@ -593,12 +590,12 @@ export function SeoOverview() {
           <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Search size={20} />
-              {t('advanced.server_seo_audit_heading')}
+              {"Server SEO Audit"}
             </h3>
             <div className="flex items-center gap-2">
               {serverAudit?.last_run_at && (
                 <span className="text-xs text-default-400">
-                  {t('advanced.last_run_label')}: {new Date(serverAudit.last_run_at).toLocaleDateString()}
+                  {"Last Run"}: {new Date(serverAudit.last_run_at).toLocaleDateString()}
                 </span>
               )}
               <Button
@@ -608,7 +605,7 @@ export function SeoOverview() {
                 onPress={handleRunAudit}
                 isLoading={auditRunning}
               >
-                {t('advanced.run_audit')}
+                {"Run Audit"}
               </Button>
             </div>
           </CardHeader>
@@ -630,7 +627,7 @@ export function SeoOverview() {
               </div>
             ) : (
               <p className="text-sm text-default-500">
-                {auditRunning ? t('advanced.running_audit') : t('advanced.no_audit_results_prompt')}
+                {auditRunning ? "Running Audit" : "No audit results prompt found"}
               </p>
             )}
           </CardBody>
@@ -646,7 +643,7 @@ export function SeoOverview() {
             isLoading={saving}
             isDisabled={saving}
           >
-            {t('advanced.save_seo_settings')}
+            {"Save SEO Settings"}
           </Button>
         </div>
       </div>

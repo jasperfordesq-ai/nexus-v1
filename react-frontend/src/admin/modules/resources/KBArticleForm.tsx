@@ -141,8 +141,8 @@ export function KBArticleForm() {
 
   usePageTitle(
     isEdit && article
-      ? `Admin - ${t('breadcrumbs.edit')}: ${article.title}`
-      : `Admin - ${t('breadcrumbs.create')} ${t('resources.page_title')}`,
+      ? `Admin - ${"Edit"}: ${article.title}`
+      : `Admin - ${"Create"} ${"Resources"}`,
   );
 
   // Load categories (from main categories table, type=resource)
@@ -206,10 +206,10 @@ export function KBArticleForm() {
         // Set mode based on content_type
         setMode(data.content_type === 'markdown' ? 'upload' : 'write');
       } else {
-        setLoadError(t('resources.failed_to_load_resources'));
+        setLoadError("Failed to load resources");
       }
     } catch {
-      setLoadError(t('resources.an_unexpected_error_occurred'));
+      setLoadError("An unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -300,10 +300,10 @@ export function KBArticleForm() {
         setAttachments((prev) => [...prev, res.data as KBAttachment]);
         toast.success(t('resources.attachment_uploaded', 'File attached successfully'));
       } else {
-        toast.error(res.error || t('resources.failed_to_upload_attachment'));
+        toast.error(res.error || "Failed to upload attachment");
       }
     } catch {
-      toast.error(t('resources.failed_to_upload_attachment'));
+      toast.error("Failed to upload attachment");
     } finally {
       setUploadingAttachment(false);
     }
@@ -318,7 +318,7 @@ export function KBArticleForm() {
         toast.success(t('resources.attachment_deleted', 'Attachment removed'));
       }
     } catch {
-      toast.error(t('resources.failed_to_delete_attachment'));
+      toast.error("Failed to delete attachment");
     }
   }
 
@@ -369,10 +369,10 @@ export function KBArticleForm() {
         );
         navigate(tenantPath('/admin/resources'));
       } else {
-        toast.error(res.error || t('resources.an_unexpected_error_occurred'));
+        toast.error(res.error || "An unexpected error occurred");
       }
     } catch {
-      toast.error(t('resources.an_unexpected_error_occurred'));
+      toast.error("An unexpected error occurred");
     } finally {
       setSubmitting(false);
     }
@@ -383,7 +383,7 @@ export function KBArticleForm() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" label={t('federation.loading')} />
+        <Spinner size="lg" label={"Loading federation..."} />
       </div>
     );
   }
@@ -392,22 +392,22 @@ export function KBArticleForm() {
     return (
       <div>
         <PageHeader
-          title={`${t('breadcrumbs.edit')} ${t('resources.page_title')}`}
+          title={`${"Edit"} ${"Resources"}`}
           actions={
             <Button variant="flat" startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/resources'))}>
-              {t('common.back')}
+              {"Back"}
             </Button>
           }
         />
         <Card className="max-w-2xl">
           <CardBody className="p-6">
             <p className="text-center text-danger">
-              {loadError || t('resources.failed_to_load_resources')}
+              {loadError || "Failed to load resources"}
             </p>
             <div className="mt-4 flex justify-center">
               <Button variant="flat" onPress={() => navigate(tenantPath('/admin/resources'))}>
-                {t('common.back')}
+                {"Back"}
               </Button>
             </div>
           </CardBody>
@@ -421,13 +421,13 @@ export function KBArticleForm() {
       <PageHeader
         title={
           isEdit
-            ? `${t('breadcrumbs.edit')}: ${article?.title}`
-            : `${t('breadcrumbs.create')} ${t('resources.page_title')}`
+            ? `${"Edit"}: ${article?.title}`
+            : `${"Create"} ${"Resources"}`
         }
         actions={
           <Button variant="flat" startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/resources'))}>
-            {t('common.back')}
+            {"Back"}
           </Button>
         }
       />
@@ -465,7 +465,7 @@ export function KBArticleForm() {
 
             {/* Title */}
             <Input
-              label={t('content.label_name')}
+              label={"Name"}
               placeholder={t('resources.placeholder_title', 'Enter article title')}
               value={title}
               onValueChange={setTitle}
@@ -477,7 +477,7 @@ export function KBArticleForm() {
 
             {/* Slug */}
             <Input
-              label={t('federation.col_slug')}
+              label={"Slug"}
               placeholder={t('resources.placeholder_slug', 'Auto-generated from title')}
               value={slug}
               onValueChange={setSlug}
@@ -493,7 +493,7 @@ export function KBArticleForm() {
             {mode === 'write' && contentType !== 'markdown' && (
               <Suspense fallback={<Spinner size="sm" className="m-4" />}>
                 <RichTextEditor
-                  label={t('content.page_title')}
+                  label={"Content"}
                   placeholder={t('resources.placeholder_content', 'Write the article content...')}
                   value={content}
                   onChange={setContent}
@@ -610,7 +610,7 @@ export function KBArticleForm() {
             {/* Category + Parent */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Select
-                label={t('breadcrumbs.categories')}
+                label={"Categories"}
                 placeholder={t('resources.placeholder_category', 'Select a category (optional)')}
                 selectedKeys={categoryId ? [categoryId] : []}
                 onSelectionChange={(keys) => {
@@ -746,7 +746,7 @@ export function KBArticleForm() {
                 onPress={() => navigate(tenantPath('/admin/resources'))}
                 isDisabled={submitting}
               >
-                {t('cancel')}
+                {"Cancel"}
               </Button>
               <Button
                 type="submit"
@@ -756,8 +756,8 @@ export function KBArticleForm() {
                 isDisabled={submitting}
               >
                 {isEdit
-                  ? t('federation.save_changes')
-                  : `${t('breadcrumbs.create')} ${t('resources.page_title')}`}
+                  ? "Save Changes"
+                  : `${"Create"} ${"Resources"}`}
               </Button>
             </div>
           </CardBody>

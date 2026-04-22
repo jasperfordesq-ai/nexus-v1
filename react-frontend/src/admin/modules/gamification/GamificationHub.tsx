@@ -26,7 +26,7 @@ import { useTranslation } from 'react-i18next';
 
 export function GamificationHub() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('gamification.page_title'));
+  usePageTitle("Gamification");
   const toast = useToast();
   const { tenantPath } = useTenant();
 
@@ -48,7 +48,7 @@ export function GamificationHub() {
     if (res.success && res.data) {
       setStats(res.data as GamificationStats);
     } else {
-      toast.error(t('gamification.failed_to_load_gamification_stats'));
+      toast.error("Failed to load gamification stats");
     }
     setLoading(false);
   }, [toast, t])
@@ -71,7 +71,7 @@ export function GamificationHub() {
 
   const handleBulkAward = async () => {
     if (!selectedBadge) {
-      toast.error(t('gamification.bulk_award_select_badge'));
+      toast.error("Bulk Award Select Badge");
       return;
     }
     const ids = userIdsText
@@ -79,7 +79,7 @@ export function GamificationHub() {
       .map((s) => parseInt(s.trim(), 10))
       .filter((n) => !isNaN(n) && n > 0);
     if (ids.length === 0) {
-      toast.error(t('gamification.bulk_award_no_users'));
+      toast.error("Bulk Award No Users");
       return;
     }
     setAwarding(true);
@@ -87,12 +87,12 @@ export function GamificationHub() {
     setAwarding(false);
     if (res.success) {
       const awarded = (res.data as { awarded?: number })?.awarded ?? ids.length;
-      toast.success(t('gamification.bulk_award_success', { count: awarded }));
+      toast.success(`Bulk Award succeeded`);
       onBulkClose();
       setSelectedBadge('');
       setUserIdsText('');
     } else {
-      toast.error(res.error || t('gamification.bulk_award_failed'));
+      toast.error(res.error || "Bulk Award failed");
     }
   };
 
@@ -101,10 +101,10 @@ export function GamificationHub() {
     const res = await adminGamification.recheckAll();
     if (res.success) {
       const data = res.data as { users_checked?: number; message?: string } | undefined;
-      toast.success(data?.message || t('gamification.badge_recheck_completed'));
+      toast.success(data?.message || "Badge recheck completed");
       loadStats();
     } else {
-      toast.error(res.error || t('gamification.badge_recheck_failed'));
+      toast.error(res.error || "Badge recheck failed");
     }
     setRechecking(false);
   };
@@ -115,8 +115,8 @@ export function GamificationHub() {
   return (
     <div>
       <PageHeader
-        title={t('gamification.gamification_hub_title')}
-        description={t('gamification.gamification_hub_desc')}
+        title={"Gamification Hub"}
+        description={"Manage badges, campaigns, and gamification settings"}
         actions={
           <div className="flex gap-2">
             <Button
@@ -125,7 +125,7 @@ export function GamificationHub() {
               startContent={<Gift size={16} />}
               onPress={handleOpenBulkAward}
             >
-              {t('gamification.bulk_award_button')}
+              {"Bulk Award"}
             </Button>
             <Button
               color="primary"
@@ -133,7 +133,7 @@ export function GamificationHub() {
               onPress={handleRecheckAll}
               isLoading={rechecking}
             >
-              {t('gamification.recheck_all_badges')}
+              {"Recheck All Badges"}
             </Button>
           </div>
         }
@@ -142,28 +142,28 @@ export function GamificationHub() {
       {/* Stats Row */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label={t('gamification.label_total_badges_awarded')}
+          label={"Total Badges Awarded"}
           value={stats?.total_badges_awarded ?? 0}
           icon={Award}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label={t('gamification.label_active_users')}
+          label={"Active Users"}
           value={stats?.active_users ?? 0}
           icon={Users}
           color="success"
           loading={loading}
         />
         <StatCard
-          label={t('gamification.label_total_x_p_awarded')}
+          label={"Total XP Awarded"}
           value={stats?.total_xp_awarded ?? 0}
           icon={Zap}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label={t('gamification.label_active_campaigns')}
+          label={"Active Campaigns"}
           value={stats?.active_campaigns ?? 0}
           icon={Target}
           color="secondary"
@@ -176,8 +176,8 @@ export function GamificationHub() {
         <Card shadow="sm" className="lg:col-span-2">
           <CardHeader className="flex items-center justify-between pb-0">
             <div>
-              <h3 className="text-lg font-semibold text-foreground">{t('gamification.badge_distribution')}</h3>
-              <p className="text-sm text-default-500">{t('gamification.top_10_badges')}</p>
+              <h3 className="text-lg font-semibold text-foreground">{"Badge Distribution"}</h3>
+              <p className="text-sm text-default-500">{"Top 10 Badges"}</p>
             </div>
           </CardHeader>
           <CardBody>
@@ -207,7 +207,7 @@ export function GamificationHub() {
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <Award size={40} className="text-default-300 mb-2" />
-                <p className="text-default-500">{t('gamification.no_badges_awarded')}</p>
+                <p className="text-default-500">{"No badges awarded"}</p>
               </div>
             )}
           </CardBody>
@@ -216,7 +216,7 @@ export function GamificationHub() {
         {/* Quick Links */}
         <Card shadow="sm">
           <CardHeader className="pb-0">
-            <h3 className="text-lg font-semibold text-foreground">{t('gamification.quick_links')}</h3>
+            <h3 className="text-lg font-semibold text-foreground">{"Quick Links"}</h3>
           </CardHeader>
           <CardBody className="gap-3">
             <Link to={tenantPath("/admin/gamification/campaigns")} className="block">
@@ -226,8 +226,8 @@ export function GamificationHub() {
                     <Megaphone size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground">{t('gamification.campaigns')}</p>
-                    <p className="text-xs text-default-500">{t('gamification.manage_badge_campaigns')}</p>
+                    <p className="font-medium text-foreground">{"Campaigns"}</p>
+                    <p className="text-xs text-default-500">{"Manage Badge Campaigns"}</p>
                   </div>
                   <ArrowRight size={16} className="text-default-400" />
                 </CardBody>
@@ -241,8 +241,8 @@ export function GamificationHub() {
                     <Award size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground">{t('gamification.custom_badges')}</p>
-                    <p className="text-xs text-default-500">{t('gamification.create_and_manage_badges')}</p>
+                    <p className="font-medium text-foreground">{"Custom Badges"}</p>
+                    <p className="text-xs text-default-500">{"Create and Manage Badges"}</p>
                   </div>
                   <ArrowRight size={16} className="text-default-400" />
                 </CardBody>
@@ -271,8 +271,8 @@ export function GamificationHub() {
                     <BarChart3 size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground">{t('gamification.analytics')}</p>
-                    <p className="text-xs text-default-500">{t('gamification.gamification_insights')}</p>
+                    <p className="font-medium text-foreground">{"Analytics"}</p>
+                    <p className="text-xs text-default-500">{"Gamification Insights"}</p>
                   </div>
                   <ArrowRight size={16} className="text-default-400" />
                 </CardBody>
@@ -285,17 +285,17 @@ export function GamificationHub() {
       {/* Bulk Badge Award Modal */}
       <Modal isOpen={isBulkOpen} onClose={onBulkClose} size="md">
         <ModalContent>
-          <ModalHeader>{t('gamification.bulk_award_modal_title')}</ModalHeader>
+          <ModalHeader>{"Bulk Award Modal"}</ModalHeader>
           <ModalBody className="gap-4">
             <p className="text-sm text-default-500">
-              {t('gamification.bulk_award_modal_desc')}
+              {"Bulk Award Modal."}
             </p>
             {badgesLoading ? (
               <div className="flex justify-center py-4"><Spinner /></div>
             ) : (
               <Select
-                label={t('gamification.bulk_award_badge_label')}
-                placeholder={t('gamification.bulk_award_badge_placeholder')}
+                label={"Bulk Award Badge"}
+                placeholder={"Enter bulk award badge..."}
                 selectedKeys={selectedBadge ? [selectedBadge] : []}
                 onSelectionChange={(keys) => setSelectedBadge(Array.from(keys)[0] as string ?? '')}
               >
@@ -305,20 +305,20 @@ export function GamificationHub() {
               </Select>
             )}
             <Textarea
-              label={t('gamification.bulk_award_users_label')}
-              placeholder={t('gamification.bulk_award_users_placeholder')}
+              label={"Bulk Award Users"}
+              placeholder={"Enter bulk award users..."}
               value={userIdsText}
               onChange={(e) => setUserIdsText(e.target.value)}
               minRows={4}
-              description={t('gamification.bulk_award_users_hint')}
+              description={"Bulk Award Users."}
             />
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onBulkClose}>
-              {t('common.cancel')}
+              {"Cancel"}
             </Button>
             <Button color="secondary" onPress={handleBulkAward} isLoading={awarding}>
-              {t('gamification.bulk_award_submit')}
+              {"Bulk Award Submit"}
             </Button>
           </ModalFooter>
         </ModalContent>

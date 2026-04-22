@@ -16,7 +16,6 @@ import { useToast } from '@/contexts';
 import { PageHeader, EmptyState, DataTable, ConfirmModal, type Column } from '../../components';
 import { adminTools } from '../../api/adminApi';
 
-import { useTranslation } from 'react-i18next';
 interface Error404Entry {
   id: number;
   url: string;
@@ -27,8 +26,7 @@ interface Error404Entry {
 }
 
 export function Error404Tracking() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('advanced.page_title'));
+  usePageTitle("Advanced");
   const toast = useToast();
 
   const [errors, setErrors] = useState<Error404Entry[]>([]);
@@ -53,7 +51,7 @@ export function Error404Tracking() {
       setTotalItems(total);
       setPage(pg);
     } catch {
-      toast.error(t('advanced.failed_to_load_404_errors'));
+      toast.error("Failed to load 404 errors");
     } finally {
       if (mounted.current) setLoading(false);
     }
@@ -72,15 +70,15 @@ export function Error404Tracking() {
       const res = await adminTools.delete404Error(deleteTarget.id);
 
       if (res.success) {
-        toast.success(t('advanced.404_entry_dismissed'));
+        toast.success("404 entry dismissed");
         setDeleteTarget(null);
         await fetchErrors();
       } else {
-        const error = (res as { error?: string }).error || t('advanced.failed_to_delete_404_entry');
+        const error = (res as { error?: string }).error || "Failed to delete 404 entry";
         toast.error(error);
       }
     } catch (err) {
-      toast.error(t('advanced.failed_to_delete_404_entry'));
+      toast.error("Failed to delete 404 entry");
     } finally {
       setDeleting(false);
     }
@@ -89,7 +87,7 @@ export function Error404Tracking() {
   const columns: Column<Error404Entry>[] = [
     {
       key: 'url',
-      label: t('advanced.col_url'),
+      label: "URL",
       sortable: true,
       render: (item) => (
         <span className="font-mono text-sm break-all">{item.url}</span>
@@ -97,7 +95,7 @@ export function Error404Tracking() {
     },
     {
       key: 'referrer',
-      label: t('advanced.col_referrer'),
+      label: "Referrer",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500 break-all">
@@ -105,10 +103,10 @@ export function Error404Tracking() {
         </span>
       ),
     },
-    { key: 'hits', label: t('advanced.col_hits'), sortable: true },
+    { key: 'hits', label: "Hits", sortable: true },
     {
       key: 'last_seen',
-      label: t('advanced.col_last_seen'),
+      label: "Last Seen",
       sortable: true,
       render: (item) => new Date(item.last_seen).toLocaleDateString(),
     },
@@ -122,7 +120,7 @@ export function Error404Tracking() {
           color="danger"
           size="sm"
           onPress={() => setDeleteTarget(item)}
-          aria-label={t('advanced.dismiss_404_entry')}
+          aria-label={"Dismiss"}
         >
           <Trash2 size={16} />
         </Button>
@@ -133,7 +131,7 @@ export function Error404Tracking() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('advanced.error404_tracking_title')} description={t('advanced.error404_tracking_desc')} />
+        <PageHeader title={"404 Error Tracking"} description={"Track pages that return 404 errors so you can create redirects or fix broken links"} />
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
@@ -143,13 +141,13 @@ export function Error404Tracking() {
 
   return (
     <div>
-      <PageHeader title={t('advanced.error404_tracking_title')} description={t('advanced.error404_tracking_desc')} />
+      <PageHeader title={"404 Error Tracking"} description={"Track pages that return 404 errors so you can create redirects or fix broken links"} />
 
       {errors.length === 0 ? (
         <EmptyState
           icon={AlertTriangle}
-          title={t('advanced.no_404_errors')}
-          description={t('advanced.desc_when_visitors_hit_missing_pages_they_wi')}
+          title={"No 404 errors found"}
+          description={"When visitors hit missing pages, they will see a 404 error tracked here"}
         />
       ) : (
         <DataTable
@@ -168,9 +166,9 @@ export function Error404Tracking() {
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title={t('advanced.dismiss_404_title')}
-        message={t('advanced.dismiss_404_message', { url: deleteTarget?.url })}
-        confirmLabel={t('advanced.dismiss')}
+        title={"Dismiss 404"}
+        message={`Dismiss 404`}
+        confirmLabel={"Dismiss"}
         confirmColor="danger"
         isLoading={deleting}
       />

@@ -15,10 +15,8 @@ import { adminSuper } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
 import type { SuperAdminTenant, SuperAdminUser, BulkOperationResult } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 export function BulkOperations() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('super.page_title'));
+  usePageTitle("Super Admin");
   const toast = useToast();
   const { tenantPath } = useTenant();
 
@@ -68,11 +66,11 @@ export function BulkOperations() {
     });
     if (res?.success) {
       const result = res.data as BulkOperationResult | undefined;
-      toast.success(t('super.bulk_users_moved', { count: result?.updated_count || selectedUserIds.size }));
+      toast.success(`Bulk Users Moved`);
       setSelectedUserIds(new Set());
       loadUsersForTenant(sourceTenant);
     } else {
-      toast.error(res?.error || t('super.bulk_move_failed'));
+      toast.error(res?.error || "Bulk Move failed");
     }
     setMoveLoading(false);
     setMoveConfirm(false);
@@ -86,11 +84,11 @@ export function BulkOperations() {
     });
     if (res?.success) {
       const result = res.data as BulkOperationResult | undefined;
-      toast.success(t('super.bulk_tenants_updated', { count: result?.updated_count || selectedTenantIds.size }));
+      toast.success(`Bulk Tenants updated`);
       setSelectedTenantIds(new Set());
       loadTenants();
     } else {
-      toast.error(res?.error || t('super.bulk_update_failed'));
+      toast.error(res?.error || "Bulk Update failed");
     }
     setTenantLoading(false);
     setTenantConfirm(false);
@@ -127,24 +125,24 @@ export function BulkOperations() {
       <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
         <Link to={tenantPath('/admin/super')} className="hover:text-primary">Super Admin</Link>
         <span>/</span>
-        <span className="text-foreground">{t('super_controls.bulk_operations')}</span>
+        <span className="text-foreground">{"Bulk Operations"}</span>
       </nav>
-      <PageHeader title={t('super.bulk_operations_title')} description={t('super.bulk_operations_desc')} />
+      <PageHeader title={"Bulk Operations"} description={"Perform bulk operations across multiple tenants"} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Bulk Move Users */}
         <Card>
           <CardHeader className="flex flex-col items-start gap-1">
             <div className="flex gap-2 items-center">
-              <Users size={20} /> <h3 className="text-lg font-semibold">{t('bulk_operations.bulk_move_users')}</h3>
+              <Users size={20} /> <h3 className="text-lg font-semibold">{"Bulk Move Users"}</h3>
             </div>
             <p className="text-xs text-default-400">
-              {t('bulk_operations.bulk_move_desc')}{' '}
-              <Link to={tenantPath('/admin/super/users')} className="text-primary hover:underline">{t('bulk_operations.manage_individual_users')}</Link>
+              {"Bulk Move."}{' '}
+              <Link to={tenantPath('/admin/super/users')} className="text-primary hover:underline">{"Manage Individual Users"}</Link>
             </p>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
-            <Select label={t('super.label_source_tenant')} selectedKeys={sourceTenant ? [sourceTenant] : []}
+            <Select label={"Source Tenant"} selectedKeys={sourceTenant ? [sourceTenant] : []}
               onSelectionChange={(keys) => {
                 const val = String(Array.from(keys)[0] || '');
                 setSourceTenant(val);
@@ -164,10 +162,10 @@ export function BulkOperations() {
                 ))}
               </div>
             )}
-            {loading && <p className="text-center text-default-400 text-sm">{t('bulk_operations.loading_users')}</p>}
+            {loading && <p className="text-center text-default-400 text-sm">{"Loading users..."}</p>}
 
             <Divider />
-            <Select label={t('super.label_target_tenant')} selectedKeys={targetTenant ? [targetTenant] : []}
+            <Select label={"Target Tenant"} selectedKeys={targetTenant ? [targetTenant] : []}
               onSelectionChange={(keys) => setTargetTenant(String(Array.from(keys)[0] || ''))}>
               {tenants.filter(t => String(t.id) !== sourceTenant).map(t =>
                 <SelectItem key={String(t.id)}>{t.name}</SelectItem>)}
@@ -182,8 +180,8 @@ export function BulkOperations() {
                 }}
               >
                 <div>
-                  <p className="text-sm font-medium">{t('bulk_operations.grant_sa_on_arrival')}</p>
-                  <p className="text-xs text-default-500 mt-0.5">{t('bulk_operations.grant_sa_on_arrival_desc')}</p>
+                  <p className="text-sm font-medium">{"Grant Sa on Arrival"}</p>
+                  <p className="text-xs text-default-500 mt-0.5">{"Grant Sa on Arrival."}</p>
                 </div>
               </Switch>
             </div>
@@ -191,7 +189,7 @@ export function BulkOperations() {
             <Button color="primary" startContent={<ArrowRight size={16} />}
               isDisabled={selectedUserIds.size === 0 || !targetTenant}
               onPress={() => setMoveConfirm(true)}>
-              {t('bulk_operations.move_n_users', { count: selectedUserIds.size })}
+              {`Move N Users`}
             </Button>
           </CardBody>
         </Card>
@@ -200,16 +198,16 @@ export function BulkOperations() {
         <Card>
           <CardHeader className="flex flex-col items-start gap-1">
             <div className="flex gap-2 items-center">
-              <Building2 size={20} /> <h3 className="text-lg font-semibold">{t('bulk_operations.bulk_update_tenants')}</h3>
+              <Building2 size={20} /> <h3 className="text-lg font-semibold">{"Bulk Update Tenants"}</h3>
             </div>
             <p className="text-xs text-default-400">
-              {t('bulk_operations.bulk_update_desc')}{' '}
-              <Link to={tenantPath('/admin/super/tenants')} className="text-primary hover:underline">{t('bulk_operations.manage_individual_tenants')}</Link>
+              {"Bulk Update."}{' '}
+              <Link to={tenantPath('/admin/super/tenants')} className="text-primary hover:underline">{"Manage Individual Tenants"}</Link>
             </p>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
             <div className="flex items-center justify-between mb-1">
-              <p className="text-sm font-medium">{t('bulk_operations.select_tenants')}</p>
+              <p className="text-sm font-medium">{"Select Tenants"}</p>
               <div className="flex gap-2">
                 <Button
                   size="sm"
@@ -218,7 +216,7 @@ export function BulkOperations() {
                   startContent={<CheckCheck size={14} />}
                   onPress={selectAllTenants}
                 >
-                  {t('bulk_operations.select_all')}
+                  {"Select All"}
                 </Button>
                 <Button
                   size="sm"
@@ -227,7 +225,7 @@ export function BulkOperations() {
                   startContent={<XCircle size={14} />}
                   onPress={deselectAllTenants}
                 >
-                  {t('bulk_operations.deselect_all')}
+                  {"Deselect All"}
                 </Button>
               </div>
             </div>
@@ -243,7 +241,7 @@ export function BulkOperations() {
             </div>
             <Divider />
             <div>
-              <p className="text-sm font-medium mb-3">{t('bulk_operations.select_action')}</p>
+              <p className="text-sm font-medium mb-3">{"Select"}</p>
               <RadioGroup value={bulkAction} onValueChange={setBulkAction}>
                 <div className="grid grid-cols-2 gap-3">
                   <div
@@ -256,8 +254,8 @@ export function BulkOperations() {
                   >
                     <Radio value="activate" classNames={{ wrapper: 'hidden' }}>
                       <div className="flex flex-col gap-1">
-                        <p className="text-sm font-semibold text-success">{t('bulk_operations.action_activate')}</p>
-                        <p className="text-xs text-default-500">{t('bulk_operations.action_activate_desc')}</p>
+                        <p className="text-sm font-semibold text-success">{"Activate"}</p>
+                        <p className="text-xs text-default-500">{"Activate Desc"}</p>
                       </div>
                     </Radio>
                   </div>
@@ -271,8 +269,8 @@ export function BulkOperations() {
                   >
                     <Radio value="deactivate" classNames={{ wrapper: 'hidden' }}>
                       <div className="flex flex-col gap-1">
-                        <p className="text-sm font-semibold text-danger">{t('bulk_operations.action_deactivate')}</p>
-                        <p className="text-xs text-default-500">{t('bulk_operations.action_deactivate_desc')}</p>
+                        <p className="text-sm font-semibold text-danger">{"Deactivate"}</p>
+                        <p className="text-xs text-default-500">{"Deactivate Desc"}</p>
                       </div>
                     </Radio>
                   </div>
@@ -286,8 +284,8 @@ export function BulkOperations() {
                   >
                     <Radio value="enable_hub" classNames={{ wrapper: 'hidden' }}>
                       <div className="flex flex-col gap-1">
-                        <p className="text-sm font-semibold text-primary">{t('bulk_operations.action_enable_hub')}</p>
-                        <p className="text-xs text-default-500">{t('bulk_operations.action_enable_hub_desc')}</p>
+                        <p className="text-sm font-semibold text-primary">{"Enable Hub"}</p>
+                        <p className="text-xs text-default-500">{"Enable Hub Desc"}</p>
                       </div>
                     </Radio>
                   </div>
@@ -301,8 +299,8 @@ export function BulkOperations() {
                   >
                     <Radio value="disable_hub" classNames={{ wrapper: 'hidden' }}>
                       <div className="flex flex-col gap-1">
-                        <p className="text-sm font-semibold text-warning-600 dark:text-warning">{t('bulk_operations.action_disable_hub')}</p>
-                        <p className="text-xs text-default-500">{t('bulk_operations.action_disable_hub_desc')}</p>
+                        <p className="text-sm font-semibold text-warning-600 dark:text-warning">{"Disable Hub"}</p>
+                        <p className="text-xs text-default-500">{"Disable Hub Desc"}</p>
                       </div>
                     </Radio>
                   </div>
@@ -320,7 +318,7 @@ export function BulkOperations() {
               isDisabled={selectedTenantIds.size === 0 || !bulkAction}
               onPress={() => setTenantConfirm(true)}
             >
-              {t('bulk_operations.apply_to_n_tenants', { count: selectedTenantIds.size })}
+              {`Apply to N Tenants`}
             </Button>
           </CardBody>
         </Card>
@@ -328,13 +326,13 @@ export function BulkOperations() {
 
       <ConfirmModal isOpen={moveConfirm} onClose={() => setMoveConfirm(false)}
         onConfirm={handleBulkMoveUsers}
-        title={t('bulk_operations.confirm_bulk_move')} message={`${t('bulk_operations.move_count', { count: selectedUserIds.size })}${grantSA ? ` ${t('bulk_operations.grant_sa_note')}` : ''}`}
-        confirmLabel={t('bulk_operations.move_users')} confirmColor="primary" isLoading={moveLoading} />
+        title={"Are you sure you want to bulk move?"} message={`${`Move Count`}${grantSA ? ` ${"Grant Sa"}` : ''}`}
+        confirmLabel={"Move Users"} confirmColor="primary" isLoading={moveLoading} />
 
       <ConfirmModal isOpen={tenantConfirm} onClose={() => setTenantConfirm(false)}
         onConfirm={handleBulkUpdateTenants}
-        title={t('bulk_operations.confirm_bulk_update')} message={t('bulk_operations.apply_action', { action: bulkAction.replace('_', ' '), count: selectedTenantIds.size })}
-        confirmLabel={t('bulk_operations.apply')} confirmColor={
+        title={"Are you sure you want to bulk update?"} message={`Apply`}
+        confirmLabel={"Apply"} confirmColor={
           bulkAction === 'activate' ? 'primary' :
           bulkAction === 'deactivate' ? 'danger' :
           'warning'

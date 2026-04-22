@@ -130,7 +130,7 @@ function StatCard({ label, value, color = 'default', icon }: StatCardProps) {
 
 export function RevenueDashboard() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('billing.revenue_title'));
+  usePageTitle("Revenue");
   const { user } = useAuth();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
@@ -156,10 +156,10 @@ export function RevenueDashboard() {
         if (res.success && res.data) {
           setData(res.data as unknown as RevenueDashboardData);
         } else {
-          setError(t('billing.failed_to_load'));
+          setError("Failed to load");
         }
       })
-      .catch(() => setError(t('billing.failed_to_load')))
+      .catch(() => setError("Failed to load"))
       .finally(() => setLoading(false));
   }, [user, t]);
 
@@ -173,8 +173,8 @@ export function RevenueDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold">{t('billing.revenue_title')}</h1>
-          <p className="text-default-500 text-sm mt-1">{t('billing.revenue_desc')}</p>
+          <h1 className="text-2xl font-bold">{"Revenue"}</h1>
+          <p className="text-default-500 text-sm mt-1">{"Revenue."}</p>
         </div>
         <Button
           as={Link}
@@ -182,7 +182,7 @@ export function RevenueDashboard() {
           variant="flat"
           size="sm"
         >
-          {t('billing.back_to_billing')}
+          {"Back to Billing"}
         </Button>
       </div>
 
@@ -201,24 +201,24 @@ export function RevenueDashboard() {
           {/* ── Row 1: Revenue & users ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
-              label={t('billing.mrr')}
+              label={"Mrr"}
               value={`${formatCurrency(data.mrr)}/mo`}
               color="primary"
               icon={<DollarSign className="w-4 h-4" />}
             />
             <StatCard
-              label={t('billing.arr')}
+              label={"Arr"}
               value={`${formatCurrency(data.arr)}/yr`}
               color="success"
               icon={<TrendingUp className="w-4 h-4" />}
             />
             <StatCard
-              label={t('billing.active_tenants')}
+              label={"Active Tenants"}
               value={data.active_tenants}
               icon={<Building2 className="w-4 h-4" />}
             />
             <StatCard
-              label={t('billing.total_users')}
+              label={"Total Users"}
               value={data.total_platform_users.toLocaleString()}
               icon={<Users className="w-4 h-4" />}
             />
@@ -227,21 +227,21 @@ export function RevenueDashboard() {
           {/* ── Row 2: Status indicators ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
-              label={t('billing.free_tenants')}
+              label={"Free Tenants"}
               value={data.free_tenants}
             />
             <StatCard
-              label={t('billing.over_limit_tenants')}
+              label={"Over Limit Tenants"}
               value={data.over_limit_tenants}
               color={data.over_limit_tenants > 0 ? 'danger' : 'default'}
             />
             <StatCard
-              label={t('billing.in_grace')}
+              label={"In Grace"}
               value={data.in_grace_period}
               color={data.in_grace_period > 0 ? 'warning' : 'default'}
             />
             <StatCard
-              label={t('billing.paused_tenants')}
+              label={"Paused Tenants"}
               value={data.paused_tenants}
               color={data.paused_tenants > 0 ? 'warning' : 'default'}
             />
@@ -250,18 +250,18 @@ export function RevenueDashboard() {
           {/* ── Plan Breakdown ── */}
           <Card>
             <CardHeader>
-              <h2 className="text-lg font-semibold">{t('billing.plan_breakdown')}</h2>
+              <h2 className="text-lg font-semibold">{"Plan Breakdown"}</h2>
             </CardHeader>
             <Divider />
             <CardBody className="p-0">
-              <Table removeWrapper aria-label={t('billing.plan_breakdown')}>
+              <Table removeWrapper aria-label={"Plan Breakdown"}>
                 <TableHeader>
-                  <TableColumn>{t('billing.col_current_plan')}</TableColumn>
-                  <TableColumn>{t('billing.col_users')}</TableColumn>
-                  <TableColumn>{t('billing.mrr_contribution')}</TableColumn>
+                  <TableColumn>{"Current Plan"}</TableColumn>
+                  <TableColumn>{"Users"}</TableColumn>
+                  <TableColumn>{"Mrr Contribution"}</TableColumn>
                   <TableColumn>% MRR</TableColumn>
                 </TableHeader>
-                <TableBody emptyContent={t('billing.no_plan')}>
+                <TableBody emptyContent={"No plan found"}>
                   {data.plan_breakdown.map((row) => {
                     const pct = totalMrr > 0 ? Math.round((row.mrr_contribution / totalMrr) * 100) : 0;
                     return (
@@ -291,16 +291,16 @@ export function RevenueDashboard() {
           {/* ── Recent Changes ── */}
           <Card>
             <CardHeader>
-              <h2 className="text-lg font-semibold">{t('billing.recent_changes')}</h2>
+              <h2 className="text-lg font-semibold">{"Recent Changes"}</h2>
             </CardHeader>
             <Divider />
             <CardBody className="p-0">
-              <Table removeWrapper aria-label={t('billing.recent_changes')}>
+              <Table removeWrapper aria-label={"Recent Changes"}>
                 <TableHeader>
-                  <TableColumn>{t('billing.col_tenant')}</TableColumn>
-                  <TableColumn>{t('billing.assign_plan')}</TableColumn>
-                  <TableColumn>{t('billing.changed_by')}</TableColumn>
-                  <TableColumn>{t('billing.expiry_date')}</TableColumn>
+                  <TableColumn>{"Tenant"}</TableColumn>
+                  <TableColumn>{"Assign Plan"}</TableColumn>
+                  <TableColumn>{"Changed by"}</TableColumn>
+                  <TableColumn>{"Expiry Date"}</TableColumn>
                 </TableHeader>
                 <TableBody emptyContent="-">
                   {data.recent_changes.slice(0, 10).map((change, idx) => (

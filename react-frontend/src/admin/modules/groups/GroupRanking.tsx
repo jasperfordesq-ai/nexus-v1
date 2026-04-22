@@ -11,10 +11,8 @@ import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';
 import type { FeaturedGroup } from '@/admin/api/types';
 
-import { useTranslation } from 'react-i18next';
 export default function GroupRanking() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('groups.page_title'));
+  usePageTitle("Groups");
   const { success, error } = useToast();
   const [groups, setGroups] = useState<FeaturedGroup[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +24,7 @@ export default function GroupRanking() {
       const response = await adminGroups.getFeaturedGroups();
       setGroups((response.data as FeaturedGroup[]) || []);
     } catch {
-      error(t('groups.failed_to_load_featured_groups'));
+      error("Failed to load featured groups");
     } finally {
       setLoading(false);
     }
@@ -40,10 +38,10 @@ export default function GroupRanking() {
     try {
       setUpdating(true);
       await adminGroups.updateFeaturedGroups();
-      success(t('groups.rankings_updated'));
+      success("Rankings Updated");
       loadGroups();
     } catch {
-      error(t('groups.failed_to_update_rankings'));
+      error("Failed to update rankings");
     } finally {
       setUpdating(false);
     }
@@ -52,10 +50,10 @@ export default function GroupRanking() {
   const handleToggleFeatured = async (groupId: number) => {
     try {
       await adminGroups.toggleFeatured(groupId);
-      success(t('groups.featured_status_updated'));
+      success("Featured status updated");
       loadGroups();
     } catch {
-      error(t('groups.failed_to_update_featured_status'));
+      error("Failed to update featured status");
     }
   };
 
@@ -63,9 +61,9 @@ export default function GroupRanking() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">{t('groups.group_ranking_title')}</h1>
+          <h1 className="text-2xl font-bold">{"Group Ranking"}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {t('groups.group_ranking_desc')}
+            {"View and manage the automatic ranking of groups by activity score"}
           </p>
         </div>
         <Button
@@ -74,21 +72,21 @@ export default function GroupRanking() {
           onPress={handleUpdateRankings}
           isLoading={updating}
         >
-          {t('groups.auto_update_rankings')}
+          {"Auto Update Rankings"}
         </Button>
       </div>
 
       <Card className="p-4">
-        <Table aria-label={t('groups.label_featured_groups_table')}>
+        <Table aria-label={"Featured Groups Table"}>
           <TableHeader>
-            <TableColumn>{t('groups.col_group')}</TableColumn>
-            <TableColumn>{t('groups.col_members')}</TableColumn>
-            <TableColumn>{t('groups.col_engagement')}</TableColumn>
-            <TableColumn>{t('groups.col_geo_diversity')}</TableColumn>
-            <TableColumn>{t('groups.col_total_score')}</TableColumn>
-            <TableColumn>{t('groups.col_featured')}</TableColumn>
+            <TableColumn>{"Group"}</TableColumn>
+            <TableColumn>{"Members"}</TableColumn>
+            <TableColumn>{"Engagement"}</TableColumn>
+            <TableColumn>{"Geo Diversity"}</TableColumn>
+            <TableColumn>{"Total Score"}</TableColumn>
+            <TableColumn>{"Featured"}</TableColumn>
           </TableHeader>
-          <TableBody emptyContent={loading ? t('groups.loading') : t('groups.no_groups_found')}>
+          <TableBody emptyContent={loading ? "Loading groups..." : "No groups found"}>
             {groups.map((group) => (
               <TableRow key={group.group_id}>
                 <TableCell>
@@ -136,16 +134,16 @@ export default function GroupRanking() {
       </Card>
 
       <Card className="p-6">
-        <h2 className="text-lg font-semibold mb-3">{t('groups.ranking_algorithm_title')}</h2>
+        <h2 className="text-lg font-semibold mb-3">{"Ranking Algorithm"}</h2>
         <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
           <p>
-            <strong>{t('groups.total_score_formula_label')}</strong>
-            {t('groups.total_score_formula')}
+            <strong>{"Score Formula"}</strong>
+            {"Total Score = Engagement + Geographic Diversity + Activity"}
           </p>
-          <p><strong>{t('groups.engagement_score_label')}</strong> {t('groups.engagement_score_desc')}</p>
-          <p><strong>{t('groups.geographic_diversity_label')}</strong> {t('groups.geographic_diversity_desc')}</p>
+          <p><strong>{"Engagement Score"}</strong> {"Score based on member activity, posts, and participation in the group"}</p>
+          <p><strong>{"Geographic Diversity"}</strong> {"Score based on the geographic spread of group members"}</p>
           <p className="text-xs mt-4">
-            {t('groups.ranking_algorithm_note')}
+            {"Rankings are automatically updated based on group activity, member count, and engagement score"}
           </p>
         </div>
       </Card>

@@ -38,7 +38,7 @@ export function PageBuilder() {
   const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const isEdit = id !== undefined && id !== 'new';
-  usePageTitle(`Admin - ${isEdit ? t('breadcrumbs.edit') : t('breadcrumbs.create')} ${t('breadcrumbs.pages')}`);
+  usePageTitle(`Admin - ${isEdit ? "Edit" : "Create"} ${"Pages"}`);
   const navigate = useNavigate();
   const { tenantPath, tenant, refreshTenant } = useTenant();
   const { user } = useAuth();
@@ -100,7 +100,7 @@ export function PageBuilder() {
             });
           }
         })
-        .catch(() => toast.error(t('content.failed_to_load_pages')))
+        .catch(() => toast.error("Failed to load pages"))
         .finally(() => setLoading(false));
     }
   }, [id, isEdit, toast, t])
@@ -135,7 +135,7 @@ export function PageBuilder() {
           refreshTenant();
           navigate(tenantPath('/admin/pages'));
         } else {
-          toast.error(res?.error || t('content.an_unexpected_error_occurred'));
+          toast.error(res?.error || "An unexpected error occurred");
         }
       } else {
         const res = await adminPages.create(payload);
@@ -144,11 +144,11 @@ export function PageBuilder() {
           refreshTenant();
           navigate(tenantPath('/admin/pages'));
         } else {
-          toast.error(res?.error || t('content.an_unexpected_error_occurred'));
+          toast.error(res?.error || "An unexpected error occurred");
         }
       }
     } catch {
-      toast.error(t('content.an_unexpected_error_occurred'));
+      toast.error("An unexpected error occurred");
     } finally {
       setSaving(false);
     }
@@ -157,7 +157,7 @@ export function PageBuilder() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={isEdit ? `${t('breadcrumbs.edit')} ${t('breadcrumbs.pages')}` : t('content.pages_admin_title')} description={t('federation.loading')} />
+        <PageHeader title={isEdit ? `${"Edit"} ${"Pages"}` : "Pages Admin"} description={"Loading federation..."} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -166,11 +166,11 @@ export function PageBuilder() {
   return (
     <div>
       <PageHeader
-        title={isEdit ? `${t('breadcrumbs.edit')} ${t('breadcrumbs.pages')}` : t('content.pages_admin_title')}
-        description={t('content.pages_admin_desc')}
+        title={isEdit ? `${"Edit"} ${"Pages"}` : "Pages Admin"}
+        description={"Create and manage custom pages for your platform"}
         actions={
           <div className="flex gap-2">
-            <Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/pages'))}>{t('common.back')}</Button>
+            <Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/pages'))}>{"Back"}</Button>
             {isEdit && formData.slug && (
               <Button
                 variant="flat"
@@ -196,10 +196,10 @@ export function PageBuilder() {
 
       <div className="flex flex-col gap-4">
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><FileText size={20} /> {t('content.page_title')}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><FileText size={20} /> {"Content"}</h3></CardHeader>
           <CardBody className="gap-4">
             <Input
-              label={t('content.label_name')}
+              label={"Name"}
               placeholder={t('content.placeholder_eg_skill_level', 'e.g., About Us')}
               isRequired
               variant="bordered"
@@ -224,7 +224,7 @@ export function PageBuilder() {
             />
             <Suspense fallback={<Spinner size="sm" className="m-4" />}>
               <RichTextEditor
-                label={t('content.page_title')}
+                label={"Content"}
                 placeholder={t('content.placeholder_content', 'Write your page content here...')}
                 value={formData.content}
                 onChange={(html) => handleChange('content', html)}
@@ -239,7 +239,7 @@ export function PageBuilder() {
               onValueChange={(v) => handleChange('meta_description', v)}
             />
             <Select
-              label={t('listings.status')}
+              label={"Status"}
               variant="bordered"
               selectedKeys={[formData.status]}
               onSelectionChange={(keys) => {
@@ -265,7 +265,7 @@ export function PageBuilder() {
             {formData.show_in_menu && (
               <>
                 <Select
-                  label={t('content.label_location')}
+                  label={"Location"}
                   variant="bordered"
                   description={t('content.menu_location_desc', 'Where this page appears in the navigation')}
                   selectedKeys={[formData.menu_location]}
@@ -291,14 +291,14 @@ export function PageBuilder() {
         </Card>
 
         <div className="flex justify-end gap-2">
-          <Button variant="flat" onPress={() => navigate(tenantPath('/admin/pages'))}>{t('cancel')}</Button>
+          <Button variant="flat" onPress={() => navigate(tenantPath('/admin/pages'))}>{"Cancel"}</Button>
           <Button
             color="primary"
             startContent={<Save size={16} />}
             onPress={handleSave}
             isLoading={saving}
           >
-            {isEdit ? t('federation.save_changes') : `${t('breadcrumbs.create')} ${t('breadcrumbs.pages')}`}
+            {isEdit ? "Save Changes" : `${"Create"} ${"Pages"}`}
           </Button>
         </div>
       </div>

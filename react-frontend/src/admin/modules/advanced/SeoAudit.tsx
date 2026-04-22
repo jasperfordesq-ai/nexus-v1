@@ -17,7 +17,6 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminTools } from '../../api/adminApi';
 
-import { useTranslation } from 'react-i18next';
 interface AuditCheck {
   name: string;
   description: string;
@@ -32,8 +31,7 @@ const statusColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default
 };
 
 export function SeoAudit() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('advanced.page_title'));
+  usePageTitle("Advanced");
   const toast = useToast();
 
   const [checks, setChecks] = useState<AuditCheck[]>([]);
@@ -89,16 +87,16 @@ export function SeoAudit() {
         const failCount = newChecks.filter(c => c.status === 'fail').length;
 
         const parts: string[] = [];
-        if (passCount > 0) parts.push(t('advanced.passed_count', { count: passCount }));
-        if (warnCount > 0) parts.push(t('advanced.warnings_count', { count: warnCount }));
-        if (failCount > 0) parts.push(t('advanced.failed_count', { count: failCount }));
+        if (passCount > 0) parts.push(`Passed`);
+        if (warnCount > 0) parts.push(`Warnings`);
+        if (failCount > 0) parts.push(`Failed to count`);
 
-        toast.success(t('advanced.seo_audit_complete'), t('advanced.seo_audit_summary', { summary: parts.join(', '), defaultValue: '{{summary}}.' }));
+        toast.success("SEO audit complete", `SEO Audit Summary`);
       } else {
-        toast.error(t('advanced.seo_audit_failed'), t('advanced.seo_audit_no_results'));
+        toast.error("SEO audit failed", "SEO audit returned no results");
       }
     } catch {
-      toast.error(t('advanced.seo_audit_failed'), t('advanced.seo_audit_error'));
+      toast.error("SEO audit failed", "SEO audit error");
     } finally {
       setRunning(false);
     }
@@ -113,8 +111,8 @@ export function SeoAudit() {
     return (
       <div>
         <PageHeader
-          title={t('advanced.seo_audit_title')}
-          description={t('advanced.seo_audit_desc')}
+          title={"SEO Audit"}
+          description={"Run an automated SEO audit to identify issues with your site"}
         />
         <div className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
@@ -126,8 +124,8 @@ export function SeoAudit() {
   return (
     <div>
       <PageHeader
-        title={t('advanced.seo_audit_title')}
-        description={t('advanced.seo_audit_desc')}
+        title={"SEO Audit"}
+        description={"Run an automated SEO audit to identify issues with your site"}
         actions={
           <div className="flex items-center gap-2">
             {hasResults && (
@@ -137,7 +135,7 @@ export function SeoAudit() {
                 onPress={loadAudit}
                 size="sm"
               >
-                {t('advanced.reload_results')}
+                {"Reload Results"}
               </Button>
             )}
             <Button
@@ -146,7 +144,7 @@ export function SeoAudit() {
               onPress={handleRunAudit}
               isLoading={running}
             >
-              {t('advanced.run_audit')}
+              {"Run Audit"}
             </Button>
           </div>
         }
@@ -154,12 +152,12 @@ export function SeoAudit() {
 
       {hasResults && (
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          {passCount > 0 && <Chip color="success" variant="flat">{t('advanced.passed_count', { count: passCount })}</Chip>}
-          {warnCount > 0 && <Chip color="warning" variant="flat">{t('advanced.warnings_count', { count: warnCount })}</Chip>}
-          {failCount > 0 && <Chip color="danger" variant="flat">{t('advanced.failed_count', { count: failCount })}</Chip>}
+          {passCount > 0 && <Chip color="success" variant="flat">{`Passed`}</Chip>}
+          {warnCount > 0 && <Chip color="warning" variant="flat">{`Warnings`}</Chip>}
+          {failCount > 0 && <Chip color="danger" variant="flat">{`Failed to count`}</Chip>}
           {lastRunAt && (
             <span className="text-xs text-default-400 ml-2">
-              {t('advanced.last_run', { time: new Date(lastRunAt).toLocaleString() })}
+              {`Last Run`}
             </span>
           )}
         </div>
@@ -168,15 +166,15 @@ export function SeoAudit() {
       <Card shadow="sm">
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <ClipboardCheck size={20} /> {t('advanced.audit_results')}
+            <ClipboardCheck size={20} /> {"Audit Results"}
           </h3>
         </CardHeader>
         <CardBody>
           {!hasResults ? (
             <div className="flex flex-col items-center py-8 text-default-400">
               <ClipboardCheck size={40} className="mb-2" />
-              <p className="font-medium">{t('advanced.no_audit_results')}</p>
-              <p className="text-sm mt-1">{t('advanced.no_audit_results_desc')}</p>
+              <p className="font-medium">{"No audit results"}</p>
+              <p className="text-sm mt-1">{"Run an audit to see SEO results"}</p>
             </div>
           ) : (
             <div className="space-y-3">

@@ -21,7 +21,6 @@ import {
   Spinner,
 } from '@heroui/react';
 import { Save, ArrowLeft } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminLegalDocs } from '../../api/adminApi';
@@ -29,26 +28,25 @@ import { PageHeader } from '../../components';
 
 
 export function LegalDocForm() {
-  const { t } = useTranslation('admin');
   const { id } = useParams();
   const isEdit = !!id;
 
   const DOC_TYPES = [
-    { value: 'terms', label: t('legal_doc_form.doc_type_terms') },
-    { value: 'privacy', label: t('legal_doc_form.doc_type_privacy') },
-    { value: 'cookies', label: t('legal_doc_form.doc_type_cookies') },
-    { value: 'accessibility', label: t('legal_doc_form.doc_type_accessibility') },
-    { value: 'community_guidelines', label: t('legal_doc_form.doc_type_community_guidelines') },
-    { value: 'acceptable_use', label: t('legal_doc_form.doc_type_acceptable_use') },
+    { value: 'terms', label: "Doc Type Terms" },
+    { value: 'privacy', label: "Doc Type Privacy" },
+    { value: 'cookies', label: "Doc Type Cookies" },
+    { value: 'accessibility', label: "Doc Type Accessibility" },
+    { value: 'community_guidelines', label: "Doc Type Community Guidelines" },
+    { value: 'acceptable_use', label: "Doc Type Acceptable Use" },
   ];
 
   const STATUS_OPTIONS = [
-    { value: 'draft', label: t('legal_doc_form.status_draft') },
-    { value: 'published', label: t('legal_doc_form.status_published') },
-    { value: 'archived', label: t('legal_doc_form.status_archived') },
+    { value: 'draft', label: "Draft" },
+    { value: 'published', label: "Published" },
+    { value: 'archived', label: "Archived" },
   ];
 
-  usePageTitle(isEdit ? t('legal_doc_form.page_title_edit') : t('legal_doc_form.page_title_create'));
+  usePageTitle(isEdit ? "Title Edit" : "Title Create");
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -81,7 +79,7 @@ export function LegalDocForm() {
         setStatus(doc.status || 'draft');
       }
     } catch {
-      toast.error(t('enterprise.failed_to_load_document'));
+      toast.error("Failed to load document");
     } finally {
       setLoading(false);
     }
@@ -93,7 +91,7 @@ export function LegalDocForm() {
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      toast.error(t('enterprise.title_is_required'));
+      toast.error("Title is Required");
       return;
     }
 
@@ -115,14 +113,14 @@ export function LegalDocForm() {
       }
 
       if (res.success) {
-        toast.success(isEdit ? t('enterprise.document_updated') : t('enterprise.document_created'));
+        toast.success(isEdit ? "Document updated" : "Document created");
         navigate(tenantPath('/admin/legal-documents'));
       } else {
-        const error = (res as { error?: string }).error || t('legal_doc_form.save_failed_generic');
+        const error = (res as { error?: string }).error || "Save Failed Generic";
         toast.error(error);
       }
     } catch (err) {
-      toast.error(t('enterprise.failed_to_save_document'));
+      toast.error("Failed to save document");
     } finally {
       setSaving(false);
     }
@@ -139,8 +137,8 @@ export function LegalDocForm() {
   return (
     <div>
       <PageHeader
-        title={isEdit ? t('legal_doc_form.edit_title') : t('legal_doc_form.create_title')}
-        description={isEdit ? t('legal_doc_form.edit_description') : t('legal_doc_form.create_description')}
+        title={isEdit ? "Edit" : "Create"}
+        description={isEdit ? "Edit." : "Create."}
         actions={
           <Button
             variant="flat"
@@ -148,7 +146,7 @@ export function LegalDocForm() {
             onPress={() => navigate(tenantPath('/admin/legal-documents'))}
             size="sm"
           >
-            {t('legal_doc_form.back_to_documents')}
+            {"Back to Documents"}
           </Button>
         }
       />
@@ -157,18 +155,18 @@ export function LegalDocForm() {
         {/* Metadata */}
         <Card shadow="sm">
           <CardBody className="p-4 space-y-4">
-            <h3 className="text-lg font-semibold">{t('shared.document_details')}</h3>
+            <h3 className="text-lg font-semibold">{"Document Details"}</h3>
             <Input
-              label={t('enterprise.label_title')}
+              label={"Title"}
               value={title}
               onValueChange={setTitle}
               variant="bordered"
               isRequired
-              placeholder={t('enterprise.placeholder_title')}
+              placeholder={"Enter title..."}
             />
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <Select
-                label={t('enterprise.label_type')}
+                label={"Type"}
                 selectedKeys={new Set([type])}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0] as string;
@@ -181,14 +179,14 @@ export function LegalDocForm() {
                 ))}
               </Select>
               <Input
-                label={t('enterprise.label_version')}
+                label={"Version"}
                 value={version}
                 onValueChange={setVersion}
                 variant="bordered"
                 placeholder="1.0"
               />
               <Select
-                label={t('enterprise.label_status')}
+                label={"Status"}
                 selectedKeys={new Set([status])}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0] as string;
@@ -207,14 +205,14 @@ export function LegalDocForm() {
         {/* Content */}
         <Card shadow="sm">
           <CardBody className="p-4">
-            <h3 className="text-lg font-semibold mb-3">{t('shared.content')}</h3>
+            <h3 className="text-lg font-semibold mb-3">{"Content"}</h3>
             <Textarea
-              label={t('enterprise.label_document_content')}
+              label={"Document Content"}
               value={content}
               onValueChange={setContent}
               variant="bordered"
               minRows={12}
-              placeholder={t('enterprise.placeholder_document_content')}
+              placeholder={"Enter document content..."}
             />
           </CardBody>
         </Card>
@@ -225,7 +223,7 @@ export function LegalDocForm() {
             variant="flat"
             onPress={() => navigate(tenantPath('/admin/legal-documents'))}
           >
-            {t('legal_doc_form.cancel')}
+            {"Cancel"}
           </Button>
           <Button
             color="primary"
@@ -233,7 +231,7 @@ export function LegalDocForm() {
             onPress={handleSubmit}
             isLoading={saving}
           >
-            {isEdit ? t('legal_doc_form.update_document') : t('legal_doc_form.create_document')}
+            {isEdit ? "Update Document" : "Create Document"}
           </Button>
         </div>
       </div>

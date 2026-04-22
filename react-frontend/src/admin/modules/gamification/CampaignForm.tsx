@@ -87,7 +87,7 @@ export function CampaignForm() {
   const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
-  usePageTitle(isEdit ? t('gamification.edit_campaign_title') : t('gamification.create_campaign_title'));
+  usePageTitle(isEdit ? "Edit Campaign" : "Create Campaign");
   const toast = useToast();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
@@ -135,7 +135,7 @@ export function CampaignForm() {
           schedule: '',
         });
       } else {
-        toast.error(t('gamification.campaign_not_found'));
+        toast.error("Campaign not Found");
         navigate(tenantPath('/admin/gamification/campaigns'));
       }
     }
@@ -174,7 +174,7 @@ export function CampaignForm() {
     setFieldErrors({});
 
     if (!formData.name.trim()) {
-      setFieldErrors({ name: t('gamification.campaign_name_required') });
+      setFieldErrors({ name: "Campaign name is required" });
       return;
     }
 
@@ -194,21 +194,21 @@ export function CampaignForm() {
     if (isEdit) {
       const res = await adminGamification.updateCampaign(Number(id), payload);
       if (res.success) {
-        toast.success(t('gamification.campaign_updated'));
+        toast.success("Campaign Updated");
         navigate(tenantPath('/admin/gamification/campaigns'));
       } else {
         const resAny = res as { error?: string; errors?: Record<string, string | string[]> | Array<{ message: string }> };
-        const genericMsg = applyApiErrors(resAny.errors) ?? resAny.error ?? t('gamification.failed_to_update_campaign');
+        const genericMsg = applyApiErrors(resAny.errors) ?? resAny.error ?? "Failed to update campaign";
         if (genericMsg) toast.error(genericMsg);
       }
     } else {
       const res = await adminGamification.createCampaign(payload);
       if (res.success) {
-        toast.success(t('gamification.campaign_created'));
+        toast.success("Campaign Created");
         navigate(tenantPath('/admin/gamification/campaigns'));
       } else {
         const resAny = res as { error?: string; errors?: Record<string, string | string[]> | Array<{ message: string }> };
-        const genericMsg = applyApiErrors(resAny.errors) ?? resAny.error ?? t('gamification.failed_to_create_campaign');
+        const genericMsg = applyApiErrors(resAny.errors) ?? resAny.error ?? "Failed to create campaign";
         if (genericMsg) toast.error(genericMsg);
       }
     }
@@ -227,12 +227,12 @@ export function CampaignForm() {
   return (
     <div>
       <PageHeader
-        title={isEdit ? t('gamification.edit_campaign') : t('gamification.create_campaign')}
-        description={isEdit ? t('gamification.edit_campaign_desc') : t('gamification.create_campaign_desc')}
+        title={isEdit ? "Edit Campaign" : "Create Campaign"}
+        description={isEdit ? "Update the settings and triggers for this badge campaign" : "Create a badge campaign to automatically award badges based on triggers"}
         actions={
           <Link to={tenantPath("/admin/gamification/campaigns")}>
             <Button variant="flat" startContent={<ArrowLeft size={16} />}>
-              {t('gamification.back_to_campaigns')}
+              {"Back to Campaigns"}
             </Button>
           </Link>
         }
@@ -240,12 +240,12 @@ export function CampaignForm() {
 
       <Card shadow="sm" className="max-w-2xl">
         <CardHeader className="pb-0">
-          <h3 className="text-lg font-semibold text-foreground">{t('gamification.campaign_details')}</h3>
+          <h3 className="text-lg font-semibold text-foreground">{"Campaign Details"}</h3>
         </CardHeader>
         <CardBody className="gap-4">
           <Input
-            label={t('gamification.label_name')}
-            placeholder={t('gamification.placeholder_campaign_name')}
+            label={"Name"}
+            placeholder={"Campaign Name..."}
             value={formData.name}
             onValueChange={(v) => { updateField('name', v); setFieldErrors((prev) => ({ ...prev, name: '' })); }}
             isRequired
@@ -256,8 +256,8 @@ export function CampaignForm() {
           />
 
           <Textarea
-            label={t('gamification.label_description')}
-            placeholder={t('gamification.placeholder_campaign_desc')}
+            label={"Description"}
+            placeholder={"Describe what this campaign is about..."}
             value={formData.description}
             onValueChange={(v) => updateField('description', v)}
             variant="bordered"
@@ -268,7 +268,7 @@ export function CampaignForm() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Select
-              label={t('gamification.label_status')}
+              label={"Status"}
               selectedKeys={new Set([formData.status])}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
@@ -282,7 +282,7 @@ export function CampaignForm() {
             </Select>
 
             <Select
-              label={t('gamification.label_campaign_type')}
+              label={"Campaign Type"}
               selectedKeys={new Set([formData.type])}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
@@ -297,7 +297,7 @@ export function CampaignForm() {
           </div>
 
           <Select
-            label={t('gamification.label_badge_to_award')}
+            label={"Badge to Award"}
             selectedKeys={formData.badge_key ? new Set([formData.badge_key]) : new Set()}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0] as string;
@@ -305,7 +305,7 @@ export function CampaignForm() {
             }}
             variant="bordered"
             isLoading={loadingBadges}
-            placeholder={t('gamification.placeholder_select_badge')}
+            placeholder={"Select Badge..."}
           >
             {badges.map((badge) => (
               <SelectItem key={badge.key} textValue={badge.name}>
@@ -318,19 +318,19 @@ export function CampaignForm() {
           </Select>
 
           <Input
-            label={t('gamification.label_xp_amount')}
+            label={"XP Amount"}
             type="number"
             placeholder="0"
             value={formData.xp_amount}
             onValueChange={(v) => updateField('xp_amount', v)}
             variant="bordered"
-            description={t('gamification.desc_bonus_xp')}
+            description={"Bonus XP"}
             isInvalid={!!fieldErrors.xp_amount}
             errorMessage={fieldErrors.xp_amount}
           />
 
           <Select
-            label={t('gamification.label_target_audience')}
+            label={"Target Audience"}
             selectedKeys={new Set([formData.target_audience])}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0] as string;
@@ -345,24 +345,24 @@ export function CampaignForm() {
 
           {formData.type === 'recurring' && (
             <Select
-              label={t('gamification.label_schedule')}
+              label={"Schedule"}
               selectedKeys={formData.schedule ? new Set([formData.schedule]) : new Set()}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
                 updateField('schedule', selected || '');
               }}
               variant="bordered"
-              placeholder={t('gamification.placeholder_select_frequency')}
+              placeholder={"Select Frequency..."}
             >
-              <SelectItem key="daily">{t('gamification.schedule_daily')}</SelectItem>
-              <SelectItem key="weekly">{t('gamification.schedule_weekly')}</SelectItem>
-              <SelectItem key="monthly">{t('gamification.schedule_monthly')}</SelectItem>
+              <SelectItem key="daily">{"Schedule Daily"}</SelectItem>
+              <SelectItem key="weekly">{"Schedule Weekly"}</SelectItem>
+              <SelectItem key="monthly">{"Schedule Monthly"}</SelectItem>
             </Select>
           )}
 
           <div className="flex justify-end gap-2 pt-2">
             <Link to={tenantPath("/admin/gamification/campaigns")}>
-              <Button variant="flat" isDisabled={saving}>{t('gamification.cancel')}</Button>
+              <Button variant="flat" isDisabled={saving}>{"Cancel"}</Button>
             </Link>
             <Button
               color="primary"
@@ -370,7 +370,7 @@ export function CampaignForm() {
               onPress={handleSave}
               isLoading={saving}
             >
-              {isEdit ? t('gamification.save_changes') : t('gamification.create_campaign')}
+              {isEdit ? "Save Changes" : "Create Campaign"}
             </Button>
           </div>
         </CardBody>

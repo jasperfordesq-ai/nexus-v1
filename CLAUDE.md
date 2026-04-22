@@ -194,19 +194,23 @@ The Laravel migration has been **merged to `main`** (2026-03-19) and is live in 
 
 ### 🔴 NO HARDCODED STRINGS — ALL USER-FACING TEXT MUST USE TRANSLATIONS (CRITICAL)
 
-**NEVER write hardcoded English strings in email templates, admin UI, or any user-facing output.** This has regressed repeatedly — every new feature ships with inline English, making the platform untranslatable.
+**NEVER write hardcoded English strings in email templates or end-user React frontend output.** This has regressed repeatedly — every new feature ships with inline English, making the platform untranslatable.
 
 **Rules:**
 - **PHP emails/services:** Every user-facing string MUST use `__('emails.section.key')` with keys in `lang/en/emails.json`
-- **React admin:** Every label MUST use `t('key')` with keys in the appropriate `public/locales/en/*.json` namespace
-- **React frontend:** Every label MUST use `t('key')` with keys in the appropriate namespace
+- **React frontend (end-user UI):** Every label MUST use `t('key')` with keys in the appropriate namespace — applies to everything under `react-frontend/src/pages/`, `src/components/`, etc.
 - **When adding a new email:** Add ALL translation keys to `lang/en/emails.json` FIRST, then reference them with `__()`
-- **When adding admin UI:** Add translation keys to the correct JSON file FIRST, then reference with `t()`
-- **Admin sidebar keys** use TOP-LEVEL keys in `admin_nav.json` — NEVER prefix with `sidebar.` (see comment in `AdminSidebar.tsx`)
 
-**What counts as hardcoded:** Subject lines, greetings ("Hi {name},"), button text ("View Profile"), footer text ("All rights reserved"), info card labels ("From", "Amount"), body paragraphs, notice text. ALL of these must be translated.
+**🔴 EXEMPTION: Admin panel is English-only — DO NOT translate it.**
+- `react-frontend/src/admin/` (including `/admin/*` and `/super-admin/*` routes) is **English-only by design**
+- **DO NOT add `t()` calls** to admin code. Plain English JSX is CORRECT there.
+- **DO NOT audit admin for hardcoded strings.** The tooling has been configured to skip `src/admin/`.
+- This was the root cause of months of recurring bugs — see `memory/feedback_admin_english_only.md`
+- If you see existing `t()` calls in admin, leave them alone unless the user asks to strip them; do not propagate the pattern to new admin code
 
-**CI enforcement:** `scripts/check-i18n.sh` runs in pre-push and CI to catch common violations.
+**What counts as hardcoded (non-admin code only):** Subject lines, greetings ("Hi {name},"), button text ("View Profile"), footer text ("All rights reserved"), info card labels, body paragraphs, notice text. All of these must be translated in emails and non-admin React.
+
+**CI enforcement:** `scripts/check-i18n.sh` runs in pre-push and CI — now configured to skip admin automatically.
 
 ---
 

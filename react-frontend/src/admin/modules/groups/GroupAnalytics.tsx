@@ -17,10 +17,8 @@ import { adminGroups } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 import type { GroupAnalyticsData } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 export function GroupAnalytics() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('groups.page_title'));
+  usePageTitle("Groups");
   const toast = useToast();
 
   const [data, setData] = useState<GroupAnalyticsData | null>(null);
@@ -35,7 +33,7 @@ export function GroupAnalytics() {
           setData(res.data as GroupAnalyticsData);
         }
       } catch {
-        toast.error(t('groups.failed_to_load_group_analytics'));
+        toast.error("Failed to load group analytics");
       } finally {
         setLoading(false);
       }
@@ -46,7 +44,7 @@ export function GroupAnalytics() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={t('groups.group_analytics_title')} description={t('groups.group_analytics_desc')} />
+        <PageHeader title={"Group Analytics"} description={"View analytics for group activity, members, and engagement"} />
         <div className="flex items-center justify-center py-20">
           <Spinner size="lg" />
         </div>
@@ -57,10 +55,10 @@ export function GroupAnalytics() {
   if (!data) {
     return (
       <div>
-        <PageHeader title={t('groups.group_analytics_title')} description={t('groups.group_analytics_desc')} />
+        <PageHeader title={"Group Analytics"} description={"View analytics for group activity, members, and engagement"} />
         <Card>
           <CardBody className="py-10 text-center text-default-500">
-            {t('groups.no_analytics_data')}
+            {"No analytics data"}
           </CardBody>
         </Card>
       </div>
@@ -69,30 +67,30 @@ export function GroupAnalytics() {
 
   return (
     <div>
-      <PageHeader title={t('groups.group_analytics_title')} description={t('groups.group_analytics_desc')} />
+      <PageHeader title={"Group Analytics"} description={"View analytics for group activity, members, and engagement"} />
 
       {/* Stat cards grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
-          label={t('groups.label_total_groups')}
+          label={"Total Groups"}
           value={data.total_groups}
           icon={Users}
           color="primary"
         />
         <StatCard
-          label={t('groups.label_total_members')}
+          label={"Total Members"}
           value={data.total_members}
           icon={UserCheck}
           color="success"
         />
         <StatCard
-          label={t('groups.label_avg_members_group')}
+          label={"Avg Members per Group"}
           value={data.avg_members_per_group}
           icon={BarChart3}
           color="secondary"
         />
         <StatCard
-          label={t('groups.label_active_groups')}
+          label={"Active Groups"}
           value={data.active_groups}
           icon={ShieldCheck}
           color="warning"
@@ -105,7 +103,7 @@ export function GroupAnalytics() {
           <CardBody className="flex flex-row items-center gap-3 py-3">
             <Clock size={20} className="text-warning shrink-0" />
             <p className="text-sm text-foreground">
-              {t('groups.pending_approvals_message', { count: data.pending_approvals })}
+              {`You have pending membership requests awaiting your review`}
             </p>
           </CardBody>
         </Card>
@@ -114,11 +112,11 @@ export function GroupAnalytics() {
       {/* Most active groups */}
       <Card>
         <CardHeader className="pb-2">
-          <h3 className="text-lg font-semibold text-foreground">{t('groups.most_active_groups')}</h3>
+          <h3 className="text-lg font-semibold text-foreground">{"Most Active Groups"}</h3>
         </CardHeader>
         <CardBody>
           {data.most_active_groups.length === 0 ? (
-            <p className="text-sm text-default-500 py-4 text-center">{t('groups.no_groups_found')}</p>
+            <p className="text-sm text-default-500 py-4 text-center">{"No groups found"}</p>
           ) : (
             <div className="divide-y divide-default-100">
               {data.most_active_groups.map((group, index) => (
@@ -131,7 +129,7 @@ export function GroupAnalytics() {
                   </div>
                   <div className="flex items-center gap-1.5 text-sm text-default-500">
                     <Users size={14} />
-                    <span>{t('groups.member_count', { count: group.member_count })}</span>
+                    <span>{`Member`}</span>
                   </div>
                 </div>
               ))}

@@ -29,10 +29,8 @@ import { adminBroker } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { BrokerArchiveDetail as BrokerArchiveDetailType } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 export function ArchiveDetail() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('broker.page_title'));
+  usePageTitle("Broker Controls");
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();
   const [data, setData] = useState<BrokerArchiveDetailType | null>(null);
@@ -46,10 +44,10 @@ export function ArchiveDetail() {
       if (res.success && res.data) {
         setData(res.data);
       } else {
-        setError(t('broker.archive_record_not_found'));
+        setError("Archive Record Not Found");
       }
     } catch {
-      setError(t('broker.failed_to_load_archive_record'));
+      setError("Failed to load archive record");
     } finally {
       setLoading(false);
     }
@@ -71,7 +69,7 @@ export function ArchiveDetail() {
   if (error || !data) {
     return (
       <div className="text-center py-12">
-        <p className="text-danger">{error || t('broker.archive_record_not_found')}</p>
+        <p className="text-danger">{error || "Archive Record Not Found"}</p>
         <Button
           as={Link}
           to={tenantPath('/admin/broker-controls/archives')}
@@ -79,7 +77,7 @@ export function ArchiveDetail() {
           className="mt-4"
           startContent={<ArrowLeft size={16} />}
         >
-          {t('broker.back_to_archives')}
+          {"Back to Archives"}
         </Button>
       </div>
     );
@@ -90,7 +88,7 @@ export function ArchiveDetail() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t('broker.archive_detail_title')}
+        title={"Archive Detail"}
         actions={
           <Button
             as={Link}
@@ -99,7 +97,7 @@ export function ArchiveDetail() {
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
-            {t('common.back')}
+            {"Back"}
           </Button>
         }
       />
@@ -111,7 +109,7 @@ export function ArchiveDetail() {
         size="lg"
         startContent={<Lock size={14} />}
       >
-        {t('broker.read_only_compliance_record')}
+        {"Read Only Compliance Record"}
       </Chip>
 
       {/* Decision Card */}
@@ -122,13 +120,13 @@ export function ArchiveDetail() {
           ) : (
             <Flag size={18} className="text-danger" />
           )}
-          <span className="font-semibold">{t('broker.decision')}</span>
+          <span className="font-semibold">{"Decision"}</span>
         </CardHeader>
         <Divider />
         <CardBody className="space-y-3">
           <div className="flex flex-wrap items-center gap-4">
             <div>
-              <p className="text-xs text-default-400">{t('broker.decision')}</p>
+              <p className="text-xs text-default-400">{"Decision"}</p>
               <Chip
                 size="sm"
                 variant="flat"
@@ -139,11 +137,11 @@ export function ArchiveDetail() {
               </Chip>
             </div>
             <div>
-              <p className="text-xs text-default-400">{t('broker.decided_by')}</p>
+              <p className="text-xs text-default-400">{"Decided by"}</p>
               <p className="text-sm font-medium mt-1">{data.decided_by_name}</p>
             </div>
             <div>
-              <p className="text-xs text-default-400">{t('broker.date')}</p>
+              <p className="text-xs text-default-400">{"Date"}</p>
               <p className="text-sm mt-1">
                 {new Date(data.decided_at).toLocaleString()}
               </p>
@@ -152,14 +150,14 @@ export function ArchiveDetail() {
 
           {data.decision_notes && (
             <div>
-              <p className="text-xs text-default-400">{t('broker.decision_notes')}</p>
+              <p className="text-xs text-default-400">{"Decision Notes"}</p>
               <p className="text-sm mt-1">{data.decision_notes}</p>
             </div>
           )}
 
           {data.flag_reason && (
             <div className="rounded-lg bg-danger-50 p-3">
-              <p className="text-xs text-danger font-medium">{t('broker.flag_reason')}</p>
+              <p className="text-xs text-danger font-medium">{"Flag Reason"}</p>
               <p className="text-sm mt-1">{data.flag_reason}</p>
               {data.flag_severity && (
                 <Chip
@@ -168,7 +166,7 @@ export function ArchiveDetail() {
                   color="danger"
                   className="capitalize mt-2"
                 >
-                  {t('broker.severity_label', { severity: data.flag_severity })}
+                  {`Severity`}
                 </Chip>
               )}
             </div>
@@ -180,7 +178,7 @@ export function ArchiveDetail() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
           <Mail size={18} />
-          <span className="font-semibold">{t('broker.target_message')}</span>
+          <span className="font-semibold">{"Target"}</span>
         </CardHeader>
         <Divider />
         <CardBody className="space-y-3">
@@ -188,14 +186,14 @@ export function ArchiveDetail() {
             <div className="flex items-center gap-2">
               <User size={14} className="text-default-400" />
               <div>
-                <p className="text-xs text-default-400">{t('broker.sender')}</p>
+                <p className="text-xs text-default-400">{"Sender"}</p>
                 <p className="text-sm font-medium">{data.sender_name}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <User size={14} className="text-default-400" />
               <div>
-                <p className="text-xs text-default-400">{t('broker.receiver')}</p>
+                <p className="text-xs text-default-400">{"Receiver"}</p>
                 <p className="text-sm font-medium">{data.receiver_name}</p>
               </div>
             </div>
@@ -204,26 +202,26 @@ export function ArchiveDetail() {
           <Divider />
 
           <div>
-            <p className="text-xs text-default-400">{t('broker.message_body')}</p>
+            <p className="text-xs text-default-400">{"Body"}</p>
             <p className="text-sm mt-1 whitespace-pre-wrap">{data.target_message_body}</p>
           </div>
 
           <div className="flex flex-wrap gap-4">
             <div>
-              <p className="text-xs text-default-400">{t('broker.copy_reason')}</p>
+              <p className="text-xs text-default-400">{"Copy Reason"}</p>
               <Chip size="sm" variant="flat" color="default" className="capitalize mt-1">
                 {data.copy_reason.replace(/_/g, ' ')}
               </Chip>
             </div>
             <div>
-              <p className="text-xs text-default-400">{t('broker.sent_at')}</p>
+              <p className="text-xs text-default-400">{"Sent at"}</p>
               <p className="text-sm mt-1">
                 {new Date(data.target_message_sent_at).toLocaleString()}
               </p>
             </div>
             {data.listing_title && (
               <div>
-                <p className="text-xs text-default-400">{t('broker.listing')}</p>
+                <p className="text-xs text-default-400">{"Listing"}</p>
                 <p className="text-sm mt-1">{data.listing_title}</p>
               </div>
             )}
@@ -235,15 +233,15 @@ export function ArchiveDetail() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
           <MessageSquare size={18} />
-          <span className="font-semibold">{t('broker.conversation_snapshot')}</span>
+          <span className="font-semibold">{"Conversation Snapshot"}</span>
           <Chip size="sm" variant="flat" color="default" className="ml-auto">
-            {t('broker.messages_count', { count: data.conversation_snapshot.length })}
+            {`Messages Count`}
           </Chip>
         </CardHeader>
         <Divider />
         <CardBody>
           {data.conversation_snapshot.length === 0 ? (
-            <p className="text-sm text-default-500">{t('broker.no_conversation_snapshot')}</p>
+            <p className="text-sm text-default-500">{"No conversation snapshot found"}</p>
           ) : (
             <ScrollShadow className="max-h-[500px]">
               <div className="space-y-0">
@@ -261,13 +259,13 @@ export function ArchiveDetail() {
                       </div>
                       <p className="text-sm text-default-600 whitespace-pre-wrap">
                         {msg.is_deleted ? (
-                          <span className="italic text-default-400">{t('broker.message_deleted')}</span>
+                          <span className="italic text-default-400">{"Deleted"}</span>
                         ) : (
                           msg.body
                         )}
                       </p>
                       {msg.is_edited && (
-                        <span className="text-xs text-default-400 italic">{t('broker.edited')}</span>
+                        <span className="text-xs text-default-400 italic">{"Edited"}</span>
                       )}
                     </div>
                   </div>

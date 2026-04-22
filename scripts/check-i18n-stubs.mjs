@@ -72,6 +72,12 @@ function isStub(flatKey, value) {
   return valNormalized === keyAsWords;
 }
 
+// Admin locale files are excluded — admin panel is English-only by design.
+// See memory/feedback_admin_english_only.md (2026-04-22).
+const ADMIN_LOCALE_FILES = new Set([
+  'admin.json', 'admin_nav.json', 'admin_dashboard.json', 'super_admin.json',
+]);
+
 function collectStubs() {
   const stubs = [];
   const langs = fs.readdirSync(LOCALES_DIR).filter((d) => {
@@ -80,7 +86,9 @@ function collectStubs() {
 
   for (const lang of langs) {
     const langDir = path.join(LOCALES_DIR, lang);
-    const files = fs.readdirSync(langDir).filter((f) => f.endsWith('.json'));
+    const files = fs.readdirSync(langDir).filter(
+      (f) => f.endsWith('.json') && !ADMIN_LOCALE_FILES.has(f),
+    );
     for (const file of files) {
       const data = JSON.parse(fs.readFileSync(path.join(langDir, file), 'utf8'));
       const flat = flattenKeys(data);

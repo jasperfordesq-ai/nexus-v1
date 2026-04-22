@@ -111,7 +111,7 @@ function formatTimestamp(ts: string): string {
 
 export function VolunteeringOverview() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('volunteering.page_title'));
+  usePageTitle("Volunteering");
   const toast = useToast();
   const navigate = useNavigate();
   const [stats, setStats] = useState<VolStats | null>(null);
@@ -143,7 +143,7 @@ export function VolunteeringOverview() {
         setOpportunities(d.recent_opportunities || []);
       }
     } catch {
-      toast.error(t('volunteering.failed_to_load_volunteering_data'));
+      toast.error("Failed to load volunteering data");
       setStats(null);
       setOpportunities([]);
     }
@@ -203,10 +203,10 @@ export function VolunteeringOverview() {
   })) : [];
 
   const quickActions: QuickAction[] = [
-    { label: t('volunteering.review_applications'), description: t('volunteering.review_applications_desc'), icon: ClipboardCheck, path: '/admin/volunteering/approvals', color: 'warning' },
-    { label: t('volunteering.verify_hours'), description: t('volunteering.verify_hours_desc'), icon: Clock, path: '/admin/volunteering/hours', color: 'success' },
-    { label: t('volunteering.manage_organizations'), description: t('volunteering.manage_organizations_desc'), icon: Building2, path: '/admin/volunteering/organizations', color: 'secondary' },
-    { label: t('volunteering.view_expenses'), description: t('volunteering.view_expenses_desc'), icon: DollarSign, path: '/admin/volunteering/expenses', color: 'primary' },
+    { label: "Review Applications", description: "Review Applications.", icon: ClipboardCheck, path: '/admin/volunteering/approvals', color: 'warning' },
+    { label: "Verify Hours", description: "Verify Hours.", icon: Clock, path: '/admin/volunteering/hours', color: 'success' },
+    { label: "Manage Organizations", description: "Manage Organizations.", icon: Building2, path: '/admin/volunteering/organizations', color: 'secondary' },
+    { label: "View Expenses", description: "View Expenses.", icon: DollarSign, path: '/admin/volunteering/expenses', color: 'primary' },
   ];
 
   // Build alert banners for urgent items
@@ -224,9 +224,9 @@ export function VolunteeringOverview() {
   return (
     <div>
       <PageHeader
-        title={t('volunteering.volunteering_overview_title')}
-        description={t('volunteering.volunteering_overview_desc')}
-        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={handleRefresh} isLoading={loading}>{t('common.refresh')}</Button>}
+        title={"Volunteering Overview"}
+        description={"Overview of volunteering activity, organisations, and applications"}
+        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={handleRefresh} isLoading={loading}>{"Refresh"}</Button>}
       />
 
       {/* Alert Banners */}
@@ -250,33 +250,33 @@ export function VolunteeringOverview() {
       )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-6">
-        <StatCard label={t('volunteering.label_active_opportunities')} value={stats?.active_opportunities ?? 0} icon={Briefcase} color="primary" loading={loading} />
-        <StatCard label={t('volunteering.label_pending_applications')} value={stats?.pending_applications ?? 0} icon={Users} color="warning" loading={loading} />
-        <StatCard label={t('volunteering.label_total_hours_logged')} value={stats?.total_hours_logged ?? 0} icon={Clock} color="success" loading={loading} />
+        <StatCard label={"Active Opportunities"} value={stats?.active_opportunities ?? 0} icon={Briefcase} color="primary" loading={loading} />
+        <StatCard label={"Pending Applications"} value={stats?.pending_applications ?? 0} icon={Users} color="warning" loading={loading} />
+        <StatCard label={"Total Hours Logged"} value={stats?.total_hours_logged ?? 0} icon={Clock} color="success" loading={loading} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-6">
-        <StatCard label={t('volunteering.label_total_opportunities')} value={stats?.total_opportunities ?? 0} icon={Heart} color="secondary" loading={loading} />
-        <StatCard label={t('volunteering.label_total_applications')} value={stats?.total_applications ?? 0} icon={Users} color="primary" loading={loading} />
-        <StatCard label={t('volunteering.label_active_volunteers')} value={stats?.active_volunteers ?? 0} icon={Users} color="success" loading={loading} />
+        <StatCard label={"Total Opportunities"} value={stats?.total_opportunities ?? 0} icon={Heart} color="secondary" loading={loading} />
+        <StatCard label={"Total Applications"} value={stats?.total_applications ?? 0} icon={Users} color="primary" loading={loading} />
+        <StatCard label={"Active Volunteers"} value={stats?.active_volunteers ?? 0} icon={Users} color="success" loading={loading} />
       </div>
 
       {/* Trends Chart */}
       <Card shadow="sm" className="mb-6">
         <CardHeader className="flex flex-row items-center justify-between">
-          <h3 className="text-lg font-semibold">{t('volunteering.trends_title')}</h3>
+          <h3 className="text-lg font-semibold">{"Trends"}</h3>
           <ButtonGroup size="sm" variant="flat">
             <Button
               color={trendPeriod === 'week' ? 'primary' : 'default'}
               onPress={() => setTrendPeriod('week')}
             >
-              {t('volunteering.weekly')}
+              {"Weekly"}
             </Button>
             <Button
               color={trendPeriod === 'month' ? 'primary' : 'default'}
               onPress={() => setTrendPeriod('month')}
             >
-              {t('volunteering.monthly')}
+              {"Monthly"}
             </Button>
           </ButtonGroup>
         </CardHeader>
@@ -288,7 +288,7 @@ export function VolunteeringOverview() {
           ) : chartData.length === 0 ? (
             <div className="flex flex-col items-center py-8 text-default-400">
               <Activity size={40} className="mb-2" />
-              <p>{t('volunteering.no_trend_data')}</p>
+              <p>{"No trend data found"}</p>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
@@ -321,7 +321,7 @@ export function VolunteeringOverview() {
                 <Area
                   type="monotone"
                   dataKey="hours"
-                  name={t('volunteering.chart_hours')}
+                  name={"Chart Hours"}
                   stroke="var(--chart-color-success, #22c55e)"
                   fill="url(#gradHours)"
                   strokeWidth={2}
@@ -329,7 +329,7 @@ export function VolunteeringOverview() {
                 <Area
                   type="monotone"
                   dataKey="applications"
-                  name={t('volunteering.chart_applications')}
+                  name={"Chart Applications"}
                   stroke="var(--chart-color-info, #3b82f6)"
                   fill="url(#gradApplications)"
                   strokeWidth={2}
@@ -337,7 +337,7 @@ export function VolunteeringOverview() {
                 <Area
                   type="monotone"
                   dataKey="volunteers"
-                  name={t('volunteering.chart_volunteers')}
+                  name={"Chart Volunteers"}
                   stroke="var(--chart-color-accent, #a855f7)"
                   fill="url(#gradVolunteers)"
                   strokeWidth={2}
@@ -384,12 +384,12 @@ export function VolunteeringOverview() {
 
       {/* Recent Opportunities */}
       <Card shadow="sm" className="mb-6">
-        <CardHeader><h3 className="text-lg font-semibold">{t('volunteering.recent_opportunities')}</h3></CardHeader>
+        <CardHeader><h3 className="text-lg font-semibold">{"Recent Opportunities"}</h3></CardHeader>
         <CardBody>
           {opportunities.length === 0 ? (
             <div className="flex flex-col items-center py-8 text-default-400">
               <Heart size={40} className="mb-2" />
-              <p>{t('volunteering.no_opportunities_yet')}</p>
+              <p>{"No opportunities yet"}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -397,7 +397,7 @@ export function VolunteeringOverview() {
                 <div key={opp.id} className="flex items-center justify-between rounded-lg border border-default-200 p-3">
                   <div>
                     <p className="font-medium">{opp.title}</p>
-                      <p className="text-xs text-default-400">{t('volunteering.by_name', { name: `${opp.first_name} ${opp.last_name}`.trim() })}</p>
+                      <p className="text-xs text-default-400">{`By Name`}</p>
                   </div>
                   <Chip size="sm" variant="flat" color={['active', 'open'].includes(opp.status) ? 'success' : 'default'} className="capitalize">{opp.status}</Chip>
                 </div>
@@ -409,7 +409,7 @@ export function VolunteeringOverview() {
 
       {/* Activity Feed */}
       <Card shadow="sm">
-        <CardHeader><h3 className="text-lg font-semibold">{t('volunteering.activity_feed')}</h3></CardHeader>
+        <CardHeader><h3 className="text-lg font-semibold">{"Activity Feed"}</h3></CardHeader>
         <CardBody>
           {activitiesLoading ? (
             <div className="space-y-4">
@@ -426,7 +426,7 @@ export function VolunteeringOverview() {
           ) : activities.length === 0 ? (
             <div className="flex flex-col items-center py-8 text-default-400">
               <Clock size={40} className="mb-2" />
-              <p>{t('volunteering.no_recent_activity')}</p>
+              <p>{"No recent activity found"}</p>
             </div>
           ) : (
             <div className="space-y-4">

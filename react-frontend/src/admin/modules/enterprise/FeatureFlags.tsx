@@ -83,7 +83,7 @@ function formatKey(key: string): string {
 
 export function FeatureFlags() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('enterprise.page_title'));
+  usePageTitle("Enterprise");
   const toast = useToast();
 
   const [data, setData] = useState<FeatureFlagsType | null>(null);
@@ -102,7 +102,7 @@ export function FeatureFlags() {
         setData(res.data as unknown as FeatureFlagsType);
       }
     } catch {
-      toast.error(t('enterprise.failed_to_load_feature_flags'));
+      toast.error("Failed to load feature flags");
     } finally {
       setLoading(false);
     }
@@ -132,7 +132,7 @@ export function FeatureFlags() {
       // could be spoofed; the backend always derives scope from the authenticated user.
       const res = await adminEnterprise.updateFeatureFlag({ key, value, type });
       if (res.success) {
-        toast.success(t('enterprise.feature_flag_toggled', { name: formatKey(key), status: value ? t('enterprise.enabled') : t('enterprise.disabled') }));
+        toast.success(`Feature Flag Toggled`);
       } else {
         // Revert on failure
         setData((prev) => {
@@ -143,7 +143,7 @@ export function FeatureFlags() {
             [section]: { ...prev[section], [key]: !value },
           };
         });
-        toast.error(t('enterprise.failed_to_update_feature_flag', { name: formatKey(key) }));
+        toast.error(`Failed to update feature flag`);
       }
     } catch {
       // Revert on error
@@ -155,7 +155,7 @@ export function FeatureFlags() {
           [section]: { ...prev[section], [key]: !value },
         };
       });
-      toast.error(t('enterprise.failed_to_update_feature_flag', { name: formatKey(key) }));
+      toast.error(`Failed to update feature flag`);
     } finally {
       setTogglingKeys((prev) => {
         const next = new Set(prev);
@@ -222,7 +222,7 @@ export function FeatureFlags() {
                       <p className="mt-0.5 text-xs text-default-400">{description}</p>
                     )}
                     {isCritical && (
-                      <p className="mt-0.5 text-xs font-medium text-warning">{t('shared.core_module')}</p>
+                      <p className="mt-0.5 text-xs font-medium text-warning">{"Core Module"}</p>
                     )}
                   </div>
                   <Switch
@@ -244,8 +244,8 @@ export function FeatureFlags() {
   return (
     <div>
       <PageHeader
-        title={t('enterprise.feature_flags_page_title')}
-        description={t('enterprise.feature_flags_page_desc')}
+        title={"Feature Flags Page"}
+        description={"Feature Flags Page."}
         actions={
           <Button
             variant="flat"
@@ -254,7 +254,7 @@ export function FeatureFlags() {
             isLoading={loading}
             size="sm"
           >
-            {t('common.refresh')}
+            {"Refresh"}
           </Button>
         }
       />
@@ -291,7 +291,7 @@ export function FeatureFlags() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <AlertTriangle size={20} className="text-warning" />
-                <span>{t('enterprise.disable_feature_title', { feature: confirmModal ? formatKey(confirmModal.key) : '' })}</span>
+                <span>{`Disable Feature`}</span>
               </ModalHeader>
               <ModalBody>
                 <p className="text-sm text-default-600">
@@ -304,7 +304,7 @@ export function FeatureFlags() {
                 </p>
                 <div className="mt-2 rounded-lg border border-warning/30 bg-warning/10 p-3">
                   <p className="text-xs font-medium text-warning">
-                    {t('enterprise.core_module_warning', { feature: confirmModal ? formatKey(confirmModal.key) : '' })}
+                    {`Core Module Warning`}
                   </p>
                 </div>
               </ModalBody>

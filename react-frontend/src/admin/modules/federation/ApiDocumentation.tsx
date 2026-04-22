@@ -275,8 +275,8 @@ function AuthenticationTab() {
         <CardHeader className="flex items-center gap-2">
           <Shield size={20} className="text-primary" />
           <div>
-            <h3 className="text-lg font-semibold">{t('federation.api_doc_api_key_auth')}</h3>
-            <p className="text-sm text-default-500">{t('federation.api_doc_api_key_desc')}</p>
+            <h3 className="text-lg font-semibold">{"API Doc API Key Auth"}</h3>
+            <p className="text-sm text-default-500">{"API Doc API Key."}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
@@ -300,8 +300,8 @@ Content-Type: application/json
         <CardHeader className="flex items-center gap-2">
           <Shield size={20} className="text-warning" />
           <div>
-            <h3 className="text-lg font-semibold">{t('federation.api_doc_hmac_auth')}</h3>
-            <p className="text-sm text-default-500">{t('federation.api_doc_hmac_desc')}</p>
+            <h3 className="text-lg font-semibold">{"API Doc Hmac Auth"}</h3>
+            <p className="text-sm text-default-500">{"API Doc Hmac."}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
@@ -320,7 +320,7 @@ BODY
             (use empty string for GET requests with no body), each separated by a newline character.
           </p>
           <p className="text-sm font-semibold text-default-700">{t('federation.api_doc_required_headers', 'Required headers:')}</p>
-          <Table aria-label={t('api_docs.aria_hmac_headers')} removeWrapper>
+          <Table aria-label={"Hmac Headers"} removeWrapper>
             <TableHeader>
               <TableColumn>{t('federation.api_doc_col_header', 'Header')}</TableColumn>
               <TableColumn>{t('federation.api_doc_col_description', 'Description')}</TableColumn>
@@ -352,8 +352,8 @@ BODY
         <CardHeader className="flex items-center gap-2">
           <Shield size={20} className="text-success" />
           <div>
-            <h3 className="text-lg font-semibold">{t('federation.api_doc_jwt_auth')}</h3>
-            <p className="text-sm text-default-500">{t('federation.api_doc_jwt_desc')}</p>
+            <h3 className="text-lg font-semibold">{"API Doc JWT Auth"}</h3>
+            <p className="text-sm text-default-500">{"API Doc JWT."}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
@@ -386,15 +386,15 @@ grant_type=client_credentials&scope=members:read listings:read
         <CardHeader className="flex items-center gap-2">
           <AlertTriangle size={20} className="text-danger" />
           <div>
-            <h3 className="text-lg font-semibold">{t('federation.api_doc_rate_limits')}</h3>
-            <p className="text-sm text-default-500">{t('federation.api_doc_rate_limits_desc')}</p>
+            <h3 className="text-lg font-semibold">{"API Doc Rate Limits"}</h3>
+            <p className="text-sm text-default-500">{"API Doc Rate Limits."}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
           <p className="text-sm text-default-600">
             {t('federation.api_doc_rate_limit_instructions', 'All API responses include rate-limit headers. When the limit is exceeded, responses return 429 Too Many Requests.')}
           </p>
-          <Table aria-label={t('api_docs.aria_rate_limit_headers')} removeWrapper>
+          <Table aria-label={"Rate Limit Headers"} removeWrapper>
             <TableHeader>
               <TableColumn>{t('federation.api_doc_col_header', 'Header')}</TableColumn>
               <TableColumn>{t('federation.api_doc_col_description', 'Description')}</TableColumn>
@@ -819,7 +819,7 @@ function EndpointsTab() {
             {ep.params && ep.params.length > 0 && (
               <>
                 <p className="text-sm font-semibold text-default-700">{t('federation.api_doc_parameters', 'Parameters')}</p>
-                <Table aria-label={t('api_docs.aria_parameters')} removeWrapper>
+                <Table aria-label={"Parameters"} removeWrapper>
                   <TableHeader>
                     <TableColumn>{t('federation.api_doc_col_name', 'Name')}</TableColumn>
                     <TableColumn>{t('federation.api_doc_col_type', 'Type')}</TableColumn>
@@ -1049,7 +1049,7 @@ function ExamplesTab() {
 
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">{t('federation.api_doc_example_api_key')}</h3>
+          <h3 className="text-lg font-semibold">{"API Doc Example API Key"}</h3>
         </CardHeader>
         <CardBody>
           <CodeBlock>{EXAMPLES.apiKey[lang]}</CodeBlock>
@@ -1058,7 +1058,7 @@ function ExamplesTab() {
 
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">{t('federation.api_doc_example_hmac')}</h3>
+          <h3 className="text-lg font-semibold">{"API Doc Example Hmac"}</h3>
         </CardHeader>
         <CardBody>
           <CodeBlock>{EXAMPLES.hmac[lang]}</CodeBlock>
@@ -1067,7 +1067,7 @@ function ExamplesTab() {
 
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">{t('federation.api_doc_example_message')}</h3>
+          <h3 className="text-lg font-semibold">{"API Doc Example"}</h3>
         </CardHeader>
         <CardBody>
           <CodeBlock>{EXAMPLES.message[lang]}</CodeBlock>
@@ -1105,7 +1105,7 @@ function ErrorCodesTab() {
   "timestamp": "2026-03-28T12:00:00+00:00"
 }`}</CodeBlock>
 
-      <Table aria-label={t('federation.api_doc_error_codes_aria')}>
+      <Table aria-label={"API Doc Error Codes"}>
         <TableHeader>
           <TableColumn>{t('federation.api_doc_col_code', 'Code')}</TableColumn>
           <TableColumn>{t('federation.api_doc_col_name', 'Name')}</TableColumn>
@@ -1162,8 +1162,8 @@ function WebhooksTab() {
         <CardHeader className="flex items-center gap-2">
           <Webhook size={20} className="text-primary" />
           <div>
-            <h3 className="text-lg font-semibold">{t('federation.api_doc_webhook_events')}</h3>
-            <p className="text-sm text-default-500">{t('federation.api_doc_webhook_events_desc')}</p>
+            <h3 className="text-lg font-semibold">{"API Doc Webhook Events"}</h3>
+            <p className="text-sm text-default-500">{"API Doc Webhook Events."}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
@@ -1172,7 +1172,7 @@ function WebhooksTab() {
             to your configured HTTPS endpoint. Configure webhooks on the{' '}
             <a href="../webhooks" className="text-primary underline">Webhooks</a> page.
           </p>
-          <Table aria-label={t('federation.api_doc_webhook_events_aria')} removeWrapper>
+          <Table aria-label={"API Doc Webhook Events"} removeWrapper>
             <TableHeader>
               <TableColumn>{t('federation.api_doc_col_event', 'Event')}</TableColumn>
               <TableColumn>{t('federation.api_doc_col_description', 'Description')}</TableColumn>
@@ -1193,7 +1193,7 @@ function WebhooksTab() {
 
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">{t('federation.api_doc_payload_format')}</h3>
+          <h3 className="text-lg font-semibold">{"API Doc Payload Format"}</h3>
         </CardHeader>
         <CardBody className="space-y-3">
           <p className="text-sm text-default-600">
@@ -1225,7 +1225,7 @@ function WebhooksTab() {
 
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">{t('federation.api_doc_signature_verification')}</h3>
+          <h3 className="text-lg font-semibold">{"API Doc Signature Verification"}</h3>
         </CardHeader>
         <CardBody className="space-y-3">
           <p className="text-sm text-default-600">
@@ -1319,7 +1319,7 @@ export function ApiDocumentation() {
       />
 
       <Tabs
-        aria-label={t('api_docs.aria_api_documentation_sections')}
+        aria-label={"API Documentation Sections"}
         variant="underlined"
         classNames={{
           tabList: 'gap-6',

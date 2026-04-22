@@ -28,10 +28,8 @@ import { adminTimebanking } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { TimebankingStats } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 export function TimebankingDashboard() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('timebanking.page_title'));
+  usePageTitle("Timebanking");
   const { tenantPath } = useTenant();
 
   const [stats, setStats] = useState<TimebankingStats | null>(null);
@@ -58,8 +56,8 @@ export function TimebankingDashboard() {
   return (
     <div>
       <PageHeader
-        title={t('timebanking.timebanking_dashboard_title')}
-        description={t('timebanking.timebanking_dashboard_desc')}
+        title={"Timebanking Dashboard"}
+        description={"Overview of time credit activity, balances, and fraud alerts"}
         actions={
           <Button
             variant="flat"
@@ -68,7 +66,7 @@ export function TimebankingDashboard() {
             isLoading={loading}
             size="sm"
           >
-            {t('common.refresh')}
+            {"Refresh"}
           </Button>
         }
       />
@@ -76,28 +74,28 @@ export function TimebankingDashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label={t('timebanking.label_total_transactions')}
+          label={"Total Transactions"}
           value={stats?.total_transactions ?? '—'}
           icon={ArrowLeftRight}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label={t('timebanking.label_total_volume')}
+          label={"Total Volume"}
           value={stats?.total_volume ?? '—'}
           icon={TrendingUp}
           color="success"
           loading={loading}
         />
         <StatCard
-          label={t('timebanking.label_avg_transaction')}
+          label={"Avg Transaction"}
           value={stats?.avg_transaction ?? '—'}
           icon={Wallet}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label={t('timebanking.label_active_alerts')}
+          label={"Active Alerts"}
           value={stats?.active_alerts ?? '—'}
           icon={AlertTriangle}
           color={stats?.active_alerts && stats.active_alerts > 0 ? 'danger' : 'warning'}
@@ -111,7 +109,7 @@ export function TimebankingDashboard() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <TrendingUp size={18} className="text-success" />
-            <h3 className="font-semibold">{t('timebanking.top_earners')}</h3>
+            <h3 className="font-semibold">{"Top Earners"}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
@@ -144,7 +142,7 @@ export function TimebankingDashboard() {
               </div>
             ) : (
               <p className="py-8 text-center text-sm text-default-400">
-                {t('timebanking.no_transaction_data')}
+                {"No transaction data"}
               </p>
             )}
           </CardBody>
@@ -154,7 +152,7 @@ export function TimebankingDashboard() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Wallet size={18} className="text-warning" />
-            <h3 className="font-semibold">{t('timebanking.top_spenders')}</h3>
+            <h3 className="font-semibold">{"Top Spenders"}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
@@ -187,7 +185,7 @@ export function TimebankingDashboard() {
               </div>
             ) : (
               <p className="py-8 text-center text-sm text-default-400">
-                {t('timebanking.no_transaction_data')}
+                {"No transaction data"}
               </p>
             )}
           </CardBody>
@@ -197,7 +195,7 @@ export function TimebankingDashboard() {
       {/* Quick Links */}
       <Card shadow="sm">
         <CardHeader className="px-4 pt-4 pb-0">
-          <h3 className="font-semibold">{t('timebanking.quick_links')}</h3>
+          <h3 className="font-semibold">{"Quick Links"}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -211,7 +209,7 @@ export function TimebankingDashboard() {
             >
               <div className="flex items-center gap-2">
                 <AlertTriangle size={18} />
-                <span>{t('timebanking.fraud_alerts_title')}</span>
+                <span>{"Fraud Alerts"}</span>
               </div>
             </Button>
 
@@ -225,7 +223,7 @@ export function TimebankingDashboard() {
             >
               <div className="flex items-center gap-2">
                 <Users size={18} />
-                <span>{t('timebanking.user_report_title')}</span>
+                <span>{"User Report"}</span>
               </div>
             </Button>
 
@@ -239,7 +237,7 @@ export function TimebankingDashboard() {
             >
               <div className="flex items-center gap-2">
                 <Building2 size={18} />
-                <span>{t('timebanking.org_wallets_title')}</span>
+                <span>{"Org Wallets"}</span>
               </div>
             </Button>
           </div>

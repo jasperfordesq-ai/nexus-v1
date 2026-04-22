@@ -147,55 +147,12 @@ if [ "$MODE" != "--react-only" ]; then
 fi
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# PHASE 2: React admin
+# PHASE 2: React admin — REMOVED
 # ═══════════════════════════════════════════════════════════════════════════════
-
-if [ "$MODE" != "--php-only" ]; then
-    echo "═══════════════════════════════════════════════════════════════"
-    echo "  PHASE 2: React admin panel"
-    echo "═══════════════════════════════════════════════════════════════"
-
-    ADMIN="$PROJECT_ROOT/react-frontend/src/admin"
-
-    # Toast messages
-    check_recursive "toast.success('" "Hardcoded toast message" "$ADMIN" "*.tsx"
-    check_recursive 'toast.success("' "Hardcoded toast message" "$ADMIN" "*.tsx"
-    check_recursive 'toast.success(`' "Hardcoded toast message" "$ADMIN" "*.tsx"
-    check_recursive "toast.error('" "Hardcoded toast error" "$ADMIN" "*.tsx"
-    check_recursive 'toast.error("' "Hardcoded toast error" "$ADMIN" "*.tsx"
-    check_recursive 'toast.error(`' "Hardcoded toast error" "$ADMIN" "*.tsx"
-    check_recursive "showToast('" "Hardcoded toast message" "$ADMIN" "*.tsx"
-    check_recursive 'showToast("' "Hardcoded toast message" "$ADMIN" "*.tsx"
-
-    # Confirmation dialogs
-    check_recursive "Are you sure" "Hardcoded confirmation text" "$ADMIN" "*.tsx"
-    check_recursive "This action cannot be undone" "Hardcoded confirmation text" "$ADMIN" "*.tsx"
-    check_recursive "window.confirm(" "Use ConfirmModal with t() instead" "$ADMIN" "*.tsx"
-
-    # Sidebar prefix bug
-    SIDEBAR_FILE="$PROJECT_ROOT/react-frontend/src/admin/components/AdminSidebar.tsx"
-    if [ -f "$SIDEBAR_FILE" ]; then
-        BAD_SIDEBAR=$(grep -n "t('sidebar\." "$SIDEBAR_FILE" 2>/dev/null \
-            | grep -v "sidebar\.admin" \
-            | grep -v "sidebar\.expand_sidebar" \
-            | grep -v "sidebar\.collapse_sidebar" \
-            | grep -v "sidebar\.broker_panel" \
-            | grep -v '// ' || true)
-        if [ -n "$BAD_SIDEBAR" ]; then
-            sb_count=0
-            sb_count=$(echo "$BAD_SIDEBAR" | wc -l)
-            VIOLATIONS=$((VIOLATIONS + sb_count))
-            echo "$BAD_SIDEBAR" | while IFS= read -r line; do
-                echo "  AdminSidebar.tsx:${line}" >> "$VIOLATION_FILE"
-                echo "     -> sidebar.* prefix bug — use top-level key" >> "$VIOLATION_FILE"
-                echo "" >> "$VIOLATION_FILE"
-            done
-        fi
-    fi
-
-    echo "  Done."
-    echo ""
-fi
+# Admin panel (react-frontend/src/admin/) is ENGLISH-ONLY by design.
+# Hardcoded English strings in admin code are INTENTIONAL, not violations.
+# See feedback_admin_english_only.md in memory.
+# Do NOT re-enable admin i18n audits without explicit user instruction.
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # REPORT

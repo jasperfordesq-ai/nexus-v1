@@ -9,7 +9,6 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   Tabs,
   Tab,
@@ -67,8 +66,7 @@ const typeColors: Record<string, 'primary' | 'secondary' | 'default'> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MarketplaceSellerAdmin() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('marketplace.sellers_page_title'));
+  usePageTitle("Marketplace Sellers");
   const toast = useToast();
   const { tenantPath } = useTenant();
 
@@ -117,7 +115,7 @@ export function MarketplaceSellerAdmin() {
         }
       }
     } catch {
-      toast.error(t('marketplace.failed_load_sellers'));
+      toast.error("Failed to load sellers");
     } finally {
       setLoading(false);
     }
@@ -135,13 +133,13 @@ export function MarketplaceSellerAdmin() {
     try {
       const res = await api.post(`/v2/admin/marketplace/sellers/${confirmVerify.id}/verify`);
       if (res?.success) {
-        toast.success(t('marketplace.seller_verified', { name: confirmVerify.display_name }));
+        toast.success(`Seller verified`);
         loadSellers();
       } else {
-        toast.error((res as { error?: string }).error || t('marketplace.failed_verify_seller'));
+        toast.error((res as { error?: string }).error || "Failed to verify seller");
       }
     } catch {
-      toast.error(t('marketplace.unexpected_error'));
+      toast.error("An unexpected error occurred");
     } finally {
       setActionLoading(false);
       setConfirmVerify(null);
@@ -154,13 +152,13 @@ export function MarketplaceSellerAdmin() {
     try {
       const res = await api.post(`/v2/admin/marketplace/sellers/${confirmSuspend.id}/suspend`);
       if (res?.success) {
-        toast.success(t('marketplace.seller_suspended', { name: confirmSuspend.display_name }));
+        toast.success(`Seller suspended`);
         loadSellers();
       } else {
-        toast.error((res as { error?: string }).error || t('marketplace.failed_suspend_seller'));
+        toast.error((res as { error?: string }).error || "Failed to suspend seller");
       }
     } catch {
-      toast.error(t('marketplace.unexpected_error'));
+      toast.error("An unexpected error occurred");
     } finally {
       setActionLoading(false);
       setConfirmSuspend(null);
@@ -187,13 +185,13 @@ export function MarketplaceSellerAdmin() {
   const columns: Column<Seller>[] = [
     {
       key: 'display_name',
-      label: t('marketplace.col_seller_name'),
+      label: "Name",
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-2">
           <span className="font-medium text-foreground">{item.display_name}</span>
           {item.business_verified && (
-            <Tooltip content={t('marketplace.verified_seller')}>
+            <Tooltip content={"Verified"}>
               <BadgeCheck size={16} className="text-success shrink-0" />
             </Tooltip>
           )}
@@ -202,7 +200,7 @@ export function MarketplaceSellerAdmin() {
     },
     {
       key: 'seller_type',
-      label: t('marketplace.col_type'),
+      label: "Type",
       sortable: true,
       render: (item) => (
         <Chip
@@ -217,7 +215,7 @@ export function MarketplaceSellerAdmin() {
     },
     {
       key: 'active_listings',
-      label: t('marketplace.col_active_listings'),
+      label: "Listings",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">{item.active_listings}</span>
@@ -225,7 +223,7 @@ export function MarketplaceSellerAdmin() {
     },
     {
       key: 'total_sales',
-      label: t('marketplace.col_total_sales'),
+      label: "Sales",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">{item.total_sales}</span>
@@ -233,13 +231,13 @@ export function MarketplaceSellerAdmin() {
     },
     {
       key: 'avg_rating',
-      label: t('marketplace.col_avg_rating'),
+      label: "Rating",
       sortable: true,
       render: (item) => renderRating(item.avg_rating),
     },
     {
       key: 'joined_marketplace_at',
-      label: t('marketplace.col_joined'),
+      label: "Joined",
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -251,11 +249,11 @@ export function MarketplaceSellerAdmin() {
     },
     {
       key: 'actions',
-      label: t('marketplace.col_actions'),
+      label: "Actions",
       render: (item) => (
         <div className="flex gap-1">
           {item.seller_type === 'business' && !item.business_verified && (
-            <Tooltip content={t('marketplace.action_verify_business')}>
+            <Tooltip content={"Verify Business"}>
               <Button
                 isIconOnly
                 size="sm"
@@ -263,13 +261,13 @@ export function MarketplaceSellerAdmin() {
                 color="success"
                 onPress={() => setConfirmVerify(item)}
                 isDisabled={actionLoading}
-                aria-label={t('marketplace.action_verify_seller')}
+                aria-label={"Verify Seller"}
               >
                 <ShieldCheck size={14} />
               </Button>
             </Tooltip>
           )}
-          <Tooltip content={t('marketplace.action_suspend_seller')}>
+          <Tooltip content={"Suspend Seller"}>
             <Button
               isIconOnly
               size="sm"
@@ -277,12 +275,12 @@ export function MarketplaceSellerAdmin() {
               color="danger"
               onPress={() => setConfirmSuspend(item)}
               isDisabled={actionLoading}
-              aria-label={t('marketplace.action_suspend_seller')}
+              aria-label={"Suspend Seller"}
             >
               <UserX size={14} />
             </Button>
           </Tooltip>
-          <Tooltip content={t('marketplace.action_view_profile')}>
+          <Tooltip content={"View Profile"}>
             <Button
               isIconOnly
               size="sm"
@@ -292,7 +290,7 @@ export function MarketplaceSellerAdmin() {
               href={tenantPath(`/profile/${item.user_id}`)}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={t('marketplace.action_view_seller_profile')}
+              aria-label={"View Seller Profile"}
             >
               <Eye size={14} />
             </Button>
@@ -305,15 +303,15 @@ export function MarketplaceSellerAdmin() {
   return (
     <div>
       <PageHeader
-        title={t('marketplace.sellers_title')}
-        description={t('marketplace.sellers_description')}
+        title={"Sellers"}
+        description={"Manage registered marketplace sellers"}
         actions={
           <Button
             variant="flat"
             startContent={<RefreshCw size={16} />}
             onPress={loadSellers}
           >
-            {t('marketplace.refresh')}
+            {"Refresh"}
           </Button>
         }
       />
@@ -340,7 +338,7 @@ export function MarketplaceSellerAdmin() {
         columns={columns}
         data={sellers}
         isLoading={loading}
-        searchPlaceholder={t('marketplace.search_sellers')}
+        searchPlaceholder={"Search sellers..."}
         onSearch={(q) => {
           setSearch(q);
           setPage(1);
@@ -353,11 +351,11 @@ export function MarketplaceSellerAdmin() {
         emptyContent={
           <EmptyState
             icon={Store}
-            title={t('marketplace.no_sellers_found')}
+            title={"No sellers found"}
             description={
               search || filter !== 'all'
-                ? t('marketplace.try_adjusting_filters')
-                : t('marketplace.no_sellers_registered_yet')
+                ? "Try adjusting your search or filters"
+                : "No sellers have registered yet"
             }
           />
         }
@@ -369,9 +367,9 @@ export function MarketplaceSellerAdmin() {
           isOpen={!!confirmVerify}
           onClose={() => setConfirmVerify(null)}
           onConfirm={handleVerify}
-          title={t('marketplace.verify_seller_title')}
-          message={t('marketplace.verify_seller_message', { name: confirmVerify.display_name })}
-          confirmLabel={t('marketplace.verify_btn')}
+          title={"Verify Seller"}
+          message={`This will mark the seller as verified. Continue?`}
+          confirmLabel={"Verify"}
           confirmColor="primary"
           isLoading={actionLoading}
         />
@@ -383,9 +381,9 @@ export function MarketplaceSellerAdmin() {
           isOpen={!!confirmSuspend}
           onClose={() => setConfirmSuspend(null)}
           onConfirm={handleSuspend}
-          title={t('marketplace.suspend_seller_title')}
-          message={t('marketplace.suspend_seller_message', { name: confirmSuspend.display_name })}
-          confirmLabel={t('marketplace.suspend_btn')}
+          title={"Suspend Seller"}
+          message={`Are you sure you want to suspend this seller?`}
+          confirmLabel={"Suspend"}
           confirmColor="danger"
           isLoading={actionLoading}
         />

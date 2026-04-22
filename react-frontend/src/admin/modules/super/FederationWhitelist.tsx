@@ -28,7 +28,6 @@ import { useToast, useTenant } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
 import type { FederationWhitelistEntry, SuperAdminTenant } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 interface WhitelistEntry {
   id: number;
   tenant_id: number;
@@ -58,8 +57,7 @@ function mapWhitelistEntry(e: FederationWhitelistEntry): WhitelistEntry {
 }
 
 export default function FederationWhitelist() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('super.page_title'));
+  usePageTitle("Super Admin");
   const toast = useToast();
   const { tenantPath } = useTenant();
   const [entries, setEntries] = useState<WhitelistEntry[]>([]);
@@ -90,18 +88,18 @@ export default function FederationWhitelist() {
 
   const handleAdd = async () => {
     if (!selectedTenantId) {
-      toast.error(t('super.please_select_a_tenant'));
+      toast.error("Please Select a Tenant");
       return;
     }
 
     const res = await adminSuper.addToWhitelist(parseInt(selectedTenantId), notes || undefined);
     if (res.success) {
-      toast.success(t('super.tenant_added_to_whitelist'));
+      toast.success("Tenant Added to Whitelist");
       setSelectedTenantId('');
       setNotes('');
       loadData();
     } else {
-      toast.error(res.error || t('federation_whitelist.failed_to_add'));
+      toast.error(res.error || "Failed to add");
     }
   };
 
@@ -110,9 +108,9 @@ export default function FederationWhitelist() {
     if (res.success) {
       setEntries(prev => prev.filter(e => e.tenant_id !== tenantId));
       setRemoving(null);
-      toast.success(t('super.tenant_removed_from_whitelist'));
+      toast.success("Tenant Removed from Whitelist");
     } else {
-      toast.error(res.error || t('federation_whitelist.failed_to_remove'));
+      toast.error(res.error || "Failed to remove");
       setRemoving(null);
     }
   };
@@ -128,8 +126,8 @@ export default function FederationWhitelist() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t('super.federation_whitelist_title')}
-        description={t('super.federation_whitelist_desc')}
+        title={"Federation Whitelist"}
+        description={"Manage the list of tenants allowed to participate in federation"}
       />
 
       {/* Add Form */}
@@ -137,13 +135,13 @@ export default function FederationWhitelist() {
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <Plus className="w-5 h-5" />
-            {t('federation_whitelist.add_tenant_to_whitelist')}
+            {"Add Tenant to Whitelist"}
           </h3>
         </CardHeader>
         <CardBody className="space-y-4">
           <Select
-            label={t('super.label_tenant')}
-            placeholder={t('super.placeholder_select_a_tenant')}
+            label={"Tenant"}
+            placeholder={"Select a Tenant..."}
             selectedKeys={selectedTenantId ? [selectedTenantId] : []}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0];
@@ -159,8 +157,8 @@ export default function FederationWhitelist() {
           </Select>
 
           <Textarea
-            label={t('federation_whitelist.label_notes_optional')}
-            placeholder={t('super.placeholder_add_notes_about_why_this_tenant_is_being_whitelist')}
+            label={"Notes Optional"}
+            placeholder={"Add Notes About Why This Tenant is Being Whitelist..."}
             value={notes}
             onValueChange={setNotes}
             variant="bordered"
@@ -172,7 +170,7 @@ export default function FederationWhitelist() {
             onPress={handleAdd}
             startContent={<Plus className="w-4 h-4" />}
           >
-            {t('federation_whitelist.add_to_whitelist')}
+            {"Add to Whitelist"}
           </Button>
         </CardBody>
       </Card>
@@ -180,19 +178,19 @@ export default function FederationWhitelist() {
       {/* Whitelist Table */}
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">{t('federation_whitelist.whitelisted_tenants_count', { count: entries.length })}</h3>
+          <h3 className="text-lg font-semibold">{`Whitelisted Tenants Count`}</h3>
         </CardHeader>
         <CardBody>
-          <Table aria-label={t('super.label_whitelisted_tenants')} shadow="sm" isStriped>
+          <Table aria-label={"Whitelisted Tenants"} shadow="sm" isStriped>
             <TableHeader>
-              <TableColumn>{t('federation_whitelist.col_tenant')}</TableColumn>
-              <TableColumn>{t('federation_whitelist.col_domain')}</TableColumn>
-              <TableColumn>{t('federation_whitelist.col_approved_by')}</TableColumn>
-              <TableColumn>{t('federation_whitelist.col_date')}</TableColumn>
-              <TableColumn>{t('federation_whitelist.col_notes')}</TableColumn>
-              <TableColumn>{t('federation_whitelist.col_actions')}</TableColumn>
+              <TableColumn>{"Tenant"}</TableColumn>
+              <TableColumn>{"Domain"}</TableColumn>
+              <TableColumn>{"Approved by"}</TableColumn>
+              <TableColumn>{"Date"}</TableColumn>
+              <TableColumn>{"Notes"}</TableColumn>
+              <TableColumn>{"Actions"}</TableColumn>
             </TableHeader>
-            <TableBody emptyContent={t('federation_whitelist.no_tenants_whitelisted')}>
+            <TableBody emptyContent={"No tenants whitelisted found"}>
               {entries.map(entry => (
                 <TableRow key={entry.id}>
                   <TableCell>
@@ -220,7 +218,7 @@ export default function FederationWhitelist() {
                         variant="flat"
                         color="primary"
                       >
-                        {t('federation_whitelist.view')}
+                        {"View"}
                       </Button>
                       <Button
                         size="sm"
@@ -229,7 +227,7 @@ export default function FederationWhitelist() {
                         onPress={() => setRemoving(entry.tenant_id)}
                         startContent={<Trash2 className="w-4 h-4" />}
                       >
-                        {t('federation_whitelist.remove')}
+                        {"Remove"}
                       </Button>
                     </div>
                   </TableCell>
@@ -246,9 +244,9 @@ export default function FederationWhitelist() {
           isOpen={true}
           onClose={() => setRemoving(null)}
           onConfirm={() => handleRemove(removing)}
-          title={t('federation_whitelist.remove_from_whitelist')}
-          message={t('federation_whitelist.remove_confirm_message')}
-          confirmLabel={t('federation_whitelist.remove')}
+          title={"Remove From Whitelist"}
+          message={"Remove Confirm"}
+          confirmLabel={"Remove"}
           confirmColor="danger"
         />
       )}

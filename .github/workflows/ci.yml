@@ -457,8 +457,9 @@ jobs:
       - name: "BLOCKING: Check for hardcoded strings in email templates"
         run: bash scripts/check-i18n.sh
 
-      - name: "BLOCKING: Check recurring admin locale coverage"
-        run: node scripts/check-admin-i18n.mjs
+      # check-admin-i18n REMOVED 2026-04-22 — admin panel is English-only by design.
+      # Hardcoded English in admin code is intentional, not a violation.
+      # See memory/feedback_admin_english_only.md.
 
       - name: "BLOCKING: Prevent non-admin translation-gap regressions"
         run: npm run check:i18n:baseline
@@ -466,8 +467,8 @@ jobs:
       - name: "BLOCKING: Prevent stub placeholder translation values"
         run: node scripts/check-i18n-stubs.mjs
 
-      - name: "BLOCKING: Prevent hardcoded English breadcrumbs"
-        run: node scripts/check-admin-breadcrumbs.mjs
+      # check-admin-breadcrumbs REMOVED 2026-04-22 — admin is English-only by design.
+      # See memory/feedback_admin_english_only.md.
 
       - name: "BLOCKING: Exhaustive t() key coverage (ratchets down via baseline)"
         run: node scripts/check-i18n-coverage.mjs

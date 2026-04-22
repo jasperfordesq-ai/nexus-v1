@@ -16,10 +16,8 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 
-import { useTranslation } from 'react-i18next';
 export function FeedAlgorithm() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('advanced.page_title'));
+  usePageTitle("Advanced");
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -40,7 +38,7 @@ export function FeedAlgorithm() {
           setFormData(prev => ({ ...prev, ...res.data }));
         }
       })
-      .catch(() => toast.error(t('advanced.failed_to_load_feed_algorithm_settings')))
+      .catch(() => toast.error("Failed to load feed algorithm settings"))
       .finally(() => setLoading(false));
   }, [toast, t])
 
@@ -50,7 +48,7 @@ export function FeedAlgorithm() {
     for (const field of weightFields) {
       const val = Number(formData[field]);
       if (!Number.isFinite(val) || val < 0 || val > 100) {
-        toast.error(t('advanced.invalid_weight', { field }));
+        toast.error(`Invalid Weight`);
         return;
       }
     }
@@ -60,13 +58,13 @@ export function FeedAlgorithm() {
       const res = await adminSettings.updateFeedAlgorithm(formData);
 
       if (res.success) {
-        toast.success(t('advanced.feed_algorithm_settings_saved_successful'));
+        toast.success("Feed algorithm settings saved successfully");
       } else {
-        const error = (res as { error?: string }).error || t('advanced.save_failed');
+        const error = (res as { error?: string }).error || "Save failed";
         toast.error(error);
       }
     } catch (err) {
-      toast.error(t('advanced.failed_to_save_feed_algorithm_settings'));
+      toast.error("Failed to save feed algorithm settings");
     } finally {
       setSaving(false);
     }
@@ -86,60 +84,60 @@ export function FeedAlgorithm() {
 
   return (
     <div>
-      <PageHeader title={t('advanced.feed_algorithm_title')} description={t('advanced.feed_algorithm_desc')} />
+      <PageHeader title={"Feed Algorithm"} description={"Configure how posts are ranked and surfaced in the community feed"} />
 
       <div className="space-y-4">
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Rss size={20} /> {t('advanced.feed_ranking_weights')}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Rss size={20} /> {"Feed Ranking Weights"}</h3></CardHeader>
           <CardBody className="gap-6">
             <div>
-              <p className="text-sm font-medium mb-2">{t('advanced.recency_weight')}</p>
-              <Slider minValue={0} maxValue={100} value={Number(formData.recency_weight)} onChange={(v) => updateField('recency_weight', v)} step={5} label={t('advanced.label_how_much_to_prioritize_newer_content')} className="max-w-md" />
+              <p className="text-sm font-medium mb-2">{"Recency Weight"}</p>
+              <Slider minValue={0} maxValue={100} value={Number(formData.recency_weight)} onChange={(v) => updateField('recency_weight', v)} step={5} label={"How much to prioritise newer content"} className="max-w-md" />
             </div>
             <div>
-              <p className="text-sm font-medium mb-2">{t('advanced.engagement_weight')}</p>
-              <Slider minValue={0} maxValue={100} value={Number(formData.engagement_weight)} onChange={(v) => updateField('engagement_weight', v)} step={5} label={t('advanced.label_how_much_to_prioritize_likedcommented_content')} className="max-w-md" />
+              <p className="text-sm font-medium mb-2">{"Engagement Weight"}</p>
+              <Slider minValue={0} maxValue={100} value={Number(formData.engagement_weight)} onChange={(v) => updateField('engagement_weight', v)} step={5} label={"How much to prioritise liked/commented content"} className="max-w-md" />
             </div>
             <div>
-              <p className="text-sm font-medium mb-2">{t('advanced.connection_weight')}</p>
-              <Slider minValue={0} maxValue={100} value={Number(formData.connection_weight)} onChange={(v) => updateField('connection_weight', v)} step={5} label={t('advanced.label_boost_content_from_connected_users')} className="max-w-md" />
+              <p className="text-sm font-medium mb-2">{"Connection Weight"}</p>
+              <Slider minValue={0} maxValue={100} value={Number(formData.connection_weight)} onChange={(v) => updateField('connection_weight', v)} step={5} label={"Boost Content from Connected Users"} className="max-w-md" />
             </div>
             <div>
-              <p className="text-sm font-medium mb-2">{t('advanced.diversity_factor')}</p>
-              <Slider minValue={0} maxValue={100} value={Number(formData.diversity_factor)} onChange={(v) => updateField('diversity_factor', v)} step={5} label={t('advanced.label_vary_content_types_in_the_feed')} className="max-w-md" />
+              <p className="text-sm font-medium mb-2">{"Diversity Factor"}</p>
+              <Slider minValue={0} maxValue={100} value={Number(formData.diversity_factor)} onChange={(v) => updateField('diversity_factor', v)} step={5} label={"Vary Content Types in the Feed"} className="max-w-md" />
             </div>
           </CardBody>
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">{t('advanced.feed_options')}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{"Feed Options"}</h3></CardHeader>
           <CardBody className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('advanced.chronological_mode')}</p>
-                <p className="text-sm text-default-500">{t('advanced.chronological_mode_desc')}</p>
+                <p className="font-medium">{"Chronological Mode"}</p>
+                <p className="text-sm text-default-500">{"Show feed items in strict chronological order instead of ranked order"}</p>
               </div>
-              <Switch isSelected={!!formData.chronological_mode} onValueChange={(v) => updateField('chronological_mode', v)} aria-label={t('advanced.label_chronological_mode')} />
+              <Switch isSelected={!!formData.chronological_mode} onValueChange={(v) => updateField('chronological_mode', v)} aria-label={"Chronological Mode"} />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('advanced.include_polls')}</p>
-                <p className="text-sm text-default-500">{t('advanced.include_polls_desc')}</p>
+                <p className="font-medium">{"Include Polls"}</p>
+                <p className="text-sm text-default-500">{"Include polls in the feed ranking algorithm"}</p>
               </div>
-              <Switch isSelected={!!formData.include_polls} onValueChange={(v) => updateField('include_polls', v)} aria-label={t('advanced.label_include_polls')} />
+              <Switch isSelected={!!formData.include_polls} onValueChange={(v) => updateField('include_polls', v)} aria-label={"Include Polls"} />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t('advanced.include_events')}</p>
-                <p className="text-sm text-default-500">{t('advanced.include_events_desc')}</p>
+                <p className="font-medium">{"Include Events"}</p>
+                <p className="text-sm text-default-500">{"Include event posts in the feed ranking algorithm"}</p>
               </div>
-              <Switch isSelected={!!formData.include_events} onValueChange={(v) => updateField('include_events', v)} aria-label={t('advanced.label_include_events')} />
+              <Switch isSelected={!!formData.include_events} onValueChange={(v) => updateField('include_events', v)} aria-label={"Include Events"} />
             </div>
           </CardBody>
         </Card>
 
         <div className="flex justify-end">
-          <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving} isDisabled={saving}>{t('advanced.save_algorithm')}</Button>
+          <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving} isDisabled={saving}>{"Save Algorithm"}</Button>
         </div>
       </div>
     </div>

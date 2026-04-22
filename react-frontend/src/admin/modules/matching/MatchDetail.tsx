@@ -62,7 +62,7 @@ function scoreLabelKey(score: number): string {
 
 export function MatchDetail() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('matching.page_title'));
+  usePageTitle("Matching");
   const toast = useToast();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
@@ -91,7 +91,7 @@ export function MatchDetail() {
         setItem(data as MatchApprovalDetail);
       }
     } else {
-      setError(res.error || t('matching.failed_to_load_match_approval'));
+      setError(res.error || "Failed to load match approval");
     }
     setLoading(false);
   }, [id, t]);
@@ -105,10 +105,10 @@ export function MatchDetail() {
     setApproveLoading(true);
     const res = await adminMatching.approveMatch(item.id);
     if (res.success) {
-      toast.success(t('matching.match_approved', { id: item.id }));
+      toast.success(`Match Approved`);
       loadItem();
     } else {
-      toast.error(res.error || t('matching.failed_to_approve_match'));
+      toast.error(res.error || "Failed to approve match");
     }
     setApproveLoading(false);
   };
@@ -116,18 +116,18 @@ export function MatchDetail() {
   const handleReject = async () => {
     if (!item) return;
     if (!rejectReason.trim()) {
-      toast.error(t('matching.please_provide_a_reason_for_rejection'));
+      toast.error("Please provide a reason for rejection");
       return;
     }
     setRejectLoading(true);
     const res = await adminMatching.rejectMatch(item.id, rejectReason.trim());
     if (res.success) {
-      toast.success(t('matching.match_rejected', { id: item.id }));
+      toast.success(`Match Rejected`);
       setRejectModal(false);
       setRejectReason('');
       loadItem();
     } else {
-      toast.error(res.error || t('matching.failed_to_reject_match'));
+      toast.error(res.error || "Failed to reject match");
     }
     setRejectLoading(false);
   };
@@ -146,14 +146,14 @@ export function MatchDetail() {
     return (
       <div>
         <PageHeader
-          title={t('matching.match_detail_title')}
+          title={"Match Detail"}
           actions={
             <Button
               variant="flat"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/match-approvals'))}
             >
-              {t('matching.back')}
+              {"Back"}
             </Button>
           }
         />
@@ -161,10 +161,10 @@ export function MatchDetail() {
           <CardBody className="flex flex-col items-center justify-center py-16">
             <XCircle size={40} className="mb-3 text-danger" />
             <p className="text-lg font-medium text-foreground">
-              {t('matching.match_not_found')}
+              {"Match Not Found"}
             </p>
             <p className="mt-1 text-sm text-default-500">
-              {error || t('matching.match_could_not_be_loaded')}
+              {error || "Match Could Not Be Loaded"}
             </p>
           </CardBody>
         </Card>
@@ -177,15 +177,15 @@ export function MatchDetail() {
   return (
     <div>
       <PageHeader
-        title={t('matching.match_approval_title', { id: item.id })}
-        description={t('matching.match_submitted_date', { date: new Date(item.created_at).toLocaleDateString() })}
+        title={`Match Approval`}
+        description={`Match Submitted Date`}
         actions={
           <Button
             variant="flat"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/match-approvals'))}
           >
-            {t('matching.back_to_approvals')}
+            {"Back to Approvals"}
           </Button>
         }
       />
@@ -194,7 +194,7 @@ export function MatchDetail() {
       <Card shadow="sm" className="mb-6">
         <CardHeader className="flex items-center gap-3 pb-0">
           <Shield size={20} className="text-primary" />
-          <h3 className="text-lg font-semibold">{t('match_detail.match_information')}</h3>
+          <h3 className="text-lg font-semibold">{"Match Information"}</h3>
           <div className="ml-auto">
             <StatusBadge status={item.status} />
           </div>
@@ -203,7 +203,7 @@ export function MatchDetail() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {/* Score */}
             <div className="flex flex-col items-center justify-center rounded-xl bg-default-50 p-6">
-              <p className="mb-2 text-sm text-default-500">{t('match_detail.match_score')}</p>
+              <p className="mb-2 text-sm text-default-500">{"Match Score"}</p>
               <div className="relative mb-2">
                 <Progress
                   size="lg"
@@ -229,14 +229,14 @@ export function MatchDetail() {
             {/* Details */}
             <div className="space-y-3">
               <div>
-                <p className="text-xs text-default-400">{t('match_detail.match_type')}</p>
+                <p className="text-xs text-default-400">{"Match"}</p>
                 <Chip size="sm" variant="flat" className="mt-1 capitalize">
                   {(item.match_type || 'one_way').replace('_', ' ')}
                 </Chip>
               </div>
               {item.distance_km !== null && item.distance_km !== undefined && (
                 <div>
-                  <p className="text-xs text-default-400">{t('match_detail.distance')}</p>
+                  <p className="text-xs text-default-400">{"Distance"}</p>
                   <p className="flex items-center gap-1 text-sm text-foreground">
                     <MapPin size={14} className="text-default-400" />
                     {item.distance_km.toFixed(1)} km
@@ -245,7 +245,7 @@ export function MatchDetail() {
               )}
               {item.category_name && (
                 <div>
-                  <p className="text-xs text-default-400">{t('match_detail.category')}</p>
+                  <p className="text-xs text-default-400">{"Category"}</p>
                   <p className="text-sm text-foreground">{item.category_name}</p>
                 </div>
               )}
@@ -253,7 +253,7 @@ export function MatchDetail() {
 
             {/* Match Reasons */}
             <div>
-              <p className="mb-2 text-xs text-default-400">{t('match_detail.match_reasons')}</p>
+              <p className="mb-2 text-xs text-default-400">{"Match Reasons"}</p>
               {item.match_reasons && item.match_reasons.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5">
                   {item.match_reasons.map((reason, i) => (
@@ -278,7 +278,7 @@ export function MatchDetail() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-3 pb-0">
             <User size={18} className="text-primary" />
-            <h3 className="font-semibold">{t('match_detail.matched_user')}</h3>
+            <h3 className="font-semibold">{"Matched User"}</h3>
           </CardHeader>
           <CardBody>
             <div className="flex items-start gap-4">
@@ -315,7 +315,7 @@ export function MatchDetail() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-3 pb-0">
             <User size={18} className="text-success" />
-            <h3 className="font-semibold">{t('match_detail.listing_owner')}</h3>
+            <h3 className="font-semibold">{"Listing Owner"}</h3>
           </CardHeader>
           <CardBody>
             <div className="flex items-start gap-4">
@@ -354,7 +354,7 @@ export function MatchDetail() {
         <Card shadow="sm" className="mb-6">
           <CardHeader className="flex items-center gap-3 pb-0">
             <FileText size={18} className="text-secondary" />
-            <h3 className="font-semibold">{t('match_detail.associated_listing')}</h3>
+            <h3 className="font-semibold">{"Associated Listing"}</h3>
           </CardHeader>
           <CardBody>
             <div className="space-y-2">
@@ -386,18 +386,18 @@ export function MatchDetail() {
         <Card shadow="sm" className="mb-6">
           <CardHeader className="flex items-center gap-3 pb-0">
             <Clock size={18} className="text-default-500" />
-            <h3 className="font-semibold">{t('match_detail.review_details')}</h3>
+            <h3 className="font-semibold">{"Review Details"}</h3>
           </CardHeader>
           <CardBody>
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <p className="text-sm text-default-400">{t('matching.reviewed_by')}</p>
+                <p className="text-sm text-default-400">{"Reviewed by"}</p>
                 <p className="text-sm font-medium text-foreground">
-                  {item.reviewer_name || t('matching.unknown')}
+                  {item.reviewer_name || "Unknown"}
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <p className="text-sm text-default-400">{t('matching.reviewed_at')}</p>
+                <p className="text-sm text-default-400">{"Reviewed at"}</p>
                 <p className="text-sm text-foreground">
                   {new Date(item.reviewed_at).toLocaleString()}
                 </p>
@@ -407,7 +407,7 @@ export function MatchDetail() {
                   <Divider className="my-2" />
                   <div>
                     <p className="mb-1 text-sm text-default-400">
-                      {item.status === 'rejected' ? t('matching.rejection_reason_label') : t('matching.notes_label')}
+                      {item.status === 'rejected' ? "Rejection Reason" : "Notes"}
                     </p>
                     <p className="rounded-lg bg-default-50 p-3 text-sm text-foreground">
                       {item.notes}
@@ -433,7 +433,7 @@ export function MatchDetail() {
                 setRejectReason('');
               }}
             >
-              {t('matching.reject_match')}
+              {"Reject Match"}
             </Button>
             <Button
               color="success"
@@ -441,7 +441,7 @@ export function MatchDetail() {
               onPress={handleApprove}
               isLoading={approveLoading}
             >
-              {t('matching.approve_match')}
+              {"Approve Match"}
             </Button>
           </CardBody>
         </Card>
@@ -459,7 +459,7 @@ export function MatchDetail() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <XCircle size={20} className="text-danger" />
-            {t('matching.reject_match')}
+            {"Reject Match"}
           </ModalHeader>
           <ModalBody>
             <p className="mb-3 text-sm text-default-600">
@@ -469,8 +469,8 @@ export function MatchDetail() {
               })}
             </p>
             <Textarea
-              label={t('matching.label_rejection_reason')}
-              placeholder={t('matching.placeholder_explain_why_this_match_is_being_rejected')}
+              label={"Rejection Reason"}
+              placeholder={"Explain Why This Match is Being Rejected..."}
               value={rejectReason}
               onValueChange={setRejectReason}
               variant="bordered"
@@ -487,7 +487,7 @@ export function MatchDetail() {
               }}
               isDisabled={rejectLoading}
             >
-              {t('common.cancel')}
+              {"Cancel"}
             </Button>
             <Button
               color="danger"
@@ -495,7 +495,7 @@ export function MatchDetail() {
               isLoading={rejectLoading}
               isDisabled={!rejectReason.trim()}
             >
-              {t('matching.reject_match')}
+              {"Reject Match"}
             </Button>
           </ModalFooter>
         </ModalContent>

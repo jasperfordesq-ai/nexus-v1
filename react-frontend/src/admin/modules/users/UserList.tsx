@@ -48,7 +48,6 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useAuth } from '@/contexts';
-import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -58,8 +57,7 @@ import { DataTable, StatusBadge, PageHeader, ConfirmModal, BulkActionToolbar, ty
 import type { AdminUser, UserListParams } from '../../api/types';
 
 export function UserList() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('users.page_title'));
+  usePageTitle("Page");
   const { tenantPath, tenant } = useTenant();
   const toast = useToast();
   const { user: currentUser } = useAuth();
@@ -111,14 +109,14 @@ export function UserList() {
 
   const handleBulkResult = (res: { success: boolean; error?: string; data?: BulkActionResult | unknown }, actionLabel: string) => {
     if (!res.success) {
-      toast.error(res.error || t('bulk.result_failed'));
+      toast.error(res.error || "Result failed");
       return;
     }
     const data = (res.data as BulkActionResult) || { success: 0, failed: 0 };
     if (data.failed && data.failed > 0) {
-      toast.error(t('bulk.result_partial', { success: data.success, failed: data.failed }));
+      toast.error(`Result Partial`);
     } else {
-      toast.success(t('bulk.result_success', { count: data.success }));
+      toast.success(`Result succeeded`);
     }
     setSelectedIds(new Set());
     loadUsers();
@@ -178,11 +176,11 @@ export function UserList() {
       const data = res.data as { imported: number; skipped: number; errors: string[]; total_rows: number };
       setImportResults(data);
       if (data.imported > 0) {
-        toast.success(t('users.import_success', { count: data.imported }));
+        toast.success(`Import successfully`);
         loadUsers();
       }
     } else {
-      toast.error(res.error || t('users.import_failed'));
+      toast.error(res.error || "Import Failed");
     }
     setImportLoading(false);
   };
@@ -229,12 +227,12 @@ export function UserList() {
             // Use BroadcastChannel for memory-only token handoff — never persisted
             const { sendImpersonationToken } = await import('@/lib/impersonate');
             sendImpersonationToken(token, `${window.location.origin}${tenantPath('/dashboard')}`);
-            toast.success(t('users.impersonate_success', { name: user.name }));
+            toast.success(`Impersonate successfully`);
           } else {
-            toast.success(t('users.impersonate_started'));
+            toast.success("Impersonate Started");
           }
         } else {
-          toast.error(res?.error || t('users.impersonate_failed'));
+          toast.error(res?.error || "Impersonate Failed");
         }
         setActionLoading(false);
         setConfirmAction(null);
@@ -246,13 +244,13 @@ export function UserList() {
       const data = res.data as Record<string, unknown> | undefined;
       if ((type === 'approve' || type === 'reactivate') && data?.email_sent === false) {
         const action = type === 'approve' ? 'approved' : 'reactivated';
-        toast.success(t('users.user_approved_email_warning', { action }));
+        toast.success(`An approval email will be sent to this user`);
       } else {
-        toast.success(t('users.user_action_success', { action: type }));
+        toast.success(`User Action successfully`);
       }
       loadUsers();
     } else {
-      toast.error(res?.error || t('users.user_action_failed', { action: type }));
+      toast.error(res?.error || `User action failed`);
     }
 
     setActionLoading(false);
@@ -260,45 +258,45 @@ export function UserList() {
   };
 
   const confirmMessages: Record<string, { title: string; message: string; label: string }> = {
-    approve: { title: t('users.confirm_approve_title'), message: t('users.confirm_approve_message'), label: t('users.action_approve') },
-    suspend: { title: t('users.confirm_suspend_title'), message: t('users.confirm_suspend_message'), label: t('users.action_suspend') },
-    ban: { title: t('users.confirm_ban_title'), message: t('users.confirm_ban_message'), label: t('users.action_ban') },
-    reactivate: { title: t('users.confirm_reactivate_title'), message: t('users.confirm_reactivate_message'), label: t('users.action_reactivate') },
-    delete: { title: t('users.confirm_delete_title'), message: t('users.confirm_delete_message'), label: t('users.action_delete') },
-    reset2fa: { title: t('users.confirm_reset_2fa_title'), message: t('users.confirm_reset_2fa_message'), label: t('users.action_reset_2fa') },
-    impersonate: { title: t('users.confirm_impersonate_title'), message: t('users.confirm_impersonate_message'), label: t('users.action_impersonate') },
+    approve: { title: "Approve User", message: "Are you sure you want to approve this user? They will gain access to the platform.", label: "Approve" },
+    suspend: { title: "Suspend User", message: "Are you sure you want to suspend this user? They will temporarily lose access.", label: "Suspend" },
+    ban: { title: "Ban User", message: "Are you sure you want to ban this user? They will lose access to the platform.", label: "Ban" },
+    reactivate: { title: "Reactivate User", message: "Are you sure you want to reactivate this user? They will regain access.", label: "Reactivate" },
+    delete: { title: "Delete User", message: "Are you sure you want to delete this user? This cannot be undone.", label: "Delete" },
+    reset2fa: { title: "Reset 2FA", message: "Are you sure you want to reset two-factor authentication for this user?", label: "Reset 2FA" },
+    impersonate: { title: "Impersonate User", message: "Are you sure you want to impersonate this user? You will be logged in as them.", label: "Impersonate" },
   };
 
   function UserActionsMenu({ user }: { user: AdminUser }) {
     type ActionKey = 'edit' | 'approve' | 'suspend' | 'ban' | 'reactivate' | 'reset2fa' | 'permissions' | 'impersonate' | 'delete';
 
     const items: { key: ActionKey; label: string; icon: React.ReactNode; color?: 'success' | 'warning' | 'danger'; className?: string }[] = [
-      { key: 'edit', label: t('users.action_edit'), icon: <Edit size={14} /> },
+      { key: 'edit', label: "Edit", icon: <Edit size={14} /> },
     ];
 
     if (user.status === 'pending') {
-      items.push({ key: 'approve', label: t('users.action_approve'), icon: <UserCheck size={14} />, color: 'success', className: 'text-success' });
+      items.push({ key: 'approve', label: "Approve", icon: <UserCheck size={14} />, color: 'success', className: 'text-success' });
     }
     if (user.status === 'active') {
-      items.push({ key: 'suspend', label: t('users.action_suspend'), icon: <UserX size={14} />, color: 'warning', className: 'text-warning' });
+      items.push({ key: 'suspend', label: "Suspend", icon: <UserX size={14} />, color: 'warning', className: 'text-warning' });
     }
     if (user.status !== 'banned') {
-      items.push({ key: 'ban', label: t('users.action_ban'), icon: <Ban size={14} />, color: 'danger', className: 'text-danger' });
+      items.push({ key: 'ban', label: "Ban", icon: <Ban size={14} />, color: 'danger', className: 'text-danger' });
     }
     if (user.status === 'suspended' || user.status === 'banned') {
-      items.push({ key: 'reactivate', label: t('users.action_reactivate'), icon: <RotateCcw size={14} />, color: 'success', className: 'text-success' });
+      items.push({ key: 'reactivate', label: "Reactivate", icon: <RotateCcw size={14} />, color: 'success', className: 'text-success' });
     }
     if (user.has_2fa_enabled) {
-      items.push({ key: 'reset2fa', label: t('users.action_reset_2fa'), icon: <KeyRound size={14} /> });
+      items.push({ key: 'reset2fa', label: "Reset 2FA", icon: <KeyRound size={14} /> });
     }
-    items.push({ key: 'permissions', label: t('users.action_permissions'), icon: <Shield size={14} /> });
+    items.push({ key: 'permissions', label: "Permissions", icon: <Shield size={14} /> });
     // Super admins can impersonate other users (but not other super admins)
     if (isSuperAdmin && !user.is_super_admin && user.id !== currentUser?.id) {
-      items.push({ key: 'impersonate', label: t('users.action_impersonate'), icon: <LogIn size={14} /> });
+      items.push({ key: 'impersonate', label: "Impersonate", icon: <LogIn size={14} /> });
     }
     // Delete (only if not current user)
     if (user.id !== currentUser?.id) {
-      items.push({ key: 'delete', label: t('users.action_delete'), icon: <Trash2 size={14} />, color: 'danger', className: 'text-danger' });
+      items.push({ key: 'delete', label: "Delete", icon: <Trash2 size={14} />, color: 'danger', className: 'text-danger' });
     }
 
     const handleMenuAction = (key: React.Key) => {
@@ -317,11 +315,11 @@ export function UserList() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label={t('users.actions_menu')}>
+          <Button isIconOnly size="sm" variant="light" aria-label={"Actions Menu"}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
-        <DropdownMenu aria-label={t('users.actions_menu')} onAction={handleMenuAction}>
+        <DropdownMenu aria-label={"Actions Menu"} onAction={handleMenuAction}>
           {items.map((item) => (
             <DropdownItem
               key={item.key}
@@ -340,7 +338,7 @@ export function UserList() {
   const columns: Column<AdminUser>[] = [
     {
       key: 'name',
-      label: t('users.col_user'),
+      label: "User",
       sortable: true,
       render: (user) => (
         <div className="flex items-center gap-3">
@@ -363,7 +361,7 @@ export function UserList() {
     },
     {
       key: 'role',
-      label: t('users.col_role'),
+      label: "Role",
       sortable: true,
       render: (user) => (
         <div className="flex items-center gap-1">
@@ -384,19 +382,19 @@ export function UserList() {
     },
     {
       key: 'status',
-      label: t('users.col_status'),
+      label: "Status",
       sortable: true,
       render: (user) => <StatusBadge status={user.status} />,
     },
     {
       key: 'balance',
-      label: t('users.col_balance'),
+      label: "Balance",
       sortable: true,
       render: (user) => <span>{user.balance ?? 0}h</span>,
     },
     {
       key: 'created_at',
-      label: t('users.col_joined'),
+      label: "Joined",
       sortable: true,
       render: (user) => (
         <span className="text-sm text-default-500">
@@ -406,7 +404,7 @@ export function UserList() {
     },
     {
       key: 'actions',
-      label: t('users.col_actions'),
+      label: "Actions",
       render: (user) => <UserActionsMenu user={user} />,
     },
   ];
@@ -414,8 +412,8 @@ export function UserList() {
   return (
     <div>
       <PageHeader
-        title={t('users.title')}
-        description={t('users.description')}
+        title={"Users"}
+        description={"Manage users settings and configuration"}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -423,14 +421,14 @@ export function UserList() {
               startContent={<Upload size={16} />}
               onPress={() => setImportOpen(true)}
             >
-              {t('users.import_csv')}
+              {"Import CSV"}
             </Button>
             <Button
               color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/users/create'))}
             >
-              {t('users.add_user')}
+              {"Add User"}
             </Button>
           </div>
         }
@@ -444,13 +442,13 @@ export function UserList() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={t('users.all_users')} />
-          <Tab key="pending" title={t('users.pending')} />
-          <Tab key="active" title={t('users.active')} />
-          <Tab key="suspended" title={t('users.suspended')} />
-          <Tab key="banned" title={t('users.banned')} />
-          <Tab key="never_logged_in" title={t('users.never_logged_in')} />
-          <Tab key="onboarding_incomplete" title={t('users.onboarding_incomplete')} />
+          <Tab key="all" title={"All Users"} />
+          <Tab key="pending" title={"Pending"} />
+          <Tab key="active" title={"Active"} />
+          <Tab key="suspended" title={"Suspended"} />
+          <Tab key="banned" title={"Banned"} />
+          <Tab key="never_logged_in" title={"Never Logged in"} />
+          <Tab key="onboarding_incomplete" title={"Onboarding Incomplete"} />
         </Tabs>
       </div>
 
@@ -459,11 +457,11 @@ export function UserList() {
         const bulkActions: BulkAction[] = [
           {
             key: 'approve',
-            label: t('bulk.users.approve'),
+            label: "Approve",
             icon: <UserCheck size={14} />,
             color: 'success',
-            confirmTitle: t('bulk.users.approve_confirm_title'),
-            confirmMessage: t('bulk.users.approve_confirm_message', { count: selectedIdList.length }),
+            confirmTitle: "Approve Confirm",
+            confirmMessage: `Approve Confirm`,
             onConfirm: async () => {
               setBulkLoading(true);
               try {
@@ -476,15 +474,15 @@ export function UserList() {
           },
           {
             key: 'suspend',
-            label: t('bulk.users.suspend'),
+            label: "Suspend",
             icon: <UserX size={14} />,
             color: 'warning',
             destructive: true,
             needsReason: true,
-            reasonLabel: t('bulk.users.reason_label'),
-            reasonPlaceholder: t('bulk.users.reason_placeholder'),
-            confirmTitle: t('bulk.users.suspend_confirm_title'),
-            confirmMessage: t('bulk.users.suspend_confirm_message', { count: selectedIdList.length }),
+            reasonLabel: "Reason",
+            reasonPlaceholder: "Enter reason...",
+            confirmTitle: "Suspend Confirm",
+            confirmMessage: `Suspend Confirm`,
             onConfirm: async (reason) => {
               setBulkLoading(true);
               try {
@@ -510,7 +508,7 @@ export function UserList() {
         columns={columns}
         data={users}
         isLoading={loading}
-        searchPlaceholder={t('users.search_placeholder')}
+        searchPlaceholder={"Search users..."}
         onSearch={(q) => { setSearch(q); setPage(1); }}
         onRefresh={loadUsers}
         totalItems={total}
@@ -540,12 +538,12 @@ export function UserList() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <FileUp size={20} />
-            {t('users.import_title')}
+            {"Import"}
           </ModalHeader>
           <ModalBody>
             {!importResults ? (
               <div className="flex flex-col gap-4">
-                <p className="text-sm text-default-500" dangerouslySetInnerHTML={{ __html: sanitizeInline(t('users.import_csv_description')) }} />
+                <p className="text-sm text-default-500" dangerouslySetInnerHTML={{ __html: sanitizeInline("Import members from a CSV file. Download the template to see the required format.") }} />
 
                 <div className="flex items-center gap-2">
                   <Button
@@ -554,12 +552,12 @@ export function UserList() {
                     startContent={<Download size={14} />}
                     onPress={() => adminUsers.downloadImportTemplate()}
                   >
-                    {t('users.import_download_template')}
+                    {"Download Template"}
                   </Button>
                 </div>
 
                 <div>
-                  <label htmlFor="import-csv-file" className="block text-sm font-medium mb-1">{t('users.import_csv_file')}</label>
+                  <label htmlFor="import-csv-file" className="block text-sm font-medium mb-1">{"CSV File"}</label>
                   <input
                     id="import-csv-file"
                     type="file"
@@ -570,7 +568,7 @@ export function UserList() {
                 </div>
 
                 <Select
-                  label={t('users.import_default_role')}
+                  label={"Default Role"}
                   selectedKeys={[importRole]}
                   onSelectionChange={(keys) => {
                     const selected = Array.from(keys)[0] as string;
@@ -579,9 +577,9 @@ export function UserList() {
                   size="sm"
                   variant="bordered"
                 >
-                  <SelectItem key="member">{t('users.import_role_member')}</SelectItem>
-                  <SelectItem key="broker">{t('users.import_role_broker')}</SelectItem>
-                  <SelectItem key="coordinator">{t('users.import_role_coordinator')}</SelectItem>
+                  <SelectItem key="member">{"Member"}</SelectItem>
+                  <SelectItem key="broker">{"Broker"}</SelectItem>
+                  <SelectItem key="coordinator">{"Coordinator"}</SelectItem>
                 </Select>
               </div>
             ) : (
@@ -589,22 +587,22 @@ export function UserList() {
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2 text-success">
                     <CheckCircle2 size={18} />
-                    <span className="font-medium">{t('users.import_imported', { count: importResults.imported })}</span>
+                    <span className="font-medium">{`Import Imported`}</span>
                   </div>
                   {importResults.skipped > 0 && (
                     <div className="flex items-center gap-2 text-warning">
                       <AlertCircle size={18} />
-                      <span className="font-medium">{t('users.import_skipped', { count: importResults.skipped })}</span>
+                      <span className="font-medium">{`Import Skipped`}</span>
                     </div>
                   )}
                   <span className="text-sm text-default-400">
-                    {t('users.import_total_rows', { count: importResults.total_rows })}
+                    {`Total Rows`}
                   </span>
                 </div>
 
                 {importResults.errors.length > 0 && (
                   <div className="max-h-48 overflow-y-auto rounded-lg bg-danger-50 p-3">
-                    <p className="text-sm font-medium text-danger mb-1">{t('users.import_errors')}</p>
+                    <p className="text-sm font-medium text-danger mb-1">{"Import Errors"}</p>
                     <ul className="text-xs text-danger-600 space-y-1">
                       {importResults.errors.map((err, i) => (
                         // Error strings may duplicate; use index prefix for stable key
@@ -618,7 +616,7 @@ export function UserList() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={resetImportModal} isDisabled={importLoading}>
-              {importResults ? t('close') : t('cancel')}
+              {importResults ? "Close" : "Cancel"}
             </Button>
             {!importResults && (
               <Button
@@ -628,7 +626,7 @@ export function UserList() {
                 isDisabled={!importFile}
                 startContent={!importLoading ? <Upload size={16} /> : undefined}
               >
-                {t('import')}
+                {"Import"}
               </Button>
             )}
           </ModalFooter>

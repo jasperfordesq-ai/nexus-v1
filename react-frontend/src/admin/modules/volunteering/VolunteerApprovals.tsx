@@ -47,7 +47,7 @@ interface VolApplication {
 
 export function VolunteerApprovals() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('volunteering.page_title'));
+  usePageTitle("Volunteering");
   const toast = useToast();
   const [items, setItems] = useState<VolApplication[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,7 +73,7 @@ export function VolunteerApprovals() {
         }
       }
     } catch {
-      toast.error(t('volunteering.failed_to_load_approvals'));
+      toast.error("Failed to load approvals");
       setItems([]);
     }
     setLoading(false);
@@ -116,13 +116,13 @@ export function VolunteerApprovals() {
     try {
       const res = await adminVolunteering.approveApplication(id);
       if (res.success) {
-        toast.success(t('volunteering.application_approved'));
+        toast.success("Application Approved");
         loadData();
       } else {
-        toast.error(t('volunteering.failed_to_approve_application'));
+        toast.error("Failed to approve application");
       }
     } catch {
-      toast.error(t('volunteering.failed_to_approve_application'));
+      toast.error("Failed to approve application");
     } finally {
       setActionId(null);
     }
@@ -133,13 +133,13 @@ export function VolunteerApprovals() {
     try {
       const res = await adminVolunteering.declineApplication(id);
       if (res.success) {
-        toast.success(t('volunteering.application_declined'));
+        toast.success("Application Declined");
         loadData();
       } else {
-        toast.error(t('volunteering.failed_to_decline_application'));
+        toast.error("Failed to decline application");
       }
     } catch {
-      toast.error(t('volunteering.failed_to_decline_application'));
+      toast.error("Failed to decline application");
     } finally {
       setActionId(null);
     }
@@ -217,7 +217,7 @@ export function VolunteerApprovals() {
       ),
     },
     {
-      key: 'applicant', label: t('volunteering.col_applicant'), sortable: true,
+      key: 'applicant', label: "Applicant", sortable: true,
       render: (item) => (
         <div className="flex items-center gap-3">
           <Avatar name={`${item.first_name} ${item.last_name}`} size="sm" />
@@ -228,17 +228,17 @@ export function VolunteerApprovals() {
         </div>
       ),
     },
-    { key: 'opportunity_title', label: t('volunteering.col_opportunity'), sortable: true },
+    { key: 'opportunity_title', label: "Opportunity", sortable: true },
     {
-      key: 'status', label: t('volunteering.col_status'),
+      key: 'status', label: "Status",
       render: (item) => <StatusBadge status={item.status} />,
     },
     {
-      key: 'created_at', label: t('volunteering.col_applied'), sortable: true,
+      key: 'created_at', label: "Applied", sortable: true,
       render: (item) => <span className="text-sm text-default-500">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
     },
     {
-      key: 'actions', label: t('volunteering.col_actions'),
+      key: 'actions', label: "Actions",
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -250,7 +250,7 @@ export function VolunteerApprovals() {
             isLoading={actionId === item.id}
             isDisabled={actionId !== null && actionId !== item.id}
           >
-            {t('volunteering.approve')}
+            {"Approve"}
           </Button>
           <Button
             size="sm"
@@ -261,7 +261,7 @@ export function VolunteerApprovals() {
             isLoading={actionId === item.id}
             isDisabled={actionId !== null && actionId !== item.id}
           >
-            {t('volunteering.decline')}
+            {"Decline"}
           </Button>
         </div>
       ),
@@ -385,8 +385,8 @@ export function VolunteerApprovals() {
   if (!loading && items.length === 0) {
     return (
       <div>
-        <PageHeader title={t('volunteering.volunteer_approvals_title')} description={t('volunteering.volunteer_approvals_desc')} />
-        <EmptyState icon={ClipboardCheck} title={t('volunteering.no_pending_approvals')} description={t('volunteering.desc_all_volunteer_applications_have_been_rev')} />
+        <PageHeader title={"Volunteer Approvals"} description={"Review and approve or decline volunteer applications"} />
+        <EmptyState icon={ClipboardCheck} title={"No pending approvals"} description={"All volunteer applications have been reviewed"} />
       </div>
     );
   }
@@ -394,9 +394,9 @@ export function VolunteerApprovals() {
   return (
     <div>
       <PageHeader
-        title={t('volunteering.volunteer_approvals_title')}
-        description={t('volunteering.volunteer_approvals_desc')}
-        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('common.refresh')}</Button>}
+        title={"Volunteer Approvals"}
+        description={"Review and approve or decline volunteer applications"}
+        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{"Refresh"}</Button>}
       />
       <DataTable
         columns={columns}

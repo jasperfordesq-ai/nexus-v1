@@ -61,7 +61,6 @@ import { adminSuper } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
 import type { SuperAdminTenantDetail } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 const FEATURE_OPTIONS = [
   'events', 'groups', 'gamification', 'goals', 'blog', 'resources',
   'volunteering', 'exchange_workflow', 'federation', 'organisations',
@@ -83,9 +82,8 @@ const LANGUAGE_LABELS: Record<string, string> = {
 };
 
 export function TenantShow() {
-  const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
-  usePageTitle(t('super.page_title'));
+  usePageTitle("Super Admin");
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -131,13 +129,13 @@ export function TenantShow() {
     try {
       const res = await adminSuper.moveTenant(tenant.id, Number(moveParentId));
       if (res.success) {
-        toast.success(t('super.tenant_moved_successfully'));
+        toast.success("Tenant moved successfully");
         moveModal.onClose();
         loadTenant();
       } else {
-        toast.error(res.error || t('super.failed_to_move_tenant'));
+        toast.error(res.error || "Failed to move tenant");
       }
-    } catch { toast.error(t('super.an_error_occurred')); }
+    } catch { toast.error("An error occurred"); }
     setActionLoading(false);
   };
 
@@ -153,12 +151,12 @@ export function TenantShow() {
       }
       if (res.success) {
         const newActive = !tenant.is_active;
-        toast.success(newActive ? t('super.tenant_reactivated') : t('super.tenant_deactivated'));
+        toast.success(newActive ? "Tenant Reactivated" : "Tenant Deactivated");
         setTenant((prev) => prev ? { ...prev, is_active: newActive } : prev);
       } else {
-        toast.error(res.error || t('super.operation_failed'));
+        toast.error(res.error || "Operation failed");
       }
-    } catch { toast.error(t('super.an_error_occurred')); }
+    } catch { toast.error("An error occurred"); }
     setActionLoading(false);
   };
 
@@ -170,13 +168,13 @@ export function TenantShow() {
     try {
       const res = await adminSuper.toggleHub(tenant.id, newValue);
       if (res.success) {
-        toast.success(newValue ? t('super.hub_enabled') : t('super.hub_disabled'));
+        toast.success(newValue ? "Hub Enabled" : "Hub Disabled");
         // Optimistic update — avoids refetch which re-triggers Switch onValueChange
         setTenant((prev) => prev ? { ...prev, allows_subtenants: newValue } : prev);
       } else {
-        toast.error(res.error || t('super.failed_to_toggle_hub'));
+        toast.error(res.error || "Failed to toggle hub");
       }
-    } catch { toast.error(t('super.an_error_occurred')); }
+    } catch { toast.error("An error occurred"); }
     setActionLoading(false);
     // Release guard after a tick so the Switch settles
     requestAnimationFrame(() => { togglingHub.current = false; });
@@ -190,10 +188,10 @@ export function TenantShow() {
       if (res.success && res.data) {
         setTenant(res.data as SuperAdminTenantDetail);
       } else {
-        toast.error(res.error || t('super.failed_to_load_tenant'));
+        toast.error(res.error || "Failed to load tenant");
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('super.an_error_occurred'));
+      toast.error(err instanceof Error ? err.message : "An error occurred");
     }
     setLoading(false);
   }, [id, toast, t])
@@ -201,7 +199,7 @@ export function TenantShow() {
   const handleAddAdmin = async () => {
     if (!tenant) return;
     if (!adminForm.first_name.trim() || !adminForm.email.trim() || !adminForm.password.trim()) {
-      toast.error(t('super.first_name_email_and_password_are_requ'));
+      toast.error("First name, email, and password are required");
       return;
     }
     setAddingAdmin(true);
@@ -215,15 +213,15 @@ export function TenantShow() {
         role: adminForm.role,
       });
       if (res.success) {
-        toast.success(t('super.administrator_added_successfully'));
+        toast.success("Administrator added successfully");
         setShowAddAdmin(false);
         setAdminForm({ first_name: '', last_name: '', email: '', password: '', role: 'admin' });
         loadTenant(); // Refresh to show new admin
       } else {
-        toast.error(res.error || t('super.failed_to_add_administrator'));
+        toast.error(res.error || "Failed to add administrator");
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : t('super.failed_to_add_administrator');
+      const message = err instanceof Error ? err.message : "Failed to add administrator";
       toast.error(message);
     }
     setAddingAdmin(false);
@@ -234,13 +232,13 @@ export function TenantShow() {
     try {
       const res = await adminSuper.updateUser(admin.id, { role: 'member' });
       if (res.success) {
-        toast.success(t('super.admin_demoted', { name: admin.name }));
+        toast.success(`Admin Demoted`);
         loadTenant();
       } else {
-        toast.error(res.error || t('super.failed_to_remove_admin'));
+        toast.error(res.error || "Failed to remove admin");
       }
     } catch {
-      toast.error(t('super.an_error_occurred'));
+      toast.error("An error occurred");
     }
     setRemovingAdminId(null);
   };
@@ -260,14 +258,14 @@ export function TenantShow() {
   if (!tenant) {
     return (
       <div className="py-20 text-center">
-        <p className="text-default-500">{t('super.tenant_not_found')}</p>
+        <p className="text-default-500">{"Tenant Not Found"}</p>
         <Button
           variant="flat"
           className="mt-4"
           startContent={<ArrowLeft size={16} />}
           onPress={() => navigate(tenantPath('/admin/super/tenants'))}
         >
-          {t('super.back_to_tenants')}
+          {"Back to Tenants"}
         </Button>
       </div>
     );
@@ -287,7 +285,7 @@ export function TenantShow() {
     <div>
       <PageHeader
         title={tenant.name}
-        description={tenant.tagline || `${t('super.label_tenant_i_d')}: ${tenant.id}`}
+        description={tenant.tagline || `${"Tenant I D"}: ${tenant.id}`}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -295,14 +293,14 @@ export function TenantShow() {
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/super/tenants'))}
             >
-              {t('super.back')}
+              {"Back"}
             </Button>
             <Button
               color="primary"
               startContent={<Edit size={16} />}
               onPress={() => navigate(tenantPath(`/admin/super/tenants/${tenant.id}/edit`))}
             >
-              {t('super.edit')}
+              {"Edit"}
             </Button>
           </div>
         }
@@ -337,16 +335,16 @@ export function TenantShow() {
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
                 <Building2 size={18} className="text-primary" />
-                <h3 className="text-lg font-semibold">{t('super.section_tenant_information')}</h3>
+                <h3 className="text-lg font-semibold">{"Tenant Information"}</h3>
               </div>
             </CardHeader>
             <CardBody className="pt-3">
               <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <DetailField label={t('super.label_name')} value={tenant.name} />
-                <DetailField label={t('super.label_slug')} value={tenant.slug} />
-                <DetailField label={t('super.label_domain')} value={tenant.domain} />
+                <DetailField label={"Name"} value={tenant.name} />
+                <DetailField label={"Slug"} value={tenant.slug} />
+                <DetailField label={"Domain"} value={tenant.domain} />
                 <DetailField
-                  label={t('super.label_parent_tenant')}
+                  label={"Parent Tenant"}
                   value={
                     tenant.parent_id ? (
                       <Link
@@ -356,19 +354,19 @@ export function TenantShow() {
                         {tenant.parent_name || `Tenant #${tenant.parent_id}`}
                       </Link>
                     ) : (
-                      <span className="text-default-400">{t('super.none_top_level')}</span>
+                      <span className="text-default-400">{"None Top Level"}</span>
                     )
                   }
                 />
-                <DetailField label={t('super.label_depth_in_hierarchy')} value={String(tenant.depth ?? 0)} />
-                <DetailField label={t('super.label_max_subtenant_depth')} value={String(tenant.max_depth)} />
+                <DetailField label={"Depth in Hierarchy"} value={String(tenant.depth ?? 0)} />
+                <DetailField label={"Max Subtenant Depth"} value={String(tenant.max_depth)} />
                 <DetailField
-                  label={t('super.label_allows_subtenants')}
+                  label={"Allows Subtenants"}
                   value={
                     tenant.allows_subtenants ? (
-                      <Chip color="success" variant="flat" size="sm">{t('super.yes_hub')}</Chip>
+                      <Chip color="success" variant="flat" size="sm">{"Yes Hub"}</Chip>
                     ) : (
-                      <Chip color="default" variant="flat" size="sm">{t('super.no')}</Chip>
+                      <Chip color="default" variant="flat" size="sm">{"No"}</Chip>
                     )
                   }
                 />
@@ -377,14 +375,14 @@ export function TenantShow() {
                 <>
                   <Divider className="my-4" />
                   <div>
-                    <p className="text-xs font-medium uppercase text-default-400 mb-1">{t('super.label_description')}</p>
+                    <p className="text-xs font-medium uppercase text-default-400 mb-1">{"Description"}</p>
                     <p className="text-sm text-default-700 whitespace-pre-line">{tenant.description}</p>
                   </div>
                 </>
               )}
               {tenant.tagline && (
                 <div className="mt-3">
-                  <p className="text-xs font-medium uppercase text-default-400 mb-1">{t('super.label_tagline')}</p>
+                  <p className="text-xs font-medium uppercase text-default-400 mb-1">{"Tagline"}</p>
                   <p className="text-sm text-default-700">{tenant.tagline}</p>
                 </div>
               )}
@@ -397,14 +395,14 @@ export function TenantShow() {
               <CardHeader className="pb-0">
                 <div className="flex items-center gap-2">
                   <Users size={18} className="text-primary" />
-                  <h3 className="text-lg font-semibold">{t('super.section_contact_information')}</h3>
+                  <h3 className="text-lg font-semibold">{"Contact Information"}</h3>
                 </div>
               </CardHeader>
               <CardBody className="pt-3">
                 <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <DetailField label={t('super.label_email')} value={tenant.contact_email} />
-                  <DetailField label={t('super.label_phone')} value={tenant.contact_phone} />
-                  <DetailField label={t('super.label_address')} value={tenant.address} />
+                  <DetailField label={"Email"} value={tenant.contact_email} />
+                  <DetailField label={"Phone"} value={tenant.contact_phone} />
+                  <DetailField label={"Address"} value={tenant.address} />
                 </dl>
               </CardBody>
             </Card>
@@ -415,17 +413,17 @@ export function TenantShow() {
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
                 <Search size={18} className="text-primary" />
-                <h3 className="text-lg font-semibold">{t('super.section_seo_settings')}</h3>
+                <h3 className="text-lg font-semibold">{"SEO Settings"}</h3>
               </div>
             </CardHeader>
             <CardBody className="pt-3">
               <dl className="grid grid-cols-1 gap-4">
-                <DetailField label={t('super.label_meta_title')} value={tenant.meta_title} />
-                <DetailField label={t('super.label_meta_description')} value={tenant.meta_description} />
-                <DetailField label={t('super.label_h1_headline')} value={tenant.h1_headline} />
-                <DetailField label={t('super.label_hero_introduction')} value={tenant.hero_intro} />
-                <DetailField label={t('super.label_o_g_image_u_r_l')} value={tenant.og_image_url} />
-                <DetailField label={t('super.label_robots_directive')} value={tenant.robots_directive} />
+                <DetailField label={"Meta Title"} value={tenant.meta_title} />
+                <DetailField label={"Meta Description"} value={tenant.meta_description} />
+                <DetailField label={"H1 Headline"} value={tenant.h1_headline} />
+                <DetailField label={"Hero Introduction"} value={tenant.hero_intro} />
+                <DetailField label={"O G Image URL"} value={tenant.og_image_url} />
+                <DetailField label={"Robots Directive"} value={tenant.robots_directive} />
               </dl>
             </CardBody>
           </Card>
@@ -435,16 +433,16 @@ export function TenantShow() {
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
                 <MapPin size={18} className="text-primary" />
-                <h3 className="text-lg font-semibold">{t('super.section_location')}</h3>
+                <h3 className="text-lg font-semibold">{"Location"}</h3>
               </div>
             </CardHeader>
             <CardBody className="pt-3">
               <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <DetailField label={t('super.label_location_name')} value={tenant.location_name} />
-                <DetailField label={t('super.label_country_code')} value={tenant.country_code} />
-                <DetailField label={t('super.label_service_area')} value={tenant.service_area} />
-                <DetailField label={t('super.label_latitude')} value={tenant.latitude} />
-                <DetailField label={t('super.label_longitude')} value={tenant.longitude} />
+                <DetailField label={"Location Name"} value={tenant.location_name} />
+                <DetailField label={"Country Code"} value={tenant.country_code} />
+                <DetailField label={"Service Area"} value={tenant.service_area} />
+                <DetailField label={"Latitude"} value={tenant.latitude} />
+                <DetailField label={"Longitude"} value={tenant.longitude} />
               </dl>
             </CardBody>
           </Card>
@@ -454,7 +452,7 @@ export function TenantShow() {
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
                 <Globe size={18} className="text-primary" />
-                <h3 className="text-lg font-semibold">{t('super.section_social_media')}</h3>
+                <h3 className="text-lg font-semibold">{"Social Media"}</h3>
               </div>
             </CardHeader>
             <CardBody className="pt-3">
@@ -483,7 +481,7 @@ export function TenantShow() {
                   })}
                 </div>
               ) : (
-                <p className="text-sm text-default-400">{t('super.no_social_links')}</p>
+                <p className="text-sm text-default-400">{"No social links found"}</p>
               )}
             </CardBody>
           </Card>
@@ -493,13 +491,13 @@ export function TenantShow() {
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
                 <Languages size={18} className="text-primary" />
-                <h3 className="text-lg font-semibold">{t('super.section_languages')}</h3>
+                <h3 className="text-lg font-semibold">{"Languages"}</h3>
               </div>
             </CardHeader>
             <CardBody className="pt-3">
               <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <DetailField
-                  label={t('super.label_default_language')}
+                  label={"Default Language"}
                   value={
                     (() => {
                       const code = (tenant.configuration as Record<string, unknown>)?.default_language as string | undefined;
@@ -508,7 +506,7 @@ export function TenantShow() {
                   }
                 />
                 <div>
-                  <dt className="text-xs font-medium uppercase text-default-400">{t('super.label_supported_languages')}</dt>
+                  <dt className="text-xs font-medium uppercase text-default-400">{"Supported Languages"}</dt>
                   <dd className="mt-1 flex flex-wrap gap-1.5">
                     {(() => {
                       const langs = (tenant.configuration as Record<string, unknown>)?.supported_languages as string[] | undefined;
@@ -530,7 +528,7 @@ export function TenantShow() {
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
                 <Network size={18} className="text-primary" />
-                <h3 className="text-lg font-semibold">{t('super.section_features_modules')}</h3>
+                <h3 className="text-lg font-semibold">{"Features Modules"}</h3>
               </div>
             </CardHeader>
             <CardBody className="pt-3">
@@ -563,46 +561,46 @@ export function TenantShow() {
           {/* Status */}
           <Card shadow="sm">
             <CardHeader className="pb-0">
-              <h3 className="text-lg font-semibold">{t('super.section_status')}</h3>
+              <h3 className="text-lg font-semibold">{"Status"}</h3>
             </CardHeader>
             <CardBody className="pt-3 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-default-500">{t('super.label_active')}</span>
+                <span className="text-sm text-default-500">{"Active"}</span>
                 <Chip
                   color={tenant.is_active ? 'success' : 'danger'}
                   variant="flat"
                   size="sm"
                 >
-                  {tenant.is_active ? t('super.status_active_label') : t('super.status_inactive_label')}
+                  {tenant.is_active ? "Active Label" : "Inactive Label"}
                 </Chip>
               </div>
               {tenant.allows_subtenants && (
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-default-500">{t('super.label_type')}</span>
-                  <Chip color="secondary" variant="flat" size="sm">{t('super.hub')}</Chip>
+                  <span className="text-sm text-default-500">{"Type"}</span>
+                  <Chip color="secondary" variant="flat" size="sm">{"Hub"}</Chip>
                 </div>
               )}
               <div className="flex items-center justify-between">
-                <span className="text-sm text-default-500">{t('super.label_max_depth')}</span>
+                <span className="text-sm text-default-500">{"Max Depth"}</span>
                 <span className="text-sm font-medium">{tenant.max_depth}</span>
               </div>
               {tenant.user_count !== undefined && (
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-default-500">{t('super.label_users')}</span>
+                  <span className="text-sm text-default-500">{"Users"}</span>
                   <span className="text-sm font-medium">{tenant.user_count}</span>
                 </div>
               )}
               {tenant.listing_count !== undefined && (
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-default-500">{t('super.label_listings')}</span>
+                  <span className="text-sm text-default-500">{"Listings"}</span>
                   <span className="text-sm font-medium">{tenant.listing_count}</span>
                 </div>
               )}
               <Divider />
               <div className="text-xs text-default-400">
-                <p>{t('super.created')}: {new Date(tenant.created_at).toLocaleDateString()}</p>
+                <p>{"Created"}: {new Date(tenant.created_at).toLocaleDateString()}</p>
                 {tenant.updated_at && (
-                  <p>{t('super.updated')}: {new Date(tenant.updated_at).toLocaleDateString()}</p>
+                  <p>{"Updated"}: {new Date(tenant.updated_at).toLocaleDateString()}</p>
                 )}
               </div>
             </CardBody>
@@ -614,7 +612,7 @@ export function TenantShow() {
               <div className="flex items-center gap-2">
                 <Building2 size={18} className="text-primary" />
                 <h3 className="text-lg font-semibold">
-                  {t('super.section_children')}
+                  {"Children"}
                   {tenant.children.length > 0 && (
                     <span className="ml-1 text-sm font-normal text-default-400">
                       ({tenant.children.length})
@@ -625,7 +623,7 @@ export function TenantShow() {
             </CardHeader>
             <CardBody className="pt-3">
               {tenant.children.length === 0 ? (
-                <p className="text-sm text-default-400">{t('super.no_child_tenants')}</p>
+                <p className="text-sm text-default-400">{"No child tenants found"}</p>
               ) : (
                 <ul className="space-y-2">
                   {tenant.children.map((child) => (
@@ -648,7 +646,7 @@ export function TenantShow() {
                           variant="dot"
                           size="sm"
                         >
-                          {child.is_active ? t('super.status_active_label') : t('super.status_inactive_label')}
+                          {child.is_active ? "Active Label" : "Inactive Label"}
                         </Chip>
                       </Link>
                     </li>
@@ -665,7 +663,7 @@ export function TenantShow() {
                 <div className="flex items-center gap-2">
                   <Users size={18} className="text-primary" />
                   <h3 className="text-lg font-semibold">
-                    {t('super.section_admins')}
+                    {"Admins"}
                     {tenant.admins.length > 0 && (
                       <span className="ml-1 text-sm font-normal text-default-400">
                         ({tenant.admins.length})
@@ -680,7 +678,7 @@ export function TenantShow() {
                   startContent={<UserPlus size={14} />}
                   onPress={() => setShowAddAdmin(!showAddAdmin)}
                 >
-                  {showAddAdmin ? t('super.cancel') : t('super.add')}
+                  {showAddAdmin ? "Cancel" : "Add"}
                 </Button>
               </div>
             </CardHeader>
@@ -688,25 +686,25 @@ export function TenantShow() {
               {/* Add Administrator Form */}
               {showAddAdmin && (
                 <div className="mb-4 space-y-3 rounded-lg border border-default-200 p-3">
-                  <p className="text-sm font-medium text-foreground">{t('super.add_administrator')}</p>
+                  <p className="text-sm font-medium text-foreground">{"Add Administrator"}</p>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <Input
                       size="sm"
-                      label={t('super.label_first_name')}
+                      label={"First Name"}
                       isRequired
                       value={adminForm.first_name}
                       onValueChange={(v) => setAdminForm({ ...adminForm, first_name: v })}
                     />
                     <Input
                       size="sm"
-                      label={t('super.label_last_name')}
+                      label={"Last Name"}
                       value={adminForm.last_name}
                       onValueChange={(v) => setAdminForm({ ...adminForm, last_name: v })}
                     />
                   </div>
                   <Input
                     size="sm"
-                    label={t('super.label_email')}
+                    label={"Email"}
                     type="email"
                     isRequired
                     value={adminForm.email}
@@ -714,7 +712,7 @@ export function TenantShow() {
                   />
                   <Input
                     size="sm"
-                    label={t('super.label_password')}
+                    label={"Password"}
                     type="password"
                     isRequired
                     value={adminForm.password}
@@ -722,16 +720,16 @@ export function TenantShow() {
                   />
                   <Select
                     size="sm"
-                    label={t('super.label_role')}
+                    label={"Role"}
                     selectedKeys={[adminForm.role]}
                     onSelectionChange={(keys) => {
                       const val = Array.from(keys)[0] as string;
                       if (val) setAdminForm({ ...adminForm, role: val });
                     }}
                   >
-                    <SelectItem key="admin">{t('super.role_admin')}</SelectItem>
-                    <SelectItem key="tenant_admin">{t('super.role_tenant_admin')}</SelectItem>
-                    <SelectItem key="member">{t('super.role_member')}</SelectItem>
+                    <SelectItem key="admin">{"Role Admin"}</SelectItem>
+                    <SelectItem key="tenant_admin">{"Role Tenant Admin"}</SelectItem>
+                    <SelectItem key="member">{"Role Member"}</SelectItem>
                   </Select>
                   <Button
                     size="sm"
@@ -740,13 +738,13 @@ export function TenantShow() {
                     onPress={handleAddAdmin}
                     fullWidth
                   >
-                    {t('super.create_administrator')}
+                    {"Create Administrator"}
                   </Button>
                 </div>
               )}
 
               {tenant.admins.length === 0 && !showAddAdmin ? (
-                <p className="text-sm text-default-400">{t('super.no_admins_found')}</p>
+                <p className="text-sm text-default-400">{"No admins found found"}</p>
               ) : (
                 <ul className="space-y-2">
                   {tenant.admins.map((admin) => (
@@ -791,7 +789,7 @@ export function TenantShow() {
           {/* Quick Actions */}
           <Card shadow="sm">
             <CardHeader className="pb-0">
-              <h3 className="text-lg font-semibold">{t('super.section_actions')}</h3>
+              <h3 className="text-lg font-semibold">{"Actions"}</h3>
             </CardHeader>
             <CardBody className="pt-3 space-y-2">
               <Button
@@ -801,7 +799,7 @@ export function TenantShow() {
                 startContent={<Edit size={16} />}
                 onPress={() => navigate(tenantPath(`/admin/super/tenants/${tenant.id}/edit`))}
               >
-                {t('super.edit_tenant')}
+                {"Edit Tenant"}
               </Button>
               {tenant.allows_subtenants && (
                 <Button
@@ -811,7 +809,7 @@ export function TenantShow() {
                   startContent={<Plus size={16} />}
                   onPress={() => navigate(tenantPath(`/admin/super/tenants/create?parent_id=${tenant.id}`))}
                 >
-                  {t('super.create_sub_tenant')}
+                  {"Create Sub Tenant"}
                 </Button>
               )}
               <Button
@@ -820,7 +818,7 @@ export function TenantShow() {
                 startContent={<ArrowLeft size={16} />}
                 onPress={() => navigate(tenantPath('/admin/super/tenants'))}
               >
-                {t('super.back_to_tenants')}
+                {"Back to Tenants"}
               </Button>
             </CardBody>
           </Card>
@@ -830,22 +828,22 @@ export function TenantShow() {
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
                 <Network size={18} className="text-primary" />
-                <h3 className="text-lg font-semibold">{t('super.section_hub_settings')}</h3>
+                <h3 className="text-lg font-semibold">{"Hub Settings"}</h3>
               </div>
             </CardHeader>
             <CardBody className="pt-3 space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium">{t('super.subtenant_capability')}</p>
+                  <p className="text-sm font-medium">{"Subtenant Capability"}</p>
                   <p className="text-xs text-default-400">
-                    {tenant.allows_subtenants ? t('super.can_create_subtenants') : t('super.standard_tenant')}
+                    {tenant.allows_subtenants ? "Can Create Subtenants" : "Standard Tenant"}
                   </p>
                 </div>
                 <Switch
                   isSelected={tenant.allows_subtenants}
                   isDisabled={actionLoading}
                   onValueChange={handleToggleHub}
-                  aria-label={t('super.label_toggle_hub_capability')}
+                  aria-label={"Toggle Hub Capability"}
                 />
               </div>
             </CardBody>
@@ -857,12 +855,12 @@ export function TenantShow() {
               <CardHeader className="pb-0">
                 <div className="flex items-center gap-2">
                   <MoveRight size={18} className="text-warning" />
-                  <h3 className="text-lg font-semibold">{t('super.section_move_tenant')}</h3>
+                  <h3 className="text-lg font-semibold">{"Move Tenant"}</h3>
                 </div>
               </CardHeader>
               <CardBody className="pt-3">
                 <p className="text-xs text-default-400 mb-3">
-                  {t('super.move_tenant_desc')}
+                  {"Move Tenant."}
                 </p>
                 <Button
                   color="warning"
@@ -873,7 +871,7 @@ export function TenantShow() {
                     moveModal.onOpen();
                   }}
                 >
-                  {t('super.move_to_different_parent')}
+                  {"Move to Different Parent"}
                 </Button>
               </CardBody>
             </Card>
@@ -885,7 +883,7 @@ export function TenantShow() {
               <CardHeader className="pb-0">
                 <div className="flex items-center gap-2 text-danger">
                   <AlertTriangle size={18} />
-                  <h3 className="text-lg font-semibold">{t('super.section_danger_zone')}</h3>
+                  <h3 className="text-lg font-semibold">{"Danger Zone"}</h3>
                 </div>
               </CardHeader>
               <CardBody className="pt-3">
@@ -897,11 +895,11 @@ export function TenantShow() {
                   startContent={<Power size={16} />}
                   onPress={handleToggleActive}
                 >
-                  {tenant.is_active ? t('super.deactivate_tenant') : t('super.reactivate_tenant')}
+                  {tenant.is_active ? "Deactivate Tenant" : "Reactivate Tenant"}
                 </Button>
                 {tenant.is_active && (
                   <p className="text-xs text-default-400 mt-2">
-                    {t('super.deactivate_warning')}
+                    {"Deactivate Warning"}
                   </p>
                 )}
               </CardBody>
@@ -913,14 +911,14 @@ export function TenantShow() {
       {/* Move Tenant Modal */}
       <Modal isOpen={moveModal.isOpen} onClose={moveModal.onClose}>
         <ModalContent>
-          <ModalHeader>{t('super.section_move_tenant')}</ModalHeader>
+          <ModalHeader>{"Move Tenant"}</ModalHeader>
           <ModalBody>
             <p className="text-sm text-default-500 mb-3">
-              {t('super.select_new_parent_for', { name: tenant.name })}
+              {`Select New Parent for`}
             </p>
             <Select
-              label={t('super.label_new_parent_tenant')}
-              placeholder={t('super.placeholder_select_parent')}
+              label={"New Parent Tenant"}
+              placeholder={"Select Parent..."}
               selectedKeys={moveParentId ? [moveParentId] : []}
               onSelectionChange={(keys) => {
                 const arr = Array.from(keys);
@@ -935,14 +933,14 @@ export function TenantShow() {
             </Select>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={moveModal.onClose}>{t('super.cancel')}</Button>
+            <Button variant="light" onPress={moveModal.onClose}>{"Cancel"}</Button>
             <Button
               color="warning"
               isDisabled={!moveParentId}
               isLoading={actionLoading}
               onPress={handleMove}
             >
-              {t('super.move')}
+              {"Move"}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -958,9 +956,9 @@ export function TenantShow() {
             setDemoteTarget(null);
           }
         }}
-        title={t('super.demote_admin_title')}
-        message={t('super.demote_confirm', { name: demoteTarget?.name ?? '' })}
-        confirmLabel={t('super.demote')}
+        title={"Demote Admin"}
+        message={`Demote Confirm`}
+        confirmLabel={"Demote"}
         confirmColor="danger"
         isLoading={removingAdminId !== null}
       />

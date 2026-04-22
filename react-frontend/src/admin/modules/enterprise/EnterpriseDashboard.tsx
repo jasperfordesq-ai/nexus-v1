@@ -27,10 +27,8 @@ import { adminEnterprise } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { EnterpriseDashboardStats } from '../../api/types';
 
-import { useTranslation } from 'react-i18next';
 export function EnterpriseDashboard() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('enterprise.page_title'));
+  usePageTitle("Enterprise");
   const { tenantPath } = useTenant();
 
   const [stats, setStats] = useState<EnterpriseDashboardStats | null>(null);
@@ -57,18 +55,18 @@ export function EnterpriseDashboard() {
   const healthColor = stats?.health_status === 'healthy' ? 'success' : stats?.health_status === 'degraded' ? 'warning' : 'danger';
 
   const quickLinks = [
-    { label: t('enterprise.link_roles_permissions'), href: tenantPath('/admin/enterprise/roles'), icon: Shield },
-    { label: t('enterprise.link_gdpr_dashboard'), href: tenantPath('/admin/enterprise/gdpr'), icon: FileWarning },
-    { label: t('enterprise.link_system_monitoring'), href: tenantPath('/admin/enterprise/monitoring'), icon: HeartPulse },
-    { label: t('enterprise.link_system_configuration'), href: tenantPath('/admin/enterprise/config'), icon: Shield },
-    { label: t('enterprise.link_legal_documents'), href: tenantPath('/admin/legal-documents'), icon: FileWarning },
+    { label: "Roles & Permissions", href: tenantPath('/admin/enterprise/roles'), icon: Shield },
+    { label: "GDPR Dashboard", href: tenantPath('/admin/enterprise/gdpr'), icon: FileWarning },
+    { label: "System Monitoring", href: tenantPath('/admin/enterprise/monitoring'), icon: HeartPulse },
+    { label: "System Configuration", href: tenantPath('/admin/enterprise/config'), icon: Shield },
+    { label: "Legal Documents", href: tenantPath('/admin/legal-documents'), icon: FileWarning },
   ];
 
   return (
     <div>
       <PageHeader
-        title={t('enterprise.enterprise_dashboard_title')}
-        description={t('enterprise.enterprise_dashboard_desc')}
+        title={"Enterprise Dashboard"}
+        description={"Overview of GDPR compliance, system health, roles, and configuration"}
         actions={
           <Button
             variant="flat"
@@ -77,7 +75,7 @@ export function EnterpriseDashboard() {
             isLoading={loading}
             size="sm"
           >
-            {t('common.refresh')}
+            {"Refresh"}
           </Button>
         }
       />
@@ -85,28 +83,28 @@ export function EnterpriseDashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label={t('enterprise.label_total_users')}
+          label={"Total Users"}
           value={stats?.user_count ?? '---'}
           icon={Users}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label={t('enterprise.label_roles')}
+          label={"Roles"}
           value={stats?.role_count ?? '---'}
           icon={Shield}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label={t('enterprise.label_pending_g_d_p_r')}
+          label={"Pending GDPR"}
           value={stats?.pending_gdpr_requests ?? 0}
           icon={FileWarning}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label={t('enterprise.label_system_health')}
+          label={"System Health"}
           value={stats?.health_status ?? '---'}
           icon={HeartPulse}
           color={healthColor}
@@ -118,7 +116,7 @@ export function EnterpriseDashboard() {
       {stats && (
         <Card shadow="sm" className="mb-6">
           <CardBody className="p-4">
-            <p className="text-sm font-semibold text-default-700 mb-3">{t('enterprise.label_system_health')}</p>
+            <p className="text-sm font-semibold text-default-700 mb-3">{"System Health"}</p>
             <div className="flex flex-wrap gap-3">
               <Chip color={stats.db_connected ? 'success' : 'danger'} variant="flat" size="sm" startContent={<Database size={12} />}>
                 Database {stats.db_connected ? 'Connected' : 'Disconnected'}
@@ -140,7 +138,7 @@ export function EnterpriseDashboard() {
       {/* Quick Links */}
       <Card shadow="sm">
         <CardBody className="p-4">
-          <h3 className="text-lg font-semibold text-foreground mb-4">{t('enterprise.quick_links')}</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-4">{"Quick Links"}</h3>
           {loading ? (
             <div className="flex justify-center py-8">
               <Spinner />
@@ -169,7 +167,7 @@ export function EnterpriseDashboard() {
       {stats?.recent_gdpr_activity && stats.recent_gdpr_activity.length > 0 && (
         <Card shadow="sm" className="mt-6">
           <CardBody className="p-4">
-            <p className="text-sm font-semibold text-default-700 mb-3">{t('enterprise.recent_gdpr_activity')}</p>
+            <p className="text-sm font-semibold text-default-700 mb-3">{"Recent GDPR Activity"}</p>
             <div className="space-y-2">
               {stats.recent_gdpr_activity.map((entry) => (
                 <div key={entry.id} className="flex items-center justify-between text-sm border-b border-divider pb-2 last:border-0">

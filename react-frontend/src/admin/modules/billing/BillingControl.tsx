@@ -35,7 +35,6 @@ import {
   TableCell,
 } from '@heroui/react';
 import { CreditCard, AlertTriangle, Leaf, Download } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -103,8 +102,7 @@ function formatEur(amount: number): string {
 // ---------------------------------------------------------------------------
 
 export function BillingControl() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('billing.control_title'));
+  usePageTitle("Control");
   const { user } = useAuth();
   const toast = useToast();
 
@@ -156,7 +154,7 @@ export function BillingControl() {
         setSnapshot(obj.data ?? []);
       }
     } catch {
-      toast.error(t('billing.failed_to_load'));
+      toast.error("Failed to load");
     } finally {
       setLoading(false);
     }
@@ -217,11 +215,11 @@ export function BillingControl() {
         discount_reason: discountReason || null,
         nonprofit_verified: nonprofitVerified,
       });
-      toast.success(t('billing.plan_assigned'));
+      toast.success("Plan Assigned");
       onAssignClose();
       void fetchSnapshot();
     } catch {
-      toast.error(t('billing.failed_to_assign'));
+      toast.error("Failed to assign");
     } finally {
       setAssigning(false);
     }
@@ -238,10 +236,10 @@ export function BillingControl() {
         ? '/api/v2/admin/super/billing/resume'
         : '/api/v2/admin/super/billing/pause';
       await api.post(endpoint, { tenant_id: tenant.tenant_id });
-      toast.success(tenant.is_paused ? t('billing.resume_billing') : t('billing.pause_billing'));
+      toast.success(tenant.is_paused ? "Resume Billing" : "Pause Billing");
       void fetchSnapshot();
     } catch {
-      toast.error(t('billing.failed_to_assign'));
+      toast.error("Failed to assign");
     } finally {
       setPausingId(null);
     }
@@ -266,11 +264,11 @@ export function BillingControl() {
         tenant_id: graceTenant.tenant_id,
         days,
       });
-      toast.success(t('billing.set_grace_period'));
+      toast.success("Set Grace Period");
       onGraceClose();
       void fetchSnapshot();
     } catch {
-      toast.error(t('billing.failed_to_assign'));
+      toast.error("Failed to assign");
     } finally {
       setSettingGrace(false);
     }
@@ -291,10 +289,10 @@ export function BillingControl() {
   };
 
   const getPlanChipLabel = (row: TenantSnapshot): string => {
-    if (row.is_paused) return t('billing.paused');
-    if (!row.current_plan_name) return t('billing.status_no_plan');
-    if (row.is_in_grace_period) return t('billing.in_grace_period', { days: row.grace_days_remaining });
-    if (row.is_over_limit) return t('billing.over_limit');
+    if (row.is_paused) return "Paused";
+    if (!row.current_plan_name) return "No Plan";
+    if (row.is_in_grace_period) return `In Grace Period`;
+    if (row.is_over_limit) return "Over Limit";
     return row.current_plan_name;
   };
 
@@ -313,8 +311,8 @@ export function BillingControl() {
     return (
       <div>
         <PageHeader
-          title={t('billing.control_title')}
-          description={t('billing.control_desc')}
+          title={"Control"}
+          description={"Control."}
         />
         <div className="flex justify-center py-12">
           <Spinner size="lg" />
@@ -330,8 +328,8 @@ export function BillingControl() {
   return (
     <div>
       <PageHeader
-        title={t('billing.control_title')}
-        description={t('billing.control_desc')}
+        title={"Control"}
+        description={"Control."}
         actions={
           <Button
             size="sm"
@@ -340,7 +338,7 @@ export function BillingControl() {
             startContent={<Download size={14} />}
             onPress={() => window.open('/api/v2/admin/super/billing/export', '_blank')}
           >
-            {t('billing.export_csv')}
+            {"Export CSV"}
           </Button>
         }
       />
@@ -348,22 +346,22 @@ export function BillingControl() {
       <Card>
         <CardHeader className="flex items-center gap-2 pb-0">
           <CreditCard size={18} className="text-primary" />
-          <span className="font-semibold text-sm">{t('billing.control_title')}</span>
+          <span className="font-semibold text-sm">{"Control"}</span>
         </CardHeader>
         <CardBody className="p-0">
-          <Table aria-label={t('billing.control_title')} removeWrapper>
+          <Table aria-label={"Control"} removeWrapper>
             <TableHeader>
-              <TableColumn>{t('billing.col_tenant')}</TableColumn>
-              <TableColumn>{t('billing.col_users')}</TableColumn>
-              <TableColumn>{t('billing.col_current_plan')}</TableColumn>
-              <TableColumn>{t('billing.col_effective_price')}</TableColumn>
-              <TableColumn>{t('billing.col_status')}</TableColumn>
+              <TableColumn>{"Tenant"}</TableColumn>
+              <TableColumn>{"Users"}</TableColumn>
+              <TableColumn>{"Current Plan"}</TableColumn>
+              <TableColumn>{"Effective Price"}</TableColumn>
+              <TableColumn>{"Status"}</TableColumn>
               {isGod
-                ? <TableColumn>{t('billing.col_actions')}</TableColumn>
+                ? <TableColumn>{"Actions"}</TableColumn>
                 : <TableColumn>{''}</TableColumn>
               }
             </TableHeader>
-            <TableBody emptyContent={t('billing.failed_to_load')} items={snapshot}>
+            <TableBody emptyContent={"Failed to load"} items={snapshot}>
               {(row) => (
                 <TableRow key={row.tenant_id}>
                   {/* Tenant name with depth indent */}
@@ -408,11 +406,11 @@ export function BillingControl() {
                       </span>
                       {row.effective_price?.has_custom || row.effective_price?.discount_pct > 0 ? (
                         <Chip size="sm" variant="flat" color="secondary" className="text-xs">
-                          {t('billing.custom_badge')}
+                          {"Custom Badge"}
                         </Chip>
                       ) : null}
                       {row.effective_price?.nonprofit && (
-                        <Leaf size={12} className="text-success-500" aria-label={t('billing.nonprofit_verified')} />
+                        <Leaf size={12} className="text-success-500" aria-label={"Nonprofit Verified"} />
                       )}
                     </div>
                   </TableCell>
@@ -421,12 +419,12 @@ export function BillingControl() {
                   <TableCell>
                     <span className="text-sm text-default-600">
                       {row.is_paused
-                        ? t('billing.paused')
+                        ? "Paused"
                         : row.is_in_grace_period
-                          ? t('billing.in_grace_period', { days: row.grace_days_remaining })
+                          ? `In Grace Period`
                           : row.current_plan_id
-                            ? t('billing.status_ok')
-                            : t('billing.status_no_plan')
+                            ? "Ok"
+                            : "No Plan"
                       }
                     </span>
                   </TableCell>
@@ -441,7 +439,7 @@ export function BillingControl() {
                           variant="flat"
                           onPress={() => handleOpenAssign(row)}
                         >
-                          {t('billing.assign_plan')}
+                          {"Assign Plan"}
                         </Button>
                         <Button
                           size="sm"
@@ -450,7 +448,7 @@ export function BillingControl() {
                           isLoading={pausingId === row.tenant_id}
                           onPress={() => void handlePause(row)}
                         >
-                          {row.is_paused ? t('billing.resume_billing') : t('billing.pause_billing')}
+                          {row.is_paused ? "Resume Billing" : "Pause Billing"}
                         </Button>
                         <Button
                           size="sm"
@@ -458,7 +456,7 @@ export function BillingControl() {
                           variant="flat"
                           onPress={() => handleOpenGrace(row)}
                         >
-                          {t('billing.set_grace_period')}
+                          {"Set Grace Period"}
                         </Button>
                       </div>
                     ) : null}
@@ -476,7 +474,7 @@ export function BillingControl() {
       <Modal isOpen={isAssignOpen} onClose={onAssignClose} size="lg" scrollBehavior="inside">
         <ModalContent>
           <ModalHeader>
-            {t('billing.assign_plan_title')}
+            {"Assign Plan"}
             {selectedTenant && (
               <span className="text-default-500 text-sm font-normal ml-2">
                 — {selectedTenant.tenant_name}
@@ -491,7 +489,7 @@ export function BillingControl() {
             ) : (
               <div className="flex flex-col gap-4">
                 <Select
-                  label={t('billing.select_plan')}
+                  label={"Select Plan"}
                   selectedKeys={selectedPlanId ? new Set([selectedPlanId]) : new Set<string>()}
                   onSelectionChange={(keys) => {
                     const val = Array.from(keys)[0];
@@ -507,20 +505,20 @@ export function BillingControl() {
                 </Select>
 
                 <Input
-                  label={t('billing.expiry_date')}
+                  label={"Expiry Date"}
                   type="date"
                   value={expiresAt}
                   onValueChange={setExpiresAt}
                 />
 
                 <Input
-                  label={t('billing.notes')}
+                  label={"Notes"}
                   value={notes}
                   onValueChange={setNotes}
                 />
 
                 <Input
-                  label={t('billing.custom_price_monthly')}
+                  label={"Custom Price Monthly"}
                   type="number"
                   min={0}
                   value={customPriceMonthly}
@@ -534,7 +532,7 @@ export function BillingControl() {
                 />
 
                 <Input
-                  label={t('billing.custom_price_yearly')}
+                  label={"Custom Price Yearly"}
                   type="number"
                   min={0}
                   value={customPriceYearly}
@@ -543,7 +541,7 @@ export function BillingControl() {
                 />
 
                 <Input
-                  label={t('billing.discount_pct')}
+                  label={"Discount Pct"}
                   type="number"
                   min={0}
                   max={100}
@@ -553,7 +551,7 @@ export function BillingControl() {
                 />
 
                 <Input
-                  label={t('billing.discount_reason')}
+                  label={"Discount Reason"}
                   value={discountReason}
                   onValueChange={setDiscountReason}
                   placeholder="e.g. Charity verified, Early adopter"
@@ -561,13 +559,13 @@ export function BillingControl() {
 
                 <div className="flex items-center justify-between rounded-lg border border-default-200 px-4 py-3">
                   <div>
-                    <p className="text-sm font-medium">{t('billing.nonprofit_verified')}</p>
-                    <p className="text-xs text-default-500">{t('billing.nonprofit_verified_desc')}</p>
+                    <p className="text-sm font-medium">{"Nonprofit Verified"}</p>
+                    <p className="text-xs text-default-500">{"Nonprofit Verified."}</p>
                   </div>
                   <Switch
                     isSelected={nonprofitVerified}
                     onValueChange={setNonprofitVerified}
-                    aria-label={t('billing.nonprofit_verified')}
+                    aria-label={"Nonprofit Verified"}
                   />
                 </div>
               </div>
@@ -575,7 +573,7 @@ export function BillingControl() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onAssignClose} isDisabled={assigning}>
-              {t('advanced.cancel')}
+              {"Cancel"}
             </Button>
             <Button
               color="primary"
@@ -583,7 +581,7 @@ export function BillingControl() {
               isLoading={assigning}
               isDisabled={!selectedPlanId || plansLoading}
             >
-              {t('billing.assign_plan')}
+              {"Assign Plan"}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -595,7 +593,7 @@ export function BillingControl() {
       <Modal isOpen={isGraceOpen} onClose={onGraceClose} size="sm">
         <ModalContent>
           <ModalHeader>
-            {t('billing.grace_period_modal_title')}
+            {"Grace Period Modal"}
             {graceTenant && (
               <span className="text-default-500 text-sm font-normal ml-2">
                 — {graceTenant.tenant_name}
@@ -604,9 +602,9 @@ export function BillingControl() {
           </ModalHeader>
           <ModalBody>
             <div className="flex flex-col gap-3">
-              <p className="text-sm text-default-600">{t('billing.grace_period_desc')}</p>
+              <p className="text-sm text-default-600">{"Grace Period."}</p>
               <Input
-                label={t('billing.grace_days')}
+                label={"Grace Days"}
                 type="number"
                 min={1}
                 max={365}
@@ -617,7 +615,7 @@ export function BillingControl() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onGraceClose} isDisabled={settingGrace}>
-              {t('advanced.cancel')}
+              {"Cancel"}
             </Button>
             <Button
               color="secondary"
@@ -625,7 +623,7 @@ export function BillingControl() {
               isLoading={settingGrace}
               isDisabled={!graceDays}
             >
-              {t('billing.set_grace_period')}
+              {"Set Grace Period"}
             </Button>
           </ModalFooter>
         </ModalContent>

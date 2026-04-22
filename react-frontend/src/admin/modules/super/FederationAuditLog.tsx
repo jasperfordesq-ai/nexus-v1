@@ -78,7 +78,7 @@ const categoryColorMap: Record<string, 'primary' | 'secondary' | 'success' | 'wa
 
 export function FederationAuditLog() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('super.page_title'));
+  usePageTitle("Super Admin");
 
   const [logs, setLogs] = useState<SuperAuditEntry[]>([]);
   const [totalItems, setTotalItems] = useState(0);
@@ -189,7 +189,7 @@ export function FederationAuditLog() {
 
   const exportCsv = () => {
     if (logs.length === 0) return;
-    const headers = [t('super.col_id'), t('super.col_timestamp'), t('super.col_category'), t('super.col_level'), t('super.col_description'), t('super.col_actor')];
+    const headers = ["ID", "Timestamp", "Category", "Level", "Description", "Actor"];
     const rows = logs.map((entry) => [
       entry.id,
       entry.created_at,
@@ -211,7 +211,7 @@ export function FederationAuditLog() {
   const columns: Column<SuperAuditEntry>[] = [
     {
       key: 'created_at',
-      label: t('super.col_timestamp'),
+      label: "Timestamp",
       sortable: true,
       render: (entry) => (
         <span className="text-sm text-default-500">
@@ -221,7 +221,7 @@ export function FederationAuditLog() {
     },
     {
       key: 'category',
-      label: t('super.col_category'),
+      label: "Category",
       render: (entry) => {
         const cat = categorizeAction(entry.action_type);
         return (
@@ -233,7 +233,7 @@ export function FederationAuditLog() {
     },
     {
       key: 'level',
-      label: t('super.col_level'),
+      label: "Level",
       render: (entry) => {
         const lvl = inferLevel(entry.action_type);
         return (
@@ -245,14 +245,14 @@ export function FederationAuditLog() {
     },
     {
       key: 'description',
-      label: t('super.col_description'),
+      label: "Description",
       render: (entry) => (
         <span className="text-sm">{entry.description || entry.action_type.replace(/_/g, ' ')}</span>
       ),
     },
     {
       key: 'actor',
-      label: t('super.col_actor'),
+      label: "Actor",
       render: (entry) => (
         <span className="text-sm text-default-500">
           {entry.actor_name || `User #${entry.actor_id}`}
@@ -264,8 +264,8 @@ export function FederationAuditLog() {
   return (
     <div>
       <PageHeader
-        title={t('super.federation_audit_log_title')}
-        description={t('super.federation_audit_log_desc')}
+        title={"Federation Audit Log"}
+        description={"View the audit log for all federation actions taken by super admins"}
         actions={
           <Button
             variant="flat"
@@ -274,7 +274,7 @@ export function FederationAuditLog() {
             onPress={exportCsv}
             isDisabled={logs.length === 0}
           >
-            {t('federation_audit.export_csv')}
+            {"Export CSV"}
           </Button>
         }
       />
@@ -282,28 +282,28 @@ export function FederationAuditLog() {
       {/* Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
-          label={t('federation_audit.total_actions_30d')}
+          label={"Total Actions 30d"}
           value={stats.total}
           icon={Activity}
           color="primary"
           loading={loading && stats.total === 0}
         />
         <StatCard
-          label={t('super.label_federation_changes')}
+          label={"Federation Changes"}
           value={stats.federation}
           icon={Network}
           color="success"
           loading={loading && stats.total === 0}
         />
         <StatCard
-          label={t('super.label_partnership_actions')}
+          label={"Partnership Actions"}
           value={stats.partnerships}
           icon={Handshake}
           color="secondary"
           loading={loading && stats.total === 0}
         />
         <StatCard
-          label={t('super.label_emergency_actions')}
+          label={"Emergency Actions"}
           value={stats.emergency}
           icon={AlertTriangle}
           color="danger"
@@ -314,7 +314,7 @@ export function FederationAuditLog() {
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-4 items-end">
         <Select
-          label={t('super.label_category')}
+          label={"Category"}
           size="sm"
           className="max-w-[200px]"
           selectedKeys={category ? [category] : []}
@@ -329,7 +329,7 @@ export function FederationAuditLog() {
         </Select>
 
         <Select
-          label={t('super.label_level')}
+          label={"Level"}
           size="sm"
           className="max-w-[160px]"
           selectedKeys={level ? [level] : []}
@@ -344,7 +344,7 @@ export function FederationAuditLog() {
         </Select>
 
         <Input
-          label={t('super.label_from_date')}
+          label={"From Date"}
           type="date"
           size="sm"
           className="max-w-[170px]"
@@ -353,7 +353,7 @@ export function FederationAuditLog() {
         />
 
         <Input
-          label={t('super.label_to_date')}
+          label={"To Date"}
           type="date"
           size="sm"
           className="max-w-[170px]"
@@ -362,7 +362,7 @@ export function FederationAuditLog() {
         />
 
         <Input
-          label={t('super.label_search')}
+          label={"Search"}
           size="sm"
           className="max-w-[200px]"
           value={search}
@@ -379,7 +379,7 @@ export function FederationAuditLog() {
             startContent={<X size={14} />}
             onPress={clearFilters}
           >
-            {t('federation_audit.clear')}
+            {"Clear"}
           </Button>
         )}
       </div>

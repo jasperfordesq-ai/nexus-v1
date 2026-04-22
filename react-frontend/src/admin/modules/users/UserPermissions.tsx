@@ -13,7 +13,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Chip, Button, Spinner } from '@heroui/react';
 import { ArrowLeft, Shield, Info } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminUsers } from '../../api/adminApi';
@@ -21,8 +20,7 @@ import { PageHeader } from '../../components';
 import type { AdminUserDetail } from '../../api/types';
 
 export function UserPermissions() {
-  const { t } = useTranslation('admin');
-  usePageTitle(t('users.permissions_title'));
+  usePageTitle("Permissions");
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
@@ -40,10 +38,10 @@ export function UserPermissions() {
         if (!cancelled && res?.success && res.data) {
           setUser(res.data as AdminUserDetail);
         } else if (!cancelled) {
-          toast.error(t('users.failed_to_load_user'));
+          toast.error("Failed to load user");
         }
       } catch {
-        if (!cancelled) toast.error(t('users.failed_to_load_user'));
+        if (!cancelled) toast.error("Failed to load user");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -65,11 +63,11 @@ export function UserPermissions() {
   return (
     <div>
       <PageHeader
-        title={t('users.permissions_title')}
-        description={t('users.permissions_description')}
+        title={"Permissions"}
+        description={"Permissions."}
         actions={
           <Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/users'))}>
-            {t('common.back')}
+            {"Back"}
           </Button>
         }
       />
@@ -79,7 +77,7 @@ export function UserPermissions() {
       ) : !user ? (
         <Card shadow="sm">
           <CardBody className="py-8 text-center text-default-500">
-            {t('users.failed_to_load_user')}
+            {"Failed to load user"}
           </CardBody>
         </Card>
       ) : (
@@ -92,7 +90,7 @@ export function UserPermissions() {
             </CardHeader>
             <CardBody className="gap-4">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-sm font-medium">{t('users.role_label')}:</span>
+                <span className="text-sm font-medium">{"Role"}:</span>
                 <Chip color={roleColorFor(user.role)} variant="flat" size="sm">
                   {user.role}
                 </Chip>
@@ -108,7 +106,7 @@ export function UserPermissions() {
               </div>
 
               <div>
-                <div className="text-sm font-medium mb-2">{t('users.permissions_granted')}</div>
+                <div className="text-sm font-medium mb-2">{"Permissions Granted"}</div>
                 {user.permissions && user.permissions.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {user.permissions.map((p) => (
@@ -116,7 +114,7 @@ export function UserPermissions() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-sm text-default-500">{t('users.no_explicit_permissions')}</div>
+                  <div className="text-sm text-default-500">{"No explicit permissions found"}</div>
                 )}
               </div>
             </CardBody>
@@ -126,8 +124,8 @@ export function UserPermissions() {
             <CardBody className="flex flex-row items-start gap-3">
               <Info size={20} className="text-warning shrink-0 mt-0.5" />
               <div>
-                <div className="font-medium">{t('users.permissions_editor_coming_soon_title')}</div>
-                <p className="text-sm text-default-500 mt-1">{t('users.permissions_editor_coming_soon_desc')}</p>
+                <div className="font-medium">{"Permissions Editor Coming Soon"}</div>
+                <p className="text-sm text-default-500 mt-1">{"Permissions Editor Coming Soon."}</p>
               </div>
             </CardBody>
           </Card>

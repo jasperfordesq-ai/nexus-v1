@@ -28,7 +28,7 @@ import type { FederationSystemControls as FederationSystemControlsType, Federati
 import { useTranslation } from 'react-i18next';
 export function FederationControls() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('super.page_title'));
+  usePageTitle("Super Admin");
   const toast = useToast();
   const toastRef = useRef(toast);
   toastRef.current = toast;
@@ -59,7 +59,7 @@ export function FederationControls() {
       if (pRes.success && pRes.data) setPartnerships(Array.isArray(pRes.data) ? pRes.data : []);
       if (jwtRes.success && jwtRes.data) setJwtStatus(jwtRes.data);
     } catch (err) {
-      toastRef.current.error(t('super.federation_error', { message: err instanceof Error ? err.message : 'Unknown error' }));
+      toastRef.current.error(`Federation error`);
     }
     setLoading(false);
   }, [t])
@@ -76,7 +76,7 @@ export function FederationControls() {
         toastRef.current.error(t('super.failed_to_update_setting', 'Failed to update setting'));
       }
     } catch (err) {
-      toastRef.current.error(t('super.failed_to_update_setting_detail', { detail: err instanceof Error ? err.message : '', defaultValue: 'Failed to update setting: {{detail}}' }));
+      toastRef.current.error(`Failed to update setting detail`);
     } finally {
       setSaving(null);
     }
@@ -98,7 +98,7 @@ export function FederationControls() {
         else toastRef.current.error(t('super.failed_to_activate_lockdown', 'Failed to activate lockdown'));
       }
     } catch (err) {
-      toastRef.current.error(t('super.lockdown_action_failed_detail', { detail: err instanceof Error ? err.message : '', defaultValue: 'Lockdown action failed: {{detail}}' }));
+      toastRef.current.error(`Lockdown Action Failed Detail`);
     } finally {
       setLockdownConfirm(false);
     }
@@ -185,8 +185,8 @@ export function FederationControls() {
   };
 
   const quickLinks = [
-    { label: t('super.link_whitelist', 'Whitelist'), description: t('super.link_whitelist_desc', { count: whitelist.length }), href: '/admin/super/federation/whitelist', icon: ListChecks, color: 'success' as const },
-    { label: t('super.link_partnerships', 'Partnerships'), description: t('super.link_partnerships_desc', { active: activePartnerships, pending: pendingPartnerships }), href: '/admin/super/federation/partnerships', icon: Handshake, color: 'secondary' as const },
+    { label: t('super.link_whitelist', 'Whitelist'), description: `Manage the federation whitelist`, href: '/admin/super/federation/whitelist', icon: ListChecks, color: 'success' as const },
+    { label: t('super.link_partnerships', 'Partnerships'), description: `View and manage federation partnerships`, href: '/admin/super/federation/partnerships', icon: Handshake, color: 'secondary' as const },
     { label: t('super.link_audit_log', 'Audit Log'), description: t('super.link_audit_log_desc', 'Federation action history'), href: '/admin/super/federation/audit', icon: Activity, color: 'warning' as const },
   ];
 
@@ -200,32 +200,32 @@ export function FederationControls() {
       </nav>
 
       <PageHeader
-        title={t('super.federation_controls_title')}
-        description={t('super.federation_controls_desc')}
+        title={"Federation Controls"}
+        description={"Control federation settings at the platform level"}
       />
 
       {/* Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          label={t('super.label_federation_status')}
+          label={"Federation Status"}
           value={controls.federation_enabled ? t('super.status_active', 'Active') : t('super.status_disabled', 'Disabled')}
           icon={Globe}
           color={controls.federation_enabled ? 'success' : 'danger'}
         />
         <StatCard
-          label={t('super.label_whitelisted_tenants')}
+          label={"Whitelisted Tenants"}
           value={whitelist.length}
           icon={Shield}
           color="primary"
         />
         <StatCard
-          label={t('super.label_active_partnerships')}
+          label={"Active Partnerships"}
           value={activePartnerships}
           icon={Handshake}
           color="secondary"
         />
         <StatCard
-          label={t('super.label_system_status')}
+          label={"System Status"}
           value={controls.emergency_lockdown_active ? t('super.status_lockdown', 'LOCKDOWN') : t('super.status_normal', 'Normal')}
           icon={controls.emergency_lockdown_active ? Lock : Unlock}
           color={controls.emergency_lockdown_active ? 'danger' : 'success'}
@@ -238,16 +238,16 @@ export function FederationControls() {
         <CardHeader className="flex items-center gap-3">
           <KeyRound size={20} className={jwtStatus?.configured ? 'text-success' : 'text-warning'} />
           <div className="flex-1">
-            <p className="font-semibold">{t('super.jwt_card.title')}</p>
+            <p className="font-semibold">{"Title"}</p>
             <p className="text-xs text-default-500">
-              {t('super.jwt_card.subtitle')}
+              {"Subtitle"}
             </p>
           </div>
           {jwtStatus ? (
             jwtStatus.configured ? (
-              <Chip color="success" variant="flat" size="sm">{t('super.jwt_card.chip_configured', { bits: jwtStatus.key_bits })}</Chip>
+              <Chip color="success" variant="flat" size="sm">{`Configured`}</Chip>
             ) : (
-              <Chip color="warning" variant="flat" size="sm" startContent={<AlertTriangle size={14} />}>{t('super.jwt_card.chip_not_configured')}</Chip>
+              <Chip color="warning" variant="flat" size="sm" startContent={<AlertTriangle size={14} />}>{"Not Configured"}</Chip>
             )
           ) : (
             <Chip variant="flat" size="sm">…</Chip>
@@ -256,21 +256,21 @@ export function FederationControls() {
         <CardBody className="gap-3 text-sm">
           {jwtStatus?.configured && jwtStatus.key_bits < jwtStatus.recommended_bits && (
             <div className="rounded-md border border-warning bg-warning-50 dark:bg-warning-950 p-3 text-warning-700 dark:text-warning-300">
-              <strong>{t('super.jwt_card.warn_weak_key_heading')}</strong>{' '}
-              {t('super.jwt_card.warn_weak_key_body', { current: jwtStatus.key_bits, recommended: jwtStatus.recommended_bits })}
+              <strong>{"Warn Weak Key"}</strong>{' '}
+              {`Warn Weak Key Body`}
             </div>
           )}
 
           {!jwtStatus?.configured && (
             <div className="rounded-md border border-warning bg-warning-50 dark:bg-warning-950 p-3 text-warning-700 dark:text-warning-300">
-              <strong>{t('super.jwt_card.warn_not_set_heading')}</strong>{' '}
-              {t('super.jwt_card.warn_not_set_body')}
+              <strong>{"Warn Not Set"}</strong>{' '}
+              {"Warn Not Set Body"}
             </div>
           )}
 
           <div className="text-default-600">
-            <span className="font-medium">{t('super.jwt_card.issuer_label')}</span>{' '}
-            <Code size="sm">{jwtStatus?.issuer || t('super.jwt_card.issuer_fallback')}</Code>
+            <span className="font-medium">{"Issuer"}</span>{' '}
+            <Code size="sm">{jwtStatus?.issuer || "Issuer Fallback"}</Code>
           </div>
 
           <Divider />
@@ -278,8 +278,8 @@ export function FederationControls() {
           <Accordion variant="light" isCompact>
             <AccordionItem
               key="what"
-              aria-label={t('super.jwt_card.accordion_what_aria')}
-              title={<span className="font-medium">{t('super.jwt_card.accordion_what_title')}</span>}
+              aria-label={"Accordion What"}
+              title={<span className="font-medium">{"Accordion What"}</span>}
             >
               <div className="space-y-2 text-default-600">
                 <p>
@@ -303,8 +303,8 @@ export function FederationControls() {
 
             <AccordionItem
               key="setup"
-              aria-label={t('super.jwt_card.accordion_setup_aria')}
-              title={<span className="font-medium">{t('super.jwt_card.accordion_setup_title')}</span>}
+              aria-label={"Accordion Setup"}
+              title={<span className="font-medium">{"Accordion Setup"}</span>}
             >
               <div className="space-y-3 text-default-600">
                 <div>
@@ -341,8 +341,8 @@ export function FederationControls() {
 
             <AccordionItem
               key="rotate"
-              aria-label={t('super.jwt_card.accordion_rotate_aria')}
-              title={<span className="font-medium">{t('super.jwt_card.accordion_rotate_title')}</span>}
+              aria-label={"Accordion Rotate"}
+              title={<span className="font-medium">{"Accordion Rotate"}</span>}
             >
               <div className="space-y-2 text-default-600">
                 <p>Rotate this secret when:</p>
@@ -367,8 +367,8 @@ export function FederationControls() {
 
             <AccordionItem
               key="troubleshoot"
-              aria-label={t('super.jwt_card.accordion_troubleshoot_aria')}
-              title={<span className="font-medium">{t('super.jwt_card.accordion_troubleshoot_title')}</span>}
+              aria-label={"Accordion Troubleshoot"}
+              title={<span className="font-medium">{"Accordion Troubleshoot"}</span>}
             >
               <div className="space-y-2 text-default-600 text-xs">
                 <p><strong>Status shows &quot;Not configured&quot; but I set the env var:</strong></p>
@@ -543,7 +543,7 @@ export function FederationControls() {
             <div className="flex gap-2">
               <Input
                 size="sm"
-                label={t('super.label_tenant_i_d')}
+                label={"Tenant I D"}
                 value={addTenantId}
                 onValueChange={setAddTenantId}
                 className="max-w-[120px]"
@@ -562,7 +562,7 @@ export function FederationControls() {
                     </Link>
                     {' '}<span className="text-xs text-default-400">(ID: {entry.tenant_id})</span>
                   </span>
-                  <Button size="sm" variant="light" color="danger" isIconOnly aria-label={t('super.label_remove_from_whitelist')} onPress={() => handleRemoveWhitelist(entry.tenant_id)}>
+                  <Button size="sm" variant="light" color="danger" isIconOnly aria-label={"Remove from Whitelist"} onPress={() => handleRemoveWhitelist(entry.tenant_id)}>
                     <Trash2 size={14} />
                   </Button>
                 </div>
@@ -651,8 +651,8 @@ export function FederationControls() {
       >
         {!controls.emergency_lockdown_active && (
           <Input
-            label={t('super.label_lockdown_reason')}
-            placeholder={t('super.placeholder_describe_reason_for_emergency_lockdown')}
+            label={"Lockdown Reason"}
+            placeholder={"Describe Reason for Emergency Lockdown..."}
             value={lockdownReason}
             onValueChange={setLockdownReason}
             className="mt-3"

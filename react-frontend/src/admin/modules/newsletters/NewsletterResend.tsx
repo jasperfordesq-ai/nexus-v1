@@ -14,7 +14,6 @@ import {
   Button, RadioGroup, Radio, Input, Card, CardBody,
 } from '@heroui/react';
 import { Mail, Users, AlertCircle } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import type { ResendInfo } from '../../api/types';
@@ -27,7 +26,6 @@ interface NewsletterResendProps {
 }
 
 export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: NewsletterResendProps) {
-  const { t } = useTranslation('admin');
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -46,7 +44,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
           setInfo(res.data as ResendInfo);
         }
       } catch {
-        toast.error(t('newsletters.failed_to_load_resend_info'));
+        toast.error("Failed to load resend info");
       }
       setLoading(false);
     };
@@ -66,14 +64,14 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
 
       if (res.success) {
         const data = res.data as { queued_count?: number };
-        toast.success(t('newsletters.resend_queued', { count: data.queued_count || 0 }));
+        toast.success(`Resend Queued`);
         onSuccess?.();
         onClose();
       } else {
-        toast.error(t('newsletters.failed_to_queue_resend'));
+        toast.error("Failed to queue resend");
       }
     } catch {
-      toast.error(t('newsletters.failed_to_queue_resend'));
+      toast.error("Failed to queue resend");
     }
     setSending(false);
   };
@@ -102,7 +100,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
             <ModalHeader className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <Mail size={20} />
-                <span>{t('newsletter_resend.resend_newsletter')}</span>
+                <span>{"Resend Newsletter"}</span>
               </div>
               <p className="text-sm font-normal text-default-500">
                 Send this newsletter to a targeted subset of recipients
@@ -119,15 +117,15 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                     <CardBody className="gap-2">
                       <div className="grid grid-cols-3 gap-4 text-center">
                         <div>
-                          <p className="text-sm text-default-500">{t('newsletter_resend.total_sent')}</p>
+                          <p className="text-sm text-default-500">{"Total sent"}</p>
                           <p className="text-2xl font-bold">{info.total_sent.toLocaleString()}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-default-500">{t('newsletter_resend.opened')}</p>
+                          <p className="text-sm text-default-500">{"Opened"}</p>
                           <p className="text-2xl font-bold text-success">{info.total_opened.toLocaleString()}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-default-500">{t('newsletter_resend.clicked')}</p>
+                          <p className="text-sm text-default-500">{"Clicked"}</p>
                           <p className="text-2xl font-bold text-primary">{info.total_clicked.toLocaleString()}</p>
                         </div>
                       </div>
@@ -135,7 +133,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                   </Card>
 
                   <RadioGroup
-                    label={t('newsletter_form.label_resend_to')}
+                    label={"Resend to"}
                     value={target}
                     onValueChange={(v) => setTarget(v as typeof target)}
                   >
@@ -158,18 +156,18 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                   </RadioGroup>
 
                   <Input
-                    label={t('newsletter_form.label_subject_override')}
-                    placeholder={t('newsletters.placeholder_leave_blank_to_use_original_subject')}
+                    label={"Subject Override"}
+                    placeholder={"Enter leave blank to use original subject..."}
                     value={subjectOverride}
                     onValueChange={setSubjectOverride}
-                    description={t('newsletters.desc_subject_override')}
+                    description={"Subject Override."}
                   />
 
                   <Card className="bg-default-100">
                     <CardBody className="flex-row items-center gap-3">
                       <Users size={20} className="text-primary" />
                       <div className="flex-1">
-                        <p className="text-sm font-medium">{t('newsletter_resend.preview_recipient_count')}</p>
+                        <p className="text-sm font-medium">{"Preview Recipient Count"}</p>
                         <p className="text-xs text-default-500">
                           This resend will be sent to {recipientCount.toLocaleString()} recipient{recipientCount !== 1 ? 's' : ''}
                         </p>
@@ -182,7 +180,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                       <CardBody className="flex-row items-center gap-3">
                         <AlertCircle size={20} className="text-warning" />
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-warning">{t('newsletter_resend.no_recipients')}</p>
+                          <p className="text-sm font-medium text-warning">{"No recipients found"}</p>
                           <p className="text-xs text-warning-600 dark:text-warning-400">
                             There are no recipients matching your selection criteria
                           </p>
@@ -193,7 +191,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                 </div>
               ) : (
                 <div className="flex items-center justify-center py-8">
-                  <div className="text-danger">{t('newsletter_resend.failed_to_load')}</div>
+                  <div className="text-danger">{"Failed to load"}</div>
                 </div>
               )}
             </ModalBody>

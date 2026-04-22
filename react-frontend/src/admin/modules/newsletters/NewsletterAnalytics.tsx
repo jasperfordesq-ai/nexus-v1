@@ -134,7 +134,7 @@ function rateColor(rate: number, benchmark: number): 'success' | 'warning' | 'da
 
 export function NewsletterAnalytics() {
   const { t } = useTranslation('admin');
-  usePageTitle(t('newsletters.page_title'));
+  usePageTitle("Newsletters");
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -197,8 +197,8 @@ export function NewsletterAnalytics() {
   return (
     <div>
       <PageHeader
-        title={t('newsletters.newsletter_analytics_title')}
-        description={t('newsletters.newsletter_analytics_desc')}
+        title={"Newsletter Analytics"}
+        description={"View open rates, click rates, and delivery statistics for your newsletters"}
         actions={
           <Button
             variant="flat"
@@ -206,7 +206,7 @@ export function NewsletterAnalytics() {
             onPress={loadData}
             isLoading={loading}
           >
-            {t('newsletters.refresh')}
+            {"Refresh"}
           </Button>
         }
       />
@@ -214,35 +214,35 @@ export function NewsletterAnalytics() {
       {/* ── Summary Stats ─────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard
-          label={t('newsletters.label_campaigns_sent')}
+          label={"Campaigns Sent"}
           value={data?.total_newsletters ?? 0}
           icon={Send}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label={t('newsletters.label_emails_delivered')}
+          label={"Emails Delivered"}
           value={totals?.total_sent ?? data?.total_sent ?? 0}
           icon={Mail}
           color="success"
           loading={loading}
         />
         <StatCard
-          label={t('newsletters.label_avg_open_rate')}
+          label={"Avg Open Rate"}
           value={`${avgOpenRate}%`}
           icon={Eye}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label={t('newsletters.label_avg_click_rate')}
+          label={"Avg Click Rate"}
           value={`${avgClickRate}%`}
           icon={MousePointer}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label={t('newsletters.label_subscribers')}
+          label={"Subscribers"}
           value={data?.total_subscribers ?? 0}
           icon={Users}
           color="primary"
@@ -258,37 +258,37 @@ export function NewsletterAnalytics() {
               <BarChart3 size={20} />
             </div>
             <div>
-              <h3 className="text-base font-semibold">{t('newsletters.section_engagement_summary')}</h3>
+              <h3 className="text-base font-semibold">{"Engagement Summary"}</h3>
               <p className="text-sm text-default-500">
-                {t('newsletters.engagement_summary_desc')}
+                {"Engagement Summary."}
               </p>
             </div>
           </CardHeader>
           <CardBody className="px-6 pb-6">
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">
               <EngagementStat
-                label={t('newsletters.label_unique_opens')}
+                label={"Unique Opens"}
                 value={totals.unique_opens}
                 color="text-primary"
               />
               <EngagementStat
-                label={t('newsletters.label_total_opens')}
+                label={"Total Opens"}
                 value={totals.total_opens}
                 color="text-primary"
               />
               <EngagementStat
-                label={t('newsletters.label_unique_clicks')}
+                label={"Unique Clicks"}
                 value={totals.unique_clicks}
                 color="text-success"
               />
               <EngagementStat
-                label={t('newsletters.label_total_clicks')}
+                label={"Total Clicks"}
                 value={totals.total_clicks}
                 color="text-success"
               />
               {totals.total_failed > 0 && (
                 <EngagementStat
-                  label={t('newsletters.label_failed')}
+                  label={"Failed"}
                   value={totals.total_failed}
                   color="text-danger"
                   icon={<AlertTriangle size={14} className="text-danger" />}
@@ -307,9 +307,9 @@ export function NewsletterAnalytics() {
               <TrendingUp size={20} />
             </div>
             <div>
-              <h3 className="text-base font-semibold">{t('newsletters.section_monthly_performance')}</h3>
+              <h3 className="text-base font-semibold">{"Monthly Performance"}</h3>
               <p className="text-sm text-default-500">
-                {t('newsletters.monthly_performance_desc')}
+                {"Monthly Performance."}
               </p>
             </div>
           </CardHeader>
@@ -329,19 +329,19 @@ export function NewsletterAnalytics() {
                   formatter={(value, name) => {
                     const v = value as number;
                     const n = name as string;
-                    if (n === 'openRate' || n === 'clickRate') return [`${v}%`, n === 'openRate' ? t('newsletters.chart_open_rate') : t('newsletters.chart_click_rate')];
-                    return [v.toLocaleString(), n === 'sent' ? t('newsletters.chart_emails_sent') : n === 'opens' ? t('newsletters.chart_opens') : t('newsletters.chart_clicks')];
+                    if (n === 'openRate' || n === 'clickRate') return [`${v}%`, n === 'openRate' ? "Chart Open Rate" : "Chart Click Rate"];
+                    return [v.toLocaleString(), n === 'sent' ? "Chart Emails sent" : n === 'opens' ? "Chart Opens" : "Chart Clicks"];
                   }}
                   labelFormatter={(label) => String(label)}
                 />
                 <Legend
                   formatter={(value: string) => {
                     const labels: Record<string, string> = {
-                      sent: t('newsletters.chart_emails_sent'),
-                      opens: t('newsletters.chart_opens'),
-                      clicks: t('newsletters.chart_clicks'),
-                      openRate: t('newsletters.chart_open_rate_pct'),
-                      clickRate: t('newsletters.chart_click_rate_pct'),
+                      sent: "Chart Emails sent",
+                      opens: "Chart Opens",
+                      clicks: "Chart Clicks",
+                      openRate: "Chart Open Rate Pct",
+                      clickRate: "Chart Click Rate Pct",
                     };
                     return labels[value] ?? value;
                   }}
@@ -356,18 +356,18 @@ export function NewsletterAnalytics() {
             <Divider className="my-4" />
             <div className="overflow-x-auto">
               <Table
-                aria-label={t('newsletters.label_monthly_performance_breakdown')}
+                aria-label={"Monthly Performance"}
                 removeWrapper
                 classNames={{ th: 'text-xs uppercase', td: 'py-2' }}
               >
                 <TableHeader>
-                  <TableColumn>{t('newsletters.col_month')}</TableColumn>
-                  <TableColumn className="text-center">{t('newsletters.col_newsletters')}</TableColumn>
-                  <TableColumn className="text-center">{t('newsletters.col_emails_sent')}</TableColumn>
-                  <TableColumn className="text-center">{t('newsletters.col_opens')}</TableColumn>
-                  <TableColumn className="text-center">{t('newsletters.col_clicks')}</TableColumn>
-                  <TableColumn className="text-center">{t('newsletters.col_open_rate')}</TableColumn>
-                  <TableColumn className="text-center">{t('newsletters.col_click_rate')}</TableColumn>
+                  <TableColumn>{"Month"}</TableColumn>
+                  <TableColumn className="text-center">{"Newsletters"}</TableColumn>
+                  <TableColumn className="text-center">{"Emails Sent"}</TableColumn>
+                  <TableColumn className="text-center">{"Opens"}</TableColumn>
+                  <TableColumn className="text-center">{"Clicks"}</TableColumn>
+                  <TableColumn className="text-center">{"Open Rate"}</TableColumn>
+                  <TableColumn className="text-center">{"Click Rate"}</TableColumn>
                 </TableHeader>
                 <TableBody>
                   {chartData.map((row) => (
@@ -418,25 +418,25 @@ export function NewsletterAnalytics() {
               <Trophy size={20} />
             </div>
             <div>
-              <h3 className="text-base font-semibold">{t('newsletters.section_top_performers')}</h3>
+              <h3 className="text-base font-semibold">{"Top Performers"}</h3>
               <p className="text-sm text-default-500">
-                {t('newsletters.top_performers_desc')}
+                {"Top Performers."}
               </p>
             </div>
           </CardHeader>
           <CardBody className="px-0 pb-4 sm:px-2">
             <Table
-              aria-label={t('newsletters.label_top_performing_newsletters')}
+              aria-label={"Top Performing"}
               removeWrapper
               classNames={{ th: 'text-xs uppercase', td: 'py-3' }}
             >
               <TableHeader>
                 <TableColumn className="w-[50px]">#</TableColumn>
-                <TableColumn>{t('newsletters.col_subject')}</TableColumn>
-                <TableColumn className="text-center">{t('newsletters.col_recipients')}</TableColumn>
-                <TableColumn className="text-center">{t('newsletters.col_open_rate')}</TableColumn>
-                <TableColumn className="text-center">{t('newsletters.col_click_rate')}</TableColumn>
-                <TableColumn className="text-end">{t('newsletters.col_date')}</TableColumn>
+                <TableColumn>{"Subject"}</TableColumn>
+                <TableColumn className="text-center">{"Recipients"}</TableColumn>
+                <TableColumn className="text-center">{"Open Rate"}</TableColumn>
+                <TableColumn className="text-center">{"Click Rate"}</TableColumn>
+                <TableColumn className="text-end">{"Date"}</TableColumn>
               </TableHeader>
               <TableBody>
                 {topPerformers.map((nl, idx) => (
@@ -491,21 +491,21 @@ export function NewsletterAnalytics() {
               <Target size={20} />
             </div>
             <div>
-              <h3 className="text-base font-semibold">{t('newsletters.section_benchmark')}</h3>
+              <h3 className="text-base font-semibold">{"Benchmark"}</h3>
               <p className="text-sm text-default-500">
-                {t('newsletters.benchmark_desc')}
+                {"Benchmark."}
               </p>
             </div>
           </CardHeader>
           <CardBody className="px-6 pb-6">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <BenchmarkCard
-                label={t('newsletters.label_open_rate')}
+                label={"Open Rate"}
                 yours={avgOpenRate}
                 benchmark={BENCHMARK_OPEN_RATE}
               />
               <BenchmarkCard
-                label={t('newsletters.label_click_rate')}
+                label={"Click Rate"}
                 yours={avgClickRate}
                 benchmark={BENCHMARK_CLICK_RATE}
               />
@@ -521,9 +521,9 @@ export function NewsletterAnalytics() {
             <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-default-100">
               <BarChart3 size={40} className="text-default-300" />
             </div>
-            <h3 className="text-lg font-semibold">{t('newsletters.empty_no_analytics')}</h3>
+            <h3 className="text-lg font-semibold">{"No no analytics found"}</h3>
             <p className="mt-1 text-default-500">
-              {t('newsletters.empty_no_analytics_desc')}
+              {"Empty No Analytics."}
             </p>
           </CardBody>
         </Card>
