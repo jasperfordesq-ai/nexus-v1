@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\MarketplaceDispute;
 use App\Models\MarketplaceOrder;
 use App\Models\MarketplaceSellerProfile;
@@ -92,12 +93,14 @@ class MarketplaceRatingService
                 $link = '/marketplace/orders/' . $orderId;
                 self::sendRatingEmail(
                     $rateeId,
-                    __('emails_misc.marketplace_rating.received_subject'),
-                    __('emails_misc.marketplace_rating.received_title'),
-                    __('emails_misc.marketplace_rating.received_body', [
+                    'emails_misc.marketplace_rating.received_subject',
+                    [],
+                    'emails_misc.marketplace_rating.received_title',
+                    'emails_misc.marketplace_rating.received_body',
+                    [
                         'rating'       => $rating,
                         'order_number' => $order->order_number,
-                    ]),
+                    ],
                     $link
                 );
             } catch (\Throwable $e) {
@@ -230,9 +233,11 @@ class MarketplaceRatingService
             $link = '/marketplace/orders/' . $orderId;
             self::sendRatingEmail(
                 $otherPartyId,
-                __('emails_misc.marketplace_dispute.opened_subject', ['order_number' => $order->order_number]),
-                __('emails_misc.marketplace_dispute.opened_title'),
-                __('emails_misc.marketplace_dispute.opened_body', ['order_number' => $order->order_number]),
+                'emails_misc.marketplace_dispute.opened_subject',
+                ['order_number' => $order->order_number],
+                'emails_misc.marketplace_dispute.opened_title',
+                'emails_misc.marketplace_dispute.opened_body',
+                ['order_number' => $order->order_number],
                 $link
             );
         } catch (\Throwable $e) {
@@ -256,28 +261,31 @@ class MarketplaceRatingService
     //  Helpers
     // -----------------------------------------------------------------
 
-    private static function sendRatingEmail(int $userId, string $subject, string $title, string $body, string $link): void
+    private static function sendRatingEmail(int $userId, string $subjectKey, array $subjectParams, string $titleKey, string $bodyKey, array $bodyParams, string $link): void
     {
         $tenantId = TenantContext::getId();
-        $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+        $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
 
         if (!$user || empty($user->email)) {
             return;
         }
 
-        $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-        $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+        $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
-        $html = EmailTemplateBuilder::make()
-            ->title($title)
-            ->greeting($firstName)
-            ->paragraph($body)
-            ->button(__('emails_misc.marketplace_rating.received_cta'), $fullUrl)
-            ->render();
+        LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $fullUrl, $userId): void {
+            $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
-        if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
-            Log::warning('[MarketplaceRatingService] email failed', ['user_id' => $userId]);
-        }
+            $html = EmailTemplateBuilder::make()
+                ->title(__($titleKey))
+                ->greeting($firstName)
+                ->paragraph(__($bodyKey, $bodyParams))
+                ->button(__('emails_misc.marketplace_rating.received_cta'), $fullUrl)
+                ->render();
+
+            if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $subjectParams), $html)) {
+                Log::warning('[MarketplaceRatingService] email failed', ['user_id' => $userId]);
+            }
+        });
     }
 
     private static function formatRating(MarketplaceSellerRating $rating): array

@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\MarketplaceListing;
 use App\Models\MarketplaceOffer;
 use App\Models\Notification;
@@ -428,25 +429,28 @@ class MarketplaceOfferService
     private static function sendOfferEmail(int $userId, string $subjectKey, string $titleKey, string $bodyKey, array $bodyParams, array $subjectParams, string $link, string $ctaKey): void
     {
         $tenantId = TenantContext::getId();
-        $user     = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+        $user     = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
 
         if (!$user || empty($user->email)) {
             return;
         }
 
-        $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-        $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+        $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
-        $html = EmailTemplateBuilder::make()
-            ->title(__($titleKey))
-            ->greeting($firstName)
-            ->paragraph(__($bodyKey, $bodyParams))
-            ->button(__($ctaKey), $fullUrl)
-            ->render();
+        LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $ctaKey, $fullUrl, $userId): void {
+            $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
-        if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $subjectParams), $html)) {
-            Log::warning('[MarketplaceOfferService] email failed', ['user_id' => $userId, 'subject_key' => $subjectKey]);
-        }
+            $html = EmailTemplateBuilder::make()
+                ->title(__($titleKey))
+                ->greeting($firstName)
+                ->paragraph(__($bodyKey, $bodyParams))
+                ->button(__($ctaKey), $fullUrl)
+                ->render();
+
+            if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $subjectParams), $html)) {
+                Log::warning('[MarketplaceOfferService] email failed', ['user_id' => $userId, 'subject_key' => $subjectKey]);
+            }
+        });
     }
 
     private static function userName(int $userId): string

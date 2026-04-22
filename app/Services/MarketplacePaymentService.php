@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\MarketplaceEscrow;
 use App\Models\MarketplaceOrder;
 use App\Models\MarketplacePayment;
@@ -559,45 +560,52 @@ class MarketplacePaymentService
 
             $link = '/marketplace/orders/' . $order->id;
 
-            $sendEmail = function (int $userId, string $subject, string $emailTitle, string $body) use ($link): void {
+            $sendEmail = function (int $userId, string $subjectKey, array $subjectParams, string $titleKey, string $bodyKey, array $bodyParams) use ($link): void {
                 $tenantId = TenantContext::getId();
                 $user = DB::table('users')
                     ->where('id', $userId)
                     ->where('tenant_id', $tenantId)
-                    ->select(['email', 'first_name', 'name'])
+                    ->select(['email', 'first_name', 'name', 'preferred_language'])
                     ->first();
                 if (!$user || empty($user->email)) {
                     return;
                 }
 
-                $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                 $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
-                $html = EmailTemplateBuilder::make()
-                    ->title($emailTitle)
-                    ->greeting($firstName)
-                    ->paragraph($body)
-                    ->button(__('emails_misc.marketplace_order.order_cta'), $fullUrl)
-                    ->render();
+                LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $fullUrl, $userId): void {
+                    $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
-                if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
-                    Log::warning('[MarketplacePaymentService] refund email failed', ['user_id' => $userId]);
-                }
+                    $html = EmailTemplateBuilder::make()
+                        ->title(__($titleKey))
+                        ->greeting($firstName)
+                        ->paragraph(__($bodyKey, $bodyParams))
+                        ->button(__('emails_misc.marketplace_order.order_cta'), $fullUrl)
+                        ->render();
+
+                    if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $subjectParams), $html)) {
+                        Log::warning('[MarketplacePaymentService] refund email failed', ['user_id' => $userId]);
+                    }
+                });
             };
 
             $sendEmail(
                 (int) $order->buyer_id,
-                __('emails_misc.marketplace_order.refunded_buyer_subject', ['order_number' => $order->order_number]),
-                __('emails_misc.marketplace_order.refunded_buyer_title'),
-                __('emails_misc.marketplace_order.refunded_buyer_body', ['amount' => $formattedAmount, 'order_number' => $order->order_number, 'title' => $title])
+                'emails_misc.marketplace_order.refunded_buyer_subject',
+                ['order_number' => $order->order_number],
+                'emails_misc.marketplace_order.refunded_buyer_title',
+                'emails_misc.marketplace_order.refunded_buyer_body',
+                ['amount' => $formattedAmount, 'order_number' => $order->order_number, 'title' => $title]
             );
 
             $reasonText = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
             $sendEmail(
                 (int) $order->seller_id,
-                __('emails_misc.marketplace_order.refunded_seller_subject', ['order_number' => $order->order_number]),
-                __('emails_misc.marketplace_order.refunded_seller_title'),
-                __('emails_misc.marketplace_order.refunded_seller_body', ['amount' => $formattedAmount, 'order_number' => $order->order_number, 'title' => $title, 'reason' => $reasonText])
+                'emails_misc.marketplace_order.refunded_seller_subject',
+                ['order_number' => $order->order_number],
+                'emails_misc.marketplace_order.refunded_seller_title',
+                'emails_misc.marketplace_order.refunded_seller_body',
+                ['amount' => $formattedAmount, 'order_number' => $order->order_number, 'title' => $title, 'reason' => $reasonText]
             );
 
             // In-app bell notifications
@@ -760,17 +768,19 @@ class MarketplacePaymentService
                     'created_at' => now(),
                 ]);
 
-                $buyer = DB::table('users')->where('id', $order->buyer_id)->select(['email', 'first_name', 'name'])->first();
+                $buyer = DB::table('users')->where('id', $order->buyer_id)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
                 if ($buyer && !empty($buyer->email)) {
-                    $firstName = $buyer->first_name ?? $buyer->name ?? __('emails.common.fallback_name');
                     $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/marketplace/orders/' . $order->id;
-                    $html = EmailTemplateBuilder::make()
-                        ->title(__($emailTitleKey))
-                        ->greeting($firstName)
-                        ->paragraph(__($emailBodyKey, ['amount' => $amountFormatted, 'currency' => $currency, 'order_number' => $orderNumber]))
-                        ->button(__('emails_misc.marketplace_order.order_cta'), $fullUrl)
-                        ->render();
-                    Mailer::forCurrentTenant()->send($buyer->email, __($emailSubjectKey, ['order_number' => $orderNumber]), $html);
+                    LocaleContext::withLocale($buyer, function () use ($buyer, $emailTitleKey, $emailBodyKey, $emailSubjectKey, $amountFormatted, $currency, $orderNumber, $fullUrl): void {
+                        $firstName = $buyer->first_name ?? $buyer->name ?? __('emails.common.fallback_name');
+                        $html = EmailTemplateBuilder::make()
+                            ->title(__($emailTitleKey))
+                            ->greeting($firstName)
+                            ->paragraph(__($emailBodyKey, ['amount' => $amountFormatted, 'currency' => $currency, 'order_number' => $orderNumber]))
+                            ->button(__('emails_misc.marketplace_order.order_cta'), $fullUrl)
+                            ->render();
+                        Mailer::forCurrentTenant()->send($buyer->email, __($emailSubjectKey, ['order_number' => $orderNumber]), $html);
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('MarketplacePayment webhook: refund notification failed', [

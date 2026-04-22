@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\MarketplaceListing;
 use App\Models\MarketplaceReport;
 use App\Models\MarketplaceSellerProfile;
@@ -490,29 +491,32 @@ class MarketplaceReportService
     private static function sendReportEmail(int $userId, string $subjectKey, array $subjectParams, string $titleKey, string $bodyKey, array $bodyParams, ?string $noteKey, array $noteParams, string $link, string $ctaKey): void
     {
         $tenantId = TenantContext::getId();
-        $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+        $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
 
         if (!$user || empty($user->email)) {
             return;
         }
 
-        $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-        $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+        $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
-        $builder = EmailTemplateBuilder::make()
-            ->title(__($titleKey))
-            ->greeting($firstName)
-            ->paragraph(__($bodyKey, $bodyParams));
+        LocaleContext::withLocale($user, function () use ($user, $subjectKey, $subjectParams, $titleKey, $bodyKey, $bodyParams, $noteKey, $noteParams, $ctaKey, $fullUrl, $userId): void {
+            $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
 
-        if ($noteKey !== null) {
-            $builder->paragraph(__($noteKey, $noteParams));
-        }
+            $builder = EmailTemplateBuilder::make()
+                ->title(__($titleKey))
+                ->greeting($firstName)
+                ->paragraph(__($bodyKey, $bodyParams));
 
-        $html = $builder->button(__($ctaKey), $fullUrl)->render();
+            if ($noteKey !== null) {
+                $builder->paragraph(__($noteKey, $noteParams));
+            }
 
-        if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $subjectParams), $html)) {
-            Log::warning('[MarketplaceReportService] email failed', ['user_id' => $userId, 'subject_key' => $subjectKey]);
-        }
+            $html = $builder->button(__($ctaKey), $fullUrl)->render();
+
+            if (!Mailer::forCurrentTenant()->send($user->email, __($subjectKey, $subjectParams), $html)) {
+                Log::warning('[MarketplaceReportService] email failed', ['user_id' => $userId, 'subject_key' => $subjectKey]);
+            }
+        });
     }
 
     // -----------------------------------------------------------------
