@@ -6,8 +6,10 @@
 
 namespace App\Services;
 
+use App\I18n\LocaleContext;
 use App\Models\Challenge;
 use App\Models\Notification;
+use App\Models\User;
 use App\Models\UserChallengeProgress;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -256,12 +258,20 @@ class ChallengeService
                 // Notify user of completion — rewards are claimed explicitly via
                 // POST /v2/gamification/challenges/{id}/claim to prevent double-award
                 if (! empty($completed) && $completed[array_key_last($completed)]['id'] === $challenge->id) {
-                    Notification::create([
-                        'user_id' => $userId,
-                        'type'    => 'achievement',
-                        'message' => __('svc_notifications.challenge.complete_claim', ['title' => $challenge->title]),
-                        'link'    => '/achievements',
-                    ]);
+                    // Render the bell in the RECIPIENT's preferred language.
+                    $recipient = User::query()
+                        ->withoutGlobalScopes()
+                        ->select(['id', 'preferred_language'])
+                        ->find($userId);
+
+                    LocaleContext::withLocale($recipient, function () use ($userId, $challenge) {
+                        Notification::create([
+                            'user_id' => $userId,
+                            'type'    => 'achievement',
+                            'message' => __('svc_notifications.challenge.complete_claim', ['title' => $challenge->title]),
+                            'link'    => '/achievements',
+                        ]);
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::error('ChallengeService::updateProgress error: ' . $e->getMessage());
@@ -298,11 +308,19 @@ class ChallengeService
             GamificationService::awardBadgeByKey($userId, $challenge->badge_reward);
         }
 
-        Notification::create([
-            'user_id' => $userId,
-            'type'    => 'achievement',
-            'message' => __('svc_notifications.challenge.complete_earned', ['title' => $challenge->title, 'xp' => $challenge->xp_reward]),
-            'link'    => '/achievements',
-        ]);
+        // Render the bell in the RECIPIENT's preferred language.
+        $recipient = User::query()
+            ->withoutGlobalScopes()
+            ->select(['id', 'preferred_language'])
+            ->find($userId);
+
+        LocaleContext::withLocale($recipient, function () use ($userId, $challenge) {
+            Notification::create([
+                'user_id' => $userId,
+                'type'    => 'achievement',
+                'message' => __('svc_notifications.challenge.complete_earned', ['title' => $challenge->title, 'xp' => $challenge->xp_reward]),
+                'link'    => '/achievements',
+            ]);
+        });
     }
 }

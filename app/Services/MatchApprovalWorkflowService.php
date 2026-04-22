@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Services\SafeguardingTriggerService;
 use App\Services\VettingService;
 use Illuminate\Support\Facades\DB;
@@ -159,18 +160,28 @@ class MatchApprovalWorkflowService
                 ]);
             }
 
-            // Notify brokers/admins that a match needs approval
+            // Notify brokers/admins that a match needs approval.
+            // The fallback_member_name is rendered per-broker under their
+            // preferred_language so it doesn't leak the caller's locale into
+            // the recipient's bell. The downstream dispatcher already wraps
+            // under LocaleContext for the notification text itself.
             try {
-                $brokerIds = DB::table('users')
+                $brokers = DB::table('users')
                     ->where('tenant_id', $tenantId)
                     ->whereIn('role', ['admin', 'broker', 'coordinator'])
                     ->where('status', 'active')
-                    ->pluck('id');
+                    ->select(['id', 'preferred_language'])
+                    ->get();
 
-                foreach ($brokerIds as $brokerId) {
+                foreach ($brokers as $broker) {
+                    $trimmedUserName = trim((string) ($userName ?? ''));
+                    $resolvedName = $trimmedUserName !== ''
+                        ? $trimmedUserName
+                        : LocaleContext::withLocale($broker, fn () => __('emails.common.fallback_member_name'));
+
                     NotificationDispatcher::dispatchMatchApprovalRequest(
-                        (int) $brokerId,
-                        trim($userName ?? __('emails.common.fallback_member_name')),
+                        (int) $broker->id,
+                        $resolvedName,
                         $listingTitle ?? 'a listing',
                         (int) $id
                     );
@@ -182,12 +193,17 @@ class MatchApprovalWorkflowService
                 ]);
             }
 
-            // If this is a mutual match, notify both users
+            // If this is a mutual match, notify both users.
+            // We pass the real user names verbatim (trimmed) or null, so the
+            // downstream dispatcher can apply its own fallback_someone under
+            // the recipient's LocaleContext — avoiding a leak of the caller's
+            // locale into the recipient's persisted bell.
             if ($matchType === 'mutual') {
                 try {
+                    $trimmedUserName = trim((string) ($userName ?? ''));
                     $matchInfo = [
                         'id' => $listingId,
-                        'user_name' => trim($userName ?? __('emails.common.fallback_someone')),
+                        'user_name' => $trimmedUserName !== '' ? $trimmedUserName : null,
                     ];
                     $reciprocalInfo = [
                         'they_offer' => $matchData['matched_listing'] ?? 'a skill you need',
@@ -205,10 +221,11 @@ class MatchApprovalWorkflowService
                         ->where('id', $listingOwnerId)
                         ->where('tenant_id', $tenantId)
                         ->value(DB::raw("CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, ''))"));
+                    $trimmedOwnerName = trim((string) ($ownerName ?? ''));
 
                     $reverseMatchInfo = [
                         'id' => $listingId,
-                        'user_name' => trim($ownerName ?? __('emails.common.fallback_someone')),
+                        'user_name' => $trimmedOwnerName !== '' ? $trimmedOwnerName : null,
                     ];
                     $reverseReciprocalInfo = [
                         'they_offer' => $listingTitle ?? 'a skill you need',

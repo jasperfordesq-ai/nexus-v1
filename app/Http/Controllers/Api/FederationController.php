@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\CorsHelper;
 use App\Core\FederationApiMiddleware;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Services\BrokerMessageVisibilityService;
 use App\Services\FederationAuditService;
@@ -706,12 +707,23 @@ class FederationController extends BaseApiController
         try { $this->federationEmailService->sendNewMessageNotification((int) $input['recipient_id'], (int) $input['sender_id'], (int) $partnerTenantId, substr($input['body'], 0, 200)); } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning("FederationV1: email failed: " . $e->getMessage()); }
         try { $this->federationRealtimeService->broadcastNewMessage((int) $input['sender_id'], (int) $partnerTenantId, (int) $input['recipient_id'], (int) $recipient['tenant_id'], ['message_id' => (int) $messageId, 'sender_name' => $senderName, 'sender_tenant_name' => $senderTenantName, 'subject' => $sanitizedSubject, 'body' => $sanitizedBody]); } catch (\Exception $e) { \Log::warning('[Federation] broadcastNewMessage failed', ['error' => $e->getMessage()]); }
         try {
-            $notifBody = __('notifications.federation.new_message', [
-                'sender' => $senderName,
-                'tenant' => $senderTenantName,
-                'subject' => substr($input['subject'], 0, 50),
-            ]);
-            Notification::createNotification((int) $input['recipient_id'], $notifBody, '/federation/messages', 'federation_message', true, (int) $recipient['tenant_id']);
+            // Render the federation-message bell under the recipient's
+            // preferred_language — the federation API caller is an external
+            // partner server and their locale carries no meaning here.
+            $recipientUser = DB::table('users')
+                ->where('id', (int) $input['recipient_id'])
+                ->where('tenant_id', (int) $recipient['tenant_id'])
+                ->select(['preferred_language'])
+                ->first();
+
+            LocaleContext::withLocale($recipientUser, function () use ($input, $senderName, $senderTenantName, $recipient) {
+                $notifBody = __('notifications.federation.new_message', [
+                    'sender' => $senderName,
+                    'tenant' => $senderTenantName,
+                    'subject' => substr($input['subject'], 0, 50),
+                ]);
+                Notification::createNotification((int) $input['recipient_id'], $notifBody, '/federation/messages', 'federation_message', true, (int) $recipient['tenant_id']);
+            });
         } catch (\Exception $e) {
             \Log::warning('[Federation] createNotification failed', ['recipient' => $input['recipient_id'] ?? null, 'error' => $e->getMessage()]);
         }
@@ -954,16 +966,26 @@ class FederationController extends BaseApiController
             'external_partner' => $isExternal,
         ]);
 
-        // Notify reviewee of federated review
+        // Notify reviewee of federated review in their preferred_language.
+        // The federation API caller is an external partner server, so the
+        // caller locale cannot represent the reviewee's preference here.
         try {
             $reviewerName = 'A member from another community';
-            \App\Models\Notification::createNotification(
-                (int) $input['reviewee_id'],
-                __('api_controllers_3.federation.review_received', ['name' => $reviewerName, 'rating' => $rating]),
-                '/reviews',
-                'review',
-                (int) $reviewee['tenant_id']
-            );
+            $revieweeUser = DB::table('users')
+                ->where('id', (int) $input['reviewee_id'])
+                ->where('tenant_id', (int) $reviewee['tenant_id'])
+                ->select(['preferred_language'])
+                ->first();
+
+            LocaleContext::withLocale($revieweeUser, function () use ($input, $reviewerName, $rating, $reviewee) {
+                \App\Models\Notification::createNotification(
+                    (int) $input['reviewee_id'],
+                    __('api_controllers_3.federation.review_received', ['name' => $reviewerName, 'rating' => $rating]),
+                    '/reviews',
+                    'review',
+                    (int) $reviewee['tenant_id']
+                );
+            });
         } catch (\Throwable $e) {
             \Log::warning('[Federation] review notification failed', ['reviewee' => $input['reviewee_id'] ?? null, 'error' => $e->getMessage()]);
         }

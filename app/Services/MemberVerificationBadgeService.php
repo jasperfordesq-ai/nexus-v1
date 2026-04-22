@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -78,7 +79,7 @@ class MemberVerificationBadgeService
         $user = DB::table('users')
             ->where('id', $userId)
             ->where('tenant_id', $tenantId)
-            ->select('id', 'first_name', 'last_name')
+            ->select('id', 'first_name', 'last_name', 'preferred_language')
             ->first();
 
         if (!$user) {
@@ -125,17 +126,21 @@ class MemberVerificationBadgeService
             ]);
         }
 
-        // Send notification
+        // Send notification under the badge recipient's preferred_language
+        // so the bell is readable to them rather than rendered in the admin
+        // caller's locale.
         try {
             $label = self::BADGE_LABELS[$badgeType] ?? $badgeType;
-            DB::table('notifications')->insert([
-                'user_id' => $userId,
-                'tenant_id' => $tenantId,
-                'message' => __('svc_notifications.verification_badge.granted', ['label' => $label]),
-                'link' => '/settings',
-                'type' => 'verification',
-                'created_at' => now(),
-            ]);
+            LocaleContext::withLocale($user, function () use ($userId, $tenantId, $label) {
+                DB::table('notifications')->insert([
+                    'user_id' => $userId,
+                    'tenant_id' => $tenantId,
+                    'message' => __('svc_notifications.verification_badge.granted', ['label' => $label]),
+                    'link' => '/settings',
+                    'type' => 'verification',
+                    'created_at' => now(),
+                ]);
+            });
         } catch (\Exception $e) {
             // Non-critical
         }

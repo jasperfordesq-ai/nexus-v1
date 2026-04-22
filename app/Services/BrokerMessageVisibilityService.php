@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\BrokerMessageCopy;
 use App\Models\Message;
 use App\Models\Notification;
@@ -145,7 +146,7 @@ class BrokerMessageVisibilityService
             $brokerUsers = User::where('tenant_id', $tenantId)
                 ->whereIn('role', ['admin', 'tenant_admin', 'broker', 'super_admin'])
                 ->where('status', 'active')
-                ->select(['id', 'email', 'first_name', 'name'])
+                ->select(['id', 'email', 'first_name', 'name', 'preferred_language'])
                 ->get();
 
             $reviewUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/admin/broker-controls/messages';
@@ -155,22 +156,24 @@ class BrokerMessageVisibilityService
                     continue;
                 }
 
-                // In-app notification (all reasons)
-                Notification::create([
-                    'tenant_id' => $tenantId,
-                    'user_id'   => $broker->id,
-                    'message'   => __('svc_notifications.broker.message_for_review', ['sender' => $senderDisplayName]),
-                    'link'      => '/admin/broker-controls/messages',
-                    'type'      => 'broker_review',
-                ]);
+                // Render bell + email in each broker's preferred language.
+                LocaleContext::withLocale($broker, function () use ($broker, $tenantId, $senderDisplayName, $reason, $reviewUrl) {
+                    Notification::create([
+                        'tenant_id' => $tenantId,
+                        'user_id'   => $broker->id,
+                        'message'   => __('svc_notifications.broker.message_for_review', ['sender' => $senderDisplayName]),
+                        'link'      => '/admin/broker-controls/messages',
+                        'type'      => 'broker_review',
+                    ]);
 
-                // Email notification — only for high-priority reasons that affect monitored/vulnerable members
-                if (
-                    in_array($reason, [self::REASON_FLAGGED_USER, self::REASON_HIGH_RISK_LISTING], true)
-                    && !empty($broker->email)
-                ) {
-                    $this->sendBrokerReviewEmail($broker, $senderDisplayName, $reason, $reviewUrl);
-                }
+                    // Email notification — only for high-priority reasons that affect monitored/vulnerable members
+                    if (
+                        in_array($reason, [self::REASON_FLAGGED_USER, self::REASON_HIGH_RISK_LISTING], true)
+                        && !empty($broker->email)
+                    ) {
+                        $this->sendBrokerReviewEmail($broker, $senderDisplayName, $reason, $reviewUrl);
+                    }
+                });
             }
         } catch (\Throwable $e) {
             Log::warning('[BrokerMessageVisibilityService] Admin notification error: ' . $e->getMessage());

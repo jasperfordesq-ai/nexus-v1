@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\AccountRelationship;
 use App\Models\Notification;
 use App\Models\User;
@@ -240,19 +241,23 @@ class SubAccountService
         ]);
         $rel->save();
 
-        // Notify the child user
+        // Notify the child user in their preferred_language so the bell is
+        // readable to them rather than rendered in the parent's locale.
         try {
             $parentName = $parent->first_name . ' ' . $parent->last_name;
+            $child = User::find($childUserId);
 
-            Notification::create([
-                'tenant_id'  => TenantContext::getId(),
-                'user_id'    => $childUserId,
-                'type'       => 'account',
-                'message'    => __('svc_notifications.sub_account.management_request', ['name' => $parentName, 'type' => $type]),
-                'link'       => '/settings',
-                'is_read'    => false,
-                'created_at' => now(),
-            ]);
+            LocaleContext::withLocale($child, function () use ($childUserId, $parentName, $type) {
+                Notification::create([
+                    'tenant_id'  => TenantContext::getId(),
+                    'user_id'    => $childUserId,
+                    'type'       => 'account',
+                    'message'    => __('svc_notifications.sub_account.management_request', ['name' => $parentName, 'type' => $type]),
+                    'link'       => '/settings',
+                    'is_read'    => false,
+                    'created_at' => now(),
+                ]);
+            });
         } catch (\Exception $e) {
             // Non-critical
         }

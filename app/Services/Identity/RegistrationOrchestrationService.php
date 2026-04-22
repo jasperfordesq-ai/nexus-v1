@@ -8,6 +8,7 @@ namespace App\Services\Identity;
 
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 
 /**
  * RegistrationOrchestrationService — Central coordinator for the registration flow.
@@ -452,11 +453,32 @@ class RegistrationOrchestrationService
                 }
                 $email = $user->email ?? '';
 
-                \App\Services\NotificationDispatcher::notifyAdmins(
-                    'pending_approval',
-                    ['user_id' => $userId, 'user_name' => $userName, 'email' => $email],
-                    __('svc_notifications.registration.admin_pending_approval', ['name' => $userName, 'email' => $email])
-                );
+                // Render the admin bell message per-admin under their
+                // preferred_language — the registering user's caller locale
+                // would otherwise leak into every admin's notification
+                // (notifyAdmins wraps under LocaleContext but receives a
+                // pre-rendered $message, so the render has to happen per
+                // admin here). We inline Notification::createNotification
+                // per-admin since pending_approval has no email pathway
+                // through sendExchangeEmailImmediately.
+                $admins = \Illuminate\Support\Facades\DB::table('users')
+                    ->where('tenant_id', $tenantId)
+                    ->whereIn('role', ['admin', 'broker', 'coordinator'])
+                    ->where('status', 'active')
+                    ->select(['id', 'preferred_language'])
+                    ->get();
+
+                foreach ($admins as $admin) {
+                    LocaleContext::withLocale($admin, function () use ($admin, $userId, $userName, $email) {
+                        $message = __('svc_notifications.registration.admin_pending_approval', ['name' => $userName, 'email' => $email]);
+                        \App\Models\Notification::createNotification(
+                            (int) $admin->id,
+                            $message,
+                            '/notifications',
+                            'pending_approval'
+                        );
+                    });
+                }
             }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning("[RegistrationOrchestrationService] Failed to notify admins of pending approval for user #{$userId}: " . $e->getMessage());

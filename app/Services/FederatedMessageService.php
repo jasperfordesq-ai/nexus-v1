@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -223,18 +224,22 @@ class FederatedMessageService
             ]);
 
             try {
-                $notifyMessage = __('svc_notifications.federation.message_received', [
-                    'sender' => $senderName,
-                    'partner' => $partnerName,
-                ]);
-                Notification::createNotification(
-                    $receiverUserId,
-                    $notifyMessage,
-                    '/federation/messages',
-                    'federation_message',
-                    false,
-                    (int) $receiver->tenant_id
-                );
+                // Render the bell in the RECIPIENT's preferred language.
+                $recipientLocale = $receiver->preferred_language ?? null;
+                LocaleContext::withLocale($recipientLocale, function () use ($receiverUserId, $senderName, $partnerName, $receiver) {
+                    $notifyMessage = __('svc_notifications.federation.message_received', [
+                        'sender' => $senderName,
+                        'partner' => $partnerName,
+                    ]);
+                    Notification::createNotification(
+                        $receiverUserId,
+                        $notifyMessage,
+                        '/federation/messages',
+                        'federation_message',
+                        false,
+                        (int) $receiver->tenant_id
+                    );
+                });
             } catch (\Throwable $e) {
                 Log::warning('Failed to dispatch federation message notification', ['error' => $e->getMessage()]);
             }

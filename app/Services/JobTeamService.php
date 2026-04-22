@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\JobVacancy;
 use App\Models\JobVacancyTeam;
 use App\Models\Notification;
@@ -46,14 +47,19 @@ class JobTeamService
                 ]
             );
 
-            // Notify the added member
+            // Notify the added member in their preferred_language — the
+            // caller is the job poster and wouldn't share the recipient's
+            // locale in a multi-lingual community.
             try {
-                Notification::createNotification(
-                    $targetUserId,
-                    __('svc_notifications.job_team.added_as_role', ['role' => $role, 'title' => $vacancy->title]),
-                    "/jobs/{$vacancyId}",
-                    'job_application'
-                );
+                $target = User::find($targetUserId);
+                LocaleContext::withLocale($target, function () use ($targetUserId, $role, $vacancy, $vacancyId) {
+                    Notification::createNotification(
+                        $targetUserId,
+                        __('svc_notifications.job_team.added_as_role', ['role' => $role, 'title' => $vacancy->title]),
+                        "/jobs/{$vacancyId}",
+                        'job_application'
+                    );
+                });
             } catch (\Throwable $e) {
                 Log::warning('JobTeamService::addMember notification failed: ' . $e->getMessage());
             }

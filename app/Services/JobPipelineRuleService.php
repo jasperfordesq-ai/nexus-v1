@@ -7,10 +7,12 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\JobApplication;
 use App\Models\JobPipelineRule;
 use App\Models\JobVacancy;
 use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
 class JobPipelineRuleService
@@ -113,24 +115,32 @@ class JobPipelineRuleService
                             $actioned++;
                         } elseif ($rule->action === 'reject') {
                             $app->update(['status' => 'rejected', 'stage' => 'rejected']);
-                            // Notify candidate
-                            Notification::createNotification(
-                                (int) $app->user_id,
-                                __('svc_notifications.job_application.status_updated_generic'),
-                                "/jobs/{$vacancyId}",
-                                'job_application_status'
-                            );
+                            // Notify candidate in their preferred_language — this
+                            // rule runs from cron, so the caller locale would
+                            // otherwise always be the worker default.
+                            $candidate = User::find((int) $app->user_id);
+                            LocaleContext::withLocale($candidate, function () use ($app, $vacancyId) {
+                                Notification::createNotification(
+                                    (int) $app->user_id,
+                                    __('svc_notifications.job_application.status_updated_generic'),
+                                    "/jobs/{$vacancyId}",
+                                    'job_application_status'
+                                );
+                            });
                             $actioned++;
                         } elseif ($rule->action === 'notify_reviewer') {
-                            // Notify the job poster
+                            // Notify the job poster in their own preferred_language.
                             $vacancy = JobVacancy::find($vacancyId);
                             if ($vacancy) {
-                                Notification::createNotification(
-                                    (int) $vacancy->user_id,
-                                    __('svc_notifications.job_application.stuck_in_stage', ['id' => $app->id, 'stage' => $rule->trigger_stage, 'days' => $rule->condition_days]),
-                                    "/jobs/{$vacancyId}/kanban",
-                                    'job_application'
-                                );
+                                $poster = User::find((int) $vacancy->user_id);
+                                LocaleContext::withLocale($poster, function () use ($vacancy, $vacancyId, $app, $rule) {
+                                    Notification::createNotification(
+                                        (int) $vacancy->user_id,
+                                        __('svc_notifications.job_application.stuck_in_stage', ['id' => $app->id, 'stage' => $rule->trigger_stage, 'days' => $rule->condition_days]),
+                                        "/jobs/{$vacancyId}/kanban",
+                                        'job_application'
+                                    );
+                                });
                             }
                             $actioned++;
                         }

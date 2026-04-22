@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\I18n\LocaleContext;
 use App\Models\Connection;
 use App\Models\Event;
 use App\Models\EventRsvp;
@@ -138,7 +139,7 @@ class NexusScoreService
                 'badges'     => $badges,
                 'impact'     => $impact,
             ],
-            'insights'       => $this->generateInsights($engagement, $quality, $volunteer, $activity, $badges, $impact),
+            'insights'       => $this->generateInsights($engagement, $quality, $volunteer, $activity, $badges, $impact, $userId),
             'next_milestone' => $this->getNextMilestone($totalScore),
         ];
     }
@@ -473,67 +474,88 @@ class NexusScoreService
 
     /**
      * Generate personalized insights.
+     *
+     * Strings are rendered in the scored user's preferred_language when a
+     * $userId is provided. Insights are cached as fully-rendered JSON in
+     * nexus_score_cache and later surfaced back to the user themselves, so
+     * they must resolve under the recipient's locale rather than the HTTP
+     * caller's (an admin viewing another user's score would otherwise leak
+     * the admin's locale into the cached payload).
      */
-    public function generateInsights(array $engagement, array $quality, array $volunteer, array $activity, array $badges, array $impact): array
+    public function generateInsights(array $engagement, array $quality, array $volunteer, array $activity, array $badges, array $impact, ?int $userId = null): array
     {
-        $insights = [];
-        $categories = [
-            ['name' => 'Engagement', 'data' => $engagement, 'key' => 'engagement'],
-            ['name' => 'Quality', 'data' => $quality, 'key' => 'quality'],
-            ['name' => 'Volunteer', 'data' => $volunteer, 'key' => 'volunteer'],
-            ['name' => 'Activity', 'data' => $activity, 'key' => 'activity'],
-            ['name' => 'Badges', 'data' => $badges, 'key' => 'badges'],
-            ['name' => 'Impact', 'data' => $impact, 'key' => 'impact'],
-        ];
-
-        usort($categories, fn ($a, $b) => $b['data']['percentage'] <=> $a['data']['percentage']);
-
-        $strongest = $categories[0];
-        $insights[] = [
-            'type'    => 'strength',
-            'title'   => __('svc_notifications.nexus_score.strength_title', ['name' => $strongest['name']]),
-            'message' => __('svc_notifications.nexus_score.strength_message', ['percentage' => $strongest['data']['percentage'], 'name' => $strongest['name']]),
-            'icon'    => "\xF0\x9F\x8F\x86",
-        ];
-
-        $weakest = $categories[count($categories) - 1];
-        if ($weakest['data']['percentage'] < 50) {
-            $tipKeys = [
-                'engagement' => 'tip_engagement',
-                'quality'    => 'tip_quality',
-                'volunteer'  => 'tip_volunteer',
-                'activity'   => 'tip_activity',
-                'badges'     => 'tip_badges',
-                'impact'     => 'tip_impact',
-            ];
-            $tipKey = $tipKeys[$weakest['key']] ?? 'tip_default';
-            $insights[] = [
-                'type'    => 'improvement',
-                'title'   => __('svc_notifications.nexus_score.improvement_title', ['name' => $weakest['name']]),
-                'message' => __('svc_notifications.nexus_score.' . $tipKey),
-                'icon'    => "\xF0\x9F\x92\xA1",
-            ];
+        $locale = null;
+        if ($userId !== null) {
+            try {
+                $row = DB::table('users')->where('id', $userId)->value('preferred_language');
+                if (is_string($row) && $row !== '') {
+                    $locale = $row;
+                }
+            } catch (\Throwable $e) {
+                // Fall through — render in the current locale if the lookup fails.
+            }
         }
 
-        if (($engagement['details']['unique_connections'] ?? 0) < 10) {
-            $insights[] = [
-                'type'    => 'suggestion',
-                'title'   => __('svc_notifications.nexus_score.suggestion_connect_title'),
-                'message' => __('svc_notifications.nexus_score.suggestion_connect_message'),
-                'icon'    => "\xF0\x9F\xA4\x9D",
+        return LocaleContext::withLocale($locale, function () use ($engagement, $quality, $volunteer, $activity, $badges, $impact) {
+            $insights = [];
+            $categories = [
+                ['name' => 'Engagement', 'data' => $engagement, 'key' => 'engagement'],
+                ['name' => 'Quality', 'data' => $quality, 'key' => 'quality'],
+                ['name' => 'Volunteer', 'data' => $volunteer, 'key' => 'volunteer'],
+                ['name' => 'Activity', 'data' => $activity, 'key' => 'activity'],
+                ['name' => 'Badges', 'data' => $badges, 'key' => 'badges'],
+                ['name' => 'Impact', 'data' => $impact, 'key' => 'impact'],
             ];
-        }
 
-        if (($quality['details']['review_count'] ?? 0) < 5) {
+            usort($categories, fn ($a, $b) => $b['data']['percentage'] <=> $a['data']['percentage']);
+
+            $strongest = $categories[0];
             $insights[] = [
-                'type'    => 'suggestion',
-                'title'   => __('svc_notifications.nexus_score.suggestion_exchanges_title'),
-                'message' => __('svc_notifications.nexus_score.suggestion_exchanges_message'),
-                'icon'    => "\xE2\xAD\x90",
+                'type'    => 'strength',
+                'title'   => __('svc_notifications.nexus_score.strength_title', ['name' => $strongest['name']]),
+                'message' => __('svc_notifications.nexus_score.strength_message', ['percentage' => $strongest['data']['percentage'], 'name' => $strongest['name']]),
+                'icon'    => "\xF0\x9F\x8F\x86",
             ];
-        }
 
-        return $insights;
+            $weakest = $categories[count($categories) - 1];
+            if ($weakest['data']['percentage'] < 50) {
+                $tipKeys = [
+                    'engagement' => 'tip_engagement',
+                    'quality'    => 'tip_quality',
+                    'volunteer'  => 'tip_volunteer',
+                    'activity'   => 'tip_activity',
+                    'badges'     => 'tip_badges',
+                    'impact'     => 'tip_impact',
+                ];
+                $tipKey = $tipKeys[$weakest['key']] ?? 'tip_default';
+                $insights[] = [
+                    'type'    => 'improvement',
+                    'title'   => __('svc_notifications.nexus_score.improvement_title', ['name' => $weakest['name']]),
+                    'message' => __('svc_notifications.nexus_score.' . $tipKey),
+                    'icon'    => "\xF0\x9F\x92\xA1",
+                ];
+            }
+
+            if (($engagement['details']['unique_connections'] ?? 0) < 10) {
+                $insights[] = [
+                    'type'    => 'suggestion',
+                    'title'   => __('svc_notifications.nexus_score.suggestion_connect_title'),
+                    'message' => __('svc_notifications.nexus_score.suggestion_connect_message'),
+                    'icon'    => "\xF0\x9F\xA4\x9D",
+                ];
+            }
+
+            if (($quality['details']['review_count'] ?? 0) < 5) {
+                $insights[] = [
+                    'type'    => 'suggestion',
+                    'title'   => __('svc_notifications.nexus_score.suggestion_exchanges_title'),
+                    'message' => __('svc_notifications.nexus_score.suggestion_exchanges_message'),
+                    'icon'    => "\xE2\xAD\x90",
+                ];
+            }
+
+            return $insights;
+        });
     }
 
     /**

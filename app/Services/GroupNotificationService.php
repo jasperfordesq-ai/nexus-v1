@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Services\NotificationDispatcher;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -46,32 +47,36 @@ class GroupNotificationService
 
         $safeUserName  = htmlspecialchars($userName, ENT_QUOTES, 'UTF-8');
         $safeGroupName = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
-        $message = __('notifications.group_join_request', ['name' => $userName, 'group' => $group->name]);
         $link = "/groups/{$groupId}/members?tab=requests";
-        $htmlContent = "<p>" . __('notifications.group_join_request', ['name' => "<strong>{$safeUserName}</strong>", 'group' => "<strong>{$safeGroupName}</strong>"]) . "</p>"
-            . "<p><a href=\"{$link}\">" . __('notifications.group_join_request_review') . "</a></p>";
 
         foreach ($admins as $admin) {
             if ((int) $admin->user_id === $userId) {
                 continue; // Don't notify the requester if they're somehow an admin
             }
-            try {
-                NotificationDispatcher::dispatch(
-                    (int) $admin->user_id,
-                    'group',
-                    $groupId,
-                    'group_join_request',
-                    $message,
-                    $link,
-                    $htmlContent
-                );
-            } catch (\Throwable $e) {
-                Log::error('GroupNotification: failed to dispatch join request notification', [
-                    'group_id' => $groupId,
-                    'admin_user_id' => $admin->user_id,
-                    'error' => $e->getMessage(),
-                ]);
-            }
+            // Render the bell + email in each admin's preferred language.
+            LocaleContext::withLocale($admin->preferred_language ?? null, function () use ($admin, $groupId, $userName, $group, $safeUserName, $safeGroupName, $link) {
+                $message = __('notifications.group_join_request', ['name' => $userName, 'group' => $group->name]);
+                $htmlContent = "<p>" . __('notifications.group_join_request', ['name' => "<strong>{$safeUserName}</strong>", 'group' => "<strong>{$safeGroupName}</strong>"]) . "</p>"
+                    . "<p><a href=\"{$link}\">" . __('notifications.group_join_request_review') . "</a></p>";
+
+                try {
+                    NotificationDispatcher::dispatch(
+                        (int) $admin->user_id,
+                        'group',
+                        $groupId,
+                        'group_join_request',
+                        $message,
+                        $link,
+                        $htmlContent
+                    );
+                } catch (\Throwable $e) {
+                    Log::error('GroupNotification: failed to dispatch join request notification', [
+                        'group_id' => $groupId,
+                        'admin_user_id' => $admin->user_id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            });
         }
     }
 
@@ -87,29 +92,33 @@ class GroupNotificationService
             return;
         }
 
+        $recipientLocale = $this->getUserLocale($userId, $tenantId);
         $safeGroupName = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
-        $message = __('notifications.group_joined', ['group' => $group->name]);
         $link = "/groups/{$groupId}";
-        $htmlContent = "<p>" . __('notifications.group_joined', ['group' => "<strong>{$safeGroupName}</strong>"]) . "</p>"
-            . "<p><a href=\"{$link}\">" . __('notifications.group_joined_visit') . "</a></p>";
 
-        try {
-            NotificationDispatcher::dispatch(
-                $userId,
-                'group',
-                $groupId,
-                'group_join',
-                $message,
-                $link,
-                $htmlContent
-            );
-        } catch (\Throwable $e) {
-            Log::error('GroupNotification: failed to dispatch joined notification', [
-                'group_id' => $groupId,
-                'user_id' => $userId,
-                'error' => $e->getMessage(),
-            ]);
-        }
+        LocaleContext::withLocale($recipientLocale, function () use ($userId, $groupId, $group, $safeGroupName, $link) {
+            $message = __('notifications.group_joined', ['group' => $group->name]);
+            $htmlContent = "<p>" . __('notifications.group_joined', ['group' => "<strong>{$safeGroupName}</strong>"]) . "</p>"
+                . "<p><a href=\"{$link}\">" . __('notifications.group_joined_visit') . "</a></p>";
+
+            try {
+                NotificationDispatcher::dispatch(
+                    $userId,
+                    'group',
+                    $groupId,
+                    'group_join',
+                    $message,
+                    $link,
+                    $htmlContent
+                );
+            } catch (\Throwable $e) {
+                Log::error('GroupNotification: failed to dispatch joined notification', [
+                    'group_id' => $groupId,
+                    'user_id' => $userId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        });
     }
 
     /**
@@ -124,29 +133,33 @@ class GroupNotificationService
             return;
         }
 
+        $recipientLocale = $this->getUserLocale($userId, $tenantId);
         $safeGroupName = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
-        $message = __('notifications.group_join_rejected', ['group' => $group->name]);
         $link = "/groups";
-        $htmlContent = "<p>" . __('notifications.group_join_rejected', ['group' => "<strong>{$safeGroupName}</strong>"]) . "</p>"
-            . "<p><a href=\"{$link}\">" . __('notifications.group_browse_others') . "</a></p>";
 
-        try {
-            NotificationDispatcher::dispatch(
-                $userId,
-                'group',
-                $groupId,
-                'group_join_rejected',
-                $message,
-                $link,
-                $htmlContent
-            );
-        } catch (\Throwable $e) {
-            Log::error('GroupNotification: failed to dispatch join rejected notification', [
-                'group_id' => $groupId,
-                'user_id' => $userId,
-                'error' => $e->getMessage(),
-            ]);
-        }
+        LocaleContext::withLocale($recipientLocale, function () use ($userId, $groupId, $group, $safeGroupName, $link) {
+            $message = __('notifications.group_join_rejected', ['group' => $group->name]);
+            $htmlContent = "<p>" . __('notifications.group_join_rejected', ['group' => "<strong>{$safeGroupName}</strong>"]) . "</p>"
+                . "<p><a href=\"{$link}\">" . __('notifications.group_browse_others') . "</a></p>";
+
+            try {
+                NotificationDispatcher::dispatch(
+                    $userId,
+                    'group',
+                    $groupId,
+                    'group_join_rejected',
+                    $message,
+                    $link,
+                    $htmlContent
+                );
+            } catch (\Throwable $e) {
+                Log::error('GroupNotification: failed to dispatch join rejected notification', [
+                    'group_id' => $groupId,
+                    'user_id' => $userId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        });
     }
 
     /**
@@ -166,10 +179,7 @@ class GroupNotificationService
         $safeTitle     = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
         $safeAuthor    = htmlspecialchars($authorName, ENT_QUOTES, 'UTF-8');
         $safeGroupName = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
-        $message = __('notifications.group_new_discussion', ['author' => $authorName, 'title' => $title, 'group' => $group->name]);
         $link = "/groups/{$groupId}/discussions/{$discussionId}";
-        $htmlContent = "<p>" . __('notifications.group_new_discussion', ['author' => "<strong>{$safeAuthor}</strong>", 'title' => "<strong>\"{$safeTitle}\"</strong>", 'group' => "<strong>{$safeGroupName}</strong>"]) . "</p>"
-            . "<p><a href=\"{$link}\">" . __('notifications.group_view_discussion') . "</a></p>";
 
         $members = $this->getActiveMembers($groupId, $tenantId);
 
@@ -177,24 +187,31 @@ class GroupNotificationService
             if ((int) $member->user_id === $authorId) {
                 continue; // Don't notify the author
             }
-            try {
-                NotificationDispatcher::dispatch(
-                    (int) $member->user_id,
-                    'group',
-                    $groupId,
-                    'new_topic',
-                    $message,
-                    $link,
-                    $htmlContent
-                );
-            } catch (\Throwable $e) {
-                Log::error('GroupNotification: failed to dispatch new discussion notification', [
-                    'group_id' => $groupId,
-                    'discussion_id' => $discussionId,
-                    'member_user_id' => $member->user_id,
-                    'error' => $e->getMessage(),
-                ]);
-            }
+            // Render message + html content in each member's preferred language.
+            LocaleContext::withLocale($member->preferred_language ?? null, function () use ($member, $groupId, $discussionId, $authorName, $title, $group, $safeAuthor, $safeTitle, $safeGroupName, $link) {
+                $message = __('notifications.group_new_discussion', ['author' => $authorName, 'title' => $title, 'group' => $group->name]);
+                $htmlContent = "<p>" . __('notifications.group_new_discussion', ['author' => "<strong>{$safeAuthor}</strong>", 'title' => "<strong>\"{$safeTitle}\"</strong>", 'group' => "<strong>{$safeGroupName}</strong>"]) . "</p>"
+                    . "<p><a href=\"{$link}\">" . __('notifications.group_view_discussion') . "</a></p>";
+
+                try {
+                    NotificationDispatcher::dispatch(
+                        (int) $member->user_id,
+                        'group',
+                        $groupId,
+                        'new_topic',
+                        $message,
+                        $link,
+                        $htmlContent
+                    );
+                } catch (\Throwable $e) {
+                    Log::error('GroupNotification: failed to dispatch new discussion notification', [
+                        'group_id' => $groupId,
+                        'discussion_id' => $discussionId,
+                        'member_user_id' => $member->user_id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            });
         }
     }
 
@@ -215,10 +232,7 @@ class GroupNotificationService
         $safeTitle     = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
         $safeAuthor    = htmlspecialchars($authorName, ENT_QUOTES, 'UTF-8');
         $safeGroupName = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
-        $message = __('notifications.group_new_announcement', ['author' => $authorName, 'title' => $title, 'group' => $group->name]);
         $link = "/groups/{$groupId}/announcements";
-        $htmlContent = "<p>" . __('notifications.group_new_announcement', ['author' => "<strong>{$safeAuthor}</strong>", 'title' => "<strong>\"{$safeTitle}\"</strong>", 'group' => "<strong>{$safeGroupName}</strong>"]) . "</p>"
-            . "<p><a href=\"{$link}\">" . __('notifications.group_view_announcement') . "</a></p>";
 
         $members = $this->getActiveMembers($groupId, $tenantId);
 
@@ -226,24 +240,31 @@ class GroupNotificationService
             if ((int) $member->user_id === $authorId) {
                 continue; // Don't notify the author
             }
-            try {
-                NotificationDispatcher::dispatch(
-                    (int) $member->user_id,
-                    'group',
-                    $groupId,
-                    'new_topic',
-                    $message,
-                    $link,
-                    $htmlContent,
-                    true // isOrganizer: announcements are admin-only, treat as organizer priority
-                );
-            } catch (\Throwable $e) {
-                Log::error('GroupNotification: failed to dispatch announcement notification', [
-                    'group_id' => $groupId,
-                    'member_user_id' => $member->user_id,
-                    'error' => $e->getMessage(),
-                ]);
-            }
+            // Render announcement in each member's preferred language.
+            LocaleContext::withLocale($member->preferred_language ?? null, function () use ($member, $groupId, $authorName, $title, $group, $safeAuthor, $safeTitle, $safeGroupName, $link) {
+                $message = __('notifications.group_new_announcement', ['author' => $authorName, 'title' => $title, 'group' => $group->name]);
+                $htmlContent = "<p>" . __('notifications.group_new_announcement', ['author' => "<strong>{$safeAuthor}</strong>", 'title' => "<strong>\"{$safeTitle}\"</strong>", 'group' => "<strong>{$safeGroupName}</strong>"]) . "</p>"
+                    . "<p><a href=\"{$link}\">" . __('notifications.group_view_announcement') . "</a></p>";
+
+                try {
+                    NotificationDispatcher::dispatch(
+                        (int) $member->user_id,
+                        'group',
+                        $groupId,
+                        'new_topic',
+                        $message,
+                        $link,
+                        $htmlContent,
+                        true // isOrganizer: announcements are admin-only, treat as organizer priority
+                    );
+                } catch (\Throwable $e) {
+                    Log::error('GroupNotification: failed to dispatch announcement notification', [
+                        'group_id' => $groupId,
+                        'member_user_id' => $member->user_id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            });
         }
     }
 
@@ -284,8 +305,10 @@ class GroupNotificationService
     private function getGroupAdmins(int $groupId, int $tenantId): array
     {
         return DB::select(
-            "SELECT gm.user_id FROM group_members gm
+            "SELECT gm.user_id, u.preferred_language
+             FROM group_members gm
              JOIN `groups` g ON gm.group_id = g.id
+             JOIN users u ON u.id = gm.user_id
              WHERE gm.group_id = ? AND g.tenant_id = ?
              AND gm.role IN ('admin', 'owner')
              AND gm.status IN ('active', 'approved')",
@@ -301,8 +324,10 @@ class GroupNotificationService
     private function getActiveMembers(int $groupId, int $tenantId): array
     {
         return DB::select(
-            "SELECT gm.user_id FROM group_members gm
+            "SELECT gm.user_id, u.preferred_language
+             FROM group_members gm
              JOIN `groups` g ON gm.group_id = g.id
+             JOIN users u ON u.id = gm.user_id
              WHERE gm.group_id = ? AND g.tenant_id = ?
              AND gm.status IN ('active', 'approved')",
             [$groupId, $tenantId]

@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -588,7 +589,9 @@ class LegalDocumentService
 
         $tenantId = $document['tenant_id'];
 
-        // Get users who need to re-accept
+        // Get users who need to re-accept. Include preferred_language so
+        // each bell + email renders in that user's own locale rather than
+        // the admin caller's locale when a new version is published.
         $users = DB::table('users')
             ->where('tenant_id', $tenantId)
             ->where('status', 'active')
@@ -598,7 +601,7 @@ class LegalDocumentService
                   ->whereColumn('user_legal_acceptances.user_id', 'users.id')
                   ->where('user_legal_acceptances.version_id', $vid);
             })
-            ->select('id', 'name', 'first_name', 'email')
+            ->select('id', 'name', 'first_name', 'email', 'preferred_language')
             ->get();
 
         $docType   = $document['title'] ?? $document['document_type'] ?? 'document';
@@ -608,43 +611,51 @@ class LegalDocumentService
 
         $sentCount = 0;
         foreach ($users as $user) {
-            try {
-                DB::table('notifications')->insert([
-                    'user_id'    => $user->id,
-                    'type'       => 'legal_update',
-                    'title'      => __('svc_notifications.legal.update_title', ['title' => $document['title']]),
-                    'message'    => __('svc_notifications.legal.update_message', ['version' => $version['version_number'], 'title' => $document['title']]),
-                    'link'       => '/' . $docSlug,
-                    'created_at' => now(),
-                ]);
+            $bellSent = LocaleContext::withLocale($user, function () use ($user, $document, $version, $docSlug) {
+                try {
+                    DB::table('notifications')->insert([
+                        'user_id'    => $user->id,
+                        'type'       => 'legal_update',
+                        'title'      => __('svc_notifications.legal.update_title', ['title' => $document['title']]),
+                        'message'    => __('svc_notifications.legal.update_message', ['version' => $version['version_number'], 'title' => $document['title']]),
+                        'link'       => '/' . $docSlug,
+                        'created_at' => now(),
+                    ]);
+                    return true;
+                } catch (\Throwable $e) {
+                    // Continue with other users
+                    return false;
+                }
+            });
+            if ($bellSent) {
                 $sentCount++;
-            } catch (\Throwable $e) {
-                // Continue with other users
             }
 
             // Email notification (only if user has an email address)
             if ($sendEmail && ! empty($user->email)) {
-                try {
-                    $firstName = $user->first_name ?? (explode(' ', $user->name ?? '')[0] ?: 'there');
+                LocaleContext::withLocale($user, function () use ($user, $docType, $community, $reviewUrl) {
+                    try {
+                        $firstName = $user->first_name ?? (explode(' ', $user->name ?? '')[0] ?: 'there');
 
-                    $html = EmailTemplateBuilder::make()
-                        ->theme('warning')
-                        ->title(__('emails_content.legal_update.title'))
-                        ->previewText(__('emails_content.legal_update.preview', ['community' => $community, 'doc_type' => $docType]))
-                        ->greeting($firstName)
-                        ->paragraph(__('emails_content.legal_update.body', ['community' => $community, 'doc_type' => $docType]))
-                        ->paragraph(__('emails_content.legal_update.action_required'))
-                        ->button(__('emails_content.legal_update.cta'), $reviewUrl)
-                        ->render();
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('warning')
+                            ->title(__('emails_content.legal_update.title'))
+                            ->previewText(__('emails_content.legal_update.preview', ['community' => $community, 'doc_type' => $docType]))
+                            ->greeting($firstName)
+                            ->paragraph(__('emails_content.legal_update.body', ['community' => $community, 'doc_type' => $docType]))
+                            ->paragraph(__('emails_content.legal_update.action_required'))
+                            ->button(__('emails_content.legal_update.cta'), $reviewUrl)
+                            ->render();
 
-                    Mailer::forCurrentTenant()->send(
-                        $user->email,
-                        __('emails_content.legal_update.subject', ['community' => $community, 'doc_type' => $docType]),
-                        $html
-                    );
-                } catch (\Throwable $e) {
-                    Log::warning('[LegalDocumentService] email failed for user ' . $user->id . ': ' . $e->getMessage());
-                }
+                        Mailer::forCurrentTenant()->send(
+                            $user->email,
+                            __('emails_content.legal_update.subject', ['community' => $community, 'doc_type' => $docType]),
+                            $html
+                        );
+                    } catch (\Throwable $e) {
+                        Log::warning('[LegalDocumentService] email failed for user ' . $user->id . ': ' . $e->getMessage());
+                    }
+                });
             }
         }
 

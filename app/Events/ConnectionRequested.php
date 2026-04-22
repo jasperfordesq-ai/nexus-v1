@@ -6,6 +6,7 @@
 
 namespace App\Events;
 
+use App\I18n\LocaleContext;
 use App\Models\Connection;
 use App\Models\User;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -60,12 +61,19 @@ class ConnectionRequested implements ShouldBroadcast, ShouldRescue
      */
     public function broadcastWith(): array
     {
+        // Fallback name is rendered in the RECIPIENT's (target) locale —
+        // this payload is broadcast on the target user's private channel.
+        $fallbackName = LocaleContext::withLocale(
+            $this->target,
+            static fn () => __('emails.common.fallback_someone')
+        );
+
         return [
             'id'           => $this->connectionModel->id,
             'requester_id' => $this->requester->id,
             'requester_name' => trim(
                 ($this->requester->first_name ?? '') . ' ' . ($this->requester->last_name ?? '')
-            ) ?: ($this->requester->name ?? __('emails.common.fallback_someone')),
+            ) ?: ($this->requester->name ?? $fallbackName),
             'created_at'   => $this->connectionModel->created_at?->toISOString(),
         ];
     }

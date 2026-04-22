@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\TenantSafeguardingOption;
 use App\Models\UserSafeguardingPreference;
 use Illuminate\Support\Facades\DB;
@@ -398,32 +399,48 @@ class SafeguardingPreferenceService
         // Re-evaluate triggers (may deactivate protections)
         SafeguardingTriggerService::activateTriggersForUser($userId, $tenantId);
 
-        // Bell admins/brokers — a member has withdrawn consent, protections may have changed
+        // Bell admins/brokers — a member has withdrawn consent, protections
+        // may have changed. Render per-staff so each admin sees the bell in
+        // their own preferred_language (including the fallback_member_name
+        // when the revoker has no usable display name).
         try {
             $revoker = \App\Models\User::find($userId);
-            $revokerName = $revoker
-                ? (trim(($revoker->first_name ?? '') . ' ' . ($revoker->last_name ?? '')) ?: ($revoker->name ?? __('emails.common.fallback_member_name')))
-                : 'A member';
+            $hasName = $revoker
+                && trim(($revoker->first_name ?? '') . ' ' . ($revoker->last_name ?? '')) !== '';
+            $legacyName = $revoker ? ($revoker->name ?? null) : null;
 
             $staffUsers = DB::select(
-                "SELECT id FROM users WHERE tenant_id = ? AND role IN ('admin', 'tenant_admin', 'broker', 'super_admin') AND status = 'active'",
+                "SELECT id, preferred_language FROM users WHERE tenant_id = ? AND role IN ('admin', 'tenant_admin', 'broker', 'super_admin') AND status = 'active'",
                 [$tenantId]
             );
 
-            $bellMessage = __('emails_misc.safeguarding.consent_revoked_admin_bell', [
-                'name'   => $revokerName,
-                'option' => $optionLabel,
-            ]);
-
             foreach ($staffUsers as $staff) {
-                \App\Models\Notification::create([
-                    'tenant_id' => $tenantId,
-                    'user_id'   => $staff->id,
-                    'type'      => 'safeguarding_flag',
-                    'message'   => $bellMessage,
-                    'link'      => "/admin/safeguarding?user={$userId}",
-                    'is_read'   => false,
-                ]);
+                LocaleContext::withLocale($staff, function () use ($staff, $tenantId, $userId, $optionLabel, $hasName, $revoker, $legacyName) {
+                    if ($hasName) {
+                        $revokerName = trim(($revoker->first_name ?? '') . ' ' . ($revoker->last_name ?? ''));
+                    } elseif (!empty($legacyName)) {
+                        $revokerName = $legacyName;
+                    } else {
+                        // Revoker row missing or no display name — use the
+                        // translated fallback, rendered in this staff member's
+                        // preferred_language.
+                        $revokerName = __('emails.common.fallback_member_name');
+                    }
+
+                    $bellMessage = __('emails_misc.safeguarding.consent_revoked_admin_bell', [
+                        'name'   => $revokerName,
+                        'option' => $optionLabel,
+                    ]);
+
+                    \App\Models\Notification::create([
+                        'tenant_id' => $tenantId,
+                        'user_id'   => $staff->id,
+                        'type'      => 'safeguarding_flag',
+                        'message'   => $bellMessage,
+                        'link'      => "/admin/safeguarding?user={$userId}",
+                        'is_read'   => false,
+                    ]);
+                });
             }
         } catch (\Throwable $notifErr) {
             Log::warning('SafeguardingPreferenceService::revokePreference: admin bell failed', [

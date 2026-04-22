@@ -276,7 +276,8 @@ class NexusScoreCacheService
                 'breakdown'      => $breakdown,
                 'insights'       => $this->scoreService->generateInsights(
                     $breakdown['engagement'], $breakdown['quality'], $breakdown['volunteer'],
-                    $breakdown['activity'], $breakdown['badges'], $breakdown['impact']
+                    $breakdown['activity'], $breakdown['badges'], $breakdown['impact'],
+                    $userId
                 ),
                 'next_milestone' => $this->scoreService->getNextMilestone($cached->total_score),
                 'cached'         => true,

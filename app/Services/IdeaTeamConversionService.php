@@ -7,8 +7,10 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\IdeaTeamLink;
 use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -157,14 +159,19 @@ class IdeaTeamConversionService
                         ->where('id', $groupId)
                         ->update(['cached_member_count' => 2]);
 
-                    // Notify the idea author that they've been added to the new group
+                    // Notify the idea author that they've been added to the
+                    // new group — render under their preferred_language since
+                    // the converter and idea author often differ in locale.
                     try {
-                        Notification::createNotification(
-                            (int) $idea->user_id,
-                            __('svc_notifications.idea_team.added_to_group', ['group' => $groupName]),
-                            "/groups/{$groupId}",
-                            'group_added'
-                        );
+                        $ideaAuthor = User::find((int) $idea->user_id);
+                        LocaleContext::withLocale($ideaAuthor, function () use ($idea, $groupName, $groupId) {
+                            Notification::createNotification(
+                                (int) $idea->user_id,
+                                __('svc_notifications.idea_team.added_to_group', ['group' => $groupName]),
+                                "/groups/{$groupId}",
+                                'group_added'
+                            );
+                        });
                     } catch (\Throwable $e) {
                         Log::warning('IdeaTeamConversionService: failed to notify added user', [
                             'user_id' => $idea->user_id,

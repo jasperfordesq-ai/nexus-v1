@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Connection;
 use App\Models\Event;
 use App\Models\EventRsvp;
@@ -491,13 +492,20 @@ class GamificationService
             return;
         }
 
-        // Create notification
-        Notification::create([
-            'user_id' => $userId,
-            'type'    => 'achievement',
-            'message' => __('svc_notifications.gamification.badge_earned', ['name' => $badge['name'], 'icon' => $badge['icon']]),
-            'link'    => '/profile',
-        ]);
+        // Create notification — render in the RECIPIENT's preferred language.
+        $recipient = User::query()
+            ->withoutGlobalScopes()
+            ->select(['id', 'preferred_language'])
+            ->find($userId);
+
+        LocaleContext::withLocale($recipient, function () use ($userId, $badge) {
+            Notification::create([
+                'user_id' => $userId,
+                'type'    => 'achievement',
+                'message' => __('svc_notifications.gamification.badge_earned', ['name' => $badge['name'], 'icon' => $badge['icon']]),
+                'link'    => '/profile',
+            ]);
+        });
 
         // Broadcast badge earned event
         try {
@@ -625,12 +633,20 @@ class GamificationService
                 $user->level = $newLevel;
                 $user->save();
 
-                Notification::create([
-                    'user_id' => $userId,
-                    'type'    => 'achievement',
-                    'message' => __('svc_notifications.gamification.level_up', ['level' => $newLevel]),
-                    'link'    => '/profile',
-                ]);
+                // Render the bell in the RECIPIENT's preferred language.
+                $recipient = User::query()
+                    ->withoutGlobalScopes()
+                    ->select(['id', 'preferred_language'])
+                    ->find($userId);
+
+                LocaleContext::withLocale($recipient, function () use ($userId, $newLevel) {
+                    Notification::create([
+                        'user_id' => $userId,
+                        'type'    => 'achievement',
+                        'message' => __('svc_notifications.gamification.level_up', ['level' => $newLevel]),
+                        'link'    => '/profile',
+                    ]);
+                });
 
                 // Broadcast level up event
                 try {

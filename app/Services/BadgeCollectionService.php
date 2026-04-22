@@ -6,12 +6,14 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\BadgeCollection;
 use App\Models\BadgeCollectionItem;
 use App\Models\Notification;
+use App\Models\User;
 use App\Models\UserBadge;
 use App\Models\UserCollectionCompletion;
-use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -305,12 +307,20 @@ class BadgeCollectionService
                 }
             });
 
-            Notification::create([
-                'user_id' => $userId,
-                'type'    => 'achievement',
-                'message' => __('svc_notifications.badge_collection.collection_complete', ['name' => $collection->name, 'xp' => $collection->bonus_xp, 'icon' => $collection->icon]),
-                'link'    => '/achievements',
-            ]);
+            // Render the achievement bell in the RECIPIENT's preferred language.
+            $recipient = User::query()
+                ->withoutGlobalScopes()
+                ->select(['id', 'preferred_language'])
+                ->find($userId);
+
+            LocaleContext::withLocale($recipient, function () use ($userId, $collection) {
+                Notification::create([
+                    'user_id' => $userId,
+                    'type'    => 'achievement',
+                    'message' => __('svc_notifications.badge_collection.collection_complete', ['name' => $collection->name, 'xp' => $collection->bonus_xp, 'icon' => $collection->icon]),
+                    'link'    => '/achievements',
+                ]);
+            });
         } catch (\Throwable $e) {
             Log::error('Failed to award collection completion: ' . $e->getMessage());
         }

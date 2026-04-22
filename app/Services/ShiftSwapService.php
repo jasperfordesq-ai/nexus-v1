@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\VolApplication;
 use App\Models\VolShift;
 use App\Services\NotificationDispatcher;
@@ -130,7 +131,7 @@ class ShiftSwapService
             ]);
 
             // Notify the target user about the incoming swap request
-            self::notifySwap($toUserId, 'vol_swap_requested', __('svc_notifications.shift_swap.requested'), '/volunteering?tab=swaps');
+            self::notifySwap($toUserId, 'vol_swap_requested', 'svc_notifications.shift_swap.requested', '/volunteering?tab=swaps');
 
             return (int) $swapId;
         } catch (\Exception $e) {
@@ -177,7 +178,7 @@ class ShiftSwapService
                     ->update(['status' => 'rejected']);
 
                 // Notify requester their swap was declined
-                self::notifySwap((int) $swap->from_user_id, 'vol_swap_declined', __('svc_notifications.shift_swap.declined'), '/volunteering?tab=swaps');
+                self::notifySwap((int) $swap->from_user_id, 'vol_swap_declined', 'svc_notifications.shift_swap.declined', '/volunteering?tab=swaps');
 
                 return true;
             }
@@ -196,7 +197,7 @@ class ShiftSwapService
 
             if ($result) {
                 // Notify requester their swap was approved
-                self::notifySwap((int) $swap->from_user_id, 'vol_swap_approved', __('svc_notifications.shift_swap.accepted'), '/volunteering?tab=swaps');
+                self::notifySwap((int) $swap->from_user_id, 'vol_swap_approved', 'svc_notifications.shift_swap.accepted', '/volunteering?tab=swaps');
             }
 
             return $result;
@@ -239,8 +240,8 @@ class ShiftSwapService
                     ->update(['status' => 'admin_rejected', 'admin_id' => $adminId]);
 
                 // Notify both parties
-                self::notifySwap((int) $swap->from_user_id, 'vol_swap_declined', __('svc_notifications.shift_swap.declined_by_admin'), '/volunteering?tab=swaps');
-                self::notifySwap((int) $swap->to_user_id, 'vol_swap_declined', __('svc_notifications.shift_swap.accepted_swap_declined_by_admin'), '/volunteering?tab=swaps');
+                self::notifySwap((int) $swap->from_user_id, 'vol_swap_declined', 'svc_notifications.shift_swap.declined_by_admin', '/volunteering?tab=swaps');
+                self::notifySwap((int) $swap->to_user_id, 'vol_swap_declined', 'svc_notifications.shift_swap.accepted_swap_declined_by_admin', '/volunteering?tab=swaps');
 
                 return true;
             }
@@ -255,8 +256,8 @@ class ShiftSwapService
                     ->update(['admin_id' => $adminId]);
 
                 // Notify both parties
-                self::notifySwap((int) $swap->from_user_id, 'vol_swap_approved', __('svc_notifications.shift_swap.approved_by_admin'), '/volunteering?tab=swaps');
-                self::notifySwap((int) $swap->to_user_id, 'vol_swap_approved', __('svc_notifications.shift_swap.accepted_swap_approved_by_admin'), '/volunteering?tab=swaps');
+                self::notifySwap((int) $swap->from_user_id, 'vol_swap_approved', 'svc_notifications.shift_swap.approved_by_admin', '/volunteering?tab=swaps');
+                self::notifySwap((int) $swap->to_user_id, 'vol_swap_approved', 'svc_notifications.shift_swap.accepted_swap_approved_by_admin', '/volunteering?tab=swaps');
             }
 
             return $result;
@@ -552,20 +553,31 @@ class ShiftSwapService
 
     /**
      * Dispatch an in-app notification for a shift swap event.
+     *
+     * $contentKey is the translation key (e.g. 'svc_notifications.shift_swap.requested')
+     * — rendered here, inside LocaleContext keyed on the recipient's
+     * preferred_language, so the persisted bell text lands in the recipient's
+     * locale rather than the admin caller's or cron worker's.
      */
-    private static function notifySwap(int $userId, string $activityType, string $content, string $link): void
+    private static function notifySwap(int $userId, string $activityType, string $contentKey, string $link, array $contentParams = []): void
     {
         try {
-            NotificationDispatcher::dispatch(
-                $userId,
-                'global',
-                null,
-                $activityType,
-                $content,
-                $link,
-                null,
-                false
-            );
+            $recipientLocale = DB::table('users')->where('id', $userId)->value('preferred_language');
+            $localeInput = is_string($recipientLocale) && $recipientLocale !== '' ? $recipientLocale : null;
+
+            LocaleContext::withLocale($localeInput, function () use ($userId, $activityType, $contentKey, $contentParams, $link) {
+                $content = __($contentKey, $contentParams);
+                NotificationDispatcher::dispatch(
+                    $userId,
+                    'global',
+                    null,
+                    $activityType,
+                    $content,
+                    $link,
+                    null,
+                    false
+                );
+            });
         } catch (\Throwable $e) {
             // Notification failure should never block the swap operation
             Log::warning('ShiftSwapService: notification dispatch failed: ' . $e->getMessage());

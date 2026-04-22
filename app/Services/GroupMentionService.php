@@ -6,10 +6,11 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use App\I18n\LocaleContext;
+use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Core\TenantContext;
-use App\Models\Notification;
 
 /**
  * GroupMentionService — Handles @mention parsing, notification, and member
@@ -42,14 +43,15 @@ class GroupMentionService
             ->where('tenant_id', $tenantId)
             ->where('status', '!=', 'banned')
             ->whereIn('username', $usernames)
-            ->select(['id', 'username'])
+            ->select(['id', 'username', 'preferred_language'])
             ->get();
 
         $results = [];
         foreach ($users as $user) {
             $results[] = [
-                'username' => $user->username,
-                'user_id'  => (int) $user->id,
+                'username'           => $user->username,
+                'user_id'            => (int) $user->id,
+                'preferred_language' => $user->preferred_language ?? null,
             ];
         }
 
@@ -96,12 +98,15 @@ class GroupMentionService
             }
 
             try {
-                Notification::createNotification(
-                    $mention['user_id'],
-                    __('svc_notifications.group_mention.mentioned_in_group', ['group' => $groupName]),
-                    $link,
-                    'group_mention'
-                );
+                // Render bell in the mentioned user's preferred language.
+                LocaleContext::withLocale($mention['preferred_language'] ?? null, function () use ($mention, $groupName, $link) {
+                    Notification::createNotification(
+                        $mention['user_id'],
+                        __('svc_notifications.group_mention.mentioned_in_group', ['group' => $groupName]),
+                        $link,
+                        'group_mention'
+                    );
+                });
             } catch (\Exception $e) {
                 Log::debug("GroupMentionService::notifyMentioned error: " . $e->getMessage());
             }

@@ -16,6 +16,7 @@ use App\Events\FederatedListingReceived;
 use App\Events\FederatedMemberUpdated;
 use App\Events\FederatedReviewReceived;
 use App\Events\FederatedVolunteeringReceived;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Services\FederatedMessageService;
 use App\Services\FederationExternalApiClient;
@@ -1003,21 +1004,27 @@ class FederationExternalWebhookController extends BaseApiController
             }
 
             try {
-                $senderName = $data['sender_name'] ?? __('api.external_user_fallback');
-                $partnerName = $partner->name ?? __('api.external_partner_fallback');
-                $notifyMessage = __('svc_notifications.federation.transaction_received', [
-                    'amount' => rtrim(rtrim(number_format($amount, 2), '0'), '.'),
-                    'sender' => $senderName,
-                    'partner' => $partnerName,
-                ]);
-                Notification::createNotification(
-                    $receiverUserId,
-                    $notifyMessage,
-                    '/wallet',
-                    'federation_transaction',
-                    false,
-                    (int) TenantContext::getId()
-                );
+                // Render the transaction-received bell (including its two
+                // fallback strings) under the receiver's preferred_language.
+                // Webhook caller is an external partner server; its locale
+                // has no bearing on the recipient's bell text.
+                LocaleContext::withLocale($receiver, function () use ($data, $partner, $amount, $receiverUserId) {
+                    $senderName = $data['sender_name'] ?? __('api.external_user_fallback');
+                    $partnerName = $partner->name ?? __('api.external_partner_fallback');
+                    $notifyMessage = __('svc_notifications.federation.transaction_received', [
+                        'amount' => rtrim(rtrim(number_format($amount, 2), '0'), '.'),
+                        'sender' => $senderName,
+                        'partner' => $partnerName,
+                    ]);
+                    Notification::createNotification(
+                        $receiverUserId,
+                        $notifyMessage,
+                        '/wallet',
+                        'federation_transaction',
+                        false,
+                        (int) TenantContext::getId()
+                    );
+                });
             } catch (\Throwable $e) {
                 Log::warning('Failed to dispatch federation transaction notification', ['error' => $e->getMessage()]);
             }
