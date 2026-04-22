@@ -11,7 +11,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Spinner, Chip } from '@heroui/react';
-import { Users } from 'lucide-react';
+import Users from 'lucide-react/icons/users';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';

@@ -12,7 +12,9 @@
 
 import { useState, useCallback } from 'react';
 import { Button, Input, Spinner, Divider } from '@heroui/react';
-import { Plus, FolderOpen, Check } from 'lucide-react';
+import Plus from 'lucide-react/icons/plus';
+import FolderOpen from 'lucide-react/icons/folder-open';
+import Check from 'lucide-react/icons/check';
 import { useTranslation } from 'react-i18next';
 import { useBookmarkCollections } from '@/hooks/useBookmarkCollections';
 

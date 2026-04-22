@@ -12,7 +12,7 @@
 
 import { useState, useCallback } from 'react';
 import { Button, Input, Textarea } from '@heroui/react';
-import { Send } from 'lucide-react';
+import Send from 'lucide-react/icons/send';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

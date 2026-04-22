@@ -27,25 +27,23 @@ import {
   Textarea,
   Divider,
 } from '@heroui/react';
-import {
-  Sparkles,
-  ArrowRight,
-  ArrowLeft,
-  CheckCircle,
-  Heart,
-  HandHeart,
-  HelpCircle,
-  Rocket,
-  Camera,
-  UserCircle,
-  Upload,
-  SkipForward,
-  PartyPopper,
-  ImagePlus,
-  Clock,
-  Users,
-  Star,
-} from 'lucide-react';
+import Sparkles from 'lucide-react/icons/sparkles';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Heart from 'lucide-react/icons/heart';
+import HandHeart from 'lucide-react/icons/hand-heart';
+import HelpCircle from 'lucide-react/icons/circle-help';
+import Rocket from 'lucide-react/icons/rocket';
+import Camera from 'lucide-react/icons/camera';
+import UserCircle from 'lucide-react/icons/circle-user';
+import Upload from 'lucide-react/icons/upload';
+import SkipForward from 'lucide-react/icons/skip-forward';
+import PartyPopper from 'lucide-react/icons/party-popper';
+import ImagePlus from 'lucide-react/icons/image-plus';
+import Clock from 'lucide-react/icons/clock';
+import Users from 'lucide-react/icons/users';
+import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { usePageTitle } from '@/hooks';

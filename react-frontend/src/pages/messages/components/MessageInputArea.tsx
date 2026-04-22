@@ -6,7 +6,13 @@
 import type { RefObject, ChangeEvent, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Textarea } from '@heroui/react';
-import { Send, Mic, Square, Paperclip, X, FileText, AlertTriangle } from 'lucide-react';
+import Send from 'lucide-react/icons/send';
+import Mic from 'lucide-react/icons/mic';
+import Square from 'lucide-react/icons/square';
+import Paperclip from 'lucide-react/icons/paperclip';
+import X from 'lucide-react/icons/x';
+import FileText from 'lucide-react/icons/file-text';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useNavigate } from 'react-router-dom';
 import { useTenant } from '@/contexts';
 import { GifPicker } from '@/components/compose/GifPicker';

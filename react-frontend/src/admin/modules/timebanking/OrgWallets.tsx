@@ -12,7 +12,8 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@heroui/react';
-import { Building2, ArrowLeft } from 'lucide-react';
+import Building2 from 'lucide-react/icons/building-2';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminTimebanking } from '../../api/adminApi';

@@ -17,14 +17,12 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Accordion, AccordionItem, Button, Input, Spinner } from '@heroui/react';
 import { SafeHtml } from '@/components/ui/SafeHtml';
-import {
-  HelpCircle,
-  Search,
-  MessageSquare,
-  BookOpen,
-  Wallet,
-  Calendar,
-} from 'lucide-react';
+import HelpCircle from 'lucide-react/icons/circle-help';
+import Search from 'lucide-react/icons/search';
+import MessageSquare from 'lucide-react/icons/message-square';
+import BookOpen from 'lucide-react/icons/book-open';
+import Wallet from 'lucide-react/icons/wallet';
+import Calendar from 'lucide-react/icons/calendar';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';

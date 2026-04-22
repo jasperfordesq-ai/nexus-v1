@@ -33,14 +33,12 @@ import {
   SelectItem,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Store,
-  Package,
-  Truck,
-  Star,
-  ExternalLink,
-  Clock,
-} from 'lucide-react';
+import Store from 'lucide-react/icons/store';
+import Package from 'lucide-react/icons/package';
+import Truck from 'lucide-react/icons/truck';
+import Star from 'lucide-react/icons/star';
+import ExternalLink from 'lucide-react/icons/external-link';
+import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

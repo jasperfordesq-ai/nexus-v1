@@ -14,7 +14,10 @@ import {
   Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure,
 } from '@heroui/react';
-import { ClipboardCheck, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
+import ClipboardCheck from 'lucide-react/icons/clipboard-check';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 

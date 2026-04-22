@@ -31,34 +31,32 @@ import {
   ModalBody,
   ModalFooter,
 } from '@heroui/react';
-import {
-  Heart,
-  MessageCircle,
-  Send,
-  MoreHorizontal,
-  Eye,
-  EyeOff,
-  VolumeX,
-  Flag,
-  Trash2,
-  Check,
-  Star,
-  Clock,
-  TrendingUp,
-  BarChart3,
-  Target,
-  ShoppingBag,
-  Calendar,
-  MapPin,
-  ArrowRight,
-  BookOpen,
-  Users,
-  Trophy,
-  Zap,
-  Pencil,
-  X,
-  ThumbsDown,
-} from 'lucide-react';
+import Heart from 'lucide-react/icons/heart';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import Send from 'lucide-react/icons/send';
+import MoreHorizontal from 'lucide-react/icons/ellipsis';
+import Eye from 'lucide-react/icons/eye';
+import EyeOff from 'lucide-react/icons/eye-off';
+import VolumeX from 'lucide-react/icons/volume-x';
+import Flag from 'lucide-react/icons/flag';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Check from 'lucide-react/icons/check';
+import Star from 'lucide-react/icons/star';
+import Clock from 'lucide-react/icons/clock';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Target from 'lucide-react/icons/target';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import Calendar from 'lucide-react/icons/calendar';
+import MapPin from 'lucide-react/icons/map-pin';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import BookOpen from 'lucide-react/icons/book-open';
+import Users from 'lucide-react/icons/users';
+import Trophy from 'lucide-react/icons/trophy';
+import Zap from 'lucide-react/icons/zap';
+import Pencil from 'lucide-react/icons/pencil';
+import X from 'lucide-react/icons/x';
+import ThumbsDown from 'lucide-react/icons/thumbs-down';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, BottomSheet, ConfettiCelebration } from '@/components/ui';
 import { useTenant, useToast } from '@/contexts';

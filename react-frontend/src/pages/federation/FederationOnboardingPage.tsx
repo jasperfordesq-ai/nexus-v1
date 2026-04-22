@@ -28,26 +28,24 @@ import {
   Spinner,
   Chip,
 } from '@heroui/react';
-import {
-  Globe,
-  Users,
-  ArrowRightLeft,
-  ArrowRight,
-  ArrowLeft,
-  Eye,
-  Search,
-  Zap,
-  MapPin,
-  Star,
-  Send,
-  CreditCard,
-  Mail,
-  Shield,
-  CheckCircle,
-  Sparkles,
-  HandHeart,
-  Network,
-} from 'lucide-react';
+import Globe from 'lucide-react/icons/globe';
+import Users from 'lucide-react/icons/users';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Eye from 'lucide-react/icons/eye';
+import Search from 'lucide-react/icons/search';
+import Zap from 'lucide-react/icons/zap';
+import MapPin from 'lucide-react/icons/map-pin';
+import Star from 'lucide-react/icons/star';
+import Send from 'lucide-react/icons/send';
+import CreditCard from 'lucide-react/icons/credit-card';
+import Mail from 'lucide-react/icons/mail';
+import Shield from 'lucide-react/icons/shield';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Sparkles from 'lucide-react/icons/sparkles';
+import HandHeart from 'lucide-react/icons/hand-heart';
+import Network from 'lucide-react/icons/network';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';

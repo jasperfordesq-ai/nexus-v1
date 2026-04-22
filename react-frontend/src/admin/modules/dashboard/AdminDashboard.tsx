@@ -28,25 +28,23 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Spinner, Button, Chip } from '@heroui/react';
-import {
-  Users,
-  ListChecks,
-  ArrowLeftRight,
-  Clock,
-  UserCheck,
-  UserPlus,
-  FileCheck,
-  TrendingUp,
-  Activity,
-  RefreshCw,
-  Send,
-  PenSquare,
-  Trophy,
-  Settings,
-  Rocket,
-  ChevronRight,
-  ShieldAlert,
-} from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import ListChecks from 'lucide-react/icons/list-checks';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import Clock from 'lucide-react/icons/clock';
+import UserCheck from 'lucide-react/icons/user-check';
+import UserPlus from 'lucide-react/icons/user-plus';
+import FileCheck from 'lucide-react/icons/file-check';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Activity from 'lucide-react/icons/activity';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Send from 'lucide-react/icons/send';
+import PenSquare from 'lucide-react/icons/square-pen';
+import Trophy from 'lucide-react/icons/trophy';
+import Settings from 'lucide-react/icons/settings';
+import Rocket from 'lucide-react/icons/rocket';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { useOnboardingConfig } from '@/hooks/useOnboardingConfig';

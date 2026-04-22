@@ -22,85 +22,83 @@ import { Button, Input } from '@heroui/react';
 import { useAuth, useTenant } from '@/contexts';
 import { adminBroker } from '../api/adminApi';
 import { api } from '@/lib/api';
-import {
-  LayoutDashboard,
-  Users,
-  ListChecks,
-  Newspaper,
-  Trophy,
-  Megaphone,
-  Sparkles,
-  Coins,
-  Building2,
-  Globe,
-  Settings,
-  ChevronDown,
-  ChevronRight,
-  PanelLeftClose,
-  PanelLeft,
-  UserCheck,
-  FileText,
-  Menu,
-  FolderTree,
-  Tags,
-  Tag,
-  Gamepad2,
-  Medal,
-  BarChart3,
-  Zap,
-  Target,
-  Brain,
-  Search,
-  ArrowLeftRight,
-  AlertTriangle,
-  Clock,
-  Wallet,
-  CreditCard,
-  Shield,
-  Key,
-  ShieldCheck,
-  Heart,
-  Cog,
-  Timer,
-  Contact,
-  StickyNote,
-  ClipboardList,
-  Filter,
-  Activity,
-  Crown,
-  Network,
-  ScrollText,
-  Mail,
-  Wrench,
-  Stethoscope,
-  MessageSquare,
-  MessageSquareWarning,
-  MessageCircle,
-  Star,
-  Flag,
-  Eye,
-  Archive,
-  FileCheck,
-  UserX,
-  Calendar,
-  BarChart2,
-  Lightbulb,
-  Briefcase,
-  BookOpen,
-  Cpu,
-  Handshake,
-  Database,
-  MapPin,
-  FileSearch,
-  Webhook,
-  Puzzle,
-  Palette,
-  ShoppingBag,
-  Store,
-  Languages,
-  X,
-  type LucideIcon,
-} from 'lucide-react';
+import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
+import Users from 'lucide-react/icons/users';
+import ListChecks from 'lucide-react/icons/list-checks';
+import Newspaper from 'lucide-react/icons/newspaper';
+import Trophy from 'lucide-react/icons/trophy';
+import Megaphone from 'lucide-react/icons/megaphone';
+import Sparkles from 'lucide-react/icons/sparkles';
+import Coins from 'lucide-react/icons/coins';
+import Building2 from 'lucide-react/icons/building-2';
+import Globe from 'lucide-react/icons/globe';
+import Settings from 'lucide-react/icons/settings';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import PanelLeftClose from 'lucide-react/icons/panel-left-close';
+import PanelLeft from 'lucide-react/icons/panel-left';
+import UserCheck from 'lucide-react/icons/user-check';
+import FileText from 'lucide-react/icons/file-text';
+import Menu from 'lucide-react/icons/menu';
+import FolderTree from 'lucide-react/icons/folder-tree';
+import Tags from 'lucide-react/icons/tags';
+import Tag from 'lucide-react/icons/tag';
+import Gamepad2 from 'lucide-react/icons/gamepad-2';
+import Medal from 'lucide-react/icons/medal';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Zap from 'lucide-react/icons/zap';
+import Target from 'lucide-react/icons/target';
+import Brain from 'lucide-react/icons/brain';
+import Search from 'lucide-react/icons/search';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Clock from 'lucide-react/icons/clock';
+import Wallet from 'lucide-react/icons/wallet';
+import CreditCard from 'lucide-react/icons/credit-card';
+import Shield from 'lucide-react/icons/shield';
+import Key from 'lucide-react/icons/key';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import Heart from 'lucide-react/icons/heart';
+import Cog from 'lucide-react/icons/cog';
+import Timer from 'lucide-react/icons/timer';
+import Contact from 'lucide-react/icons/contact';
+import StickyNote from 'lucide-react/icons/sticky-note';
+import ClipboardList from 'lucide-react/icons/clipboard-list';
+import Filter from 'lucide-react/icons/filter';
+import Activity from 'lucide-react/icons/activity';
+import Crown from 'lucide-react/icons/crown';
+import Network from 'lucide-react/icons/network';
+import ScrollText from 'lucide-react/icons/scroll-text';
+import Mail from 'lucide-react/icons/mail';
+import Wrench from 'lucide-react/icons/wrench';
+import Stethoscope from 'lucide-react/icons/stethoscope';
+import MessageSquare from 'lucide-react/icons/message-square';
+import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import Star from 'lucide-react/icons/star';
+import Flag from 'lucide-react/icons/flag';
+import Eye from 'lucide-react/icons/eye';
+import Archive from 'lucide-react/icons/archive';
+import FileCheck from 'lucide-react/icons/file-check';
+import UserX from 'lucide-react/icons/user-x';
+import Calendar from 'lucide-react/icons/calendar';
+import BarChart2 from 'lucide-react/icons/chart-no-axes-column';
+import Lightbulb from 'lucide-react/icons/lightbulb';
+import Briefcase from 'lucide-react/icons/briefcase';
+import BookOpen from 'lucide-react/icons/book-open';
+import Cpu from 'lucide-react/icons/cpu';
+import Handshake from 'lucide-react/icons/handshake';
+import Database from 'lucide-react/icons/database';
+import MapPin from 'lucide-react/icons/map-pin';
+import FileSearch from 'lucide-react/icons/file-search';
+import Webhook from 'lucide-react/icons/webhook';
+import Puzzle from 'lucide-react/icons/puzzle';
+import Palette from 'lucide-react/icons/palette';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import Store from 'lucide-react/icons/store';
+import Languages from 'lucide-react/icons/languages';
+import X from 'lucide-react/icons/x';
+import type { LucideIcon } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Navigation config — mirrors PHP admin-navigation-config.php

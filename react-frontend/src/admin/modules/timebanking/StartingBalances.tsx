@@ -20,7 +20,11 @@ import {
   Chip,
   Textarea,
 } from '@heroui/react';
-import { Wallet, Plus, History, Search, Users } from 'lucide-react';
+import Wallet from 'lucide-react/icons/wallet';
+import Plus from 'lucide-react/icons/plus';
+import History from 'lucide-react/icons/history';
+import Search from 'lucide-react/icons/search';
+import Users from 'lucide-react/icons/users';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminUsers, adminTimebanking } from '../../api/adminApi';

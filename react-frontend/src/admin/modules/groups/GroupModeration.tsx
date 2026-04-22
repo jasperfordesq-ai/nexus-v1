@@ -10,7 +10,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Chip, Spinner } from '@heroui/react';
-import { ShieldAlert, Flag } from 'lucide-react';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import Flag from 'lucide-react/icons/flag';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminGroups } from '../../api/adminApi';

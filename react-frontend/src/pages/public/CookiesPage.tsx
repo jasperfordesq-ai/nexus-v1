@@ -13,20 +13,18 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Chip, Divider, Spinner } from '@heroui/react';
-import {
-  Cookie,
-  Shield,
-  Settings,
-  BarChart3,
-  Lock,
-  Globe,
-  MessageSquare,
-  Send,
-  CalendarDays,
-  CheckCircle,
-  Info,
-  Monitor,
-} from 'lucide-react';
+import Cookie from 'lucide-react/icons/cookie';
+import Shield from 'lucide-react/icons/shield';
+import Settings from 'lucide-react/icons/settings';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Lock from 'lucide-react/icons/lock';
+import Globe from 'lucide-react/icons/globe';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Send from 'lucide-react/icons/send';
+import CalendarDays from 'lucide-react/icons/calendar-days';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Info from 'lucide-react/icons/info';
+import Monitor from 'lucide-react/icons/monitor';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';

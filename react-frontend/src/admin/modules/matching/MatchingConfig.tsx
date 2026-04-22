@@ -28,7 +28,10 @@ import {
   TableRow,
   TableCell,
 } from '@heroui/react';
-import { ArrowLeft, Save, Trash2, RotateCcw } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
+import Trash2 from 'lucide-react/icons/trash-2';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';

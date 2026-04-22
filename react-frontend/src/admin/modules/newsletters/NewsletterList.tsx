@@ -13,7 +13,16 @@ import { useState, useCallback, useEffect } from 'react';
 import {
   Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Chip,
 } from '@heroui/react';
-import { Mail, Plus, RefreshCw, MoreVertical, Edit, Trash2, Copy, Send, BarChart3, Activity } from 'lucide-react';
+import Mail from 'lucide-react/icons/mail';
+import Plus from 'lucide-react/icons/plus';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Edit from 'lucide-react/icons/square-pen';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Copy from 'lucide-react/icons/copy';
+import Send from 'lucide-react/icons/send';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Activity from 'lucide-react/icons/activity';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';

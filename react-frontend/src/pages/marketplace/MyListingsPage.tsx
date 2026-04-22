@@ -29,18 +29,16 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Plus,
-  ShoppingBag,
-  Package,
-  Edit3,
-  RefreshCw,
-  Trash2,
-  Eye,
-  DollarSign,
-  BarChart3,
-  Clock,
-} from 'lucide-react';
+import Plus from 'lucide-react/icons/plus';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import Package from 'lucide-react/icons/package';
+import Edit3 from 'lucide-react/icons/pen-line';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Eye from 'lucide-react/icons/eye';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

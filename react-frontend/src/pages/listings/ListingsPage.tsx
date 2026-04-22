@@ -21,29 +21,27 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Input, Select, SelectItem, Avatar } from '@heroui/react';
-import {
-  Search,
-  Plus,
-  Filter,
-  Grid,
-  List,
-  ListTodo,
-  Map as MapIcon,
-  MapPin,
-  Tag,
-  Clock,
-  Calendar,
-  Heart,
-  AlertTriangle,
-  RefreshCw,
-  Monitor,
-  ArrowRightLeft,
-  Star,
-  SlidersHorizontal,
-  X,
-  Zap,
-  ArrowUpDown,
-} from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import Plus from 'lucide-react/icons/plus';
+import Filter from 'lucide-react/icons/filter';
+import Grid from 'lucide-react/icons/grid-3x3';
+import List from 'lucide-react/icons/list';
+import ListTodo from 'lucide-react/icons/list-todo';
+import MapIcon from 'lucide-react/icons/map';
+import MapPin from 'lucide-react/icons/map-pin';
+import Tag from 'lucide-react/icons/tag';
+import Clock from 'lucide-react/icons/clock';
+import Calendar from 'lucide-react/icons/calendar';
+import Heart from 'lucide-react/icons/heart';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Monitor from 'lucide-react/icons/monitor';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import Star from 'lucide-react/icons/star';
+import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
+import X from 'lucide-react/icons/x';
+import Zap from 'lucide-react/icons/zap';
+import ArrowUpDown from 'lucide-react/icons/arrow-up-down';
 import { GlassCard, AlgorithmLabel, ListingSkeleton, ImagePlaceholder } from '@/components/ui';
 import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
 import { EntityMapView } from '@/components/location';

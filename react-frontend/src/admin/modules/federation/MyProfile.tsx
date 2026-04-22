@@ -11,7 +11,11 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Input, Textarea, Button, Spinner, Chip, Skeleton } from '@heroui/react';
-import { Building, RefreshCw, Save, Star, Tag } from 'lucide-react';
+import Building from 'lucide-react/icons/building';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Save from 'lucide-react/icons/save';
+import Star from 'lucide-react/icons/star';
+import Tag from 'lucide-react/icons/tag';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';

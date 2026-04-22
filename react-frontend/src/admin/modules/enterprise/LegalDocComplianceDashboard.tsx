@@ -24,14 +24,12 @@ import {
   ModalBody,
   ModalFooter,
 } from '@heroui/react';
-import {
-  Users,
-  CheckCircle2,
-  AlertCircle,
-  Download,
-  Eye,
-  TrendingUp,
-} from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import Download from 'lucide-react/icons/download';
+import Eye from 'lucide-react/icons/eye';
+import TrendingUp from 'lucide-react/icons/trending-up';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
 import { adminLegalDocs } from '@/admin/api/adminApi';

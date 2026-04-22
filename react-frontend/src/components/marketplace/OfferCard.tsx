@@ -11,7 +11,10 @@
  */
 
 import { Avatar, Button, Chip } from '@heroui/react';
-import { Check, X, RotateCcw, Undo2 } from 'lucide-react';
+import Check from 'lucide-react/icons/check';
+import X from 'lucide-react/icons/x';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
+import Undo2 from 'lucide-react/icons/undo-2';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { resolveAvatarUrl } from '@/lib/helpers';

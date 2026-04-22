@@ -11,7 +11,8 @@
 
 import { Link } from 'react-router-dom';
 import { Card, CardBody, Button } from '@heroui/react';
-import { FileQuestion, ArrowLeft } from 'lucide-react';
+import FileQuestion from 'lucide-react/icons/file-question';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
 import { PageHeader } from '../components';

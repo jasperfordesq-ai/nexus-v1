@@ -21,7 +21,7 @@ import {
   Divider,
   ButtonGroup,
 } from '@heroui/react';
-import { Check } from 'lucide-react';
+import Check from 'lucide-react/icons/check';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';

@@ -11,7 +11,11 @@
 
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { Card, CardBody, CardHeader, Input, Select, SelectItem, Button, Spinner, Switch } from '@heroui/react';
-import { FileText, ArrowLeft, Save, Menu, ExternalLink } from 'lucide-react';
+import FileText from 'lucide-react/icons/file-text';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
+import Menu from 'lucide-react/icons/menu';
+import ExternalLink from 'lucide-react/icons/external-link';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast, useAuth } from '@/contexts';

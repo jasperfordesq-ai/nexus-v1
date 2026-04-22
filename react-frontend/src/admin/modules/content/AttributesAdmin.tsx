@@ -27,7 +27,12 @@ import {
   SelectItem,
   Switch,
 } from '@heroui/react';
-import { Tags, Plus, MoreVertical, Edit, Trash2, RefreshCw } from 'lucide-react';
+import Tags from 'lucide-react/icons/tags';
+import Plus from 'lucide-react/icons/plus';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Edit from 'lucide-react/icons/square-pen';
+import Trash2 from 'lucide-react/icons/trash-2';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminAttributes, adminCategories } from '../../api/adminApi';

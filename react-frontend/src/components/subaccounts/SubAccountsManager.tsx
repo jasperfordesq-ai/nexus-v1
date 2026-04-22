@@ -27,18 +27,16 @@ import {
   Spinner,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Users,
-  Plus,
-  UserPlus,
-  Shield,
-  Trash2,
-  Mail,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  RefreshCw,
-} from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import Plus from 'lucide-react/icons/plus';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Shield from 'lucide-react/icons/shield';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Mail from 'lucide-react/icons/mail';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Clock from 'lucide-react/icons/clock';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

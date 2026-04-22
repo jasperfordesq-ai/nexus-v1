@@ -9,7 +9,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from '@/test/test-utils';
-import { Heart } from 'lucide-react';
+import Heart from 'lucide-react/icons/heart';
 
 vi.mock('@/lib/api', () => ({
   api: {

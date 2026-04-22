@@ -5,7 +5,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Avatar, Button, Spinner } from '@heroui/react';
-import { Users, ChevronDown } from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import ChevronDown from 'lucide-react/icons/chevron-down';
 import { GlassCard } from '@/components/ui';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

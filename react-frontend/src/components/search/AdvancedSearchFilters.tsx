@@ -16,7 +16,11 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button, Input, Select, SelectItem, Chip } from '@heroui/react';
-import { Filter, X, Calendar, Tag, SlidersHorizontal } from 'lucide-react';
+import Filter from 'lucide-react/icons/filter';
+import X from 'lucide-react/icons/x';
+import Calendar from 'lucide-react/icons/calendar';
+import Tag from 'lucide-react/icons/tag';
+import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { api } from '@/lib/api';

@@ -29,24 +29,22 @@ import {
   Avatar,
   Spinner,
 } from '@heroui/react';
-import {
-  ArrowLeft,
-  ShieldCheck,
-  ShieldAlert,
-  Clock,
-  Plus,
-  Check,
-  X,
-  Search,
-  FileText,
-  Users,
-  Baby,
-  HeartHandshake,
-  Trash2,
-  Eye,
-  Pencil,
-  Upload,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import Clock from 'lucide-react/icons/clock';
+import Plus from 'lucide-react/icons/plus';
+import Check from 'lucide-react/icons/check';
+import X from 'lucide-react/icons/x';
+import Search from 'lucide-react/icons/search';
+import FileText from 'lucide-react/icons/file-text';
+import Users from 'lucide-react/icons/users';
+import Baby from 'lucide-react/icons/baby';
+import HeartHandshake from 'lucide-react/icons/heart-handshake';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Eye from 'lucide-react/icons/eye';
+import Pencil from 'lucide-react/icons/pencil';
+import Upload from 'lucide-react/icons/upload';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';

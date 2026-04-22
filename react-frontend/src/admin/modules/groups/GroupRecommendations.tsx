@@ -5,7 +5,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Card, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip } from '@heroui/react';
-import { TrendingUp, Users, Target } from 'lucide-react';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Users from 'lucide-react/icons/users';
+import Target from 'lucide-react/icons/target';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';

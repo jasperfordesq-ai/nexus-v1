@@ -12,16 +12,14 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Button, Spinner } from '@heroui/react';
-import {
-  ArrowLeftRight,
-  AlertTriangle,
-  TrendingUp,
-  Wallet,
-  Users,
-  Building2,
-  RefreshCw,
-  ChevronRight,
-} from 'lucide-react';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Wallet from 'lucide-react/icons/wallet';
+import Users from 'lucide-react/icons/users';
+import Building2 from 'lucide-react/icons/building-2';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ChevronRight from 'lucide-react/icons/chevron-right';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
 import { adminTimebanking } from '../../api/adminApi';

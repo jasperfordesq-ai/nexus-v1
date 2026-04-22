@@ -27,7 +27,11 @@ import {
   TableRow,
   TableCell,
 } from '@heroui/react';
-import { Target, Search, RefreshCw, Trash2, Eye } from 'lucide-react';
+import Target from 'lucide-react/icons/target';
+import Search from 'lucide-react/icons/search';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Eye from 'lucide-react/icons/eye';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';

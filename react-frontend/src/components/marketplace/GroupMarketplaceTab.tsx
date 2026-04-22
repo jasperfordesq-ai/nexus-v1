@@ -13,7 +13,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Button, Spinner, Chip } from '@heroui/react';
-import { ShoppingBag, Plus, Package, Users, Tag } from 'lucide-react';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import Plus from 'lucide-react/icons/plus';
+import Package from 'lucide-react/icons/package';
+import Users from 'lucide-react/icons/users';
+import Tag from 'lucide-react/icons/tag';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { MarketplaceListingGrid } from './MarketplaceListingGrid';

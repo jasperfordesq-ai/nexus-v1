@@ -18,7 +18,7 @@
 
 import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
-import { Inbox } from 'lucide-react';
+import Inbox from 'lucide-react/icons/inbox';
 import { Button } from '@heroui/react';
 
 /** Inline action config — alternative to passing a full ReactNode */

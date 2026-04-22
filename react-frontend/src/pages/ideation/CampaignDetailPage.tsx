@@ -25,22 +25,20 @@ import {
   Textarea,
   useDisclosure,
 } from '@heroui/react';
-import {
-  ArrowLeft,
-  Layers,
-  Edit3,
-  Trash2,
-  Lightbulb,
-  MessageSquarePlus,
-  Eye,
-  Calendar,
-  Trophy,
-  Heart,
-  Star,
-  AlertTriangle,
-  RefreshCw,
-  Unlink,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Layers from 'lucide-react/icons/layers';
+import Edit3 from 'lucide-react/icons/pen-line';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Lightbulb from 'lucide-react/icons/lightbulb';
+import MessageSquarePlus from 'lucide-react/icons/message-square-plus';
+import Eye from 'lucide-react/icons/eye';
+import Calendar from 'lucide-react/icons/calendar';
+import Trophy from 'lucide-react/icons/trophy';
+import Heart from 'lucide-react/icons/heart';
+import Star from 'lucide-react/icons/star';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Unlink from 'lucide-react/icons/unlink';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

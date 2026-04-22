@@ -19,7 +19,9 @@ import {
   Card,
   CardBody,
 } from '@heroui/react';
-import { UserPlus, Users, X } from 'lucide-react';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Users from 'lucide-react/icons/users';
+import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useFeature, useTenant, useToast } from '@/contexts';

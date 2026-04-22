@@ -18,7 +18,7 @@ import {
   Button,
   Spinner,
 } from '@heroui/react';
-import { X } from 'lucide-react';
+import X from 'lucide-react/icons/x';
 import { adminNewsletters } from '../../api/adminApi';
 
 interface TemplatePreviewProps {

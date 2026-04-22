@@ -12,7 +12,11 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Button, Spinner } from '@heroui/react';
-import { ArrowLeft, Award, Users, Zap, Target } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Award from 'lucide-react/icons/award';
+import Users from 'lucide-react/icons/users';
+import Zap from 'lucide-react/icons/zap';
+import Target from 'lucide-react/icons/target';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';

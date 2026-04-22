@@ -12,7 +12,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Input, Select, SelectItem, Button } from '@heroui/react';
-import { Download, X } from 'lucide-react';
+import Download from 'lucide-react/icons/download';
+import X from 'lucide-react/icons/x';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';

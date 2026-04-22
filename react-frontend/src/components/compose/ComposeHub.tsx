@@ -23,13 +23,11 @@ import {
   Tab,
   Divider,
 } from '@heroui/react';
-import {
-  BarChart3,
-  ShoppingBag,
-  Calendar,
-  Target,
-  FileText,
-} from 'lucide-react';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import Calendar from 'lucide-react/icons/calendar';
+import Target from 'lucide-react/icons/target';
+import FileText from 'lucide-react/icons/file-text';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { useMediaQuery } from '@/hooks/useMediaQuery';

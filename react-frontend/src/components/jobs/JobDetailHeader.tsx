@@ -14,29 +14,27 @@ import {
   DropdownMenu,
   DropdownItem,
 } from '@heroui/react';
-import {
-  Briefcase,
-  MapPin,
-  Eye,
-  FileText,
-  Edit3,
-  Trash2,
-  Mail,
-  DollarSign,
-  Heart,
-  Timer,
-  Calendar,
-  RefreshCw,
-  Bookmark,
-  BookmarkCheck,
-  BarChart3,
-  Star,
-  EyeOff,
-  Globe,
-  Copy,
-  Send,
-  Share2,
-} from 'lucide-react';
+import Briefcase from 'lucide-react/icons/briefcase';
+import MapPin from 'lucide-react/icons/map-pin';
+import Eye from 'lucide-react/icons/eye';
+import FileText from 'lucide-react/icons/file-text';
+import Edit3 from 'lucide-react/icons/pen-line';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Mail from 'lucide-react/icons/mail';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import Heart from 'lucide-react/icons/heart';
+import Timer from 'lucide-react/icons/timer';
+import Calendar from 'lucide-react/icons/calendar';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Bookmark from 'lucide-react/icons/bookmark';
+import BookmarkCheck from 'lucide-react/icons/bookmark-check';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Star from 'lucide-react/icons/star';
+import EyeOff from 'lucide-react/icons/eye-off';
+import Globe from 'lucide-react/icons/globe';
+import Copy from 'lucide-react/icons/copy';
+import Send from 'lucide-react/icons/send';
+import Share2 from 'lucide-react/icons/share-2';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { formatDateValue, resolveAvatarUrl } from '@/lib/helpers';

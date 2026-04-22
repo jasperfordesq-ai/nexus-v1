@@ -17,7 +17,7 @@
 
 import { useState } from 'react';
 import { Button } from '@heroui/react';
-import { Play } from 'lucide-react';
+import Play from 'lucide-react/icons/play';
 import { useTranslation } from 'react-i18next';
 import { resolveAssetUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';

@@ -13,7 +13,9 @@ import {
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
   Button, RadioGroup, Radio, Input, Card, CardBody,
 } from '@heroui/react';
-import { Mail, Users, AlertCircle } from 'lucide-react';
+import Mail from 'lucide-react/icons/mail';
+import Users from 'lucide-react/icons/users';
+import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import type { ResendInfo } from '../../api/types';

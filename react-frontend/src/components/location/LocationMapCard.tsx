@@ -8,7 +8,7 @@
  * Falls back to text-only display if no API key or no coordinates.
  */
 
-import { MapPin } from 'lucide-react';
+import MapPin from 'lucide-react/icons/map-pin';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { LocationMap, type MapMarker } from './LocationMap';
 import { MAPS_ENABLED } from '@/lib/map-config';

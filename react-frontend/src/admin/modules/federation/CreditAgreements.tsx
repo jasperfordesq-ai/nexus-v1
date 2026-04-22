@@ -37,24 +37,22 @@ import {
   Progress,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Handshake,
-  Plus,
-  RefreshCw,
-  CheckCircle,
-  XCircle,
-  Pause,
-  Play,
-  ArrowRightLeft,
-  Clock,
-  TrendingUp,
-  AlertTriangle,
-  Eye,
-  Wallet,
-  BarChart3,
-  ArrowUpRight,
-  ArrowDownRight,
-} from 'lucide-react';
+import Handshake from 'lucide-react/icons/handshake';
+import Plus from 'lucide-react/icons/plus';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Pause from 'lucide-react/icons/pause';
+import Play from 'lucide-react/icons/play';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import Clock from 'lucide-react/icons/clock';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Eye from 'lucide-react/icons/eye';
+import Wallet from 'lucide-react/icons/wallet';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import ArrowUpRight from 'lucide-react/icons/arrow-up-right';
+import ArrowDownRight from 'lucide-react/icons/arrow-down-right';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

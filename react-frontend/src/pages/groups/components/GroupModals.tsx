@@ -27,21 +27,19 @@ import {
   Switch,
   Spinner,
 } from '@heroui/react';
-import {
-  MessageSquare,
-  Settings,
-  Lock,
-  Globe,
-  UserMinus,
-  UserPlus,
-  Trash2,
-  AlertCircle,
-  FileText,
-  Upload,
-  Image,
-  MapPin,
-  Flag,
-} from 'lucide-react';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Settings from 'lucide-react/icons/settings';
+import Lock from 'lucide-react/icons/lock';
+import Globe from 'lucide-react/icons/globe';
+import UserMinus from 'lucide-react/icons/user-minus';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Trash2 from 'lucide-react/icons/trash-2';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import FileText from 'lucide-react/icons/file-text';
+import Upload from 'lucide-react/icons/upload';
+import Image from 'lucide-react/icons/image';
+import MapPin from 'lucide-react/icons/map-pin';
+import Flag from 'lucide-react/icons/flag';
 import { ErrorBoundary } from '@/components/feedback';
 import type { Group } from '@/types/api';
 

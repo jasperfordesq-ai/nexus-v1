@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { CalendarClock } from 'lucide-react';
+import CalendarClock from 'lucide-react/icons/calendar-clock';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 

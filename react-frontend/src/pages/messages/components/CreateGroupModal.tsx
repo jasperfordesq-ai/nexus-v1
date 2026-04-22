@@ -6,7 +6,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Button, Avatar, Chip } from '@heroui/react';
-import { Search, Loader2, Users } from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import Loader2 from 'lucide-react/icons/loader-circle';
+import Users from 'lucide-react/icons/users';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

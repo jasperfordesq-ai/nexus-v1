@@ -12,7 +12,8 @@
 
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Home } from 'lucide-react';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import Home from 'lucide-react/icons/house';
 import { useTenant } from '@/contexts';
 
 export interface BreadcrumbItem {

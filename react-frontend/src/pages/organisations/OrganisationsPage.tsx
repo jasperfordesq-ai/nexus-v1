@@ -13,19 +13,17 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Input, Avatar } from '@heroui/react';
-import {
-  Building2,
-  Search,
-  RefreshCw,
-  AlertTriangle,
-  MapPin,
-  Globe,
-  Heart,
-  Clock,
-  Star,
-  Users,
-  Plus,
-} from 'lucide-react';
+import Building2 from 'lucide-react/icons/building-2';
+import Search from 'lucide-react/icons/search';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import MapPin from 'lucide-react/icons/map-pin';
+import Globe from 'lucide-react/icons/globe';
+import Heart from 'lucide-react/icons/heart';
+import Clock from 'lucide-react/icons/clock';
+import Star from 'lucide-react/icons/star';
+import Users from 'lucide-react/icons/users';
+import Plus from 'lucide-react/icons/plus';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

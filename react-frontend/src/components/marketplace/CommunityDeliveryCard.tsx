@@ -31,7 +31,11 @@ import {
   Spinner,
   useDisclosure,
 } from '@heroui/react';
-import { Truck, Clock, Users, HelpCircle, CheckCircle } from 'lucide-react';
+import Truck from 'lucide-react/icons/truck';
+import Clock from 'lucide-react/icons/clock';
+import Users from 'lucide-react/icons/users';
+import HelpCircle from 'lucide-react/icons/circle-help';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

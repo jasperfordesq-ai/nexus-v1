@@ -11,25 +11,23 @@ import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Skeleton, Avatar, AvatarGroup } from '@heroui/react';
-import {
-  Bell,
-  MessageSquare,
-  ListTodo,
-  Wallet,
-  User,
-  Calendar,
-  Users,
-  Award,
-  Check,
-  CheckCheck,
-  Trash2,
-  Settings,
-  ShieldAlert,
-  Shield,
-  Eye,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react';
+import Bell from 'lucide-react/icons/bell';
+import MessageSquare from 'lucide-react/icons/message-square';
+import ListTodo from 'lucide-react/icons/list-todo';
+import Wallet from 'lucide-react/icons/wallet';
+import User from 'lucide-react/icons/user';
+import Calendar from 'lucide-react/icons/calendar';
+import Users from 'lucide-react/icons/users';
+import Award from 'lucide-react/icons/award';
+import Check from 'lucide-react/icons/check';
+import CheckCheck from 'lucide-react/icons/check-check';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Settings from 'lucide-react/icons/settings';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import Shield from 'lucide-react/icons/shield';
+import Eye from 'lucide-react/icons/eye';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import ChevronUp from 'lucide-react/icons/chevron-up';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

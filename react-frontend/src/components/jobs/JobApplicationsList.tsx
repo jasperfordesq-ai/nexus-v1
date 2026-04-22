@@ -4,7 +4,9 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Button } from '@heroui/react';
-import { Users, ChevronRight, RefreshCw } from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { ApplicationCard } from './ApplicationCard';

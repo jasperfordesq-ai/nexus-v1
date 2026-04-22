@@ -28,31 +28,29 @@ import {
   Skeleton,
   Textarea,
 } from '@heroui/react';
-import {
-  Calendar,
-  Clock,
-  MapPin,
-  Users,
-  Edit,
-  Trash2,
-  ExternalLink,
-  AlertCircle,
-  RefreshCw,
-  CheckCircle2,
-  Heart,
-  XCircle,
-  Copy,
-  UserCheck,
-  ClipboardCheck,
-  Ban,
-  ListOrdered,
-  Link2,
-  Repeat,
-  ArrowRight,
-  CalendarRange,
-  Video,
-  BarChart3,
-} from 'lucide-react';
+import Calendar from 'lucide-react/icons/calendar';
+import Clock from 'lucide-react/icons/clock';
+import MapPin from 'lucide-react/icons/map-pin';
+import Users from 'lucide-react/icons/users';
+import Edit from 'lucide-react/icons/square-pen';
+import Trash2 from 'lucide-react/icons/trash-2';
+import ExternalLink from 'lucide-react/icons/external-link';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import Heart from 'lucide-react/icons/heart';
+import XCircle from 'lucide-react/icons/circle-x';
+import Copy from 'lucide-react/icons/copy';
+import UserCheck from 'lucide-react/icons/user-check';
+import ClipboardCheck from 'lucide-react/icons/clipboard-check';
+import Ban from 'lucide-react/icons/ban';
+import ListOrdered from 'lucide-react/icons/list-ordered';
+import Link2 from 'lucide-react/icons/link-2';
+import Repeat from 'lucide-react/icons/repeat';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import CalendarRange from 'lucide-react/icons/calendar-range';
+import Video from 'lucide-react/icons/video';
+import BarChart3 from 'lucide-react/icons/chart-column';
 import { Helmet } from 'react-helmet-async';
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';

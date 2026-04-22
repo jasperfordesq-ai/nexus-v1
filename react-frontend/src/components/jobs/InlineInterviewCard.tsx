@@ -4,15 +4,13 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Button, Chip } from '@heroui/react';
-import {
-  Calendar,
-  Clock,
-  MapPin,
-  CheckCircle,
-  XCircle,
-  Video,
-  CalendarPlus,
-} from 'lucide-react';
+import Calendar from 'lucide-react/icons/calendar';
+import Clock from 'lucide-react/icons/clock';
+import MapPin from 'lucide-react/icons/map-pin';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Video from 'lucide-react/icons/video';
+import CalendarPlus from 'lucide-react/icons/calendar-plus';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { API_BASE } from '@/lib/api';

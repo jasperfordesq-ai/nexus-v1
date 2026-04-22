@@ -7,7 +7,7 @@
  * FeaturedBadge - Visual badge for featured listings
  */
 
-import { Star } from 'lucide-react';
+import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
 
 interface FeaturedBadgeProps {

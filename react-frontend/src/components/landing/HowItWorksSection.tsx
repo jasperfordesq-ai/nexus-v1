@@ -4,7 +4,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { motion } from 'framer-motion';
-import { UserPlus, Search, Handshake, Coins } from 'lucide-react';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Search from 'lucide-react/icons/search';
+import Handshake from 'lucide-react/icons/handshake';
+import Coins from 'lucide-react/icons/coins';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { getIcon } from './iconMap';

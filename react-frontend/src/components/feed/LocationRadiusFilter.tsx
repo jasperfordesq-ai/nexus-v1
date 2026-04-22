@@ -8,7 +8,8 @@
  */
 
 import { Button, Slider, Tooltip } from '@heroui/react';
-import { MapPin, Globe } from 'lucide-react';
+import MapPin from 'lucide-react/icons/map-pin';
+import Globe from 'lucide-react/icons/globe';
 import { useTranslation } from 'react-i18next';
 
 interface LocationRadiusFilterProps {

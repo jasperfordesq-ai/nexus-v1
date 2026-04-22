@@ -11,7 +11,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@heroui/react';
-import { ClipboardCheck, Play, RefreshCw } from 'lucide-react';
+import ClipboardCheck from 'lucide-react/icons/clipboard-check';
+import Play from 'lucide-react/icons/play';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';

@@ -19,7 +19,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardBody, CardHeader, Input, Switch, Button, Select, SelectItem, Spinner, Divider, Chip } from '@heroui/react';
-import { Bot, Save, Key, Cpu, Sliders, Shield } from 'lucide-react';
+import Bot from 'lucide-react/icons/bot';
+import Save from 'lucide-react/icons/save';
+import Key from 'lucide-react/icons/key';
+import Cpu from 'lucide-react/icons/cpu';
+import Sliders from 'lucide-react/icons/sliders-vertical';
+import Shield from 'lucide-react/icons/shield';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';

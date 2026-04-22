@@ -10,7 +10,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@/test/test-utils';
 import type { ComposeTab, ComposeTabConfig } from '../types';
-import { FileText, ListChecks, Calendar, Target } from 'lucide-react';
+import FileText from 'lucide-react/icons/file-text';
+import ListChecks from 'lucide-react/icons/list-checks';
+import Calendar from 'lucide-react/icons/calendar';
+import Target from 'lucide-react/icons/target';
 
 vi.mock('@/lib/api', () => ({
   api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn() },

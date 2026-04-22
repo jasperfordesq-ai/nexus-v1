@@ -11,7 +11,7 @@
  */
 
 import { Avatar, Chip } from '@heroui/react';
-import { CheckCircle } from 'lucide-react';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';

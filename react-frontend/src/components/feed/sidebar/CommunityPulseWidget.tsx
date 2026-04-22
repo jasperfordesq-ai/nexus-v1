@@ -8,7 +8,11 @@
  */
 
 import { Link } from 'react-router-dom';
-import { HeartPulse, Users, Tag, CalendarDays, UsersRound } from 'lucide-react';
+import HeartPulse from 'lucide-react/icons/heart-pulse';
+import Users from 'lucide-react/icons/users';
+import Tag from 'lucide-react/icons/tag';
+import CalendarDays from 'lucide-react/icons/calendar-days';
+import UsersRound from 'lucide-react/icons/users-round';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';

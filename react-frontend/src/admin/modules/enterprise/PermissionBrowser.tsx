@@ -10,7 +10,8 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Card, CardBody, Chip, Spinner } from '@heroui/react';
-import { Key, Lock } from 'lucide-react';
+import Key from 'lucide-react/icons/key';
+import Lock from 'lucide-react/icons/lock';
 import { usePageTitle } from '@/hooks';
 import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';

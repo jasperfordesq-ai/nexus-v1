@@ -13,7 +13,11 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Avatar, Card, CardBody, Chip, Skeleton } from '@heroui/react';
-import { Globe, MessageSquare, Star, StarHalf, AlertTriangle } from 'lucide-react';
+import Globe from 'lucide-react/icons/globe';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Star from 'lucide-react/icons/star';
+import StarHalf from 'lucide-react/icons/star-half';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';

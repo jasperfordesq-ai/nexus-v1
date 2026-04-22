@@ -38,30 +38,28 @@ import {
   useDisclosure,
   Skeleton,
 } from '@heroui/react';
-import {
-  Target,
-  Plus,
-  RefreshCw,
-  AlertTriangle,
-  Calendar,
-  TrendingUp,
-  Users,
-  CheckCircle,
-  Globe,
-  Lock,
-  MoreVertical,
-  Edit3,
-  Trash2,
-  Award,
-  Clock,
-  MessageCircle,
-  Heart,
-  UserPlus,
-  Sparkles,
-  ClipboardCheck,
-  FileText,
-  History,
-} from 'lucide-react';
+import Target from 'lucide-react/icons/target';
+import Plus from 'lucide-react/icons/plus';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Calendar from 'lucide-react/icons/calendar';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Users from 'lucide-react/icons/users';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Globe from 'lucide-react/icons/globe';
+import Lock from 'lucide-react/icons/lock';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Edit3 from 'lucide-react/icons/pen-line';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Award from 'lucide-react/icons/award';
+import Clock from 'lucide-react/icons/clock';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import Heart from 'lucide-react/icons/heart';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Sparkles from 'lucide-react/icons/sparkles';
+import ClipboardCheck from 'lucide-react/icons/clipboard-check';
+import FileText from 'lucide-react/icons/file-text';
+import History from 'lucide-react/icons/history';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, ConfettiCelebration } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

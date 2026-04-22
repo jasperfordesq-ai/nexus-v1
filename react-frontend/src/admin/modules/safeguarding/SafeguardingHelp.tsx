@@ -16,18 +16,16 @@
  */
 
 import { Card, CardBody, CardHeader, Accordion, AccordionItem, Divider, Chip } from '@heroui/react';
-import {
-  BookOpen,
-  Shield,
-  Flag,
-  Zap,
-  UserCheck,
-  Users,
-  Scale,
-  Clock,
-  FileText,
-  Eye,
-} from 'lucide-react';
+import BookOpen from 'lucide-react/icons/book-open';
+import Shield from 'lucide-react/icons/shield';
+import Flag from 'lucide-react/icons/flag';
+import Zap from 'lucide-react/icons/zap';
+import UserCheck from 'lucide-react/icons/user-check';
+import Users from 'lucide-react/icons/users';
+import Scale from 'lucide-react/icons/scale';
+import Clock from 'lucide-react/icons/clock';
+import FileText from 'lucide-react/icons/file-text';
+import Eye from 'lucide-react/icons/eye';
 
 export function SafeguardingHelp() {
   return (

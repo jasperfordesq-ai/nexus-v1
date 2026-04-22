@@ -16,15 +16,13 @@ import {
   Textarea,
   Spinner,
 } from '@heroui/react';
-import {
-  MessageSquare,
-  Lock,
-  Plus,
-  Send,
-  Clock,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Lock from 'lucide-react/icons/lock';
+import Plus from 'lucide-react/icons/plus';
+import Send from 'lucide-react/icons/send';
+import Clock from 'lucide-react/icons/clock';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import ChevronUp from 'lucide-react/icons/chevron-up';
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';

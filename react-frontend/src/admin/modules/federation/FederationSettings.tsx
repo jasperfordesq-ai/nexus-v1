@@ -11,7 +11,10 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Switch, Button, Input, Divider, Skeleton } from '@heroui/react';
-import { Network, RefreshCw, Save, KeyRound } from 'lucide-react';
+import Network from 'lucide-react/icons/network';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Save from 'lucide-react/icons/save';
+import KeyRound from 'lucide-react/icons/key-round';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';

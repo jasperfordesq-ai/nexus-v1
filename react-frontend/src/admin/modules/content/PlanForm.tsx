@@ -14,7 +14,12 @@ import {
   Card, CardBody, CardHeader,
   Input, Textarea, Switch, Button, Spinner, Chip, Divider,
 } from '@heroui/react';
-import { CreditCard, ArrowLeft, Save, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
+import CreditCard from 'lucide-react/icons/credit-card';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';

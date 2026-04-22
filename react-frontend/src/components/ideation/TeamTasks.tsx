@@ -30,15 +30,13 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Plus,
-  CheckSquare,
-  Clock,
-  AlertCircle,
-  Trash2,
-  Calendar,
-  BarChart3,
-} from 'lucide-react';
+import Plus from 'lucide-react/icons/plus';
+import CheckSquare from 'lucide-react/icons/square-check-big';
+import Clock from 'lucide-react/icons/clock';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Calendar from 'lucide-react/icons/calendar';
+import BarChart3 from 'lucide-react/icons/chart-column';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

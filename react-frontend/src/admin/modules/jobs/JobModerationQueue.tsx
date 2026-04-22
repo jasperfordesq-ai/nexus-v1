@@ -28,18 +28,16 @@ import {
   Tooltip,
   Divider,
 } from '@heroui/react';
-import {
-  CheckCircle2,
-  XCircle,
-  Flag,
-  Clock,
-  ShieldAlert,
-  ShieldCheck,
-  RefreshCw,
-  AlertTriangle,
-  BarChart3,
-  Inbox,
-} from 'lucide-react';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import XCircle from 'lucide-react/icons/circle-x';
+import Flag from 'lucide-react/icons/flag';
+import Clock from 'lucide-react/icons/clock';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Inbox from 'lucide-react/icons/inbox';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';

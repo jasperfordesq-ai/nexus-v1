@@ -23,14 +23,12 @@ import {
   Code,
   Chip,
 } from '@heroui/react';
-import {
-  Server,
-  Copy,
-  CheckCircle,
-  PlayCircle,
-  AlertTriangle,
-  Info,
-} from 'lucide-react';
+import Server from 'lucide-react/icons/server';
+import Copy from 'lucide-react/icons/copy';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import PlayCircle from 'lucide-react/icons/circle-play';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Info from 'lucide-react/icons/info';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';

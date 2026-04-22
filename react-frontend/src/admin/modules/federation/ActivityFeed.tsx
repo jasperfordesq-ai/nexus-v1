@@ -23,21 +23,19 @@ import {
   Tooltip,
   Skeleton,
 } from '@heroui/react';
-import {
-  Mail,
-  CreditCard,
-  UserPlus,
-  Package,
-  Handshake,
-  Eye,
-  Download,
-  Search,
-  X,
-  ArrowDown,
-  Activity,
-  RefreshCw,
-  Inbox,
-} from 'lucide-react';
+import Mail from 'lucide-react/icons/mail';
+import CreditCard from 'lucide-react/icons/credit-card';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Package from 'lucide-react/icons/package';
+import Handshake from 'lucide-react/icons/handshake';
+import Eye from 'lucide-react/icons/eye';
+import Download from 'lucide-react/icons/download';
+import Search from 'lucide-react/icons/search';
+import X from 'lucide-react/icons/x';
+import ArrowDown from 'lucide-react/icons/arrow-down';
+import Activity from 'lucide-react/icons/activity';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Inbox from 'lucide-react/icons/inbox';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { formatRelativeTime } from '@/lib/helpers';

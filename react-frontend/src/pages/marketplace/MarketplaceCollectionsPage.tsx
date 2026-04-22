@@ -30,15 +30,13 @@ import {
   Textarea,
   Chip,
 } from '@heroui/react';
-import {
-  FolderHeart,
-  Plus,
-  Search,
-  ArrowLeft,
-  Trash2,
-  ShoppingBag,
-  Package,
-} from 'lucide-react';
+import FolderHeart from 'lucide-react/icons/folder-heart';
+import Plus from 'lucide-react/icons/plus';
+import Search from 'lucide-react/icons/search';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Trash2 from 'lucide-react/icons/trash-2';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import Package from 'lucide-react/icons/package';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

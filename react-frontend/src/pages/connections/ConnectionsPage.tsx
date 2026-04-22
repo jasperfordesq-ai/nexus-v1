@@ -26,17 +26,15 @@ import {
   Skeleton,
   Chip,
 } from '@heroui/react';
-import {
-  Users2,
-  UserCheck,
-  UserX,
-  UserMinus,
-  MessageSquare,
-  Search,
-  UserPlus,
-  Clock,
-  Send,
-} from 'lucide-react';
+import Users2 from 'lucide-react/icons/users-round';
+import UserCheck from 'lucide-react/icons/user-check';
+import UserX from 'lucide-react/icons/user-x';
+import UserMinus from 'lucide-react/icons/user-minus';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Search from 'lucide-react/icons/search';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Clock from 'lucide-react/icons/clock';
+import Send from 'lucide-react/icons/send';
 import { useTenant, useToast } from '@/contexts';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';

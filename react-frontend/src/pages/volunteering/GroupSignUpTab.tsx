@@ -23,20 +23,18 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Users,
-  UserPlus,
-  Calendar,
-  Clock,
-  Building2,
-  MapPin,
-  AlertTriangle,
-  RefreshCw,
-  Crown,
-  CheckCircle,
-  Hourglass,
-  XCircle,
-} from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Calendar from 'lucide-react/icons/calendar';
+import Clock from 'lucide-react/icons/clock';
+import Building2 from 'lucide-react/icons/building-2';
+import MapPin from 'lucide-react/icons/map-pin';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Crown from 'lucide-react/icons/crown';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Hourglass from 'lucide-react/icons/hourglass';
+import XCircle from 'lucide-react/icons/circle-x';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';

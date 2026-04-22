@@ -9,7 +9,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@/test/test-utils';
-import { FileText } from 'lucide-react';
+import FileText from 'lucide-react/icons/file-text';
 
 vi.mock('@/contexts', () => ({
   useToast: vi.fn(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() })),

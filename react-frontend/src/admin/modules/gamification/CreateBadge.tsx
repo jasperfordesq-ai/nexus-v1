@@ -22,7 +22,9 @@ import {
   SelectItem,
   Switch,
 } from '@heroui/react';
-import { ArrowLeft, Save, Award } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
+import Award from 'lucide-react/icons/award';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';

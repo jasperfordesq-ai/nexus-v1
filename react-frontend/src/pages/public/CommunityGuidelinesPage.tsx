@@ -15,7 +15,10 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Spinner } from '@heroui/react';
-import { Users, ArrowLeft, FileText, Send } from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import FileText from 'lucide-react/icons/file-text';
+import Send from 'lucide-react/icons/send';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';

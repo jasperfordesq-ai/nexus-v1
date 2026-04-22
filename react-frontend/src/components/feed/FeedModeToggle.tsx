@@ -8,7 +8,8 @@
  */
 
 import { Tabs, Tab } from '@heroui/react';
-import { Sparkles, Clock } from 'lucide-react';
+import Sparkles from 'lucide-react/icons/sparkles';
+import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
 import type { Key } from 'react';
 

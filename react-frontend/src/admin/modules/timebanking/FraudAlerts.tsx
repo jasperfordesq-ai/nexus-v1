@@ -21,7 +21,9 @@ import {
   DropdownItem,
   Button,
 } from '@heroui/react';
-import { AlertTriangle, MoreVertical, ArrowLeft } from 'lucide-react';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminTimebanking } from '../../api/adminApi';

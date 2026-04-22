@@ -25,18 +25,16 @@ import {
   TableCell,
   Chip,
 } from '@heroui/react';
-import {
-  Handshake,
-  ArrowRightLeft,
-  MessageSquare,
-  Clock,
-  RefreshCw,
-  Globe,
-  Package,
-  Star,
-  AlertTriangle,
-  Users,
-} from 'lucide-react';
+import Handshake from 'lucide-react/icons/handshake';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Clock from 'lucide-react/icons/clock';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Globe from 'lucide-react/icons/globe';
+import Package from 'lucide-react/icons/package';
+import Star from 'lucide-react/icons/star';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Users from 'lucide-react/icons/users';
 import {
   ResponsiveContainer,
   LineChart,

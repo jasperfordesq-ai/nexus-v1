@@ -16,7 +16,8 @@
 
 import { useState } from 'react';
 import { Card, Skeleton } from '@heroui/react';
-import { ExternalLink, Globe } from 'lucide-react';
+import ExternalLink from 'lucide-react/icons/external-link';
+import Globe from 'lucide-react/icons/globe';
 import { YouTubeEmbed } from './YouTubeEmbed';
 
 /* ───────────────────────── Types ───────────────────────── */

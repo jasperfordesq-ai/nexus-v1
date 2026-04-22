@@ -8,7 +8,7 @@
  */
 
 import { Button } from '@heroui/react';
-import { PenSquare } from 'lucide-react';
+import PenSquare from 'lucide-react/icons/square-pen';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 

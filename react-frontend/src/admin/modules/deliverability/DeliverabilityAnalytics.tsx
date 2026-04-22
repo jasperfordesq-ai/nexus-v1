@@ -11,7 +11,10 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Spinner } from '@heroui/react';
-import { BarChart3, CheckCircle, Clock, TrendingUp } from 'lucide-react';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Clock from 'lucide-react/icons/clock';
+import TrendingUp from 'lucide-react/icons/trending-up';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminDeliverability } from '../../api/adminApi';

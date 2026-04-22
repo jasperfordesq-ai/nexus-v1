@@ -15,7 +15,9 @@
 
 import { useMemo } from 'react';
 import { Button } from '@heroui/react';
-import { MapPin, Navigation, MapPinOff } from 'lucide-react';
+import MapPin from 'lucide-react/icons/map-pin';
+import Navigation from 'lucide-react/icons/navigation';
+import MapPinOff from 'lucide-react/icons/map-pin-off';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { LocationMap, type MapMarker } from '@/components/location';

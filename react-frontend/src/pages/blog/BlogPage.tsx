@@ -18,16 +18,14 @@ import {
   Input,
   Avatar,
 } from '@heroui/react';
-import {
-  BookOpen,
-  RefreshCw,
-  AlertTriangle,
-  Calendar,
-  Clock,
-  Eye,
-  Search,
-  User,
-} from 'lucide-react';
+import BookOpen from 'lucide-react/icons/book-open';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Calendar from 'lucide-react/icons/calendar';
+import Clock from 'lucide-react/icons/clock';
+import Eye from 'lucide-react/icons/eye';
+import Search from 'lucide-react/icons/search';
+import User from 'lucide-react/icons/user';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

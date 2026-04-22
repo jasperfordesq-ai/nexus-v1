@@ -20,7 +20,9 @@ import {
   RadioGroup,
   Radio,
 } from '@heroui/react';
-import { Heart, Users, User } from 'lucide-react';
+import Heart from 'lucide-react/icons/heart';
+import Users from 'lucide-react/icons/users';
+import User from 'lucide-react/icons/user';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

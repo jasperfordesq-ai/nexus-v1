@@ -24,18 +24,16 @@ import {
   Textarea,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Heart,
-  Activity,
-  AlertTriangle,
-  Smile,
-  Flame,
-  CalendarCheck,
-  RefreshCw,
-  TrendingDown,
-  Coffee,
-  Sun,
-} from 'lucide-react';
+import Heart from 'lucide-react/icons/heart';
+import Activity from 'lucide-react/icons/activity';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Smile from 'lucide-react/icons/smile';
+import Flame from 'lucide-react/icons/flame';
+import CalendarCheck from 'lucide-react/icons/calendar-check';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import TrendingDown from 'lucide-react/icons/trending-down';
+import Coffee from 'lucide-react/icons/coffee';
+import Sun from 'lucide-react/icons/sun';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

@@ -14,10 +14,16 @@ import {
   Card, CardBody, CardHeader, Button, Switch, Chip, Divider, Spinner,
 } from '@heroui/react';
 import { useParams } from 'react-router-dom';
-import {
-  Shield, Network, UserCheck, MessageSquare, ArrowLeftRight,
-  LayoutList, Calendar, Users, Plus, Minus,
-} from 'lucide-react';
+import Shield from 'lucide-react/icons/shield';
+import Network from 'lucide-react/icons/network';
+import UserCheck from 'lucide-react/icons/user-check';
+import MessageSquare from 'lucide-react/icons/message-square';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import LayoutList from 'lucide-react/icons/layout-list';
+import Calendar from 'lucide-react/icons/calendar';
+import Users from 'lucide-react/icons/users';
+import Plus from 'lucide-react/icons/plus';
+import Minus from 'lucide-react/icons/minus';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { useTranslation } from 'react-i18next';

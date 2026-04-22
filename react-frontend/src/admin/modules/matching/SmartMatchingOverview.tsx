@@ -21,18 +21,16 @@ import {
   Spinner,
   Divider,
 } from '@heroui/react';
-import {
-  Settings,
-  BarChart3,
-  Trash2,
-  Zap,
-  Target,
-  Database,
-  TrendingUp,
-  Users,
-  ShieldCheck,
-  RefreshCw,
-} from 'lucide-react';
+import Settings from 'lucide-react/icons/settings';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Zap from 'lucide-react/icons/zap';
+import Target from 'lucide-react/icons/target';
+import Database from 'lucide-react/icons/database';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Users from 'lucide-react/icons/users';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';

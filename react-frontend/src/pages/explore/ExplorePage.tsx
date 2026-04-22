@@ -17,38 +17,36 @@ import {
   Tabs,
   Tab,
 } from '@heroui/react';
-import {
-  Search,
-  Users,
-  ArrowRightLeft,
-  Clock,
-  ListTodo,
-  Eye,
-  Bookmark,
-  MapPin,
-  Calendar,
-  Crown,
-  Trophy,
-  Hash,
-  UserPlus,
-  Lightbulb,
-  Heart,
-  MessageSquare,
-  TrendingUp,
-  AlertCircle,
-  RefreshCw,
-  Navigation,
-  BookOpen,
-  HandHeart,
-  Building2,
-  BarChart3,
-  Wrench,
-  FolderOpen,
-  Briefcase,
-  X,
-  History,
-  Trash2,
-} from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import Users from 'lucide-react/icons/users';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import Clock from 'lucide-react/icons/clock';
+import ListTodo from 'lucide-react/icons/list-todo';
+import Eye from 'lucide-react/icons/eye';
+import Bookmark from 'lucide-react/icons/bookmark';
+import MapPin from 'lucide-react/icons/map-pin';
+import Calendar from 'lucide-react/icons/calendar';
+import Crown from 'lucide-react/icons/crown';
+import Trophy from 'lucide-react/icons/trophy';
+import Hash from 'lucide-react/icons/hash';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Lightbulb from 'lucide-react/icons/lightbulb';
+import Heart from 'lucide-react/icons/heart';
+import MessageSquare from 'lucide-react/icons/message-square';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Navigation from 'lucide-react/icons/navigation';
+import BookOpen from 'lucide-react/icons/book-open';
+import HandHeart from 'lucide-react/icons/hand-heart';
+import Building2 from 'lucide-react/icons/building-2';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Wrench from 'lucide-react/icons/wrench';
+import FolderOpen from 'lucide-react/icons/folder-open';
+import Briefcase from 'lucide-react/icons/briefcase';
+import X from 'lucide-react/icons/x';
+import History from 'lucide-react/icons/history';
+import Trash2 from 'lucide-react/icons/trash-2';
 import { motion } from 'framer-motion';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageMeta } from '@/components/seo/PageMeta';

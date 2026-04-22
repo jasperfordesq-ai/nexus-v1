@@ -26,15 +26,13 @@ import {
   DropdownItem,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Megaphone,
-  Pin,
-  PinOff,
-  Plus,
-  Trash2,
-  MoreVertical,
-  AlertCircle,
-} from 'lucide-react';
+import Megaphone from 'lucide-react/icons/megaphone';
+import Pin from 'lucide-react/icons/pin';
+import PinOff from 'lucide-react/icons/pin-off';
+import Plus from 'lucide-react/icons/plus';
+import Trash2 from 'lucide-react/icons/trash-2';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';

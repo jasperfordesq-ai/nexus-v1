@@ -22,7 +22,10 @@ import {
   PopoverContent,
   Divider,
 } from '@heroui/react';
-import { Bell, BellOff, BellRing, Check } from 'lucide-react';
+import Bell from 'lucide-react/icons/bell';
+import BellOff from 'lucide-react/icons/bell-off';
+import BellRing from 'lucide-react/icons/bell-ring';
+import Check from 'lucide-react/icons/check';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

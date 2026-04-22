@@ -23,20 +23,18 @@ import {
   Avatar,
   AvatarGroup,
 } from '@heroui/react';
-import {
-  Bell,
-  MessageSquare,
-  ListTodo,
-  Wallet,
-  User,
-  Calendar,
-  Users,
-  Award,
-  CheckCheck,
-  ExternalLink,
-  Info,
-  X,
-} from 'lucide-react';
+import Bell from 'lucide-react/icons/bell';
+import MessageSquare from 'lucide-react/icons/message-square';
+import ListTodo from 'lucide-react/icons/list-todo';
+import Wallet from 'lucide-react/icons/wallet';
+import User from 'lucide-react/icons/user';
+import Calendar from 'lucide-react/icons/calendar';
+import Users from 'lucide-react/icons/users';
+import Award from 'lucide-react/icons/award';
+import CheckCheck from 'lucide-react/icons/check-check';
+import ExternalLink from 'lucide-react/icons/external-link';
+import Info from 'lucide-react/icons/info';
+import X from 'lucide-react/icons/x';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useTranslation } from 'react-i18next';
 import { useNotifications, useTenant } from '@/contexts';

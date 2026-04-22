@@ -10,7 +10,7 @@
 
 import { useState } from 'react';
 import { Button, Tooltip } from '@heroui/react';
-import { Sparkles } from 'lucide-react';
+import Sparkles from 'lucide-react/icons/sparkles';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';

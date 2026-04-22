@@ -47,21 +47,19 @@ import {
   Bar,
   Legend,
 } from 'recharts';
-import {
-  Clock,
-  TrendingUp,
-  Heart,
-  Users,
-  Download,
-  RefreshCw,
-  Activity,
-  ArrowLeftRight,
-  Settings,
-  Sparkles,
-  Lightbulb,
-  Calendar,
-  Award,
-} from 'lucide-react';
+import Clock from 'lucide-react/icons/clock';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Heart from 'lucide-react/icons/heart';
+import Users from 'lucide-react/icons/users';
+import Download from 'lucide-react/icons/download';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Activity from 'lucide-react/icons/activity';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import Settings from 'lucide-react/icons/settings';
+import Sparkles from 'lucide-react/icons/sparkles';
+import Lightbulb from 'lucide-react/icons/lightbulb';
+import Calendar from 'lucide-react/icons/calendar';
+import Award from 'lucide-react/icons/award';
 
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';

@@ -5,7 +5,9 @@
 
 import { useRef, useEffect } from 'react';
 import { Button, Input, Spinner } from '@heroui/react';
-import { Sparkles, X, Send } from 'lucide-react';
+import Sparkles from 'lucide-react/icons/sparkles';
+import X from 'lucide-react/icons/x';
+import Send from 'lucide-react/icons/send';
 import { useTranslation } from 'react-i18next';
 
 interface AiChatMessage {

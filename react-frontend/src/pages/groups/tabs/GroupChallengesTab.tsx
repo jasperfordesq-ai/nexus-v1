@@ -26,15 +26,13 @@ import {
   Chip,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Trophy,
-  Target,
-  Clock,
-  Plus,
-  Award,
-  Flame,
-  CheckCircle2,
-} from 'lucide-react';
+import Trophy from 'lucide-react/icons/trophy';
+import Target from 'lucide-react/icons/target';
+import Clock from 'lucide-react/icons/clock';
+import Plus from 'lucide-react/icons/plus';
+import Award from 'lucide-react/icons/award';
+import Flame from 'lucide-react/icons/flame';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';

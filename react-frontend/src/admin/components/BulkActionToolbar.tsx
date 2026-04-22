@@ -28,7 +28,8 @@ import {
   ModalFooter,
   Textarea,
 } from '@heroui/react';
-import { AlertTriangle, X } from 'lucide-react';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import X from 'lucide-react/icons/x';
 
 export interface BulkAction {
   key: string;

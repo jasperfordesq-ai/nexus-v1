@@ -25,17 +25,15 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@heroui/react';
-import {
-  FileText,
-  File,
-  Image,
-  Film,
-  Music,
-  Archive,
-  Trash2,
-  Download,
-  Upload,
-} from 'lucide-react';
+import FileText from 'lucide-react/icons/file-text';
+import File from 'lucide-react/icons/file';
+import Image from 'lucide-react/icons/image';
+import Film from 'lucide-react/icons/film';
+import Music from 'lucide-react/icons/music';
+import Archive from 'lucide-react/icons/archive';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Download from 'lucide-react/icons/download';
+import Upload from 'lucide-react/icons/upload';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

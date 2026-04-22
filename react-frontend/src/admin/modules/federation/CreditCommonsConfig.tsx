@@ -20,7 +20,11 @@ import {
   Divider,
   Chip,
 } from '@heroui/react';
-import { Globe, Save, RefreshCw, Link2, Hash } from 'lucide-react';
+import Globe from 'lucide-react/icons/globe';
+import Save from 'lucide-react/icons/save';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Link2 from 'lucide-react/icons/link-2';
+import Hash from 'lucide-react/icons/hash';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

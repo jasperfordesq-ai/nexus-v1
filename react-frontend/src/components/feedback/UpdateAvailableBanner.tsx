@@ -23,7 +23,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, X } from 'lucide-react';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import X from 'lucide-react/icons/x';
 import { Button } from '@heroui/react';
 
 // Stores the BUILD_COMMIT that the user clicked "Update" from.

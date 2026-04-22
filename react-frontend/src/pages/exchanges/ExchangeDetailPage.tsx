@@ -29,21 +29,19 @@ import {
   Input,
   Textarea,
 } from '@heroui/react';
-import {
-  ArrowRightLeft,
-  CheckCircle,
-  MessageSquare,
-  Play,
-  Check,
-  X,
-  XCircle,
-  AlertTriangle,
-  Clock,
-  Circle,
-  Ban,
-  UserCheck,
-  Star,
-} from 'lucide-react';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Play from 'lucide-react/icons/play';
+import Check from 'lucide-react/icons/check';
+import X from 'lucide-react/icons/x';
+import XCircle from 'lucide-react/icons/circle-x';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Clock from 'lucide-react/icons/clock';
+import Circle from 'lucide-react/icons/circle';
+import Ban from 'lucide-react/icons/ban';
+import UserCheck from 'lucide-react/icons/user-check';
+import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';

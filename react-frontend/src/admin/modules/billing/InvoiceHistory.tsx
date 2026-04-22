@@ -10,7 +10,9 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Spinner, Chip, Button } from '@heroui/react';
-import { Receipt, ExternalLink, Download } from 'lucide-react';
+import Receipt from 'lucide-react/icons/receipt';
+import ExternalLink from 'lucide-react/icons/external-link';
+import Download from 'lucide-react/icons/download';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';

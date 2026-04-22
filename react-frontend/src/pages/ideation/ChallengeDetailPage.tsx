@@ -42,33 +42,31 @@ import {
   Tooltip,
   useDisclosure,
 } from '@heroui/react';
-import {
-  ArrowLeft,
-  ArrowBigUp,
-  Lightbulb,
-  Plus,
-  RefreshCw,
-  AlertTriangle,
-  Calendar,
-  MessageCircle,
-  Trophy,
-  MoreVertical,
-  Edit3,
-  Trash2,
-  Heart,
-  Eye,
-  Star,
-  Copy,
-  Users,
-  Link as LinkIcon,
-  Image,
-  FileText,
-  Video,
-  ExternalLink,
-  Award,
-  Target,
-  Layers,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import ArrowBigUp from 'lucide-react/icons/arrow-big-up';
+import Lightbulb from 'lucide-react/icons/lightbulb';
+import Plus from 'lucide-react/icons/plus';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Calendar from 'lucide-react/icons/calendar';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import Trophy from 'lucide-react/icons/trophy';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Edit3 from 'lucide-react/icons/pen-line';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Heart from 'lucide-react/icons/heart';
+import Eye from 'lucide-react/icons/eye';
+import Star from 'lucide-react/icons/star';
+import Copy from 'lucide-react/icons/copy';
+import Users from 'lucide-react/icons/users';
+import LinkIcon from 'lucide-react/icons/link';
+import Image from 'lucide-react/icons/image';
+import FileText from 'lucide-react/icons/file-text';
+import Video from 'lucide-react/icons/video';
+import ExternalLink from 'lucide-react/icons/external-link';
+import Award from 'lucide-react/icons/award';
+import Target from 'lucide-react/icons/target';
+import Layers from 'lucide-react/icons/layers';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { GlassCard } from '@/components/ui';

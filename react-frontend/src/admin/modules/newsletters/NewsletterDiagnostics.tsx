@@ -13,9 +13,14 @@ import { useNavigate } from 'react-router-dom';
 import {
   Button, Card, CardBody, CardHeader, Chip, Progress,
 } from '@heroui/react';
-import {
-  RefreshCw, AlertCircle, CheckCircle, XCircle, Mail, Settings, Activity, Wrench,
-} from 'lucide-react';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Mail from 'lucide-react/icons/mail';
+import Settings from 'lucide-react/icons/settings';
+import Activity from 'lucide-react/icons/activity';
+import Wrench from 'lucide-react/icons/wrench';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { useTenant } from '@/contexts';

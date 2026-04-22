@@ -22,25 +22,23 @@ import {
   Avatar,
   Textarea,
 } from '@heroui/react';
-import {
-  RefreshCw,
-  AlertTriangle,
-  Calendar,
-  Clock,
-  Eye,
-  ArrowLeft,
-  MessageCircle,
-  Send,
-  ChevronDown,
-  ChevronUp,
-  Reply,
-  Smile,
-  Heart,
-  ThumbsUp,
-  ThumbsDown,
-  Laugh,
-  Angry,
-} from 'lucide-react';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Calendar from 'lucide-react/icons/calendar';
+import Clock from 'lucide-react/icons/clock';
+import Eye from 'lucide-react/icons/eye';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import Send from 'lucide-react/icons/send';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import ChevronUp from 'lucide-react/icons/chevron-up';
+import Reply from 'lucide-react/icons/reply';
+import Smile from 'lucide-react/icons/smile';
+import Heart from 'lucide-react/icons/heart';
+import ThumbsUp from 'lucide-react/icons/thumbs-up';
+import ThumbsDown from 'lucide-react/icons/thumbs-down';
+import Laugh from 'lucide-react/icons/laugh';
+import Angry from 'lucide-react/icons/angry';
 import { sanitizeRichText } from '@/lib/sanitize';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';

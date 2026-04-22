@@ -22,16 +22,14 @@ import {
   Chip,
   useDisclosure,
 } from '@heroui/react';
-import {
-  HelpCircle,
-  ArrowUp,
-  ArrowDown,
-  Check,
-  CheckCircle,
-  MessageSquare,
-  Plus,
-  Search,
-} from 'lucide-react';
+import HelpCircle from 'lucide-react/icons/circle-help';
+import ArrowUp from 'lucide-react/icons/arrow-up';
+import ArrowDown from 'lucide-react/icons/arrow-down';
+import Check from 'lucide-react/icons/check';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Plus from 'lucide-react/icons/plus';
+import Search from 'lucide-react/icons/search';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';

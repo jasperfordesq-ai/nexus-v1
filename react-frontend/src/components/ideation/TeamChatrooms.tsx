@@ -29,16 +29,14 @@ import {
   Tooltip,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Hash,
-  Lock,
-  Pin,
-  PinOff,
-  Plus,
-  Send,
-  Trash2,
-  MessageSquare,
-} from 'lucide-react';
+import Hash from 'lucide-react/icons/hash';
+import Lock from 'lucide-react/icons/lock';
+import Pin from 'lucide-react/icons/pin';
+import PinOff from 'lucide-react/icons/pin-off';
+import Plus from 'lucide-react/icons/plus';
+import Send from 'lucide-react/icons/send';
+import Trash2 from 'lucide-react/icons/trash-2';
+import MessageSquare from 'lucide-react/icons/message-square';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, usePusherOptional } from '@/contexts';

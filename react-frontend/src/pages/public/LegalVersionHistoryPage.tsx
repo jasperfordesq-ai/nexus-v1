@@ -25,19 +25,17 @@ import { useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Chip, Spinner } from '@heroui/react';
 import { sanitizeRichText } from '@/lib/sanitize';
-import {
-  History,
-  CalendarDays,
-  ChevronDown,
-  ChevronUp,
-  FileText,
-  ArrowLeft,
-  CheckCircle,
-  Clock,
-  Info,
-  GitCompareArrows,
-  X,
-} from 'lucide-react';
+import History from 'lucide-react/icons/history';
+import CalendarDays from 'lucide-react/icons/calendar-days';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import ChevronUp from 'lucide-react/icons/chevron-up';
+import FileText from 'lucide-react/icons/file-text';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Clock from 'lucide-react/icons/clock';
+import Info from 'lucide-react/icons/info';
+import GitCompareArrows from 'lucide-react/icons/git-compare-arrows';
+import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';

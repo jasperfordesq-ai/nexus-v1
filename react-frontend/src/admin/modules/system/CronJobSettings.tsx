@@ -23,7 +23,10 @@ import {
   Divider,
   Spinner,
 } from '@heroui/react';
-import { Settings, Save, AlertCircle, Info } from 'lucide-react';
+import Settings from 'lucide-react/icons/settings';
+import Save from 'lucide-react/icons/save';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import Info from 'lucide-react/icons/info';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { Navigate } from 'react-router-dom';

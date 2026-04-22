@@ -10,7 +10,10 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Button, Chip } from '@heroui/react';
-import { Key, Plus, RefreshCw, Ban } from 'lucide-react';
+import Key from 'lucide-react/icons/key';
+import Plus from 'lucide-react/icons/plus';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Ban from 'lucide-react/icons/ban';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';

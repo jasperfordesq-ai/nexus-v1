@@ -18,17 +18,15 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Spinner } from '@heroui/react';
-import {
-  ShieldCheck,
-  ShieldX,
-  ShieldAlert,
-  ExternalLink,
-  ArrowLeft,
-  Loader2,
-  CheckCircle,
-  RefreshCw,
-  Clock,
-} from 'lucide-react';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import ShieldX from 'lucide-react/icons/shield-x';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import ExternalLink from 'lucide-react/icons/external-link';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Loader2 from 'lucide-react/icons/loader-circle';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';

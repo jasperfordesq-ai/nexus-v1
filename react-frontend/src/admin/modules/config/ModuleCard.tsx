@@ -9,7 +9,7 @@
  */
 
 import { Card, CardBody, Switch, Button, Chip } from '@heroui/react';
-import { Settings2 } from 'lucide-react';
+import Settings2 from 'lucide-react/icons/settings-2';
 import { useTranslation } from 'react-i18next';
 import type { ModuleDefinition } from './moduleRegistry';
 

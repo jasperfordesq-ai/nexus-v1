@@ -11,7 +11,9 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Card, CardBody, Button, Spinner } from '@heroui/react';
-import { CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import ArrowRight from 'lucide-react/icons/arrow-right';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';

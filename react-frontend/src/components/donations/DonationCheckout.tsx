@@ -25,13 +25,11 @@ import {
   Switch,
   Textarea,
 } from '@heroui/react';
-import {
-  ArrowLeft,
-  Banknote,
-  CheckCircle,
-  CreditCard,
-  FileText,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Banknote from 'lucide-react/icons/banknote';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import CreditCard from 'lucide-react/icons/credit-card';
+import FileText from 'lucide-react/icons/file-text';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

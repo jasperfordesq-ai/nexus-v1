@@ -19,15 +19,13 @@ import {
   useDisclosure,
   Image,
 } from '@heroui/react';
-import {
-  Camera,
-  Film,
-  Upload,
-  Trash2,
-  X,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react';
+import Camera from 'lucide-react/icons/camera';
+import Film from 'lucide-react/icons/film';
+import Upload from 'lucide-react/icons/upload';
+import Trash2 from 'lucide-react/icons/trash-2';
+import X from 'lucide-react/icons/x';
+import ChevronLeft from 'lucide-react/icons/chevron-left';
+import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

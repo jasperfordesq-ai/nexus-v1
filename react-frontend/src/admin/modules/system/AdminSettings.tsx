@@ -10,7 +10,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardBody, CardHeader, Input, Switch, Button, Textarea, Spinner, Select, SelectItem } from '@heroui/react';
-import { Settings, Save, ShieldCheck, Scale } from 'lucide-react';
+import Settings from 'lucide-react/icons/settings';
+import Save from 'lucide-react/icons/save';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import Scale from 'lucide-react/icons/scale';
 import { Link } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';

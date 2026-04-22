@@ -18,16 +18,14 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Avatar, Button } from '@heroui/react';
-import {
-  X,
-  Eye,
-  MoreHorizontal,
-  Trash2,
-  Play,
-  ChevronLeft,
-  ChevronRight,
-  Send,
-} from 'lucide-react';
+import X from 'lucide-react/icons/x';
+import Eye from 'lucide-react/icons/eye';
+import MoreHorizontal from 'lucide-react/icons/ellipsis';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Play from 'lucide-react/icons/play';
+import ChevronLeft from 'lucide-react/icons/chevron-left';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import Send from 'lucide-react/icons/send';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';

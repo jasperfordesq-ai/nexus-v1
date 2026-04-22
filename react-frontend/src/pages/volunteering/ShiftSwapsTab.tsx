@@ -18,18 +18,16 @@ import {
   ModalBody,
   ModalFooter,
 } from '@heroui/react';
-import {
-  ArrowLeftRight,
-  Check,
-  X,
-  Calendar,
-  Building2,
-  AlertTriangle,
-  RefreshCw,
-  Send,
-  Inbox,
-  Ban,
-} from 'lucide-react';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import Check from 'lucide-react/icons/check';
+import X from 'lucide-react/icons/x';
+import Calendar from 'lucide-react/icons/calendar';
+import Building2 from 'lucide-react/icons/building-2';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Send from 'lucide-react/icons/send';
+import Inbox from 'lucide-react/icons/inbox';
+import Ban from 'lucide-react/icons/ban';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

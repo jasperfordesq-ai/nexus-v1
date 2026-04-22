@@ -11,7 +11,8 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Spinner } from '@heroui/react';
-import { BarChart3, TrendingUp } from 'lucide-react';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import TrendingUp from 'lucide-react/icons/trending-up';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminDiagnostics } from '../../api/adminApi';

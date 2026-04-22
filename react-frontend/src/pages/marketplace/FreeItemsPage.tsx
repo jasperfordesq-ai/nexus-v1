@@ -13,7 +13,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Spinner } from '@heroui/react';
-import { Gift, Plus, ShoppingBag } from 'lucide-react';
+import Gift from 'lucide-react/icons/gift';
+import Plus from 'lucide-react/icons/plus';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

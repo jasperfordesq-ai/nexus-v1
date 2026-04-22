@@ -13,16 +13,14 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Spinner } from '@heroui/react';
-import {
-  Accessibility,
-  CheckCircle,
-  MessageSquare,
-  Monitor,
-  Eye,
-  Keyboard,
-  Volume2,
-  Globe,
-} from 'lucide-react';
+import Accessibility from 'lucide-react/icons/accessibility';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Monitor from 'lucide-react/icons/monitor';
+import Eye from 'lucide-react/icons/eye';
+import Keyboard from 'lucide-react/icons/keyboard';
+import Volume2 from 'lucide-react/icons/volume-2';
+import Globe from 'lucide-react/icons/globe';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';

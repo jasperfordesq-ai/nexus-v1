@@ -5,7 +5,8 @@
 
 import { useRef, useState, useCallback, useEffect, type ReactNode } from 'react';
 import { Button } from '@heroui/react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import ChevronLeft from 'lucide-react/icons/chevron-left';
+import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
 
 interface HorizontalScrollProps {

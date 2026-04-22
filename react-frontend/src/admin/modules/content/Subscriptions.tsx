@@ -11,7 +11,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Spinner } from '@heroui/react';
-import { CreditCard } from 'lucide-react';
+import CreditCard from 'lucide-react/icons/credit-card';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminPlans } from '../../api/adminApi';

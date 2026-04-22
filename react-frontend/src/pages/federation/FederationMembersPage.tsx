@@ -22,19 +22,17 @@ import {
   Button,
   Spinner,
 } from '@heroui/react';
-import {
-  Search,
-  Globe,
-  MapPin,
-  MessageSquare,
-  User,
-  AlertTriangle,
-  RefreshCw,
-  Users,
-  Compass,
-  Car,
-  Home,
-} from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import Globe from 'lucide-react/icons/globe';
+import MapPin from 'lucide-react/icons/map-pin';
+import MessageSquare from 'lucide-react/icons/message-square';
+import User from 'lucide-react/icons/user';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Users from 'lucide-react/icons/users';
+import Compass from 'lucide-react/icons/compass';
+import Car from 'lucide-react/icons/car';
+import Home from 'lucide-react/icons/house';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';

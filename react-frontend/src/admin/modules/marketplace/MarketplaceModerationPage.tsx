@@ -23,14 +23,12 @@ import {
   ModalFooter,
   Tooltip,
 } from '@heroui/react';
-import {
-  CheckCircle,
-  XCircle,
-  Trash2,
-  Eye,
-  RefreshCw,
-  ShoppingBag,
-} from 'lucide-react';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Eye from 'lucide-react/icons/eye';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';

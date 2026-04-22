@@ -5,15 +5,13 @@
 
 import { useState } from 'react';
 import { Button, Chip } from '@heroui/react';
-import {
-  Target,
-  Sparkles,
-  Building2,
-  ChevronUp,
-  ChevronDown,
-  Check,
-  X,
-} from 'lucide-react';
+import Target from 'lucide-react/icons/target';
+import Sparkles from 'lucide-react/icons/sparkles';
+import Building2 from 'lucide-react/icons/building-2';
+import ChevronUp from 'lucide-react/icons/chevron-up';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import Check from 'lucide-react/icons/check';
+import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';

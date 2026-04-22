@@ -30,31 +30,29 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Building2,
-  ArrowLeft,
-  Edit,
-  Globe,
-  Languages,
-  MapPin,
-  Search,
-  Users,
-  ExternalLink,
-  Network,
-  CheckCircle2,
-  XCircle,
-  Facebook,
-  Twitter,
-  Instagram,
-  Linkedin,
-  Youtube,
-  UserPlus,
-  UserMinus,
-  Plus,
-  MoveRight,
-  Power,
-  AlertTriangle,
-} from 'lucide-react';
+import Building2 from 'lucide-react/icons/building-2';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Edit from 'lucide-react/icons/square-pen';
+import Globe from 'lucide-react/icons/globe';
+import Languages from 'lucide-react/icons/languages';
+import MapPin from 'lucide-react/icons/map-pin';
+import Search from 'lucide-react/icons/search';
+import Users from 'lucide-react/icons/users';
+import ExternalLink from 'lucide-react/icons/external-link';
+import Network from 'lucide-react/icons/network';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import XCircle from 'lucide-react/icons/circle-x';
+import Facebook from 'lucide-react/icons/facebook';
+import Twitter from 'lucide-react/icons/twitter';
+import Instagram from 'lucide-react/icons/instagram';
+import Linkedin from 'lucide-react/icons/linkedin';
+import Youtube from 'lucide-react/icons/youtube';
+import UserPlus from 'lucide-react/icons/user-plus';
+import UserMinus from 'lucide-react/icons/user-minus';
+import Plus from 'lucide-react/icons/plus';
+import MoveRight from 'lucide-react/icons/move-right';
+import Power from 'lucide-react/icons/power';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';

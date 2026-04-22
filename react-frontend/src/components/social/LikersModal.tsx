@@ -18,7 +18,7 @@ import {
   Avatar,
   Spinner,
 } from '@heroui/react';
-import { Heart } from 'lucide-react';
+import Heart from 'lucide-react/icons/heart';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';

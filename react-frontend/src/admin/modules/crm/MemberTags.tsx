@@ -16,7 +16,12 @@ import {
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure,
   Chip, Spinner, Avatar,
 } from '@heroui/react';
-import { Tag, Plus, Trash2, Search, Users, ArrowLeft } from 'lucide-react';
+import Tag from 'lucide-react/icons/tag';
+import Plus from 'lucide-react/icons/plus';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Search from 'lucide-react/icons/search';
+import Users from 'lucide-react/icons/users';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { Link } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';

@@ -12,7 +12,13 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, Tab, Chip, Button } from '@heroui/react';
-import { BookOpen, Eye, Trash2, ThumbsUp, Plus, Pencil, FolderTree } from 'lucide-react';
+import BookOpen from 'lucide-react/icons/book-open';
+import Eye from 'lucide-react/icons/eye';
+import Trash2 from 'lucide-react/icons/trash-2';
+import ThumbsUp from 'lucide-react/icons/thumbs-up';
+import Plus from 'lucide-react/icons/plus';
+import Pencil from 'lucide-react/icons/pencil';
+import FolderTree from 'lucide-react/icons/folder-tree';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';

@@ -15,7 +15,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Tooltip } from '@heroui/react';
-import { Heart, Clock } from 'lucide-react';
+import Heart from 'lucide-react/icons/heart';
+import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
 
 /* ───────────────────────── Reaction Config ───────────────────────── */

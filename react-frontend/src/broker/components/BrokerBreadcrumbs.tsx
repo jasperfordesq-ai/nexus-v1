@@ -11,7 +11,8 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
-import { ChevronRight, LayoutDashboard } from 'lucide-react';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
 
 const SEGMENT_LABELS: Record<string, string> = {
   broker: 'breadcrumbs.dashboard',

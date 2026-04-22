@@ -27,7 +27,9 @@ import {
 const RichTextEditor = lazy(() =>
   import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),
 );
-import { ArrowLeft, Save, Search } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
+import Search from 'lucide-react/icons/search';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBlog, adminCategories } from '../../api/adminApi';

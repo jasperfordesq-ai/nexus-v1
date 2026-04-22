@@ -17,7 +17,7 @@ import {
   Button,
   Textarea,
 } from '@heroui/react';
-import { Star } from 'lucide-react';
+import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

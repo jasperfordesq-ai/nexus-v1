@@ -22,17 +22,15 @@ import {
   SelectItem,
   Spinner,
 } from '@heroui/react';
-import {
-  Shield,
-  ArrowRight,
-  ArrowLeft,
-  SkipForward,
-  ExternalLink,
-  CheckCircle2,
-  Eye,
-  Zap,
-  Settings as SettingsIcon,
-} from 'lucide-react';
+import Shield from 'lucide-react/icons/shield';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import SkipForward from 'lucide-react/icons/skip-forward';
+import ExternalLink from 'lucide-react/icons/external-link';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import Eye from 'lucide-react/icons/eye';
+import Zap from 'lucide-react/icons/zap';
+import SettingsIcon from 'lucide-react/icons/settings';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useToast, useTenant } from '@/contexts';

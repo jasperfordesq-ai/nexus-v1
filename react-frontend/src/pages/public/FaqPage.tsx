@@ -14,10 +14,13 @@ import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Accordion, AccordionItem, Input } from '@heroui/react';
-import {
-  Rocket, Wallet, Handshake, Trophy, ShieldCheck,
-  Search, HelpCircle,
-} from 'lucide-react';
+import Rocket from 'lucide-react/icons/rocket';
+import Wallet from 'lucide-react/icons/wallet';
+import Handshake from 'lucide-react/icons/handshake';
+import Trophy from 'lucide-react/icons/trophy';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import Search from 'lucide-react/icons/search';
+import HelpCircle from 'lucide-react/icons/circle-help';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';

@@ -12,20 +12,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@heroui/react';
-import {
-  Users,
-  Activity,
-  UserPlus,
-  UserCheck,
-  ClipboardList,
-  AlertTriangle,
-  StickyNote,
-  TrendingUp,
-  ChevronRight,
-  RefreshCw,
-  Download,
-  Tag,
-} from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import Activity from 'lucide-react/icons/activity';
+import UserPlus from 'lucide-react/icons/user-plus';
+import UserCheck from 'lucide-react/icons/user-check';
+import ClipboardList from 'lucide-react/icons/clipboard-list';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import StickyNote from 'lucide-react/icons/sticky-note';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Download from 'lucide-react/icons/download';
+import Tag from 'lucide-react/icons/tag';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import api from '@/lib/api';

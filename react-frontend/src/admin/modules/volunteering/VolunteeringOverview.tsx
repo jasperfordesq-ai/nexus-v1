@@ -11,10 +11,17 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Button, Chip, Avatar, ButtonGroup, Skeleton } from '@heroui/react';
-import {
-  Heart, Users, Clock, Briefcase, RefreshCw, AlertTriangle,
-  ClipboardCheck, Building2, DollarSign, ChevronRight, Activity,
-} from 'lucide-react';
+import Heart from 'lucide-react/icons/heart';
+import Users from 'lucide-react/icons/users';
+import Clock from 'lucide-react/icons/clock';
+import Briefcase from 'lucide-react/icons/briefcase';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import ClipboardCheck from 'lucide-react/icons/clipboard-check';
+import Building2 from 'lucide-react/icons/building-2';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import Activity from 'lucide-react/icons/activity';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';

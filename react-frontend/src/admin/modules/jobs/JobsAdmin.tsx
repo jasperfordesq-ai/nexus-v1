@@ -11,7 +11,22 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Tabs, Tab, Chip, Button, Tooltip, Avatar, Spinner, Textarea, Select, SelectItem, Card, CardBody } from '@heroui/react';
-import { Briefcase, Star, StarOff, Trash2, Eye, RefreshCw, ChevronDown, ChevronUp, Users, ClipboardList, CheckCircle2, Save, FileText, Calendar, Gift, TrendingUp } from 'lucide-react';
+import Briefcase from 'lucide-react/icons/briefcase';
+import Star from 'lucide-react/icons/star';
+import StarOff from 'lucide-react/icons/star-off';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Eye from 'lucide-react/icons/eye';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import ChevronUp from 'lucide-react/icons/chevron-up';
+import Users from 'lucide-react/icons/users';
+import ClipboardList from 'lucide-react/icons/clipboard-list';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import Save from 'lucide-react/icons/save';
+import FileText from 'lucide-react/icons/file-text';
+import Calendar from 'lucide-react/icons/calendar';
+import Gift from 'lucide-react/icons/gift';
+import TrendingUp from 'lucide-react/icons/trending-up';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';

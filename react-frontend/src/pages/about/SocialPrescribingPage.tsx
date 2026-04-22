@@ -18,21 +18,19 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
-import {
-  HeartPulse,
-  ArrowRight,
-  CheckCircle2,
-  Users,
-  ClipboardList,
-  UserPlus,
-  Link2,
-  CalendarCheck,
-  Quote,
-  ShieldCheck,
-  TrendingUp,
-  Stethoscope,
-  Mail,
-} from 'lucide-react';
+import HeartPulse from 'lucide-react/icons/heart-pulse';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import Users from 'lucide-react/icons/users';
+import ClipboardList from 'lucide-react/icons/clipboard-list';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Link2 from 'lucide-react/icons/link-2';
+import CalendarCheck from 'lucide-react/icons/calendar-check';
+import Quote from 'lucide-react/icons/quote';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Stethoscope from 'lucide-react/icons/stethoscope';
+import Mail from 'lucide-react/icons/mail';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';

@@ -33,19 +33,17 @@ import {
   Spinner,
   Chip,
 } from '@heroui/react';
-import {
-  Camera,
-  X,
-  Plus,
-  Sparkles,
-  ArrowLeft,
-  Truck,
-  Package,
-  DollarSign,
-  FileText,
-  Upload,
-  Video,
-} from 'lucide-react';
+import Camera from 'lucide-react/icons/camera';
+import X from 'lucide-react/icons/x';
+import Plus from 'lucide-react/icons/plus';
+import Sparkles from 'lucide-react/icons/sparkles';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Truck from 'lucide-react/icons/truck';
+import Package from 'lucide-react/icons/package';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import FileText from 'lucide-react/icons/file-text';
+import Upload from 'lucide-react/icons/upload';
+import Video from 'lucide-react/icons/video';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';

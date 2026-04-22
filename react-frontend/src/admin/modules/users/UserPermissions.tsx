@@ -12,7 +12,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Chip, Button, Spinner } from '@heroui/react';
-import { ArrowLeft, Shield, Info } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Shield from 'lucide-react/icons/shield';
+import Info from 'lucide-react/icons/info';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminUsers } from '../../api/adminApi';

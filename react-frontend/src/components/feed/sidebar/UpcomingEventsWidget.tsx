@@ -8,7 +8,9 @@
  */
 
 import { Link } from 'react-router-dom';
-import { CalendarDays, Clock, MapPin } from 'lucide-react';
+import CalendarDays from 'lucide-react/icons/calendar-days';
+import Clock from 'lucide-react/icons/clock';
+import MapPin from 'lucide-react/icons/map-pin';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';

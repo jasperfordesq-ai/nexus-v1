@@ -28,12 +28,10 @@ import {
   Chip,
   Spinner,
 } from '@heroui/react';
-import {
-  Search,
-  Map as MapIcon,
-  List,
-  RefreshCw,
-} from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import MapIcon from 'lucide-react/icons/map';
+import List from 'lucide-react/icons/list';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

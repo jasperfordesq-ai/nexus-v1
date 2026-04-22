@@ -17,7 +17,10 @@
 
 import { useRef, useState, useCallback, type DragEvent } from 'react';
 import { Button, Input } from '@heroui/react';
-import { ImagePlus, X, GripVertical, Type } from 'lucide-react';
+import ImagePlus from 'lucide-react/icons/image-plus';
+import X from 'lucide-react/icons/x';
+import GripVertical from 'lucide-react/icons/grip-vertical';
+import Type from 'lucide-react/icons/type';
 import { useTranslation } from 'react-i18next';
 import {
   DndContext,

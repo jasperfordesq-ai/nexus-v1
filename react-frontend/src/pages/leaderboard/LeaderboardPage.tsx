@@ -17,25 +17,23 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
 import { Button, Avatar, Select, SelectItem, Chip, Skeleton, Tabs, Tab } from '@heroui/react';
-import {
-  Trophy,
-  Medal,
-  Crown,
-  TrendingUp,
-  RefreshCw,
-  AlertTriangle,
-  Star,
-  Clock,
-  Coins,
-  Zap,
-  Calendar,
-  ChevronRight,
-  Flame,
-  Users,
-  Route,
-  Sparkles,
-  BarChart3,
-} from 'lucide-react';
+import Trophy from 'lucide-react/icons/trophy';
+import Medal from 'lucide-react/icons/medal';
+import Crown from 'lucide-react/icons/crown';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Star from 'lucide-react/icons/star';
+import Clock from 'lucide-react/icons/clock';
+import Coins from 'lucide-react/icons/coins';
+import Zap from 'lucide-react/icons/zap';
+import Calendar from 'lucide-react/icons/calendar';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import Flame from 'lucide-react/icons/flame';
+import Users from 'lucide-react/icons/users';
+import Route from 'lucide-react/icons/route';
+import Sparkles from 'lucide-react/icons/sparkles';
+import BarChart3 from 'lucide-react/icons/chart-column';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { GlassCard } from '@/components/ui';

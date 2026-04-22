@@ -11,7 +11,8 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Spinner } from '@heroui/react';
-import { Activity, BarChart3 } from 'lucide-react';
+import Activity from 'lucide-react/icons/activity';
+import BarChart3 from 'lucide-react/icons/chart-column';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';

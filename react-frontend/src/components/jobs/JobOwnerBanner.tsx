@@ -5,13 +5,11 @@
 
 import { Link } from 'react-router-dom';
 import { Button } from '@heroui/react';
-import {
-  Briefcase,
-  Edit3,
-  BarChart3,
-  Users,
-  CalendarClock,
-} from 'lucide-react';
+import Briefcase from 'lucide-react/icons/briefcase';
+import Edit3 from 'lucide-react/icons/pen-line';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Users from 'lucide-react/icons/users';
+import CalendarClock from 'lucide-react/icons/calendar-clock';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { api } from '@/lib/api';

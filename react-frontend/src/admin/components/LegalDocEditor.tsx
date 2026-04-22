@@ -60,24 +60,22 @@ import {
 } from '@lexical/utils';
 import { $isListNode, ListNode as ListNodeClass } from '@lexical/list';
 import { Button, Tooltip, Divider } from '@heroui/react';
-import {
-  Bold,
-  Italic,
-  Underline,
-  Strikethrough,
-  Heading2,
-  Heading3,
-  List,
-  ListOrdered,
-  Link2,
-  Quote,
-  Undo2,
-  Redo2,
-  Code,
-  Megaphone,
-  Eye,
-  EyeOff,
-} from 'lucide-react';
+import Bold from 'lucide-react/icons/bold';
+import Italic from 'lucide-react/icons/italic';
+import Underline from 'lucide-react/icons/underline';
+import Strikethrough from 'lucide-react/icons/strikethrough';
+import Heading2 from 'lucide-react/icons/heading-2';
+import Heading3 from 'lucide-react/icons/heading-3';
+import List from 'lucide-react/icons/list';
+import ListOrdered from 'lucide-react/icons/list-ordered';
+import Link2 from 'lucide-react/icons/link-2';
+import Quote from 'lucide-react/icons/quote';
+import Undo2 from 'lucide-react/icons/undo-2';
+import Redo2 from 'lucide-react/icons/redo-2';
+import Code from 'lucide-react/icons/code';
+import Megaphone from 'lucide-react/icons/megaphone';
+import Eye from 'lucide-react/icons/eye';
+import EyeOff from 'lucide-react/icons/eye-off';
 import { useTranslation } from 'react-i18next';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
 import type { LegalDocument } from '@/hooks/useLegalDocument';

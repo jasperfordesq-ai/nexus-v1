@@ -16,7 +16,7 @@ import {
 import { useToast } from '@/contexts/ToastContext';
 import { adminLegalDocs } from '@/admin/api/adminApi';
 import type { LegalDocumentVersion } from '@/admin/api/types';
-import { AlertCircle } from 'lucide-react';
+import AlertCircle from 'lucide-react/icons/circle-alert';
 import { LegalDocEditor } from '@/admin/components';
 
 interface LegalDocVersionFormProps {

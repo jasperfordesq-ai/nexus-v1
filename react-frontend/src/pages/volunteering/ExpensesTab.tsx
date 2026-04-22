@@ -23,18 +23,16 @@ import {
   useDisclosure,
   Textarea,
 } from '@heroui/react';
-import {
-  Receipt,
-  Plus,
-  AlertTriangle,
-  Calendar,
-  Car,
-  UtensilsCrossed,
-  Package,
-  Wrench,
-  ParkingCircle,
-  MoreHorizontal,
-} from 'lucide-react';
+import Receipt from 'lucide-react/icons/receipt';
+import Plus from 'lucide-react/icons/plus';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Calendar from 'lucide-react/icons/calendar';
+import Car from 'lucide-react/icons/car';
+import UtensilsCrossed from 'lucide-react/icons/utensils-crossed';
+import Package from 'lucide-react/icons/package';
+import Wrench from 'lucide-react/icons/wrench';
+import ParkingCircle from 'lucide-react/icons/circle-parking';
+import MoreHorizontal from 'lucide-react/icons/ellipsis';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

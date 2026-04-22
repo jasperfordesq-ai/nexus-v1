@@ -20,7 +20,8 @@ import {
   DropdownItem,
   Textarea,
 } from '@heroui/react';
-import { MoreVertical, RefreshCw } from 'lucide-react';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';

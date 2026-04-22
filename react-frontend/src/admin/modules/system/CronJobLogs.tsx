@@ -34,16 +34,14 @@ import {
   Input,
   Pagination,
 } from '@heroui/react';
-import {
-  FileText,
-  RefreshCw,
-  CheckCircle,
-  XCircle,
-  Calendar,
-  Trash2,
-  Download,
-  Filter,
-} from 'lucide-react';
+import FileText from 'lucide-react/icons/file-text';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Calendar from 'lucide-react/icons/calendar';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Download from 'lucide-react/icons/download';
+import Filter from 'lucide-react/icons/filter';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminCron } from '../../api/adminApi';

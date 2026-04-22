@@ -9,7 +9,10 @@
  */
 
 import { Card, CardBody, Chip } from '@heroui/react';
-import { FolderHeart, Lock, Globe, Package } from 'lucide-react';
+import FolderHeart from 'lucide-react/icons/folder-heart';
+import Lock from 'lucide-react/icons/lock';
+import Globe from 'lucide-react/icons/globe';
+import Package from 'lucide-react/icons/package';
 import { useTranslation } from 'react-i18next';
 import type { MarketplaceCollection } from '@/types/marketplace';
 

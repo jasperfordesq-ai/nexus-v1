@@ -6,14 +6,12 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Chip, Spinner } from '@heroui/react';
-import {
-  Users,
-  ClipboardList,
-  Clock,
-  Wallet,
-  Briefcase,
-  ArrowRight,
-} from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import ClipboardList from 'lucide-react/icons/clipboard-list';
+import Clock from 'lucide-react/icons/clock';
+import Wallet from 'lucide-react/icons/wallet';
+import Briefcase from 'lucide-react/icons/briefcase';
+import ArrowRight from 'lucide-react/icons/arrow-right';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';

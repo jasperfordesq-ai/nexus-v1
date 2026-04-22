@@ -27,7 +27,11 @@ import {
   Textarea,
   useDisclosure,
 } from '@heroui/react';
-import { CreditCard, ArrowRight, Receipt, Settings, Users } from 'lucide-react';
+import CreditCard from 'lucide-react/icons/credit-card';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import Receipt from 'lucide-react/icons/receipt';
+import Settings from 'lucide-react/icons/settings';
+import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { usePageTitle } from '@/hooks';

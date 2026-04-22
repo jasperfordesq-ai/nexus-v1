@@ -12,17 +12,15 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Card, CardBody, CardHeader, Spinner } from '@heroui/react';
-import {
-  Users,
-  ShieldAlert,
-  MessageSquareWarning,
-  ArrowLeftRight,
-  ShieldCheck,
-  Eye,
-  AlertTriangle,
-  UserPlus,
-  ChevronRight,
-} from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import Eye from 'lucide-react/icons/eye';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import UserPlus from 'lucide-react/icons/user-plus';
+import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';

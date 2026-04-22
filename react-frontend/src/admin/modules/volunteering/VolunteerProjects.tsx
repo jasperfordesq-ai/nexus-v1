@@ -22,7 +22,14 @@ import {
   SelectItem,
   useDisclosure,
 } from '@heroui/react';
-import { FolderKanban, RefreshCw, ClipboardCheck, CheckCircle, Play, Flag, Users, PlusCircle } from 'lucide-react';
+import FolderKanban from 'lucide-react/icons/folder-kanban';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ClipboardCheck from 'lucide-react/icons/clipboard-check';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Play from 'lucide-react/icons/play';
+import Flag from 'lucide-react/icons/flag';
+import Users from 'lucide-react/icons/users';
+import PlusCircle from 'lucide-react/icons/circle-plus';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';

@@ -19,18 +19,16 @@ import {
   Tab,
   Tabs,
 } from '@heroui/react';
-import {
-  UserPlus,
-  UserCheck,
-  Clock,
-  Send,
-  Globe,
-  MessageSquare,
-  Trash2,
-  Check,
-  X,
-  AlertTriangle,
-} from 'lucide-react';
+import UserPlus from 'lucide-react/icons/user-plus';
+import UserCheck from 'lucide-react/icons/user-check';
+import Clock from 'lucide-react/icons/clock';
+import Send from 'lucide-react/icons/send';
+import Globe from 'lucide-react/icons/globe';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Check from 'lucide-react/icons/check';
+import X from 'lucide-react/icons/x';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';

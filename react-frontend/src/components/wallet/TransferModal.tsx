@@ -23,7 +23,11 @@ import {
   Avatar,
   Spinner,
 } from '@heroui/react';
-import { X, Send, Search, User, AlertCircle } from 'lucide-react';
+import X from 'lucide-react/icons/x';
+import Send from 'lucide-react/icons/send';
+import Search from 'lucide-react/icons/search';
+import User from 'lucide-react/icons/user';
+import AlertCircle from 'lucide-react/icons/circle-alert';
 import { api } from '@/lib/api';
 import { formatNumber, resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';

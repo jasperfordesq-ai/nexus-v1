@@ -15,11 +15,26 @@ import {
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure,
   Accordion, AccordionItem,
 } from '@heroui/react';
-import {
-  ShieldCheck, Save, Info, AlertTriangle, Key, Ticket, Plus, Trash2, Copy,
-  Eye, EyeOff, CheckCircle2, HelpCircle, Lock, UserCheck, Users,
-  Clock, Mail, Globe, Shield,
-} from 'lucide-react';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import Save from 'lucide-react/icons/save';
+import Info from 'lucide-react/icons/info';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Key from 'lucide-react/icons/key';
+import Ticket from 'lucide-react/icons/ticket';
+import Plus from 'lucide-react/icons/plus';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Copy from 'lucide-react/icons/copy';
+import Eye from 'lucide-react/icons/eye';
+import EyeOff from 'lucide-react/icons/eye-off';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import HelpCircle from 'lucide-react/icons/circle-help';
+import Lock from 'lucide-react/icons/lock';
+import UserCheck from 'lucide-react/icons/user-check';
+import Users from 'lucide-react/icons/users';
+import Clock from 'lucide-react/icons/clock';
+import Mail from 'lucide-react/icons/mail';
+import Globe from 'lucide-react/icons/globe';
+import Shield from 'lucide-react/icons/shield';
 import { VerificationAuditLog } from './VerificationAuditLog';
 import { VerificationReviewQueue } from './VerificationReviewQueue';
 import { ProviderHealthDashboard } from './ProviderHealthDashboard';

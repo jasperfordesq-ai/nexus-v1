@@ -18,19 +18,17 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
-import {
-  Handshake,
-  Clock,
-  Users,
-  Heart,
-  ArrowRight,
-  TrendingUp,
-  Sparkles,
-  BookOpen,
-  Gem,
-  RefreshCw,
-  Network,
-} from 'lucide-react';
+import Handshake from 'lucide-react/icons/handshake';
+import Clock from 'lucide-react/icons/clock';
+import Users from 'lucide-react/icons/users';
+import Heart from 'lucide-react/icons/heart';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Sparkles from 'lucide-react/icons/sparkles';
+import BookOpen from 'lucide-react/icons/book-open';
+import Gem from 'lucide-react/icons/gem';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Network from 'lucide-react/icons/network';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';

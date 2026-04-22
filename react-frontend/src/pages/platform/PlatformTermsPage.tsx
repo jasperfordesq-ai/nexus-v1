@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { FileText } from 'lucide-react';
+import FileText from 'lucide-react/icons/file-text';
 import { useTranslation } from 'react-i18next';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks/usePageTitle';

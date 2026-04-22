@@ -15,7 +15,7 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from '@heroui/react';
-import { FileText } from 'lucide-react';
+import FileText from 'lucide-react/icons/file-text';
 import { useTranslation } from 'react-i18next';
 
 import type { ComposeTab } from '../types';

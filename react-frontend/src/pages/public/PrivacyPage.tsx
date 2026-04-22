@@ -13,24 +13,22 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Chip, Divider, Spinner } from '@heroui/react';
-import {
-  Shield,
-  Database,
-  PieChart,
-  UserCheck,
-  Cookie,
-  Eye,
-  Lock,
-  Clock,
-  Handshake,
-  Pencil,
-  Trash2,
-  Download,
-  Ban,
-  MessageSquare,
-  Send,
-  CalendarDays,
-} from 'lucide-react';
+import Shield from 'lucide-react/icons/shield';
+import Database from 'lucide-react/icons/database';
+import PieChart from 'lucide-react/icons/chart-pie';
+import UserCheck from 'lucide-react/icons/user-check';
+import Cookie from 'lucide-react/icons/cookie';
+import Eye from 'lucide-react/icons/eye';
+import Lock from 'lucide-react/icons/lock';
+import Clock from 'lucide-react/icons/clock';
+import Handshake from 'lucide-react/icons/handshake';
+import Pencil from 'lucide-react/icons/pencil';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Download from 'lucide-react/icons/download';
+import Ban from 'lucide-react/icons/ban';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Send from 'lucide-react/icons/send';
+import CalendarDays from 'lucide-react/icons/calendar-days';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';

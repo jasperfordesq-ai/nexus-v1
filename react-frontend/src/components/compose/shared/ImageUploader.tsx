@@ -9,7 +9,8 @@
 
 import { useRef } from 'react';
 import { Button } from '@heroui/react';
-import { ImagePlus, X } from 'lucide-react';
+import ImagePlus from 'lucide-react/icons/image-plus';
+import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 
 interface ImageUploaderProps {

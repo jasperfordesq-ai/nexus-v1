@@ -11,7 +11,12 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Button, Avatar, Input, Tabs, Tab, Checkbox, Select, SelectItem } from '@heroui/react';
-import { ClipboardCheck, RefreshCw, CheckCircle, XCircle, Search, Download } from 'lucide-react';
+import ClipboardCheck from 'lucide-react/icons/clipboard-check';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Search from 'lucide-react/icons/search';
+import Download from 'lucide-react/icons/download';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';

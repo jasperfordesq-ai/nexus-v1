@@ -12,19 +12,17 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Input, Textarea, Switch, Avatar } from '@heroui/react';
-import {
-  ArrowLeft,
-  Save,
-  Users,
-  FileText,
-  Lock,
-  Globe,
-  CheckCircle,
-  AlertTriangle,
-  RefreshCw,
-  ImagePlus,
-  X,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
+import Users from 'lucide-react/icons/users';
+import FileText from 'lucide-react/icons/file-text';
+import Lock from 'lucide-react/icons/lock';
+import Globe from 'lucide-react/icons/globe';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ImagePlus from 'lucide-react/icons/image-plus';
+import X from 'lucide-react/icons/x';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';

@@ -19,19 +19,17 @@ import {
   DropdownMenu,
   DropdownItem,
 } from '@heroui/react';
-import {
-  Lightbulb,
-  Eye,
-  Trash2,
-  MoreVertical,
-  RefreshCw,
-  CheckCircle,
-  Archive,
-  XCircle,
-  FileEdit,
-  Vote,
-  ClipboardCheck,
-} from 'lucide-react';
+import Lightbulb from 'lucide-react/icons/lightbulb';
+import Eye from 'lucide-react/icons/eye';
+import Trash2 from 'lucide-react/icons/trash-2';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Archive from 'lucide-react/icons/archive';
+import XCircle from 'lucide-react/icons/circle-x';
+import FileEdit from 'lucide-react/icons/file-pen';
+import Vote from 'lucide-react/icons/vote';
+import ClipboardCheck from 'lucide-react/icons/clipboard-check';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

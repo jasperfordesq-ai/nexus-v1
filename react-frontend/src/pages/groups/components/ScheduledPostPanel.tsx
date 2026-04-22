@@ -24,7 +24,9 @@ import {
   ModalFooter,
   Spinner,
 } from '@heroui/react';
-import { CalendarClock, Plus, X } from 'lucide-react';
+import CalendarClock from 'lucide-react/icons/calendar-clock';
+import Plus from 'lucide-react/icons/plus';
+import X from 'lucide-react/icons/x';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 import { GlassCard } from '@/components/ui';

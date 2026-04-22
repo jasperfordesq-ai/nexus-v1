@@ -30,18 +30,16 @@ import {
   Badge,
   Tooltip,
 } from '@heroui/react';
-import {
-  MoreVertical,
-  Clock,
-  Coins,
-  StickyNote,
-  ShieldCheck,
-  UserCheck,
-  UserX,
-  RotateCcw,
-  ExternalLink,
-  Send,
-} from 'lucide-react';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Clock from 'lucide-react/icons/clock';
+import Coins from 'lucide-react/icons/coins';
+import StickyNote from 'lucide-react/icons/sticky-note';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import UserCheck from 'lucide-react/icons/user-check';
+import UserX from 'lucide-react/icons/user-x';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
+import ExternalLink from 'lucide-react/icons/external-link';
+import Send from 'lucide-react/icons/send';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminUsers, adminCrm } from '@/admin/api/adminApi';

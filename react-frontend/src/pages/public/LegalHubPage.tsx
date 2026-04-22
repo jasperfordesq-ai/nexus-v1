@@ -13,23 +13,21 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Divider } from '@heroui/react';
-import {
-  Scale,
-  Shield,
-  FileText,
-  Cookie,
-  Accessibility,
-  CalendarDays,
-  ArrowRight,
-  Handshake,
-  Send,
-  Users,
-  ShieldCheck,
-  Hexagon,
-  AlertTriangle,
-  ExternalLink,
-  Building,
-} from 'lucide-react';
+import Scale from 'lucide-react/icons/scale';
+import Shield from 'lucide-react/icons/shield';
+import FileText from 'lucide-react/icons/file-text';
+import Cookie from 'lucide-react/icons/cookie';
+import Accessibility from 'lucide-react/icons/accessibility';
+import CalendarDays from 'lucide-react/icons/calendar-days';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import Handshake from 'lucide-react/icons/handshake';
+import Send from 'lucide-react/icons/send';
+import Users from 'lucide-react/icons/users';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import Hexagon from 'lucide-react/icons/hexagon';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import ExternalLink from 'lucide-react/icons/external-link';
+import Building from 'lucide-react/icons/building';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';

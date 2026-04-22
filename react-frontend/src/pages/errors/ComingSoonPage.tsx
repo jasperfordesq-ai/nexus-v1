@@ -10,7 +10,9 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
-import { Home, ArrowLeft, Construction } from 'lucide-react';
+import Home from 'lucide-react/icons/house';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Construction from 'lucide-react/icons/construction';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';

@@ -18,7 +18,7 @@
 
 import { useState, useCallback } from 'react';
 import { Button, useDisclosure } from '@heroui/react';
-import { CreditCard } from 'lucide-react';
+import CreditCard from 'lucide-react/icons/credit-card';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';

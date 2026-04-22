@@ -16,7 +16,13 @@ import {
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
   Input, Select, SelectItem, Textarea, Switch, Spinner,
 } from '@heroui/react';
-import { ArrowLeft, ShieldCheck, ShieldAlert, Plus, Edit, Trash2, Search } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import Plus from 'lucide-react/icons/plus';
+import Edit from 'lucide-react/icons/square-pen';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Search from 'lucide-react/icons/search';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBroker, adminListings } from '../../api/adminApi';

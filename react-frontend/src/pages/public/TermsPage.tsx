@@ -14,25 +14,23 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Chip, Divider, Spinner } from '@heroui/react';
-import {
-  FileText,
-  Clock,
-  Users,
-  Ban,
-  Shield,
-  Handshake,
-  UserCog,
-  AlertTriangle,
-  MapPin,
-  Scale,
-  RefreshCw,
-  Gem,
-  MessageSquare,
-  Send,
-  CalendarDays,
-  Info,
-  CircleSlash,
-} from 'lucide-react';
+import FileText from 'lucide-react/icons/file-text';
+import Clock from 'lucide-react/icons/clock';
+import Users from 'lucide-react/icons/users';
+import Ban from 'lucide-react/icons/ban';
+import Shield from 'lucide-react/icons/shield';
+import Handshake from 'lucide-react/icons/handshake';
+import UserCog from 'lucide-react/icons/user-cog';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import MapPin from 'lucide-react/icons/map-pin';
+import Scale from 'lucide-react/icons/scale';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Gem from 'lucide-react/icons/gem';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Send from 'lucide-react/icons/send';
+import CalendarDays from 'lucide-react/icons/calendar-days';
+import Info from 'lucide-react/icons/info';
+import CircleSlash from 'lucide-react/icons/circle-slash';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';

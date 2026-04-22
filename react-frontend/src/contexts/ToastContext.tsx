@@ -11,7 +11,11 @@
 import { createContext, useContext, useState, useCallback, useMemo, useRef, forwardRef, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@heroui/react';
-import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
+import X from 'lucide-react/icons/x';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
 
 // ─────────────────────────────────────────────────────────────────────────────

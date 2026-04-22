@@ -13,7 +13,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { Button } from '@heroui/react';
-import { Image } from 'lucide-react';
+import Image from 'lucide-react/icons/image';
 import { useTranslation } from 'react-i18next';
 
 interface GalleryImage {

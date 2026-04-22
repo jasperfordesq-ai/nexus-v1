@@ -22,23 +22,21 @@ import {
   Input,
   Spinner,
 } from '@heroui/react';
-import {
-  Settings,
-  Eye,
-  MessageSquare,
-  MapPin,
-  Save,
-  ShieldCheck,
-  ShieldOff,
-  AlertTriangle,
-  Globe,
-  Star,
-  Search,
-  Zap,
-  Send,
-  CreditCard,
-  Mail,
-} from 'lucide-react';
+import Settings from 'lucide-react/icons/settings';
+import Eye from 'lucide-react/icons/eye';
+import MessageSquare from 'lucide-react/icons/message-square';
+import MapPin from 'lucide-react/icons/map-pin';
+import Save from 'lucide-react/icons/save';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import ShieldOff from 'lucide-react/icons/shield-off';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Globe from 'lucide-react/icons/globe';
+import Star from 'lucide-react/icons/star';
+import Search from 'lucide-react/icons/search';
+import Zap from 'lucide-react/icons/zap';
+import Send from 'lucide-react/icons/send';
+import CreditCard from 'lucide-react/icons/credit-card';
+import Mail from 'lucide-react/icons/mail';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';

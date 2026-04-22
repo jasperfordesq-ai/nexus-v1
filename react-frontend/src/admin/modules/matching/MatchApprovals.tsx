@@ -25,15 +25,13 @@ import {
   ModalBody,
   ModalFooter,
 } from '@heroui/react';
-import {
-  CheckCircle,
-  XCircle,
-  Clock,
-  Users,
-  TrendingUp,
-  Eye,
-  BarChart3,
-} from 'lucide-react';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Clock from 'lucide-react/icons/clock';
+import Users from 'lucide-react/icons/users';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Eye from 'lucide-react/icons/eye';
+import BarChart3 from 'lucide-react/icons/chart-column';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';

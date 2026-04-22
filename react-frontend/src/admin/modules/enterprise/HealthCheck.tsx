@@ -24,13 +24,11 @@ import {
   TableColumn,
   TableCell,
 } from '@heroui/react';
-import {
-  CheckCircle,
-  XCircle,
-  RefreshCw,
-  HeartPulse,
-  History,
-} from 'lucide-react';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import HeartPulse from 'lucide-react/icons/heart-pulse';
+import History from 'lucide-react/icons/history';
 import { usePageTitle } from '@/hooks';
 import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';

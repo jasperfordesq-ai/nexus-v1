@@ -13,19 +13,17 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
-import {
-  TrendingUp,
-  Heart,
-  Stethoscope,
-  FileText,
-  Compass,
-  ArrowRight,
-  Quote,
-  Sparkles,
-  Users,
-  ShieldCheck,
-  Mail,
-} from 'lucide-react';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Heart from 'lucide-react/icons/heart';
+import Stethoscope from 'lucide-react/icons/stethoscope';
+import FileText from 'lucide-react/icons/file-text';
+import Compass from 'lucide-react/icons/compass';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import Quote from 'lucide-react/icons/quote';
+import Sparkles from 'lucide-react/icons/sparkles';
+import Users from 'lucide-react/icons/users';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import Mail from 'lucide-react/icons/mail';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';

@@ -10,7 +10,9 @@
 
 import { Component, type ReactNode, type ErrorInfo } from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Home from 'lucide-react/icons/house';
 import { Button } from '@heroui/react';
 import { GlassCard } from '@/components/ui';
 import { logError } from '@/lib/logger';

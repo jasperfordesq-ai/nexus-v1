@@ -30,21 +30,19 @@ import {
   TableRow,
   TableCell,
 } from '@heroui/react';
-import {
-  Users,
-  RefreshCw,
-  Download,
-  Upload,
-  UserPlus,
-  Copy,
-  ExternalLink,
-  Trash2,
-  Search,
-  Mail,
-  CheckCircle,
-  Clock,
-  UserX,
-} from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Download from 'lucide-react/icons/download';
+import Upload from 'lucide-react/icons/upload';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Copy from 'lucide-react/icons/copy';
+import ExternalLink from 'lucide-react/icons/external-link';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Search from 'lucide-react/icons/search';
+import Mail from 'lucide-react/icons/mail';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Clock from 'lucide-react/icons/clock';
+import UserX from 'lucide-react/icons/user-x';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';

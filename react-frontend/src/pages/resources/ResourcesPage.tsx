@@ -27,29 +27,27 @@ import {
   Progress,
   useDisclosure,
 } from '@heroui/react';
-import {
-  FolderOpen,
-  RefreshCw,
-  AlertTriangle,
-  Search,
-  Download,
-  FileText,
-  FileSpreadsheet,
-  FileImage,
-  File,
-  Calendar,
-  User,
-  Upload,
-  X,
-  CheckCircle,
-  ChevronRight,
-  ChevronDown,
-  Folder,
-  GripVertical,
-  ArrowUp,
-  ArrowDown,
-  Trash2,
-} from 'lucide-react';
+import FolderOpen from 'lucide-react/icons/folder-open';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Search from 'lucide-react/icons/search';
+import Download from 'lucide-react/icons/download';
+import FileText from 'lucide-react/icons/file-text';
+import FileSpreadsheet from 'lucide-react/icons/file-spreadsheet';
+import FileImage from 'lucide-react/icons/file-image';
+import File from 'lucide-react/icons/file';
+import Calendar from 'lucide-react/icons/calendar';
+import User from 'lucide-react/icons/user';
+import Upload from 'lucide-react/icons/upload';
+import X from 'lucide-react/icons/x';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import Folder from 'lucide-react/icons/folder';
+import GripVertical from 'lucide-react/icons/grip-vertical';
+import ArrowUp from 'lucide-react/icons/arrow-up';
+import ArrowDown from 'lucide-react/icons/arrow-down';
+import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

@@ -20,7 +20,8 @@ import {
   TableRow,
   TableCell,
 } from '@heroui/react';
-import { Plus, Trash2 } from 'lucide-react';
+import Plus from 'lucide-react/icons/plus';
+import Trash2 from 'lucide-react/icons/trash-2';
 import PageHeader from '../../components/PageHeader';
 import ConfirmModal from '../../components/ConfirmModal';
 import { usePageTitle } from '@/hooks/usePageTitle';

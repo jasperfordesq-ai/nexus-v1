@@ -31,18 +31,16 @@ import {
   ModalBody,
   ModalFooter,
 } from '@heroui/react';
-import {
-  Search,
-  Globe,
-  Hand,
-  Clock,
-  MapPin,
-  AlertTriangle,
-  RefreshCw,
-  ListTodo,
-  MessageSquare,
-  User,
-} from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import Globe from 'lucide-react/icons/globe';
+import Hand from 'lucide-react/icons/hand';
+import Clock from 'lucide-react/icons/clock';
+import MapPin from 'lucide-react/icons/map-pin';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ListTodo from 'lucide-react/icons/list-todo';
+import MessageSquare from 'lucide-react/icons/message-square';
+import User from 'lucide-react/icons/user';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';

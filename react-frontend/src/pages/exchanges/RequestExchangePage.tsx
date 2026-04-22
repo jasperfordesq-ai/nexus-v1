@@ -11,13 +11,11 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Input, Textarea } from '@heroui/react';
-import {
-  ArrowRightLeft,
-  Clock,
-  User,
-  Tag,
-  Send,
-} from 'lucide-react';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import Clock from 'lucide-react/icons/clock';
+import User from 'lucide-react/icons/user';
+import Tag from 'lucide-react/icons/tag';
+import Send from 'lucide-react/icons/send';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';

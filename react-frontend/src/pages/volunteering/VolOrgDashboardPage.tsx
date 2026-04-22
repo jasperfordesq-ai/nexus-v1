@@ -16,16 +16,14 @@ import React, { Suspense, useState, useEffect, useCallback, useRef } from 'react
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Spinner, Chip } from '@heroui/react';
-import {
-  LayoutDashboard,
-  ClipboardList,
-  Clock,
-  Users,
-  Wallet,
-  Settings,
-  Building2,
-  ArrowLeft,
-} from 'lucide-react';
+import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
+import ClipboardList from 'lucide-react/icons/clipboard-list';
+import Clock from 'lucide-react/icons/clock';
+import Users from 'lucide-react/icons/users';
+import Wallet from 'lucide-react/icons/wallet';
+import Settings from 'lucide-react/icons/settings';
+import Building2 from 'lucide-react/icons/building-2';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';

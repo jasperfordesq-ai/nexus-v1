@@ -11,7 +11,9 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button, Spinner, Input, Tooltip } from '@heroui/react';
-import { Bookmark, Trash2, Play } from 'lucide-react';
+import Bookmark from 'lucide-react/icons/bookmark';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Play from 'lucide-react/icons/play';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useToast, useAuth } from '@/contexts';

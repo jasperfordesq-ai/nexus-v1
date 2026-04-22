@@ -32,22 +32,20 @@ import {
   Select,
   SelectItem,
 } from '@heroui/react';
-import {
-  Lightbulb,
-  Plus,
-  RefreshCw,
-  AlertTriangle,
-  Calendar,
-  MessageSquarePlus,
-  Trophy,
-  Heart,
-  Eye,
-  Star,
-  Layers,
-  BarChart3,
-  Search,
-  X,
-} from 'lucide-react';
+import Lightbulb from 'lucide-react/icons/lightbulb';
+import Plus from 'lucide-react/icons/plus';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Calendar from 'lucide-react/icons/calendar';
+import MessageSquarePlus from 'lucide-react/icons/message-square-plus';
+import Trophy from 'lucide-react/icons/trophy';
+import Heart from 'lucide-react/icons/heart';
+import Eye from 'lucide-react/icons/eye';
+import Star from 'lucide-react/icons/star';
+import Layers from 'lucide-react/icons/layers';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Search from 'lucide-react/icons/search';
+import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';

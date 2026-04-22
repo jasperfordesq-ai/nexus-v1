@@ -19,26 +19,24 @@ import { useState, useEffect, useRef, useCallback, type FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Input, Checkbox, Divider, Select, SelectItem, Progress } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  User,
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  ArrowLeft,
-  ArrowRight,
-  Loader2,
-  Building2,
-  Phone,
-  Check,
-  X,
-  ChevronLeft,
-  MailCheck,
-  ShieldCheck,
-  Ticket,
-  Clock,
-  Users,
-} from 'lucide-react';
+import User from 'lucide-react/icons/user';
+import Mail from 'lucide-react/icons/mail';
+import Lock from 'lucide-react/icons/lock';
+import Eye from 'lucide-react/icons/eye';
+import EyeOff from 'lucide-react/icons/eye-off';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import Loader2 from 'lucide-react/icons/loader-circle';
+import Building2 from 'lucide-react/icons/building-2';
+import Phone from 'lucide-react/icons/phone';
+import Check from 'lucide-react/icons/check';
+import X from 'lucide-react/icons/x';
+import ChevronLeft from 'lucide-react/icons/chevron-left';
+import MailCheck from 'lucide-react/icons/mail-check';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import Ticket from 'lucide-react/icons/ticket';
+import Clock from 'lucide-react/icons/clock';
+import Users from 'lucide-react/icons/users';
 import { useTranslation, Trans } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
 import type { RegisterResult } from '@/contexts/AuthContext';

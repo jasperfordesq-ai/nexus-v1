@@ -12,21 +12,19 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Input, Textarea, Select, SelectItem, Radio, RadioGroup } from '@heroui/react';
-import {
-  Save,
-  Clock,
-  Tag,
-  FileText,
-  CheckCircle,
-  ImagePlus,
-  X,
-  MapPin,
-  Monitor,
-  ArrowRightLeft,
-  HelpCircle,
-  Sparkles,
-  Info,
-} from 'lucide-react';
+import Save from 'lucide-react/icons/save';
+import Clock from 'lucide-react/icons/clock';
+import Tag from 'lucide-react/icons/tag';
+import FileText from 'lucide-react/icons/file-text';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import ImagePlus from 'lucide-react/icons/image-plus';
+import X from 'lucide-react/icons/x';
+import MapPin from 'lucide-react/icons/map-pin';
+import Monitor from 'lucide-react/icons/monitor';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import HelpCircle from 'lucide-react/icons/circle-help';
+import Sparkles from 'lucide-react/icons/sparkles';
+import Info from 'lucide-react/icons/info';
 import { PlaceAutocompleteInput } from '@/components/location';
 import { SkillTagsInput } from '@/components/listings/SkillTagsInput';
 import { GlassCard } from '@/components/ui';

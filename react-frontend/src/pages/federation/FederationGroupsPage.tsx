@@ -24,15 +24,13 @@ import {
   SelectItem,
   Chip,
 } from '@heroui/react';
-import {
-  Search,
-  Globe,
-  Users,
-  AlertTriangle,
-  RefreshCw,
-  UsersRound,
-  Lock,
-} from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import Globe from 'lucide-react/icons/globe';
+import Users from 'lucide-react/icons/users';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import UsersRound from 'lucide-react/icons/users-round';
+import Lock from 'lucide-react/icons/lock';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';

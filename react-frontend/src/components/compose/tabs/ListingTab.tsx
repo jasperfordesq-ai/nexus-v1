@@ -10,7 +10,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button, Input, Textarea, Select, SelectItem, Chip } from '@heroui/react';
-import { ImagePlus, X } from 'lucide-react';
+import ImagePlus from 'lucide-react/icons/image-plus';
+import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { useDraftPersistence } from '@/hooks';

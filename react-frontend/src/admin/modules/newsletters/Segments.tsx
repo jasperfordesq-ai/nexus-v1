@@ -19,7 +19,13 @@ import {
   DropdownItem,
   useDisclosure,
 } from '@heroui/react';
-import { Filter, Plus, RefreshCw, MoreVertical, Pencil, Trash2, Users } from 'lucide-react';
+import Filter from 'lucide-react/icons/filter';
+import Plus from 'lucide-react/icons/plus';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Pencil from 'lucide-react/icons/pencil';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Users from 'lucide-react/icons/users';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';

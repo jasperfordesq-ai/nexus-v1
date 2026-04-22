@@ -12,7 +12,10 @@ import {
   Card, CardBody, CardHeader, Select, SelectItem, Button, Spinner, Chip,
   Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
 } from '@heroui/react';
-import { ScrollText, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
+import ScrollText from 'lucide-react/icons/scroll-text';
+import ChevronLeft from 'lucide-react/icons/chevron-left';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 

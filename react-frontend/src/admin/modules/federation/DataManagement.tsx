@@ -25,7 +25,11 @@ import {
   Chip,
   useDisclosure,
 } from '@heroui/react';
-import { Download, Upload, Trash2, FileJson, AlertTriangle } from 'lucide-react';
+import Download from 'lucide-react/icons/download';
+import Upload from 'lucide-react/icons/upload';
+import Trash2 from 'lucide-react/icons/trash-2';
+import FileJson from 'lucide-react/icons/file-json';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';

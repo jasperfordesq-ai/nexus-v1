@@ -10,7 +10,12 @@
 
 import { Link } from 'react-router-dom';
 import { Button, Chip, Spinner } from '@heroui/react';
-import { Calendar, Plus, Clock, MapPin, Users, ChevronRight } from 'lucide-react';
+import Calendar from 'lucide-react/icons/calendar';
+import Plus from 'lucide-react/icons/plus';
+import Clock from 'lucide-react/icons/clock';
+import MapPin from 'lucide-react/icons/map-pin';
+import Users from 'lucide-react/icons/users';
+import ChevronRight from 'lucide-react/icons/chevron-right';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';

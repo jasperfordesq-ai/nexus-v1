@@ -13,23 +13,21 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
-import {
-  Compass,
-  Download,
-  Eye,
-  Rocket,
-  Target,
-  ShieldAlert,
-  TrendingUp,
-  Lightbulb,
-  AlertTriangle,
-  CheckCircle2,
-  Sprout,
-  DollarSign,
-  Calendar,
-  ChevronRight,
-  Mail,
-} from 'lucide-react';
+import Compass from 'lucide-react/icons/compass';
+import Download from 'lucide-react/icons/download';
+import Eye from 'lucide-react/icons/eye';
+import Rocket from 'lucide-react/icons/rocket';
+import Target from 'lucide-react/icons/target';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Lightbulb from 'lucide-react/icons/lightbulb';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import Sprout from 'lucide-react/icons/sprout';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import Calendar from 'lucide-react/icons/calendar';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import Mail from 'lucide-react/icons/mail';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';

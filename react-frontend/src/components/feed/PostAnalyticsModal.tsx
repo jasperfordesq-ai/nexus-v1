@@ -18,7 +18,12 @@ import {
   CardBody,
   Spinner,
 } from '@heroui/react';
-import { Eye, Heart, MessageCircle, Repeat2, Users, BarChart3 } from 'lucide-react';
+import Eye from 'lucide-react/icons/eye';
+import Heart from 'lucide-react/icons/heart';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import Repeat2 from 'lucide-react/icons/repeat-2';
+import Users from 'lucide-react/icons/users';
+import BarChart3 from 'lucide-react/icons/chart-column';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

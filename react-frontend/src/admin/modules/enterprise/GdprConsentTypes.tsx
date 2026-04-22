@@ -15,10 +15,14 @@ import {
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
   Input, Textarea, Select, SelectItem, Switch,
 } from '@heroui/react';
-import {
-  RefreshCw, Plus, Edit, Users, Trash2,
-  CheckCircle, XCircle, ExternalLink,
-} from 'lucide-react';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Plus from 'lucide-react/icons/plus';
+import Edit from 'lucide-react/icons/square-pen';
+import Users from 'lucide-react/icons/users';
+import Trash2 from 'lucide-react/icons/trash-2';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import ExternalLink from 'lucide-react/icons/external-link';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';

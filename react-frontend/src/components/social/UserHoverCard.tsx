@@ -22,7 +22,9 @@ import {
   Chip,
   Skeleton,
 } from '@heroui/react';
-import { UserPlus, UserCheck, MessageCircle } from 'lucide-react';
+import UserPlus from 'lucide-react/icons/user-plus';
+import UserCheck from 'lucide-react/icons/user-check';
+import MessageCircle from 'lucide-react/icons/message-circle';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';

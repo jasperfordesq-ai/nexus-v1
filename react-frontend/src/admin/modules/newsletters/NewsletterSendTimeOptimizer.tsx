@@ -12,7 +12,9 @@ import { useState, useCallback, useEffect } from 'react';
 import {
   Button, Card, CardBody, CardHeader, Select, SelectItem, Chip,
 } from '@heroui/react';
-import { Clock, RefreshCw, TrendingUp } from 'lucide-react';
+import Clock from 'lucide-react/icons/clock';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import TrendingUp from 'lucide-react/icons/trending-up';
 import { usePageTitle } from '@/hooks';
 import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader } from '../../components';

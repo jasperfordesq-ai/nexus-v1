@@ -12,7 +12,9 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardBody, Button } from '@heroui/react';
-import { Plus, Award, Trash2 } from 'lucide-react';
+import Plus from 'lucide-react/icons/plus';
+import Award from 'lucide-react/icons/award';
+import Trash2 from 'lucide-react/icons/trash-2';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';

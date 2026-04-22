@@ -15,19 +15,17 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@heroui/react';
-import {
-  Search,
-  X,
-  ListTodo,
-  Calendar,
-  Settings,
-  Sun,
-  Moon,
-  UserCircle,
-  HelpCircle,
-  Clock,
-  ArrowRight,
-} from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import X from 'lucide-react/icons/x';
+import ListTodo from 'lucide-react/icons/list-todo';
+import Calendar from 'lucide-react/icons/calendar';
+import Settings from 'lucide-react/icons/settings';
+import Sun from 'lucide-react/icons/sun';
+import Moon from 'lucide-react/icons/moon';
+import UserCircle from 'lucide-react/icons/circle-user';
+import HelpCircle from 'lucide-react/icons/circle-help';
+import Clock from 'lucide-react/icons/clock';
+import ArrowRight from 'lucide-react/icons/arrow-right';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useTheme } from '@/contexts';
 import { api } from '@/lib/api';

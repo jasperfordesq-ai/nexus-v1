@@ -13,15 +13,13 @@ import {
   Select,
   SelectItem,
 } from '@heroui/react';
-import {
-  Save,
-  Camera,
-  Phone,
-  Building2,
-  Monitor,
-  Lock,
-  ShieldCheck,
-} from 'lucide-react';
+import Save from 'lucide-react/icons/save';
+import Camera from 'lucide-react/icons/camera';
+import Phone from 'lucide-react/icons/phone';
+import Building2 from 'lucide-react/icons/building-2';
+import Monitor from 'lucide-react/icons/monitor';
+import Lock from 'lucide-react/icons/lock';
+import ShieldCheck from 'lucide-react/icons/shield-check';
 import { GlassCard } from '@/components/ui';
 import { PlaceAutocompleteInput } from '@/components/location';
 import { resolveAvatarUrl } from '@/lib/helpers';

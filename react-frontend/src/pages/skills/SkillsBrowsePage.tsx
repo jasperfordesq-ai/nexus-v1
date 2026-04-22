@@ -11,22 +11,20 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Input, Chip, Spinner, Avatar } from '@heroui/react';
-import {
-  Sparkles,
-  Search,
-  ChevronRight,
-  ChevronDown,
-  Users,
-  RefreshCw,
-  AlertTriangle,
-  FolderTree,
-  GraduationCap,
-  HandHelping,
-  Megaphone,
-  Settings,
-  ArrowRight,
-  X,
-} from 'lucide-react';
+import Sparkles from 'lucide-react/icons/sparkles';
+import Search from 'lucide-react/icons/search';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import Users from 'lucide-react/icons/users';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import FolderTree from 'lucide-react/icons/folder-tree';
+import GraduationCap from 'lucide-react/icons/graduation-cap';
+import HandHelping from 'lucide-react/icons/hand-helping';
+import Megaphone from 'lucide-react/icons/megaphone';
+import Settings from 'lucide-react/icons/settings';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

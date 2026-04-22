@@ -41,20 +41,18 @@ import {
   TableRow,
   TableCell,
 } from '@heroui/react';
-import {
-  ArrowLeftRight,
-  CheckCircle,
-  Users,
-  Scale,
-  AlertTriangle,
-  Play,
-  UserPlus,
-  X,
-  XCircle,
-  ArrowRight,
-  Search,
-  Plus,
-} from 'lucide-react';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Users from 'lucide-react/icons/users';
+import Scale from 'lucide-react/icons/scale';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Play from 'lucide-react/icons/play';
+import UserPlus from 'lucide-react/icons/user-plus';
+import X from 'lucide-react/icons/x';
+import XCircle from 'lucide-react/icons/circle-x';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import Search from 'lucide-react/icons/search';
+import Plus from 'lucide-react/icons/plus';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';

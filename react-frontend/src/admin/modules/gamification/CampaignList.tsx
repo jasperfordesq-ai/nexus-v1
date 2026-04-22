@@ -18,7 +18,14 @@ import {
   DropdownMenu,
   DropdownItem,
 } from '@heroui/react';
-import { Plus, MoreVertical, Edit, Trash2, Megaphone, Play, Pause, RotateCcw } from 'lucide-react';
+import Plus from 'lucide-react/icons/plus';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Edit from 'lucide-react/icons/square-pen';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Megaphone from 'lucide-react/icons/megaphone';
+import Play from 'lucide-react/icons/play';
+import Pause from 'lucide-react/icons/pause';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';

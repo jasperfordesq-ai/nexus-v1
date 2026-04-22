@@ -26,22 +26,20 @@ import {
   DropdownItem,
   useDisclosure,
 } from '@heroui/react';
-import {
-  FolderOpen,
-  Upload,
-  Download,
-  Trash2,
-  File,
-  FileText,
-  FileImage,
-  FileVideo,
-  FileAudio,
-  FileArchive,
-  Search,
-  FolderPlus,
-  MoreVertical,
-  X,
-} from 'lucide-react';
+import FolderOpen from 'lucide-react/icons/folder-open';
+import Upload from 'lucide-react/icons/upload';
+import Download from 'lucide-react/icons/download';
+import Trash2 from 'lucide-react/icons/trash-2';
+import File from 'lucide-react/icons/file';
+import FileText from 'lucide-react/icons/file-text';
+import FileImage from 'lucide-react/icons/file-image';
+import FileVideo from 'lucide-react/icons/file-video';
+import FileAudio from 'lucide-react/icons/file-audio';
+import FileArchive from 'lucide-react/icons/file-archive';
+import Search from 'lucide-react/icons/search';
+import FolderPlus from 'lucide-react/icons/folder-plus';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

@@ -6,13 +6,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button, Chip, Avatar } from '@heroui/react';
-import {
-  CheckCircle,
-  XCircle,
-  ChevronRight,
-  History,
-  MessageCircle,
-} from 'lucide-react';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import History from 'lucide-react/icons/history';
+import MessageCircle from 'lucide-react/icons/message-circle';
 import { useTranslation } from 'react-i18next';
 import { formatDateTime, formatDateValue, resolveAvatarUrl } from '@/lib/helpers';
 import { api } from '@/lib/api';

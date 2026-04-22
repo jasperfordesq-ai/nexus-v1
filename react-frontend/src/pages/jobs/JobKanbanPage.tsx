@@ -33,18 +33,16 @@ import {
   Tabs,
   Tab,
 } from '@heroui/react';
-import {
-  ArrowLeft,
-  Briefcase,
-  Download,
-  FileText,
-  Calendar,
-  Percent,
-  DollarSign,
-  Sparkles,
-  Star,
-  ScrollText,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Briefcase from 'lucide-react/icons/briefcase';
+import Download from 'lucide-react/icons/download';
+import FileText from 'lucide-react/icons/file-text';
+import Calendar from 'lucide-react/icons/calendar';
+import Percent from 'lucide-react/icons/percent';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import Sparkles from 'lucide-react/icons/sparkles';
+import Star from 'lucide-react/icons/star';
+import ScrollText from 'lucide-react/icons/scroll-text';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';

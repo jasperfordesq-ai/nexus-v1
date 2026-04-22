@@ -10,7 +10,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Button, Chip } from '@heroui/react';
-import { RefreshCw } from 'lucide-react';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';

@@ -33,12 +33,10 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@heroui/react';
-import {
-  ArrowLeft,
-  FileText,
-  Eye,
-  HelpCircle,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import FileText from 'lucide-react/icons/file-text';
+import Eye from 'lucide-react/icons/eye';
+import HelpCircle from 'lucide-react/icons/circle-help';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

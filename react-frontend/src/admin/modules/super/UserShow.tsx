@@ -9,11 +9,22 @@ import {
   Card, CardBody, CardHeader, Button, Chip, Divider, Avatar, Spinner,
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Select, SelectItem,
 } from '@heroui/react';
-import {
-  ArrowLeft, Edit, Shield, ShieldOff, ShieldAlert, Crown, CrownIcon,
-  MapPin, Phone, Clock, CalendarDays, Wallet, User, Building2, ArrowRightLeft,
-  UserCog,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Edit from 'lucide-react/icons/square-pen';
+import Shield from 'lucide-react/icons/shield';
+import ShieldOff from 'lucide-react/icons/shield-off';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import Crown from 'lucide-react/icons/crown';
+import CrownIcon from 'lucide-react/icons/crown';
+import MapPin from 'lucide-react/icons/map-pin';
+import Phone from 'lucide-react/icons/phone';
+import Clock from 'lucide-react/icons/clock';
+import CalendarDays from 'lucide-react/icons/calendar-days';
+import Wallet from 'lucide-react/icons/wallet';
+import User from 'lucide-react/icons/user';
+import Building2 from 'lucide-react/icons/building-2';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import UserCog from 'lucide-react/icons/user-cog';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';

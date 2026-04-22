@@ -16,18 +16,16 @@
  */
 
 import { Card, CardBody, CardHeader, Accordion, AccordionItem, Divider } from '@heroui/react';
-import {
-  BookOpen,
-  Workflow,
-  MessageSquareWarning,
-  ShieldAlert,
-  Eye,
-  ShieldCheck,
-  AlertTriangle,
-  Scale,
-  Phone,
-  Database,
-} from 'lucide-react';
+import BookOpen from 'lucide-react/icons/book-open';
+import Workflow from 'lucide-react/icons/workflow';
+import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import Eye from 'lucide-react/icons/eye';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Scale from 'lucide-react/icons/scale';
+import Phone from 'lucide-react/icons/phone';
+import Database from 'lucide-react/icons/database';
 
 export function BrokerControlsHelp() {
   return (

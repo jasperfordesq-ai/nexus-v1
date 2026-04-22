@@ -24,7 +24,12 @@ import {
   CardBody,
   Chip,
 } from '@heroui/react';
-import { Bot, Send, RefreshCw, Sparkles, AlertCircle, Zap } from 'lucide-react';
+import Bot from 'lucide-react/icons/bot';
+import Send from 'lucide-react/icons/send';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Sparkles from 'lucide-react/icons/sparkles';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import Zap from 'lucide-react/icons/zap';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import api from '@/lib/api';
 import { usePageTitle } from '@/hooks';

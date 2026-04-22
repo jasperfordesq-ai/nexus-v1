@@ -16,10 +16,15 @@ import {
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
   Textarea, Input, Progress, Divider,
 } from '@heroui/react';
-import {
-  ArrowLeft, MessageSquarePlus, UserPlus, Download,
-  Play, CheckCircle, XCircle, Clock, AlertTriangle,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import MessageSquarePlus from 'lucide-react/icons/message-square-plus';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Download from 'lucide-react/icons/download';
+import Play from 'lucide-react/icons/play';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Clock from 'lucide-react/icons/clock';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';

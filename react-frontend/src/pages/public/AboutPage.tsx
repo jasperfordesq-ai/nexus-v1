@@ -18,29 +18,27 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
-import {
-  Hexagon,
-  UserPlus,
-  Search,
-  Handshake,
-  Coins,
-  Scale,
-  Heart,
-  Shield,
-  Sprout,
-  Users,
-  Clock,
-  ListTodo,
-  Globe,
-  ArrowRight,
-  HelpCircle,
-  Mail,
-  Code,
-  Crown,
-  Star,
-  Award,
-  BookOpen,
-} from 'lucide-react';
+import Hexagon from 'lucide-react/icons/hexagon';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Search from 'lucide-react/icons/search';
+import Handshake from 'lucide-react/icons/handshake';
+import Coins from 'lucide-react/icons/coins';
+import Scale from 'lucide-react/icons/scale';
+import Heart from 'lucide-react/icons/heart';
+import Shield from 'lucide-react/icons/shield';
+import Sprout from 'lucide-react/icons/sprout';
+import Users from 'lucide-react/icons/users';
+import Clock from 'lucide-react/icons/clock';
+import ListTodo from 'lucide-react/icons/list-todo';
+import Globe from 'lucide-react/icons/globe';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import HelpCircle from 'lucide-react/icons/circle-help';
+import Mail from 'lucide-react/icons/mail';
+import Code from 'lucide-react/icons/code';
+import Crown from 'lucide-react/icons/crown';
+import Star from 'lucide-react/icons/star';
+import Award from 'lucide-react/icons/award';
+import BookOpen from 'lucide-react/icons/book-open';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';

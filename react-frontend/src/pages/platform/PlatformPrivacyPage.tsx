@@ -10,7 +10,7 @@
  * Community Operators maintain their own privacy policies for community-level data.
  */
 
-import { Shield } from 'lucide-react';
+import Shield from 'lucide-react/icons/shield';
 import { useTranslation } from 'react-i18next';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks/usePageTitle';

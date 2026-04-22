@@ -11,24 +11,22 @@ import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Input, Select, SelectItem, Chip, Skeleton } from '@heroui/react';
-import {
-  Search,
-  Calendar,
-  List,
-  Map as MapIcon,
-  MapPin,
-  Users,
-  Clock,
-  Plus,
-  Filter,
-  CalendarDays,
-  ChevronRight,
-  RefreshCw,
-  AlertTriangle,
-  Tag,
-  Star,
-  Ban,
-} from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import Calendar from 'lucide-react/icons/calendar';
+import List from 'lucide-react/icons/list';
+import MapIcon from 'lucide-react/icons/map';
+import MapPin from 'lucide-react/icons/map-pin';
+import Users from 'lucide-react/icons/users';
+import Clock from 'lucide-react/icons/clock';
+import Plus from 'lucide-react/icons/plus';
+import Filter from 'lucide-react/icons/filter';
+import CalendarDays from 'lucide-react/icons/calendar-days';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Tag from 'lucide-react/icons/tag';
+import Star from 'lucide-react/icons/star';
+import Ban from 'lucide-react/icons/ban';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';

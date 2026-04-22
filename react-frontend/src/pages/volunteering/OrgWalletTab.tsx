@@ -23,16 +23,14 @@ import {
   Switch,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Wallet,
-  ArrowDownToLine,
-  ArrowUpFromLine,
-  Clock,
-  ChevronDown,
-  RefreshCw,
-  AlertTriangle,
-  User,
-} from 'lucide-react';
+import Wallet from 'lucide-react/icons/wallet';
+import ArrowDownToLine from 'lucide-react/icons/arrow-down-to-line';
+import ArrowUpFromLine from 'lucide-react/icons/arrow-up-from-line';
+import Clock from 'lucide-react/icons/clock';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import User from 'lucide-react/icons/user';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

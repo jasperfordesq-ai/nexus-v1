@@ -20,7 +20,9 @@ import {
   Avatar,
   Spinner,
 } from '@heroui/react';
-import { Search, Send, Check } from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import Send from 'lucide-react/icons/send';
+import Check from 'lucide-react/icons/check';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

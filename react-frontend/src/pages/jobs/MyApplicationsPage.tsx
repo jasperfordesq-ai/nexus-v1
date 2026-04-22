@@ -20,23 +20,21 @@ import {
   Skeleton,
   Spinner,
 } from '@heroui/react';
-import {
-  Briefcase,
-  MapPin,
-  Wifi,
-  Clock,
-  ChevronDown,
-  ChevronUp,
-  Calendar,
-  CalendarPlus,
-  AlertTriangle,
-  History,
-  MessageCircle,
-  Video,
-  Download,
-  FileDown,
-  ExternalLink,
-} from 'lucide-react';
+import Briefcase from 'lucide-react/icons/briefcase';
+import MapPin from 'lucide-react/icons/map-pin';
+import Wifi from 'lucide-react/icons/wifi';
+import Clock from 'lucide-react/icons/clock';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import ChevronUp from 'lucide-react/icons/chevron-up';
+import Calendar from 'lucide-react/icons/calendar';
+import CalendarPlus from 'lucide-react/icons/calendar-plus';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import History from 'lucide-react/icons/history';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import Video from 'lucide-react/icons/video';
+import Download from 'lucide-react/icons/download';
+import FileDown from 'lucide-react/icons/file-down';
+import ExternalLink from 'lucide-react/icons/external-link';
 import { GlassCard } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';

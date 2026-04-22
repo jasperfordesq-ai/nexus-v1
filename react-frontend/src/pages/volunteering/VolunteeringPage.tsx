@@ -27,40 +27,38 @@ import {
   SelectItem,
   Spinner,
 } from '@heroui/react';
-import {
-  Heart,
-  Plus,
-  RefreshCw,
-  AlertTriangle,
-  MapPin,
-  Calendar,
-  Clock,
-  Building2,
-  Search,
-  ChevronRight,
-  Send,
-  CheckCircle,
-  XCircle,
-  Hourglass,
-  TrendingUp,
-  Globe,
-  Briefcase,
-  Timer,
-  Sparkles,
-  Award,
-  Siren,
-  Smile,
-  ShieldCheck,
-  ArrowLeftRight,
-  Users,
-  MessageSquare,
-  ClipboardCheck,
-  Receipt,
-  Shield,
-  Lightbulb,
-  HandHeart,
-  Accessibility,
-} from 'lucide-react';
+import Heart from 'lucide-react/icons/heart';
+import Plus from 'lucide-react/icons/plus';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import MapPin from 'lucide-react/icons/map-pin';
+import Calendar from 'lucide-react/icons/calendar';
+import Clock from 'lucide-react/icons/clock';
+import Building2 from 'lucide-react/icons/building-2';
+import Search from 'lucide-react/icons/search';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import Send from 'lucide-react/icons/send';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Hourglass from 'lucide-react/icons/hourglass';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Globe from 'lucide-react/icons/globe';
+import Briefcase from 'lucide-react/icons/briefcase';
+import Timer from 'lucide-react/icons/timer';
+import Sparkles from 'lucide-react/icons/sparkles';
+import Award from 'lucide-react/icons/award';
+import Siren from 'lucide-react/icons/siren';
+import Smile from 'lucide-react/icons/smile';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import Users from 'lucide-react/icons/users';
+import MessageSquare from 'lucide-react/icons/message-square';
+import ClipboardCheck from 'lucide-react/icons/clipboard-check';
+import Receipt from 'lucide-react/icons/receipt';
+import Shield from 'lucide-react/icons/shield';
+import Lightbulb from 'lucide-react/icons/lightbulb';
+import HandHeart from 'lucide-react/icons/hand-heart';
+import Accessibility from 'lucide-react/icons/accessibility';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';

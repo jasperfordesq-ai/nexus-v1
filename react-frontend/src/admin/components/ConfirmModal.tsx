@@ -16,7 +16,7 @@ import {
   ModalFooter,
   Button,
 } from '@heroui/react';
-import { AlertTriangle } from 'lucide-react';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 
 interface ConfirmModalProps {
   isOpen: boolean;

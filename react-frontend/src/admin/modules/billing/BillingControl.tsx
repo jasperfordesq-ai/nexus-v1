@@ -34,7 +34,10 @@ import {
   TableRow,
   TableCell,
 } from '@heroui/react';
-import { CreditCard, AlertTriangle, Leaf, Download } from 'lucide-react';
+import CreditCard from 'lucide-react/icons/credit-card';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Leaf from 'lucide-react/icons/leaf';
+import Download from 'lucide-react/icons/download';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';

@@ -22,52 +22,50 @@ import {
   DropdownItem,
   DropdownSection,
 } from '@heroui/react';
-import {
-  LayoutDashboard,
-  ListTodo,
-  MessageSquare,
-  Wallet,
-  Users,
-  Users2,
-  Calendar,
-  Settings,
-  LogOut,
-  Menu,
-  Search,
-  Plus,
-  Sun,
-  Moon,
-  ArrowRightLeft,
-  ChevronDown,
-  Trophy,
-  Medal,
-  Target,
-  HelpCircle,
-  UserCircle,
-  Newspaper,
-  BookOpen,
-  FolderOpen,
-  Heart,
-  Building2,
-  Globe,
-  Info,
-  FileText,
-  Shield,
-  Handshake,
-  Stethoscope,
-  TrendingUp,
-  BarChart3,
-  Compass,
-  Bot,
-  Briefcase,
-  Lightbulb,
-  GraduationCap,
-  Activity,
-  ShoppingBag,
-  Fingerprint,
-  ShieldCheck,
-  Bookmark,
-} from 'lucide-react';
+import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
+import ListTodo from 'lucide-react/icons/list-todo';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Wallet from 'lucide-react/icons/wallet';
+import Users from 'lucide-react/icons/users';
+import Users2 from 'lucide-react/icons/users-round';
+import Calendar from 'lucide-react/icons/calendar';
+import Settings from 'lucide-react/icons/settings';
+import LogOut from 'lucide-react/icons/log-out';
+import Menu from 'lucide-react/icons/menu';
+import Search from 'lucide-react/icons/search';
+import Plus from 'lucide-react/icons/plus';
+import Sun from 'lucide-react/icons/sun';
+import Moon from 'lucide-react/icons/moon';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import Trophy from 'lucide-react/icons/trophy';
+import Medal from 'lucide-react/icons/medal';
+import Target from 'lucide-react/icons/target';
+import HelpCircle from 'lucide-react/icons/circle-help';
+import UserCircle from 'lucide-react/icons/circle-user';
+import Newspaper from 'lucide-react/icons/newspaper';
+import BookOpen from 'lucide-react/icons/book-open';
+import FolderOpen from 'lucide-react/icons/folder-open';
+import Heart from 'lucide-react/icons/heart';
+import Building2 from 'lucide-react/icons/building-2';
+import Globe from 'lucide-react/icons/globe';
+import Info from 'lucide-react/icons/info';
+import FileText from 'lucide-react/icons/file-text';
+import Shield from 'lucide-react/icons/shield';
+import Handshake from 'lucide-react/icons/handshake';
+import Stethoscope from 'lucide-react/icons/stethoscope';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Compass from 'lucide-react/icons/compass';
+import Bot from 'lucide-react/icons/bot';
+import Briefcase from 'lucide-react/icons/briefcase';
+import Lightbulb from 'lucide-react/icons/lightbulb';
+import GraduationCap from 'lucide-react/icons/graduation-cap';
+import Activity from 'lucide-react/icons/activity';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import Fingerprint from 'lucide-react/icons/fingerprint';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import Bookmark from 'lucide-react/icons/bookmark';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useTheme, useMenuContext } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';

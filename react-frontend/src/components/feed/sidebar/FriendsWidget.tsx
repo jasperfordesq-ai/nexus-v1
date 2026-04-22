@@ -9,7 +9,7 @@
 
 import { Link } from 'react-router-dom';
 import { Avatar } from '@heroui/react';
-import { Users } from 'lucide-react';
+import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';

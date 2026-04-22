@@ -22,7 +22,10 @@ import {
   ModalBody,
   ModalFooter,
 } from '@heroui/react';
-import { RefreshCw, ToggleLeft, Boxes, AlertTriangle } from 'lucide-react';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ToggleLeft from 'lucide-react/icons/toggle-left';
+import Boxes from 'lucide-react/icons/boxes';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';

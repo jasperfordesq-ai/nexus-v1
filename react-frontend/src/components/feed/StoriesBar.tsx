@@ -13,7 +13,9 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Avatar, Skeleton, Button } from '@heroui/react';
-import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import Plus from 'lucide-react/icons/plus';
+import ChevronLeft from 'lucide-react/icons/chevron-left';
+import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts';
 import { api } from '@/lib/api';

@@ -18,16 +18,14 @@ import {
   Chip,
   Spinner,
 } from '@heroui/react';
-import {
-  ArrowLeft,
-  Target,
-  CheckCircle,
-  Clock,
-  BarChart3,
-  Award,
-  AlertTriangle,
-  RefreshCw,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Target from 'lucide-react/icons/target';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Clock from 'lucide-react/icons/clock';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Award from 'lucide-react/icons/award';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

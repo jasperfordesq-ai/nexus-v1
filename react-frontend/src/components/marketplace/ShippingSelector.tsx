@@ -18,7 +18,10 @@ import {
   Spinner,
   Chip,
 } from '@heroui/react';
-import { Truck, MapPin, Package, Clock } from 'lucide-react';
+import Truck from 'lucide-react/icons/truck';
+import MapPin from 'lucide-react/icons/map-pin';
+import Package from 'lucide-react/icons/package';
+import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

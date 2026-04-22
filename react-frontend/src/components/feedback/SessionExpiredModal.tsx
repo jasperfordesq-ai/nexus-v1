@@ -19,7 +19,8 @@ import {
   ModalFooter,
   Button,
 } from '@heroui/react';
-import { LogIn, Clock } from 'lucide-react';
+import LogIn from 'lucide-react/icons/log-in';
+import Clock from 'lucide-react/icons/clock';
 import { SESSION_EXPIRED_EVENT } from '@/lib/api';
 import { useTenant, useAuth } from '@/contexts';
 

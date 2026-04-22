@@ -24,12 +24,10 @@ import {
   ModalBody,
   ModalFooter,
 } from '@heroui/react';
-import {
-  ArrowLeft,
-  RefreshCw,
-  Download,
-  Trash2,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Download from 'lucide-react/icons/download';
+import Trash2 from 'lucide-react/icons/trash-2';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';

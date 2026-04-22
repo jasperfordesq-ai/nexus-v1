@@ -22,19 +22,17 @@ import {
   Tab,
   Tabs,
 } from '@heroui/react';
-import {
-  Clock,
-  CheckCircle,
-  Hourglass,
-  CreditCard,
-  RefreshCw,
-  ThumbsUp,
-  ThumbsDown,
-  Download,
-  Building2,
-  Banknote,
-  CalendarRange,
-} from 'lucide-react';
+import Clock from 'lucide-react/icons/clock';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Hourglass from 'lucide-react/icons/hourglass';
+import CreditCard from 'lucide-react/icons/credit-card';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ThumbsUp from 'lucide-react/icons/thumbs-up';
+import ThumbsDown from 'lucide-react/icons/thumbs-down';
+import Download from 'lucide-react/icons/download';
+import Building2 from 'lucide-react/icons/building-2';
+import Banknote from 'lucide-react/icons/banknote';
+import CalendarRange from 'lucide-react/icons/calendar-range';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';

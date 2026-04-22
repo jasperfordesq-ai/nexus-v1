@@ -9,7 +9,7 @@
  */
 
 import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
+import Loader2 from 'lucide-react/icons/loader-circle';
 import i18n from 'i18next';
 
 interface LoadingScreenProps {

@@ -22,15 +22,13 @@ import {
   Spinner,
   Chip,
 } from '@heroui/react';
-import {
-  CreditCard,
-  CheckCircle2,
-  AlertCircle,
-  Building2,
-  Shield,
-  ArrowRight,
-  RefreshCw,
-} from 'lucide-react';
+import CreditCard from 'lucide-react/icons/credit-card';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import Building2 from 'lucide-react/icons/building-2';
+import Shield from 'lucide-react/icons/shield';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';

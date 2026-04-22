@@ -19,10 +19,15 @@ import {
   Card, CardBody, Button, Chip, Tabs, Tab, Skeleton, Pagination,
   Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
 } from '@heroui/react';
-import {
-  ArrowLeft, Eye, MousePointer, Activity, Inbox, Users,
-  UserX, UserCheck, Download,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Eye from 'lucide-react/icons/eye';
+import MousePointer from 'lucide-react/icons/mouse-pointer';
+import Activity from 'lucide-react/icons/activity';
+import Inbox from 'lucide-react/icons/inbox';
+import Users from 'lucide-react/icons/users';
+import UserX from 'lucide-react/icons/user-x';
+import UserCheck from 'lucide-react/icons/user-check';
+import Download from 'lucide-react/icons/download';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';

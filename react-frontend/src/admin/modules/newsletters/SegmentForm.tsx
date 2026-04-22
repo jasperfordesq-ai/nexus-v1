@@ -24,16 +24,14 @@ import {
   Divider,
   Tooltip,
 } from '@heroui/react';
-import {
-  Save,
-  ArrowLeft,
-  Plus,
-  Trash2,
-  Eye,
-  Users,
-  Sparkles,
-  Lightbulb,
-} from 'lucide-react';
+import Save from 'lucide-react/icons/save';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Plus from 'lucide-react/icons/plus';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Eye from 'lucide-react/icons/eye';
+import Users from 'lucide-react/icons/users';
+import Sparkles from 'lucide-react/icons/sparkles';
+import Lightbulb from 'lucide-react/icons/lightbulb';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';

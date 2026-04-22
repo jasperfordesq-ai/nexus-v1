@@ -10,7 +10,9 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Button, Chip, Spinner } from '@heroui/react';
-import { Check, X, UserPlus } from 'lucide-react';
+import Check from 'lucide-react/icons/check';
+import X from 'lucide-react/icons/x';
+import UserPlus from 'lucide-react/icons/user-plus';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminGroups } from '../../api/adminApi';

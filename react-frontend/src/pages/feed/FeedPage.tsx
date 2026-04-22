@@ -28,17 +28,15 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Newspaper,
-  Plus,
-  RefreshCw,
-  AlertTriangle,
-  ImagePlus,
-  BarChart3,
-  TrendingUp,
-  Flag,
-  ArrowUp,
-} from 'lucide-react';
+import Newspaper from 'lucide-react/icons/newspaper';
+import Plus from 'lucide-react/icons/plus';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import ImagePlus from 'lucide-react/icons/image-plus';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Flag from 'lucide-react/icons/flag';
+import ArrowUp from 'lucide-react/icons/arrow-up';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, AlgorithmLabel } from '@/components/ui';
 import { PageMeta } from '@/components/seo';

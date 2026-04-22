@@ -8,7 +8,11 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@heroui/react';
 import { useTenant, useFeature, useCookieConsent } from '@/contexts';
-import { Mail, Phone, MapPin, Cookie, Bug } from 'lucide-react';
+import Mail from 'lucide-react/icons/mail';
+import Phone from 'lucide-react/icons/phone';
+import MapPin from 'lucide-react/icons/map-pin';
+import Cookie from 'lucide-react/icons/cookie';
+import Bug from 'lucide-react/icons/bug';
 import { TenantLogo } from '@/components/branding';
 
 export interface FooterProps {

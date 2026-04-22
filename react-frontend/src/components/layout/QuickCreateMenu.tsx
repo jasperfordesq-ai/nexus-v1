@@ -17,13 +17,11 @@ import {
   ModalBody,
   Button,
 } from '@heroui/react';
-import {
-  ListTodo,
-  Calendar,
-  Users,
-  Target,
-  X,
-} from 'lucide-react';
+import ListTodo from 'lucide-react/icons/list-todo';
+import Calendar from 'lucide-react/icons/calendar';
+import Users from 'lucide-react/icons/users';
+import Target from 'lucide-react/icons/target';
+import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import type { TenantFeatures, TenantModules } from '@/types/api';

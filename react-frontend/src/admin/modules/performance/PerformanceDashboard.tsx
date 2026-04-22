@@ -5,7 +5,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Card, Button, Tabs, Tab, Chip, Spinner } from '@heroui/react';
-import { Activity, Database, Zap, AlertTriangle, Clock, MemoryStick } from 'lucide-react';
+import Activity from 'lucide-react/icons/activity';
+import Database from 'lucide-react/icons/database';
+import Zap from 'lucide-react/icons/zap';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Clock from 'lucide-react/icons/clock';
+import MemoryStick from 'lucide-react/icons/memory-stick';
 import { api } from '@/lib/api';
 import { usePageTitle } from '@/hooks/usePageTitle';
 

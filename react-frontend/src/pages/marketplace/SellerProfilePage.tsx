@@ -24,17 +24,15 @@ import {
   Tab,
   Divider,
 } from '@heroui/react';
-import {
-  ArrowLeft,
-  Star,
-  Clock,
-  ShoppingBag,
-  MapPin,
-  MessageCircle,
-  Shield,
-  Package,
-  User,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Star from 'lucide-react/icons/star';
+import Clock from 'lucide-react/icons/clock';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import MapPin from 'lucide-react/icons/map-pin';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import Shield from 'lucide-react/icons/shield';
+import Package from 'lucide-react/icons/package';
+import User from 'lucide-react/icons/user';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

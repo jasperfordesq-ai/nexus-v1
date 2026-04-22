@@ -51,17 +51,15 @@ import {
   AreaChart,
   Area,
 } from 'recharts';
-import {
-  Clock,
-  Download,
-  RefreshCw,
-  TrendingUp,
-  Users,
-  BarChart3,
-  PieChart as PieChartIcon,
-  Activity,
-  ArrowLeftRight,
-} from 'lucide-react';
+import Clock from 'lucide-react/icons/clock';
+import Download from 'lucide-react/icons/download';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Users from 'lucide-react/icons/users';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import PieChartIcon from 'lucide-react/icons/chart-pie';
+import Activity from 'lucide-react/icons/activity';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api, tokenManager } from '@/lib/api';

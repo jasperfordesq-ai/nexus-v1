@@ -11,21 +11,19 @@ import {
   DropdownMenu,
   DropdownItem,
 } from '@heroui/react';
-import {
-  Users,
-  MessageSquare,
-  Calendar,
-  FolderTree,
-  CheckCircle,
-  FileText,
-  Image,
-  Newspaper,
-  Flag,
-  FolderOpen,
-  Megaphone,
-  ChevronDown,
-  AlertCircle,
-} from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Calendar from 'lucide-react/icons/calendar';
+import FolderTree from 'lucide-react/icons/folder-tree';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import FileText from 'lucide-react/icons/file-text';
+import Image from 'lucide-react/icons/image';
+import Newspaper from 'lucide-react/icons/newspaper';
+import Flag from 'lucide-react/icons/flag';
+import FolderOpen from 'lucide-react/icons/folder-open';
+import Megaphone from 'lucide-react/icons/megaphone';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTenant } from '@/contexts';
 
 interface GroupTabNavProps {

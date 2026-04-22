@@ -11,7 +11,7 @@
  */
 
 import { Button, ButtonGroup, Switch } from '@heroui/react';
-import { Check } from 'lucide-react';
+import Check from 'lucide-react/icons/check';
 import { useTheme } from '@/contexts';
 import { useTranslation } from 'react-i18next';
 import type { FontSize, Density } from '@/contexts/ThemeContext';

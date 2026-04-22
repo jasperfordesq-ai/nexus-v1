@@ -22,7 +22,10 @@ import {
   ModalFooter,
   Textarea,
 } from '@heroui/react';
-import { ArrowLeft, CheckCircle, XCircle, Eye } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Eye from 'lucide-react/icons/eye';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBroker } from '../../api/adminApi';

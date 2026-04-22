@@ -9,7 +9,12 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Card, CardBody, Switch, Chip, Button, Spinner, Tabs, Tab } from '@heroui/react';
-import { Award, RotateCcw, Shield, Star, Gem, Zap } from 'lucide-react';
+import Award from 'lucide-react/icons/award';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
+import Shield from 'lucide-react/icons/shield';
+import Star from 'lucide-react/icons/star';
+import Gem from 'lucide-react/icons/gem';
+import Zap from 'lucide-react/icons/zap';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { useTranslation } from 'react-i18next';

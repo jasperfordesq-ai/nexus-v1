@@ -11,7 +11,16 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Card, CardBody, CardHeader, CardFooter, Button, Chip, Spinner, Divider } from '@heroui/react';
-import { Clock, Play, RefreshCw, CheckCircle, XCircle, Terminal, Calendar, Tag, AlertTriangle, Activity } from 'lucide-react';
+import Clock from 'lucide-react/icons/clock';
+import Play from 'lucide-react/icons/play';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Terminal from 'lucide-react/icons/terminal';
+import Calendar from 'lucide-react/icons/calendar';
+import Tag from 'lucide-react/icons/tag';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Activity from 'lucide-react/icons/activity';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminSystem, adminCron } from '../../api/adminApi';

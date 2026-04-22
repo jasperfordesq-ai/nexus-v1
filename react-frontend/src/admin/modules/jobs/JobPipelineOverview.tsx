@@ -21,7 +21,8 @@ import {
   Select,
   SelectItem,
 } from '@heroui/react';
-import { CalendarClock, Handshake } from 'lucide-react';
+import CalendarClock from 'lucide-react/icons/calendar-clock';
+import Handshake from 'lucide-react/icons/handshake';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';

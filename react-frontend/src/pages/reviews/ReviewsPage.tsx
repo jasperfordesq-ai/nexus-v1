@@ -22,7 +22,9 @@ import {
   Chip,
   Skeleton,
 } from '@heroui/react';
-import { Star, AlertTriangle, Trash2 } from 'lucide-react';
+import Star from 'lucide-react/icons/star';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Trash2 from 'lucide-react/icons/trash-2';
 import { useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { api } from '@/lib/api';

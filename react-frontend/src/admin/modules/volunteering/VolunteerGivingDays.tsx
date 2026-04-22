@@ -29,20 +29,18 @@ import {
   Tabs,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Gift,
-  RefreshCw,
-  Plus,
-  Edit2,
-  XCircle,
-  Download,
-  DollarSign,
-  Calendar,
-  Users,
-  BarChart3,
-  EyeOff,
-  TrendingUp,
-} from 'lucide-react';
+import Gift from 'lucide-react/icons/gift';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Plus from 'lucide-react/icons/plus';
+import Edit2 from 'lucide-react/icons/pen';
+import XCircle from 'lucide-react/icons/circle-x';
+import Download from 'lucide-react/icons/download';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import Calendar from 'lucide-react/icons/calendar';
+import Users from 'lucide-react/icons/users';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import EyeOff from 'lucide-react/icons/eye-off';
+import TrendingUp from 'lucide-react/icons/trending-up';
 import {
   BarChart,
   Bar,

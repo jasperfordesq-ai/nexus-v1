@@ -48,17 +48,15 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import {
-  Users,
-  Download,
-  RefreshCw,
-  TrendingUp,
-  UserCheck,
-  UserX,
-  Activity,
-  Trophy,
-  BarChart3,
-} from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import Download from 'lucide-react/icons/download';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import UserCheck from 'lucide-react/icons/user-check';
+import UserX from 'lucide-react/icons/user-x';
+import Activity from 'lucide-react/icons/activity';
+import Trophy from 'lucide-react/icons/trophy';
+import BarChart3 from 'lucide-react/icons/chart-column';
 import { usePageTitle } from '@/hooks';
 import { api, tokenManager } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';

@@ -14,7 +14,7 @@
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, ScrollShadow, Tabs, Tab } from '@heroui/react';
-import { X } from 'lucide-react';
+import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { useComposeSubmit } from './ComposeSubmitContext';
 import type { ComposeTab, ComposeTabConfig } from './types';

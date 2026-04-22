@@ -29,18 +29,16 @@ import {
   Divider,
   useDisclosure,
 } from '@heroui/react';
-import {
-  MapPin,
-  Plus,
-  RefreshCw,
-  Trash2,
-  Users,
-  Calendar,
-  Building2,
-  Globe,
-  UserPlus,
-  X,
-} from 'lucide-react';
+import MapPin from 'lucide-react/icons/map-pin';
+import Plus from 'lucide-react/icons/plus';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Users from 'lucide-react/icons/users';
+import Calendar from 'lucide-react/icons/calendar';
+import Building2 from 'lucide-react/icons/building-2';
+import Globe from 'lucide-react/icons/globe';
+import UserPlus from 'lucide-react/icons/user-plus';
+import X from 'lucide-react/icons/x';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

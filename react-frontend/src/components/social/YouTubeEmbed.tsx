@@ -16,7 +16,7 @@
 
 import { useState, useCallback } from 'react';
 import { Card, Button } from '@heroui/react';
-import { Play } from 'lucide-react';
+import Play from 'lucide-react/icons/play';
 
 /* ───────────────────────── Types ───────────────────────── */
 

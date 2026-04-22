@@ -22,7 +22,10 @@ import {
   ModalFooter,
   Spinner,
 } from '@heroui/react';
-import { Webhook, Plus, Trash2, AlertTriangle } from 'lucide-react';
+import Webhook from 'lucide-react/icons/webhook';
+import Plus from 'lucide-react/icons/plus';
+import Trash2 from 'lucide-react/icons/trash-2';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 import { GlassCard } from '@/components/ui';

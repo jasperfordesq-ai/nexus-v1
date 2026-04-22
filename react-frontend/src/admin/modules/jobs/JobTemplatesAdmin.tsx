@@ -10,7 +10,11 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Chip, Button, Tooltip } from '@heroui/react';
-import { Copy, Trash2, Globe, Lock, RefreshCw } from 'lucide-react';
+import Copy from 'lucide-react/icons/copy';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Globe from 'lucide-react/icons/globe';
+import Lock from 'lucide-react/icons/lock';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';

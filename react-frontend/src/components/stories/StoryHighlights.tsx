@@ -24,7 +24,10 @@ import {
   Input,
   useDisclosure,
 } from '@heroui/react';
-import { Plus, X, Pencil, Trash2 } from 'lucide-react';
+import Plus from 'lucide-react/icons/plus';
+import X from 'lucide-react/icons/x';
+import Pencil from 'lucide-react/icons/pencil';
+import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';

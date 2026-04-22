@@ -24,16 +24,14 @@ import {
   ModalBody,
   ModalFooter,
 } from '@heroui/react';
-import {
-  Send,
-  MessageCircle,
-  Clock,
-  CornerDownRight,
-  Pencil,
-  Trash2,
-  Check,
-  X,
-} from 'lucide-react';
+import Send from 'lucide-react/icons/send';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import Clock from 'lucide-react/icons/clock';
+import CornerDownRight from 'lucide-react/icons/corner-down-right';
+import Pencil from 'lucide-react/icons/pencil';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Check from 'lucide-react/icons/check';
+import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';

@@ -18,17 +18,15 @@ import {
   ModalBody,
   ModalFooter,
 } from '@heroui/react';
-import {
-  Clock,
-  Users,
-  X,
-  MapPin,
-  Calendar,
-  Building2,
-  AlertTriangle,
-  RefreshCw,
-  Hash,
-} from 'lucide-react';
+import Clock from 'lucide-react/icons/clock';
+import Users from 'lucide-react/icons/users';
+import X from 'lucide-react/icons/x';
+import MapPin from 'lucide-react/icons/map-pin';
+import Calendar from 'lucide-react/icons/calendar';
+import Building2 from 'lucide-react/icons/building-2';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Hash from 'lucide-react/icons/hash';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

@@ -13,20 +13,18 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, CardHeader, Chip, Progress, Spinner } from '@heroui/react';
 import type { LucideIcon } from 'lucide-react';
-import {
-  Activity,
-  ArrowDown,
-  ArrowDownRight,
-  ArrowRight,
-  CalendarDays,
-  ChevronRight,
-  Filter,
-  RefreshCw,
-  Target,
-  TrendingDown,
-  TrendingUp,
-  Users,
-} from 'lucide-react';
+import Activity from 'lucide-react/icons/activity';
+import ArrowDown from 'lucide-react/icons/arrow-down';
+import ArrowDownRight from 'lucide-react/icons/arrow-down-right';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import CalendarDays from 'lucide-react/icons/calendar-days';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import Filter from 'lucide-react/icons/filter';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Target from 'lucide-react/icons/target';
+import TrendingDown from 'lucide-react/icons/trending-down';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Users from 'lucide-react/icons/users';
 import {
   Area,
   AreaChart,

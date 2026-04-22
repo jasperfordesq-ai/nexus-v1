@@ -22,20 +22,18 @@ import {
   Avatar,
   Progress,
 } from '@heroui/react';
-import {
-  Sparkles,
-  ListChecks,
-  Briefcase,
-  Heart,
-  Users,
-  RefreshCw,
-  TrendingUp,
-  Target,
-  ArrowRight,
-  Filter,
-  Zap,
-  X,
-} from 'lucide-react';
+import Sparkles from 'lucide-react/icons/sparkles';
+import ListChecks from 'lucide-react/icons/list-checks';
+import Briefcase from 'lucide-react/icons/briefcase';
+import Heart from 'lucide-react/icons/heart';
+import Users from 'lucide-react/icons/users';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Target from 'lucide-react/icons/target';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import Filter from 'lucide-react/icons/filter';
+import Zap from 'lucide-react/icons/zap';
+import X from 'lucide-react/icons/x';
 import { GlassCard, AlgorithmLabel } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';

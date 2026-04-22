@@ -23,19 +23,17 @@ import {
   Chip,
   Divider,
 } from '@heroui/react';
-import {
-  Menu,
-  ArrowLeft,
-  Save,
-  Plus,
-  Trash2,
-  GripVertical,
-  Pencil,
-  ChevronDown,
-  ChevronRight,
-  Eye,
-  EyeOff,
-} from 'lucide-react';
+import Menu from 'lucide-react/icons/menu';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
+import Plus from 'lucide-react/icons/plus';
+import Trash2 from 'lucide-react/icons/trash-2';
+import GripVertical from 'lucide-react/icons/grip-vertical';
+import Pencil from 'lucide-react/icons/pencil';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import Eye from 'lucide-react/icons/eye';
+import EyeOff from 'lucide-react/icons/eye-off';
 import {
   DndContext,
   DragOverlay,

@@ -23,15 +23,13 @@ import {
   Textarea,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Hash,
-  ArrowLeft,
-  RefreshCw,
-  AlertTriangle,
-  TrendingUp,
-  Sparkles,
-  Flag,
-} from 'lucide-react';
+import Hash from 'lucide-react/icons/hash';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Sparkles from 'lucide-react/icons/sparkles';
+import Flag from 'lucide-react/icons/flag';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { EmptyState } from '@/components/feedback';

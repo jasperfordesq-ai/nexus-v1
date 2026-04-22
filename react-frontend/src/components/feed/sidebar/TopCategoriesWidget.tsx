@@ -8,7 +8,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Flame } from 'lucide-react';
+import Flame from 'lucide-react/icons/flame';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';

@@ -25,7 +25,9 @@ import {
   Select,
   SelectItem,
 } from '@heroui/react';
-import { ArrowLeft, CheckCircle, Flag } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Flag from 'lucide-react/icons/flag';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBroker } from '../../api/adminApi';

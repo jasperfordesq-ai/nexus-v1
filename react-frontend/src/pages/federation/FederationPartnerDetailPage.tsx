@@ -19,21 +19,19 @@ import {
   Chip,
   Spinner,
 } from '@heroui/react';
-import {
-  Globe,
-  MapPin,
-  Users,
-  ArrowLeft,
-  AlertTriangle,
-  RefreshCw,
-  Shield,
-  MessageSquare,
-  ArrowRightLeft,
-  ListTodo,
-  Calendar,
-  UserCheck,
-  Handshake,
-} from 'lucide-react';
+import Globe from 'lucide-react/icons/globe';
+import MapPin from 'lucide-react/icons/map-pin';
+import Users from 'lucide-react/icons/users';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Shield from 'lucide-react/icons/shield';
+import MessageSquare from 'lucide-react/icons/message-square';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import ListTodo from 'lucide-react/icons/list-todo';
+import Calendar from 'lucide-react/icons/calendar';
+import UserCheck from 'lucide-react/icons/user-check';
+import Handshake from 'lucide-react/icons/handshake';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';

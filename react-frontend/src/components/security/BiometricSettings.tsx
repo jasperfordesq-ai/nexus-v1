@@ -16,18 +16,16 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Fingerprint,
-  Pencil,
-  Trash2,
-  AlertTriangle,
-  CheckCircle,
-  Monitor,
-  Smartphone,
-  Tablet,
-  Laptop,
-  Info,
-} from 'lucide-react';
+import Fingerprint from 'lucide-react/icons/fingerprint';
+import Pencil from 'lucide-react/icons/pencil';
+import Trash2 from 'lucide-react/icons/trash-2';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Monitor from 'lucide-react/icons/monitor';
+import Smartphone from 'lucide-react/icons/smartphone';
+import Tablet from 'lucide-react/icons/tablet';
+import Laptop from 'lucide-react/icons/laptop';
+import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import {

@@ -8,7 +8,10 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import {
   Card, CardBody, CardHeader, Button, Input, Select, SelectItem, Switch, Divider,
 } from '@heroui/react';
-import { Save, ArrowLeft, ArrowRightLeft, Crown } from 'lucide-react';
+import Save from 'lucide-react/icons/save';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import Crown from 'lucide-react/icons/crown';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';

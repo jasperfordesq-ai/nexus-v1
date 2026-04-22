@@ -29,20 +29,18 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Bell,
-  Plus,
-  ArrowLeft,
-  Trash2,
-  Pause,
-  Play,
-  MapPin,
-  Tag,
-  Briefcase,
-  Wifi,
-  AlertTriangle,
-  RefreshCw,
-} from 'lucide-react';
+import Bell from 'lucide-react/icons/bell';
+import Plus from 'lucide-react/icons/plus';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Pause from 'lucide-react/icons/pause';
+import Play from 'lucide-react/icons/play';
+import MapPin from 'lucide-react/icons/map-pin';
+import Tag from 'lucide-react/icons/tag';
+import Briefcase from 'lucide-react/icons/briefcase';
+import Wifi from 'lucide-react/icons/wifi';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

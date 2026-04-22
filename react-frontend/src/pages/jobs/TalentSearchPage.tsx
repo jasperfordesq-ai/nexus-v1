@@ -20,16 +20,14 @@ import {
   Avatar,
   Spinner,
 } from '@heroui/react';
-import {
-  Search,
-  MapPin,
-  ArrowLeft,
-  Clock,
-  Users,
-  Filter,
-  X,
-  UserSearch,
-} from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import MapPin from 'lucide-react/icons/map-pin';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Clock from 'lucide-react/icons/clock';
+import Users from 'lucide-react/icons/users';
+import Filter from 'lucide-react/icons/filter';
+import X from 'lucide-react/icons/x';
+import UserSearch from 'lucide-react/icons/user-search';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

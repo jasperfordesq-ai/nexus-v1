@@ -11,7 +11,9 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Input, Spinner, ButtonGroup, Button, Chip } from '@heroui/react';
-import { Search, RefreshCw, Construction } from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Construction from 'lucide-react/icons/construction';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';

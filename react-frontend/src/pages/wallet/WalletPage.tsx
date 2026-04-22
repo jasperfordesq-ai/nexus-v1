@@ -12,19 +12,17 @@ import Papa from 'papaparse';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Tabs, Tab, Skeleton } from '@heroui/react';
-import {
-  Wallet,
-  ArrowUpRight,
-  ArrowDownLeft,
-  Clock,
-  TrendingUp,
-  Calendar,
-  User,
-  Download,
-  Send,
-  AlertTriangle,
-  RefreshCw,
-} from 'lucide-react';
+import Wallet from 'lucide-react/icons/wallet';
+import ArrowUpRight from 'lucide-react/icons/arrow-up-right';
+import ArrowDownLeft from 'lucide-react/icons/arrow-down-left';
+import Clock from 'lucide-react/icons/clock';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Calendar from 'lucide-react/icons/calendar';
+import User from 'lucide-react/icons/user';
+import Download from 'lucide-react/icons/download';
+import Send from 'lucide-react/icons/send';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';

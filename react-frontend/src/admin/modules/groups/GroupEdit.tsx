@@ -19,10 +19,17 @@ import {
   Avatar,
   Chip,
 } from '@heroui/react';
-import {
-  ArrowLeft, Save, Users, AlertTriangle, Settings,
-  MapPin, Globe, Star, Palette, Image, Shield,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
+import Users from 'lucide-react/icons/users';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Settings from 'lucide-react/icons/settings';
+import MapPin from 'lucide-react/icons/map-pin';
+import Globe from 'lucide-react/icons/globe';
+import Star from 'lucide-react/icons/star';
+import Palette from 'lucide-react/icons/palette';
+import Image from 'lucide-react/icons/image';
+import Shield from 'lucide-react/icons/shield';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminGroups } from '../../api/adminApi';

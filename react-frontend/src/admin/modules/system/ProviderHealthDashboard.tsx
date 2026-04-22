@@ -12,9 +12,14 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   Card, CardBody, CardHeader, Chip, Progress, Spinner, Tooltip,
 } from '@heroui/react';
-import {
-  Activity, CheckCircle, XCircle, Clock, AlertTriangle, Shield, Wifi, WifiOff,
-} from 'lucide-react';
+import Activity from 'lucide-react/icons/activity';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Clock from 'lucide-react/icons/clock';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Shield from 'lucide-react/icons/shield';
+import Wifi from 'lucide-react/icons/wifi';
+import WifiOff from 'lucide-react/icons/wifi-off';
 import { useToast } from '@/contexts';
 import type { TFunction } from 'i18next';
 import { api } from '@/lib/api';

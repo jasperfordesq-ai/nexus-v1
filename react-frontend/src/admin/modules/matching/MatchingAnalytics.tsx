@@ -20,17 +20,15 @@ import {
   Spinner,
   Divider,
 } from '@heroui/react';
-import {
-  ArrowLeft,
-  BarChart3,
-  Target,
-  MapPin,
-  TrendingUp,
-  Users,
-  Zap,
-  CheckCircle,
-  RefreshCw,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Target from 'lucide-react/icons/target';
+import MapPin from 'lucide-react/icons/map-pin';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Users from 'lucide-react/icons/users';
+import Zap from 'lucide-react/icons/zap';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';

@@ -16,7 +16,14 @@ import {
   Chip, Spinner, Pagination, Avatar, Dropdown, DropdownTrigger, DropdownMenu,
   DropdownItem,
 } from '@heroui/react';
-import { StickyNote, Plus, Pin, Trash2, Edit3, Filter, MoreVertical, Search } from 'lucide-react';
+import StickyNote from 'lucide-react/icons/sticky-note';
+import Plus from 'lucide-react/icons/plus';
+import Pin from 'lucide-react/icons/pin';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Edit3 from 'lucide-react/icons/pen-line';
+import Filter from 'lucide-react/icons/filter';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Search from 'lucide-react/icons/search';
 import { useSearchParams, Link } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';

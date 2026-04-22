@@ -18,7 +18,7 @@ import {
   DropdownMenu,
   DropdownItem,
 } from '@heroui/react';
-import { Globe } from 'lucide-react';
+import Globe from 'lucide-react/icons/globe';
 import { api, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useTenantLanguages } from '@/contexts/TenantContext';

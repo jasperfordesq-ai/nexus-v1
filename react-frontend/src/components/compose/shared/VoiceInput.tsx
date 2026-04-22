@@ -11,7 +11,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@heroui/react';
-import { Mic, MicOff } from 'lucide-react';
+import Mic from 'lucide-react/icons/mic';
+import MicOff from 'lucide-react/icons/mic-off';
 import { useTranslation } from 'react-i18next';
 
 // ─────────────────────────────────────────────────────────────────────────────

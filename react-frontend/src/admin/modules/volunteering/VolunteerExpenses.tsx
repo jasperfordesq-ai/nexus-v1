@@ -27,21 +27,19 @@ import {
   Accordion,
   AccordionItem,
 } from '@heroui/react';
-import {
-  DollarSign,
-  RefreshCw,
-  Download,
-  CheckCircle,
-  XCircle,
-  CreditCard,
-  Clock,
-  FileText,
-  Settings,
-  CalendarRange,
-  Building2,
-  Eye,
-  ExternalLink,
-} from 'lucide-react';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Download from 'lucide-react/icons/download';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import CreditCard from 'lucide-react/icons/credit-card';
+import Clock from 'lucide-react/icons/clock';
+import FileText from 'lucide-react/icons/file-text';
+import Settings from 'lucide-react/icons/settings';
+import CalendarRange from 'lucide-react/icons/calendar-range';
+import Building2 from 'lucide-react/icons/building-2';
+import Eye from 'lucide-react/icons/eye';
+import ExternalLink from 'lucide-react/icons/external-link';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';

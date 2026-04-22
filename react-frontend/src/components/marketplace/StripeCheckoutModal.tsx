@@ -24,7 +24,9 @@ import {
   Divider,
   Spinner,
 } from '@heroui/react';
-import { CreditCard, ShieldCheck, AlertCircle } from 'lucide-react';
+import CreditCard from 'lucide-react/icons/credit-card';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTranslation } from 'react-i18next';
 
 // ─────────────────────────────────────────────────────────────────────────────

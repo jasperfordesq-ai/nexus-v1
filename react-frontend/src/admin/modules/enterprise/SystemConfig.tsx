@@ -28,18 +28,16 @@ import {
   ModalFooter,
   Tooltip,
 } from '@heroui/react';
-import {
-  Save,
-  RefreshCw,
-  RotateCcw,
-  Settings2,
-  UserPlus,
-  Wallet,
-  Shield,
-  Bell,
-  Gauge,
-  Info,
-} from 'lucide-react';
+import Save from 'lucide-react/icons/save';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
+import Settings2 from 'lucide-react/icons/settings-2';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Wallet from 'lucide-react/icons/wallet';
+import Shield from 'lucide-react/icons/shield';
+import Bell from 'lucide-react/icons/bell';
+import Gauge from 'lucide-react/icons/gauge';
+import Info from 'lucide-react/icons/info';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';

@@ -12,7 +12,8 @@
  */
 
 import { Tooltip, Chip } from '@heroui/react';
-import { Clock, HelpCircle } from 'lucide-react';
+import Clock from 'lucide-react/icons/clock';
+import HelpCircle from 'lucide-react/icons/circle-help';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useTenant } from '@/contexts';

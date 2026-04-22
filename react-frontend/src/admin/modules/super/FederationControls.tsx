@@ -15,10 +15,20 @@ import {
   Card, CardBody, CardHeader, Button, Switch, Chip, Divider, Input, Spinner,
   Code, Snippet, Accordion, AccordionItem,
 } from '@heroui/react';
-import {
-  Globe, Shield, Lock, Unlock, AlertTriangle, Network, Trash2, Plus,
-  Activity, ArrowRight, ListChecks, Users, Handshake, KeyRound,
-} from 'lucide-react';
+import Globe from 'lucide-react/icons/globe';
+import Shield from 'lucide-react/icons/shield';
+import Lock from 'lucide-react/icons/lock';
+import Unlock from 'lucide-react/icons/lock-open';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Network from 'lucide-react/icons/network';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Plus from 'lucide-react/icons/plus';
+import Activity from 'lucide-react/icons/activity';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import ListChecks from 'lucide-react/icons/list-checks';
+import Users from 'lucide-react/icons/users';
+import Handshake from 'lucide-react/icons/handshake';
+import KeyRound from 'lucide-react/icons/key-round';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';

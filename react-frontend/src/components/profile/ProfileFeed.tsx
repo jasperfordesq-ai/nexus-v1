@@ -10,7 +10,10 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Button, Skeleton, Divider } from '@heroui/react';
-import { Rss, ChevronDown, AlertTriangle, RefreshCw } from 'lucide-react';
+import Rss from 'lucide-react/icons/rss';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { FeedCard } from '@/components/feed/FeedCard';

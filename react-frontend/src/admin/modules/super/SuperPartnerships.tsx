@@ -5,7 +5,15 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Card, CardBody, CardHeader, Button, Chip, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
-import { TrendingUp, Users, MessageSquare, DollarSign, FileText, Calendar, UsersRound, Pause, XCircle } from 'lucide-react';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Users from 'lucide-react/icons/users';
+import MessageSquare from 'lucide-react/icons/message-square';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import FileText from 'lucide-react/icons/file-text';
+import Calendar from 'lucide-react/icons/calendar';
+import UsersRound from 'lucide-react/icons/users-round';
+import Pause from 'lucide-react/icons/pause';
+import XCircle from 'lucide-react/icons/circle-x';
 import PageHeader from '../../components/PageHeader';
 import ConfirmModal from '../../components/ConfirmModal';
 import { usePageTitle } from '@/hooks/usePageTitle';

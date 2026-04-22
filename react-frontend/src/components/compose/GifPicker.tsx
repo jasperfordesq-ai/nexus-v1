@@ -10,7 +10,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Input, Popover, PopoverContent, PopoverTrigger, Skeleton } from '@heroui/react';
-import { Film, Search } from 'lucide-react';
+import Film from 'lucide-react/icons/film';
+import Search from 'lucide-react/icons/search';
 import { useTranslation } from 'react-i18next';
 
 import { featured, searchGifs, type TenorGif } from '@/lib/tenor';

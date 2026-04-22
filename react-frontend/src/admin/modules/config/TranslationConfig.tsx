@@ -14,7 +14,10 @@ import {
   Select, SelectItem, Input,
   Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
 } from '@heroui/react';
-import { Settings, BookOpen, Trash2, Plus } from 'lucide-react';
+import Settings from 'lucide-react/icons/settings';
+import BookOpen from 'lucide-react/icons/book-open';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Plus from 'lucide-react/icons/plus';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';

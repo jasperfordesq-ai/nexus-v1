@@ -11,23 +11,21 @@ import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Input, Select, SelectItem, Avatar, Button, Chip, Tooltip } from '@heroui/react';
-import {
-  Search,
-  Users,
-  Map as MapIcon,
-  MapPin,
-  Star,
-  Clock,
-  Filter,
-  Grid,
-  List,
-  RefreshCw,
-  AlertTriangle,
-  Sparkles,
-  TrendingUp,
-  BadgeCheck,
-  UserCircle,
-} from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import Users from 'lucide-react/icons/users';
+import MapIcon from 'lucide-react/icons/map';
+import MapPin from 'lucide-react/icons/map-pin';
+import Star from 'lucide-react/icons/star';
+import Clock from 'lucide-react/icons/clock';
+import Filter from 'lucide-react/icons/filter';
+import Grid from 'lucide-react/icons/grid-3x3';
+import List from 'lucide-react/icons/list';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Sparkles from 'lucide-react/icons/sparkles';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import BadgeCheck from 'lucide-react/icons/badge-check';
+import UserCircle from 'lucide-react/icons/circle-user';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, MemberCardSkeleton, AlgorithmLabel, useAlgorithmInfo } from '@/components/ui';
 import { PresenceIndicator } from '@/components/social';

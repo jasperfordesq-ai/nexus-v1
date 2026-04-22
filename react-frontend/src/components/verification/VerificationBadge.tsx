@@ -12,15 +12,13 @@
 
 import { useState, useEffect } from 'react';
 import { Chip } from '@heroui/react';
-import {
-  ShieldCheck,
-  ShieldOff,
-  Mail,
-  Phone,
-  FileCheck,
-  UserCheck,
-  Shield,
-} from 'lucide-react';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import ShieldOff from 'lucide-react/icons/shield-off';
+import Mail from 'lucide-react/icons/mail';
+import Phone from 'lucide-react/icons/phone';
+import FileCheck from 'lucide-react/icons/file-check';
+import UserCheck from 'lucide-react/icons/user-check';
+import Shield from 'lucide-react/icons/shield';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

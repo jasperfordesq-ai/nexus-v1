@@ -21,7 +21,11 @@ import {
   ModalBody,
   ModalFooter,
 } from '@heroui/react';
-import { Plus, Pencil, Trash2, FolderTree, ArrowLeft } from 'lucide-react';
+import Plus from 'lucide-react/icons/plus';
+import Pencil from 'lucide-react/icons/pencil';
+import Trash2 from 'lucide-react/icons/trash-2';
+import FolderTree from 'lucide-react/icons/folder-tree';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';

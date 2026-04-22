@@ -26,11 +26,9 @@ import {
   CheckboxGroup,
   Chip,
 } from '@heroui/react';
-import {
-  Search,
-  SlidersHorizontal,
-  RotateCcw,
-} from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

@@ -30,27 +30,25 @@ import {
   useDisclosure,
   Spinner,
 } from '@heroui/react';
-import {
-  MapPin,
-  Calendar,
-  Clock,
-  Briefcase,
-  Users,
-  Building2,
-  Wifi,
-  Tag,
-  ChevronRight,
-  AlertTriangle,
-  RefreshCw,
-  Search,
-  Send,
-  CheckCircle,
-  XCircle,
-  ClipboardList,
-  MessageSquare,
-  ChevronDown,
-  QrCode,
-} from 'lucide-react';
+import MapPin from 'lucide-react/icons/map-pin';
+import Calendar from 'lucide-react/icons/calendar';
+import Clock from 'lucide-react/icons/clock';
+import Briefcase from 'lucide-react/icons/briefcase';
+import Users from 'lucide-react/icons/users';
+import Building2 from 'lucide-react/icons/building-2';
+import Wifi from 'lucide-react/icons/wifi';
+import Tag from 'lucide-react/icons/tag';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Search from 'lucide-react/icons/search';
+import Send from 'lucide-react/icons/send';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import ClipboardList from 'lucide-react/icons/clipboard-list';
+import MessageSquare from 'lucide-react/icons/message-square';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import QrCode from 'lucide-react/icons/qr-code';
 import { Helmet } from 'react-helmet-async';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';

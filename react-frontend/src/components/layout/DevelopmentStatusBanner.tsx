@@ -16,7 +16,7 @@
 
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FlaskConical } from 'lucide-react';
+import FlaskConical from 'lucide-react/icons/flask-conical';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 
 export function DevelopmentStatusBanner() {

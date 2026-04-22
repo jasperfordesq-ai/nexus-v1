@@ -8,14 +8,12 @@
  * Used by ExchangesPage, ExchangeDetailPage, and other exchange-related components
  */
 
-import {
-  Clock,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  ArrowRightLeft,
-  type LucideIcon,
-} from 'lucide-react';
+import Clock from 'lucide-react/icons/clock';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import type { LucideIcon } from 'lucide-react';
 import type { ExchangeStatus } from '@/types/api';
 
 export interface ExchangeStatusConfig {

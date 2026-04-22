@@ -13,7 +13,7 @@
  */
 
 import { Chip, Tooltip } from '@heroui/react';
-import { Shield } from 'lucide-react';
+import Shield from 'lucide-react/icons/shield';
 import { useTranslation } from 'react-i18next';
 
 export interface FederatedTrustBadgeProps {

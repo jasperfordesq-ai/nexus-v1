@@ -17,7 +17,7 @@ import {
   DropdownItem,
   Button,
 } from '@heroui/react';
-import { ChevronDown } from 'lucide-react';
+import ChevronDown from 'lucide-react/icons/chevron-down';
 import { useTranslation } from 'react-i18next';
 import { DynamicIcon } from '@/components/ui';
 import { useTenant, useAuth } from '@/contexts';

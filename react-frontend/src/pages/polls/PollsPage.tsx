@@ -40,26 +40,24 @@ import {
   useDisclosure,
 } from '@heroui/react';
 import type { DateInputValue } from '@heroui/react';
-import {
-  BarChart3,
-  Plus,
-  Clock,
-  CheckCircle,
-  Users,
-  Trash2,
-  X,
-  ChevronUp,
-  RefreshCw,
-  AlertTriangle,
-  Check,
-  TrendingUp,
-  GripVertical,
-  EyeOff,
-  Download,
-  Tag,
-  ListOrdered,
-  Filter,
-} from 'lucide-react';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Plus from 'lucide-react/icons/plus';
+import Clock from 'lucide-react/icons/clock';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Users from 'lucide-react/icons/users';
+import Trash2 from 'lucide-react/icons/trash-2';
+import X from 'lucide-react/icons/x';
+import ChevronUp from 'lucide-react/icons/chevron-up';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Check from 'lucide-react/icons/check';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import GripVertical from 'lucide-react/icons/grip-vertical';
+import EyeOff from 'lucide-react/icons/eye-off';
+import Download from 'lucide-react/icons/download';
+import Tag from 'lucide-react/icons/tag';
+import ListOrdered from 'lucide-react/icons/list-ordered';
+import Filter from 'lucide-react/icons/filter';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

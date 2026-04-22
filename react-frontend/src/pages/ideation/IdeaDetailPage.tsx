@@ -37,19 +37,17 @@ import {
   SelectItem,
   useDisclosure,
 } from '@heroui/react';
-import {
-  ArrowLeft,
-  ArrowBigUp,
-  AlertTriangle,
-  RefreshCw,
-  MessageCircle,
-  MoreVertical,
-  Award,
-  Star,
-  Trash2,
-  Send,
-  Users,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import ArrowBigUp from 'lucide-react/icons/arrow-big-up';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Award from 'lucide-react/icons/award';
+import Star from 'lucide-react/icons/star';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Send from 'lucide-react/icons/send';
+import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { GlassCard } from '@/components/ui';

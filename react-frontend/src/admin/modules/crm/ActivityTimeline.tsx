@@ -14,10 +14,16 @@ import {
   Card, CardBody, Button, Select, SelectItem,
   Chip, Spinner, Pagination, Avatar,
 } from '@heroui/react';
-import {
-  Activity, Filter, User, StickyNote, ClipboardList,
-  LogIn, UserPlus, FileText, ArrowRightLeft, RefreshCw,
-} from 'lucide-react';
+import Activity from 'lucide-react/icons/activity';
+import Filter from 'lucide-react/icons/filter';
+import User from 'lucide-react/icons/user';
+import StickyNote from 'lucide-react/icons/sticky-note';
+import ClipboardList from 'lucide-react/icons/clipboard-list';
+import LogIn from 'lucide-react/icons/log-in';
+import UserPlus from 'lucide-react/icons/user-plus';
+import FileText from 'lucide-react/icons/file-text';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useSearchParams, Link } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';

@@ -292,7 +292,7 @@ describe('RichTextEditor', () => {
 // ─── StatCard ────────────────────────────────────────────────────────────────
 
 import { StatCard } from '../StatCard';
-import { Users } from 'lucide-react';
+import Users from 'lucide-react/icons/users';
 
 describe('StatCard', () => {
   it('renders without crashing', () => {

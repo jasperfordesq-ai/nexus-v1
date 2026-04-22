@@ -14,16 +14,14 @@ import {
   Card, CardBody, CardHeader, Switch, Spinner, Button, Divider,
   Select, SelectItem, Checkbox,
 } from '@heroui/react';
-import {
-  Cog,
-  Zap,
-  RefreshCw,
-  Trash2,
-  Database,
-  Timer,
-  Play,
-  Globe,
-} from 'lucide-react';
+import Cog from 'lucide-react/icons/cog';
+import Zap from 'lucide-react/icons/zap';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Database from 'lucide-react/icons/database';
+import Timer from 'lucide-react/icons/timer';
+import Play from 'lucide-react/icons/play';
+import Globe from 'lucide-react/icons/globe';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminConfig } from '../../api/adminApi';

@@ -19,18 +19,16 @@ import {
   Input,
   Divider,
 } from '@heroui/react';
-import {
-  RefreshCw,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  Search,
-  Server,
-  FolderOpen,
-  Settings,
-  Puzzle,
-  Code,
-} from 'lucide-react';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Search from 'lucide-react/icons/search';
+import Server from 'lucide-react/icons/server';
+import FolderOpen from 'lucide-react/icons/folder-open';
+import Settings from 'lucide-react/icons/settings';
+import Puzzle from 'lucide-react/icons/puzzle';
+import Code from 'lucide-react/icons/code';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';

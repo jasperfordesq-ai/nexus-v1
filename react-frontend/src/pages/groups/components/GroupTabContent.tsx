@@ -5,7 +5,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { Button } from '@heroui/react';
-import { Lock } from 'lucide-react';
+import Lock from 'lucide-react/icons/lock';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth } from '@/contexts';

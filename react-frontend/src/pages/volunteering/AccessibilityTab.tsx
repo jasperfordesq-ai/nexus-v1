@@ -13,15 +13,13 @@ import {
   SelectItem,
   Textarea,
 } from '@heroui/react';
-import {
-  Accessibility,
-  Info,
-  Plus,
-  Save,
-  Trash2,
-  RefreshCw,
-  AlertTriangle,
-} from 'lucide-react';
+import Accessibility from 'lucide-react/icons/accessibility';
+import Info from 'lucide-react/icons/info';
+import Plus from 'lucide-react/icons/plus';
+import Save from 'lucide-react/icons/save';
+import Trash2 from 'lucide-react/icons/trash-2';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

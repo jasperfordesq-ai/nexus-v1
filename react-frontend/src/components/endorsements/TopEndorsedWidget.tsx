@@ -13,7 +13,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Avatar, Chip, Spinner } from '@heroui/react';
-import { Trophy, ThumbsUp, Medal } from 'lucide-react';
+import Trophy from 'lucide-react/icons/trophy';
+import ThumbsUp from 'lucide-react/icons/thumbs-up';
+import Medal from 'lucide-react/icons/medal';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';

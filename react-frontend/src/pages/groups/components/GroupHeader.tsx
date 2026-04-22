@@ -9,21 +9,19 @@ import {
   Avatar,
   Spinner,
 } from '@heroui/react';
-import {
-  Users,
-  MessageSquare,
-  Settings,
-  Lock,
-  Globe,
-  UserPlus,
-  UserMinus,
-  Calendar,
-  MapPin,
-  CheckCircle,
-  XCircle,
-  Trash2,
-  Megaphone,
-} from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Settings from 'lucide-react/icons/settings';
+import Lock from 'lucide-react/icons/lock';
+import Globe from 'lucide-react/icons/globe';
+import UserPlus from 'lucide-react/icons/user-plus';
+import UserMinus from 'lucide-react/icons/user-minus';
+import Calendar from 'lucide-react/icons/calendar';
+import MapPin from 'lucide-react/icons/map-pin';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Megaphone from 'lucide-react/icons/megaphone';
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { LocationMapCard } from '@/components/location';

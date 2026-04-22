@@ -10,7 +10,10 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Avatar, Skeleton, Divider } from '@heroui/react';
-import { Lock, Newspaper, Plus, TrendingUp } from 'lucide-react';
+import Lock from 'lucide-react/icons/lock';
+import Newspaper from 'lucide-react/icons/newspaper';
+import Plus from 'lucide-react/icons/plus';
+import TrendingUp from 'lucide-react/icons/trending-up';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';

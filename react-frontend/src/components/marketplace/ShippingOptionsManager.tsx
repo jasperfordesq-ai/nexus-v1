@@ -21,15 +21,13 @@ import {
   Spinner,
   Chip,
 } from '@heroui/react';
-import {
-  Plus,
-  Pencil,
-  Trash2,
-  Truck,
-  Check,
-  X,
-  Package,
-} from 'lucide-react';
+import Plus from 'lucide-react/icons/plus';
+import Pencil from 'lucide-react/icons/pencil';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Truck from 'lucide-react/icons/truck';
+import Check from 'lucide-react/icons/check';
+import X from 'lucide-react/icons/x';
+import Package from 'lucide-react/icons/package';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

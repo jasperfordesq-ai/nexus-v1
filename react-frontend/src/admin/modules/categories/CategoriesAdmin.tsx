@@ -30,15 +30,13 @@ import {
   Card,
   CardBody,
 } from '@heroui/react';
-import {
-  Plus,
-  MoreVertical,
-  Edit,
-  Trash2,
-  FolderOpen,
-  Tag,
-  AlertTriangle,
-} from 'lucide-react';
+import Plus from 'lucide-react/icons/plus';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Edit from 'lucide-react/icons/square-pen';
+import Trash2 from 'lucide-react/icons/trash-2';
+import FolderOpen from 'lucide-react/icons/folder-open';
+import Tag from 'lucide-react/icons/tag';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminCategories } from '../../api/adminApi';

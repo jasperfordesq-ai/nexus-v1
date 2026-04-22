@@ -23,15 +23,13 @@ import {
   Chip,
   useDisclosure,
 } from '@heroui/react';
-import {
-  BookOpen,
-  FileText,
-  Plus,
-  Edit,
-  Trash2,
-  History,
-  ChevronRight,
-} from 'lucide-react';
+import BookOpen from 'lucide-react/icons/book-open';
+import FileText from 'lucide-react/icons/file-text';
+import Plus from 'lucide-react/icons/plus';
+import Edit from 'lucide-react/icons/square-pen';
+import Trash2 from 'lucide-react/icons/trash-2';
+import History from 'lucide-react/icons/history';
+import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

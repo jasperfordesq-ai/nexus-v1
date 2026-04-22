@@ -28,16 +28,14 @@ import {
   ModalBody,
   ModalFooter,
 } from '@heroui/react';
-import {
-  ArrowLeft,
-  CheckCircle,
-  XCircle,
-  MapPin,
-  User,
-  FileText,
-  Clock,
-  Shield,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import MapPin from 'lucide-react/icons/map-pin';
+import User from 'lucide-react/icons/user';
+import FileText from 'lucide-react/icons/file-text';
+import Clock from 'lucide-react/icons/clock';
+import Shield from 'lucide-react/icons/shield';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';

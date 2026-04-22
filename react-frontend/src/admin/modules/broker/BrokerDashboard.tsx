@@ -12,19 +12,17 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Button, Spinner, Chip, Divider } from '@heroui/react';
-import {
-  ArrowLeftRight,
-  MessageSquareWarning,
-  ShieldAlert,
-  Eye,
-  RefreshCw,
-  ChevronRight,
-  ShieldCheck,
-  Clock,
-  AlertTriangle,
-  Activity,
-  Settings,
-} from 'lucide-react';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import Eye from 'lucide-react/icons/eye';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import Clock from 'lucide-react/icons/clock';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Activity from 'lucide-react/icons/activity';
+import Settings from 'lucide-react/icons/settings';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBroker } from '../../api/adminApi';

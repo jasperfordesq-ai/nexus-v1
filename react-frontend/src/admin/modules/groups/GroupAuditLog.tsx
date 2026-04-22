@@ -22,7 +22,9 @@ import {
   TableColumn,
   TableCell,
 } from '@heroui/react';
-import { ScrollText, ChevronDown, ChevronUp } from 'lucide-react';
+import ScrollText from 'lucide-react/icons/scroll-text';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import ChevronUp from 'lucide-react/icons/chevron-up';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { GlassCard } from '@/components/ui';

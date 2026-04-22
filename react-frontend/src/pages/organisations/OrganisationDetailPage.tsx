@@ -28,22 +28,20 @@ import {
   Textarea,
   useDisclosure,
 } from '@heroui/react';
-import {
-  MapPin,
-  Globe,
-  Mail,
-  Clock,
-  Star,
-  Users,
-  Heart,
-  Calendar,
-  Briefcase,
-  ChevronRight,
-  AlertTriangle,
-  RefreshCw,
-  ExternalLink,
-  Send,
-} from 'lucide-react';
+import MapPin from 'lucide-react/icons/map-pin';
+import Globe from 'lucide-react/icons/globe';
+import Mail from 'lucide-react/icons/mail';
+import Clock from 'lucide-react/icons/clock';
+import Star from 'lucide-react/icons/star';
+import Users from 'lucide-react/icons/users';
+import Heart from 'lucide-react/icons/heart';
+import Calendar from 'lucide-react/icons/calendar';
+import Briefcase from 'lucide-react/icons/briefcase';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ExternalLink from 'lucide-react/icons/external-link';
+import Send from 'lucide-react/icons/send';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState, LoadingScreen } from '@/components/feedback';

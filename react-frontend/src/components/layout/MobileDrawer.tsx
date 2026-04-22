@@ -23,51 +23,49 @@ import {
   Accordion,
   AccordionItem,
 } from '@heroui/react';
-import {
-  X,
-  Home,
-  LayoutDashboard,
-  ListTodo,
-  MessageSquare,
-  Wallet,
-  Users,
-  Users2,
-  Calendar,
-  Settings,
-  LogOut,
-  HelpCircle,
-  Trophy,
-  Medal,
-  Target,
-  ArrowRightLeft,
-  Newspaper,
-  BookOpen,
-  FolderOpen,
-  Heart,
-  Building2,
-  Search,
-  Shield,
-  Globe,
-  Info,
-  FileText,
-  Handshake,
-  Stethoscope,
-  TrendingUp,
-  BarChart3,
-  Compass,
-  Cookie,
-  Bot,
-  Briefcase,
-  ShoppingBag,
-  Lightbulb,
-  GraduationCap,
-  Activity,
-  Sun,
-  Moon,
-  FlaskConical,
-  Fingerprint,
-  Bookmark,
-} from 'lucide-react';
+import X from 'lucide-react/icons/x';
+import Home from 'lucide-react/icons/house';
+import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
+import ListTodo from 'lucide-react/icons/list-todo';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Wallet from 'lucide-react/icons/wallet';
+import Users from 'lucide-react/icons/users';
+import Users2 from 'lucide-react/icons/users-round';
+import Calendar from 'lucide-react/icons/calendar';
+import Settings from 'lucide-react/icons/settings';
+import LogOut from 'lucide-react/icons/log-out';
+import HelpCircle from 'lucide-react/icons/circle-help';
+import Trophy from 'lucide-react/icons/trophy';
+import Medal from 'lucide-react/icons/medal';
+import Target from 'lucide-react/icons/target';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import Newspaper from 'lucide-react/icons/newspaper';
+import BookOpen from 'lucide-react/icons/book-open';
+import FolderOpen from 'lucide-react/icons/folder-open';
+import Heart from 'lucide-react/icons/heart';
+import Building2 from 'lucide-react/icons/building-2';
+import Search from 'lucide-react/icons/search';
+import Shield from 'lucide-react/icons/shield';
+import Globe from 'lucide-react/icons/globe';
+import Info from 'lucide-react/icons/info';
+import FileText from 'lucide-react/icons/file-text';
+import Handshake from 'lucide-react/icons/handshake';
+import Stethoscope from 'lucide-react/icons/stethoscope';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Compass from 'lucide-react/icons/compass';
+import Cookie from 'lucide-react/icons/cookie';
+import Bot from 'lucide-react/icons/bot';
+import Briefcase from 'lucide-react/icons/briefcase';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import Lightbulb from 'lucide-react/icons/lightbulb';
+import GraduationCap from 'lucide-react/icons/graduation-cap';
+import Activity from 'lucide-react/icons/activity';
+import Sun from 'lucide-react/icons/sun';
+import Moon from 'lucide-react/icons/moon';
+import FlaskConical from 'lucide-react/icons/flask-conical';
+import Fingerprint from 'lucide-react/icons/fingerprint';
+import Bookmark from 'lucide-react/icons/bookmark';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 import { TenantLogo } from '@/components/branding';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';

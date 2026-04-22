@@ -21,20 +21,18 @@ import {
   RadioGroup,
   Radio,
 } from '@heroui/react';
-import {
-  Clock,
-  FileText,
-  Eye,
-  GitCompare,
-  Plus,
-  CheckCircle2,
-  Send,
-  User,
-  Calendar,
-  AlertCircle,
-  Trash2,
-  Pencil,
-} from 'lucide-react';
+import Clock from 'lucide-react/icons/clock';
+import FileText from 'lucide-react/icons/file-text';
+import Eye from 'lucide-react/icons/eye';
+import GitCompare from 'lucide-react/icons/git-compare';
+import Plus from 'lucide-react/icons/plus';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import Send from 'lucide-react/icons/send';
+import User from 'lucide-react/icons/user';
+import Calendar from 'lucide-react/icons/calendar';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Pencil from 'lucide-react/icons/pencil';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
 import { useTenant } from '@/contexts/TenantContext';

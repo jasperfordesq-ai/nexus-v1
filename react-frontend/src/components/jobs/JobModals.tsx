@@ -16,15 +16,13 @@ import {
   Progress,
   Spinner,
 } from '@heroui/react';
-import {
-  Target,
-  CheckCircle,
-  XCircle,
-  Upload,
-  FileText as FileTextIcon,
-  Sparkles,
-  X,
-} from 'lucide-react';
+import Target from 'lucide-react/icons/target';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Upload from 'lucide-react/icons/upload';
+import FileTextIcon from 'lucide-react/icons/file-text';
+import Sparkles from 'lucide-react/icons/sparkles';
+import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import type { QualificationResult } from './JobDetailTypes';
 

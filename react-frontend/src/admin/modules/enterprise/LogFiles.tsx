@@ -11,16 +11,14 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardBody, Button, Spinner, Chip, Input } from '@heroui/react';
-import {
-  FileText,
-  AlertTriangle,
-  Clock,
-  RefreshCw,
-  Download,
-  Search,
-  HardDrive,
-  Files,
-} from 'lucide-react';
+import FileText from 'lucide-react/icons/file-text';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Clock from 'lucide-react/icons/clock';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Download from 'lucide-react/icons/download';
+import Search from 'lucide-react/icons/search';
+import HardDrive from 'lucide-react/icons/hard-drive';
+import Files from 'lucide-react/icons/files';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';

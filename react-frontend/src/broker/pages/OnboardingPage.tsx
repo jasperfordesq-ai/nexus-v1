@@ -24,7 +24,8 @@ import {
   Button,
   Spinner,
 } from '@heroui/react';
-import { ArrowDown, MoreVertical } from 'lucide-react';
+import ArrowDown from 'lucide-react/icons/arrow-down';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminCrm, adminUsers } from '@/admin/api/adminApi';

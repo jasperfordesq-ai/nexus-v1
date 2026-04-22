@@ -7,33 +7,31 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Chip, Skeleton, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip } from '@heroui/react';
-import {
-  User,
-  MapPin,
-  Calendar,
-  UserPlus,
-  UserCheck,
-  MessageSquare,
-  Star,
-  Clock,
-  ListTodo,
-  Award,
-  Settings,
-  ArrowLeft,
-  RefreshCw,
-  AlertTriangle,
-  Trophy,
-  Lock,
-  Users,
-  CalendarCheck,
-  ArrowUpRight,
-  ArrowDownLeft,
-  Rss,
-  MoreVertical,
-  ShieldOff,
-  ShieldCheck,
-  ExternalLink,
-} from 'lucide-react';
+import User from 'lucide-react/icons/user';
+import MapPin from 'lucide-react/icons/map-pin';
+import Calendar from 'lucide-react/icons/calendar';
+import UserPlus from 'lucide-react/icons/user-plus';
+import UserCheck from 'lucide-react/icons/user-check';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Star from 'lucide-react/icons/star';
+import Clock from 'lucide-react/icons/clock';
+import ListTodo from 'lucide-react/icons/list-todo';
+import Award from 'lucide-react/icons/award';
+import Settings from 'lucide-react/icons/settings';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Trophy from 'lucide-react/icons/trophy';
+import Lock from 'lucide-react/icons/lock';
+import Users from 'lucide-react/icons/users';
+import CalendarCheck from 'lucide-react/icons/calendar-check';
+import ArrowUpRight from 'lucide-react/icons/arrow-up-right';
+import ArrowDownLeft from 'lucide-react/icons/arrow-down-left';
+import Rss from 'lucide-react/icons/rss';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import ShieldOff from 'lucide-react/icons/shield-off';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import ExternalLink from 'lucide-react/icons/external-link';
 import { sanitizeRichText } from '@/lib/sanitize';
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';

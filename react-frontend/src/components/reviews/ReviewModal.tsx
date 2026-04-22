@@ -18,7 +18,7 @@ import {
   Textarea,
   Avatar,
 } from '@heroui/react';
-import { Star } from 'lucide-react';
+import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

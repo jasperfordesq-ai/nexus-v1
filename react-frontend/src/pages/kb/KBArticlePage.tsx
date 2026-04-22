@@ -25,22 +25,20 @@ import {
   Spinner,
   Divider,
 } from '@heroui/react';
-import {
-  BookOpen,
-  ChevronRight,
-  ThumbsUp,
-  ThumbsDown,
-  Clock,
-  Eye,
-  FileText,
-  ArrowLeft,
-  Folder,
-  RefreshCw,
-  AlertTriangle,
-  CheckCircle,
-  Download,
-  File,
-} from 'lucide-react';
+import BookOpen from 'lucide-react/icons/book-open';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import ThumbsUp from 'lucide-react/icons/thumbs-up';
+import ThumbsDown from 'lucide-react/icons/thumbs-down';
+import Clock from 'lucide-react/icons/clock';
+import Eye from 'lucide-react/icons/eye';
+import FileText from 'lucide-react/icons/file-text';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Folder from 'lucide-react/icons/folder';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Download from 'lucide-react/icons/download';
+import File from 'lucide-react/icons/file';
 import { sanitizeRichText } from '@/lib/sanitize';
 import { Helmet } from 'react-helmet-async';
 import { lazy, Suspense } from 'react';

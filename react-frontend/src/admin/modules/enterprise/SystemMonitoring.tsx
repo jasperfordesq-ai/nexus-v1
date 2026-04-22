@@ -11,18 +11,16 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardBody, Button, Spinner, Chip, Progress } from '@heroui/react';
-import {
-  Server,
-  Database,
-  HardDrive,
-  Clock,
-  Cpu,
-  RefreshCw,
-  ArrowRight,
-  FileText,
-  Settings,
-  ToggleLeft,
-} from 'lucide-react';
+import Server from 'lucide-react/icons/server';
+import Database from 'lucide-react/icons/database';
+import HardDrive from 'lucide-react/icons/hard-drive';
+import Clock from 'lucide-react/icons/clock';
+import Cpu from 'lucide-react/icons/cpu';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import FileText from 'lucide-react/icons/file-text';
+import Settings from 'lucide-react/icons/settings';
+import ToggleLeft from 'lucide-react/icons/toggle-left';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';

@@ -9,7 +9,11 @@
  */
 
 import { Card, CardBody, Chip, Switch, Button } from '@heroui/react';
-import { Search, Bell, Trash2, MapPin, Tag } from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import Bell from 'lucide-react/icons/bell';
+import Trash2 from 'lucide-react/icons/trash-2';
+import MapPin from 'lucide-react/icons/map-pin';
+import Tag from 'lucide-react/icons/tag';
 import { useTranslation } from 'react-i18next';
 import type { MarketplaceSavedSearch } from '@/types/marketplace';
 

@@ -11,7 +11,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Button, Chip, Spinner } from '@heroui/react';
-import { FileText, Plus, Pencil, Trash2 } from 'lucide-react';
+import FileText from 'lucide-react/icons/file-text';
+import Plus from 'lucide-react/icons/plus';
+import Pencil from 'lucide-react/icons/pencil';
+import Trash2 from 'lucide-react/icons/trash-2';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';

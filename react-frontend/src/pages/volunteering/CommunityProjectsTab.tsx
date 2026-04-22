@@ -21,16 +21,14 @@ import {
   Textarea,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Heart,
-  Plus,
-  MapPin,
-  Calendar,
-  User,
-  Users,
-  AlertTriangle,
-  Lightbulb,
-} from 'lucide-react';
+import Heart from 'lucide-react/icons/heart';
+import Plus from 'lucide-react/icons/plus';
+import MapPin from 'lucide-react/icons/map-pin';
+import Calendar from 'lucide-react/icons/calendar';
+import User from 'lucide-react/icons/user';
+import Users from 'lucide-react/icons/users';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Lightbulb from 'lucide-react/icons/lightbulb';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

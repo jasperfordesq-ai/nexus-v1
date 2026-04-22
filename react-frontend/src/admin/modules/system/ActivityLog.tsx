@@ -11,7 +11,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Chip, Avatar, Button } from '@heroui/react';
-import { Activity, RefreshCw } from 'lucide-react';
+import Activity from 'lucide-react/icons/activity';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { usePageTitle } from '@/hooks';
 import { adminSystem } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';

@@ -11,7 +11,9 @@
 
 import { useState } from 'react';
 import { Card, CardBody, CardHeader, Input, Textarea, Select, SelectItem, Button } from '@heroui/react';
-import { Target, ArrowLeft, Save } from 'lucide-react';
+import Target from 'lucide-react/icons/target';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';

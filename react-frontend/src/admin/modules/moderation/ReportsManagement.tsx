@@ -22,7 +22,12 @@ import {
   Card,
   CardBody,
 } from '@heroui/react';
-import { Search, RefreshCw, CheckCircle2, XCircle, AlertCircle, Flag } from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import XCircle from 'lucide-react/icons/circle-x';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import Flag from 'lucide-react/icons/flag';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';

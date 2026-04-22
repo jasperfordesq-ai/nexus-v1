@@ -10,7 +10,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Avatar, Skeleton } from '@heroui/react';
-import { Heart, HandHelping } from 'lucide-react';
+import Heart from 'lucide-react/icons/heart';
+import HandHelping from 'lucide-react/icons/hand-helping';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useAuth, useTenant } from '@/contexts';

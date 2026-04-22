@@ -5,7 +5,9 @@
 
 import { useState, useCallback } from 'react';
 import { Button, Select, SelectItem, Input } from '@heroui/react';
-import { Zap, ChevronUp, ChevronDown } from 'lucide-react';
+import Zap from 'lucide-react/icons/zap';
+import ChevronUp from 'lucide-react/icons/chevron-up';
+import ChevronDown from 'lucide-react/icons/chevron-down';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { api } from '@/lib/api';

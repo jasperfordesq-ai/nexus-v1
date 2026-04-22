@@ -38,23 +38,21 @@ import {
   Divider,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Shield,
-  ShieldAlert,
-  ShieldCheck,
-  AlertTriangle,
-  Eye,
-  Users,
-  MessageSquare,
-  CheckCircle,
-  XCircle,
-  RefreshCw,
-  Search,
-  UserPlus,
-  UserMinus,
-  Clock,
-  Flag,
-} from 'lucide-react';
+import Shield from 'lucide-react/icons/shield';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Eye from 'lucide-react/icons/eye';
+import Users from 'lucide-react/icons/users';
+import MessageSquare from 'lucide-react/icons/message-square';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Search from 'lucide-react/icons/search';
+import UserPlus from 'lucide-react/icons/user-plus';
+import UserMinus from 'lucide-react/icons/user-minus';
+import Clock from 'lucide-react/icons/clock';
+import Flag from 'lucide-react/icons/flag';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

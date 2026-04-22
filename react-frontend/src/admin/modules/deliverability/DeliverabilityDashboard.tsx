@@ -11,7 +11,10 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Spinner } from '@heroui/react';
-import { Target, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import Target from 'lucide-react/icons/target';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Clock from 'lucide-react/icons/clock';
+import AlertCircle from 'lucide-react/icons/circle-alert';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminDeliverability } from '../../api/adminApi';

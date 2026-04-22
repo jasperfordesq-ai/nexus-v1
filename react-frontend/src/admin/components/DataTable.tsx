@@ -25,7 +25,8 @@ import {
   type Selection,
   type SortDescriptor,
 } from '@heroui/react';
-import { Search, RefreshCw } from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

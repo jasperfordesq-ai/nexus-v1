@@ -26,30 +26,28 @@ import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Input, Chip, Tabs, Tab, Select, SelectItem, Switch } from '@heroui/react';
-import {
-  Briefcase,
-  Search,
-  Plus,
-  MapPin,
-  Clock,
-  Eye,
-  FileText,
-  RefreshCw,
-  AlertTriangle,
-  ChevronRight,
-  Wifi,
-  DollarSign,
-  Heart,
-  Timer,
-  Bookmark,
-  BookmarkCheck,
-  Bell,
-  Star,
-  Edit,
-  Rocket,
-  ArrowUpDown,
-  TrendingUp,
-} from 'lucide-react';
+import Briefcase from 'lucide-react/icons/briefcase';
+import Search from 'lucide-react/icons/search';
+import Plus from 'lucide-react/icons/plus';
+import MapPin from 'lucide-react/icons/map-pin';
+import Clock from 'lucide-react/icons/clock';
+import Eye from 'lucide-react/icons/eye';
+import FileText from 'lucide-react/icons/file-text';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import Wifi from 'lucide-react/icons/wifi';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import Heart from 'lucide-react/icons/heart';
+import Timer from 'lucide-react/icons/timer';
+import Bookmark from 'lucide-react/icons/bookmark';
+import BookmarkCheck from 'lucide-react/icons/bookmark-check';
+import Bell from 'lucide-react/icons/bell';
+import Star from 'lucide-react/icons/star';
+import Edit from 'lucide-react/icons/square-pen';
+import Rocket from 'lucide-react/icons/rocket';
+import ArrowUpDown from 'lucide-react/icons/arrow-up-down';
+import TrendingUp from 'lucide-react/icons/trending-up';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';

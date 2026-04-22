@@ -25,7 +25,11 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@heroui/react';
-import { Search, Plus, X, Star, Sparkles } from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import Plus from 'lucide-react/icons/plus';
+import X from 'lucide-react/icons/x';
+import Star from 'lucide-react/icons/star';
+import Sparkles from 'lucide-react/icons/sparkles';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

@@ -16,20 +16,18 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button, Chip, Spinner } from '@heroui/react';
-import {
-  BarChart3,
-  Eye,
-  Users,
-  FileText,
-  TrendingUp,
-  Clock,
-  ArrowLeft,
-  RefreshCw,
-  Download,
-  Share2,
-  Star,
-  Sparkles,
-} from 'lucide-react';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Eye from 'lucide-react/icons/eye';
+import Users from 'lucide-react/icons/users';
+import FileText from 'lucide-react/icons/file-text';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Clock from 'lucide-react/icons/clock';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Download from 'lucide-react/icons/download';
+import Share2 from 'lucide-react/icons/share-2';
+import Star from 'lucide-react/icons/star';
+import Sparkles from 'lucide-react/icons/sparkles';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

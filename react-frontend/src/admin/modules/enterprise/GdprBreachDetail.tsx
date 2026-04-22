@@ -15,10 +15,15 @@ import {
   Card, CardBody, CardHeader, Chip, Button, Spinner,
   Textarea, Divider, Progress,
 } from '@heroui/react';
-import {
-  ArrowLeft, Save, AlertTriangle, Shield, CheckCircle,
-  Search, Ban, ArrowUpCircle, Bell,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Shield from 'lucide-react/icons/shield';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Search from 'lucide-react/icons/search';
+import Ban from 'lucide-react/icons/ban';
+import ArrowUpCircle from 'lucide-react/icons/circle-arrow-up';
+import Bell from 'lucide-react/icons/bell';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';

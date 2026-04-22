@@ -17,11 +17,23 @@ import {
   Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
   Divider,
 } from '@heroui/react';
-import {
-  ArrowLeft, CheckCircle, Eye, MousePointer, BarChart3,
-  Trophy, Send, Mail, ExternalLink, Clock, Monitor, Smartphone,
-  Tablet, HelpCircle, Copy, FileText, TrendingUp,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Eye from 'lucide-react/icons/eye';
+import MousePointer from 'lucide-react/icons/mouse-pointer';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Trophy from 'lucide-react/icons/trophy';
+import Send from 'lucide-react/icons/send';
+import Mail from 'lucide-react/icons/mail';
+import ExternalLink from 'lucide-react/icons/external-link';
+import Clock from 'lucide-react/icons/clock';
+import Monitor from 'lucide-react/icons/monitor';
+import Smartphone from 'lucide-react/icons/smartphone';
+import Tablet from 'lucide-react/icons/tablet';
+import HelpCircle from 'lucide-react/icons/circle-help';
+import Copy from 'lucide-react/icons/copy';
+import FileText from 'lucide-react/icons/file-text';
+import TrendingUp from 'lucide-react/icons/trending-up';
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, PieChart, Pie, Cell,

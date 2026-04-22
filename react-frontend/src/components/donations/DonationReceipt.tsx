@@ -12,7 +12,9 @@
 
 import { useEffect, useState } from 'react';
 import { Button, Card, CardBody, CardHeader, Chip, Spinner } from '@heroui/react';
-import { AlertTriangle, Printer, Receipt } from 'lucide-react';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Printer from 'lucide-react/icons/printer';
+import Receipt from 'lucide-react/icons/receipt';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { formatCurrency, formatDateValue } from '@/lib/helpers';

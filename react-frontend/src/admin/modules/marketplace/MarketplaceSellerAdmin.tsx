@@ -16,15 +16,13 @@ import {
   Chip,
   Tooltip,
 } from '@heroui/react';
-import {
-  Store,
-  ShieldCheck,
-  UserX,
-  Eye,
-  RefreshCw,
-  BadgeCheck,
-  Star,
-} from 'lucide-react';
+import Store from 'lucide-react/icons/store';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import UserX from 'lucide-react/icons/user-x';
+import Eye from 'lucide-react/icons/eye';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import BadgeCheck from 'lucide-react/icons/badge-check';
+import Star from 'lucide-react/icons/star';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';

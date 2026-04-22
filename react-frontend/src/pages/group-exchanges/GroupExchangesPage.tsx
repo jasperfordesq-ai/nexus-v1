@@ -26,15 +26,13 @@ import {
   Tab,
   Avatar,
 } from '@heroui/react';
-import {
-  Plus,
-  Users,
-  Clock,
-  ArrowLeftRight,
-  Calendar,
-  RefreshCw,
-  AlertTriangle,
-} from 'lucide-react';
+import Plus from 'lucide-react/icons/plus';
+import Users from 'lucide-react/icons/users';
+import Clock from 'lucide-react/icons/clock';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import Calendar from 'lucide-react/icons/calendar';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

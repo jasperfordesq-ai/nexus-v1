@@ -13,7 +13,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Spinner } from '@heroui/react';
-import { TrendingUp } from 'lucide-react';
+import TrendingUp from 'lucide-react/icons/trending-up';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';

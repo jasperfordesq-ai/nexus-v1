@@ -12,7 +12,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Button, Chip, Divider, Spinner } from '@heroui/react';
-import { ArrowLeft, User, Shield, Clock } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import User from 'lucide-react/icons/user';
+import Shield from 'lucide-react/icons/shield';
+import Clock from 'lucide-react/icons/clock';
 import { usePageTitle } from '@/hooks';
 import { adminBroker } from '../../api/adminApi';
 import type { ExchangeDetail as ExchangeDetailType } from '../../api/types';

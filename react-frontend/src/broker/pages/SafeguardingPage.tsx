@@ -22,14 +22,12 @@ import {
   ModalFooter,
   Textarea,
 } from '@heroui/react';
-import {
-  Shield,
-  Flag,
-  AlertTriangle,
-  Eye,
-  Users,
-  Heart,
-} from 'lucide-react';
+import Shield from 'lucide-react/icons/shield';
+import Flag from 'lucide-react/icons/flag';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Eye from 'lucide-react/icons/eye';
+import Users from 'lucide-react/icons/users';
+import Heart from 'lucide-react/icons/heart';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

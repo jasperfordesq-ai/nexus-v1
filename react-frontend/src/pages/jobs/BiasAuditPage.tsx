@@ -25,17 +25,15 @@ import {
   SelectItem,
   Chip,
 } from '@heroui/react';
-import {
-  ShieldCheck,
-  ArrowLeft,
-  RefreshCw,
-  Users,
-  Clock,
-  TrendingUp,
-  BarChart3,
-  AlertTriangle,
-  Info,
-} from 'lucide-react';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Users from 'lucide-react/icons/users';
+import Clock from 'lucide-react/icons/clock';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
 import {
   BarChart,

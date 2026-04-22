@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Chip } from '@heroui/react';
-import { Target } from 'lucide-react';
+import Target from 'lucide-react/icons/target';
 import { useTranslation } from 'react-i18next';
 import type { MatchResult } from './JobDetailTypes';
 

@@ -11,7 +11,14 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Button, Spinner, Chip, Tooltip } from '@heroui/react';
-import { CreditCard, Plus, Pencil, Trash2, RefreshCw, CheckCircle, AlertCircle, Users } from 'lucide-react';
+import CreditCard from 'lucide-react/icons/credit-card';
+import Plus from 'lucide-react/icons/plus';
+import Pencil from 'lucide-react/icons/pencil';
+import Trash2 from 'lucide-react/icons/trash-2';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import Users from 'lucide-react/icons/users';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast, useAuth } from '@/contexts';

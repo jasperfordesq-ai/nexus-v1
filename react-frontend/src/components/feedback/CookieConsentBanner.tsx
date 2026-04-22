@@ -17,7 +17,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Switch } from '@heroui/react';
-import { Cookie, ChevronDown, ChevronUp, Shield, ExternalLink } from 'lucide-react';
+import Cookie from 'lucide-react/icons/cookie';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import ChevronUp from 'lucide-react/icons/chevron-up';
+import Shield from 'lucide-react/icons/shield';
+import ExternalLink from 'lucide-react/icons/external-link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCookieConsent } from '@/contexts/CookieConsentContext';
 import { useTenant } from '@/contexts';

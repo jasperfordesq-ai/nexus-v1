@@ -15,10 +15,18 @@ import {
   Divider, Switch, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
   Tooltip, Spinner,
 } from '@heroui/react';
-import {
-  Save, ArrowLeft, Send, TestTube, Users, Calendar, Repeat, Target,
-  MapPin, UsersRound, AlertCircle, CheckCircle,
-} from 'lucide-react';
+import Save from 'lucide-react/icons/save';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Send from 'lucide-react/icons/send';
+import TestTube from 'lucide-react/icons/test-tube';
+import Users from 'lucide-react/icons/users';
+import Calendar from 'lucide-react/icons/calendar';
+import Repeat from 'lucide-react/icons/repeat';
+import Target from 'lucide-react/icons/target';
+import MapPin from 'lucide-react/icons/map-pin';
+import UsersRound from 'lucide-react/icons/users-round';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';

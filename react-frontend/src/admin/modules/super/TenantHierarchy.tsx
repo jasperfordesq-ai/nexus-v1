@@ -11,18 +11,16 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardBody, Button, Chip, Spinner } from '@heroui/react';
-import {
-  ChevronRight,
-  ChevronDown,
-  ChevronsDownUp,
-  ChevronsUpDown,
-  Building2,
-  Users,
-  RefreshCw,
-  Network,
-  Plus,
-  List,
-} from 'lucide-react';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import ChevronsDownUp from 'lucide-react/icons/chevrons-down-up';
+import ChevronsUpDown from 'lucide-react/icons/chevrons-up-down';
+import Building2 from 'lucide-react/icons/building-2';
+import Users from 'lucide-react/icons/users';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Network from 'lucide-react/icons/network';
+import Plus from 'lucide-react/icons/plus';
+import List from 'lucide-react/icons/list';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';

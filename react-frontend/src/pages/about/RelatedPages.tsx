@@ -11,15 +11,13 @@
  */
 
 import { Link } from 'react-router-dom';
-import {
-  BookOpen,
-  Handshake,
-  Stethoscope,
-  TrendingUp,
-  BarChart3,
-  Compass,
-  ArrowRight,
-} from 'lucide-react';
+import BookOpen from 'lucide-react/icons/book-open';
+import Handshake from 'lucide-react/icons/handshake';
+import Stethoscope from 'lucide-react/icons/stethoscope';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Compass from 'lucide-react/icons/compass';
+import ArrowRight from 'lucide-react/icons/arrow-right';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';

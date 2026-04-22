@@ -37,16 +37,14 @@ import {
   Chip,
   Checkbox,
 } from '@heroui/react';
-import {
-  UserX,
-  Download,
-  RefreshCw,
-  AlertTriangle,
-  Clock,
-  Bell,
-  Scan,
-  Activity,
-} from 'lucide-react';
+import UserX from 'lucide-react/icons/user-x';
+import Download from 'lucide-react/icons/download';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Clock from 'lucide-react/icons/clock';
+import Bell from 'lucide-react/icons/bell';
+import Scan from 'lucide-react/icons/scan';
+import Activity from 'lucide-react/icons/activity';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts/ToastContext';
 import { api, tokenManager } from '@/lib/api';

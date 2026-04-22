@@ -24,7 +24,7 @@ import {
   Tabs,
   Tab,
 } from '@heroui/react';
-import { Clock } from 'lucide-react';
+import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';

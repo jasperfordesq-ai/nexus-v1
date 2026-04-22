@@ -13,7 +13,9 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Tabs, Tab, Button, Chip, Input } from '@heroui/react';
-import { ArrowLeft, Search, Flag } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Search from 'lucide-react/icons/search';
+import Flag from 'lucide-react/icons/flag';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBroker } from '../../api/adminApi';

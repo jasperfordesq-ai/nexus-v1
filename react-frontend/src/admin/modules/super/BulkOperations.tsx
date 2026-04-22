@@ -8,7 +8,11 @@ import { Link } from 'react-router-dom';
 import {
   Card, CardBody, CardHeader, Button, Select, SelectItem, Switch, Divider, Chip, Checkbox, RadioGroup, Radio,
 } from '@heroui/react';
-import { Users, Building2, ArrowRight, CheckCheck, XCircle } from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import Building2 from 'lucide-react/icons/building-2';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import CheckCheck from 'lucide-react/icons/check-check';
+import XCircle from 'lucide-react/icons/circle-x';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';

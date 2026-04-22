@@ -12,7 +12,10 @@
 
 import { Card, CardBody } from '@heroui/react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, TrendingUp, TrendingDown, type LucideIcon } from 'lucide-react';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import TrendingDown from 'lucide-react/icons/trending-down';
+import type { LucideIcon } from 'lucide-react';
 
 interface StatCardProps {
   label: string;

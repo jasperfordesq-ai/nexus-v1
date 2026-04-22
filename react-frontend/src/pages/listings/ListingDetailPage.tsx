@@ -13,26 +13,24 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Chip, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, RadioGroup, Radio, Textarea } from '@heroui/react';
-import {
-  Clock,
-  MapPin,
-  Calendar,
-  User,
-  Tag,
-  MessageSquare,
-  Heart,
-  Edit,
-  Trash2,
-  AlertCircle,
-  ArrowRightLeft,
-  Bookmark,
-  RefreshCw,
-  BarChart3,
-  Flag,
-  Monitor,
-  HelpCircle,
-  Star,
-} from 'lucide-react';
+import Clock from 'lucide-react/icons/clock';
+import MapPin from 'lucide-react/icons/map-pin';
+import Calendar from 'lucide-react/icons/calendar';
+import User from 'lucide-react/icons/user';
+import Tag from 'lucide-react/icons/tag';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Heart from 'lucide-react/icons/heart';
+import Edit from 'lucide-react/icons/square-pen';
+import Trash2 from 'lucide-react/icons/trash-2';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import Bookmark from 'lucide-react/icons/bookmark';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Flag from 'lucide-react/icons/flag';
+import Monitor from 'lucide-react/icons/monitor';
+import HelpCircle from 'lucide-react/icons/circle-help';
+import Star from 'lucide-react/icons/star';
 import { GlassCard, ImagePlaceholder } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { Breadcrumbs } from '@/components/navigation';

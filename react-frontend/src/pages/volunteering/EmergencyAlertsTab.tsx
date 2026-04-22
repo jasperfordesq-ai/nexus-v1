@@ -14,18 +14,16 @@ import {
   Button,
   Chip,
 } from '@heroui/react';
-import {
-  AlertTriangle,
-  Bell,
-  Calendar,
-  Clock,
-  MapPin,
-  Building2,
-  CheckCircle,
-  XCircle,
-  RefreshCw,
-  Siren,
-} from 'lucide-react';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Bell from 'lucide-react/icons/bell';
+import Calendar from 'lucide-react/icons/calendar';
+import Clock from 'lucide-react/icons/clock';
+import MapPin from 'lucide-react/icons/map-pin';
+import Building2 from 'lucide-react/icons/building-2';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Siren from 'lucide-react/icons/siren';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';

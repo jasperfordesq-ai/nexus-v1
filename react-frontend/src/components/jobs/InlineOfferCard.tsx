@@ -4,12 +4,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Button } from '@heroui/react';
-import {
-  DollarSign,
-  Calendar,
-  CheckCircle,
-  XCircle,
-} from 'lucide-react';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import Calendar from 'lucide-react/icons/calendar';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { formatDateValue } from '@/lib/helpers';

@@ -5,7 +5,8 @@
 
 import { useState } from 'react';
 import { Button, Input, Textarea } from '@heroui/react';
-import { Save, Building2 } from 'lucide-react';
+import Save from 'lucide-react/icons/save';
+import Building2 from 'lucide-react/icons/building-2';
 import { GlassCard } from '@/components/ui';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

@@ -5,7 +5,12 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Avatar, Button, Chip, Spinner } from '@heroui/react';
-import { Clock, CheckCircle, XCircle, Wallet, AlertTriangle, ChevronDown } from 'lucide-react';
+import Clock from 'lucide-react/icons/clock';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Wallet from 'lucide-react/icons/wallet';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import ChevronDown from 'lucide-react/icons/chevron-down';
 import { GlassCard } from '@/components/ui';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

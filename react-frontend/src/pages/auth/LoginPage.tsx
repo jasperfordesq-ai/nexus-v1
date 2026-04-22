@@ -17,7 +17,17 @@ import { useState, useEffect, useRef, useCallback, type FormEvent } from 'react'
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Button, Input, Checkbox, Divider, Select, SelectItem } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, Shield, ArrowLeft, Loader2, Building2, Fingerprint, ShieldAlert, ShieldX } from 'lucide-react';
+import Mail from 'lucide-react/icons/mail';
+import Lock from 'lucide-react/icons/lock';
+import Eye from 'lucide-react/icons/eye';
+import EyeOff from 'lucide-react/icons/eye-off';
+import Shield from 'lucide-react/icons/shield';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Loader2 from 'lucide-react/icons/loader-circle';
+import Building2 from 'lucide-react/icons/building-2';
+import Fingerprint from 'lucide-react/icons/fingerprint';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import ShieldX from 'lucide-react/icons/shield-x';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { GlassCard } from '@/components/ui';

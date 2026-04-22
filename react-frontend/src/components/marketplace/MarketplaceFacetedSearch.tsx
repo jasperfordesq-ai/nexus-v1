@@ -23,7 +23,7 @@ import {
   Select,
   SelectItem,
 } from '@heroui/react';
-import { SlidersHorizontal } from 'lucide-react';
+import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import { useTranslation } from 'react-i18next';
 import type { MarketplaceFilters, MarketplaceCategory } from '@/types/marketplace';
 

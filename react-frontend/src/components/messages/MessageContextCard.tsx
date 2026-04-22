@@ -13,14 +13,12 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Chip, Skeleton } from '@heroui/react';
-import {
-  ListChecks,
-  Calendar,
-  Briefcase,
-  Heart,
-  ExternalLink,
-  LinkIcon,
-} from 'lucide-react';
+import ListChecks from 'lucide-react/icons/list-checks';
+import Calendar from 'lucide-react/icons/calendar';
+import Briefcase from 'lucide-react/icons/briefcase';
+import Heart from 'lucide-react/icons/heart';
+import ExternalLink from 'lucide-react/icons/external-link';
+import LinkIcon from 'lucide-react/icons/link';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

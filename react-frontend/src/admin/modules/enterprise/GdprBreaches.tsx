@@ -14,7 +14,9 @@ import {
   Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
   Input, Textarea, Select, SelectItem,
 } from '@heroui/react';
-import { RefreshCw, Plus, AlertTriangle } from 'lucide-react';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Plus from 'lucide-react/icons/plus';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';

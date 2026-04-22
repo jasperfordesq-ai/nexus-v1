@@ -24,7 +24,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@heroui/react';
-import { Briefcase, ArrowLeft, RefreshCw } from 'lucide-react';
+import Briefcase from 'lucide-react/icons/briefcase';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { useDisclosure } from '@heroui/react';
 import { GlassCard } from '@/components/ui';

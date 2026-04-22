@@ -20,17 +20,15 @@ import {
   Tabs,
   Tab,
 } from '@heroui/react';
-import {
-  Plus,
-  MoreVertical,
-  Edit,
-  Eye,
-  Trash2,
-  Shield,
-  ToggleLeft,
-  ToggleRight,
-  Network,
-} from 'lucide-react';
+import Plus from 'lucide-react/icons/plus';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Edit from 'lucide-react/icons/square-pen';
+import Eye from 'lucide-react/icons/eye';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Shield from 'lucide-react/icons/shield';
+import ToggleLeft from 'lucide-react/icons/toggle-left';
+import ToggleRight from 'lucide-react/icons/toggle-right';
+import Network from 'lucide-react/icons/network';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';

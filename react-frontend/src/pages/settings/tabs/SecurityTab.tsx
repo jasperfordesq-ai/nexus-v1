@@ -14,21 +14,19 @@ import {
   Chip,
   Spinner,
 } from '@heroui/react';
-import {
-  Lock,
-  Key,
-  LogOut,
-  Trash2,
-  AlertTriangle,
-  Eye,
-  EyeOff,
-  Monitor,
-  QrCode,
-  ShieldCheck,
-  ShieldOff,
-  Copy,
-  CheckCircle,
-} from 'lucide-react';
+import Lock from 'lucide-react/icons/lock';
+import Key from 'lucide-react/icons/key';
+import LogOut from 'lucide-react/icons/log-out';
+import Trash2 from 'lucide-react/icons/trash-2';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Eye from 'lucide-react/icons/eye';
+import EyeOff from 'lucide-react/icons/eye-off';
+import Monitor from 'lucide-react/icons/monitor';
+import QrCode from 'lucide-react/icons/qr-code';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import ShieldOff from 'lucide-react/icons/shield-off';
+import Copy from 'lucide-react/icons/copy';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
 import { GlassCard } from '@/components/ui';
 import { BiometricSettings } from '@/components/security/BiometricSettings';
 import { useTranslation } from 'react-i18next';

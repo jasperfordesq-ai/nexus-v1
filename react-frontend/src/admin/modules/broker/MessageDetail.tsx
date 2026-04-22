@@ -18,10 +18,15 @@ import {
   Textarea, Select, SelectItem,
   ScrollShadow, Spinner,
 } from '@heroui/react';
-import {
-  ArrowLeft, CheckCircle, Flag, Archive, Shield,
-  MessageCircle, User, Calendar, AlertTriangle,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Flag from 'lucide-react/icons/flag';
+import Archive from 'lucide-react/icons/archive';
+import Shield from 'lucide-react/icons/shield';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import User from 'lucide-react/icons/user';
+import Calendar from 'lucide-react/icons/calendar';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBroker } from '../../api/adminApi';

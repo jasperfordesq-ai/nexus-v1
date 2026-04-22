@@ -10,7 +10,8 @@
 
 import { useState, useEffect } from 'react';
 import { Button, Switch, Textarea, Spinner } from '@heroui/react';
-import { HandHeart, Save } from 'lucide-react';
+import HandHeart from 'lucide-react/icons/hand-heart';
+import Save from 'lucide-react/icons/save';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 import { GlassCard } from '@/components/ui';

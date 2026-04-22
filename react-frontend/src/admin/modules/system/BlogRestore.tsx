@@ -11,7 +11,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardBody, CardHeader, Button, Spinner } from '@heroui/react';
-import { RotateCcw, AlertTriangle, FileArchive, Download } from 'lucide-react';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import FileArchive from 'lucide-react/icons/file-archive';
+import Download from 'lucide-react/icons/download';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader, EmptyState, ConfirmModal } from '../../components';

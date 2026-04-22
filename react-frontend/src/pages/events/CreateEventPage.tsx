@@ -15,21 +15,19 @@ import { motion } from 'framer-motion';
 import { Button, Input, Textarea, Select, SelectItem, DatePicker, TimeInput, Switch, CheckboxGroup, Checkbox } from '@heroui/react';
 import type { DateInputValue, TimeInputValue } from '@heroui/react';
 import { parseDate, parseTime, today, getLocalTimeZone } from '@internationalized/date';
-import {
-  Save,
-  Calendar,
-  FileText,
-  CheckCircle,
-  Users,
-  AlertTriangle,
-  RefreshCw,
-  ImagePlus,
-  X,
-  Tag,
-  Repeat,
-  Video,
-  BarChart3,
-} from 'lucide-react';
+import Save from 'lucide-react/icons/save';
+import Calendar from 'lucide-react/icons/calendar';
+import FileText from 'lucide-react/icons/file-text';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Users from 'lucide-react/icons/users';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ImagePlus from 'lucide-react/icons/image-plus';
+import X from 'lucide-react/icons/x';
+import Tag from 'lucide-react/icons/tag';
+import Repeat from 'lucide-react/icons/repeat';
+import Video from 'lucide-react/icons/video';
+import BarChart3 from 'lucide-react/icons/chart-column';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';

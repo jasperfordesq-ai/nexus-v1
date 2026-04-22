@@ -27,7 +27,13 @@ import {
   Avatar,
   Spinner,
 } from '@heroui/react';
-import { ArrowLeft, Eye, MessageCircleOff, UserPlus, UserMinus, X, Search } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Eye from 'lucide-react/icons/eye';
+import MessageCircleOff from 'lucide-react/icons/message-circle-off';
+import UserPlus from 'lucide-react/icons/user-plus';
+import UserMinus from 'lucide-react/icons/user-minus';
+import X from 'lucide-react/icons/x';
+import Search from 'lucide-react/icons/search';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';

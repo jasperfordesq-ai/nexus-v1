@@ -21,7 +21,9 @@ import {
   Textarea,
   useDisclosure,
 } from '@heroui/react';
-import { ArrowLeft, AlertTriangle, Flag } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Flag from 'lucide-react/icons/flag';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { FeedCard } from '@/components/feed/FeedCard';

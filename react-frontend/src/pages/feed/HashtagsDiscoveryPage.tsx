@@ -15,14 +15,12 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Input, Spinner } from '@heroui/react';
-import {
-  Hash,
-  Search,
-  TrendingUp,
-  RefreshCw,
-  AlertTriangle,
-  ArrowLeft,
-} from 'lucide-react';
+import Hash from 'lucide-react/icons/hash';
+import Search from 'lucide-react/icons/search';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { EmptyState } from '@/components/feedback';

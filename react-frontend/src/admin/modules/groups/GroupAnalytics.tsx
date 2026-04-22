@@ -10,7 +10,11 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Spinner } from '@heroui/react';
-import { Users, UserCheck, BarChart3, Clock, ShieldCheck } from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import UserCheck from 'lucide-react/icons/user-check';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Clock from 'lucide-react/icons/clock';
+import ShieldCheck from 'lucide-react/icons/shield-check';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminGroups } from '../../api/adminApi';

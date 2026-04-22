@@ -22,13 +22,11 @@ import {
   Spinner,
   Button,
 } from '@heroui/react';
-import {
-  Target,
-  Search,
-  User,
-  RefreshCw,
-  Sparkles,
-} from 'lucide-react';
+import Target from 'lucide-react/icons/target';
+import Search from 'lucide-react/icons/search';
+import User from 'lucide-react/icons/user';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Sparkles from 'lucide-react/icons/sparkles';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

@@ -15,10 +15,17 @@ import {
   useDisclosure, Chip, Spinner, Pagination, Avatar,
   Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Checkbox,
 } from '@heroui/react';
-import {
-  ClipboardList, Plus, Calendar, AlertTriangle, CheckCircle,
-  Clock, MoreVertical, Trash2, Edit3, User, Search,
-} from 'lucide-react';
+import ClipboardList from 'lucide-react/icons/clipboard-list';
+import Plus from 'lucide-react/icons/plus';
+import Calendar from 'lucide-react/icons/calendar';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Clock from 'lucide-react/icons/clock';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Edit3 from 'lucide-react/icons/pen-line';
+import User from 'lucide-react/icons/user';
+import Search from 'lucide-react/icons/search';
 import { Link } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';

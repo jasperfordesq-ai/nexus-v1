@@ -21,10 +21,18 @@ import {
   Card, CardBody, CardHeader, Switch, Input, Button, Spinner,
   Chip, Divider, Textarea,
 } from '@heroui/react';
-import {
-  Save, RefreshCw, ExternalLink, FileText, Globe, Image,
-  Search, Share2, CheckCircle, AlertTriangle, XCircle, BarChart3,
-} from 'lucide-react';
+import Save from 'lucide-react/icons/save';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ExternalLink from 'lucide-react/icons/external-link';
+import FileText from 'lucide-react/icons/file-text';
+import Globe from 'lucide-react/icons/globe';
+import Image from 'lucide-react/icons/image';
+import Search from 'lucide-react/icons/search';
+import Share2 from 'lucide-react/icons/share-2';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import XCircle from 'lucide-react/icons/circle-x';
+import BarChart3 from 'lucide-react/icons/chart-column';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';

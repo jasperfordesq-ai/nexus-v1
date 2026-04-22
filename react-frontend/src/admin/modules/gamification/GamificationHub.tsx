@@ -12,7 +12,16 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Select, SelectItem, Textarea, useDisclosure } from '@heroui/react';
-import { Award, Users, Zap, Target, RefreshCw, ArrowRight, Megaphone, BarChart3, Settings2, Gift } from 'lucide-react';
+import Award from 'lucide-react/icons/award';
+import Users from 'lucide-react/icons/users';
+import Zap from 'lucide-react/icons/zap';
+import Target from 'lucide-react/icons/target';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import Megaphone from 'lucide-react/icons/megaphone';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Settings2 from 'lucide-react/icons/settings-2';
+import Gift from 'lucide-react/icons/gift';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';

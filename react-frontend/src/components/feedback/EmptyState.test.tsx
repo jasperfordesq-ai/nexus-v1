@@ -10,7 +10,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@/test/test-utils';
 import { EmptyState } from './EmptyState';
-import { Search } from 'lucide-react';
+import Search from 'lucide-react/icons/search';
 
 describe('EmptyState', () => {
   it('renders title and description', () => {

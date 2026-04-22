@@ -21,16 +21,14 @@ import {
   Tabs,
   Tab,
 } from '@heroui/react';
-import {
-  FileText,
-  Plus,
-  RefreshCw,
-  MoreVertical,
-  Pencil,
-  Copy,
-  Eye,
-  Trash2,
-} from 'lucide-react';
+import FileText from 'lucide-react/icons/file-text';
+import Plus from 'lucide-react/icons/plus';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Pencil from 'lucide-react/icons/pencil';
+import Copy from 'lucide-react/icons/copy';
+import Eye from 'lucide-react/icons/eye';
+import Trash2 from 'lucide-react/icons/trash-2';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';

@@ -14,28 +14,26 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
-import {
-  FileText,
-  BookOpen,
-  BarChart3,
-  Activity,
-  Users,
-  Calculator,
-  MessageSquare,
-  Lightbulb,
-  Quote,
-  Download,
-  ExternalLink,
-  ChevronRight,
-  TrendingUp,
-  Heart,
-  ArrowUp,
-  Clock,
-  LogIn,
-  ArrowRightLeft,
-  Wallet,
-  Mail,
-} from 'lucide-react';
+import FileText from 'lucide-react/icons/file-text';
+import BookOpen from 'lucide-react/icons/book-open';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Activity from 'lucide-react/icons/activity';
+import Users from 'lucide-react/icons/users';
+import Calculator from 'lucide-react/icons/calculator';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Lightbulb from 'lucide-react/icons/lightbulb';
+import Quote from 'lucide-react/icons/quote';
+import Download from 'lucide-react/icons/download';
+import ExternalLink from 'lucide-react/icons/external-link';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Heart from 'lucide-react/icons/heart';
+import ArrowUp from 'lucide-react/icons/arrow-up';
+import Clock from 'lucide-react/icons/clock';
+import LogIn from 'lucide-react/icons/log-in';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import Wallet from 'lucide-react/icons/wallet';
+import Mail from 'lucide-react/icons/mail';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';

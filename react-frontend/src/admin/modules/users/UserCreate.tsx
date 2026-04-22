@@ -20,7 +20,8 @@ import {
   SelectItem,
   Switch,
 } from '@heroui/react';
-import { ArrowLeft, Save } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminUsers } from '../../api/adminApi';

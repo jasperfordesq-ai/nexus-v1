@@ -9,7 +9,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@heroui/react';
-import { Landmark, TrendingUp, TrendingDown, Heart, AlertTriangle, RefreshCw } from 'lucide-react';
+import Landmark from 'lucide-react/icons/landmark';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import TrendingDown from 'lucide-react/icons/trending-down';
+import Heart from 'lucide-react/icons/heart';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { api } from '@/lib/api';

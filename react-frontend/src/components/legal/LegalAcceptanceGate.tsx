@@ -23,7 +23,8 @@ import {
   Button,
   Chip,
 } from '@heroui/react';
-import { FileText, ExternalLink } from 'lucide-react';
+import FileText from 'lucide-react/icons/file-text';
+import ExternalLink from 'lucide-react/icons/external-link';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { PendingDocument } from '@/hooks/useLegalGate';

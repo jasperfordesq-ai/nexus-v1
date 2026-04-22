@@ -24,11 +24,25 @@ import {
   Spinner,
   Checkbox,
 } from '@heroui/react';
-import {
-  Building2, Save, ArrowLeft, Calendar, Users, Trophy, Target, BookOpen, Library,
-  Heart, ArrowRightLeft, Network, Building, ShoppingBag, Wallet, MessageCircle,
-  LayoutDashboard, Rss, Eye,
-} from 'lucide-react';
+import Building2 from 'lucide-react/icons/building-2';
+import Save from 'lucide-react/icons/save';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Calendar from 'lucide-react/icons/calendar';
+import Users from 'lucide-react/icons/users';
+import Trophy from 'lucide-react/icons/trophy';
+import Target from 'lucide-react/icons/target';
+import BookOpen from 'lucide-react/icons/book-open';
+import Library from 'lucide-react/icons/library';
+import Heart from 'lucide-react/icons/heart';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import Network from 'lucide-react/icons/network';
+import Building from 'lucide-react/icons/building';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import Wallet from 'lucide-react/icons/wallet';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
+import Rss from 'lucide-react/icons/rss';
+import Eye from 'lucide-react/icons/eye';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';

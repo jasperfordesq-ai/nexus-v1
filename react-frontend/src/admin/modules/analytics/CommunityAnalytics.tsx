@@ -28,18 +28,16 @@ import {
   AreaChart,
 } from 'recharts';
 import { CHART_COLORS, CHART_COLOR_MAP } from '@/lib/chartColors';
-import {
-  TrendingUp,
-  Users,
-  Clock,
-  Activity,
-  Download,
-  RefreshCw,
-  BarChart3,
-  PieChart as PieChartIcon,
-  MapPin,
-  Globe,
-} from 'lucide-react';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Users from 'lucide-react/icons/users';
+import Clock from 'lucide-react/icons/clock';
+import Activity from 'lucide-react/icons/activity';
+import Download from 'lucide-react/icons/download';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import PieChartIcon from 'lucide-react/icons/chart-pie';
+import MapPin from 'lucide-react/icons/map-pin';
+import Globe from 'lucide-react/icons/globe';
 import { usePageTitle } from '@/hooks';
 import api from '@/lib/api';
 import { LocationMap } from '@/components/location';

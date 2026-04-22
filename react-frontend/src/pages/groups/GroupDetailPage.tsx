@@ -13,11 +13,9 @@ import { Helmet } from 'react-helmet-async';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, useDisclosure } from '@heroui/react';
-import {
-  AlertCircle,
-  ArrowLeft,
-  RefreshCw,
-} from 'lucide-react';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { Breadcrumbs } from '@/components/navigation';

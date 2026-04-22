@@ -11,16 +11,14 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardBody, Chip, Button } from '@heroui/react';
-import {
-  FileWarning,
-  UserCheck,
-  AlertTriangle,
-  ClipboardList,
-  ArrowRight,
-  RefreshCw,
-  Plus,
-  ShieldAlert,
-} from 'lucide-react';
+import FileWarning from 'lucide-react/icons/file-warning';
+import UserCheck from 'lucide-react/icons/user-check';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import ClipboardList from 'lucide-react/icons/clipboard-list';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Plus from 'lucide-react/icons/plus';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';

@@ -9,7 +9,8 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Users, ChevronRight } from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import ChevronRight from 'lucide-react/icons/chevron-right';
 import { GlassCard } from '@/components/ui';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';

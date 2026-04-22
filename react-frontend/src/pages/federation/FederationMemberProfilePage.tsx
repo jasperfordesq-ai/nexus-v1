@@ -28,21 +28,19 @@ import {
   Tooltip,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Globe,
-  MapPin,
-  MessageSquare,
-  ArrowLeft,
-  AlertTriangle,
-  RefreshCw,
-  Home,
-  Compass,
-  Car,
-  User,
-  UserPlus,
-  Coins,
-  Star,
-} from 'lucide-react';
+import Globe from 'lucide-react/icons/globe';
+import MapPin from 'lucide-react/icons/map-pin';
+import MessageSquare from 'lucide-react/icons/message-square';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Home from 'lucide-react/icons/house';
+import Compass from 'lucide-react/icons/compass';
+import Car from 'lucide-react/icons/car';
+import User from 'lucide-react/icons/user';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Coins from 'lucide-react/icons/coins';
+import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';

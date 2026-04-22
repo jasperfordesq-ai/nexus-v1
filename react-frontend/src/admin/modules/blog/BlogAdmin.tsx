@@ -12,7 +12,11 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, Tab, Button, Chip } from '@heroui/react';
-import { Plus, Pencil, Trash2, ToggleLeft, Send } from 'lucide-react';
+import Plus from 'lucide-react/icons/plus';
+import Pencil from 'lucide-react/icons/pencil';
+import Trash2 from 'lucide-react/icons/trash-2';
+import ToggleLeft from 'lucide-react/icons/toggle-left';
+import Send from 'lucide-react/icons/send';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBlog, type BulkActionResult } from '../../api/adminApi';

@@ -19,13 +19,11 @@ import {
   Avatar,
   Chip,
 } from '@heroui/react';
-import {
-  TrendingUp,
-  Users,
-  BarChart3,
-  Download,
-  Award,
-} from 'lucide-react';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Users from 'lucide-react/icons/users';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Download from 'lucide-react/icons/download';
+import Award from 'lucide-react/icons/award';
 import {
   LineChart,
   Line,

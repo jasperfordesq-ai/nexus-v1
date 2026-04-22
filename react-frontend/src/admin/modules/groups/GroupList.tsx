@@ -16,7 +16,15 @@ import {
   Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input,
 } from '@heroui/react';
-import { Trash2, Users, Eye, EyeOff, Lock, MoreVertical, Power, PowerOff, Pencil } from 'lucide-react';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Users from 'lucide-react/icons/users';
+import Eye from 'lucide-react/icons/eye';
+import EyeOff from 'lucide-react/icons/eye-off';
+import Lock from 'lucide-react/icons/lock';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Power from 'lucide-react/icons/power';
+import PowerOff from 'lucide-react/icons/power-off';
+import Pencil from 'lucide-react/icons/pencil';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminGroups } from '../../api/adminApi';

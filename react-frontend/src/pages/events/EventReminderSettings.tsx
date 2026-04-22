@@ -15,7 +15,8 @@
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Card, CardBody } from '@heroui/react';
-import { Bell, Clock } from 'lucide-react';
+import Bell from 'lucide-react/icons/bell';
+import Clock from 'lucide-react/icons/clock';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
 export function EventReminderSettings() {

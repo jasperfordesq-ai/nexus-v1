@@ -16,11 +16,9 @@ import {
   Button,
   Tooltip,
 } from '@heroui/react';
-import {
-  Copy,
-  Mail,
-  Check,
-} from 'lucide-react';
+import Copy from 'lucide-react/icons/copy';
+import Mail from 'lucide-react/icons/mail';
+import Check from 'lucide-react/icons/check';
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';

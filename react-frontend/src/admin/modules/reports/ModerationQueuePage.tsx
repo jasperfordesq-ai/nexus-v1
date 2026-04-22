@@ -47,16 +47,14 @@ import {
   Input,
   Divider,
 } from '@heroui/react';
-import {
-  Shield,
-  RefreshCw,
-  CheckCircle,
-  XCircle,
-  Clock,
-  AlertTriangle,
-  Settings,
-  Filter,
-} from 'lucide-react';
+import Shield from 'lucide-react/icons/shield';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Clock from 'lucide-react/icons/clock';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Settings from 'lucide-react/icons/settings';
+import Filter from 'lucide-react/icons/filter';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts/ToastContext';
 import { api } from '@/lib/api';

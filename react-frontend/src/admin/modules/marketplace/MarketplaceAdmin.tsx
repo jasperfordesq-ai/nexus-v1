@@ -25,17 +25,15 @@ import {
   TableColumn,
   TableCell,
 } from '@heroui/react';
-import {
-  ShoppingBag,
-  Store,
-  PackageCheck,
-  Clock,
-  DollarSign,
-  RefreshCw,
-  ChevronRight,
-  Shield,
-  Users,
-} from 'lucide-react';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import Store from 'lucide-react/icons/store';
+import PackageCheck from 'lucide-react/icons/package-check';
+import Clock from 'lucide-react/icons/clock';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import Shield from 'lucide-react/icons/shield';
+import Users from 'lucide-react/icons/users';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';

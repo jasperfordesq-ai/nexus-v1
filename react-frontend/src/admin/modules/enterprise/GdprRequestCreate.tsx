@@ -14,9 +14,15 @@ import { useNavigate } from 'react-router-dom';
 import {
   Card, CardBody, Input, Textarea, Select, SelectItem, Button, Chip, Spinner,
 } from '@heroui/react';
-import {
-  ArrowLeft, Save, Eye, Trash2, Download, Edit, Lock, AlertTriangle, Search,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
+import Eye from 'lucide-react/icons/eye';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Download from 'lucide-react/icons/download';
+import Edit from 'lucide-react/icons/square-pen';
+import Lock from 'lucide-react/icons/lock';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Search from 'lucide-react/icons/search';
 import type { LucideIcon } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';

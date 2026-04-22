@@ -13,7 +13,7 @@
  */
 
 import { Popover, PopoverTrigger, PopoverContent, Button } from '@heroui/react';
-import { Info } from 'lucide-react';
+import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
 import type { FeedItem } from './types';
 

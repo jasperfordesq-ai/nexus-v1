@@ -11,7 +11,13 @@
  */
 
 import { Card, CardBody, CardHeader, Divider, Chip } from '@heroui/react';
-import { FlaskConical, CheckCircle, AlertTriangle, Bug, Shield, Users, ExternalLink } from 'lucide-react';
+import FlaskConical from 'lucide-react/icons/flask-conical';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Bug from 'lucide-react/icons/bug';
+import Shield from 'lucide-react/icons/shield';
+import Users from 'lucide-react/icons/users';
+import ExternalLink from 'lucide-react/icons/external-link';
 import { useTranslation } from 'react-i18next';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks/usePageTitle';

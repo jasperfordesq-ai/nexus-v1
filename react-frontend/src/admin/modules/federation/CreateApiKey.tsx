@@ -10,7 +10,10 @@
 
 import { useState } from 'react';
 import { Card, CardBody, CardHeader, Input, Button, Checkbox } from '@heroui/react';
-import { Key, ArrowLeft, Copy, Calendar } from 'lucide-react';
+import Key from 'lucide-react/icons/key';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Copy from 'lucide-react/icons/copy';
+import Calendar from 'lucide-react/icons/calendar';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';

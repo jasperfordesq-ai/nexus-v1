@@ -24,7 +24,10 @@ import {
   Spinner,
   useDisclosure,
 } from '@heroui/react';
-import { Shield, Trash2, CheckCircle2, Lock } from 'lucide-react';
+import Shield from 'lucide-react/icons/shield';
+import Trash2 from 'lucide-react/icons/trash-2';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import Lock from 'lucide-react/icons/lock';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useToast } from '@/contexts';

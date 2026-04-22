@@ -15,11 +15,9 @@ import {
   DropdownMenu,
   DropdownItem,
 } from '@heroui/react';
-import {
-  Share2,
-  Link2,
-  Repeat2,
-} from 'lucide-react';
+import Share2 from 'lucide-react/icons/share-2';
+import Link2 from 'lucide-react/icons/link-2';
+import Repeat2 from 'lucide-react/icons/repeat-2';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { logError } from '@/lib/logger';

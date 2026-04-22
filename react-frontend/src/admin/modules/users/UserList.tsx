@@ -29,24 +29,22 @@ import {
   Select,
   SelectItem,
 } from '@heroui/react';
-import {
-  Plus,
-  Upload,
-  Download,
-  MoreVertical,
-  UserCheck,
-  UserX,
-  Ban,
-  RotateCcw,
-  Edit,
-  Shield,
-  KeyRound,
-  LogIn,
-  FileUp,
-  CheckCircle2,
-  AlertCircle,
-  Trash2,
-} from 'lucide-react';
+import Plus from 'lucide-react/icons/plus';
+import Upload from 'lucide-react/icons/upload';
+import Download from 'lucide-react/icons/download';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import UserCheck from 'lucide-react/icons/user-check';
+import UserX from 'lucide-react/icons/user-x';
+import Ban from 'lucide-react/icons/ban';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
+import Edit from 'lucide-react/icons/square-pen';
+import Shield from 'lucide-react/icons/shield';
+import KeyRound from 'lucide-react/icons/key-round';
+import LogIn from 'lucide-react/icons/log-in';
+import FileUp from 'lucide-react/icons/file-up';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import Trash2 from 'lucide-react/icons/trash-2';
 import { useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';

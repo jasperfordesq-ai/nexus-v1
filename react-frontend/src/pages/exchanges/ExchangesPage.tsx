@@ -10,15 +10,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Button, Avatar, Chip, Tabs, Tab } from '@heroui/react';
-import {
-  ArrowRightLeft,
-  Clock,
-  Calendar,
-  User,
-  Plus,
-  RefreshCw,
-  AlertTriangle,
-} from 'lucide-react';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import Clock from 'lucide-react/icons/clock';
+import Calendar from 'lucide-react/icons/calendar';
+import User from 'lucide-react/icons/user';
+import Plus from 'lucide-react/icons/plus';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, ExchangeCardSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

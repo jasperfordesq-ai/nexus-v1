@@ -19,7 +19,10 @@ import {
   Card, CardBody, Switch, Input, Select, SelectItem,
   Button, Chip, Spinner, Divider,
 } from '@heroui/react';
-import { ExternalLink, Save, Info, Construction } from 'lucide-react';
+import ExternalLink from 'lucide-react/icons/external-link';
+import Save from 'lucide-react/icons/save';
+import Info from 'lucide-react/icons/info';
+import Construction from 'lucide-react/icons/construction';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useToast, useTenant } from '@/contexts';

@@ -25,18 +25,16 @@ import {
   CardBody,
   CardHeader,
 } from '@heroui/react';
-import {
-  ShieldAlert,
-  RefreshCw,
-  AlertTriangle,
-  Search,
-  Eye,
-  CheckCircle,
-  Clock,
-  Users,
-  Activity,
-  ArrowRight,
-} from 'lucide-react';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Search from 'lucide-react/icons/search';
+import Eye from 'lucide-react/icons/eye';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Clock from 'lucide-react/icons/clock';
+import Users from 'lucide-react/icons/users';
+import Activity from 'lucide-react/icons/activity';
+import ArrowRight from 'lucide-react/icons/arrow-right';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';

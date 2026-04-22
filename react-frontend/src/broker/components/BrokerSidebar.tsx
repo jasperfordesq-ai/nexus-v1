@@ -14,18 +14,16 @@ import { useTranslation } from 'react-i18next';
 import { Button, Chip, Tooltip } from '@heroui/react';
 import { useAuth, useTenant } from '@/contexts';
 import { adminBroker, adminUsers } from '@/admin/api/adminApi';
-import {
-  LayoutDashboard,
-  Users,
-  UserPlus,
-  ShieldAlert,
-  ShieldCheck,
-  ArrowLeftRight,
-  MessageSquareWarning,
-  PanelLeftClose,
-  PanelLeft,
-  Settings,
-} from 'lucide-react';
+import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
+import Users from 'lucide-react/icons/users';
+import UserPlus from 'lucide-react/icons/user-plus';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
+import PanelLeftClose from 'lucide-react/icons/panel-left-close';
+import PanelLeft from 'lucide-react/icons/panel-left';
+import Settings from 'lucide-react/icons/settings';
 
 interface BrokerSidebarProps {
   collapsed: boolean;

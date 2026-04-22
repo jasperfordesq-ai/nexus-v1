@@ -18,16 +18,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Button, Input } from '@heroui/react';
-import {
-  Search,
-  Plus,
-  ShoppingBag,
-  Star,
-  Grid3X3,
-  Heart,
-  Package,
-  HandCoins,
-} from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import Plus from 'lucide-react/icons/plus';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import Star from 'lucide-react/icons/star';
+import Grid3X3 from 'lucide-react/icons/grid-3x3';
+import Heart from 'lucide-react/icons/heart';
+import Package from 'lucide-react/icons/package';
+import HandCoins from 'lucide-react/icons/hand-coins';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

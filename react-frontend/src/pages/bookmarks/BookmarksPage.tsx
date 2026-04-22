@@ -30,20 +30,18 @@ import {
   DropdownItem,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Bookmark,
-  BookmarkCheck,
-  FolderPlus,
-  Pencil,
-  Trash2,
-  MoreHorizontal,
-  BookOpen,
-  Calendar,
-  Briefcase,
-  MessageSquare,
-  ShoppingBag,
-  Inbox,
-} from 'lucide-react';
+import Bookmark from 'lucide-react/icons/bookmark';
+import BookmarkCheck from 'lucide-react/icons/bookmark-check';
+import FolderPlus from 'lucide-react/icons/folder-plus';
+import Pencil from 'lucide-react/icons/pencil';
+import Trash2 from 'lucide-react/icons/trash-2';
+import MoreHorizontal from 'lucide-react/icons/ellipsis';
+import BookOpen from 'lucide-react/icons/book-open';
+import Calendar from 'lucide-react/icons/calendar';
+import Briefcase from 'lucide-react/icons/briefcase';
+import MessageSquare from 'lucide-react/icons/message-square';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import Inbox from 'lucide-react/icons/inbox';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant, useToast } from '@/contexts';

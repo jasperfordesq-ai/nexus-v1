@@ -9,7 +9,8 @@
  */
 
 import { Card, CardBody, Button } from '@heroui/react';
-import { Inbox, type LucideIcon } from 'lucide-react';
+import Inbox from 'lucide-react/icons/inbox';
+import type { LucideIcon } from 'lucide-react';
 
 interface EmptyStateProps {
   icon?: LucideIcon;

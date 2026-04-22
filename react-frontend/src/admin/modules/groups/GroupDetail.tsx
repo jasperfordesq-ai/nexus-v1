@@ -20,7 +20,13 @@ import {
   Input,
   Textarea,
 } from '@heroui/react';
-import { ArrowLeft, MapPin, TrendingUp, Users, FileText, Calendar, Save } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import MapPin from 'lucide-react/icons/map-pin';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Users from 'lucide-react/icons/users';
+import FileText from 'lucide-react/icons/file-text';
+import Calendar from 'lucide-react/icons/calendar';
+import Save from 'lucide-react/icons/save';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';

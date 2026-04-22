@@ -34,7 +34,14 @@ import {
 const RichTextEditor = lazy(() =>
   import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),
 );
-import { ArrowLeft, Save, Upload, FileText, Trash2, Download, X, Youtube } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
+import Upload from 'lucide-react/icons/upload';
+import FileText from 'lucide-react/icons/file-text';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Download from 'lucide-react/icons/download';
+import X from 'lucide-react/icons/x';
+import Youtube from 'lucide-react/icons/youtube';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminKb } from '../../api/adminApi';

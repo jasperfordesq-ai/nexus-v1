@@ -10,7 +10,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardBody, CardHeader, Button, Spinner } from '@heroui/react';
-import { Image, Play } from 'lucide-react';
+import Image from 'lucide-react/icons/image';
+import Play from 'lucide-react/icons/play';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';

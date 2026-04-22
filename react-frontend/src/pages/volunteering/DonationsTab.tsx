@@ -22,17 +22,15 @@ import {
   Textarea,
   Progress,
 } from '@heroui/react';
-import {
-  Heart,
-  Calendar,
-  Users,
-  CreditCard,
-  AlertTriangle,
-  RefreshCw,
-  Plus,
-  Banknote,
-  EyeOff,
-} from 'lucide-react';
+import Heart from 'lucide-react/icons/heart';
+import Calendar from 'lucide-react/icons/calendar';
+import Users from 'lucide-react/icons/users';
+import CreditCard from 'lucide-react/icons/credit-card';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Plus from 'lucide-react/icons/plus';
+import Banknote from 'lucide-react/icons/banknote';
+import EyeOff from 'lucide-react/icons/eye-off';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

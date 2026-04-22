@@ -36,18 +36,16 @@ import {
   DropdownMenu,
   DropdownItem,
 } from '@heroui/react';
-import {
-  Globe,
-  Plus,
-  RefreshCw,
-  MoreVertical,
-  Pencil,
-  Trash2,
-  HeartPulse,
-  ScrollText,
-  X,
-  Check,
-} from 'lucide-react';
+import Globe from 'lucide-react/icons/globe';
+import Plus from 'lucide-react/icons/plus';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Pencil from 'lucide-react/icons/pencil';
+import Trash2 from 'lucide-react/icons/trash-2';
+import HeartPulse from 'lucide-react/icons/heart-pulse';
+import ScrollText from 'lucide-react/icons/scroll-text';
+import X from 'lucide-react/icons/x';
+import Check from 'lucide-react/icons/check';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

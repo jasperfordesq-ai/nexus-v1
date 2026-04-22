@@ -3,24 +3,22 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  Clock,
-  Users,
-  Zap,
-  UserPlus,
-  Search,
-  Handshake,
-  Coins,
-  Heart,
-  Shield,
-  Star,
-  Globe,
-  BookOpen,
-  MessageCircle,
-  Award,
-  Target,
-  ThumbsUp,
-} from 'lucide-react';
+import Clock from 'lucide-react/icons/clock';
+import Users from 'lucide-react/icons/users';
+import Zap from 'lucide-react/icons/zap';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Search from 'lucide-react/icons/search';
+import Handshake from 'lucide-react/icons/handshake';
+import Coins from 'lucide-react/icons/coins';
+import Heart from 'lucide-react/icons/heart';
+import Shield from 'lucide-react/icons/shield';
+import Star from 'lucide-react/icons/star';
+import Globe from 'lucide-react/icons/globe';
+import BookOpen from 'lucide-react/icons/book-open';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import Award from 'lucide-react/icons/award';
+import Target from 'lucide-react/icons/target';
+import ThumbsUp from 'lucide-react/icons/thumbs-up';
 import type { LucideIcon } from 'lucide-react';
 import type { LandingIconId } from '@/types';
 

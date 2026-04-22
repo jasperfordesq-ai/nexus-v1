@@ -5,7 +5,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Avatar, Button, Input, Spinner } from '@heroui/react';
-import { Search } from 'lucide-react';
+import Search from 'lucide-react/icons/search';
 import { adminUsers } from '../api/adminApi';
 import type { AdminUser } from '../api/types';
 

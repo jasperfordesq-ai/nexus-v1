@@ -32,18 +32,16 @@ import {
   ModalFooter,
   Tooltip,
 } from '@heroui/react';
-import {
-  MessageSquare,
-  Send,
-  Mail,
-  MailOpen,
-  Globe,
-  ChevronRight,
-  Plus,
-  Search,
-  ArrowLeft,
-  Languages,
-} from 'lucide-react';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Send from 'lucide-react/icons/send';
+import Mail from 'lucide-react/icons/mail';
+import MailOpen from 'lucide-react/icons/mail-open';
+import Globe from 'lucide-react/icons/globe';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import Plus from 'lucide-react/icons/plus';
+import Search from 'lucide-react/icons/search';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Languages from 'lucide-react/icons/languages';
 
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';

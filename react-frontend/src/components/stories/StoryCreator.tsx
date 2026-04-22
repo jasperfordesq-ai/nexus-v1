@@ -20,26 +20,24 @@ import {
   Textarea,
   Input,
 } from '@heroui/react';
-import {
-  X,
-  Camera,
-  Type,
-  BarChart3,
-  ImagePlus,
-  Video,
-  Send,
-  Trash2,
-  Plus,
-  Minus,
-  Globe,
-  Users,
-  Heart,
-  SwitchCamera,
-  Circle,
-  Square,
-  Pencil,
-  Eraser,
-} from 'lucide-react';
+import X from 'lucide-react/icons/x';
+import Camera from 'lucide-react/icons/camera';
+import Type from 'lucide-react/icons/type';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import ImagePlus from 'lucide-react/icons/image-plus';
+import Video from 'lucide-react/icons/video';
+import Send from 'lucide-react/icons/send';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Plus from 'lucide-react/icons/plus';
+import Minus from 'lucide-react/icons/minus';
+import Globe from 'lucide-react/icons/globe';
+import Users from 'lucide-react/icons/users';
+import Heart from 'lucide-react/icons/heart';
+import SwitchCamera from 'lucide-react/icons/switch-camera';
+import Circle from 'lucide-react/icons/circle';
+import Square from 'lucide-react/icons/square';
+import Pencil from 'lucide-react/icons/pencil';
+import Eraser from 'lucide-react/icons/eraser';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

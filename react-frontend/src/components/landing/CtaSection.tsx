@@ -6,7 +6,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
-import { ArrowRight } from 'lucide-react';
+import ArrowRight from 'lucide-react/icons/arrow-right';
 import { useTranslation } from 'react-i18next';
 import { useTenant, useAuth } from '@/contexts';
 import type { CtaContent } from '@/types';

@@ -25,19 +25,17 @@ import {
   SelectItem,
   useDisclosure,
 } from '@heroui/react';
-import {
-  ShieldCheck,
-  Upload,
-  FileText,
-  Clock,
-  AlertTriangle,
-  RefreshCw,
-  CheckCircle,
-  XCircle,
-  Hourglass,
-  Calendar,
-  Trash2,
-} from 'lucide-react';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import Upload from 'lucide-react/icons/upload';
+import FileText from 'lucide-react/icons/file-text';
+import Clock from 'lucide-react/icons/clock';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Hourglass from 'lucide-react/icons/hourglass';
+import Calendar from 'lucide-react/icons/calendar';
+import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

@@ -12,7 +12,10 @@
 import { useState, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import { Button, Input, Textarea, Select, SelectItem } from '@heroui/react';
-import { Mail, MessageSquare, Loader2, ArrowLeft } from 'lucide-react';
+import Mail from 'lucide-react/icons/mail';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Loader2 from 'lucide-react/icons/loader-circle';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant, useAuth } from '@/contexts';

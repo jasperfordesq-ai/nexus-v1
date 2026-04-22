@@ -10,7 +10,9 @@
 
 import { useState, useRef } from 'react';
 import { Card, CardBody, CardHeader, Button, Checkbox, Input } from '@heroui/react';
-import { Database, Play, AlertTriangle } from 'lucide-react';
+import Database from 'lucide-react/icons/database';
+import Play from 'lucide-react/icons/play';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';

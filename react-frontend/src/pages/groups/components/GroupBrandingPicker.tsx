@@ -9,7 +9,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Paintbrush } from 'lucide-react';
+import Paintbrush from 'lucide-react/icons/paintbrush';
 import { GlassCard } from '@/components/ui';
 import { useTranslation } from 'react-i18next';
 

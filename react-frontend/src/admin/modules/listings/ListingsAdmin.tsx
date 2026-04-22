@@ -22,7 +22,13 @@ import {
   Spinner,
   Tooltip,
 } from '@heroui/react';
-import { CheckCircle, XCircle, Trash2, Star, StarOff, Search, Plus } from 'lucide-react';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Star from 'lucide-react/icons/star';
+import StarOff from 'lucide-react/icons/star-off';
+import Search from 'lucide-react/icons/search';
+import Plus from 'lucide-react/icons/plus';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';

@@ -22,21 +22,19 @@ import {
   Switch,
   Progress,
 } from '@heroui/react';
-import {
-  Briefcase,
-  Building2,
-  Rocket,
-  CheckCircle,
-  ArrowRight,
-  ArrowLeft,
-  Lightbulb,
-  Globe,
-  DollarSign,
-  MapPin,
-  Clock,
-  Tag,
-  Star,
-} from 'lucide-react';
+import Briefcase from 'lucide-react/icons/briefcase';
+import Building2 from 'lucide-react/icons/building-2';
+import Rocket from 'lucide-react/icons/rocket';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Lightbulb from 'lucide-react/icons/lightbulb';
+import Globe from 'lucide-react/icons/globe';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import MapPin from 'lucide-react/icons/map-pin';
+import Clock from 'lucide-react/icons/clock';
+import Tag from 'lucide-react/icons/tag';
+import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';

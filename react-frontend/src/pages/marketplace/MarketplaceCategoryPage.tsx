@@ -29,14 +29,12 @@ import {
   Spinner,
   Divider,
 } from '@heroui/react';
-import {
-  Search,
-  SlidersHorizontal,
-  ShoppingBag,
-  ChevronRight,
-  Tag,
-  RotateCcw,
-} from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import Tag from 'lucide-react/icons/tag';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

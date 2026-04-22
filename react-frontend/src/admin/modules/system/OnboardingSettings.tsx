@@ -38,20 +38,18 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Save,
-  Sparkles,
-  UserCircle,
-  Heart,
-  HandHeart,
-  Shield,
-  CheckCircle,
-  Eye,
-  ListChecks,
-  FileText,
-  Globe,
-  AlertTriangle,
-} from 'lucide-react';
+import Save from 'lucide-react/icons/save';
+import Sparkles from 'lucide-react/icons/sparkles';
+import UserCircle from 'lucide-react/icons/circle-user';
+import Heart from 'lucide-react/icons/heart';
+import HandHeart from 'lucide-react/icons/hand-heart';
+import Shield from 'lucide-react/icons/shield';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Eye from 'lucide-react/icons/eye';
+import ListChecks from 'lucide-react/icons/list-checks';
+import FileText from 'lucide-react/icons/file-text';
+import Globe from 'lucide-react/icons/globe';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';

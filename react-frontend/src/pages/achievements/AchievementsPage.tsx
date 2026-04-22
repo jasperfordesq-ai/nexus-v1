@@ -26,28 +26,26 @@ import {
   Spinner,
   Skeleton,
 } from '@heroui/react';
-import {
-  Trophy,
-  Medal,
-  Star,
-  Sparkles,
-  RefreshCw,
-  AlertTriangle,
-  Lock,
-  Filter,
-  Target,
-  Clock,
-  Gift,
-  ShoppingBag,
-  CheckCircle,
-  Crown,
-  Gem,
-  Layers,
-  Zap,
-  Package,
-  Route,
-  Calendar,
-} from 'lucide-react';
+import Trophy from 'lucide-react/icons/trophy';
+import Medal from 'lucide-react/icons/medal';
+import Star from 'lucide-react/icons/star';
+import Sparkles from 'lucide-react/icons/sparkles';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Lock from 'lucide-react/icons/lock';
+import Filter from 'lucide-react/icons/filter';
+import Target from 'lucide-react/icons/target';
+import Clock from 'lucide-react/icons/clock';
+import Gift from 'lucide-react/icons/gift';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Crown from 'lucide-react/icons/crown';
+import Gem from 'lucide-react/icons/gem';
+import Layers from 'lucide-react/icons/layers';
+import Zap from 'lucide-react/icons/zap';
+import Package from 'lucide-react/icons/package';
+import Route from 'lucide-react/icons/route';
+import Calendar from 'lucide-react/icons/calendar';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import { GlassCard } from '@/components/ui';

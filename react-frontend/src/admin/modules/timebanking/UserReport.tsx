@@ -15,7 +15,10 @@ import {
   Avatar, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
   Input, Textarea,
 } from '@heroui/react';
-import { Users, ArrowLeft, Download, PlusCircle } from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Download from 'lucide-react/icons/download';
+import PlusCircle from 'lucide-react/icons/circle-plus';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';

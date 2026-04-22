@@ -21,7 +21,7 @@ import {
   Switch,
   Spinner,
 } from '@heroui/react';
-import { Bell } from 'lucide-react';
+import Bell from 'lucide-react/icons/bell';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 import { useTranslation } from 'react-i18next';

@@ -31,12 +31,10 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Send,
-  Inbox,
-  HandCoins,
-  RotateCcw,
-} from 'lucide-react';
+import Send from 'lucide-react/icons/send';
+import Inbox from 'lucide-react/icons/inbox';
+import HandCoins from 'lucide-react/icons/hand-coins';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/feedback';
 import { OfferCard } from '@/components/marketplace';

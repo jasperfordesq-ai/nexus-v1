@@ -18,16 +18,14 @@ import {
   Card,
   CardBody,
 } from '@heroui/react';
-import {
-  GraduationCap,
-  RefreshCw,
-  CheckCircle,
-  XCircle,
-  Clock,
-  AlertTriangle,
-  ShieldCheck,
-  ListChecks,
-} from 'lucide-react';
+import GraduationCap from 'lucide-react/icons/graduation-cap';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Clock from 'lucide-react/icons/clock';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import ListChecks from 'lucide-react/icons/list-checks';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';

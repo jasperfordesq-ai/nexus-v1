@@ -20,7 +20,12 @@ import {
   CardBody,
   Spinner,
 } from '@heroui/react';
-import { Zap, Star, ArrowUpCircle, LayoutGrid, Clock, Check } from 'lucide-react';
+import Zap from 'lucide-react/icons/zap';
+import Star from 'lucide-react/icons/star';
+import ArrowUpCircle from 'lucide-react/icons/circle-arrow-up';
+import LayoutGrid from 'lucide-react/icons/layout-grid';
+import Clock from 'lucide-react/icons/clock';
+import Check from 'lucide-react/icons/check';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

@@ -9,7 +9,13 @@ import {
   Button, Avatar, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
   Select, SelectItem, Switch,
 } from '@heroui/react';
-import { Plus, MoreVertical, Shield, ArrowRight, Eye, UserCheck, UserX } from 'lucide-react';
+import Plus from 'lucide-react/icons/plus';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Shield from 'lucide-react/icons/shield';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import Eye from 'lucide-react/icons/eye';
+import UserCheck from 'lucide-react/icons/user-check';
+import UserX from 'lucide-react/icons/user-x';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';

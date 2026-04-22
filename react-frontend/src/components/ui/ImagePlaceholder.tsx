@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import type { LucideIcon } from 'lucide-react';
-import { ShoppingBag } from 'lucide-react';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
 
 interface ImagePlaceholderProps {
   /** Lucide icon to display in center */

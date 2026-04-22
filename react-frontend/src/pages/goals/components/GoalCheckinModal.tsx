@@ -30,18 +30,16 @@ import {
   Chip,
   Divider,
 } from '@heroui/react';
-import {
-  ClipboardCheck,
-  Smile,
-  Frown,
-  Meh,
-  Heart,
-  Zap,
-  Star,
-  Clock,
-  TrendingUp,
-  MessageSquare,
-} from 'lucide-react';
+import ClipboardCheck from 'lucide-react/icons/clipboard-check';
+import Smile from 'lucide-react/icons/smile';
+import Frown from 'lucide-react/icons/frown';
+import Meh from 'lucide-react/icons/meh';
+import Heart from 'lucide-react/icons/heart';
+import Zap from 'lucide-react/icons/zap';
+import Star from 'lucide-react/icons/star';
+import Clock from 'lucide-react/icons/clock';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import MessageSquare from 'lucide-react/icons/message-square';
 import { GlassCard } from '@/components/ui';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

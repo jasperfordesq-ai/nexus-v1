@@ -25,7 +25,10 @@ import {
   Button,
   Divider,
 } from '@heroui/react';
-import { TrendingUp, Users, DollarSign, Building2 } from 'lucide-react';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Users from 'lucide-react/icons/users';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import Building2 from 'lucide-react/icons/building-2';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant } from '@/contexts';

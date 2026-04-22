@@ -6,7 +6,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@heroui/react';
-import { Play, Pause, FileText } from 'lucide-react';
+import Play from 'lucide-react/icons/play';
+import Pause from 'lucide-react/icons/pause';
+import FileText from 'lucide-react/icons/file-text';
 import { resolveAssetUrl } from '@/lib/helpers';
 
 export interface VoiceMessagePlayerProps {

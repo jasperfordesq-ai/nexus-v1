@@ -11,7 +11,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Button, Spinner, Card, CardBody } from '@heroui/react';
-import { Target, Plus, Trash2, Pencil, AlertTriangle } from 'lucide-react';
+import Target from 'lucide-react/icons/target';
+import Plus from 'lucide-react/icons/plus';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Pencil from 'lucide-react/icons/pencil';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';

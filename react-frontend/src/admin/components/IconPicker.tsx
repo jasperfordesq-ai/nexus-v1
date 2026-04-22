@@ -12,7 +12,8 @@ import {
   Input,
   Button,
 } from '@heroui/react';
-import { Search, X } from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import X from 'lucide-react/icons/x';
 import { ICON_MAP, ICON_NAMES, DynamicIcon } from '@/components/ui';
 
 interface IconPickerProps {

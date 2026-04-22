@@ -22,17 +22,15 @@ import {
   Input,
   Divider,
 } from '@heroui/react';
-import {
-  BarChart3,
-  Clock,
-  Users,
-  Target,
-  RefreshCw,
-  Filter,
-  TrendingUp,
-  TrendingDown,
-  Briefcase,
-} from 'lucide-react';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Clock from 'lucide-react/icons/clock';
+import Users from 'lucide-react/icons/users';
+import Target from 'lucide-react/icons/target';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Filter from 'lucide-react/icons/filter';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import TrendingDown from 'lucide-react/icons/trending-down';
+import Briefcase from 'lucide-react/icons/briefcase';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';

@@ -9,7 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import { Select, SelectItem, Skeleton } from '@heroui/react';
-import { Users } from 'lucide-react';
+import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useAuth, useToast } from '@/contexts';

@@ -24,7 +24,10 @@ import {
   ModalFooter,
   Spinner,
 } from '@heroui/react';
-import { RefreshCw, Download, Filter, Eye } from 'lucide-react';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Download from 'lucide-react/icons/download';
+import Filter from 'lucide-react/icons/filter';
+import Eye from 'lucide-react/icons/eye';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';

@@ -24,15 +24,13 @@ import {
   Textarea,
   useDisclosure,
 } from '@heroui/react';
-import {
-  ArrowLeft,
-  Layers,
-  Plus,
-  AlertTriangle,
-  RefreshCw,
-  Lightbulb,
-  Calendar,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Layers from 'lucide-react/icons/layers';
+import Plus from 'lucide-react/icons/plus';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Lightbulb from 'lucide-react/icons/lightbulb';
+import Calendar from 'lucide-react/icons/calendar';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

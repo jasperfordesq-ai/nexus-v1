@@ -20,7 +20,10 @@ import {
   Pagination,
   Spinner,
 } from '@heroui/react';
-import { Search, RefreshCw, EyeOff, Trash2 } from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import EyeOff from 'lucide-react/icons/eye-off';
+import Trash2 from 'lucide-react/icons/trash-2';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';

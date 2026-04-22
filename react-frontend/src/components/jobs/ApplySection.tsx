@@ -5,7 +5,8 @@
 
 import { Link, useNavigate } from 'react-router-dom';
 import { Button, Chip } from '@heroui/react';
-import { CheckCircle, MessageCircle } from 'lucide-react';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import MessageCircle from 'lucide-react/icons/message-circle';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { api } from '@/lib/api';

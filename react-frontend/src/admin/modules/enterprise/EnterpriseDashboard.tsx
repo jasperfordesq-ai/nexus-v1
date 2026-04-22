@@ -11,16 +11,14 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardBody, Button, Spinner, Chip } from '@heroui/react';
-import {
-  Users,
-  Shield,
-  FileWarning,
-  HeartPulse,
-  ArrowRight,
-  RefreshCw,
-  Database,
-  Cpu,
-} from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import Shield from 'lucide-react/icons/shield';
+import FileWarning from 'lucide-react/icons/file-warning';
+import HeartPulse from 'lucide-react/icons/heart-pulse';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Database from 'lucide-react/icons/database';
+import Cpu from 'lucide-react/icons/cpu';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';

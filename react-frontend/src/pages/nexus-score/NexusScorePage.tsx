@@ -10,18 +10,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Progress, Chip, Button, Spinner } from '@heroui/react';
-import {
-  Trophy,
-  Users,
-  Star,
-  Clock,
-  Medal,
-  Heart,
-  RefreshCw,
-  AlertTriangle,
-  TrendingUp,
-  Info,
-} from 'lucide-react';
+import Trophy from 'lucide-react/icons/trophy';
+import Users from 'lucide-react/icons/users';
+import Star from 'lucide-react/icons/star';
+import Clock from 'lucide-react/icons/clock';
+import Medal from 'lucide-react/icons/medal';
+import Heart from 'lucide-react/icons/heart';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { GlassCard } from '@/components/ui';

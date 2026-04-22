@@ -30,17 +30,15 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@heroui/react';
-import {
-  User,
-  Bell,
-  Shield,
-  Lock,
-  Settings,
-  Sparkles,
-  Calendar,
-  Users,
-  Info,
-} from 'lucide-react';
+import User from 'lucide-react/icons/user';
+import Bell from 'lucide-react/icons/bell';
+import Shield from 'lucide-react/icons/shield';
+import Lock from 'lucide-react/icons/lock';
+import Settings from 'lucide-react/icons/settings';
+import Sparkles from 'lucide-react/icons/sparkles';
+import Calendar from 'lucide-react/icons/calendar';
+import Users from 'lucide-react/icons/users';
+import Info from 'lucide-react/icons/info';
 import { sanitizeRichText } from '@/lib/sanitize';
 import { GlassCard } from '@/components/ui';
 import { AvailabilityGrid } from '@/components/availability/AvailabilityGrid';

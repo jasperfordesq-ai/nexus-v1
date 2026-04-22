@@ -13,7 +13,12 @@ import {
   Button, Card, CardBody, CardHeader, Tabs, Tab, Chip, Input,
   Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
 } from '@heroui/react';
-import { AlertTriangle, RefreshCw, Trash2, Download, Search, TrendingUp } from 'lucide-react';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Download from 'lucide-react/icons/download';
+import Search from 'lucide-react/icons/search';
+import TrendingUp from 'lucide-react/icons/trending-up';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';

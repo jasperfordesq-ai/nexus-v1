@@ -16,11 +16,27 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Chip, Progress, Skeleton } from '@heroui/react';
-import {
-  Clock, ListTodo, MessageSquare, Wallet, TrendingUp, Users, Calendar,
-  Bell, ArrowRight, Plus, AlertTriangle, RefreshCw, Activity, Sparkles,
-  MapPin, Heart, MessageCircle, UserPlus, Award, Star, ThumbsUp,
-} from 'lucide-react';
+import Clock from 'lucide-react/icons/clock';
+import ListTodo from 'lucide-react/icons/list-todo';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Wallet from 'lucide-react/icons/wallet';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Users from 'lucide-react/icons/users';
+import Calendar from 'lucide-react/icons/calendar';
+import Bell from 'lucide-react/icons/bell';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import Plus from 'lucide-react/icons/plus';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Activity from 'lucide-react/icons/activity';
+import Sparkles from 'lucide-react/icons/sparkles';
+import MapPin from 'lucide-react/icons/map-pin';
+import Heart from 'lucide-react/icons/heart';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Award from 'lucide-react/icons/award';
+import Star from 'lucide-react/icons/star';
+import ThumbsUp from 'lucide-react/icons/thumbs-up';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant, useFeature, useModule, useNotifications } from '@/contexts';

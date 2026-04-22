@@ -30,20 +30,18 @@ import {
   ModalBody,
   ModalFooter,
 } from '@heroui/react';
-import {
-  ArrowLeft,
-  Save,
-  Trash2,
-  LogIn,
-  ShieldAlert,
-  Coins,
-  RefreshCw,
-  KeyRound,
-  Mail,
-  Building2,
-  ShieldCheck,
-  FileCheck,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
+import Trash2 from 'lucide-react/icons/trash-2';
+import LogIn from 'lucide-react/icons/log-in';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import Coins from 'lucide-react/icons/coins';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import KeyRound from 'lucide-react/icons/key-round';
+import Mail from 'lucide-react/icons/mail';
+import Building2 from 'lucide-react/icons/building-2';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import FileCheck from 'lucide-react/icons/file-check';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';

@@ -15,18 +15,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Spinner, Input } from '@heroui/react';
-import {
-  ShieldCheck,
-  ShieldX,
-  Fingerprint,
-  ExternalLink,
-  ArrowLeft,
-  Loader2,
-  RefreshCw,
-  BadgeCheck,
-  CalendarDays,
-  CreditCard,
-} from 'lucide-react';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import ShieldX from 'lucide-react/icons/shield-x';
+import Fingerprint from 'lucide-react/icons/fingerprint';
+import ExternalLink from 'lucide-react/icons/external-link';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Loader2 from 'lucide-react/icons/loader-circle';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import BadgeCheck from 'lucide-react/icons/badge-check';
+import CalendarDays from 'lucide-react/icons/calendar-days';
+import CreditCard from 'lucide-react/icons/credit-card';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant, useAuth } from '@/contexts';

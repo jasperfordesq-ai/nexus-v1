@@ -22,7 +22,13 @@ import {
   Spinner,
   ScrollShadow,
 } from '@heroui/react';
-import { ArrowLeft, Lock, Flag, CheckCircle, User, Mail, MessageSquare } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Lock from 'lucide-react/icons/lock';
+import Flag from 'lucide-react/icons/flag';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import User from 'lucide-react/icons/user';
+import Mail from 'lucide-react/icons/mail';
+import MessageSquare from 'lucide-react/icons/message-square';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
 import { adminBroker } from '../../api/adminApi';

@@ -24,19 +24,17 @@ import {
   Button,
   Divider,
 } from '@heroui/react';
-import {
-  BarChart3,
-  Mail,
-  Users,
-  MousePointer,
-  Eye,
-  RefreshCw,
-  Trophy,
-  TrendingUp,
-  Send,
-  AlertTriangle,
-  Target,
-} from 'lucide-react';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Mail from 'lucide-react/icons/mail';
+import Users from 'lucide-react/icons/users';
+import MousePointer from 'lucide-react/icons/mouse-pointer';
+import Eye from 'lucide-react/icons/eye';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Trophy from 'lucide-react/icons/trophy';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Send from 'lucide-react/icons/send';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Target from 'lucide-react/icons/target';
 import {
   BarChart,
   Bar,

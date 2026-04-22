@@ -11,7 +11,11 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth, useTenant } from '@/contexts';
 import { Button, Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
-import { ArrowLeft, Bell, LogOut, Menu, User } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Bell from 'lucide-react/icons/bell';
+import LogOut from 'lucide-react/icons/log-out';
+import Menu from 'lucide-react/icons/menu';
+import User from 'lucide-react/icons/user';
 import { resolveAvatarUrl } from '@/lib/helpers';
 
 interface AdminHeaderProps {

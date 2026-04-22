@@ -17,14 +17,12 @@ import {
   Button,
   Textarea,
 } from '@heroui/react';
-import {
-  ShieldCheck,
-  Clock,
-  CheckCircle,
-  AlertTriangle,
-  FileCheck,
-  XCircle,
-} from 'lucide-react';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import Clock from 'lucide-react/icons/clock';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import FileCheck from 'lucide-react/icons/file-check';
+import XCircle from 'lucide-react/icons/circle-x';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVetting } from '@/admin/api/adminApi';

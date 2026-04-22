@@ -7,7 +7,14 @@ import { useState, useEffect, useRef, useCallback, memo, type ReactNode } from '
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Input } from '@heroui/react';
-import { SmilePlus, MoreVertical, Pencil, Trash2, Check, CheckCheck, FileText, Languages } from 'lucide-react';
+import SmilePlus from 'lucide-react/icons/smile-plus';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Pencil from 'lucide-react/icons/pencil';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Check from 'lucide-react/icons/check';
+import CheckCheck from 'lucide-react/icons/check-check';
+import FileText from 'lucide-react/icons/file-text';
+import Languages from 'lucide-react/icons/languages';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { api } from '@/lib/api';
 import { useTenant } from '@/contexts/TenantContext';

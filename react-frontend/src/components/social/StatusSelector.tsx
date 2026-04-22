@@ -25,7 +25,11 @@ import {
   ModalBody,
   ModalFooter,
 } from '@heroui/react';
-import { Circle, Moon, MinusCircle, MessageSquare, X } from 'lucide-react';
+import Circle from 'lucide-react/icons/circle';
+import Moon from 'lucide-react/icons/moon';
+import MinusCircle from 'lucide-react/icons/circle-minus';
+import MessageSquare from 'lucide-react/icons/message-square';
+import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { usePresenceOptional, type PresenceStatus } from '@/contexts/PresenceContext';
 import { useAuth } from '@/contexts/AuthContext';

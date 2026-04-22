@@ -10,37 +10,35 @@
  */
 
 import type { LucideIcon } from 'lucide-react';
-import {
-  ListChecks,
-  Wallet,
-  MessageSquare,
-  LayoutDashboard,
-  Rss,
-  Bell,
-  UserCircle,
-  Settings,
-  Calendar,
-  Users,
-  Gamepad2,
-  Target,
-  FileText,
-  BookOpen,
-  Heart,
-  ArrowLeftRight,
-  Building2,
-  Globe,
-  Link2,
-  Star,
-  BarChart3,
-  Briefcase,
-  Lightbulb,
-  MessageCircle,
-  Repeat2,
-  Search,
-  Brain,
-  ShoppingBag,
-  ShieldCheck,
-} from 'lucide-react';
+import ListChecks from 'lucide-react/icons/list-checks';
+import Wallet from 'lucide-react/icons/wallet';
+import MessageSquare from 'lucide-react/icons/message-square';
+import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
+import Rss from 'lucide-react/icons/rss';
+import Bell from 'lucide-react/icons/bell';
+import UserCircle from 'lucide-react/icons/circle-user';
+import Settings from 'lucide-react/icons/settings';
+import Calendar from 'lucide-react/icons/calendar';
+import Users from 'lucide-react/icons/users';
+import Gamepad2 from 'lucide-react/icons/gamepad-2';
+import Target from 'lucide-react/icons/target';
+import FileText from 'lucide-react/icons/file-text';
+import BookOpen from 'lucide-react/icons/book-open';
+import Heart from 'lucide-react/icons/heart';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import Building2 from 'lucide-react/icons/building-2';
+import Globe from 'lucide-react/icons/globe';
+import Link2 from 'lucide-react/icons/link-2';
+import Star from 'lucide-react/icons/star';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Briefcase from 'lucide-react/icons/briefcase';
+import Lightbulb from 'lucide-react/icons/lightbulb';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import Repeat2 from 'lucide-react/icons/repeat-2';
+import Search from 'lucide-react/icons/search';
+import Brain from 'lucide-react/icons/brain';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import ShieldCheck from 'lucide-react/icons/shield-check';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

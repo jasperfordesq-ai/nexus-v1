@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Chip } from '@heroui/react';
-import { LayoutGrid } from 'lucide-react';
+import LayoutGrid from 'lucide-react/icons/layout-grid';
 import { useTranslation } from 'react-i18next';
 import type { MarketplaceCategory } from '@/types/marketplace';
 

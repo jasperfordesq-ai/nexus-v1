@@ -16,18 +16,16 @@ import {
   Chip,
   Progress,
 } from '@heroui/react';
-import {
-  Sparkles,
-  MapPin,
-  Calendar,
-  Clock,
-  Building2,
-  RefreshCw,
-  AlertTriangle,
-  Target,
-  Zap,
-  ExternalLink,
-} from 'lucide-react';
+import Sparkles from 'lucide-react/icons/sparkles';
+import MapPin from 'lucide-react/icons/map-pin';
+import Calendar from 'lucide-react/icons/calendar';
+import Clock from 'lucide-react/icons/clock';
+import Building2 from 'lucide-react/icons/building-2';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Target from 'lucide-react/icons/target';
+import Zap from 'lucide-react/icons/zap';
+import ExternalLink from 'lucide-react/icons/external-link';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';

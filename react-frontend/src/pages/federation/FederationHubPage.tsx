@@ -22,30 +22,28 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Chip, Avatar, Spinner } from '@heroui/react';
-import {
-  Globe,
-  Users,
-  MessageSquare,
-  ArrowRightLeft,
-  Search,
-  Settings,
-  Calendar,
-  ListTodo,
-  ArrowRight,
-  AlertTriangle,
-  RefreshCw,
-  Activity,
-  Network,
-  Handshake,
-  Shield,
-  Zap,
-  ChevronRight,
-  UserPlus,
-  Send,
-  CheckCircle,
-  XCircle,
-  Clock,
-} from 'lucide-react';
+import Globe from 'lucide-react/icons/globe';
+import Users from 'lucide-react/icons/users';
+import MessageSquare from 'lucide-react/icons/message-square';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import Search from 'lucide-react/icons/search';
+import Settings from 'lucide-react/icons/settings';
+import Calendar from 'lucide-react/icons/calendar';
+import ListTodo from 'lucide-react/icons/list-todo';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Activity from 'lucide-react/icons/activity';
+import Network from 'lucide-react/icons/network';
+import Handshake from 'lucide-react/icons/handshake';
+import Shield from 'lucide-react/icons/shield';
+import Zap from 'lucide-react/icons/zap';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import UserPlus from 'lucide-react/icons/user-plus';
+import Send from 'lucide-react/icons/send';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs, type BreadcrumbItem } from '@/components/navigation';

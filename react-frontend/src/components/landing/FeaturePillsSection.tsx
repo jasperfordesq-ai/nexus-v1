@@ -4,7 +4,9 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { motion } from 'framer-motion';
-import { Clock, Users, Zap } from 'lucide-react';
+import Clock from 'lucide-react/icons/clock';
+import Users from 'lucide-react/icons/users';
+import Zap from 'lucide-react/icons/zap';
 import { useTranslation } from 'react-i18next';
 import { getIcon } from './iconMap';
 import type { LucideIcon } from 'lucide-react';

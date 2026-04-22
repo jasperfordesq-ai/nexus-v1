@@ -4,16 +4,14 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Divider } from '@heroui/react';
-import {
-  MapPin,
-  Clock,
-  DollarSign,
-  Mail,
-  Phone,
-  Timer,
-  Tag,
-  TrendingUp,
-} from 'lucide-react';
+import MapPin from 'lucide-react/icons/map-pin';
+import Clock from 'lucide-react/icons/clock';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import Mail from 'lucide-react/icons/mail';
+import Phone from 'lucide-react/icons/phone';
+import Timer from 'lucide-react/icons/timer';
+import Tag from 'lucide-react/icons/tag';
+import TrendingUp from 'lucide-react/icons/trending-up';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import type { JobVacancy } from './JobDetailTypes';

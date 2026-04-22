@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Navigation } from 'lucide-react';
+import Navigation from 'lucide-react/icons/navigation';
 
 export interface DistanceBadgeProps {
   distanceKm: number;

@@ -19,7 +19,8 @@ import {
   useElements,
 } from '@stripe/react-stripe-js';
 import { Button, Chip } from '@heroui/react';
-import { CreditCard, AlertTriangle } from 'lucide-react';
+import CreditCard from 'lucide-react/icons/credit-card';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 
 /* ───────────────────────── Stripe init (module-level, called once) ───────────────────────── */

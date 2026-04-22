@@ -24,18 +24,16 @@ import {
   Tabs,
   Tab,
 } from '@heroui/react';
-import {
-  BookOpen,
-  Search,
-  RefreshCw,
-  AlertTriangle,
-  ChevronRight,
-  FileText,
-  Clock,
-  Eye,
-  Folder,
-  File,
-} from 'lucide-react';
+import BookOpen from 'lucide-react/icons/book-open';
+import Search from 'lucide-react/icons/search';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import FileText from 'lucide-react/icons/file-text';
+import Clock from 'lucide-react/icons/clock';
+import Eye from 'lucide-react/icons/eye';
+import Folder from 'lucide-react/icons/folder';
+import File from 'lucide-react/icons/file';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';

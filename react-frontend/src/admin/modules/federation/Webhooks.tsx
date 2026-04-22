@@ -37,21 +37,19 @@ import {
   Tooltip,
   Snippet,
 } from '@heroui/react';
-import {
-  Webhook,
-  Plus,
-  RefreshCw,
-  MoreVertical,
-  Pencil,
-  Trash2,
-  ScrollText,
-  Send,
-  Check,
-  X,
-  RotateCcw,
-  ChevronDown,
-  ChevronRight,
-} from 'lucide-react';
+import Webhook from 'lucide-react/icons/webhook';
+import Plus from 'lucide-react/icons/plus';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Pencil from 'lucide-react/icons/pencil';
+import Trash2 from 'lucide-react/icons/trash-2';
+import ScrollText from 'lucide-react/icons/scroll-text';
+import Send from 'lucide-react/icons/send';
+import Check from 'lucide-react/icons/check';
+import X from 'lucide-react/icons/x';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import ChevronRight from 'lucide-react/icons/chevron-right';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

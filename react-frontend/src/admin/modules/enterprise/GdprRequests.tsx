@@ -20,7 +20,9 @@ import {
   Select,
   SelectItem,
 } from '@heroui/react';
-import { RefreshCw, MoreVertical, Plus } from 'lucide-react';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Plus from 'lucide-react/icons/plus';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';

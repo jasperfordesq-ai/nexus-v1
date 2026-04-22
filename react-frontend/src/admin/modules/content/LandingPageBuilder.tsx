@@ -24,16 +24,14 @@ import {
   SelectItem,
   Divider,
 } from '@heroui/react';
-import {
-  ChevronUp,
-  ChevronDown,
-  Save,
-  RotateCcw,
-  Plus,
-  Trash2,
-  ChevronRight,
-  Layers,
-} from 'lucide-react';
+import ChevronUp from 'lucide-react/icons/chevron-up';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import Save from 'lucide-react/icons/save';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
+import Plus from 'lucide-react/icons/plus';
+import Trash2 from 'lucide-react/icons/trash-2';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import Layers from 'lucide-react/icons/layers';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminLandingPage } from '../../api/adminApi';

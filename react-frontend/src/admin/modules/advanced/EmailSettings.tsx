@@ -10,7 +10,13 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Input, Button, Select, SelectItem, Spinner, Chip } from '@heroui/react';
-import { Mail, Save, Send, Shield, Globe, Copy, Check } from 'lucide-react';
+import Mail from 'lucide-react/icons/mail';
+import Save from 'lucide-react/icons/save';
+import Send from 'lucide-react/icons/send';
+import Shield from 'lucide-react/icons/shield';
+import Globe from 'lucide-react/icons/globe';
+import Copy from 'lucide-react/icons/copy';
+import Check from 'lucide-react/icons/check';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';

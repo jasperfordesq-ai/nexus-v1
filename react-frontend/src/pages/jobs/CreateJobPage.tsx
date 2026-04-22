@@ -32,26 +32,24 @@ import {
   DropdownItem,
   Avatar,
 } from '@heroui/react';
-import {
-  Briefcase,
-  ArrowLeft,
-  Info,
-  ChevronDown,
-  ChevronUp,
-  Users,
-  TrendingUp,
-  FileText,
-  Sparkles,
-  X,
-  Eye,
-  EyeOff,
-  Trash2,
-  Plus,
-  Search,
-  MapPin,
-  Calendar,
-  DollarSign,
-} from 'lucide-react';
+import Briefcase from 'lucide-react/icons/briefcase';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Info from 'lucide-react/icons/info';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import ChevronUp from 'lucide-react/icons/chevron-up';
+import Users from 'lucide-react/icons/users';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import FileText from 'lucide-react/icons/file-text';
+import Sparkles from 'lucide-react/icons/sparkles';
+import X from 'lucide-react/icons/x';
+import Eye from 'lucide-react/icons/eye';
+import EyeOff from 'lucide-react/icons/eye-off';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Plus from 'lucide-react/icons/plus';
+import Search from 'lucide-react/icons/search';
+import MapPin from 'lucide-react/icons/map-pin';
+import Calendar from 'lucide-react/icons/calendar';
+import DollarSign from 'lucide-react/icons/dollar-sign';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';

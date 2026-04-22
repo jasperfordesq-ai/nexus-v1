@@ -11,14 +11,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Tabs, Tab, Button, Chip } from '@heroui/react';
-import {
-  Calendar,
-  Eye,
-  Trash2,
-  XCircle,
-  MapPin,
-  Users,
-} from 'lucide-react';
+import Calendar from 'lucide-react/icons/calendar';
+import Eye from 'lucide-react/icons/eye';
+import Trash2 from 'lucide-react/icons/trash-2';
+import XCircle from 'lucide-react/icons/circle-x';
+import MapPin from 'lucide-react/icons/map-pin';
+import Users from 'lucide-react/icons/users';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';

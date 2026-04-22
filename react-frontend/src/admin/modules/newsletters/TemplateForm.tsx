@@ -26,13 +26,11 @@ import {
   Divider,
   Spinner,
 } from '@heroui/react';
-import {
-  ArrowLeft,
-  Save,
-  Copy,
-  Lightbulb,
-  BarChart3,
-} from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
+import Copy from 'lucide-react/icons/copy';
+import Lightbulb from 'lucide-react/icons/lightbulb';
+import BarChart3 from 'lucide-react/icons/chart-column';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';

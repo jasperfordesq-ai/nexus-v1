@@ -9,7 +9,9 @@
 
 import { useRef, useState } from 'react';
 import { Button } from '@heroui/react';
-import { Video, X, AlertCircle } from 'lucide-react';
+import Video from 'lucide-react/icons/video';
+import X from 'lucide-react/icons/x';
+import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTranslation } from 'react-i18next';
 
 interface VideoUploaderProps {

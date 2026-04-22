@@ -14,11 +14,9 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Chip, Spinner } from '@heroui/react';
-import {
-  Building2,
-  ArrowRight,
-  Plus,
-} from 'lucide-react';
+import Building2 from 'lucide-react/icons/building-2';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import Plus from 'lucide-react/icons/plus';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { useTenant } from '@/contexts';

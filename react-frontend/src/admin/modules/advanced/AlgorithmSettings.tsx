@@ -14,10 +14,15 @@ import {
   Card, CardBody, CardHeader,
   Slider, Button, Spinner, Switch, Chip, Divider,
 } from '@heroui/react';
-import {
-  Settings, Save, Activity, Database, Cpu,
-  CheckCircle, XCircle, RefreshCw, Search,
-} from 'lucide-react';
+import Settings from 'lucide-react/icons/settings';
+import Save from 'lucide-react/icons/save';
+import Activity from 'lucide-react/icons/activity';
+import Database from 'lucide-react/icons/database';
+import Cpu from 'lucide-react/icons/cpu';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Search from 'lucide-react/icons/search';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';

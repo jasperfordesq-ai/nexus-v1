@@ -11,18 +11,16 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardBody, Button, Chip, Spinner } from '@heroui/react';
-import {
-  Building2,
-  Users,
-  Shield,
-  Globe,
-  Plus,
-  ArrowRight,
-  RefreshCw,
-  Network,
-  Activity,
-  ListChecks,
-} from 'lucide-react';
+import Building2 from 'lucide-react/icons/building-2';
+import Users from 'lucide-react/icons/users';
+import Shield from 'lucide-react/icons/shield';
+import Globe from 'lucide-react/icons/globe';
+import Plus from 'lucide-react/icons/plus';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Network from 'lucide-react/icons/network';
+import Activity from 'lucide-react/icons/activity';
+import ListChecks from 'lucide-react/icons/list-checks';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';

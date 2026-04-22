@@ -10,7 +10,8 @@
 
 import { useMemo, useRef, useState } from 'react';
 import { Button, Input, Popover, PopoverContent, PopoverTrigger } from '@heroui/react';
-import { Search, Smile } from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import Smile from 'lucide-react/icons/smile';
 import { useTranslation } from 'react-i18next';
 
 import { EMOJI_CATEGORIES, EMOJI_KEYWORDS } from '@/data/emoji-data';

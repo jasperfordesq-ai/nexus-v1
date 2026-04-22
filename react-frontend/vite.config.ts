@@ -105,7 +105,9 @@ export default defineConfig(({ command }) => ({
     },
   },
   optimizeDeps: {
-    // Pre-bundle heavy deps so Vite doesn't re-crawl them on every page load
+    // Pre-bundle heavy deps so Vite doesn't re-crawl them on every page load.
+    // lucide-react removed: imports now use individual sub-path files
+    // (lucide-react/icons/*) so the full-barrel 784 KB pre-bundle is no longer needed.
     include: [
       '@heroui/react',
       'framer-motion',
@@ -115,7 +117,6 @@ export default defineConfig(({ command }) => ({
       'recharts',
       'i18next',
       'react-i18next',
-      'lucide-react',
     ],
   },
   server: {

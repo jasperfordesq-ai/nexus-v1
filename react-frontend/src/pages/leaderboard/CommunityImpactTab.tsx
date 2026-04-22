@@ -6,10 +6,16 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Skeleton, Chip } from '@heroui/react';
-import {
-  Users, Clock, Award, TrendingUp, TrendingDown,
-  UserPlus, FileText, Handshake, Zap, Heart,
-} from 'lucide-react';
+import Users from 'lucide-react/icons/users';
+import Clock from 'lucide-react/icons/clock';
+import Award from 'lucide-react/icons/award';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import TrendingDown from 'lucide-react/icons/trending-down';
+import UserPlus from 'lucide-react/icons/user-plus';
+import FileText from 'lucide-react/icons/file-text';
+import Handshake from 'lucide-react/icons/handshake';
+import Zap from 'lucide-react/icons/zap';
+import Heart from 'lucide-react/icons/heart';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { api } from '@/lib/api';

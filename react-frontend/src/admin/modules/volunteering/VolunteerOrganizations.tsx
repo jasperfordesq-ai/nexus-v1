@@ -24,18 +24,16 @@ import {
   SelectItem,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Building2,
-  RefreshCw,
-  Wallet,
-  ArrowLeftRight,
-  ShieldCheck,
-  ShieldOff,
-  Search,
-  Pencil,
-  Users,
-  Plus,
-} from 'lucide-react';
+import Building2 from 'lucide-react/icons/building-2';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Wallet from 'lucide-react/icons/wallet';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import ShieldOff from 'lucide-react/icons/shield-off';
+import Search from 'lucide-react/icons/search';
+import Pencil from 'lucide-react/icons/pencil';
+import Users from 'lucide-react/icons/users';
+import Plus from 'lucide-react/icons/plus';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';

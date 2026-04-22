@@ -32,24 +32,22 @@ import {
   Textarea,
   useDisclosure,
 } from '@heroui/react';
-import {
-  Heart,
-  MessageCircle,
-  MapPin,
-  Eye,
-  Clock,
-  ShoppingBag,
-  ArrowLeft,
-  Share2,
-  Star,
-  ChevronLeft,
-  ChevronRight,
-  DollarSign,
-  Package,
-  User,
-  ExternalLink,
-  Flag,
-} from 'lucide-react';
+import Heart from 'lucide-react/icons/heart';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import MapPin from 'lucide-react/icons/map-pin';
+import Eye from 'lucide-react/icons/eye';
+import Clock from 'lucide-react/icons/clock';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Share2 from 'lucide-react/icons/share-2';
+import Star from 'lucide-react/icons/star';
+import ChevronLeft from 'lucide-react/icons/chevron-left';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import Package from 'lucide-react/icons/package';
+import User from 'lucide-react/icons/user';
+import ExternalLink from 'lucide-react/icons/external-link';
+import Flag from 'lucide-react/icons/flag';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

@@ -9,7 +9,8 @@
  */
 
 import { type ReactNode, useMemo } from 'react';
-import { MapPin, MapPinOff } from 'lucide-react';
+import MapPin from 'lucide-react/icons/map-pin';
+import MapPinOff from 'lucide-react/icons/map-pin-off';
 import { useTranslation } from 'react-i18next';
 import { LocationMap, type MapMarker } from './LocationMap';
 import { MAPS_ENABLED } from '@/lib/map-config';

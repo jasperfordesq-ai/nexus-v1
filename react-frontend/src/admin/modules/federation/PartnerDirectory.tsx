@@ -27,22 +27,20 @@ import {
   Textarea,
   Skeleton,
 } from '@heroui/react';
-import {
-  Globe,
-  RefreshCw,
-  Search,
-  Users,
-  Handshake,
-  MapPin,
-  Tag,
-  Send,
-  CheckCircle,
-  Clock,
-  XCircle,
-  Filter,
-  Mail,
-  ExternalLink,
-} from 'lucide-react';
+import Globe from 'lucide-react/icons/globe';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Search from 'lucide-react/icons/search';
+import Users from 'lucide-react/icons/users';
+import Handshake from 'lucide-react/icons/handshake';
+import MapPin from 'lucide-react/icons/map-pin';
+import Tag from 'lucide-react/icons/tag';
+import Send from 'lucide-react/icons/send';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Clock from 'lucide-react/icons/clock';
+import XCircle from 'lucide-react/icons/circle-x';
+import Filter from 'lucide-react/icons/filter';
+import Mail from 'lucide-react/icons/mail';
+import ExternalLink from 'lucide-react/icons/external-link';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';

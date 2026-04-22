@@ -11,7 +11,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Button, Spinner, Chip } from '@heroui/react';
-import { Menu, Plus, Pencil, Trash2, Info } from 'lucide-react';
+import Menu from 'lucide-react/icons/menu';
+import Plus from 'lucide-react/icons/plus';
+import Pencil from 'lucide-react/icons/pencil';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Info from 'lucide-react/icons/info';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';

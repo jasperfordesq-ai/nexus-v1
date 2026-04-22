@@ -11,7 +11,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardHeader, CardBody, Button, Input, Switch, Divider, Spinner } from '@heroui/react';
-import { ArrowLeft, Save } from 'lucide-react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
 import { Link } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { adminBroker } from '../../api/adminApi';

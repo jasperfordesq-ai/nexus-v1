@@ -11,7 +11,12 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Select, SelectItem, Input, Button, Chip } from '@heroui/react';
-import { Download, X, Activity, Network, Handshake, AlertTriangle } from 'lucide-react';
+import Download from 'lucide-react/icons/download';
+import X from 'lucide-react/icons/x';
+import Activity from 'lucide-react/icons/activity';
+import Network from 'lucide-react/icons/network';
+import Handshake from 'lucide-react/icons/handshake';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { usePageTitle } from '@/hooks';
 import { adminSuper } from '../../api/adminApi';
 import { DataTable, PageHeader, StatCard, type Column } from '../../components';

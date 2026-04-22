@@ -31,14 +31,12 @@ import {
   ModalBody,
   ModalFooter,
 } from '@heroui/react';
-import {
-  ShoppingBag,
-  Package,
-  Truck,
-  Star,
-  ExternalLink,
-  CheckCircle2,
-} from 'lucide-react';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import Package from 'lucide-react/icons/package';
+import Truck from 'lucide-react/icons/truck';
+import Star from 'lucide-react/icons/star';
+import ExternalLink from 'lucide-react/icons/external-link';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

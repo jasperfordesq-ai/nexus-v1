@@ -17,11 +17,24 @@ import {
   Select, SelectItem, Switch, Textarea, Card, CardBody, CardHeader,
   Spinner, useDisclosure,
 } from '@heroui/react';
-import {
-  Handshake, RefreshCw, MoreVertical, CheckCircle, XCircle, Ban,
-  Eye, MessageSquare, ArrowLeftRight, ShieldCheck, Clock, BarChart3,
-  Users, Mail, ShoppingBag, Calendar, UsersRound, Inbox,
-} from 'lucide-react';
+import Handshake from 'lucide-react/icons/handshake';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Ban from 'lucide-react/icons/ban';
+import Eye from 'lucide-react/icons/eye';
+import MessageSquare from 'lucide-react/icons/message-square';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import Clock from 'lucide-react/icons/clock';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import Users from 'lucide-react/icons/users';
+import Mail from 'lucide-react/icons/mail';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import Calendar from 'lucide-react/icons/calendar';
+import UsersRound from 'lucide-react/icons/users-round';
+import Inbox from 'lucide-react/icons/inbox';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';

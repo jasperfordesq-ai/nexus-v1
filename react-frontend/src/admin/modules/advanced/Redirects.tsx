@@ -20,7 +20,9 @@ import {
   Input,
   useDisclosure,
 } from '@heroui/react';
-import { ArrowRightLeft, Plus, Trash2 } from 'lucide-react';
+import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
+import Plus from 'lucide-react/icons/plus';
+import Trash2 from 'lucide-react/icons/trash-2';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader, EmptyState, DataTable, ConfirmModal, type Column } from '../../components';

@@ -11,16 +11,14 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Input, Tabs, Tab, Avatar, Skeleton } from '@heroui/react';
-import {
-  Search,
-  ListTodo,
-  User,
-  Calendar,
-  Users,
-  Clock,
-  MapPin,
-  AlertTriangle,
-} from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import ListTodo from 'lucide-react/icons/list-todo';
+import User from 'lucide-react/icons/user';
+import Calendar from 'lucide-react/icons/calendar';
+import Users from 'lucide-react/icons/users';
+import Clock from 'lucide-react/icons/clock';
+import MapPin from 'lucide-react/icons/map-pin';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, AlgorithmLabel } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

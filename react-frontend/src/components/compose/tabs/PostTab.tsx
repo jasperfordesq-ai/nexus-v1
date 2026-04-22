@@ -12,7 +12,8 @@ import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react'
 import { Button, Avatar, Spinner, DatePicker, TimeInput, Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
 import type { DateInputValue, TimeInputValue } from '@heroui/react';
 import { today, getLocalTimeZone } from '@internationalized/date';
-import { Calendar, X } from 'lucide-react';
+import Calendar from 'lucide-react/icons/calendar';
+import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { useDraftPersistence } from '@/hooks';

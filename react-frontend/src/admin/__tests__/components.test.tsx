@@ -19,7 +19,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { HeroUIProvider } from '@heroui/react';
-import { Users } from 'lucide-react';
+import Users from 'lucide-react/icons/users';
 
 vi.mock('@/contexts', () => ({
   useAuth: vi.fn(() => ({

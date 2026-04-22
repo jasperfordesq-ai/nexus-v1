@@ -11,18 +11,16 @@ import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Input, Select, SelectItem, Avatar, AvatarGroup } from '@heroui/react';
-import {
-  Search,
-  Users,
-  Plus,
-  Filter,
-  Lock,
-  Globe,
-  MessageSquare,
-  RefreshCw,
-  AlertTriangle,
-  Star,
-} from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import Users from 'lucide-react/icons/users';
+import Plus from 'lucide-react/icons/plus';
+import Filter from 'lucide-react/icons/filter';
+import Lock from 'lucide-react/icons/lock';
+import Globe from 'lucide-react/icons/globe';
+import MessageSquare from 'lucide-react/icons/message-square';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, GroupCardSkeleton } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';

@@ -10,7 +10,10 @@
 
 import { useState } from 'react';
 import { Card, CardBody, CardHeader, Button, Chip } from '@heroui/react';
-import { FlaskConical, Play, CheckCircle, XCircle } from 'lucide-react';
+import FlaskConical from 'lucide-react/icons/flask-conical';
+import Play from 'lucide-react/icons/play';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';

@@ -12,7 +12,7 @@
  */
 
 import { Chip } from '@heroui/react';
-import { CheckCircle } from 'lucide-react';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
 import { useTranslation } from 'react-i18next';
 
 interface BusinessSellerBadgeProps {

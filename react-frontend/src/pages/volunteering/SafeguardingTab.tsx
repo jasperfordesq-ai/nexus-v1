@@ -6,7 +6,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Button, Chip, Input, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, useDisclosure } from '@heroui/react';
-import { ShieldCheck, GraduationCap, AlertTriangle, Plus, RefreshCw, FileWarning, Calendar } from 'lucide-react';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import GraduationCap from 'lucide-react/icons/graduation-cap';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Plus from 'lucide-react/icons/plus';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import FileWarning from 'lucide-react/icons/file-warning';
+import Calendar from 'lucide-react/icons/calendar';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';

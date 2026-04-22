@@ -9,7 +9,9 @@
  */
 
 import { Card, CardBody, Button } from '@heroui/react';
-import { Wrench, LogIn, Info } from 'lucide-react';
+import Wrench from 'lucide-react/icons/wrench';
+import LogIn from 'lucide-react/icons/log-in';
+import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { PageMeta } from '@/components/seo';

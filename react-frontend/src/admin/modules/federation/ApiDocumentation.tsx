@@ -26,14 +26,12 @@ import {
   TableCell,
   Divider,
 } from '@heroui/react';
-import {
-  BookOpen,
-  Shield,
-  Code,
-  AlertTriangle,
-  Webhook,
-  HelpCircle,
-} from 'lucide-react';
+import BookOpen from 'lucide-react/icons/book-open';
+import Shield from 'lucide-react/icons/shield';
+import Code from 'lucide-react/icons/code';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Webhook from 'lucide-react/icons/webhook';
+import HelpCircle from 'lucide-react/icons/circle-help';
 import { usePageTitle } from '@/hooks';
 import { PageHeader } from '../../components';
 import { useTranslation } from 'react-i18next';

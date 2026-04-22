@@ -25,13 +25,11 @@ import {
   DropdownMenu,
   DropdownItem,
 } from '@heroui/react';
-import {
-  Repeat2,
-  Quote,
-  Copy,
-  Share2,
-  MessageSquare,
-} from 'lucide-react';
+import Repeat2 from 'lucide-react/icons/repeat-2';
+import Quote from 'lucide-react/icons/quote';
+import Copy from 'lucide-react/icons/copy';
+import Share2 from 'lucide-react/icons/share-2';
+import MessageSquare from 'lucide-react/icons/message-square';
 import { useTranslation } from 'react-i18next';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';

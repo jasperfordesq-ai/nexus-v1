@@ -22,22 +22,20 @@ import {
   ModalBody,
   ModalFooter,
 } from '@heroui/react';
-import {
-  KeyRound,
-  CheckCircle,
-  XCircle,
-  RefreshCw,
-  RotateCcw,
-  Plug,
-  ChevronDown,
-  ChevronRight,
-  Database,
-  Mail,
-  Bot,
-  Shield,
-  Bell,
-  HardDrive,
-} from 'lucide-react';
+import KeyRound from 'lucide-react/icons/key-round';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
+import Plug from 'lucide-react/icons/plug';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import Database from 'lucide-react/icons/database';
+import Mail from 'lucide-react/icons/mail';
+import Bot from 'lucide-react/icons/bot';
+import Shield from 'lucide-react/icons/shield';
+import Bell from 'lucide-react/icons/bell';
+import HardDrive from 'lucide-react/icons/hard-drive';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';

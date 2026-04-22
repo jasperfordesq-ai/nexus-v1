@@ -26,17 +26,15 @@ import {
   Chip,
   Avatar,
 } from '@heroui/react';
-import {
-  Search,
-  Globe,
-  Calendar,
-  MapPin,
-  Users,
-  Clock,
-  AlertTriangle,
-  RefreshCw,
-  Wifi,
-} from 'lucide-react';
+import Search from 'lucide-react/icons/search';
+import Globe from 'lucide-react/icons/globe';
+import Calendar from 'lucide-react/icons/calendar';
+import MapPin from 'lucide-react/icons/map-pin';
+import Users from 'lucide-react/icons/users';
+import Clock from 'lucide-react/icons/clock';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Wifi from 'lucide-react/icons/wifi';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';

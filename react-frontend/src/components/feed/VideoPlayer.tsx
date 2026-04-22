@@ -14,7 +14,9 @@
 
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { Button } from '@heroui/react';
-import { Play, Volume2, VolumeX } from 'lucide-react';
+import Play from 'lucide-react/icons/play';
+import Volume2 from 'lucide-react/icons/volume-2';
+import VolumeX from 'lucide-react/icons/volume-x';
 import { useTranslation } from 'react-i18next';
 import { resolveAssetUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';

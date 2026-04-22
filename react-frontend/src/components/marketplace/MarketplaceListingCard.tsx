@@ -12,7 +12,9 @@
 
 import { useState, useCallback } from 'react';
 import { Button, Card, CardBody, Chip } from '@heroui/react';
-import { Heart, MapPin, Megaphone } from 'lucide-react';
+import Heart from 'lucide-react/icons/heart';
+import MapPin from 'lucide-react/icons/map-pin';
+import Megaphone from 'lucide-react/icons/megaphone';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';

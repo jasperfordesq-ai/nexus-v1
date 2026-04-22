@@ -10,7 +10,10 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Button, Chip, Card, CardBody } from '@heroui/react';
-import { ShieldCheck, RefreshCw, AlertTriangle, Mail } from 'lucide-react';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Mail from 'lucide-react/icons/mail';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';

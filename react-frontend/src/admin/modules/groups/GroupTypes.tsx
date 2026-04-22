@@ -22,7 +22,10 @@ import {
   Textarea,
   useDisclosure,
 } from '@heroui/react';
-import { Plus, Settings, Trash2, Edit2 } from 'lucide-react';
+import Plus from 'lucide-react/icons/plus';
+import Settings from 'lucide-react/icons/settings';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Edit2 from 'lucide-react/icons/pen';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';

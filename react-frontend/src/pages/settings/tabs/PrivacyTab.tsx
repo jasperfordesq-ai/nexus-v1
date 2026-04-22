@@ -9,24 +9,22 @@ import {
   Select,
   SelectItem,
 } from '@heroui/react';
-import {
-  Save,
-  Eye,
-  Search,
-  MessageSquare,
-  FileText,
-  Download,
-  RefreshCw,
-  Trash2,
-  PenLine,
-  Ban,
-  Scale,
-  Info,
-  FileCheck,
-  Upload,
-  Globe,
-  ChevronRight,
-} from 'lucide-react';
+import Save from 'lucide-react/icons/save';
+import Eye from 'lucide-react/icons/eye';
+import Search from 'lucide-react/icons/search';
+import MessageSquare from 'lucide-react/icons/message-square';
+import FileText from 'lucide-react/icons/file-text';
+import Download from 'lucide-react/icons/download';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Trash2 from 'lucide-react/icons/trash-2';
+import PenLine from 'lucide-react/icons/pen-line';
+import Ban from 'lucide-react/icons/ban';
+import Scale from 'lucide-react/icons/scale';
+import Info from 'lucide-react/icons/info';
+import FileCheck from 'lucide-react/icons/file-check';
+import Upload from 'lucide-react/icons/upload';
+import Globe from 'lucide-react/icons/globe';
+import ChevronRight from 'lucide-react/icons/chevron-right';
 import { GlassCard } from '@/components/ui';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

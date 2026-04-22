@@ -15,7 +15,10 @@
 
 import { useState, useCallback } from 'react';
 import { Button, Textarea, Card, CardBody } from '@heroui/react';
-import { Sparkles, Copy, Check, RefreshCw } from 'lucide-react';
+import Sparkles from 'lucide-react/icons/sparkles';
+import Copy from 'lucide-react/icons/copy';
+import Check from 'lucide-react/icons/check';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

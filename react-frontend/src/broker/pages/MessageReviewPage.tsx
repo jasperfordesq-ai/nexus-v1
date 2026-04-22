@@ -10,7 +10,9 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Tabs, Tab, Chip, Button } from '@heroui/react';
-import { RefreshCw, MessageSquare, Eye } from 'lucide-react';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Eye from 'lucide-react/icons/eye';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
