@@ -651,7 +651,7 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
       summary_of_changes: null,
       has_previous_versions: false,
     }),
-    [currentHtml,
+    [currentHtml],
   );
 
   return (

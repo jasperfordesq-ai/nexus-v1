@@ -49,8 +49,11 @@ export default defineConfig(({ command }) => ({
         });
       },
     },
-    // PWA plugin only in production builds — no service worker overhead in dev.
-    ...(command === 'build' ? [VitePWA({
+    // VitePWA is always loaded so its virtual module (virtual:pwa-register) is
+    // resolvable in dev. The plugin is disabled in dev via the `disable` flag —
+    // no service worker is generated or registered, so there is zero SW overhead.
+    VitePWA({
+      disable: command !== 'build',
       registerType: 'prompt',
       // Don't inject SW registration into index.html automatically —
       // we handle it in main.tsx so it only fires in production builds
@@ -77,7 +80,7 @@ export default defineConfig(({ command }) => ({
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//, /^\/admin-legacy\//, /^\/health\.php/],
       },
-    })] : []),
+    }),
     // Image optimizer only runs during build — skip in dev for faster startup.
     // Some local environments end up with an incomplete sharp install, which
     // makes vite-plugin-image-optimizer log asset errors despite a successful build.
@@ -101,9 +104,16 @@ export default defineConfig(({ command }) => ({
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
   },
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
+    alias: [
+      { find: '@', replacement: path.resolve(__dirname, './src') },
+      // lucide-react v0.453.0 has no package exports map, so sub-path imports
+      // like `lucide-react/icons/lock` don't resolve. Map them to the actual
+      // ESM dist files. Each file exports the icon as default, matching usage.
+      {
+        find: /^lucide-react\/icons\/(.+)$/,
+        replacement: path.resolve(__dirname, 'node_modules/lucide-react/dist/esm/icons/$1'),
+      },
+    ],
   },
   optimizeDeps: {
     // Pre-bundle heavy deps so Vite doesn't re-crawl them on every page load.
