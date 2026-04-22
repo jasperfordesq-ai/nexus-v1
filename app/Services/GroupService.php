@@ -14,6 +14,7 @@ use App\Events\GroupDeleted;
 use App\Events\GroupMemberJoined;
 use App\Events\GroupMemberLeft;
 use App\Events\GroupUpdated;
+use App\I18n\LocaleContext;
 use App\Models\Group;
 use App\Models\GroupDiscussion;
 use App\Models\GroupPost;
@@ -302,30 +303,34 @@ class GroupService
             $creator = DB::table('users')
                 ->where('id', $userId)
                 ->where('tenant_id', TenantContext::getId())
-                ->select(['email', 'first_name', 'name'])
+                ->select(['email', 'first_name', 'name', 'preferred_language'])
                 ->first();
 
             if ($creator && !empty($creator->email)) {
-                $firstName  = $creator->first_name ?? $creator->name ?? __('emails.common.fallback_name');
-                $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
-                $groupUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups/' . $group->id;
-                $groupName  = $group->name ?? '';
+                // Render title/preview/greeting/body/subject in the creator's
+                // preferred_language so the confirmation lands in their language.
+                LocaleContext::withLocale($creator, function () use ($creator, $group) {
+                    $firstName  = $creator->first_name ?? $creator->name ?? __('emails.common.fallback_name');
+                    $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
+                    $groupUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups/' . $group->id;
+                    $groupName  = $group->name ?? '';
 
-                $html = EmailTemplateBuilder::make()
-                    ->theme('success')
-                    ->title(__('emails_created.group.title'))
-                    ->previewText(__('emails_created.group.preview', ['name' => $groupName, 'community' => $tenantName]))
-                    ->greeting($firstName)
-                    ->paragraph(__('emails_created.group.body', ['community' => $tenantName]))
-                    ->highlight($groupName)
-                    ->button(__('emails_created.group.cta'), $groupUrl)
-                    ->render();
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('success')
+                        ->title(__('emails_created.group.title'))
+                        ->previewText(__('emails_created.group.preview', ['name' => $groupName, 'community' => $tenantName]))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_created.group.body', ['community' => $tenantName]))
+                        ->highlight($groupName)
+                        ->button(__('emails_created.group.cta'), $groupUrl)
+                        ->render();
 
-                Mailer::forCurrentTenant()->send(
-                    $creator->email,
-                    __('emails_created.group.subject', ['name' => $groupName, 'community' => $tenantName]),
-                    $html
-                );
+                    Mailer::forCurrentTenant()->send(
+                        $creator->email,
+                        __('emails_created.group.subject', ['name' => $groupName, 'community' => $tenantName]),
+                        $html
+                    );
+                });
             }
         } catch (\Throwable $e) {
             Log::warning('[GroupService] creation email failed: ' . $e->getMessage());
@@ -716,27 +721,30 @@ class GroupService
                 $member = DB::table('users')
                     ->where('id', $targetUserId)
                     ->where('tenant_id', $tenantId)
-                    ->select(['email', 'first_name', 'name'])
+                    ->select(['email', 'first_name', 'name', 'preferred_language'])
                     ->first();
                 if ($member && !empty($member->email)) {
-                    $firstName  = $member->first_name ?? $member->name ?? __('emails.common.fallback_name');
-                    $community  = TenantContext::getName();
-                    $groupName  = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
-                    $roleLabel  = ucfirst($role);
-                    $groupUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups/' . $groupId;
-                    $html = EmailTemplateBuilder::make()
-                        ->theme('success')
-                        ->title(__('emails_commerce.group_promoted.title'))
-                        ->greeting($firstName)
-                        ->paragraph(__('emails_commerce.group_promoted.body', ['role' => $roleLabel, 'group_name' => $groupName, 'community' => $community]))
-                        ->paragraph(__('emails_commerce.group_promoted.responsibilities', ['role' => $roleLabel]))
-                        ->button(__('emails_commerce.group_promoted.cta'), $groupUrl)
-                        ->render();
-                    Mailer::forCurrentTenant()->send(
-                        $member->email,
-                        __('emails_commerce.group_promoted.subject', ['role' => $roleLabel, 'group_name' => $groupName, 'community' => $community]),
-                        $html
-                    );
+                    // Render subject + body in the promoted member's locale.
+                    LocaleContext::withLocale($member, function () use ($member, $group, $groupId, $role) {
+                        $firstName  = $member->first_name ?? $member->name ?? __('emails.common.fallback_name');
+                        $community  = TenantContext::getName();
+                        $groupName  = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
+                        $roleLabel  = ucfirst($role);
+                        $groupUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups/' . $groupId;
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('success')
+                            ->title(__('emails_commerce.group_promoted.title'))
+                            ->greeting($firstName)
+                            ->paragraph(__('emails_commerce.group_promoted.body', ['role' => $roleLabel, 'group_name' => $groupName, 'community' => $community]))
+                            ->paragraph(__('emails_commerce.group_promoted.responsibilities', ['role' => $roleLabel]))
+                            ->button(__('emails_commerce.group_promoted.cta'), $groupUrl)
+                            ->render();
+                        Mailer::forCurrentTenant()->send(
+                            $member->email,
+                            __('emails_commerce.group_promoted.subject', ['role' => $roleLabel, 'group_name' => $groupName, 'community' => $community]),
+                            $html
+                        );
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('[GroupService] group_promoted email failed: ' . $e->getMessage());
@@ -782,45 +790,53 @@ class GroupService
             $group->decrement('cached_member_count');
         }
 
-        // Email removed member
+        // Email + bell to removed member — both rendered in their locale.
         try {
             $tenantId = TenantContext::getId();
             $member = DB::table('users')
                 ->where('id', $targetUserId)
                 ->where('tenant_id', $tenantId)
-                ->select(['email', 'first_name', 'name'])
+                ->select(['email', 'first_name', 'name', 'preferred_language'])
                 ->first();
-            if ($member && !empty($member->email)) {
-                $firstName = $member->first_name ?? $member->name ?? __('emails.common.fallback_name');
-                $community = TenantContext::getName();
-                $groupName = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
-                $browseUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups';
-                $html = EmailTemplateBuilder::make()
-                    ->theme('warning')
-                    ->title(__('emails_commerce.group_removed.title'))
-                    ->greeting($firstName)
-                    ->paragraph(__('emails_commerce.group_removed.body', ['group_name' => $groupName, 'community' => $community]))
-                    ->paragraph(__('emails_commerce.group_removed.suggestion'))
-                    ->button(__('emails_commerce.group_removed.cta'), $browseUrl)
-                    ->render();
-                Mailer::forCurrentTenant()->send(
-                    $member->email,
-                    __('emails_commerce.group_removed.subject', ['group_name' => $groupName, 'community' => $community]),
-                    $html
-                );
-            }
-        } catch (\Throwable $e) {
-            Log::warning('[GroupService] group_removed email failed: ' . $e->getMessage());
-        }
 
-        // In-app bell to removed member
-        Notification::create([
-            'user_id'    => $targetUserId,
-            'message'    => __('api_controllers_3.admin_bells.group_member_removed', ['group' => $group->name]),
-            'link'       => '/groups',
-            'type'       => 'group_member_removed',
-            'created_at' => now(),
-        ]);
+            LocaleContext::withLocale($member, function () use ($member, $group, $targetUserId) {
+                // Email (only if we have contact details)
+                if ($member && !empty($member->email)) {
+                    try {
+                        $firstName = $member->first_name ?? $member->name ?? __('emails.common.fallback_name');
+                        $community = TenantContext::getName();
+                        $groupName = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
+                        $browseUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups';
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('warning')
+                            ->title(__('emails_commerce.group_removed.title'))
+                            ->greeting($firstName)
+                            ->paragraph(__('emails_commerce.group_removed.body', ['group_name' => $groupName, 'community' => $community]))
+                            ->paragraph(__('emails_commerce.group_removed.suggestion'))
+                            ->button(__('emails_commerce.group_removed.cta'), $browseUrl)
+                            ->render();
+                        Mailer::forCurrentTenant()->send(
+                            $member->email,
+                            __('emails_commerce.group_removed.subject', ['group_name' => $groupName, 'community' => $community]),
+                            $html
+                        );
+                    } catch (\Throwable $e) {
+                        Log::warning('[GroupService] group_removed email failed: ' . $e->getMessage());
+                    }
+                }
+
+                // In-app bell to removed member
+                Notification::create([
+                    'user_id'    => $targetUserId,
+                    'message'    => __('api_controllers_3.admin_bells.group_member_removed', ['group' => $group->name]),
+                    'link'       => '/groups',
+                    'type'       => 'group_member_removed',
+                    'created_at' => now(),
+                ]);
+            });
+        } catch (\Throwable $e) {
+            Log::warning('[GroupService] group_removed notification failed: ' . $e->getMessage());
+        }
 
         return true;
     }

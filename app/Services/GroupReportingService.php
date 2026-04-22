@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -194,17 +195,22 @@ class GroupReportingService
                     ->where('status', 'active')
                     ->whereNotNull('email')
                     ->where('email', '!=', '')
-                    ->first(['id', 'email', 'first_name', 'last_name']);
+                    ->first(['id', 'email', 'first_name', 'last_name', 'preferred_language']);
 
                 if (!$user) {
                     continue;
                 }
 
-                $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
-                $subject = __('emails.group_digest.subject', ['group' => $group->name]);
-                $body = self::buildDigestEmailBody($name, $stats, $tenant->name ?? __('emails.common.fallback_tenant_name'));
+                // Wrap subject + body (stat labels, greetings, CTA) render in the
+                // recipient's preferred_language. Each admin/owner gets the digest
+                // in their own language.
+                $success = LocaleContext::withLocale($user, function () use ($user, $group, $stats, $tenant, $emailService) {
+                    $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+                    $subject = __('emails.group_digest.subject', ['group' => $group->name]);
+                    $body = self::buildDigestEmailBody($name, $stats, $tenant->name ?? __('emails.common.fallback_tenant_name'));
 
-                $success = $emailService->send($user->email, $subject, $body);
+                    return $emailService->send($user->email, $subject, $body);
+                });
 
                 if ($success) {
                     $emailsSent++;

@@ -11,6 +11,7 @@ use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\CommunityEventCreated;
 use App\Events\CommunityEventUpdated;
+use App\I18n\LocaleContext;
 use App\Models\Event;
 use App\Models\EventRsvp;
 use Illuminate\Database\Eloquent\Builder;
@@ -239,30 +240,33 @@ class EventService
             $creator = DB::table('users')
                 ->where('id', $userId)
                 ->where('tenant_id', TenantContext::getId())
-                ->select(['email', 'first_name', 'name'])
+                ->select(['email', 'first_name', 'name', 'preferred_language'])
                 ->first();
 
             if ($creator && !empty($creator->email)) {
-                $firstName  = $creator->first_name ?? $creator->name ?? __('emails.common.fallback_name');
-                $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
-                $eventUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/events/' . $event->id;
-                $eventTitle = $event->title ?? '';
+                // Render greeting, subject, body + CTA in the creator's preferred_language.
+                LocaleContext::withLocale($creator, function () use ($creator, $event) {
+                    $firstName  = $creator->first_name ?? $creator->name ?? __('emails.common.fallback_name');
+                    $tenantName = TenantContext::getSetting('site_name', 'Project NEXUS');
+                    $eventUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/events/' . $event->id;
+                    $eventTitle = $event->title ?? '';
 
-                $html = EmailTemplateBuilder::make()
-                    ->theme('success')
-                    ->title(__('emails_created.event.title'))
-                    ->previewText(__('emails_created.event.preview', ['title' => $eventTitle, 'community' => $tenantName]))
-                    ->greeting($firstName)
-                    ->paragraph(__('emails_created.event.body'))
-                    ->highlight($eventTitle)
-                    ->button(__('emails_created.event.cta'), $eventUrl)
-                    ->render();
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('success')
+                        ->title(__('emails_created.event.title'))
+                        ->previewText(__('emails_created.event.preview', ['title' => $eventTitle, 'community' => $tenantName]))
+                        ->greeting($firstName)
+                        ->paragraph(__('emails_created.event.body'))
+                        ->highlight($eventTitle)
+                        ->button(__('emails_created.event.cta'), $eventUrl)
+                        ->render();
 
-                Mailer::forCurrentTenant()->send(
-                    $creator->email,
-                    __('emails_created.event.subject', ['title' => $eventTitle, 'community' => $tenantName]),
-                    $html
-                );
+                    Mailer::forCurrentTenant()->send(
+                        $creator->email,
+                        __('emails_created.event.subject', ['title' => $eventTitle, 'community' => $tenantName]),
+                        $html
+                    );
+                });
             }
         } catch (\Throwable $e) {
             Log::warning('[EventService] creation email failed: ' . $e->getMessage());

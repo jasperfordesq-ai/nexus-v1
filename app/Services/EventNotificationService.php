@@ -158,36 +158,41 @@ class EventNotificationService
                     ->where('r.event_id', $eventId)
                     ->whereIn('r.status', ['going', 'interested'])
                     ->whereNull('ers.id')
-                    ->select(['r.user_id', 'u.name', 'u.first_name', 'u.last_name', 'u.email'])
+                    ->select(['r.user_id', 'u.name', 'u.first_name', 'u.last_name', 'u.email', 'u.preferred_language'])
                     ->get();
 
                 foreach ($attendees as $attendee) {
                     $userId = (int) $attendee->user_id;
 
                     try {
-                        $message = $this->createReminderNotification($userId, $event, $type);
-                        $this->markReminderSent($tenantId, $eventId, $userId, $type);
+                        // Wrap the bell + email render under the recipient's locale so
+                        // the stored bell text AND email subject/body both render in
+                        // THEIR preferred_language, not the caller's.
+                        LocaleContext::withLocale($attendee, function () use ($attendee, $event, $type, $userId, $tenantId, $eventId, &$sent) {
+                            $message = $this->createReminderNotification($userId, $event, $type);
+                            $this->markReminderSent($tenantId, $eventId, $userId, $type);
 
-                        // Send reminder email
-                        try {
-                            $eventTitle = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
-                            $subject = $type === '24h'
-                                ? __('notifications.event_reminder_subject_24h', ['title' => $eventTitle])
-                                : __('notifications.event_reminder_subject_1h', ['title' => $eventTitle]);
+                            // Send reminder email
+                            try {
+                                $eventTitle = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
+                                $subject = $type === '24h'
+                                    ? __('notifications.event_reminder_subject_24h', ['title' => $eventTitle])
+                                    : __('notifications.event_reminder_subject_1h', ['title' => $eventTitle]);
 
-                            $this->sendEventEmail(
-                                $attendee,
-                                $subject,
-                                $message,
-                                '/events/' . $eventId,
-                                'event_reminder',
-                                $this->buildReminderEmailHtml($event, $type, $attendee)
-                            );
-                        } catch (\Throwable $e) {
-                            Log::warning("[EventNotificationService] Reminder email failed for user {$userId}: " . $e->getMessage());
-                        }
+                                $this->sendEventEmail(
+                                    $attendee,
+                                    $subject,
+                                    $message,
+                                    '/events/' . $eventId,
+                                    'event_reminder',
+                                    $this->buildReminderEmailHtml($event, $type, $attendee)
+                                );
+                            } catch (\Throwable $e) {
+                                Log::warning("[EventNotificationService] Reminder email failed for user {$userId}: " . $e->getMessage());
+                            }
 
-                        $sent++;
+                            $sent++;
+                        });
                     } catch (\Throwable $e) {
                         Log::error("[EventNotificationService] Reminder failed: event={$eventId}, user={$userId}, type={$type}: " . $e->getMessage());
                     }
@@ -228,7 +233,7 @@ class EventNotificationService
                 ->where('r.event_id', $eventId)
                 ->where('r.tenant_id', $tenantId)
                 ->whereIn('r.status', ['going', 'interested', 'invited'])
-                ->select(['r.user_id', 'u.email', 'u.name', 'u.first_name'])
+                ->select(['r.user_id', 'u.email', 'u.name', 'u.first_name', 'u.preferred_language'])
                 ->distinct()
                 ->get()
                 ->keyBy('user_id');
@@ -242,7 +247,7 @@ class EventNotificationService
                 ->where('w.event_id', $eventId)
                 ->where('w.tenant_id', $tenantId)
                 ->where('w.status', 'waiting')
-                ->select(['w.user_id', 'u.email', 'u.name', 'u.first_name'])
+                ->select(['w.user_id', 'u.email', 'u.name', 'u.first_name', 'u.preferred_language'])
                 ->distinct()
                 ->get()
                 ->keyBy('user_id');
@@ -255,38 +260,42 @@ class EventNotificationService
             }
 
             $eventTitle = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
-            $message = __('notifications.event_cancelled', ['title' => $event->title]);
-            if (!empty($reason)) {
-                $message .= ' ' . __('notifications.event_cancelled_reason', ['reason' => $reason]);
-            }
-
             $path = '/events/' . $eventId;
             $count = 0;
 
             foreach ($allUsers as $uid => $user) {
                 try {
-                    Notification::create([
-                        'user_id' => (int) $uid,
-                        'tenant_id' => $tenantId,
-                        'message' => $message,
-                        'link' => $path,
-                        'type' => 'event',
-                        'created_at' => now(),
-                    ]);
+                    // Render bell message + email subject/body under the recipient's
+                    // preferred_language so every nested __() resolves in THEIR locale.
+                    LocaleContext::withLocale($user, function () use ($user, $uid, $tenantId, $event, $eventTitle, $reason, $path) {
+                        $message = __('notifications.event_cancelled', ['title' => $event->title]);
+                        if (!empty($reason)) {
+                            $message .= ' ' . __('notifications.event_cancelled_reason', ['reason' => $reason]);
+                        }
 
-                    // Send cancellation email
-                    try {
-                        $this->sendEventEmail(
-                            $user,
-                            __('emails.events.cancelled_subject', ['title' => $eventTitle]),
-                            $message,
-                            $path,
-                            'event_cancellation',
-                            $this->buildCancellationEmailHtml($event, $reason, $user)
-                        );
-                    } catch (\Throwable $e) {
-                        Log::warning("[EventNotificationService] Cancellation email failed for user {$uid}: " . $e->getMessage());
-                    }
+                        Notification::create([
+                            'user_id' => (int) $uid,
+                            'tenant_id' => $tenantId,
+                            'message' => $message,
+                            'link' => $path,
+                            'type' => 'event',
+                            'created_at' => now(),
+                        ]);
+
+                        // Send cancellation email
+                        try {
+                            $this->sendEventEmail(
+                                $user,
+                                __('emails.events.cancelled_subject', ['title' => $eventTitle]),
+                                $message,
+                                $path,
+                                'event_cancellation',
+                                $this->buildCancellationEmailHtml($event, $reason, $user)
+                            );
+                        } catch (\Throwable $e) {
+                            Log::warning("[EventNotificationService] Cancellation email failed for user {$uid}: " . $e->getMessage());
+                        }
+                    });
 
                     $count++;
                 } catch (\Throwable $e) {
@@ -337,7 +346,7 @@ class EventNotificationService
                 ->where('r.event_id', $eventId)
                 ->where('r.tenant_id', $tenantId)
                 ->whereIn('r.status', ['going', 'interested'])
-                ->select(['r.user_id', 'u.email', 'u.name', 'u.first_name'])
+                ->select(['r.user_id', 'u.email', 'u.name', 'u.first_name', 'u.preferred_language'])
                 ->distinct()
                 ->get();
 
@@ -348,21 +357,6 @@ class EventNotificationService
             $eventTitle = $event->title;
             $path = '/events/' . $eventId;
             $organizerId = (int) $event->user_id;
-
-            // Build change summary
-            $changeParts = [];
-            if (isset($meaningfulChanges['start_time'])) {
-                $changeParts[] = __('notifications.event_change_date_time');
-            }
-            if (isset($meaningfulChanges['location'])) {
-                $changeParts[] = __('notifications.event_change_location');
-            }
-            if (isset($meaningfulChanges['title'])) {
-                $changeParts[] = __('notifications.event_change_title');
-            }
-            $changeLabel = implode(' and ', $changeParts);
-            $message = __('notifications.event_updated', ['title' => $eventTitle, 'changes' => $changeLabel]);
-
             $safeTitle = htmlspecialchars($eventTitle, ENT_QUOTES, 'UTF-8');
 
             foreach ($attendees as $attendee) {
@@ -371,28 +365,46 @@ class EventNotificationService
                     continue;
                 }
 
-                Notification::create([
-                    'user_id' => $attendeeId,
-                    'tenant_id' => $tenantId,
-                    'message' => $message,
-                    'link' => $path,
-                    'type' => 'event_update',
-                    'created_at' => now(),
-                ]);
+                // Each recipient gets their own locale wrap so the change summary,
+                // bell message, and email subject all render in their language.
+                LocaleContext::withLocale($attendee, function () use ($attendee, $attendeeId, $tenantId, $event, $eventTitle, $safeTitle, $path, $meaningfulChanges) {
+                    // Build change summary (localised per recipient)
+                    $changeParts = [];
+                    if (isset($meaningfulChanges['start_time'])) {
+                        $changeParts[] = __('notifications.event_change_date_time');
+                    }
+                    if (isset($meaningfulChanges['location'])) {
+                        $changeParts[] = __('notifications.event_change_location');
+                    }
+                    if (isset($meaningfulChanges['title'])) {
+                        $changeParts[] = __('notifications.event_change_title');
+                    }
+                    $changeLabel = implode(' and ', $changeParts);
+                    $message = __('notifications.event_updated', ['title' => $eventTitle, 'changes' => $changeLabel]);
 
-                // Send update email
-                try {
-                    $this->sendEventEmail(
-                        $attendee,
-                        __('emails.events.updated_subject', ['title' => $safeTitle, 'changes' => $changeLabel]),
-                        $message,
-                        $path,
-                        'event_update',
-                        $this->buildUpdateEmailHtml($event, $meaningfulChanges, $attendee)
-                    );
-                } catch (\Throwable $e) {
-                    Log::warning("[EventNotificationService] Update email failed for user {$attendeeId}: " . $e->getMessage());
-                }
+                    Notification::create([
+                        'user_id' => $attendeeId,
+                        'tenant_id' => $tenantId,
+                        'message' => $message,
+                        'link' => $path,
+                        'type' => 'event_update',
+                        'created_at' => now(),
+                    ]);
+
+                    // Send update email
+                    try {
+                        $this->sendEventEmail(
+                            $attendee,
+                            __('emails.events.updated_subject', ['title' => $safeTitle, 'changes' => $changeLabel]),
+                            $message,
+                            $path,
+                            'event_update',
+                            $this->buildUpdateEmailHtml($event, $meaningfulChanges, $attendee)
+                        );
+                    } catch (\Throwable $e) {
+                        Log::warning("[EventNotificationService] Update email failed for user {$attendeeId}: " . $e->getMessage());
+                    }
+                });
             }
         } catch (\Throwable $e) {
             Log::error("EventNotificationService::notifyEventUpdated error: " . $e->getMessage());
@@ -424,7 +436,7 @@ class EventNotificationService
             $user = DB::table('users')
                 ->where('id', $userId)
                 ->where('tenant_id', $tenantId)
-                ->select(['id', 'name', 'first_name', 'last_name'])
+                ->select(['id', 'name', 'first_name', 'last_name', 'preferred_language'])
                 ->first();
 
             if (!$user) {
@@ -434,66 +446,73 @@ class EventNotificationService
             $userName = $user->name ?? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
             $eventTitle = $event->title;
             $organizerId = (int) $event->user_id;
-
-            $statusLabel = $status === 'going'
-                ? __('emails.events.rsvp_status_going')
-                : __('emails.events.rsvp_status_interested');
-
             $path = '/events/' . $eventId;
-            $message = $status === 'going'
-                ? __('notifications.event_rsvp_going', ['name' => $userName, 'title' => $eventTitle])
-                : __('notifications.event_rsvp_interested', ['name' => $userName, 'title' => $eventTitle]);
 
-            Notification::create([
-                'user_id' => $organizerId,
-                'tenant_id' => $tenantId,
-                'message' => $message,
-                'link' => $path,
-                'type' => 'event_rsvp',
-                'created_at' => now(),
-            ]);
+            // Fetch organizer up-front so we have preferred_language available for
+            // the bell + email wraps.
+            $organizer = DB::table('users')
+                ->where('id', $organizerId)
+                ->where('tenant_id', $tenantId)
+                ->select(['id as user_id', 'email', 'name', 'first_name', 'preferred_language'])
+                ->first();
 
-            // Confirm the RSVP to the person who RSVPed
-            try {
-                $selfBell = $status === 'going'
-                    ? __('svc_notifications_2.event.rsvp_confirmed_going', ['title' => $eventTitle])
-                    : __('svc_notifications_2.event.rsvp_confirmed_interested', ['title' => $eventTitle]);
+            // Organizer bell + email — rendered in the organizer's locale.
+            if ($organizer) {
+                LocaleContext::withLocale($organizer, function () use ($organizer, $organizerId, $tenantId, $status, $userName, $eventTitle, $event, $user, $path) {
+                    $statusLabel = $status === 'going'
+                        ? __('emails.events.rsvp_status_going')
+                        : __('emails.events.rsvp_status_interested');
 
-                Notification::create([
-                    'user_id'    => $userId,
-                    'tenant_id'  => $tenantId,
-                    'message'    => $selfBell,
-                    'link'       => $path,
-                    'type'       => 'event_rsvp_confirm',
-                    'created_at' => now(),
-                ]);
-            } catch (\Throwable $e) {
-                Log::warning("[EventNotificationService] RSVP self-confirmation bell failed for user {$userId}: " . $e->getMessage());
+                    $message = $status === 'going'
+                        ? __('notifications.event_rsvp_going', ['name' => $userName, 'title' => $eventTitle])
+                        : __('notifications.event_rsvp_interested', ['name' => $userName, 'title' => $eventTitle]);
+
+                    Notification::create([
+                        'user_id' => $organizerId,
+                        'tenant_id' => $tenantId,
+                        'message' => $message,
+                        'link' => $path,
+                        'type' => 'event_rsvp',
+                        'created_at' => now(),
+                    ]);
+
+                    // Send email to organizer about the RSVP
+                    try {
+                        $safeTitle = htmlspecialchars($eventTitle, ENT_QUOTES, 'UTF-8');
+                        $safeUserName = htmlspecialchars($userName, ENT_QUOTES, 'UTF-8');
+
+                        $this->sendEventEmail(
+                            $organizer,
+                            __('emails.events.rsvp_subject', ['name' => $safeUserName, 'status_label' => $statusLabel, 'title' => $safeTitle]),
+                            $message,
+                            $path,
+                            'event_rsvp',
+                            $this->buildRsvpEmailHtml($event, $user, $status, $organizer)
+                        );
+                    } catch (\Throwable $e) {
+                        Log::warning("[EventNotificationService] RSVP email failed for organizer {$organizerId}: " . $e->getMessage());
+                    }
+                });
             }
 
-            // Send email to organizer about the RSVP
+            // Confirm the RSVP to the person who RSVPed — rendered in THEIR locale.
             try {
-                $organizer = DB::table('users')
-                    ->where('id', $organizerId)
-                    ->where('tenant_id', $tenantId)
-                    ->select(['id as user_id', 'email', 'name', 'first_name'])
-                    ->first();
+                LocaleContext::withLocale($user, function () use ($userId, $tenantId, $status, $eventTitle, $path) {
+                    $selfBell = $status === 'going'
+                        ? __('svc_notifications_2.event.rsvp_confirmed_going', ['title' => $eventTitle])
+                        : __('svc_notifications_2.event.rsvp_confirmed_interested', ['title' => $eventTitle]);
 
-                if ($organizer) {
-                    $safeTitle = htmlspecialchars($eventTitle, ENT_QUOTES, 'UTF-8');
-                    $safeUserName = htmlspecialchars($userName, ENT_QUOTES, 'UTF-8');
-
-                    $this->sendEventEmail(
-                        $organizer,
-                        __('emails.events.rsvp_subject', ['name' => $safeUserName, 'status_label' => $statusLabel, 'title' => $safeTitle]),
-                        $message,
-                        $path,
-                        'event_rsvp',
-                        $this->buildRsvpEmailHtml($event, $user, $status, $organizer)
-                    );
-                }
+                    Notification::create([
+                        'user_id'    => $userId,
+                        'tenant_id'  => $tenantId,
+                        'message'    => $selfBell,
+                        'link'       => $path,
+                        'type'       => 'event_rsvp_confirm',
+                        'created_at' => now(),
+                    ]);
+                });
             } catch (\Throwable $e) {
-                Log::warning("[EventNotificationService] RSVP email failed for organizer {$organizerId}: " . $e->getMessage());
+                Log::warning("[EventNotificationService] RSVP self-confirmation bell failed for user {$userId}: " . $e->getMessage());
             }
         } catch (\Throwable $e) {
             Log::error("EventNotificationService::notifyRsvp error: " . $e->getMessage());
@@ -532,7 +551,7 @@ class EventNotificationService
             $organizer = DB::table('users')
                 ->where('id', $organizerId)
                 ->where('tenant_id', $tenantId)
-                ->select(['id as user_id', 'email', 'name', 'first_name'])
+                ->select(['id as user_id', 'email', 'name', 'first_name', 'preferred_language'])
                 ->first();
 
             if (!$organizer) {
@@ -542,36 +561,41 @@ class EventNotificationService
 
             $eventTitle = $event->title;
             $path = '/events/' . $eventId;
-            $bellMessage = __('notifications.event_created_confirmation', ['title' => $eventTitle]);
 
-            // In-app bell notification for the organizer
-            Notification::create([
-                'user_id'    => $organizerId,
-                'tenant_id'  => $tenantId,
-                'message'    => $bellMessage,
-                'link'       => $path,
-                'type'       => 'event_created',
-                'created_at' => now(),
-            ]);
+            // Render bell + email under the organizer's locale so confirmation text
+            // matches their preferred_language.
+            LocaleContext::withLocale($organizer, function () use ($organizer, $organizerId, $tenantId, $event, $eventTitle, $path) {
+                $bellMessage = __('notifications.event_created_confirmation', ['title' => $eventTitle]);
 
-            // Email notification to organizer
-            try {
-                $safeTitle = htmlspecialchars($eventTitle, ENT_QUOTES, 'UTF-8');
-                $subject = __('emails_misc.events.created_subject');
+                // In-app bell notification for the organizer
+                Notification::create([
+                    'user_id'    => $organizerId,
+                    'tenant_id'  => $tenantId,
+                    'message'    => $bellMessage,
+                    'link'       => $path,
+                    'type'       => 'event_created',
+                    'created_at' => now(),
+                ]);
 
-                $this->sendEventEmail(
-                    $organizer,
-                    $subject,
-                    $bellMessage,
-                    $path,
-                    'event_created',
-                    $this->buildEventCreatedEmailHtml($event, $organizer)
-                );
-            } catch (\Throwable $e) {
-                Log::warning("[EventNotificationService] notifyEventCreated email failed for organizer {$organizerId}: " . $e->getMessage());
-            }
+                // Email notification to organizer
+                try {
+                    $subject = __('emails_misc.events.created_subject');
+
+                    $this->sendEventEmail(
+                        $organizer,
+                        $subject,
+                        $bellMessage,
+                        $path,
+                        'event_created',
+                        $this->buildEventCreatedEmailHtml($event, $organizer)
+                    );
+                } catch (\Throwable $e) {
+                    Log::warning("[EventNotificationService] notifyEventCreated email failed for organizer {$organizerId}: " . $e->getMessage());
+                }
+            });
 
             // Optionally notify any attendees who RSVPed during creation
+            // (notifyAttendees() handles per-recipient locale wrapping internally.)
             if ($notifyInitialAttendees) {
                 $initialMessage = __('notifications.event_attendee_confirmation', ['title' => $eventTitle]);
                 $this->notifyAttendees($tenantId, $eventId, $initialMessage);

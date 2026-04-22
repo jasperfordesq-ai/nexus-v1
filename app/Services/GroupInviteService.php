@@ -8,10 +8,11 @@ namespace App\Services;
 
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
+use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use App\Core\TenantContext;
 
 /**
  * GroupInviteService — Manages group invitations via email and shareable links.
@@ -107,6 +108,7 @@ class GroupInviteService
             $existingUser = DB::table('users')
                 ->where('email', $email)
                 ->where('tenant_id', $tenantId)
+                ->select(['id', 'preferred_language'])
                 ->first();
 
             if ($existingUser) {
@@ -153,29 +155,34 @@ class GroupInviteService
                 'updated_at' => now(),
             ]);
 
-            // Send the actual invitation email
+            // Send the actual invitation email — render subject, title, greeting,
+            // body, and CTA in the recipient's preferred_language when we have
+            // an existing user record. For brand-new invitees (no account yet)
+            // this resolves to null and falls back to the caller's locale.
             try {
-                $inviteUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups/invite/' . $token;
-                $subject   = __('emails_misc.group_invite.email_subject', ['group' => $group->name]);
-                $body      = __('emails_misc.group_invite.email_body', [
-                    'inviter' => htmlspecialchars($inviterName, ENT_QUOTES, 'UTF-8'),
-                    'group'   => htmlspecialchars($group->name ?? '', ENT_QUOTES, 'UTF-8'),
-                ]);
+                LocaleContext::withLocale($existingUser ?? null, function () use ($email, $token, $group, $inviterName, $message, $groupId) {
+                    $inviteUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/groups/invite/' . $token;
+                    $subject   = __('emails_misc.group_invite.email_subject', ['group' => $group->name]);
+                    $body      = __('emails_misc.group_invite.email_body', [
+                        'inviter' => htmlspecialchars($inviterName, ENT_QUOTES, 'UTF-8'),
+                        'group'   => htmlspecialchars($group->name ?? '', ENT_QUOTES, 'UTF-8'),
+                    ]);
 
-                $builder = EmailTemplateBuilder::make()
-                    ->title(__('emails_misc.group_invite.email_title'))
-                    ->greeting(__('emails_misc.group_invite.email_greeting'))
-                    ->paragraph($body);
+                    $builder = EmailTemplateBuilder::make()
+                        ->title(__('emails_misc.group_invite.email_title'))
+                        ->greeting(__('emails_misc.group_invite.email_greeting'))
+                        ->paragraph($body);
 
-                if (!empty($message)) {
-                    $builder->paragraph('<em>' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</em>');
-                }
+                    if (!empty($message)) {
+                        $builder->paragraph('<em>' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</em>');
+                    }
 
-                $html = $builder->button(__('emails_misc.group_invite.email_cta'), $inviteUrl)->render();
+                    $html = $builder->button(__('emails_misc.group_invite.email_cta'), $inviteUrl)->render();
 
-                if (!Mailer::forCurrentTenant()->send($email, $subject, $html)) {
-                    Log::warning('[GroupInviteService] invite email failed to send', ['email' => $email, 'group_id' => $groupId]);
-                }
+                    if (!Mailer::forCurrentTenant()->send($email, $subject, $html)) {
+                        Log::warning('[GroupInviteService] invite email failed to send', ['email' => $email, 'group_id' => $groupId]);
+                    }
+                });
             } catch (\Throwable $e) {
                 Log::warning('[GroupInviteService] invite email error: ' . $e->getMessage(), ['email' => $email]);
             }
