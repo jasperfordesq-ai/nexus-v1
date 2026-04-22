@@ -10,6 +10,7 @@ use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\SafeguardingFlaggedEvent;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -59,14 +60,11 @@ class NotifySafeguardingStaff implements ShouldQueue
                  WHERE usp.user_id = ? AND usp.tenant_id = ? AND usp.revoked_at IS NULL AND tso.is_active = 1",
                 [$flaggedUserId, $tenantId]
             );
-            $optionLabels  = array_map(fn ($row) => $row->label, $selectedOptions);
-            $optionSummary = !empty($optionLabels)
-                ? implode(', ', $optionLabels)
-                : __('emails_misc.safeguarding.onboarding_flag_options_label');
+            $optionLabels = array_map(fn ($row) => $row->label, $selectedOptions);
 
             // Find all admin, tenant_admin, broker, and super_admin users for this tenant
             $staffUsers = DB::select(
-                "SELECT id, email, first_name, name, role FROM users
+                "SELECT id, email, first_name, name, role, preferred_language FROM users
                  WHERE tenant_id = ? AND role IN ('admin', 'tenant_admin', 'broker', 'super_admin') AND status = 'active'",
                 [$tenantId]
             );
@@ -79,28 +77,34 @@ class NotifySafeguardingStaff implements ShouldQueue
                 return;
             }
 
-            $notificationMessage = __('emails_misc.safeguarding.onboarding_flag_bell', [
-                'name'    => $memberName,
-                'options' => $optionSummary,
-            ]);
             $adminLink = "/admin/safeguarding?user={$flaggedUserId}";
 
             foreach ($staffUsers as $staff) {
-                // In-app notification
-                Notification::create([
-                    'tenant_id'  => $tenantId,
-                    'user_id'    => $staff->id,
-                    'type'       => 'safeguarding_flag',
-                    'message'    => $notificationMessage,
-                    'link'       => $adminLink,
-                    'is_read'    => false,
-                    'created_at' => now(),
-                ]);
+                // Each staff member sees bell copy + email in THEIR language.
+                LocaleContext::withLocale($staff, function () use ($staff, $memberName, $optionLabels, $flaggedUserId, $tenantId, $adminLink) {
+                    $optionSummary = !empty($optionLabels)
+                        ? implode(', ', $optionLabels)
+                        : __('emails_misc.safeguarding.onboarding_flag_options_label');
 
-                // HTML email notification
-                if (!empty($staff->email)) {
-                    $this->sendEmail($staff, $memberName, $optionLabels, $flaggedUserId, $tenantId, $adminLink);
-                }
+                    $notificationMessage = __('emails_misc.safeguarding.onboarding_flag_bell', [
+                        'name'    => $memberName,
+                        'options' => $optionSummary,
+                    ]);
+
+                    Notification::create([
+                        'tenant_id'  => $tenantId,
+                        'user_id'    => $staff->id,
+                        'type'       => 'safeguarding_flag',
+                        'message'    => $notificationMessage,
+                        'link'       => $adminLink,
+                        'is_read'    => false,
+                        'created_at' => now(),
+                    ]);
+
+                    if (!empty($staff->email)) {
+                        $this->sendEmail($staff, $memberName, $optionLabels, $flaggedUserId, $tenantId, $adminLink);
+                    }
+                });
             }
 
             Log::info('NotifySafeguardingStaff: notified staff', [

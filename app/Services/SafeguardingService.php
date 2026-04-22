@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\SafeguardingAssignment;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -926,27 +927,30 @@ class SafeguardingService
                 $reporter = DB::table('users')
                     ->where('id', $reporterId)
                     ->where('tenant_id', $tenantId)
-                    ->select(['email', 'first_name', 'name'])
+                    ->select(['email', 'first_name', 'name', 'preferred_language'])
                     ->first();
 
                 if ($reporter && !empty($reporter->email)) {
                     TenantContext::setById($tenantId);
-                    $firstName = $reporter->first_name ?? $reporter->name ?? __('emails.common.fallback_name');
-                    $safeLabel = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
 
-                    $html = \App\Core\EmailTemplateBuilder::make()
-                        ->theme($newStatus === 'resolved' ? 'success' : 'brand')
-                        ->title(__('emails_misc.safeguarding.reporter_status_title'))
-                        ->previewText(__('emails_misc.safeguarding.reporter_status_preview', ['status' => $safeLabel]))
-                        ->greeting($firstName)
-                        ->paragraph(__('emails_misc.safeguarding.reporter_status_body', ['incident_id' => $incidentId, 'status' => $safeLabel]))
-                        ->paragraph(__('emails_misc.safeguarding.reporter_status_confidentiality'))
-                        ->render();
+                    LocaleContext::withLocale($reporter, function () use ($reporter, $incidentId, $label, $newStatus) {
+                        $firstName = $reporter->first_name ?? $reporter->name ?? __('emails.common.fallback_name');
+                        $safeLabel = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
 
-                    $subject = __('emails_misc.safeguarding.reporter_status_subject', ['incident_id' => $incidentId, 'status' => $safeLabel]);
+                        $html = \App\Core\EmailTemplateBuilder::make()
+                            ->theme($newStatus === 'resolved' ? 'success' : 'brand')
+                            ->title(__('emails_misc.safeguarding.reporter_status_title'))
+                            ->previewText(__('emails_misc.safeguarding.reporter_status_preview', ['status' => $safeLabel]))
+                            ->greeting($firstName)
+                            ->paragraph(__('emails_misc.safeguarding.reporter_status_body', ['incident_id' => $incidentId, 'status' => $safeLabel]))
+                            ->paragraph(__('emails_misc.safeguarding.reporter_status_confidentiality'))
+                            ->render();
 
-                    $emailService = app(\App\Services\EmailService::class);
-                    $emailService->send($reporter->email, $subject, $html);
+                        $subject = __('emails_misc.safeguarding.reporter_status_subject', ['incident_id' => $incidentId, 'status' => $safeLabel]);
+
+                        $emailService = app(\App\Services\EmailService::class);
+                        $emailService->send($reporter->email, $subject, $html);
+                    });
                 }
             } catch (\Throwable $emailEx) {
                 Log::warning('[SafeguardingService] reporter status email failed: ' . $emailEx->getMessage());

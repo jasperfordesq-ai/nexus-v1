@@ -8,6 +8,7 @@ namespace App\Console\Commands;
 
 use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Services\EmailService;
 use Illuminate\Console\Command;
@@ -90,6 +91,7 @@ class SafeguardingReviewFlagsCommand extends Command
                 'u.first_name',
                 'u.last_name',
                 'u.name as display_name',
+                'u.preferred_language',
                 't.name as community_name',
             ])
             ->get();
@@ -105,6 +107,7 @@ class SafeguardingReviewFlagsCommand extends Command
                     'name' => trim(($row->first_name ?? '') . ' ' . ($row->last_name ?? ''))
                         ?: ($row->display_name ?? ''),
                     'community' => $row->community_name ?? '',
+                    'preferred_language' => $row->preferred_language ?? null,
                     'preference_ids' => [],
                 ];
             }
@@ -212,25 +215,28 @@ class SafeguardingReviewFlagsCommand extends Command
         try {
             TenantContext::setById($userBatch['tenant_id']);
 
-            $safeName = htmlspecialchars($userBatch['name'] ?: __('emails.common.fallback_member_name'), ENT_QUOTES, 'UTF-8');
-            $safeCommunity = htmlspecialchars($userBatch['community'] ?: 'the community', ENT_QUOTES, 'UTF-8');
+            // Safeguarding reminder rendered in the recipient member's language.
+            LocaleContext::withLocale($userBatch['preferred_language'] ?? null, function () use ($userBatch) {
+                $safeName = htmlspecialchars($userBatch['name'] ?: __('emails.common.fallback_member_name'), ENT_QUOTES, 'UTF-8');
+                $safeCommunity = htmlspecialchars($userBatch['community'] ?: 'the community', ENT_QUOTES, 'UTF-8');
 
-            $html = EmailTemplateBuilder::make()
-                ->theme('info')
-                ->title(__('safeguarding.review.reminder_title'))
-                ->greeting($safeName)
-                ->paragraph(__('safeguarding.review.reminder_body', ['community' => $safeCommunity]))
-                ->button(
-                    __('safeguarding.review.reminder_cta'),
-                    EmailTemplateBuilder::tenantUrl('/settings/safeguarding')
-                )
-                ->render();
+                $html = EmailTemplateBuilder::make()
+                    ->theme('info')
+                    ->title(__('safeguarding.review.reminder_title'))
+                    ->greeting($safeName)
+                    ->paragraph(__('safeguarding.review.reminder_body', ['community' => $safeCommunity]))
+                    ->button(
+                        __('safeguarding.review.reminder_cta'),
+                        EmailTemplateBuilder::tenantUrl('/settings/safeguarding')
+                    )
+                    ->render();
 
-            app(EmailService::class)->send(
-                $userBatch['email'],
-                __('safeguarding.review.reminder_subject'),
-                $html
-            );
+                app(EmailService::class)->send(
+                    $userBatch['email'],
+                    __('safeguarding.review.reminder_subject'),
+                    $html
+                );
+            });
         } finally {
             if ($previousTenantId !== null) {
                 TenantContext::setById($previousTenantId);

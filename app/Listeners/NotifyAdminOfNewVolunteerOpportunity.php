@@ -10,6 +10,7 @@ use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\VolunteerOpportunityCreated;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
@@ -51,15 +52,14 @@ class NotifyAdminOfNewVolunteerOpportunity implements ShouldQueue
                 ->where('tenant_id', $event->tenantId)
                 ->whereIn('role', ['super_admin', 'admin', 'tenant_admin', 'broker', 'coordinator'])
                 ->where('status', 'active')
-                ->select(['id', 'email', 'first_name', 'name'])
+                ->select(['id', 'email', 'first_name', 'name', 'preferred_language'])
                 ->get();
 
             if ($admins->isEmpty()) {
                 return;
             }
 
-            $subject = __('emails_misc.admin_notify.new_vol_opp_subject', ['community' => $tenantName]);
-            $mailer  = Mailer::forCurrentTenant();
+            $mailer = Mailer::forCurrentTenant();
 
             foreach ($admins as $admin) {
                 $adminEmail = $admin->email ?? null;
@@ -67,27 +67,31 @@ class NotifyAdminOfNewVolunteerOpportunity implements ShouldQueue
                     continue;
                 }
 
-                $adminName = $admin->first_name ?? $admin->name ?? 'Admin';
+                LocaleContext::withLocale($admin, function () use ($admin, $opportunity, $oppTitle, $oppUrl, $posterName, $tenantName, $adminEmail, $mailer) {
+                    $adminName = $admin->first_name ?? $admin->name ?? 'Admin';
 
-                $bellContent = __('emails_misc.admin_notify.new_vol_opp_bell', ['title' => $oppTitle]);
-                Notification::createNotification((int) $admin->id, $bellContent, '/volunteering/' . $opportunity->id, 'new_vol_opp_created');
+                    $bellContent = __('emails_misc.admin_notify.new_vol_opp_bell', ['title' => $oppTitle]);
+                    Notification::createNotification((int) $admin->id, $bellContent, '/volunteering/' . $opportunity->id, 'new_vol_opp_created');
 
-                $html = EmailTemplateBuilder::make()
-                    ->theme('info')
-                    ->title(__('emails_misc.admin_notify.new_vol_opp_title'))
-                    ->previewText(__('emails_misc.admin_notify.new_vol_opp_preview', ['community' => $tenantName]))
-                    ->greeting($adminName)
-                    ->paragraph(__('emails_misc.admin_notify.new_vol_opp_body', ['community' => htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8')]))
-                    ->highlight(htmlspecialchars($oppTitle, ENT_QUOTES, 'UTF-8'))
-                    ->bulletList([
-                        __('emails_misc.admin_notify.new_vol_opp_by_label') . ': ' . htmlspecialchars($posterName, ENT_QUOTES, 'UTF-8'),
-                    ])
-                    ->button(__('emails_misc.admin_notify.new_vol_opp_cta'), $oppUrl)
-                    ->render();
+                    $subject = __('emails_misc.admin_notify.new_vol_opp_subject', ['community' => $tenantName]);
 
-                if (!$mailer->send($adminEmail, $subject, $html)) {
-                    Log::warning('NotifyAdminOfNewVolunteerOpportunity: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
-                }
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('info')
+                        ->title(__('emails_misc.admin_notify.new_vol_opp_title'))
+                        ->previewText(__('emails_misc.admin_notify.new_vol_opp_preview', ['community' => $tenantName]))
+                        ->greeting($adminName)
+                        ->paragraph(__('emails_misc.admin_notify.new_vol_opp_body', ['community' => htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8')]))
+                        ->highlight(htmlspecialchars($oppTitle, ENT_QUOTES, 'UTF-8'))
+                        ->bulletList([
+                            __('emails_misc.admin_notify.new_vol_opp_by_label') . ': ' . htmlspecialchars($posterName, ENT_QUOTES, 'UTF-8'),
+                        ])
+                        ->button(__('emails_misc.admin_notify.new_vol_opp_cta'), $oppUrl)
+                        ->render();
+
+                    if (!$mailer->send($adminEmail, $subject, $html)) {
+                        Log::warning('NotifyAdminOfNewVolunteerOpportunity: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
+                    }
+                });
             }
         } catch (\Throwable $e) {
             Log::error('NotifyAdminOfNewVolunteerOpportunity listener failed', [

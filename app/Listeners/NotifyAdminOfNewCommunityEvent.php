@@ -10,6 +10,7 @@ use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\CommunityEventCreated;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
@@ -51,15 +52,14 @@ class NotifyAdminOfNewCommunityEvent implements ShouldQueue
                 ->where('tenant_id', $event->tenantId)
                 ->whereIn('role', ['super_admin', 'admin', 'tenant_admin', 'broker', 'coordinator'])
                 ->where('status', 'active')
-                ->select(['id', 'email', 'first_name', 'name'])
+                ->select(['id', 'email', 'first_name', 'name', 'preferred_language'])
                 ->get();
 
             if ($admins->isEmpty()) {
                 return;
             }
 
-            $subject = __('emails_misc.admin_notify.new_event_subject', ['community' => $tenantName]);
-            $mailer  = Mailer::forCurrentTenant();
+            $mailer = Mailer::forCurrentTenant();
 
             foreach ($admins as $admin) {
                 $adminEmail = $admin->email ?? null;
@@ -67,27 +67,31 @@ class NotifyAdminOfNewCommunityEvent implements ShouldQueue
                     continue;
                 }
 
-                $adminName = $admin->first_name ?? $admin->name ?? 'Admin';
+                LocaleContext::withLocale($admin, function () use ($admin, $communityEvent, $eventTitle, $eventUrl, $creatorName, $tenantName, $adminEmail, $mailer) {
+                    $adminName = $admin->first_name ?? $admin->name ?? 'Admin';
 
-                $bellContent = __('emails_misc.admin_notify.new_event_bell', ['title' => $eventTitle]);
-                Notification::createNotification((int) $admin->id, $bellContent, '/events/' . $communityEvent->id, 'new_event_created');
+                    $bellContent = __('emails_misc.admin_notify.new_event_bell', ['title' => $eventTitle]);
+                    Notification::createNotification((int) $admin->id, $bellContent, '/events/' . $communityEvent->id, 'new_event_created');
 
-                $html = EmailTemplateBuilder::make()
-                    ->theme('info')
-                    ->title(__('emails_misc.admin_notify.new_event_title'))
-                    ->previewText(__('emails_misc.admin_notify.new_event_preview', ['community' => $tenantName]))
-                    ->greeting($adminName)
-                    ->paragraph(__('emails_misc.admin_notify.new_event_body', ['community' => htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8')]))
-                    ->highlight(htmlspecialchars($eventTitle, ENT_QUOTES, 'UTF-8'))
-                    ->bulletList([
-                        __('emails_misc.admin_notify.new_event_by_label') . ': ' . htmlspecialchars($creatorName, ENT_QUOTES, 'UTF-8'),
-                    ])
-                    ->button(__('emails_misc.admin_notify.new_event_cta'), $eventUrl)
-                    ->render();
+                    $subject = __('emails_misc.admin_notify.new_event_subject', ['community' => $tenantName]);
 
-                if (!$mailer->send($adminEmail, $subject, $html)) {
-                    Log::warning('NotifyAdminOfNewCommunityEvent: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
-                }
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('info')
+                        ->title(__('emails_misc.admin_notify.new_event_title'))
+                        ->previewText(__('emails_misc.admin_notify.new_event_preview', ['community' => $tenantName]))
+                        ->greeting($adminName)
+                        ->paragraph(__('emails_misc.admin_notify.new_event_body', ['community' => htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8')]))
+                        ->highlight(htmlspecialchars($eventTitle, ENT_QUOTES, 'UTF-8'))
+                        ->bulletList([
+                            __('emails_misc.admin_notify.new_event_by_label') . ': ' . htmlspecialchars($creatorName, ENT_QUOTES, 'UTF-8'),
+                        ])
+                        ->button(__('emails_misc.admin_notify.new_event_cta'), $eventUrl)
+                        ->render();
+
+                    if (!$mailer->send($adminEmail, $subject, $html)) {
+                        Log::warning('NotifyAdminOfNewCommunityEvent: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
+                    }
+                });
             }
         } catch (\Throwable $e) {
             Log::error('NotifyAdminOfNewCommunityEvent listener failed', [
