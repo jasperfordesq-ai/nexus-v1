@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -48,22 +49,24 @@ class WalletAlertService
         $user = DB::table('users')
             ->where('id', $userId)
             ->where('tenant_id', $tenantId)
-            ->select(['email', 'first_name', 'name'])
+            ->select(['email', 'first_name', 'name', 'preferred_language'])
             ->first();
 
         if (!$user || empty($user->email)) {
             return;
         }
 
-        $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-        $balanceFormatted = number_format($newBalance, 1);
-        $baseUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
+        LocaleContext::withLocale($user, function () use ($user, $newBalance) {
+            $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+            $balanceFormatted = number_format($newBalance, 1);
+            $baseUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
 
-        if ($newBalance <= 0) {
-            self::sendEmptyBalanceEmail($user->email, $firstName, $balanceFormatted, $baseUrl);
-        } else {
-            self::sendLowBalanceEmail($user->email, $firstName, $balanceFormatted, $baseUrl);
-        }
+            if ($newBalance <= 0) {
+                self::sendEmptyBalanceEmail($user->email, $firstName, $balanceFormatted, $baseUrl);
+            } else {
+                self::sendLowBalanceEmail($user->email, $firstName, $balanceFormatted, $baseUrl);
+            }
+        });
     }
 
     private static function sendLowBalanceEmail(string $email, string $firstName, string $balance, string $baseUrl): void

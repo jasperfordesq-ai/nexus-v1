@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Schema;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 
 /**
  * TenantBillingService — Billing snapshot, plan assignment, pricing, and revenue
@@ -479,22 +480,23 @@ class TenantBillingService
 
             $planName       = htmlspecialchars($plan->name ?? '', ENT_QUOTES, 'UTF-8');
             $effectivePrice = '€' . number_format($effective['yearly'], 2) . ' / yr';
-            $expiryText     = $expiresAt
-                ? date('d M Y', strtotime($expiresAt))
-                : __('emails_misc.billing.plan_assigned_no_expiry');
+            $expiryDate     = $expiresAt ? date('d M Y', strtotime($expiresAt)) : null;
 
             self::sendTenantAdminEmail(
                 $tenantId,
-                __('emails_misc.billing.plan_assigned_subject'),
-                __('emails_misc.billing.plan_assigned_title'),
-                __('emails_misc.billing.plan_assigned_body', [
-                    'plan'    => $planName,
-                    'price'   => $effectivePrice,
-                    'expiry'  => $expiryText,
-                    'notes'   => $notes ?? '',
-                ]),
+                ['key' => 'emails_misc.billing.plan_assigned_subject'],
+                ['key' => 'emails_misc.billing.plan_assigned_title'],
+                [
+                    'key' => 'emails_misc.billing.plan_assigned_body',
+                    'params_builder' => fn() => [
+                        'plan'   => $planName,
+                        'price'  => $effectivePrice,
+                        'expiry' => $expiryDate ?? __('emails_misc.billing.plan_assigned_no_expiry'),
+                        'notes'  => $notes ?? '',
+                    ],
+                ],
                 '/admin/billing',
-                __('emails_misc.billing.plan_assigned_cta')
+                ['key' => 'emails_misc.billing.plan_assigned_cta']
             );
         } catch (\Throwable $e) {
             Log::warning('[TenantBillingService] assignPlan email failed: ' . $e->getMessage(), [
@@ -809,16 +811,25 @@ class TenantBillingService
     }
 
     /**
-     * Send a notification email to the primary admin of a tenant.
-     * Follows the same pattern as StripeSubscriptionService::sendTenantAdminEmail().
+     * Send a notification email to the primary admin of a tenant, rendering
+     * subject/title/body/CTA in the admin's preferred_language.
+     *
+     * Each $subject/$title/$body/$ctaText is an array: ['key' => 'lang.key',
+     * 'params' => [...]] or with 'params_builder' => fn() => [...] for cases
+     * where params themselves depend on locale-aware translations.
+     *
+     * @param array{key:string,params?:array,params_builder?:callable} $subject
+     * @param array{key:string,params?:array,params_builder?:callable} $title
+     * @param array{key:string,params?:array,params_builder?:callable} $body
+     * @param array{key:string,params?:array,params_builder?:callable} $ctaText
      */
     private static function sendTenantAdminEmail(
         int $tenantId,
-        string $subject,
-        string $title,
-        string $body,
+        array $subject,
+        array $title,
+        array $body,
         string $link,
-        string $ctaText
+        array $ctaText
     ): void {
         TenantContext::setById($tenantId);
 
@@ -826,25 +837,32 @@ class TenantBillingService
             ->where('tenant_id', $tenantId)
             ->where('role', 'admin')
             ->whereNotNull('email')
-            ->select(['email', 'first_name', 'name'])
+            ->select(['email', 'first_name', 'name', 'preferred_language'])
             ->first();
 
         if (!$admin || empty($admin->email)) {
             return;
         }
 
-        $firstName = $admin->first_name ?? $admin->name ?? __('emails.common.fallback_name');
-        $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+        LocaleContext::withLocale($admin, function () use ($admin, $subject, $title, $body, $link, $ctaText, $tenantId) {
+            $firstName = $admin->first_name ?? $admin->name ?? __('emails.common.fallback_name');
+            $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
-        $html = EmailTemplateBuilder::make()
-            ->title($title)
-            ->greeting($firstName)
-            ->paragraph($body)
-            ->button($ctaText, $fullUrl)
-            ->render();
+            $resolveParams = fn(array $spec): array =>
+                isset($spec['params_builder']) && is_callable($spec['params_builder'])
+                    ? ($spec['params_builder'])()
+                    : ($spec['params'] ?? []);
 
-        if (!Mailer::forCurrentTenant()->send($admin->email, $subject, $html)) {
-            Log::warning('[TenantBillingService] tenant admin email failed', ['tenant_id' => $tenantId]);
-        }
+            $html = EmailTemplateBuilder::make()
+                ->title(__($title['key'], $resolveParams($title)))
+                ->greeting($firstName)
+                ->paragraph(__($body['key'], $resolveParams($body)))
+                ->button(__($ctaText['key'], $resolveParams($ctaText)), $fullUrl)
+                ->render();
+
+            if (!Mailer::forCurrentTenant()->send($admin->email, __($subject['key'], $resolveParams($subject)), $html)) {
+                Log::warning('[TenantBillingService] tenant admin email failed', ['tenant_id' => $tenantId]);
+            }
+        });
     }
 }

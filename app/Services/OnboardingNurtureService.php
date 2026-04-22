@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -89,7 +90,7 @@ class OnboardingNurtureService
                     ->where('status', 'active')
                     ->whereNotNull('email')
                     ->whereBetween('created_at', [$windowStart, $windowEnd])
-                    ->select(['id', 'email', 'first_name', 'name', 'onboarding_completed'])
+                    ->select(['id', 'email', 'first_name', 'name', 'onboarding_completed', 'preferred_language'])
                     ->get();
             } catch (\Throwable $e) {
                 Log::error("[OnboardingNurtureService] Query failed for tenant={$tenantId}, day={$day}: " . $e->getMessage());
@@ -111,7 +112,7 @@ class OnboardingNurtureService
                 }
 
                 try {
-                    self::sendNurtureEmail($tenantId, $userId, $user, $day);
+                    LocaleContext::withLocale($user, fn() => self::sendNurtureEmail($tenantId, $userId, $user, $day));
                     Cache::put($cacheKey, true, now()->addDays(self::DEDUP_TTL_DAYS));
                     $sent++;
                 } catch (\Throwable $e) {

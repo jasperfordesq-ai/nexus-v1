@@ -9,6 +9,7 @@ namespace App\Services\Identity;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Services\StripeService;
 use App\Services\TenantSettingsService;
 use Illuminate\Support\Facades\DB;
@@ -154,17 +155,19 @@ class IdentityVerificationPaymentService
             $tenantId = (int) ($session['tenant_id'] ?? 0);
             if ($userId && $tenantId) {
                 TenantContext::setById($tenantId);
-                $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+                $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
                 if ($user && !empty($user->email)) {
-                    $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-                    $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
-                    $html = EmailTemplateBuilder::make()
-                        ->title(__('emails_misc.identity_payment.success_title'))
-                        ->greeting($firstName)
-                        ->paragraph(__('emails_misc.identity_payment.success_body'))
-                        ->button(__('emails_misc.identity_payment.success_cta'), $frontendUrl . '/verify-identity')
-                        ->render();
-                    Mailer::forCurrentTenant()->send($user->email, __('emails_misc.identity_payment.success_subject'), $html);
+                    LocaleContext::withLocale($user, function () use ($user) {
+                        $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                        $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
+                        $html = EmailTemplateBuilder::make()
+                            ->title(__('emails_misc.identity_payment.success_title'))
+                            ->greeting($firstName)
+                            ->paragraph(__('emails_misc.identity_payment.success_body'))
+                            ->button(__('emails_misc.identity_payment.success_cta'), $frontendUrl . '/verify-identity')
+                            ->render();
+                        Mailer::forCurrentTenant()->send($user->email, __('emails_misc.identity_payment.success_subject'), $html);
+                    });
                 }
             }
         } catch (\Throwable $e) {
@@ -197,18 +200,20 @@ class IdentityVerificationPaymentService
             $tenantId = (int) ($session['tenant_id'] ?? 0);
             if ($userId && $tenantId) {
                 TenantContext::setById($tenantId);
-                $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+                $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
                 if ($user && !empty($user->email)) {
-                    $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-                    $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
-                    $html = EmailTemplateBuilder::make()
-                        ->theme('warning')
-                        ->title(__('emails_misc.identity_payment.failed_title'))
-                        ->greeting($firstName)
-                        ->paragraph(__('emails_misc.identity_payment.failed_body'))
-                        ->button(__('emails_misc.identity_payment.failed_cta'), $frontendUrl . '/verify-identity')
-                        ->render();
-                    Mailer::forCurrentTenant()->send($user->email, __('emails_misc.identity_payment.failed_subject'), $html);
+                    LocaleContext::withLocale($user, function () use ($user) {
+                        $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                        $frontendUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
+                        $html = EmailTemplateBuilder::make()
+                            ->theme('warning')
+                            ->title(__('emails_misc.identity_payment.failed_title'))
+                            ->greeting($firstName)
+                            ->paragraph(__('emails_misc.identity_payment.failed_body'))
+                            ->button(__('emails_misc.identity_payment.failed_cta'), $frontendUrl . '/verify-identity')
+                            ->render();
+                        Mailer::forCurrentTenant()->send($user->email, __('emails_misc.identity_payment.failed_subject'), $html);
+                    });
                 }
             }
         } catch (\Throwable $e) {

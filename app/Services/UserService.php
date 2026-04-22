@@ -8,7 +8,9 @@ namespace App\Services;
 
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
+use App\Core\TenantContext;
 use App\Events\MemberProfileUpdated;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\OnboardingConfigService;
@@ -16,7 +18,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use App\Core\TenantContext;
 
 /**
  * UserService — Laravel DI-based service for user/profile operations.
@@ -354,13 +355,15 @@ class UserService
             return false;
         }
 
-        // Capture old email BEFORE the update for security notification
+        // Capture old email + preferred language BEFORE the update for security notification
         $oldEmail = null;
+        $userLocale = null;
         if (isset($data['email']) && $data['email'] !== '') {
             try {
                 $currentUser = User::query()->find($userId);
                 if ($currentUser) {
-                    $oldEmail = $currentUser->email;
+                    $oldEmail   = $currentUser->email;
+                    $userLocale = $currentUser->preferred_language ?? null;
                 }
             } catch (\Throwable $e) {
                 Log::warning('Failed to fetch old email for change notification', ['user_id' => $userId, 'error' => $e->getMessage()]);
@@ -411,34 +414,36 @@ class UserService
 
         // Security notification: bell + email to OLD address when email is changed
         if ($oldEmail && isset($data['email']) && $oldEmail !== $data['email']) {
-            try {
-                Notification::createNotification(
-                    $userId,
-                    __('svc_notifications.user_security.email_changed'),
-                    null,
-                    'email_changed'
-                );
-            } catch (\Throwable $e) {
-                Log::warning('Failed to create email change notification', ['user_id' => $userId, 'error' => $e->getMessage()]);
-            }
+            LocaleContext::withLocale($userLocale, function () use ($userId, $oldEmail) {
+                try {
+                    Notification::createNotification(
+                        $userId,
+                        __('svc_notifications.user_security.email_changed'),
+                        null,
+                        'email_changed'
+                    );
+                } catch (\Throwable $e) {
+                    Log::warning('Failed to create email change notification', ['user_id' => $userId, 'error' => $e->getMessage()]);
+                }
 
-            try {
-                $mailer = Mailer::forCurrentTenant();
-                $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+                try {
+                    $mailer = Mailer::forCurrentTenant();
+                    $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
 
-                $html = EmailTemplateBuilder::make()
-                    ->theme('warning')
-                    ->title(__('emails.security.email_changed_title'))
-                    ->previewText(__('emails.security.email_changed_preview'))
-                    ->paragraph(__('emails.security.email_changed_body', ['community' => htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8')]))
-                    ->highlight(__('emails.security.email_changed_warning'))
-                    ->render();
+                    $html = EmailTemplateBuilder::make()
+                        ->theme('warning')
+                        ->title(__('emails.security.email_changed_title'))
+                        ->previewText(__('emails.security.email_changed_preview'))
+                        ->paragraph(__('emails.security.email_changed_body', ['community' => htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8')]))
+                        ->highlight(__('emails.security.email_changed_warning'))
+                        ->render();
 
-                $subject = __('emails.security.email_changed_subject', ['community' => $tenantName]);
-                $mailer->send($oldEmail, $subject, $html);
-            } catch (\Throwable $e) {
-                Log::warning('Failed to send email change notification to old address', ['user_id' => $userId, 'error' => $e->getMessage()]);
-            }
+                    $subject = __('emails.security.email_changed_subject', ['community' => $tenantName]);
+                    $mailer->send($oldEmail, $subject, $html);
+                } catch (\Throwable $e) {
+                    Log::warning('Failed to send email change notification to old address', ['user_id' => $userId, 'error' => $e->getMessage()]);
+                }
+            });
         }
 
         return true;

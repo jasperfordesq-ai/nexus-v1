@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -127,34 +128,42 @@ class GuardianConsentService
             'created_at' => now(),
         ]);
 
-        // Send consent email to guardian
+        // Send consent email to guardian — rendered in the minor's preferred language
+        // (best available proxy since the guardian has no account / no known locale).
         $tenant = TenantContext::get();
         $tenantSlug = $tenant['slug'] ?? '';
         $verifyUrl = config('app.frontend_url', 'https://app.project-nexus.ie')
             . '/' . $tenantSlug
             . '/volunteering/guardian-consent/verify/' . $consentToken;
 
+        $minorLocale = DB::table('users')
+            ->where('id', $minorUserId)
+            ->where('tenant_id', $tenantId)
+            ->value('preferred_language');
+
         try {
-            $safeName = htmlspecialchars($guardianData['guardian_name'], ENT_QUOTES, 'UTF-8');
-            $safeRelationship = htmlspecialchars($guardianData['relationship'], ENT_QUOTES, 'UTF-8');
+            LocaleContext::withLocale($minorLocale, function () use ($guardianData, $verifyUrl) {
+                $safeName = htmlspecialchars($guardianData['guardian_name'], ENT_QUOTES, 'UTF-8');
+                $safeRelationship = htmlspecialchars($guardianData['relationship'], ENT_QUOTES, 'UTF-8');
 
-            $html = EmailTemplateBuilder::make()
-                ->theme('brand')
-                ->title(__('emails_misc.guardian.consent_title'))
-                ->previewText(__('emails_misc.guardian.consent_preview'))
-                ->greeting($safeName)
-                ->paragraph(__('emails_misc.guardian.consent_body'))
-                ->highlight(__('emails_misc.guardian.consent_highlight'), '📋')
-                ->infoCard([
-                    __('emails_misc.guardian.info_card_relationship') => $safeRelationship,
-                    __('emails_misc.guardian.info_card_expires')      => __('emails_misc.guardian.consent_expires_label', ['days' => self::CONSENT_EXPIRY_DAYS]),
-                ])
-                ->button(__('emails_misc.guardian.consent_cta'), $verifyUrl)
-                ->paragraph(__('emails_misc.guardian.consent_ignore'))
-                ->render();
+                $html = EmailTemplateBuilder::make()
+                    ->theme('brand')
+                    ->title(__('emails_misc.guardian.consent_title'))
+                    ->previewText(__('emails_misc.guardian.consent_preview'))
+                    ->greeting($safeName)
+                    ->paragraph(__('emails_misc.guardian.consent_body'))
+                    ->highlight(__('emails_misc.guardian.consent_highlight'), '📋')
+                    ->infoCard([
+                        __('emails_misc.guardian.info_card_relationship') => $safeRelationship,
+                        __('emails_misc.guardian.info_card_expires')      => __('emails_misc.guardian.consent_expires_label', ['days' => self::CONSENT_EXPIRY_DAYS]),
+                    ])
+                    ->button(__('emails_misc.guardian.consent_cta'), $verifyUrl)
+                    ->paragraph(__('emails_misc.guardian.consent_ignore'))
+                    ->render();
 
-            $mailer = Mailer::forCurrentTenant();
-            $mailer->send($guardianData['guardian_email'], __('emails_misc.guardian.consent_subject'), $html);
+                $mailer = Mailer::forCurrentTenant();
+                $mailer->send($guardianData['guardian_email'], __('emails_misc.guardian.consent_subject'), $html);
+            });
         } catch (\Throwable $e) {
             Log::warning('Failed to send guardian consent email: ' . $e->getMessage());
             // Don't fail the request — consent record is still created
@@ -211,14 +220,22 @@ class GuardianConsentService
 
             // Notify the minor that their guardian has granted consent
             try {
-                Notification::create([
-                    'tenant_id' => $tenantId,
-                    'user_id'   => (int) $consent->minor_user_id,
-                    'type'      => 'guardian_consent',
-                    'message'   => __('emails_misc.guardian.consent_granted_minor_bell'),
-                    'link'      => '/volunteering',
-                    'is_read'   => false,
-                ]);
+                $minorUserId = (int) $consent->minor_user_id;
+                $minorLocale = DB::table('users')
+                    ->where('id', $minorUserId)
+                    ->where('tenant_id', $tenantId)
+                    ->value('preferred_language');
+
+                LocaleContext::withLocale($minorLocale, function () use ($tenantId, $minorUserId) {
+                    Notification::create([
+                        'tenant_id' => $tenantId,
+                        'user_id'   => $minorUserId,
+                        'type'      => 'guardian_consent',
+                        'message'   => __('emails_misc.guardian.consent_granted_minor_bell'),
+                        'link'      => '/volunteering',
+                        'is_read'   => false,
+                    ]);
+                });
             } catch (\Throwable $notifErr) {
                 Log::warning('GuardianConsentService::grantConsent notification failed', ['error' => $notifErr->getMessage()]);
             }
@@ -284,22 +301,30 @@ class GuardianConsentService
                     'updated_at' => now(),
                 ]);
 
-            // Notify the minor that consent has been withdrawn
+            // Notify the minor that consent has been withdrawn — render bell text
+            // in the minor's preferred_language since the bell is displayed to them.
             try {
                 $minorUserId = (int) $consent->minor_user_id;
-                $bellMsg = $isMinor
-                    ? __('emails_misc.guardian.consent_withdrawn_minor_bell')
-                    : __('emails_misc.guardian.consent_withdrawn_admin_bell');
-
                 if ($minorUserId) {
-                    Notification::create([
-                        'tenant_id' => $tenantId,
-                        'user_id'   => $minorUserId,
-                        'type'      => 'guardian_consent',
-                        'message'   => $bellMsg,
-                        'link'      => '/volunteering',
-                        'is_read'   => false,
-                    ]);
+                    $minorLocale = DB::table('users')
+                        ->where('id', $minorUserId)
+                        ->where('tenant_id', $tenantId)
+                        ->value('preferred_language');
+
+                    LocaleContext::withLocale($minorLocale, function () use ($tenantId, $minorUserId, $isMinor) {
+                        $bellMsg = $isMinor
+                            ? __('emails_misc.guardian.consent_withdrawn_minor_bell')
+                            : __('emails_misc.guardian.consent_withdrawn_admin_bell');
+
+                        Notification::create([
+                            'tenant_id' => $tenantId,
+                            'user_id'   => $minorUserId,
+                            'type'      => 'guardian_consent',
+                            'message'   => $bellMsg,
+                            'link'      => '/volunteering',
+                            'is_read'   => false,
+                        ]);
+                    });
                 }
             } catch (\Throwable $notifErr) {
                 Log::warning('GuardianConsentService::withdrawConsent notification failed', ['error' => $notifErr->getMessage()]);

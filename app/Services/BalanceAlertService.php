@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -264,11 +265,11 @@ class BalanceAlertService
                 $owner = DB::table('users')
                     ->where('id', $org->user_id)
                     ->where('tenant_id', $tenantId)
-                    ->select(['id', 'email', 'first_name', 'name'])
+                    ->select(['id', 'email', 'first_name', 'name', 'preferred_language'])
                     ->first();
 
                 if ($owner && !empty($owner->email)) {
-                    $this->sendBalanceAlertEmail($owner, $org->name, $balance, $alertType);
+                    LocaleContext::withLocale($owner, fn() => $this->sendBalanceAlertEmail($owner, $org->name, $balance, $alertType));
                 }
             }
         } catch (\Exception $e) {

@@ -10,6 +10,7 @@ use App\Core\EmailTemplate;
 use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Events\UserRegistered;
+use App\I18n\LocaleContext;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -167,30 +168,32 @@ class RegistrationService
 
         // Send the verification email
         try {
-            $appUrl = TenantContext::getFrontendUrl();
-            $basePath = TenantContext::getSlugPrefix();
-            $verifyUrl = $appUrl . $basePath . '/verify-email?token=' . $token;
+            LocaleContext::withLocale($user, function () use ($user, $token) {
+                $appUrl = TenantContext::getFrontendUrl();
+                $basePath = TenantContext::getSlugPrefix();
+                $verifyUrl = $appUrl . $basePath . '/verify-email?token=' . $token;
 
-            $tenantName = 'Project NEXUS';
-            try {
-                $tenant = TenantContext::get();
-                $tenantName = $tenant['name'] ?? 'Project NEXUS';
-            } catch (\Throwable $e) {
-                // Use default
-            }
+                $tenantName = 'Project NEXUS';
+                try {
+                    $tenant = TenantContext::get();
+                    $tenantName = $tenant['name'] ?? 'Project NEXUS';
+                } catch (\Throwable $e) {
+                    // Use default
+                }
 
-            $firstName = $user->first_name ?? __('emails.common.fallback_name');
+                $firstName = $user->first_name ?? __('emails.common.fallback_name');
 
-            $html = \App\Core\EmailTemplateBuilder::make()
-                ->theme('brand')
-                ->title(__('emails_misc.registration.verify_title'))
-                ->greeting(__('emails_misc.registration.verify_greeting', ['name' => $firstName, 'tenant' => $tenantName]))
-                ->paragraph(__('emails_misc.registration.verify_body'))
-                ->button(__('emails_misc.registration.verify_cta'), $verifyUrl)
-                ->render();
+                $html = \App\Core\EmailTemplateBuilder::make()
+                    ->theme('brand')
+                    ->title(__('emails_misc.registration.verify_title'))
+                    ->greeting(__('emails_misc.registration.verify_greeting', ['name' => $firstName, 'tenant' => $tenantName]))
+                    ->paragraph(__('emails_misc.registration.verify_body'))
+                    ->button(__('emails_misc.registration.verify_cta'), $verifyUrl)
+                    ->render();
 
-            $mailer = Mailer::forCurrentTenant();
-            $mailer->send($user->email, __('emails_misc.registration.verify_subject', ['tenant' => $tenantName]), $html);
+                $mailer = Mailer::forCurrentTenant();
+                $mailer->send($user->email, __('emails_misc.registration.verify_subject', ['tenant' => $tenantName]), $html);
+            });
         } catch (\Throwable $e) {
             Log::warning('RegistrationService: Failed to send verification email', [
                 'user_id' => $user->id,

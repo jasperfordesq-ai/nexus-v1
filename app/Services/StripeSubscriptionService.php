@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -336,11 +337,11 @@ class StripeSubscriptionService
             $plan = DB::selectOne("SELECT name FROM pay_plans WHERE id = ?", [$planId]);
             static::sendTenantAdminEmail(
                 $tenantId,
-                __('emails_misc.stripe_subscription.activated_subject', ['plan' => $plan->name ?? '']),
-                __('emails_misc.stripe_subscription.activated_title'),
-                __('emails_misc.stripe_subscription.activated_body', ['plan' => htmlspecialchars($plan->name ?? '', ENT_QUOTES, 'UTF-8')]),
+                ['key' => 'emails_misc.stripe_subscription.activated_subject', 'params' => ['plan' => $plan->name ?? '']],
+                ['key' => 'emails_misc.stripe_subscription.activated_title'],
+                ['key' => 'emails_misc.stripe_subscription.activated_body', 'params' => ['plan' => htmlspecialchars($plan->name ?? '', ENT_QUOTES, 'UTF-8')]],
                 '/admin/billing',
-                __('emails_misc.stripe_subscription.activated_cta')
+                ['key' => 'emails_misc.stripe_subscription.activated_cta']
             );
         } catch (\Throwable $e) {
             Log::warning('[StripeSubscriptionService] handleCheckoutCompleted email failed: ' . $e->getMessage());
@@ -434,11 +435,11 @@ class StripeSubscriptionService
                     try {
                         static::sendTenantAdminEmail(
                             $tenantId,
-                            __('emails_misc.stripe_subscription.plan_changed_subject', ['new_plan' => $newPlanName]),
-                            __('emails_misc.stripe_subscription.plan_changed_title'),
-                            __('emails_misc.stripe_subscription.plan_changed_body', ['old_plan' => $oldPlanName, 'new_plan' => $newPlanName]),
+                            ['key' => 'emails_misc.stripe_subscription.plan_changed_subject', 'params' => ['new_plan' => $newPlanName]],
+                            ['key' => 'emails_misc.stripe_subscription.plan_changed_title'],
+                            ['key' => 'emails_misc.stripe_subscription.plan_changed_body', 'params' => ['old_plan' => $oldPlanName, 'new_plan' => $newPlanName]],
                             '/admin/billing',
-                            __('emails_misc.stripe_subscription.plan_changed_cta')
+                            ['key' => 'emails_misc.stripe_subscription.plan_changed_cta']
                         );
                     } catch (\Throwable $e) {
                         Log::warning('[StripeSubscriptionService] plan_changed email failed: ' . $e->getMessage());
@@ -452,11 +453,11 @@ class StripeSubscriptionService
             try {
                 static::sendTenantAdminEmail(
                     $tenantId,
-                    __('emails_misc.stripe_subscription.past_due_subject'),
-                    __('emails_misc.stripe_subscription.past_due_title'),
-                    __('emails_misc.stripe_subscription.past_due_body'),
+                    ['key' => 'emails_misc.stripe_subscription.past_due_subject'],
+                    ['key' => 'emails_misc.stripe_subscription.past_due_title'],
+                    ['key' => 'emails_misc.stripe_subscription.past_due_body'],
                     '/admin/billing',
-                    __('emails_misc.stripe_subscription.past_due_cta')
+                    ['key' => 'emails_misc.stripe_subscription.past_due_cta']
                 );
             } catch (\Throwable $e) {
                 Log::warning('[StripeSubscriptionService] past_due email failed: ' . $e->getMessage());
@@ -465,11 +466,11 @@ class StripeSubscriptionService
             try {
                 static::sendTenantAdminEmail(
                     $tenantId,
-                    __('emails_misc.stripe_subscription.expired_subject'),
-                    __('emails_misc.stripe_subscription.expired_title'),
-                    __('emails_misc.stripe_subscription.expired_body'),
+                    ['key' => 'emails_misc.stripe_subscription.expired_subject'],
+                    ['key' => 'emails_misc.stripe_subscription.expired_title'],
+                    ['key' => 'emails_misc.stripe_subscription.expired_body'],
                     '/admin/billing',
-                    __('emails_misc.stripe_subscription.expired_cta')
+                    ['key' => 'emails_misc.stripe_subscription.expired_cta']
                 );
             } catch (\Throwable $e) {
                 Log::warning('[StripeSubscriptionService] expired email failed: ' . $e->getMessage());
@@ -521,11 +522,11 @@ class StripeSubscriptionService
         try {
             static::sendTenantAdminEmail(
                 (int) $assignment->tenant_id,
-                __('emails_misc.stripe_subscription.cancelled_subject'),
-                __('emails_misc.stripe_subscription.cancelled_title'),
-                __('emails_misc.stripe_subscription.cancelled_body'),
+                ['key' => 'emails_misc.stripe_subscription.cancelled_subject'],
+                ['key' => 'emails_misc.stripe_subscription.cancelled_title'],
+                ['key' => 'emails_misc.stripe_subscription.cancelled_body'],
                 '/admin/billing',
-                __('emails_misc.stripe_subscription.cancelled_cta')
+                ['key' => 'emails_misc.stripe_subscription.cancelled_cta']
             );
         } catch (\Throwable $e) {
             Log::warning('[StripeSubscriptionService] handleSubscriptionDeleted email failed: ' . $e->getMessage());
@@ -589,11 +590,11 @@ class StripeSubscriptionService
             $planName = $plan->name ?? '';
             static::sendTenantAdminEmail(
                 (int) $assignment->tenant_id,
-                __('emails_misc.stripe_subscription.renewed_subject'),
-                __('emails_misc.stripe_subscription.renewed_title'),
-                __('emails_misc.stripe_subscription.renewed_body', ['plan' => htmlspecialchars($planName, ENT_QUOTES, 'UTF-8')]),
+                ['key' => 'emails_misc.stripe_subscription.renewed_subject'],
+                ['key' => 'emails_misc.stripe_subscription.renewed_title'],
+                ['key' => 'emails_misc.stripe_subscription.renewed_body', 'params' => ['plan' => htmlspecialchars($planName, ENT_QUOTES, 'UTF-8')]],
                 '/admin/billing',
-                __('emails_misc.stripe_subscription.renewed_cta')
+                ['key' => 'emails_misc.stripe_subscription.renewed_cta']
             );
         } catch (\Throwable $e) {
             Log::warning('[StripeSubscriptionService] handleInvoicePaid email failed: ' . $e->getMessage());
@@ -628,11 +629,11 @@ class StripeSubscriptionService
             try {
                 static::sendTenantAdminEmail(
                     (int) $assignment->tenant_id,
-                    __('emails_misc.stripe_subscription.payment_failed_subject'),
-                    __('emails_misc.stripe_subscription.payment_failed_title'),
-                    __('emails_misc.stripe_subscription.payment_failed_body'),
+                    ['key' => 'emails_misc.stripe_subscription.payment_failed_subject'],
+                    ['key' => 'emails_misc.stripe_subscription.payment_failed_title'],
+                    ['key' => 'emails_misc.stripe_subscription.payment_failed_body'],
                     '/admin/billing',
-                    __('emails_misc.stripe_subscription.payment_failed_cta'),
+                    ['key' => 'emails_misc.stripe_subscription.payment_failed_cta'],
                     'danger'
                 );
             } catch (\Throwable $e) {
@@ -681,14 +682,14 @@ class StripeSubscriptionService
 
                 static::sendTenantAdminEmail(
                     (int) $assignment->tenant_id,
-                    __('emails_misc.stripe_subscription.renewal_reminder_subject'),
-                    __('emails_misc.stripe_subscription.renewal_reminder_title'),
-                    __('emails_misc.stripe_subscription.renewal_reminder_body', [
+                    ['key' => 'emails_misc.stripe_subscription.renewal_reminder_subject'],
+                    ['key' => 'emails_misc.stripe_subscription.renewal_reminder_title'],
+                    ['key' => 'emails_misc.stripe_subscription.renewal_reminder_body', 'params' => [
                         'plan' => htmlspecialchars($planName, ENT_QUOTES, 'UTF-8'),
                         'date' => $dateFormatted,
-                    ]),
+                    ]],
                     '/admin/billing',
-                    __('emails_misc.stripe_subscription.renewal_reminder_cta')
+                    ['key' => 'emails_misc.stripe_subscription.renewal_reminder_cta']
                 );
 
                 $sent++;
@@ -736,14 +737,14 @@ class StripeSubscriptionService
                         Cache::put($cacheKey, true, now()->addHours(24));
                         static::sendTenantAdminEmail(
                             (int) $assignment->tenant_id,
-                            __('emails_misc.stripe_subscription.trial_ending_7d_subject'),
-                            __('emails_misc.stripe_subscription.trial_ending_7d_title'),
-                            __('emails_misc.stripe_subscription.trial_ending_7d_body', [
+                            ['key' => 'emails_misc.stripe_subscription.trial_ending_7d_subject'],
+                            ['key' => 'emails_misc.stripe_subscription.trial_ending_7d_title'],
+                            ['key' => 'emails_misc.stripe_subscription.trial_ending_7d_body', 'params' => [
                                 'community' => $communityName,
                                 'date'      => $dateFormatted,
-                            ]),
+                            ]],
                             '/admin/billing',
-                            __('emails_misc.stripe_subscription.trial_ending_7d_cta')
+                            ['key' => 'emails_misc.stripe_subscription.trial_ending_7d_cta']
                         );
                         $sent++;
                     }
@@ -756,14 +757,14 @@ class StripeSubscriptionService
                         Cache::put($cacheKey, true, now()->addHours(24));
                         static::sendTenantAdminEmail(
                             (int) $assignment->tenant_id,
-                            __('emails_misc.stripe_subscription.trial_ending_1d_subject'),
-                            __('emails_misc.stripe_subscription.trial_ending_1d_title'),
-                            __('emails_misc.stripe_subscription.trial_ending_1d_body', [
+                            ['key' => 'emails_misc.stripe_subscription.trial_ending_1d_subject'],
+                            ['key' => 'emails_misc.stripe_subscription.trial_ending_1d_title'],
+                            ['key' => 'emails_misc.stripe_subscription.trial_ending_1d_body', 'params' => [
                                 'community' => $communityName,
                                 'date'      => $dateFormatted,
-                            ]),
+                            ]],
                             '/admin/billing',
-                            __('emails_misc.stripe_subscription.trial_ending_1d_cta')
+                            ['key' => 'emails_misc.stripe_subscription.trial_ending_1d_cta']
                         );
                         $sent++;
                     }
@@ -777,7 +778,16 @@ class StripeSubscriptionService
         return ['sent' => $sent, 'errors' => $errors];
     }
 
-    private static function sendTenantAdminEmail(int $tenantId, string $subject, string $title, string $body, string $link, string $ctaText, string $theme = 'default'): void
+    /**
+     * Send a templated email to the tenant admin, rendering subject/title/body/CTA
+     * in the admin's preferred_language.
+     *
+     * @param array{key:string,params?:array} $subject
+     * @param array{key:string,params?:array} $title
+     * @param array{key:string,params?:array} $body
+     * @param array{key:string,params?:array} $ctaText
+     */
+    private static function sendTenantAdminEmail(int $tenantId, array $subject, array $title, array $body, string $link, array $ctaText, string $theme = 'default'): void
     {
         TenantContext::setById($tenantId);
 
@@ -785,31 +795,33 @@ class StripeSubscriptionService
             ->where('tenant_id', $tenantId)
             ->where('role', 'admin')
             ->whereNotNull('email')
-            ->select(['email', 'first_name', 'name'])
+            ->select(['email', 'first_name', 'name', 'preferred_language'])
             ->first();
 
         if (!$admin || empty($admin->email)) {
             return;
         }
 
-        $firstName = $admin->first_name ?? $admin->name ?? __('emails.common.fallback_name');
-        $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+        LocaleContext::withLocale($admin, function () use ($admin, $subject, $title, $body, $link, $ctaText, $theme, $tenantId) {
+            $firstName = $admin->first_name ?? $admin->name ?? __('emails.common.fallback_name');
+            $fullUrl   = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
-        $builder = EmailTemplateBuilder::make();
-        if ($theme !== 'default') {
-            $builder->theme($theme);
-        }
+            $builder = EmailTemplateBuilder::make();
+            if ($theme !== 'default') {
+                $builder->theme($theme);
+            }
 
-        $html = $builder
-            ->title($title)
-            ->greeting($firstName)
-            ->paragraph($body)
-            ->button($ctaText, $fullUrl)
-            ->render();
+            $html = $builder
+                ->title(__($title['key'], $title['params'] ?? []))
+                ->greeting($firstName)
+                ->paragraph(__($body['key'], $body['params'] ?? []))
+                ->button(__($ctaText['key'], $ctaText['params'] ?? []), $fullUrl)
+                ->render();
 
-        if (!Mailer::forCurrentTenant()->send($admin->email, $subject, $html)) {
-            Log::warning('[StripeSubscriptionService] tenant admin email failed', ['tenant_id' => $tenantId]);
-        }
+            if (!Mailer::forCurrentTenant()->send($admin->email, __($subject['key'], $subject['params'] ?? []), $html)) {
+                Log::warning('[StripeSubscriptionService] tenant admin email failed', ['tenant_id' => $tenantId]);
+            }
+        });
     }
 
     /**
