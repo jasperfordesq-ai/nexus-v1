@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\JobApplication;
 use App\Models\JobInterview;
 use App\Models\Notification;
@@ -71,29 +72,37 @@ class JobInterviewService
 
             // Notify the candidate
             try {
-                $jobTitle = $application->vacancy->title ?? __('emails.common.fallback_job');
                 $candidateId = (int) $application->user_id;
-                $interviewMsg = __('emails_misc.jobs.interview_requested', ['title' => $jobTitle]);
-                Notification::createNotification(
-                    $candidateId,
-                    $interviewMsg,
-                    "/jobs/{$application->vacancy_id}",
-                    'job_application'
-                );
-                RealtimeService::broadcastAndPush($candidateId, $interviewMsg, [
-                    'type'      => 'job_interview_proposed',
-                    'job_id'    => (int) $application->vacancy_id,
-                    'job_title' => $jobTitle,
-                    'message'   => $interviewMsg,
-                    'url'       => "/jobs/{$application->vacancy_id}",
-                ]);
-                static::sendInterviewEmail(
-                    $candidateId,
-                    'emails_misc.jobs.interview_email_subject_proposed',
-                    'emails_misc.jobs.interview_requested',
-                    ['title' => $jobTitle],
-                    "/jobs/{$application->vacancy_id}"
-                );
+                $candidate = DB::table('users')
+                    ->where('id', $candidateId)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['id', 'preferred_language'])
+                    ->first();
+
+                LocaleContext::withLocale($candidate, function () use ($application, $candidateId) {
+                    $jobTitle = $application->vacancy->title ?? __('emails.common.fallback_job');
+                    $interviewMsg = __('emails_misc.jobs.interview_requested', ['title' => $jobTitle]);
+                    Notification::createNotification(
+                        $candidateId,
+                        $interviewMsg,
+                        "/jobs/{$application->vacancy_id}",
+                        'job_application'
+                    );
+                    RealtimeService::broadcastAndPush($candidateId, $interviewMsg, [
+                        'type'      => 'job_interview_proposed',
+                        'job_id'    => (int) $application->vacancy_id,
+                        'job_title' => $jobTitle,
+                        'message'   => $interviewMsg,
+                        'url'       => "/jobs/{$application->vacancy_id}",
+                    ]);
+                    static::sendInterviewEmail(
+                        $candidateId,
+                        'emails_misc.jobs.interview_email_subject_proposed',
+                        'emails_misc.jobs.interview_requested',
+                        ['title' => $jobTitle],
+                        "/jobs/{$application->vacancy_id}"
+                    );
+                });
             } catch (\Throwable $e) {
                 Log::warning('JobInterviewService::propose notification failed: ' . $e->getMessage());
             }
@@ -140,30 +149,38 @@ class JobInterviewService
 
             // Notify the job poster
             try {
-                $jobTitle = $interview->application->vacancy->title ?? __('emails.common.fallback_job');
                 $posterId = $interview->application->vacancy->user_id ?? null;
                 if ($posterId) {
-                    $acceptMsg = __('emails_misc.jobs.interview_accepted', ['title' => $jobTitle]);
-                    Notification::createNotification(
-                        (int) $posterId,
-                        $acceptMsg,
-                        "/jobs/{$interview->vacancy_id}/applications",
-                        'job_application_status'
-                    );
-                    RealtimeService::broadcastAndPush((int) $posterId, $acceptMsg, [
-                        'type'      => 'job_interview_accepted',
-                        'job_id'    => (int) $interview->vacancy_id,
-                        'job_title' => $jobTitle,
-                        'message'   => $acceptMsg,
-                        'url'       => "/jobs/{$interview->vacancy_id}/applications",
-                    ]);
-                    static::sendInterviewEmail(
-                        (int) $posterId,
-                        'emails_misc.jobs.interview_email_subject_accepted',
-                        'emails_misc.jobs.interview_accepted',
-                        ['title' => $jobTitle],
-                        "/jobs/{$interview->vacancy_id}/applications"
-                    );
+                    $poster = DB::table('users')
+                        ->where('id', (int) $posterId)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['id', 'preferred_language'])
+                        ->first();
+
+                    LocaleContext::withLocale($poster, function () use ($interview, $posterId) {
+                        $jobTitle = $interview->application->vacancy->title ?? __('emails.common.fallback_job');
+                        $acceptMsg = __('emails_misc.jobs.interview_accepted', ['title' => $jobTitle]);
+                        Notification::createNotification(
+                            (int) $posterId,
+                            $acceptMsg,
+                            "/jobs/{$interview->vacancy_id}/applications",
+                            'job_application_status'
+                        );
+                        RealtimeService::broadcastAndPush((int) $posterId, $acceptMsg, [
+                            'type'      => 'job_interview_accepted',
+                            'job_id'    => (int) $interview->vacancy_id,
+                            'job_title' => $jobTitle,
+                            'message'   => $acceptMsg,
+                            'url'       => "/jobs/{$interview->vacancy_id}/applications",
+                        ]);
+                        static::sendInterviewEmail(
+                            (int) $posterId,
+                            'emails_misc.jobs.interview_email_subject_accepted',
+                            'emails_misc.jobs.interview_accepted',
+                            ['title' => $jobTitle],
+                            "/jobs/{$interview->vacancy_id}/applications"
+                        );
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('JobInterviewService::accept notification failed: ' . $e->getMessage());
@@ -211,30 +228,38 @@ class JobInterviewService
 
             // Notify the job poster
             try {
-                $jobTitle = $interview->application->vacancy->title ?? __('emails.common.fallback_job');
                 $posterId = $interview->application->vacancy->user_id ?? null;
                 if ($posterId) {
-                    $declineMsg = __('emails_misc.jobs.interview_declined', ['title' => $jobTitle]);
-                    Notification::createNotification(
-                        (int) $posterId,
-                        $declineMsg,
-                        "/jobs/{$interview->vacancy_id}/applications",
-                        'job_application_status'
-                    );
-                    RealtimeService::broadcastAndPush((int) $posterId, $declineMsg, [
-                        'type'      => 'job_interview_declined',
-                        'job_id'    => (int) $interview->vacancy_id,
-                        'job_title' => $jobTitle,
-                        'message'   => $declineMsg,
-                        'url'       => "/jobs/{$interview->vacancy_id}/applications",
-                    ]);
-                    static::sendInterviewEmail(
-                        (int) $posterId,
-                        'emails_misc.jobs.interview_email_subject_declined',
-                        'emails_misc.jobs.interview_declined',
-                        ['title' => $jobTitle],
-                        "/jobs/{$interview->vacancy_id}/applications"
-                    );
+                    $poster = DB::table('users')
+                        ->where('id', (int) $posterId)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['id', 'preferred_language'])
+                        ->first();
+
+                    LocaleContext::withLocale($poster, function () use ($interview, $posterId) {
+                        $jobTitle = $interview->application->vacancy->title ?? __('emails.common.fallback_job');
+                        $declineMsg = __('emails_misc.jobs.interview_declined', ['title' => $jobTitle]);
+                        Notification::createNotification(
+                            (int) $posterId,
+                            $declineMsg,
+                            "/jobs/{$interview->vacancy_id}/applications",
+                            'job_application_status'
+                        );
+                        RealtimeService::broadcastAndPush((int) $posterId, $declineMsg, [
+                            'type'      => 'job_interview_declined',
+                            'job_id'    => (int) $interview->vacancy_id,
+                            'job_title' => $jobTitle,
+                            'message'   => $declineMsg,
+                            'url'       => "/jobs/{$interview->vacancy_id}/applications",
+                        ]);
+                        static::sendInterviewEmail(
+                            (int) $posterId,
+                            'emails_misc.jobs.interview_email_subject_declined',
+                            'emails_misc.jobs.interview_declined',
+                            ['title' => $jobTitle],
+                            "/jobs/{$interview->vacancy_id}/applications"
+                        );
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('JobInterviewService::decline notification failed: ' . $e->getMessage());
@@ -326,30 +351,38 @@ class JobInterviewService
 
             // Notify the candidate
             try {
-                $jobTitle = $interview->application->vacancy->title ?? __('emails.common.fallback_job');
                 $candidateId = $interview->application->user_id ?? null;
                 if ($candidateId) {
-                    $cancelMsg = __('emails_misc.jobs.interview_cancelled', ['title' => $jobTitle]);
-                    Notification::createNotification(
-                        (int) $candidateId,
-                        $cancelMsg,
-                        "/jobs/{$interview->vacancy_id}",
-                        'job_application_status'
-                    );
-                    RealtimeService::broadcastAndPush((int) $candidateId, $cancelMsg, [
-                        'type'      => 'job_interview_cancelled',
-                        'job_id'    => (int) $interview->vacancy_id,
-                        'job_title' => $jobTitle,
-                        'message'   => $cancelMsg,
-                        'url'       => "/jobs/{$interview->vacancy_id}",
-                    ]);
-                    static::sendInterviewEmail(
-                        (int) $candidateId,
-                        'emails_misc.jobs.interview_email_subject_cancelled',
-                        'emails_misc.jobs.interview_cancelled',
-                        ['title' => $jobTitle],
-                        "/jobs/{$interview->vacancy_id}"
-                    );
+                    $candidate = DB::table('users')
+                        ->where('id', (int) $candidateId)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['id', 'preferred_language'])
+                        ->first();
+
+                    LocaleContext::withLocale($candidate, function () use ($interview, $candidateId) {
+                        $jobTitle = $interview->application->vacancy->title ?? __('emails.common.fallback_job');
+                        $cancelMsg = __('emails_misc.jobs.interview_cancelled', ['title' => $jobTitle]);
+                        Notification::createNotification(
+                            (int) $candidateId,
+                            $cancelMsg,
+                            "/jobs/{$interview->vacancy_id}",
+                            'job_application_status'
+                        );
+                        RealtimeService::broadcastAndPush((int) $candidateId, $cancelMsg, [
+                            'type'      => 'job_interview_cancelled',
+                            'job_id'    => (int) $interview->vacancy_id,
+                            'job_title' => $jobTitle,
+                            'message'   => $cancelMsg,
+                            'url'       => "/jobs/{$interview->vacancy_id}",
+                        ]);
+                        static::sendInterviewEmail(
+                            (int) $candidateId,
+                            'emails_misc.jobs.interview_email_subject_cancelled',
+                            'emails_misc.jobs.interview_cancelled',
+                            ['title' => $jobTitle],
+                            "/jobs/{$interview->vacancy_id}"
+                        );
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('JobInterviewService::cancel notification failed: ' . $e->getMessage());
@@ -390,63 +423,82 @@ class JobInterviewService
             foreach ($upcoming as $interview) {
                 try {
                     // Set tenant context for this interview
-                    TenantContext::setById((int) $interview->tenant_id);
+                    $tenantId = (int) $interview->tenant_id;
+                    TenantContext::setById($tenantId);
 
-                    $jobTitle = $interview->vacancy->title ?? __('emails.common.fallback_job');
                     $scheduledAt = $interview->scheduled_at->format('M j, g:i A');
                     $hoursUntil = (int) $now->diffInHours($interview->scheduled_at);
 
-                    $timeLabel = $hoursUntil <= 1 ? __('emails_misc.jobs.interview_in_1_hour') : __('emails_misc.jobs.interview_in_hours', ['hours' => $hoursUntil]);
-                    $message = __('emails_misc.jobs.interview_reminder', ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt]);
-
-                    // Notify the candidate
+                    // Notify the candidate (render message in candidate's locale)
                     $candidateId = $interview->application->user_id ?? null;
                     if ($candidateId) {
-                        Notification::createNotification(
-                            (int) $candidateId,
-                            $message,
-                            "/jobs/{$interview->vacancy_id}",
-                            'job_interview_proposed'
-                        );
-                        RealtimeService::broadcastAndPush((int) $candidateId, __('emails_misc.jobs.interview_reminder_push_title'), [
-                            'type'      => 'job_interview_reminder',
-                            'job_id'    => (int) $interview->vacancy_id,
-                            'job_title' => $jobTitle,
-                            'message'   => $message,
-                            'url'       => "/jobs/{$interview->vacancy_id}",
-                        ]);
-                        static::sendInterviewEmail(
-                            (int) $candidateId,
-                            'emails_misc.jobs.interview_email_subject_reminder',
-                            'emails_misc.jobs.interview_reminder',
-                            ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt],
-                            "/jobs/{$interview->vacancy_id}"
-                        );
+                        $candidate = DB::table('users')
+                            ->where('id', (int) $candidateId)
+                            ->where('tenant_id', $tenantId)
+                            ->select(['id', 'preferred_language'])
+                            ->first();
+
+                        LocaleContext::withLocale($candidate, function () use ($interview, $candidateId, $hoursUntil, $scheduledAt) {
+                            $jobTitle  = $interview->vacancy->title ?? __('emails.common.fallback_job');
+                            $timeLabel = $hoursUntil <= 1 ? __('emails_misc.jobs.interview_in_1_hour') : __('emails_misc.jobs.interview_in_hours', ['hours' => $hoursUntil]);
+                            $message   = __('emails_misc.jobs.interview_reminder', ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt]);
+                            Notification::createNotification(
+                                (int) $candidateId,
+                                $message,
+                                "/jobs/{$interview->vacancy_id}",
+                                'job_interview_proposed'
+                            );
+                            RealtimeService::broadcastAndPush((int) $candidateId, __('emails_misc.jobs.interview_reminder_push_title'), [
+                                'type'      => 'job_interview_reminder',
+                                'job_id'    => (int) $interview->vacancy_id,
+                                'job_title' => $jobTitle,
+                                'message'   => $message,
+                                'url'       => "/jobs/{$interview->vacancy_id}",
+                            ]);
+                            static::sendInterviewEmail(
+                                (int) $candidateId,
+                                'emails_misc.jobs.interview_email_subject_reminder',
+                                'emails_misc.jobs.interview_reminder',
+                                ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt],
+                                "/jobs/{$interview->vacancy_id}"
+                            );
+                        });
                     }
 
-                    // Notify the employer/interviewer
+                    // Notify the employer/interviewer (render message in poster's locale)
                     $posterId = $interview->vacancy->user_id ?? null;
                     if ($posterId) {
-                        Notification::createNotification(
-                            (int) $posterId,
-                            $message,
-                            "/jobs/{$interview->vacancy_id}/applications",
-                            'job_interview_proposed'
-                        );
-                        RealtimeService::broadcastAndPush((int) $posterId, __('emails_misc.jobs.interview_reminder_push_title'), [
-                            'type'      => 'job_interview_reminder',
-                            'job_id'    => (int) $interview->vacancy_id,
-                            'job_title' => $jobTitle,
-                            'message'   => $message,
-                            'url'       => "/jobs/{$interview->vacancy_id}/applications",
-                        ]);
-                        static::sendInterviewEmail(
-                            (int) $posterId,
-                            'emails_misc.jobs.interview_email_subject_reminder',
-                            'emails_misc.jobs.interview_reminder',
-                            ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt],
-                            "/jobs/{$interview->vacancy_id}/applications"
-                        );
+                        $poster = DB::table('users')
+                            ->where('id', (int) $posterId)
+                            ->where('tenant_id', $tenantId)
+                            ->select(['id', 'preferred_language'])
+                            ->first();
+
+                        LocaleContext::withLocale($poster, function () use ($interview, $posterId, $hoursUntil, $scheduledAt) {
+                            $jobTitle  = $interview->vacancy->title ?? __('emails.common.fallback_job');
+                            $timeLabel = $hoursUntil <= 1 ? __('emails_misc.jobs.interview_in_1_hour') : __('emails_misc.jobs.interview_in_hours', ['hours' => $hoursUntil]);
+                            $message   = __('emails_misc.jobs.interview_reminder', ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt]);
+                            Notification::createNotification(
+                                (int) $posterId,
+                                $message,
+                                "/jobs/{$interview->vacancy_id}/applications",
+                                'job_interview_proposed'
+                            );
+                            RealtimeService::broadcastAndPush((int) $posterId, __('emails_misc.jobs.interview_reminder_push_title'), [
+                                'type'      => 'job_interview_reminder',
+                                'job_id'    => (int) $interview->vacancy_id,
+                                'job_title' => $jobTitle,
+                                'message'   => $message,
+                                'url'       => "/jobs/{$interview->vacancy_id}/applications",
+                            ]);
+                            static::sendInterviewEmail(
+                                (int) $posterId,
+                                'emails_misc.jobs.interview_email_subject_reminder',
+                                'emails_misc.jobs.interview_reminder',
+                                ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt],
+                                "/jobs/{$interview->vacancy_id}/applications"
+                            );
+                        });
                     }
 
                     // Mark as reminded to prevent duplicate sends
@@ -483,28 +535,34 @@ class JobInterviewService
     {
         try {
             $tenantId = TenantContext::getId();
-            $user     = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name'])->first();
+            $user     = DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->select(['email', 'first_name', 'name', 'preferred_language'])
+                ->first();
 
             if (!$user || empty($user->email)) {
                 return;
             }
 
-            $firstName  = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
-            $bodyText   = __($messageKey, $params);
-            $subject    = __($subjectKey, $params);
-            $fullUrl    = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $jobLink;
+            LocaleContext::withLocale($user, function () use ($user, $userId, $subjectKey, $messageKey, $params, $jobLink) {
+                $firstName  = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                $bodyText   = __($messageKey, $params);
+                $subject    = __($subjectKey, $params);
+                $fullUrl    = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $jobLink;
 
-            $html = EmailTemplateBuilder::make()
-                ->title(__('emails_misc.jobs.interview_email_title'))
-                ->previewText($bodyText)
-                ->greeting($firstName)
-                ->paragraph($bodyText)
-                ->button(__('emails_misc.jobs.interview_email_cta'), $fullUrl)
-                ->render();
+                $html = EmailTemplateBuilder::make()
+                    ->title(__('emails_misc.jobs.interview_email_title'))
+                    ->previewText($bodyText)
+                    ->greeting($firstName)
+                    ->paragraph($bodyText)
+                    ->button(__('emails_misc.jobs.interview_email_cta'), $fullUrl)
+                    ->render();
 
-            if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
-                Log::warning('[JobInterviewService] Interview email failed', ['user_id' => $userId, 'subject_key' => $subjectKey]);
-            }
+                if (!Mailer::forCurrentTenant()->send($user->email, $subject, $html)) {
+                    Log::warning('[JobInterviewService] Interview email failed', ['user_id' => $userId, 'subject_key' => $subjectKey]);
+                }
+            });
         } catch (\Throwable $e) {
             Log::warning('[JobInterviewService] sendInterviewEmail error: ' . $e->getMessage());
         }

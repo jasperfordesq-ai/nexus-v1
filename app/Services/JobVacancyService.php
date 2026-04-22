@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\JobAlert;
 use App\Models\JobApplication;
 use App\Models\JobApplicationHistory;
@@ -815,33 +816,41 @@ class JobVacancyService
 
             // Notify the applicant about their status change
             try {
-                $jobTitle = $application->vacancy->title ?? __('emails.common.fallback_job');
                 $applicantId = (int) $application->user_id;
+                $applicant = DB::table('users')
+                    ->where('id', $applicantId)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['id', 'preferred_language'])
+                    ->first();
 
-                $message = match ($status) {
-                    'shortlisted' => __('svc_notifications.job_application.shortlisted', ['title' => $jobTitle]),
-                    'rejected'    => __('svc_notifications.job_application.rejected', ['title' => $jobTitle]),
-                    'hired', 'accepted' => __('svc_notifications.job_application.hired', ['title' => $jobTitle]),
-                    default       => __('svc_notifications.job_application.status_updated', ['title' => $jobTitle, 'status' => $status]),
-                };
+                LocaleContext::withLocale($applicant, function () use ($application, $applicationId, $applicantId, $status, $previousStatus) {
+                    $jobTitle = $application->vacancy->title ?? __('emails.common.fallback_job');
 
-                Notification::createNotification(
-                    $applicantId,
-                    $message,
-                    "/jobs/{$application->vacancy_id}",
-                    'job_application'
-                );
+                    $message = match ($status) {
+                        'shortlisted' => __('svc_notifications.job_application.shortlisted', ['title' => $jobTitle]),
+                        'rejected'    => __('svc_notifications.job_application.rejected', ['title' => $jobTitle]),
+                        'hired', 'accepted' => __('svc_notifications.job_application.hired', ['title' => $jobTitle]),
+                        default       => __('svc_notifications.job_application.status_updated', ['title' => $jobTitle, 'status' => $status]),
+                    };
 
-                // Real-time broadcast to candidate
-                RealtimeService::broadcastAndPush($applicantId, $message, [
-                    'type'        => 'job_application_status',
-                    'job_id'      => (int) $application->vacancy_id,
-                    'job_title'   => $jobTitle,
-                    'application_id' => $applicationId,
-                    'from_status' => $previousStatus,
-                    'to_status'   => $status,
-                    'message'     => $message,
-                ]);
+                    Notification::createNotification(
+                        $applicantId,
+                        $message,
+                        "/jobs/{$application->vacancy_id}",
+                        'job_application'
+                    );
+
+                    // Real-time broadcast to candidate
+                    RealtimeService::broadcastAndPush($applicantId, $message, [
+                        'type'        => 'job_application_status',
+                        'job_id'      => (int) $application->vacancy_id,
+                        'job_title'   => $jobTitle,
+                        'application_id' => $applicationId,
+                        'from_status' => $previousStatus,
+                        'to_status'   => $status,
+                        'message'     => $message,
+                    ]);
+                });
             } catch (\Throwable $e) {
                 Log::warning('JobVacancyService::updateApplicationStatus notification failed', [
                     'application_id' => $applicationId,

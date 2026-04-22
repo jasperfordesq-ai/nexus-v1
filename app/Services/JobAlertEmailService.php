@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\JobAlert;
 use App\Models\JobVacancy;
 use App\Models\User;
@@ -33,11 +34,13 @@ class JobAlertEmailService
     public static function sendImmediateAlert(User $recipient, JobVacancy $vacancy, JobAlert $alert): bool
     {
         try {
-            $subject = __('emails.job_alert.subject_single', ['title' => $vacancy->title]);
-            $bodyHtml = self::buildAlertEmailHtml($recipient, [$vacancy]);
+            return LocaleContext::withLocale($recipient, function () use ($recipient, $vacancy) {
+                $subject = __('emails.job_alert.subject_single', ['title' => $vacancy->title]);
+                $bodyHtml = self::buildAlertEmailHtml($recipient, [$vacancy]);
 
-            $mailer = Mailer::forCurrentTenant();
-            return $mailer->send($recipient->email, $subject, $bodyHtml);
+                $mailer = Mailer::forCurrentTenant();
+                return $mailer->send($recipient->email, $subject, $bodyHtml);
+            });
         } catch (\Throwable $e) {
             Log::warning('JobAlertEmailService::sendImmediateAlert failed', [
                 'user_id'    => $recipient->id,

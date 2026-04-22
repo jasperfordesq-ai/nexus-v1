@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\JobApplication;
 use App\Models\JobOffer;
 use App\Models\Notification;
@@ -71,21 +72,29 @@ class JobOfferService
 
             // Notify the candidate
             try {
-                $jobTitle = $application->vacancy->title ?? __('emails.common.fallback_job');
                 $candidateId = (int) $application->user_id;
-                Notification::createNotification(
-                    $candidateId,
-                    __('svc_notifications.job_offer.received_bell', ['title' => $jobTitle]),
-                    "/jobs/{$application->vacancy_id}",
-                    'job_application_status'
-                );
-                RealtimeService::broadcastAndPush($candidateId, __('svc_notifications.job_offer.received_push_title'), [
-                    'type'      => 'job_offer_received',
-                    'job_id'    => (int) $application->vacancy_id,
-                    'job_title' => $jobTitle,
-                    'message'   => __('svc_notifications.job_offer.received_push_message', ['title' => $jobTitle]),
-                    'url'       => "/jobs/{$application->vacancy_id}",
-                ]);
+                $candidate = DB::table('users')
+                    ->where('id', $candidateId)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['id', 'preferred_language'])
+                    ->first();
+
+                LocaleContext::withLocale($candidate, function () use ($application, $candidateId) {
+                    $jobTitle = $application->vacancy->title ?? __('emails.common.fallback_job');
+                    Notification::createNotification(
+                        $candidateId,
+                        __('svc_notifications.job_offer.received_bell', ['title' => $jobTitle]),
+                        "/jobs/{$application->vacancy_id}",
+                        'job_application_status'
+                    );
+                    RealtimeService::broadcastAndPush($candidateId, __('svc_notifications.job_offer.received_push_title'), [
+                        'type'      => 'job_offer_received',
+                        'job_id'    => (int) $application->vacancy_id,
+                        'job_title' => $jobTitle,
+                        'message'   => __('svc_notifications.job_offer.received_push_message', ['title' => $jobTitle]),
+                        'url'       => "/jobs/{$application->vacancy_id}",
+                    ]);
+                });
             } catch (\Throwable $e) {
                 Log::warning('JobOfferService::create notification failed: ' . $e->getMessage());
             }
@@ -176,19 +185,27 @@ class JobOfferService
                         ->increment('balance', $creditAmount);
 
                     // Notify the candidate about their earned credits
-                    Notification::createNotification(
-                        $candidateId,
-                        __('svc_notifications.job_offer.credits_earned_bell', ['amount' => $creditAmount, 'title' => $jobTitle]),
-                        '/wallet',
-                        'transaction'
-                    );
-                    RealtimeService::broadcastAndPush($candidateId, __('svc_notifications.job_offer.credits_earned_push_title'), [
-                        'type'      => 'job_completion_credits',
-                        'amount'    => $creditAmount,
-                        'job_title' => $jobTitle,
-                        'message'   => __('svc_notifications.job_offer.credits_earned_push_message', ['amount' => $creditAmount, 'title' => $jobTitle]),
-                        'url'       => '/wallet',
-                    ]);
+                    $candidate = DB::table('users')
+                        ->where('id', $candidateId)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['id', 'preferred_language'])
+                        ->first();
+
+                    LocaleContext::withLocale($candidate, function () use ($candidateId, $creditAmount, $jobTitle) {
+                        Notification::createNotification(
+                            $candidateId,
+                            __('svc_notifications.job_offer.credits_earned_bell', ['amount' => $creditAmount, 'title' => $jobTitle]),
+                            '/wallet',
+                            'transaction'
+                        );
+                        RealtimeService::broadcastAndPush($candidateId, __('svc_notifications.job_offer.credits_earned_push_title'), [
+                            'type'      => 'job_completion_credits',
+                            'amount'    => $creditAmount,
+                            'job_title' => $jobTitle,
+                            'message'   => __('svc_notifications.job_offer.credits_earned_push_message', ['amount' => $creditAmount, 'title' => $jobTitle]),
+                            'url'       => '/wallet',
+                        ]);
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('JobOfferService::accept auto-credit failed', ['error' => $e->getMessage()]);
@@ -196,22 +213,30 @@ class JobOfferService
 
             // Notify the job poster
             try {
-                $jobTitle = $offer->application->vacancy->title ?? __('emails.common.fallback_job');
                 $posterId = $offer->application->vacancy->user_id ?? null;
                 if ($posterId) {
-                    Notification::createNotification(
-                        (int) $posterId,
-                        __('svc_notifications.job_offer.accepted_bell', ['title' => $jobTitle]),
-                        "/jobs/{$offer->vacancy_id}/applications",
-                        'job_application_status'
-                    );
-                    RealtimeService::broadcastAndPush((int) $posterId, __('svc_notifications.job_offer.accepted_push_title', ['title' => $jobTitle]), [
-                        'type'      => 'job_offer_accepted',
-                        'job_id'    => (int) $offer->vacancy_id,
-                        'job_title' => $jobTitle,
-                        'message'   => __('svc_notifications.job_offer.accepted_push_message', ['title' => $jobTitle]),
-                        'url'       => "/jobs/{$offer->vacancy_id}/applications",
-                    ]);
+                    $poster = DB::table('users')
+                        ->where('id', (int) $posterId)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['id', 'preferred_language'])
+                        ->first();
+
+                    LocaleContext::withLocale($poster, function () use ($offer, $posterId) {
+                        $jobTitle = $offer->application->vacancy->title ?? __('emails.common.fallback_job');
+                        Notification::createNotification(
+                            (int) $posterId,
+                            __('svc_notifications.job_offer.accepted_bell', ['title' => $jobTitle]),
+                            "/jobs/{$offer->vacancy_id}/applications",
+                            'job_application_status'
+                        );
+                        RealtimeService::broadcastAndPush((int) $posterId, __('svc_notifications.job_offer.accepted_push_title', ['title' => $jobTitle]), [
+                            'type'      => 'job_offer_accepted',
+                            'job_id'    => (int) $offer->vacancy_id,
+                            'job_title' => $jobTitle,
+                            'message'   => __('svc_notifications.job_offer.accepted_push_message', ['title' => $jobTitle]),
+                            'url'       => "/jobs/{$offer->vacancy_id}/applications",
+                        ]);
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('JobOfferService::accept notification failed: ' . $e->getMessage());
@@ -271,22 +296,30 @@ class JobOfferService
 
             // Notify the job poster
             try {
-                $jobTitle = $offer->application->vacancy->title ?? __('emails.common.fallback_job');
                 $posterId = $offer->application->vacancy->user_id ?? null;
                 if ($posterId) {
-                    Notification::createNotification(
-                        (int) $posterId,
-                        __('svc_notifications.job_offer.rejected_bell', ['title' => $jobTitle]),
-                        "/jobs/{$offer->vacancy_id}/applications",
-                        'job_application_status'
-                    );
-                    RealtimeService::broadcastAndPush((int) $posterId, __('svc_notifications.job_offer.rejected_push_title', ['title' => $jobTitle]), [
-                        'type'      => 'job_offer_rejected',
-                        'job_id'    => (int) $offer->vacancy_id,
-                        'job_title' => $jobTitle,
-                        'message'   => __('svc_notifications.job_offer.rejected_push_message', ['title' => $jobTitle]),
-                        'url'       => "/jobs/{$offer->vacancy_id}/applications",
-                    ]);
+                    $poster = DB::table('users')
+                        ->where('id', (int) $posterId)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['id', 'preferred_language'])
+                        ->first();
+
+                    LocaleContext::withLocale($poster, function () use ($offer, $posterId) {
+                        $jobTitle = $offer->application->vacancy->title ?? __('emails.common.fallback_job');
+                        Notification::createNotification(
+                            (int) $posterId,
+                            __('svc_notifications.job_offer.rejected_bell', ['title' => $jobTitle]),
+                            "/jobs/{$offer->vacancy_id}/applications",
+                            'job_application_status'
+                        );
+                        RealtimeService::broadcastAndPush((int) $posterId, __('svc_notifications.job_offer.rejected_push_title', ['title' => $jobTitle]), [
+                            'type'      => 'job_offer_rejected',
+                            'job_id'    => (int) $offer->vacancy_id,
+                            'job_title' => $jobTitle,
+                            'message'   => __('svc_notifications.job_offer.rejected_push_message', ['title' => $jobTitle]),
+                            'url'       => "/jobs/{$offer->vacancy_id}/applications",
+                        ]);
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('JobOfferService::reject notification failed: ' . $e->getMessage());
@@ -331,22 +364,30 @@ class JobOfferService
 
             // Notify the candidate
             try {
-                $jobTitle = $offer->application->vacancy->title ?? __('emails.common.fallback_job');
                 $candidateId = $offer->application->user_id ?? null;
                 if ($candidateId) {
-                    Notification::createNotification(
-                        (int) $candidateId,
-                        __('svc_notifications.job_offer.withdrawn_bell', ['title' => $jobTitle]),
-                        "/jobs/{$offer->vacancy_id}",
-                        'job_application_status'
-                    );
-                    RealtimeService::broadcastAndPush((int) $candidateId, __('svc_notifications.job_offer.withdrawn_push_title', ['title' => $jobTitle]), [
-                        'type'      => 'job_offer_withdrawn',
-                        'job_id'    => (int) $offer->vacancy_id,
-                        'job_title' => $jobTitle,
-                        'message'   => __('svc_notifications.job_offer.withdrawn_push_message', ['title' => $jobTitle]),
-                        'url'       => "/jobs/{$offer->vacancy_id}",
-                    ]);
+                    $candidate = DB::table('users')
+                        ->where('id', (int) $candidateId)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['id', 'preferred_language'])
+                        ->first();
+
+                    LocaleContext::withLocale($candidate, function () use ($offer, $candidateId) {
+                        $jobTitle = $offer->application->vacancy->title ?? __('emails.common.fallback_job');
+                        Notification::createNotification(
+                            (int) $candidateId,
+                            __('svc_notifications.job_offer.withdrawn_bell', ['title' => $jobTitle]),
+                            "/jobs/{$offer->vacancy_id}",
+                            'job_application_status'
+                        );
+                        RealtimeService::broadcastAndPush((int) $candidateId, __('svc_notifications.job_offer.withdrawn_push_title', ['title' => $jobTitle]), [
+                            'type'      => 'job_offer_withdrawn',
+                            'job_id'    => (int) $offer->vacancy_id,
+                            'job_title' => $jobTitle,
+                            'message'   => __('svc_notifications.job_offer.withdrawn_push_message', ['title' => $jobTitle]),
+                            'url'       => "/jobs/{$offer->vacancy_id}",
+                        ]);
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('JobOfferService::withdraw notification failed: ' . $e->getMessage());
