@@ -496,18 +496,22 @@ If a deploy fails, **maintenance mode stays ON**. Recovery:
 
 ### For AI assistants
 
-When the user says **"deploy"**, **ALWAYS use `--detach`**:
+When the user says **"deploy"** (or any variation), **ALWAYS use `auto --detach`**:
 ```bash
-# Launch deploy (returns immediately — deploy runs in background)
+# Launch deploy — auto detects quick vs full from git diff, runs in background
 ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
-  "cd /opt/nexus-php && sudo bash scripts/safe-deploy.sh full --detach"
+  "cd /opt/nexus-php && sudo bash scripts/safe-deploy.sh auto --detach"
 
 # Poll for completion (run every 30-60 seconds until done)
 ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
   "cd /opt/nexus-php && sudo bash scripts/safe-deploy.sh logs"
 ```
 
-**NEVER run `safe-deploy.sh full` or `safe-deploy.sh quick` WITHOUT `--detach`** — Docker builds take 10+ minutes and WILL timeout the SSH session, leaving the site stuck in maintenance mode.
+**How `auto` works:** it fetches origin/main and checks what files changed. If `composer.json`, `composer.lock`, `package.json`, `package-lock.json`, or any `Dockerfile` changed → `full` rebuild. Everything else → `quick` (PHP source is volume-mounted, not baked into the image, so only OPCache restart is needed).
+
+**NEVER run `safe-deploy.sh` WITHOUT `--detach`** — Docker builds can take several minutes and WILL timeout the SSH session, leaving the site stuck in maintenance mode.
+
+**NEVER manually choose `full` for PHP/Laravel code changes** — `auto` will correctly pick `quick`, which is sufficient since PHP files are volume-mounted.
 
 When the user says **"maintenance mode on"**, run:
 ```bash

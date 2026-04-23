@@ -2,14 +2,20 @@
 # =============================================================================
 # Project NEXUS - Safe Production Deploy Script (Orchestrator)
 # =============================================================================
-# Usage: sudo bash scripts/safe-deploy.sh [quick|full|rollback|status|logs] [--migrate] [--detach]
+# Usage: sudo bash scripts/safe-deploy.sh [auto|quick|full|rollback|status|logs] [--migrate] [--detach]
 #
 # Modes:
-#   quick     - Git pull + rebuild frontend + restart all (DEFAULT)
-#   full      - Git pull + rebuild ALL containers (--no-cache)
+#   auto      - AUTO-DETECT: inspects git diff vs origin/main, picks quick or full (RECOMMENDED)
+#   quick     - Git pull + rebuild frontend + restart PHP (use for PHP/React code changes)
+#   full      - Git pull + rebuild ALL containers --no-cache (use for composer/package/Dockerfile changes)
 #   rollback  - Rollback to last successful deploy (full rebuild)
 #   status    - Show current deployment status (no changes)
 #   logs      - Tail the latest deploy log (follow mode: logs -f)
+#
+# Auto-detection triggers full rebuild when any of these change:
+#   composer.json, composer.lock, package.json, package-lock.json,
+#   Dockerfile, Dockerfile.prod, react-frontend/Dockerfile.prod
+#   All other changes → quick (PHP code is volume-mounted, not baked into image)
 #
 # Flags:
 #   --migrate  - Also run `php artisan migrate --force` (Laravel migrations)
@@ -116,6 +122,31 @@ fi
 # Enable maintenance mode before any changes
 run_phase "$DEPLOY_SCRIPTS/phases/maintenance-on.sh"
 
+# Auto-detect mode: fetch origin/main and inspect what changed
+if [ "$MODE" = "auto" ]; then
+    echo "" | tee -a "$LOG_FILE"
+    echo "  Auto-detecting deploy mode..." | tee -a "$LOG_FILE"
+    git fetch origin main --quiet 2>&1 | tee -a "$LOG_FILE"
+    CHANGED=$(git diff HEAD origin/main --name-only 2>/dev/null || echo "")
+    FULL_TRIGGERS="composer.json composer.lock package.json package-lock.json Dockerfile Dockerfile.prod react-frontend/Dockerfile.prod react-frontend/package.json react-frontend/package-lock.json sales-site/package.json sales-site/package-lock.json"
+    NEEDS_FULL=0
+    for trigger in $FULL_TRIGGERS; do
+        if echo "$CHANGED" | grep -qF "$trigger"; then
+            echo "  Trigger: $trigger changed → full rebuild required" | tee -a "$LOG_FILE"
+            NEEDS_FULL=1
+            break
+        fi
+    done
+    if [ "$NEEDS_FULL" = "1" ]; then
+        MODE="full"
+        echo "  Mode selected: FULL (dependency/Dockerfile changes detected)" | tee -a "$LOG_FILE"
+    else
+        MODE="quick"
+        echo "  Mode selected: QUICK (code-only changes, PHP is volume-mounted)" | tee -a "$LOG_FILE"
+    fi
+    echo "" | tee -a "$LOG_FILE"
+fi
+
 # Execute deployment based on mode
 case "$MODE" in
     quick)
@@ -129,7 +160,7 @@ case "$MODE" in
         ;;
     *)
         log_err "Invalid mode: $MODE"
-        log_info "Usage: sudo bash scripts/safe-deploy.sh [quick|full|rollback|status] [--migrate]"
+        log_info "Usage: sudo bash scripts/safe-deploy.sh [auto|quick|full|rollback|status|logs] [--migrate]"
         exit 1
         ;;
 esac
