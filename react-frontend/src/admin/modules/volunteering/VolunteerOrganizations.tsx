@@ -490,7 +490,7 @@ export function VolunteerOrganizations() {
         <SelectItem key="pending">{t('common.pending', 'Pending')}</SelectItem>
       </Select>
     </div>
-  ), [searchQuery, statusFilter);
+  ), [searchQuery, statusFilter]);
 
   if (!loading && items.length === 0) {
     return (
