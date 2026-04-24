@@ -116,8 +116,11 @@ export function OnboardingPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
-  const [bio, setBio] = useState(user?.bio || '');
+  const [bio, setBio] = useState('');
   const [isDraggingOver, setIsDraggingOver] = useState(false);
+
+  // Track whether existing user data has been loaded into wizard state (one-shot)
+  const userDataLoaded = useRef(false);
 
   // Categories loaded from API
   const [categories, setCategories] = useState<Category[]>([]);
@@ -154,15 +157,48 @@ export function OnboardingPage() {
     }
   }, [user?.onboarding_completed, navigate, tenantPath, isComplete]);
 
-  // ── Pre-populate bio from user context if available ──────────────────────
+  // ── Pre-populate all wizard fields from existing user data (one-shot on mount) ──
+  // Fetches /v2/onboarding/status to get existing interests and skills,
+  // and reads bio from the user context. Runs once when user is available.
 
   useEffect(() => {
-    if (user?.bio && !bio) {
+    if (userDataLoaded.current || !user) return;
+    userDataLoaded.current = true;
+
+    // Pre-fill bio from user context immediately (no extra API call needed)
+    if (user.bio) {
       setBio(user.bio);
     }
-    // Only run on mount and when user.bio changes
+
+    // Fetch existing interests/skills to pre-select them in steps 3 & 4
+    api.get<{
+      onboarding_completed: boolean;
+      has_avatar: boolean;
+      has_bio: boolean;
+      interests: Array<{ category_id: number; interest_type: string }>;
+    }>('/v2/onboarding/status').then(response => {
+      if (!mountedRef.current || !response.success || !response.data) return;
+      const interests = response.data.interests ?? [];
+      setSelectedInterests(
+        interests
+          .filter(i => i.interest_type === 'interest')
+          .map(i => i.category_id)
+      );
+      setSkillOffers(
+        interests
+          .filter(i => i.interest_type === 'skill_offer')
+          .map(i => i.category_id)
+      );
+      setSkillNeeds(
+        interests
+          .filter(i => i.interest_type === 'skill_need')
+          .map(i => i.category_id)
+      );
+    }).catch(() => {
+      // Non-fatal: wizard still works, just starts with empty selections
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.bio]);
+  }, [user]);
 
   // ── Move focus to step content on step change (screen reader accessibility) ──
 
