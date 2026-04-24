@@ -18,6 +18,8 @@
   "filter_my": "My Groups",
   "filter_public": "Public",
   "filter_private": "Private",
+  "filters_aria": "Group filters",
+  "active_filters": "Showing",
   "unable_to_load": "Unable to Load Groups",
   "try_again": "Try Again",
   "featured_groups": "Featured Groups",
@@ -30,6 +32,8 @@
   "member_status": "Member",
   "private_title": "Private group",
   "public_title": "Public group",
+  "members_count_label": "{{count}} members",
+  "posts_count_label": "{{count}} posts",
   "detail": {
     "loading": "Loading group...",
     "unable_to_load": "Unable to Load Group",

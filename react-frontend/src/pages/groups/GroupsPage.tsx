@@ -10,11 +10,10 @@
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Select, SelectItem, Avatar, AvatarGroup } from '@heroui/react';
+import { Button, Input, Avatar, AvatarGroup, Tooltip } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import Users from 'lucide-react/icons/users';
 import Plus from 'lucide-react/icons/plus';
-import Filter from 'lucide-react/icons/filter';
 import Lock from 'lucide-react/icons/lock';
 import Globe from 'lucide-react/icons/globe';
 import MessageSquare from 'lucide-react/icons/message-square';
@@ -28,7 +27,7 @@ import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAssetUrl, resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 import type { Group } from '@/types/api';
@@ -59,6 +58,8 @@ export function GroupsPage() {
   const [filter, setFilter] = useState<GroupFilter>('all');
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const nextCursorRef = useRef<string | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Debounce search query
   useEffect(() => {
@@ -77,6 +78,14 @@ export function GroupsPage() {
   }, [searchQuery]);
 
   const loadGroups = useCallback(async (append = false) => {
+    if (!append && abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    if (!append) {
+      abortControllerRef.current = controller;
+    }
+
     try {
       if (!append) {
         setIsLoading(true);
@@ -98,11 +107,12 @@ export function GroupsPage() {
       }
       params.set('per_page', String(ITEMS_PER_PAGE));
       // Cursor-based pagination: only send cursor when loading more pages
-      if (append && cursor) {
-        params.set('cursor', cursor);
+      if (append && nextCursorRef.current) {
+        params.set('cursor', nextCursorRef.current);
       }
 
-      const response = await api.get<Group[]>(`/v2/groups?${params}`);
+      const response = await api.get<Group[]>(`/v2/groups?${params}`, { signal: controller.signal });
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         if (append) {
           setGroups((prev) => [...prev, ...(response.data ?? [])]);
@@ -111,6 +121,7 @@ export function GroupsPage() {
         }
         // Always use server-reported has_more; assume false when meta is absent
         const nextCursor = response.meta?.cursor ?? response.meta?.next_cursor ?? null;
+        nextCursorRef.current = nextCursor;
         setCursor(nextCursor);
         setHasMore(response.meta?.has_more ?? false);
         if (response.meta?.total_items !== undefined) {
@@ -122,6 +133,7 @@ export function GroupsPage() {
         }
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load groups', err);
       if (!append) {
         setError(t('load_error'));
@@ -130,16 +142,24 @@ export function GroupsPage() {
         toast.error(t('load_more_error'));
       }
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     }
-  }, [debouncedQuery, filter, cursor, user?.id, t, toast]);
+  }, [debouncedQuery, filter, user?.id, t, toast]);
 
   // Load groups when filter or debounced query changes; reset cursor for a fresh page-1 fetch
   useEffect(() => {
+    nextCursorRef.current = null;
     setCursor(null);
     loadGroups();
     setHasMore(true);
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [debouncedQuery, filter]); // eslint-disable-line react-hooks/exhaustive-deps -- reset on filter change; loadGroups excluded to avoid loop
 
   // Update URL params
@@ -150,9 +170,28 @@ export function GroupsPage() {
   }, [searchQuery, setSearchParams]);
 
   const loadMoreGroups = useCallback(() => {
-    if (isLoadingMore || !hasMore) return;
+    if (isLoadingMore || !hasMore || !cursor) return;
     loadGroups(true);
-  }, [isLoadingMore, hasMore, loadGroups]);
+  }, [isLoadingMore, hasMore, cursor, loadGroups]);
+
+  function resetSearch() {
+    setSearchQuery('');
+    setDebouncedQuery('');
+  }
+
+  function getFilterLabel(value: GroupFilter) {
+    switch (value) {
+      case 'joined':
+        return t('filter_my');
+      case 'public':
+        return t('filter_public');
+      case 'private':
+        return t('filter_private');
+      case 'all':
+      default:
+        return t('filter_all');
+    }
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -169,24 +208,22 @@ export function GroupsPage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title={t('page_title', { defaultValue: 'Groups' })} description={t('page_description', { defaultValue: 'Browse and join community groups and interest circles.' })} />
+      <PageMeta title={t('page_title')} description={t('page_description')} />
       {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-indigo-600 via-purple-500 to-pink-500 p-6 sm:p-8">
-        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
-        <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+      <div className="relative overflow-hidden rounded-xl border border-theme-default bg-theme-surface p-5 shadow-sm sm:p-6">
         <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                <Users className="w-6 h-6 text-white" aria-hidden="true" />
+              <div className="rounded-lg bg-indigo-500/10 p-2 text-indigo-600 dark:text-indigo-400">
+                <Users className="w-5 h-5" aria-hidden="true" />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('title')}</h1>
+              <h1 className="text-2xl sm:text-3xl font-semibold text-theme-primary">{t('title')}</h1>
             </div>
             <div className="flex items-center gap-3 flex-wrap">
-              <p className="text-white/80 text-sm">{t('subtitle', { defaultValue: 'Browse and join community groups and interest circles.' })}</p>
+              <p className="text-theme-muted text-sm">{t('subtitle')}</p>
               {totalCount != null && !isLoading && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true" />
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-theme-default bg-theme-elevated px-2.5 py-1 text-xs font-medium text-theme-secondary">
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" aria-hidden="true" />
                   {t('count_pill', { count: totalCount.toLocaleString() })}
                 </span>
               )}
@@ -195,7 +232,8 @@ export function GroupsPage() {
           {isAuthenticated && (
             <Link to={tenantPath('/groups/create')}>
               <Button
-                className="bg-white text-indigo-700 font-semibold hover:bg-white/90 shrink-0 shadow-lg"
+                color="primary"
+                className="shrink-0 font-semibold shadow-sm"
                 startContent={<Plus className="w-4 h-4" />}
               >
                 {t('create_group')}
@@ -205,15 +243,64 @@ export function GroupsPage() {
         </div>
       </div>
 
+      {/* Quick Filters */}
+      <div className="flex flex-wrap items-center gap-2" aria-label={t('filters_aria')}>
+        <Button
+          size="sm"
+          variant={filter === 'all' ? 'solid' : 'flat'}
+          color={filter === 'all' ? 'primary' : 'default'}
+          className={filter === 'all' ? 'font-semibold shadow-sm' : 'bg-theme-elevated text-theme-secondary hover:text-indigo-600'}
+          startContent={<Users className="w-3.5 h-3.5" aria-hidden="true" />}
+          onPress={() => setFilter('all')}
+          aria-pressed={filter === 'all'}
+        >
+          {t('filter_all')}
+        </Button>
+        {isAuthenticated && (
+          <Button
+            size="sm"
+            variant={filter === 'joined' ? 'solid' : 'flat'}
+            className={filter === 'joined' ? 'bg-emerald-600 text-white font-semibold shadow-sm' : 'bg-theme-elevated text-theme-secondary hover:text-emerald-600'}
+            startContent={<Star className="w-3.5 h-3.5" aria-hidden="true" />}
+            onPress={() => setFilter('joined')}
+            aria-pressed={filter === 'joined'}
+          >
+            {t('filter_my')}
+          </Button>
+        )}
+        <Button
+          size="sm"
+          variant={filter === 'public' ? 'solid' : 'flat'}
+          className={filter === 'public' ? 'bg-sky-600 text-white font-semibold shadow-sm' : 'bg-theme-elevated text-theme-secondary hover:text-sky-600'}
+          startContent={<Globe className="w-3.5 h-3.5" aria-hidden="true" />}
+          onPress={() => setFilter('public')}
+          aria-pressed={filter === 'public'}
+        >
+          {t('filter_public')}
+        </Button>
+        <Button
+          size="sm"
+          variant={filter === 'private' ? 'solid' : 'flat'}
+          className={filter === 'private' ? 'bg-amber-600 text-white font-semibold shadow-sm' : 'bg-theme-elevated text-theme-secondary hover:text-amber-600'}
+          startContent={<Lock className="w-3.5 h-3.5" aria-hidden="true" />}
+          onPress={() => setFilter('private')}
+          aria-pressed={filter === 'private'}
+        >
+          {t('filter_private')}
+        </Button>
+      </div>
+
       {/* Filters */}
       <GlassCard className="p-4">
-        <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex flex-col gap-3">
           <div className="flex-1">
             <Input
               placeholder={t('search_placeholder')}
               aria-label={t('search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              isClearable
+              onClear={resetSearch}
               startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               classNames={{
                 input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
@@ -221,25 +308,13 @@ export function GroupsPage() {
               }}
             />
           </div>
-
-          <Select
-            placeholder={t('filter_placeholder')}
-            aria-label={t('filter_placeholder')}
-            selectedKeys={[filter]}
-            onChange={(e) => setFilter(e.target.value as GroupFilter)}
-            className="w-full sm:w-40"
-            disallowEmptySelection
-            classNames={{
-              trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-              value: 'text-theme-primary',
-            }}
-            startContent={<Filter className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
-          >
-            <SelectItem key="all">{t('filter_all')}</SelectItem>
-            {isAuthenticated ? <SelectItem key="joined">{t('filter_my')}</SelectItem> : null}
-            <SelectItem key="public">{t('filter_public')}</SelectItem>
-            <SelectItem key="private">{t('filter_private')}</SelectItem>
-          </Select>
+          {(debouncedQuery || filter !== 'all') && (
+            <div className="flex flex-wrap items-center gap-2 text-xs text-theme-muted">
+              <span>{t('active_filters')}</span>
+              {debouncedQuery && <span className="rounded-full bg-theme-elevated px-2 py-1 text-theme-secondary">{debouncedQuery}</span>}
+              {filter !== 'all' && <span className="rounded-full bg-theme-elevated px-2 py-1 text-theme-secondary">{getFilterLabel(filter)}</span>}
+            </div>
+          )}
         </div>
       </GlassCard>
 
@@ -385,76 +460,100 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
   const { t } = useTranslation('groups');
   const { tenantPath } = useTenant();
   const memberCount = group.member_count ?? group.members_count ?? 0;
+  const groupImageSource = group.cover_image_url || group.cover_image || group.image_url;
+  const imageUrl = groupImageSource ? resolveAssetUrl(groupImageSource) : '';
 
   return (
-    <Link to={tenantPath(`/groups/${group.id}`)} aria-label={`${group.name} - ${t('members', { count: memberCount })}`}>
-      <article>
-        <GlassCard className={`p-5 hover:scale-[1.02] transition-transform h-full flex flex-col${featured ? ' ring-1 ring-amber-500/30' : ''}`}>
-          {featured && (
-            <div className="flex items-center gap-1.5 mb-2" role="img" aria-label={t('featured_badge')}>
-              <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" aria-hidden="true" />
-              <span className="text-xs font-medium text-amber-600 dark:text-amber-400" aria-hidden="true">
-                {t('featured_badge')}
-              </span>
-            </div>
-          )}
-          <div className="flex items-start justify-between gap-3 mb-3">
-            <h3 className="font-semibold text-theme-primary text-lg">{group.name}</h3>
-            {group.visibility === 'private' ? (
-              <span className="shrink-0 p-1.5 rounded-full bg-amber-500/20" title={t('private_title')}>
-                <Lock className="w-4 h-4 text-amber-400" aria-hidden="true" />
-              </span>
+    <Link to={tenantPath(`/groups/${group.id}`)} aria-label={`${group.name} - ${t('members', { count: memberCount })}`} className="block h-full">
+      <article className="h-full">
+        <GlassCard className={`overflow-hidden hover:scale-[1.01] transition-transform h-full flex flex-col${featured ? ' ring-1 ring-amber-500/30' : ''}`}>
+          <div className="relative h-24 bg-theme-elevated">
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt=""
+                className="h-full w-full object-cover"
+                loading="lazy"
+              />
             ) : (
-              <span className="shrink-0 p-1.5 rounded-full bg-emerald-500/20" title={t('public_title')}>
-                <Globe className="w-4 h-4 text-emerald-400" aria-hidden="true" />
-              </span>
+              <div className="flex h-full items-center justify-center bg-theme-elevated text-theme-subtle">
+                <Users className="h-8 w-8" aria-hidden="true" />
+              </div>
+            )}
+            <div className="absolute inset-0 bg-linear-to-t from-black/35 to-transparent" aria-hidden="true" />
+            {group.visibility === 'private' ? (
+              <Tooltip content={t('private_title')}>
+                <span className="absolute right-3 top-3 shrink-0 rounded-full bg-black/45 p-1.5 text-white backdrop-blur-sm">
+                  <Lock className="w-4 h-4" aria-hidden="true" />
+                </span>
+              </Tooltip>
+            ) : (
+              <Tooltip content={t('public_title')}>
+                <span className="absolute right-3 top-3 shrink-0 rounded-full bg-black/45 p-1.5 text-white backdrop-blur-sm">
+                  <Globe className="w-4 h-4" aria-hidden="true" />
+                </span>
+              </Tooltip>
             )}
           </div>
-
-          <SafeHtml content={group.description || t('no_description')} className="text-theme-muted text-sm line-clamp-2 flex-1 mb-2" as="p" />
-
-          {/* Tags */}
-          {group.tags && group.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-3">
-              {group.tags.slice(0, MAX_VISIBLE_TAGS).map((tag: { id: number; name: string }) => (
-                <span key={tag.id} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-primary/10 text-primary">
-                  {tag.name}
+          <div className="flex flex-1 flex-col p-5">
+            {featured && (
+              <div className="flex items-center gap-1.5 mb-2" role="img" aria-label={t('featured_badge')}>
+                <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" aria-hidden="true" />
+                <span className="text-xs font-medium text-amber-600 dark:text-amber-400" aria-hidden="true">
+                  {t('featured_badge')}
                 </span>
-              ))}
-              {group.tags.length > MAX_VISIBLE_TAGS && (
-                <span className="text-[10px] text-theme-subtle">+{group.tags.length - MAX_VISIBLE_TAGS}</span>
-              )}
-            </div>
-          )}
+              </div>
+            )}
+            <h3 className="mb-3 line-clamp-2 text-lg font-semibold text-theme-primary">{group.name}</h3>
 
-          {/* Group Stats */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4 text-sm text-theme-subtle">
-              <span className="flex items-center gap-1">
-                <Users className="w-4 h-4" aria-hidden="true" />
-                {memberCount}
-              </span>
-              {group.posts_count !== undefined && (
-                <span className="flex items-center gap-1">
-                  <MessageSquare className="w-4 h-4" aria-hidden="true" />
-                  {group.posts_count}
-                </span>
-              )}
-            </div>
+            <SafeHtml content={group.description || t('no_description')} className="text-theme-muted text-sm line-clamp-2 flex-1 mb-2" as="p" />
 
-            {group.recent_members && group.recent_members.length > 0 && (
-              <AvatarGroup max={3} size="sm">
-                {group.recent_members.map((member) => (
-                  <Avatar
-                    key={member.id}
-                    src={resolveAvatarUrl(member.avatar_url || member.avatar)}
-                    name={member.name || `${member.first_name ?? ''} ${member.last_name ?? ''}`.trim()}
-                    className="ring-2 ring-black/50"
-                  />
+            {/* Tags */}
+            {group.tags && group.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1 mb-3">
+                {group.tags.slice(0, MAX_VISIBLE_TAGS).map((tag: { id: number; name: string }) => (
+                  <span key={tag.id} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-primary/10 text-primary">
+                    {tag.name}
+                  </span>
                 ))}
-              </AvatarGroup>
+                {group.tags.length > MAX_VISIBLE_TAGS && (
+                  <span className="text-[10px] text-theme-subtle">+{group.tags.length - MAX_VISIBLE_TAGS}</span>
+                )}
+              </div>
             )}
-          </div>
+
+            {/* Group Stats */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4 text-sm text-theme-subtle">
+                <Tooltip content={t('members_count_label', { count: memberCount })}>
+                  <span className="flex items-center gap-1" aria-label={t('members_count_label', { count: memberCount })}>
+                    <Users className="w-4 h-4" aria-hidden="true" />
+                    {memberCount}
+                  </span>
+                </Tooltip>
+                {group.posts_count !== undefined && (
+                  <Tooltip content={t('posts_count_label', { count: group.posts_count })}>
+                    <span className="flex items-center gap-1" aria-label={t('posts_count_label', { count: group.posts_count })}>
+                      <MessageSquare className="w-4 h-4" aria-hidden="true" />
+                      {group.posts_count}
+                    </span>
+                  </Tooltip>
+                )}
+              </div>
+
+              {group.recent_members && group.recent_members.length > 0 && (
+                <AvatarGroup max={3} size="sm">
+                  {group.recent_members.map((member) => (
+                    <Avatar
+                      key={member.id}
+                      src={resolveAvatarUrl(member.avatar_url || member.avatar)}
+                      name={member.name || `${member.first_name ?? ''} ${member.last_name ?? ''}`.trim()}
+                      className="ring-2 ring-black/50"
+                    />
+                  ))}
+                </AvatarGroup>
+              )}
+            </div>
 
           {/* Member Status */}
           {(group.is_member || group.viewer_membership?.status === 'active') && (
@@ -464,6 +563,7 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
               </span>
             </div>
           )}
+          </div>
         </GlassCard>
       </article>
     </Link>

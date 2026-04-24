@@ -8,7 +8,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@/test/test-utils';
+import { fireEvent, render, screen, waitFor } from '@/test/test-utils';
+import { api } from '@/lib/api';
 
 vi.mock('@/lib/api', () => ({
   api: {
@@ -25,6 +26,7 @@ vi.mock('@/contexts', () => ({
   })),
   useTenant: vi.fn(() => ({
     tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
+    branding: { name: 'Test Tenant' },
     tenantPath: (p: string) => `/test${p}`,
     hasFeature: vi.fn(() => true),
     hasModule: vi.fn(() => true),
@@ -47,8 +49,10 @@ vi.mock('@/contexts', () => ({
 }));
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
+vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
+  resolveAssetUrl: vi.fn((url) => url || ''),
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
 }));
 vi.mock('@/components/feedback', () => ({
@@ -59,7 +63,10 @@ vi.mock('framer-motion', () => {  const motionProps = new Set(['variants', 'init
 import { GroupsPage } from './GroupsPage';
 
 describe('GroupsPage', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: [], meta: {} });
+  });
 
   it('renders without crashing', () => {
     render(<GroupsPage />);
@@ -74,5 +81,51 @@ describe('GroupsPage', () => {
   it('shows search input', () => {
     render(<GroupsPage />);
     expect(screen.getByPlaceholderText(/Search groups/i)).toBeInTheDocument();
+  });
+
+  it('loads public groups when the public filter is selected', async () => {
+    render(<GroupsPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: /Public/i }));
+
+    await waitFor(() => {
+      expect(api.get).toHaveBeenCalledWith(
+        expect.stringContaining('visibility=public'),
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
+      );
+    });
+    expect(screen.getByText('Showing')).toBeInTheDocument();
+    expect(screen.getAllByText('Public').length).toBeGreaterThan(0);
+  });
+
+  it('renders polished group cards with imagery and accessible stats', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      success: true,
+      data: [
+        {
+          id: 42,
+          name: 'Garden Crew',
+          description: 'A group for growing food together.',
+          image_url: '/uploads/groups/garden.jpg',
+          member_count: 12,
+          members_count: 12,
+          posts_count: 5,
+          visibility: 'public',
+          is_featured: true,
+          tags: [{ id: 1, name: 'Outdoors' }],
+          recent_members: [],
+          created_at: '2026-01-01T00:00:00Z',
+        },
+      ],
+      meta: { has_more: false, total_items: 1 },
+    });
+
+    const { container } = render(<GroupsPage />);
+
+    expect(await screen.findByText('Garden Crew')).toBeInTheDocument();
+    expect(container.querySelector('img')).toHaveAttribute('src', '/uploads/groups/garden.jpg');
+    expect(screen.getByLabelText('12 members')).toBeInTheDocument();
+    expect(screen.getByLabelText('5 posts')).toBeInTheDocument();
+    expect(screen.getByText('Featured')).toBeInTheDocument();
   });
 });
