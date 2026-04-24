@@ -523,15 +523,15 @@ export function DashboardPage() {
                 <div className="relative">
                   <SectionHeader icon={<Sparkles className="w-4 h-4 text-amber-500 dark:text-amber-400" aria-hidden="true" />} iconColor="amber" title={t('sections.suggested_for_you')} linkTo={tenantPath('/listings')} linkText={t('browse_all')} />
                   {suggestedLoading ? (
-                    <div aria-label={t('aria.loading_suggestions')} aria-busy="true" className="grid grid-cols-2 gap-3">
+                    <div aria-label={t('aria.loading_suggestions')} aria-busy="true" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {Array.from({ length: 4 }).map((_, i) => (<Skeleton key={i} className="rounded-lg"><div className="h-24 rounded-lg bg-default-300" /></Skeleton>))}
                     </div>
                   ) : stats.suggestedListings.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {stats.suggestedListings.map((listing) => (
                         <Link key={listing.id} to={tenantPath(`/listings/${listing.id}`)} className="block p-3 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors group" aria-label={`${listing.title} - ${listing.type === 'offer' ? t('listings.offer') : t('listings.request')}`}>
                           <div className="flex items-center gap-2 mb-2">
-                            <Avatar src={resolveAvatarUrl(listing.author_avatar ?? listing.user?.avatar)} name={listing.author_name ?? listing.user?.name ?? 'User'} size="sm" className="w-6 h-6" />
+                            <Avatar src={resolveAvatarUrl(listing.author_avatar ?? listing.user?.avatar)} name={listing.author_name ?? listing.user?.name ?? t('listings.user_fallback')} size="sm" className="w-6 h-6" />
                             <Chip size="sm" variant="flat" color={listing.type === 'offer' ? 'success' : 'warning'} className="text-[10px] h-5">{listing.type === 'offer' ? t('listings.offer') : t('listings.request')}</Chip>
                           </div>
                           <h3 className="text-sm font-medium text-theme-primary line-clamp-2 group-hover:text-[var(--color-primary)] transition-colors">{listing.title}</h3>
