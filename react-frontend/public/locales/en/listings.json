@@ -7,8 +7,10 @@
   "request": "Request",
   "offering": "Offering",
   "requesting": "Requesting",
+  "hours_short": "{{hours}}h",
   "all": "All",
   "empty": "No listings found",
+  "empty_no_listings": "Be the first to share what you can offer or what you need.",
   "create_first": "Create your first listing",
   "filters": {
     "all": "All",
@@ -91,6 +93,7 @@
   "filter_category_label": "Category",
   "filter_all_categories": "All Categories",
   "aria_location": "Location: {{location}}",
+  "aria_hours_estimated": "{{hours}} hours estimated",
   "show_more": "Show more",
   "show_less": "Show less",
   "aria_grid_view": "Grid view",
@@ -180,7 +183,9 @@
   "sort_recommended": "Recommended",
   "sort_newest": "Newest first",
   "reciprocity_mutual": "Mutual match",
+  "reciprocity_mutual_title": "Mutual match - they want what you offer, and offer what you need",
   "reciprocity_one_way": "Match",
+  "reciprocity_one_way_title": "Matches your offer or request",
   "skill_tags": {
     "label": "Skill Tags",
     "placeholder": "Type a skill and press Enter...",

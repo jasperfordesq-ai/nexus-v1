@@ -304,25 +304,23 @@ export function MembersPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageMeta title={t('page_meta.members.title')} description={t('page_meta.members.description')} />
       {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-indigo-600 via-purple-500 to-pink-500 p-6 sm:p-8">
-        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
-        <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+      <div className="relative overflow-hidden rounded-xl border border-theme-default bg-theme-surface p-5 shadow-sm sm:p-6">
         <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                <Users className="w-6 h-6 text-white" aria-hidden="true" />
+              <div className="rounded-lg bg-indigo-500/10 p-2 text-indigo-600 dark:text-indigo-400">
+                <Users className="w-5 h-5" aria-hidden="true" />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('members.title')}</h1>
+              <h1 className="text-2xl sm:text-3xl font-semibold text-theme-primary">{t('members.title')}</h1>
             </div>
             <div className="flex items-center gap-3 flex-wrap">
-              <p className="text-white/80 text-sm">{t('members.subtitle')}</p>
+              <p className="text-theme-muted text-sm">{t('members.subtitle')}</p>
               {totalCount != null && !isLoading && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true" />
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-theme-default bg-theme-elevated px-2.5 py-1 text-xs font-medium text-theme-secondary">
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" aria-hidden="true" />
                   {t('members.showing', { shown: members.length.toLocaleString(), total: totalCount.toLocaleString() })}
                 </span>
               )}
@@ -334,7 +332,8 @@ export function MembersPage() {
           {isAuthenticated && user && (
             <Link to={tenantPath(`/profile/${user.id}`)}>
               <Button
-                className="bg-white text-indigo-700 font-semibold hover:bg-white/90 shrink-0 shadow-lg"
+                color="primary"
+                className="shrink-0 font-semibold shadow-sm"
                 startContent={<UserCircle className="w-4 h-4" />}
               >
                 {t('members.my_profile')}
@@ -732,7 +731,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                 )}
                 <span className="flex items-center gap-1 shrink-0 whitespace-nowrap" aria-label={t('members.hours_exchanged_aria', { count: (member.total_hours_given ?? 0) + (member.total_hours_received ?? 0) })}>
                   <Clock className="w-4 h-4" aria-hidden="true" />
-                  <span>{(member.total_hours_given ?? 0) + (member.total_hours_received ?? 0)}h</span>
+                  <span>{t('members.hours_short', { count: (member.total_hours_given ?? 0) + (member.total_hours_received ?? 0) })}</span>
                 </span>
                 {joinedLabel && (
                   <span className="flex items-center gap-1 shrink-0 whitespace-nowrap text-indigo-500 dark:text-indigo-400">
@@ -816,7 +815,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
               aria-label={t('members.hours_exchanged_aria', { count: (member.total_hours_given ?? 0) + (member.total_hours_received ?? 0) })}
             >
               <Clock className="w-3 h-3" aria-hidden="true" />
-              {(member.total_hours_given ?? 0) + (member.total_hours_received ?? 0)}h
+              {t('members.hours_short', { count: (member.total_hours_given ?? 0) + (member.total_hours_received ?? 0) })}
             </span>
             {sortBy === 'communityrank' && member.community_rank_score != null && (
               <Tooltip content={t('members.community_rank_score_tooltip', 'CommunityRank score')}>

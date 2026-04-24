@@ -272,7 +272,7 @@ export function ListingsPage() {
   useEffect(() => {
     loadListingsRef.current(true);
     return () => { abortRef.current?.abort(); };
-  }, [searchQuery, selectedType, selectedCategory, nearMeEnabled, user?.latitude, user?.longitude, radiusKm, hoursRange, serviceMode, postedWithin]);
+  }, [searchQuery, selectedType, selectedCategory, nearMeEnabled, user?.latitude, user?.longitude, radiusKm, hoursRange, serviceMode, postedWithin, sortMode]);
 
   // Restore scroll position on back-navigation; save on unmount
   useEffect(() => {
@@ -285,7 +285,7 @@ export function ListingsPage() {
     return () => {
       sessionStorage.setItem(key, String(Math.round(window.scrollY)));
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // Sync URL params with filter state (harmless if it re-runs)
   useEffect(() => {
@@ -298,8 +298,9 @@ export function ListingsPage() {
     if (postedWithin !== 'any') params.set('posted', postedWithin);
     if (nearMeEnabled) params.set('near_me', '1');
     if (nearMeEnabled && radiusKm !== 25) params.set('radius', String(radiusKm));
+    if (sortMode !== 'recommended') params.set('sort', sortMode);
     setSearchParams(params, { replace: true });
-  }, [searchInput, selectedType, selectedCategory, hoursRange, serviceMode, postedWithin, nearMeEnabled, radiusKm, setSearchParams]);
+  }, [searchInput, selectedType, selectedCategory, hoursRange, serviceMode, postedWithin, nearMeEnabled, radiusKm, sortMode, setSearchParams]);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -334,10 +335,10 @@ export function ListingsPage() {
     try {
       if (currentlySaved) {
         await api.delete(`/v2/listings/${listingId}/save`);
-        toastRef.current.success(tRef.current('unsaved_success', 'Listing removed from saved'));
+        toastRef.current.success(tRef.current('unsaved_success'));
       } else {
         await api.post(`/v2/listings/${listingId}/save`);
-        toastRef.current.success(tRef.current('saved_success', 'Listing saved'));
+        toastRef.current.success(tRef.current('saved_success'));
       }
     } catch (error) {
       logError('Failed to toggle save listing', error);
@@ -345,7 +346,7 @@ export function ListingsPage() {
       setListings((prev) =>
         prev.map((l) => l.id === listingId ? { ...l, is_favorited: currentlySaved } : l)
       );
-      toastRef.current.error(tRef.current('save_error', 'Failed to update saved listing'));
+      toastRef.current.error(tRef.current('save_error'));
     } finally {
       setSavingIds((prev) => {
         const next = new Set(prev);
@@ -366,25 +367,23 @@ export function ListingsPage() {
         description={t("page_meta_description")}
         keywords={t("page_meta_keywords")}
       />
-      <div className="space-y-6">
+      <div className="space-y-5">
         {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-indigo-600 via-purple-600 to-emerald-500 p-6 sm:p-8">
-        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
-        <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+      <div className="relative overflow-hidden rounded-xl border border-theme-default bg-theme-surface p-5 shadow-sm sm:p-6">
         <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                <ListTodo className="w-6 h-6 text-white" aria-hidden="true" />
+              <div className="rounded-lg bg-emerald-500/10 p-2 text-emerald-600 dark:text-emerald-400">
+                <ListTodo className="w-5 h-5" aria-hidden="true" />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('title')}</h1>
+              <h1 className="text-2xl sm:text-3xl font-semibold text-theme-primary">{t('title')}</h1>
             </div>
             <div className="flex items-center gap-3 flex-wrap">
-              <p className="text-white/80 text-sm">{t('page_subtitle')}</p>
+              <p className="text-theme-muted text-sm">{t('page_subtitle')}</p>
               {totalItems != null && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true" />
-                  {t('results_count', '{{count}} listings found', { count: totalItems })}
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-theme-default bg-theme-elevated px-2.5 py-1 text-xs font-medium text-theme-secondary">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+                  {t('results_count', { count: totalItems })}
                 </span>
               )}
               <AlgorithmLabel area="listings" />
@@ -393,7 +392,8 @@ export function ListingsPage() {
           {isAuthenticated && (
             <Link to={tenantPath('/listings/create')}>
               <Button
-                className="bg-white text-indigo-700 font-semibold hover:bg-white/90 shrink-0 shadow-lg"
+                color="primary"
+                className="shrink-0 font-semibold shadow-sm"
                 startContent={<Plus className="w-4 h-4" />}
               >
                 {t('create')}
@@ -466,7 +466,7 @@ export function ListingsPage() {
 
             {/* Sort order */}
             <Select
-              aria-label={t('sort_label', 'Sort')}
+              aria-label={t('sort_label')}
               selectedKeys={[sortMode]}
               disallowEmptySelection
               onSelectionChange={(keys) => {
@@ -480,8 +480,8 @@ export function ListingsPage() {
               }}
               startContent={<ArrowUpDown className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             >
-              <SelectItem key="recommended">{t('sort_recommended', 'Recommended')}</SelectItem>
-              <SelectItem key="newest">{t('sort_newest', 'Newest first')}</SelectItem>
+              <SelectItem key="recommended">{t('sort_recommended')}</SelectItem>
+              <SelectItem key="newest">{t('sort_newest')}</SelectItem>
             </Select>
 
             {/* Filters toggle */}
@@ -493,9 +493,9 @@ export function ListingsPage() {
               startContent={<SlidersHorizontal className="w-4 h-4" aria-hidden="true" />}
               onPress={() => setShowAdvancedFilters((prev) => !prev)}
               aria-expanded={showAdvancedFilters}
-              aria-label={t('more_filters', 'More filters')}
+              aria-label={t('more_filters')}
             >
-              {t('filters_label', 'Filters')}
+              {t('filters_label')}
               {activeFilterCount > 0 && (
                 <span className="ml-1 inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-xs font-bold">
                   {activeFilterCount}
@@ -503,7 +503,7 @@ export function ListingsPage() {
               )}
             </Button>
 
-            <div className="flex rounded-xl overflow-hidden border border-theme-default" role="group" aria-label={t('aria.view_mode', 'View mode')}>
+            <div className="flex rounded-xl overflow-hidden border border-theme-default" role="group" aria-label={t('aria.view_mode')}>
               <Button
                 isIconOnly
                 variant="light"
@@ -544,8 +544,8 @@ export function ListingsPage() {
         {showAdvancedFilters && (
           <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-3 pt-3 border-t border-theme-default">
             <Select
-              aria-label={t('filter_hours', 'Duration')}
-              placeholder={t('filter_hours', 'Duration')}
+              aria-label={t('filter_hours')}
+              placeholder={t('filter_hours')}
               selectedKeys={[hoursRange]}
               disallowEmptySelection
               onSelectionChange={(keys) => {
@@ -559,16 +559,16 @@ export function ListingsPage() {
               }}
               startContent={<Clock className="w-4 h-4 text-theme-subtle" />}
             >
-              <SelectItem key="any">{t('filter_any_duration', 'Any duration')}</SelectItem>
-              <SelectItem key="quick">{t('filter_quick', 'Quick (under 1h)')}</SelectItem>
-              <SelectItem key="short">{t('filter_short', 'Short (1-3h)')}</SelectItem>
-              <SelectItem key="half_day">{t('filter_half_day', 'Half day (3-6h)')}</SelectItem>
-              <SelectItem key="full_day">{t('filter_full_day', 'Full day (6h+)')}</SelectItem>
+              <SelectItem key="any">{t('filter_any_duration')}</SelectItem>
+              <SelectItem key="quick">{t('filter_quick')}</SelectItem>
+              <SelectItem key="short">{t('filter_short')}</SelectItem>
+              <SelectItem key="half_day">{t('filter_half_day')}</SelectItem>
+              <SelectItem key="full_day">{t('filter_full_day')}</SelectItem>
             </Select>
 
             <Select
-              aria-label={t('filter_service_mode', 'Service mode')}
-              placeholder={t('filter_service_mode', 'Service mode')}
+              aria-label={t('filter_service_mode')}
+              placeholder={t('filter_service_mode')}
               selectedKeys={[serviceMode]}
               disallowEmptySelection
               onSelectionChange={(keys) => {
@@ -582,14 +582,14 @@ export function ListingsPage() {
               }}
               startContent={<MapIcon className="w-4 h-4 text-theme-subtle" />}
             >
-              <SelectItem key="any">{t('filter_any_mode', 'Any mode')}</SelectItem>
-              <SelectItem key="remote">{t('filter_remote', 'Remote available')}</SelectItem>
-              <SelectItem key="in_person">{t('filter_in_person', 'In-person only')}</SelectItem>
+              <SelectItem key="any">{t('filter_any_mode')}</SelectItem>
+              <SelectItem key="remote">{t('filter_remote')}</SelectItem>
+              <SelectItem key="in_person">{t('filter_in_person')}</SelectItem>
             </Select>
 
             <Select
-              aria-label={t('filter_posted_date', 'Posted date')}
-              placeholder={t('filter_posted_date', 'Posted date')}
+              aria-label={t('filter_posted_date')}
+              placeholder={t('filter_posted_date')}
               selectedKeys={[postedWithin]}
               disallowEmptySelection
               onSelectionChange={(keys) => {
@@ -603,10 +603,10 @@ export function ListingsPage() {
               }}
               startContent={<Calendar className="w-4 h-4 text-theme-subtle" />}
             >
-              <SelectItem key="any">{t('filter_any_time', 'Any time')}</SelectItem>
-              <SelectItem key="1">{t('filter_today', 'Today')}</SelectItem>
-              <SelectItem key="7">{t('filter_this_week', 'This week')}</SelectItem>
-              <SelectItem key="30">{t('filter_this_month', 'This month')}</SelectItem>
+              <SelectItem key="any">{t('filter_any_time')}</SelectItem>
+              <SelectItem key="1">{t('filter_today')}</SelectItem>
+              <SelectItem key="7">{t('filter_this_week')}</SelectItem>
+              <SelectItem key="30">{t('filter_this_month')}</SelectItem>
             </Select>
 
             <Button
@@ -617,15 +617,15 @@ export function ListingsPage() {
               startContent={<MapPin className="w-4 h-4" aria-hidden="true" />}
               onPress={handleNearMeToggle}
               aria-pressed={nearMeEnabled}
-              aria-label={t('near_me', 'Near me')}
+              aria-label={t('near_me')}
             >
-              {t('near_me', 'Near me')}
+              {t('near_me')}
             </Button>
 
             {nearMeEnabled && (
               <Select
-                aria-label={t('radius_label', 'Radius')}
-                placeholder={t('radius_label', 'Radius')}
+                aria-label={t('radius_label')}
+                placeholder={t('radius_label')}
                 selectedKeys={[String(radiusKm)]}
                 disallowEmptySelection
                 onSelectionChange={(keys) => {
@@ -657,9 +657,9 @@ export function ListingsPage() {
                   setPostedWithin('any');
                   setNearMeEnabled(false);
                 }}
-                aria-label={t('clear_filters', 'Clear filters')}
+                aria-label={t('clear_filters')}
               >
-                {t('clear_filters', 'Clear filters')}
+                {t('clear_filters')}
               </Button>
             )}
           </div>
@@ -673,7 +673,7 @@ export function ListingsPage() {
       {isLoading && listings.length === 0 ? (
         <div
           className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}
-          aria-label={t('aria.loading_listings', 'Loading listings')}
+          aria-label={t('aria.loading_listings')}
           aria-busy="true"
         >
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -700,7 +700,7 @@ export function ListingsPage() {
             <EmptyState
               icon={<Search className="w-12 h-12" />}
               title={t('empty')}
-              description={hasActiveFilters ? t('empty_subtitle') : t('empty_no_listings', 'Be the first to share what you can offer or what you need.')}
+              description={hasActiveFilters ? t('empty_subtitle') : t('empty_no_listings')}
               action={
                 hasActiveFilters ? (
                   <Button
@@ -763,7 +763,7 @@ export function ListingsPage() {
           ) : (
             <>
               <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
-                {!isLoading && listings.length > 0 ? t('listings_loaded_count', '{{count}} listings loaded', { count: listings.length }) : ''}
+                {!isLoading && listings.length > 0 ? t('listings_loaded_count', { count: listings.length }) : ''}
               </div>
               <motion.div
                 key={`${searchQuery}-${selectedType}-${selectedCategory}-${sortMode}`}
@@ -817,7 +817,7 @@ export function ListingsPage() {
                     : t('load_more')}
                 </Button>
                 {paginationError && (
-                  <p className="text-center text-sm text-danger mt-2">{t('load_more_error_persistent', 'Failed to load more listings. Please try again.')}</p>
+                  <p className="text-center text-sm text-danger mt-2">{t('load_more_error_persistent')}</p>
                 )}
               </div>
             </div>
@@ -851,6 +851,11 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
     }
   }
 
+  function handleSaveContainerClick(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
   const imageUrl = listing.image_url ? resolveAssetUrl(listing.image_url) : null;
 
   if (!isGrid) {
@@ -858,7 +863,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
     return (
       <Link to={tenantPath(`/listings/${listing.id}`)}>
         <GlassCard className={`cursor-pointer p-4 hover:bg-theme-hover hover:shadow-md transition-all duration-200 border-l-4 ${listing.type === 'offer' ? 'border-l-emerald-500/60' : 'border-l-amber-500/60'}`}>
-          <div className="flex items-start gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
             {imageUrl && !imgError ? (
               <img
                 src={imageUrl}
@@ -879,7 +884,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
               />
             )}
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
                   listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
                 }`}>
@@ -888,25 +893,25 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                 {listing.reciprocity_match === 'mutual' && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-600 dark:text-violet-400 font-medium flex items-center gap-0.5">
                     <Zap className="w-2.5 h-2.5" aria-hidden="true" />
-                    {t('reciprocity_mutual', 'Mutual match')}
+                    {t('reciprocity_mutual')}
                   </span>
                 )}
                 {listing.reciprocity_match === 'one_way' && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-sky-500/20 text-sky-600 dark:text-sky-400 font-medium flex items-center gap-0.5">
                     <Zap className="w-2.5 h-2.5" aria-hidden="true" />
-                    {t('reciprocity_one_way', 'Match')}
+                    {t('reciprocity_one_way')}
                   </span>
                 )}
                 {listing.service_type === 'remote_only' && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium flex items-center gap-0.5">
                     <Monitor className="w-2.5 h-2.5" aria-hidden="true" />
-                    {t('service_type_remote', 'Remote')}
+                    {t('service_type_remote')}
                   </span>
                 )}
                 {listing.service_type === 'hybrid' && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-medium flex items-center gap-0.5">
                     <ArrowRightLeft className="w-2.5 h-2.5" aria-hidden="true" />
-                    {t('service_type_hybrid_available', 'Remote Available')}
+                    {t('service_type_hybrid_available')}
                   </span>
                 )}
                 {listing.category_name && (
@@ -918,11 +923,11 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
               <h3 className="font-semibold text-theme-primary truncate">{listing.title}</h3>
               <p className="text-theme-muted text-sm line-clamp-1 mt-0.5">{listing.description}</p>
             </div>
-            <div className="flex flex-col items-end gap-1 text-xs text-theme-subtle shrink-0">
+            <div className="flex flex-row items-center justify-between gap-3 text-xs text-theme-subtle sm:flex-col sm:items-end sm:justify-start sm:gap-1 sm:shrink-0">
               {hours && (
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3" aria-hidden="true" />
-                  {hours}h
+                  {t('hours_short', { hours })}
                 </span>
               )}
               {listing.location && (
@@ -932,20 +937,22 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                 </span>
               )}
               {onToggleSave && (
-                <Button
-                  isIconOnly
-                  size="sm"
-                  variant="flat"
-                  onPress={handleSaveClick}
-                  isDisabled={isSaving}
-                  aria-label={isFavorited ? t('unsave_listing', 'Unsave listing') : t('save_listing', 'Save listing')}
-                  className="p-1 rounded transition-colors hover:bg-theme-hover min-w-[44px] min-h-[44px]"
-                >
-                  <Heart
-                    className={`w-4 h-4 transition-colors ${isFavorited ? 'fill-rose-500 text-rose-500' : 'text-theme-muted hover:text-rose-400'}`}
-                    aria-hidden="true"
-                  />
-                </Button>
+                <span onClick={handleSaveContainerClick}>
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    variant="flat"
+                    onPress={handleSaveClick}
+                    isDisabled={isSaving}
+                    aria-label={isFavorited ? t('unsave_listing') : t('save_listing')}
+                    className="p-1 rounded transition-colors hover:bg-theme-hover min-w-[44px] min-h-[44px]"
+                  >
+                    <Heart
+                      className={`w-4 h-4 transition-colors ${isFavorited ? 'fill-rose-500 text-rose-500' : 'text-theme-muted hover:text-rose-400'}`}
+                      aria-hidden="true"
+                    />
+                  </Button>
+                </span>
               )}
             </div>
           </div>
@@ -957,14 +964,14 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
   // ─── Grid View ───
   return (
     <Link to={tenantPath(`/listings/${listing.id}`)} className="group">
-      <GlassCard className="cursor-pointer hover:scale-[1.02] hover:shadow-lg hover:shadow-indigo-500/10 transition-all duration-200 h-full flex flex-col overflow-hidden">
+      <GlassCard className="cursor-pointer hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 h-full flex flex-col overflow-hidden">
         {/* Listing Image with hover overlay and floating save button */}
-        <div className="relative overflow-hidden">
+        <div className="relative aspect-video overflow-hidden bg-theme-elevated">
           {imageUrl && !imgError ? (
             <img
               src={imageUrl}
               alt={listing.title || 'Listing image'}
-              className="w-full h-36 object-cover transition-transform duration-300 group-hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               width={800}
               height={450}
               loading="lazy"
@@ -978,13 +985,13 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 pointer-events-none" aria-hidden="true" />
           {/* Floating save button */}
           {onToggleSave && (
-            <div className="absolute top-2 right-2">
+            <div className="absolute top-2 right-2" onClick={handleSaveContainerClick}>
               <Button
                 isIconOnly
                 size="sm"
                 onPress={handleSaveClick}
                 isDisabled={isSaving}
-                aria-label={isFavorited ? t('unsave_listing', 'Unsave listing') : t('save_listing', 'Save listing')}
+                aria-label={isFavorited ? t('unsave_listing') : t('save_listing')}
                 className={`min-w-[36px] min-h-[36px] rounded-full backdrop-blur-sm shadow-lg transition-all ${
                   isFavorited
                     ? 'bg-rose-500/90 text-white hover:bg-rose-600'
@@ -1000,10 +1007,10 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
           )}
         </div>
 
-        <div className="p-5 flex flex-col flex-1">
+        <div className="p-4 flex flex-col flex-1">
         {/* Type + Category Badges */}
-        <div className="flex items-center gap-2 mb-3 flex-wrap">
-          <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+        <div className="flex items-center gap-1.5 mb-3 flex-wrap">
+          <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
             listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
           }`}>
             {listing.type === 'offer' ? t('offering') : t('requesting')}
@@ -1012,35 +1019,35 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
           {listing.reciprocity_match === 'mutual' && (
             <span
               className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-600 dark:text-violet-400 font-medium flex items-center gap-0.5"
-              title={t('reciprocity_mutual', 'Mutual match — they want what you offer, and offer what you need')}
+              title={t('reciprocity_mutual_title')}
             >
               <Zap className="w-2.5 h-2.5" aria-hidden="true" />
-              {t('reciprocity_mutual', 'Mutual match')}
+              {t('reciprocity_mutual')}
             </span>
           )}
           {listing.reciprocity_match === 'one_way' && (
             <span
               className="text-[10px] px-1.5 py-0.5 rounded-full bg-sky-500/20 text-sky-600 dark:text-sky-400 font-medium flex items-center gap-0.5"
-              title={t('reciprocity_one_way', 'Matches your offer or request')}
+              title={t('reciprocity_one_way_title')}
             >
               <Zap className="w-2.5 h-2.5" aria-hidden="true" />
-              {t('reciprocity_one_way', 'Match')}
+              {t('reciprocity_one_way')}
             </span>
           )}
           {listing.service_type === 'remote_only' && (
             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium flex items-center gap-0.5">
               <Monitor className="w-2.5 h-2.5" aria-hidden="true" />
-              {t('service_type_remote', 'Remote')}
+              {t('service_type_remote')}
             </span>
           )}
           {listing.service_type === 'hybrid' && (
             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-medium flex items-center gap-0.5">
               <ArrowRightLeft className="w-2.5 h-2.5" aria-hidden="true" />
-              {t('service_type_hybrid_available', 'Remote Available')}
+              {t('service_type_hybrid_available')}
             </span>
           )}
           {listing.category_name && (
-            <span className="text-xs px-2 py-1 rounded-full bg-theme-hover text-theme-muted">
+            <span className="text-[11px] px-2 py-0.5 rounded-full bg-theme-hover text-theme-muted">
               {listing.category_name}
             </span>
           )}
@@ -1069,13 +1076,13 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
           </div>
           <div className="flex items-center gap-2 text-xs text-theme-subtle min-w-0 overflow-hidden">
             {hours && (
-              <span className="flex items-center gap-1 shrink-0" aria-label={t('aria_hours_estimated', '{{hours}} hours estimated', { hours })}>
+              <span className="flex items-center gap-1 shrink-0" aria-label={t('aria_hours_estimated', { hours })}>
                 <Clock className="w-3 h-3" aria-hidden="true" />
-                {hours}h
+                {t('hours_short', { hours })}
               </span>
             )}
             {listing.location && (
-              <span className="flex items-center gap-1 min-w-0" aria-label={t('aria_location', 'Location: {{location}}', { location: listing.location })}>
+              <span className="flex items-center gap-1 min-w-0" aria-label={t('aria_location', { location: listing.location })}>
                 <MapPin className="w-3 h-3 shrink-0" aria-hidden="true" />
                 <span className="truncate">{listing.location}</span>
               </span>
