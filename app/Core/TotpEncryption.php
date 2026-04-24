@@ -27,20 +27,24 @@ class TotpEncryption
      *
      * Uses SHA-256 hash of the raw APP_KEY value (including any "base64:" prefix)
      * to ensure a consistent 32-byte key. This matches the original implementation
-     * — do NOT strip the base64: prefix or existing encrypted secrets will break.
+     * Strips the "base64:" prefix before hashing so that adding or removing the
+     * prefix in APP_KEY does not change the derived encryption key and break
+     * existing stored secrets.
      */
     private static function getKey(): string
     {
-        // Use config() which reads from Laravel's config/app.php
-        // Note: config('app.key') returns the raw string (e.g. "base64:ABC...")
-        // We must hash the raw string to stay compatible with existing data.
         $key = config('app.key', '');
 
         if (empty($key)) {
             throw new \RuntimeException('APP_KEY is not set — cannot encrypt/decrypt TOTP secrets.');
         }
 
-        // SHA-256 hash ensures consistent 32-byte key
+        // Strip the "base64:" prefix Laravel adds — we hash the raw base64 string
+        // so that the derived key is stable regardless of whether the prefix is present.
+        if (str_starts_with($key, 'base64:')) {
+            $key = substr($key, 7);
+        }
+
         return hash('sha256', $key, true);
     }
 
