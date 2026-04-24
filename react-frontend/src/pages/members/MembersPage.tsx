@@ -21,6 +21,7 @@ import Filter from 'lucide-react/icons/filter';
 import Grid from 'lucide-react/icons/grid-3x3';
 import List from 'lucide-react/icons/list';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
+import X from 'lucide-react/icons/x';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Sparkles from 'lucide-react/icons/sparkles';
 import TrendingUp from 'lucide-react/icons/trending-up';
@@ -303,6 +304,11 @@ export function MembersPage() {
     setNearMeEnabled(true);
   }
 
+  function resetSearch() {
+    setSearchQuery('');
+    setDebouncedQuery('');
+  }
+
   return (
     <div className="space-y-5">
       <PageMeta title={t('page_meta.members.title')} description={t('page_meta.members.description')} />
@@ -344,13 +350,13 @@ export function MembersPage() {
       </div>
 
       {/* Quick Filters */}
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2" aria-label={t('members.quick_filters')}>
         <Button
           size="sm"
           variant={quickFilter === 'all' ? 'solid' : 'flat'}
           className={
             quickFilter === 'all'
-              ? 'bg-linear-to-r from-indigo-500 to-purple-600 text-white'
+              ? 'bg-indigo-600 text-white shadow-sm'
               : 'bg-theme-elevated text-theme-secondary hover:text-indigo-500 hover:bg-indigo-500/5 transition-colors'
           }
           isDisabled={isNearbyMode}
@@ -365,7 +371,7 @@ export function MembersPage() {
           variant={quickFilter === 'new' ? 'solid' : 'flat'}
           className={
             quickFilter === 'new'
-              ? 'bg-linear-to-r from-indigo-500 to-purple-600 text-white'
+              ? 'bg-emerald-600 text-white shadow-sm'
               : 'bg-theme-elevated text-theme-secondary hover:text-emerald-500 hover:bg-emerald-500/5 transition-colors'
           }
           isDisabled={isNearbyMode}
@@ -380,7 +386,7 @@ export function MembersPage() {
           variant={quickFilter === 'active' ? 'solid' : 'flat'}
           className={
             quickFilter === 'active'
-              ? 'bg-linear-to-r from-indigo-500 to-purple-600 text-white'
+              ? 'bg-amber-600 text-white shadow-sm'
               : 'bg-theme-elevated text-theme-secondary hover:text-amber-500 hover:bg-amber-500/5 transition-colors'
           }
           isDisabled={isNearbyMode}
@@ -394,12 +400,14 @@ export function MembersPage() {
 
       {/* Search & Sort Filters */}
       <GlassCard className="p-4">
-        <div className="flex flex-col lg:flex-row gap-4">
-          <div className="flex-1">
+        <div className="flex flex-col gap-4 xl:flex-row">
+          <div className="min-w-0 flex-1">
             <Input
               placeholder={t('members.search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              isClearable
+              onClear={resetSearch}
               startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               aria-label={t('members.search_placeholder')}
               classNames={{
@@ -409,7 +417,7 @@ export function MembersPage() {
             />
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap xl:flex-nowrap">
             <Select
               placeholder={t('members.sort_by')}
               selectedKeys={activeSortBy ? [activeSortBy] : []}
@@ -437,8 +445,8 @@ export function MembersPage() {
               size="sm"
               variant={nearMeEnabled ? 'solid' : 'flat'}
               className={nearMeEnabled
-                ? 'bg-primary text-white'
-                : 'bg-theme-elevated text-theme-primary'}
+                ? 'bg-emerald-600 text-white shadow-sm'
+                : 'bg-theme-elevated text-theme-primary hover:bg-emerald-500/10 hover:text-emerald-600'}
               startContent={<MapPin className="w-4 h-4" aria-hidden="true" />}
               onPress={handleNearMeToggle}
               aria-pressed={nearMeEnabled}
@@ -470,13 +478,13 @@ export function MembersPage() {
               </Select>
             )}
 
-            <div className="flex rounded-xl overflow-hidden border border-theme-default" role="group" aria-label={t('aria.view_mode', 'View mode')}>
+            <div className="flex w-fit rounded-xl overflow-hidden border border-theme-default" role="group" aria-label={t('aria.view_mode')}>
               <Button
                 isIconOnly
                 size="sm"
                 variant="light"
                 className={`rounded-none transition-colors ${viewMode === 'grid' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
-                aria-label={t('aria.grid_view', 'Grid view')}
+                aria-label={t('aria.grid_view')}
                 aria-pressed={viewMode === 'grid'}
                 onPress={() => setViewMode('grid')}
               >
@@ -487,7 +495,7 @@ export function MembersPage() {
                 size="sm"
                 variant="light"
                 className={`rounded-none transition-colors ${viewMode === 'list' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
-                aria-label={t('aria.list_view', 'List view')}
+                aria-label={t('aria.list_view')}
                 aria-pressed={viewMode === 'list'}
                 onPress={() => setViewMode('list')}
               >
@@ -499,7 +507,7 @@ export function MembersPage() {
                   size="sm"
                   variant="light"
                   className={`rounded-none rounded-r-xl transition-colors ${viewMode === 'map' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
-                  aria-label={t('aria.map_view', 'Map view')}
+                  aria-label={t('aria.map_view')}
                   aria-pressed={viewMode === 'map'}
                   onPress={() => setViewMode('map')}
                 >
@@ -509,6 +517,34 @@ export function MembersPage() {
             </div>
           </div>
         </div>
+        {(debouncedQuery || nearMeEnabled) && (
+          <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-theme-default pt-3">
+            <span className="text-xs font-medium uppercase tracking-wide text-theme-subtle">{t('members.applied_filters')}</span>
+            {debouncedQuery && (
+              <Chip
+                variant="flat"
+                className="bg-theme-elevated text-theme-secondary"
+                endContent={
+                  <button
+                    type="button"
+                    className="ml-1 rounded-full p-0.5 text-theme-subtle transition-colors hover:bg-theme-hover hover:text-theme-primary"
+                    onClick={resetSearch}
+                    aria-label={t('members.clear_search')}
+                  >
+                    <X className="h-3 w-3" aria-hidden="true" />
+                  </button>
+                }
+              >
+                {t('members.search_filter', { query: debouncedQuery })}
+              </Chip>
+            )}
+            {nearMeEnabled && (
+              <Chip variant="flat" className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
+                {t('members.nearby_filter', { radius: radiusKm })}
+              </Chip>
+            )}
+          </div>
+        )}
       </GlassCard>
 
       {/* Error State */}
@@ -541,14 +577,32 @@ export function MembersPage() {
               icon={<Users className="w-12 h-12" />}
               title={t('members.no_members')}
               description={debouncedQuery ? t('members.no_members_search') : t('members.no_members_community')}
+              action={debouncedQuery ? (
+                <Button variant="bordered" onPress={resetSearch} startContent={<X className="h-4 w-4" aria-hidden="true" />}>
+                  {t('members.clear_search')}
+                </Button>
+              ) : undefined}
             />
           ) : (
             <>
               {/* Results count with search context */}
-              {debouncedQuery && totalCount !== null && (
-                <p className="text-sm text-theme-muted">
-                  {t('members.results_matching', { shown: members.length.toLocaleString(), total: totalCount.toLocaleString(), query: debouncedQuery })}
-                </p>
+              {(debouncedQuery || totalCount !== null) && (
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  {debouncedQuery && totalCount !== null ? (
+                    <p className="text-sm text-theme-muted">
+                      {t('members.results_matching', { shown: members.length.toLocaleString(), total: totalCount.toLocaleString(), query: debouncedQuery })}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-theme-muted">
+                      {t('members.results_count', { count: members.length.toLocaleString() })}
+                    </p>
+                  )}
+                  {debouncedQuery && (
+                    <Button size="sm" variant="light" className="text-theme-muted" onPress={resetSearch} startContent={<X className="h-3.5 w-3.5" aria-hidden="true" />}>
+                      {t('members.clear_search')}
+                    </Button>
+                  )}
+                </div>
               )}
 
               {viewMode === 'map' ? (
@@ -671,15 +725,15 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
 
   // Distance label for nearby mode
   const distanceLabel = member.distance != null
-    ? `${Number(member.distance).toFixed(1)} km`
+    ? t('members.distance_km', { distance: Number(member.distance).toFixed(1) })
     : null;
 
   if (viewMode === 'list') {
     return (
-      <Link to={tenantPath(`/profile/${member.id}`)} aria-label={`${displayName}'s profile`}>
+      <Link to={tenantPath(`/profile/${member.id}`)} aria-label={t('members.profile_aria', { name: displayName })}>
         <article>
           <GlassCard className="p-4 hover:bg-theme-hover hover:shadow-md hover:shadow-indigo-500/5 border-l-4 border-l-indigo-500/20 hover:border-l-indigo-500/50 transition-all duration-200">
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <div className="relative inline-block">
                 <Avatar
                   src={avatarSrc}
@@ -690,11 +744,11 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                 <PresenceIndicator userId={member.id} size="md" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <h3 className="font-semibold text-theme-primary">{displayName}</h3>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <h3 className="truncate font-semibold text-theme-primary">{displayName}</h3>
                   {member.is_verified && (
-                    <Tooltip content={t('members.verified_member', 'Verified member')}>
-                      <BadgeCheck className="w-4 h-4 text-teal-500 shrink-0" aria-label={t('members.verified_member', 'Verified member')} />
+                    <Tooltip content={t('members.verified_member')}>
+                      <BadgeCheck className="w-4 h-4 text-teal-500 shrink-0" aria-label={t('members.verified_member')} />
                     </Tooltip>
                   )}
                   {hasGamification && level > 0 && (
@@ -713,14 +767,14 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                   )}
                 </div>
                 {member.tagline && (
-                  <p className="text-sm text-theme-subtle truncate">{member.tagline}</p>
+                  <p className="mt-0.5 line-clamp-2 text-sm text-theme-subtle sm:truncate">{member.tagline}</p>
                 )}
               </div>
-              <div className="flex items-center gap-3 sm:gap-6 text-sm text-theme-subtle">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-theme-subtle sm:justify-end">
                 {member.location && (
-                  <span className="flex items-center gap-1">
+                  <span className="flex min-w-0 items-center gap-1">
                     <MapPin className="w-4 h-4" aria-hidden="true" />
-                    <span>{member.location}</span>
+                    <span className="truncate">{member.location}</span>
                   </span>
                 )}
                 {member.rating != null && (
@@ -762,9 +816,9 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
   }
 
   return (
-    <Link to={tenantPath(`/profile/${member.id}`)} aria-label={`${displayName}'s profile`} className="group">
+      <Link to={tenantPath(`/profile/${member.id}`)} aria-label={t('members.profile_aria', { name: displayName })} className="group h-full">
       <article>
-        <GlassCard className="p-5 hover:scale-[1.03] hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-200 text-center">
+        <GlassCard className="flex h-full min-h-[272px] flex-col p-5 text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/10">
           <div className="relative inline-block mx-auto mb-3">
             <Avatar
               src={avatarSrc}
@@ -796,7 +850,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
             </div>
           )}
           {member.tagline && (
-            <p className="text-sm text-theme-subtle line-clamp-1 mt-1">{member.tagline}</p>
+            <p className="mx-auto mt-1 min-h-5 max-w-full text-sm text-theme-subtle line-clamp-1">{member.tagline}</p>
           )}
 
           {/* Stat chips */}
@@ -828,9 +882,13 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
           </div>
 
           {(member.location || distanceLabel) && (
-            <p className="text-xs text-theme-subtle mt-2 flex items-center justify-center gap-1">
+            <p className="mt-2 flex items-center justify-center gap-1 text-xs text-theme-subtle">
               <MapPin className="w-3 h-3" aria-hidden="true" />
-              <span>{distanceLabel ? `${member.location ? member.location + ' · ' : ''}${distanceLabel}` : member.location}</span>
+              <span className="truncate">
+                {distanceLabel && member.location
+                  ? t('members.location_distance', { location: member.location, distance: distanceLabel })
+                  : distanceLabel || member.location}
+              </span>
             </p>
           )}
 
