@@ -109,7 +109,8 @@
   "card": {
     "cancelled": "Cancelado",
     "spots_left": "{{count}} plazas disponibles",
-    "full": "Completo"
+    "full": "Completo",
+    "open_aria": "{{title}} on {{date}}"
   },
   "form": {
     "create_title": "Crear Nuevo Evento",
@@ -253,5 +254,9 @@
   "radius_100": "100 km",
   "nearby_error": "Unable to load nearby events",
   "count_pill": "{{count}} eventos",
-  "load_more_count": "Cargar más ({{remaining}} restantes)"
+  "load_more_count": "Cargar más ({{remaining}} restantes)",
+  "active_filters": "Active filters",
+  "active_search": "Search: {{query}}",
+  "active_near_me": "Within {{radius}} km",
+  "clear_filters": "Clear filters"
 }

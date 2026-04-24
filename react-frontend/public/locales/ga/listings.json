@@ -271,5 +271,10 @@
   "service_type_hybrid_available": "Remote Available",
   "service_type_remote": "Remote",
   "community_member": "Community Member",
-  "comments_error": "Comments could not be loaded."
+  "comments_error": "Comments could not be loaded.",
+  "hours_short": "{{hours}}h",
+  "empty_no_listings": "Be the first to share what you can offer or what you need.",
+  "aria_hours_estimated": "{{hours}} hours estimated",
+  "reciprocity_mutual_title": "Mutual match - they want what you offer, and offer what you need",
+  "reciprocity_one_way_title": "Matches your offer or request"
 }

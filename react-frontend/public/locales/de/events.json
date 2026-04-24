@@ -109,7 +109,8 @@
   "card": {
     "cancelled": "Abgesagt",
     "spots_left": "{{count}} Plätze frei",
-    "full": "Ausgebucht"
+    "full": "Ausgebucht",
+    "open_aria": "{{title}} on {{date}}"
   },
   "form": {
     "create_title": "Neue Veranstaltung erstellen",
@@ -253,5 +254,9 @@
   "radius_100": "100 km",
   "nearby_error": "Unable to load nearby events",
   "count_pill": "{{count}} Veranstaltungen",
-  "load_more_count": "Mehr laden ({{remaining}} verbleibend)"
+  "load_more_count": "Mehr laden ({{remaining}} verbleibend)",
+  "active_filters": "Active filters",
+  "active_search": "Search: {{query}}",
+  "active_near_me": "Within {{radius}} km",
+  "clear_filters": "Clear filters"
 }

@@ -106,7 +106,8 @@
   "card": {
     "cancelled": "Cancelled",
     "spots_left": "{{count}} spots left",
-    "full": "Full"
+    "full": "Full",
+    "open_aria": "{{title}} on {{date}}"
   },
   "form": {
     "create_title": "Create New Event",
@@ -253,5 +254,9 @@
   "radius_100": "100 km",
   "nearby_error": "Unable to load nearby events",
   "count_pill": "{{count}} 件のイベント",
-  "load_more_count": "さらに読み込む (残り {{remaining}} 件)"
+  "load_more_count": "さらに読み込む (残り {{remaining}} 件)",
+  "active_filters": "Active filters",
+  "active_search": "Search: {{query}}",
+  "active_near_me": "Within {{radius}} km",
+  "clear_filters": "Clear filters"
 }

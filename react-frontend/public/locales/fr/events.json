@@ -109,7 +109,8 @@
   "card": {
     "cancelled": "Annulé",
     "spots_left": "{{count}} places restantes",
-    "full": "Complet"
+    "full": "Complet",
+    "open_aria": "{{title}} on {{date}}"
   },
   "form": {
     "create_title": "Créer un nouvel événement",
@@ -253,5 +254,9 @@
   "radius_100": "100 km",
   "nearby_error": "Unable to load nearby events",
   "count_pill": "{{count}} événements",
-  "load_more_count": "Charger plus ({{remaining}} restants)"
+  "load_more_count": "Charger plus ({{remaining}} restants)",
+  "active_filters": "Active filters",
+  "active_search": "Search: {{query}}",
+  "active_near_me": "Within {{radius}} km",
+  "clear_filters": "Clear filters"
 }

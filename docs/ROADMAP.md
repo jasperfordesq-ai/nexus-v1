@@ -39,7 +39,7 @@ Deployed 2026-04-08. Stops the bleeding while the architectural fix is planned.
 | SEO5 | robots.txt Sitemap directive fix | ✅ Done | nginx `sub_filter` rewrites `app.project-nexus.ie` → `$host` so each custom domain references its own sitemap. |
 | SEO6 | Sitemap API domain URL fix | ✅ Done | `SitemapController` case 3 uses `generateForAppDomain()` instead of generating URLs with the API domain. |
 | SEO7 | Group lastmod dates | ✅ Done | `SitemapService` uses `COALESCE(updated_at, created_at)` instead of `created_at`. 431 groups had stale Dec 2025 dates. |
-| SEO8 | Auto-recache after deploy | ✅ Done | `scripts/recache-prerender.sh` (2-phase: static + sitemap URLs). Integrated into `safe-deploy.sh`. |
+| SEO8 | Auto-recache after deploy | ✅ Done | Self-hosted prerendering via `scripts/prerender-tenants.sh` + `scripts/prerender-worker.mjs` (Playwright). Prerender.io retired; `recache-prerender.sh` deleted. |
 | SEO9 | Cloudflare robots.txt injection | ✅ Done | Disabled Cloudflare AI bot control robots.txt modification across all 8 zones. Was creating duplicate `User-agent: *` groups. |
 
 ### Phase B — Build-Time Static Pre-Rendering (Partially Done)
@@ -49,7 +49,7 @@ Interim solution: pre-render public pages at build time so nginx serves real HTM
 | # | Item | Status | Priority | Notes |
 |---|------|--------|----------|-------|
 | SEO10 | Playwright pre-render script | ⚙️ In Progress | Critical | `react-frontend/scripts/prerender.mjs` + `scripts/prerender-worker.mjs` exist and cover ~19 static public routes. Not yet wired as a `postbuild` step in `react-frontend/package.json` — currently invoked separately. |
-| SEO11 | Dynamic route pre-rendering | 📋 Planned | Critical | Blog posts, listings, groups fetched from sitemap at build time and pre-rendered. Prerender.io fallback still used at runtime (see memory: `recache-prerender.sh` integrated into safe-deploy). |
+| SEO11 | Dynamic route pre-rendering | 📋 Planned | Critical | Blog posts, listings, groups fetched from sitemap at build time and pre-rendered. Self-hosted Playwright prerender (no Prerender.io). |
 | SEO12 | Structured data on listings | 📋 Planned | High | Product/Service JSON-LD schema on `ListingDetailPage`. Enables rich snippets. |
 | SEO13 | Article schema completion | 📋 Planned | High | Blog posts: add `dateModified`, `description`, `author.url` to Article JSON-LD. |
 | SEO14 | Homepage internal linking | 📋 Planned | High | Add discoverable links to blog, listings, events, groups in `LandingPageRenderer` for crawlers. |

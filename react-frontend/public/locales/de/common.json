@@ -274,7 +274,17 @@
     "rating_aria": "Rating: {{rating}} out of 5",
     "hours_exchanged_aria": "{{count}} hours exchanged",
     "my_profile": "Mein Profil",
-    "load_more_count": "Mehr laden ({{remaining}} verbleibend)"
+    "load_more_count": "Mehr laden ({{remaining}} verbleibend)",
+    "quick_filters": "Member filters",
+    "applied_filters": "Active filters",
+    "search_filter": "Search: {{query}}",
+    "nearby_filter": "Within {{radius}} km",
+    "clear_search": "Clear search",
+    "results_count": "{{count}} members shown",
+    "profile_aria": "View {{name}}'s profile",
+    "distance_km": "{{distance}} km",
+    "location_distance": "{{location}} · {{distance}}",
+    "hours_short": "{{count}}h"
   },
   "update_banner": {
     "message": "Eine neue Version ist verfügbar.",

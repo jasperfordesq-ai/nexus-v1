@@ -30,7 +30,10 @@
     "blogs": "Blog",
     "discussions": "Discussions",
     "following": "Following",
-    "saved": "Saved"
+    "saved": "Saved",
+    "clear": "Clear feed filters",
+    "more": "More",
+    "select": "Select feed filter"
   },
   "report": {
     "title": "Zgłoś post",
