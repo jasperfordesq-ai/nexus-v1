@@ -3,6 +3,7 @@
   "page_description": "Explore listings, events, groups, and opportunities across the community.",
   "heading": "Discover",
   "subtitle": "Find skills, events, groups, and more in your community",
+  "see_all": "See All",
   "search_placeholder": "Discover skills, events, groups...",
   "stats": {
     "members": "Members",
@@ -53,7 +54,8 @@
     "title": "Featured Challenges",
     "subtitle": "Share your ideas and make an impact",
     "ideas_count": "{{count}} ideas",
-    "ends": "Ends {{date}}"
+    "ends": "Ends {{date}}",
+    "progress": "Challenge progress"
   },
   "time_ago": {
     "just_now": "Just now",

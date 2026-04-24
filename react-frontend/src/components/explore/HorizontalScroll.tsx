@@ -81,8 +81,7 @@ export function HorizontalScroll({ children, className = '' }: HorizontalScrollP
       {/* Scrollable area */}
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-hide pb-2 -mb-2"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        className="flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-hide [scrollbar-width:none] [-ms-overflow-style:none] pb-2 -mb-2"
       >
         {children}
       </div>

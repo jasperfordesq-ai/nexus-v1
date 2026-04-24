@@ -16,6 +16,7 @@ import {
   Skeleton,
   Tabs,
   Tab,
+  Progress,
 } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import Users from 'lucide-react/icons/users';
@@ -385,13 +386,20 @@ export default function ExplorePage() {
   const { tenantPath, hasFeature } = useTenant();
   const { isAuthenticated } = useAuth();
   const hasConnections = hasFeature('connections');
+  const hasEvents = hasFeature('events');
+  const hasGroups = hasFeature('groups');
   const [searchQuery, setSearchQuery] = useState('');
 
   // ── Tab navigation (persisted in URL ?tab=...) ──────────────────────────
   const [searchParams, setSearchParams] = useSearchParams();
   const tabFromUrl = searchParams.get('tab');
   const requestedTab: ExploreTab = isValidTab(tabFromUrl) ? tabFromUrl : 'all';
-  const activeTab: ExploreTab = !hasConnections && requestedTab === 'people' ? 'all' : requestedTab;
+  const activeTab: ExploreTab =
+    (!hasConnections && requestedTab === 'people') ||
+    (!hasEvents && requestedTab === 'events') ||
+    (!hasGroups && requestedTab === 'groups')
+      ? 'all'
+      : requestedTab;
 
   const handleTabChange = useCallback((key: React.Key) => {
     const newTab = String(key) as ExploreTab;
@@ -519,6 +527,19 @@ export default function ExplorePage() {
     });
   };
 
+  const getChallengeProgress = (startDate: string, endDate: string) => {
+    const start = new Date(startDate).getTime();
+    const end = new Date(endDate).getTime();
+    const now = Date.now();
+
+    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) {
+      return 100;
+    }
+
+    const elapsedRatio = ((now - start) / (end - start)) * 100;
+    return Math.min(100, Math.max(5, elapsedRatio));
+  };
+
   // Memoize time-ago for trending posts
   const timeAgo = useCallback((dateStr: string) => {
     const now = new Date();
@@ -534,7 +555,7 @@ export default function ExplorePage() {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-      <PageMeta title={t('explore.page_title', { defaultValue: 'Explore' })} description={t('explore.meta_description', { defaultValue: 'Discover community content, listings, events, and more.' })} />
+      <PageMeta title={t('page_title')} description={t('page_description')} />
 
       {/* ─── Hero Search Bar ──────────────────────────────────────────────── */}
       <motion.div
@@ -588,7 +609,6 @@ export default function ExplorePage() {
                 variant="flat"
                 size="sm"
                 className="cursor-pointer hover:bg-[var(--surface-hover)] transition-colors"
-                style={cat.color ? { borderColor: cat.color } : undefined}
                 onClick={() => navigate(tenantPath(`/listings?category=${cat.slug}`))}
               >
                 {cat.name}
@@ -619,8 +639,8 @@ export default function ExplorePage() {
           <Tab key="for_you" title={t('tabs.for_you')} />
           <Tab key="listings" title={t('tabs.listings')} />
           {hasConnections && <Tab key="people" title={t('tabs.people')} />}
-          <Tab key="events" title={t('tabs.events')} />
-          <Tab key="groups" title={t('tabs.groups')} />
+          {hasEvents && <Tab key="events" title={t('tabs.events')} />}
+          {hasGroups && <Tab key="groups" title={t('tabs.groups')} />}
         </Tabs>
       </div>
 
@@ -683,7 +703,7 @@ export default function ExplorePage() {
           ) : !forYouLoading ? (
             <EmptyState
               icon={TrendingUp}
-              message={t('for_you_empty', 'Interact with listings, posts, and events to get personalised recommendations.')}
+              message={t('for_you_empty')}
               cta={t('tabs.all')}
               onAction={() => handleTabChange('all')}
             />
@@ -711,7 +731,7 @@ export default function ExplorePage() {
           {/* End of feed */}
           {!forYouHasMore && forYouItems.length > 0 && (
             <p className="text-center text-sm text-[var(--text-muted)] mt-6">
-              {t('end_of_feed', "You're all caught up!")}
+              {t('end_of_feed')}
             </p>
           )}
         </div>
@@ -726,7 +746,6 @@ export default function ExplorePage() {
       >
         <Card
           className="border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-[var(--glass-blur)]"
-          style={{ backdropFilter: `blur(var(--glass-blur)) saturate(var(--glass-saturate))` }}
         >
           <CardBody className="p-0">
             <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-[var(--border-default)]">
@@ -872,7 +891,6 @@ export default function ExplorePage() {
                               size="sm"
                               variant="flat"
                               className="text-xs"
-                              style={listing.category_color ? { backgroundColor: `${listing.category_color}20`, color: listing.category_color } : undefined}
                             >
                               {listing.category_name}
                             </Chip>
@@ -1188,7 +1206,7 @@ export default function ExplorePage() {
                             {listing.distance_km != null && (
                               <span className="text-[10px] text-[var(--text-muted)] flex items-center gap-0.5">
                                 <Navigation className="w-2.5 h-2.5" />
-                                {listing.distance_km} km
+                                {t('near_you.distance', { distance: listing.distance_km })}
                               </span>
                             )}
                           </div>
@@ -1572,7 +1590,7 @@ export default function ExplorePage() {
             {data.featured_resources.map((resource) => (
               <Link
                 key={resource.id}
-                to={tenantPath(`/resources/${resource.id}`)}
+                to={tenantPath('/resources')}
                 className="min-w-[220px] max-w-[260px] snap-start shrink-0"
               >
                 <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
@@ -1744,17 +1762,17 @@ export default function ExplorePage() {
                             </span>
                           )}
                         </div>
-                        {/* Simple progress indicator */}
                         {challenge.end_date && challenge.start_date && (
                           <div className="mt-2">
-                            <div className="w-full h-1.5 rounded-full bg-[var(--surface-elevated)]">
-                              <div
-                                className="h-1.5 rounded-full bg-[var(--color-secondary)]"
-                                style={{
-                                  width: `${Math.min(100, Math.max(5, ((Date.now() - new Date(challenge.start_date).getTime()) / (new Date(challenge.end_date).getTime() - new Date(challenge.start_date).getTime())) * 100))}%`,
-                                }}
-                              />
-                            </div>
+                            <Progress
+                              aria-label={t('featured_challenges.progress')}
+                              size="sm"
+                              value={getChallengeProgress(challenge.start_date, challenge.end_date)}
+                              classNames={{
+                                track: 'bg-[var(--surface-elevated)]',
+                                indicator: 'bg-[var(--color-secondary)]',
+                              }}
+                            />
                           </div>
                         )}
                       </div>
@@ -1769,16 +1787,16 @@ export default function ExplorePage() {
 
       {/* ─── Empty states for filtered tabs ──────────────────────────────── */}
       {!isLoading && activeTab === 'listings' && !data?.popular_listings?.length && !data?.recommended_listings?.length && (
-        <EmptyState icon={ListTodo} message={t('empty_listings', 'No listings to show yet. Be the first to create one!')} cta={t('create_listing', 'Create Listing')} onAction={() => navigate(tenantPath('/listings/new'))} />
+        <EmptyState icon={ListTodo} message={t('empty_listings')} cta={t('create_listing')} onAction={() => navigate(tenantPath('/listings/new'))} />
       )}
       {!isLoading && hasConnections && activeTab === 'people' && !data?.suggested_connections?.length && !data?.new_members?.length && !data?.top_contributors?.length && (
-        <EmptyState icon={Users} message={t('empty_people', 'No members to show yet. Invite someone to join!')} />
+        <EmptyState icon={Users} message={t('empty_people')} />
       )}
       {!isLoading && activeTab === 'events' && !data?.upcoming_events?.length && (
-        <EmptyState icon={Calendar} message={t('empty_events', 'No upcoming events. Create one to bring your community together!')} cta={t('create_event', 'Create Event')} onAction={() => navigate(tenantPath('/events/new'))} />
+        <EmptyState icon={Calendar} message={t('empty_events')} cta={t('create_event')} onAction={() => navigate(tenantPath('/events/create'))} />
       )}
       {!isLoading && activeTab === 'groups' && !data?.active_groups?.length && (
-        <EmptyState icon={Users} message={t('empty_groups', 'No active groups yet. Start a group around your interests!')} cta={t('create_group', 'Create Group')} onAction={() => navigate(tenantPath('/groups/new'))} />
+        <EmptyState icon={Users} message={t('empty_groups')} cta={t('create_group')} onAction={() => navigate(tenantPath('/groups/create'))} />
       )}
     </div>
   );

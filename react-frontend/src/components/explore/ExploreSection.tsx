@@ -5,6 +5,7 @@
 
 import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { motion } from 'framer-motion';
 
@@ -25,10 +26,13 @@ export function ExploreSection({
   title,
   subtitle,
   seeAllLink,
-  seeAllLabel = 'See All',
+  seeAllLabel,
   children,
   className = '',
 }: ExploreSectionProps) {
+  const { t } = useTranslation('explore');
+  const resolvedSeeAllLabel = seeAllLabel ?? t('see_all');
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
@@ -51,7 +55,7 @@ export function ExploreSection({
             to={seeAllLink}
             className="flex items-center gap-1 text-sm font-medium text-[var(--color-primary)] hover:underline shrink-0"
           >
-            {seeAllLabel}
+            {resolvedSeeAllLabel}
             <ChevronRight className="w-4 h-4" />
           </Link>
         )}
