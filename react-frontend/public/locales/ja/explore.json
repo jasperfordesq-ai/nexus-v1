@@ -53,7 +53,8 @@
     "title": "注目のチャレンジ",
     "subtitle": "あなたのアイデアを共有して影響を与えましょう",
     "ideas_count": "{{count}} アイデア",
-    "ends": "終了 {{date}}"
+    "ends": "終了 {{date}}",
+    "progress": "チャレンジの進捗"
   },
   "time_ago": {
     "just_now": "たった今",
@@ -151,5 +152,6 @@
   "empty_groups": "まだアクティブなグループはありません。あなたの興味に基づいてグループを始めましょう！",
   "create_listing": "リスティングを作成",
   "create_event": "イベントを作成",
-  "create_group": "グループを作成"
+  "create_group": "グループを作成",
+  "see_all": "すべて表示"
 }

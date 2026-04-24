@@ -53,7 +53,8 @@
     "title": "التحديات المميزة",
     "subtitle": "شارك أفكارك واصنع تأثيرًا",
     "ideas_count": "{{count}} أفكار",
-    "ends": "ينتهي {{date}}"
+    "ends": "ينتهي {{date}}",
+    "progress": "تقدم التحدي"
   },
   "time_ago": {
     "just_now": "الآن",
@@ -151,5 +152,6 @@
   "empty_groups": "لا توجد مجموعات نشطة بعد. ابدأ مجموعة حول اهتماماتك!",
   "create_listing": "إنشاء قائمة",
   "create_event": "إنشاء حدث",
-  "create_group": "إنشاء مجموعة"
+  "create_group": "إنشاء مجموعة",
+  "see_all": "عرض الكل"
 }

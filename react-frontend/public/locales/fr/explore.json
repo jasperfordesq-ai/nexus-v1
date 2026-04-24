@@ -53,7 +53,8 @@
     "title": "Défis à la une",
     "subtitle": "Partagez vos idées et faites une différence",
     "ideas_count": "{{count}} idées",
-    "ends": "Fin le {{date}}"
+    "ends": "Fin le {{date}}",
+    "progress": "Progression du défi"
   },
   "time_ago": {
     "just_now": "À l'instant",
@@ -151,5 +152,6 @@
   "empty_groups": "Aucun groupe actif pour le moment. Créez un groupe autour de vos centres d'intérêt !",
   "create_listing": "Créer une annonce",
   "create_event": "Créer un événement",
-  "create_group": "Créer un groupe"
+  "create_group": "Créer un groupe",
+  "see_all": "Tout voir"
 }

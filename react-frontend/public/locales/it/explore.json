@@ -53,7 +53,8 @@
     "title": "Sfide in Evidenza",
     "subtitle": "Condividi le tue idee e fai la differenza",
     "ideas_count": "{{count}} idee",
-    "ends": "Termina {{date}}"
+    "ends": "Termina {{date}}",
+    "progress": "Avanzamento della sfida"
   },
   "time_ago": {
     "just_now": "Proprio ora",
@@ -151,5 +152,6 @@
   "empty_groups": "Nessun gruppo attivo. Avvia un gruppo sui tuoi interessi!",
   "create_listing": "Crea Annuncio",
   "create_event": "Crea Evento",
-  "create_group": "Crea Gruppo"
+  "create_group": "Crea Gruppo",
+  "see_all": "Vedi tutto"
 }

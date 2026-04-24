@@ -53,7 +53,8 @@
     "title": "Empfohlene Herausforderungen",
     "subtitle": "Teilen Sie Ihre Ideen und bewirken Sie etwas",
     "ideas_count": "{{count}} Ideen",
-    "ends": "Endet am {{date}}"
+    "ends": "Endet am {{date}}",
+    "progress": "Fortschritt der Herausforderung"
   },
   "time_ago": {
     "just_now": "Gerade eben",
@@ -151,5 +152,6 @@
   "empty_groups": "Noch keine aktiven Gruppen. Gründen Sie eine Gruppe zu Ihren Interessen!",
   "create_listing": "Inserat erstellen",
   "create_event": "Veranstaltung erstellen",
-  "create_group": "Gruppe erstellen"
+  "create_group": "Gruppe erstellen",
+  "see_all": "Alle anzeigen"
 }

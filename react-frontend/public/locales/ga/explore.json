@@ -52,7 +52,8 @@
     "title": "Dúshláin Mholta",
     "subtitle": "Roinn do smaointe agus déan tionchar",
     "ideas_count": "{{count}} smaoineamh",
-    "ends": "Ag críochnú {{date}}"
+    "ends": "Ag críochnú {{date}}",
+    "progress": "Dul chun cinn an dúshláin"
   },
   "time_ago": {
     "just_now": "Díreach anois",
@@ -151,5 +152,6 @@
   "create_listing": "Cruthaigh Liostú",
   "create_event": "Cruthaigh Imeacht",
   "create_group": "Cruthaigh Grúpa",
-  "page_description": "Explore listings, events, groups, and opportunities across the community."
+  "page_description": "Explore listings, events, groups, and opportunities across the community.",
+  "see_all": "Féach ar fad"
 }

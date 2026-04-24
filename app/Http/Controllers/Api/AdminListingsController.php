@@ -333,10 +333,10 @@ class AdminListingsController extends BaseApiController
         }
 
         // Clean up related records before hard delete to avoid orphans
-        DB::table('listing_skill_tags')->where('listing_id', $id)->delete();
-        DB::table('user_saved_listings')->where('listing_id', $id)->delete();
-        DB::table('listing_views')->where('listing_id', $id)->delete();
-        DB::table('listing_contacts')->where('listing_id', $id)->delete();
+        DB::table('listing_skill_tags')->where('tenant_id', $tenantId)->where('listing_id', $id)->delete();
+        DB::table('user_saved_listings')->where('tenant_id', $tenantId)->where('listing_id', $id)->delete();
+        DB::table('listing_views')->where('tenant_id', $tenantId)->where('listing_id', $id)->delete();
+        DB::table('listing_contacts')->where('tenant_id', $tenantId)->where('listing_id', $id)->delete();
 
         // Remove from search index
         try {

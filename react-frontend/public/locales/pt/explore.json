@@ -53,7 +53,8 @@
     "title": "Desafios em Destaque",
     "subtitle": "Partilhe as suas ideias e faça a diferença",
     "ideas_count": "{{count}} ideias",
-    "ends": "Termina em {{date}}"
+    "ends": "Termina em {{date}}",
+    "progress": "Progresso do desafio"
   },
   "time_ago": {
     "just_now": "Agora mesmo",
@@ -151,5 +152,6 @@
   "empty_groups": "Ainda não há grupos ativos. Comece um grupo sobre os seus interesses!",
   "create_listing": "Criar Anúncio",
   "create_event": "Criar Evento",
-  "create_group": "Criar Grupo"
+  "create_group": "Criar Grupo",
+  "see_all": "Ver tudo"
 }

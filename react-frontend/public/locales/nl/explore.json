@@ -53,7 +53,8 @@
     "title": "Uitgelichte Uitdagingen",
     "subtitle": "Deel je ideeën en maak impact",
     "ideas_count": "{{count}} ideeën",
-    "ends": "Eindigt {{date}}"
+    "ends": "Eindigt {{date}}",
+    "progress": "Voortgang van de uitdaging"
   },
   "time_ago": {
     "just_now": "Zojuist",
@@ -151,5 +152,6 @@
   "empty_groups": "Nog geen actieve groepen. Start een groep rond jouw interesses!",
   "create_listing": "Aanbieding maken",
   "create_event": "Evenement maken",
-  "create_group": "Groep Aanmaken"
+  "create_group": "Groep Aanmaken",
+  "see_all": "Alles bekijken"
 }

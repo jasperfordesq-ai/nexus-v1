@@ -835,14 +835,15 @@ class FederationController extends BaseApiController
             // Use the validated recipient id from the authoritative SELECT above,
             // not the raw request body, to avoid TOCTOU drift.
             $validatedRecipientId = (int) $recipient['id'];
+            $validatedRecipientTenantId = (int) $recipient['tenant_id'];
 
             $stmt = $db->prepare("INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at) VALUES (?, ?, ?, ?, ?, 'pending', 1, ?, ?, NOW())");
-            $stmt->execute([$recipient['tenant_id'], $senderId, $validatedRecipientId, $amount, $input['description'], $partnerTenantId, $recipient['tenant_id']]);
+            $stmt->execute([$validatedRecipientTenantId, $senderId, $validatedRecipientId, $amount, $input['description'], $partnerTenantId, $validatedRecipientTenantId]);
             $transactionId = $db->lastInsertId();
 
             $status = 'pending';
             if ($isExternal) {
-                $db->prepare("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?")->execute([$amount, $validatedRecipientId, $partnerTenantId]);
+                $db->prepare("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?")->execute([$amount, $validatedRecipientId, $validatedRecipientTenantId]);
                 $db->prepare("UPDATE transactions SET status = 'completed' WHERE id = ?")->execute([$transactionId]);
                 $status = 'completed';
             }

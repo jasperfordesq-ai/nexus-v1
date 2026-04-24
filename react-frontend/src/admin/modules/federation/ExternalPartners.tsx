@@ -359,12 +359,12 @@ export function ExternalPartners() {
         }
         loadData();
       } else {
-        const errorMsg = (res as { error?: string }).error || "Health Check error";
-        toast.error(`Health Check Partner error`);
+        const errorMsg = (res as { error?: string }).error || t('federation.health_check_error');
+        toast.error(errorMsg);
       }
     } catch (err) {
       logError('ExternalPartners.healthCheck', err);
-      toast.error(`Health check failed` || `${partner.name}: Health check failed`);
+      toast.error(t('federation.health_check_failed'));
     }
     setHealthCheckLoading(null);
   }, [toast, t, loadData]);

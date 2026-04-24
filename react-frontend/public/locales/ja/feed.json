@@ -314,8 +314,7 @@
     },
     "milestone": {
       "badge_unlocked": "Badge unlocked",
-      "level_reached": "Level reached",
-      "items_loaded": "{{count}} posts"
+      "level_reached": "Level reached"
     }
   },
   "hashtag": {

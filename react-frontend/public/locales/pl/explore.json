@@ -53,7 +53,8 @@
     "title": "Wyróżnione wyzwania",
     "subtitle": "Podziel się swoimi pomysłami i wprowadź zmiany",
     "ideas_count": "{{count}} pomysłów",
-    "ends": "Kończy się {{date}}"
+    "ends": "Kończy się {{date}}",
+    "progress": "Postęp wyzwania"
   },
   "time_ago": {
     "just_now": "Właśnie teraz",
@@ -151,5 +152,6 @@
   "empty_groups": "Brak aktywnych grup. Załóż grupę wokół swoich zainteresowań!",
   "create_listing": "Utwórz ogłoszenie",
   "create_event": "Utwórz wydarzenie",
-  "create_group": "Utwórz Grupę"
+  "create_group": "Utwórz Grupę",
+  "see_all": "Zobacz wszystko"
 }
