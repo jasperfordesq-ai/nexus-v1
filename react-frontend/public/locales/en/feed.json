@@ -16,7 +16,7 @@
   "error_load_retry": "Failed to load feed. Please try again.",
   "empty_title": "No posts yet",
   "empty_desc": "Be the first to share something with your community!",
-  "empty_filtered": "No {{filter}} in the feed right now. Try a different filter!",
+  "empty_filtered": "Nothing matches this view right now. Try a different filter.",
   "filter": {
     "all": "All",
     "posts": "Posts",
@@ -30,7 +30,8 @@
     "blogs": "Blog",
     "discussions": "Discussions",
     "following": "Following",
-    "saved": "Saved"
+    "saved": "Saved",
+    "clear": "Clear feed filters"
   },
   "report": {
     "title": "Report Post",

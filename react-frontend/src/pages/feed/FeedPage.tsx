@@ -37,6 +37,7 @@ import BarChart3 from 'lucide-react/icons/chart-column';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Flag from 'lucide-react/icons/flag';
 import ArrowUp from 'lucide-react/icons/arrow-up';
+import CircleX from 'lucide-react/icons/circle-x';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, AlgorithmLabel } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
@@ -68,6 +69,50 @@ import type { ReactionType } from '@/components/social';
 
 const SCROLL_THRESHOLD = 200;
 const FEED_MODE_KEY = 'nexus_feed_mode';
+const VALID_FEED_FILTERS: FeedFilter[] = ['all', 'following', 'saved', 'posts', 'listings', 'events', 'polls', 'goals', 'jobs', 'challenges', 'volunteering', 'blogs', 'discussions'];
+const FILTERS_WITH_SUBFILTERS = new Set<FeedFilter>(['listings']);
+
+function coerceFeedFilter(value: string | null): FeedFilter {
+  return value && VALID_FEED_FILTERS.includes(value as FeedFilter)
+    ? (value as FeedFilter)
+    : 'all';
+}
+
+function feedItemMatchesFilter(item: FeedItem, activeFilter: FeedFilter): boolean {
+  switch (activeFilter) {
+    case 'all':
+      return true;
+    case 'posts':
+      return item.type === 'post';
+    case 'listings':
+      return item.type === 'listing';
+    case 'events':
+      return item.type === 'event';
+    case 'polls':
+      return item.type === 'poll';
+    case 'goals':
+      return item.type === 'goal';
+    case 'jobs':
+      return item.type === 'job';
+    case 'challenges':
+      return item.type === 'challenge';
+    case 'volunteering':
+      return item.type === 'volunteer';
+    case 'blogs':
+      return item.type === 'blog';
+    case 'discussions':
+      return item.type === 'discussion';
+    case 'saved':
+      return item.is_bookmarked === true;
+    case 'following':
+      return false;
+    default: {
+      const _exhaustiveCheck: never = activeFilter;
+      void _exhaustiveCheck;
+      return false;
+    }
+  }
+}
 
 /* ───────────────────────── Sidebar Error Boundary ───────────────────────── */
 
@@ -100,9 +145,7 @@ export function FeedPage() {
 
   // Initialize filter from URL param, fallback to 'all'
   const [filter, setFilter] = useState<FeedFilter>(() => {
-    const urlFilter = searchParams.get('filter') as FeedFilter | null;
-    const validFilters: FeedFilter[] = ['all', 'posts', 'listings', 'events', 'polls', 'goals', 'jobs', 'challenges', 'volunteering', 'blogs', 'discussions'];
-    return urlFilter && validFilters.includes(urlFilter) ? urlFilter : 'all';
+    return coerceFeedFilter(searchParams.get('filter'));
   });
 
   const [hasMore, setHasMore] = useState(false);
@@ -123,7 +166,10 @@ export function FeedPage() {
   });
 
   // Sub-filter (e.g. listings -> offers/requests) — synced to URL
-  const [subFilter, setSubFilter] = useState<string | null>(() => searchParams.get('subFilter') || null);
+  const [subFilter, setSubFilter] = useState<string | null>(() => {
+    const initialFilter = coerceFeedFilter(searchParams.get('filter'));
+    return FILTERS_WITH_SUBFILTERS.has(initialFilter) ? searchParams.get('subFilter') || null : null;
+  });
 
   // Compose Hub
   const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
@@ -151,6 +197,7 @@ export function FeedPage() {
       if (updates.filter !== undefined) {
         if (updates.filter === 'all') next.delete('filter');
         else next.set('filter', updates.filter);
+        if (!FILTERS_WITH_SUBFILTERS.has(updates.filter)) next.delete('subFilter');
       }
       if (updates.mode !== undefined) {
         if (updates.mode === 'ranking') next.delete('mode');
@@ -324,21 +371,7 @@ export function FeedPage() {
             const existingKeys = new Set(prev.map((p) => `${p.type}-${p.id}`));
             const newItems = buffered
               .filter((fi) => !existingKeys.has(`${fi.type}-${fi.id}`))
-              .filter((fi) =>
-                currentFilter === 'all' ||
-                (currentFilter === 'posts' && fi.type === 'post') ||
-                (currentFilter === 'listings' && fi.type === 'listing') ||
-                (currentFilter === 'events' && fi.type === 'event') ||
-                (currentFilter === 'polls' && fi.type === 'poll') ||
-                (currentFilter === 'goals' && fi.type === 'goal') ||
-                (currentFilter === 'jobs' && fi.type === 'job') ||
-                (currentFilter === 'challenges' && fi.type === 'challenge') ||
-                (currentFilter === 'volunteering' && fi.type === 'volunteer') ||
-                (currentFilter === 'blogs' && fi.type === 'blog') ||
-                (currentFilter === 'discussions' && fi.type === 'discussion') ||
-                currentFilter === 'saved' ||
-                currentFilter === 'following'
-              );
+              .filter((fi) => feedItemMatchesFilter(fi, currentFilter));
             return [...newItems, ...prev];
           });
         }
@@ -368,20 +401,7 @@ export function FeedPage() {
       // Only surface posts that match the active filter.
       // M5: Use filterRef.current so the closure always has the latest filter value.
       const currentFilter = filterRef.current;
-      const matchesFilter =
-        currentFilter === 'all' ||
-        (currentFilter === 'posts' && incoming.type === 'post') ||
-        (currentFilter === 'listings' && incoming.type === 'listing') ||
-        (currentFilter === 'events' && incoming.type === 'event') ||
-        (currentFilter === 'polls' && incoming.type === 'poll') ||
-        (currentFilter === 'goals' && incoming.type === 'goal') ||
-        (currentFilter === 'jobs' && incoming.type === 'job') ||
-        (currentFilter === 'challenges' && incoming.type === 'challenge') ||
-        (currentFilter === 'volunteering' && incoming.type === 'volunteer') ||
-        (currentFilter === 'blogs' && incoming.type === 'blog') ||
-        (currentFilter === 'discussions' && incoming.type === 'discussion') ||
-        currentFilter === 'saved' ||
-        currentFilter === 'following';
+      const matchesFilter = feedItemMatchesFilter(incoming, currentFilter);
 
       if (!matchesFilter) return;
 
@@ -680,19 +700,7 @@ export function FeedPage() {
           const existingKeys = new Set(prev.map((p) => `${p.type}-${p.id}`));
           const newItems = buffered
             .filter((fi) => !existingKeys.has(`${fi.type}-${fi.id}`))
-            .filter((fi) =>
-              currentFilter === 'all' ||
-              (currentFilter === 'posts' && fi.type === 'post') ||
-              (currentFilter === 'listings' && fi.type === 'listing') ||
-              (currentFilter === 'events' && fi.type === 'event') ||
-              (currentFilter === 'polls' && fi.type === 'poll') ||
-              (currentFilter === 'goals' && fi.type === 'goal') ||
-              (currentFilter === 'jobs' && fi.type === 'job') ||
-              (currentFilter === 'challenges' && fi.type === 'challenge') ||
-              (currentFilter === 'volunteering' && fi.type === 'volunteer') ||
-              (currentFilter === 'blogs' && fi.type === 'blog') ||
-              (currentFilter === 'discussions' && fi.type === 'discussion')
-            );
+            .filter((fi) => feedItemMatchesFilter(fi, currentFilter));
           return [...newItems, ...prev];
         });
       }
@@ -702,11 +710,28 @@ export function FeedPage() {
     setTimeout(() => { isScrollingRef.current = false; }, 1000);
   }, []);
 
+  const handleFilterChange = useCallback((nextFilter: FeedFilter) => {
+    setFilter(nextFilter);
+    if (!FILTERS_WITH_SUBFILTERS.has(nextFilter)) {
+      setSubFilter(null);
+    }
+    syncToUrl({
+      filter: nextFilter,
+      subFilter: FILTERS_WITH_SUBFILTERS.has(nextFilter) ? undefined : null,
+    });
+  }, [syncToUrl]);
+
+  const clearFeedControls = useCallback(() => {
+    setFilter('all');
+    setSubFilter(null);
+    syncToUrl({ filter: 'all', subFilter: null });
+  }, [syncToUrl]);
+
   const filterOptions: { key: FeedFilter; label: string }[] = [
     { key: 'all', label: t('filter.all') },
     ...(user ? [
-      { key: 'following' as FeedFilter, label: t('filter.following', 'Following') },
-      { key: 'saved' as FeedFilter, label: t('filter.saved', 'Saved') },
+      { key: 'following' as FeedFilter, label: t('filter.following') },
+      { key: 'saved' as FeedFilter, label: t('filter.saved') },
     ] : []),
     { key: 'posts', label: t('filter.posts') },
     { key: 'listings', label: t('filter.listings') },
@@ -720,6 +745,8 @@ export function FeedPage() {
     { key: 'discussions', label: t('filter.discussions') },
   ];
 
+  const hasActiveFeedView = filter !== 'all' || subFilter !== null;
+
 
   return (
     <>
@@ -728,53 +755,47 @@ export function FeedPage() {
       description={t("subtitle")}
       noIndex
     />
-    <div className="max-w-5xl mx-auto flex gap-6">
+    <div className="max-w-6xl mx-auto flex gap-6">
       {/* Main Feed Column */}
       <div className="flex-1 min-w-0 max-w-2xl space-y-5">
 
       {/* Pull-to-refresh indicator (mobile only) */}
       {(pullDistance > 0 || isRefreshing) && (
-        <div
-          className="flex justify-center items-center overflow-hidden"
-          style={{ height: Math.max(pullDistance, isRefreshing ? 48 : 0), transition: pullDistance > 0 ? 'none' : 'height 0.3s ease-out' }}
-        >
+        <div className="flex h-12 items-center justify-center overflow-hidden sm:hidden">
           <RefreshCw
-            className={`w-5 h-5 text-primary ${isRefreshing ? 'animate-spin' : ''}`}
-            style={{
-              transform: isRefreshing ? undefined : `rotate(${pullDistance * 4}deg)`,
-              opacity: isRefreshing ? 1 : Math.min(pullDistance / 60, 1),
-              transition: 'opacity 0.2s ease',
-            }}
+            className={`w-5 h-5 text-primary transition-opacity ${isRefreshing || pullDistance > 48 ? 'animate-spin opacity-100' : 'opacity-60'}`}
+            aria-hidden="true"
           />
         </div>
       )}
 
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500 p-6 sm:p-8">
-        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
-        <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
-        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                <Newspaper className="w-6 h-6 text-white" aria-hidden="true" />
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('title')}</h1>
-            </div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <p className="text-white/80 text-sm">{t('subtitle')}</p>
-              {!isLoading && items.length > 0 && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-pink-300 animate-pulse" aria-hidden="true" />
-                  {t('items_loaded', '{{count}} posts', { count: items.length })}
-                </span>
-              )}
-              <AlgorithmLabel area="feed" />
+      {/* Compact page header */}
+      <div className="flex flex-col gap-3 rounded-xl border border-theme-default bg-theme-elevated/70 px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Newspaper className="w-5 h-5" aria-hidden="true" />
+            </span>
+            <div className="min-w-0">
+              <h1 className="truncate text-xl font-semibold text-theme-primary sm:text-2xl">{t('title')}</h1>
+              <p className="text-sm text-theme-muted">{t('subtitle')}</p>
             </div>
           </div>
+        </div>
+        <div className="flex items-center gap-2">
+          {!isLoading && items.length > 0 && (
+            <Chip
+              size="sm"
+              variant="flat"
+              className="hidden bg-primary/10 text-primary sm:inline-flex"
+            >
+              {t('items_loaded', { count: items.length })}
+            </Chip>
+          )}
+          <AlgorithmLabel area="feed" />
           {isAuthenticated && (
             <Button
-              className="hidden sm:flex bg-white text-indigo-700 font-semibold hover:bg-white/90 shrink-0 shadow-lg"
+              className="hidden bg-primary text-white shadow-sm sm:flex"
               startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
               onPress={() => openCompose('post')}
             >
@@ -784,19 +805,48 @@ export function FeedPage() {
         </div>
       </div>
 
-      {/* Feed Mode Toggle (For You / Recent) */}
-      <div className="flex items-center justify-between">
-        <FeedModeToggle mode={feedMode} onModeChange={(mode) => { localStorage.setItem(FEED_MODE_KEY, mode); setFeedMode(mode); syncToUrl({ mode }); }} />
-        {isAuthenticated && (
-          <Button
-            size="sm"
-            className="sm:hidden bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md"
-            startContent={<Plus className="w-3.5 h-3.5" aria-hidden="true" />}
-            onPress={() => openCompose('post')}
-          >
-            {t('new_post')}
-          </Button>
-        )}
+      {/* Feed controls */}
+      <div className="sticky top-[72px] z-30 w-full min-w-0 max-w-full space-y-2 overflow-hidden rounded-xl border border-theme-default bg-[var(--surface-base)]/95 px-3 py-3 shadow-sm backdrop-blur-md">
+        <div className="flex min-w-0 items-center justify-between gap-3">
+          <FeedModeToggle mode={feedMode} onModeChange={(mode) => { localStorage.setItem(FEED_MODE_KEY, mode); setFeedMode(mode); syncToUrl({ mode }); }} />
+          {hasActiveFeedView && (
+            <Button
+              isIconOnly
+              size="sm"
+              variant="light"
+              className="text-theme-muted hover:text-primary"
+              onPress={clearFeedControls}
+              aria-label={t('filter.clear')}
+            >
+              <CircleX className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          )}
+        </div>
+
+        <div className="-mx-1 w-[calc(100%+0.5rem)] min-w-0 overflow-x-auto px-1 pb-1 sm:mx-0 sm:w-full sm:overflow-visible sm:px-0">
+          <div className="flex min-w-max gap-2 sm:min-w-0 sm:flex-wrap">
+            {filterOptions.map((opt) => (
+              <Button
+                key={opt.key}
+                size="sm"
+                variant={filter === opt.key ? 'solid' : 'flat'}
+                radius="full"
+                aria-pressed={filter === opt.key}
+                className={`shrink-0 ${
+                  filter === opt.key
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'bg-theme-elevated text-theme-muted hover:text-primary hover:bg-primary/5 border border-theme-default transition-colors'
+                }`}
+                onPress={() => handleFilterChange(opt.key)}
+              >
+                {opt.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Sub-Filter Chips (contextual, e.g. Listings -> Offers/Requests) */}
+        <SubFilterChips filter={filter} subFilter={subFilter} onSubFilterChange={(sf) => { setSubFilter(sf); syncToUrl({ subFilter: sf }); }} />
       </div>
 
       {/* Stories Bar — loads its own data from /v2/stories */}
@@ -850,29 +900,6 @@ export function FeedPage() {
           </div>
         </GlassCard>
       )}
-
-      {/* Filter Tabs */}
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-        {filterOptions.map((opt) => (
-          <Button
-            key={opt.key}
-            size="sm"
-            variant={filter === opt.key ? 'solid' : 'flat'}
-            radius="full"
-            className={`shrink-0 ${
-              filter === opt.key
-                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/20'
-                : 'bg-theme-elevated text-theme-muted hover:text-indigo-500 hover:bg-indigo-500/5 border border-theme-default transition-colors'
-            }`}
-            onPress={() => { setFilter(opt.key); syncToUrl({ filter: opt.key }); }}
-          >
-            {opt.label}
-          </Button>
-        ))}
-      </div>
-
-      {/* Sub-Filter Chips (contextual, e.g. Listings -> Offers/Requests) */}
-      <SubFilterChips filter={filter} subFilter={subFilter} onSubFilterChange={(sf) => { setSubFilter(sf); syncToUrl({ subFilter: sf }); }} />
 
       {/* New posts floating chip — appears when real-time posts arrive while scrolled down */}
       <AnimatePresence>
@@ -940,7 +967,7 @@ export function FeedPage() {
               <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('empty_title')}</h2>
               <p className="text-sm text-theme-muted mb-6 max-w-xs mx-auto">
                 {filter !== 'all'
-                  ? t('empty_filtered', { filter })
+                  ? t('empty_filtered')
                   : t('empty_desc')}
               </p>
               {isAuthenticated && (
@@ -1111,9 +1138,11 @@ export function FeedPage() {
 
       {/* Right Sidebar — Full widget panel (hidden on mobile) */}
       <aside className="hidden lg:block w-72 flex-shrink-0">
-        <SidebarErrorBoundary>
-          <FeedSidebar />
-        </SidebarErrorBoundary>
+        <div className="sticky top-20">
+          <SidebarErrorBoundary>
+            <FeedSidebar />
+          </SidebarErrorBoundary>
+        </div>
       </aside>
     </div>
 

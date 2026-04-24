@@ -111,7 +111,7 @@ export default defineConfig(({ command }) => ({
       // ESM dist files. Each file exports the icon as default, matching usage.
       {
         find: /^lucide-react\/icons\/(.+)$/,
-        replacement: path.resolve(__dirname, 'node_modules/lucide-react/dist/esm/icons/$1'),
+        replacement: path.resolve(__dirname, 'node_modules/lucide-react/dist/esm/icons/$1.js'),
       },
     ],
   },
