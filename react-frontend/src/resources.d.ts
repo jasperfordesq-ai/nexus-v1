@@ -9818,6 +9818,8 @@ export default interface Resources {
       "polls": "Polls",
       "posts": "Posts",
       "saved": "Saved",
+      "more": "More",
+      "select": "Select feed filter",
       "volunteering": "Volunteering"
     },
     "hashtag": {

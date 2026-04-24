@@ -26,6 +26,10 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
   useDisclosure,
 } from '@heroui/react';
 import Newspaper from 'lucide-react/icons/newspaper';
@@ -38,6 +42,7 @@ import TrendingUp from 'lucide-react/icons/trending-up';
 import Flag from 'lucide-react/icons/flag';
 import ArrowUp from 'lucide-react/icons/arrow-up';
 import CircleX from 'lucide-react/icons/circle-x';
+import ListFilter from 'lucide-react/icons/list-filter';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, AlgorithmLabel } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
@@ -745,6 +750,10 @@ export function FeedPage() {
     { key: 'discussions', label: t('filter.discussions') },
   ];
 
+  const mobilePrimaryFilters = new Set<FeedFilter>(['all', 'following', 'saved', 'posts']);
+  const mobilePrimaryFilterOptions = filterOptions.filter((opt) => mobilePrimaryFilters.has(opt.key));
+  const mobileOverflowFilterOptions = filterOptions.filter((opt) => !mobilePrimaryFilters.has(opt.key));
+  const activeOverflowFilter = mobileOverflowFilterOptions.find((opt) => opt.key === filter);
   const hasActiveFeedView = filter !== 'all' || subFilter !== null;
 
 
@@ -757,7 +766,7 @@ export function FeedPage() {
     />
     <div className="max-w-6xl mx-auto flex gap-6">
       {/* Main Feed Column */}
-      <div className="flex-1 min-w-0 max-w-2xl space-y-5">
+      <div className="flex-1 min-w-0 max-w-2xl space-y-4">
 
       {/* Pull-to-refresh indicator (mobile only) */}
       {(pullDistance > 0 || isRefreshing) && (
@@ -806,7 +815,7 @@ export function FeedPage() {
       </div>
 
       {/* Feed controls */}
-      <div className="sticky top-[72px] z-30 w-full min-w-0 max-w-full space-y-2 overflow-hidden rounded-xl border border-theme-default bg-[var(--surface-base)]/95 px-3 py-3 shadow-sm backdrop-blur-md">
+      <div className="sticky top-[72px] z-30 w-full min-w-0 max-w-full space-y-2 overflow-hidden rounded-xl border border-theme-default bg-[var(--surface-base)]/95 px-3 py-2.5 shadow-sm backdrop-blur-md">
         <div className="flex min-w-0 items-center justify-between gap-3">
           <FeedModeToggle mode={feedMode} onModeChange={(mode) => { localStorage.setItem(FEED_MODE_KEY, mode); setFeedMode(mode); syncToUrl({ mode }); }} />
           {hasActiveFeedView && (
@@ -823,16 +832,62 @@ export function FeedPage() {
           )}
         </div>
 
-        <div className="-mx-1 w-[calc(100%+0.5rem)] min-w-0 overflow-x-auto px-1 pb-1 sm:mx-0 sm:w-full sm:overflow-visible sm:px-0">
-          <div className="flex min-w-max gap-2 sm:min-w-0 sm:flex-wrap">
-            {filterOptions.map((opt) => (
+        <div className="min-w-0">
+          <div className="grid grid-cols-2 gap-2 min-[390px]:flex min-[390px]:items-center sm:flex-wrap">
+            {mobilePrimaryFilterOptions.map((opt) => (
               <Button
                 key={opt.key}
                 size="sm"
                 variant={filter === opt.key ? 'solid' : 'flat'}
                 radius="full"
                 aria-pressed={filter === opt.key}
-                className={`shrink-0 ${
+                className={`min-w-0 px-3 ${
+                  filter === opt.key
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'bg-theme-elevated text-theme-muted hover:text-primary hover:bg-primary/5 border border-theme-default transition-colors'
+                }`}
+                onPress={() => handleFilterChange(opt.key)}
+              >
+                <span className="truncate">{opt.label}</span>
+              </Button>
+            ))}
+            <Dropdown placement="bottom-end">
+              <DropdownTrigger>
+                <Button
+                  size="sm"
+                  variant={activeOverflowFilter ? 'solid' : 'flat'}
+                  radius="full"
+                  className={`min-w-0 px-3 sm:hidden ${
+                    activeOverflowFilter
+                      ? 'bg-primary text-white shadow-sm'
+                      : 'bg-theme-elevated text-theme-muted hover:text-primary hover:bg-primary/5 border border-theme-default transition-colors'
+                  }`}
+                  startContent={<ListFilter className="h-4 w-4 shrink-0" aria-hidden="true" />}
+                >
+                  <span className="truncate">{activeOverflowFilter?.label ?? t('filter.more')}</span>
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                aria-label={t('filter.select')}
+                selectedKeys={new Set([filter])}
+                selectionMode="single"
+                onAction={(key) => handleFilterChange(key as FeedFilter)}
+              >
+                {mobileOverflowFilterOptions.map((opt) => (
+                  <DropdownItem key={opt.key}>
+                    {opt.label}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+            {mobileOverflowFilterOptions.map((opt) => (
+              <Button
+                key={opt.key}
+                size="sm"
+                variant={filter === opt.key ? 'solid' : 'flat'}
+                radius="full"
+                aria-pressed={filter === opt.key}
+                className={`hidden shrink-0 sm:inline-flex ${
                   filter === opt.key
                     ? 'bg-primary text-white shadow-sm'
                     : 'bg-theme-elevated text-theme-muted hover:text-primary hover:bg-primary/5 border border-theme-default transition-colors'
@@ -856,7 +911,7 @@ export function FeedPage() {
 
       {/* Quick Post Box */}
       {isAuthenticated && (
-        <GlassCard className="p-4 hover:border-primary/20 transition-colors">
+        <GlassCard className="p-3.5 hover:border-primary/20 transition-colors">
           <div
             className="flex items-center gap-3 cursor-pointer"
             role="button"

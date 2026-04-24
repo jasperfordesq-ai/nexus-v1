@@ -31,7 +31,9 @@
     "discussions": "Discussions",
     "following": "Following",
     "saved": "Saved",
-    "clear": "Clear feed filters"
+    "clear": "Clear feed filters",
+    "more": "More",
+    "select": "Select feed filter"
   },
   "report": {
     "title": "Report Post",
