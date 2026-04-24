@@ -50,10 +50,15 @@ vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
+  resolveAssetUrl: vi.fn((url) => url || '/placeholder.png'),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
+  formatDateTime: vi.fn(() => '10:00'),
+  formatDateValue: vi.fn(() => 'April 24, 2026'),
+  formatMonthShort: vi.fn(() => 'Apr'),
 }));
 vi.mock('@/lib/map-config', () => ({ MAPS_ENABLED: false }));
 vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
+vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 vi.mock('@/components/location', () => ({
   EntityMapView: () => <div data-testid="map-view">Map</div>,
 }));
@@ -74,7 +79,7 @@ describe('EventsPage', () => {
 
   it('shows the page description', () => {
     render(<EventsPage />);
-    expect(screen.getByText(/community events/i)).toBeInTheDocument();
+    expect(screen.getByText('Discover community events, workshops, and meetups near you.')).toBeInTheDocument();
   });
 
   it('shows search input', () => {

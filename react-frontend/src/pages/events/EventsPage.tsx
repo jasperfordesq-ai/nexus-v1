@@ -7,7 +7,7 @@
  * Events Page - Community events listing with category filtering
  */
 
-import { useState, useEffect, useCallback, useRef, memo } from 'react';
+import { useState, useEffect, useCallback, useRef, memo, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Input, Select, SelectItem, Chip, Skeleton } from '@heroui/react';
@@ -27,6 +27,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Tag from 'lucide-react/icons/tag';
 import Star from 'lucide-react/icons/star';
 import Ban from 'lucide-react/icons/ban';
+import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
@@ -36,7 +37,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { logError } from '@/lib/logger';
-import { formatDateTime, formatDateValue, formatMonthShort } from '@/lib/helpers';
+import { formatDateTime, formatDateValue, formatMonthShort, resolveAssetUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 import type { Event } from '@/types/api';
@@ -105,6 +106,22 @@ export function EventsPage() {
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [nearMeEnabled, setNearMeEnabled] = useState(false);
   const [radiusKm, setRadiusKm] = useState(25);
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (searchQuery.trim()) count += 1;
+    if (filter !== 'upcoming') count += 1;
+    if (selectedCategory !== 'all') count += 1;
+    if (nearMeEnabled) count += 1;
+    return count;
+  }, [searchQuery, filter, selectedCategory, nearMeEnabled]);
+
+  const clearFilters = useCallback(() => {
+    setSearchQuery('');
+    setFilter('upcoming');
+    setSelectedCategory('all');
+    setNearMeEnabled(false);
+  }, []);
 
   const tRef = useRef(t);
   tRef.current = t;
@@ -245,7 +262,7 @@ export function EventsPage() {
       return;
     }
     if (!user?.latitude || !user?.longitude) {
-      toast.error(t('near_me_no_location', 'Set your location in your profile to use Near me'));
+      toast.error(t('near_me_no_location'));
       return;
     }
     setNearMeEnabled(true);
@@ -262,33 +279,33 @@ export function EventsPage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title={t('page_title', { defaultValue: 'Events' })} description={t('page_description', { defaultValue: 'Discover community events, workshops, and meetups near you.' })} />
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-indigo-600 via-purple-500 to-pink-500 p-6 sm:p-8">
-        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
-        <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
-        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                <Calendar className="w-6 h-6 text-white" aria-hidden="true" />
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('title')}</h1>
-            </div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <p className="text-white/80 text-sm">{t('page_description', { defaultValue: 'Discover community events, workshops, and meetups near you.' })}</p>
-              {totalCount != null && !isLoading && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true" />
-                  {t('count_pill', { count: totalCount.toLocaleString() })}
-                </span>
-              )}
-            </div>
+      <PageMeta title={t('page_title')} description={t('page_description')} />
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 rounded-full border border-theme-default bg-theme-elevated px-3 py-1 text-xs font-medium text-theme-muted">
+            <CalendarDays className="h-3.5 w-3.5 text-amber-500" aria-hidden="true" />
+            {t('subtitle')}
           </div>
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold text-theme-primary sm:text-4xl">{t('title')}</h1>
+            <p className="max-w-2xl text-sm text-theme-muted sm:text-base">{t('page_description')}</p>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          {totalCount != null && !isLoading && (
+            <Chip
+              variant="flat"
+              color="primary"
+              startContent={<Calendar className="h-3.5 w-3.5" aria-hidden="true" />}
+            >
+              {t('count_pill', { count: totalCount.toLocaleString() })}
+            </Chip>
+          )}
           {isAuthenticated && (
             <Link to={tenantPath('/events/create')}>
               <Button
-                className="bg-white text-indigo-700 font-semibold hover:bg-white/90 shrink-0 shadow-lg"
+                color="primary"
+                className="font-semibold"
                 startContent={<Plus className="w-4 h-4" />}
               >
                 {t('create_event')}
@@ -299,8 +316,8 @@ export function EventsPage() {
       </div>
 
       {/* Search & Time Filter */}
-      <GlassCard className="p-4">
-        <div className="flex flex-col lg:flex-row gap-4">
+      <GlassCard className="p-4 sm:p-5">
+        <div className="grid gap-3 lg:grid-cols-[minmax(260px,1fr)_auto_auto_auto_auto] lg:items-center">
           <div className="flex-1">
             <Input
               placeholder={t('search_placeholder')}
@@ -321,7 +338,7 @@ export function EventsPage() {
             selectedKeys={[filter]}
             disallowEmptySelection
             onChange={(e) => setFilter(e.target.value as EventFilter)}
-            className="w-32 sm:w-40"
+            className="w-full lg:w-40"
             classNames={{
               trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
               value: 'text-theme-primary',
@@ -336,26 +353,26 @@ export function EventsPage() {
           <Button
             variant={nearMeEnabled ? 'solid' : 'flat'}
             className={nearMeEnabled
-              ? 'bg-primary text-white min-h-[40px]'
-              : 'bg-theme-elevated text-theme-primary min-h-[40px]'}
+              ? 'bg-primary text-white min-h-[40px] w-full lg:w-auto'
+              : 'bg-theme-elevated text-theme-primary min-h-[40px] w-full lg:w-auto'}
             startContent={<MapPin className="w-4 h-4" aria-hidden="true" />}
             onPress={handleNearMeToggle}
             aria-pressed={nearMeEnabled}
-            aria-label={t('near_me', 'Near me')}
+            aria-label={t('near_me')}
           >
-            {t('near_me', 'Near me')}
+            {t('near_me')}
           </Button>
 
           {nearMeEnabled && (
             <Select
-              aria-label={t('radius_label', 'Radius')}
+              aria-label={t('radius_label')}
               selectedKeys={[String(radiusKm)]}
               disallowEmptySelection
               onSelectionChange={(keys) => {
                 const val = keys instanceof Set ? ([...keys][0] as string) : '25';
                 setRadiusKm(Number(val) || 25);
               }}
-              className="w-32 sm:w-36"
+              className="w-full lg:w-36"
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
                 value: 'text-theme-primary',
@@ -370,7 +387,7 @@ export function EventsPage() {
           )}
 
           {MAPS_ENABLED && (
-            <div className="flex rounded-xl overflow-hidden border border-white/20 bg-white/10" role="group" aria-label={t('view_mode_aria')}>
+            <div className="flex min-h-[40px] rounded-xl overflow-hidden border border-theme-default bg-theme-elevated" role="group" aria-label={t('view_mode_aria')}>
               <Button
                 isIconOnly
                 size="sm"
@@ -396,6 +413,31 @@ export function EventsPage() {
             </div>
           )}
         </div>
+
+        {activeFilterCount > 0 && (
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-theme-default pt-4">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-theme-muted">
+              <span className="font-medium text-theme-secondary">{t('active_filters')}</span>
+              {searchQuery.trim() && <Chip size="sm" variant="flat">{t('active_search', { query: searchQuery.trim() })}</Chip>}
+              {filter !== 'upcoming' && <Chip size="sm" variant="flat">{t(`filter_${filter}`)}</Chip>}
+              {selectedCategory !== 'all' && (
+                <Chip size="sm" variant="flat">
+                  {EVENT_CATEGORIES.find((cat) => cat.id === selectedCategory)?.name ?? selectedCategory}
+                </Chip>
+              )}
+              {nearMeEnabled && <Chip size="sm" variant="flat">{t('active_near_me', { radius: radiusKm })}</Chip>}
+            </div>
+            <Button
+              size="sm"
+              variant="light"
+              className="text-theme-muted"
+              startContent={<X className="h-4 w-4" aria-hidden="true" />}
+              onPress={clearFilters}
+            >
+              {t('clear_filters')}
+            </Button>
+          </div>
+        )}
       </GlassCard>
 
       {/* Category Filter Chips */}
@@ -430,7 +472,7 @@ export function EventsPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
+            color="primary"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadEvents()}
           >
@@ -479,7 +521,7 @@ export function EventsPage() {
               action={
                 isAuthenticated && (
                   <Link to={tenantPath('/events/create')}>
-                    <Button className="bg-linear-to-r from-indigo-500 to-purple-600 text-white">
+                    <Button color="primary">
                       {t('create_event')}
                     </Button>
                   </Link>
@@ -518,8 +560,8 @@ export function EventsPage() {
             >
               {Object.entries(groupedEvents).map(([month, monthEvents]) => (
                 <section key={month} aria-label={t('events_in_month', 'Events in {{month}}', { month })}>
-                  <h2 className="text-lg font-semibold text-theme-secondary mb-4 flex items-center gap-2">
-                    <CalendarDays className="w-5 h-5 text-amber-400" aria-hidden="true" />
+                  <h2 className="text-sm font-semibold uppercase tracking-wide text-theme-muted mb-3 flex items-center gap-2">
+                    <CalendarDays className="w-4 h-4 text-amber-500" aria-hidden="true" />
                     {month}
                   </h2>
                   <div className="space-y-4">
@@ -546,7 +588,7 @@ export function EventsPage() {
                       </div>
                       <div className="h-1.5 rounded-full bg-theme-elevated overflow-hidden">
                         <motion.div
-                          className="h-full rounded-full bg-linear-to-r from-indigo-500 to-purple-600"
+                          className="h-full rounded-full bg-primary"
                           initial={{ width: '0%' }}
                           animate={{ width: `${Math.round((events.length / totalCount) * 100)}%` }}
                           transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -590,16 +632,25 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
   const monthLabel = formatMonthShort(startDate, true);
   const weekdayLabel = formatDateValue(startDate, { weekday: 'short' });
   const timeLabel = formatDateTime(startDate, { hour: '2-digit', minute: '2-digit' });
+  const coverImage = event.cover_image ? resolveAssetUrl(event.cover_image) : null;
 
   return (
-    <Link to={tenantPath(`/events/${event.id}`)} aria-label={`${event.title} on ${eventDateLabel}`}>
+    <Link to={tenantPath(`/events/${event.id}`)} aria-label={t('card.open_aria', { title: event.title, date: eventDateLabel })}>
       <article>
-        <GlassCard className={`p-5 hover:scale-[1.01] transition-transform ${isPast || isCancelled ? 'opacity-60' : ''}`}>
-          <div className="flex gap-3 sm:gap-4">
+        <GlassCard className={`overflow-hidden hover:border-primary/40 hover:shadow-lg transition ${isPast || isCancelled ? 'opacity-65' : ''}`}>
+          {coverImage && (
+            <img
+              src={coverImage}
+              alt={t('detail.cover_alt', { title: event.title })}
+              className="h-36 w-full object-cover sm:hidden"
+              loading="lazy"
+            />
+          )}
+          <div className="flex gap-3 p-4 sm:gap-4 sm:p-5">
             {/* Date Box */}
             <div className="flex-shrink-0 w-14 sm:w-16 text-center">
-              <time dateTime={event.start_date} className="block bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-lg p-2">
-                <span className="text-amber-400 text-xs font-medium uppercase block">
+              <time dateTime={event.start_date} className="block rounded-lg border border-amber-500/25 bg-amber-500/10 p-2">
+                <span className="text-amber-600 dark:text-amber-400 text-xs font-medium uppercase block">
                   {monthLabel}
                 </span>
                 <span className="text-theme-primary text-xl sm:text-2xl font-bold block">
@@ -613,55 +664,68 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
 
             {/* Event Details */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="font-semibold text-theme-primary text-lg">{event.title}</h3>
-                {event.category_name && (
-                  <Chip size="sm" variant="flat" color="secondary" className="text-xs">
-                    {event.category_name}
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-semibold text-theme-primary text-base sm:text-lg leading-snug">{event.title}</h3>
+                    {event.category_name && (
+                      <Chip size="sm" variant="flat" color="secondary" className="text-xs">
+                        {event.category_name}
+                      </Chip>
+                    )}
+                  </div>
+                  <SafeHtml content={event.description} className="text-theme-muted text-sm line-clamp-2 mt-1" as="p" />
+                </div>
+                {coverImage && (
+                  <img
+                    src={coverImage}
+                    alt={t('detail.cover_alt', { title: event.title })}
+                    className="hidden h-20 w-28 flex-shrink-0 rounded-lg object-cover sm:block"
+                    loading="lazy"
+                  />
+                )}
+              </div>
+
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {isCancelled && (
+                  <Chip size="sm" variant="flat" color="danger" startContent={<Ban className="h-3.5 w-3.5" aria-hidden="true" />}>
+                    {t('card.cancelled')}
+                  </Chip>
+                )}
+                {event.is_full && !isCancelled && (
+                  <Chip size="sm" variant="flat" color="danger">{t('card.full')}</Chip>
+                )}
+                {event.max_attendees != null && event.spots_left != null && event.spots_left > 0 && !isCancelled && (
+                  <Chip size="sm" variant="flat" color={event.spots_left <= 3 ? 'danger' : 'success'}>
+                    {t('card.spots_left', { count: event.spots_left })}
                   </Chip>
                 )}
               </div>
-              <SafeHtml content={event.description} className="text-theme-muted text-sm line-clamp-2 mt-1" as="p" />
 
-              <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-theme-subtle">
-                {event.status === 'cancelled' && (
-                  <span className="flex items-center gap-1 text-red-400 font-medium">
-                    <Ban className="w-4 h-4" aria-hidden="true" />
-                    {t('card.cancelled')}
-                  </span>
-                )}
-                <span className="flex items-center gap-1">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-sm text-theme-subtle">
+                <span className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4" aria-hidden="true" />
                   <time dateTime={event.start_date}>
                     {timeLabel}
                   </time>
                 </span>
                 {event.location && (
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" aria-hidden="true" />
-                    {event.location}
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    <MapPin className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                    <span className="truncate">{event.location}</span>
                   </span>
                 )}
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-1.5">
                   <Users className="w-4 h-4" aria-hidden="true" />
                   {t('going', { count: event.attendees_count ?? 0 })}
                   {(event.interested_count ?? 0) > 0 && (
                     <span className="text-theme-subtle">&middot; {t('interested', { count: event.interested_count })}</span>
                   )}
                 </span>
-                {event.max_attendees != null && event.spots_left != null && event.spots_left > 0 && event.status !== 'cancelled' && (
-                  <span className={`text-xs font-medium ${event.spots_left <= 3 ? 'text-red-400' : 'text-emerald-400'}`}>
-                    {t('card.spots_left', { count: event.spots_left })}
-                  </span>
-                )}
-                {event.is_full && event.status !== 'cancelled' && (
-                  <span className="text-xs font-medium text-red-400">{t('card.full')}</span>
-                )}
               </div>
             </div>
 
-            {/* Arrow */}
-            <div className="flex-shrink-0 self-center">
+            <div className="hidden flex-shrink-0 self-center sm:block">
               <ChevronRight className="w-5 h-5 text-theme-subtle" aria-hidden="true" />
             </div>
           </div>

@@ -112,7 +112,8 @@
   "card": {
     "cancelled": "Cancelled",
     "spots_left": "{{count}} spots left",
-    "full": "Full"
+    "full": "Full",
+    "open_aria": "{{title}} on {{date}}"
   },
   "form": {
     "create_title": "Create New Event",
@@ -253,5 +254,9 @@
     }
   },
   "count_pill": "{{count}} events",
-  "load_more_count": "Load more ({{remaining}} remaining)"
+  "load_more_count": "Load more ({{remaining}} remaining)",
+  "active_filters": "Active filters",
+  "active_search": "Search: {{query}}",
+  "active_near_me": "Within {{radius}} km",
+  "clear_filters": "Clear filters"
 }
