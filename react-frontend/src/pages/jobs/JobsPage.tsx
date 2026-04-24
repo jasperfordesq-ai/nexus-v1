@@ -313,25 +313,22 @@ export function JobsPage() {
     <div className="space-y-6">
       <PageMeta title={t('page_title', { defaultValue: 'Job Vacancies' })} description={t('page_description', { defaultValue: 'Find job opportunities, volunteering positions, and timebank roles.' })} />
       {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-600 via-indigo-500 to-violet-500 p-6 sm:p-8">
-        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
-        <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+      <div className="relative overflow-hidden rounded-xl border border-theme-default bg-theme-surface p-5 shadow-sm sm:p-6">
         <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                <Briefcase className="w-6 h-6 text-white" aria-hidden="true" />
+              <div className="rounded-lg bg-blue-500/10 p-2 text-blue-600 dark:text-blue-400">
+                <Briefcase className="w-5 h-5" aria-hidden="true" />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('title')}</h1>
+              <h1 className="text-xl font-bold text-theme-primary">{t('title')}</h1>
             </div>
-            <p className="text-white/80 text-sm">{t('subtitle')}</p>
+            <p className="text-sm text-theme-muted">{t('subtitle')}</p>
           </div>
           {isAuthenticated && (
             <div className="flex gap-2 flex-wrap shrink-0">
               <Link to={tenantPath('/jobs/my-applications')}>
                 <Button
                   variant="flat"
-                  className="bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm"
                   startContent={<FileText className="w-4 h-4" aria-hidden="true" />}
                 >
                   {t('my_applications.title')}
@@ -340,7 +337,6 @@ export function JobsPage() {
               <Link to={tenantPath('/jobs/alerts')}>
                 <Button
                   variant="flat"
-                  className="bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm"
                   startContent={<Bell className="w-4 h-4" aria-hidden="true" />}
                 >
                   {t('alerts.title')}
@@ -348,7 +344,7 @@ export function JobsPage() {
               </Link>
               <Link to={tenantPath('/jobs/create')}>
                 <Button
-                  className="bg-white text-blue-700 font-semibold hover:bg-white/90 shadow-lg"
+                  color="primary"
                   startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                 >
                   {t('create_vacancy')}

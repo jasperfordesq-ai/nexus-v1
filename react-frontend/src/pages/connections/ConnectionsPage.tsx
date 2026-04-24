@@ -575,25 +575,21 @@ export default function ConnectionsPage() {
       <PageMeta title={t('page_meta.title')} noIndex />
       <div className="max-w-3xl mx-auto">
         {/* Hero Banner */}
-        <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-indigo-600 via-purple-500 to-pink-500 p-6 sm:p-8 mb-6">
-          <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
-          <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
-          <div className="relative">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                <Users2 className="w-6 h-6 text-white" aria-hidden="true" />
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('title')}</h1>
+        <div className="relative overflow-hidden rounded-xl border border-theme-default bg-theme-surface p-5 shadow-sm sm:p-6 mb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="rounded-lg bg-indigo-500/10 p-2 text-indigo-600 dark:text-indigo-400">
+              <Users2 className="w-5 h-5" aria-hidden="true" />
             </div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <p className="text-white/80 text-sm">{t('subtitle')}</p>
-              {pendingReceivedCount > 0 && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse" aria-hidden="true" />
-                  {t('pending_count', { count: pendingReceivedCount })}
-                </span>
-              )}
-            </div>
+            <h1 className="text-xl font-bold text-theme-primary">{t('title')}</h1>
+          </div>
+          <div className="flex items-center gap-3 flex-wrap">
+            <p className="text-sm text-theme-muted">{t('subtitle')}</p>
+            {pendingReceivedCount > 0 && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-warning/10 text-warning text-xs font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" aria-hidden="true" />
+                {t('pending_count', { count: pendingReceivedCount })}
+              </span>
+            )}
           </div>
         </div>
 

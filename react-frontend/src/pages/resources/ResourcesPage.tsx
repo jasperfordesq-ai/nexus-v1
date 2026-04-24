@@ -536,22 +536,21 @@ export function ResourcesPage() {
     <div className="space-y-6">
       <PageMeta title={t('page_title', { defaultValue: 'Resources' })} description={t('page_description', { defaultValue: 'Community resources, documents, and guides.' })} />
       {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-amber-500 via-orange-500 to-yellow-500 p-6 sm:p-8">
-        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
-        <div className="absolute -left-4 -top-4 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden="true" />
+      <div className="relative overflow-hidden rounded-xl border border-theme-default bg-theme-surface p-5 shadow-sm sm:p-6">
         <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                <FolderOpen className="w-6 h-6 text-white" aria-hidden="true" />
+              <div className="rounded-lg bg-amber-500/10 p-2 text-amber-600 dark:text-amber-400">
+                <FolderOpen className="w-5 h-5" aria-hidden="true" />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('resources.heading')}</h1>
+              <h1 className="text-xl font-bold text-theme-primary">{t('resources.heading')}</h1>
             </div>
-            <p className="text-white/80 text-sm">{t('resources.subtitle')}</p>
+            <p className="text-sm text-theme-muted">{t('resources.subtitle')}</p>
           </div>
           {isAuthenticated && (
             <Button
-              className="bg-white text-amber-700 font-semibold hover:bg-white/90 shrink-0 shadow-lg"
+              color="primary"
+              className="shrink-0"
               startContent={<Upload className="w-4 h-4" aria-hidden="true" />}
               onPress={uploadModal.onOpen}
             >

@@ -176,34 +176,28 @@ function FederationHero({ onOptIn, isOptingIn }: { onOptIn: () => void; isOpting
       className="text-center"
     >
       {/* Hero banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-8 md:p-12 lg:p-16 text-white mb-8">
-        {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-          <div className="absolute -top-24 -right-24 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-white/10 rounded-full blur-2xl" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-        </div>
-
-        <div className="relative z-10 max-w-3xl mx-auto">
+      <div className="relative overflow-hidden rounded-xl border border-theme-default bg-theme-surface p-8 shadow-sm md:p-12 mb-8 text-center">
+        <div className="max-w-3xl mx-auto">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="mx-auto mb-6 w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center"
+            className="mx-auto mb-6 w-20 h-20 rounded-2xl bg-indigo-500/10 flex items-center justify-center"
           >
-            <Network className="w-10 h-10 text-white" aria-hidden="true" />
+            <Network className="w-10 h-10 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
           </motion.div>
 
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-theme-primary mb-4">
             {t('hub.hero_title')}
           </h1>
-          <p className="text-lg md:text-xl text-white/80 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-theme-muted mb-8 max-w-2xl mx-auto">
             {t('hub.hero_description')}
           </p>
 
           <Button
             size="lg"
-            className="bg-white text-indigo-700 font-semibold hover:bg-white/90 px-8 py-6 text-lg"
+            color="primary"
+            className="px-8"
             onPress={onOptIn}
             isLoading={isOptingIn}
             startContent={!isOptingIn ? <Globe className="w-5 h-5" aria-hidden="true" /> : undefined}
