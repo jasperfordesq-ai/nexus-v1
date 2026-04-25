@@ -163,10 +163,10 @@ class PasswordResetController extends BaseApiController
             );
         }
 
-        // Defence-in-depth: if the reset token was created with an explicit tenant,
-        // it must match the user's tenant. Tokens created before this column was
-        // backfilled (tenant_id IS NULL) are still accepted for backward compat.
-        if ($tokenTenantId !== null && (int) $user['tenant_id'] !== $tokenTenantId) {
+        // Defence-in-depth: every active token MUST carry its origin tenant.
+        // The migration purges pre-existing NULL-tenant rows; a NULL here can
+        // only mean tampering or schema drift — reject either way.
+        if ($tokenTenantId === null || (int) $user['tenant_id'] !== $tokenTenantId) {
             return $this->respondWithError(
                 ApiErrorCodes::AUTH_TOKEN_INVALID,
                 __('api.invalid_reset_token'),

@@ -43,6 +43,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('safeguarding-clear-expired-monitoring');
 
+        // Surface federated transactions stuck in 'pending' (saga safety-net).
+        $schedule->job(new \App\Jobs\ReconcileFederationPendingTxJob())
+            ->everyFiveMinutes()
+            ->name('federation-reconcile-pending-tx')
+            ->withoutOverlapping(10);
+
         $schedule->command('safeguarding:purge-message-copies')
             ->weekly()
             ->withoutOverlapping()

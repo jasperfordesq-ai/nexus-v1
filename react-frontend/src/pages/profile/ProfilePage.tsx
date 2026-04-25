@@ -1029,7 +1029,7 @@ export function ProfilePage() {
                             <SafeHtml content={listing.description} className="text-sm text-theme-subtle line-clamp-2" as="p" />
                             <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
                               <Clock className="w-3 h-3" aria-hidden="true" />
-                              {listing.hours_estimate ?? listing.estimated_hours ?? '\u2014'}h
+                              {t('hours_abbrev', { hours: listing.hours_estimate ?? listing.estimated_hours ?? '\u2014' })}
                             </div>
                           </div>
                         </GlassCard>

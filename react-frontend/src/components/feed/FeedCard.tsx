@@ -1560,7 +1560,7 @@ const FeedCard = React.memo(function FeedCard({
                           >
                             <span className="flex items-center justify-between gap-3">
                               <span className="truncate">{option.text}</span>
-                              <ArrowRight className="w-4 h-4 text-theme-subtle group-hover:text-[var(--color-warning)] group-hover:translate-x-0.5 transition-all" aria-hidden="true" />
+                              <ArrowRight className="w-4 h-4 text-theme-subtle group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all" aria-hidden="true" />
                             </span>
                           </button>
                         );
@@ -1647,7 +1647,7 @@ const FeedCard = React.memo(function FeedCard({
               </div>
               {item.content && (
                 <blockquote className="relative border-s-4 border-amber-500/60 ps-4 py-1 text-[15px] text-theme-secondary italic leading-relaxed">
-                  <span className="absolute -top-1 -start-1 text-2xl text-[var(--color-warning)]/40 leading-none select-none" aria-hidden="true">&ldquo;</span>
+                  <span className="absolute -top-1 -start-1 text-2xl text-amber-500/40 leading-none select-none" aria-hidden="true">&ldquo;</span>
                   {item.content}
                 </blockquote>
               )}

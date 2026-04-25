@@ -72,7 +72,7 @@ const cookieCategoryDefs = [
   {
     nameKey: 'cookies.cat_analytics_name',
     icon: BarChart3,
-    color: 'text-[var(--color-info)]',
+    color: 'text-blue-500',
     bg: 'bg-blue-500/20',
     borderColor: 'border-blue-500/20',
     required: false,
@@ -169,7 +169,7 @@ export function CookiesPage() {
       {/* Hero Header */}
       <motion.div variants={itemVariants} className="text-center">
         <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 mb-4">
-          <Cookie className="w-10 h-10 text-[var(--color-warning)]" aria-hidden="true" />
+          <Cookie className="w-10 h-10 text-amber-500" aria-hidden="true" />
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-3">
           {t('cookies.heading')}
@@ -193,7 +193,7 @@ export function CookiesPage() {
               onPress={() => scrollToSection(item.id)}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-theme-elevated hover:bg-amber-500/10 text-theme-primary text-sm font-medium transition-colors h-auto min-w-0"
             >
-              <item.icon className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />
+              <item.icon className="w-4 h-4 text-amber-500" aria-hidden="true" />
               {t(item.key)}
             </Button>
           ))}
@@ -205,7 +205,7 @@ export function CookiesPage() {
         <GlassCard className="p-6 sm:p-8">
           <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
             <h2 className="text-xl font-semibold text-theme-primary mb-3 flex items-center gap-2">
-              <Cookie className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
+              <Cookie className="w-5 h-5 text-amber-500" aria-hidden="true" />
               {t('cookies.what_are_title')}
             </h2>
             <div className="space-y-3 text-theme-muted">
@@ -224,7 +224,7 @@ export function CookiesPage() {
       <motion.div variants={itemVariants} id="cookie-categories">
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-6 flex items-center gap-2">
-            <Settings className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
+            <Settings className="w-5 h-5 text-amber-500" aria-hidden="true" />
             {t('cookies.categories_title')}
           </h2>
 
@@ -277,7 +277,7 @@ export function CookiesPage() {
       <motion.div variants={itemVariants} id="cookie-list">
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-6 flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
+            <BarChart3 className="w-5 h-5 text-amber-500" aria-hidden="true" />
             {t('cookies.list_title')}
           </h2>
 
@@ -315,7 +315,7 @@ export function CookiesPage() {
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Globe className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
+            <Globe className="w-5 h-5 text-amber-500" aria-hidden="true" />
             {t('cookies.third_party_title')}
           </h2>
           <div className="space-y-3 text-theme-muted">
@@ -346,7 +346,7 @@ export function CookiesPage() {
       <motion.div variants={itemVariants} id="manage-cookies">
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Monitor className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
+            <Monitor className="w-5 h-5 text-amber-500" aria-hidden="true" />
             {t('cookies.manage_title')}
           </h2>
           <div className="space-y-4 text-theme-muted">
@@ -355,7 +355,7 @@ export function CookiesPage() {
             </p>
 
             <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-3">
-              <Info className="w-5 h-5 text-[var(--color-warning)] mt-0.5 flex-shrink-0" aria-hidden="true" />
+              <Info className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
               <p className="text-sm text-theme-muted">
                 {t('cookies.manage_warning')}
               </p>
@@ -372,7 +372,7 @@ export function CookiesPage() {
                   key={browser.nameKey}
                   className="flex items-start gap-3 p-3 rounded-xl bg-theme-elevated"
                 >
-                  <Monitor className="w-4 h-4 text-[var(--color-warning)] mt-0.5 flex-shrink-0" aria-hidden="true" />
+                  <Monitor className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
                   <div>
                     <p className="font-medium text-theme-primary text-sm">{t(browser.nameKey)}</p>
                     <p className="text-xs text-theme-subtle mt-0.5">{t(browser.pathKey)}</p>
@@ -389,7 +389,7 @@ export function CookiesPage() {
         <GlassCard className="p-6 sm:p-8">
           <div className="text-center">
             <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 mb-4">
-              <MessageSquare className="w-8 h-8 text-[var(--color-warning)]" aria-hidden="true" />
+              <MessageSquare className="w-8 h-8 text-amber-500" aria-hidden="true" />
             </div>
             <h2 className="text-xl font-semibold text-theme-primary mb-2">
               {t('cookies.cta_title')}

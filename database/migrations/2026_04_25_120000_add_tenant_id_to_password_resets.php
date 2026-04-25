@@ -21,6 +21,14 @@ return new class extends Migration {
                 $table->index(['tenant_id', 'email'], 'password_resets_tenant_email_idx');
             });
         }
+
+        // Purge any pre-migration tokens (tenant_id IS NULL). Tokens are short-
+        // lived (1h) so this loses at most one expiring window, and prevents
+        // a NULL token from being redeemed cross-tenant under the backward-
+        // compat path in PasswordResetController.
+        \Illuminate\Support\Facades\DB::table('password_resets')
+            ->whereNull('tenant_id')
+            ->delete();
     }
 
     public function down(): void

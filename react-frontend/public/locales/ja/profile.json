@@ -177,5 +177,6 @@
   "show_more_skills": "Show {{count}} more",
   "show_less": "Show less",
   "read_more": "Read more",
-  "read_less": "Read less"
+  "read_less": "Read less",
+  "hours_abbrev": "{{hours}}h"
 }

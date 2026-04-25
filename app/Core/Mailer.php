@@ -512,7 +512,10 @@ class Mailer
         \Illuminate\Support\Facades\Log::warning("Gmail token refresh response: " . json_encode($logData));
 
         if ($httpCode < 200 || $httpCode >= 300) {
-            \Illuminate\Support\Facades\Log::warning("Gmail token refresh failed (HTTP $httpCode): " . ($data['error_description'] ?? $response));
+            // Log only the structured error fields; the full $response body may
+            // contain sensitive material (refresh tokens, secrets) on rare
+            // backends.
+            \Illuminate\Support\Facades\Log::warning("Gmail token refresh failed (HTTP $httpCode): " . ($data['error_description'] ?? $data['error'] ?? '[error body redacted]'));
             return null;
         }
 

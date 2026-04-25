@@ -77,7 +77,7 @@ export function CookieConsentBanner() {
             {/* Header row */}
             <div className="flex items-start gap-3">
               <div className="p-2 rounded-xl bg-amber-500/15 flex-shrink-0">
-                <Cookie className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
+                <Cookie className="w-5 h-5 text-amber-500" aria-hidden="true" />
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-sm sm:text-base font-semibold text-[var(--text-primary)]">
@@ -131,7 +131,7 @@ export function CookieConsentBanner() {
                     {/* Analytics */}
                     <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-[var(--surface-elevated)]">
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <Cookie className="w-4 h-4 text-[var(--color-info)] flex-shrink-0" aria-hidden="true" />
+                        <Cookie className="w-4 h-4 text-blue-500 flex-shrink-0" aria-hidden="true" />
                         <div>
                           <p className="text-sm font-medium text-[var(--text-primary)]">
                             {t('cookie_consent.analytics', 'Analytics')}

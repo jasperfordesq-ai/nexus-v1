@@ -282,7 +282,7 @@ export function AvailabilityGrid({
           {isDirty && (
             <Button
               size="sm"
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              color="primary"
               startContent={<Save className="w-3.5 h-3.5" aria-hidden="true" />}
               onPress={handleSave}
               isLoading={isSaving}

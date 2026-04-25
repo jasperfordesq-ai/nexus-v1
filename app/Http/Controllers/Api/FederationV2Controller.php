@@ -2481,7 +2481,27 @@ class FederationV2Controller extends BaseApiController
 
         // Partner accepted — finalise local record.
         $externalTxId = $result['data']['transaction_id'] ?? null;
-        DB::update("UPDATE transactions SET status = 'completed' WHERE id = ?", [$txId]);
+        try {
+            DB::update("UPDATE transactions SET status = 'completed' WHERE id = ?", [$txId]);
+        } catch (\Throwable $e) {
+            // Local debit committed and partner accepted, but we couldn't flip
+            // the local row to 'completed'. The reconciliation safety-net job
+            // will pick this up via the 'pending' status. Log loudly + audit.
+            \Illuminate\Support\Facades\Log::critical(
+                "FederationV2 success-finalisation FAILED for tx {$txId}; partner accepted but local status not updated",
+                [
+                    'transaction_id' => $txId,
+                    'tenant_id' => $tenantId,
+                    'user_id' => $userId,
+                    'amount' => $amount,
+                    'partner_id' => $externalPartnerId,
+                    'external_tx_id' => $externalTxId,
+                    'error' => $e->getMessage(),
+                ]
+            );
+            $this->federationAuditService->log('external_transaction_completion_failed', $tenantId, null, $userId,
+                ['transaction_id' => $txId, 'external_tx_id' => $externalTxId, 'partner_id' => $externalPartnerId, 'amount' => $amount, 'error' => $e->getMessage()]);
+        }
 
         $this->federationAuditService->log('external_transaction_sent', $tenantId, null, $userId,
             ['transaction_id' => $txId, 'external_tx_id' => $externalTxId, 'partner_id' => $externalPartnerId, 'amount' => $amount]);
