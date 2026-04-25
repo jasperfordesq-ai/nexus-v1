@@ -90,6 +90,12 @@ interface DashboardStats {
   myEndorsements: EndorsementEntry[];
 }
 
+function normalizePercent(value: unknown): number {
+  const percent = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(percent)) return 0;
+  return Math.min(Math.max(percent, 0), 100);
+}
+
 function formatActivityAction(item: FeedActivityItem, t: (key: string) => string): string {
   switch (item.type) {
     case 'listing': return t('activity.action_listing');
@@ -240,6 +246,7 @@ export function DashboardPage() {
 
   const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08 } } };
   const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 15 } } };
+  const levelProgress = normalizePercent(stats.gamification?.level_progress);
 
   if (error) {
     return (
@@ -493,9 +500,9 @@ export function DashboardPage() {
                       <div>
                         <div className="flex justify-between text-xs sm:text-sm mb-1.5">
                           <span className="text-theme-muted">{t('gamification.level', { level: stats.gamification.level })}</span>
-                          <span className="text-theme-primary font-medium">{Math.round(stats.gamification.level_progress)}%</span>
+                          <span className="text-theme-primary font-medium">{Math.round(levelProgress)}%</span>
                         </div>
-                        <Progress value={Math.min(stats.gamification.level_progress, 100)} color="warning" size="sm" aria-label={t('gamification.xp_progress')} className="h-2" />
+                        <Progress value={levelProgress} color="warning" size="sm" aria-label={t('gamification.xp_progress')} className="h-2" />
                       </div>
                       <div className="flex justify-center pt-2">
                         <div className="text-center p-2 rounded-lg bg-theme-elevated w-full">

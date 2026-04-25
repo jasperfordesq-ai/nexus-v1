@@ -234,6 +234,24 @@ describe('DashboardPage', () => {
     expect(screen.getByText('View All Pending')).toBeInTheDocument();
   });
 
+  it('falls back to 0% when gamification progress is missing', async () => {
+    mockApiGet.mockImplementation((endpoint: string) => {
+      if (endpoint === '/v2/gamification/profile') {
+        return Promise.resolve({
+          success: true,
+          data: { level: 2, xp: 150, badges_count: 3 },
+        });
+      }
+
+      return Promise.resolve(buildApiResponse(endpoint));
+    });
+
+    render(<DashboardPage />);
+
+    expect(await screen.findByText('0%')).toBeInTheDocument();
+    expect(screen.queryByText('NaN%')).not.toBeInTheDocument();
+  });
+
   it('keeps core dashboard sections available when optional modules are disabled', async () => {
     Object.assign(featureFlags, {
       connections: false,
