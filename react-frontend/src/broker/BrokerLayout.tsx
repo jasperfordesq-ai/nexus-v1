@@ -14,15 +14,11 @@ import { Outlet } from 'react-router-dom';
 import { BrokerSidebar } from './components/BrokerSidebar';
 import { BrokerHeader } from './components/BrokerHeader';
 import { BrokerBreadcrumbs } from './components/BrokerBreadcrumbs';
-import { DevelopmentStatusBanner } from '@/components/layout/DevelopmentStatusBanner';
-
 export function BrokerLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
-      <DevelopmentStatusBanner />
-
       {/* Sidebar — hidden on mobile, shown on md+ */}
       <div className="hidden md:block">
         <BrokerSidebar

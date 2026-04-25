@@ -14,6 +14,8 @@ import MapPin from 'lucide-react/icons/map-pin';
 import Cookie from 'lucide-react/icons/cookie';
 import Bug from 'lucide-react/icons/bug';
 import { TenantLogo } from '@/components/branding';
+import FlaskConical from 'lucide-react/icons/flask-conical';
+import { RELEASE_STATUS } from '@/config/releaseStatus';
 
 export interface FooterProps {
   /** Footer content/links */
@@ -148,6 +150,22 @@ export function Footer({ children, copyright }: FooterProps) {
                 </div>
               </div>
             ) : null}
+
+            {/* RC dev notice */}
+            <div className="border-t border-theme-default pt-4 flex items-center justify-center gap-1.5 text-xs text-amber-700 dark:text-amber-400">
+              <FlaskConical className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+              <span>
+                <span className="font-semibold">{RELEASE_STATUS.stageLabel}</span>
+                {' — '}
+                {t('dev_banner.summary', { defaultValue: RELEASE_STATUS.stageSummary })}
+              </span>
+              <Link
+                to={RELEASE_STATUS.readMorePath}
+                className="underline font-medium ms-1 hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-amber-500 rounded whitespace-nowrap"
+              >
+                {t('dev_banner.read_more', 'Read more')}
+              </Link>
+            </div>
 
             {/* Tenant Copyright */}
             <div className="border-t border-theme-default pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">

@@ -14,16 +14,11 @@ import { Outlet } from 'react-router-dom';
 import { AdminSidebar } from './components/AdminSidebar';
 import { AdminHeader } from './components/AdminHeader';
 import { AdminBreadcrumbs } from './components/AdminBreadcrumbs';
-import { DevelopmentStatusBanner } from '@/components/layout/DevelopmentStatusBanner';
-
 export function AdminLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Development status banner — always visible, non-dismissible */}
-      <DevelopmentStatusBanner />
-
       {/* Sidebar — hidden on mobile, shown on md+ */}
       <div className="hidden md:block">
         <AdminSidebar

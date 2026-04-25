@@ -18,7 +18,6 @@ import { Footer } from './Footer';
 import { BackToTop } from '@/components/ui/BackToTop';
 import { OfflineIndicator } from '@/components/feedback/OfflineIndicator';
 import { UpdateAvailableBanner } from '@/components/feedback/UpdateAvailableBanner';
-import { DevelopmentStatusBanner } from './DevelopmentStatusBanner';
 import { SessionExpiredModal } from '@/components/feedback';
 import { AppUpdateModal } from '@/components/feedback/AppUpdateModal';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -241,9 +240,6 @@ export function AuthLayout() {
         <div className="blob blob-purple" />
         <div className="blob blob-cyan" />
       </div>
-
-      {/* Development status banner */}
-      <DevelopmentStatusBanner />
 
       {/* Service worker update banner — user-controlled, never auto-reloads */}
       <UpdateAvailableBanner />
