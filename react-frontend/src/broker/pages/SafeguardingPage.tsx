@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Tabs,
@@ -114,6 +115,7 @@ export default function SafeguardingPage() {
   const { t } = useTranslation('broker');
   usePageTitle(t('safeguarding.title'));
   const toast = useToast();
+  const [searchParams] = useSearchParams();
 
   // ── Dashboard stats ──────────────────────────────────────────────────────
   const [stats, setStats] = useState<SafeguardingDashboard | null>(null);
@@ -139,7 +141,17 @@ export default function SafeguardingPage() {
   const [reviewLoading, setReviewLoading] = useState(false);
 
   // ── Active tab ───────────────────────────────────────────────────────────
-  const [activeTab, setActiveTab] = useState('flagged');
+  // Initialise from `?tab=` so dashboard tiles (Onboarding Flags →
+  // ?tab=preferences) land on the correct tab. Falls back to the default
+  // 'flagged' tab when no param is supplied or the value is unrecognised.
+  const ALLOWED_TABS = ['flagged', 'guardians', 'preferences'] as const;
+  const urlTab = searchParams.get('tab');
+  const initialTab = urlTab && (ALLOWED_TABS as readonly string[]).includes(urlTab) ? urlTab : 'flagged';
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
+
+  // The "Safeguarding Alerts" tile passes `?filter=critical` so the flagged
+  // tab loads with severity=critical pre-applied.
+  const severityFilter = searchParams.get('filter') || '';
 
   // ── Data fetchers ────────────────────────────────────────────────────────
 
@@ -159,7 +171,9 @@ export default function SafeguardingPage() {
   const fetchFlagged = useCallback(async (page = 1) => {
     setFlaggedLoading(true);
     try {
-      const res = await api.get<unknown>(`/v2/admin/safeguarding/flagged-messages?page=${page}&reviewed=0`);
+      const params = new URLSearchParams({ page: String(page), reviewed: '0' });
+      if (severityFilter) params.set('severity', severityFilter);
+      const res = await api.get<unknown>(`/v2/admin/safeguarding/flagged-messages?${params.toString()}`);
       const payload = res.data as unknown;
       if (Array.isArray(payload)) {
         setFlaggedMessages(payload as FlaggedMessage[]);
@@ -174,7 +188,7 @@ export default function SafeguardingPage() {
     } finally {
       setFlaggedLoading(false);
     }
-  }, []);
+  }, [severityFilter]);
 
   const fetchAssignments = useCallback(async () => {
     setAssignmentsLoading(true);

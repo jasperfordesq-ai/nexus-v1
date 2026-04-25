@@ -841,7 +841,7 @@ export function UserEdit() {
                       </Chip>
                       <Button
                         as={Link}
-                        to={tenantPath('/broker/vetting')}
+                        to={tenantPath(user?.id ? `/broker/vetting?user_id=${user.id}` : '/broker/vetting')}
                         size="sm"
                         variant="flat"
                         color="primary"
@@ -910,7 +910,7 @@ export function UserEdit() {
                       </Chip>
                       <Button
                         as={Link}
-                        to={tenantPath('/broker/insurance')}
+                        to={tenantPath(user?.id ? `/broker/insurance?user_id=${user.id}` : '/broker/insurance')}
                         size="sm"
                         variant="flat"
                         color="primary"

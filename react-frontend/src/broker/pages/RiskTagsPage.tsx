@@ -29,7 +29,6 @@ import { adminBroker, adminListings } from '@/admin/api/adminApi';
 import { DataTable, PageHeader, type Column } from '@/admin/components';
 import type { RiskTag } from '@/admin/api/types';
 
-import { useTranslation } from 'react-i18next';
 const riskColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
   low: 'success',
   medium: 'warning',
@@ -38,6 +37,13 @@ const riskColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default'>
 };
 
 const RISK_LEVEL_KEYS = ['low', 'medium', 'high', 'critical'] as const;
+
+const RISK_LEVEL_LABELS: Record<(typeof RISK_LEVEL_KEYS)[number], string> = {
+  low: 'Low',
+  medium: 'Medium',
+  high: 'High',
+  critical: 'Critical',
+};
 
 const RISK_CATEGORY_KEYS = [
   'safeguarding',
@@ -48,6 +54,16 @@ const RISK_CATEGORY_KEYS = [
   'fraud',
   'other',
 ] as const;
+
+const RISK_CATEGORY_LABELS: Record<(typeof RISK_CATEGORY_KEYS)[number], string> = {
+  safeguarding: 'Safeguarding',
+  financial: 'Financial',
+  health_safety: 'Health & Safety',
+  legal: 'Legal',
+  reputation: 'Reputation',
+  fraud: 'Fraud',
+  other: 'Other',
+};
 
 interface RiskTagForm {
   listing_id: string;
@@ -78,7 +94,6 @@ interface ListingSearchResult {
 }
 
 export function RiskTagsPage() {
-  const { t } = useTranslation('admin');
   usePageTitle("Risk Tags - Broker");
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -329,7 +344,9 @@ export function RiskTagsPage() {
       label: "Category",
       sortable: true,
       render: (item) => {
-        return <span className="text-sm">{item.risk_category ? t(`broker.risk_cat_${item.risk_category}`, { defaultValue: item.risk_category }) : '—'}</span>;
+        const cat = item.risk_category;
+        const label = cat ? (RISK_CATEGORY_LABELS[cat as keyof typeof RISK_CATEGORY_LABELS] ?? cat) : '—';
+        return <span className="text-sm">{label}</span>;
       },
     },
     {
@@ -555,7 +572,7 @@ export function RiskTagsPage() {
             >
               {RISK_LEVEL_KEYS.map(key => (
                 <SelectItem key={key}>
-                  {t(`broker.risk_level_${key}`)}
+                  {RISK_LEVEL_LABELS[key]}
                 </SelectItem>
               ))}
             </Select>
@@ -571,7 +588,7 @@ export function RiskTagsPage() {
             >
               {RISK_CATEGORY_KEYS.map(key => (
                 <SelectItem key={key}>
-                  {t(`broker.risk_cat_${key}`)}
+                  {RISK_CATEGORY_LABELS[key]}
                 </SelectItem>
               ))}
             </Select>

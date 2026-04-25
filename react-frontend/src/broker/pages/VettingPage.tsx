@@ -115,6 +115,10 @@ export function VettingRecords() {
     [setSearchParams]
   );
 
+  // `?user_id=` is set by the "Manage Vetting" link from User Edit so the
+  // page lands pre-filtered to that member's records.
+  const userIdFilter = searchParams.get('user_id');
+
   // List state
   const [items, setItems] = useState<VettingRecord[]>([]);
   const [total, setTotal] = useState(0);
@@ -248,6 +252,9 @@ export function VettingRecords() {
       if (searchQuery.trim()) {
         params.search = searchQuery.trim();
       }
+      if (userIdFilter) {
+        params.user_id = userIdFilter;
+      }
 
       const res = await adminVetting.list(params as Parameters<typeof adminVetting.list>[0]);
       if (res.success && Array.isArray(res.data)) {
@@ -260,7 +267,7 @@ export function VettingRecords() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, searchQuery, toast])
+  }, [page, statusFilter, searchQuery, userIdFilter, toast])
 
 
   useEffect(() => {

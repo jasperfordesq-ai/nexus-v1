@@ -42,7 +42,13 @@
     "safeguarding": "Ochrona",
     "vetting": "Weryfikacja i DBS",
     "exchanges": "Wymiany",
-    "messages": "Wiadomości"
+    "messages": "Wiadomości",
+    "monitoring": "User Monitoring",
+    "risk_tags": "Risk Tags",
+    "insurance": "Insurance",
+    "archives": "Review Archive",
+    "configuration": "Configuration",
+    "help": "Help"
   },
   "dashboard": {
     "title": "Panel brokera",

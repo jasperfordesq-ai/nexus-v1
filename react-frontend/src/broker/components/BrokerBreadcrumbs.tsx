@@ -22,6 +22,12 @@ const SEGMENT_LABELS: Record<string, string> = {
   vetting: 'breadcrumbs.vetting',
   exchanges: 'breadcrumbs.exchanges',
   messages: 'breadcrumbs.messages',
+  monitoring: 'breadcrumbs.monitoring',
+  'risk-tags': 'breadcrumbs.risk_tags',
+  insurance: 'breadcrumbs.insurance',
+  archives: 'breadcrumbs.archives',
+  configuration: 'breadcrumbs.configuration',
+  help: 'breadcrumbs.help',
 };
 
 export function BrokerBreadcrumbs() {

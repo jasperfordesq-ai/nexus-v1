@@ -42,7 +42,13 @@
     "safeguarding": "Safeguarding",
     "vetting": "Vérification et DBS",
     "exchanges": "Exchanges",
-    "messages": "Messages"
+    "messages": "Messages",
+    "monitoring": "User Monitoring",
+    "risk_tags": "Risk Tags",
+    "insurance": "Insurance",
+    "archives": "Review Archive",
+    "configuration": "Configuration",
+    "help": "Help"
   },
   "dashboard": {
     "title": "Tableau de bord du courtier",

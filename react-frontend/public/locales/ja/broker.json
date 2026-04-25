@@ -42,7 +42,13 @@
     "safeguarding": "セーフガーディング",
     "vetting": "審査・DBS",
     "exchanges": "交換",
-    "messages": "メッセージ"
+    "messages": "メッセージ",
+    "monitoring": "User Monitoring",
+    "risk_tags": "Risk Tags",
+    "insurance": "Insurance",
+    "archives": "Review Archive",
+    "configuration": "Configuration",
+    "help": "Help"
   },
   "dashboard": {
     "title": "ブローカーダッシュボード",

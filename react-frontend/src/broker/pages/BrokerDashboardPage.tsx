@@ -28,7 +28,7 @@ import { useTenant, useToast } from '@/contexts';
 import { adminBroker } from '@/admin/api/adminApi';
 import { StatCard, PageHeader } from '@/admin/components';
 import type { BrokerDashboardStats, BrokerActivityEntry } from '@/admin/api/types';
-import BrokerControlsHelp from './BrokerHelpPage';
+import { BrokerControlsHelp } from './BrokerHelpPage';
 
 const QUICK_LINKS = [
   {
@@ -268,8 +268,10 @@ export function BrokerDashboard() {
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center justify-center py-10 text-center">
             <Activity size={40} className="text-default-300 mb-3" />
-            <p className="text-default-500 font-medium">{"No recent broker activity found"}</p>
-            <p className="text-sm text-default-400 mt-1">{"Activity Empty."}</p>
+            <p className="text-default-500 font-medium">No recent broker activity</p>
+            <p className="text-sm text-default-400 mt-1">
+              Approvals, message reviews, and other broker actions will appear here as they happen.
+            </p>
           </CardBody>
         </Card>
       )}

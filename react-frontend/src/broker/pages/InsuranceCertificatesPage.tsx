@@ -50,7 +50,6 @@ import { adminInsurance, adminUsers, adminBroker } from '@/admin/api/adminApi';
 import { DataTable, StatCard, PageHeader, ConfirmModal, EmptyState, type Column } from '@/admin/components';
 import type { InsuranceCertificate, InsuranceStats, BrokerConfig } from '@/admin/api/types';
 
-import { useTranslation } from 'react-i18next';
 const INSURANCE_TYPE_KEYS = [
   'public_liability',
   'professional_indemnity',
@@ -59,6 +58,20 @@ const INSURANCE_TYPE_KEYS = [
   'personal_accident',
   'other',
 ] as const;
+
+const INSURANCE_TYPE_LABELS: Record<(typeof INSURANCE_TYPE_KEYS)[number], string> = {
+  public_liability: 'Public Liability',
+  professional_indemnity: 'Professional Indemnity',
+  employers_liability: "Employers' Liability",
+  product_liability: 'Product Liability',
+  personal_accident: 'Personal Accident',
+  other: 'Other',
+};
+
+function formatInsuranceType(type: string | null | undefined): string {
+  if (!type) return '—';
+  return INSURANCE_TYPE_LABELS[type as keyof typeof INSURANCE_TYPE_LABELS] ?? type;
+}
 
 const STATUS_COLOR_MAP: Record<string, 'warning' | 'success' | 'danger' | 'primary' | 'default'> = {
   pending: 'warning',
@@ -79,7 +92,6 @@ interface UserSearchResult {
 }
 
 export function InsuranceCertificates() {
-  const { t } = useTranslation('admin');
   usePageTitle("Insurance Certificates - Broker");
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -112,6 +124,10 @@ export function InsuranceCertificates() {
     },
     [setSearchParams]
   );
+
+  // `?user_id=` is set by the "Manage Insurance" link from User Edit so the
+  // page lands pre-filtered to that member's certificates.
+  const userIdFilter = searchParams.get('user_id');
 
   const [items, setItems] = useState<InsuranceCertificate[]>([]);
   const [total, setTotal] = useState(0);
@@ -238,6 +254,9 @@ export function InsuranceCertificates() {
       if (debouncedSearch.trim()) {
         params.search = debouncedSearch.trim();
       }
+      if (userIdFilter) {
+        params.user_id = userIdFilter;
+      }
 
       const res = await adminInsurance.list(params as Parameters<typeof adminInsurance.list>[0]);
       if (res.success && Array.isArray(res.data)) {
@@ -250,7 +269,7 @@ export function InsuranceCertificates() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, debouncedSearch, toast])
+  }, [page, statusFilter, debouncedSearch, userIdFilter, toast])
 
 
   useEffect(() => { loadStats(); }, [loadStats]);
@@ -476,7 +495,7 @@ export function InsuranceCertificates() {
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat" color="primary">
-          {t(`broker.insurance_type_${item.insurance_type}`, { defaultValue: item.insurance_type })}
+          {formatInsuranceType(item.insurance_type)}
         </Chip>
       ),
     },
@@ -797,7 +816,7 @@ export function InsuranceCertificates() {
               isRequired
             >
               {INSURANCE_TYPE_KEYS.map((key) => (
-                <SelectItem key={key}>{t(`broker.insurance_type_${key}`)}</SelectItem>
+                <SelectItem key={key}>{INSURANCE_TYPE_LABELS[key]}</SelectItem>
               ))}
             </Select>
             <Input
@@ -904,7 +923,7 @@ export function InsuranceCertificates() {
                 isRequired
               >
                 {INSURANCE_TYPE_KEYS.map((key) => (
-                  <SelectItem key={key}>{t(`broker.insurance_type_${key}`)}</SelectItem>
+                  <SelectItem key={key}>{INSURANCE_TYPE_LABELS[key]}</SelectItem>
                 ))}
               </Select>
               <Input
@@ -1048,7 +1067,7 @@ export function InsuranceCertificates() {
               <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
                 <div>
                   <p className="text-default-400">{"Type"}</p>
-                  <p className="font-medium">{t(`broker.insurance_type_${viewItem.insurance_type}`, { defaultValue: viewItem.insurance_type })}</p>
+                  <p className="font-medium">{formatInsuranceType(viewItem.insurance_type)}</p>
                 </div>
                 <div>
                   <p className="text-default-400">{"Status"}</p>

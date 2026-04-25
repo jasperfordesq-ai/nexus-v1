@@ -42,7 +42,13 @@
     "safeguarding": "Cosaint",
     "vetting": "Scagadh & DBS",
     "exchanges": "Malartuithe",
-    "messages": "Teachtaireachtaí"
+    "messages": "Teachtaireachtaí",
+    "monitoring": "User Monitoring",
+    "risk_tags": "Risk Tags",
+    "insurance": "Insurance",
+    "archives": "Review Archive",
+    "configuration": "Configuration",
+    "help": "Help"
   },
   "dashboard": {
     "title": "Deais Bhróicéara",

@@ -4,15 +4,19 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * BrokerControlsHelp — collapsible guidance panel for the Broker Controls dashboard.
+ * BrokerControlsHelp — collapsible guidance panel for the Broker Controls.
  *
- * Rendered at the bottom of BrokerDashboard. The panel heading is always visible;
- * each section's content is tucked into a HeroUI Accordion so admins can scan
- * section titles and expand the one they need.
+ * Used in two places:
+ *   1. Embedded at the bottom of BrokerDashboardPage (no page-title side effect)
+ *   2. As the standalone /broker/help route via the BrokerHelpPage default export
  *
- * Content is written in British English for admin operators. If admin-panel i18n
- * is ever turned on (currently English-only per project policy), migrate these
- * strings into the `admin.broker_help.*` namespace.
+ * The presentational `BrokerControlsHelp` component does NOT call usePageTitle —
+ * if it did, embedding it on the dashboard would clobber the dashboard's title.
+ * The standalone wrapper `BrokerHelpPage` owns the title for the /broker/help route.
+ *
+ * Content is written in British English. The broker panel supports i18n; once
+ * the help copy is ready to translate, lift these strings into a `broker_help.*`
+ * namespace and reference them via `useTranslation('broker')`.
  */
 
 import { Card, CardBody, CardHeader, Accordion, AccordionItem, Divider } from '@heroui/react';
@@ -29,7 +33,6 @@ import Phone from 'lucide-react/icons/phone';
 import Database from 'lucide-react/icons/database';
 
 export function BrokerControlsHelp() {
-  usePageTitle("Help - Broker");
   return (
     <section className="mt-10">
       <Card shadow="sm" className="border border-default-200">
@@ -461,4 +464,11 @@ export function BrokerControlsHelp() {
   );
 }
 
-export default BrokerControlsHelp;
+/**
+ * Standalone /broker/help route wrapper. Owns the page title; the embedded
+ * usage on the dashboard renders the bare `BrokerControlsHelp` component.
+ */
+export default function BrokerHelpPage() {
+  usePageTitle('Help - Broker');
+  return <BrokerControlsHelp />;
+}
