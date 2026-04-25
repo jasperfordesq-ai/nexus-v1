@@ -124,7 +124,7 @@ export function PlatformLegalPage({
       <motion.div variants={itemVariants}>
         <GlassCard className="p-5 sm:p-6">
           <div className="flex items-start gap-3 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-            <Info className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" aria-hidden="true" />
+            <Info className="w-5 h-5 text-[var(--color-info)] mt-0.5 shrink-0" aria-hidden="true" />
             <div>
               <h2 className="font-semibold text-sm text-blue-600 dark:text-blue-400 mb-1">
                 {t('platform.provider_notice_title')}

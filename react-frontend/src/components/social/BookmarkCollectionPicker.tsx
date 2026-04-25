@@ -84,7 +84,7 @@ export function BookmarkCollectionPicker({ selectedId, onSelect, onClose }: Book
           onPress={() => handleSelect(col.id)}
           className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors h-auto justify-start"
         >
-          <FolderOpen className="w-4 h-4 text-amber-500" />
+          <FolderOpen className="w-4 h-4 text-[var(--color-warning)]" />
           <span className="flex-1 text-left truncate">{col.name}</span>
           <span className="text-xs text-[var(--text-subtle)]">{col.bookmarks_count}</span>
           {selectedId === col.id && <Check className="w-4 h-4 text-[var(--color-primary)]" />}

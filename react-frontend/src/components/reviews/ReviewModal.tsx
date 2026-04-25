@@ -119,7 +119,7 @@ export function ReviewModal({
           {/* Rating Stars */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-theme-primary">
-              {t('review_modal.rating_label')} <span className="text-red-500">{t('review_modal.rating_required')}</span>
+              {t('review_modal.rating_label')} <span className="text-[var(--color-error)]">{t('review_modal.rating_required')}</span>
             </label>
             <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map((star) => (

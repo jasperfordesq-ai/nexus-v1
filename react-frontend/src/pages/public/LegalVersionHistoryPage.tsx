@@ -368,7 +368,7 @@ export function LegalVersionHistoryPage() {
                           {/* Summary of changes callout */}
                           {expandedContent.summary_of_changes && (
                             <div className="flex items-start gap-3 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                              <Info className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" aria-hidden="true" />
+                              <Info className="w-5 h-5 text-[var(--color-info)] mt-0.5 shrink-0" aria-hidden="true" />
                               <div>
                                 <h4 className="font-medium text-sm text-blue-600 dark:text-blue-400 mb-1">
                                   {t('version_history.summary_of_changes')}
@@ -424,7 +424,7 @@ export function LegalVersionHistoryPage() {
                                     {/* Diff header */}
                                     <div className="flex items-center justify-between gap-3 px-4 py-3 bg-amber-500/5 border-b border-amber-500/20">
                                       <div className="flex items-center gap-2 text-sm">
-                                        <GitCompareArrows className="w-4 h-4 text-amber-500" aria-hidden="true" />
+                                        <GitCompareArrows className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />
                                         <span className="font-medium text-theme-primary">
                                           {t('version_history.changes_between', {
                                             defaultValue: 'Changes: v{{old}} → v{{new}}',

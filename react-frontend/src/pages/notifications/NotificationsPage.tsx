@@ -374,7 +374,7 @@ export function NotificationsPage() {
       {/* Load Error */}
       {loadError && !isLoading && (
         <GlassCard className="p-8 text-center">
-          <Bell className="w-12 h-12 text-amber-500 mx-auto mb-4 opacity-50" aria-hidden="true" />
+          <Bell className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4 opacity-50" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('error_title', 'Unable to load')}</h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <Button
@@ -575,7 +575,7 @@ const NotificationCard = memo(function NotificationCard({ notification, onMarkRe
               isIconOnly
               variant="flat"
               size="sm"
-              className="bg-theme-elevated text-theme-muted hover:text-red-500 dark:hover:text-red-400"
+              className="bg-theme-elevated text-theme-muted hover:text-[var(--color-error)] dark:hover:text-red-400"
               onPress={onDelete}
               aria-label={t('delete_aria')}
             >

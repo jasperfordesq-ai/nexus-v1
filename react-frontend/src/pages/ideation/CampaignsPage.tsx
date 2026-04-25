@@ -111,7 +111,7 @@ export function CampaignsPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 py-16 text-center">
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 flex items-center justify-center mb-4">
-          <Lightbulb className="w-8 h-8 text-amber-500" aria-hidden="true" />
+          <Lightbulb className="w-8 h-8 text-[var(--color-warning)]" aria-hidden="true" />
         </div>
         <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">{t('campaigns.feature_not_available', 'Ideation Not Available')}</h2>
         <p className="text-[var(--color-text-muted)] max-w-sm">

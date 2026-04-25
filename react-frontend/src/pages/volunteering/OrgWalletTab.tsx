@@ -257,8 +257,8 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
   /* ───────────────────────── Helpers ───────────────────────── */
 
   const getBalanceColor = () => {
-    if (balance <= 0) return 'text-red-500';
-    if (balance < 5) return 'text-amber-500';
+    if (balance <= 0) return 'text-[var(--color-error)]';
+    if (balance < 5) return 'text-[var(--color-warning)]';
     return 'text-emerald-500';
   };
 
@@ -268,7 +268,7 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
   };
 
   const getAmountColor = (amount: number) => {
-    return amount >= 0 ? 'text-emerald-500' : 'text-red-500';
+    return amount >= 0 ? 'text-emerald-500' : 'text-[var(--color-error)]';
   };
 
   /* ───────────────────────── Animation variants ───────────────────────── */
@@ -360,7 +360,7 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
         {/* Error */}
         {error && !isLoading && (
           <GlassCard className="p-8 text-center">
-            <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+            <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
             <p className="text-theme-muted mb-4">{error}</p>
             <Button
               className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
@@ -442,7 +442,7 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
                       {tx.amount >= 0 ? (
                         <ArrowDownToLine className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                       ) : (
-                        <ArrowUpFromLine className="w-5 h-5 text-red-500" aria-hidden="true" />
+                        <ArrowUpFromLine className="w-5 h-5 text-[var(--color-error)]" aria-hidden="true" />
                       )}
                     </div>
                   </div>

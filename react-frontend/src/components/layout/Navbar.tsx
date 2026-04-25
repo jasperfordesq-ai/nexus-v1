@@ -841,7 +841,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                           key="logout"
                           color="danger"
                           startContent={<LogOut className="w-4 h-4" aria-hidden="true" />}
-                          className="text-red-500 dark:text-red-400"
+                          className="text-[var(--color-error)]"
                         >
                           {t('user_menu.log_out')}
                         </DropdownItem>

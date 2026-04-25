@@ -214,13 +214,13 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
             <Wallet
-              className={`w-5 h-5 ${isBalanceLow ? 'text-amber-500' : 'text-emerald-500'}`}
+              className={`w-5 h-5 ${isBalanceLow ? 'text-[var(--color-warning)]' : 'text-emerald-500'}`}
               aria-hidden="true"
             />
             <span className="text-theme-primary font-semibold">
               {t('org_wallet_balance', 'Wallet balance:')}
             </span>
-            <span className={`font-bold text-lg ${isBalanceLow ? 'text-amber-500' : 'text-emerald-500'}`}>
+            <span className={`font-bold text-lg ${isBalanceLow ? 'text-[var(--color-warning)]' : 'text-emerald-500'}`}>
               {balance} {balance === 1 ? t('hour', 'hour') : t('hours', 'hours')}
             </span>
           </div>

@@ -333,7 +333,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
           {/* What activates */}
           <section className="mb-6">
             <div className="flex items-center gap-2 mb-2">
-              <Zap className="w-4 h-4 text-amber-500" />
+              <Zap className="w-4 h-4 text-[var(--color-warning)]" />
               <h3 className="text-sm font-semibold text-theme-primary">
                 {t('safeguarding.confirmation.what_activates_heading')}
               </h3>
@@ -341,7 +341,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
             <ul className="space-y-2">
               {activations.map((activation, idx) => (
                 <li key={idx} className="flex items-start gap-2 pl-1">
-                  <span className="text-amber-500 mt-1">•</span>
+                  <span className="text-[var(--color-warning)] mt-1">•</span>
                   <span className="text-sm text-theme-secondary">{activation}</span>
                 </li>
               ))}

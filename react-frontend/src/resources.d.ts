@@ -3338,7 +3338,7 @@ export default interface Resources {
       "location_sidebar": "Sidebar",
       "nest_inside": "Nest inside {{label}}",
       "new_item_default": "New Item",
-      "placeholder_css": "e.g., text-red-500",
+      "placeholder_css": "e.g., text-[var(--color-error)]",
       "sub_items": "{{count}} sub-item",
       "sub_items_plural": "{{count}} sub-items",
       "type_divider_desc": "Visual separator",

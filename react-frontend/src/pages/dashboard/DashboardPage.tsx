@@ -246,7 +246,7 @@ export function DashboardPage() {
       <>
         <PageMeta title={t('meta.title')} description={t('meta.description')} noIndex />
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />} onPress={() => loadDashboardData()}>{t('try_again')}</Button>
@@ -477,7 +477,7 @@ export function DashboardPage() {
               <GlassCard className="p-6 h-full relative overflow-hidden">
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-500/10 via-transparent to-orange-500/10 pointer-events-none" />
                 <div className="relative">
-                  <SectionHeader icon={<TrendingUp className="w-4 h-4 text-amber-500 dark:text-amber-400" aria-hidden="true" />} iconColor="amber" title={t('sections.your_progress')} linkTo={tenantPath('/achievements')} linkText={t('view_achievements')} />
+                  <SectionHeader icon={<TrendingUp className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />} iconColor="amber" title={t('sections.your_progress')} linkTo={tenantPath('/achievements')} linkText={t('view_achievements')} />
                   {isLoading ? (
                     <div aria-label={t('aria.loading_progress')} aria-busy="true" className="space-y-4">
                       <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-1/2" /></Skeleton>
@@ -487,7 +487,7 @@ export function DashboardPage() {
                   ) : stats.gamification ? (
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-theme-primary flex items-center gap-1.5"><Award className="w-4 h-4 text-amber-500" aria-hidden="true" />{t('gamification.level', { level: stats.gamification.level })}</span>
+                        <span className="text-sm font-medium text-theme-primary flex items-center gap-1.5"><Award className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />{t('gamification.level', { level: stats.gamification.level })}</span>
                         <Chip size="sm" variant="flat" color="warning" className="text-xs">{stats.gamification.xp} XP</Chip>
                       </div>
                       <div>
@@ -521,7 +521,7 @@ export function DashboardPage() {
               <GlassCard className="p-6 h-full relative overflow-hidden">
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 pointer-events-none" />
                 <div className="relative">
-                  <SectionHeader icon={<Sparkles className="w-4 h-4 text-amber-500 dark:text-amber-400" aria-hidden="true" />} iconColor="amber" title={t('sections.suggested_for_you')} linkTo={tenantPath('/listings')} linkText={t('browse_all')} />
+                  <SectionHeader icon={<Sparkles className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />} iconColor="amber" title={t('sections.suggested_for_you')} linkTo={tenantPath('/listings')} linkText={t('browse_all')} />
                   {suggestedLoading ? (
                     <div aria-label={t('aria.loading_suggestions')} aria-busy="true" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {Array.from({ length: 4 }).map((_, i) => (<Skeleton key={i} className="rounded-lg"><div className="h-24 rounded-lg bg-default-300" /></Skeleton>))}
@@ -676,7 +676,7 @@ function PendingReviewsCard() {
     return (
       <GlassCard className="p-6 h-full">
         <div className="flex items-center gap-2.5 mb-4">
-          <SectionIcon color="amber"><Star className="w-4 h-4 text-amber-500" aria-hidden="true" /></SectionIcon>
+          <SectionIcon color="amber"><Star className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" /></SectionIcon>
           <h2 className="text-lg font-semibold text-theme-primary">{t('sections.pending_reviews')}</h2>
         </div>
         <div aria-label={t('aria.loading_pending_reviews')} aria-busy="true" className="space-y-3">
@@ -690,7 +690,7 @@ function PendingReviewsCard() {
     return (
       <GlassCard className="p-6 h-full">
         <div className="flex items-center gap-2.5 mb-4">
-          <SectionIcon color="amber"><Star className="w-4 h-4 text-amber-500" aria-hidden="true" /></SectionIcon>
+          <SectionIcon color="amber"><Star className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" /></SectionIcon>
           <h2 className="text-lg font-semibold text-theme-primary">{t('sections.pending_reviews')}</h2>
         </div>
         <div className="text-center py-6 text-theme-subtle">
@@ -704,7 +704,7 @@ function PendingReviewsCard() {
   return (
     <GlassCard className="p-6 h-full">
       <div className="flex items-center gap-2.5 mb-4">
-        <SectionIcon color="amber"><Star className="w-4 h-4 text-amber-500" aria-hidden="true" /></SectionIcon>
+        <SectionIcon color="amber"><Star className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" /></SectionIcon>
         <h2 className="text-lg font-semibold text-theme-primary">{t('sections.pending_reviews')}</h2>
         <Chip size="sm" color="warning" variant="flat" className="ml-auto">{pending.length}</Chip>
       </div>

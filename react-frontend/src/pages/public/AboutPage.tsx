@@ -420,7 +420,7 @@ export function AboutPage() {
                 <GlassCard className="p-6 h-full">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-2.5 rounded-xl bg-amber-500/15">
-                      <Award className="w-5 h-5 text-amber-500 dark:text-amber-400" aria-hidden="true" />
+                      <Award className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
                     </div>
                     <h3 className="font-semibold text-theme-primary text-lg">{t('about.credits.acknowledgements')}</h3>
                   </div>

@@ -259,7 +259,7 @@ function BootstrapError({ onRetry }: { onRetry: () => void }) {
     <div className="min-h-screen flex items-center justify-center px-4 bg-[var(--surface-base)]">
       <div className="text-center max-w-sm">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/20 mb-6">
-          <svg className="w-8 h-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <svg className="w-8 h-8 text-[var(--color-warning)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M12 9v2m0 4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z" />
           </svg>
@@ -312,7 +312,7 @@ function CommunityNotFound({ slug }: { slug: string }) {
       >
         <GlassCard className="p-8 text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 mb-6">
-            <Globe className="w-10 h-10 text-amber-500" aria-hidden="true" />
+            <Globe className="w-10 h-10 text-[var(--color-warning)]" aria-hidden="true" />
           </div>
 
           <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('community_not_found')}</h1>

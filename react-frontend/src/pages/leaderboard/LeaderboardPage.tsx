@@ -213,7 +213,7 @@ function SeasonCard() {
   if (seasonError) {
     return (
       <GlassCard className="p-5">
-        <div className="flex items-center gap-3 text-amber-500">
+        <div className="flex items-center gap-3 text-[var(--color-warning)]">
           <AlertTriangle className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
           <div className="flex-1">
             <p className="text-sm font-medium text-theme-primary">{t('leaderboard.season.unavailable', 'Season data unavailable')}</p>
@@ -772,7 +772,7 @@ function CompetitiveLeaderboard(props: CompetitiveLeaderboardProps) {
       {/* Error State */}
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('leaderboard.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button

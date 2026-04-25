@@ -991,7 +991,7 @@ export function FeedPage() {
       {error && !isLoading && (
         <GlassCard className="p-10 text-center" glow="primary" role="alert">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mx-auto mb-5">
-            <AlertTriangle className="w-8 h-8 text-amber-500" aria-hidden="true" />
+            <AlertTriangle className="w-8 h-8 text-[var(--color-warning)]" aria-hidden="true" />
           </div>
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-5 text-sm max-w-xs mx-auto">{error}</p>

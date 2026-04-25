@@ -93,7 +93,7 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  engagement: 'text-blue-500',
+  engagement: 'text-[var(--color-info)]',
   quality:    'text-yellow-500',
   volunteer:  'text-emerald-500',
   activity:   'text-violet-500',

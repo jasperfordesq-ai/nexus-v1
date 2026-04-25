@@ -175,13 +175,13 @@ export function BlogPage() {
   };
 
   const categoryColorMap: Record<string, string> = {
-    blue: 'bg-blue-500/10 text-blue-500',
+    blue: 'bg-blue-500/10 text-[var(--color-info)]',
     gray: 'bg-gray-500/10 text-gray-500',
     fuchsia: 'bg-fuchsia-500/10 text-fuchsia-500',
     purple: 'bg-purple-500/10 text-purple-500',
     green: 'bg-emerald-500/10 text-emerald-500',
     red: 'bg-rose-500/10 text-rose-500',
-    yellow: 'bg-amber-500/10 text-amber-500',
+    yellow: 'bg-amber-500/10 text-[var(--color-warning)]',
   };
 
   return (
@@ -247,7 +247,7 @@ export function BlogPage() {
       {/* Error */}
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
@@ -377,7 +377,7 @@ function FeaturedPostCard({ post, categoryColors }: PostCardProps) {
                 {post.category.name}
               </Chip>
             )}
-            <h2 className="text-xl font-bold text-theme-primary mb-2 group-hover:text-blue-500 transition-colors line-clamp-2">
+            <h2 className="text-xl font-bold text-theme-primary mb-2 group-hover:text-[var(--color-info)] transition-colors line-clamp-2">
               {post.title}
             </h2>
             <p className="text-sm text-theme-muted mb-4 line-clamp-3">{post.excerpt}</p>
@@ -439,7 +439,7 @@ function BlogPostCard({ post, categoryColors }: PostCardProps) {
             </Chip>
           )}
 
-          <h3 className="font-semibold text-theme-primary group-hover:text-blue-500 transition-colors mb-2 line-clamp-2">
+          <h3 className="font-semibold text-theme-primary group-hover:text-[var(--color-info)] transition-colors mb-2 line-clamp-2">
             {post.title}
           </h3>
 

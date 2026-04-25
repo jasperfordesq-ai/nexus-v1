@@ -260,7 +260,7 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
 
           {/* XP reward badge */}
           <div className="flex-shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10">
-            <Flame className="w-3.5 h-3.5 text-amber-500" aria-hidden="true" />
+            <Flame className="w-3.5 h-3.5 text-[var(--color-warning)]" aria-hidden="true" />
             <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
               {challenge.reward_xp} XP
             </span>

@@ -247,7 +247,7 @@ export function DonationCheckout({
               {/* ── Step 3: Success ── */}
               {step === 'success' && (
                 <div className="text-center py-6 space-y-4">
-                  <CheckCircle className="w-16 h-16 text-green-500 mx-auto" aria-hidden="true" />
+                  <CheckCircle className="w-16 h-16 text-[var(--color-success)] mx-auto" aria-hidden="true" />
                   <div>
                     <p className="text-lg font-semibold text-theme-primary">
                       {t('donations.success_title', 'Thank You!')}

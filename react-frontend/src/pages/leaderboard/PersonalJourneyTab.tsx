@@ -128,12 +128,12 @@ export default function PersonalJourneyTab() {
         <SummaryCard
           label={t('journey.badges', 'Badges')}
           value={summary.total_badges}
-          icon={<Award className="w-4 h-4 text-amber-500" />}
+          icon={<Award className="w-4 h-4 text-[var(--color-warning)]" />}
         />
         <SummaryCard
           label={t('journey.listings', 'Listings')}
           value={summary.total_listings}
-          icon={<Target className="w-4 h-4 text-blue-500" />}
+          icon={<Target className="w-4 h-4 text-[var(--color-info)]" />}
         />
         <SummaryCard
           label={t('journey.volunteer_hours', 'Volunteer Hours')}
@@ -231,7 +231,7 @@ export default function PersonalJourneyTab() {
       {milestones.length > 0 && (
         <GlassCard className="p-6">
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Milestone className="w-5 h-5 text-amber-500" />
+            <Milestone className="w-5 h-5 text-[var(--color-warning)]" />
             {t('journey.milestones', 'Milestones')}
           </h3>
           <div className="space-y-2">

@@ -64,9 +64,9 @@ describe('DynamicIcon', () => {
   });
 
   it('applies custom className to the icon', () => {
-    const { container } = render(<DynamicIcon name="Home" className="text-red-500 w-6 h-6" />);
+    const { container } = render(<DynamicIcon name="Home" className="text-[var(--color-error)] w-6 h-6" />);
     const svg = container.querySelector('svg');
-    expect(svg).toHaveAttribute('class', expect.stringContaining('text-red-500'));
+    expect(svg).toHaveAttribute('class', expect.stringContaining('text-[var(--color-error)]'));
   });
 
   it('applies custom size to the icon', () => {

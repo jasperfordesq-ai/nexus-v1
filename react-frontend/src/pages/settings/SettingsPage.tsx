@@ -1158,7 +1158,7 @@ export function SettingsPage() {
 
               <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
                 <p className="text-sm text-theme-muted flex items-start gap-2">
-                  <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <Info className="w-4 h-4 text-[var(--color-info)] flex-shrink-0 mt-0.5" aria-hidden="true" />
                   {t("gdpr.confirmation_email")}
                 </p>
               </div>

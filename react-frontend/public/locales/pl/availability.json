@@ -17,5 +17,15 @@
     "fri": "Fri",
     "sat": "Sat",
     "sun": "Sun"
+  },
+  "slot_status_label": "{{day}} {{time}}: {{status}}",
+  "full_days": {
+    "mon": "Monday",
+    "tue": "Tuesday",
+    "wed": "Wednesday",
+    "thu": "Thursday",
+    "fri": "Friday",
+    "sat": "Saturday",
+    "sun": "Sunday"
   }
 }

@@ -227,7 +227,7 @@ export function SecurityTab({
                         </span>
                       ) : (
                         <span className="flex items-center gap-1">
-                          <ShieldOff className="w-3 h-3 text-amber-500" aria-hidden="true" />
+                          <ShieldOff className="w-3 h-3 text-[var(--color-warning)]" aria-hidden="true" />
                           {t('twofa_not_enabled')}
                         </span>
                       )}
@@ -240,7 +240,7 @@ export function SecurityTab({
                       <Button
                         size="sm"
                         variant="flat"
-                        className="bg-red-500/10 text-red-500"
+                        className="bg-red-500/10 text-[var(--color-error)]"
                         onPress={twoFactorDisableModalOnOpen}
                       >
                         {t('twofa_disable')}

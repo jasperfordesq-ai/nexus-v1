@@ -107,7 +107,11 @@
     "user_availability": "Beschikbaarheid van de gebruiker",
     "user_reviews": "Beoordelingen van de gebruiker",
     "user_achievements": "Prestaties van de gebruiker",
-    "loading_reviews": "Beoordelingen laden"
+    "loading_reviews": "Beoordelingen laden",
+    "rating_summary": "Rating: {{rating}} out of 5",
+    "nexus_score_summary": "NexusScore: {{score}} ({{tier}})",
+    "nexus_score_link": "NexusScore: {{score}} ({{tier}}) - view breakdown",
+    "listing_card": "{{type}}: {{title}}"
   },
   "review_modal": {
     "title": "Schrijf een Beoordeling",

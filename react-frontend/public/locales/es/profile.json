@@ -107,7 +107,11 @@
     "user_availability": "Disponibilidad del usuario",
     "user_reviews": "Reseñas del usuario",
     "user_achievements": "Logros del usuario",
-    "loading_reviews": "Cargando reseñas"
+    "loading_reviews": "Cargando reseñas",
+    "rating_summary": "Rating: {{rating}} out of 5",
+    "nexus_score_summary": "NexusScore: {{score}} ({{tier}})",
+    "nexus_score_link": "NexusScore: {{score}} ({{tier}}) - view breakdown",
+    "listing_card": "{{type}}: {{title}}"
   },
   "review_modal": {
     "title": "Escribir una reseña",

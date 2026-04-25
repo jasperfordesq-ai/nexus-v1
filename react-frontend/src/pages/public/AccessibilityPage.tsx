@@ -181,7 +181,7 @@ export function AccessibilityPage() {
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-amber-500" aria-hidden="true" />
+            <MessageSquare className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
             {t('accessibility.feedback_title')}
           </h2>
           <div className="space-y-4 text-theme-muted">
@@ -230,7 +230,7 @@ export function AccessibilityPage() {
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Globe className="w-5 h-5 text-blue-500" aria-hidden="true" />
+            <Globe className="w-5 h-5 text-[var(--color-info)]" aria-hidden="true" />
             {t('accessibility.tech_title')}
           </h2>
           <div className="space-y-4 text-theme-muted">
@@ -251,7 +251,7 @@ export function AccessibilityPage() {
                   key={key}
                   className="flex items-center gap-2 p-3 rounded-lg bg-theme-elevated text-sm"
                 >
-                  <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0" aria-hidden="true" />
+                  <CheckCircle className="w-4 h-4 text-[var(--color-info)] flex-shrink-0" aria-hidden="true" />
                   <span className="text-theme-primary">{t(key)}</span>
                 </div>
               ))}

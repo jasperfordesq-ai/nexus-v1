@@ -119,7 +119,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
       {/* Hero Header */}
       <motion.div variants={itemVariants} className="text-center">
         <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 mb-4">
-          <FileText className="w-10 h-10 text-blue-500 dark:text-blue-400" aria-hidden="true" />
+          <FileText className="w-10 h-10 text-[var(--color-info)]" aria-hidden="true" />
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-3">
           {t('terms.heading')}
@@ -143,7 +143,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
               onPress={() => scrollToSection(item.id)}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-theme-elevated hover:bg-blue-500/10 text-theme-primary text-sm font-medium transition-colors h-auto min-w-0"
             >
-              <item.icon className="w-4 h-4 text-blue-500" aria-hidden="true" />
+              <item.icon className="w-4 h-4 text-[var(--color-info)]" aria-hidden="true" />
               {t(item.key)}
             </Button>
           ))}
@@ -155,7 +155,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
         <GlassCard className="p-6 sm:p-8">
           <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
             <h2 className="text-xl font-semibold text-theme-primary mb-3 flex items-center gap-2">
-              <Handshake className="w-5 h-5 text-blue-500" aria-hidden="true" />
+              <Handshake className="w-5 h-5 text-[var(--color-info)]" aria-hidden="true" />
               {t('terms.welcome_title', { name: branding.name })}
             </h2>
             <div className="space-y-3 text-theme-muted">
@@ -177,7 +177,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">1</Chip>
-            <Clock className="w-5 h-5 text-blue-500" aria-hidden="true" />
+            <Clock className="w-5 h-5 text-[var(--color-info)]" aria-hidden="true" />
             {t('terms.section1_title')}
           </h2>
           <p className="text-theme-muted mb-4">
@@ -189,14 +189,14 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
           <div className="flex flex-wrap items-center justify-center gap-4 my-6">
             <div className="flex items-center gap-3 p-4 rounded-xl bg-theme-elevated">
               <div className="p-2 rounded-lg bg-blue-500/20">
-                <Clock className="w-6 h-6 text-blue-500" aria-hidden="true" />
+                <Clock className="w-6 h-6 text-[var(--color-info)]" aria-hidden="true" />
               </div>
               <span className="font-medium text-theme-primary">{t('terms.one_hour_service')}</span>
             </div>
-            <span className="text-2xl font-bold text-blue-500">=</span>
+            <span className="text-2xl font-bold text-[var(--color-info)]">=</span>
             <div className="flex items-center gap-3 p-4 rounded-xl bg-theme-elevated">
               <div className="p-2 rounded-lg bg-blue-500/20">
-                <Gem className="w-6 h-6 text-blue-500" aria-hidden="true" />
+                <Gem className="w-6 h-6 text-[var(--color-info)]" aria-hidden="true" />
               </div>
               <span className="font-medium text-theme-primary">{t('terms.one_time_credit')}</span>
             </div>
@@ -204,7 +204,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
 
           {/* Important notice */}
           <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-4 flex items-start gap-3">
-            <Info className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
+            <Info className="w-5 h-5 text-[var(--color-warning)] mt-0.5 flex-shrink-0" aria-hidden="true" />
             <div>
               <h4 className="font-medium text-amber-600 dark:text-amber-400 text-sm mb-1">{t('terms.important')}</h4>
               <p className="text-sm text-theme-muted">
@@ -234,7 +234,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">2</Chip>
-            <UserCog className="w-5 h-5 text-blue-500" aria-hidden="true" />
+            <UserCog className="w-5 h-5 text-[var(--color-info)]" aria-hidden="true" />
             {t('terms.section2_title')}
           </h2>
           <p className="text-theme-muted mb-4">
@@ -265,7 +265,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
           <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 mb-4">
             <h2 className="text-xl font-semibold text-theme-primary mb-2 flex items-center gap-2">
               <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">3</Chip>
-              <Users className="w-5 h-5 text-blue-500" aria-hidden="true" />
+              <Users className="w-5 h-5 text-[var(--color-info)]" aria-hidden="true" />
               {t('terms.section3_title')}
             </h2>
             <p className="text-theme-muted text-sm">
@@ -285,7 +285,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
             ] as const).map((item, index) => (
               <li key={item.labelKey} className="flex items-start gap-3">
                 <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
-                  <span className="text-xs font-bold text-blue-500">{index + 1}</span>
+                  <span className="text-xs font-bold text-[var(--color-info)]">{index + 1}</span>
                 </div>
                 <span>
                   <strong className="text-theme-primary">{t(item.labelKey)}</strong> — {t(item.descKey)}
@@ -301,7 +301,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">4</Chip>
-            <Ban className="w-5 h-5 text-red-500" aria-hidden="true" />
+            <Ban className="w-5 h-5 text-[var(--color-error)]" aria-hidden="true" />
             {t('terms.section4_title')}
           </h2>
           <p className="text-theme-muted mb-4">
@@ -314,7 +314,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
                 key={key}
                 className="flex items-center gap-3 p-3 rounded-xl bg-red-500/5 border border-red-500/10"
               >
-                <CircleSlash className="w-4 h-4 text-red-500 flex-shrink-0" aria-hidden="true" />
+                <CircleSlash className="w-4 h-4 text-[var(--color-error)] flex-shrink-0" aria-hidden="true" />
                 <span className="text-sm text-theme-muted">{t(key)}</span>
               </div>
             ))}
@@ -327,7 +327,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">5</Chip>
-            <MapPin className="w-5 h-5 text-blue-500" aria-hidden="true" />
+            <MapPin className="w-5 h-5 text-[var(--color-info)]" aria-hidden="true" />
             {t('terms.section5_title')}
           </h2>
           <p className="text-theme-muted mb-4">
@@ -357,7 +357,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">6</Chip>
-            <Scale className="w-5 h-5 text-blue-500" aria-hidden="true" />
+            <Scale className="w-5 h-5 text-[var(--color-info)]" aria-hidden="true" />
             {t('terms.section6_title')}
           </h2>
           <p className="text-theme-muted mb-4">
@@ -390,7 +390,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">7</Chip>
-            <AlertTriangle className="w-5 h-5 text-amber-500" aria-hidden="true" />
+            <AlertTriangle className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
             {t('terms.section7_title')}
           </h2>
           <p className="text-theme-muted mb-4">
@@ -421,7 +421,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">8</Chip>
-            <RefreshCw className="w-5 h-5 text-blue-500" aria-hidden="true" />
+            <RefreshCw className="w-5 h-5 text-[var(--color-info)]" aria-hidden="true" />
             {t('terms.section8_title')}
           </h2>
           <p className="text-theme-muted mb-4">
@@ -447,7 +447,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
         <GlassCard className="p-6 sm:p-8">
           <div className="text-center">
             <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 mb-4">
-              <MessageSquare className="w-8 h-8 text-blue-500 dark:text-blue-400" aria-hidden="true" />
+              <MessageSquare className="w-8 h-8 text-[var(--color-info)]" aria-hidden="true" />
             </div>
             <h2 className="text-xl font-semibold text-theme-primary mb-2">
               {t('terms.cta_title')}

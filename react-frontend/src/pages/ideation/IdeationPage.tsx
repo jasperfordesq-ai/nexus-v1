@@ -584,7 +584,7 @@ export function IdeationPage() {
                           <Heart
                             className={`w-4 h-4 ${
                               challenge.is_favorited
-                                ? 'text-red-500 fill-current'
+                                ? 'text-[var(--color-error)] fill-current'
                                 : 'text-[var(--color-text-tertiary)]'
                             }`}
                           />
@@ -637,7 +637,7 @@ export function IdeationPage() {
                       {/* Prize indicator */}
                       {challenge.prize_description && (
                         <span className="flex items-center gap-1">
-                          <Trophy className="w-3.5 h-3.5 text-amber-500" />
+                          <Trophy className="w-3.5 h-3.5 text-[var(--color-warning)]" />
                           {t('challenge.prize')}
                         </span>
                       )}

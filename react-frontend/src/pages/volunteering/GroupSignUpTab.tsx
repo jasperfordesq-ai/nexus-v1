@@ -263,8 +263,8 @@ export function GroupSignUpTab() {
   const memberStatusIcon = (status: string) => {
     switch (status) {
       case 'confirmed': return <CheckCircle className="w-3 h-3 text-emerald-500" />;
-      case 'declined': return <XCircle className="w-3 h-3 text-red-500" />;
-      default: return <Hourglass className="w-3 h-3 text-amber-500" />;
+      case 'declined': return <XCircle className="w-3 h-3 text-[var(--color-error)]" />;
+      default: return <Hourglass className="w-3 h-3 text-[var(--color-warning)]" />;
     }
   };
 
@@ -301,7 +301,7 @@ export function GroupSignUpTab() {
       {/* Error */}
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white" onPress={load}>
             {t('common.try_again', 'Try Again')}

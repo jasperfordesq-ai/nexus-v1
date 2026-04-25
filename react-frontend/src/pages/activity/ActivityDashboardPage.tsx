@@ -112,10 +112,10 @@ interface DashboardData {
 const activityIcons: Record<string, { icon: React.ReactNode; color: string }> = {
   exchange: { icon: <ArrowUpRight className="w-4 h-4" />, color: 'text-emerald-500 bg-emerald-500/10' },
   listing: { icon: <ListTodo className="w-4 h-4" />, color: 'text-indigo-500 bg-indigo-500/10' },
-  connection: { icon: <Users className="w-4 h-4" />, color: 'text-blue-500 bg-blue-500/10' },
+  connection: { icon: <Users className="w-4 h-4" />, color: 'text-[var(--color-info)] bg-blue-500/10' },
   event: { icon: <CalendarCheck className="w-4 h-4" />, color: 'text-purple-500 bg-purple-500/10' },
   message: { icon: <MessageSquare className="w-4 h-4" />, color: 'text-cyan-500 bg-cyan-500/10' },
-  review: { icon: <Star className="w-4 h-4" />, color: 'text-amber-500 bg-amber-500/10' },
+  review: { icon: <Star className="w-4 h-4" />, color: 'text-[var(--color-warning)] bg-amber-500/10' },
   post: { icon: <Activity className="w-4 h-4" />, color: 'text-rose-500 bg-rose-500/10' },
   default: { icon: <Activity className="w-4 h-4" />, color: 'text-theme-subtle bg-theme-elevated' },
 };
@@ -258,7 +258,7 @@ export function ActivityDashboardPage() {
     return (
       <div className="max-w-4xl mx-auto">
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
@@ -323,7 +323,7 @@ export function ActivityDashboardPage() {
           icon={<Users className="w-5 h-5" aria-hidden="true" />}
           label={t('stats.connections')}
           value={connection_stats.total_connections}
-          color="from-blue-500/20 to-cyan-500/20 text-blue-500"
+          color="from-blue-500/20 to-cyan-500/20 text-[var(--color-info)]"
         />
         <StatCard
           icon={<ListTodo className="w-5 h-5" aria-hidden="true" />}

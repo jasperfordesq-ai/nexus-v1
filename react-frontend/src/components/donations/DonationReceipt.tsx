@@ -86,7 +86,7 @@ export function DonationReceipt({ donationId }: DonationReceiptProps) {
   if (error || !receipt) {
     return (
       <div className="text-center py-12">
-        <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+        <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
         <p className="text-theme-muted">{error || t('donations.receipt_not_found', 'Receipt not found.')}</p>
       </div>
     );

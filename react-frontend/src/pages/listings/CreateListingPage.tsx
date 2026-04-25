@@ -545,7 +545,7 @@ export function CreateListingPage() {
                 }}
               >
                 <div className="flex items-center gap-2">
-                  <Monitor className="w-4 h-4 text-blue-500 shrink-0" />
+                  <Monitor className="w-4 h-4 text-[var(--color-info)] shrink-0" />
                   <div>
                     <div className="font-medium text-sm">{t('form.service_type_remote', 'Remote / Online')}</div>
                   </div>

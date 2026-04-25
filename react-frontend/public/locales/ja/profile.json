@@ -107,7 +107,11 @@
     "user_availability": "User availability",
     "user_reviews": "User reviews",
     "user_achievements": "User achievements",
-    "loading_reviews": "Loading reviews"
+    "loading_reviews": "Loading reviews",
+    "rating_summary": "Rating: {{rating}} out of 5",
+    "nexus_score_summary": "NexusScore: {{score}} ({{tier}})",
+    "nexus_score_link": "NexusScore: {{score}} ({{tier}}) - view breakdown",
+    "listing_card": "{{type}}: {{title}}"
   },
   "review_modal": {
     "title": "レビューを書く",

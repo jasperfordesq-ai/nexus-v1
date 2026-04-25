@@ -231,7 +231,7 @@ export function ExpensesTab() {
           {[
             { label: t('expenses.stats.total_claimed', 'Total Claimed'), value: stats.claimed, color: 'text-theme-primary' },
             { label: t('expenses.stats.approved', 'Approved'), value: stats.approved, color: 'text-rose-500' },
-            { label: t('expenses.stats.paid', 'Paid'), value: stats.paid, color: 'text-blue-500' },
+            { label: t('expenses.stats.paid', 'Paid'), value: stats.paid, color: 'text-[var(--color-info)]' },
           ].map((s) => (
             <GlassCard key={s.label} className="p-3 text-center">
               <p className="text-xs text-theme-muted">{s.label}</p>
@@ -244,7 +244,7 @@ export function ExpensesTab() {
       {/* Error */}
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white" onPress={load}>
             {t('expenses.try_again', 'Try Again')}

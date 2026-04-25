@@ -856,7 +856,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                       onPress={startRecording}
                       aria-label={t('creator.start_recording')}
                     >
-                      <Circle className="w-6 h-6 text-red-500 fill-red-500" />
+                      <Circle className="w-6 h-6 text-[var(--color-error)] fill-red-500" />
                     </Button>
                   )}
                   <Button

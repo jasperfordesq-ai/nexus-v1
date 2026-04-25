@@ -95,7 +95,7 @@ const gdprRightKeys = [
     icon: Eye,
     titleKey: 'privacy.right_access_title',
     descKey: 'privacy.right_access_desc',
-    color: 'text-blue-500',
+    color: 'text-[var(--color-info)]',
     bg: 'bg-blue-500/20',
   },
   {
@@ -109,7 +109,7 @@ const gdprRightKeys = [
     icon: Trash2,
     titleKey: 'privacy.right_erasure_title',
     descKey: 'privacy.right_erasure_desc',
-    color: 'text-red-500',
+    color: 'text-[var(--color-error)]',
     bg: 'bg-red-500/20',
   },
   {
@@ -123,7 +123,7 @@ const gdprRightKeys = [
     icon: Ban,
     titleKey: 'privacy.right_restrict_title',
     descKey: 'privacy.right_restrict_desc',
-    color: 'text-amber-500',
+    color: 'text-[var(--color-warning)]',
     bg: 'bg-amber-500/20',
   },
   {

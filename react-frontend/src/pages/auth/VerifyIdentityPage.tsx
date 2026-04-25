@@ -262,7 +262,7 @@ export function VerifyIdentityPage() {
             {verificationData && !verificationData.is_approved && (
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm text-left mb-6">
                 <div className="flex items-start gap-3">
-                  <Clock className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                  <Clock className="w-5 h-5 text-[var(--color-warning)] shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium text-amber-600 dark:text-amber-400">
                       {t('verify_identity.pending_approval_title', { defaultValue: 'Awaiting admin approval' })}

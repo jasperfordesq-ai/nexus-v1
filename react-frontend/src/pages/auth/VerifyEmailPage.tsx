@@ -150,7 +150,7 @@ export function VerifyEmailPage() {
             {requiresApproval && !isAuthenticated && (
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm text-left mb-6">
                 <div className="flex items-start gap-3">
-                  <ShieldCheck className="w-5 h-5 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
+                  <ShieldCheck className="w-5 h-5 text-[var(--color-warning)] shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium text-amber-600 dark:text-amber-400">{t('verify_email.awaiting_approval_title', { defaultValue: 'Awaiting admin approval' })}</p>
                     <p className="text-amber-600/80 dark:text-amber-300/80 mt-1">

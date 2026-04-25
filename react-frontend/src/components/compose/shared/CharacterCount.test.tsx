@@ -60,7 +60,7 @@ describe('CharacterCount', () => {
   it('shows red text color when at or exceeding the limit', () => {
     render(<CharacterCount current={500} max={500} />);
     const countText = screen.getByText('500/500');
-    expect(countText).toHaveClass('text-red-500');
+    expect(countText).toHaveClass('text-[var(--color-error)]');
   });
 
   it('shows muted text color when below the limit', () => {

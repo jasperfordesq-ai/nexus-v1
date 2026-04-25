@@ -97,8 +97,8 @@ export default function CommunityImpactTab() {
   if (!data) return null;
 
   const stats = [
-    { label: t('community.total_members', 'Community Members'), value: data.total_members, icon: <Users className="w-5 h-5" />, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-    { label: t('community.total_badges', 'Badges Awarded'), value: data.total_badges_awarded, icon: <Award className="w-5 h-5" />, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+    { label: t('community.total_members', 'Community Members'), value: data.total_members, icon: <Users className="w-5 h-5" />, color: 'text-[var(--color-info)]', bg: 'bg-blue-500/10' },
+    { label: t('community.total_badges', 'Badges Awarded'), value: data.total_badges_awarded, icon: <Award className="w-5 h-5" />, color: 'text-[var(--color-warning)]', bg: 'bg-amber-500/10' },
     { label: t('community.volunteer_hours', 'Volunteer Hours'), value: data.total_volunteer_hours, icon: <Clock className="w-5 h-5" />, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
     { label: t('community.total_xp', 'Total XP Earned'), value: data.total_xp.toLocaleString(), icon: <Zap className="w-5 h-5" />, color: 'text-purple-500', bg: 'bg-purple-500/10' },
   ];

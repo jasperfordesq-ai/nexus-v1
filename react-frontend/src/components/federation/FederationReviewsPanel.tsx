@@ -220,7 +220,7 @@ export function FederationReviewsPanel({ memberId }: FederationReviewsPanelProps
     return (
       <Card className="bg-theme-elevated">
         <CardBody className="items-center text-center gap-3 py-8">
-          <AlertTriangle className="w-10 h-10 text-amber-500" aria-hidden="true" />
+          <AlertTriangle className="w-10 h-10 text-[var(--color-warning)]" aria-hidden="true" />
           <p className="text-theme-muted">{error}</p>
         </CardBody>
       </Card>

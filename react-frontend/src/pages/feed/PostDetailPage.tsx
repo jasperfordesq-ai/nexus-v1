@@ -214,7 +214,7 @@ export function PostDetailPage() {
           <FeedSkeleton />
         ) : error ? (
           <GlassCard className="p-8 text-center">
-            <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+            <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
             <p className="text-theme-muted">{error}</p>
             <Link to={tenantPath('/feed')} className="mt-4 inline-block">
               <Button variant="flat" className="bg-theme-elevated text-theme-primary">

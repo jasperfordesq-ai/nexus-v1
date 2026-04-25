@@ -387,7 +387,7 @@ export function MembersPage() {
           className={
             quickFilter === 'active'
               ? 'bg-amber-600 text-white shadow-sm'
-              : 'bg-theme-elevated text-theme-secondary hover:text-amber-500 hover:bg-amber-500/5 transition-colors'
+              : 'bg-theme-elevated text-theme-secondary hover:text-[var(--color-warning)] hover:bg-amber-500/5 transition-colors'
           }
           isDisabled={isNearbyMode}
           startContent={<TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />}
@@ -550,7 +550,7 @@ export function MembersPage() {
       {/* Error State */}
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('members.unable_to_load')}</h3>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
@@ -860,7 +860,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                 className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-medium"
                 aria-label={t('members.rating_aria', { rating: member.rating.toFixed(1) })}
               >
-                <Star className="w-3 h-3 fill-amber-500 text-amber-500" aria-hidden="true" />
+                <Star className="w-3 h-3 fill-amber-500 text-[var(--color-warning)]" aria-hidden="true" />
                 {member.rating.toFixed(1)}
               </span>
             )}

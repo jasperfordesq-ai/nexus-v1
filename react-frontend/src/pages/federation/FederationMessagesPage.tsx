@@ -757,7 +757,7 @@ export function FederationMessagesPage() {
       {!isFederationEnabled && (
         <GlassCard className="p-4 border-l-4 border-amber-500 bg-amber-500/10">
           <div className="flex items-start gap-3">
-            <Globe className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <Globe className="w-5 h-5 text-[var(--color-warning)] flex-shrink-0 mt-0.5" aria-hidden="true" />
             <div className="flex-1">
               <h3 className="font-semibold text-theme-primary">{t('messages.federation_not_enabled')}</h3>
               <p className="text-sm text-theme-muted mt-1">
@@ -818,7 +818,7 @@ export function FederationMessagesPage() {
         </GlassCard>
       ) : loadError ? (
         <GlassCard className="p-8 text-center">
-          <Globe className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <Globe className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('messages.unable_to_load')}</h3>
           <p className="text-theme-muted mb-4">{t('messages.unable_to_load_description')}</p>
           <Button

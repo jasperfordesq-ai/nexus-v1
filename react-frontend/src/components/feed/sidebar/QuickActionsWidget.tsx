@@ -46,7 +46,7 @@ export function QuickActionsWidget() {
       label: t('sidebar.actions.set_goal', 'Set Goal'),
       icon: Target,
       path: '/goals',
-      color: 'text-amber-500',
+      color: 'text-[var(--color-warning)]',
       bg: 'bg-amber-500/10 hover:bg-amber-500/20',
       feature: 'goals' as const,
     },

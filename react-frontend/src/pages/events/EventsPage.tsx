@@ -283,7 +283,7 @@ export function EventsPage() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 rounded-full border border-theme-default bg-theme-elevated px-3 py-1 text-xs font-medium text-theme-muted">
-            <CalendarDays className="h-3.5 w-3.5 text-amber-500" aria-hidden="true" />
+            <CalendarDays className="h-3.5 w-3.5 text-[var(--color-warning)]" aria-hidden="true" />
             {t('subtitle')}
           </div>
           <div className="space-y-1">
@@ -468,7 +468,7 @@ export function EventsPage() {
       {/* Error State */}
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
@@ -561,7 +561,7 @@ export function EventsPage() {
               {Object.entries(groupedEvents).map(([month, monthEvents]) => (
                 <section key={month} aria-label={t('events_in_month', 'Events in {{month}}', { month })}>
                   <h2 className="text-sm font-semibold uppercase tracking-wide text-theme-muted mb-3 flex items-center gap-2">
-                    <CalendarDays className="w-4 h-4 text-amber-500" aria-hidden="true" />
+                    <CalendarDays className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />
                     {month}
                   </h2>
                   <div className="space-y-4">

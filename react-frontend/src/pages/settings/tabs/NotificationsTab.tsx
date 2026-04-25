@@ -121,7 +121,7 @@ export function NotificationsTab({
 
       {notificationError ? (
         <div className="text-center py-8">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{notificationError}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"

@@ -299,7 +299,7 @@ export function TransferModal({
               {/* Recipient Search */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-theme-muted">
-                  {t('recipient')} <span className="text-red-500 dark:text-red-400">*</span>
+                  {t('recipient')} <span className="text-[var(--color-error)]">*</span>
                 </label>
 
                 {formData.recipient ? (
@@ -419,7 +419,7 @@ export function TransferModal({
               {/* Amount Input */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-theme-muted">
-                  {t('amount_hours')} <span className="text-red-500 dark:text-red-400">*</span>
+                  {t('amount_hours')} <span className="text-[var(--color-error)]">*</span>
                 </label>
                 <Input
                   type="number"
@@ -434,12 +434,12 @@ export function TransferModal({
                   }}
                   endContent={<span className="text-theme-subtle text-sm">{t('hours').toLowerCase()}</span>}
                   classNames={{
-                    input: `bg-transparent text-theme-primary text-lg font-semibold ${isOverBalance ? 'text-red-500 dark:text-red-400' : ''}`,
+                    input: `bg-transparent text-theme-primary text-lg font-semibold ${isOverBalance ? 'text-[var(--color-error)]' : ''}`,
                     inputWrapper: `bg-theme-elevated border-theme-default hover:bg-theme-hover ${isOverBalance ? 'border-red-500/50' : ''}`,
                   }}
                 />
                 {isOverBalance && (
-                  <p className="text-red-500 dark:text-red-400 text-sm flex items-center gap-1">
+                  <p className="text-[var(--color-error)] text-sm flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
                     {t('exceeds_balance')}
                   </p>
@@ -479,8 +479,8 @@ export function TransferModal({
               {/* Error Message */}
               {error && (
                 <div className="bg-red-500/20 border border-red-500/40 rounded-lg p-3 flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-400 flex-shrink-0" />
-                  <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>
+                  <AlertCircle className="w-4 h-4 text-[var(--color-error)] flex-shrink-0" />
+                  <p className="text-[var(--color-error)] text-sm">{error}</p>
                 </div>
               )}
 

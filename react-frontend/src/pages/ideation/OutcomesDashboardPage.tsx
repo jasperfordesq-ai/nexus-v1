@@ -176,12 +176,12 @@ export function OutcomesDashboardPage() {
               <p className="text-xs text-[var(--color-text-tertiary)]">{t('outcomes.total_challenges')}</p>
             </GlassCard>
             <GlassCard className="p-4 text-center">
-              <CheckCircle className="w-6 h-6 mx-auto mb-2 text-green-500" />
+              <CheckCircle className="w-6 h-6 mx-auto mb-2 text-[var(--color-success)]" />
               <p className="text-2xl font-bold text-green-600 dark:text-green-400">{dashboard.implemented}</p>
               <p className="text-xs text-[var(--color-text-tertiary)]">{t('outcomes.implemented_count')}</p>
             </GlassCard>
             <GlassCard className="p-4 text-center">
-              <Clock className="w-6 h-6 mx-auto mb-2 text-amber-500" />
+              <Clock className="w-6 h-6 mx-auto mb-2 text-[var(--color-warning)]" />
               <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{dashboard.in_progress}</p>
               <p className="text-xs text-[var(--color-text-tertiary)]">{t('outcomes.in_progress_count')}</p>
             </GlassCard>
@@ -214,7 +214,7 @@ export function OutcomesDashboardPage() {
                         </h3>
                         {entry.winning_idea_title && (
                           <p className="text-sm text-[var(--color-text-secondary)] flex items-center gap-1.5 mb-1">
-                            <Award className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                            <Award className="w-3.5 h-3.5 text-[var(--color-warning)] shrink-0" />
                             {entry.winning_idea_title}
                           </p>
                         )}

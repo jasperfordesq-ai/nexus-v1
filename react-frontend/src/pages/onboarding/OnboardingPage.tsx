@@ -693,7 +693,7 @@ export function OnboardingPage() {
                   description={t('benefit_community_desc')}
                 />
                 <BenefitCard
-                  icon={<Star className="w-6 h-6 text-amber-500" />}
+                  icon={<Star className="w-6 h-6 text-[var(--color-warning)]" />}
                   title={t('benefit_skills_title')}
                   description={t('benefit_skills_desc')}
                 />
@@ -1192,7 +1192,7 @@ export function OnboardingPage() {
                   <Divider />
 
                   <SummarySection
-                    icon={<HelpCircle className="w-4 h-4 text-amber-500" />}
+                    icon={<HelpCircle className="w-4 h-4 text-[var(--color-warning)]" />}
                     title={t('summary_needs')}
                     items={skillNeeds}
                     getCategoryName={getCategoryName}

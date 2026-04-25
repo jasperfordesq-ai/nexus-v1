@@ -107,7 +107,11 @@
     "user_availability": "Disponibilità dell'utente",
     "user_reviews": "Recensioni dell'utente",
     "user_achievements": "Traguardi dell'utente",
-    "loading_reviews": "Caricamento recensioni"
+    "loading_reviews": "Caricamento recensioni",
+    "rating_summary": "Rating: {{rating}} out of 5",
+    "nexus_score_summary": "NexusScore: {{score}} ({{tier}})",
+    "nexus_score_link": "NexusScore: {{score}} ({{tier}}) - view breakdown",
+    "listing_card": "{{type}}: {{title}}"
   },
   "review_modal": {
     "title": "Scrivi una recensione",

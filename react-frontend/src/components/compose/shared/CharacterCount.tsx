@@ -26,7 +26,7 @@ export function CharacterCount({ current, max }: CharacterCountProps) {
       : 'bg-[var(--color-primary)]';
 
   const textColor = isOverLimit
-    ? 'text-red-500'
+    ? 'text-[var(--color-error)]'
     : 'text-[var(--text-muted)]';
 
   return (

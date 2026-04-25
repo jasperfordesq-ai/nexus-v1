@@ -754,7 +754,7 @@ export function ListingDetailPage() {
                   <div className="flex items-center gap-3 mt-1 flex-wrap">
                     {listing.author_rating != null && listing.author_rating > 0 && (
                       <span className="flex items-center gap-1 text-xs text-theme-muted">
-                        <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" aria-hidden="true" />
+                        <Star className="w-3.5 h-3.5 fill-amber-500 text-[var(--color-warning)]" aria-hidden="true" />
                         <span className="font-medium text-theme-primary">{listing.author_rating.toFixed(1)}</span>
                         {listing.author_reviews_count != null && listing.author_reviews_count > 0 && (
                           <span>({listing.author_reviews_count} {listing.author_reviews_count === 1 ? t('review', 'review') : t('reviews', 'reviews')})</span>
@@ -789,7 +789,7 @@ export function ListingDetailPage() {
                   <div className="flex items-center gap-3 mt-1 flex-wrap">
                     {listing.author_rating != null && listing.author_rating > 0 && (
                       <span className="flex items-center gap-1 text-xs text-theme-muted">
-                        <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" aria-hidden="true" />
+                        <Star className="w-3.5 h-3.5 fill-amber-500 text-[var(--color-warning)]" aria-hidden="true" />
                         <span className="font-medium text-theme-primary">{listing.author_rating.toFixed(1)}</span>
                         {listing.author_reviews_count != null && listing.author_reviews_count > 0 && (
                           <span>({listing.author_reviews_count} {listing.author_reviews_count === 1 ? t('review', 'review') : t('reviews', 'reviews')})</span>
@@ -853,7 +853,7 @@ export function ListingDetailPage() {
           )}
           {(listing.member_requests?.length ?? 0) > 0 && (
             <div>
-              <h3 className="text-sm font-medium text-amber-500 mb-2">{t('detail_looking_for', 'Looking for:')}</h3>
+              <h3 className="text-sm font-medium text-[var(--color-warning)] mb-2">{t('detail_looking_for', 'Looking for:')}</h3>
               <div className="flex flex-wrap gap-2">
                 {listing.member_requests!.map((l) => (
                   <Link key={l.id} to={tenantPath(`/listings/${l.id}`)}>

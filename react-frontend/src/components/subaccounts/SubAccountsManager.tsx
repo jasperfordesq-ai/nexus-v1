@@ -248,7 +248,7 @@ export function SubAccountsManager() {
       {/* Error */}
       {error && !isLoading && (
         <GlassCard className="p-6 text-center">
-          <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto mb-3" aria-hidden="true" />
+          <AlertTriangle className="w-8 h-8 text-[var(--color-warning)] mx-auto mb-3" aria-hidden="true" />
           <p className="text-sm text-theme-muted mb-3">{error}</p>
           <Button
             size="sm"

@@ -290,7 +290,7 @@ export function ImpactReportPage() {
                       bg: 'bg-rose-500/10',
                     },
                     {
-                      color: 'text-amber-500 dark:text-amber-400',
+                      color: 'text-[var(--color-warning)]',
                       bg: 'bg-amber-500/10',
                     },
                     {
@@ -509,7 +509,7 @@ export function ImpactReportPage() {
               <GlassCard className="p-5">
                 <div className="flex items-start gap-3">
                   <div className="p-2 rounded-lg bg-amber-500/15 flex-shrink-0">
-                    <ArrowUp className="w-4 h-4 text-amber-500 dark:text-amber-400" aria-hidden="true" />
+                    <ArrowUp className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />
                   </div>
                   <p className="text-sm text-theme-muted leading-relaxed">
                     {t('impact_report.sroi_benchmark_note')}
@@ -725,7 +725,7 @@ function CaseStudyCard({ name, quote, accent }: CaseStudyCardProps) {
     amber: {
       bg: 'bg-amber-500/5',
       border: 'border-amber-500/20',
-      icon: 'text-amber-500/60',
+      icon: 'text-[var(--color-warning)]/60',
       badge: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
     },
   };

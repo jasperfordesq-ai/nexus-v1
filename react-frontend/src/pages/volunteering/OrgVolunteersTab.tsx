@@ -109,7 +109,7 @@ export default function OrgVolunteersTab({ orgId }: OrgVolunteersTabProps) {
     return (
       <GlassCard className="p-8 text-center">
         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 flex items-center justify-center mx-auto mb-4">
-          <Users className="w-7 h-7 text-blue-500" aria-hidden="true" />
+          <Users className="w-7 h-7 text-[var(--color-info)]" aria-hidden="true" />
         </div>
         <p className="text-theme-muted">{t('org_volunteers.none', 'No approved volunteers yet.')}</p>
         <p className="text-sm text-theme-subtle mt-1">{t('org_volunteers.none_desc', 'Volunteers will appear here after their applications are approved.')}</p>

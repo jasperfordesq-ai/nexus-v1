@@ -99,7 +99,7 @@ export default function MemberSpotlightTab() {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-2">
-        <Sparkles className="w-5 h-5 text-amber-500" />
+        <Sparkles className="w-5 h-5 text-[var(--color-warning)]" />
         <p className="text-sm text-default-500">
           {t('spotlight.description', "Today's featured active community members")}
         </p>

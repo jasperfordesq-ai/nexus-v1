@@ -67,7 +67,7 @@ export function TopEndorsedWidget({ limit = 5 }: { limit?: number }) {
   if (members.length === 0) return null;
 
   const rankIcons = [
-    <Medal key="gold" className="w-5 h-5 text-amber-500" aria-hidden="true" />,
+    <Medal key="gold" className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />,
     <Medal key="silver" className="w-5 h-5 text-gray-400" aria-hidden="true" />,
     <Medal key="bronze" className="w-5 h-5 text-amber-700" aria-hidden="true" />,
   ];
@@ -75,7 +75,7 @@ export function TopEndorsedWidget({ limit = 5 }: { limit?: number }) {
   return (
     <GlassCard className="p-4">
       <div className="flex items-center gap-2 mb-4">
-        <Trophy className="w-5 h-5 text-amber-500" aria-hidden="true" />
+        <Trophy className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
         <h3 className="font-semibold text-theme-primary text-sm">{t('most_endorsed')}</h3>
       </div>
 

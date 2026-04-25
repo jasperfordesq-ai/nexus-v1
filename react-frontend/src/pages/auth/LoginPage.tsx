@@ -394,7 +394,7 @@ export function LoginPage() {
                       )}
                       {loginErrorCode === 'AUTH_PENDING_VERIFICATION' && (
                         <div className="mt-3 flex items-start gap-2">
-                          <ShieldAlert className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                          <ShieldAlert className="w-4 h-4 text-[var(--color-warning)] mt-0.5 flex-shrink-0" />
                           <div>
                             <p className="text-amber-600 dark:text-amber-400 text-xs">
                               {t('login.pending_verification', {
@@ -416,7 +416,7 @@ export function LoginPage() {
                       )}
                       {loginErrorCode === 'AUTH_VERIFICATION_FAILED' && (
                         <div className="mt-3 flex items-start gap-2">
-                          <ShieldX className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                          <ShieldX className="w-4 h-4 text-[var(--color-error)] mt-0.5 flex-shrink-0" />
                           <div>
                             <p className="text-red-600 dark:text-red-400 text-xs">
                               {t('login.verification_failed', {

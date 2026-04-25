@@ -589,7 +589,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   <Button
                     variant="light"
                     onPress={handleLogout}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-red-500 dark:text-red-400 hover:bg-red-500/10 transition-all h-auto border border-red-500/20"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-[var(--color-error)] hover:bg-red-500/10 transition-all h-auto border border-red-500/20"
                   >
                     <LogOut className="w-4 h-4" aria-hidden="true" />
                     <span>{t('account.log_out')}</span>

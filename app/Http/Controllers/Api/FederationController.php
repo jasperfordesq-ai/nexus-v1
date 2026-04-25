@@ -787,6 +787,40 @@ class FederationController extends BaseApiController
             }
         }
 
+        // Idempotency check FIRST (before expensive partnership / credit-agreement
+        // queries) so a partner spamming retries cannot DOS those lookups.
+        // Accept a client-supplied idempotency_key; otherwise derive a deterministic
+        // key from the request payload so identical retries are still de-duplicated.
+        // Always hash to a fixed-width digest so two long client keys sharing a
+        // common prefix cannot collide via truncation.
+        $rawKey = isset($input['idempotency_key']) && is_string($input['idempotency_key'])
+            ? $input['idempotency_key']
+            : json_encode([
+                $partnerTenantId,
+                $senderId,
+                (int) $recipient['id'],
+                $amount,
+                $input['description'] ?? '',
+            ]);
+        $clientKey = hash('sha256', $rawKey);
+        $nonce = 'tx:' . $partnerTenantId . ':' . $clientKey; // 'tx:' + N + ':' + 64 hex = always < 128
+        $partnerKeyId = $isExternal ? (int) ($auth['platform_id'] ?? 0) : 0;
+        try {
+            $inserted = DB::affectingStatement(
+                "INSERT IGNORE INTO federation_webhook_nonces (partner_id, nonce, seen_at) VALUES (?, ?, NOW())",
+                [$partnerKeyId, $nonce]
+            );
+            if ($inserted === 0) {
+                return $this->fedError(409, 'Duplicate transaction (idempotency replay)', 'DUPLICATE_REQUEST');
+            }
+        } catch (\Throwable $e) {
+            // Fail closed: if the dedup table is unavailable, refuse the
+            // transaction rather than risk processing a duplicate. Money safety
+            // outranks availability for federation transfers.
+            \Illuminate\Support\Facades\Log::error('FederationV1::createTransaction idempotency check failed (fail-closed): ' . $e->getMessage());
+            return $this->fedError(503, 'Idempotency service unavailable; please retry', 'IDEMPOTENCY_UNAVAILABLE');
+        }
+
         // Fix 4: Check partnership level allows transactions
         if (!$isExternal) {
             $partnershipCheck = DB::selectOne(
@@ -809,33 +843,6 @@ class FederationController extends BaseApiController
         );
         if (!$creditAgreement) {
             return $this->fedError(403, 'No active credit agreement between tenants', 'NO_CREDIT_AGREEMENT');
-        }
-
-        // Idempotency: reject duplicate retries. Accept a client-supplied
-        // idempotency_key; otherwise derive a deterministic key from the
-        // request payload so identical retries are still de-duplicated.
-        $clientKey = isset($input['idempotency_key']) && is_string($input['idempotency_key'])
-            ? substr($input['idempotency_key'], 0, 96)
-            : hash('sha256', json_encode([
-                $partnerTenantId,
-                $senderId,
-                (int) $recipient['id'],
-                $amount,
-                $input['description'] ?? '',
-            ]));
-        $nonce = substr('tx:' . $partnerTenantId . ':' . $clientKey, 0, 128);
-        $partnerKeyId = $isExternal ? (int) ($auth['platform_id'] ?? 0) : 0;
-        try {
-            $inserted = DB::affectingStatement(
-                "INSERT IGNORE INTO federation_webhook_nonces (partner_id, nonce, seen_at) VALUES (?, ?, NOW())",
-                [$partnerKeyId, $nonce]
-            );
-            if ($inserted === 0) {
-                return $this->fedError(409, 'Duplicate transaction (idempotency replay)', 'DUPLICATE_REQUEST');
-            }
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning('FederationV1::createTransaction idempotency check failed: ' . $e->getMessage());
-            // Soft-fail open: continue rather than block transactions on dedup-table errors.
         }
 
         // Fix 1: Wrap transaction creation in DB transaction for atomicity

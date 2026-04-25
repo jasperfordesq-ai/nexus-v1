@@ -692,9 +692,9 @@ function SwotCard({ title, accent, icon: Icon, items }: SwotCardProps) {
       gradient: 'from-amber-500/10 to-orange-500/10',
       border: 'border-amber-500/20',
       iconBg: 'bg-amber-500/15',
-      iconColor: 'text-amber-500 dark:text-amber-400',
+      iconColor: 'text-[var(--color-warning)]',
       titleColor: 'text-amber-600 dark:text-amber-400',
-      bullet: 'text-amber-500 dark:text-amber-400',
+      bullet: 'text-[var(--color-warning)]',
     },
   };
 

@@ -406,7 +406,7 @@ export function MessagesPage() {
       {!isDirectMessagingEnabled && (
         <GlassCard className="p-4 border-l-4 border-amber-500 bg-amber-500/10">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <AlertTriangle className="w-5 h-5 text-[var(--color-warning)] flex-shrink-0 mt-0.5" aria-hidden="true" />
             <div className="flex-1">
               <h3 className="font-semibold text-theme-primary">{t('disabled_title')}</h3>
               <p className="text-sm text-theme-muted mt-1">
@@ -429,7 +429,7 @@ export function MessagesPage() {
       {isDirectMessagingEnabled && messagingRestricted && (
         <GlassCard className="p-4 border-l-4 border-red-500 bg-red-500/10">
           <div className="flex items-start gap-3" role="alert">
-            <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <AlertTriangle className="w-5 h-5 text-[var(--color-error)] flex-shrink-0 mt-0.5" aria-hidden="true" />
             <div className="flex-1">
               <h3 className="font-semibold text-red-700 dark:text-red-300">{t('messaging_restricted_title')}</h3>
               <p className="text-sm text-red-600/80 dark:text-red-400/80 mt-1">
@@ -549,7 +549,7 @@ export function MessagesPage() {
             <div className="mt-4 space-y-2 max-h-64 overflow-y-auto">
               {userSearchError ? (
                 <div className="text-center py-4">
-                  <p className="text-red-500 dark:text-red-400 text-sm">{userSearchError}</p>
+                  <p className="text-[var(--color-error)] text-sm">{userSearchError}</p>
                   <Button
                     size="sm"
                     variant="flat"
@@ -608,7 +608,7 @@ export function MessagesPage() {
         // Inbox view
         error ? (
           <GlassCard className="p-8 text-center">
-            <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+            <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
             <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('load_error_title')}</h3>
             <p className="text-theme-muted mb-4">{error}</p>
             <Button

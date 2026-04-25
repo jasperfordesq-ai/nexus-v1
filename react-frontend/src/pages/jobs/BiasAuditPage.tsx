@@ -469,13 +469,13 @@ export function BiasAuditPage() {
               <p className="text-sm text-theme-muted mb-4">{t('bias_audit.skills_match_description')}</p>
               <div className="flex items-center gap-6">
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-green-500">
+                  <p className="text-3xl font-bold text-[var(--color-success)]">
                     {report.skills_match_correlation.accepted_count}
                   </p>
                   <p className="text-xs text-theme-muted">{t('bias_audit.accepted_count')}</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-red-500">
+                  <p className="text-3xl font-bold text-[var(--color-error)]">
                     {report.skills_match_correlation.rejected_count}
                   </p>
                   <p className="text-xs text-theme-muted">{t('bias_audit.rejected_count')}</p>

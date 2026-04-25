@@ -2439,6 +2439,7 @@ class FederationV2Controller extends BaseApiController
 
         if (!($result['success'] ?? false)) {
             // Definitive partner rejection — issue compensating refund.
+            $refundOk = false;
             try {
                 DB::transaction(function () use ($userId, $tenantId, $amount, $txId) {
                     DB::update(
@@ -2447,11 +2448,33 @@ class FederationV2Controller extends BaseApiController
                     );
                     DB::update("UPDATE transactions SET status = 'failed' WHERE id = ?", [$txId]);
                 });
+                $refundOk = true;
             } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::error(
-                    "FederationV2::sendExternalTransaction compensating-refund failed for tx {$txId}: " . $e->getMessage()
+                // Money is now stuck: local debit is committed, partner did not
+                // accept, refund failed. Log critical + audit + alert ops via
+                // a dedicated audit-event so the reconciliation queue picks it
+                // up. The user response still surfaces the partner rejection,
+                // but the recorded tx remains 'pending' for manual recovery.
+                \Illuminate\Support\Facades\Log::critical(
+                    "FederationV2 compensating-refund FAILED for tx {$txId}; manual reconciliation required",
+                    [
+                        'transaction_id' => $txId,
+                        'tenant_id' => $tenantId,
+                        'user_id' => $userId,
+                        'amount' => $amount,
+                        'partner_id' => $externalPartnerId,
+                        'refund_error' => $e->getMessage(),
+                    ]
                 );
+                $this->federationAuditService->log('external_transaction_refund_failed', $tenantId, null, $userId,
+                    ['transaction_id' => $txId, 'partner_id' => $externalPartnerId, 'amount' => $amount, 'error' => $e->getMessage()]);
             }
+
+            if ($refundOk) {
+                $this->federationAuditService->log('external_transaction_refunded', $tenantId, null, $userId,
+                    ['transaction_id' => $txId, 'partner_id' => $externalPartnerId, 'amount' => $amount]);
+            }
+
             $errorMsg = $result['error'] ?? __('api.fed_external_partner_rejected');
             return $this->respondWithError('EXTERNAL_TX_FAILED', $errorMsg, null, 422);
         }

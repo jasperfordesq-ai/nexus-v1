@@ -382,7 +382,7 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
                   size="sm"
                   isIconOnly
                   variant="flat"
-                  className="w-6 h-6 min-w-0 bg-red-500/10 text-red-500"
+                  className="w-6 h-6 min-w-0 bg-red-500/10 text-[var(--color-error)]"
                   onPress={() => { setIsEditing(false); setEditContent(comment.content); }}
                   aria-label={t('card.cancel', 'Cancel')}
                 >
@@ -426,7 +426,7 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
                 variant="light"
                 size="sm"
                 onPress={handleDelete}
-                className="text-[10px] text-red-400 hover:text-red-500 flex items-center gap-0.5 h-auto p-0 min-w-0"
+                className="text-[10px] text-red-400 hover:text-[var(--color-error)] flex items-center gap-0.5 h-auto p-0 min-w-0"
                 startContent={<Trash2 className="w-2.5 h-2.5" aria-hidden="true" />}
               >
                 {t('card.delete', 'Delete')}
@@ -1560,7 +1560,7 @@ const FeedCard = React.memo(function FeedCard({
                           >
                             <span className="flex items-center justify-between gap-3">
                               <span className="truncate">{option.text}</span>
-                              <ArrowRight className="w-4 h-4 text-theme-subtle group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all" aria-hidden="true" />
+                              <ArrowRight className="w-4 h-4 text-theme-subtle group-hover:text-[var(--color-warning)] group-hover:translate-x-0.5 transition-all" aria-hidden="true" />
                             </span>
                           </button>
                         );
@@ -1647,7 +1647,7 @@ const FeedCard = React.memo(function FeedCard({
               </div>
               {item.content && (
                 <blockquote className="relative border-s-4 border-amber-500/60 ps-4 py-1 text-[15px] text-theme-secondary italic leading-relaxed">
-                  <span className="absolute -top-1 -start-1 text-2xl text-amber-500/40 leading-none select-none" aria-hidden="true">&ldquo;</span>
+                  <span className="absolute -top-1 -start-1 text-2xl text-[var(--color-warning)]/40 leading-none select-none" aria-hidden="true">&ldquo;</span>
                   {item.content}
                 </blockquote>
               )}

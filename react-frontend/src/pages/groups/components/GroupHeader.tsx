@@ -147,7 +147,7 @@ export function GroupHeader({
               </Button>
               <Button
                 variant="flat"
-                className="bg-red-500/10 text-red-500 hover:bg-red-500/20"
+                className="bg-red-500/10 text-[var(--color-error)] hover:bg-red-500/20"
                 startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
                 onPress={onOpenDelete}
               >
@@ -306,7 +306,7 @@ export function GroupHeader({
                     <Button
                       size="sm"
                       variant="flat"
-                      className="bg-red-500/10 text-red-500"
+                      className="bg-red-500/10 text-[var(--color-error)]"
                       startContent={<XCircle className="w-3.5 h-3.5" aria-hidden="true" />}
                       isLoading={processingRequest === request.user_id}
                       onPress={() => onJoinRequest(request.user_id, 'reject')}

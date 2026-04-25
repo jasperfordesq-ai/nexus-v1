@@ -698,7 +698,7 @@ export function OpportunityDetailPage() {
     return (
       <div className="max-w-3xl mx-auto px-4 py-8">
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error || t('opportunity.not_found', 'Opportunity not found.')}</p>
           <Button
             className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"

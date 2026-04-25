@@ -171,7 +171,7 @@ function CommentItemInner({
                   size="sm"
                   isIconOnly
                   variant="flat"
-                  className="w-6 h-6 min-w-0 bg-red-500/10 text-red-500"
+                  className="w-6 h-6 min-w-0 bg-red-500/10 text-[var(--color-error)]"
                   onPress={() => { setIsEditing(false); setEditContent(comment.content); }}
                   aria-label={t('cancel', 'Cancel')}
                 >
@@ -233,7 +233,7 @@ function CommentItemInner({
                     variant="light"
                     size="sm"
                     onPress={() => setShowDeleteModal(true)}
-                    className="text-[10px] text-red-400 hover:text-red-500 flex items-center gap-0.5 h-auto p-0 min-w-0"
+                    className="text-[10px] text-red-400 hover:text-[var(--color-error)] flex items-center gap-0.5 h-auto p-0 min-w-0"
                     startContent={<Trash2 className="w-2.5 h-2.5" aria-hidden="true" />}
                   >
                     {t('delete', 'Delete')}

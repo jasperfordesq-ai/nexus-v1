@@ -246,7 +246,7 @@ function PendingCard({ connection, onAccept, onDecline, isActing, tenantPathFn }
                 <p className="text-sm text-theme-muted mt-1 line-clamp-2">{stripHtmlToText(user.bio)}</p>
               )}
               <div className="flex items-center gap-1 mt-1.5">
-                <Clock className="w-3 h-3 text-amber-500" aria-hidden="true" />
+                <Clock className="w-3 h-3 text-[var(--color-warning)]" aria-hidden="true" />
                 <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
                   {t('wants_to_connect')}
                 </p>

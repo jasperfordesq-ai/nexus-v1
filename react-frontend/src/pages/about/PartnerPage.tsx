@@ -233,7 +233,7 @@ export function PartnerPage() {
 
               <div className="flex items-start gap-4 mb-4">
                 <div className="flex-shrink-0 p-3 rounded-xl bg-amber-500/15">
-                  <Lightbulb className="w-6 h-6 text-amber-500 dark:text-amber-400" aria-hidden="true" />
+                  <Lightbulb className="w-6 h-6 text-[var(--color-warning)]" aria-hidden="true" />
                 </div>
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold text-theme-primary mb-3">

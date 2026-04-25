@@ -115,7 +115,7 @@ const values = [
     title: 'Reciprocity',
     description:
       'Giving and receiving go hand in hand. When you help someone, you create a ripple of goodwill that comes back to strengthen the whole community.',
-    color: 'text-amber-500 dark:text-amber-400',
+    color: 'text-[var(--color-warning)]',
     bg: 'bg-amber-500/15',
   },
   {

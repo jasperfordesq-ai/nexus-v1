@@ -92,11 +92,11 @@ export function PostAnalyticsModal({ isOpen, onClose, postId }: PostAnalyticsMod
   }, [isOpen, postId]) // t is stable — excluded to avoid re-fetch on language changes
 
   const stats = data ? [
-    { label: t('analytics.views', 'Views'), value: data.views_count, icon: Eye, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+    { label: t('analytics.views', 'Views'), value: data.views_count, icon: Eye, color: 'text-[var(--color-info)]', bg: 'bg-blue-500/10' },
     { label: t('analytics.likes', 'Likes'), value: data.likes_count, icon: Heart, color: 'text-rose-500', bg: 'bg-rose-500/10' },
     { label: t('analytics.comments', 'Comments'), value: data.comments_count, icon: MessageCircle, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
     { label: t('analytics.shares', 'Shares'), value: data.shares_count, icon: Repeat2, color: 'text-purple-500', bg: 'bg-purple-500/10' },
-    { label: t('analytics.reach', 'Reach'), value: data.reach_estimate, icon: Users, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+    { label: t('analytics.reach', 'Reach'), value: data.reach_estimate, icon: Users, color: 'text-[var(--color-warning)]', bg: 'bg-amber-500/10' },
   ] : [];
 
   return (

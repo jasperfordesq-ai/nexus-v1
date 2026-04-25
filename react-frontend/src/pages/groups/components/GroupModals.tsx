@@ -464,14 +464,14 @@ export function GroupDeleteModal({
       <ModalContent>
         {(onClose) => (
           <>
-            <ModalHeader className="text-red-500 flex items-center gap-2">
+            <ModalHeader className="text-[var(--color-error)] flex items-center gap-2">
               <Trash2 className="w-5 h-5" aria-hidden="true" />
               {t('detail.delete_modal_title')}
             </ModalHeader>
             <ModalBody>
               <div className="text-center py-4">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/10 flex items-center justify-center">
-                  <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
+                  <AlertCircle className="w-8 h-8 text-[var(--color-error)]" aria-hidden="true" />
                 </div>
                 <p className="text-theme-primary font-medium mb-2">
                   {t('detail.delete_confirm', { name: groupName })}

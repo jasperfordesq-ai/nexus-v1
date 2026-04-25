@@ -152,7 +152,7 @@ function CategoryTreeItem({
       <div
         className={`
           w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-colors
-          ${isSelected ? 'bg-amber-500/10 text-amber-500 font-semibold' : 'text-theme-muted hover:bg-theme-hover'}
+          ${isSelected ? 'bg-amber-500/10 text-[var(--color-warning)] font-semibold' : 'text-theme-muted hover:bg-theme-hover'}
         `}
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
       >
@@ -517,13 +517,13 @@ export function ResourcesPage() {
   }
 
   const categoryColorMap: Record<string, string> = {
-    blue: 'bg-blue-500/10 text-blue-500',
+    blue: 'bg-blue-500/10 text-[var(--color-info)]',
     gray: 'bg-gray-500/10 text-gray-500',
     fuchsia: 'bg-fuchsia-500/10 text-fuchsia-500',
     purple: 'bg-purple-500/10 text-purple-500',
     green: 'bg-emerald-500/10 text-emerald-500',
     red: 'bg-rose-500/10 text-rose-500',
-    yellow: 'bg-amber-500/10 text-amber-500',
+    yellow: 'bg-amber-500/10 text-[var(--color-warning)]',
   };
 
   const inputClassNames = {
@@ -649,7 +649,7 @@ export function ResourcesPage() {
                     variant="light"
                     onPress={() => setSelectedCategory(null)}
                     className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left text-sm transition-colors justify-start h-auto ${
-                      !selectedCategory ? 'bg-amber-500/10 text-amber-500 font-semibold' : 'text-theme-muted hover:bg-theme-hover'
+                      !selectedCategory ? 'bg-amber-500/10 text-[var(--color-warning)] font-semibold' : 'text-theme-muted hover:bg-theme-hover'
                     }`}
                     startContent={<FolderOpen className="w-3.5 h-3.5" aria-hidden="true" />}
                   >
@@ -675,7 +675,7 @@ export function ResourcesPage() {
       {/* Error */}
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('resources.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
@@ -821,7 +821,7 @@ export function ResourcesPage() {
                             isIconOnly
                             size="sm"
                             variant="light"
-                            className="text-theme-subtle hover:text-red-500"
+                            className="text-theme-subtle hover:text-[var(--color-error)]"
                             onPress={() => {
                               setDeletingResource(resource);
                               deleteModal.onOpen();
@@ -875,7 +875,7 @@ export function ResourcesPage() {
       >
         <ModalContent>
           <ModalHeader className="text-theme-primary flex items-center gap-2">
-            <Trash2 className="w-5 h-5 text-red-500" aria-hidden="true" />
+            <Trash2 className="w-5 h-5 text-[var(--color-error)]" aria-hidden="true" />
             {t('resources.delete_confirm_title', 'Delete Resource')}
           </ModalHeader>
           <ModalBody>
@@ -925,7 +925,7 @@ export function ResourcesPage() {
       >
         <ModalContent>
           <ModalHeader className="text-theme-primary flex items-center gap-2">
-            <Upload className="w-5 h-5 text-amber-500" aria-hidden="true" />
+            <Upload className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
             {t('resources.upload_resource')}
           </ModalHeader>
           <ModalBody>
@@ -1005,7 +1005,7 @@ export function ResourcesPage() {
                       isIconOnly
                       size="sm"
                       variant="light"
-                      className="text-theme-muted hover:text-red-500 min-w-0 w-8 h-8"
+                      className="text-theme-muted hover:text-[var(--color-error)] min-w-0 w-8 h-8"
                       onPress={() => setUploadFile(null)}
                       isDisabled={isUploading}
                       aria-label={t('resources.remove_file_aria')}

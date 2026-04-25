@@ -32,7 +32,7 @@ export function DevelopmentStatusPage() {
       <PageMeta title={t('page_meta.development_status.title')} noIndex />
       {/* Header */}
       <div className="flex items-start gap-3">
-        <FlaskConical className="w-8 h-8 text-amber-500 shrink-0 mt-1" aria-hidden="true" />
+        <FlaskConical className="w-8 h-8 text-[var(--color-warning)] shrink-0 mt-1" aria-hidden="true" />
         <div>
           <h1 className="text-2xl font-bold text-foreground">
             {t('dev_status.title', { stage: RELEASE_STATUS.stageLabel })}

@@ -350,7 +350,7 @@ export function CampaignDetailPage() {
                           {t(`status.${ch.status}`)}
                         </Chip>
                         {ch.is_featured && (
-                          <Star className="w-3.5 h-3.5 text-amber-500 fill-current" />
+                          <Star className="w-3.5 h-3.5 text-[var(--color-warning)] fill-current" />
                         )}
                       </div>
                     </div>
@@ -380,7 +380,7 @@ export function CampaignDetailPage() {
                         {ch.favorites_count}
                       </span>
                       {ch.prize_description && (
-                        <Trophy className="w-3.5 h-3.5 text-amber-500" />
+                        <Trophy className="w-3.5 h-3.5 text-[var(--color-warning)]" />
                       )}
                     </div>
                   </div>

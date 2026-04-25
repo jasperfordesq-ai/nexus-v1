@@ -682,7 +682,7 @@ export function ListingsPage() {
         </div>
       ) : loadError ? (
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('load_error_title')}</h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <Button
@@ -1068,7 +1068,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
             />
             <span className="text-sm text-theme-subtle truncate">{listing.author_name}</span>
             {listing.author_rating != null && listing.author_rating > 0 && (
-              <span className="flex items-center gap-0.5 text-[11px] text-amber-500 shrink-0">
+              <span className="flex items-center gap-0.5 text-[11px] text-[var(--color-warning)] shrink-0">
                 <Star className="w-3 h-3 fill-amber-500" aria-hidden="true" />
                 {listing.author_rating.toFixed(1)}
               </span>

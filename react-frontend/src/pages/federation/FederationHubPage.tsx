@@ -254,7 +254,7 @@ function FederationHero({ onOptIn, isOptingIn }: { onOptIn: () => void; isOpting
             </p>
           </div>
           <div>
-            <Zap className="w-8 h-8 text-amber-500 mx-auto mb-2" aria-hidden="true" />
+            <Zap className="w-8 h-8 text-[var(--color-warning)] mx-auto mb-2" aria-hidden="true" />
             <h4 className="font-semibold text-foreground mb-1">{t('hub.feature_instant_title')}</h4>
             <p className="text-sm text-default-500">
               {t('hub.feature_instant_description')}

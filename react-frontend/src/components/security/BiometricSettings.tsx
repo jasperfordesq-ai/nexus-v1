@@ -410,7 +410,7 @@ export function BiometricSettings() {
                     isIconOnly
                     size="sm"
                     variant="light"
-                    className="text-red-500 hover:bg-red-500/10"
+                    className="text-[var(--color-error)] hover:bg-red-500/10"
                     onPress={() => handleRemove(cred.credential_id)}
                     isLoading={removingId === cred.credential_id}
                     aria-label={t('biometric_remove', { defaultValue: 'Remove passkey' })}
@@ -428,7 +428,7 @@ export function BiometricSettings() {
               <Button
                 size="sm"
                 variant="flat"
-                className="bg-red-500/10 text-red-500"
+                className="bg-red-500/10 text-[var(--color-error)]"
                 onPress={removeAllConfirm.onOpen}
                 isLoading={removingAll}
                 startContent={!removingAll ? <Trash2 className="w-3 h-3" /> : undefined}

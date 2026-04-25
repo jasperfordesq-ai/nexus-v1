@@ -62,7 +62,7 @@ export function CommunityPulseWidget({ stats }: CommunityPulseWidgetProps) {
       count: stats.groups,
       label: t('sidebar.pulse.groups', 'Groups'),
       path: '/groups',
-      color: 'text-amber-500',
+      color: 'text-[var(--color-warning)]',
       bg: 'bg-amber-500/10',
     },
   ];

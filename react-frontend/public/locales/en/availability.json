@@ -9,6 +9,7 @@
   "instructions": "Click on time slots to mark when you are available. Your availability helps other members find the best time to connect.",
   "loading": "Loading availability",
   "timezone_label": "Timezone",
+  "slot_status_label": "{{day}} {{time}}: {{status}}",
   "days": {
     "mon": "Mon",
     "tue": "Tue",
@@ -17,5 +18,14 @@
     "fri": "Fri",
     "sat": "Sat",
     "sun": "Sun"
+  },
+  "full_days": {
+    "mon": "Monday",
+    "tue": "Tuesday",
+    "wed": "Wednesday",
+    "thu": "Thursday",
+    "fri": "Friday",
+    "sat": "Saturday",
+    "sun": "Sunday"
   }
 }

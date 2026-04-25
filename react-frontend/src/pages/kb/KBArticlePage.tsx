@@ -220,7 +220,7 @@ export function KBArticlePage() {
     return (
       <div className="space-y-6">
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('error.article_title')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <div className="flex gap-2 justify-center">

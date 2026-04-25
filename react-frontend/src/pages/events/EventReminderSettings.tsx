@@ -32,7 +32,7 @@ export function EventReminderSettings() {
         <CardBody className="p-6 text-center space-y-4">
           <div className="flex justify-center">
             <div className="relative p-3 rounded-2xl bg-amber-500/10">
-              <Bell className="w-8 h-8 text-amber-500" aria-hidden="true" />
+              <Bell className="w-8 h-8 text-[var(--color-warning)]" aria-hidden="true" />
               <Clock
                 className="w-4 h-4 text-amber-400 absolute -bottom-0.5 -right-0.5"
                 aria-hidden="true"

@@ -42,7 +42,6 @@ interface AvailabilityData {
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const FULL_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const TIME_SLOTS = [
   '06:00', '07:00', '08:00', '09:00', '10:00', '11:00',
   '12:00', '13:00', '14:00', '15:00', '16:00', '17:00',
@@ -89,6 +88,10 @@ export function AvailabilityGrid({
   const DAYS = [
     tAvail('days.mon'), tAvail('days.tue'), tAvail('days.wed'), tAvail('days.thu'),
     tAvail('days.fri'), tAvail('days.sat'), tAvail('days.sun'),
+  ];
+  const FULL_DAYS = [
+    tAvail('full_days.mon'), tAvail('full_days.tue'), tAvail('full_days.wed'), tAvail('full_days.thu'),
+    tAvail('full_days.fri'), tAvail('full_days.sat'), tAvail('full_days.sun'),
   ];
 
   // Build key for slot map (day = grid index: 0=Mon, 6=Sun)
@@ -241,7 +244,7 @@ export function AvailabilityGrid({
   if (error) {
     return (
       <GlassCard className="p-6 text-center">
-        <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto mb-3" aria-hidden="true" />
+        <AlertTriangle className="w-8 h-8 text-[var(--color-warning)] mx-auto mb-3" aria-hidden="true" />
         <p className="text-sm text-theme-muted mb-3">{error}</p>
         <Button
           size="sm"
@@ -326,7 +329,11 @@ export function AvailabilityGrid({
                   return (
                     <Tooltip
                       key={key}
-                      content={`${FULL_DAYS[dayIdx] ?? ''} ${time} - ${isAvail ? tAvail('available') : tAvail('unavailable')}`}
+                      content={tAvail('slot_status_label', {
+                        day: FULL_DAYS[dayIdx] ?? '',
+                        time,
+                        status: isAvail ? tAvail('available') : tAvail('unavailable'),
+                      })}
                       delay={300}
                       closeDelay={0}
                       size="sm"
@@ -343,7 +350,11 @@ export function AvailabilityGrid({
                           ${editable ? 'cursor-pointer' : 'cursor-default'}
                         `}
                         variant="flat"
-                        aria-label={`${FULL_DAYS[dayIdx] ?? ''} ${time}: ${isAvail ? tAvail('available') : tAvail('unavailable')}`}
+                        aria-label={tAvail('slot_status_label', {
+                          day: FULL_DAYS[dayIdx] ?? '',
+                          time,
+                          status: isAvail ? tAvail('available') : tAvail('unavailable'),
+                        })}
                         aria-pressed={isAvail}
                       />
                     </Tooltip>

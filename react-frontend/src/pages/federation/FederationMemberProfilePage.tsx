@@ -265,7 +265,7 @@ export function FederationMemberProfilePage() {
           ]}
         />
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
             {t('member_profile.not_found_heading')}
           </h2>
@@ -485,7 +485,7 @@ export function FederationMemberProfilePage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Star className="w-5 h-5 text-amber-500" aria-hidden="true" />
+            <Star className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
             {t('reviews.title')}
           </h2>
           <FederationReviewsPanel memberId={member.id} />

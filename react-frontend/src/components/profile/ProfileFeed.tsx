@@ -215,7 +215,7 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
   if (error) {
     return (
       <GlassCard className="p-8 text-center">
-        <AlertTriangle className="w-10 h-10 text-amber-500 mx-auto mb-3" aria-hidden="true" />
+        <AlertTriangle className="w-10 h-10 text-[var(--color-warning)] mx-auto mb-3" aria-hidden="true" />
         <p className="text-theme-muted mb-4">{error}</p>
         <Button
           variant="flat"

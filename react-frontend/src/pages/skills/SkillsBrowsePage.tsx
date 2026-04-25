@@ -63,9 +63,9 @@ interface SkillMember {
 
 const proficiencyConfig: Record<string, { labelKey: string; fallback: string; color: string; bg: string; dots: number }> = {
   beginner: { labelKey: 'skills.proficiency.beginner', fallback: 'Beginner', color: 'text-emerald-500', bg: 'bg-emerald-500', dots: 1 },
-  intermediate: { labelKey: 'skills.proficiency.intermediate', fallback: 'Intermediate', color: 'text-blue-500', bg: 'bg-blue-500', dots: 2 },
+  intermediate: { labelKey: 'skills.proficiency.intermediate', fallback: 'Intermediate', color: 'text-[var(--color-info)]', bg: 'bg-blue-500', dots: 2 },
   advanced: { labelKey: 'skills.proficiency.advanced', fallback: 'Advanced', color: 'text-purple-500', bg: 'bg-purple-500', dots: 3 },
-  expert: { labelKey: 'skills.proficiency.expert', fallback: 'Expert', color: 'text-amber-500', bg: 'bg-amber-500', dots: 4 },
+  expert: { labelKey: 'skills.proficiency.expert', fallback: 'Expert', color: 'text-[var(--color-warning)]', bg: 'bg-amber-500', dots: 4 },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -278,7 +278,7 @@ export function SkillsBrowsePage() {
               </p>
             </div>
             <div className="flex items-start gap-2">
-              <Megaphone className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" aria-hidden="true" />
+              <Megaphone className="w-4 h-4 text-[var(--color-info)] mt-0.5 shrink-0" aria-hidden="true" />
               <p className="text-xs text-theme-subtle">
                 <span className="font-medium text-blue-600 dark:text-blue-400">
                   {t('skills.requesting_label', 'Requesting')}
@@ -347,7 +347,7 @@ export function SkillsBrowsePage() {
       {/* ── Error State ──────────────────────────────────────────────────── */}
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h3 className="text-lg font-semibold text-theme-primary mb-2">
             {t('common.unable_to_load', 'Unable to load')}
           </h3>
@@ -532,7 +532,7 @@ export function SkillsBrowsePage() {
                                               </span>
                                             )}
                                             {skill.requesting_count > 0 && (
-                                              <span className="text-xs text-blue-500 flex items-center gap-1">
+                                              <span className="text-xs text-[var(--color-info)] flex items-center gap-1">
                                                 <Megaphone className="w-3 h-3" aria-hidden="true" />
                                                 {skill.requesting_count} {t('skills.requesting', 'requesting')}
                                               </span>

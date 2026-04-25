@@ -286,7 +286,7 @@ export function JobsPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 py-16 text-center">
         <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 flex items-center justify-center mb-4">
-          <Briefcase className="w-8 h-8 text-blue-500" aria-hidden="true" />
+          <Briefcase className="w-8 h-8 text-[var(--color-info)]" aria-hidden="true" />
         </div>
         <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">{t('feature_not_available', 'Jobs Not Available')}</h2>
         <p className="text-[var(--color-text-muted)] max-w-sm">
@@ -528,7 +528,7 @@ export function JobsPage() {
           {/* Error State */}
           {error && !isLoading && (
             <GlassCard className="p-8 text-center">
-              <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+              <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
               <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
               <p className="text-theme-muted mb-4">{error}</p>
               <Button

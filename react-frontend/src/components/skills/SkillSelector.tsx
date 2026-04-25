@@ -71,9 +71,9 @@ interface SkillSearchResult {
 
 const proficiencyConfig: Record<string, { label: string; color: string; dots: number }> = {
   beginner: { label: 'Beginner', color: 'text-emerald-500', dots: 1 },
-  intermediate: { label: 'Intermediate', color: 'text-blue-500', dots: 2 },
+  intermediate: { label: 'Intermediate', color: 'text-[var(--color-info)]', dots: 2 },
   advanced: { label: 'Advanced', color: 'text-purple-500', dots: 3 },
-  expert: { label: 'Expert', color: 'text-amber-500', dots: 4 },
+  expert: { label: 'Expert', color: 'text-[var(--color-warning)]', dots: 4 },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -121,7 +121,7 @@ export function SkillChip({
         <ProficiencyDots level={skill.proficiency_level} />
       )}
       {endorsementCount !== undefined && endorsementCount > 0 && (
-        <span className="flex items-center gap-0.5 text-xs text-amber-500">
+        <span className="flex items-center gap-0.5 text-xs text-[var(--color-warning)]">
           <Star className="w-3 h-3 fill-amber-500" aria-hidden="true" />
           {endorsementCount}
         </span>
@@ -132,7 +132,7 @@ export function SkillChip({
           size="sm"
           variant="light"
           onPress={onRemove}
-          className="ml-1 p-0.5 rounded-full hover:bg-red-500/20 text-theme-subtle hover:text-red-500 transition-colors min-w-0 w-auto h-auto"
+          className="ml-1 p-0.5 rounded-full hover:bg-red-500/20 text-theme-subtle hover:text-[var(--color-error)] transition-colors min-w-0 w-auto h-auto"
           aria-label={`Remove ${skill.skill_name}`}
         >
           <X className="w-3 h-3" />

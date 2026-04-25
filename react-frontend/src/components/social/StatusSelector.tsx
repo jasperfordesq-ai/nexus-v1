@@ -52,8 +52,8 @@ const STATUS_OPTIONS: Array<{
   {
     key: 'online',
     labelKey: 'status.online',
-    icon: <Circle className="w-3 h-3 fill-green-500 text-green-500" />,
-    color: 'text-green-500',
+    icon: <Circle className="w-3 h-3 fill-green-500 text-[var(--color-success)]" />,
+    color: 'text-[var(--color-success)]',
     descriptionKey: 'status.online_desc',
   },
   {
@@ -66,8 +66,8 @@ const STATUS_OPTIONS: Array<{
   {
     key: 'dnd',
     labelKey: 'status.dnd',
-    icon: <MinusCircle className="w-3 h-3 text-red-500" />,
-    color: 'text-red-500',
+    icon: <MinusCircle className="w-3 h-3 text-[var(--color-error)]" />,
+    color: 'text-[var(--color-error)]',
     descriptionKey: 'status.dnd_desc',
   },
 ];
@@ -115,11 +115,11 @@ export function StatusSelector({ children }: StatusSelectorProps) {
   const currentStatusKey = currentStatus?.status ?? 'offline';
   const statusColorClass =
     currentStatusKey === 'online'
-      ? 'fill-green-500 text-green-500'
+      ? 'fill-green-500 text-[var(--color-success)]'
       : currentStatusKey === 'away'
         ? 'fill-yellow-500 text-yellow-500'
         : currentStatusKey === 'dnd'
-          ? 'fill-red-500 text-red-500'
+          ? 'fill-red-500 text-[var(--color-error)]'
           : 'fill-gray-400 text-gray-400';
   const statusLabel =
     currentStatusKey === 'online'

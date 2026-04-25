@@ -546,7 +546,7 @@ export function RegisterPage() {
                   ) : inviteCodeValid === true ? (
                     <Check className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                   ) : inviteCodeValid === false ? (
-                    <X className="w-4 h-4 text-red-500" aria-hidden="true" />
+                    <X className="w-4 h-4 text-[var(--color-error)]" aria-hidden="true" />
                   ) : null
                 }
                 isRequired
@@ -1064,7 +1064,7 @@ export function RegisterPage() {
                 {pendingResult.requiresVerification && (
                   <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-sm">
                     <div className="flex items-start gap-3">
-                      <MailCheck className="w-5 h-5 text-blue-500 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                      <MailCheck className="w-5 h-5 text-[var(--color-info)] flex-shrink-0 mt-0.5" />
                       <div>
                         <p className="font-medium text-blue-600 dark:text-blue-400">{t('register.verify_email_title', { defaultValue: 'Verify your email' })}</p>
                         <p className="text-blue-600/80 dark:text-blue-300/80 mt-1">
@@ -1083,7 +1083,7 @@ export function RegisterPage() {
                 {pendingResult.requiresApproval && (
                   <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm">
                     <div className="flex items-start gap-3">
-                      <ShieldCheck className="w-5 h-5 text-amber-500 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                      <ShieldCheck className="w-5 h-5 text-[var(--color-warning)] flex-shrink-0 mt-0.5" />
                       <div>
                         <p className="font-medium text-amber-600 dark:text-amber-400">{t('register.approval_title', { defaultValue: 'Awaiting admin approval' })}</p>
                         <p className="text-amber-600/80 dark:text-amber-300/80 mt-1">

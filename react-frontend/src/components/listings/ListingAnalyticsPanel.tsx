@@ -83,7 +83,7 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
     return (
       <GlassCard className="p-6">
         <div className="flex flex-col items-center justify-center py-6 text-center">
-          <AlertTriangle className="w-10 h-10 text-amber-500 mb-3" aria-hidden="true" />
+          <AlertTriangle className="w-10 h-10 text-[var(--color-warning)] mb-3" aria-hidden="true" />
           <p className="text-theme-muted mb-4">
             {t('analytics.load_error', 'Failed to load analytics data.')}
           </p>
@@ -115,13 +115,13 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
       {/* Summary Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         <StatCard
-          icon={<Eye className="w-5 h-5 text-blue-500" />}
+          icon={<Eye className="w-5 h-5 text-[var(--color-info)]" />}
           label={t('analytics.total_views', 'Total Views')}
           value={summary.total_views}
           subtext={t('analytics.unique_viewers', '{{count}} unique', { count: summary.unique_viewers })}
         />
         <StatCard
-          icon={<MessageCircle className="w-5 h-5 text-green-500" />}
+          icon={<MessageCircle className="w-5 h-5 text-[var(--color-success)]" />}
           label={t('analytics.contacts', 'Contacts')}
           value={summary.total_contacts}
           subtext={t('analytics.contact_rate', '{{rate}}% rate', { rate: summary.contact_rate })}
@@ -135,7 +135,7 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
         <StatCard
           icon={trendPositive
             ? <TrendingUp className="w-5 h-5 text-emerald-500" />
-            : <TrendingDown className="w-5 h-5 text-amber-500" />
+            : <TrendingDown className="w-5 h-5 text-[var(--color-warning)]" />
           }
           label={t('analytics.trend_7day', '7-Day Trend')}
           value={`${trendPositive ? '+' : ''}${summary.views_trend_percent}%`}

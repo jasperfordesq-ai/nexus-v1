@@ -193,11 +193,11 @@ export function ReactionPicker({
       case 'love':
         return 'text-rose-500 font-medium';
       case 'like':
-        return 'text-blue-500 font-medium';
+        return 'text-[var(--color-info)] font-medium';
       case 'laugh':
-        return 'text-amber-500 font-medium';
+        return 'text-[var(--color-warning)] font-medium';
       case 'wow':
-        return 'text-amber-500 font-medium';
+        return 'text-[var(--color-warning)] font-medium';
       case 'sad':
         return 'text-blue-400 font-medium';
       case 'celebrate':

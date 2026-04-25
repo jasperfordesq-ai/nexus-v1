@@ -119,7 +119,7 @@ export function MessageInputArea({
       {/* Messaging restricted by broker/admin */}
       {isDirectMessagingEnabled && messagingRestriction?.messaging_disabled && (
         <div className="flex items-start gap-3 p-3 bg-red-500/10 border border-red-500/30 rounded-lg" role="alert">
-          <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+          <AlertTriangle className="w-5 h-5 text-[var(--color-error)] flex-shrink-0 mt-0.5" aria-hidden="true" />
           <div className="flex-1">
             <p className="text-red-700 dark:text-red-300 text-sm font-medium">
               {t('messaging_restricted_title')}

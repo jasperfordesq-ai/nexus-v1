@@ -46,7 +46,7 @@ export function SellerCard({ seller }: SellerCardProps) {
           </span>
           {seller.is_verified && (
             <CheckCircle
-              className="w-4 h-4 text-blue-500 shrink-0"
+              className="w-4 h-4 text-[var(--color-info)] shrink-0"
               aria-label={t('seller.verified', 'Verified')}
             />
           )}

@@ -264,13 +264,13 @@ export function BlogPostPage() {
   };
 
   const categoryColorMap: Record<string, string> = {
-    blue: 'bg-blue-500/10 text-blue-500',
+    blue: 'bg-blue-500/10 text-[var(--color-info)]',
     gray: 'bg-gray-500/10 text-gray-500',
     fuchsia: 'bg-fuchsia-500/10 text-fuchsia-500',
     purple: 'bg-purple-500/10 text-purple-500',
     green: 'bg-emerald-500/10 text-emerald-500',
     red: 'bg-rose-500/10 text-rose-500',
-    yellow: 'bg-amber-500/10 text-amber-500',
+    yellow: 'bg-amber-500/10 text-[var(--color-warning)]',
   };
 
   // Loading state
@@ -299,7 +299,7 @@ export function BlogPostPage() {
     return (
       <div className="max-w-3xl mx-auto">
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
             {error || t('post.not_found')}
           </h2>
@@ -463,7 +463,7 @@ export function BlogPostPage() {
                 [&_h2]:text-theme-primary [&_h2]:font-bold [&_h2]:mt-8 [&_h2]:mb-4
                 [&_h3]:text-theme-primary [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-3
                 [&_p]:text-theme-muted [&_p]:leading-relaxed [&_p]:mb-4
-                [&_a]:text-blue-500 [&_a]:hover:text-blue-600
+                [&_a]:text-[var(--color-info)] [&_a]:hover:text-blue-600
                 [&_ul]:text-theme-muted [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4
                 [&_ol]:text-theme-muted [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4
                 [&_li]:mb-1

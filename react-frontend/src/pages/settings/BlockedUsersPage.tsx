@@ -97,7 +97,7 @@ export function BlockedUsersPage() {
         </Link>
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <ShieldOff className="w-7 h-7 text-red-500" />
+            <ShieldOff className="w-7 h-7 text-[var(--color-error)]" />
             {t('blocked_users.title')}
           </h1>
           <p className="text-theme-muted mt-1">{t('blocked_users.subtitle')}</p>

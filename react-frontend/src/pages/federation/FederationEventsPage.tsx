@@ -302,7 +302,7 @@ export function FederationEventsPage() {
       {/* Error State */}
       {!isLoading && loadError && (
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
             {t('events.unable_to_load')}
           </h2>

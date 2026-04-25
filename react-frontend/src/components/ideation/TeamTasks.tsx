@@ -254,16 +254,16 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
             </span>
           </GlassCard>
           <GlassCard className="px-3 py-2 flex items-center gap-2">
-            <CheckSquare className="w-4 h-4 text-green-500" />
+            <CheckSquare className="w-4 h-4 text-[var(--color-success)]" />
             <span className="text-sm text-green-600 dark:text-green-400">{stats.done}</span>
           </GlassCard>
           <GlassCard className="px-3 py-2 flex items-center gap-2">
-            <Clock className="w-4 h-4 text-amber-500" />
+            <Clock className="w-4 h-4 text-[var(--color-warning)]" />
             <span className="text-sm text-amber-600 dark:text-amber-400">{stats.in_progress}</span>
           </GlassCard>
           {stats.overdue > 0 && (
             <GlassCard className="px-3 py-2 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-red-500" />
+              <AlertCircle className="w-4 h-4 text-[var(--color-error)]" />
               <span className="text-sm text-red-600 dark:text-red-400">
                 {stats.overdue} {t('tasks.overdue')}
               </span>
@@ -341,7 +341,7 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
                     <CheckSquare className="w-3 h-3" />
                   )}
                   {task.status === 'in_progress' && (
-                    <Clock className="w-3 h-3 text-amber-500" />
+                    <Clock className="w-3 h-3 text-[var(--color-warning)]" />
                   )}
                 </Button>
 
@@ -381,7 +381,7 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
                     {task.due_date && (
                       <span className={`flex items-center gap-1 ${
                         isOverdue(task.due_date) && task.status !== 'done'
-                          ? 'text-red-500 font-medium'
+                          ? 'text-[var(--color-error)] font-medium'
                           : ''
                       }`}>
                         <Calendar className="w-3 h-3" />

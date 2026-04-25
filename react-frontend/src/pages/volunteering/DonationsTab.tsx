@@ -292,7 +292,7 @@ export function DonationsTab() {
           </GlassCard>
           <GlassCard className="p-3 text-center">
             <p className="text-xs text-theme-muted">{t('donations.stats.active_campaigns', 'Active Campaigns')}</p>
-            <p className="text-lg font-bold text-blue-500">{stats.active_campaigns}</p>
+            <p className="text-lg font-bold text-[var(--color-info)]">{stats.active_campaigns}</p>
           </GlassCard>
         </div>
       )}
@@ -300,7 +300,7 @@ export function DonationsTab() {
       {/* Error */}
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white" onPress={load}>
             {t('donations.try_again', 'Try Again')}

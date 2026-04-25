@@ -321,7 +321,7 @@ export function GroupsPage() {
       {/* Error State */}
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
@@ -376,7 +376,7 @@ export function GroupsPage() {
                     {featuredGroups.length > 0 && (
                       <div className="space-y-3">
                         <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-                          <Star className="w-5 h-5 text-amber-500" aria-hidden="true" />
+                          <Star className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
                           {t('featured_groups')}
                         </h2>
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -498,7 +498,7 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
           <div className="flex flex-1 flex-col p-5">
             {featured && (
               <div className="flex items-center gap-1.5 mb-2" role="img" aria-label={t('featured_badge')}>
-                <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" aria-hidden="true" />
+                <Star className="w-3.5 h-3.5 text-[var(--color-warning)] fill-amber-500" aria-hidden="true" />
                 <span className="text-xs font-medium text-amber-600 dark:text-amber-400" aria-hidden="true">
                   {t('featured_badge')}
                 </span>

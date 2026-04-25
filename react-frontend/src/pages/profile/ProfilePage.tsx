@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Avatar, Chip, Skeleton, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip } from '@heroui/react';
+import { Button, Avatar, Chip, Skeleton, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip, Tabs, Tab } from '@heroui/react';
 import User from 'lucide-react/icons/user';
 import MapPin from 'lucide-react/icons/map-pin';
 import Calendar from 'lucide-react/icons/calendar';
@@ -32,7 +32,6 @@ import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import ShieldOff from 'lucide-react/icons/shield-off';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ExternalLink from 'lucide-react/icons/external-link';
-import { sanitizeRichText } from '@/lib/sanitize';
 import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
@@ -492,7 +491,7 @@ export function ProfilePage() {
     return (
       <div className="max-w-4xl mx-auto">
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <div className="flex justify-center gap-3">
@@ -506,7 +505,7 @@ export function ProfilePage() {
               </Button>
             </Link>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              color="primary"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={() => loadProfile()}
             >
@@ -631,7 +630,10 @@ export function ProfilePage() {
                   </span>
                 )}
                 {typeof profile.rating === 'number' && profile.rating > 0 && (
-                  <span className="flex items-center gap-1" aria-label={`Rating: ${profile.rating.toFixed(1)} out of 5`}>
+                  <span
+                    className="flex items-center gap-1"
+                    aria-label={t('aria.rating_summary', { rating: profile.rating.toFixed(1) })}
+                  >
                     <Star className="w-4 h-4 text-amber-400" aria-hidden="true" />
                     <span aria-hidden="true">{profile.rating.toFixed(1)}</span>
                   </span>
@@ -641,7 +643,10 @@ export function ProfilePage() {
                     <Link
                       to={tenantPath('/nexus-score')}
                       className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 text-xs font-semibold hover:bg-indigo-500/25 transition-colors"
-                      aria-label={`NexusScore: ${profile.nexus_score.total_score} (${profile.nexus_score.tier}) — view breakdown`}
+                      aria-label={t('aria.nexus_score_link', {
+                        score: profile.nexus_score.total_score,
+                        tier: profile.nexus_score.tier,
+                      })}
                     >
                       <Trophy className="w-3.5 h-3.5" aria-hidden="true" />
                       {profile.nexus_score.total_score}
@@ -650,7 +655,10 @@ export function ProfilePage() {
                   ) : (
                     <span
                       className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 text-xs font-semibold"
-                      aria-label={`NexusScore: ${profile.nexus_score.total_score} (${profile.nexus_score.tier})`}
+                      aria-label={t('aria.nexus_score_summary', {
+                        score: profile.nexus_score.total_score,
+                        tier: profile.nexus_score.tier,
+                      })}
                     >
                       <Trophy className="w-3.5 h-3.5" aria-hidden="true" />
                       {profile.nexus_score.total_score}
@@ -665,7 +673,7 @@ export function ProfilePage() {
                 {isOwnProfile ? (
                   <Link to={tenantPath('/settings')}>
                     <Button
-                      className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                      color="primary"
                       startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
                     >
                       {t('settings')}
@@ -692,7 +700,7 @@ export function ProfilePage() {
                     {isAuthenticated && (
                       <Link to={tenantPath(`/messages/new/${profile.id}`)}>
                         <Button
-                          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                          color="primary"
                           startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
                         >
                           {t('send_message')}
@@ -737,53 +745,6 @@ export function ProfilePage() {
                           : t('connect')}
                       </Button>
                     )}
-                    {hasConnections && isAuthenticated && connectionStatus === 'connected' && (
-                      <Button
-                        variant="flat"
-                        className="bg-theme-elevated text-theme-secondary"
-                        startContent={<UserCheck className="w-4 h-4" aria-hidden="true" />}
-                        onPress={() => setIsDisconnectConfirmOpen(true)}
-                      >
-                        {t('connected')}
-                      </Button>
-                    )}
-                    {/* Write Review */}
-                    {isAuthenticated && hasReviews && (
-                      <Button
-                        variant="flat"
-                        className="bg-amber-500/20 text-amber-600 dark:text-amber-400"
-                        startContent={<Star className="w-4 h-4" aria-hidden="true" />}
-                        onPress={() => setIsReviewModalOpen(true)}
-                      >
-                        {t('write_review')}
-                      </Button>
-                    )}
-                    {!isAuthenticated && hasReviews && (
-                      <Tooltip content={t('login_to_review')}>
-                        <span>
-                          <Button
-                            variant="flat"
-                            className="bg-amber-500/20 text-amber-600 dark:text-amber-400"
-                            startContent={<Star className="w-4 h-4" aria-hidden="true" />}
-                            isDisabled
-                          >
-                            {t('write_review')}
-                          </Button>
-                        </span>
-                      </Tooltip>
-                    )}
-                    {/* Send credits */}
-                    {isAuthenticated && hasWallet && (
-                      <Button
-                        variant="flat"
-                        className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                        startContent={<ArrowUpRight className="w-4 h-4" aria-hidden="true" />}
-                        onPress={() => setIsTransferModalOpen(true)}
-                      >
-                        {t('send_credits')}
-                      </Button>
-                    )}
-                    {/* More options (Block) */}
                     {isAuthenticated && (
                       <Dropdown>
                         <DropdownTrigger>
@@ -794,10 +755,28 @@ export function ProfilePage() {
                         <DropdownMenu
                           aria-label={t('profile_actions')}
                           onAction={(key) => {
+                            if (key === 'review') setIsReviewModalOpen(true);
+                            if (key === 'credits') setIsTransferModalOpen(true);
+                            if (key === 'disconnect') setIsDisconnectConfirmOpen(true);
                             if (key === 'block') setIsBlockConfirmOpen(true);
                           }}
                         >
-                          <DropdownItem key="block" className="text-danger" startContent={<ShieldOff className="w-4 h-4" />}>
+                          {hasReviews ? (
+                            <DropdownItem key="review" startContent={<Star className="w-4 h-4" />}>
+                              {t('write_review')}
+                            </DropdownItem>
+                          ) : null}
+                          {hasWallet ? (
+                            <DropdownItem key="credits" startContent={<ArrowUpRight className="w-4 h-4" />}>
+                              {t('send_credits')}
+                            </DropdownItem>
+                          ) : null}
+                          {hasConnections && connectionStatus === 'connected' ? (
+                            <DropdownItem key="disconnect" startContent={<UserCheck className="w-4 h-4" />}>
+                              {t('disconnect_confirm')}
+                            </DropdownItem>
+                          ) : null}
+                          <DropdownItem key="block" className="text-danger" color="danger" startContent={<ShieldOff className="w-4 h-4" />}>
                             {t('block_user')}
                           </DropdownItem>
                         </DropdownMenu>
@@ -888,35 +867,36 @@ export function ProfilePage() {
             ...(hasGamification ? [{ key: 'achievements', icon: Award, label: t('tabs.achievements') }] : []),
           ];
           return (
-            <div
-              className="flex items-center gap-1 bg-theme-elevated p-1 rounded-lg overflow-x-auto scrollbar-hide"
-              role="tablist"
+            <Tabs
               aria-label={t('aria.profile_sections')}
+              selectedKey={activeTab}
+              onSelectionChange={(key) => setActiveTab(String(key))}
+              variant="light"
+              classNames={{
+                base: 'w-full overflow-x-auto',
+                tabList: 'bg-theme-elevated p-1 rounded-lg gap-1',
+                cursor: 'bg-theme-hover shadow-sm',
+                tab: 'h-auto px-3 py-2 text-xs sm:text-sm',
+                tabContent: 'group-data-[selected=true]:text-theme-primary text-theme-muted',
+              }}
             >
               {tabs.map((tab) => {
                 const Icon = tab.icon;
-                const isActive = activeTab === tab.key;
                 return (
-                  <Button
-                    variant="light"
+                  <Tab
                     key={tab.key}
                     id={`tab-${tab.key}`}
-                    role="tab"
-                    aria-selected={isActive ? 'true' : 'false'}
                     aria-controls={`panel-${tab.key}`}
-                    onPress={() => setActiveTab(tab.key)}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap h-auto min-w-0 ${
-                      isActive
-                        ? 'bg-theme-hover text-theme-primary shadow-sm'
-                        : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover/50'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                    {tab.label}
-                  </Button>
+                    title={(
+                      <span className="flex items-center gap-1.5 whitespace-nowrap">
+                        <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                        {tab.label}
+                      </span>
+                    )}
+                  />
                 );
               })}
-            </div>
+            </Tabs>
           );
         })()}
 
@@ -926,11 +906,10 @@ export function ProfilePage() {
               <h2 className="text-lg font-semibold text-theme-primary mb-4">{t('about.heading')}</h2>
               {profile.bio ? (
                 <div>
-                  <div
+                  <SafeHtml
+                    content={profile.bio}
+                    as="div"
                     className={`text-theme-muted whitespace-pre-wrap prose prose-sm max-w-none dark:prose-invert${!isOwnProfile && !bioExpanded && profile.bio.length > 300 ? ' line-clamp-4' : ''}`}
-                    dangerouslySetInnerHTML={{
-                      __html: sanitizeRichText(profile.bio),
-                    }}
                   />
                   {!isOwnProfile && profile.bio.length > 300 && (
                     <button
@@ -1009,13 +988,16 @@ export function ProfilePage() {
 
           {activeTab === 'listings' && (
             <div role="tabpanel" id="panel-listings" aria-labelledby="tab-listings" className="space-y-4">
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-4" role={listings.length > 0 ? 'list' : undefined}>
                 {listings.length > 0 ? (
                   listings.map((listing) => (
                     <Link
                       key={listing.id}
                       to={tenantPath(`/listings/${listing.id}`)}
-                      aria-label={`${listing.type === 'offer' ? t('listing_type.offer') : t('listing_type.request')}: ${listing.title}`}
+                      aria-label={t('aria.listing_card', {
+                        type: listing.type === 'offer' ? t('listing_type.offer') : t('listing_type.request'),
+                        title: listing.title,
+                      })}
                       className="cursor-pointer"
                     >
                       <article role="listitem">
@@ -1063,7 +1045,7 @@ export function ProfilePage() {
                       action={
                         isOwnProfile && (
                           <Link to={tenantPath('/listings/create')}>
-                            <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+                            <Button color="primary">
                               {t('create_listing')}
                             </Button>
                           </Link>
@@ -1199,7 +1181,7 @@ export function ProfilePage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="p-2 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20">
-                          <Trophy className="w-5 h-5 text-amber-500" aria-hidden="true" />
+                          <Trophy className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
                         </div>
                         <div>
                           <p className="text-sm font-medium text-theme-primary">
@@ -1249,7 +1231,7 @@ export function ProfilePage() {
                     description={isOwnProfile ? t('achievements.no_achievements_own') : t('achievements.no_achievements_other')}
                     action={isOwnProfile && (
                       <Link to={tenantPath('/achievements')}>
-                        <Button className="bg-gradient-to-r from-amber-500 to-orange-600 text-white">
+                        <Button color="warning" className="text-white">
                           {t('achievements.view_badges')}
                         </Button>
                       </Link>
@@ -1369,7 +1351,7 @@ function ProfileStatCard({ icon, label, value, color }: ProfileStatCardProps) {
     emerald: 'from-emerald-500/20 to-teal-500/20 text-emerald-500',
     indigo: 'from-indigo-500/20 to-blue-500/20 text-indigo-500',
     purple: 'from-purple-500/20 to-fuchsia-500/20 text-purple-500',
-    amber: 'from-amber-500/20 to-orange-500/20 text-amber-500',
+    amber: 'from-amber-500/20 to-orange-500/20 text-[var(--color-warning)]',
     rose: 'from-rose-500/20 to-pink-500/20 text-rose-500',
   };
 
@@ -1441,7 +1423,7 @@ function ReviewCard({ review }: ReviewCardProps) {
           </div>
 
           {/* Star Rating */}
-          <div className="flex items-center gap-0.5 mt-2" aria-label={`Rating: ${review.rating} out of 5`}>
+          <div className="flex items-center gap-0.5 mt-2" aria-label={t('aria.rating_summary', { rating: review.rating })}>
             {[1, 2, 3, 4, 5].map((star) => (
               <Star
                 key={star}

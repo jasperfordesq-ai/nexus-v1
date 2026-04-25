@@ -96,7 +96,7 @@ export function ImpactSummaryPage() {
           >
             <GlassCard className="inline-block px-8 py-5 mx-auto">
               <h2 className="flex items-center gap-3 justify-center text-2xl sm:text-3xl md:text-4xl font-extrabold text-gradient">
-                <Sparkles className="w-6 h-6 text-amber-500 dark:text-amber-400 flex-shrink-0" aria-hidden="true" />
+                <Sparkles className="w-6 h-6 text-[var(--color-warning)] flex-shrink-0" aria-hidden="true" />
                 <span>
                   {t('impact_summary.hero_headline')}
                 </span>
@@ -128,7 +128,7 @@ export function ImpactSummaryPage() {
               { value: '€16', label: t('impact_summary.stat_return_label'), icon: TrendingUp, color: 'text-emerald-500 dark:text-emerald-400', bg: 'bg-emerald-500/15' },
               { value: '100%', label: t('impact_summary.stat_wellbeing_label'), icon: Heart, color: 'text-rose-500 dark:text-rose-400', bg: 'bg-rose-500/15' },
               { value: '95%', label: t('impact_summary.stat_connected_label'), icon: Users, color: 'text-indigo-500 dark:text-indigo-400', bg: 'bg-indigo-500/15' },
-              { value: '€803K', label: t('impact_summary.stat_value_label'), icon: ShieldCheck, color: 'text-amber-500 dark:text-amber-400', bg: 'bg-amber-500/15' },
+              { value: '€803K', label: t('impact_summary.stat_value_label'), icon: ShieldCheck, color: 'text-[var(--color-warning)]', bg: 'bg-amber-500/15' },
             ].map((stat) => (
               <motion.div key={stat.label} variants={fadeInUp}>
                 <GlassCard className="p-5 text-center">

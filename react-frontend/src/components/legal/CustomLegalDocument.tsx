@@ -136,7 +136,7 @@ const ACCENT_STYLES = {
   blue: {
     gradientFrom: 'from-blue-500/20',
     gradientTo: 'to-cyan-500/20',
-    icon: 'text-blue-500 dark:text-blue-400',
+    icon: 'text-[var(--color-info)]',
     tocHover: 'hover:bg-blue-500/10',
     chipBg: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
     btnGradient: 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white',
@@ -168,7 +168,7 @@ const ACCENT_STYLES = {
   amber: {
     gradientFrom: 'from-amber-500/20',
     gradientTo: 'to-orange-500/20',
-    icon: 'text-amber-500 dark:text-amber-400',
+    icon: 'text-[var(--color-warning)]',
     tocHover: 'hover:bg-amber-500/10',
     chipBg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
     btnGradient: 'bg-gradient-to-r from-amber-500 to-orange-600 text-white',

@@ -800,7 +800,7 @@ export function ChallengeDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 py-16 text-center">
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 flex items-center justify-center mb-4">
-          <Lightbulb className="w-8 h-8 text-amber-500" aria-hidden="true" />
+          <Lightbulb className="w-8 h-8 text-[var(--color-warning)]" aria-hidden="true" />
         </div>
         <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">{t('campaigns.feature_not_available', 'Ideation Not Available')}</h2>
         <p className="text-[var(--color-text-muted)] max-w-sm">
@@ -906,7 +906,7 @@ export function ChallengeDetailPage() {
               <Heart
                 className={`w-5 h-5 ${
                   challenge.is_favorited
-                    ? 'text-red-500 fill-current'
+                    ? 'text-[var(--color-error)] fill-current'
                     : 'text-[var(--color-text-tertiary)]'
                 }`}
               />
@@ -988,7 +988,7 @@ export function ChallengeDetailPage() {
         {challenge.prize_description && (
           <div className="mt-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
             <div className="flex items-center gap-2 mb-1">
-              <Trophy className="w-4 h-4 text-amber-500" />
+              <Trophy className="w-4 h-4 text-[var(--color-warning)]" />
               <span className="font-semibold text-amber-700 dark:text-amber-400">
                 {t('challenge.prize')}
               </span>
@@ -1022,7 +1022,7 @@ export function ChallengeDetailPage() {
                   {t('outcomes.winning_idea')}
                 </span>
                 <p className="text-[var(--color-text)] flex items-center gap-2 mt-0.5">
-                  <Award className="w-4 h-4 text-amber-500" />
+                  <Award className="w-4 h-4 text-[var(--color-warning)]" />
                   {outcome.winning_idea_title}
                 </p>
               </div>
