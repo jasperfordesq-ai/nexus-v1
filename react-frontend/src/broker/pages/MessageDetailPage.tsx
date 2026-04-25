@@ -80,10 +80,16 @@ export function MessageDetail() {
 
   const loadDetail = useCallback(async () => {
     if (!id) return;
+    const numericId = Number(id);
+    if (!Number.isFinite(numericId) || numericId <= 0) {
+      setError("Invalid message id");
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      const res = await adminBroker.showMessage(Number(id));
+      const res = await adminBroker.showMessage(numericId);
       if (res.success && res.data) {
         setDetail(res.data);
       } else {

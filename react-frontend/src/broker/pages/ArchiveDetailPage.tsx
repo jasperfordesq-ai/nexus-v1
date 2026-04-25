@@ -61,7 +61,13 @@ export function ArchiveDetail() {
 
   useEffect(() => {
     if (!id) return;
-    loadArchive(Number(id));
+    const numericId = Number(id);
+    if (!Number.isFinite(numericId) || numericId <= 0) {
+      setError("Invalid archive id");
+      setLoading(false);
+      return;
+    }
+    loadArchive(numericId);
   }, [id, loadArchive]);
 
   if (loading) {

@@ -125,6 +125,13 @@ export function VettingRecords() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
+  // Debounce the search input so we don't fire a network request on every
+  // keystroke (300ms feels responsive without spamming the API).
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  useEffect(() => {
+    const handle = setTimeout(() => setDebouncedSearch(searchQuery), 300);
+    return () => clearTimeout(handle);
+  }, [searchQuery]);
 
   // Stats
   const [stats, setStats] = useState<VettingStats | null>(null);
@@ -249,8 +256,8 @@ export function VettingRecords() {
       } else if (statusFilter !== 'all') {
         params.status = statusFilter;
       }
-      if (searchQuery.trim()) {
-        params.search = searchQuery.trim();
+      if (debouncedSearch.trim()) {
+        params.search = debouncedSearch.trim();
       }
       if (userIdFilter) {
         params.user_id = userIdFilter;
@@ -267,7 +274,7 @@ export function VettingRecords() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, searchQuery, userIdFilter, toast])
+  }, [page, statusFilter, debouncedSearch, userIdFilter, toast])
 
 
   useEffect(() => {
@@ -815,6 +822,7 @@ export function VettingRecords() {
         pageSize={25}
         onPageChange={setPage}
         selectable
+        selectedKeys={selectedIds}
         onSelectionChange={setSelectedIds}
         emptyContent={
           <EmptyState

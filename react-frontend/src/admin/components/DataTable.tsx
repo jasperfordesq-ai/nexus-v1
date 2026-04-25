@@ -56,6 +56,14 @@ interface DataTableProps<T extends Record<string, any>> {
   onRefresh?: () => void;
   selectable?: boolean;
   onSelectionChange?: (selectedKeys: Set<string>) => void;
+  /**
+   * Optional controlled selection. When provided, the table operates in
+   * controlled mode and reflects this set on the row checkboxes — including
+   * clearing them after the parent resets state (e.g. after a bulk action).
+   * Without this, HeroUI's Table runs uncontrolled and row checkboxes can
+   * stay visually checked even after the parent's selectedIds is empty.
+   */
+  selectedKeys?: Set<string>;
   topContent?: ReactNode;
   emptyContent?: ReactNode;
 }
@@ -80,6 +88,7 @@ export function DataTable<T extends Record<string, any>>({
   onRefresh,
   selectable = false,
   onSelectionChange,
+  selectedKeys,
   topContent,
   emptyContent,
 }: DataTableProps<T>) {
@@ -180,6 +189,7 @@ export function DataTable<T extends Record<string, any>>({
     <Table
       aria-label={"Data"}
       selectionMode={selectable ? 'multiple' : 'none'}
+      selectedKeys={selectable && selectedKeys ? (selectedKeys as unknown as Selection) : undefined}
       onSelectionChange={selectable ? handleSelectionChange : undefined}
       sortDescriptor={sortDescriptor}
       onSortChange={setSortDescriptor}

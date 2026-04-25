@@ -108,7 +108,7 @@ class AdminBrokerController extends BaseApiController
     /** GET /api/v2/admin/broker/dashboard */
     public function dashboard(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
         $effectiveTenantId = $this->resolveEffectiveTenantId($isSuperAdmin, $tenantId);
@@ -236,7 +236,7 @@ class AdminBrokerController extends BaseApiController
     /** GET /api/v2/admin/broker/exchanges */
     public function exchanges(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
         $page = $this->queryInt('page', 1, 1);
@@ -303,7 +303,7 @@ class AdminBrokerController extends BaseApiController
     /** GET /api/v2/admin/broker/exchanges/{id} */
     public function showExchange(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
 
@@ -389,7 +389,7 @@ class AdminBrokerController extends BaseApiController
     /** POST /api/v2/admin/broker/exchanges/{id}/approve */
     public function approveExchange(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
         $notes = $this->input('notes', '');
@@ -426,7 +426,7 @@ class AdminBrokerController extends BaseApiController
     /** POST /api/v2/admin/broker/exchanges/{id}/reject */
     public function rejectExchange(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
         $reason = $this->input('reason', '');
@@ -471,7 +471,7 @@ class AdminBrokerController extends BaseApiController
     /** GET /api/v2/admin/broker/risk-tags */
     public function riskTags(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
         $riskLevel = $this->query('risk_level');
@@ -521,7 +521,7 @@ class AdminBrokerController extends BaseApiController
     /** POST /api/v2/admin/broker/listings/{lid}/risk-tag */
     public function saveRiskTag(int $listingId): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
 
@@ -594,7 +594,7 @@ class AdminBrokerController extends BaseApiController
     /** DELETE /api/v2/admin/broker/listings/{lid}/risk-tag */
     public function removeRiskTag(int $listingId): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
 
@@ -627,7 +627,7 @@ class AdminBrokerController extends BaseApiController
     /** GET /api/v2/admin/broker/messages */
     public function messages(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
         $page = $this->queryInt('page', 1, 1);
@@ -690,7 +690,7 @@ class AdminBrokerController extends BaseApiController
     /** GET /api/v2/admin/broker/messages/{id} */
     public function showMessage(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
 
@@ -756,7 +756,7 @@ class AdminBrokerController extends BaseApiController
     /** POST /api/v2/admin/broker/messages/{id}/review */
     public function reviewMessage(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
 
@@ -786,7 +786,7 @@ class AdminBrokerController extends BaseApiController
     /** POST /api/v2/admin/broker/messages/{id}/approve */
     public function approveMessage(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
         $notes = trim($this->input('notes', ''));
@@ -875,7 +875,7 @@ class AdminBrokerController extends BaseApiController
     /** POST /api/v2/admin/broker/messages/{id}/flag */
     public function flagMessage(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
         $reason = trim($this->input('reason', ''));
@@ -920,7 +920,7 @@ class AdminBrokerController extends BaseApiController
     /** GET /api/v2/admin/broker/monitoring */
     public function monitoring(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
 
@@ -963,7 +963,7 @@ class AdminBrokerController extends BaseApiController
     /** POST /api/v2/admin/broker/users/{userId}/monitoring */
     public function setMonitoring(int $userId): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
         $underMonitoring = (bool) $this->input('under_monitoring', true);
@@ -1072,7 +1072,7 @@ class AdminBrokerController extends BaseApiController
     /** GET /api/v2/admin/broker/archives */
     public function archives(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
 
@@ -1145,7 +1145,7 @@ class AdminBrokerController extends BaseApiController
     /** GET /api/v2/admin/broker/archives/{id} */
     public function showArchive(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
 
@@ -1188,7 +1188,7 @@ class AdminBrokerController extends BaseApiController
     /** GET /api/v2/admin/broker/configuration */
     public function getConfiguration(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
         $effectiveTenantId = $this->resolveEffectiveTenantId($isSuperAdmin, $tenantId);
@@ -1254,7 +1254,7 @@ class AdminBrokerController extends BaseApiController
     /** PUT /api/v2/admin/broker/configuration */
     public function saveConfiguration(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $isSuperAdmin = $this->isSuperAdmin();
         $tenantId = TenantContext::getId();
 
@@ -1330,7 +1330,7 @@ class AdminBrokerController extends BaseApiController
     /** GET /api/v2/admin/broker/unreviewed-count */
     public function unreviewedCount(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
 
         $count = $this->brokerMessageVisibilityService->countUnreviewed();
 

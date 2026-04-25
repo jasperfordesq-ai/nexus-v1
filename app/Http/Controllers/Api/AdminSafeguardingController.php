@@ -38,7 +38,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function dashboard(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         $activeAssignments = 0;
@@ -138,7 +138,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function flaggedMessages(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         $page = $this->queryInt('page', 1, 1);
@@ -229,7 +229,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function assignments(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         try {
@@ -297,7 +297,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function reviewMessage(Request $request, int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         $notes = $request->input('notes', '');
@@ -365,7 +365,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function createAssignment(Request $request): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         $wardId = null;
@@ -544,7 +544,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function deleteAssignment(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         try {
@@ -678,7 +678,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function memberPreferences(): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = TenantContext::getId();
 
         try {
@@ -764,7 +764,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function memberActivity(Request $request, int $userId): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         $member = DB::table('users')
@@ -812,7 +812,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function memberActivityCsv(Request $request, int $userId)
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         $member = DB::table('users')
@@ -1061,7 +1061,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function getStatement(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         $tenant = DB::table('tenants')
@@ -1114,7 +1114,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function uploadStatement(Request $request): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         $tenant = DB::table('tenants')->where('id', $tenantId)->first();
@@ -1245,7 +1245,7 @@ class AdminSafeguardingController extends BaseApiController
      */
     public function downloadStatement()
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         $tenant = DB::table('tenants')

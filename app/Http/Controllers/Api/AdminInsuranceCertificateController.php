@@ -28,7 +28,7 @@ class AdminInsuranceCertificateController extends BaseApiController
     /** GET /api/v2/admin/insurance-certificates */
     public function list(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
 
         try {
             $filters = [
@@ -57,14 +57,14 @@ class AdminInsuranceCertificateController extends BaseApiController
     /** GET /api/v2/admin/insurance-certificates/stats */
     public function stats(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         return $this->respondWithData($this->insuranceCertificateService->getStats());
     }
 
     /** GET /api/v2/admin/insurance-certificates/{id} */
     public function show(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
 
         try {
             $record = $this->insuranceCertificateService->getById($id);
@@ -80,7 +80,7 @@ class AdminInsuranceCertificateController extends BaseApiController
     /** POST /api/v2/admin/insurance-certificates */
     public function store(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
 
         $userId = $this->inputInt('user_id');
         $insuranceType = $this->input('insurance_type');
@@ -126,7 +126,7 @@ class AdminInsuranceCertificateController extends BaseApiController
     /** PUT /api/v2/admin/insurance-certificates/{id} */
     public function update(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
 
         try {
             $existing = $this->insuranceCertificateService->getById($id);
@@ -176,7 +176,7 @@ class AdminInsuranceCertificateController extends BaseApiController
     /** POST /api/v2/admin/insurance-certificates/{id}/verify */
     public function verify(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
 
         try {
             $existing = $this->insuranceCertificateService->getById($id);
@@ -215,7 +215,7 @@ class AdminInsuranceCertificateController extends BaseApiController
     /** POST /api/v2/admin/insurance-certificates/{id}/reject */
     public function reject(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $reason = $this->input('reason', '');
 
         if (empty($reason)) {
@@ -256,7 +256,7 @@ class AdminInsuranceCertificateController extends BaseApiController
     /** DELETE /api/v2/admin/insurance-certificates/{id} */
     public function destroy(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
 
         try {
             $existing = $this->insuranceCertificateService->getById($id);
@@ -274,7 +274,7 @@ class AdminInsuranceCertificateController extends BaseApiController
     /** GET /api/v2/admin/insurance/user/{userId} */
     public function getUserCertificates(int $userId): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
 
         try {
             $records = $this->insuranceCertificateService->getUserCertificates($userId);

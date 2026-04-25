@@ -611,6 +611,45 @@ abstract class BaseApiController extends Controller
     }
 
     /**
+     * Require broker-or-admin role.
+     *
+     * Accepts the same admin role/flag combinations as requireAdmin() PLUS
+     * role='broker'. Used by endpoints behind the 'broker-or-admin' route
+     * middleware (/v2/admin/broker/*, /v2/admin/vetting/*, /v2/admin/insurance/*,
+     * and the broker-relevant subset of /v2/admin/users/* and /v2/admin/crm/*).
+     *
+     * Defence-in-depth: route middleware already gates entry, this controller
+     * helper is the second-layer check matching requireAdmin()'s pattern.
+     *
+     * @return int User ID
+     *
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException if not broker or admin
+     */
+    protected function requireBrokerOrAdmin(): int
+    {
+        $userId = $this->requireAuth();
+        $user = $this->resolveUser();
+
+        $role = $user->role ?? 'member';
+
+        if ($role === 'broker') {
+            return $userId;
+        }
+
+        if (in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true)) {
+            return $userId;
+        }
+
+        if (($user->is_admin ?? false) || ($user->is_super_admin ?? false) || ($user->is_tenant_super_admin ?? false) || ($user->is_god ?? false)) {
+            return $userId;
+        }
+
+        throw new \Illuminate\Http\Exceptions\HttpResponseException(
+            $this->error(__('api.admin_access_required'), 403, 'AUTH_INSUFFICIENT_PERMISSIONS')
+        );
+    }
+
+    /**
      * Require super-admin role (tenant-scoped or platform-wide).
      *
      * Accepts both platform super-admins (is_super_admin, role=super_admin|god)

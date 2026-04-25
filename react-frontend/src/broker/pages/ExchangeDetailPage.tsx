@@ -57,7 +57,13 @@ export default function ExchangeDetail() {
 
   useEffect(() => {
     if (!id) return;
-    loadExchange(parseInt(id));
+    const numericId = parseInt(id, 10);
+    if (Number.isNaN(numericId) || numericId <= 0) {
+      setError("Invalid exchange id");
+      setLoading(false);
+      return;
+    }
+    loadExchange(numericId);
   }, [id, loadExchange]);
 
   if (loading) {

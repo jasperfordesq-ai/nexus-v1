@@ -9,17 +9,29 @@
  * Simplified version of AdminLayout for broker users.
  */
 
-import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import { BrokerSidebar } from './components/BrokerSidebar';
 import { BrokerHeader } from './components/BrokerHeader';
 import { BrokerBreadcrumbs } from './components/BrokerBreadcrumbs';
+
 export function BrokerLayout() {
+  // Desktop collapse state (controls width of fixed sidebar on md+).
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  // Mobile drawer open state — independent of desktop collapse.
+  // Default closed so first paint on mobile doesn't cover the page.
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const location = useLocation();
+
+  // Auto-close the mobile drawer whenever the route changes — without this
+  // the drawer would stay open over the page after navigating from a nav link.
+  useEffect(() => {
+    setMobileDrawerOpen(false);
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Sidebar — hidden on mobile, shown on md+ */}
+      {/* Sidebar — fixed on md+ */}
       <div className="hidden md:block">
         <BrokerSidebar
           collapsed={sidebarCollapsed}
@@ -30,25 +42,25 @@ export function BrokerLayout() {
       {/* Header */}
       <BrokerHeader
         sidebarCollapsed={sidebarCollapsed}
-        onSidebarToggle={() => setSidebarCollapsed((prev) => !prev)}
+        onSidebarToggle={() => setMobileDrawerOpen((prev) => !prev)}
       />
 
       {/* Mobile sidebar overlay */}
-      {!sidebarCollapsed && (
+      {mobileDrawerOpen && (
         <div
           className="fixed inset-0 z-30 bg-black/50 md:hidden"
-          onClick={() => setSidebarCollapsed(true)}
+          onClick={() => setMobileDrawerOpen(false)}
         />
       )}
       {/* Mobile sidebar drawer */}
       <div
         className={`fixed left-0 top-0 z-40 h-screen w-64 border-r border-divider bg-content1 transition-transform duration-300 md:hidden ${
-          sidebarCollapsed ? '-translate-x-full' : 'translate-x-0'
+          mobileDrawerOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <BrokerSidebar
           collapsed={false}
-          onToggle={() => setSidebarCollapsed(true)}
+          onToggle={() => setMobileDrawerOpen(false)}
         />
       </div>
 

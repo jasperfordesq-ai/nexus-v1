@@ -33,7 +33,7 @@ class AdminVettingController extends BaseApiController
     /** GET /api/v2/admin/vetting */
     public function list(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
 
         try {
             $filters = [
@@ -62,14 +62,14 @@ class AdminVettingController extends BaseApiController
     /** GET /api/v2/admin/vetting/stats */
     public function stats(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         return $this->respondWithData($this->vettingService->getStats());
     }
 
     /** GET /api/v2/admin/vetting/{id} */
     public function show(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
 
         try {
             $record = $this->vettingService->getById($id);
@@ -85,7 +85,7 @@ class AdminVettingController extends BaseApiController
     /** POST /api/v2/admin/vetting */
     public function store(): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
 
         $userId = $this->inputInt('user_id');
         $vettingType = $this->input('vetting_type');
@@ -149,7 +149,7 @@ class AdminVettingController extends BaseApiController
     /** PUT /api/v2/admin/vetting/{id} */
     public function update(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
 
         try {
             $existing = $this->vettingService->getById($id);
@@ -216,7 +216,7 @@ class AdminVettingController extends BaseApiController
     /** POST /api/v2/admin/vetting/{id}/verify */
     public function verify(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
 
         try {
             $existing = $this->vettingService->getById($id);
@@ -263,7 +263,7 @@ class AdminVettingController extends BaseApiController
     /** POST /api/v2/admin/vetting/{id}/reject */
     public function reject(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $reason = $this->input('reason', '');
 
         if (empty($reason)) {
@@ -302,7 +302,7 @@ class AdminVettingController extends BaseApiController
     /** DELETE /api/v2/admin/vetting/{id} */
     public function destroy(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
 
         try {
             $existing = $this->vettingService->getById($id);
@@ -345,7 +345,7 @@ class AdminVettingController extends BaseApiController
     /** POST /api/v2/admin/vetting/bulk */
     public function bulk(): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
 
         $ids = $this->input('ids');
         $action = $this->input('action');
@@ -473,7 +473,7 @@ class AdminVettingController extends BaseApiController
     /** GET /api/v2/admin/vetting/user/{userId} */
     public function getUserRecords(int $userId): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         try {
             $records = $this->vettingService->getUserRecords($userId);
             return $this->respondWithData($records);
@@ -490,7 +490,7 @@ class AdminVettingController extends BaseApiController
      */
     public function uploadDocument(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
 
         try {
             $existing = $this->vettingService->getById($id);

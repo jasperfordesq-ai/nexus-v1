@@ -115,7 +115,7 @@ export default function SafeguardingPage() {
   const { t } = useTranslation('broker');
   usePageTitle(t('safeguarding.title'));
   const toast = useToast();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // ── Dashboard stats ──────────────────────────────────────────────────────
   const [stats, setStats] = useState<SafeguardingDashboard | null>(null);
@@ -140,17 +140,31 @@ export default function SafeguardingPage() {
   const [reviewNotes, setReviewNotes] = useState('');
   const [reviewLoading, setReviewLoading] = useState(false);
 
-  // ── Active tab ───────────────────────────────────────────────────────────
-  // Initialise from `?tab=` so dashboard tiles (Onboarding Flags →
-  // ?tab=preferences) land on the correct tab. Falls back to the default
-  // 'flagged' tab when no param is supplied or the value is unrecognised.
+  // ── Active tab + severity filter (URL-driven) ────────────────────────────
+  // The active tab and severity filter are mirrored to the `?tab=` and
+  // `?filter=` URL params so dashboard tiles can deep-link directly into a
+  // pre-filtered view AND browser back/forward round-trips correctly.
   const ALLOWED_TABS = ['flagged', 'guardians', 'preferences'] as const;
-  const urlTab = searchParams.get('tab');
-  const initialTab = urlTab && (ALLOWED_TABS as readonly string[]).includes(urlTab) ? urlTab : 'flagged';
-  const [activeTab, setActiveTab] = useState<string>(initialTab);
-
-  // The "Safeguarding Alerts" tile passes `?filter=critical` so the flagged
-  // tab loads with severity=critical pre-applied.
+  type TabKey = (typeof ALLOWED_TABS)[number];
+  const urlTab = searchParams.get('tab') as TabKey | null;
+  const activeTab: TabKey = urlTab && ALLOWED_TABS.includes(urlTab) ? urlTab : 'flagged';
+  const setActiveTab = useCallback(
+    (next: TabKey) => {
+      setSearchParams(
+        (prev) => {
+          const params = new URLSearchParams(prev);
+          if (next === 'flagged') {
+            params.delete('tab');
+          } else {
+            params.set('tab', next);
+          }
+          return params;
+        },
+        { replace: true }
+      );
+    },
+    [setSearchParams]
+  );
   const severityFilter = searchParams.get('filter') || '';
 
   // ── Data fetchers ────────────────────────────────────────────────────────
@@ -230,6 +244,9 @@ export default function SafeguardingPage() {
 
   useEffect(() => {
     void fetchStats();
+    // Reset to page 1 whenever the severity filter (from URL) changes so
+    // pagination meta stays consistent with the new data set.
+    setFlaggedPage(1);
     void fetchFlagged(1);
   }, [fetchStats, fetchFlagged]);
 
@@ -437,7 +454,12 @@ export default function SafeguardingPage() {
       {/* Tabs */}
       <Tabs
         selectedKey={activeTab}
-        onSelectionChange={(key) => setActiveTab(String(key))}
+        onSelectionChange={(key) => {
+          const k = String(key);
+          if ((ALLOWED_TABS as readonly string[]).includes(k)) {
+            setActiveTab(k as TabKey);
+          }
+        }}
         aria-label={t('safeguarding.tabs_aria')}
         color="primary"
         variant="underlined"

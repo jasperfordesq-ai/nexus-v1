@@ -1285,46 +1285,52 @@ Route::get('/v2/admin/legal-documents/versions/{versionId}/acceptances', [\App\H
 Route::get('/v2/admin/legal-documents/{docId}/acceptances/export', [\App\Http\Controllers\Api\AdminLegalDocController::class, 'exportAcceptances']);
 Route::post('/v2/admin/legal-documents/{docId}/versions/{versionId}/notify', [\App\Http\Controllers\Api\AdminLegalDocController::class, 'notifyUsers']);
 Route::get('/v2/admin/legal-documents/{docId}/versions/{versionId}/pending-count', [\App\Http\Controllers\Api\AdminLegalDocController::class, 'getUsersPendingCount']);
-Route::get('/v2/admin/broker/dashboard', [\App\Http\Controllers\Api\AdminBrokerController::class, 'dashboard']);
-Route::get('/v2/admin/broker/exchanges', [\App\Http\Controllers\Api\AdminBrokerController::class, 'exchanges']);
-Route::post('/v2/admin/broker/exchanges/{id}/approve', [\App\Http\Controllers\Api\AdminBrokerController::class, 'approveExchange']);
-Route::post('/v2/admin/broker/exchanges/{id}/reject', [\App\Http\Controllers\Api\AdminBrokerController::class, 'rejectExchange']);
-Route::get('/v2/admin/broker/risk-tags', [\App\Http\Controllers\Api\AdminBrokerController::class, 'riskTags']);
-Route::get('/v2/admin/broker/messages', [\App\Http\Controllers\Api\AdminBrokerController::class, 'messages']);
-Route::get('/v2/admin/broker/messages/unreviewed-count', [\App\Http\Controllers\Api\AdminBrokerController::class, 'unreviewedCount']);
-Route::post('/v2/admin/broker/messages/{id}/review', [\App\Http\Controllers\Api\AdminBrokerController::class, 'reviewMessage']);
-Route::get('/v2/admin/broker/monitoring', [\App\Http\Controllers\Api\AdminBrokerController::class, 'monitoring']);
-Route::post('/v2/admin/broker/messages/{id}/flag', [\App\Http\Controllers\Api\AdminBrokerController::class, 'flagMessage']);
-Route::post('/v2/admin/broker/monitoring/{userId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'setMonitoring']);
-Route::post('/v2/admin/broker/risk-tags/{listingId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'saveRiskTag']);
-Route::delete('/v2/admin/broker/risk-tags/{listingId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'removeRiskTag']);
-Route::get('/v2/admin/broker/configuration', [\App\Http\Controllers\Api\AdminBrokerController::class, 'getConfiguration']);
-Route::post('/v2/admin/broker/configuration', [\App\Http\Controllers\Api\AdminBrokerController::class, 'saveConfiguration']);
-Route::get('/v2/admin/broker/exchanges/{id}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'showExchange']);
-Route::get('/v2/admin/broker/messages/{id}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'showMessage']);
-Route::post('/v2/admin/broker/messages/{id}/approve', [\App\Http\Controllers\Api\AdminBrokerController::class, 'approveMessage']);
-Route::get('/v2/admin/broker/archives', [\App\Http\Controllers\Api\AdminBrokerController::class, 'archives']);
-Route::get('/v2/admin/broker/archives/{id}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'showArchive']);
-Route::get('/v2/admin/vetting/stats', [\App\Http\Controllers\Api\AdminVettingController::class, 'stats']);
-Route::get('/v2/admin/vetting/user/{userId}', [\App\Http\Controllers\Api\AdminVettingController::class, 'getUserRecords']);
-Route::get('/v2/admin/vetting', [\App\Http\Controllers\Api\AdminVettingController::class, 'list']);
-Route::get('/v2/admin/vetting/{id}', [\App\Http\Controllers\Api\AdminVettingController::class, 'show']);
-Route::post('/v2/admin/vetting/bulk', [\App\Http\Controllers\Api\AdminVettingController::class, 'bulk']);
-Route::post('/v2/admin/vetting', [\App\Http\Controllers\Api\AdminVettingController::class, 'store']);
-Route::put('/v2/admin/vetting/{id}', [\App\Http\Controllers\Api\AdminVettingController::class, 'update']);
-Route::post('/v2/admin/vetting/{id}/verify', [\App\Http\Controllers\Api\AdminVettingController::class, 'verify']);
-Route::post('/v2/admin/vetting/{id}/reject', [\App\Http\Controllers\Api\AdminVettingController::class, 'reject']);
-Route::delete('/v2/admin/vetting/{id}', [\App\Http\Controllers\Api\AdminVettingController::class, 'destroy']);
-Route::post('/v2/admin/vetting/{id}/upload', [\App\Http\Controllers\Api\AdminVettingController::class, 'uploadDocument']);
-Route::get('/v2/admin/insurance/stats', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'stats']);
-Route::get('/v2/admin/insurance/user/{userId}', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'getUserCertificates']);
-Route::get('/v2/admin/insurance', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'list']);
-Route::get('/v2/admin/insurance/{id}', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'show']);
-Route::post('/v2/admin/insurance', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'store']);
-Route::put('/v2/admin/insurance/{id}', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'update']);
-Route::post('/v2/admin/insurance/{id}/verify', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'verify']);
-Route::post('/v2/admin/insurance/{id}/reject', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'reject']);
-Route::delete('/v2/admin/insurance/{id}', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'destroy']);
+// Broker-or-admin endpoints — accessible to role='broker' as well as admin roles.
+// Brokers run the broker control panel at /broker/* in the React frontend; without
+// this override, EnsureIsAdmin (the 'admin' alias) returns 403 for role='broker' by
+// design. See app/Http/Middleware/EnsureIsBrokerOrAdmin.php.
+Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function () {
+    Route::get('/v2/admin/broker/dashboard', [\App\Http\Controllers\Api\AdminBrokerController::class, 'dashboard']);
+    Route::get('/v2/admin/broker/exchanges', [\App\Http\Controllers\Api\AdminBrokerController::class, 'exchanges']);
+    Route::post('/v2/admin/broker/exchanges/{id}/approve', [\App\Http\Controllers\Api\AdminBrokerController::class, 'approveExchange']);
+    Route::post('/v2/admin/broker/exchanges/{id}/reject', [\App\Http\Controllers\Api\AdminBrokerController::class, 'rejectExchange']);
+    Route::get('/v2/admin/broker/risk-tags', [\App\Http\Controllers\Api\AdminBrokerController::class, 'riskTags']);
+    Route::get('/v2/admin/broker/messages', [\App\Http\Controllers\Api\AdminBrokerController::class, 'messages']);
+    Route::get('/v2/admin/broker/messages/unreviewed-count', [\App\Http\Controllers\Api\AdminBrokerController::class, 'unreviewedCount']);
+    Route::post('/v2/admin/broker/messages/{id}/review', [\App\Http\Controllers\Api\AdminBrokerController::class, 'reviewMessage']);
+    Route::get('/v2/admin/broker/monitoring', [\App\Http\Controllers\Api\AdminBrokerController::class, 'monitoring']);
+    Route::post('/v2/admin/broker/messages/{id}/flag', [\App\Http\Controllers\Api\AdminBrokerController::class, 'flagMessage']);
+    Route::post('/v2/admin/broker/monitoring/{userId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'setMonitoring']);
+    Route::post('/v2/admin/broker/risk-tags/{listingId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'saveRiskTag']);
+    Route::delete('/v2/admin/broker/risk-tags/{listingId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'removeRiskTag']);
+    Route::get('/v2/admin/broker/configuration', [\App\Http\Controllers\Api\AdminBrokerController::class, 'getConfiguration']);
+    Route::post('/v2/admin/broker/configuration', [\App\Http\Controllers\Api\AdminBrokerController::class, 'saveConfiguration']);
+    Route::get('/v2/admin/broker/exchanges/{id}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'showExchange']);
+    Route::get('/v2/admin/broker/messages/{id}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'showMessage']);
+    Route::post('/v2/admin/broker/messages/{id}/approve', [\App\Http\Controllers\Api\AdminBrokerController::class, 'approveMessage']);
+    Route::get('/v2/admin/broker/archives', [\App\Http\Controllers\Api\AdminBrokerController::class, 'archives']);
+    Route::get('/v2/admin/broker/archives/{id}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'showArchive']);
+    Route::get('/v2/admin/vetting/stats', [\App\Http\Controllers\Api\AdminVettingController::class, 'stats']);
+    Route::get('/v2/admin/vetting/user/{userId}', [\App\Http\Controllers\Api\AdminVettingController::class, 'getUserRecords']);
+    Route::get('/v2/admin/vetting', [\App\Http\Controllers\Api\AdminVettingController::class, 'list']);
+    Route::get('/v2/admin/vetting/{id}', [\App\Http\Controllers\Api\AdminVettingController::class, 'show']);
+    Route::post('/v2/admin/vetting/bulk', [\App\Http\Controllers\Api\AdminVettingController::class, 'bulk']);
+    Route::post('/v2/admin/vetting', [\App\Http\Controllers\Api\AdminVettingController::class, 'store']);
+    Route::put('/v2/admin/vetting/{id}', [\App\Http\Controllers\Api\AdminVettingController::class, 'update']);
+    Route::post('/v2/admin/vetting/{id}/verify', [\App\Http\Controllers\Api\AdminVettingController::class, 'verify']);
+    Route::post('/v2/admin/vetting/{id}/reject', [\App\Http\Controllers\Api\AdminVettingController::class, 'reject']);
+    Route::delete('/v2/admin/vetting/{id}', [\App\Http\Controllers\Api\AdminVettingController::class, 'destroy']);
+    Route::post('/v2/admin/vetting/{id}/upload', [\App\Http\Controllers\Api\AdminVettingController::class, 'uploadDocument']);
+    Route::get('/v2/admin/insurance/stats', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'stats']);
+    Route::get('/v2/admin/insurance/user/{userId}', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'getUserCertificates']);
+    Route::get('/v2/admin/insurance', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'list']);
+    Route::get('/v2/admin/insurance/{id}', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'show']);
+    Route::post('/v2/admin/insurance', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'store']);
+    Route::put('/v2/admin/insurance/{id}', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'update']);
+    Route::post('/v2/admin/insurance/{id}/verify', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'verify']);
+    Route::post('/v2/admin/insurance/{id}/reject', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'reject']);
+    Route::delete('/v2/admin/insurance/{id}', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'destroy']);
+});
 Route::get('/v2/admin/newsletters', [\App\Http\Controllers\Api\AdminNewsletterController::class, 'index']);
 Route::post('/v2/admin/newsletters', [\App\Http\Controllers\Api\AdminNewsletterController::class, 'store']);
 Route::get('/v2/admin/newsletters/subscribers', [\App\Http\Controllers\Api\AdminNewsletterController::class, 'subscribers']);
@@ -1594,13 +1600,16 @@ Route::get('/v2/admin/deliverability/{id}', [\App\Http\Controllers\Api\AdminDeli
 Route::put('/v2/admin/deliverability/{id}', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'updateDeliverable']);
 Route::delete('/v2/admin/deliverability/{id}', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'deleteDeliverable']);
 Route::post('/v2/admin/deliverability/{id}/comments', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'addComment']);
-Route::get('/v2/admin/safeguarding/dashboard', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'dashboard']);
-Route::get('/v2/admin/safeguarding/flagged-messages', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'flaggedMessages']);
-Route::get('/v2/admin/safeguarding/assignments', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'assignments']);
-Route::post('/v2/admin/safeguarding/flagged-messages/{id}/review', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'reviewMessage']);
-Route::post('/v2/admin/safeguarding/assignments', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'createAssignment']);
-Route::delete('/v2/admin/safeguarding/assignments/{id}', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'deleteAssignment']);
-Route::get('/v2/admin/safeguarding/member-preferences', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'memberPreferences']);
+// Safeguarding workflow endpoints — broker-or-admin (broker panel uses these).
+Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function () {
+    Route::get('/v2/admin/safeguarding/dashboard', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'dashboard']);
+    Route::get('/v2/admin/safeguarding/flagged-messages', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'flaggedMessages']);
+    Route::get('/v2/admin/safeguarding/assignments', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'assignments']);
+    Route::post('/v2/admin/safeguarding/flagged-messages/{id}/review', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'reviewMessage']);
+    Route::post('/v2/admin/safeguarding/assignments', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'createAssignment']);
+    Route::delete('/v2/admin/safeguarding/assignments/{id}', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'deleteAssignment']);
+    Route::get('/v2/admin/safeguarding/member-preferences', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'memberPreferences']);
+});
 
 // Tier 2a — tenant-level safeguarding declaration (Tusla / Children First Act 2015)
 Route::get('/v2/admin/safeguarding/statement', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'getStatement']);

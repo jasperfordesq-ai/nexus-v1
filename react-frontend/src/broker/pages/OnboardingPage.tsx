@@ -133,6 +133,9 @@ export default function OnboardingPage() {
         toast.success(t('members.approved_success'));
         setApproveUser(null);
         fetchMembers();
+        // Approving a member shifts their funnel stage — refetch the funnel
+        // counts so the visualisation stays consistent with the table.
+        fetchFunnel();
       } else {
         toast.error(t('members.action_failed'));
       }
@@ -141,7 +144,7 @@ export default function OnboardingPage() {
     } finally {
       setActionLoading(false);
     }
-  }, [approveUser, toast, t, fetchMembers]);
+  }, [approveUser, toast, t, fetchMembers, fetchFunnel]);
 
   // ─── Funnel visualization ─────────────────────────────────────────────────
 
@@ -200,7 +203,7 @@ export default function OnboardingPage() {
               <DropdownItem
                 key="view"
                 onPress={() =>
-                  window.open(tenantPath(`/members/${user.id}`), '_blank')
+                  window.open(tenantPath(`/profile/${user.id}`), '_blank')
                 }
               >
                 {t('members.view_profile')}

@@ -415,7 +415,7 @@ export default function MembersPage() {
                 <DropdownItem
                   key="vetting"
                   startContent={<ShieldCheck size={14} />}
-                  onPress={() => window.open(tenantPath('/broker/vetting') + `?search=${encodeURIComponent(user.name)}`, '_self')}
+                  onPress={() => window.open(tenantPath(`/broker/vetting?user_id=${user.id}`), '_self')}
                 >
                   {t('members.check_vetting')}
                 </DropdownItem>

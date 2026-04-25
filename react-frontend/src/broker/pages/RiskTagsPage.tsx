@@ -26,7 +26,7 @@ import Search from 'lucide-react/icons/search';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBroker, adminListings } from '@/admin/api/adminApi';
-import { DataTable, PageHeader, type Column } from '@/admin/components';
+import { DataTable, PageHeader, ConfirmModal, type Column } from '@/admin/components';
 import type { RiskTag } from '@/admin/api/types';
 
 const riskColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
@@ -133,6 +133,7 @@ export function RiskTagsPage() {
   const [form, setForm] = useState<RiskTagForm>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [removing, setRemoving] = useState<number | null>(null);
+  const [removeTarget, setRemoveTarget] = useState<RiskTag | null>(null);
 
   // Listing search state
   const [listingSearch, setListingSearch] = useState('');
@@ -270,13 +271,13 @@ export function RiskTagsPage() {
   }
 
   async function handleRemove(tag: RiskTag) {
-    if (!confirm(`Are you sure you want to remove risk tag?`)) return;
     setRemoving(tag.listing_id);
     try {
       const res = await adminBroker.removeRiskTag(tag.listing_id);
       if (res.success) {
         toast.success("Risk tag removed");
         loadItems();
+        setRemoveTarget(null);
       } else {
         toast.error("Failed to remove risk tag");
       }
@@ -417,7 +418,7 @@ export function RiskTagsPage() {
             color="danger"
             isIconOnly
             isLoading={removing === item.listing_id}
-            onPress={() => handleRemove(item)}
+            onPress={() => setRemoveTarget(item)}
             aria-label={"Remove Risk Tag"}
           >
             <Trash2 size={14} />
@@ -655,6 +656,24 @@ export function RiskTagsPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* Remove confirmation — replaces native window.confirm() so the
+          dialog matches the rest of the broker panel (HeroUI styled,
+          non-blocking, iOS-friendly). */}
+      <ConfirmModal
+        isOpen={!!removeTarget}
+        onClose={() => setRemoveTarget(null)}
+        onConfirm={() => removeTarget && handleRemove(removeTarget)}
+        title="Remove risk tag"
+        message={
+          removeTarget
+            ? `Remove the risk tag from "${removeTarget.listing_title ?? `Listing #${removeTarget.listing_id}`}"? This cannot be undone.`
+            : ''
+        }
+        confirmLabel="Remove"
+        confirmColor="danger"
+        isLoading={removing !== null}
+      />
     </div>
   );
 }

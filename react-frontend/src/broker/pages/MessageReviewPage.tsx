@@ -584,7 +584,7 @@ export function MessageReview() {
           </ModalBody>
 
           <ModalFooter>
-            <Button variant="flat" onPress={closeDetail}>
+            <Button variant="flat" onPress={closeDetail} isDisabled={detailReviewLoading}>
               {"Cancel"}
             </Button>
             {!isDetailReviewed && detailItem && (
