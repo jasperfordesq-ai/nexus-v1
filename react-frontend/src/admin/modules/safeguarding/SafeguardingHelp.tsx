@@ -11,7 +11,7 @@
  * principle, and audit access.
  *
  * Companion to BrokerControlsHelp, which covers the broader operational flow
- * under /admin/broker-controls. Keep the two synchronised if the underlying
+ * under /broker. Keep the two synchronised if the underlying
  * system behaviour changes.
  */
 
@@ -253,7 +253,7 @@ export function SafeguardingHelp() {
                 <ul className="list-disc pl-5 space-y-2">
                   <li>
                     <strong>Create</strong> from the Assignments tab or by navigating to
-                    <em> broker-controls/monitoring → Assign Guardian</em>. Both parties receive an
+                    <em> broker/monitoring → Assign Guardian</em>. Both parties receive an
                     email and an in-app bell notification.
                   </li>
                   <li>

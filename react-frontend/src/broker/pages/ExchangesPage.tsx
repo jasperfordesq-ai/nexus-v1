@@ -4,359 +4,344 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Broker Exchanges Page
- * Oversight of exchange requests with approve/reject workflows.
+ * Exchange Management
+ * List and manage exchange requests with approve/reject actions.
+ * Parity: PHP BrokerControlsController::exchanges()
  */
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   Tabs,
   Tab,
-  Chip,
   Button,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
   Textarea,
 } from '@heroui/react';
-import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import { useTranslation } from 'react-i18next';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Eye from 'lucide-react/icons/eye';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminBroker } from '@/admin/api/adminApi';
-import { DataTable, PageHeader, ConfirmModal, EmptyState, type Column } from '@/admin/components';
+import { DataTable, StatusBadge, PageHeader, type Column } from '@/admin/components';
 import type { ExchangeRequest } from '@/admin/api/types';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Status chip color mapping
-// ─────────────────────────────────────────────────────────────────────────────
+type ActionType = 'approve' | 'reject';
 
-const statusColorMap: Record<string, 'warning' | 'success' | 'danger' | 'default'> = {
-  pending: 'warning',
-  approved: 'success',
-  in_progress: 'success',
-  completed: 'success',
-  disputed: 'danger',
-  rejected: 'default',
-  cancelled: 'default',
-};
-
-const ACTIONABLE_STATUSES = new Set(['pending', 'pending_broker', 'disputed']);
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Component
-// ─────────────────────────────────────────────────────────────────────────────
-
-export default function ExchangesPage() {
-  const { t } = useTranslation('broker');
-  usePageTitle(t('exchanges.title'));
+export function ExchangeManagement() {
+  usePageTitle("Exchanges - Broker");
+  const { tenantPath } = useTenant();
   const toast = useToast();
 
-  // Data state
+  // Status filter is mirrored to `?status=` so stat-card deep-links and
+  // browser back/forward work as expected.
+  const EXCHANGE_STATUSES = [
+    'all', 'pending_broker', 'accepted', 'in_progress', 'completed', 'cancelled', 'disputed',
+  ] as const;
+  type ExchangeStatus = (typeof EXCHANGE_STATUSES)[number];
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlStatus = searchParams.get('status') as ExchangeStatus | null;
+  const status: ExchangeStatus =
+    urlStatus && EXCHANGE_STATUSES.includes(urlStatus) ? urlStatus : 'all';
+  const setStatus = useCallback(
+    (next: ExchangeStatus) => {
+      setSearchParams(
+        (prev) => {
+          const params = new URLSearchParams(prev);
+          if (next === 'all') {
+            params.delete('status');
+          } else {
+            params.set('status', next);
+          }
+          return params;
+        },
+        { replace: true }
+      );
+    },
+    [setSearchParams]
+  );
+
   const [items, setItems] = useState<ExchangeRequest[]>([]);
   const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [status, setStatus] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
 
-  // Action state
-  const [actionLoading, setActionLoading] = useState<number | null>(null);
-  const [approveTarget, setApproveTarget] = useState<ExchangeRequest | null>(null);
-  const [rejectTarget, setRejectTarget] = useState<ExchangeRequest | null>(null);
-  const [approveNotes, setApproveNotes] = useState('');
-  const [rejectReason, setRejectReason] = useState('');
+  // Action modal state
+  const [actionModal, setActionModal] = useState<{
+    type: ActionType;
+    item: ExchangeRequest;
+  } | null>(null);
+  const [actionText, setActionText] = useState('');
+  const [actionLoading, setActionLoading] = useState(false);
 
-  // ── Data fetching ─────────────────────────────────────────────────────────
-
-  const loadExchanges = useCallback(async () => {
+  const loadItems = useCallback(async () => {
     setLoading(true);
     try {
-      const params: { page?: number; status?: string } = { page };
-      if (status) params.status = status;
-
-      const res = await adminBroker.getExchanges(params);
-      if (res.success && res.data) {
-        const payload = res.data as unknown;
-        if (Array.isArray(payload)) {
-          setItems(payload);
-          setTotal(payload.length);
-        } else if (payload && typeof payload === 'object') {
-          const paged = payload as { data: ExchangeRequest[]; meta?: { total: number } };
-          setItems(paged.data || []);
-          setTotal(paged.meta?.total ?? 0);
-        }
+      const res = await adminBroker.getExchanges({
+        page,
+        status: status === 'all' ? undefined : status,
+      });
+      if (res.success && Array.isArray(res.data)) {
+        setItems(res.data as ExchangeRequest[]);
+        const meta = res.meta as Record<string, unknown> | undefined;
+        setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
       }
     } catch {
-      toast.error(t('common.error'));
+      toast.error("Failed to load exchanges");
     } finally {
       setLoading(false);
     }
-  }, [page, status, toast, t]);
+  }, [page, status, toast])
+
 
   useEffect(() => {
-    loadExchanges();
-  }, [loadExchanges]);
+    loadItems();
+  }, [loadItems]);
 
-  // ── Tab change ────────────────────────────────────────────────────────────
+  const handleAction = async () => {
+    if (!actionModal) return;
+    const { type, item } = actionModal;
 
-  const handleTabChange = useCallback((key: React.Key) => {
-    const tab = String(key);
-    setStatus(tab === 'all' ? '' : tab);
-    setPage(1);
-  }, []);
+    if (type === 'reject' && !actionText.trim()) {
+      toast.error("A reason is required to reject an exchange");
+      return;
+    }
 
-  // ── Approve ───────────────────────────────────────────────────────────────
-
-  const handleApprove = useCallback(async () => {
-    if (!approveTarget) return;
-    setActionLoading(approveTarget.id);
+    setActionLoading(true);
     try {
-      const res = await adminBroker.approveExchange(
-        approveTarget.id,
-        approveNotes || undefined,
-      );
+      const res = type === 'approve'
+        ? await adminBroker.approveExchange(item.id, actionText || undefined)
+        : await adminBroker.rejectExchange(item.id, actionText);
+
       if (res?.success) {
-        toast.success(t('exchanges.approved_success'));
-        loadExchanges();
+        toast.success(`Exchange Action succeeded`);
+        loadItems();
       } else {
-        toast.error(t('common.error'));
+        toast.error(res?.error || `Exchange Action failed`);
       }
     } catch {
-      toast.error(t('common.error'));
+      toast.error(`Exchange Action failed`);
     } finally {
-      setActionLoading(null);
-      setApproveTarget(null);
-      setApproveNotes('');
+      setActionLoading(false);
+      setActionModal(null);
+      setActionText('');
     }
-  }, [approveTarget, approveNotes, loadExchanges, toast, t]);
+  };
 
-  // ── Reject ────────────────────────────────────────────────────────────────
+  const openActionModal = (type: ActionType, item: ExchangeRequest) => {
+    setActionModal({ type, item });
+    setActionText('');
+  };
 
-  const handleReject = useCallback(async () => {
-    if (!rejectTarget || !rejectReason.trim()) return;
-    setActionLoading(rejectTarget.id);
-    try {
-      const res = await adminBroker.rejectExchange(rejectTarget.id, rejectReason);
-      if (res?.success) {
-        toast.success(t('exchanges.rejected_success'));
-        loadExchanges();
-      } else {
-        toast.error(t('common.error'));
-      }
-    } catch {
-      toast.error(t('common.error'));
-    } finally {
-      setActionLoading(null);
-      setRejectTarget(null);
-      setRejectReason('');
-    }
-  }, [rejectTarget, rejectReason, loadExchanges, toast, t]);
-
-  // ── Columns ───────────────────────────────────────────────────────────────
-
-  const columns: Column<ExchangeRequest>[] = useMemo(
-    () => [
-      {
-        key: 'requester_name',
-        label: t('exchanges.col_from'),
-        sortable: true,
-        render: (item) => (
-          <span className="font-medium text-foreground">{item.requester_name}</span>
-        ),
-      },
-      {
-        key: 'provider_name',
-        label: t('exchanges.col_to'),
-        sortable: true,
-        render: (item) => (
-          <span className="text-sm text-default-600">{item.provider_name}</span>
-        ),
-      },
-      {
-        key: 'listing_title',
-        label: t('exchanges.col_service'),
-        render: (item) => (
-          <span className="text-sm text-default-600">
-            {item.listing_title || '--'}
-          </span>
-        ),
-      },
-      {
-        key: 'final_hours',
-        label: t('exchanges.col_hours'),
-        sortable: true,
-        render: (item) => (
-          <span className="text-sm text-default-600">
-            {item.final_hours ?? '--'}
-          </span>
-        ),
-      },
-      {
-        key: 'status',
-        label: t('exchanges.col_status'),
-        render: (item) => (
-          <Chip
+  const columns: Column<ExchangeRequest>[] = [
+    {
+      key: 'requester_name',
+      label: "Requester",
+      sortable: true,
+      render: (item) => (
+        <span className="font-medium text-foreground">{item.requester_name}</span>
+      ),
+    },
+    {
+      key: 'provider_name',
+      label: "Provider",
+      sortable: true,
+      render: (item) => (
+        <span className="font-medium text-foreground">{item.provider_name}</span>
+      ),
+    },
+    {
+      key: 'listing_title',
+      label: "Listing",
+      sortable: true,
+      render: (item) => (
+        <span className="text-sm text-default-600">
+          {item.listing_title || '—'}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      label: "Status",
+      sortable: true,
+      render: (item) => <StatusBadge status={item.status} />,
+    },
+    {
+      key: 'final_hours',
+      label: "Hours",
+      sortable: true,
+      render: (item) => (
+        <span className="text-sm">
+          {item.final_hours != null ? `${item.final_hours}h` : '—'}
+        </span>
+      ),
+    },
+    {
+      key: 'created_at',
+      label: "Date",
+      sortable: true,
+      render: (item) => (
+        <span className="text-sm text-default-500">
+          {new Date(item.created_at).toLocaleDateString()}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      label: "Actions",
+      render: (item) => (
+        <div className="flex gap-1">
+          <Button
+            isIconOnly
             size="sm"
             variant="flat"
-            color={statusColorMap[item.status?.toLowerCase()] || 'default'}
-            className="capitalize"
+            color="default"
+            as={Link}
+            to={tenantPath(`/broker/exchanges/${item.id}`)}
+            aria-label={"View Exchange Details"}
           >
-            {item.status}
-          </Chip>
-        ),
-      },
-      {
-        key: 'created_at',
-        label: t('exchanges.col_date'),
-        sortable: true,
-        render: (item) => (
-          <span className="text-sm text-default-500">
-            {item.created_at
-              ? new Date(item.created_at).toLocaleDateString()
-              : '--'}
-          </span>
-        ),
-      },
-      {
-        key: 'actions',
-        label: t('exchanges.col_actions'),
-        render: (item) => {
-          if (!ACTIONABLE_STATUSES.has(item.status?.toLowerCase())) return null;
-          return (
-            <Dropdown>
-              <DropdownTrigger>
-                <Button isIconOnly size="sm" variant="light" aria-label={t('exchanges.actions_aria')}>
-                  <MoreVertical size={16} />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu aria-label={t('exchanges.exchange_actions_aria')}>
-                <DropdownItem
-                  key="approve"
-                  onPress={() => setApproveTarget(item)}
-                >
-                  {t('exchanges.approve')}
-                </DropdownItem>
-                <DropdownItem
-                  key="reject"
-                  className="text-danger"
-                  color="danger"
-                  onPress={() => setRejectTarget(item)}
-                >
-                  {t('exchanges.reject')}
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          );
-        },
-      },
-    ],
-    [t],
-  );
-
-  // ── Render ────────────────────────────────────────────────────────────────
+            <Eye size={14} />
+          </Button>
+          {item.status === 'pending_broker' && (
+            <>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="flat"
+                color="success"
+                onPress={() => openActionModal('approve', item)}
+                aria-label={"Approve Exchange"}
+              >
+                <CheckCircle size={14} />
+              </Button>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="flat"
+                color="danger"
+                onPress={() => openActionModal('reject', item)}
+                aria-label={"Reject Exchange"}
+              >
+                <XCircle size={14} />
+              </Button>
+            </>
+          )}
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div>
       <PageHeader
-        title={t('exchanges.title')}
-        description={t('exchanges.description')}
+        title={"Exchange Management"}
+        description={"Review and approve or reject exchanges flagged for broker attention"}
         actions={
           <Button
-            isIconOnly
+            as={Link}
+            to={tenantPath('/broker')}
             variant="flat"
+            startContent={<ArrowLeft size={16} />}
             size="sm"
-            onPress={loadExchanges}
-            aria-label={t('common.refresh')}
           >
-            <RefreshCw size={16} />
+            {"Back"}
           </Button>
         }
       />
 
-      {/* Status tabs */}
-      <Tabs
-        aria-label={t('exchanges.status_filter_aria')}
-        selectedKey={status || 'all'}
-        onSelectionChange={handleTabChange}
-        className="mb-4"
-      >
-        <Tab key="all" title={t('exchanges.tab_all')} />
-        <Tab key="pending" title={t('exchanges.tab_pending')} />
-        <Tab key="approved" title={t('exchanges.tab_approved')} />
-        <Tab key="in_progress" title={t('exchanges.tab_in_progress')} />
-        <Tab key="completed" title={t('exchanges.tab_completed')} />
-        <Tab key="disputed" title={t('exchanges.tab_disputed')} />
-      </Tabs>
+      <div className="mb-4">
+        <Tabs
+          selectedKey={status}
+          onSelectionChange={(key) => { setStatus(key as ExchangeStatus); setPage(1); }}
+          variant="underlined"
+          size="sm"
+        >
+          <Tab key="all" title={"All"} />
+          <Tab key="pending_broker" title={"Pending"} />
+          <Tab key="accepted" title={"Approved"} />
+          <Tab key="in_progress" title={"In Progress"} />
+          <Tab key="completed" title={"Completed"} />
+          <Tab key="cancelled" title={"Cancelled"} />
+          <Tab key="disputed" title={"Disputed"} />
+        </Tabs>
+      </div>
 
-      {/* Data table */}
-      {!loading && items.length === 0 ? (
-        <EmptyState
-          title={t('exchanges.no_exchanges')}
-          description={t('exchanges.description')}
-        />
-      ) : (
-        <DataTable
-          columns={columns}
-          data={items}
-          isLoading={loading}
-          totalItems={total}
-          page={page}
-          pageSize={20}
-          onPageChange={setPage}
-          onRefresh={loadExchanges}
-        />
+      <DataTable
+        columns={columns}
+        data={items}
+        isLoading={loading}
+        searchable={false}
+        onRefresh={loadItems}
+        totalItems={total}
+        page={page}
+        pageSize={20}
+        onPageChange={setPage}
+      />
+
+      {/* Approve/Reject Modal */}
+      {actionModal && (
+        <Modal isOpen={!!actionModal} onClose={() => { setActionModal(null); setActionText(''); }} size="md">
+          <ModalContent>
+            <ModalHeader className="flex items-center gap-2">
+              {actionModal.type === 'approve' ? (
+                <>
+                  <CheckCircle size={20} className="text-success" />
+                  {"Approve Exchange"}
+                </>
+              ) : (
+                <>
+                  <XCircle size={20} className="text-danger" />
+                  {"Reject Exchange"}
+                </>
+              )}
+            </ModalHeader>
+            <ModalBody>
+              <p className="text-default-600 mb-3">
+                {actionModal.type === 'approve'
+                  ? `Are you sure you want to approve exchange?`
+                  : `Are you sure you want to reject exchange?`
+                }
+              </p>
+              <Textarea
+                label={actionModal.type === 'approve' ? "Notes Optional" : "Reason Required"}
+                placeholder={actionModal.type === 'approve'
+                  ? "Enter approval notes..."
+                  : "Enter rejection reason..."
+                }
+                value={actionText}
+                onValueChange={setActionText}
+                minRows={3}
+                variant="bordered"
+                isRequired={actionModal.type === 'reject'}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                variant="flat"
+                onPress={() => { setActionModal(null); setActionText(''); }}
+                isDisabled={actionLoading}
+              >
+                {"Cancel"}
+              </Button>
+              <Button
+                color={actionModal.type === 'approve' ? 'success' : 'danger'}
+                onPress={handleAction}
+                isLoading={actionLoading}
+              >
+                {actionModal.type === 'approve' ? "Approve" : "Reject"}
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
-
-      {/* Approve confirm modal */}
-      <ConfirmModal
-        isOpen={!!approveTarget}
-        onClose={() => {
-          setApproveTarget(null);
-          setApproveNotes('');
-        }}
-        onConfirm={handleApprove}
-        title={t('exchanges.confirm_approve_title')}
-        message={t('exchanges.confirm_approve_message')}
-        confirmLabel={t('exchanges.approve')}
-        confirmColor="primary"
-        isLoading={actionLoading === approveTarget?.id}
-      >
-        <Textarea
-          label={t('exchanges.notes_placeholder')}
-          placeholder={t('exchanges.notes_placeholder')}
-          value={approveNotes}
-          onValueChange={setApproveNotes}
-          minRows={2}
-          className="mt-2"
-        />
-      </ConfirmModal>
-
-      {/* Reject confirm modal */}
-      <ConfirmModal
-        isOpen={!!rejectTarget}
-        onClose={() => {
-          setRejectTarget(null);
-          setRejectReason('');
-        }}
-        onConfirm={handleReject}
-        title={t('exchanges.confirm_reject_title')}
-        message={t('exchanges.confirm_reject_message')}
-        confirmLabel={t('exchanges.reject')}
-        confirmColor="danger"
-        isLoading={actionLoading === rejectTarget?.id}
-      >
-        <Textarea
-          label={t('exchanges.reason_placeholder')}
-          placeholder={t('exchanges.reason_placeholder')}
-          value={rejectReason}
-          onValueChange={setRejectReason}
-          isRequired
-          minRows={2}
-          className="mt-2"
-        />
-      </ConfirmModal>
     </div>
   );
 }
+
+export default ExchangeManagement;

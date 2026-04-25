@@ -841,7 +841,7 @@ export function UserEdit() {
                       </Chip>
                       <Button
                         as={Link}
-                        to={tenantPath('/admin/broker-controls/vetting')}
+                        to={tenantPath('/broker/vetting')}
                         size="sm"
                         variant="flat"
                         color="primary"
@@ -910,7 +910,7 @@ export function UserEdit() {
                       </Chip>
                       <Button
                         as={Link}
-                        to={tenantPath('/admin/broker-controls/insurance')}
+                        to={tenantPath('/broker/insurance')}
                         size="sm"
                         variant="flat"
                         color="primary"

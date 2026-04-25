@@ -4,295 +4,359 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Broker Dashboard Page
- * Overview of daily community management tasks with stat cards,
- * quick-action links, and a recent activity feed.
+ * Broker Controls Dashboard
+ * Overview with key metrics and quick links to sub-pages.
+ * Parity: PHP BrokerControlsController::dashboard()
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, CardHeader, Spinner } from '@heroui/react';
-import Users from 'lucide-react/icons/users';
-import ShieldAlert from 'lucide-react/icons/shield-alert';
-import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
+import { Link } from 'react-router-dom';
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Divider } from '@heroui/react';
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
-import ShieldCheck from 'lucide-react/icons/shield-check';
+import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
 import Eye from 'lucide-react/icons/eye';
-import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import UserPlus from 'lucide-react/icons/user-plus';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ChevronRight from 'lucide-react/icons/chevron-right';
-import { useNavigate } from 'react-router-dom';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import Clock from 'lucide-react/icons/clock';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Activity from 'lucide-react/icons/activity';
+import Settings from 'lucide-react/icons/settings';
 import { usePageTitle } from '@/hooks';
-import { useTenant } from '@/contexts';
-import { adminBroker, adminUsers } from '@/admin/api/adminApi';
-import type { BrokerDashboardStats, BrokerActivityEntry } from '@/admin/api/types';
+import { useTenant, useToast } from '@/contexts';
+import { adminBroker } from '@/admin/api/adminApi';
 import { StatCard, PageHeader } from '@/admin/components';
+import type { BrokerDashboardStats, BrokerActivityEntry } from '@/admin/api/types';
+import BrokerControlsHelp from './BrokerHelpPage';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Types
-// ─────────────────────────────────────────────────────────────────────────────
+import { useTranslation } from 'react-i18next';
 
-interface QuickAction {
-  label: string;
-  description: string;
-  path: string;
-  icon: typeof Users;
-  color: string;
-}
+type TFunction = (key: string) => string;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Component
-// ─────────────────────────────────────────────────────────────────────────────
+const getQuickLinks = (t: TFunction) => [
+  {
+    title: "Link Exchange Management",
+    description: "Link Exchange Management.",
+    icon: ArrowLeftRight,
+    color: 'primary' as const,
+    path: '/broker/exchanges',
+  },
+  {
+    title: "Link Risk Tags",
+    description: "Link Risk Tags.",
+    icon: ShieldAlert,
+    color: 'danger' as const,
+    path: '/broker/risk-tags',
+  },
+  {
+    title: "Link Message Review",
+    description: "Link Message Review.",
+    icon: MessageSquareWarning,
+    color: 'warning' as const,
+    path: '/broker/messages',
+  },
+  {
+    title: "Link User Monitoring",
+    description: "Link User Monitoring.",
+    icon: Eye,
+    color: 'secondary' as const,
+    path: '/broker/monitoring',
+  },
+  {
+    title: "Link Vetting Records",
+    description: "Link Vetting Records.",
+    icon: ShieldCheck,
+    color: 'success' as const,
+    path: '/broker/vetting',
+  },
+  {
+    title: "Link Configuration",
+    description: "Link Configuration.",
+    icon: Settings,
+    color: 'default' as const,
+    path: '/broker/configuration',
+  },
+];
 
-export default function BrokerDashboardPage() {
-  const { t } = useTranslation('broker');
+// Tailwind JIT needs full class names at build time — dynamic `bg-${color}/10` won't work
+const quickLinkBgClass: Record<string, string> = {
+  primary: 'bg-primary/10',
+  danger: 'bg-danger/10',
+  warning: 'bg-warning/10',
+  secondary: 'bg-secondary/10',
+  success: 'bg-success/10',
+  default: 'bg-default/10',
+};
+const quickLinkTextClass: Record<string, string> = {
+  primary: 'text-primary',
+  danger: 'text-danger',
+  warning: 'text-warning',
+  secondary: 'text-secondary',
+  success: 'text-success',
+  default: 'text-default-500',
+};
+
+export function BrokerDashboard() {
+  const { t } = useTranslation('admin');
+  usePageTitle("Broker Dashboard");
   const { tenantPath } = useTenant();
-  const navigate = useNavigate();
-  usePageTitle(t('dashboard.title'));
+  const toast = useToast();
+
+  const quickLinks = getQuickLinks(t as TFunction);
 
   const [stats, setStats] = useState<BrokerDashboardStats | null>(null);
-  const [pendingCount, setPendingCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  const fetchData = useCallback(async () => {
+  const loadDashboard = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
-      const [dashRes, usersRes] = await Promise.all([
-        adminBroker.getDashboard(),
-        adminUsers.list({ status: 'pending', limit: 1 }),
-      ]);
-
-      if (dashRes.success && dashRes.data) {
-        setStats(dashRes.data as BrokerDashboardStats);
-      }
-
-      if (usersRes.success && usersRes.data) {
-        const payload = usersRes.data as unknown;
-        if (Array.isArray(payload)) {
-          // Flat array — count is length (capped at per_page=1, so no reliable total)
-          setPendingCount(payload.length);
-        } else if (payload && typeof payload === 'object') {
-          const paged = payload as { data: unknown[]; meta?: { total: number } };
-          setPendingCount(paged.meta?.total ?? paged.data?.length ?? 0);
-        }
+      const res = await adminBroker.getDashboard();
+      if (res.success && res.data) {
+        setStats(res.data);
       }
     } catch {
-      setError(t('common.error'));
+      toast.error("Failed to load broker dashboard");
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, [toast])
+
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  // Quick action cards
-  const quickActions: QuickAction[] = [
-    {
-      label: t('nav.members'),
-      description: t('members.description'),
-      path: '/broker/members',
-      icon: Users,
-      color: 'bg-primary/10 text-primary',
-    },
-    {
-      label: t('nav.safeguarding'),
-      description: t('safeguarding.description'),
-      path: '/broker/safeguarding',
-      icon: ShieldAlert,
-      color: 'bg-danger/10 text-danger',
-    },
-    {
-      label: t('nav.onboarding'),
-      description: t('onboarding.description'),
-      path: '/broker/onboarding',
-      icon: UserPlus,
-      color: 'bg-success/10 text-success',
-    },
-    {
-      label: t('nav.exchanges'),
-      description: t('exchanges.description'),
-      path: '/broker/exchanges',
-      icon: ArrowLeftRight,
-      color: 'bg-warning/10 text-warning',
-    },
-  ];
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Spinner size="lg" label={t('common.loading')} />
-      </div>
-    );
-  }
-
-  if (error || !stats) {
-    return (
-      <div className="max-w-7xl mx-auto space-y-6">
-        <PageHeader
-          title={t('dashboard.title')}
-          description={t('dashboard.description')}
-        />
-        <Card>
-          <CardBody>
-            <p className="text-danger">{error || t('common.error')}</p>
-          </CardBody>
-        </Card>
-      </div>
-    );
-  }
-
-  const recentActivity: BrokerActivityEntry[] = stats.recent_activity ?? [];
+    loadDashboard();
+  }, [loadDashboard]);
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div>
       <PageHeader
-        title={t('dashboard.title')}
-        description={t('dashboard.description')}
+        title={"Broker Dashboard"}
+        description={"Overview of pending exchanges, insurance, vetting, and monitored users"}
+        actions={
+          <Button
+            variant="flat"
+            startContent={<RefreshCw size={16} />}
+            onPress={loadDashboard}
+            isLoading={loading}
+            size="sm"
+          >
+            {"Refresh"}
+          </Button>
+        }
       />
 
-      {/* Row 1: 4 stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Stats Grid — each tile deep-links into the relevant management page
+          with the filter already applied, so admins triage in one click. */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label={t('dashboard.pending_members')}
-          value={pendingCount}
-          icon={Users}
-          color="warning"
-          loading={false}
+          label={"Pending Exchanges"}
+          value={stats?.pending_exchanges ?? '—'}
+          icon={ArrowLeftRight}
+          color="primary"
+          loading={loading}
+          to={tenantPath('/broker/exchanges?status=pending_broker')}
         />
         <StatCard
-          label={t('dashboard.safeguarding_alerts')}
-          value={stats.safeguarding_alerts}
+          label={"Unreviewed Messages"}
+          value={stats?.unreviewed_messages ?? '—'}
+          icon={MessageSquareWarning}
+          color="warning"
+          loading={loading}
+          to={tenantPath('/broker/messages?status=unreviewed')}
+        />
+        <StatCard
+          label={"High Risk Listings"}
+          value={stats?.high_risk_listings ?? '—'}
           icon={ShieldAlert}
           color="danger"
-          loading={false}
+          loading={loading}
+          to={tenantPath('/broker/risk-tags?level=high')}
         />
         <StatCard
-          label={t('dashboard.unreviewed_messages')}
-          value={stats.unreviewed_messages}
-          icon={MessageSquareWarning}
-          color="primary"
-          loading={false}
-        />
-        <StatCard
-          label={t('dashboard.pending_exchanges')}
-          value={stats.pending_exchanges}
-          icon={ArrowLeftRight}
-          color="secondary"
-          loading={false}
-        />
-      </div>
-
-      {/* Row 2: 4 stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          label={t('dashboard.vetting_expiring')}
-          value={stats.vetting_expiring}
-          icon={ShieldCheck}
-          color="warning"
-          loading={false}
-        />
-        <StatCard
-          label={t('dashboard.monitored_users')}
-          value={stats.monitored_users}
+          label={"Monitored Users"}
+          value={stats?.monitored_users ?? '—'}
           icon={Eye}
-          color="default"
-          loading={false}
+          color="secondary"
+          loading={loading}
+          to={tenantPath('/broker/monitoring')}
         />
         <StatCard
-          label={t('dashboard.high_risk_listings')}
-          value={stats.high_risk_listings}
+          label={"Vetting Pending"}
+          value={stats?.vetting_pending ?? '—'}
+          icon={ShieldCheck}
+          color="success"
+          loading={loading}
+          to={tenantPath('/broker/vetting?status=pending')}
+        />
+        <StatCard
+          label={"Expiring Soon"}
+          value={stats?.vetting_expiring ?? '—'}
+          icon={Clock}
+          color="warning"
+          loading={loading}
+          to={tenantPath('/broker/vetting?status=expiring_soon')}
+        />
+        <StatCard
+          label={"Safeguarding Alerts"}
+          value={stats?.safeguarding_alerts ?? '—'}
           icon={AlertTriangle}
           color="danger"
-          loading={false}
+          loading={loading}
+          to={tenantPath('/admin/safeguarding?filter=critical')}
         />
         <StatCard
-          label={t('dashboard.safeguarding_flags')}
-          value={stats.onboarding_safeguarding_flags}
-          icon={UserPlus}
-          color="success"
-          loading={false}
+          label={"Onboarding Flags"}
+          value={stats?.onboarding_safeguarding_flags ?? '—'}
+          icon={ShieldAlert}
+          color="warning"
+          loading={loading}
+          to={tenantPath('/admin/safeguarding?tab=preferences')}
         />
       </div>
 
-      {/* Quick Actions + Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Quick Actions */}
-        <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <h3 className="text-lg font-semibold">{t('dashboard.quick_actions')}</h3>
-            </CardHeader>
-            <CardBody className="gap-3">
-              {quickActions.map((action) => {
-                const Icon = action.icon;
-                return (
-                  <Button
-                    key={action.path}
-                    variant="light"
-                    onPress={() => navigate(tenantPath(action.path))}
-                    className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-default-100 transition-colors text-left h-auto min-w-0 justify-start"
-                  >
-                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${action.color}`}>
-                      <Icon size={20} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground">{action.label}</p>
-                      <p className="text-xs text-default-400 truncate">{action.description}</p>
-                    </div>
-                    <ChevronRight size={16} className="text-default-400 shrink-0" />
-                  </Button>
-                );
-              })}
-            </CardBody>
-          </Card>
-        </div>
-
-        {/* Recent Activity */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <h3 className="text-lg font-semibold">{t('dashboard.recent_activity')}</h3>
-            </CardHeader>
-            <CardBody>
-              {recentActivity.length === 0 ? (
-                <p className="text-sm text-default-400 text-center py-8">
-                  {t('dashboard.no_activity')}
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  {recentActivity.map((entry) => (
-                    <div
-                      key={entry.id}
-                      className="flex items-start gap-3 p-3 rounded-lg bg-default-50"
-                    >
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                        <Users size={14} className="text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-foreground">
-                          <span className="font-medium">
-                            {entry.first_name} {entry.last_name}
-                          </span>{' '}
-                          <span className="text-default-500">
-                            {entry.action_type?.replace(/_/g, ' ')}
-                          </span>
-                        </p>
-                        <p className="text-xs text-default-400 mt-0.5">
-                          {new Date(entry.created_at).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+      {/* Quick Links */}
+      <h2 className="text-lg font-semibold text-foreground mb-4">{"Quick Access"}</h2>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {quickLinks.map((link) => {
+          const Icon = link.icon;
+          return (
+            <Card key={link.path} shadow="sm" isPressable as={Link} to={tenantPath(link.path)}>
+              <CardBody className="flex flex-row items-center gap-4 p-4">
+                <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${quickLinkBgClass[link.color]}`}>
+                  <Icon size={24} className={quickLinkTextClass[link.color]} />
                 </div>
-              )}
-            </CardBody>
-          </Card>
-        </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-foreground">{link.title}</p>
+                  <p className="text-sm text-default-500">{link.description}</p>
+                </div>
+                <ChevronRight size={20} className="text-default-400 shrink-0" />
+              </CardBody>
+            </Card>
+          );
+        })}
       </div>
+
+      {/* Recent Activity */}
+      <h2 className="text-lg font-semibold text-foreground mb-4 mt-8">{"Recent Activity"}</h2>
+      {loading && !stats ? (
+        <div className="flex items-center justify-center py-12">
+          <Spinner size="lg" />
+        </div>
+      ) : stats?.recent_activity && stats.recent_activity.length > 0 ? (
+        <Card shadow="sm">
+          <CardHeader className="flex items-center gap-2 pb-0">
+            <Activity size={18} className="text-default-500" />
+            <span className="text-sm font-semibold text-foreground">{"Broker Actions"}</span>
+          </CardHeader>
+          <Divider className="my-2" />
+          <CardBody className="p-0">
+            <ul className="divide-y divide-divider">
+              {stats.recent_activity.map((entry: BrokerActivityEntry) => (
+                <li key={entry.id} className="flex items-center gap-3 px-4 py-3">
+                  <ActivityChip actionType={entry.action_type} />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-foreground">
+                      <span className="font-medium">{entry.first_name} {entry.last_name}</span>
+                      {' '}{formatActionLabel(entry.action_type, t as TFunction)}
+                    </p>
+                    {entry.details && (
+                      <p className="text-xs text-default-400 truncate">{entry.details}</p>
+                    )}
+                  </div>
+                  <span className="shrink-0 text-xs text-default-400">
+                    {formatTimeAgo(entry.created_at, t as TFunction)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </CardBody>
+        </Card>
+      ) : (
+        <Card shadow="sm">
+          <CardBody className="flex flex-col items-center justify-center py-10 text-center">
+            <Activity size={40} className="text-default-300 mb-3" />
+            <p className="text-default-500 font-medium">{"No recent broker activity found"}</p>
+            <p className="text-sm text-default-400 mt-1">{"Activity Empty."}</p>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Collapsible guidance panel — title visible, body tucked into accordion sections */}
+      <BrokerControlsHelp />
     </div>
   );
 }
+
+type ChipColor = 'success' | 'danger' | 'primary' | 'warning' | 'secondary' | 'default';
+
+const actionChipColorMap: Record<string, ChipColor> = {
+  exchange_approved: 'success',
+  exchange_rejected: 'danger',
+  message_reviewed: 'primary',
+  risk_tag_added: 'warning',
+  user_monitored: 'secondary',
+  vetting_verified: 'success',
+  vetting_rejected: 'danger',
+  user_banned: 'danger',
+  user_unbanned: 'success',
+  balance_adjusted: 'primary',
+};
+
+const actionChipLabelKey: Record<string, string> = {
+  exchange_approved: 'broker_dashboard.chip_approved',
+  exchange_rejected: 'broker_dashboard.chip_rejected',
+  message_reviewed: 'broker_dashboard.chip_reviewed',
+  risk_tag_added: 'broker_dashboard.chip_risk_tag',
+  user_monitored: 'broker_dashboard.chip_monitored',
+  vetting_verified: 'broker_dashboard.chip_verified',
+  vetting_rejected: 'broker_dashboard.chip_vet_rejected',
+  user_banned: 'broker_dashboard.chip_banned',
+  user_unbanned: 'broker_dashboard.chip_unbanned',
+  balance_adjusted: 'broker_dashboard.chip_balance',
+};
+
+const actionLabelKey: Record<string, string> = {
+  exchange_approved: 'broker_dashboard.action_exchange_approved',
+  exchange_rejected: 'broker_dashboard.action_exchange_rejected',
+  message_reviewed: 'broker_dashboard.action_message_reviewed',
+  risk_tag_added: 'broker_dashboard.action_risk_tag_added',
+  user_monitored: 'broker_dashboard.action_user_monitored',
+  vetting_verified: 'broker_dashboard.action_vetting_verified',
+  vetting_rejected: 'broker_dashboard.action_vetting_rejected',
+  user_banned: 'broker_dashboard.action_user_banned',
+  user_unbanned: 'broker_dashboard.action_user_unbanned',
+  balance_adjusted: 'broker_dashboard.action_balance_adjusted',
+};
+
+function ActivityChip({ actionType }: { actionType: string }) {
+  const { t } = useTranslation('admin');
+  const color: ChipColor = actionChipColorMap[actionType] ?? 'default';
+  const labelKey = actionChipLabelKey[actionType];
+  const label = labelKey ? t(labelKey) : actionType;
+  return (
+    <Chip size="sm" variant="flat" color={color} className="shrink-0">
+      {label}
+    </Chip>
+  );
+}
+
+function formatActionLabel(actionType: string, t: TFunction): string {
+  const key = actionLabelKey[actionType];
+  return key ? t(key) : actionType.replace(/_/g, ' ');
+}
+
+function formatTimeAgo(dateStr: string, t: TFunction): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return "Time Just Now";
+  if (diffMins < 60) return "Time Minutes Ago".replace('{{count}}', String(diffMins));
+  const diffHrs = Math.floor(diffMins / 60);
+  if (diffHrs < 24) return "Time Hours Ago".replace('{{count}}', String(diffHrs));
+  const diffDays = Math.floor(diffHrs / 24);
+  if (diffDays < 7) return "Time Days Ago".replace('{{count}}', String(diffDays));
+  return date.toLocaleDateString();
+}
+
+export default BrokerDashboard;
