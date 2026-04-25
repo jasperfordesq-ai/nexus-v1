@@ -175,6 +175,19 @@ class NewsletterController extends BaseApiController
         // 1×1 transparent GIF
         $gif = base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
 
+        // Per-IP rate limit so the unauthenticated tracking pixel can't be
+        // abused as an unauthenticated DB-lookup amplifier. 60/min is well
+        // above any realistic email-client preview rate.
+        $ip = request()->ip() ?: 'unknown';
+        if (!\App\Core\RateLimiter::attempt('nl_track_open:' . $ip, 60, 60)) {
+            // Silently serve the pixel; never reveal rate-limit state to bots.
+            return response($gif, 200, [
+                'Content-Type' => 'image/gif',
+                'Cache-Control' => 'private, no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+            ]);
+        }
+
         try {
             // Try tracking_token first (new per-send unique tokens), fall back
             // to unsubscribe_token (legacy shared tokens) for older emails.

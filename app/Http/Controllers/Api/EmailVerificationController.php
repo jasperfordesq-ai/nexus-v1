@@ -40,8 +40,10 @@ class EmailVerificationController extends BaseApiController
     /** POST /api/auth/verify-email */
     public function verifyEmail(): JsonResponse
     {
-        // Rate limit by IP - 20 attempts per 15 minutes
-        $this->rateLimit('verify_email', 20, 900);
+        // Rate limit by IP - 10 attempts per 15 minutes. Tightened from 20
+        // because this endpoint validates a token; high attempt counts have
+        // no legitimate use and only enable token-guessing.
+        $this->rateLimit('verify_email', 10, 900);
 
         $token = $this->input('token');
         $tenantId = TenantContext::getId();

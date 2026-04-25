@@ -334,7 +334,20 @@ class TenantContext
             // Fallback
         }
 
-        // 6. Hard Fallback (if DB fails) — uses TenantFeatureConfig defaults
+        // 6. Hard Fallback (if DB fails) — uses TenantFeatureConfig defaults.
+        // This path should never run in healthy production — if it does, the
+        // database lookup at step 5 has failed. Log so ops sees it.
+        try {
+            \Illuminate\Support\Facades\Log::warning(
+                'TenantContext hard-fallback to synthetic Master tenant — DB unavailable',
+                [
+                    'host' => $_SERVER['HTTP_HOST'] ?? null,
+                    'uri'  => $_SERVER['REQUEST_URI'] ?? null,
+                ]
+            );
+        } catch (\Throwable $e) {
+            // If even logging fails, swallow — we still need to render something.
+        }
         self::$tenant = [
             'id' => 1,
             'name' => 'Project NEXUS',
