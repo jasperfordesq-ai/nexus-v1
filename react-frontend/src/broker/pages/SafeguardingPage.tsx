@@ -28,6 +28,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Eye from 'lucide-react/icons/eye';
 import Users from 'lucide-react/icons/users';
 import Heart from 'lucide-react/icons/heart';
+import UserCheck from 'lucide-react/icons/user-check';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -381,7 +382,7 @@ export default function SafeguardingPage() {
       />
 
       {/* Stat cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard
           label={t('safeguarding.stat_flags_month')}
           value={stats?.total_flags_this_month ?? 0}
@@ -401,6 +402,20 @@ export default function SafeguardingPage() {
           value={stats?.unreviewed_flags ?? 0}
           icon={Eye}
           color="primary"
+          loading={statsLoading}
+        />
+        <StatCard
+          label={t('safeguarding.stat_assignments')}
+          value={stats?.active_assignments ?? 0}
+          icon={UserCheck}
+          color="success"
+          loading={statsLoading}
+        />
+        <StatCard
+          label={t('safeguarding.stat_consented')}
+          value={stats?.consented_wards ?? 0}
+          icon={Users}
+          color="default"
           loading={statsLoading}
         />
       </div>

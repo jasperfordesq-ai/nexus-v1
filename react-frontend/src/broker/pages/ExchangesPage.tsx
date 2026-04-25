@@ -36,9 +36,14 @@ import type { ExchangeRequest } from '@/admin/api/types';
 const statusColorMap: Record<string, 'warning' | 'success' | 'danger' | 'default'> = {
   pending: 'warning',
   approved: 'success',
+  in_progress: 'success',
+  completed: 'success',
   disputed: 'danger',
   rejected: 'default',
+  cancelled: 'default',
 };
+
+const ACTIONABLE_STATUSES = new Set(['pending', 'pending_broker', 'disputed']);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
@@ -217,30 +222,34 @@ export default function ExchangesPage() {
       {
         key: 'actions',
         label: t('exchanges.col_actions'),
-        render: (item) => (
-          <Dropdown>
-            <DropdownTrigger>
-              <Button isIconOnly size="sm" variant="light" aria-label={t('exchanges.actions_aria')}>
-                <MoreVertical size={16} />
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu aria-label={t('exchanges.exchange_actions_aria')}>
-              <DropdownItem
-                key="approve"
-                onPress={() => setApproveTarget(item)}
-              >
-                {t('exchanges.approve')}
-              </DropdownItem>
-              <DropdownItem
-                key="reject"
-                className="text-danger"
-                onPress={() => setRejectTarget(item)}
-              >
-                {t('exchanges.reject')}
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-        ),
+        render: (item) => {
+          if (!ACTIONABLE_STATUSES.has(item.status?.toLowerCase())) return null;
+          return (
+            <Dropdown>
+              <DropdownTrigger>
+                <Button isIconOnly size="sm" variant="light" aria-label={t('exchanges.actions_aria')}>
+                  <MoreVertical size={16} />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu aria-label={t('exchanges.exchange_actions_aria')}>
+                <DropdownItem
+                  key="approve"
+                  onPress={() => setApproveTarget(item)}
+                >
+                  {t('exchanges.approve')}
+                </DropdownItem>
+                <DropdownItem
+                  key="reject"
+                  className="text-danger"
+                  color="danger"
+                  onPress={() => setRejectTarget(item)}
+                >
+                  {t('exchanges.reject')}
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          );
+        },
       },
     ],
     [t],
@@ -276,6 +285,8 @@ export default function ExchangesPage() {
         <Tab key="all" title={t('exchanges.tab_all')} />
         <Tab key="pending" title={t('exchanges.tab_pending')} />
         <Tab key="approved" title={t('exchanges.tab_approved')} />
+        <Tab key="in_progress" title={t('exchanges.tab_in_progress')} />
+        <Tab key="completed" title={t('exchanges.tab_completed')} />
         <Tab key="disputed" title={t('exchanges.tab_disputed')} />
       </Tabs>
 
@@ -306,8 +317,8 @@ export default function ExchangesPage() {
           setApproveNotes('');
         }}
         onConfirm={handleApprove}
-        title={t('exchanges.approve')}
-        message={t('exchanges.approved_success')}
+        title={t('exchanges.confirm_approve_title')}
+        message={t('exchanges.confirm_approve_message')}
         confirmLabel={t('exchanges.approve')}
         confirmColor="primary"
         isLoading={actionLoading === approveTarget?.id}
@@ -330,8 +341,8 @@ export default function ExchangesPage() {
           setRejectReason('');
         }}
         onConfirm={handleReject}
-        title={t('exchanges.reject')}
-        message={t('exchanges.reason_placeholder')}
+        title={t('exchanges.confirm_reject_title')}
+        message={t('exchanges.confirm_reject_message')}
         confirmLabel={t('exchanges.reject')}
         confirmColor="danger"
         isLoading={actionLoading === rejectTarget?.id}

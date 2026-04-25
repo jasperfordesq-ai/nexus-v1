@@ -683,8 +683,8 @@ export const adminBroker = {
   getUnreviewedCount: () =>
     api.get<{ count: number }>('/v2/admin/broker/messages/unreviewed-count'),
 
-  reviewMessage: (id: number) =>
-    api.post<{ success: boolean }>(`/v2/admin/broker/messages/${id}/review`),
+  reviewMessage: (id: number, notes?: string) =>
+    api.post<{ success: boolean }>(`/v2/admin/broker/messages/${id}/review`, notes ? { notes } : {}),
 
   getMonitoring: () =>
     api.get<MonitoredUser[]>('/v2/admin/broker/monitoring'),

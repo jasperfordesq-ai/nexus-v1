@@ -77,17 +77,20 @@ const PAGE_SIZE = 20;
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-function timeAgo(dateStr: string | null | undefined): string {
-  if (!dateStr) return 'Never';
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'Just now';
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return new Date(dateStr).toLocaleDateString();
+function useTimeAgo() {
+  const { t } = useTranslation('broker');
+  return (dateStr: string | null | undefined): string => {
+    if (!dateStr) return t('members.time_never');
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return t('members.time_just_now');
+    if (mins < 60) return t('members.time_minutes_ago', { count: mins });
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return t('members.time_hours_ago', { count: hours });
+    const days = Math.floor(hours / 24);
+    if (days < 30) return t('members.time_days_ago', { count: days });
+    return new Date(dateStr).toLocaleDateString();
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -96,6 +99,7 @@ function timeAgo(dateStr: string | null | undefined): string {
 
 export default function MembersPage() {
   const { t } = useTranslation('broker');
+  const timeAgo = useTimeAgo();
   const toast = useToast();
   const { tenantPath } = useTenant();
   usePageTitle(t('members.title') + ' - Broker');

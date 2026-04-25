@@ -10,6 +10,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import {
   Tabs,
   Tab,
@@ -86,6 +87,7 @@ export default function VettingPage() {
   const { t } = useTranslation('broker');
   usePageTitle(t('vetting.title'));
   const toast = useToast();
+  const [searchParams] = useSearchParams();
 
   // ── Stats ────────────────────────────────────────────────────────────────
   const [stats, setStats] = useState<VettingStats | null>(null);
@@ -97,6 +99,7 @@ export default function VettingPage() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [activeTab, setActiveTab] = useState<TabKey>('all');
+  const [search, setSearch] = useState(() => searchParams.get('search') ?? '');
   const pageSize = 20;
 
   // ── Verify / Reject modals ───────────────────────────────────────────────
@@ -123,11 +126,12 @@ export default function VettingPage() {
     }
   }, []);
 
-  const fetchRecords = useCallback(async (p: number, tab: TabKey) => {
+  const fetchRecords = useCallback(async (p: number, tab: TabKey, searchQuery: string) => {
     setLoading(true);
     try {
-      const params = { ...tabToParams(tab), page: p, per_page: pageSize };
-      const res = await adminVetting.list(params);
+      const params: Record<string, unknown> = { ...tabToParams(tab), page: p, per_page: pageSize };
+      if (searchQuery.trim()) params.search = searchQuery.trim();
+      const res = await adminVetting.list(params as Parameters<typeof adminVetting.list>[0]);
       const payload = res.data as unknown;
       if (Array.isArray(payload)) {
         setRecords(payload as VettingRecord[]);
@@ -153,7 +157,14 @@ export default function VettingPage() {
 
   useEffect(() => {
     setPage(1);
-    void fetchRecords(1, activeTab);
+    void fetchRecords(1, activeTab, search);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, fetchRecords]);
+
+  const handleSearch = useCallback((q: string) => {
+    setSearch(q);
+    setPage(1);
+    void fetchRecords(1, activeTab, q);
   }, [activeTab, fetchRecords]);
 
   // ── Actions ──────────────────────────────────────────────────────────────
@@ -165,14 +176,14 @@ export default function VettingPage() {
       await adminVetting.verify(verifyTarget.id);
       toast.success(t('vetting.verified_success'));
       setVerifyTarget(null);
-      void fetchRecords(page, activeTab);
+      void fetchRecords(page, activeTab, search);
       void fetchStats();
     } catch {
       toast.error(t('common.error'));
     } finally {
       setVerifyLoading(false);
     }
-  }, [verifyTarget, page, activeTab, fetchRecords, fetchStats, toast, t]);
+  }, [verifyTarget, page, activeTab, search, fetchRecords, fetchStats, toast, t]);
 
   const handleReject = useCallback(async () => {
     if (!rejectTarget) return;
@@ -182,14 +193,14 @@ export default function VettingPage() {
       toast.success(t('vetting.rejected_success'));
       setRejectTarget(null);
       setRejectReason('');
-      void fetchRecords(page, activeTab);
+      void fetchRecords(page, activeTab, search);
       void fetchStats();
     } catch {
       toast.error(t('common.error'));
     } finally {
       setRejectLoading(false);
     }
-  }, [rejectTarget, rejectReason, page, activeTab, fetchRecords, fetchStats, toast, t]);
+  }, [rejectTarget, rejectReason, page, activeTab, search, fetchRecords, fetchStats, toast, t]);
 
   // ── Column definitions ───────────────────────────────────────────────────
 
@@ -320,10 +331,12 @@ export default function VettingPage() {
         pageSize={pageSize}
         onPageChange={(p) => {
           setPage(p);
-          void fetchRecords(p, activeTab);
+          void fetchRecords(p, activeTab, search);
         }}
-        onRefresh={() => void fetchRecords(page, activeTab)}
-        searchable={false}
+        onRefresh={() => void fetchRecords(page, activeTab, search)}
+        searchable
+        searchPlaceholder={t('vetting.search_placeholder')}
+        onSearch={handleSearch}
         emptyContent={
           <EmptyState
             icon={FileCheck}
@@ -337,10 +350,13 @@ export default function VettingPage() {
         isOpen={!!verifyTarget}
         onClose={() => setVerifyTarget(null)}
         onConfirm={() => void handleVerify()}
-        title={t('vetting.verify')}
+        title={t('vetting.confirm_verify_title')}
         message={
           verifyTarget
-            ? `Verify ${verifyTarget.first_name} ${verifyTarget.last_name}'s ${formatVettingType(verifyTarget.vetting_type)} record?`
+            ? t('vetting.confirm_verify_message', {
+                name: `${verifyTarget.first_name} ${verifyTarget.last_name}`,
+                type: formatVettingType(verifyTarget.vetting_type),
+              })
             : ''
         }
         confirmLabel={t('vetting.verify')}
@@ -356,10 +372,13 @@ export default function VettingPage() {
           setRejectReason('');
         }}
         onConfirm={() => void handleReject()}
-        title={t('vetting.reject')}
+        title={t('vetting.confirm_reject_title')}
         message={
           rejectTarget
-            ? `Reject ${rejectTarget.first_name} ${rejectTarget.last_name}'s ${formatVettingType(rejectTarget.vetting_type)} record?`
+            ? t('vetting.confirm_reject_body', {
+                name: `${rejectTarget.first_name} ${rejectTarget.last_name}`,
+                type: formatVettingType(rejectTarget.vetting_type),
+              })
             : ''
         }
         confirmLabel={t('vetting.reject')}
