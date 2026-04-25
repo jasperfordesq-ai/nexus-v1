@@ -16,7 +16,7 @@
 export const RELEASE_STATUS = {
   stageKey: 'rc' as const,
   stageLabel: 'Release Candidate (RC)',
-  stageSummary: 'This platform is new and you are viewing it in preview mode.',
+  stageSummary: 'New and improving fast.',
   readMorePath: '/development-status',
 } as const;
 
