@@ -4,7 +4,12 @@
     "title": "لوحة الوسيط",
     "expand": "توسيع الشريط الجانبي",
     "collapse": "طي الشريط الجانبي",
-    "full_admin": "لوحة الإدارة الكاملة"
+    "full_admin": "لوحة الإدارة الكاملة",
+    "section_overview": "Overview",
+    "section_daily": "Daily Workflow",
+    "section_compliance": "Compliance & Oversight",
+    "section_records": "Records",
+    "section_settings": "Settings"
   },
   "header": {
     "toggle_sidebar": "تبديل الشريط الجانبي",
@@ -21,7 +26,13 @@
     "safeguarding": "Safeguarding",
     "vetting": "التحقق و DBS",
     "exchanges": "Exchanges",
-    "messages": "Messages"
+    "messages": "Messages",
+    "monitoring": "User Monitoring",
+    "risk_tags": "Risk Tags",
+    "insurance": "Insurance",
+    "archives": "Review Archive",
+    "configuration": "Configuration",
+    "help": "Help"
   },
   "breadcrumbs": {
     "aria_label": "تنقل فتات الخبز",

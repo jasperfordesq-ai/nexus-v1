@@ -4,7 +4,12 @@
     "title": "Broker-Panel",
     "expand": "Seitenleiste erweitern",
     "collapse": "Seitenleiste einklappen",
-    "full_admin": "Vollständiges Admin-Panel"
+    "full_admin": "Vollständiges Admin-Panel",
+    "section_overview": "Overview",
+    "section_daily": "Daily Workflow",
+    "section_compliance": "Compliance & Oversight",
+    "section_records": "Records",
+    "section_settings": "Settings"
   },
   "header": {
     "toggle_sidebar": "Seitenleiste umschalten",
@@ -21,7 +26,13 @@
     "safeguarding": "Safeguarding",
     "vetting": "Überprüfung & DBS",
     "exchanges": "Exchanges",
-    "messages": "Messages"
+    "messages": "Messages",
+    "monitoring": "User Monitoring",
+    "risk_tags": "Risk Tags",
+    "insurance": "Insurance",
+    "archives": "Review Archive",
+    "configuration": "Configuration",
+    "help": "Help"
   },
   "breadcrumbs": {
     "aria_label": "Breadcrumb-Navigation",

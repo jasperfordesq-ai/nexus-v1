@@ -4,7 +4,12 @@
     "title": "Panneau du courtier",
     "expand": "Développer la barre latérale",
     "collapse": "Réduire la barre latérale",
-    "full_admin": "Panneau d'administration complet"
+    "full_admin": "Panneau d'administration complet",
+    "section_overview": "Overview",
+    "section_daily": "Daily Workflow",
+    "section_compliance": "Compliance & Oversight",
+    "section_records": "Records",
+    "section_settings": "Settings"
   },
   "header": {
     "toggle_sidebar": "Basculer la barre latérale",
@@ -21,7 +26,13 @@
     "safeguarding": "Safeguarding",
     "vetting": "Vérification et DBS",
     "exchanges": "Exchanges",
-    "messages": "Messages"
+    "messages": "Messages",
+    "monitoring": "User Monitoring",
+    "risk_tags": "Risk Tags",
+    "insurance": "Insurance",
+    "archives": "Review Archive",
+    "configuration": "Configuration",
+    "help": "Help"
   },
   "breadcrumbs": {
     "aria_label": "Navigation par fil d'Ariane",

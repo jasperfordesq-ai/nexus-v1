@@ -4,7 +4,12 @@
     "title": "Panel brokera",
     "expand": "Rozwiń pasek boczny",
     "collapse": "Zwiń pasek boczny",
-    "full_admin": "Pełny panel administratora"
+    "full_admin": "Pełny panel administratora",
+    "section_overview": "Overview",
+    "section_daily": "Daily Workflow",
+    "section_compliance": "Compliance & Oversight",
+    "section_records": "Records",
+    "section_settings": "Settings"
   },
   "header": {
     "toggle_sidebar": "Przełącz pasek boczny",
@@ -21,7 +26,13 @@
     "safeguarding": "Ochrona",
     "vetting": "Weryfikacja i DBS",
     "exchanges": "Wymiany",
-    "messages": "Wiadomości"
+    "messages": "Wiadomości",
+    "monitoring": "User Monitoring",
+    "risk_tags": "Risk Tags",
+    "insurance": "Insurance",
+    "archives": "Review Archive",
+    "configuration": "Configuration",
+    "help": "Help"
   },
   "breadcrumbs": {
     "aria_label": "Nawigacja okruszkowa",

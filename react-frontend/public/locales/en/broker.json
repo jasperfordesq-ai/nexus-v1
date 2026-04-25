@@ -5,7 +5,12 @@
     "title": "Broker Panel",
     "expand": "Expand sidebar",
     "collapse": "Collapse sidebar",
-    "full_admin": "Full Admin Panel"
+    "full_admin": "Full Admin Panel",
+    "section_overview": "Overview",
+    "section_daily": "Daily Workflow",
+    "section_compliance": "Compliance & Oversight",
+    "section_records": "Records",
+    "section_settings": "Settings"
   },
 
   "header": {
@@ -24,7 +29,13 @@
     "safeguarding": "Safeguarding",
     "vetting": "Vetting & DBS",
     "exchanges": "Exchanges",
-    "messages": "Messages"
+    "messages": "Messages",
+    "monitoring": "User Monitoring",
+    "risk_tags": "Risk Tags",
+    "insurance": "Insurance",
+    "archives": "Review Archive",
+    "configuration": "Configuration",
+    "help": "Help"
   },
 
   "breadcrumbs": {

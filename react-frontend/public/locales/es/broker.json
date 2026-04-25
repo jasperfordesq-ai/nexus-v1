@@ -4,7 +4,12 @@
     "title": "Panel de Corredor",
     "expand": "Expandir barra lateral",
     "collapse": "Colapsar barra lateral",
-    "full_admin": "Panel de Administrador Completo"
+    "full_admin": "Panel de Administrador Completo",
+    "section_overview": "Overview",
+    "section_daily": "Daily Workflow",
+    "section_compliance": "Compliance & Oversight",
+    "section_records": "Records",
+    "section_settings": "Settings"
   },
   "header": {
     "toggle_sidebar": "Alternar barra lateral",
@@ -21,7 +26,13 @@
     "safeguarding": "Safeguarding",
     "vetting": "Verificación y DBS",
     "exchanges": "Exchanges",
-    "messages": "Messages"
+    "messages": "Messages",
+    "monitoring": "User Monitoring",
+    "risk_tags": "Risk Tags",
+    "insurance": "Insurance",
+    "archives": "Review Archive",
+    "configuration": "Configuration",
+    "help": "Help"
   },
   "breadcrumbs": {
     "aria_label": "Navegación de migas de pan",

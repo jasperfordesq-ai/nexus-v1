@@ -4,7 +4,12 @@
     "title": "ブローカーパネル",
     "expand": "サイドバーを展開",
     "collapse": "サイドバーを折りたたむ",
-    "full_admin": "管理パネル全体"
+    "full_admin": "管理パネル全体",
+    "section_overview": "Overview",
+    "section_daily": "Daily Workflow",
+    "section_compliance": "Compliance & Oversight",
+    "section_records": "Records",
+    "section_settings": "Settings"
   },
   "header": {
     "toggle_sidebar": "サイドバーを切り替え",
@@ -21,7 +26,13 @@
     "safeguarding": "セーフガーディング",
     "vetting": "審査・DBS",
     "exchanges": "交換",
-    "messages": "メッセージ"
+    "messages": "メッセージ",
+    "monitoring": "User Monitoring",
+    "risk_tags": "Risk Tags",
+    "insurance": "Insurance",
+    "archives": "Review Archive",
+    "configuration": "Configuration",
+    "help": "Help"
   },
   "breadcrumbs": {
     "aria_label": "パンくずナビゲーション",
