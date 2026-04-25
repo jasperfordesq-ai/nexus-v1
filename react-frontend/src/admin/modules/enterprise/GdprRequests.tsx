@@ -140,7 +140,7 @@ export function GdprRequests() {
     {
       key: 'sla',
       label: "SLA",
-      render: (r) => <SlaChip createdAt={r.created_at} t={t} />,
+      render: (r) => <SlaChip createdAt={r.created_at} t={(key, opts) => t(key, opts)} />,
     },
     {
       key: 'created_at',

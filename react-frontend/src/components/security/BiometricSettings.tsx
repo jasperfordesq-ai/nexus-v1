@@ -140,7 +140,7 @@ export function BiometricSettings() {
   const [showInstructions, setShowInstructions] = useState(true); // Auto-show on first visit
 
   const platform = detectPlatform();
-  const instructions = getPlatformInstructions(platform, t);
+  const instructions = getPlatformInstructions(platform, (key, options) => t(key, options));
   const removeAllConfirm = useDisclosure();
 
   const loadCredentials = useCallback(async () => {
@@ -369,7 +369,7 @@ export function BiometricSettings() {
                       />
                     ) : (
                       <p className="text-sm font-medium text-theme-primary truncate">
-                        {getDeviceLabel(cred, t)}{' '}
+                        {getDeviceLabel(cred, (key, options) => t(key, options))}{' '}
                         <span className="text-theme-subtle font-mono text-xs">
                           ...{cred.credential_id.slice(-8)}
                         </span>
@@ -400,7 +400,7 @@ export function BiometricSettings() {
                     className="text-theme-subtle hover:bg-theme-hover"
                     onPress={() => {
                       setEditingId(cred.credential_id);
-                      setEditName(getDeviceLabel(cred, t));
+                      setEditName(getDeviceLabel(cred, (key, options) => t(key, options)));
                     }}
                     aria-label={t('passkey_rename', { defaultValue: 'Rename passkey' })}
                   >

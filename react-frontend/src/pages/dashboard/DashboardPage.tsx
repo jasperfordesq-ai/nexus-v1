@@ -365,7 +365,7 @@ export function DashboardPage() {
                       <Link key={`${item.type}-${item.id}-${idx}`} to={tenantPath('/feed')} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0 group">
                         <Avatar src={resolveAvatarUrl(item.author?.avatar_url)} name={item.author?.name} size="sm" className="shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-theme-primary"><span className="font-medium">{item.author?.name}</span>{' '}<span className="text-theme-muted">{formatActivityAction(item, t)}</span></p>
+                          <p className="text-sm text-theme-primary"><span className="font-medium">{item.author?.name}</span>{' '}<span className="text-theme-muted">{formatActivityAction(item, (key) => t(key))}</span></p>
                           <p className="text-xs text-theme-subtle line-clamp-1">{stripHtml(item.content)}</p>
                         </div>
                         <div className="flex items-center gap-3 shrink-0 text-theme-subtle text-xs">

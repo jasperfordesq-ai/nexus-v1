@@ -387,7 +387,8 @@
     "reopen_vacancy": "Reopen",
     "refresh": "Refresh",
     "message_applicant": "Message",
-    "kanban_board": "Tablica Kanban"
+    "kanban_board": "Tablica Kanban",
+    "cv_download_error": "Failed to download CV"
   },
   "interview": {
     "schedule": "Umów Rozmowę Kwalifikacyjną",

@@ -293,7 +293,7 @@ export function BillingPage() {
                       {t('billing.tier', 'Tier')} {subscription.plan_tier_level}
                     </Chip>
                     <Chip size="sm" variant="flat" color={statusColor(subscription.status)}>
-                      {statusLabel(subscription.status, t)}
+                      {statusLabel(subscription.status, (key) => t(key))}
                     </Chip>
                   </div>
 

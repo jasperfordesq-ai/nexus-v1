@@ -387,7 +387,8 @@
     "reopen_vacancy": "Reopen",
     "refresh": "Refresh",
     "message_applicant": "Message",
-    "kanban_board": "カンバンボード"
+    "kanban_board": "カンバンボード",
+    "cv_download_error": "Failed to download CV"
   },
   "interview": {
     "schedule": "面接をスケジュールする",

@@ -111,7 +111,7 @@ function getRiskColor(risk: string): 'success' | 'warning' | 'danger' {
 export function WellbeingTab() {
   const { t } = useTranslation('volunteering');
   const toast = useToast();
-  const moodOptions = getMoodOptions(t);
+  const moodOptions = getMoodOptions((key, defaultValue) => t(key, defaultValue));
   const [data, setData] = useState<WellbeingData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -345,7 +345,7 @@ export function WellbeingTab() {
                     {data.burnout_risk === 'low' ? t('wellbeing.risk_low', 'Low Risk') : data.burnout_risk === 'moderate' ? t('wellbeing.risk_moderate', 'Moderate Risk') : t('wellbeing.risk_high', 'High Risk')}
                   </Chip>
                   <span className={`text-sm font-semibold ${getScoreColor(data.score).text}`}>
-                    {data.score}/100 &mdash; {getScoreLabel(data.score, t)}
+                    {data.score}/100 &mdash; {getScoreLabel(data.score, (key, defaultValue) => t(key, defaultValue))}
                   </span>
                 </div>
               </div>
@@ -418,12 +418,12 @@ export function WellbeingTab() {
                 <div className="space-y-3">
                   {data.recent_checkins.map((checkin) => (
                     <div key={checkin.id} className="flex items-center gap-3 p-3 rounded-xl bg-theme-elevated">
-                      <span className="text-2xl" role="img" aria-label={getMoodLabel(checkin.mood, t)}>
-                        {getMoodEmoji(checkin.mood, t)}
+                      <span className="text-2xl" role="img" aria-label={getMoodLabel(checkin.mood, (key, defaultValue) => t(key, defaultValue))}>
+                        {getMoodEmoji(checkin.mood, (key, defaultValue) => t(key, defaultValue))}
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-theme-primary">{getMoodLabel(checkin.mood, t)}</span>
+                          <span className="text-sm font-medium text-theme-primary">{getMoodLabel(checkin.mood, (key, defaultValue) => t(key, defaultValue))}</span>
                           <span className="text-xs text-theme-subtle">
                             {new Date(checkin.created_at).toLocaleDateString(undefined, {
                               month: 'short',

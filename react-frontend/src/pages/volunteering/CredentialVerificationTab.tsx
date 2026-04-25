@@ -404,7 +404,7 @@ export function CredentialVerificationTab() {
                         variant="flat"
                         startContent={getStatusIcon(credential.status)}
                       >
-                        {getStatusLabel(credential.status, t)}
+                        {getStatusLabel(credential.status, (key, defaultValue) => t(key, { defaultValue }))}
                       </Chip>
                     </div>
 

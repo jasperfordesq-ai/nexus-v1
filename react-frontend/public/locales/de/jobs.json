@@ -387,7 +387,8 @@
     "reopen_vacancy": "Wiedereröffnen",
     "refresh": "Aktualisieren",
     "message_applicant": "Nachricht",
-    "kanban_board": "Kanban-Board"
+    "kanban_board": "Kanban-Board",
+    "cv_download_error": "Failed to download CV"
   },
   "interview": {
     "schedule": "Vorstellungsgespräch planen",

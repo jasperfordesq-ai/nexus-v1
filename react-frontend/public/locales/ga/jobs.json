@@ -387,7 +387,8 @@
     "reopen_vacancy": "Athoscail",
     "refresh": "Athnuaigh",
     "message_applicant": "Teachtaireacht",
-    "kanban_board": "Clár Kanban"
+    "kanban_board": "Clár Kanban",
+    "cv_download_error": "Failed to download CV"
   },
   "interview": {
     "schedule": "Sceideal Agallamh",

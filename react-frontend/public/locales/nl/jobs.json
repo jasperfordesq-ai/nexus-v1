@@ -387,7 +387,8 @@
     "reopen_vacancy": "Reopen",
     "refresh": "Refresh",
     "message_applicant": "Message",
-    "kanban_board": "Kanban Bord"
+    "kanban_board": "Kanban Bord",
+    "cv_download_error": "Failed to download CV"
   },
   "interview": {
     "schedule": "Plan Interview",

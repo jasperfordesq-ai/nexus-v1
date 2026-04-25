@@ -5622,7 +5622,14 @@
     "whitelist_status": "Whitelist Status",
     "whitelisted": "Whitelisted",
     "whitelisted_desc": "Whitelisted.",
-    "yes_hub": "Yes Hub"
+    "yes_hub": "Yes Hub",
+    "move_user_to_tenant_title": "Move User to Tenant",
+    "move_user_to_tenant_desc": "Move this user account to another tenant. Their memberships and permissions will be updated for the target tenant.",
+    "target_tenant": "Target Tenant",
+    "select_tenant": "Select a tenant",
+    "target_hub_tenant": "Target Hub Tenant",
+    "select_hub_tenant": "Select a hub tenant",
+    "no_hub_tenants_found": "No hub tenants found"
   },
   "system": {
     "active": "Active",

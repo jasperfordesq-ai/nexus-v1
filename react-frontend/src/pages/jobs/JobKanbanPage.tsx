@@ -46,7 +46,7 @@ import ScrollText from 'lucide-react/icons/scroll-text';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';
-import { api, API_BASE } from '@/lib/api';
+import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
@@ -508,20 +508,17 @@ export function JobKanbanPage() {
     }
   };
 
-  const handleDownloadCv = (appId: number, applicantName: string) => {
-    let token: string | null = null;
-    try { token = localStorage.getItem('nexus_access_token'); } catch { /* private browsing */ }
-    // Open CV download URL in a new tab
-    const url = `${API_BASE}/v2/jobs/applications/${appId}/cv`;
-    const link = document.createElement('a');
-    link.href = url;
-    link.target = '_blank';
-    if (token) {
-      // For authenticated downloads, append token as query param (fallback)
-      link.href = `${url}?token=${encodeURIComponent(token)}`;
+  const handleDownloadCv = async (appId: number, applicantName: string) => {
+    const safeName = applicantName.replace(/[^a-zA-Z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || 'applicant';
+
+    try {
+      await api.download(`/v2/jobs/applications/${appId}/cv`, {
+        filename: `CV-${safeName}.pdf`,
+      });
+    } catch (err) {
+      logError('JobKanbanPage: failed to download CV', err);
+      toastRef.current.error(tRef.current('detail.cv_download_error'));
     }
-    link.download = `CV-${applicantName.replace(/\s+/g, '-')}.pdf`;
-    link.click();
   };
 
   // Helper to move a card to a target status (used by interview/offer submit)

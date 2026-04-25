@@ -45,16 +45,17 @@ import FileUp from 'lucide-react/icons/file-up';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import Trash2 from 'lucide-react/icons/trash-2';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { sanitizeInline } from '@/lib/sanitize';
 import { adminUsers, type BulkActionResult } from '../../api/adminApi';
 import { DataTable, StatusBadge, PageHeader, ConfirmModal, BulkActionToolbar, type BulkAction, type Column } from '../../components';
 import type { AdminUser, UserListParams } from '../../api/types';
 
 export function UserList() {
+  const { t } = useTranslation('admin');
   usePageTitle("Page");
   const { tenantPath, tenant } = useTenant();
   const toast = useToast();
@@ -536,12 +537,14 @@ export function UserList() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <FileUp size={20} />
-            {"Import"}
+            {t('users.import_title')}
           </ModalHeader>
           <ModalBody>
             {!importResults ? (
               <div className="flex flex-col gap-4">
-                <p className="text-sm text-default-500" dangerouslySetInnerHTML={{ __html: sanitizeInline("Import members from a CSV file. Download the template to see the required format.") }} />
+                <p className="text-sm text-default-500">
+                  {t('users.import_csv_description')}
+                </p>
 
                 <div className="flex items-center gap-2">
                   <Button
@@ -550,12 +553,14 @@ export function UserList() {
                     startContent={<Download size={14} />}
                     onPress={() => adminUsers.downloadImportTemplate()}
                   >
-                    {"Download Template"}
+                    {t('users.import_download_template')}
                   </Button>
                 </div>
 
                 <div>
-                  <label htmlFor="import-csv-file" className="block text-sm font-medium mb-1">{"CSV File"}</label>
+                  <label htmlFor="import-csv-file" className="block text-sm font-medium mb-1">
+                    {t('users.import_csv_file')}
+                  </label>
                   <input
                     id="import-csv-file"
                     type="file"
@@ -566,7 +571,7 @@ export function UserList() {
                 </div>
 
                 <Select
-                  label={"Default Role"}
+                  label={t('users.import_default_role')}
                   selectedKeys={[importRole]}
                   onSelectionChange={(keys) => {
                     const selected = Array.from(keys)[0] as string;

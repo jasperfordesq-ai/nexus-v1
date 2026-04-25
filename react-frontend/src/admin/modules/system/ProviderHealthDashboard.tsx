@@ -297,26 +297,26 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
           <Tooltip content={stats.last_session_at || "No sessions yet found"}>
             <div className="flex items-center justify-between">
               <span>{"Last Session"}</span>
-              <span>{formatRelativeTime(stats.last_session_at, t)}</span>
+              <span>{formatRelativeTime(stats.last_session_at, (key, opts) => t(key, opts))}</span>
             </div>
           </Tooltip>
           <Tooltip content={stats.last_success_at || "No successful sessions found"}>
             <div className="flex items-center justify-between">
               <span>{"Last Success"}</span>
-              <span>{formatRelativeTime(stats.last_success_at, t)}</span>
+              <span>{formatRelativeTime(stats.last_success_at, (key, opts) => t(key, opts))}</span>
             </div>
           </Tooltip>
           <Tooltip content={stats.last_failure_at || "No failed sessions found"}>
             <div className="flex items-center justify-between">
               <span>{"Last Failure"}</span>
-              <span>{formatRelativeTime(stats.last_failure_at, t)}</span>
+              <span>{formatRelativeTime(stats.last_failure_at, (key, opts) => t(key, opts))}</span>
             </div>
           </Tooltip>
           {last_webhook && (
             <Tooltip content={`Last Webhook Event`}>
               <div className="flex items-center justify-between">
                 <span>{"Last Webhook"}</span>
-                <span>{formatRelativeTime(last_webhook.at, t)}</span>
+                <span>{formatRelativeTime(last_webhook.at, (key, opts) => t(key, opts))}</span>
               </div>
             </Tooltip>
           )}

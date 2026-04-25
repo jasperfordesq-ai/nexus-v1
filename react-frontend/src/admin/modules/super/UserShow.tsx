@@ -34,14 +34,13 @@ import type { SuperAdminUserDetail, SuperAdminTenant } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
-import { sanitizeInline } from '@/lib/sanitize';
 type ConfirmActionType =
   | 'grant-sa'
   | 'revoke-sa'
   | 'grant-global'
   | 'revoke-global';
 
-function getPrivilegeLevel(user: SuperAdminUserDetail, t: (key: string) => string) {
+function getPrivilegeLevel(user: SuperAdminUserDetail) {
   if (user.is_super_admin) return { label: "Privilege Global Super Admin", color: 'danger' as const, level: 4 };
   if (user.is_tenant_super_admin) return { label: "Privilege Tenant Super Admin", color: 'secondary' as const, level: 3 };
   if (user.role === 'admin' || user.role === 'tenant_admin') return { label: "Privilege Admin", color: 'primary' as const, level: 2 };
@@ -233,7 +232,7 @@ export function UserShow() {
     );
   }
 
-  const privilege = getPrivilegeLevel(user, t);
+  const privilege = getPrivilegeLevel(user);
 
   return (
     <div>
@@ -590,13 +589,15 @@ export function UserShow() {
       {/* Move to Tenant Modal */}
       <Modal isOpen={moveModalOpen} onClose={() => { setMoveModalOpen(false); setMoveTargetTenant(''); }} size="md">
         <ModalContent>
-          <ModalHeader>{"Move User to Tenant"}</ModalHeader>
+          <ModalHeader>{t('super.move_user_to_tenant_title')}</ModalHeader>
           <ModalBody>
-            <p className="text-sm text-default-600 mb-3" dangerouslySetInnerHTML={{ __html: sanitizeInline(`Move User.`) }} />
+            <p className="text-sm text-default-600 mb-3">
+              {t('super.move_user_to_tenant_desc')}
+            </p>
 
             <Select
-              label={"Target Tenant"}
-              placeholder={"Select a Tenant..."}
+              label={t('super.target_tenant')}
+              placeholder={t('super.select_tenant')}
               selectedKeys={moveTargetTenant ? [moveTargetTenant] : []}
               onSelectionChange={(keys) => setMoveTargetTenant(String(Array.from(keys)[0] || ''))}
             >
@@ -607,7 +608,7 @@ export function UserShow() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => { setMoveModalOpen(false); setMoveTargetTenant(''); }} isDisabled={moveLoading}>
-              {"Cancel"}
+              {t('common.cancel')}
             </Button>
             <Button
               color="primary"
@@ -615,7 +616,7 @@ export function UserShow() {
               isLoading={moveLoading}
               isDisabled={!moveTargetTenant}
             >
-              {"Move User"}
+              {t('super.move_user')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -655,7 +656,7 @@ export function UserShow() {
               onPress={() => setImpersonateModalOpen(false)}
               isDisabled={impersonateLoading}
             >
-              {"Cancel"}
+              {t('common.cancel')}
             </Button>
             <Button
               color="warning"
@@ -674,18 +675,20 @@ export function UserShow() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Crown size={20} className="text-secondary" />
-            {"Move and Promote"}
+            {t('super.move_and_promote')}
           </ModalHeader>
           <ModalBody>
-            <p className="text-sm text-default-600 mb-3" dangerouslySetInnerHTML={{ __html: sanitizeInline(`Move and Promote.`) }} />
+            <p className="text-sm text-default-600 mb-3">
+              {t('super.move_and_promote_desc')}
+            </p>
             <div className="bg-warning-50 dark:bg-warning-50/10 border border-warning-200 dark:border-warning-200/20 rounded-lg p-3 mb-3">
               <p className="text-xs text-warning-700 dark:text-warning-400">
-                {"Move and Promote Warning"}
+                {t('super.move_and_promote_warning')}
               </p>
             </div>
             <Select
-              label={"Target Hub Tenant"}
-              placeholder={"Select a Hub Tenant..."}
+              label={t('super.target_hub_tenant')}
+              placeholder={t('super.select_hub_tenant')}
               selectedKeys={promoteTargetTenant ? [promoteTargetTenant] : []}
               onSelectionChange={(keys) => setPromoteTargetTenant(String(Array.from(keys)[0] || ''))}
             >
@@ -694,12 +697,12 @@ export function UserShow() {
                 .map(t => <SelectItem key={String(t.id)}>{t.name}</SelectItem>)}
             </Select>
             {hubTenants.filter(t => t.id !== user.tenant_id).length === 0 && (
-              <p className="text-xs text-default-400 mt-1">{"No hub tenants found"}</p>
+              <p className="text-xs text-default-400 mt-1">{t('super.no_hub_tenants_found')}</p>
             )}
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => { setPromoteModalOpen(false); setPromoteTargetTenant(''); }} isDisabled={promoteLoading}>
-              {"Cancel"}
+              {t('common.cancel')}
             </Button>
             <Button
               color="secondary"
@@ -707,7 +710,7 @@ export function UserShow() {
               isLoading={promoteLoading}
               isDisabled={!promoteTargetTenant}
             >
-              {"Move and Promote"}
+              {t('super.move_and_promote')}
             </Button>
           </ModalFooter>
         </ModalContent>

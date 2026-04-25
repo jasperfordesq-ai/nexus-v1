@@ -387,7 +387,8 @@
     "reopen_vacancy": "Reabrir",
     "refresh": "Atualizar",
     "message_applicant": "Mensagem",
-    "kanban_board": "Quadro Kanban"
+    "kanban_board": "Quadro Kanban",
+    "cv_download_error": "Failed to download CV"
   },
   "interview": {
     "schedule": "Agendar Entrevista",

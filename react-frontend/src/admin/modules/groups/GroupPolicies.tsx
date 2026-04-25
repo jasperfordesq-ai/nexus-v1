@@ -92,7 +92,7 @@ export default function GroupPolicies({
       const response = await adminGroups.getPolicies(typeId);
       const data = (response.data as GroupPolicy[]) || [];
       setPolicies(data);
-      setSections(buildPolicySections(data, t));
+      setSections(buildPolicySections(data, (key) => t(key)));
     } catch {
       error("Failed to load policies");
     } finally {
@@ -117,7 +117,7 @@ export default function GroupPolicies({
         p.key === policy.key ? { ...p, value: newValue } : p
       );
       setPolicies(updatedPolicies);
-      setSections(buildPolicySections(updatedPolicies, t));
+      setSections(buildPolicySections(updatedPolicies, (key) => t(key)));
     } catch {
       error("Failed to update policy");
     }

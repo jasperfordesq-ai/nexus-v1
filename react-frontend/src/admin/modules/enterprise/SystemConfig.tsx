@@ -321,7 +321,7 @@ export function SystemConfig() {
   }));
 
   // Config schema with translated strings — rebuilt on each render (translations change with locale)
-  const configSchema = buildConfigSchema(t);
+  const configSchema = buildConfigSchema((key) => t(key));
 
   // ── Data loading ──────────────────────────────────────────────────────
 
@@ -369,7 +369,7 @@ export function SystemConfig() {
     setEdited((prev) => ({ ...prev, [key]: value }));
 
     if (def) {
-      const error = validateSetting(def, value, t);
+      const error = validateSetting(def, value, (key, opts) => t(key, opts));
       setErrors((prev) => {
         const next = { ...prev };
         if (error) {
@@ -393,7 +393,7 @@ export function SystemConfig() {
     const newErrors: Record<string, string> = {};
     for (const group of configSchema) {
       for (const def of group.settings) {
-        const error = validateSetting(def, getSettingValue(def.key, def.default), t);
+        const error = validateSetting(def, getSettingValue(def.key, def.default), (key, opts) => t(key, opts));
         if (error) newErrors[def.key] = error;
       }
     }

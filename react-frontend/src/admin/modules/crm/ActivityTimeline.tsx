@@ -360,7 +360,7 @@ export function ActivityTimeline() {
                         {/* Right: timestamp */}
                         <div className="text-right shrink-0">
                           <p className="text-xs text-default-400 whitespace-nowrap" title={formatDateTime(entry.created_at)}>
-                            {formatRelativeTime(entry.created_at, t)}
+                            {formatRelativeTime(entry.created_at, (key, opts) => t(key, opts))}
                           </p>
                           <p className="text-xs text-default-300 mt-0.5">
                             #{entry.user_id}

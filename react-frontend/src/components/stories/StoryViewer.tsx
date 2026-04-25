@@ -922,7 +922,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                 </p>
                 {currentStory && (
                   <p className="text-white/60 text-xs">
-                    {timeAgo(currentStory.created_at, t)}
+                    {timeAgo(currentStory.created_at, (key, opts) => t(key, opts))}
                   </p>
                 )}
               </div>
@@ -1090,7 +1090,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                     />
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-medium truncate">{v.name}</p>
-                      <p className="text-white/40 text-xs">{timeAgo(v.viewed_at, t)}</p>
+                      <p className="text-white/40 text-xs">{timeAgo(v.viewed_at, (key, opts) => t(key, opts))}</p>
                     </div>
                   </div>
                 ))

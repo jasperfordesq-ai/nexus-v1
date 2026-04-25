@@ -387,7 +387,8 @@
     "reopen_vacancy": "Riapri",
     "refresh": "Aggiorna",
     "message_applicant": "Messaggio",
-    "kanban_board": "Bacheca Kanban"
+    "kanban_board": "Bacheca Kanban",
+    "cv_download_error": "Failed to download CV"
   },
   "interview": {
     "schedule": "Pianifica Colloquio",
