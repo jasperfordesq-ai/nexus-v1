@@ -21,10 +21,13 @@ import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { LoadingScreen } from '@/components/feedback';
 
 function BrokerAppInner() {
-  // Ensure 'broker' namespace is loaded before rendering any broker components.
-  // Without this, useTranslation('broker') in child components may render raw
-  // keys on first paint because HttpBackend loads namespaces asynchronously.
-  const { ready } = useTranslation('broker');
+  // Ensure both 'broker' and 'admin' namespaces are loaded before rendering.
+  // Without this, useTranslation() in child components may render raw keys on
+  // first paint because HttpBackend loads namespaces asynchronously. The
+  // 'admin' namespace is needed because pages ported from the admin panel
+  // (BrokerDashboard, RiskTags, InsuranceCertificates, etc.) use admin-side
+  // translation keys (broker_dashboard.*, etc.).
+  const { ready } = useTranslation(['broker', 'admin']);
 
   if (!ready) {
     return <LoadingScreen />;

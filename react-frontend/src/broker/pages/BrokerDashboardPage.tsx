@@ -30,49 +30,45 @@ import { StatCard, PageHeader } from '@/admin/components';
 import type { BrokerDashboardStats, BrokerActivityEntry } from '@/admin/api/types';
 import BrokerControlsHelp from './BrokerHelpPage';
 
-import { useTranslation } from 'react-i18next';
-
-type TFunction = (key: string) => string;
-
-const getQuickLinks = (t: TFunction) => [
+const QUICK_LINKS = [
   {
-    title: "Link Exchange Management",
-    description: "Link Exchange Management.",
+    title: 'Exchange Management',
+    description: 'Review and approve exchange requests flagged for broker attention.',
     icon: ArrowLeftRight,
     color: 'primary' as const,
     path: '/broker/exchanges',
   },
   {
-    title: "Link Risk Tags",
-    description: "Link Risk Tags.",
+    title: 'Risk Tags',
+    description: 'Manage risk classifications on listings.',
     icon: ShieldAlert,
     color: 'danger' as const,
     path: '/broker/risk-tags',
   },
   {
-    title: "Link Message Review",
-    description: "Link Message Review.",
+    title: 'Message Review',
+    description: 'Review broker copies of flagged conversations.',
     icon: MessageSquareWarning,
     color: 'warning' as const,
     path: '/broker/messages',
   },
   {
-    title: "Link User Monitoring",
-    description: "Link User Monitoring.",
+    title: 'User Monitoring',
+    description: 'Track members under broker oversight.',
     icon: Eye,
     color: 'secondary' as const,
     path: '/broker/monitoring',
   },
   {
-    title: "Link Vetting Records",
-    description: "Link Vetting Records.",
+    title: 'Vetting Records',
+    description: 'Manage DBS / Garda vetting records.',
     icon: ShieldCheck,
     color: 'success' as const,
     path: '/broker/vetting',
   },
   {
-    title: "Link Configuration",
-    description: "Link Configuration.",
+    title: 'Configuration',
+    description: 'Configure broker control settings.',
     icon: Settings,
     color: 'default' as const,
     path: '/broker/configuration',
@@ -98,12 +94,9 @@ const quickLinkTextClass: Record<string, string> = {
 };
 
 export function BrokerDashboard() {
-  const { t } = useTranslation('admin');
   usePageTitle("Broker Dashboard");
   const { tenantPath } = useTenant();
   const toast = useToast();
-
-  const quickLinks = getQuickLinks(t as TFunction);
 
   const [stats, setStats] = useState<BrokerDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -202,7 +195,7 @@ export function BrokerDashboard() {
           icon={AlertTriangle}
           color="danger"
           loading={loading}
-          to={tenantPath('/admin/safeguarding?filter=critical')}
+          to={tenantPath('/broker/safeguarding?filter=critical')}
         />
         <StatCard
           label={"Onboarding Flags"}
@@ -210,14 +203,14 @@ export function BrokerDashboard() {
           icon={ShieldAlert}
           color="warning"
           loading={loading}
-          to={tenantPath('/admin/safeguarding?tab=preferences')}
+          to={tenantPath('/broker/safeguarding?tab=preferences')}
         />
       </div>
 
       {/* Quick Links */}
       <h2 className="text-lg font-semibold text-foreground mb-4">{"Quick Access"}</h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {quickLinks.map((link) => {
+        {QUICK_LINKS.map((link) => {
           const Icon = link.icon;
           return (
             <Card key={link.path} shadow="sm" isPressable as={Link} to={tenantPath(link.path)}>
@@ -257,14 +250,14 @@ export function BrokerDashboard() {
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-foreground">
                       <span className="font-medium">{entry.first_name} {entry.last_name}</span>
-                      {' '}{formatActionLabel(entry.action_type, t as TFunction)}
+                      {' '}{formatActionLabel(entry.action_type)}
                     </p>
                     {entry.details && (
                       <p className="text-xs text-default-400 truncate">{entry.details}</p>
                     )}
                   </div>
                   <span className="shrink-0 text-xs text-default-400">
-                    {formatTimeAgo(entry.created_at, t as TFunction)}
+                    {formatTimeAgo(entry.created_at)}
                   </span>
                 </li>
               ))}
@@ -302,37 +295,35 @@ const actionChipColorMap: Record<string, ChipColor> = {
   balance_adjusted: 'primary',
 };
 
-const actionChipLabelKey: Record<string, string> = {
-  exchange_approved: 'broker_dashboard.chip_approved',
-  exchange_rejected: 'broker_dashboard.chip_rejected',
-  message_reviewed: 'broker_dashboard.chip_reviewed',
-  risk_tag_added: 'broker_dashboard.chip_risk_tag',
-  user_monitored: 'broker_dashboard.chip_monitored',
-  vetting_verified: 'broker_dashboard.chip_verified',
-  vetting_rejected: 'broker_dashboard.chip_vet_rejected',
-  user_banned: 'broker_dashboard.chip_banned',
-  user_unbanned: 'broker_dashboard.chip_unbanned',
-  balance_adjusted: 'broker_dashboard.chip_balance',
+const actionChipLabel: Record<string, string> = {
+  exchange_approved: 'Approved',
+  exchange_rejected: 'Rejected',
+  message_reviewed: 'Reviewed',
+  risk_tag_added: 'Risk Tagged',
+  user_monitored: 'Monitored',
+  vetting_verified: 'Verified',
+  vetting_rejected: 'Vetting Rejected',
+  user_banned: 'Banned',
+  user_unbanned: 'Unbanned',
+  balance_adjusted: 'Balance',
 };
 
-const actionLabelKey: Record<string, string> = {
-  exchange_approved: 'broker_dashboard.action_exchange_approved',
-  exchange_rejected: 'broker_dashboard.action_exchange_rejected',
-  message_reviewed: 'broker_dashboard.action_message_reviewed',
-  risk_tag_added: 'broker_dashboard.action_risk_tag_added',
-  user_monitored: 'broker_dashboard.action_user_monitored',
-  vetting_verified: 'broker_dashboard.action_vetting_verified',
-  vetting_rejected: 'broker_dashboard.action_vetting_rejected',
-  user_banned: 'broker_dashboard.action_user_banned',
-  user_unbanned: 'broker_dashboard.action_user_unbanned',
-  balance_adjusted: 'broker_dashboard.action_balance_adjusted',
+const actionVerbLabel: Record<string, string> = {
+  exchange_approved: 'approved an exchange',
+  exchange_rejected: 'rejected an exchange',
+  message_reviewed: 'reviewed a message',
+  risk_tag_added: 'tagged a listing',
+  user_monitored: 'placed a user under monitoring',
+  vetting_verified: 'verified a vetting record',
+  vetting_rejected: 'rejected a vetting record',
+  user_banned: 'banned a user',
+  user_unbanned: 'unbanned a user',
+  balance_adjusted: 'adjusted a balance',
 };
 
 function ActivityChip({ actionType }: { actionType: string }) {
-  const { t } = useTranslation('admin');
   const color: ChipColor = actionChipColorMap[actionType] ?? 'default';
-  const labelKey = actionChipLabelKey[actionType];
-  const label = labelKey ? t(labelKey) : actionType;
+  const label = actionChipLabel[actionType] ?? actionType.replace(/_/g, ' ');
   return (
     <Chip size="sm" variant="flat" color={color} className="shrink-0">
       {label}
@@ -340,22 +331,21 @@ function ActivityChip({ actionType }: { actionType: string }) {
   );
 }
 
-function formatActionLabel(actionType: string, t: TFunction): string {
-  const key = actionLabelKey[actionType];
-  return key ? t(key) : actionType.replace(/_/g, ' ');
+function formatActionLabel(actionType: string): string {
+  return actionVerbLabel[actionType] ?? actionType.replace(/_/g, ' ');
 }
 
-function formatTimeAgo(dateStr: string, t: TFunction): string {
+function formatTimeAgo(dateStr: string): string {
   const date = new Date(dateStr);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
-  if (diffMins < 1) return "Time Just Now";
-  if (diffMins < 60) return "Time Minutes Ago".replace('{{count}}', String(diffMins));
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
   const diffHrs = Math.floor(diffMins / 60);
-  if (diffHrs < 24) return "Time Hours Ago".replace('{{count}}', String(diffHrs));
+  if (diffHrs < 24) return `${diffHrs}h ago`;
   const diffDays = Math.floor(diffHrs / 24);
-  if (diffDays < 7) return "Time Days Ago".replace('{{count}}', String(diffDays));
+  if (diffDays < 7) return `${diffDays}d ago`;
   return date.toLocaleDateString();
 }
 
