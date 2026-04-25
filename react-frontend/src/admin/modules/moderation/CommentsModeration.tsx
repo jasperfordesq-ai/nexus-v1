@@ -24,6 +24,7 @@ import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import EyeOff from 'lucide-react/icons/eye-off';
 import Trash2 from 'lucide-react/icons/trash-2';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,6 +36,7 @@ import { adminSuper } from '@/admin/api/adminApi';
 import type { AdminComment } from '@/admin/api/types';
 
 export default function CommentsModeration() {
+  const { t } = useTranslation('admin');
   usePageTitle("Moderation");
 
   const CONTENT_TYPES = [

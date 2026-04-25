@@ -15,6 +15,7 @@ import {
   Input,
   Divider,
 } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';
 import type { GroupPolicy } from '@/admin/api/types';
@@ -81,6 +82,7 @@ function buildPolicySections(
 
 export default function GroupPolicies({
   isOpen, onClose, typeId, typeName }: GroupPoliciesProps) {
+  const { t } = useTranslation('admin');
   const { success, error } = useToast();
   const [loading, setLoading] = useState(true);
   const [policies, setPolicies] = useState<GroupPolicy[]>([]);
@@ -98,7 +100,7 @@ export default function GroupPolicies({
     } finally {
       setLoading(false);
     }
-  }, [typeId, error]);
+  }, [typeId, error, t]);
 
 
   useEffect(() => {

@@ -298,7 +298,7 @@ export function EventsPage() {
               color="primary"
               startContent={<Calendar className="h-3.5 w-3.5" aria-hidden="true" />}
             >
-              {t('count_pill', { count: totalCount.toLocaleString() })}
+              {t('count_pill', { count: totalCount })}
             </Chip>
           )}
           {isAuthenticated && (

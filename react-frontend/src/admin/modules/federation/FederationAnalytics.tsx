@@ -46,6 +46,7 @@ import {
   Tooltip as ReTooltip,
   CartesianGrid,
 } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts/ToastContext';
 import { adminFederation } from '../../api/adminApi';
@@ -78,7 +79,8 @@ interface AnalyticsOverview {
 }
 
 export function FederationAnalytics() {
-  usePageTitle("Federation Analytics");
+  const { t } = useTranslation('admin');
+  usePageTitle(t('federation.analytics.title', 'Federation Analytics'));
   const toast = useToast();
   const [data, setData] = useState<AnalyticsOverview | null>(null);
   const [loading, setLoading] = useState(true);

@@ -329,7 +329,7 @@ export function SafeguardingDashboard() {
     if (activeTab !== 'assignments') return assignments;
     if (assignmentFilter === 'active') return assignments.filter((a) => a.status === 'active');
     if (assignmentFilter === 'consented') {
-      return assignments.filter((a) => a.status === 'active' && a.consent_given_at);
+      return assignments.filter((a) => a.status === 'active' && a.consent_given);
     }
     return assignments;
   }, [assignments, assignmentFilter, activeTab]);

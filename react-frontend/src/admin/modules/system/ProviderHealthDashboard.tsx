@@ -21,7 +21,6 @@ import Shield from 'lucide-react/icons/shield';
 import Wifi from 'lucide-react/icons/wifi';
 import WifiOff from 'lucide-react/icons/wifi-off';
 import { useToast } from '@/contexts';
-import type { TFunction } from 'i18next';
 import { api } from '@/lib/api';
 
 interface ProviderHealthStats {
@@ -62,7 +61,7 @@ interface ProviderHealth {
 /**
  * Format a date string as relative time (e.g., "2 hours ago").
  */
-function formatRelativeTime(dateStr: string | null, t: TFunction): string {
+function formatRelativeTime(dateStr: string | null): string {
   if (!dateStr) return "Never";
 
   const date = new Date(dateStr);
@@ -297,26 +296,26 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
           <Tooltip content={stats.last_session_at || "No sessions yet found"}>
             <div className="flex items-center justify-between">
               <span>{"Last Session"}</span>
-              <span>{formatRelativeTime(stats.last_session_at, (key, opts) => t(key, opts))}</span>
+              <span>{formatRelativeTime(stats.last_session_at)}</span>
             </div>
           </Tooltip>
           <Tooltip content={stats.last_success_at || "No successful sessions found"}>
             <div className="flex items-center justify-between">
               <span>{"Last Success"}</span>
-              <span>{formatRelativeTime(stats.last_success_at, (key, opts) => t(key, opts))}</span>
+              <span>{formatRelativeTime(stats.last_success_at)}</span>
             </div>
           </Tooltip>
           <Tooltip content={stats.last_failure_at || "No failed sessions found"}>
             <div className="flex items-center justify-between">
               <span>{"Last Failure"}</span>
-              <span>{formatRelativeTime(stats.last_failure_at, (key, opts) => t(key, opts))}</span>
+              <span>{formatRelativeTime(stats.last_failure_at)}</span>
             </div>
           </Tooltip>
           {last_webhook && (
             <Tooltip content={`Last Webhook Event`}>
               <div className="flex items-center justify-between">
                 <span>{"Last Webhook"}</span>
-                <span>{formatRelativeTime(last_webhook.at, (key, opts) => t(key, opts))}</span>
+                <span>{formatRelativeTime(last_webhook.at)}</span>
               </div>
             </Tooltip>
           )}

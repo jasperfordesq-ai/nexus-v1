@@ -224,7 +224,7 @@ export function GroupsPage() {
               {totalCount != null && !isLoading && (
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-theme-default bg-theme-elevated px-2.5 py-1 text-xs font-medium text-theme-secondary">
                   <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" aria-hidden="true" />
-                  {t('count_pill', { count: totalCount.toLocaleString() })}
+                  {t('count_pill', { count: totalCount })}
                 </span>
               )}
             </div>

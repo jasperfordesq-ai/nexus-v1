@@ -3,10 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-export {};
+declare module 'lucide-react/icons/*' {
+  import type { LucideIcon } from 'lucide-react';
 
-declare module 'i18next' {
-  interface CustomTypeOptions {
-    defaultNS: 'common';
-  }
+  const icon: LucideIcon;
+  export default icon;
 }

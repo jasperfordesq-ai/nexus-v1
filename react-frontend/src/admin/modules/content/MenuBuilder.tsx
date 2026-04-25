@@ -54,6 +54,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { DynamicIcon } from '@/components/ui';
@@ -390,6 +391,7 @@ function DragItemCard({ item }: { item: MenuItemData }) {
 export function MenuBuilder() {
   const { id } = useParams<{ id: string }>();
   const isEdit = id !== undefined && id !== 'new';
+  const { t } = useTranslation('admin');
   usePageTitle("Content");
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
@@ -751,7 +753,7 @@ export function MenuBuilder() {
 
   const LOCATION_OPTIONS = getLocationOptions(t as TFunction);
   const TYPE_OPTIONS = getTypeOptions(t as TFunction);
-  const APP_ROUTES = useMemo(() => getAppRoutes(t as TFunction), []);
+  const APP_ROUTES = useMemo(() => getAppRoutes(t as TFunction), [t]);
 
   const parentOptions = menuItems
     .filter((i) => i.type === 'dropdown' && i.id !== selectedItemId)

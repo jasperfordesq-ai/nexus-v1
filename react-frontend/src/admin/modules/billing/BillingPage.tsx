@@ -33,7 +33,6 @@ import Receipt from 'lucide-react/icons/receipt';
 import Settings from 'lucide-react/icons/settings';
 import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
-import type { TFunction } from 'i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { billingApi, type SubscriptionDetails } from '../../api/billingApi';
@@ -56,7 +55,9 @@ function statusColor(status: string): 'success' | 'warning' | 'danger' | 'defaul
   }
 }
 
-function statusLabel(status: string, t: TFunction): string {
+type StatusLabelTranslator = (key: string, defaultValue: string) => string;
+
+function statusLabel(status: string, t: StatusLabelTranslator): string {
   switch (status) {
     case 'active':
       return t('billing.status_active', 'Active');
@@ -293,7 +294,7 @@ export function BillingPage() {
                       {t('billing.tier', 'Tier')} {subscription.plan_tier_level}
                     </Chip>
                     <Chip size="sm" variant="flat" color={statusColor(subscription.status)}>
-                      {statusLabel(subscription.status, (key) => t(key))}
+                      {statusLabel(subscription.status, (key, defaultValue) => t(key, defaultValue))}
                     </Chip>
                   </div>
 

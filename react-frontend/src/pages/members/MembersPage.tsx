@@ -594,7 +594,7 @@ export function MembersPage() {
                     </p>
                   ) : (
                     <p className="text-sm text-theme-muted">
-                      {t('members.results_count', { count: members.length.toLocaleString() })}
+                      {t('members.results_count', { count: members.length })}
                     </p>
                   )}
                   {debouncedQuery && (
