@@ -190,7 +190,7 @@ function TenantGuard({
 
   if (maintenanceMode && !isAdmin && !isAdminRoute && !isAuthRoute) {
     return (
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div>{t('loading')}</div>}>
         <MaintenancePage />
       </Suspense>
     );

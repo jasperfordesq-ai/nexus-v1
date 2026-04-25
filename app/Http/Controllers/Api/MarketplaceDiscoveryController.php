@@ -71,7 +71,7 @@ class MarketplaceDiscoveryController extends BaseApiController
         $this->ensureFeature();
         $userId = $request->user()->id;
 
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:100',
             'search_query' => 'nullable|string|max:255',
             'filters' => 'nullable|array',
@@ -85,7 +85,7 @@ class MarketplaceDiscoveryController extends BaseApiController
             'alert_channel' => 'nullable|in:email,push,both',
         ]);
 
-        $search = MarketplaceDiscoveryService::createSavedSearch($userId, $request->all());
+        $search = MarketplaceDiscoveryService::createSavedSearch($userId, $validated);
 
         return $this->respondWithData([
             'id' => $search->id,
@@ -147,13 +147,13 @@ class MarketplaceDiscoveryController extends BaseApiController
         $this->ensureFeature();
         $userId = $request->user()->id;
 
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:100',
             'description' => 'nullable|string|max:500',
             'is_public' => 'nullable|boolean',
         ]);
 
-        $collection = MarketplaceDiscoveryService::createCollection($userId, $request->all());
+        $collection = MarketplaceDiscoveryService::createCollection($userId, $validated);
 
         return $this->respondWithData([
             'id' => $collection->id,
@@ -181,13 +181,13 @@ class MarketplaceDiscoveryController extends BaseApiController
             return $this->respondWithError('RESOURCE_NOT_FOUND', 'Collection not found.', null, 404);
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'sometimes|required|string|max:100',
             'description' => 'nullable|string|max:500',
             'is_public' => 'nullable|boolean',
         ]);
 
-        $collection = MarketplaceDiscoveryService::updateCollection($collection, $request->all());
+        $collection = MarketplaceDiscoveryService::updateCollection($collection, $validated);
 
         return $this->respondWithData([
             'id' => $collection->id,

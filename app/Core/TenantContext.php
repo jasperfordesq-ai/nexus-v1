@@ -290,25 +290,15 @@ class TenantContext
                 self::$basePath = '/' . $tenant['slug'];
                 return;
             } else {
-                // STRICT ISOLATION VS CUSTOM PAGES
-                // Before 404ing, check if this is actually a known custom page for the Master Tenant
-                // (Only applies if we are falling back to ID 1)
-                // Sanitize segment to prevent path traversal (e.g. ../../etc/passwd)
-                $safeSegment = basename($firstSegment);
-                $masterPagePath = __DIR__ . '/../../views/tenants/master/pages/' . $safeSegment . '.php';
-                if ($safeSegment === $firstSegment && file_exists($masterPagePath)) {
-                    // It's a custom page, not a tenant. Fallthrough to Master Logic.
-                } else {
-                    // STRICT ISOLATION:
-                    // If path looks like a tenant slug but isn't one, and isn't a custom page...
-                    if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
-                        throw new \Symfony\Component\HttpKernel\Exception\HttpException(404, 'The requested tenant or page does not exist.');
-                    }
-                    http_response_code(404);
-                    // Optional: Render a simple 404 view or text
-                    echo "<h1>404 Not Found</h1><p>The requested tenant or page does not exist.</p>";
-                    exit;
+                // STRICT ISOLATION:
+                // If path looks like a tenant slug but isn't one, 404.
+                // (Legacy custom-page fallthrough removed — views/ is decommissioned.)
+                if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+                    throw new \Symfony\Component\HttpKernel\Exception\HttpException(404, 'The requested tenant or page does not exist.');
                 }
+                http_response_code(404);
+                echo "<h1>404 Not Found</h1><p>The requested tenant or page does not exist.</p>";
+                exit;
             }
         }
 
@@ -638,60 +628,16 @@ class TenantContext
     }
 
     /**
-     * Get list of custom pages for the current tenant.
-     * Scans views/tenants/{slug}/pages/ AND views/tenants/{slug}/{layout}/pages/
+     * Custom-pages helper retained for API compatibility but always returns
+     * empty: legacy views/ tree is decommissioned and the React frontend owns
+     * all UI now. Callers should treat an empty array as "no custom pages".
      *
-     * @param string|null $layout Optional layout name (e.g. 'modern')
-     * @return array List of pages like [['url' => '/slug', 'name' => 'Name']]
+     * @param string|null $layout Unused (kept for signature stability).
+     * @return array Always [].
      */
     public static function getCustomPages($layout = null)
     {
-        $tenant = self::get();
-        if (!$tenant || empty($tenant['slug'])) {
-            return [];
-        }
-
-        $baseDir = __DIR__ . '/../../views/tenants/' . $tenant['slug'];
-        $dirs = [];
-
-        // 1. Standard Custom Pages (Shared)
-        $dirs[] = $baseDir . '/pages';
-
-        // 2. Layout Specific Pages (Overrides)
-        if ($layout) {
-            $dirs[] = $baseDir . '/' . $layout . '/pages';
-        }
-
-        $pages = [];
-        $seen = [];
-
-        foreach ($dirs as $dir) {
-            if (!is_dir($dir)) continue;
-
-            $files = glob($dir . '/*.php');
-            foreach ($files as $file) {
-                $slug = basename($file, '.php');
-
-                // Avoid duplicates if a page exists in both (Layout takes precedence logically, but here we just list them)
-                if (isset($seen[$slug])) continue;
-                $seen[$slug] = true;
-
-                // Convert "custom-page" to "Custom Page"
-                $name = ucwords(str_replace('-', ' ', $slug));
-
-                $pages[] = [
-                    'url' => self::$basePath . '/' . $slug, // e.g. /hour-timebank/about
-                    'name' => $name
-                ];
-            }
-        }
-
-        // Sort alphabetically by name
-        usort($pages, function ($a, $b) {
-            return strcmp($a['name'], $b['name']);
-        });
-
-        return $pages;
+        return [];
     }
 
     /**

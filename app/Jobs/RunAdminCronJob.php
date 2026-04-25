@@ -12,6 +12,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class RunAdminCronJob implements ShouldQueue
 {
@@ -19,11 +20,25 @@ class RunAdminCronJob implements ShouldQueue
 
     public int $timeout = 300;
 
+    /** Retry on transient DB / network failures. */
+    public int $tries = 3;
+
+    /** Exponential-style backoff (seconds). */
+    public array $backoff = [30, 120, 300];
+
     public function __construct(private readonly string $method) {}
 
     public function handle(CronJobRunner $runner): void
     {
         $method = $this->method;
         $runner->$method();
+    }
+
+    public function failed(\Throwable $e): void
+    {
+        Log::error('RunAdminCronJob failed permanently', [
+            'method' => $this->method,
+            'error'  => $e->getMessage(),
+        ]);
     }
 }

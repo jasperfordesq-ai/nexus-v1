@@ -563,7 +563,7 @@ export function FederationMemberProfilePage() {
                         } else {
                           toast.error(
                             t('member_profile.tx_failed'),
-                            (res as { error?: string }).error || 'Unknown error'
+                            (res as { error?: string }).error || t('member_profile.tx_unknown_error')
                           );
                         }
                       } catch (err) {

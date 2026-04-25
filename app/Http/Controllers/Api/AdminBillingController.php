@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Services\StripeSubscriptionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -232,17 +233,23 @@ class AdminBillingController extends BaseApiController
             'updated_at'      => now(),
         ]);
 
-        // Email Jasper
+        // Email the platform owner. Recipient is the platform owner address —
+        // wrap in LocaleContext('en') so the strings always render in English
+        // regardless of the API caller's locale.
         try {
-            \Illuminate\Support\Facades\Mail::raw(
-                "Upgrade request from tenant: {$tenant} (ID: {$tenantId})\n\n" .
-                "Requested by: " . ($user->email ?? 'unknown') . "\n\n" .
-                "Message: " . ($message ?: '(none)'),
-                function ($m) use ($tenant) {
-                    $m->to('jasper@hour-timebank.ie')
-                      ->subject("Plan Upgrade Request — {$tenant}");
-                }
-            );
+            LocaleContext::withLocale('en', function () use ($tenant, $tenantId, $user, $message) {
+                $body = __('emails.billing_upgrade_request.body', [
+                    'tenant'    => $tenant,
+                    'tenant_id' => $tenantId,
+                    'email'     => $user->email ?? __('emails.billing_upgrade_request.unknown_email'),
+                    'message'   => $message ?: __('emails.billing_upgrade_request.no_message'),
+                ]);
+                $subject = __('emails.billing_upgrade_request.subject', ['tenant' => $tenant]);
+
+                \Illuminate\Support\Facades\Mail::raw($body, function ($m) use ($subject) {
+                    $m->to('jasper@hour-timebank.ie')->subject($subject);
+                });
+            });
         } catch (\Throwable $e) {
             Log::warning('BillingController: upgrade request email failed', ['error' => $e->getMessage()]);
         }

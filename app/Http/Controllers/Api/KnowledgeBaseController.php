@@ -128,6 +128,7 @@ class KnowledgeBaseController extends BaseApiController
         $articleArr = (array) $article;
 
         // Check published status
+        $isAdminPreview = false;
         if (! ($articleArr['is_published'] ?? true)) {
             $userId = $this->getOptionalUserId();
             if (! $userId) {
@@ -138,10 +139,16 @@ class KnowledgeBaseController extends BaseApiController
             if (! in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'])) {
                 return $this->respondWithError('NOT_FOUND', __('api.kb_article_not_found'), null, 404);
             }
+            $isAdminPreview = true;
         }
 
-        // Increment view count
-        DB::table('knowledge_base_articles')->where('id', $article->id)->where('tenant_id', \App\Core\TenantContext::getId())->increment('view_count');
+        // Increment view count — but skip for admin previews of unpublished
+        // articles and for HEAD requests, neither of which represent a real
+        // user view.
+        $isHead = strtoupper(request()->method()) === 'HEAD';
+        if (! $isAdminPreview && ! $isHead) {
+            DB::table('knowledge_base_articles')->where('id', $article->id)->where('tenant_id', \App\Core\TenantContext::getId())->increment('view_count');
+        }
 
         return $this->respondWithData($articleArr);
     }

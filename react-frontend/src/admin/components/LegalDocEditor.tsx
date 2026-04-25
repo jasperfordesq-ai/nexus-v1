@@ -703,7 +703,7 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
                 <RichTextPlugin
                   contentEditable={
                     <ContentEditable
-                      className="min-h-[400px] px-4 py-3 outline-none text-foreground"
+                      className="min-h-[400px] px-4 py-3 outline-none text-foreground rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
                       aria-label={"Content HTML"}
                     />
                   }

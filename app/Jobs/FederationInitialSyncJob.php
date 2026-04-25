@@ -41,6 +41,9 @@ class FederationInitialSyncJob implements ShouldQueue
     /** Retry on transient DB failures. */
     public int $tries = 3;
 
+    /** Exponential-style backoff (seconds). */
+    public array $backoff = [30, 120, 300];
+
     /** 5 minutes — may scan large tenant tables. */
     public int $timeout = 300;
 
@@ -111,6 +114,16 @@ class FederationInitialSyncJob implements ShouldQueue
             'active_listings'       => $listingCount,
             'partner_members'       => $partnerMemberCount,
             'partner_listings'      => $partnerListingCount,
+        ]);
+    }
+
+    public function failed(\Throwable $e): void
+    {
+        Log::error('FederationInitialSyncJob failed permanently', [
+            'partnership_id'    => $this->partnershipId,
+            'tenant_id'         => $this->tenantId,
+            'partner_tenant_id' => $this->partnerTenantId,
+            'error'             => $e->getMessage(),
         ]);
     }
 

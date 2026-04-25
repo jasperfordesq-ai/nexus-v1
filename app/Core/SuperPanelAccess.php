@@ -312,16 +312,12 @@ class SuperPanelAccess
                 'code' => 'SUPER_PANEL_ACCESS_DENIED'
             ]);
         } else {
-            if (file_exists(__DIR__ . '/../../views/errors/403-super-panel.php')) {
-                include __DIR__ . '/../../views/errors/403-super-panel.php';
-            } else {
-                echo '<!DOCTYPE html><html><head><title>Access Denied</title></head><body>';
-                echo '<h1>403 - Access Denied</h1>';
-                echo '<p>You do not have permission to access the Super Admin Panel.</p>';
-                echo '<p>Reason: ' . htmlspecialchars($access['reason']) . '</p>';
-                echo '<p><a href="' . TenantContext::getBasePath() . '/admin">Return to Platform Admin</a></p>';
-                echo '</body></html>';
-            }
+            echo '<!DOCTYPE html><html><head><title>Access Denied</title></head><body>';
+            echo '<h1>403 - Access Denied</h1>';
+            echo '<p>You do not have permission to access the Super Admin Panel.</p>';
+            echo '<p>Reason: ' . htmlspecialchars($access['reason']) . '</p>';
+            echo '<p><a href="' . TenantContext::getBasePath() . '/admin">Return to Platform Admin</a></p>';
+            echo '</body></html>';
         }
 
         exit;

@@ -289,7 +289,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     tokenManager.setRefreshToken(refresh_token);
 
     // Set Sentry user context
-    setSentryUser(user as unknown as User);
+    setSentryUser(user satisfies User);
     captureAuthEvent('biometric_login', user.id);
 
     wasAuthenticated.current = true;
@@ -311,7 +311,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } else {
         // Token works but profile fetch failed — set minimal user data
         setState({
-          user: user as unknown as User,
+          user: user satisfies User,
           status: 'authenticated',
           error: null,
           twoFactorToken: null,
@@ -320,7 +320,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     } catch {
       setState({
-        user: user as unknown as User,
+        user: user satisfies User,
         status: 'authenticated',
         error: null,
         twoFactorToken: null,

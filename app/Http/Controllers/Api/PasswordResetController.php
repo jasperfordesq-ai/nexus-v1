@@ -147,6 +147,7 @@ class PasswordResetController extends BaseApiController
 
         // Update the password — scope by user ID to prevent cross-tenant updates
         $email = $resetRecord['email'];
+        $tokenTenantId = isset($resetRecord['tenant_id']) ? (int) $resetRecord['tenant_id'] : null;
         $hashedPassword = password_hash($password, PASSWORD_ARGON2ID);
 
         // Find the user globally — the reset token validates identity, and the user
@@ -162,19 +163,38 @@ class PasswordResetController extends BaseApiController
             );
         }
 
+        // Defence-in-depth: if the reset token was created with an explicit tenant,
+        // it must match the user's tenant. Tokens created before this column was
+        // backfilled (tenant_id IS NULL) are still accepted for backward compat.
+        if ($tokenTenantId !== null && (int) $user['tenant_id'] !== $tokenTenantId) {
+            return $this->respondWithError(
+                ApiErrorCodes::AUTH_TOKEN_INVALID,
+                __('api.invalid_reset_token'),
+                'token',
+                400
+            );
+        }
+
         // Atomically update password, delete reset tokens, and revoke session tokens
-        DB::transaction(function () use ($hashedPassword, $user, $email) {
+        DB::transaction(function () use ($hashedPassword, $user, $email, $tokenTenantId) {
             // Update by user ID AND tenant_id — defense-in-depth against cross-tenant updates
             DB::update(
                 "UPDATE users SET password_hash = ? WHERE id = ? AND tenant_id = ?",
                 [$hashedPassword, $user['id'], $user['tenant_id']]
             );
 
-            // Delete all reset tokens for this email
-            DB::delete(
-                "DELETE FROM password_resets WHERE email = ?",
-                [$email]
-            );
+            // Delete reset tokens for this (email, tenant) pair only.
+            if ($tokenTenantId !== null) {
+                DB::delete(
+                    "DELETE FROM password_resets WHERE email = ? AND tenant_id <=> ?",
+                    [$email, $tokenTenantId]
+                );
+            } else {
+                DB::delete(
+                    "DELETE FROM password_resets WHERE email = ? AND tenant_id IS NULL",
+                    [$email]
+                );
+            }
 
             // Invalidate all existing refresh tokens for security
             $this->invalidateUserTokens((int)$user['id']);
@@ -254,16 +274,26 @@ class PasswordResetController extends BaseApiController
         // every non-expired record with bcrypt's password_verify().
         $hashedToken = hash('sha256', $token);
 
-        // Delete any existing tokens for this email
-        DB::delete(
-            "DELETE FROM password_resets WHERE email = ?",
-            [$email]
-        );
+        $userTenantId = isset($user['tenant_id']) ? (int) $user['tenant_id'] : null;
 
-        // Store the hashed token
+        // Delete any existing tokens for this (email, tenant) pair so a request
+        // from one tenant cannot clobber a pending token in another.
+        if ($userTenantId !== null) {
+            DB::delete(
+                "DELETE FROM password_resets WHERE email = ? AND tenant_id <=> ?",
+                [$email, $userTenantId]
+            );
+        } else {
+            DB::delete(
+                "DELETE FROM password_resets WHERE email = ? AND tenant_id IS NULL",
+                [$email]
+            );
+        }
+
+        // Store the hashed token together with the originating tenant.
         DB::insert(
-            "INSERT INTO password_resets (email, token, created_at) VALUES (?, ?, NOW())",
-            [$email, $hashedToken]
+            "INSERT INTO password_resets (email, tenant_id, token, created_at) VALUES (?, ?, ?, NOW())",
+            [$email, $userTenantId, $hashedToken]
         );
 
         // Build reset URL — include tenant base path for correct routing

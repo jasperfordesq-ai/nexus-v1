@@ -2376,58 +2376,99 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithError('TRANSACTIONS_NOT_ALLOWED', __('api.fed_partner_no_transactions'), null, 403);
         }
 
+        // Saga pattern:
+        //   1. Atomically debit local balance + insert pending tx record (committed).
+        //   2. Call external API with the local tx id as idempotency key.
+        //   3. On success, mark tx 'completed'.
+        //   4. On definitive failure, refund and mark tx 'failed' (compensating action).
+        //   5. On unknown / network error, leave tx 'pending' for reconciliation.
+        // This prevents the prior asymmetry where external success could orphan
+        // remote state if a later local DB write failed.
+
+        $txId = null;
         DB::beginTransaction();
         try {
-            // Lock sender row and check balance BEFORE calling external API
-            $senderBalance = DB::selectOne("SELECT balance FROM users WHERE id = ? AND tenant_id = ? FOR UPDATE", [$userId, $tenantId]);
-            if (!$senderBalance || $senderBalance->balance < $amount) {
+            // Atomic conditional debit — only deducts if balance >= amount.
+            $deducted = DB::update(
+                "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
+                [$amount, $userId, $tenantId, $amount]
+            );
+            if ($deducted === 0) {
                 DB::rollBack();
                 return $this->respondWithError('INSUFFICIENT_BALANCE', __('api.fed_insufficient_balance'), null, 400);
             }
 
-            // Call external API BEFORE deducting — if it fails, nothing to rollback
+            DB::insert(
+                "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at)
+                 VALUES (?, ?, ?, ?, ?, 'pending', 1, ?, ?, NOW())",
+                [$tenantId, $userId, $realReceiverId, $amount, $description, $tenantId, $externalPartnerId]
+            );
+            $txId = (int) DB::getPdo()->lastInsertId();
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            \Illuminate\Support\Facades\Log::warning("FederationV2::sendExternalTransaction local-stage error: " . $e->getMessage());
+            return $this->respondWithError('TRANSACTION_FAILED', __('api.fed_transaction_failed'), null, 500);
+        }
+
+        // Local debit committed — now call external partner.
+        try {
             $result = \App\Services\FederationExternalApiClient::createTransaction($externalPartnerId, [
                 'sender_id' => $userId,
                 'recipient_id' => $realReceiverId,
                 'amount' => $amount,
                 'description' => $description,
+                'idempotency_key' => 'nexus-tx-' . $tenantId . '-' . $txId,
             ]);
-
-            if (!($result['success'] ?? false)) {
-                DB::rollBack();
-                $errorMsg = $result['error'] ?? __('api.fed_external_partner_rejected');
-                return $this->respondWithError('EXTERNAL_TX_FAILED', $errorMsg, null, 422);
-            }
-
-            // External API succeeded — now deduct balance and record locally
-            DB::update("UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ?", [$amount, $userId, $tenantId]);
-
-            $externalTxId = $result['data']['transaction_id'] ?? null;
-
-            // Store the remote receiver's real ID (not 0) for data integrity.
-            // FK constraint dropped for federation support.
-            DB::insert(
-                "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at)
-                 VALUES (?, ?, ?, ?, ?, 'completed', 1, ?, ?, NOW())",
-                [$tenantId, $userId, $realReceiverId, $amount, $description, $tenantId, $externalPartnerId]
+        } catch (\Throwable $e) {
+            // Unknown state — partner may or may not have processed the tx.
+            // Leave row 'pending' for the reconciliation job to resolve.
+            \Illuminate\Support\Facades\Log::warning(
+                "FederationV2::sendExternalTransaction unknown-state for tx {$txId}: " . $e->getMessage()
             );
-            $txId = (int) DB::getPdo()->lastInsertId();
-            DB::commit();
-
-            $this->federationAuditService->log('external_transaction_sent', $tenantId, null, $userId,
-                ['transaction_id' => $txId, 'external_tx_id' => $externalTxId, 'partner_id' => $externalPartnerId, 'amount' => $amount]);
-
+            $this->federationAuditService->log('external_transaction_pending', $tenantId, null, $userId,
+                ['transaction_id' => $txId, 'partner_id' => $externalPartnerId, 'amount' => $amount, 'reason' => 'network_error']);
             return $this->respondWithData([
                 'transaction_id' => $txId,
-                'status' => 'completed',
+                'status' => 'pending',
                 'amount' => $amount,
                 'is_external' => true,
                 'external_partner' => $partner['name'] ?? 'External Partner',
-            ], null, 201);
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            \Illuminate\Support\Facades\Log::warning("FederationV2::sendExternalTransaction error: " . $e->getMessage());
-            return $this->respondWithError('TRANSACTION_FAILED', __('api.fed_transaction_failed'), null, 500);
+            ], null, 202);
         }
+
+        if (!($result['success'] ?? false)) {
+            // Definitive partner rejection — issue compensating refund.
+            try {
+                DB::transaction(function () use ($userId, $tenantId, $amount, $txId) {
+                    DB::update(
+                        "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
+                        [$amount, $userId, $tenantId]
+                    );
+                    DB::update("UPDATE transactions SET status = 'failed' WHERE id = ?", [$txId]);
+                });
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error(
+                    "FederationV2::sendExternalTransaction compensating-refund failed for tx {$txId}: " . $e->getMessage()
+                );
+            }
+            $errorMsg = $result['error'] ?? __('api.fed_external_partner_rejected');
+            return $this->respondWithError('EXTERNAL_TX_FAILED', $errorMsg, null, 422);
+        }
+
+        // Partner accepted — finalise local record.
+        $externalTxId = $result['data']['transaction_id'] ?? null;
+        DB::update("UPDATE transactions SET status = 'completed' WHERE id = ?", [$txId]);
+
+        $this->federationAuditService->log('external_transaction_sent', $tenantId, null, $userId,
+            ['transaction_id' => $txId, 'external_tx_id' => $externalTxId, 'partner_id' => $externalPartnerId, 'amount' => $amount]);
+
+        return $this->respondWithData([
+            'transaction_id' => $txId,
+            'status' => 'completed',
+            'amount' => $amount,
+            'is_external' => true,
+            'external_partner' => $partner['name'] ?? 'External Partner',
+        ], null, 201);
     }
 }

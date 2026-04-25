@@ -811,6 +811,33 @@ class FederationController extends BaseApiController
             return $this->fedError(403, 'No active credit agreement between tenants', 'NO_CREDIT_AGREEMENT');
         }
 
+        // Idempotency: reject duplicate retries. Accept a client-supplied
+        // idempotency_key; otherwise derive a deterministic key from the
+        // request payload so identical retries are still de-duplicated.
+        $clientKey = isset($input['idempotency_key']) && is_string($input['idempotency_key'])
+            ? substr($input['idempotency_key'], 0, 96)
+            : hash('sha256', json_encode([
+                $partnerTenantId,
+                $senderId,
+                (int) $recipient['id'],
+                $amount,
+                $input['description'] ?? '',
+            ]));
+        $nonce = substr('tx:' . $partnerTenantId . ':' . $clientKey, 0, 128);
+        $partnerKeyId = $isExternal ? (int) ($auth['platform_id'] ?? 0) : 0;
+        try {
+            $inserted = DB::affectingStatement(
+                "INSERT IGNORE INTO federation_webhook_nonces (partner_id, nonce, seen_at) VALUES (?, ?, NOW())",
+                [$partnerKeyId, $nonce]
+            );
+            if ($inserted === 0) {
+                return $this->fedError(409, 'Duplicate transaction (idempotency replay)', 'DUPLICATE_REQUEST');
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('FederationV1::createTransaction idempotency check failed: ' . $e->getMessage());
+            // Soft-fail open: continue rather than block transactions on dedup-table errors.
+        }
+
         // Fix 1: Wrap transaction creation in DB transaction for atomicity
         DB::beginTransaction();
         try {

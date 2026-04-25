@@ -506,5 +506,11 @@
   "dispute_resolved_preview": "Your exchange has been successfully completed",
   "dispute_resolved_body": "Your exchange has been reviewed and a final agreement of :hours hours has been reached.",
   "dispute_resolved_hours_label": "Final Hours Agreed",
-  "dispute_resolved_cta": "View Exchange"
+  "dispute_resolved_cta": "View Exchange",
+  "billing_upgrade_request": {
+    "subject": "Plan Upgrade Request — :tenant",
+    "body": "Upgrade request from tenant: :tenant (ID: :tenant_id)\n\nRequested by: :email\n\nMessage: :message",
+    "unknown_email": "unknown",
+    "no_message": "(none)"
+  }
 }

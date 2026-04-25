@@ -6,6 +6,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * SUPERSEDED — this migration is kept for historical record only.
@@ -21,6 +22,12 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Fast-path: if the schema is already loaded (sentinel: users table),
+        // skip the dump replay entirely. Avoids parsing 600KB of SQL on re-runs.
+        if (Schema::hasTable('users')) {
+            return;
+        }
+
         $sqlPath = database_path('schema/nexus-baseline.sql');
 
         if (! file_exists($sqlPath)) {
