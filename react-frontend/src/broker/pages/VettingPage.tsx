@@ -484,12 +484,13 @@ export function VettingRecords() {
       if (res?.success && res.data) {
         const d = res.data as { processed: number; failed: number };
         const label = bulkAction === 'verify' ? 'verified' : bulkAction === 'reject' ? 'rejected' : 'deleted';
-        toast.success(`Bulk Action succeeded`);
+        const failedSuffix = d.failed > 0 ? `, ${d.failed} failed` : '';
+        toast.success(`${d.processed} record${d.processed === 1 ? '' : 's'} ${label}${failedSuffix}`);
         setSelectedIds(new Set());
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || `Bulk Action failed`);
+        toast.error(res?.error || `Bulk action failed`);
       }
     } catch {
       toast.error(`Bulk Action failed`);

@@ -47,7 +47,7 @@ class AdminUsersController extends BaseApiController
     /** GET /api/v2/admin/users */
     public function index(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         $page = $this->queryInt('page', 1, 1);
@@ -185,7 +185,7 @@ class AdminUsersController extends BaseApiController
     /** GET /api/v2/admin/users/{id} */
     public function show(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         $user = DB::selectOne(
@@ -520,7 +520,7 @@ class AdminUsersController extends BaseApiController
     /** POST /api/v2/admin/users/{id}/approve */
     public function approve(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         $user = User::findById($id, true);
@@ -562,7 +562,7 @@ class AdminUsersController extends BaseApiController
     /** POST /api/v2/admin/users/{id}/suspend */
     public function suspend($id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
         $id = (int) $id;
 
@@ -685,7 +685,7 @@ class AdminUsersController extends BaseApiController
     /** POST /api/v2/admin/users/{id}/reactivate */
     public function reactivate($id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
         $id = (int) $id;
 

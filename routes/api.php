@@ -967,19 +967,25 @@ Route::get('/v2/admin/users/{id}/verification-badges', [\App\Http\Controllers\Ap
 Route::get('/v2/admin/dashboard/stats', [\App\Http\Controllers\Api\AdminDashboardController::class, 'stats']);
 Route::get('/v2/admin/dashboard/trends', [\App\Http\Controllers\Api\AdminDashboardController::class, 'trends']);
 Route::get('/v2/admin/dashboard/activity', [\App\Http\Controllers\Api\AdminDashboardController::class, 'activity']);
-Route::get('/v2/admin/users', [\App\Http\Controllers\Api\AdminUsersController::class, 'index']);
+// Broker-or-admin: list/show/approve/suspend/reactivate are used by the broker
+// panel's Members & Onboarding pages (and the badge fetch on the broker
+// sidebar). Other user-management endpoints (store, update, destroy, ban,
+// 2fa reset, badges, password) remain admin-only.
+Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function () {
+    Route::get('/v2/admin/users', [\App\Http\Controllers\Api\AdminUsersController::class, 'index']);
+    Route::get('/v2/admin/users/{id}', [\App\Http\Controllers\Api\AdminUsersController::class, 'show'])->whereNumber('id');
+    Route::post('/v2/admin/users/{id}/approve', [\App\Http\Controllers\Api\AdminUsersController::class, 'approve']);
+    Route::post('/v2/admin/users/{id}/suspend', [\App\Http\Controllers\Api\AdminUsersController::class, 'suspend']);
+    Route::post('/v2/admin/users/{id}/reactivate', [\App\Http\Controllers\Api\AdminUsersController::class, 'reactivate']);
+});
 Route::post('/v2/admin/users', [\App\Http\Controllers\Api\AdminUsersController::class, 'store']);
 Route::post('/v2/admin/users/import', [\App\Http\Controllers\Api\AdminUsersController::class, 'import']);
 Route::get('/v2/admin/users/import/template', [\App\Http\Controllers\Api\AdminUsersController::class, 'importTemplate']);
-Route::get('/v2/admin/users/{id}', [\App\Http\Controllers\Api\AdminUsersController::class, 'show']);
 Route::put('/v2/admin/users/{id}', [\App\Http\Controllers\Api\AdminUsersController::class, 'update']);
 Route::delete('/v2/admin/users/{id}', [\App\Http\Controllers\Api\AdminUsersController::class, 'destroy']);
 Route::post('/v2/admin/users/bulk-approve', [\App\Http\Controllers\Api\AdminUsersController::class, 'bulkApprove']);
 Route::post('/v2/admin/users/bulk-suspend', [\App\Http\Controllers\Api\AdminUsersController::class, 'bulkSuspend']);
-Route::post('/v2/admin/users/{id}/approve', [\App\Http\Controllers\Api\AdminUsersController::class, 'approve']);
-Route::post('/v2/admin/users/{id}/suspend', [\App\Http\Controllers\Api\AdminUsersController::class, 'suspend']);
 Route::post('/v2/admin/users/{id}/ban', [\App\Http\Controllers\Api\AdminUsersController::class, 'ban']);
-Route::post('/v2/admin/users/{id}/reactivate', [\App\Http\Controllers\Api\AdminUsersController::class, 'reactivate']);
 Route::post('/v2/admin/users/{id}/reset-2fa', [\App\Http\Controllers\Api\AdminUsersController::class, 'reset2fa']);
 Route::post('/v2/admin/users/badges/recheck-all', [\App\Http\Controllers\Api\AdminGamificationController::class, 'recheckAll']);
 Route::post('/v2/admin/users/{id}/badges', [\App\Http\Controllers\Api\AdminUsersController::class, 'addBadge']);
@@ -990,7 +996,11 @@ Route::get('/v2/admin/users/{id}/consents', [\App\Http\Controllers\Api\AdminUser
 Route::post('/v2/admin/users/{id}/password', [\App\Http\Controllers\Api\AdminUsersController::class, 'setPassword']);
 Route::post('/v2/admin/users/{id}/send-password-reset', [\App\Http\Controllers\Api\AdminUsersController::class, 'sendPasswordReset']);
 Route::post('/v2/admin/users/{id}/send-welcome-email', [\App\Http\Controllers\Api\AdminUsersController::class, 'sendWelcomeEmail']);
-Route::get('/v2/admin/listings', [\App\Http\Controllers\Api\AdminListingsController::class, 'index']);
+// Listings index is used by the broker panel's Risk Tags create-modal
+// autocomplete. Other listing-management endpoints stay admin-only.
+Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function () {
+    Route::get('/v2/admin/listings', [\App\Http\Controllers\Api\AdminListingsController::class, 'index']);
+});
 Route::get('/v2/admin/listings/featured', [\App\Http\Controllers\Api\AdminListingsController::class, 'featured']);
 Route::get('/v2/admin/listings/stats', [\App\Http\Controllers\Api\AdminListingsController::class, 'stats']);
 Route::get('/v2/admin/listings/moderation-queue', [\App\Http\Controllers\Api\AdminListingsController::class, 'moderationQueue']);
@@ -1698,10 +1708,14 @@ Route::post('/v2/admin/super/billing/grace-period', [\App\Http\Controllers\Api\A
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
 Route::get('/v2/admin/crm/dashboard', [\App\Http\Controllers\Api\AdminCrmController::class, 'dashboard']);
-Route::get('/v2/admin/crm/funnel', [\App\Http\Controllers\Api\AdminCrmController::class, 'funnel']);
+// Broker-or-admin: funnel + member notes are used by the broker panel's
+// Members and Onboarding pages.
+Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function () {
+    Route::get('/v2/admin/crm/funnel', [\App\Http\Controllers\Api\AdminCrmController::class, 'funnel']);
+    Route::get('/v2/admin/crm/notes', [\App\Http\Controllers\Api\AdminCrmController::class, 'listNotes']);
+    Route::post('/v2/admin/crm/notes', [\App\Http\Controllers\Api\AdminCrmController::class, 'createNote']);
+});
 Route::get('/v2/admin/crm/admins', [\App\Http\Controllers\Api\AdminCrmController::class, 'listAdmins']);
-Route::get('/v2/admin/crm/notes', [\App\Http\Controllers\Api\AdminCrmController::class, 'listNotes']);
-Route::post('/v2/admin/crm/notes', [\App\Http\Controllers\Api\AdminCrmController::class, 'createNote']);
 Route::put('/v2/admin/crm/notes/{id}', [\App\Http\Controllers\Api\AdminCrmController::class, 'updateNote']);
 Route::delete('/v2/admin/crm/notes/{id}', [\App\Http\Controllers\Api\AdminCrmController::class, 'deleteNote']);
 Route::get('/v2/admin/crm/tasks', [\App\Http\Controllers\Api\AdminCrmController::class, 'listTasks']);

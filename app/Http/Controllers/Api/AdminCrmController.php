@@ -126,7 +126,7 @@ class AdminCrmController extends BaseApiController
 
     public function funnel(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = TenantContext::getId();
 
         $registered = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->cnt;
@@ -196,7 +196,7 @@ class AdminCrmController extends BaseApiController
     /** GET /api/v2/admin/crm/notes */
     public function listNotes(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = TenantContext::getId();
 
         $userId = $this->queryInt('user_id');
@@ -252,7 +252,7 @@ class AdminCrmController extends BaseApiController
     /** POST /api/v2/admin/crm/notes */
     public function createNote(): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = TenantContext::getId();
 
         $userId = (int) $this->input('user_id', 0);

@@ -39,7 +39,7 @@ class AdminListingsController extends BaseApiController
     /** GET /api/v2/admin/listings */
     public function index(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         $page = $this->queryInt('page', 1, 1);

@@ -112,6 +112,12 @@ export default function MembersPage() {
   // Filter / pagination state
   const [activeTab, setActiveTab] = useState<StatusTab>('all');
   const [search, setSearch] = useState('');
+  // Debounce search so typing doesn't fire a network request on every keystroke.
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  useEffect(() => {
+    const handle = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(handle);
+  }, [search]);
   const [page, setPage] = useState(1);
 
   // Action modal state
@@ -138,7 +144,7 @@ export default function MembersPage() {
         limit: PAGE_SIZE,
       };
       if (activeTab !== 'all') params.status = activeTab;
-      if (search.trim()) params.search = search.trim();
+      if (debouncedSearch.trim()) params.search = debouncedSearch.trim();
 
       const res = await adminUsers.list(params as Parameters<typeof adminUsers.list>[0]);
       if (res.success && res.data) {
@@ -157,7 +163,7 @@ export default function MembersPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, activeTab, search, toast, t]);
+  }, [page, activeTab, debouncedSearch, toast, t]);
 
   useEffect(() => {
     fetchMembers();
@@ -419,26 +425,31 @@ export default function MembersPage() {
                 >
                   {t('members.check_vetting')}
                 </DropdownItem>
-                <DropdownItem
-                  key="status-action"
-                  startContent={
-                    user.status === 'pending' ? <UserCheck size={14} /> :
-                    user.status === 'active' ? <UserX size={14} /> :
-                    <RotateCcw size={14} />
-                  }
-                  color={user.status === 'active' ? 'danger' : user.status === 'pending' ? 'success' : 'default'}
-                  className={user.status === 'active' ? 'text-danger' : user.status === 'pending' ? 'text-success' : ''}
-                  onPress={() => {
-                    if (user.status === 'pending') setConfirmAction({ type: 'approve', user });
-                    else if (user.status === 'active') setConfirmAction({ type: 'suspend', user });
-                    else if (user.status === 'suspended') handleReactivate(user);
-                  }}
-                >
-                  {user.status === 'pending' ? t('members.approve') :
-                   user.status === 'active' ? t('members.suspend') :
-                   user.status === 'suspended' ? t('members.reactivate') :
-                   t('members.view_profile')}
-                </DropdownItem>
+                {/* Status-action item is omitted entirely for banned members
+                    (broker can't unban — that's an admin-only action). For
+                    other statuses we render an action that maps to the
+                    appropriate state transition. */}
+                {user.status !== 'banned' ? (
+                  <DropdownItem
+                    key="status-action"
+                    startContent={
+                      user.status === 'pending' ? <UserCheck size={14} /> :
+                      user.status === 'active' ? <UserX size={14} /> :
+                      <RotateCcw size={14} />
+                    }
+                    color={user.status === 'active' ? 'danger' : user.status === 'pending' ? 'success' : 'default'}
+                    className={user.status === 'active' ? 'text-danger' : user.status === 'pending' ? 'text-success' : ''}
+                    onPress={() => {
+                      if (user.status === 'pending') setConfirmAction({ type: 'approve', user });
+                      else if (user.status === 'active') setConfirmAction({ type: 'suspend', user });
+                      else if (user.status === 'suspended') handleReactivate(user);
+                    }}
+                  >
+                    {user.status === 'pending' ? t('members.approve') :
+                     user.status === 'active' ? t('members.suspend') :
+                     t('members.reactivate')}
+                  </DropdownItem>
+                ) : null}
               </DropdownMenu>
             </Dropdown>
           </div>
