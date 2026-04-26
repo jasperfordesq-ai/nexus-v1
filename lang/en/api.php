@@ -1730,4 +1730,7 @@ return [
 
     // Billing grace period
     'grace_period_days_invalid'                  => 'Days must be between 1 and 365.',
+
+    // Caring Community workflow policy
+    'caring_self_log_disabled'                   => 'Member self-logging is disabled for this community. A coordinator must record or approve these hours.',
 ];

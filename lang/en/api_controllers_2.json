@@ -133,6 +133,7 @@
   "volunteer.no_fields_to_update": "No fields to update",
   "volunteer.signed_up_for_shift": "Successfully signed up for shift",
   "volunteer.hours_logged_pending": "Hours logged successfully, pending verification",
+  "volunteer.hours_logged_approved": "Hours logged successfully and approved",
   "volunteer.review_submitted": "Review submitted successfully",
   "volunteer_wellbeing.emergency_alert_sent": "Emergency alert sent",
   "wallet.donation_successful": "Donation successful. Thank you!",

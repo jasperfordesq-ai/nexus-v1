@@ -414,7 +414,13 @@ class VolunteerController extends BaseApiController
             $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
-        return $this->respondWithData(['id' => $logId, 'status' => 'pending', 'message' => __('api_controllers_2.volunteer.hours_logged_pending')], null, 201);
+
+        $status = VolunteerService::getLastLogStatus();
+        $message = $status === 'approved'
+            ? __('api_controllers_2.volunteer.hours_logged_approved')
+            : __('api_controllers_2.volunteer.hours_logged_pending');
+
+        return $this->respondWithData(['id' => $logId, 'status' => $status, 'message' => $message], null, 201);
     }
 
     public function myHours(): JsonResponse

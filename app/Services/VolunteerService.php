@@ -18,6 +18,7 @@ use App\Models\VolShift;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * VolunteerService — Laravel DI-based service for volunteering operations.
@@ -394,12 +395,20 @@ class VolunteerService
     /** Cached decline status value for vol_logs (declined vs rejected schema variants) */
     private static ?string $declineStatusValue = null;
 
+    /** Status assigned by the last successful hour-log operation. */
+    private static string $lastLogStatus = 'pending';
+
     /**
      * Get errors from the last operation.
      */
     public static function getErrors(): array
     {
         return self::$errors;
+    }
+
+    public static function getLastLogStatus(): string
+    {
+        return self::$lastLogStatus;
     }
 
     // ========================================
@@ -950,7 +959,18 @@ class VolunteerService
     public static function logHours(int $userId, array $data): ?int
     {
         self::$errors = [];
+        self::$lastLogStatus = 'pending';
         $tenantId = self::getTenantId();
+        $policy = app(CaringCommunityWorkflowPolicyService::class)->get($tenantId);
+
+        if (!$policy['allow_member_self_log'] && !self::canBypassCaringWorkflowPolicy($userId, $tenantId)) {
+            self::$errors[] = [
+                'code' => 'FORBIDDEN',
+                'message' => __('api.caring_self_log_disabled'),
+                'field' => 'hours',
+            ];
+            return null;
+        }
 
         if (empty($data['organization_id'])) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Organization is required', 'field' => 'organization_id'];
@@ -1015,9 +1035,10 @@ class VolunteerService
         }
 
         try {
+            $status = self::resolveCaringHourLogStatus($userId, $tenantId, $policy);
             DB::insert(
                 "INSERT INTO vol_logs (tenant_id, user_id, organization_id, opportunity_id, date_logged, hours, description, status, created_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', NOW())",
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())",
                 [
                     $tenantId,
                     $userId,
@@ -1026,8 +1047,11 @@ class VolunteerService
                     $data['date'],
                     (float) $data['hours'],
                     $data['description'] ?? '',
+                    $status,
                 ]
             );
+
+            self::$lastLogStatus = $status;
 
             return (int) DB::getPdo()->lastInsertId();
         } catch (\Exception $e) {
@@ -1692,6 +1716,63 @@ class VolunteerService
         );
 
         return $orgRole && in_array($orgRole->role, ['owner', 'admin'], true);
+    }
+
+    private static function resolveCaringHourLogStatus(int $userId, int $tenantId, array $policy): string
+    {
+        if (!$policy['approval_required']) {
+            return 'approved';
+        }
+
+        if ($policy['auto_approve_trusted_reviewers'] && self::hasCaringWorkflowPermission($userId, $tenantId, 'volunteering.hours.review')) {
+            return 'approved';
+        }
+
+        return 'pending';
+    }
+
+    private static function canBypassCaringWorkflowPolicy(int $userId, int $tenantId): bool
+    {
+        $user = DB::selectOne(
+            'SELECT role, is_admin, is_super_admin, is_tenant_super_admin, is_god FROM users WHERE id = ? AND tenant_id = ?',
+            [$userId, $tenantId]
+        );
+
+        if ($user && (
+            in_array((string) $user->role, ['admin', 'tenant_admin', 'super_admin'], true)
+            || (int) ($user->is_admin ?? 0) === 1
+            || (int) ($user->is_super_admin ?? 0) === 1
+            || (int) ($user->is_tenant_super_admin ?? 0) === 1
+            || (int) ($user->is_god ?? 0) === 1
+        )) {
+            return true;
+        }
+
+        return self::hasCaringWorkflowPermission($userId, $tenantId, 'volunteering.hours.review');
+    }
+
+    private static function hasCaringWorkflowPermission(int $userId, int $tenantId, string $permission): bool
+    {
+        if (!Schema::hasTable('user_roles') || !Schema::hasTable('role_permissions') || !Schema::hasTable('permissions')) {
+            return false;
+        }
+
+        $match = DB::selectOne(
+            "SELECT 1
+             FROM user_roles ur
+             INNER JOIN role_permissions rp ON rp.role_id = ur.role_id
+             INNER JOIN permissions p ON p.id = rp.permission_id
+             WHERE ur.user_id = ?
+               AND p.name = ?
+               AND (ur.tenant_id = ? OR ur.tenant_id IS NULL)
+               AND (rp.tenant_id = ? OR rp.tenant_id IS NULL)
+               AND (p.tenant_id = ? OR p.tenant_id IS NULL)
+               AND (ur.expires_at IS NULL OR ur.expires_at > NOW())
+             LIMIT 1",
+            [$userId, $permission, $tenantId, $tenantId, $tenantId]
+        );
+
+        return $match !== null;
     }
 
     /**
